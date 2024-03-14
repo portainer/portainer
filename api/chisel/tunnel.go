@@ -9,6 +9,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	"github.com/portainer/portainer/pkg/libcrypto"
 
@@ -73,27 +74,22 @@ func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (portainer
 
 	tunnel := service.GetTunnelDetails(endpoint.ID)
 
-	if tunnel.Status == portainer.EdgeAgentActive {
+	switch tunnel.Status {
+	case portainer.EdgeAgentActive:
 		// update the LastActivity
 		service.SetTunnelStatusToActive(endpoint.ID)
-	}
 
-	if tunnel.Status == portainer.EdgeAgentIdle || tunnel.Status == portainer.EdgeAgentManagementRequired {
-		err := service.SetTunnelStatusToRequired(endpoint.ID)
-		if err != nil {
+	case portainer.EdgeAgentIdle, portainer.EdgeAgentManagementRequired:
+		if err := service.SetTunnelStatusToRequired(endpoint.ID); err != nil {
 			return portainer.TunnelDetails{}, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
 		}
 
-		if endpoint.EdgeCheckinInterval == 0 {
-			settings, err := service.dataStore.Settings().Settings()
-			if err != nil {
-				return portainer.TunnelDetails{}, fmt.Errorf("failed fetching settings from db: %w", err)
-			}
-
-			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		checkinInterval, err := edge.GetEffectiveCheckinInterval(service.dataStore, endpoint)
+		if err != nil {
+			return portainer.TunnelDetails{}, fmt.Errorf("failed fetching checkin interval: %w", err)
 		}
 
-		time.Sleep(2 * time.Duration(endpoint.EdgeCheckinInterval) * time.Second)
+		time.Sleep(2 * time.Duration(checkinInterval) * time.Second)
 	}
 
 	return service.GetTunnelDetails(endpoint.ID), nil
@@ -147,37 +143,37 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
 	defer cache.Del(endpointID)
 
-	tunnel := service.getTunnelDetails(endpointID)
-
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	if tunnel.Port == 0 {
-		endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
-		if err != nil {
-			return err
-		}
-
-		tunnel.Status = portainer.EdgeAgentManagementRequired
-		tunnel.Port = service.getUnusedPort()
-		tunnel.LastActivity = time.Now()
-
-		username, password := generateRandomCredentials()
-		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnel.Port)
-
-		if service.chiselServer != nil {
-			err = service.chiselServer.AddUser(username, password, authorizedRemote)
-			if err != nil {
-				return err
-			}
-		}
-
-		credentials, err := encryptCredentials(username, password, endpoint.EdgeID)
-		if err != nil {
-			return err
-		}
-		tunnel.Credentials = credentials
+	tunnel := service.getTunnelDetails(endpointID)
+	if tunnel.Port != 0 {
+		return nil
 	}
+
+	endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
+	if err != nil {
+		return err
+	}
+
+	tunnel.Status = portainer.EdgeAgentManagementRequired
+	tunnel.Port = service.getUnusedPort()
+	tunnel.LastActivity = time.Now()
+
+	username, password := generateRandomCredentials()
+	authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnel.Port)
+
+	if service.chiselServer != nil {
+		if err = service.chiselServer.AddUser(username, password, authorizedRemote); err != nil {
+			return err
+		}
+	}
+
+	credentials, err := encryptCredentials(username, password, endpoint.EdgeID)
+	if err != nil {
+		return err
+	}
+	tunnel.Credentials = credentials
 
 	return nil
 }

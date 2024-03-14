@@ -15,6 +15,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -153,13 +154,9 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		return nil, httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
-	checkinInterval := endpoint.EdgeCheckinInterval
-	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := tx.Settings().Settings()
-		if err != nil {
-			return nil, httperror.InternalServerError("Unable to retrieve settings from the database", err)
-		}
-		checkinInterval = settings.EdgeAgentCheckinInterval
+	checkinInterval, err := edge.GetEffectiveCheckinInterval(tx, endpoint)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve the checkin interval", err)
 	}
 
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
