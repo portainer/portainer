@@ -3,6 +3,7 @@ import { useField, Field } from 'formik';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 // this value is taken from https://github.com/portainer/portainer/blob/develop/api/portainer.go#L1628
 const DEFAULT_URL =
@@ -11,6 +12,8 @@ const DEFAULT_URL =
 export function TemplatesUrlSection() {
   const [{ name }, { error }] = useField<string>('templatesUrl');
 
+  const buildTemplateDocUrl = useDocsUrl('/advanced/app-templates/build');
+
   return (
     <FormSection title="App Templates">
       <div className="form-group">
@@ -18,11 +21,7 @@ export function TemplatesUrlSection() {
           <p>
             You can specify the URL to your own template definitions file here.
             See{' '}
-            <a
-              href="https://docs.portainer.io/advanced/app-templates/build"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href={buildTemplateDocUrl} target="_blank" rel="noreferrer">
               Portainer documentation
             </a>{' '}
             for more details.

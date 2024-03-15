@@ -36,6 +36,7 @@ import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { CodeEditor } from '@@/CodeEditor';
+import { HelpLink } from '@@/PageHeader/HelpLink';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -125,6 +126,14 @@ export const ngModule = angular
   .component(
     'reactQueryDevTools',
     r2a(withReactQuery(ReactQueryDevtoolsWrapper), [])
+  )
+  .component(
+    'helpLink',
+    r2a(withUIRouter(withReactQuery(HelpLink)), [
+      'docLink',
+      'target',
+      'children',
+    ])
   )
   .component(
     'dashboardItem',

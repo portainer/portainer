@@ -18,7 +18,7 @@
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
       <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
       Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look at
-      <a href="https://docs.portainer.io/admin/environments/add/swarm/agent" target="_blank">our agent setup</a> for more details.
+      <help-link doc-link="'/admin/environments/add/swarm/agent'" target="'_blank'" children="'our agent setup'"></help-link> for more details.
     </p>
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
       <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
