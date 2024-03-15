@@ -23,6 +23,7 @@ type stackListOperationFilters struct {
 // @description List all stacks based on the current user authorizations.
 // @description Will return all stacks if using an administrator account otherwise it
 // @description will only return the list of stacks the user have access to.
+// @description Limited stacks will not be returned by this endpoint.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
