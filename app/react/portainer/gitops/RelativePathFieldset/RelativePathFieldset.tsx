@@ -10,6 +10,7 @@ import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input, Select } from '@@/form-components/Input';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 import { RelativePathModel, getPerDevConfigsFilterType } from './types';
 
@@ -36,6 +37,10 @@ export function RelativePathFieldset({
   const { errors } = useValidation(value);
 
   const { enableFsPath0, enableFsPath1, toggleFsPath } = useEnableFsPath(value);
+
+  const gitoptsEdgeConfigDocUrl = useDocsUrl(
+    '/user/edge/stacks/add#gitops-edge-configurations'
+  );
 
   const pathTip0 =
     'For relative path volumes use with Docker Swarm, you must have a network filesystem which all of your nodes can access.';
@@ -279,10 +284,7 @@ export function RelativePathFieldset({
                         ./config/$&#123;PORTAINER_EDGE_GROUP&#125;:/myapp/groupconfig
                       </code>
                       . More documentation can be found{' '}
-                      <a href="https://docs.portainer.io/user/edge/stacks/add#gitops-edge-configurations">
-                        here
-                      </a>
-                      .
+                      <a href={gitoptsEdgeConfigDocUrl}>here</a>.
                     </div>
                   </TextTip>
                 </div>

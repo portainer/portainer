@@ -32,11 +32,11 @@ export function ContextHelp() {
   );
 }
 
-function useDocsUrl(): string {
+export function useDocsUrl(doc?: string): string {
   const { state } = useCurrentStateAndParams();
   const versionQuery = useSystemVersion();
 
-  if (!state) {
+  if (!doc && !state) {
     return '';
   }
 
@@ -52,6 +52,10 @@ function useDocsUrl(): string {
       const version = parts.slice(0, 2).join('.');
       url += `v/${version}`;
     }
+  }
+
+  if (doc) {
+    return url + doc;
   }
 
   const { data } = state;

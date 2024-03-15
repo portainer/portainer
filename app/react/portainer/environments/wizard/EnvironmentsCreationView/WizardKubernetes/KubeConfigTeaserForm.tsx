@@ -7,6 +7,7 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 const initialValues = {
   kubeConfig: '',
@@ -18,6 +19,10 @@ const initialValues = {
 };
 
 export function KubeConfigTeaserForm() {
+  const kubeConfigImportDocUrl = useDocsUrl(
+    'admin/environments/add/kubernetes/import'
+  );
+
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}} validateOnMount>
       {() => (
@@ -28,7 +33,7 @@ export function KubeConfigTeaserForm() {
               <TextTip color="blue">
                 <span className="text-muted">
                   <a
-                    href="https://docs.portainer.io/admin/environments/add/kubernetes/import"
+                    href={kubeConfigImportDocUrl}
                     target="_blank"
                     rel="noreferrer"
                   >
