@@ -17,6 +17,7 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 import { useContainers } from '../queries/containers';
 import { useSystemLimits } from '../../proxy/queries/useInfo';
@@ -77,6 +78,8 @@ function CreateForm() {
     isDockerhubRateLimited,
   });
 
+  const createContDocUrl = useDocsUrl('/docker/containers/create');
+
   if (!envQuery.data || !initialValuesQuery) {
     return null;
   }
@@ -101,11 +104,7 @@ function CreateForm() {
             The new container may fail to start if the image is changed, and
             settings from the previous container aren&apos;t compatible. Common
             causes include entrypoint, cmd or
-            <a
-              href="https://docs.portainer.io/user/docker/containers/advanced"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href={createContDocUrl} target="_blank" rel="noreferrer">
               other settings
             </a>{' '}
             set by an image.
