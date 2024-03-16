@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -25,7 +26,7 @@ type CloneOptions struct {
 }
 
 func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) (clean func(), err error) {
-	backupProjectPath := fmt.Sprintf("%s-old", options.ProjectPath)
+	backupProjectPath := fmt.Sprintf("%s-old-%s", options.ProjectPath, time.Now().Unix())
 	cleanUp := false
 	cleanFn := func() {
 		if !cleanUp {
