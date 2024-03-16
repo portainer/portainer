@@ -25,7 +25,7 @@ type CloneOptions struct {
 	TLSSkipVerify bool `example:"false"`
 }
 
-func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) (clean func(), err error) {
+func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) error {
 	backupProjectPath := fmt.Sprintf("%s-old-%s", options.ProjectPath, time.Now().Unix())
 	cleanUp := false
 	cleanFn := func() {
@@ -38,10 +38,11 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 			log.Warn().Err(err).Msg("unable to remove git repository directory")
 		}
 	}
+	defer cleanFn()
 
 	err = filesystem.MoveDirectory(options.ProjectPath, backupProjectPath)
 	if err != nil {
-		return cleanFn, errors.WithMessage(err, "Unable to move git repository directory")
+		return errors.WithMessage(err, "Unable to move git repository directory")
 	}
 
 	cleanUp = true
@@ -55,11 +56,11 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 		}
 
 		if errors.Is(err, gittypes.ErrAuthenticationFailure) {
-			return cleanFn, errors.WithMessage(err, ErrInvalidGitCredential.Error())
+			return errors.WithMessage(err, ErrInvalidGitCredential.Error())
 		}
 
-		return cleanFn, errors.WithMessage(err, "Unable to clone git repository")
+		return errors.WithMessage(err, "Unable to clone git repository")
 	}
 
-	return cleanFn, nil
+	return nil
 }
