@@ -15,6 +15,7 @@ interface CheckRepoOptions {
   creds?: Creds;
   force?: boolean;
   tlsSkipVerify?: boolean;
+  createdFromCustomTemplateId?: number;
 }
 
 export function useCheckRepo(
@@ -43,7 +44,12 @@ export async function checkRepo(
   try {
     await axios.post<string[]>(
       '/gitops/repo/refs',
-      { repository, tlsSkipVerify: options.tlsSkipVerify, ...options.creds },
+      {
+        repository,
+        tlsSkipVerify: options.tlsSkipVerify,
+        createdFromCustomTemplateId: options.createdFromCustomTemplateId,
+        ...options.creds,
+      },
       force ? { params: { force } } : {}
     );
     return true;

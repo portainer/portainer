@@ -13,6 +13,7 @@ export function PathSelector({
   dirOnly,
   readOnly,
   inputId,
+  createdFromCustomTemplateId,
 }: {
   value: string;
   onChange(value: string): void;
@@ -21,6 +22,7 @@ export function PathSelector({
   dirOnly?: boolean;
   readOnly?: boolean;
   inputId: string;
+  createdFromCustomTemplateId?: number;
 }) {
   const creds = getAuthentication(model);
   const payload = {
@@ -29,6 +31,7 @@ export function PathSelector({
     reference: model.RepositoryReferenceName,
     tlsSkipVerify: model.TLSSkipVerify,
     dirOnly,
+    createdFromCustomTemplateId,
     ...creds,
   };
   const enabled = Boolean(

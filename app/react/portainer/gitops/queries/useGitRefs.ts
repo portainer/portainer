@@ -6,6 +6,7 @@ interface RefsPayload {
   repository: string;
   username?: string;
   password?: string;
+  createdFromCustomTemplateID?: number;
   tlsSkipVerify?: boolean;
 }
 

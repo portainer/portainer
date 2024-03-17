@@ -57,7 +57,8 @@ export function useValidation({
         }),
         Git: mixed().when('Method', {
           is: git.value,
-          then: () => buildGitValidationSchema(gitCredentialsQuery.data || []),
+          then: () =>
+            buildGitValidationSchema(gitCredentialsQuery.data || [], false),
         }),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),

@@ -345,6 +345,7 @@ export default class CreateEdgeStackViewController {
       RepositoryUsername: this.formValues.RepositoryUsername,
       RepositoryPassword: this.formValues.RepositoryPassword,
       TLSSkipVerify: this.formValues.TLSSkipVerify,
+      CreatedFromCustomTemplateID: this.state.templateValues.template.Id,
     };
     return this.EdgeStackService.createStackFromGitRepository(
       {

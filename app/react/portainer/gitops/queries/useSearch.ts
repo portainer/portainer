@@ -9,6 +9,7 @@ interface SearchPayload {
   username?: string;
   password?: string;
   tlsSkipVerify?: boolean;
+  createdFromCustomTemplateId?: number;
 }
 
 export function useSearch(payload: SearchPayload, enabled: boolean) {
