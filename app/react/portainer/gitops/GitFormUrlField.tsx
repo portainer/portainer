@@ -26,6 +26,7 @@ interface Props {
   onChange(value: string): void;
   onChangeRepositoryValid(value: boolean): void;
   model: GitFormModel;
+  createdFromCustomTemplateId?: number;
   errors?: string;
 }
 
@@ -34,6 +35,7 @@ export function GitFormUrlField({
   onChange,
   onChangeRepositoryValid,
   model,
+  createdFromCustomTemplateId,
   errors,
 }: Props) {
   const queryClient = useQueryClient();
@@ -42,7 +44,12 @@ export function GitFormUrlField({
   const [force, setForce] = useState(false);
   const repoStatusQuery = useCheckRepo(
     value,
-    { creds, force, tlsSkipVerify: model.TLSSkipVerify },
+    {
+      creds,
+      force,
+      tlsSkipVerify: model.TLSSkipVerify,
+      createdFromCustomTemplateId,
+    },
     {
       onSettled(isValid) {
         onChangeRepositoryValid(!!isValid);

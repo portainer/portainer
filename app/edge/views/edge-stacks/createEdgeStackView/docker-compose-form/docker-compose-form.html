@@ -35,6 +35,7 @@
     on-change="($ctrl.onChangeFormValues)"
     base-webhook-url="{{ $ctrl.state.baseWebhookUrl }}"
     webhook-id="{{ $ctrl.state.webhookId }}"
+    created-from-custom-template-id="($ctrl.state.templateValues.type === 'custom' ? $ctrl.state.templateValues.template.Id : 0)"
     docs-links
   ></git-form>
 </div>

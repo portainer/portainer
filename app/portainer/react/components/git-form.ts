@@ -28,6 +28,7 @@ export const gitFormModule = angular
       'baseWebhookUrl',
       'webhookId',
       'webhooksDocs',
+      'createdFromCustomTemplateId',
     ])
   )
   .component(
@@ -69,6 +70,7 @@ export const gitFormModule = angular
       'model',
       'onChange',
       'stackId',
+      'createdFromCustomTemplateId',
       'value',
       'isUrlValid',
     ])
