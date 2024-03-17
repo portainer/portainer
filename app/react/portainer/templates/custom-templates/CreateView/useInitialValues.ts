@@ -23,6 +23,10 @@ export function useInitialValues({
 
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 
+  const {
+    params: { fileContent = '' },
+  } = useCurrentStateAndParams();
+
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
   if (fileContentQuery.isLoading) {
     return undefined;
@@ -30,7 +34,7 @@ export function useInitialValues({
 
   return {
     Title: '',
-    FileContent: fileContentQuery.data ?? '',
+    FileContent: (fileContentQuery.data ?? '') || fileContent,
     Type: type,
     Platform: Platform.LINUX,
     File: undefined,
