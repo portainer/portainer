@@ -87,7 +87,7 @@ const templates: EventToTemplateMap = {
   },
 };
 
-function createEventDetails(event: EventMessage) {
+export function createEventDetails(event: EventMessage) {
   const eventType = event.Type ?? '';
 
   // An action can be `action:extra`
@@ -117,18 +117,4 @@ function createEventDetails(event: EventMessage) {
     : `Unsupported event: ${eventType} / ${action}`;
 
   return details + extra;
-}
-
-export class EventViewModel {
-  Time: EventMessage['time'];
-
-  Type: EventMessage['Type'];
-
-  Details: string;
-
-  constructor(data: EventMessage) {
-    this.Time = data.time;
-    this.Type = data.Type;
-    this.Details = createEventDetails(data);
-  }
 }
