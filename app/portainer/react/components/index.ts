@@ -36,7 +36,7 @@ import { Slider } from '@@/form-components/Slider';
 import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { CodeEditor } from '@@/CodeEditor';
-import { HelpLink } from '@@/PageHeader/HelpLink';
+import { HelpLink } from '@@/HelpLink';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
