@@ -43,7 +43,7 @@ export const gitFormModule = angular
   )
   .component(
     'reactGitFormAutoUpdateFieldset',
-    r2a(AutoUpdateFieldset, [
+    r2a(withUIRouter(withReactQuery(AutoUpdateFieldset)), [
       'value',
       'onChange',
       'environmentType',
