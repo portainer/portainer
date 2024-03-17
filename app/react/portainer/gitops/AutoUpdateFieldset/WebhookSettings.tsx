@@ -1,5 +1,6 @@
 import { truncateLeftRight } from '@/portainer/filters/filters';
 
+import { HelpLink } from '@@/HelpLink';
 import { CopyButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 
@@ -21,9 +22,9 @@ export function WebhookSettings({
         !!docsLink && (
           <>
             See{' '}
-            <a href={docsLink} target="_blank" rel="noreferrer">
+            <HelpLink docLink={docsLink}>
               Portainer documentation on webhook usage
-            </a>
+            </HelpLink>
             .
           </>
         )

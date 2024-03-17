@@ -1,4 +1,4 @@
-import { useDocsUrl } from '../ContextHelp/ContextHelp';
+import { useDocsUrl } from '../PageHeader/ContextHelp/ContextHelp';
 
 type HelpLinkProps = {
   docLink?: string;
