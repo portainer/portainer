@@ -20,7 +20,7 @@ const initialValues = {
 
 export function KubeConfigTeaserForm() {
   const kubeConfigImportDocUrl = useDocsUrl(
-    'admin/environments/add/kubernetes/import'
+    '/admin/environments/add/kubernetes/import'
   );
 
   return (
