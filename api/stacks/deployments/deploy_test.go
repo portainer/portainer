@@ -138,13 +138,14 @@ func agentServer(t *testing.T) string {
 		Handler: h,
 	}
 
+	errCh := make(chan error)
 	go func() {
-		err := s.Serve(l)
-		require.ErrorIs(t, err, http.ErrServerClosed)
+		errCh <- s.Serve(l)
 	}()
 
 	t.Cleanup(func() {
-		s.Shutdown(context.Background())
+		require.NoError(t, s.Shutdown(context.Background()))
+		require.ErrorIs(t, <-errCh, http.ErrServerClosed)
 	})
 
 	return "http://" + l.Addr().String()

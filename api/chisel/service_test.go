@@ -1,6 +1,7 @@
 package chisel
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"testing"
@@ -28,12 +29,17 @@ func TestPingAgentPanic(t *testing.T) {
 	ln, err := net.ListenTCP("tcp", &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 0})
 	require.NoError(t, err)
 
+	srv := &http.Server{Handler: mux}
+
+	errCh := make(chan error)
 	go func() {
-		require.NoError(t, http.Serve(ln, mux))
+		errCh <- srv.Serve(ln)
 	}()
 
 	s.getTunnelDetails(endpointID)
 	s.tunnelDetailsMap[endpointID].Port = ln.Addr().(*net.TCPAddr).Port
 
 	require.Error(t, s.pingAgent(endpointID))
+	require.NoError(t, srv.Shutdown(context.Background()))
+	require.ErrorIs(t, <-errCh, http.ErrServerClosed)
 }
