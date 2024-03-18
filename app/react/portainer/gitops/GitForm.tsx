@@ -11,7 +11,6 @@ import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
 import { FormSection } from '@@/form-components/FormSection';
 import { validateForm } from '@@/form-components/validate-form';
 import { SwitchField } from '@@/form-components/SwitchField';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 import { GitCredential } from '../account/git-credentials/types';
 
@@ -53,7 +52,6 @@ export function GitForm({
   createdFromCustomTemplateId,
 }: Props) {
   const [value, setValue] = useState(initialValue); // TODO: remove this state when form is not inside angularjs
-  const webhooksDocsUrl = useDocsUrl(webhooksDocs);
 
   return (
     <FormSection title="Git repository">
@@ -113,7 +111,7 @@ export function GitForm({
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}
           errors={errors.AutoUpdate as FormikErrors<GitFormModel['AutoUpdate']>}
-          webhooksDocs={webhooksDocsUrl}
+          webhooksDocs={webhooksDocs}
         />
       )}
 
