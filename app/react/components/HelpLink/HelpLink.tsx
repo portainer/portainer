@@ -1,9 +1,11 @@
+import { ReactNode } from 'react';
+
 import { useDocsUrl } from '../PageHeader/ContextHelp/ContextHelp';
 
 type HelpLinkProps = {
-  docLink?: string;
+  docLink: string;
   target?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 export function HelpLink({
@@ -14,7 +16,7 @@ export function HelpLink({
   const docsUrl = useDocsUrl(docLink);
 
   return (
-    <a href={docsUrl} target={target} rel="noreferrer">
+    <a href={docsUrl} target={target} rel="noopener noreferrer">
       {children}
     </a>
   );
