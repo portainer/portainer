@@ -200,8 +200,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/images',
       views: {
         'content@': {
-          templateUrl: './views/images/images.html',
-          controller: 'ImagesController',
+          component: 'imagesListView',
         },
       },
       data: {

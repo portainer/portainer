@@ -62,7 +62,12 @@ export function SimpleForm({
         />
       </FormControl>
 
-      <FormControl label="Image" inputId="image-field" errors={errors?.image}>
+      <FormControl
+        label="Image"
+        inputId="image-field"
+        errors={errors?.image}
+        required
+      >
         <InputGroup>
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
@@ -92,6 +97,7 @@ export function SimpleForm({
                 }}
                 icon={DockerIcon}
                 data-cy="component-dockerHubSearchButton"
+                size="medium"
               >
                 Search
               </Button>
