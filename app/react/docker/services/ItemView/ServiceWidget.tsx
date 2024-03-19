@@ -33,7 +33,7 @@ export function ServiceWidget({
   isValid?: boolean;
 }>) {
   return (
-    <Widget>
+    <Widget aria-label={title}>
       <Widget.Title icon={titleIcon} title={title}>
         <Authorized authorizations="DockerServiceUpdate">
           <Button color="secondary" size="small" onClick={onAdd} icon={Plus}>

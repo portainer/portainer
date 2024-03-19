@@ -61,7 +61,7 @@ export function PortsMappingField({
       hasChanges={hasChanges}
       onReset={onReset}
       onSubmit={onSubmit}
-      isValid={!!errors}
+      isValid={!errors}
     >
       {values.length > 0 ? (
         <Table>
@@ -141,6 +141,7 @@ function Item({
             options={[{ value: 'tcp' }, { value: 'udp' }]}
             disabled={disabled}
             readOnly={readOnly}
+            aria-label="protocol selector"
           />
         </td>
         <td>
@@ -152,6 +153,7 @@ function Item({
               { value: 'host', label: 'host' },
             ]}
             disabled={disabled}
+            aria-label="publish mode"
           />
         </td>
         <td>
