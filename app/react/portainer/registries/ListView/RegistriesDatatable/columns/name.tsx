@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { useCurrentUser } from '@/react/hooks/useUser';
+import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
 
@@ -27,7 +27,7 @@ export function NameCell({
   item: DecoratedRegistry;
   hasLink?: boolean;
 }) {
-  const { isAdmin } = useCurrentUser();
+  const isEdgeAdminQuery = useIsEdgeAdmin();
 
   if (!item.Id) {
     return <DefaultRegistryName />;
@@ -35,7 +35,7 @@ export function NameCell({
 
   return (
     <>
-      {isAdmin && hasLink ? (
+      {isEdgeAdminQuery.isAdmin && hasLink ? (
         <Link to="portainer.registries.registry" params={{ id: item.Id }}>
           {item.Name}
         </Link>
