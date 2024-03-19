@@ -5,7 +5,7 @@ import { PortBinding, Protocol, Value, isProtocol, isRange } from './types';
 
 // if container is number then host is number | undefined
 export function toViewModel(
-  portBindings: Array<EndpointPortConfig>
+  portBindings: Array<EndpointPortConfig> | undefined = []
 ): Array<Value> {
   const parsedPorts = parsePorts(portBindings);
   const sortedPorts = sortPorts(parsedPorts);

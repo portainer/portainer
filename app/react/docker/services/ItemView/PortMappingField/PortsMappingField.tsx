@@ -93,7 +93,7 @@ export function PortsMappingField({
           </tbody>
         </Table>
       ) : (
-        <p>This service has no ports published.</p>
+        <p className="p-5">This service has no ports published.</p>
       )}
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">
