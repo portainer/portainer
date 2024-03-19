@@ -15,7 +15,7 @@ export function DisplayUserAccessToken(apikey: string) {
       </TextTip>
       <div className="pt-5">
         <div className="inline-flex">
-          <div className="">{apikey}</div>
+          <div aria-label="api key">{apikey}</div>
           <div>
             <CopyButton copyText={apikey} color="link" />
           </div>
