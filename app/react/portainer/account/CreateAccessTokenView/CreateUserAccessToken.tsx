@@ -48,7 +48,7 @@ export function CreateUserAccessToken() {
                   <CreateUserAccessTokenInnerForm />
                 </Formik>
               ) : (
-                DisplayUserAccessToken(newAPIToken)
+                <DisplayUserAccessToken apiKey={newAPIToken} />
               )}
             </Widget.Body>
           </Widget>

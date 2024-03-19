@@ -1,33 +1,29 @@
-import { useRouter } from '@uirouter/react';
-
 import { Button, CopyButton } from '@@/buttons';
-import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
+import { Link } from '@@/Link';
 
-export function DisplayUserAccessToken(apikey: string) {
-  const router = useRouter();
+export function DisplayUserAccessToken({ apiKey }: { apiKey: string }) {
   return (
-    <>
-      <FormSectionTitle>New access token</FormSectionTitle>
+    <FormSection title="New access token">
       <TextTip>
         Please copy the new access token. You won&#39;t be able to view the
         token again.
       </TextTip>
+
       <div className="pt-5">
         <div className="inline-flex">
-          <div aria-label="api key">{apikey}</div>
+          <div aria-label="api key">{apiKey}</div>
           <div>
-            <CopyButton copyText={apikey} color="link" />
+            <CopyButton copyText={apiKey} color="link" />
           </div>
         </div>
         <hr />
       </div>
-      <Button
-        type="button"
-        onClick={() => router.stateService.go('portainer.account')}
-      >
+
+      <Button as={Link} props={{ to: 'portainer.account' }}>
         Done
       </Button>
-    </>
+    </FormSection>
   );
 }
