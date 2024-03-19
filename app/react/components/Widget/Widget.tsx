@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { createContext, PropsWithChildren, useContext } from 'react';
+import { createContext, PropsWithChildren, Ref, useContext } from 'react';
 
 const Context = createContext<null | boolean>(null);
 Context.displayName = 'WidgetContext';
@@ -15,10 +15,12 @@ export function useWidgetContext() {
 export function Widget({
   children,
   className,
+  mRef,
   id,
   'aria-label': ariaLabel,
 }: PropsWithChildren<{
   className?: string;
+  mRef?: Ref<HTMLDivElement>;
   id?: string;
   'aria-label'?: string;
 }>) {
@@ -27,6 +29,7 @@ export function Widget({
       <section
         id={id}
         className={clsx('widget', className)}
+        ref={mRef}
         aria-label={ariaLabel}
       >
         {children}
