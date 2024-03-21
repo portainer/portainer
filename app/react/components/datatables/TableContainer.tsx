@@ -24,11 +24,11 @@ export function TableContainer({
   return (
     <div className="row">
       <div className="col-sm-12">
-        <section className="datatable" aria-label={ariaLabel}>
-          <Widget>
+        <div className="datatable">
+          <Widget aria-label={ariaLabel}>
             <WidgetBody className="no-padding">{children}</WidgetBody>
           </Widget>
-        </section>
+        </div>
       </div>
     </div>
   );
