@@ -3,6 +3,8 @@ import { FormikErrors } from 'formik';
 import { ArrowDown, ArrowUp, Plus, RotateCw, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
@@ -53,10 +55,11 @@ type RenderItemFunction<T> = (
   item: T,
   onChange: (value: T) => void,
   index: number,
+  dataCy?: string,
   error?: ItemError<T>
 ) => React.ReactNode;
 
-interface Props<T> {
+interface Props<T> extends AutomationTestingProps {
   label?: string;
   value: T[];
   onChange(value: T[], e: OnChangeEvent<T>): void;
@@ -71,9 +74,7 @@ interface Props<T> {
   errors?: ArrayError<T[]>;
   textTip?: string;
   isAddButtonHidden?: boolean;
-  addButtonDataCy?: string;
   isDeleteButtonHidden?: boolean;
-  deleteButtonDataCy?: string;
   disabled?: boolean;
   addButtonError?: string;
   readOnly?: boolean;
@@ -95,9 +96,8 @@ export function InputList<T = DefaultType>({
   errors,
   textTip,
   isAddButtonHidden = false,
-  addButtonDataCy,
   isDeleteButtonHidden = false,
-  deleteButtonDataCy,
+  'data-cy': dataCy,
   disabled,
   addButtonError,
   readOnly,
@@ -146,6 +146,7 @@ export function InputList<T = DefaultType>({
                     item,
                     (value: T) => handleChangeItem(key, value),
                     index,
+                    dataCy,
                     error
                   )
                 )}
@@ -158,6 +159,7 @@ export function InputList<T = DefaultType>({
                         onClick={() => handleMoveUp(index)}
                         className="vertical-center btn-only-icon"
                         icon={ArrowUp}
+                        data-cy={`${dataCy}-move-up_${index}`}
                       />
                       <Button
                         size="medium"
@@ -166,6 +168,7 @@ export function InputList<T = DefaultType>({
                         onClick={() => handleMoveDown(index)}
                         className="vertical-center btn-only-icon"
                         icon={ArrowDown}
+                        data-cy={`${dataCy}-move-down_${index}`}
                       />
                     </>
                   )}
@@ -175,7 +178,7 @@ export function InputList<T = DefaultType>({
                       size="medium"
                       onClick={() => handleRemoveItem(key, item)}
                       className="vertical-center btn-only-icon"
-                      data-cy={`${deleteButtonDataCy}_${index}`}
+                      data-cy={`${dataCy}RemoveButton_${index}`}
                       icon={Trash2}
                     />
                   )}
@@ -188,7 +191,7 @@ export function InputList<T = DefaultType>({
                         initialItemsCount={initialItemsCount.current}
                         handleRemoveItem={handleRemoveItem}
                         handleToggleNeedsDeletion={handleToggleNeedsDeletion}
-                        dataCy={`${deleteButtonDataCy}_${index}`}
+                        dataCy={`${dataCy}RemoveButton_${index}`}
                       />
                     )}
                 </div>
@@ -209,7 +212,7 @@ export function InputList<T = DefaultType>({
               className="!ml-0"
               size="small"
               icon={Plus}
-              data-cy={addButtonDataCy}
+              data-cy={`${dataCy}AddButton`}
             >
               {addLabel}
             </Button>
@@ -294,7 +297,9 @@ function DefaultItem({
   error,
   disabled,
   readOnly,
-}: ItemProps<DefaultType>) {
+  index,
+  'data-cy': dataCy,
+}: ItemProps<DefaultType> & AutomationTestingProps) {
   return (
     <>
       <Input
@@ -303,6 +308,7 @@ function DefaultItem({
         className={clsx('!w-full', item.needsDeletion && 'striked')}
         disabled={disabled || item.needsDeletion}
         readOnly={readOnly}
+        data-cy={`${dataCy}RemoveButton_${index}`}
       />
       {error && <FormError>{error}</FormError>}
     </>
@@ -313,10 +319,17 @@ function renderDefaultItem(
   item: DefaultType,
   onChange: (value: DefaultType) => void,
   index: number,
+  dataCy: string,
   error?: ItemError<DefaultType>
 ) {
   return (
-    <DefaultItem item={item} onChange={onChange} error={error} index={index} />
+    <DefaultItem
+      item={item}
+      onChange={onChange}
+      error={error}
+      index={index}
+      data-cy={dataCy}
+    />
   );
 }
 

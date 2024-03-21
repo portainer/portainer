@@ -48,6 +48,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-restart-max-attempts-input"
                 ng-model="service.RestartMaxAttempts"
                 ng-change="updateServiceAttribute(service, 'RestartMaxAttempts')"
                 disable-authorization="DockerServiceUpdate"

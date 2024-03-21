@@ -197,6 +197,7 @@ export function CreateContainerInstanceForm() {
                 isLoading={isSubmitting}
                 loadingText="Deployment in progress..."
                 icon={Plus}
+                data-cy="aci-create-button"
               >
                 Deploy the container
               </LoadingButton>

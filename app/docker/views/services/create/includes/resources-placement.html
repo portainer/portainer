@@ -7,7 +7,7 @@
       <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
+      <input type="number" data-cy="docker-services-create-memory-reservation-input" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
     </div>
     <div class="col-sm-4">
       <p class="small text-muted" style="margin-top: 7px"> Minimum memory available on a node to run a task (<b>MB</b>) </p>
@@ -21,7 +21,7 @@
       <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
+      <input type="number" data-cy="docker-services-create-memory-limit-input" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
     </div>
     <div class="col-sm-4" style="margin-top: 7px">
       <p class="small text-muted"> Maximum memory usage per task (<b>MB</b>) </p>

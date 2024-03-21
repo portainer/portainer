@@ -31,6 +31,7 @@ export function DevicesField({
       label="Devices"
       errors={errors}
       itemBuilder={() => ({ pathOnHost: '', pathInContainer: '' })}
+      data-cy="docker-container-devices"
     />
   );
 }

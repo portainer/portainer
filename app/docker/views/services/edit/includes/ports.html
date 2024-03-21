@@ -28,6 +28,7 @@
                 <span class="input-group-addon !leading-none">host</span>
                 <input
                   type="number"
+                  data-cy="docker-service-port-binding-host-port-input"
                   class="form-control"
                   ng-model="portBinding.PublishedPort"
                   placeholder="e.g. 8080"
@@ -42,6 +43,7 @@
                 <span class="input-group-addon !leading-none">container</span>
                 <input
                   type="number"
+                  data-cy="docker-service-port-binding-container-port-input"
                   class="form-control"
                   ng-model="portBinding.TargetPort"
                   placeholder="e.g. 80"

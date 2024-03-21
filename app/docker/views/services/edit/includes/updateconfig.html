@@ -10,6 +10,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-update-parallelism-input"
                 ng-model="service.UpdateParallelism"
                 ng-change="updateServiceAttribute(service, 'UpdateParallelism')"
                 disable-authorization="DockerServiceUpdate"

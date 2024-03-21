@@ -53,6 +53,7 @@
                   <input
                     class="input-sm"
                     type="number"
+                    data-cy="docker-service-edit-replicas-input"
                     ng-model="service.Replicas"
                     ng-change="updateServiceAttribute(service, 'Replicas')"
                     disable-authorization="DockerServiceUpdate"

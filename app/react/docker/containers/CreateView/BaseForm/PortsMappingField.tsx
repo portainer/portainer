@@ -50,6 +50,7 @@ export function PortsMappingField({
         disabled={disabled}
         readOnly={readOnly}
         tooltip="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
+        data-cy="docker-containers-ports-mapping"
       />
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">

@@ -30,6 +30,7 @@ export function SysctlsField({
       label="Sysctls"
       errors={errors}
       itemBuilder={() => ({ name: '', value: '' })}
+      data-cy="docker-container-sysctls"
     />
   );
 }

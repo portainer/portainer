@@ -83,6 +83,7 @@ export function LoggerConfig({
         itemBuilder={() => ({ option: '', value: '' })}
         disabled={isDisabled}
         errors={errors?.options}
+        data-cy="docker-logging-options"
       />
     </FormSection>
   );
@@ -96,6 +97,7 @@ function Item({
   item: { option, value },
   onChange,
   error,
+  index,
 }: ItemProps<{ option: string; value: string }>) {
   return (
     <div>
@@ -106,6 +108,7 @@ function Item({
             value={option}
             onChange={(e) => handleChange({ option: e.target.value })}
             placeholder="e.g. FOO"
+            data-cy={`docker-logging-option_${index}`}
           />
         </InputGroup>
         <InputGroup className="w-1/2">
@@ -114,6 +117,7 @@ function Item({
             value={value}
             onChange={(e) => handleChange({ value: e.target.value })}
             placeholder="e.g bar"
+            data-cy={`docker-logging-value_${index}`}
           />
         </InputGroup>
       </div>
