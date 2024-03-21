@@ -40,6 +40,7 @@ export function VolumeSelector({
       value={selectedValue}
       onChange={(vol) => onChange(vol?.Name)}
       inputId={inputId}
+      data-cy="docker-containers-volume-selector"
     />
   );
 }

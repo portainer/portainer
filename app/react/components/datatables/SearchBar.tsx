@@ -45,7 +45,13 @@ export function SearchBar({
         aria-label="Search input"
       />
       {children}
-      <Button onClick={onClear} icon={X} color="none" disabled={!searchValue} />
+      <Button
+        onClick={onClear}
+        icon={X}
+        color="none"
+        disabled={!searchValue}
+        data-cy={`${dataCy}-clear-button`}
+      />
     </div>
   );
 }

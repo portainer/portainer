@@ -38,6 +38,7 @@ export function KubeConfigSection() {
           value={value}
           options={options}
           onChange={(value) => value && setValue(value)}
+          data-cy="kubeconfig-expiry-selector"
         />
       </FormControl>
     </FormSection>

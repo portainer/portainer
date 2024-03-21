@@ -30,7 +30,11 @@ export const columns = _.compact([
     cell({ row: { original: env } }) {
       const { to, params } = getDashboardRoute(env);
       return (
-        <Link to={to} params={params}>
+        <Link
+          to={to}
+          params={params}
+          data-cy={`edge-stack-environment-link-${env.Name}`}
+        >
           {env.Name}
         </Link>
       );

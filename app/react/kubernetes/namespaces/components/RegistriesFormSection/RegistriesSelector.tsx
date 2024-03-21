@@ -28,7 +28,11 @@ export function RegistriesSelector({
           {isPureAdmin ? (
             <span>
               No registries available. Head over to the{' '}
-              <Link to="portainer.registries" target="_blank">
+              <Link
+                to="portainer.registries"
+                target="_blank"
+                data-cy="namespace-permissions-registries-selector"
+              >
                 registry view
               </Link>{' '}
               to define a container registry.

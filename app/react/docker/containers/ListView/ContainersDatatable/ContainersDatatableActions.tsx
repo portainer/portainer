@@ -167,8 +167,14 @@ export function ContainersDatatableActions({
       </ButtonGroup>
       {isAddActionVisible && (
         <Authorized authorizations="DockerContainerCreate">
-          <Link to="docker.containers.new" className="space-left">
-            <Button icon={Plus}>Add container</Button>
+          <Link to="docker.containers.new" data-cy="add-docker-container-link">
+            <Button
+              icon={Plus}
+              className="!ml-0"
+              data-cy="add-docker-container-button"
+            >
+              Add container
+            </Button>
           </Link>
         </Authorized>
       )}

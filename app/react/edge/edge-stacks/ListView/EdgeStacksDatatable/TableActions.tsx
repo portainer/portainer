@@ -31,7 +31,7 @@ export function TableActions({
 
       <Button
         as={Link}
-        props={{ to: 'edge.stacks.new' }}
+        props={{ to: 'edge.stacks.new', 'data-cy': 'edge-add-stack-link' }}
         icon={Plus}
         className="!m-0"
         data-cy="edgeStack-addStackButton"

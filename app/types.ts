@@ -11,7 +11,9 @@ declare module 'react' {
   interface HTMLAttributes<T>
     extends AriaAttributes,
       DOMAttributes<T>,
-      AutomationTestingProps {}
+      Partial<AutomationTestingProps> {
+    // keep AutomationTestingProps 'data-cy' optional because HTMLAttributes covers non interactive elements
+  }
 }
 
 export type WithRequiredProperty<Type, Key extends keyof Type> = Type & {

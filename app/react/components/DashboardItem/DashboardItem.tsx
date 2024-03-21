@@ -103,7 +103,12 @@ export function DashboardItem({
 
   if (to) {
     return (
-      <Link to={to} className="!no-underline" params={params}>
+      <Link
+        to={to}
+        className="!no-underline"
+        params={params}
+        data-cy={`${dataCy}-link`}
+      >
         {Item}
       </Link>
     );

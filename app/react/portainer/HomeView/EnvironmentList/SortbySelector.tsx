@@ -45,6 +45,7 @@ export function SortbySelector({
         onChange={(option: ListSortType) => onChange(option)}
         isClearable
         value={value}
+        data-cy="home-view-sortby-selector"
       />
 
       <button

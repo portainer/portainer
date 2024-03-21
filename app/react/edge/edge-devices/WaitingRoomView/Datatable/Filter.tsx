@@ -62,6 +62,7 @@ export function Filter() {
         value={filterStore.checkIn}
         options={checkInOptions}
         bindToBody
+        data-cy="edge-devices-check-in-filter"
       />
     </div>
   );

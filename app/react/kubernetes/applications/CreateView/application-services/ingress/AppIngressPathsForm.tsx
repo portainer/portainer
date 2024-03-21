@@ -115,6 +115,7 @@ export function AppIngressPathsForm({
               to="kubernetes.ingresses"
               target="_blank"
               rel="noopener noreferrer"
+              data-cy="applicationCreate-ingressesLink"
             >
               Ingresses screen
             </Link>{' '}

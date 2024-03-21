@@ -178,6 +178,7 @@ export function InnerForm({
         isValid={isValid}
         loadingText="Creating custom template..."
         submitLabel="Create custom template"
+        data-cy="custom-template-creation-submit-button"
       />
     </Form>
   );

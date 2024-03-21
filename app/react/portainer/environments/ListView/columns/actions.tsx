@@ -31,6 +31,7 @@ function Cell({
       props={{
         to: 'portainer.endpoints.endpoint.access',
         params: { id: environment.Id },
+        'data-cy': `environment-manage-access-${environment.Name}`,
       }}
       color="link"
       icon={Users}

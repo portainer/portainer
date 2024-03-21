@@ -20,13 +20,14 @@ export const columns = [
   columnHelper.accessor('ResourcePool', {
     id: 'namespace',
     header: 'Namespace',
-    cell: ({ getValue }) => {
+    cell: ({ getValue, row }) => {
       const value = getValue();
       return (
         <>
           <Link
             to="kubernetes.resourcePools.resourcePool"
             params={{ id: value }}
+            data-cy={`app-stack-namespace-link-${row.original.Name}`}
           >
             {value}
           </Link>
@@ -53,6 +54,7 @@ export const columns = [
         to="kubernetes.stacks.stack.logs"
         params={{ namespace: item.ResourcePool, name: item.Name }}
         className="flex items-center gap-1"
+        data-cy={`app-stack-logs-link-${item.Name}`}
       >
         <Icon icon={FileText} />
         Logs

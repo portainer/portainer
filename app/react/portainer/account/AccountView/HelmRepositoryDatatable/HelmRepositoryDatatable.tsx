@@ -73,6 +73,7 @@ export function HelmRepositoryDatatable() {
       emptyContentLabel="No Helm repository found"
       isLoading={helmReposQuery.isLoading}
       isRowSelectable={(row) => !row.original.Global}
+      data-cy="helm-repositories-datatable"
     />
   );
 }
@@ -84,7 +85,11 @@ function HelmDatatableDescription({ isAdmin }: { isAdmin: boolean }) {
       account&apos;s Portainer UI. Helm charts are pulled down from these repos
       (plus the{' '}
       {isAdmin ? (
-        <Link to="portainer.settings" params={{ '#': 'kubernetes-settings' }}>
+        <Link
+          to="portainer.settings"
+          params={{ '#': 'kubernetes-settings' }}
+          data-cy="k8s-globally-select-repo-link"
+        >
           <span>globally-set Helm repo</span>
         </Link>
       ) : (

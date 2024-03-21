@@ -122,7 +122,12 @@ export function InnerForm({
           />
           <div className="form-group">
             <div className="col-sm-12">
-              <Button color="light" icon={RefreshCw} onClick={refreshGitFile}>
+              <Button
+                color="light"
+                icon={RefreshCw}
+                onClick={refreshGitFile}
+                data-cy="custom-template-edit-reload-git-file-button"
+              >
                 Reload custom template
               </Button>
             </div>
@@ -179,6 +184,7 @@ export function InnerForm({
         isValid={isValid && dirty}
         loadingText="Updating custom template..."
         submitLabel="Update custom template"
+        data-cy="custom-template-edit-submit-button"
       />
     </Form>
   );

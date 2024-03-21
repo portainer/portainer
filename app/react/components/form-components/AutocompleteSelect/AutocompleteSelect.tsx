@@ -11,6 +11,7 @@ import {
 import clsx from 'clsx';
 
 import { useDebounce } from '@/react/hooks/useDebounce';
+import { AutomationTestingProps } from '@/types';
 
 import { Option } from '@@/form-components/PortainerSelect';
 
@@ -35,7 +36,7 @@ export function AutocompleteSelect({
   searchResults?: Option<string>[];
   readOnly?: boolean;
   inputId: string;
-}) {
+} & AutomationTestingProps) {
   const [searchTerm, setSearchTerm] = useDebounce(value, onChange);
   const [selected, setSelected] = useState(false);
 

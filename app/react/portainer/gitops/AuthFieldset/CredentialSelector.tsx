@@ -40,6 +40,7 @@ export function CredentialSelector({
             isClearable
             noOptionsMessage={() => 'no saved credentials'}
             inputId="git-creds-selector"
+            data-cy="git-credentials-selector"
           />
         </FormControl>
       </div>

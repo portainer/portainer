@@ -93,7 +93,11 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
             authorizations="DockerNetworkCreate"
             data-cy="network-addNetworkButton"
           >
-            <Button icon={Plus} as={Link} props={{ to: '.new' }}>
+            <Button
+              icon={Plus}
+              as={Link}
+              props={{ to: '.new', 'data-cy': 'docker-add-network-link' }}
+            >
               Add network
             </Button>
           </Authorized>

@@ -31,7 +31,7 @@ Primary.args = {
 
 export function WithLink() {
   return (
-    <Link to="example.page">
+    <Link to="example.page" data-cy="data-cy-example">
       <DashboardItem value={1} icon={List} type="Example resource" />
     </Link>
   );

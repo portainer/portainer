@@ -101,6 +101,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         isLoading={isLoading}
         submitLabel="Apply changes"
         loadingText="Saving in progress..."
+        data-cy="helm-cert-panel-submit-button"
       />
     </Form>
   );

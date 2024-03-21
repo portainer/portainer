@@ -91,6 +91,7 @@ export function SimpleForm({
                   rel: 'noreferrer',
                 }}
                 icon={DockerIcon}
+                data-cy="component-dockerHubSearchButton"
               >
                 Search
               </Button>

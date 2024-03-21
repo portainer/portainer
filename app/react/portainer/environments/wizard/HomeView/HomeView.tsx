@@ -62,7 +62,11 @@ export function HomeView() {
 
                 <div className="flex flex-wrap gap-4">
                   {localEnvironmentAdded.status === 'success' && (
-                    <Link to="portainer.home" className={styles.link}>
+                    <Link
+                      to="portainer.home"
+                      className={styles.link}
+                      data-cy="wizard-get-started-link"
+                    >
                       <Option
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
@@ -75,7 +79,11 @@ export function HomeView() {
                       />
                     </Link>
                   )}
-                  <Link to="portainer.wizard.endpoints" className={styles.link}>
+                  <Link
+                    to="portainer.wizard.endpoints"
+                    className={styles.link}
+                    data-cy="wizard-add-environments-link"
+                  >
                     <Option
                       title="Add Environments"
                       icon={Plug2}

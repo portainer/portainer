@@ -104,12 +104,18 @@ export function NotificationsMenu() {
                   notification={notification}
                   key={notification.id}
                   onDelete={() => onDelete(notification.id)}
+                  data-cy="notification-menu-link"
                 />
               ))}
             </div>
 
             <div className={notificationStyles.notificationLink}>
-              <Link to="portainer.notifications">View all notifications</Link>
+              <Link
+                to="portainer.notifications"
+                data-cy="notifications-see-all-link"
+              >
+                View all notifications
+              </Link>
             </div>
           </>
         ) : (

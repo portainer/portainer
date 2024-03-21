@@ -32,6 +32,7 @@ export function TasksDatatable({
       dataset={dataset}
       emptyContentLabel="No task available."
       extendTableOptions={withMeta({ table: 'tasks', serviceName })}
+      data-cy="docker-service-tasks-datatable"
     />
   );
 }

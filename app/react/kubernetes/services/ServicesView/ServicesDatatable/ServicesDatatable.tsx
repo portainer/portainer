@@ -90,6 +90,7 @@ export function ServicesDatatable() {
         />
       }
       renderRow={servicesRenderRow}
+      data-cy="k8s-services-datatable"
     />
   );
 }
@@ -193,6 +194,7 @@ function TableActions({ selectedItems }: TableActionsProps) {
           disabled={selectedItems.length === 0}
           onClick={() => handleRemoveClick(selectedItems)}
           icon={Trash2}
+          data-cy="k8s-remove-services-button"
         >
           Remove
         </Button>
@@ -201,8 +203,14 @@ function TableActions({ selectedItems }: TableActionsProps) {
           to="kubernetes.deploy"
           params={{ referrer: 'kubernetes.services' }}
           className="space-left hover:no-decoration"
+          data-cy="k8s-create-service-link"
         >
-          <Button className="btn-wrapper" color="primary" icon="plus">
+          <Button
+            className="btn-wrapper"
+            color="primary"
+            icon="plus"
+            data-cy="k8s-create-service-button"
+          >
             Create from manifest
           </Button>
         </Link>

@@ -152,6 +152,7 @@ export function ApplicationSummaryWidget() {
                       >
                         <Link
                           to="kubernetes.resourcePools.resourcePool"
+                          data-cy="k8sAppDetail-namespaceLink"
                           params={{ id: namespace }}
                         >
                           {namespace}

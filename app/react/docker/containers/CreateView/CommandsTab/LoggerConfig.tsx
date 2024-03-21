@@ -52,6 +52,7 @@ export function LoggerConfig({
           value={value.type}
           onChange={(type) => onChange({ ...value, type: type || '' })}
           options={pluginOptions}
+          data-cy="docker-logging-driver-selector"
         />
       </FormControl>
 

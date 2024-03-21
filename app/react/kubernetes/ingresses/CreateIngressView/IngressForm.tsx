@@ -182,6 +182,7 @@ export function IngressForm({
                           : 'No namespaces available'
                       }
                       noOptionsMessage={() => 'No namespaces available'}
+                      data-cy="k8sAppCreate-namespaceSelect"
                     />
                   )}
                 </div>
@@ -262,6 +263,7 @@ export function IngressForm({
                           )
                         }
                         noOptionsMessage={() => 'No ingress classes available'}
+                        data-cy="k8sAppCreate-ingressClassSelect"
                       />
                       {errors.className && (
                         <FormError className="error-inline mt-1">
@@ -457,6 +459,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-tlsSelect_${hostIndex}`}
                         />
                         {!host.NoHost && (
                           <div className="input-group-btn">
@@ -464,6 +467,7 @@ export function IngressForm({
                               className="btn btn-light btn-sm !ml-0 !rounded-l-none"
                               onClick={() => reloadTLSCerts()}
                               icon={RefreshCw}
+                              data-cy={`k8sAppCreate-tlsRefreshButton_${hostIndex}`}
                             />
                           </div>
                         )}
@@ -478,6 +482,7 @@ export function IngressForm({
                           params={{ id: environmentID }}
                           className="text-primary"
                           target="_blank"
+                          data-cy={`k8sAppCreate-createSecretLink_${hostIndex}`}
                         >
                           Create secret
                         </Link>{' '}
@@ -553,6 +558,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No services available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-serviceSelect_${hostIndex}_${pathIndex}`}
                         />
                       </InputGroup>
                       {errors[
@@ -614,6 +620,7 @@ export function IngressForm({
                               }
                               noOptionsMessage={() => 'No ports available'}
                               size="sm"
+                              data-cy={`k8sAppCreate-servicePortSelect_${hostIndex}_${pathIndex}`}
                             />
                           </InputGroup>
                           {errors[
@@ -672,6 +679,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No path types available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-pathTypeSelect_${hostIndex}_${pathIndex}`}
                         />
                       </InputGroup>
                       {errors[
@@ -748,8 +756,7 @@ export function IngressForm({
                     type="button"
                     onClick={() => addNewIngressRoute(hostIndex)}
                     icon={Plus}
-                    size="small"
-                    color="default"
+                    data-cy={`k8sAppCreate-addPathButton_${hostIndex}`}
                   >
                     Add path
                   </Button>
@@ -766,8 +773,7 @@ export function IngressForm({
                 type="button"
                 onClick={() => addNewIngressHost()}
                 icon={Plus}
-                color="default"
-                size="small"
+                data-cy="k8sAppCreate-addHostButton"
               >
                 Add new host
               </Button>
@@ -778,8 +784,7 @@ export function IngressForm({
                 onClick={() => addNewIngressHost(true)}
                 disabled={hasNoHostRule}
                 icon={Plus}
-                color="default"
-                size="small"
+                data-cy="k8sAppCreate-addFallbackButton"
               >
                 Add fallback rule
               </Button>

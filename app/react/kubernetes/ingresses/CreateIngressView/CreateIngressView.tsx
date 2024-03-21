@@ -488,6 +488,7 @@ export function CreateIngressView() {
                   params={{ id: environmentId }}
                   className="text-primary"
                   target="_blank"
+                  data-cy="ingresses-create-application-link"
                 >
                   Applications
                 </Link>

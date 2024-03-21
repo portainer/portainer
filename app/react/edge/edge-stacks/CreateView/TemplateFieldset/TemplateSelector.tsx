@@ -50,6 +50,7 @@ export function TemplateSelector({
           onChange({ template, type } as SelectedTemplateValue);
         }}
         options={options}
+        data-cy="edge-stacks-create-template-selector"
       />
     </FormControl>
   );

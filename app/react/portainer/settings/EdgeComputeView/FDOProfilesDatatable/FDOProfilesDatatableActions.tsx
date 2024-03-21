@@ -28,7 +28,11 @@ export function FDOProfilesDatatableActions({
 
   return (
     <div className="actionBar">
-      <Link to="portainer.endpoints.profile" className="space-left">
+      <Link
+        to="portainer.endpoints.profile"
+        className="space-left"
+        data-cy="fdo-add-profile-link"
+      >
         <Button disabled={!isFDOEnabled} icon={PlusCircle}>
           Add Profile
         </Button>

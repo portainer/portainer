@@ -75,8 +75,13 @@ export function AutomaticEdgeEnvCreation() {
         {!edgeComputeConfigurationOK ? (
           <TextTip color="orange">
             In order to use this feature, please turn on Edge Compute features{' '}
-            <Link to="portainer.settings.edgeCompute">here</Link> and have
-            Portainer API server URL and tunnel server address properly
+            <Link
+              to="portainer.settings.edgeCompute"
+              data-cy="edge-disabled-portainer-edge-settings-link"
+            >
+              here
+            </Link>{' '}
+            and have Portainer API server URL and tunnel server address properly
             configured.
           </TextTip>
         ) : (
@@ -171,7 +176,12 @@ function EdgeKeyInfo({
         <TextTip color="blue">
           Portainer Server URL{' '}
           {!asyncMode ? 'and tunnel server address are' : 'is'} set{' '}
-          <Link to="portainer.settings.edgeCompute">here</Link>
+          <Link
+            to="portainer.settings.edgeCompute"
+            data-cy="server-url-portainer-edge-settings-link"
+          >
+            here
+          </Link>
         </TextTip>
       </EdgeScriptForm>
     </>

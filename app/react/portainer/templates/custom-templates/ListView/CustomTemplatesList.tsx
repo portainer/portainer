@@ -57,7 +57,12 @@ export function CustomTemplatesList({
         title="Custom Templates"
         titleIcon={Edit}
         renderTableActions={() => (
-          <Button as={Link} props={{ to: '.new' }} icon={Plus}>
+          <Button
+            as={Link}
+            props={{ to: '.new', 'data-cy': 'add-custom-template-link' }}
+            icon={Plus}
+            data-cy="add-custom-template-button"
+          >
             Add Custom Template
           </Button>
         )}

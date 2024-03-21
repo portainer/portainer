@@ -135,7 +135,10 @@ function NoMetricsServerWarning() {
       {isAdmin && (
         <>
           Server metrics features must be enabled in the{' '}
-          <Link to="kubernetes.cluster.setup">
+          <Link
+            to="kubernetes.cluster.setup"
+            data-cy="environment-configuration-view"
+          >
             environment configuration view
           </Link>
           .

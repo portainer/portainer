@@ -23,6 +23,7 @@ export const namespace = columnHelper.accessor(
             id: namespace,
           }}
           title={namespace}
+          data-cy={`secret-namespace-link-${namespace}`}
         >
           {namespace}
         </Link>

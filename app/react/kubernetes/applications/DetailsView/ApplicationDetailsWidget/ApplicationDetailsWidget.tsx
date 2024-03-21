@@ -67,7 +67,10 @@ export function ApplicationDetailsWidget() {
             {!isSystemNamespace && (
               <div className="mb-4 flex flex-wrap gap-2">
                 <Authorized authorizations="K8sApplicationDetailsW">
-                  <Link to="kubernetes.applications.application.edit">
+                  <Link
+                    to="kubernetes.applications.application.edit"
+                    data-cy="k8sAppDetail-editAppLink"
+                  >
                     <Button
                       type="button"
                       color="light"
@@ -107,6 +110,7 @@ export function ApplicationDetailsWidget() {
                     params={{
                       fileContent: appStackFileQuery.data.StackFileContent,
                     }}
+                    data-cy="k8sAppDetail-createCustomTemplateLink"
                   >
                     <Button
                       type="button"

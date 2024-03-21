@@ -53,6 +53,7 @@ export function NotificationsView() {
         )}
         getRowId={(row) => row.id}
         highlightedItemId={activeItemId}
+        data-cy="notifications-datatable"
       />
     </>
   );
@@ -67,6 +68,7 @@ function TableActions({ selectedRows }: { selectedRows: ToastNotification[] }) {
       color="dangerlight"
       onClick={() => handleRemove()}
       disabled={selectedRows.length === 0}
+      data-cy="remove-notifications-button"
     >
       Remove
     </Button>

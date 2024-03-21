@@ -103,6 +103,7 @@ export function ConfigMapsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-configmaps-datatable"
     />
   );
 }
@@ -171,7 +172,11 @@ function TableActions({
       >
         Remove
       </Button>
-      <Link to="kubernetes.configmaps.new" className="ml-1">
+      <Link
+        to="kubernetes.configmaps.new"
+        className="ml-1"
+        data-cy="k8sConfig-addConfigWithFormLink"
+      >
         <Button
           className="btn-wrapper"
           color="secondary"
@@ -190,7 +195,12 @@ function TableActions({
         className="ml-1"
         data-cy="k8sConfig-deployFromManifestButton"
       >
-        <Button className="btn-wrapper" color="primary" icon={Plus}>
+        <Button
+          className="btn-wrapper"
+          color="primary"
+          icon={Plus}
+          data-cy="k8s-configmaps-deploy-button"
+        >
           Create from manifest
         </Button>
       </Link>

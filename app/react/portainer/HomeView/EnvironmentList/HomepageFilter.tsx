@@ -46,6 +46,7 @@ export function HomepageFilter<TValue = number>({
       components={{ Option }}
       onChange={(option) => onChange([...option])}
       bindToBody
+      data-cy="homepage-filter"
     />
   );
 }

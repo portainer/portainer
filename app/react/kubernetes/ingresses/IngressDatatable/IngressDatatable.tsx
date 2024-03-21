@@ -91,6 +91,7 @@ export function IngressDatatable() {
         />
       }
       disableSelect={useCheckboxes()}
+      data-cy="k8s-ingresses-datatable"
     />
   );
 
@@ -118,6 +119,7 @@ export function IngressDatatable() {
             disabled={selectedFlatRows.length === 0}
             onClick={() => handleRemoveClick(selectedFlatRows)}
             icon={Trash2}
+            data-cy="remove-ingresses-button"
           >
             Remove
           </Button>
@@ -127,8 +129,9 @@ export function IngressDatatable() {
           <Link
             to="kubernetes.ingresses.create"
             className="space-left no-decoration"
+            data-cy="add-ingress-link"
           >
-            <Button icon={Plus} color="secondary">
+            <Button icon={Plus} color="secondary" data-cy="add-ingress-button">
               Add with form
             </Button>
           </Link>
@@ -138,8 +141,11 @@ export function IngressDatatable() {
             to="kubernetes.deploy"
             className="space-left no-decoration"
             params={{ referrer: 'kubernetes.ingresses' }}
+            data-cy="ingresses-deploy-link"
           >
-            <Button icon={Plus}>Create from manifest</Button>
+            <Button icon={Plus} data-cy="k8s-ingress-deploy-button">
+              Create from manifest
+            </Button>
           </Link>
         </Authorized>
       </div>

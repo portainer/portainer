@@ -62,9 +62,10 @@ export function TableActions({
         <Authorized authorizations="DockerServiceCreate">
           <Button
             as={Link}
-            props={{ to: '.new' }}
+            props={{ to: '.new', 'data-cy': 'docker-add-service-link' }}
             icon={Plus}
             className="!ml-0"
+            data-cy="docker-add-service-button"
           >
             Add service
           </Button>

@@ -31,7 +31,7 @@ export function TableActions({
       <Authorized authorizations="DockerVolumeCreate">
         <Button
           as={Link}
-          props={{ to: '.new' }}
+          props={{ to: '.new', 'data-cy': 'docker-add-volume-link' }}
           icon={Plus}
           className="!m-0"
           data-cy="volume-addVolumeButton"

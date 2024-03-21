@@ -76,6 +76,7 @@ export function LoadBalancerServicesForm({
                     to="kubernetes.cluster.setup"
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-cy="k8sAppCreate-clusterSetupLink"
                   >
                     Cluster Setup
                   </Link>{' '}

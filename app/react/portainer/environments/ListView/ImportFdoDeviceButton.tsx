@@ -27,7 +27,10 @@ export function ImportFdoDeviceButton() {
       color="secondary"
       icon={Plus}
       as={Link}
-      props={{ to: 'portainer.endpoints.importDevice' }}
+      props={{
+        to: 'portainer.endpoints.importDevice',
+        'data-cy': 'import-fdo-device-link',
+      }}
       className="ml-[5px]"
     >
       Import FDO device

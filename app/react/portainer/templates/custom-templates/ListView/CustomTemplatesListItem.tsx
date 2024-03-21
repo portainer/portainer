@@ -55,6 +55,7 @@ export function CustomTemplatesListItem({
                   params: {
                     id: template.Id,
                   },
+                  'data-cy': `custom-templates-edit-${template.Id}`,
                 }}
                 icon={Edit}
               >
