@@ -89,7 +89,11 @@ export function AssociateAMTDialog({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose} color="default">
+        <Button
+          onClick={onClose}
+          color="default"
+          data-cy="associate-amt-dialog-cancel-button"
+        >
           Cancel
         </Button>
         <LoadingButton

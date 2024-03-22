@@ -26,6 +26,7 @@ export function AdvancedMode({
         icon={List}
         className="!ml-0 p-0 hover:no-underline"
         onClick={onSimpleModeClick}
+        data-cy="env-simple-mode-button"
       >
         Simple mode
       </Button>

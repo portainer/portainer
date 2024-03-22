@@ -147,6 +147,7 @@ export function ConsoleView() {
               <div className="row mt-4">
                 <Button
                   className="btn btn-primary !ml-0"
+                  data-cy="connect-console-button"
                   onClick={
                     connectionStatus === 'closed'
                       ? connectConsole

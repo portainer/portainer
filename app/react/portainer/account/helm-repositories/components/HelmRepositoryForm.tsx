@@ -65,6 +65,7 @@ export function HelmRepositoryForm({
               {isEditing && (
                 <Button
                   color="default"
+                  data-cy="helm-repository-cancel-button"
                   onClick={() => router.stateService.go('portainer.account')}
                 >
                   Cancel

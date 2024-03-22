@@ -137,7 +137,11 @@ export function AssignmentDialog({
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={() => onSubmit()} color="default">
+              <Button
+                onClick={() => onSubmit()}
+                color="default"
+                data-cy="waiting-room-cancel-assignment-button"
+              >
                 Cancel
               </Button>
               <LoadingButton

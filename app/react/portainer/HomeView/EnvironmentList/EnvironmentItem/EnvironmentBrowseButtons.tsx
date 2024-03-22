@@ -55,6 +55,7 @@ export function EnvironmentBrowseButtons({
         ) : (
           <Button
             icon={X}
+            data-cy={`close-snapshot-link-${environment.Name}`}
             onClick={onClickDisconnect}
             className="!m-0 w-full !py-0 opacity-60"
             size="medium"
@@ -85,6 +86,7 @@ export function EnvironmentBrowseButtons({
         </LinkButton>
       ) : (
         <Button
+          data-cy={`disconnect-link-${environment.Name}`}
           icon={WifiOff}
           onClick={onClickDisconnect}
           className="!m-0 w-full !py-0 opacity-60"

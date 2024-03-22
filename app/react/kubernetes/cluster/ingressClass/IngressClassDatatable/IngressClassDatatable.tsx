@@ -59,6 +59,7 @@ export function IngressClassDatatable({
       <div className="flex items-start">
         <ButtonGroup>
           <Button
+            data-cy="disallow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === true).length ===
               0
@@ -72,6 +73,7 @@ export function IngressClassDatatable({
             Disallow selected
           </Button>
           <Button
+            data-cy="allow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === false)
                 .length === 0

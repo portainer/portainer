@@ -44,10 +44,18 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSubmit()} color="default">
+        <Button
+          onClick={() => onSubmit()}
+          color="default"
+          data-cy="cancel-recreate"
+        >
           Cancel
         </Button>
-        <Button onClick={() => onSubmit({ pullLatest })} color="danger">
+        <Button
+          onClick={() => onSubmit({ pullLatest })}
+          color="danger"
+          data-cy="confirm-recreate"
+        >
           Recreate
         </Button>
       </Modal.Footer>

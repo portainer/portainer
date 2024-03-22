@@ -62,6 +62,7 @@ export function CustomTemplatesListItem({
                 Edit
               </Button>
               <Button
+                data-cy="custom-templates-delete-"
                 onClick={(e) => {
                   onDelete(template.Id);
                   e.stopPropagation();

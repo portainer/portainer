@@ -18,6 +18,7 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
             color="none"
             icon={table.getIsAllRowsExpanded() ? ChevronDown : ChevronUp}
             title="Expand all"
+            data-cy="expand-all-rows-button"
           />
         )
       );
@@ -34,6 +35,7 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
           color="none"
           icon={row.getIsExpanded() ? ChevronDown : ChevronUp}
           title={row.getIsExpanded() ? 'Collapse' : 'Expand'}
+          data-cy={`expand-row-button_${row.index}`}
         />
       ),
     enableColumnFilter: false,

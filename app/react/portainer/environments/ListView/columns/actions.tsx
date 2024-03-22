@@ -35,6 +35,7 @@ function Cell({
       }}
       color="link"
       icon={Users}
+      data-cy={`environment-manage-access-button-${environment.Name}`}
     >
       Manage access
     </Button>

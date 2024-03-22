@@ -45,7 +45,12 @@ export function ScaleForm({
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
-          <Button color="none" icon={X} onClick={() => onClose()} />
+          <Button
+            color="none"
+            icon={X}
+            onClick={() => onClose()}
+            data-cy="scale-form-cancel-button"
+          />
           <LoadingButton
             isLoading={mutation.isLoading}
             disabled={

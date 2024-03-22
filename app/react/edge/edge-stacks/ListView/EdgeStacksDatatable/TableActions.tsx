@@ -21,6 +21,7 @@ export function TableActions({
     <div className="flex items-center gap-2">
       <Button
         color="dangerlight"
+        data-cy="edgeStack-removeStackButton"
         disabled={selectedItems.length === 0}
         onClick={() => handleRemove(selectedItems)}
         icon={Trash2}

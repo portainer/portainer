@@ -41,7 +41,11 @@ function UpdateIngressPrompt({
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSubmit({ noMatch: value })} color="primary">
+        <Button
+          onClick={() => onSubmit({ noMatch: value })}
+          color="primary"
+          data-cy="update-ingress-confirm-button"
+        >
           Update
         </Button>
       </Modal.Footer>

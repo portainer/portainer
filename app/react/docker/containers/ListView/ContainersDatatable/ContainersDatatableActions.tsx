@@ -91,6 +91,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerStart">
           <Button
             color="light"
+            data-cy="start-docker-container-button"
             onClick={() => onStartClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
             icon={Play}
@@ -102,6 +103,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerStop">
           <Button
             color="light"
+            data-cy="stop-docker-container-button"
             onClick={() => onStopClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
             icon={Square}
@@ -113,6 +115,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerKill">
           <Button
             color="light"
+            data-cy="kill-docker-container-button"
             onClick={() => onKillClick(selectedItems)}
             disabled={selectedItemCount === 0 || hasStoppedItemsSelected}
             icon={Slash}
@@ -124,6 +127,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerRestart">
           <Button
             color="light"
+            data-cy="restart-docker-container-button"
             onClick={() => onRestartClick(selectedItems)}
             disabled={selectedItemCount === 0}
             icon={RefreshCw}
@@ -135,6 +139,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerPause">
           <Button
             color="light"
+            data-cy="pause-docker-container-button"
             onClick={() => onPauseClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
             icon={Pause}
@@ -146,6 +151,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerUnpause">
           <Button
             color="light"
+            data-cy="resume-docker-container-button"
             onClick={() => onResumeClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
             icon={Play}
@@ -157,6 +163,7 @@ export function ContainersDatatableActions({
         <Authorized authorizations="DockerContainerDelete">
           <Button
             color="dangerlight"
+            data-cy="remove-docker-container-button"
             onClick={() => onRemoveClick(selectedItems)}
             disabled={selectedItemCount === 0}
             icon={Trash2}

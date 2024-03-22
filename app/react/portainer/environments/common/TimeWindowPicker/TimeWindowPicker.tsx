@@ -72,6 +72,7 @@ export function TimeWindowPicker({
           {!isEditMode && (
             <Button
               color="default"
+              data-cy="edit-change-window-button"
               className="!ml-0"
               onClick={() => setIsEditMode(true)}
             >
@@ -81,6 +82,7 @@ export function TimeWindowPicker({
           {isEditMode && (
             <Button
               color="default"
+              data-cy="cancel-change-window-button"
               className="!ml-0"
               onClick={() => {
                 setIsEditMode(false);

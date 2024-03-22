@@ -38,6 +38,7 @@ export function TableActions({
     <>
       <Button
         onClick={() => handleRemoveDevice(selectedRows)}
+        data-cy="remove-device-button"
         disabled={selectedRows.length === 0}
         color="dangerlight"
         icon={Trash2}
@@ -60,6 +61,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateAndAssign(selectedRows)}
+            data-cy="associate-and-assign-button"
             disabled={
               selectedRows.length === 0 || licenseOverused || !isPureAdmin
             }
@@ -86,6 +88,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateDevice(selectedRows)}
+            data-cy="associate-device-button"
             disabled={selectedRows.length === 0 || licenseOverused}
             icon={Check}
           >

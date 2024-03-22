@@ -27,6 +27,7 @@ export function HiddenContainersTable({
           columns={[
             <Button
               color="danger"
+              data-cy="hidden-containers-remove-filter-button"
               size="xsmall"
               icon={Trash2}
               onClick={() => onDelete(label.name)}

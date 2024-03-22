@@ -82,6 +82,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
           >
             <Button
               disabled={selectedRows.length === 0}
+              data-cy="network-removeNetworkButton"
               color="dangerlight"
               onClick={() => onRemove(selectedRows)}
               icon={Trash2}

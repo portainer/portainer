@@ -37,6 +37,7 @@ export function YAMLInspector({ identifier, data, hideMessage }: Props) {
       <div className="flex items-center justify-between py-5">
         <Button
           icon={expanded ? Minus : Plus}
+          data-cy={`expand-collapse-yaml-${identifier}`}
           color="default"
           className="!ml-0"
           onClick={() => setExpanded(!expanded)}

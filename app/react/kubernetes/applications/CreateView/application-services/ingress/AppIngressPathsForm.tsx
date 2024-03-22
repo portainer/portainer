@@ -154,6 +154,7 @@ export function AppIngressPathsForm({
         <div className="flex w-full flex-wrap gap-2">
           <Button
             icon={Plus}
+            data-cy={`applicationCreate-addIngressPath-${serviceIndex}-${portIndex}`}
             className="!ml-0"
             size="small"
             color="default"

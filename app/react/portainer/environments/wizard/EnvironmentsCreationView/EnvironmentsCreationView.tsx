@@ -96,7 +96,10 @@ export function EnvironmentCreationView() {
                   <Button disabled={isFirstStep} onClick={onPreviousClick}>
                     <Icon icon={ArrowLeft} /> Previous
                   </Button>
-                  <Button onClick={onNextClick}>
+                  <Button
+                    onClick={onNextClick}
+                    data-cy="environment-wizard-next-button"
+                  >
                     {isLastStep ? 'Close' : 'Next'}
                     <Icon icon={ArrowRight} />
                   </Button>

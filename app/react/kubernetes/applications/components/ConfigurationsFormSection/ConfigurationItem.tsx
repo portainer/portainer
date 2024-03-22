@@ -94,7 +94,7 @@ export function ConfigurationItem({
           color="dangerlight"
           size="medium"
           onClick={onRemoveItem}
-          className="!ml-0 vertical-center btn-only-icon"
+          className="vertical-center btn-only-icon !ml-0"
           icon={Trash2}
           data-cy={`k8sAppCreate-remove${configurationType}Button_${index}`}
         />

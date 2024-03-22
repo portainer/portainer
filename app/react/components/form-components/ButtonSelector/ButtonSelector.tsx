@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { ButtonGroup, Size } from '@@/buttons/ButtonGroup';
 import { Button } from '@@/buttons';
 
@@ -67,7 +69,8 @@ function OptionItem({
   onChange,
   disabled,
   readOnly,
-}: PropsWithChildren<OptionItemProps>) {
+  'data-cy': dataCy,
+}: PropsWithChildren<OptionItemProps> & AutomationTestingProps) {
   return (
     <Button
       color="light"
@@ -79,6 +82,7 @@ function OptionItem({
         },
         '!static !z-auto'
       )}
+      data-cy={dataCy}
     >
       {children}
       <input

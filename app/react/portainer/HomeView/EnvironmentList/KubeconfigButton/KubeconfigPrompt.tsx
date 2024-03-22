@@ -118,10 +118,18 @@ export function KubeconfigPrompt({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button onClick={onClose} color="default">
+        <Button
+          onClick={onClose}
+          color="default"
+          data-cy="cancel-kubeconfig-download-button"
+        >
           Cancel
         </Button>
-        <Button onClick={handleDownload} disabled={selection.length === 0}>
+        <Button
+          onClick={handleDownload}
+          disabled={selection.length === 0}
+          data-cy="download-kubeconfig-confirbutton"
+        >
           Download File
         </Button>
       </Modal.Footer>
