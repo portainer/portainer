@@ -242,6 +242,10 @@ func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*re
 	}
 
 	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
 	config.Insecure = true
 	config.QPS = DefaultKubeClientQPS
 	config.Burst = DefaultKubeClientBurst
