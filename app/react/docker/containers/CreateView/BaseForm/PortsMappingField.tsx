@@ -74,6 +74,7 @@ function Item({
       <div className="flex items-center gap-2">
         <InputLabeled
           size="small"
+          data-cy={`hostPort-${index}`}
           disabled={disabled}
           readOnly={readOnly}
           value={item.hostPort}
@@ -98,6 +99,7 @@ function Item({
           placeholder="e.g. 80"
           className="w-1/2"
           id={`containerPort-${index}`}
+          data-cy={`containerPort-${index}`}
         />
 
         <ButtonSelector<Protocol>

@@ -410,6 +410,7 @@ export function IngressForm({
                         </InputGroup.Addon>
                         <InputGroup.Input
                           name={`ingress_host_${hostIndex}`}
+                          data-cy={`ingress-host_${hostIndex}`}
                           id={`ingress_host_${hostIndex}`}
                           type="text"
                           className="form-control form-control-sm"

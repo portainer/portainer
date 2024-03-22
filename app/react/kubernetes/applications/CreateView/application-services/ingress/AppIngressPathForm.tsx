@@ -156,6 +156,7 @@ export function AppIngressPathForm({
           <InputGroup.Addon required>Path</InputGroup.Addon>
           <InputGroup.Input
             value={ingressPath?.Path ?? ''}
+            data-cy=""
             placeholder="/example"
             onChange={(e) => {
               const newIngressPath = {

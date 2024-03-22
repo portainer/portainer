@@ -38,6 +38,7 @@ export function OverridableInput({
       </InputGroup.ButtonWrapper>
       <InputGroup.Input
         disabled={!override}
+        data-cy="docker-container-"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         id={id}
