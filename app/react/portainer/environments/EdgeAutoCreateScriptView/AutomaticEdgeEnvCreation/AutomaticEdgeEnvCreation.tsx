@@ -164,12 +164,16 @@ function EdgeKeyInfo({
         showMetaFields
       >
         <FormControl label="Portainer API server URL">
-          <Input value={url} readOnly />
+          <Input value={url} readOnly data-cy="edge-auto-create-url-input" />
         </FormControl>
 
         {!asyncMode && (
           <FormControl label="Portainer tunnel server address">
-            <Input value={tunnelUrl} readOnly />
+            <Input
+              value={tunnelUrl}
+              readOnly
+              data-cy="edge-auto-create-tunnel-address-input"
+            />
           </FormControl>
         )}
 

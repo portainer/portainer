@@ -30,6 +30,7 @@ export function NewCredentialForm({
             />
             <Input
               value={value.NewCredentialName || ''}
+              data-cy="gitops-new-credential-name-input"
               name="new_credential_name"
               placeholder="credential name"
               className="ml-4 w-48"

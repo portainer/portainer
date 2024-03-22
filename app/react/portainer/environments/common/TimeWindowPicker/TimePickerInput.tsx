@@ -42,6 +42,7 @@ export function TimePickerInput({
         />
         <Input
           type="text"
+          data-cy="time-picker-hours-input"
           value={hours}
           className="w-12 !cursor-default text-center"
           disabled
@@ -75,6 +76,7 @@ export function TimePickerInput({
         />
         <Input
           type="text"
+          data-cy="time-picker-minutes-input"
           value={minutes}
           className="w-12 !cursor-default text-center"
           disabled

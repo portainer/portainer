@@ -46,6 +46,7 @@ export function KubeNoteMinimumCharacters() {
         >
           <Input
             name="minNoteLength"
+            data-cy="min-note-length-input"
             type="number"
             placeholder="50"
             min="1"

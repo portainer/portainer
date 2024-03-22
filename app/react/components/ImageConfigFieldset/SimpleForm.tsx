@@ -190,6 +190,7 @@ function ImageField({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       id={inputId}
+      data-cy="image-field-simple-input"
     />
   );
 }

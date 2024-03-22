@@ -74,6 +74,7 @@ function Item({
           onChange={(e) => onChange(e.target.value)}
           disabled={option.preset}
           id={inputId}
+          data-cy="env-var-input"
         />
       )}
     </FormControl>

@@ -84,6 +84,7 @@ export function BaseForm({
               setFieldValue('name', name);
             }}
             placeholder="e.g. myContainer"
+            data-cy="container-name-input"
           />
         </FormControl>
 
@@ -108,6 +109,7 @@ export function BaseForm({
                     setFieldValue('alwaysPull', alwaysPull)
                   }
                   labelClass="col-sm-3 col-lg-2"
+                  data-cy="always-pull-switch"
                 />
               </div>
             </div>

@@ -86,6 +86,7 @@ export function RelativePathFieldset({
               >
                 <Input
                   name="FilesystemPath"
+                  data-cy="relative-path-filesystem-path-input"
                   placeholder="/mnt"
                   disabled={isEditing || !enableFsPath0}
                   value={value.FilesystemPath}
@@ -148,6 +149,7 @@ export function RelativePathFieldset({
                     >
                       <Input
                         name="FilesystemPath"
+                        data-cy="per-device-configs-filesystem-path-input"
                         placeholder="/mnt"
                         disabled={isEditing || !enableFsPath1}
                         value={value.FilesystemPath}
