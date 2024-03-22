@@ -95,8 +95,15 @@ func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (*Kube
 	}
 
 	factory.mu.Lock()
+	defer factory.mu.Unlock()
+
+	// The lock was released before the client was created,
+	// so we need to check again
+	if c, ok := factory.endpointClients[key]; ok {
+		return c, nil
+	}
+
 	factory.endpointClients[key] = client
-	factory.mu.Unlock()
 
 	return client, nil
 }
