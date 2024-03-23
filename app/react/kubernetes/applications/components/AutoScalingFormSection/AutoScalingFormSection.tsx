@@ -29,6 +29,7 @@ export function AutoScalingFormSection({
       {!isMetricsEnabled && <NoMetricsServerWarning />}
       <SwitchField
         disabled={!isMetricsEnabled}
+        data-cy="k8sAppCreate-autoScaleSwitch"
         label="Enable auto scaling for this application"
         labelClass="col-sm-3 col-lg-2"
         checked={values.isUsed}

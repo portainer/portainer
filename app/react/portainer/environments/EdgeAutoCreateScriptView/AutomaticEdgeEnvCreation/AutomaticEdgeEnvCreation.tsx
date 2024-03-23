@@ -152,7 +152,12 @@ function EdgeKeyInfo({
           <code>{edgeKey}</code>
         </div>
 
-        <CopyButton copyText={edgeKey}>Copy token</CopyButton>
+        <CopyButton
+          copyText={edgeKey}
+          data-cy="edge-auto-create-copy-token-button"
+        >
+          Copy token
+        </CopyButton>
       </FormSection>
 
       <hr />

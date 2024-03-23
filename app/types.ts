@@ -4,7 +4,7 @@ export interface AutomationTestingProps {
    *
    * Change with care and communicate this with QA
    */
-  'data-cy'?: string;
+  'data-cy': string;
 }
 
 declare module 'react' {

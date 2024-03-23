@@ -49,10 +49,11 @@ export function ScaleForm({
             color="none"
             icon={X}
             onClick={() => onClose()}
-            data-cy="scale-form-cancel-button"
+            data-cy={`scale-service-cancel-button-${service.Name}`}
           />
           <LoadingButton
             isLoading={mutation.isLoading}
+            data-cy={`scale-service-submit-button-${service.Name}`}
             disabled={
               values.replicas === service.Replicas ||
               values.replicas < 0 ||

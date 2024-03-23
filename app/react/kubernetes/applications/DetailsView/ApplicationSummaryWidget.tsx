@@ -99,7 +99,7 @@ export function ApplicationSummaryWidget() {
               <>
                 {failedCreateCondition && (
                   <div
-                    className="flex gap-1 items-start alert alert-danger mb-2"
+                    className="alert alert-danger mb-2 flex items-start gap-1"
                     data-cy="k8sAppDetail-failedCreateMessage"
                   >
                     <div className="mt-0.5">

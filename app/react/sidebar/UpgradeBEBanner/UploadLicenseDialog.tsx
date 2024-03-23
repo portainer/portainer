@@ -85,6 +85,7 @@ export function UploadLicenseDialog({
                 </Button>
                 <LoadingButton
                   color="primary"
+                  data-cy="start-upgrade-button"
                   size="medium"
                   loadingText="Validating License"
                   isLoading={upgradeMutation.isLoading}

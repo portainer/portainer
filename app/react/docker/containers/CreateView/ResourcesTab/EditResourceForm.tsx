@@ -73,6 +73,7 @@ export function EditResourcesForm({
             <div className="col-sm-12 flex items-center gap-4">
               <LoadingButton
                 isLoading={updateMutation.isLoading}
+                data-cy="update-limits-button"
                 disabled={isImageInvalid || !dirty}
                 loadingText="Update in progress..."
                 type="button"

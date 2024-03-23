@@ -90,6 +90,7 @@ export function CodeEditor({
         </div>
 
         <CopyButton
+          data-cy={`copy-code-button-${id}`}
           fadeDelay={2500}
           copyText={value}
           color="link"

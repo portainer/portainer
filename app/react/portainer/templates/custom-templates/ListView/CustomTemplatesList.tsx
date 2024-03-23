@@ -66,6 +66,7 @@ export function CustomTemplatesList({
             Add Custom Template
           </Button>
         )}
+        data-cy="custom-templates-datatable-header"
       />
 
       <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">

@@ -75,6 +75,7 @@ export function StackName({
             onChange={setStackName}
             placeholder="e.g. myStack"
             inputId="stack_name"
+            data-cy="k8s-deploy-stack-input"
           />
         </div>
       </div>

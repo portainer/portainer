@@ -113,6 +113,7 @@ export function InnerForm({
           value={values.File}
           onChange={(value) => setFieldValue('File', value)}
           required
+          data-cy="custom-template-creation-file-upload"
         />
       )}
 

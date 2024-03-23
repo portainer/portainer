@@ -164,6 +164,7 @@ function ItemView() {
                       <div className="col-sm-12">
                         <LoadingButton
                           disabled={!isValid}
+                          data-cy="update-schedule-button"
                           isLoading={updateMutation.isLoading}
                           loadingText="Updating..."
                         >

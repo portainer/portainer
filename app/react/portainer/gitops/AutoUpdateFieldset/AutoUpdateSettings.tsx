@@ -72,6 +72,7 @@ export function AutoUpdateSettings({
           <div className="col-sm-12">
             <SwitchField
               name="forcePullImage"
+              data-cy="gitops-force-pull-image-switch"
               featureId={FeatureId.STACK_PULL_IMAGE}
               checked={value.ForcePullImage || false}
               label="Re-pull image"

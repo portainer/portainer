@@ -97,7 +97,11 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
             <Button
               icon={Plus}
               as={Link}
-              props={{ to: '.new', 'data-cy': 'docker-add-network-link' }}
+              props={{
+                to: '.new',
+                'data-cy': 'docker-add-network-link',
+              }}
+              data-cy="docker-add-network-button"
             >
               Add network
             </Button>
@@ -113,6 +117,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
         </TableSettingsMenu>
       )}
       getRowId={(row) => `${row.Name}-${row.Id}`}
+      data-cy="networks-datatable"
     />
   );
 }

@@ -55,7 +55,7 @@ type RenderItemFunction<T> = (
   item: T,
   onChange: (value: T) => void,
   index: number,
-  dataCy?: string,
+  dataCy: string,
   error?: ItemError<T>
 ) => React.ReactNode;
 

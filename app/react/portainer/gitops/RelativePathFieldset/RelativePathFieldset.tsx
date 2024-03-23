@@ -55,6 +55,7 @@ export function RelativePathFieldset({
         <div className="col-sm-12">
           <SwitchField
             name="EnableRelativePaths"
+            data-cy="gitops-enable-relative-paths-switch"
             label="Enable relative path volumes"
             labelClass="col-sm-3 col-lg-2"
             tooltip="Enabling this means you can specify relative path volumes in your Compose files, with Portainer pulling the content from your git repository to the environment the stack is deployed to."
@@ -115,6 +116,7 @@ export function RelativePathFieldset({
             <div className="col-sm-12">
               <SwitchField
                 name="EnablePerDeviceConfigs"
+                data-cy="gitops-enable-per-device-configs-switch"
                 label="GitOps Edge configurations"
                 labelClass="col-sm-3 col-lg-2"
                 tooltip="By enabling the GitOps Edge Configurations feature, you gain the ability to define relative path volumes in your configuration files. Portainer will then automatically fetch the content from your git repository by matching the folder name or file name with the Portainer Edge ID, and apply it to the environment where the stack is deployed"

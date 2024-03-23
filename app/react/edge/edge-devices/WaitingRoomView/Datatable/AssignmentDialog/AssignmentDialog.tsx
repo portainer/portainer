@@ -146,6 +146,7 @@ export function AssignmentDialog({
               </Button>
               <LoadingButton
                 isLoading={assignRelationsMutation.isLoading}
+                data-cy="waiting-room-associate-button"
                 loadingText="Associating..."
               >
                 Associate

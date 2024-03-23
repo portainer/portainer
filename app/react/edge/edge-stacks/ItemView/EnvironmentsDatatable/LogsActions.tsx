@@ -66,6 +66,7 @@ export function LogsActions({ environmentId, edgeStackId }: Props) {
         title="Delete logs"
         disabled={status !== 'collected'}
         onClick={handleDeleteLogs}
+        data-cy="edge-stack-logs-delete-button"
       >
         <Icon
           icon={clsx({

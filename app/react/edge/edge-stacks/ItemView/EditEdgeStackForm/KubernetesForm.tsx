@@ -20,6 +20,7 @@ export function KubernetesForm({
         <div className="col-sm-12">
           <SwitchField
             label="Use namespace(s) specified from manifest"
+            data-cy="use-manifest-namespaces-switch"
             tooltip="If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment"
             checked={values.useManifestNamespaces}
             onChange={(value) => setFieldValue('useManifestNamespaces', value)}

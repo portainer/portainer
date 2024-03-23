@@ -2,6 +2,8 @@ import { Datatable as GenericDatatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 
+import { WaitingRoomEnvironment } from '../types';
+
 import { columns } from './columns';
 import { Filter } from './Filter';
 import { TableActions } from './TableActions';
@@ -26,7 +28,7 @@ export function Datatable() {
   });
 
   return (
-    <GenericDatatable
+    <GenericDatatable<WaitingRoomEnvironment>
       settingsManager={tableState}
       columns={columns}
       dataset={environments}
@@ -41,6 +43,7 @@ export function Datatable() {
       onPageChange={setPage}
       totalCount={totalCount}
       description={<Filter />}
+      data-cy="edge-devices-waiting-room-datatable"
     />
   );
 }

@@ -17,6 +17,7 @@ export function EnableOpenAIIntegrationSwitch() {
     >
       <Switch
         id="experimental_openAI"
+        data-cy="enable-openai-integration-switch"
         name={fieldKey}
         className="space-right"
         checked={inputProps.value}

@@ -87,6 +87,7 @@ function FileEnv({ onChooseFile }: { onChooseFile: (file: Values) => void }) {
         accept=".env"
         value={file}
         color="default"
+        data-cy="load-environment-variables-from-file-button"
       />
 
       {fileTooBig && (

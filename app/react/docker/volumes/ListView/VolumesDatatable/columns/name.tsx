@@ -104,6 +104,7 @@ function Cell({
               },
               'data-cy': `volume-browse-link-${name}`,
             }}
+            data-cy={`volume-browse-button-${name}`}
           >
             browse
           </Button>

@@ -55,6 +55,7 @@ export function ConnectNetworkForm({
               </div>
               <LoadingButton
                 loadingText="Joining network..."
+                data-cy="connect-network-button"
                 isLoading={connectMutation.isLoading}
               >
                 Join Network

@@ -44,6 +44,7 @@ export function ButtonSelector<T extends string | number | boolean>({
       {options.map((option) => (
         <OptionItem
           key={option.value.toString()}
+          data-cy={`button-selector-option-${option.value}`}
           selected={value === option.value}
           onChange={() => onChange(option.value)}
           disabled={disabled || option.disabled}

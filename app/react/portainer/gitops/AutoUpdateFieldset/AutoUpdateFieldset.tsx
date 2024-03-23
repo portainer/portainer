@@ -32,6 +32,7 @@ export function AutoUpdateFieldset({
         <div className="col-sm-12">
           <SwitchField
             name="autoUpdate"
+            data-cy="gitops-auto-update-switch"
             checked={value.RepositoryAutomaticUpdates}
             label="GitOps updates"
             tooltip="When enabled, at each polling interval or webhook invocation, if the

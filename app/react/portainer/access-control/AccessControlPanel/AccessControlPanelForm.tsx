@@ -112,6 +112,7 @@ export function AccessControlPanelForm({
               </Button>
               <LoadingButton
                 size="small"
+                data-cy="update-access-control-button"
                 color="primary"
                 type="submit"
                 isLoading={isSubmitting}

@@ -29,6 +29,7 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
         </p>
         <SwitchField
           name="pullLatest"
+          data-cy="recreate-pull-latest-switch"
           label="Re-pull image"
           checked={pullLatest}
           onChange={setPullLatest}

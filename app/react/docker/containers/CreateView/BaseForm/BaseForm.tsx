@@ -123,6 +123,7 @@ export function BaseForm({
                 <div className="col-sm-12">
                   <SwitchField
                     label="Create a container webhook"
+                    data-cy="container-webhook-switch"
                     tooltip="Create a webhook (or callback URI) to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
                     checked={values.enableWebhook}
                     onChange={(enableWebhook) =>
@@ -142,6 +143,7 @@ export function BaseForm({
             <div className="col-sm-12">
               <SwitchField
                 label="Publish all exposed ports to random host ports"
+                data-cy="publish-all-ports-switch"
                 tooltip="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."
                 checked={values.publishAllPorts}
                 onChange={(publishAllPorts) =>
@@ -181,6 +183,7 @@ export function BaseForm({
           <div className="col-sm-12">
             <SwitchField
               label="Auto remove"
+              data-cy="container-auto-remove-switch"
               tooltip="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
               checked={values.autoRemove}
               onChange={(autoRemove) => setFieldValue('autoRemove', autoRemove)}
@@ -193,6 +196,7 @@ export function BaseForm({
           <div className="col-sm-12">
             <LoadingButton
               loadingText="Deployment in progress..."
+              data-cy=""
               isLoading={isLoading}
               disabled={!isValid}
             >

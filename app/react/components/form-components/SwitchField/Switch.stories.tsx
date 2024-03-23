@@ -13,7 +13,15 @@ export function Example() {
     setIsChecked(!isChecked);
   }
 
-  return <Switch name="name" checked={isChecked} onChange={onChange} id="id" />;
+  return (
+    <Switch
+      name="name"
+      data-cy="switch"
+      checked={isChecked}
+      onChange={onChange}
+      id="id"
+    />
+  );
 }
 
 interface Args {

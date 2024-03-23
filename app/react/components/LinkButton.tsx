@@ -25,8 +25,9 @@ export function LinkButton({
       props={{
         to,
         params,
-        'data-cy': dataCy,
+        'data-cy': `${dataCy}-link`,
       }}
+      data-cy={`${dataCy}-button`}
     >
       {children}
     </Button>

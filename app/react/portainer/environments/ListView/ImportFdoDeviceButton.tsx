@@ -32,6 +32,7 @@ export function ImportFdoDeviceButton() {
         'data-cy': 'import-fdo-device-link',
       }}
       className="ml-[5px]"
+      data-cy="import-fdo-device-button"
     >
       Import FDO device
     </Button>

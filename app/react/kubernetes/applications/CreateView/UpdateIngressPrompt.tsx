@@ -35,6 +35,7 @@ function UpdateIngressPrompt({
 
         <SwitchField
           name="noMatch"
+          data-cy="kube-update-ingress-prompt-switch"
           label={inputLabel}
           checked={value}
           onChange={setValue}

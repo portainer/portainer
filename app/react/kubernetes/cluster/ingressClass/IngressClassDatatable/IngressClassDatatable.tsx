@@ -50,6 +50,7 @@ export function IngressClassDatatable({
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        data-cy="ingress-class-datatable"
       />
     </div>
   );

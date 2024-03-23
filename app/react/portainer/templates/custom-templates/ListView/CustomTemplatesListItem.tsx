@@ -55,9 +55,10 @@ export function CustomTemplatesListItem({
                   params: {
                     id: template.Id,
                   },
-                  'data-cy': `custom-templates-edit-${template.Id}`,
+                  'data-cy': `custom-templates-edit-link-${template.Id}`,
                 }}
                 icon={Edit}
+                data-cy={`custom-templates-edit-button-${template.Id}`}
               >
                 Edit
               </Button>

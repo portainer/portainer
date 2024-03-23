@@ -98,6 +98,7 @@ export function AssociateAMTDialog({
         </Button>
         <LoadingButton
           onClick={handleSubmit}
+          data-cy="associate-amt-dialog-associate-button"
           disabled={selection.length === 0}
           loadingText="Associating..."
           isLoading={activateDeviceMutation.isLoading}

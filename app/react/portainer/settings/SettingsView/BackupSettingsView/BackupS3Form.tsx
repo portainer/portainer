@@ -64,6 +64,7 @@ export function BackupS3Form() {
               <div className="col-sm-12">
                 <SwitchField
                   name="schedule-automatic-backup"
+                  data-cy="settings-scheduleAutomaticBackupSwitch"
                   labelClass="col-sm-3 col-lg-2"
                   label="Schedule automatic backups"
                   checked={values.scheduleAutomaticBackup}

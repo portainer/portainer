@@ -179,6 +179,7 @@ export function Datatable<D extends DefaultType>({
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
+        data-cy={`${dataCy}-header`}
       />
 
       <DatatableContent<D>

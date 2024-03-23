@@ -53,6 +53,7 @@ export function AssociatedEnvironmentsSelector({
                   );
                 }
               }}
+              data-cy="edgeGroupCreate-associatedEndpoints"
             />
           </div>
         </div>

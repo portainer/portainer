@@ -93,7 +93,11 @@ export function EnvironmentCreationView() {
                     'flex justify-between'
                   )}
                 >
-                  <Button disabled={isFirstStep} onClick={onPreviousClick}>
+                  <Button
+                    disabled={isFirstStep}
+                    onClick={onPreviousClick}
+                    data-cy="environment-wizard-previous-button"
+                  >
                     <Icon icon={ArrowLeft} /> Previous
                   </Button>
                   <Button

@@ -111,6 +111,7 @@ function CreateView() {
                       <div className="col-sm-12">
                         <LoadingButton
                           disabled={!isValid}
+                          data-cy="update-schedules-create-submit-button"
                           isLoading={createMutation.isLoading}
                           loadingText="Creating..."
                         >

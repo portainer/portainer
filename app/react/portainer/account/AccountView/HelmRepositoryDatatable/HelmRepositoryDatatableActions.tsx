@@ -29,7 +29,10 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         Remove
       </Button>
 
-      <AddButton to="portainer.account.createHelmRepository">
+      <AddButton
+        to="portainer.account.createHelmRepository"
+        data-cy="helm-repositories-addButton"
+      >
         Add Helm repository
       </AddButton>
     </div>
