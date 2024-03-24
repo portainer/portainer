@@ -108,7 +108,8 @@ export function Datatable<D extends DefaultType>({
   );
 
   const allColumns = useMemo(
-    () => _.compact([!disableSelect && createSelectColumn<D>(), ...columns]),
+    () =>
+      _.compact([!disableSelect && createSelectColumn<D>(dataCy), ...columns]),
     [disableSelect, columns]
   );
 

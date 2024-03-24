@@ -2,7 +2,7 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 
-export function createSelectColumn<T>(): ColumnDef<T> {
+export function createSelectColumn<T>(dataCy: string): ColumnDef<T> {
   let lastSelectedId = '';
 
   return {
@@ -10,7 +10,7 @@ export function createSelectColumn<T>(): ColumnDef<T> {
     header: ({ table }) => (
       <Checkbox
         id="select-all"
-        data-cy="select-all-checkbox"
+        data-cy={`select-all-checkbox-${dataCy}`}
         checked={table.getIsAllRowsSelected()}
         indeterminate={table.getIsSomeRowsSelected()}
         onChange={table.getToggleAllRowsSelectedHandler()}
