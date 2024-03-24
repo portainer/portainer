@@ -29,9 +29,7 @@
             <tr
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
             >
-              <td>
-                {{ item.Endpoint.Name }}
-              </td>
+              <td> {{ item.Endpoint.Name }} </td>
               <td>
                 <button ng-if="item.LogsStatus === 0 || item.LogsStatus === 1" class="btn btn-sm btn-primary" ng-click="$ctrl.collectLogs(item.EndpointId)"> Retrieve logs </button>
                 <button ng-if="item.LogsStatus === 3" class="btn btn-sm btn-primary" ng-click="$ctrl.onDownloadLogsClick(item.EndpointId)"> Download logs </button>

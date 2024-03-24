@@ -90,9 +90,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
                 <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
-                {{ $ctrl.state.formValidationError }}
-              </span>
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px"> {{ $ctrl.state.formValidationError }} </span>
             </div>
           </div>
           <!-- !actions -->

@@ -42,9 +42,7 @@
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{ active: item.Checked }"
             >
-              <td>
-                {{ item.Name }}
-              </td>
+              <td> {{ item.Name }} </td>
               <td>
                 <p ng-repeat="group in item.Groups" style="margin: 0">{{ group }}</p>
               </td>

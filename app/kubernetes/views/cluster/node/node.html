@@ -40,12 +40,8 @@
                     <tr>
                       <td>Status</td>
                       <td>
-                        <span class="label label-{{ ctrl.node.Status | kubernetesNodeStatusColor }}">
-                          {{ ctrl.node.Status }}
-                        </span>
-                        <span ng-if="ctrl.node.Status == 'Warning'" class="text text-warning">
-                          {{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }}
-                        </span>
+                        <span class="label label-{{ ctrl.node.Status | kubernetesNodeStatusColor }}"> {{ ctrl.node.Status }} </span>
+                        <span ng-if="ctrl.node.Status == 'Warning'" class="text text-warning"> {{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }} </span>
                       </td>
                     </tr>
                     <tr>

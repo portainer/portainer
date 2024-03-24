@@ -20,15 +20,11 @@
               <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
                 <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating" />
               </td>
-              <td ng-if="applicationState.endpoint.apiVersion >= 1.25">
-                {{ service.Name }}
-              </td>
+              <td ng-if="applicationState.endpoint.apiVersion >= 1.25"> {{ service.Name }} </td>
             </tr>
             <tr>
               <td>ID</td>
-              <td>
-                {{ service.Id }}
-              </td>
+              <td> {{ service.Id }} </td>
             </tr>
             <tr ng-if="service.CreatedAt">
               <td>Created at</td>
