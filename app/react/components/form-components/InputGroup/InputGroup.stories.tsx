@@ -92,7 +92,7 @@ function Addons() {
             onChange={(e) => setValue2(e.target.value)}
           />
           <InputGroup.Addon>
-            <input type="checkbox" />
+            <input type="checkbox" data-cy="checkbox" />
           </InputGroup.Addon>
         </InputGroup>
       </div>

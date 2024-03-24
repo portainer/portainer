@@ -32,7 +32,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="tags-selectAll" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -53,7 +53,7 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" data-cy="tags-selectItem_{{ $index }}" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 {{ item.Name }}

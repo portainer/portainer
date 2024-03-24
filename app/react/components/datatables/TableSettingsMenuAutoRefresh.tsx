@@ -21,6 +21,7 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
     <>
       <Checkbox
         id="settings-auto-refresh"
+        data-cy="settings-auto-refresh"
         label="Auto refresh"
         checked={isEnabled}
         onChange={(e) => onChange(e.target.checked ? 10 : 0)}

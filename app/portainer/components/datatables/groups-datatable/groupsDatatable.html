@@ -68,7 +68,13 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                    data-cy="endpointGroup-selectCheckbox_{{ $index }}"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.groups.group({id: item.Id})">{{ item.Name }}</a>

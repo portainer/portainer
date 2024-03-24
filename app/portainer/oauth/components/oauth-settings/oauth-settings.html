@@ -191,9 +191,7 @@
     </div>
 
     <div class="form-group">
-      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-        {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
-      </label>
+      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left"> {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }} </label>
       <div class="col-sm-9 col-lg-10">
         <input
           type="password"
@@ -397,9 +395,7 @@
       </div>
 
       <div class="form-group">
-        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-          {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
-        </label>
+        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left"> {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }} </label>
         <div class="col-sm-9 col-lg-10">
           <input
             type="password"

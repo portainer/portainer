@@ -23,6 +23,7 @@ export function NewCredentialForm({
           <div className="flex items-center gap-2">
             <Checkbox
               id="repository-save-credential"
+              data-cy="gitops-save-credential-checkbox"
               label="save credential"
               checked={value.SaveCredential || false}
               className="[&+label]:mb-0"

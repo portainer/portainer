@@ -71,6 +71,7 @@ export function AssignmentDialog({
                     <div className="mt-2">
                       <Checkbox
                         label="Override pre-assigned group"
+                        data-cy="override-group-checkbox"
                         id="overrideGroup"
                         bold={false}
                         checked={values.overrideGroup}
@@ -94,6 +95,7 @@ export function AssignmentDialog({
                     <div className="mt-2">
                       <Checkbox
                         label="Override pre-assigned edge groups"
+                        data-cy="override-edge-groups-checkbox"
                         bold={false}
                         id="overrideEdgeGroups"
                         checked={values.overrideEdgeGroups}
@@ -124,6 +126,7 @@ export function AssignmentDialog({
                     <div className="mt-2">
                       <Checkbox
                         label="Override pre-assigned tags"
+                        data-cy="override-tags-checkbox"
                         bold={false}
                         id="overrideTags"
                         checked={values.overrideTags}

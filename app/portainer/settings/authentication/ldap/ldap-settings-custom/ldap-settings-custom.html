@@ -45,7 +45,14 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <input
+        type="checkbox"
+        id="anonymous_mode"
+        ng-model="$ctrl.settings.AnonymousMode"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+        data-cy="anonymous-mode-checkbox"
+      />
       <span class="slider round"></span>
     </label>
   </div>

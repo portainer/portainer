@@ -41,7 +41,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox" ng-show="$ctrl.isAdmin">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="user-selectAllCheckbox" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -80,7 +80,14 @@
             >
               <td>
                 <span class="md-checkbox" ng-show="$ctrl.isAdmin">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                    ng-disabled="!$ctrl.allowSelection(item)"
+                    data-cy="user-selectUserCheckbox"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.users.user({id: item.Id})" ng-show="$ctrl.isAdmin">{{ item.Username }}</a>

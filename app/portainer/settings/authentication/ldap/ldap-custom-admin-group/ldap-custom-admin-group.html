@@ -102,7 +102,14 @@
           Assign admin rights to group(s)
         </label>
         <label class="switch my-0 ml-7" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
-          <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" />
+          <input
+            id="admin-auto-populate"
+            ng-disabled="!$ctrl.enableAssignAdminGroup"
+            name="admin-auto-populate"
+            type="checkbox"
+            ng-model="$ctrl.settings.AdminAutoPopulate"
+            data-cy="admin-auto-populate"
+          />
           <span class="slider round before:content-['']"></span>
         </label>
       </div>

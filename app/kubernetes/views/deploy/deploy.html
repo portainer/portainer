@@ -33,7 +33,7 @@
                   </label>
                   <div class="col-sm-8 vertical-center pt-3">
                     <label class="switch">
-                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" data-cy="use-namespce-from-menifest" />
                       <span class="slider round"></span>
                     </label>
                   </div>
@@ -87,7 +87,7 @@
                 </div>
 
                 <div ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
-                  <div class="w-fit mb-4">
+                  <div class="mb-4 w-fit">
                     <stack-name-label-insight></stack-name-label-insight>
                   </div>
                   <kube-stack-name stack-name="ctrl.formValues.StackName" set-stack-name="(ctrl.setStackName)" stacks="ctrl.stacks"></kube-stack-name>

@@ -57,11 +57,23 @@
                   <div class="menuContent">
                     <div>
                       <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                        <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                        <input
+                          id="setting_show_system"
+                          type="checkbox"
+                          ng-model="$ctrl.settings.showSystem"
+                          ng-change="$ctrl.onSettingsShowSystemChange()"
+                          data-cy="k8sNamespace-showSystemCheckbox"
+                        />
                         <label for="setting_show_system">Show system resources</label>
                       </div>
                       <div class="md-checkbox">
-                        <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                        <input
+                          id="setting_auto_refresh"
+                          type="checkbox"
+                          ng-model="$ctrl.settings.repeater.autoRefresh"
+                          ng-change="$ctrl.onSettingsRepeaterChange()"
+                          data-cy="k8sNamespace-autoRefreshCheckbox"
+                        />
                         <label for="setting_auto_refresh">Auto refresh</label>
                       </div>
                       <div ng-if="$ctrl.settings.repeater.autoRefresh">
@@ -103,7 +115,7 @@
               <th class="dropdown">
                 <div class="vertical-center flex min-w-max flex-nowrap">
                   <span ng-if="$ctrl.isAdmin" class="md-checkbox vertical-center">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sNamespace-selectAllCheckbox" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -154,7 +166,14 @@
             >
               <td>
                 <span ng-if="$ctrl.isAdmin" class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                    ng-disabled="$ctrl.disableRemove(item)"
+                    data-cy="k8sNamespace-selectCheckbox_{{ item.Namespace.Name }}"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace.Name })">{{ item.Namespace.Name }}</a>

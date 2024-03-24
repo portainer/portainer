@@ -6,9 +6,7 @@
           <div class="widget-icon space-right">
             <pr-icon icon="'svg-laptopcode'"></pr-icon>
           </div>
-          <span class="vertical-center">
-            {{ $ctrl.titleText }}
-          </span>
+          <span class="vertical-center"> {{ $ctrl.titleText }} </span>
         </div>
         <div class="searchBar min-w-[260px]">
           <pr-icon icon="'search'" class="vertical-center" class-name="'searchIcon'"></pr-icon>
@@ -31,7 +29,13 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                      <input
+                        id="setting_auto_refresh"
+                        type="checkbox"
+                        ng-model="$ctrl.settings.repeater.autoRefresh"
+                        ng-change="$ctrl.onSettingsRepeaterChange()"
+                        data-cy="auto-refresh-checkbox"
+                      />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">

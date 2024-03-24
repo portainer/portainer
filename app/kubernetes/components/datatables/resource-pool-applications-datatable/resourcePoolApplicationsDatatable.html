@@ -29,7 +29,13 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                      <input
+                        id="setting_auto_refresh"
+                        type="checkbox"
+                        ng-model="$ctrl.settings.repeater.autoRefresh"
+                        ng-change="$ctrl.onSettingsRepeaterChange()"
+                        data-cy="auto-refresh-checkbox"
+                      />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">

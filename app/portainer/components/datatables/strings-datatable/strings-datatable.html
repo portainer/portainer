@@ -38,7 +38,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="strings-select-all" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -63,6 +63,7 @@
                   <input
                     id="select_{{ $index }}"
                     type="checkbox"
+                    data-cy="strings-select-item_{{ $index }}"
                     ng-checked="$ctrl.state.selectedItems.includes(item)"
                     ng-disabled="$ctrl.disableRemove(item)"
                     ng-click="$ctrl.selectItem(item, $event)"

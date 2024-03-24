@@ -18,7 +18,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox vertical-center">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="select-all-checkbox" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -60,20 +60,21 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableSelection(item)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                    ng-disabled="$ctrl.disableSelection(item)"
+                    data-cy="select-checkbox_{{ $index }}"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 {{ item.Namespace }}
               </td>
-              <td>
-                {{ item.Name }}
-              </td>
-              <td>
-                {{ item.PathWithNamespace }}
-              </td>
-              <td>
-                {{ item.Description }}
-              </td>
+              <td> {{ item.Name }} </td>
+              <td> {{ item.PathWithNamespace }} </td>
+              <td> {{ item.Description }} </td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
               <td colspan="3" class="text-muted text-center">No projects available.</td>
