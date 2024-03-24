@@ -88,6 +88,7 @@ function OptionItem({
       {children}
       <input
         type="radio"
+        data-cy={`${dataCy}-radio-input`}
         checked={selected}
         onChange={onChange}
         disabled={disabled}

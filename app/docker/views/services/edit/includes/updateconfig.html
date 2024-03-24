@@ -44,6 +44,7 @@
                   <input
                     type="radio"
                     name="failure_action"
+                    data-cy="update-failure-action-continue"
                     ng-model="service.UpdateFailureAction"
                     value="continue"
                     ng-change="updateServiceAttribute(service, 'UpdateFailureAction')"
@@ -55,6 +56,7 @@
                   <input
                     type="radio"
                     name="failure_action"
+                    data-cy="update-failure-action-pause"
                     ng-model="service.UpdateFailureAction"
                     value="pause"
                     ng-change="updateServiceAttribute(service, 'UpdateFailureAction')"
@@ -76,6 +78,7 @@
                   <input
                     type="radio"
                     name="updateconfig_order"
+                    data-cy="update-order-start-first"
                     ng-model="service.UpdateOrder"
                     value="start-first"
                     ng-change="updateServiceAttribute(service, 'UpdateOrder')"
@@ -87,6 +90,7 @@
                   <input
                     type="radio"
                     name="updateconfig_order"
+                    data-cy="update-order-stop-first"
                     ng-model="service.UpdateOrder"
                     value="stop-first"
                     ng-change="updateServiceAttribute(service, 'UpdateOrder')"
