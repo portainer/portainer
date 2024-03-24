@@ -41,7 +41,7 @@ function Cell({
   return ports
     .filter((port) => port.PublishedPort)
     .map((port) => {
-      const scheme = port.PublishedPort === 443 ? 'https' : 'http';
+      const scheme = port.TargetPort === 443 ? 'https' : 'http';
       return (
         <a
           key={`${publicUrl}:${port.PublishedPort}`}
