@@ -117,7 +117,7 @@ export function ApplicationSummaryWidget() {
                     </div>
                   </div>
                 )}
-                <DetailsTable>
+                <DetailsTable dataCy="k8sAppDetail-table">
                   <tr>
                     <td>Name</td>
                     <td>

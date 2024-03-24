@@ -16,7 +16,7 @@ interface Props extends IconProps {
   to?: string;
   params?: object;
   children?: ReactNode;
-  dataCy?: string;
+  dataCy: string;
 }
 
 export function DashboardItem({

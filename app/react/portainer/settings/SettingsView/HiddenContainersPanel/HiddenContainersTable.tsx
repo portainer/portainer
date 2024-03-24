@@ -19,6 +19,7 @@ export function HiddenContainersTable({
       headers={['Name', 'Value', '']}
       className="table-hover"
       emptyMessage="No filter available."
+      dataCy="hidden-containers-table"
     >
       {labels.map((label, index) => (
         <DetailsTable.Row
