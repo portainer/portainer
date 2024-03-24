@@ -46,6 +46,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-reservation-slider"
                 model="service.ReservationNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"
@@ -66,6 +67,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-limit-slider"
                 model="service.LimitNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"

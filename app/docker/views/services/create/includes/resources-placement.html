@@ -4,7 +4,14 @@
   <div class="form-group">
     <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory reservation </label>
     <div class="col-sm-3">
-      <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
+      <slider
+        model="formValues.MemoryReservation"
+        floor="0"
+        ceil="state.sliderMaxMemory"
+        step="256"
+        ng-if="state.sliderMaxMemory"
+        data-cy="docker-services-create-memory-reservation-slider"
+      ></slider>
     </div>
     <div class="col-sm-2">
       <input type="number" data-cy="docker-services-create-memory-reservation-input" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
@@ -18,7 +25,14 @@
   <div class="form-group">
     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory limit </label>
     <div class="col-sm-3">
-      <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
+      <slider
+        model="formValues.MemoryLimit"
+        floor="0"
+        ceil="state.sliderMaxMemory"
+        step="256"
+        ng-if="state.sliderMaxMemory"
+        data-cy="docker-services-create-memory-limit-slider"
+      ></slider>
     </div>
     <div class="col-sm-2">
       <input type="number" data-cy="docker-services-create-memory-limit-input" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
@@ -32,7 +46,15 @@
   <div class="form-group">
     <label for="cpu-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU reservation </label>
     <div class="col-sm-5">
-      <slider model="formValues.CpuReservation" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
+      <slider
+        model="formValues.CpuReservation"
+        floor="0"
+        ceil="state.sliderMaxCpu"
+        step="0.25"
+        precision="2"
+        ng-if="state.sliderMaxCpu"
+        data-cy="docker-services-create-cpu-reservation-slider"
+      ></slider>
     </div>
     <div class="col-sm-4" style="margin-top: 20px">
       <p class="small text-muted"> Minimum CPU available on a node to run a task </p>
@@ -43,7 +65,15 @@
   <div class="form-group">
     <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
     <div class="col-sm-5">
-      <slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
+      <slider
+        model="formValues.CpuLimit"
+        floor="0"
+        ceil="state.sliderMaxCpu"
+        step="0.25"
+        precision="2"
+        ng-if="state.sliderMaxCpu"
+        data-cy="docker-services-create-cpu-limit-slider"
+      ></slider>
     </div>
     <div class="col-sm-4" style="margin-top: 20px">
       <p class="small text-muted"> Maximum CPU usage per task </p>
