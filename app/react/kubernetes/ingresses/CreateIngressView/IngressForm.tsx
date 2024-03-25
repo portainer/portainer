@@ -15,6 +15,7 @@ import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
 import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
+import { Input } from '@@/form-components/Input';
 
 import { AnnotationsForm } from '../../annotations/AnnotationsForm';
 
@@ -205,7 +206,7 @@ export function IngressForm({
                   {isEdit ? (
                     rule.IngressName
                   ) : (
-                    <input
+                    <Input
                       name="ingress_name"
                       type="text"
                       className="form-control"
@@ -215,6 +216,7 @@ export function IngressForm({
                         handleIngressChange('IngressName', e.target.value)
                       }
                       disabled={isEdit}
+                      data-cy="k8sAppCreate-ingressNameInput"
                     />
                   )}
                   {errors.ingressName && !isEdit && (

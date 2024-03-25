@@ -18,7 +18,15 @@
       <portainer-tooltip message="'Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns.'"></portainer-tooltip>
     </label>
     <div class="col-sm-4 col-lg-3">
-      <input type="text" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" />
+      <input
+        type="text"
+        class="form-control"
+        ng-model="formValues.UpdateDelay"
+        id="update-delay"
+        placeholder="e.g. 1m"
+        ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+        data-cy="docker-service-update-delay-input"
+      />
     </div>
     <div class="col-sm-5">
       <p class="small text-muted"> Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 0s, 0 seconds. </p>
@@ -77,7 +85,15 @@
       <portainer-tooltip message="'Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns.'"></portainer-tooltip>
     </label>
     <div class="col-sm-4 col-lg-3">
-      <input type="text" class="form-control" ng-model="formValues.RestartDelay" id="restart-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" />
+      <input
+        type="text"
+        class="form-control"
+        ng-model="formValues.RestartDelay"
+        id="restart-delay"
+        placeholder="e.g. 1m"
+        ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+        data-cy="docker-service-restart-delay-input"
+      />
     </div>
     <div class="col-sm-5">
       <p class="small text-muted"> Delay between restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 5s, 5 seconds. </p>
@@ -109,7 +125,15 @@
       <portainer-tooltip message="'Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns.'"></portainer-tooltip>
     </label>
     <div class="col-sm-4 col-lg-3">
-      <input type="text" class="form-control" ng-model="formValues.RestartWindow" id="restart-window" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" />
+      <input
+        type="text"
+        class="form-control"
+        ng-model="formValues.RestartWindow"
+        id="restart-window"
+        placeholder="e.g. 1m"
+        ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+        data-cy="docker-service-restart-window-input"
+      />
     </div>
     <div class="col-sm-5">
       <p class="small text-muted">

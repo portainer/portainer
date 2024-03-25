@@ -93,7 +93,7 @@
       <div ng-repeat="constraint in formValues.PlacementConstraints" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">name</span>
-          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" />
+          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" data-cy="docker-services-create-placement-constraint-name-{{ $index }}" />
         </div>
         <div class="input-group col-sm-1 input-group-sm">
           <select name="constraintOperator" class="form-control" ng-model="constraint.operator" data-cy="docker-services-create-placement-constraint-operator-">
@@ -103,7 +103,7 @@
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" />
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" data-cy="docker-services-create-placement-constraint-value-{{ $index }}" />
         </div>
         <button class="btn btn-dangerlight" type="button" ng-click="removePlacementConstraint($index)">
           <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -124,11 +124,23 @@
       <div ng-repeat="preference in formValues.PlacementPreferences" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">strategy</span>
-          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread" />
+          <input
+            type="text"
+            class="form-control"
+            ng-model="preference.strategy"
+            placeholder="e.g. spread"
+            data-cy="docker-services-create-placement-preference-strategy-{{ $index }}"
+          />
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. node.labels.datacenter" />
+          <input
+            type="text"
+            class="form-control"
+            ng-model="preference.value"
+            placeholder="e.g. node.labels.datacenter"
+            data-cy="docker-services-create-placement-preference-value-{{ $index }}"
+          />
         </div>
         <button class="btn btn-dangerlight" type="button" ng-click="removePlacementPreference($index)">
           <pr-icon icon="'trash-2'" size="'md'"></pr-icon>

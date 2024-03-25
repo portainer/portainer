@@ -18,7 +18,14 @@
             <tr>
               <td class="w-1/5">Name</td>
               <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
-                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="service.Name"
+                  ng-change="updateServiceAttribute(service, 'Name')"
+                  ng-disabled="isUpdating"
+                  data-cy="docker-service-edit-name"
+                />
               </td>
               <td ng-if="applicationState.endpoint.apiVersion >= 1.25"> {{ service.Name }} </td>
             </tr>

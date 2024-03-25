@@ -9,7 +9,7 @@
           <div class="form-group">
             <label for="config_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="ctrl.formValues.Name" id="config_name" placeholder="e.g. myConfig" />
+              <input type="text" class="form-control" ng-model="ctrl.formValues.Name" id="config_name" placeholder="e.g. myConfig" data-cy="config-name-input" />
             </div>
           </div>
           <!-- !name-input -->
@@ -37,11 +37,11 @@
               <div ng-repeat="label in ctrl.formValues.Labels" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
+                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" data-cy="config-label-input_{{ $index }}" />
                 </div>
                 <div class="input-group col-sm-6 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="config-label-value_{{ $index }}" />
                   <span class="input-group-btn">
                     <button class="btn btn-dangerlight" type="button" ng-click="ctrl.removeLabel($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>

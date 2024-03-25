@@ -35,7 +35,15 @@
                     <option ng-repeat="command in containerCommands" value="{{ command.command }}">{{ command.title }}: {{ command.command }}</option>
                   </select>
                 </div>
-                <input class="form-control" ng-if="formValues.isCustomCommand" type="text" name="custom-command" ng-model="formValues.customCommand" placeholder="e.g. ps aux" />
+                <input
+                  class="form-control"
+                  ng-if="formValues.isCustomCommand"
+                  type="text"
+                  name="custom-command"
+                  ng-model="formValues.customCommand"
+                  placeholder="e.g. ps aux"
+                  data-cy="custom-command"
+                />
               </div>
             </div>
             <!-- !command-list -->
@@ -53,7 +61,7 @@
                 <portainer-tooltip message="'Format is one of: user, user:group, uid or uid:gid'"></portainer-tooltip>
               </label>
               <div class="col-lg-11 col-sm-10">
-                <input class="form-control" type="text" ng-model="formValues.user" placeholder="root" />
+                <input class="form-control" type="text" ng-model="formValues.user" placeholder="root" data-cy="container-exec-user" />
               </div>
             </div>
             <div class="form-group">

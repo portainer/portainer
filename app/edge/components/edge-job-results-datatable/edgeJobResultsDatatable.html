@@ -8,7 +8,15 @@
         </div>
         <div class="searchBar">
           <span><pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon></span>
-          <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="edgeJobResults-searchInput"
+          />
         </div>
       </div>
       <div class="table-responsive">

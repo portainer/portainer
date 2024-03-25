@@ -25,6 +25,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-constraint-key-input-{{ $index }}"
                   class="form-control"
                   ng-model="constraint.key"
                   placeholder="e.g. node.role"
@@ -54,6 +55,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-constraint-value-input-{{ $index }}"
                   class="form-control"
                   ng-model="constraint.value"
                   placeholder="e.g. manager"

@@ -26,6 +26,7 @@
               <input
                 class="input-sm"
                 type="text"
+                data-cy="docker-service-update-delay-input"
                 ng-model="service.UpdateDelay"
                 ng-change="updateServiceAttribute(service, 'UpdateDelay')"
                 ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"

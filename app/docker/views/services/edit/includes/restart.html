@@ -31,6 +31,7 @@
               <input
                 class="input-sm"
                 type="text"
+                data-cy="docker-service-restart-delay-input"
                 ng-model="service.RestartDelay"
                 ng-change="updateServiceAttribute(service, 'RestartDelay')"
                 ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
@@ -65,6 +66,7 @@
               <input
                 class="input-sm"
                 type="text"
+                data-cy="docker-service-restart-window-input"
                 ng-model="service.RestartWindow"
                 ng-change="updateServiceAttribute(service, 'RestartWindow')"
                 ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"

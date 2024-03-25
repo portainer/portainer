@@ -12,6 +12,7 @@
           <pr-icon icon="'search'" class="searchIcon"></pr-icon>
           <input
             type="text"
+            data-cy="namespace-search-input"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"

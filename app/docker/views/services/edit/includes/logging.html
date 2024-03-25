@@ -31,7 +31,14 @@
             <td class="w-1/2">
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="option.key" ng-disabled="option.added || isUpdating" placeholder="e.g. FOO" />
+                <input
+                  type="text"
+                  data-cy="service-logging-driver-option-name-input-{{ $index }}"
+                  class="form-control"
+                  ng-model="option.key"
+                  ng-disabled="option.added || isUpdating"
+                  placeholder="e.g. FOO"
+                />
               </div>
             </td>
             <td>
@@ -39,6 +46,7 @@
                 <span class="input-group-addon fit-text-size">value</span>
                 <input
                   type="text"
+                  data-cy="service-logging-driver-option-value-input-{{ $index }}"
                   class="form-control"
                   ng-model="option.value"
                   ng-change="updateLogDriverOpt(service, option)"

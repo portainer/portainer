@@ -101,6 +101,7 @@
                       <span class="input-group-addon">Key</span>
                       <input
                         type="text"
+                        data-cy="label-key-input-{{ $index }}"
                         class="form-control"
                         name="label_key_{{ $index }}"
                         ng-model="label.Key"
@@ -113,6 +114,7 @@
                       <span class="input-group-addon">Value</span>
                       <input
                         type="text"
+                        data-cy="label-value-input-{{ $index }}"
                         class="form-control"
                         name="label_value_{{ $index }}"
                         ng-change="ctrl.onChangeLabel($index)"
@@ -160,11 +162,26 @@
                   <div class="form-inline" ng-repeat="taint in ctrl.formValues.Taints" style="padding: 3px 0 3px 0">
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Key</span>
-                      <input type="text" class="form-control" name="taint_key_{{ $index }}" ng-model="taint.Key" ng-change="ctrl.onChangeTaintKey($index)" required />
+                      <input
+                        type="text"
+                        data-cy="taint-key-input-{{ $index }}"
+                        class="form-control"
+                        name="taint_key_{{ $index }}"
+                        ng-model="taint.Key"
+                        ng-change="ctrl.onChangeTaintKey($index)"
+                        required
+                      />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" name="taint_value_{{ $index }}" ng-model="taint.Value" ng-change="ctrl.onChangeTaint($index)" />
+                      <input
+                        type="text"
+                        data-cy="taint-value-input-{{ $index }}"
+                        class="form-control"
+                        name="taint_value_{{ $index }}"
+                        ng-model="taint.Value"
+                        ng-change="ctrl.onChangeTaint($index)"
+                      />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Effect</span>

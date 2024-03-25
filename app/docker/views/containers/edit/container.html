@@ -88,7 +88,7 @@
               </td>
               <td ng-if="container.edit">
                 <form ng-submit="renameContainer()">
-                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" />
+                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" data-cy="containerNameInput" />
                   <a href="" ng-click="container.edit = false;">
                     <pr-icon icon="'x'"></pr-icon>
                   </a>

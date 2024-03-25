@@ -12,6 +12,7 @@
           <pr-icon icon="'search'" class="searchIcon"></pr-icon>
           <input
             type="text"
+            data-cy="accessTokens-searchInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"

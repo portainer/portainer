@@ -196,7 +196,7 @@ export function BaseForm({
           <div className="col-sm-12">
             <LoadingButton
               loadingText="Deployment in progress..."
-              data-cy=""
+              data-cy="deploy-container-button"
               isLoading={isLoading}
               disabled={!isValid}
             >

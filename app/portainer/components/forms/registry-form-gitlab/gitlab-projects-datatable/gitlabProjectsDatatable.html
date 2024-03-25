@@ -8,7 +8,15 @@
         </div>
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" class="searchIcon"></pr-icon>
-          <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus />
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            data-cy="gitlabProjects-searchInput"
+          />
         </div>
       </div>
       <div class="table-responsive">

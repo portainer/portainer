@@ -106,13 +106,13 @@
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
+            data-cy="k8sApp-searchApplicationsInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
-            data-cy="k8sApp-searchApplicationsInput"
           />
         </div>
       </div>

@@ -12,13 +12,13 @@
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
+            data-cy="registry-searchInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search for a registry..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
-            data-cy="registry-searchInput"
           />
         </div>
         <div class="actionBar !gap-3" ng-if="$ctrl.isAdmin">

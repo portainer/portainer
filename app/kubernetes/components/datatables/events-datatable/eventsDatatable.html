@@ -10,13 +10,13 @@
       <pr-icon icon="'search'" class="vertical-center"></pr-icon>
       <input
         type="text"
+        data-cy="k8sConfigDetail-eventsTableSearchInput"
         class="searchInput ml-1"
         ng-model="$ctrl.state.textFilter"
         ng-change="$ctrl.onTextFilterChange()"
         placeholder="Search for an event..."
         auto-focus
         ng-model-options="{ debounce: 300 }"
-        data-cy="k8sConfigDetail-eventsTableSearchInput"
       />
     </div>
     <div class="settings">

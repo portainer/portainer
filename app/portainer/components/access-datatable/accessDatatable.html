@@ -12,6 +12,7 @@
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
+            data-cy="accessDatatable-searchInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"

@@ -12,13 +12,13 @@
           <pr-icon icon="'search'"></pr-icon>
           <input
             type="text"
+            data-cy="endpointGroup-searchInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search for a group..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
-            data-cy="endpointGroup-searchInput"
           />
         </div>
         <div class="actionBar !gap-3">

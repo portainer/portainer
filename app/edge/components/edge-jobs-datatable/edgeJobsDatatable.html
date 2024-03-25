@@ -11,7 +11,15 @@
 
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" class-name="'icon'"></pr-icon>
-          <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="edgeJobs-searchInput"
+          />
         </div>
         <div class="actionBar">
           <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
