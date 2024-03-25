@@ -24,7 +24,7 @@ export function RegistriesSelector({
   return (
     <>
       {options.length === 0 && (
-        <p className="text-muted text-xs mb-1 mt-2">
+        <p className="text-muted mb-1 mt-2 text-xs">
           {isPureAdmin ? (
             <span>
               No registries available. Head over to the{' '}

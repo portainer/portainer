@@ -103,6 +103,7 @@ function SelectAndInputItem({
       />
       <Select
         onChange={(e) => onChange({ ...item, select: e.target.value })}
+        data-cy="select"
         options={[
           { label: 'option1', value: 'option1' },
           { label: 'option2', value: 'option2' },

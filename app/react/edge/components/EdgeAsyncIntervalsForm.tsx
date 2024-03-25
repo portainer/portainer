@@ -96,6 +96,7 @@ export function EdgeAsyncIntervalsForm({
       >
         <Select
           value={values.PingInterval}
+          data-cy="edge-checkin-ping-interval-select"
           name="PingInterval"
           onChange={handleChange}
           options={pingIntervalOptions}
@@ -110,6 +111,7 @@ export function EdgeAsyncIntervalsForm({
       >
         <Select
           value={values.SnapshotInterval}
+          data-cy="edge-checkin-snapshot-interval-select"
           name="SnapshotInterval"
           onChange={handleChange}
           options={snapshotIntervalOptions}
@@ -124,6 +126,7 @@ export function EdgeAsyncIntervalsForm({
       >
         <Select
           value={values.CommandInterval}
+          data-cy="edge-checkin-command-interval-select"
           name="CommandInterval"
           onChange={handleChange}
           options={commandIntervalOptions}

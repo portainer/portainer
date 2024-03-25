@@ -214,6 +214,7 @@ export function RelativePathFieldset({
                   <FormControl label="Device matching rule">
                     <Select
                       value={value.PerDeviceConfigsMatchType}
+                      data-cy="per-device-configs-match-type-select"
                       onChange={(e) =>
                         innerOnChange({
                           PerDeviceConfigsMatchType: getPerDevConfigsFilterType(
@@ -246,6 +247,7 @@ export function RelativePathFieldset({
                   <FormControl label="Group matching rule">
                     <Select
                       value={value.PerDeviceConfigsGroupMatchType}
+                      data-cy="per-device-configs-group-match-type-select"
                       onChange={(e) =>
                         innerOnChange({
                           PerDeviceConfigsGroupMatchType:
