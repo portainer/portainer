@@ -78,13 +78,16 @@ export function KubeConfigTeaserForm() {
             required
             inputId="kubeconfig_file"
           >
-            <Button disabled>Select a file</Button>
+            <Button disabled data-cy="kubeconfig-file-upload">
+              Select a file
+            </Button>
           </FormControl>
 
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
                 className="wizard-connect-button !ml-0"
+                data-cy="kubeconfig-connect-environment-button"
                 loadingText="Connecting environment..."
                 isLoading={false}
                 disabled

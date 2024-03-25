@@ -75,6 +75,7 @@ export const ngModule = angular
       'buttonText',
       'className',
       'buttonClassName',
+      'data-cy',
     ])
   )
   .component(

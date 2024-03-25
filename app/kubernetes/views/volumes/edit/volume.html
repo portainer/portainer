@@ -42,9 +42,9 @@
                     <tr>
                       <td>Namespace</td>
                       <td>
-                        <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })" data-cy="k8sVolDetail-volNamespace"
-                          >{{ ctrl.volume.ResourcePool.Namespace.Name }}</a
-                        >
+                        <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })" data-cy="k8sVolDetail-volNamespace">{{
+                          ctrl.volume.ResourcePool.Namespace.Name
+                        }}</a>
                         <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                       </td>
                     </tr>
@@ -68,9 +68,9 @@
                     </tr>
                     <tr>
                       <td>Provisioner</td>
-                      <td data-cy="k8sVolDetail-volProvisioner"
-                        >{{ ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner : '-' }}</td
-                      >
+                      <td data-cy="k8sVolDetail-volProvisioner">{{
+                        ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner : '-'
+                      }}</td>
                     </tr>
                     <tr>
                       <td>Creation date</td>

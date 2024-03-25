@@ -307,13 +307,17 @@
           <td>
             <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
           </td>
-          <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td>
+          <td title="{{ item.Image }}"
+            >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+          >
           <td>{{ item.ApplicationType }}</td>
           <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.Pod">
             <status-indicator ok="(item.TotalPodsCount > 0 && item.TotalPodsCount === item.RunningPodsCount) || item.Status === 'Ready'"></status-indicator>
             <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.Replicated">Replicated</span>
             <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.Global">Global</span>
-            <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0"><code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></span>
+            <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0"
+              ><code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></span
+            >
             <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
           </td>
           <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.Pod"> {{ item.Pods[0].Status }} </td>

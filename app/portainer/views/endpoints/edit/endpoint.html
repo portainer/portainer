@@ -8,8 +8,12 @@
           <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
           This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
         </p>
-        <p> Edge key: <code>{{ endpoint.EdgeKey }}</code> </p>
-        <p> Edge identifier: <code>{{ endpoint.EdgeID }}</code> </p>
+        <p>
+          Edge key: <code>{{ endpoint.EdgeKey }}</code>
+        </p>
+        <p>
+          Edge identifier: <code>{{ endpoint.EdgeID }}</code>
+        </p>
         <p>
           <button
             type="button"
@@ -36,7 +40,9 @@
               <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
               Refer to the platform related command below to deploy the Edge agent in your remote cluster.
             </p>
-            <p> The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u> </p>
+            <p>
+              The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
+            </p>
           </span>
 
           <div class="col-sm-12 form-section-title"> Edge agent deployment script </div>

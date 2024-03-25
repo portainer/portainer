@@ -29,7 +29,15 @@ interface Args {
 }
 
 function Template({ checked }: Args) {
-  return <Switch name="name" checked={checked} onChange={() => {}} id="id" />;
+  return (
+    <Switch
+      name="name"
+      data-cy="switch"
+      checked={checked}
+      onChange={() => {}}
+      id="id"
+    />
+  );
 }
 
 export const Checked: Story<Args> = Template.bind({});

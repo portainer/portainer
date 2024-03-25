@@ -46,6 +46,7 @@ export function CreateUserAccessTokenInnerForm() {
       </FormControl>
       <LoadingButton
         disabled={!isValid || !dirty}
+        data-cy="create-access-token-button"
         isLoading={false}
         loadingText="Adding access token..."
       >

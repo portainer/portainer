@@ -322,6 +322,7 @@ export function IngressForm({
                 <span>
                   <Button
                     className="btn btn-sm btn-light !ml-0 mb-2"
+                    data-cy="add-annotation-button"
                     onClick={() => addNewAnnotation()}
                     icon={Plus}
                   >

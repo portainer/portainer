@@ -3,7 +3,8 @@ import { SelectHTMLAttributes } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
-export interface Option<T extends string | number> extends Partial<AutomationTestingProps> {
+export interface Option<T extends string | number>
+  extends Partial<AutomationTestingProps> {
   value: T;
   label: string;
   disabled?: boolean;
