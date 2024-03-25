@@ -29,6 +29,7 @@ export function KubernetesForm({
       </div>
 
       <WebEditorForm
+        data-cy="kube-manifest-editor"
         value={values.content}
         yaml
         id="kube-manifest-editor"

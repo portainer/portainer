@@ -3,6 +3,7 @@ import YAML from 'yaml';
 import { Minus, Plus } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { AutomationTestingProps } from '@/types';
 
 import { WebEditorForm } from '@@/WebEditorForm';
 import { Button } from '@@/buttons';
@@ -12,15 +13,21 @@ type Props = {
   identifier: string;
   data: string;
   hideMessage?: boolean;
-};
+} & AutomationTestingProps;
 
-export function YAMLInspector({ identifier, data, hideMessage }: Props) {
+export function YAMLInspector({
+  identifier,
+  data,
+  hideMessage,
+  'data-cy': dataCy,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
   const yaml = useMemo(() => cleanYamlUnwantedFields(data), [data]);
 
   return (
     <div>
       <WebEditorForm
+        data-cy={dataCy}
         value={yaml}
         placeholder={
           hideMessage

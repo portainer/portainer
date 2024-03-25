@@ -221,6 +221,7 @@ export const ngModule = angular
       'onChange',
       'value',
       'height',
+      'data-cy',
     ])
   )
   .component(

@@ -96,6 +96,7 @@ export function InnerForm({
 
       {isEditor && (
         <WebEditorForm
+          data-cy="custom-template-creation-editor"
           id="custom-template-creation-editor"
           value={values.FileContent}
           onChange={handleChangeFileContent}

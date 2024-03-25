@@ -89,6 +89,7 @@ export function InnerForm({
       )}
 
       <WebEditorForm
+        data-cy="custom-template-editor"
         id="edit-custom-template-editor"
         value={gitFileContent || values.FileContent}
         onChange={handleChangeFileContent}

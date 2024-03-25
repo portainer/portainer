@@ -131,6 +131,7 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+      'data-cy',
     ])
   )
   .component(
