@@ -40,7 +40,7 @@
           </label>
           <div class="col-sm-6">
             <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
-            <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+            <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="stackFromTemplateForm-select">
               <option selected disabled hidden value="">Select value</option>
               <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
             </select>

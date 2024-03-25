@@ -167,7 +167,14 @@
           <div class="form-group">
             <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
             <div class="col-sm-9 col-lg-10">
-              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control" ng-required="state.vouchersUploaded" ng-disabled="!state.vouchersUploaded">
+              <select
+                id="device_profile"
+                data-cy="deviceImport-deviceProfileSelect"
+                ng-model="formValues.DeviceProfile"
+                class="form-control"
+                ng-required="state.vouchersUploaded"
+                ng-disabled="!state.vouchersUploaded"
+              >
                 <option selected disabled hidden value="">Select a profile for your device</option>
                 <option ng-repeat="profile in profiles | orderBy: 'name'" ng-value="profile.id">{{ profile.name }}</option>
               </select>
@@ -190,6 +197,7 @@
               <div class="col-sm-9 col-lg-10">
                 <select
                   class="form-control"
+                  data-cy="deviceImport-deviceGroupSelect"
                   ng-options="group.Id as group.Name for group in groups"
                   ng-model="formValues.GroupId"
                   id="device_group"

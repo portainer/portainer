@@ -116,8 +116,8 @@
                       <div class="col-sm-8 small text-warning">
                         <div ng-messages="resourcePoolEditForm.pool_name.$error">
                           <p class="vertical-center">
-                            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
-                            {{ ctrl.state.sliderMaxMemory }}.
+                            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and {{
+                            ctrl.state.sliderMaxMemory }}.
                           </p>
                         </div>
                       </div>
@@ -189,9 +189,7 @@
 
                   <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
                     <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Selected registries </label>
-                    <div class="col-sm-9 col-lg-4">
-                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
-                    </div>
+                    <div class="col-sm-9 col-lg-4"> {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }} </div>
                   </div>
 
                   <div ng-if="ctrl.isAdmin && !ctrl.isSystem">

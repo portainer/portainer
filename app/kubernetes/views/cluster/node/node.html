@@ -48,7 +48,13 @@
                       <td class="col-xs-3"> Availability </td>
                       <td class="col-xs-9">
                         <div class="flex flex-col">
-                          <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
+                          <select
+                            class="form-control"
+                            data-cy="node-availability-select"
+                            name="availability"
+                            style="display: inline-block; width: 16rem"
+                            ng-model="ctrl.formValues.Availability"
+                          >
                             <option>{{ ctrl.availabilities.ACTIVE }}</option>
                             <option>{{ ctrl.availabilities.PAUSE }}</option>
                             <option>{{ ctrl.availabilities.DRAIN }}</option>
@@ -163,6 +169,7 @@
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Effect</span>
                       <select
+                        data-cy="taint_effect_{{ $index }}"
                         id="taint_effect_{{ $index }}"
                         name="taint_effect_{{ $index }}"
                         class="form-control"

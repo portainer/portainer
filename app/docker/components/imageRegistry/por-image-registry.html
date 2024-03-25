@@ -4,6 +4,7 @@
     <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
+        data-cy="component-registrySelect"
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
         ng-model="$ctrl.model.Registry"
         id="image_registry"

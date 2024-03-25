@@ -31,6 +31,7 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
         <div>
           <label htmlFor="settings_refresh_rate">Refresh rate</label>
           <select
+            data-cy="settings-refresh-rate"
             id="settings_refresh_rate"
             className="small-select"
             value={value}

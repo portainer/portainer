@@ -44,6 +44,7 @@
                   <div class="col-sm-8">
                     <select
                       ng-if="!ctrl.formValues.namespace_toggle || ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                      data-cy="namespace-select"
                       ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"

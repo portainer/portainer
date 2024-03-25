@@ -188,7 +188,7 @@
               <div class="form-group">
                 <label for="log-driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
                 <div class="col-sm-4">
-                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
+                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver" data-cy="service-creation-logging-driver">
                     <option selected value="">Default logging driver</option>
                     <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
                     <option value="none">none</option>
@@ -295,6 +295,7 @@
                               class="form-control"
                               ng-model="volume.Source"
                               ng-options="vol as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30)) for vol in availableVolumes"
+                              data-cy="volume-source-select"
                             >
                               <option selected disabled value="">Select a volume</option>
                             </select>
@@ -337,7 +338,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="form-control" ng-model="formValues.Network">
+                  <select class="form-control" ng-model="formValues.Network" data-cy="create-service-network-select">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -356,7 +357,7 @@
                 <!-- network-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px">
                   <div ng-repeat="network in formValues.ExtraNetworks" style="margin-top: 2px">
-                    <select class="form-control" ng-model="network.Name">
+                    <select class="form-control" ng-model="network.Name" data-cy="create-service-extra-network-select-{{ $index }}">
                       <option selected disabled hidden value="">Select a network</option>
                       <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                     </select>

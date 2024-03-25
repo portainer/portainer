@@ -80,7 +80,13 @@
                   </div>
                   <div ng-if="$ctrl.settings.repeater.autoRefresh">
                     <label for="settings_refresh_rate"> Refresh rate </label>
-                    <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                    <select
+                      id="settings_refresh_rate"
+                      ng-model="$ctrl.settings.repeater.refreshRate"
+                      ng-change="$ctrl.onSettingsRepeaterChange()"
+                      class="small-select"
+                      data-cy="k8s-vol-table-settings-refresh-rate"
+                    >
                       <option value="10">10s</option>
                       <option value="30">30s</option>
                       <option value="60">1min</option>

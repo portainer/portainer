@@ -26,7 +26,7 @@
                     <pr-icon ng-if="imageOS == 'linux'" icon="'svg-linux'"></pr-icon>
                     <pr-icon ng-if="imageOS == 'windows'" icon="'layout-grid'"></pr-icon>
                   </span>
-                  <select class="form-control" ng-model="formValues.command" id="command">
+                  <select class="form-control" ng-model="formValues.command" id="command" data-cy="command-select">
                     <option value="ash" ng-if="imageOS == 'linux'">/bin/ash</option>
                     <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
                     <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>

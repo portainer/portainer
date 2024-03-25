@@ -56,7 +56,7 @@
                       <td>Access Modes</td>
                       <td data-cy="k8sVolDetail-volAccessPolicy">
                         <div ng-repeat="(index, accessPolicy) in ctrl.state.volumeSharedAccessPolicies" class="flex flex-col gap-y-1">
-                          <div class="items-center flex gap-x-1">
+                          <div class="flex items-center gap-x-1">
                             {{ accessPolicy }}
                             <portainer-tooltip
                               ng-if="ctrl.state.volumeSharedAccessPolicyTooltips[index]"

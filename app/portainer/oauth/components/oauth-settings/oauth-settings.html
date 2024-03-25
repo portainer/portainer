@@ -65,6 +65,7 @@
             ng-disabled="$ctrl.settings.OAuthAutoMapTeamMemberships"
             ng-model="$ctrl.settings.DefaultTeamID"
             ng-options="team.Id as team.Name for team in $ctrl.teams"
+            data-cy="default-team-select"
           >
             <option value="">No team</option>
           </select>
@@ -129,6 +130,7 @@
             <span class="input-group-addon">team</span>
             <select
               class="form-control"
+              data-cy="team-select"
               ng-init="mapping.Team = mapping.Team || $ctrl.settings.DefaultTeamID"
               ng-model="mapping.Team"
               ng-options="team.Id as team.Name for team in $ctrl.teams"
@@ -159,7 +161,7 @@
 
       <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
         <div class="col-xs-11">
-          <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
+          <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams" data-cy="default-team-select">
             <option value="">No team</option>
           </select>
         </div>

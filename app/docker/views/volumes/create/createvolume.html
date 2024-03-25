@@ -18,7 +18,13 @@
           <div class="form-group">
             <label for="volume_driver" class="col-sm-2 col-md-1 control-label text-left">Driver</label>
             <div class="col-sm-10 col-md-11">
-              <select class="form-control" ng-options="driver for driver in availableVolumeDrivers" ng-model="formValues.Driver" ng-if="availableVolumeDrivers.length > 0">
+              <select
+                class="form-control"
+                ng-options="driver for driver in availableVolumeDrivers"
+                ng-model="formValues.Driver"
+                ng-if="availableVolumeDrivers.length > 0"
+                data-cy="volume-driver-select"
+              >
                 <option disabled hidden value="">Select a driver</option>
               </select>
               <input type="text" class="form-control" ng-model="formValues.Driver" id="volume_driver" placeholder="e.g. driverName" ng-if="availableVolumeDrivers.length === 0" />

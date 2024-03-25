@@ -39,7 +39,7 @@
           <div class="form-group">
             <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
             <div class="col-sm-6">
-              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network">
+              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network" data-cy="network-select">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
@@ -53,7 +53,7 @@
             </label>
             <div class="col-sm-6">
               <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
-              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="env-select-{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
                 <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
               </select>
@@ -150,7 +150,7 @@
                         <div class="col-sm-12 input-group">
                           <span class="input-group-addon">volume</span>
                           <div class="col-sm-12 input-group">
-                            <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes">
+                            <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes" data-cy="volume-bind-select">
                               <option value="" disabled selected>Select a volume</option>
                             </select>
                           </div>

@@ -10,6 +10,7 @@
               <div class="input-group input-group-sm">
                 <select
                   class="selectpicker form-control !rounded"
+                  data-cy="docker-service-restart-condition-select"
                   ng-model="service.RestartCondition"
                   ng-change="updateServiceAttribute(service, 'RestartCondition')"
                   disable-authorization="DockerServiceUpdate"

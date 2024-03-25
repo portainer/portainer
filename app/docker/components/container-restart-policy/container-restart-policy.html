@@ -5,7 +5,8 @@
         <span>Name</span>
       </td>
       <td>
-        <select class="form-control" ng-model="$ctrl.state.editModel.name" disable-authorization="DockerContainerUpdate">
+        <select class="form-control" ng-model="$ctrl.state.editModel.name" disable-authorization="DockerContainerUpdate" data-cy="container-restart-policy-select">
+          >
           <option value="no">None</option>
           <option value="on-failure">On Failure</option>
           <option value="always">Always</option>
