@@ -24,6 +24,7 @@ export function AutocompleteSelect({
   searchResults,
   readOnly,
   inputId,
+  'data-cy': dataCy,
 }: {
   value: string;
   /**
@@ -55,6 +56,7 @@ export function AutocompleteSelect({
         readOnly={readOnly}
         id={inputId}
         autoComplete="off"
+        data-cy={dataCy}
       />
       {!selected && searchResults && searchResults.length > 0 && (
         <ComboboxPopover>
