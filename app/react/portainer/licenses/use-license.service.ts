@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
 import { useNodesCount } from '@/react/portainer/system/useNodesCount';
@@ -8,7 +8,7 @@ import { LicenseInfo, LicenseType } from './types';
 
 export function useLicenseInfo() {
   const { isLoading, data: info } = useQuery<LicenseInfo, Error>(
-    'licenseInfo',
+    ['licenseInfo'],
     () => getLicenseInfo(),
     {
       onError(error) {

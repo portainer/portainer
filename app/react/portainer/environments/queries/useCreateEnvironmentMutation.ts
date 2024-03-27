@@ -1,4 +1,8 @@
-import { useQueryClient, useMutation, MutationFunction } from 'react-query';
+import {
+  useQueryClient,
+  useMutation,
+  MutationFunction,
+} from '@tanstack/react-query';
 
 import {
   createRemoteEnvironment,

@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { saveAs } from 'file-saver';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';

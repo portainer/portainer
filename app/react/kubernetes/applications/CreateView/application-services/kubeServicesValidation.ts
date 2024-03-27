@@ -163,8 +163,10 @@ export function kubeServicesValidation(
                   .flatMap((formService) => formService.Ports)
                   .map((formServicePorts) => formServicePorts.nodePort);
                 return (
-                  !clusterNodePortsWithoutFormServices.includes(nodePort) && // node port is not in the cluster services that aren't in the application form
-                  !formNodePortsWithoutCurrentService.includes(nodePort) // and the node port is not in the current form, excluding the current service
+                  // and the node port is not in the current form, excluding the current service
+                  // node port is not in the cluster services that aren't in the application form
+                  !clusterNodePortsWithoutFormServices.includes(nodePort) &&
+                  !formNodePortsWithoutCurrentService.includes(nodePort)
                 );
               }
             )

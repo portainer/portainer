@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import PortainerError from '@/portainer/error';
 import * as notifications from '@/portainer/services/notifications';
 import { getProfiles } from '@/portainer/hostmanagement/fdo/fdo.service';
 
 export function useFDOProfiles() {
-  const { isLoading, data, isError, error } = useQuery('fdo_profiles', () =>
+  const { isLoading, data, isError, error } = useQuery(['fdo_profiles'], () =>
     getProfiles()
   );
 

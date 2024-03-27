@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { success as notifySuccess } from '@/portainer/services/notifications';
@@ -101,7 +101,7 @@ export function useGitCredentials(
   userId: UserId,
   { enabled }: { enabled?: boolean } = {}
 ) {
-  return useQuery('gitcredentials', () => getGitCredentials(userId), {
+  return useQuery(['gitcredentials'], () => getGitCredentials(userId), {
     enabled: isBE && enabled,
     meta: {
       error: {

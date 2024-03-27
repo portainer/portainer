@@ -1,5 +1,5 @@
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';

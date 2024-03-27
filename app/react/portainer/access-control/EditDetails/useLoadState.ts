@@ -13,6 +13,9 @@ export function useLoadState(environmentId: EnvironmentId) {
     teams: teams.data,
     users: users.data,
     isAdmin: isAdminQuery.isAdmin,
-    isLoading: teams.isLoading || users.isLoading || isAdminQuery.isLoading,
+    isLoading:
+      teams.isInitialLoading ||
+      users.isInitialLoading ||
+      isAdminQuery.isLoading,
   };
 }

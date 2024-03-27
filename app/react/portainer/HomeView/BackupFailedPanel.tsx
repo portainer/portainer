@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
 import { getBackupStatus } from '@/portainer/services/api/backup.service';

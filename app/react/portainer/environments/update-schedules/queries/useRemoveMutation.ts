@@ -1,4 +1,4 @@
-import { useQueryClient, useMutation } from 'react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

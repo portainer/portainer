@@ -5,6 +5,7 @@ import { UserViewModel } from '@/portainer/models/user';
 import { Role, User } from '@/portainer/users/types';
 import { isPureAdmin } from '@/portainer/users/user.helpers';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { parseAccessControlFormData } from '../utils';
 
@@ -29,9 +30,8 @@ function Template({ userRole }: Args) {
 
   const [value, setValue] = useState(defaults);
 
-  const Wrapped = withUserProvider(
-    AccessControlForm,
-    new UserViewModel({ Role: userRole })
+  const Wrapped = withTestQueryProvider(
+    withUserProvider(AccessControlForm, new UserViewModel({ Role: userRole }))
   );
 
   return (

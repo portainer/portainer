@@ -1,4 +1,4 @@
-import { ReactQueryDevtools } from 'react-query/devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 export function ReactQueryDevtoolsWrapper() {
   const showReactQueryDevtools =

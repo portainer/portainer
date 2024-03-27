@@ -1,6 +1,6 @@
 import { RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { FormikErrors } from 'formik';
 
 import { Ingress } from '@/react/kubernetes/ingresses/types';

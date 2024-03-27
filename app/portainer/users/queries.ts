@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { TeamRole, TeamMembership } from '@/react/portainer/users/teams/types';
 import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';

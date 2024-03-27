@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 
 import { useUIState } from '@/react/hooks/useUIState';
@@ -43,7 +43,7 @@ export function MotdPanel() {
 }
 
 function useMotd() {
-  const { data } = useQuery('motd', () => getMotd());
+  const { data } = useQuery(['motd'], () => getMotd());
   return data;
 }
 

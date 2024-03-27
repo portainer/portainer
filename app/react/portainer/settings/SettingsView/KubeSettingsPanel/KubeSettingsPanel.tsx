@@ -1,5 +1,5 @@
 import { Form, Formik } from 'formik';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import kubeIcon from '@/assets/ico/kube.svg?c';
 import { notifySuccess } from '@/portainer/services/notifications';

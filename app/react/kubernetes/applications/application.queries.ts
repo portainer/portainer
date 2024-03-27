@@ -1,4 +1,4 @@
-import { UseQueryResult, useMutation, useQuery } from 'react-query';
+import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
 import { Pod } from 'kubernetes-types/core/v1';
 
 import { queryClient, withError } from '@/react-tools/react-query';
@@ -18,103 +18,105 @@ import { getNamespaceHorizontalPodAutoscalers } from './autoscaling.service';
 import { applicationIsKind, matchLabelsToLabelSelectorValue } from './utils';
 
 const queryKeys = {
-  applicationsForCluster: (environmentId: EnvironmentId) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-  ],
+  applicationsForCluster: (environmentId: EnvironmentId) =>
+    ['environments', environmentId, 'kubernetes', 'applications'] as const,
   application: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string,
     yaml?: boolean
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    yaml,
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      yaml,
+    ] as const,
   applicationRevisions: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string,
     labelSelector?: string
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    'revisions',
-    labelSelector,
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      'revisions',
+      labelSelector,
+    ] as const,
   applicationServices: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    'services',
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      'services',
+    ] as const,
   ingressesForApplication: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    'ingresses',
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      'ingresses',
+    ] as const,
   applicationHorizontalPodAutoscalers: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    'horizontalpodautoscalers',
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      'horizontalpodautoscalers',
+    ] as const,
   applicationPods: (
     environmentId: EnvironmentId,
     namespace: string,
     name: string
-  ) => [
-    'environments',
-    environmentId,
-    'kubernetes',
-    'applications',
-    namespace,
-    name,
-    'pods',
-  ],
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      namespace,
+      name,
+      'pods',
+    ] as const,
 };
 
 // useQuery to get a list of all applications from an array of namespaces
 export function useApplicationsQuery(
-  environemtId: EnvironmentId,
+  environmentId: EnvironmentId,
   namespaces?: string[]
 ) {
   return useQuery(
-    queryKeys.applicationsForCluster(environemtId),
-    () => getApplicationsForCluster(environemtId, namespaces),
+    queryKeys.applicationsForCluster(environmentId),
+    () => getApplicationsForCluster(environmentId, namespaces),
     {
       ...withError('Unable to retrieve applications'),
       enabled: !!namespaces?.length,

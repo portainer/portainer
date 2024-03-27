@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';

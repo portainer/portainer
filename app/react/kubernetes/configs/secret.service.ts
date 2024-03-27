@@ -1,5 +1,5 @@
 import { Secret, SecretList } from 'kubernetes-types/core/v1';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { queryClient, withError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
