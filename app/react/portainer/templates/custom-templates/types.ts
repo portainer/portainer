@@ -5,7 +5,7 @@ import { ResourceControlResponse } from '../../access-control/types';
 import { RelativePathModel, RepoConfigResponse } from '../../gitops/types';
 import { VariableDefinition } from '../../custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { Platform } from '../types';
-import { RegistryId } from '../../registries/types';
+import { RegistryId } from '../../registries/types/registry';
 import { getDefaultRelativePathModel } from '../../gitops/RelativePathFieldset/types';
 import { isBE } from '../../feature-flags/feature-flags.service';
 

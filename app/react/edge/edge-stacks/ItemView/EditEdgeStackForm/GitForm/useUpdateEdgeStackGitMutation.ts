@@ -9,7 +9,7 @@ import {
 import { buildUrl } from '@/react/edge/edge-stacks/queries/buildUrl';
 import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 
 export interface UpdateEdgeStackGitPayload {
   id: EdgeStack['Id'];

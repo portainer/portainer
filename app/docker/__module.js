@@ -603,7 +603,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/registries',
       views: {
         'content@': {
-          component: 'endpointRegistriesView',
+          component: 'environmentRegistriesView',
         },
       },
       data: {
@@ -616,7 +616,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/registries',
       views: {
         'content@': {
-          component: 'endpointRegistriesView',
+          component: 'environmentRegistriesView',
         },
       },
       data: {

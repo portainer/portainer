@@ -4,7 +4,7 @@ import {
   RelativePathModel,
   RepoConfigResponse,
 } from '@/react/portainer/gitops/types';
-import { RegistryId } from '@/react/portainer/registries/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
