@@ -9,6 +9,7 @@ import {
 } from '@/react/portainer/registries/ListView/DefaultRegistry';
 import { RepositoriesDatatable } from '@/react/portainer/registries/repositories/ListView/RepositoriesDatatable';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { GitlabProjectTable } from '@/react/portainer/registries/CreateView/GitlabProjectsTable/GitlabProjectsTable';
 
 export const registriesModule = angular
   .module('portainer.app.react.components.registries', [])
@@ -27,4 +28,8 @@ export const registriesModule = angular
   .component(
     'registryRepositoriesDatatable',
     r2a(withUIRouter(withReactQuery(RepositoriesDatatable)), ['dataset'])
+  )
+  .component(
+    'gitlabProjectSelector',
+    r2a(GitlabProjectTable, ['dataset', 'onChange', 'value'])
   ).name;

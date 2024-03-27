@@ -130,24 +130,15 @@
       If you can't select a project, make sure that registry feature is activated on it.
     </span>
   </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <gitlab-projects-datatable
-        title-text="GitLab projects"
-        title-icon="list"
-        dataset="$ctrl.projects"
-        table-key="gitlab_projects"
-        state="$ctrl.state.gitlab"
-        order-by="Name"
-      ></gitlab-projects-datatable>
-    </div>
-  </div>
+
+  <gitlab-project-selector dataset="$ctrl.projects" value="$ctrl.selectedRegistries" on-change="($ctrl.onChangeRegistries)"></gitlab-project-selector>
+
   <div class="form-group">
     <div class="col-sm-12">
       <button
-        ng-click="$ctrl.createRegistries()"
+        ng-click="$ctrl.createRegistries($ctrl.selectedRegistries)"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !$ctrl.state.gitlab.selectedItemCount"
+        ng-disabled="$ctrl.actionInProgress || !$ctrl.selectedRegistries.length"
         button-spinner="$ctrl.actionInProgress"
         analytics-on
         analytics-category="portainer"

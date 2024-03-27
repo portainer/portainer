@@ -12,12 +12,6 @@ class CreateRegistryController {
     this.state = {
       actionInProgress: false,
       overrideConfiguration: false,
-      gitlab: {
-        get selectedItemCount() {
-          return this.selectedItems.length || 0;
-        },
-        selectedItems: [],
-      },
       originViewReference: 'portainer.registries',
       originalEndpointId: null,
     };
@@ -121,11 +115,11 @@ class CreateRegistryController {
     });
   }
 
-  createGitlabRegistries() {
+  createGitlabRegistries(registries) {
     return this.$async(async () => {
       try {
         this.state.actionInProgress = true;
-        await this.RegistryService.createGitlabRegistries(this.model, this.state.gitlab.selectedItems);
+        await this.RegistryService.createGitlabRegistries(this.model, registries);
         this.Notifications.success('Success', 'Registries successfully created');
         this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
       } catch (err) {
