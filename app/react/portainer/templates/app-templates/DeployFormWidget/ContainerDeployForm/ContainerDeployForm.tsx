@@ -146,7 +146,7 @@ export function ContainerDeployForm({
             isLoading={createMutation.isLoading}
             isValid={isValid}
             loadingText="Deployment in progress..."
-            submitLabel="Deploy the stack"
+            submitLabel="Deploy the container"
           >
             <Button type="reset" onClick={() => unselect()} color="default">
               Hide
