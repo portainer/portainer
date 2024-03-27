@@ -67,8 +67,4 @@
   </div>
 </div>
 
-<div ng-if="$ctrl.showTable">
-  <div class="form-group col-sm-12">
-    <ldap-groups-datatable dataset="$ctrl.groups" title-text="Groups" title-icon="users" table-key="ldapGroups"></ldap-groups-datatable>
-  </div>
-</div>
+<ldap-groups-datatable ng-if="$ctrl.showTable" dataset="$ctrl.groups"></ldap-groups-datatable>

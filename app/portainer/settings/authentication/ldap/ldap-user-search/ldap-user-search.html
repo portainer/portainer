@@ -32,8 +32,4 @@
   </div>
 </div>
 
-<div ng-if="$ctrl.showTable">
-  <div class="form-group col-sm-12">
-    <ldap-users-datatable dataset="$ctrl.users" title-text="Users" title-icon="users" table-key="ldapUsers" order-by="" reverse-order=""></ldap-users-datatable>
-  </div>
-</div>
+<ldap-users-datatable ng-if="$ctrl.showTable" dataset="$ctrl.users"></ldap-users-datatable>
