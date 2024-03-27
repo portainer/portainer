@@ -72,7 +72,7 @@ export interface OAuthSettings {
   KubeSecretKey: string;
 }
 
-enum AuthenticationMethod {
+export enum AuthenticationMethod {
   /**
    * Internal represents the internal authentication method (authentication against Portainer API)
    */
