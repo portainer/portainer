@@ -26,8 +26,8 @@
         </rd-widget-body>
       </rd-widget>
       <div class="row mt-5">
-        <auth-logs-datatable
-          logs="$ctrl.state.logs"
+        <authentication-logs-table
+          dataset="$ctrl.state.logs"
           keyword="$ctrl.state.keyword"
           sort="$ctrl.state.sort"
           limit="$ctrl.state.limit"
@@ -42,7 +42,7 @@
           on-change-sort="($ctrl.onChangeSort)"
           on-change-limit="($ctrl.onChangeLimit)"
           on-change-page="($ctrl.onChangePage)"
-        ></auth-logs-datatable>
+        ></authentication-logs-table>
       </div>
     </div>
   </div>
