@@ -43,14 +43,14 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 		name          string
 		fields        fields
 		args          args
-		wantExpiresAt int64
+		wantExpiresAt *jwt.NumericDate
 		wantErr       bool
 	}{
 		{
 			name:          "kubeconfig no expiry",
 			fields:        myFields,
 			args:          myArgs,
-			wantExpiresAt: 0,
+			wantExpiresAt: nil,
 			wantErr:       false,
 		},
 	}

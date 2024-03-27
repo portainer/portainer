@@ -20,7 +20,7 @@ func TestGenerateSignedToken(t *testing.T) {
 		ID:       1,
 		Role:     1,
 	}
-	expiresAt := time.Now().Add(1 * time.Hour).Unix()
+	expiresAt := time.Now().Add(1 * time.Hour)
 
 	generatedToken, err := svc.generateSignedToken(token, expiresAt, defaultScope)
 	assert.NoError(t, err, "failed to generate a signed token")
@@ -36,7 +36,7 @@ func TestGenerateSignedToken(t *testing.T) {
 	assert.Equal(t, token.Username, tokenClaims.Username)
 	assert.Equal(t, int(token.ID), tokenClaims.UserID)
 	assert.Equal(t, int(token.Role), tokenClaims.Role)
-	assert.Equal(t, expiresAt, tokenClaims.ExpiresAt)
+	assert.Equal(t, jwt.NewNumericDate(expiresAt), tokenClaims.ExpiresAt)
 }
 
 func TestGenerateSignedToken_InvalidScope(t *testing.T) {
@@ -49,7 +49,7 @@ func TestGenerateSignedToken_InvalidScope(t *testing.T) {
 		ID:       1,
 		Role:     1,
 	}
-	expiresAt := time.Now().Add(1 * time.Hour).Unix()
+	expiresAt := time.Now().Add(1 * time.Hour)
 
 	_, err = svc.generateSignedToken(token, expiresAt, "testing")
 	assert.Error(t, err)
