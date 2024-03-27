@@ -61,6 +61,7 @@ export function KubeSettingsPanel({ settings }: { settings: Settings }) {
                     isLoading={mutation.isLoading}
                     loadingText="Saving"
                     className="!ml-0"
+                    data-cy="save-kubernetes-settings-button"
                   >
                     Save Kubernetes settings
                   </LoadingButton>

@@ -23,6 +23,7 @@ export function AutocompleteSelect({
   searchResults,
   readOnly,
   inputId,
+  'data-cy': dataCy,
 }: {
   value: string;
   /**
@@ -35,6 +36,7 @@ export function AutocompleteSelect({
   searchResults?: Option<string>[];
   readOnly?: boolean;
   inputId: string;
+  'data-cy': string;
 }) {
   const [searchTerm, setSearchTerm] = useDebounce(value, onChange);
   const [selected, setSelected] = useState(false);
@@ -53,6 +55,7 @@ export function AutocompleteSelect({
         placeholder={placeholder}
         readOnly={readOnly}
         id={inputId}
+        data-cy={dataCy}
         autoComplete="off"
       />
       {!selected && searchResults && searchResults.length > 0 && (

@@ -52,6 +52,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
   return (
     <RowProvider context={rowContext}>
       <Datatable<User>
+        data-cy="team-members-table"
         dataset={users}
         columns={columns}
         titleIcon={Users}

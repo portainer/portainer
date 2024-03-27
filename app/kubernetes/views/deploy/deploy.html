@@ -49,6 +49,7 @@
                       ng-model="ctrl.formValues.Namespace"
                       ng-change="ctrl.onChangeNamespace()"
                       ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
+                      data-cy="k8sAppCreate-nsSelect"
                     ></select>
                     <span ng-if="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM" class="small text-muted pt-[7px]"
                       >Namespaces specified in the manifest will be used</span

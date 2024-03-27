@@ -14,6 +14,7 @@ type Props = {
   renderTableActions?(): ReactNode;
   description?: ReactNode;
   titleId?: string;
+  'data-cy'?: string;
 };
 
 export function DatatableHeader({
@@ -25,12 +26,19 @@ export function DatatableHeader({
   titleIcon,
   description,
   titleId,
+  'data-cy': dataCy,
 }: Props) {
   if (!title) {
     return null;
   }
 
-  const searchBar = <SearchBar value={searchValue} onChange={onSearchChange} />;
+  const searchBar = (
+    <SearchBar
+      value={searchValue}
+      onChange={onSearchChange}
+      data-cy={`${dataCy}-searchInput`}
+    />
+  );
   const tableActions = !!renderTableActions && (
     <Table.Actions>{renderTableActions()}</Table.Actions>
   );

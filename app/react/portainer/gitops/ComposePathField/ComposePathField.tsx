@@ -66,6 +66,7 @@ export function ComposePathField({
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
               model={model}
               inputId="stack_repository_path"
+              data-cy="component-gitPathInput"
               createdFromCustomTemplateId={createdFromCustomTemplateId}
             />
           ) : (
@@ -76,6 +77,7 @@ export function ComposePathField({
               }}
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
               id="stack_repository_path"
+              data-cy="component-gitPathInput"
             />
           )}
         </FormControl>
