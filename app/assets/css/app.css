@@ -28,7 +28,7 @@ html[theme='highcontrast'] {
 
 body {
   background: var(--bg-body-color);
-  font-family: 'Inter';
+  font-family: 'Inter', sans-serif;
   color: var(--text-body-color) !important;
 }
 
