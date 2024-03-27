@@ -3,9 +3,9 @@ import { SchemaOf, object, string } from 'yup';
 import { ApiKeyFormValues } from './types';
 
 export function getAPITokenValidationSchema(
-  authenticationEnabled: boolean
+  requirePassword: boolean
 ): SchemaOf<ApiKeyFormValues> {
-  if (authenticationEnabled) {
+  if (requirePassword) {
     return object({
       password: string().required('Password is required.'),
       description: string()

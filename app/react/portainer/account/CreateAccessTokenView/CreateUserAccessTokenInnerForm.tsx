@@ -7,10 +7,10 @@ import { LoadingButton } from '@@/buttons';
 import { ApiKeyFormValues } from './types';
 
 interface Props {
-  hideAuthentication: boolean;
+  showAuthentication: boolean;
 }
 
-export function CreateUserAccessTokenInnerForm({ hideAuthentication }: Props) {
+export function CreateUserAccessTokenInnerForm({ showAuthentication }: Props) {
   const { errors, values, handleSubmit, isValid, dirty } =
     useFormikContext<ApiKeyFormValues>();
 
@@ -20,7 +20,7 @@ export function CreateUserAccessTokenInnerForm({ hideAuthentication }: Props) {
       onSubmit={handleSubmit}
       autoComplete="off"
     >
-      {hideAuthentication && (
+      {showAuthentication && (
         <FormControl
           inputId="password"
           label="Current password"

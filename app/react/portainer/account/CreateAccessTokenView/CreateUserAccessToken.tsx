@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
+import { AuthenticationMethod } from '@/react/portainer/settings/types';
 
 import { Widget } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
@@ -27,8 +28,9 @@ export function CreateUserAccessToken() {
   const { trackEvent } = useAnalytics();
   const settings = useSettings();
 
-  const authenticationEnabled =
-    settings.data?.AuthenticationMethod === 1 || user.Id === 1;
+  const requirePassword =
+    settings.data?.AuthenticationMethod === AuthenticationMethod.Internal ||
+    user.Id === 1;
 
   return (
     <>
@@ -50,11 +52,11 @@ export function CreateUserAccessToken() {
                   initialValues={initialValues}
                   onSubmit={onSubmit}
                   validationSchema={getAPITokenValidationSchema(
-                    authenticationEnabled
+                    requirePassword
                   )}
                 >
                   <CreateUserAccessTokenInnerForm
-                    hideAuthentication={authenticationEnabled}
+                    showAuthentication={requirePassword}
                   />
                 </Formik>
               ) : (
