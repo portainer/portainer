@@ -168,17 +168,6 @@ pre {
   background-color: var(--bg-pre-color);
   color: var(--text-pre-color);
 }
-json-tree .key {
-  color: var(--text-json-tree-color);
-}
-
-json-tree .leaf-value {
-  color: var(--text-json-tree-leaf-color);
-}
-
-json-tree .branch-preview {
-  color: var(--text-json-tree-branch-preview-color);
-}
 
 .progress {
   background-color: var(--bg-progress-color);

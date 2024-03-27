@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
+import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
 import { ButtonGroup, Size } from '@@/buttons/ButtonGroup';
 import { Button } from '@@/buttons';
@@ -10,6 +10,7 @@ export interface Option<T> {
   value: T;
   label?: ReactNode;
   disabled?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 interface Props<T> {
@@ -46,6 +47,7 @@ export function ButtonSelector<T extends string | number | boolean>({
           onChange={() => onChange(option.value)}
           disabled={disabled || option.disabled}
           readOnly={readOnly}
+          icon={option.icon}
         >
           {option.label || option.value.toString()}
         </OptionItem>
@@ -59,6 +61,7 @@ interface OptionItemProps {
   onChange(): void;
   disabled?: boolean;
   readOnly?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 function OptionItem({
@@ -67,6 +70,7 @@ function OptionItem({
   onChange,
   disabled,
   readOnly,
+  icon,
 }: PropsWithChildren<OptionItemProps>) {
   return (
     <Button
@@ -79,6 +83,7 @@ function OptionItem({
         },
         '!static !z-auto'
       )}
+      icon={icon}
     >
       {children}
       <input
