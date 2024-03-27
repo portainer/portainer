@@ -12,9 +12,9 @@ export function ImageDetailsViewModel(data) {
   this.Architecture = data.Architecture;
   this.Author = data.Author;
   this.Command = data.Config.Cmd;
-  this.Entrypoint = data.ContainerConfig.Entrypoint ? data.ContainerConfig.Entrypoint : '';
-  this.ExposedPorts = data.ContainerConfig.ExposedPorts ? Object.keys(data.ContainerConfig.ExposedPorts) : [];
-  this.Volumes = data.ContainerConfig.Volumes ? Object.keys(data.ContainerConfig.Volumes) : [];
-  this.Env = data.ContainerConfig.Env ? data.ContainerConfig.Env : [];
-  this.Labels = data.ContainerConfig.Labels;
+  this.Entrypoint = data.Config.Entrypoint ? data.Config.Entrypoint : '';
+  this.ExposedPorts = data.Config.ExposedPorts ? Object.keys(data.Config.ExposedPorts) : [];
+  this.Volumes = data.Config.Volumes ? Object.keys(data.Config.Volumes) : [];
+  this.Env = data.Config.Env ? data.Config.Env : [];
+  this.Labels = data.Config.Labels;
 }
