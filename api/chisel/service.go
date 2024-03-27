@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/internal/edge"
 
 	chserver "github.com/jpillora/chisel/server"
 	"github.com/jpillora/chisel/share/ccrypto"
@@ -19,7 +20,7 @@ import (
 
 const (
 	tunnelCleanupInterval = 10 * time.Second
-	requiredTimeout       = 15 * time.Second
+	requiredTimeoutFactor = 3
 	activeTimeout         = 4*time.Minute + 30*time.Second
 	pingTimeout           = 3 * time.Second
 )
@@ -232,6 +233,7 @@ func (service *Service) startTunnelVerificationLoop() {
 
 func (service *Service) checkTunnels() {
 	tunnels := make(map[portainer.EndpointID]portainer.TunnelDetails)
+	envTimeout := make(map[portainer.EndpointID]time.Duration)
 
 	service.mu.Lock()
 	for key, tunnel := range service.tunnelDetailsMap {
@@ -239,15 +241,30 @@ func (service *Service) checkTunnels() {
 			continue
 		}
 
-		if tunnel.Status == portainer.EdgeAgentManagementRequired && time.Since(tunnel.LastActivity) < requiredTimeout {
-			continue
-		}
-
 		if tunnel.Status == portainer.EdgeAgentActive && time.Since(tunnel.LastActivity) < activeTimeout {
 			continue
 		}
 
+		endpoint, err := service.dataStore.Endpoint().Endpoint(key)
+		if err != nil {
+			log.Warn().Err(err).Int("endpoint_id", int(key)).Msg("unable to retrieve endpoint from database")
+			continue
+		}
+
+		checkinInterval, err := edge.GetEffectiveCheckinInterval(service.dataStore, endpoint)
+		if err != nil {
+			log.Warn().Err(err).Msg("unable to retrieve checking interval")
+			continue
+		}
+
+		requiredTimeout := requiredTimeoutFactor * time.Duration(checkinInterval) * time.Second
+
+		if tunnel.Status == portainer.EdgeAgentManagementRequired && time.Since(tunnel.LastActivity) < requiredTimeout {
+			continue
+		}
+
 		tunnels[key] = *tunnel
+		envTimeout[key] = requiredTimeout
 	}
 	service.mu.Unlock()
 
@@ -259,12 +276,12 @@ func (service *Service) checkTunnels() {
 			Float64("status_time_seconds", elapsed.Seconds()).
 			Msg("environment tunnel monitoring")
 
-		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed > requiredTimeout {
+		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed > envTimeout[endpointID] {
 			log.Debug().
 				Int("endpoint_id", int(endpointID)).
 				Str("status", tunnel.Status).
 				Float64("status_time_seconds", elapsed.Seconds()).
-				Float64("timeout_seconds", requiredTimeout.Seconds()).
+				Float64("timeout_seconds", envTimeout[endpointID].Seconds()).
 				Msg("REQUIRED state timeout exceeded")
 		}
 
