@@ -1,22 +1,28 @@
 import { useMemo } from 'react';
 import { object, array, string } from 'yup';
 
-import { useStacks } from '@/react/common/stacks/queries/useStacks';
 import { accessControlFormValidation } from '@/react/portainer/access-control/AccessControlForm';
-import { nameValidation } from '@/react/common/stacks/CreateView/NameField';
+import { useNameValidation } from '@/react/common/stacks/CreateView/NameField';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
-export function useValidation(isAdmin: boolean) {
-  const stacksQuery = useStacks();
+export function useValidation({
+  environmentId,
+  isAdmin,
+}: {
+  isAdmin: boolean;
+  environmentId: EnvironmentId;
+}) {
+  const name = useNameValidation(environmentId);
 
   return useMemo(
     () =>
       object({
-        name: nameValidation(stacksQuery.data || []),
+        name,
         accessControl: accessControlFormValidation(isAdmin),
         envVars: array()
           .transform((_, orig) => Object.values(orig))
           .of(string().required('Required')),
       }),
-    [isAdmin, stacksQuery.data]
+    [isAdmin, name]
   );
 }

@@ -1,26 +1,31 @@
 import { useMemo } from 'react';
 import { object, string } from 'yup';
 
-import { useStacks } from '@/react/common/stacks/queries/useStacks';
 import { accessControlFormValidation } from '@/react/portainer/access-control/AccessControlForm';
-import { nameValidation } from '@/react/common/stacks/CreateView/NameField';
+import { useNameValidation } from '@/react/common/stacks/CreateView/NameField';
 import { variablesFieldValidation } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
-export function useValidation(
-  variableDefs: Array<VariableDefinition>,
-  isAdmin: boolean
-) {
-  const stacksQuery = useStacks();
+export function useValidation({
+  environmentId,
+  isAdmin,
+  variableDefs,
+}: {
+  variableDefs: Array<VariableDefinition>;
+  isAdmin: boolean;
+  environmentId: EnvironmentId;
+}) {
+  const name = useNameValidation(environmentId);
 
   return useMemo(
     () =>
       object({
-        name: nameValidation(stacksQuery.data || []),
+        name,
         accessControl: accessControlFormValidation(isAdmin),
         fileContent: string().required('Required'),
         variables: variablesFieldValidation(variableDefs),
       }),
-    [isAdmin, stacksQuery.data, variableDefs]
+    [isAdmin, name, variableDefs]
   );
 }

@@ -49,10 +49,11 @@ export function DeployForm({
   const environmentId = useEnvironmentId();
   const swarmIdQuery = useSwarmId(environmentId);
   const mutation = useCreateStack();
-  const validation = useValidation(
-    template.Variables,
-    isEdgeAdminQuery.isAdmin
-  );
+  const validation = useValidation({
+    variableDefs: template.Variables,
+    isAdmin: isEdgeAdminQuery.isAdmin,
+    environmentId,
+  });
 
   if (isEdgeAdminQuery.isLoading) {
     return null;

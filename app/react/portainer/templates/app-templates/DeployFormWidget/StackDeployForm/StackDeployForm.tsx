@@ -42,7 +42,10 @@ export function StackDeployForm({
   const environmentId = useEnvironmentId();
   const swarmIdQuery = useSwarmId(environmentId);
   const mutation = useCreateStack();
-  const validation = useValidation(isEdgeAdminQuery.isAdmin);
+  const validation = useValidation({
+    isAdmin: isEdgeAdminQuery.isAdmin,
+    environmentId,
+  });
 
   if (isEdgeAdminQuery.isLoading) {
     return null;
