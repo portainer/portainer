@@ -121,7 +121,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ExecService.resizeTTY.bind(this, params.id));
+          initTerm(url, ExecService.resizeTTY.bind(this, endpoint.Id, params.id));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to exec into container');

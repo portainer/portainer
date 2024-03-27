@@ -6,11 +6,11 @@ angular.module('portainer.docker').factory('ExecService', [
     'use strict';
     var service = {};
 
-    service.resizeTTY = function (execId, width, height, timeout) {
+    service.resizeTTY = function (environmentId, execId, width, height, timeout) {
       var deferred = $q.defer();
 
       $timeout(function () {
-        Exec.resize({}, { id: execId, height: height, width: width })
+        Exec.resize({ environmentId }, { id: execId, height: height, width: width })
           .$promise.then(function success(data) {
             if (data.message) {
               deferred.reject({ msg: 'Unable to resize tty of exec', err: data.message });
