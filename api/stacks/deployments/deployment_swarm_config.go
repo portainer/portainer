@@ -2,13 +2,14 @@ package deployments
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type SwarmStackDeploymentConfig struct {
@@ -60,8 +61,14 @@ func (config *SwarmStackDeploymentConfig) GetUsername() string {
 
 func (config *SwarmStackDeploymentConfig) Deploy() error {
 	if config.FileService == nil || config.StackDeployer == nil {
-		log.Println("[deployment, swarm] file service or stack deployer is not initialised")
+		log.Error().Msg("file service or stack deployer is not initialised")
+
 		return errors.New("file service or stack deployer cannot be nil")
+	}
+
+	err := stackutils.ValidateStackFiles(config.stack, stackutils.IsValidBuildContext, config.FileService)
+	if err != nil {
+		return err
 	}
 
 	isAdminOrEndpointAdmin, err := stackutils.UserIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
@@ -72,7 +79,9 @@ func (config *SwarmStackDeploymentConfig) Deploy() error {
 	settings := &config.endpoint.SecuritySettings
 
 	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
-		err = stackutils.ValidateStackFiles(config.stack, settings, config.FileService)
+		validStackFn := stackutils.IsValidStackFileAdapter(settings)
+
+		err = stackutils.ValidateStackFiles(config.stack, validStackFn, config.FileService)
 		if err != nil {
 			return err
 		}

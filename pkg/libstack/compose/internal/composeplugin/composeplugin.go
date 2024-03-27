@@ -126,10 +126,7 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 		command.WithHost(options.Host)
 	}
 
-	var stderr bytes.Buffer
-
-	args := []string{}
-	args = append(args, command.ToArgs()...)
+	args := append([]string{}, command.ToArgs()...)
 
 	cmd := exec.Command(program, args...)
 	cmd.Dir = options.WorkingDir
@@ -150,7 +147,8 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 		Interface("env", cmd.Env).
 		Msg("run command")
 
-	cmd.Stderr = &stderr
+	stderr := &bytes.Buffer{}
+	cmd.Stderr = stderr
 
 	output, err := cmd.Output()
 	if err != nil {
