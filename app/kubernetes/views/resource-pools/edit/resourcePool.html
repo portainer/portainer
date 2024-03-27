@@ -323,19 +323,4 @@
       </kubernetes-resource-pool-applications-datatable>
     </div>
   </div>
-
-  <div class="row" ng-if="ctrl.ingresses && ctrl.ingresses.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-resource-pool-ingresses-datatable
-        dataset="ctrl.ingresses"
-        table-key="kubernetes.resourcepool.ingresses"
-        order-by="Name"
-        refresh-callback="ctrl.getIngresses"
-        loading="ctrl.state.ingressesLoading"
-        title-text="Ingress routes and applications"
-        title-icon="database"
-      >
-      </kubernetes-resource-pool-ingresses-datatable>
-    </div>
-  </div>
 </div>
