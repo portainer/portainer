@@ -1,7 +1,5 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { confirmDestructive } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
 
 angular.module('portainer.app').controller('TagsController', TagsController);
 
@@ -32,16 +30,6 @@ function TagsController($scope, $state, $async, TagService, Notifications) {
   }
 
   async function removeActionAsync(tags) {
-    const confirmed = await confirmDestructive({
-      title: 'Are you sure?',
-      message: 'Are you sure you want to remove the selected tag(s)?',
-      confirmButton: buildConfirmButton('Remove', 'danger'),
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
     for (let tag of tags) {
       try {
         await TagService.deleteTag(tag.Id);
