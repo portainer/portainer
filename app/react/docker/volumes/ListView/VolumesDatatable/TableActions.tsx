@@ -1,9 +1,7 @@
-import { Plus, Trash2 } from 'lucide-react';
-
 import { Authorized } from '@/react/hooks/useUser';
 
-import { Link } from '@@/Link';
-import { Button } from '@@/buttons';
+import { AddButton } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { DecoratedVolume } from '../types';
 
@@ -17,27 +15,15 @@ export function TableActions({
   return (
     <div className="flex items-center gap-2">
       <Authorized authorizations="DockerVolumeDelete">
-        <Button
-          color="dangerlight"
+        <DeleteButton
           disabled={selectedItems.length === 0}
-          onClick={() => onRemove(selectedItems)}
-          icon={Trash2}
-          className="!m-0"
+          onConfirmed={() => onRemove(selectedItems)}
+          confirmMessage="Do you want to remove the selected volume(s)?"
           data-cy="volume-removeVolumeButton"
-        >
-          Remove
-        </Button>
+        />
       </Authorized>
       <Authorized authorizations="DockerVolumeCreate">
-        <Button
-          as={Link}
-          props={{ to: '.new' }}
-          icon={Plus}
-          className="!m-0"
-          data-cy="volume-addVolumeButton"
-        >
-          Add volume
-        </Button>
+        <AddButton data-cy="volume-addVolumeButton">Add volume</AddButton>
       </Authorized>
     </div>
   );

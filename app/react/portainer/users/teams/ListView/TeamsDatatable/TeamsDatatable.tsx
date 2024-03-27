@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { Trash2, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -7,12 +7,11 @@ import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
 import { deleteTeam } from '@/react/portainer/users/teams/teams.service';
 
-import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
-import { Button } from '@@/buttons';
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 const storageKey = 'teams';
 
@@ -40,14 +39,11 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
       titleIcon={Users}
       renderTableActions={(selectedRows) =>
         isAdmin && (
-          <Button
-            color="dangerlight"
-            onClick={() => handleRemoveClick(selectedRows)}
+          <DeleteButton
+            onConfirmed={() => handleRemoveClick(selectedRows)}
             disabled={selectedRows.length === 0}
-            icon={Trash2}
-          >
-            Remove
-          </Button>
+            confirmMessage="Are you sure you want to remove the selected teams?"
+          />
         )
       }
       emptyContentLabel="No teams found"
@@ -79,14 +75,6 @@ function useRemoveMutation() {
   return { handleRemove };
 
   async function handleRemove(teams: TeamId[]) {
-    const confirmed = await confirmDelete(
-      'Are you sure you want to remove the selected teams?'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     deleteMutation.mutate(teams, {
       onSuccess: () => {
         notifySuccess('Teams successfully removed', '');

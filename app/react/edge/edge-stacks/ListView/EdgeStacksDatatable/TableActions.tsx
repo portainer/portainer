@@ -1,11 +1,7 @@
-import { Trash2, Plus } from 'lucide-react';
-
 import { notifySuccess } from '@/portainer/services/notifications';
 
-import { Button } from '@@/buttons';
-import { confirmDestructive } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { useDeleteEdgeStacksMutation } from './useDeleteEdgeStacksMutation';
 import { DecoratedEdgeStack } from './types';
@@ -19,39 +15,17 @@ export function TableActions({
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        color="dangerlight"
+      <DeleteButton
         disabled={selectedItems.length === 0}
-        onClick={() => handleRemove(selectedItems)}
-        icon={Trash2}
-        className="!m-0"
-      >
-        Remove
-      </Button>
+        onConfirmed={() => handleRemove(selectedItems)}
+        confirmMessage="Are you sure you want to remove the selected Edge stack(s)?"
+      />
 
-      <Button
-        as={Link}
-        props={{ to: 'edge.stacks.new' }}
-        icon={Plus}
-        className="!m-0"
-        data-cy="edgeStack-addStackButton"
-      >
-        Add stack
-      </Button>
+      <AddButton data-cy="edgeStack-addStackButton">Add stack</AddButton>
     </div>
   );
 
   async function handleRemove(selectedItems: Array<DecoratedEdgeStack>) {
-    const confirmed = await confirmDestructive({
-      title: 'Are you sure?',
-      message: 'Are you sure you want to remove the selected Edge stack(s)?',
-      confirmButton: buildConfirmButton('Remove', 'danger'),
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
     const ids = selectedItems.map((item) => item.Id);
     removeMutation.mutate(ids, {
       onSuccess: () => {

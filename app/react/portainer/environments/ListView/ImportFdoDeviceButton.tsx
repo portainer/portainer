@@ -1,7 +1,4 @@
-import { Plus } from 'lucide-react';
-
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 
 import { useSettings } from '../../settings/queries';
 import {
@@ -22,15 +19,10 @@ export function ImportFdoDeviceButton() {
   }
 
   return (
-    <Button
-      type="button"
-      color="secondary"
-      icon={Plus}
-      as={Link}
-      props={{ to: 'portainer.endpoints.importDevice' }}
-      className="ml-[5px]"
-    >
-      Import FDO device
-    </Button>
+    <div className="ml-[5px]">
+      <AddButton color="secondary" to="portainer.endpoints.importDevice">
+        Import FDO device
+      </AddButton>
+    </div>
   );
 }
