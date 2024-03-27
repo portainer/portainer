@@ -6,9 +6,14 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { DefaultOrSystemNamespace } from '../types';
 
-export function useNamespaceQuery(
+export function useNamespaceQuery<T = DefaultOrSystemNamespace>(
   environmentId: EnvironmentId,
-  namespace: string
+  namespace: string,
+  {
+    select,
+  }: {
+    select?(namespace: DefaultOrSystemNamespace): T;
+  } = {}
 ) {
   return useQuery(
     ['environments', environmentId, 'kubernetes', 'namespaces', namespace],
@@ -17,6 +22,7 @@ export function useNamespaceQuery(
       onError: (err) => {
         notifyError('Failure', err as Error, 'Unable to get namespace.');
       },
+      select,
     }
   );
 }
