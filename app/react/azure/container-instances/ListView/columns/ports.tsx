@@ -27,10 +27,17 @@ function PortsCell({
     return '-';
   }
 
-  return ports.map((port) => (
-    <a className="image-tag" href={`http://${ip}:${port.host}`} key={port.host}>
-      <Icon icon={ExternalLink} className="mr-1" />
-      {ip}:{port.host}
-    </a>
-  ));
+  return ports.map((port) => {
+    const scheme = port.host === 443 ? 'https' : 'http';
+    return (
+      <a
+        className="image-tag"
+        href={`${scheme}://${ip}:${port.host}`}
+        key={port.host}
+      >
+        <Icon icon={ExternalLink} className="mr-1" />
+        {ip}:{port.host}
+      </a>
+    );
+  });
 }

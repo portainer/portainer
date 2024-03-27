@@ -33,16 +33,19 @@ function Cell({ row }: CellContext<DockerContainer, string>) {
 
   const { PublicURL: publicUrl } = environment;
 
-  return _.uniqBy(ports, 'public').map((port) => (
-    <a
-      key={`${port.host}:${port.public}`}
-      className="image-tag"
-      href={`http://${publicUrl || port.host}:${port.public}`}
-      target="_blank"
-      rel="noreferrer"
-    >
-      <Icon icon={ExternalLink} />
-      {port.public}:{port.private}
-    </a>
-  ));
+  return _.uniqBy(ports, 'public').map((port) => {
+    const scheme = port.private === 443 ? 'https' : 'http';
+    return (
+      <a
+        key={`${port.host}:${port.public}`}
+        className="image-tag"
+        href={`${scheme}://${publicUrl || port.host}:${port.public}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <Icon icon={ExternalLink} />
+        {port.public}:{port.private}
+      </a>
+    );
+  });
 }

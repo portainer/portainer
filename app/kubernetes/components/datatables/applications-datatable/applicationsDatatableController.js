@@ -105,7 +105,10 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsDatatab
       // Map all load balancer service ports to ip address
       let loadBalancerURLs = [];
       if (item.LoadBalancerIPAddress) {
-        loadBalancerURLs = item.PublishedPorts.map((pp) => `http://${item.LoadBalancerIPAddress}:${pp.Port}`);
+        loadBalancerURLs = item.PublishedPorts.map((pp) => {
+          const scheme = pp.Port == 443 ? 'https' : 'http';
+          return `${scheme}://${item.LoadBalancerIPAddress}:${pp.Port}`;
+        });
       }
 
       // combine ingress urls
