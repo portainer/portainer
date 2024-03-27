@@ -164,7 +164,7 @@
               >Apply changes</button
             >
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="caret"></span>
+              <pr-icon icon="'chevron-down'"></pr-icon>
             </button>
             <ul class="dropdown-menu">
               <li><a ng-click="cancelChanges(service, ['Mode', 'Replicas', 'Name'])">Reset changes</a></li>
@@ -231,7 +231,17 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <h3 id="service-network-specs">Networks &amp; ports</h3>
     <div id="service-networks" class="padding-top" ng-include="'app/docker/views/services/edit/includes/networks.html'"></div>
-    <div id="service-published-ports" class="padding-top" ng-include="'app/docker/views/services/edit/includes/ports.html'"></div>
+
+    <docker-service-ports-mapping-field
+      id="service-published-ports"
+      class="block padding-top"
+      values="formValues.ports"
+      on-change="(onChangePorts)"
+      has-changes="hasChanges(service, ['Ports'])"
+      on-reset="(onResetPorts)"
+      on-submit="(onSubmit)"
+    ></docker-service-ports-mapping-field>
+
     <div id="service-hosts-entries" class="padding-top" ng-include="'app/docker/views/services/edit/includes/hosts.html'"></div>
   </div>
 </div>
