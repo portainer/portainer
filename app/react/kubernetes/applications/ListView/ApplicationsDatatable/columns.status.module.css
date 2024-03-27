@@ -8,6 +8,6 @@
   display: inline-block;
 }
 
-.ok {
+.status-indicator.ok {
   background-color: var(--green-3);
 }

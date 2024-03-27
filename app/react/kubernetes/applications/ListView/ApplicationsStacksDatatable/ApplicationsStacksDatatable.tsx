@@ -47,10 +47,11 @@ export function ApplicationsStacksDatatable({
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
 
+  const { setShowSystemResources } = tableState;
+
   useEffect(() => {
-    tableState.setShowSystemResources(showSystem || false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSystem]);
+    setShowSystemResources(showSystem || false);
+  }, [showSystem, setShowSystemResources]);
 
   const { authorized } = useAuthorizations('K8sApplicationsW');
   useRepeater(tableState.autoRefreshRate, onRefresh);

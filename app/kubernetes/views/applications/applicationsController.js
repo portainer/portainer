@@ -173,7 +173,9 @@ class KubernetesApplicationsController {
   }
 
   setSystemResources(flag) {
-    this.state.isSystemResources = flag;
+    return this.$scope.$applyAsync(() => {
+      this.state.isSystemResources = flag;
+    });
   }
 
   getApplications() {

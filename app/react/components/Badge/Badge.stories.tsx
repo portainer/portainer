@@ -9,7 +9,16 @@ export default {
     type: {
       control: {
         type: 'select',
-        options: ['success', 'danger', 'warn', 'info'],
+        options: [
+          'success',
+          'danger',
+          'warn',
+          'info',
+          'successSecondary',
+          'dangerSecondary',
+          'warnSecondary',
+          'infoSecondary',
+        ],
       },
     },
   },
@@ -26,6 +35,7 @@ function Template({ type = 'success' }: Props) {
     dangerSecondary: 'dangerSecondary badge',
     warnSecondary: 'warnSecondary badge',
     infoSecondary: 'infoSecondary badge',
+    primary: 'primary badge',
   };
   return <Badge type={type}>{message[type]}</Badge>;
 }
