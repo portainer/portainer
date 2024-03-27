@@ -3,7 +3,6 @@ import filesizeParser from 'filesize-parser';
 import angular from 'angular';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
-import { confirmDelete } from '@@/modals/confirm';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {
@@ -36,36 +35,29 @@ class KubernetesVolumesController {
     this.getVolumes = this.getVolumes.bind(this);
     this.getVolumesAsync = this.getVolumesAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
-    this.removeActionAsync = this.removeActionAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('volumes', index);
   }
 
-  async removeActionAsync(selectedItems) {
-    let actionCount = selectedItems.length;
-    for (const volume of selectedItems) {
-      try {
-        await this.KubernetesVolumeService.delete(volume);
-        this.Notifications.success('Volume successfully removed', volume.PersistentVolumeClaim.Name);
-        const index = this.volumes.indexOf(volume);
-        this.volumes.splice(index, 1);
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to remove volume');
-      } finally {
-        --actionCount;
-        if (actionCount === 0) {
-          this.$state.reload(this.$state.current);
+  async removeAction(selectedItems) {
+    return this.$async(async () => {
+      let actionCount = selectedItems.length;
+      for (const volume of selectedItems) {
+        try {
+          await this.KubernetesVolumeService.delete(volume);
+          this.Notifications.success('Volume successfully removed', volume.PersistentVolumeClaim.Name);
+          const index = this.volumes.indexOf(volume);
+          this.volumes.splice(index, 1);
+        } catch (err) {
+          this.Notifications.error('Failure', err, 'Unable to remove volume');
+        } finally {
+          --actionCount;
+          if (actionCount === 0) {
+            this.$state.reload(this.$state.current);
+          }
         }
-      }
-    }
-  }
-
-  removeAction(selectedItems) {
-    confirmDelete('Do you want to remove the selected volume(s)?').then((confirmed) => {
-      if (confirmed) {
-        return this.$async(this.removeActionAsync, selectedItems);
       }
     });
   }

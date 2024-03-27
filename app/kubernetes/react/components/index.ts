@@ -62,9 +62,13 @@ import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/comp
 import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/HelmInsightsBox';
 
 import { applicationsModule } from './applications';
+import { volumesModule } from './volumes';
 
 export const ngModule = angular
-  .module('portainer.kubernetes.react.components', [applicationsModule])
+  .module('portainer.kubernetes.react.components', [
+    applicationsModule,
+    volumesModule,
+  ])
   .component(
     'ingressClassDatatable',
     r2a(IngressClassDatatableAngular, [
