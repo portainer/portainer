@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"os"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -17,11 +18,32 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	tunnelCleanupInterval = 10 * time.Second
-	requiredTimeout       = 15 * time.Second
-	activeTimeout         = 4*time.Minute + 30*time.Second
-	pingTimeout           = 3 * time.Second
+func getEnvDuration(key string, fallback time.Duration) time.Duration {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return fallback
+	}
+
+	duration, err := time.ParseDuration(value)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Invalid duration for env var %s", key)
+	}
+
+	return duration
+}
+
+func init() {
+	tunnelCleanupInterval = getEnvDuration("EDGE_TUNNEL_CLEANUP_INTERVAL", 10*time.Second)
+	requiredTimeout = getEnvDuration("EDGE_TUNNEL_REQUIRED_TIMEOUT", 15*time.Second)
+	activeTimeout = getEnvDuration("EDGE_TUNNEL_ACTIVE_TIMEOUT", 4*time.Minute+30*time.Second)
+	pingTimeout = getEnvDuration("EDGE_TUNNEL_PING_TIMEOUT", 3*time.Second)
+}
+
+var (
+	tunnelCleanupInterval time.Duration
+	requiredTimeout       time.Duration
+	activeTimeout         time.Duration
+	pingTimeout           time.Duration
 )
 
 // Service represents a service to manage the state of multiple reverse tunnels.
@@ -269,12 +291,12 @@ func (service *Service) checkTunnels() {
 		}
 
 		if tunnel.Status == portainer.EdgeAgentActive && elapsed > activeTimeout {
-			log.Debug().
+			log.Info().
 				Int("endpoint_id", int(endpointID)).
 				Str("status", tunnel.Status).
 				Float64("status_time_seconds", elapsed.Seconds()).
 				Float64("timeout_seconds", activeTimeout.Seconds()).
-				Msg("ACTIVE state timeout exceeded")
+				Msg("ACTIVE state timeout exceeded. You can increase the timeout window using the env var EDGE_TUNNEL_ACTIVE_TIMEOUT. Keep in mind that the timeout window in the edge agent has to be increased too.")
 
 			err := service.snapshotEnvironment(endpointID, tunnel.Port)
 			if err != nil {
