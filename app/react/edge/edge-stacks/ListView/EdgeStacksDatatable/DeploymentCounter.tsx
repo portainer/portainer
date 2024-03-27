@@ -43,7 +43,7 @@ export function DeploymentCounter({
     <TooltipWithChildren message={getTooltip(count, total, type)}>
       <div className="h-2 w-full overflow-hidden rounded-lg">
         <progress
-          className={clsx('progress-unfilled:bg-gray-4 w-full', {
+          className={clsx('bg-gray-4 w-full', {
             'progress-filled:bg-success-7': type === StatusType.Running,
             'progress-filled:bg-error-7': type === StatusType.Error,
             'progress-filled:bg-blue-9': type === StatusType.Acknowledged,

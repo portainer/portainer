@@ -36,8 +36,7 @@ module.exports = {
       addVariant('th-dark', '&:is([theme="dark"] *)');
     }),
     plugin(function ({ addVariant }) {
-      addVariant('progress-unfilled', ['&::-webkit-progress-bar', '&']);
-      addVariant('progress-filled', ['&::-webkit-progress-value', '&::-moz-progress-bar', '&']);
+      addVariant('progress-filled', ['&::-webkit-progress-value', '&::-moz-progress-bar']);
     }),
   ],
 };
