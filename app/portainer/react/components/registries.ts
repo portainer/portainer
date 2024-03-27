@@ -9,6 +9,7 @@ import {
 } from '@/react/portainer/registries/ListView/DefaultRegistry';
 import { RepositoriesDatatable } from '@/react/portainer/registries/repositories/ListView/RepositoriesDatatable';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { TagsDatatable } from '@/react/portainer/registries/repositories/ItemView/TagsDatatable/TagsDatatable';
 
 export const registriesModule = angular
   .module('portainer.app.react.components.registries', [])
@@ -27,4 +28,13 @@ export const registriesModule = angular
   .component(
     'registryRepositoriesDatatable',
     r2a(withUIRouter(withReactQuery(RepositoriesDatatable)), ['dataset'])
+  )
+  .component(
+    'registriesRepositoryTagsDatatable',
+    r2a(withUIRouter(withReactQuery(TagsDatatable)), [
+      'dataset',
+      'advancedFeaturesAvailable',
+      'onRemove',
+      'onRetag',
+    ])
   ).name;
