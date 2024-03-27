@@ -2,7 +2,10 @@ import { useRouter } from '@uirouter/react';
 import { Formik, Form } from 'formik';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useCreateStack } from '@/react/common/stacks/queries/useCreateStack/useCreateStack';
+import {
+  SwarmCreatePayload,
+  useCreateStack,
+} from '@/react/common/stacks/queries/useCreateStack/useCreateStack';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { AccessControlForm } from '@/react/portainer/access-control';
@@ -116,7 +119,7 @@ export function StackDeployForm({
   function handleSubmit(values: FormValues) {
     const type =
       template.Type === TemplateType.ComposeStack ? 'standalone' : 'swarm';
-    const payload = {
+    const payload: SwarmCreatePayload['payload'] = {
       name: values.name,
       environmentId,
 
@@ -129,6 +132,7 @@ export function StackDeployForm({
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
       },
+      fromAppTemplate: true,
     };
 
     return mutation.mutate(

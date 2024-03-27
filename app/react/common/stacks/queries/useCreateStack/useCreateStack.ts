@@ -39,7 +39,7 @@ type KubernetesBasePayload = BasePayload & {
   composeFormat: boolean;
 };
 
-type SwarmCreatePayload =
+export type SwarmCreatePayload =
   | {
       method: 'file';
       payload: SwarmBasePayload & {
