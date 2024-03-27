@@ -31,11 +31,15 @@ export function UsersField({ name, users, value, onChange, errors }: Props) {
           onChange={onChange}
           value={value}
           inputId="users-selector"
+          dataCy="users-selector"
         />
       ) : (
         <span className="small text-muted">
           You have not yet created any users. Head over to the{' '}
-          <Link to="portainer.users">Users view</Link> to manage users.
+          <Link to="portainer.users" data-cy="access-control-users-link">
+            Users view
+          </Link>{' '}
+          to manage users.
         </span>
       )}
     </FormControl>

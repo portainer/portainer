@@ -5,7 +5,8 @@
         <span>Name</span>
       </td>
       <td>
-        <select class="form-control" ng-model="$ctrl.state.editModel.name" disable-authorization="DockerContainerUpdate">
+        <select class="form-control" ng-model="$ctrl.state.editModel.name" disable-authorization="DockerContainerUpdate" data-cy="container-restart-policy-select">
+          >
           <option value="no">None</option>
           <option value="on-failure">On Failure</option>
           <option value="always">Always</option>
@@ -19,7 +20,7 @@
     <tr ng-if="$ctrl.state.editModel.name === 'on-failure'">
       <td class="col-md-3">Maximum Retry Count</td>
       <td colspan="2">
-        <input type="number" class="form-control" ng-model="$ctrl.state.editModel.maximumRetryCount" />
+        <input type="number" class="form-control" ng-model="$ctrl.state.editModel.maximumRetryCount" data-cy="container-restart-max-retry-input" />
       </td>
     </tr>
   </table>

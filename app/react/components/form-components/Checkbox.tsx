@@ -18,6 +18,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
   role?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   bold?: boolean;
+  'data-cy': string;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, Props>(
@@ -30,6 +31,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
       checked,
       onChange,
       bold = true,
+      'data-cy': dataCy,
       ...props
     }: Props,
     ref
@@ -58,6 +60,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
           ref={resolvedRef}
           onChange={onChange}
           checked={checked}
+          data-cy={dataCy}
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />

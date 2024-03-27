@@ -48,6 +48,7 @@ export function MultipleSelectionFilter({
                     type="checkbox"
                     checked={value.includes(option)}
                     onChange={() => handleChange(option)}
+                    data-cy={`filter_${filterKey}_${index}`}
                   />
                   <label htmlFor={`filter_${filterKey}_${index}`}>
                     {option}

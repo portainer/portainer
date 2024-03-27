@@ -108,6 +108,7 @@ export function ServicesDatatable({
         }),
         withGlobalFilter(filter)
       )}
+      data-cy="services-datatable"
     />
   );
 }

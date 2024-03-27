@@ -47,6 +47,7 @@ export function EdgeStacksDatatable() {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
       )}
+      data-cy="edge-stacks-datatable"
     />
   );
 }

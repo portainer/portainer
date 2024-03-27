@@ -22,6 +22,7 @@ export function TextField({ disabled }: Args) {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       disabled={disabled}
+      data-cy="docker-logging-options-input"
     />
   );
 }

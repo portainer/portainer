@@ -60,6 +60,7 @@ export function ApplicationContainersDatatable() {
       titleIcon={Server}
       getRowId={(row) => row.podName} // use pod name because it's unique (name is not unique)
       disableSelect
+      data-cy="k8s-application-containers-datatable"
     />
   );
 }

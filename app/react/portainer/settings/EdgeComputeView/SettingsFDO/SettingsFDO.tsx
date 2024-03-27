@@ -101,6 +101,7 @@ export function SettingsFDOForm({ settings, onSubmit }: Props) {
                 >
                   <Switch
                     id="edge_enableFDO"
+                    data-cy="edge-enableFDO-switch"
                     name="edge_enableFDO"
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}

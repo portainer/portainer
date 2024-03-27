@@ -25,7 +25,7 @@ export function HealthStatus({ health }: Props) {
     <TableContainer>
       <TableTitle label="Container health" icon={Server} />
 
-      <DetailsTable>
+      <DetailsTable dataCy="health-status-table">
         <DetailsTable.Row label="Status">
           <div className="vertical-center">
             <Icon

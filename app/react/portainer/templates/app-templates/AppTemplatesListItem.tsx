@@ -35,6 +35,7 @@ export function AppTemplatesListItem({
           <div className="mr-5 mt-3">
             <Button
               as={Link}
+              data-cy="app-templates-duplicate-button"
               size="xsmall"
               onClick={(e) => {
                 e.stopPropagation();
@@ -45,6 +46,7 @@ export function AppTemplatesListItem({
                   appTemplateId: template.Id,
                   type: duplicateCustomTemplateType,
                 },
+                'data-cy': `app-templates-duplicate-${template.Name}`,
               }}
             >
               Copy as Custom

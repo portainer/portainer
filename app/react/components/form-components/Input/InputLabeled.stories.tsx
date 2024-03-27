@@ -16,6 +16,7 @@ function TextInput() {
   return (
     <InputLabeled
       label="label"
+      data-cy="input"
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
@@ -28,6 +29,7 @@ function NumberInput() {
   return (
     <InputLabeled
       label="label"
+      data-cy="input"
       type="number"
       value={value}
       onChange={(e) => setValue(e.target.valueAsNumber)}

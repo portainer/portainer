@@ -55,6 +55,7 @@ export function LoadBalancerServiceForm({
           <div className="text-muted vertical-center">LoadBalancer</div>
           <Button
             icon={Trash2}
+            data-cy={`remove-service-${serviceIndex}`}
             color="dangerlight"
             className="!ml-0"
             onClick={() => {
@@ -213,6 +214,7 @@ export function LoadBalancerServiceForm({
           <div className="flex">
             <Button
               icon={Plus}
+              data-cy={`k8sAppCreate-addPortButton_${serviceIndex}`}
               color="default"
               className="!ml-0"
               onClick={() => {

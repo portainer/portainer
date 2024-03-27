@@ -1,12 +1,14 @@
 import { ChangeEvent, ComponentProps, createRef } from 'react';
 import { Upload, XCircle } from 'lucide-react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 
 import styles from './FileUploadField.module.css';
 
-export interface Props {
+export interface Props extends AutomationTestingProps {
   onChange(value: File): void;
   value?: File | null;
   accept?: string;
@@ -26,6 +28,7 @@ export function FileUploadField({
   inputId,
   color = 'primary',
   name,
+  'data-cy': dataCy,
 }: Props) {
   const fileRef = createRef<HTMLInputElement>();
 
@@ -47,6 +50,7 @@ export function FileUploadField({
         color={color}
         onClick={handleButtonClick}
         className={styles.fileButton}
+        data-cy={dataCy}
         icon={Upload}
       >
         {title}

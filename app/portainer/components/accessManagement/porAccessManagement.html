@@ -26,6 +26,7 @@
                 <div>
                   <select
                     class="form-control"
+                    data-cy="access-management-role-select"
                     ng-model="ctrl.formValues.selectedRole"
                     ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles"
                   >

@@ -18,6 +18,7 @@ export function EnabledWaitingRoomSwitch() {
     >
       <Switch
         id="edge_waiting_room"
+        data-cy="edge-waiting-room-switch"
         name="EnableWaitingRoom"
         className="space-right"
         checked={inputProps.value}

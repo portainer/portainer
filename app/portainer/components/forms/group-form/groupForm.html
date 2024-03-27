@@ -3,7 +3,7 @@
   <div class="form-group">
     <label for="group_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="group_name" ng-model="$ctrl.model.Name" placeholder="e.g. my-group" required auto-focus />
+      <input type="text" class="form-control" name="group_name" ng-model="$ctrl.model.Name" placeholder="e.g. my-group" required auto-focus data-cy="group-name-input" />
       <div class="help-block" ng-show="endpointGroupForm.group_name.$invalid">
         <div class="small text-warning">
           <div ng-messages="endpointGroupForm.group_name.$error">
@@ -21,7 +21,14 @@
   <div class="form-group">
     <label for="group_description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="group_description" ng-model="$ctrl.model.Description" placeholder="e.g. production environments..." />
+      <input
+        type="text"
+        class="form-control"
+        id="group_description"
+        ng-model="$ctrl.model.Description"
+        placeholder="e.g. production environments..."
+        data-cy="group-description-input"
+      />
     </div>
   </div>
   <!-- !description-input -->

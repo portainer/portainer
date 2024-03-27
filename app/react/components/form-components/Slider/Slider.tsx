@@ -14,7 +14,7 @@ export interface Props {
   step: number;
   value: number;
   onChange: (value: number | number[]) => void;
-  dataCy?: string;
+  dataCy: string;
   // true if you want to always show the tooltip
   visibleTooltip?: boolean;
   disabled?: boolean;

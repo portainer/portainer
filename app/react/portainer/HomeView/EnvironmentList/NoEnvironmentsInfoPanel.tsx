@@ -9,8 +9,13 @@ export function NoEnvironmentsInfoPanel({ isAdmin }: { isAdmin: boolean }) {
         {isAdmin ? (
           <span>
             No environment available for management. Please head over the{' '}
-            <Link to="portainer.wizard.endpoints">environment wizard</Link> to
-            add an environment.
+            <Link
+              to="portainer.wizard.endpoints"
+              data-cy="wizard-add-environments-link"
+            >
+              environment wizard
+            </Link>{' '}
+            to add an environment.
           </span>
         ) : (
           <span>

@@ -22,7 +22,7 @@ export function DockerfileDetails({ image }: Props) {
   return (
     <TableContainer>
       <TableTitle label="Dockerfile details" icon={List} />
-      <DetailsTable>
+      <DetailsTable dataCy="dockerfile-details-table">
         <DetailsTable.Row label="CMD">
           <code>{image.Command ? joinCommand(image.Command) : '-'}</code>
         </DetailsTable.Row>

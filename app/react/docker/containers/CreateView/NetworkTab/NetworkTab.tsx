@@ -44,6 +44,7 @@ export function NetworkTab({
           value={values.hostname}
           onChange={(e) => setFieldValue('hostname', e.target.value)}
           placeholder="e.g. web01"
+          data-cy="docker-container-hostname-input"
         />
       </FormControl>
 
@@ -52,6 +53,7 @@ export function NetworkTab({
           value={values.domain}
           onChange={(e) => setFieldValue('domain', e.target.value)}
           placeholder="e.g. example.com"
+          data-cy="docker-container-domain-input"
         />
       </FormControl>
 
@@ -60,6 +62,7 @@ export function NetworkTab({
           value={values.macAddress}
           onChange={(e) => setFieldValue('macAddress', e.target.value)}
           placeholder="e.g. 12-34-56-78-9a-bc"
+          data-cy="docker-container-mac-address-input"
         />
       </FormControl>
 
@@ -68,6 +71,7 @@ export function NetworkTab({
           value={values.ipv4Address}
           onChange={(e) => setFieldValue('ipv4Address', e.target.value)}
           placeholder="e.g. 172.20.0.7"
+          data-cy="docker-container-ipv4-address-input"
         />
       </FormControl>
 
@@ -76,6 +80,7 @@ export function NetworkTab({
           value={values.ipv6Address}
           onChange={(e) => setFieldValue('ipv6Address', e.target.value)}
           placeholder="e.g. a:b:c:d::1234"
+          data-cy="docker-container-ipv6-address-input"
         />
       </FormControl>
 
@@ -84,6 +89,7 @@ export function NetworkTab({
           value={values.primaryDns}
           onChange={(e) => setFieldValue('primaryDns', e.target.value)}
           placeholder="e.g. 1.1.1.1, 2606:4700:4700::1111"
+          data-cy="docker-container-primary-dns-input"
         />
       </FormControl>
 
@@ -92,6 +98,7 @@ export function NetworkTab({
           value={values.secondaryDns}
           onChange={(e) => setFieldValue('secondaryDns', e.target.value)}
           placeholder="e.g. 1.0.0.1, 2606:4700:4700::1001"
+          data-cy="docker-container-secondary-dns-input"
         />
       </FormControl>
 
@@ -104,6 +111,7 @@ export function NetworkTab({
         errors={errors?.hostsFileEntries}
         item={HostsFileEntryItem}
         itemBuilder={() => ''}
+        data-cy="docker-container-hosts-file-entries"
       />
     </div>
   );
@@ -115,6 +123,7 @@ function HostsFileEntryItem({
   disabled,
   error,
   readOnly,
+  index,
 }: ItemProps<string>) {
   return (
     <div>
@@ -125,6 +134,7 @@ function HostsFileEntryItem({
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
           readOnly={readOnly}
+          data-cy={`docker-container-hosts-file-entry_${index}`}
         />
       </InputGroup>
 

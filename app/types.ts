@@ -4,14 +4,16 @@ export interface AutomationTestingProps {
    *
    * Change with care and communicate this with QA
    */
-  'data-cy'?: string;
+  'data-cy': string;
 }
 
 declare module 'react' {
   interface HTMLAttributes<T>
     extends AriaAttributes,
       DOMAttributes<T>,
-      AutomationTestingProps {}
+      Partial<AutomationTestingProps> {
+    // keep AutomationTestingProps 'data-cy' optional because HTMLAttributes covers non interactive elements
+  }
 }
 
 export type WithRequiredProperty<Type, Key extends keyof Type> = Type & {

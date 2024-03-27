@@ -22,6 +22,7 @@ function Defaults() {
       label="default example"
       value={values}
       onChange={(value) => setValues(value)}
+      data-cy="input-list-default-example"
     />
   );
 }
@@ -37,6 +38,7 @@ function ListWithUndoDeletion() {
       value={values}
       onChange={(value) => setValues(value)}
       canUndoDelete
+      data-cy="input-list-with-undo-deletion"
     />
   );
 }
@@ -71,6 +73,7 @@ function ListWithInputAndSelect({
       movable={movable}
       itemBuilder={() => ({ value: 0, select: '', id: values.length })}
       tooltip={tooltip}
+      data-cy="input-list-with-select-and-input"
     />
   );
 }
@@ -96,9 +99,11 @@ function SelectAndInputItem({
         onChange={(e) =>
           onChange({ ...item, value: parseInt(e.target.value, 10) })
         }
+        data-cy="input"
       />
       <Select
         onChange={(e) => onChange({ ...item, select: e.target.value })}
+        data-cy="select"
         options={[
           { label: 'option1', value: 'option1' },
           { label: 'option2', value: 'option2' },

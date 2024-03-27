@@ -4,6 +4,7 @@
     <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
+        data-cy="component-registrySelect"
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
         ng-model="$ctrl.model.Registry"
         id="image_registry"
@@ -19,6 +20,7 @@
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
         <input
           type="text"
+          data-cy="component-imageInput"
           class="form-control"
           aria-describedby="registry-name"
           uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
@@ -27,7 +29,6 @@
           placeholder="e.g. my-image:my-tag"
           ng-change="$ctrl.onImageChange()"
           required
-          data-cy="component-imageInput"
         />
         <span ng-if="$ctrl.isDockerHubRegistry()" class="input-group-btn">
           <a
@@ -51,7 +52,15 @@
       </span>
       <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image </label>
       <div ng-class="$ctrl.inputClass" class="col-sm-8">
-        <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.model.Image"
+          name="image_name"
+          placeholder="e.g. registry:port/my-image:my-tag"
+          required
+          data-cy="component-imageInput"
+        />
       </div>
     </div>
   </div>

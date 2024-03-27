@@ -13,7 +13,7 @@
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required data-cy="registry-username-input" />
       <div class="help-block" ng-show="registryFormGitlab.registry_username.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_username.$error">
@@ -76,7 +76,16 @@
       <portainer-tooltip message="'URL of Gitlab instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required />
+      <input
+        type="text"
+        class="form-control"
+        id="instance_url"
+        name="instance_url"
+        ng-model="$ctrl.model.Gitlab.InstanceURL"
+        placeholder="https://gitlab.com"
+        required
+        data-cy="instance-url-input"
+      />
       <div class="help-block" ng-show="registryFormGitlab.instance_url.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.instance_url.$error">
@@ -97,7 +106,16 @@
       <portainer-tooltip message="'URL of Gitlab registry instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required />
+      <input
+        type="text"
+        class="form-control"
+        id="registry_url"
+        name="registry_url"
+        ng-model="$ctrl.model.URL"
+        placeholder="https://registry.gitlab.com"
+        required
+        data-cy="registry-url-input"
+      />
       <div class="help-block" ng-show="registryFormGitlab.registry_url.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_url.$error">

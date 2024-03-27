@@ -29,6 +29,7 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
         </p>
         <SwitchField
           name="pullLatest"
+          data-cy="recreate-pull-latest-switch"
           label="Re-pull image"
           checked={pullLatest}
           onChange={setPullLatest}
@@ -44,10 +45,18 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSubmit()} color="default">
+        <Button
+          onClick={() => onSubmit()}
+          color="default"
+          data-cy="cancel-recreate"
+        >
           Cancel
         </Button>
-        <Button onClick={() => onSubmit({ pullLatest })} color="danger">
+        <Button
+          onClick={() => onSubmit({ pullLatest })}
+          color="danger"
+          data-cy="confirm-recreate"
+        >
           Recreate
         </Button>
       </Modal.Footer>

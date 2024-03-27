@@ -52,7 +52,9 @@ function DeployCode({ code }: DeployCodeProps) {
 
       <Code>{code}</Code>
       <div className="mt-2">
-        <CopyButton copyText={code}>Copy command</CopyButton>
+        <CopyButton copyText={code} data-cy="copy-deployment-command">
+          Copy command
+        </CopyButton>
       </div>
     </>
   );

@@ -32,7 +32,7 @@ export function TableActions({
       <Authorized authorizations="PortainerStackCreate">
         <Button
           as={Link}
-          props={{ to: '.newstack' }}
+          props={{ to: '.newstack', 'data-cy': 'docker-add-stack-link' }}
           icon={Plus}
           className="!m-0"
           data-cy="stack-addStackButton"

@@ -25,7 +25,11 @@ function NameCell({
         childrenUnauthorized={nodeName}
         adminOnlyCE
       >
-        <Link to="kubernetes.cluster.node" params={{ nodeName }}>
+        <Link
+          to="kubernetes.cluster.node"
+          params={{ nodeName }}
+          data-cy={`node-name-link-${nodeName}`}
+        >
           {nodeName}
         </Link>
       </Authorized>

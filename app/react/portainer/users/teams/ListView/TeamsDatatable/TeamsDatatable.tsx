@@ -17,7 +17,7 @@ import { useTableState } from '@@/datatables/useTableState';
 const storageKey = 'teams';
 
 const columns: ColumnDef<Team>[] = [
-  buildNameColumn<Team>('Name', 'portainer.teams.team'),
+  buildNameColumn<Team>('Name', 'portainer.teams.team', 'teams-name'),
 ];
 
 interface Props {
@@ -45,12 +45,14 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
             onClick={() => handleRemoveClick(selectedRows)}
             disabled={selectedRows.length === 0}
             icon={Trash2}
+            data-cy="remove-teams-button"
           >
             Remove
           </Button>
         )
       }
       emptyContentLabel="No teams found"
+      data-cy="teams-datatable"
     />
   );
 

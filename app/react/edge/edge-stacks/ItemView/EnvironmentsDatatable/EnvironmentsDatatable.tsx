@@ -116,9 +116,11 @@ export function EnvironmentsDatatable() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e ?? undefined)}
             options={envStatusSelectOptions}
+            data-cy="edge-stacks-environments-status-filter"
           />
         </div>
       }
+      data-cy="edge-stacks-environments-datatable"
     />
   );
 }

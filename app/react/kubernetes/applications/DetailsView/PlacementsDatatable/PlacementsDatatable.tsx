@@ -68,6 +68,7 @@ export function PlacementsDatatable({
       renderSubRow={(row) => (
         <SubRow node={row.original} cellCount={row.getVisibleCells().length} />
       )}
+      data-cy="kubernetes-application-placements-datatable"
     />
   );
 }

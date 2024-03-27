@@ -207,6 +207,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
             isSubMenu
             to={featSubMenuTo}
             params={{ endpointId: environmentId }}
+            data-cy="portainerSidebar-docker-setup"
           />
         </Authorized>
 
@@ -215,6 +216,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           isSubMenu
           to={registrySubMenuTo}
           params={{ endpointId: environmentId }}
+          data-cy="portainerSidebar-docker-registries"
         />
       </SidebarParent>
     </>

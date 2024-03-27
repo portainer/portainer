@@ -10,7 +10,11 @@ import { DockerConfig } from '../../types';
 const columnHelper = createColumnHelper<DockerConfig>();
 
 export const columns = [
-  buildNameColumn<DockerConfig>('Name', 'docker.configs.config'),
+  buildNameColumn<DockerConfig>(
+    'Name',
+    'docker.configs.config',
+    'docker-configs-name'
+  ),
   columnHelper.accessor('CreatedAt', {
     header: 'Creation Date',
     cell: ({ getValue }) => {

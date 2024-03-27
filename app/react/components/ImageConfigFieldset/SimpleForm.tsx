@@ -91,6 +91,7 @@ export function SimpleForm({
                   rel: 'noreferrer',
                 }}
                 icon={DockerIcon}
+                data-cy="component-dockerHubSearchButton"
               >
                 Search
               </Button>
@@ -189,6 +190,7 @@ function ImageField({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       id={inputId}
+      data-cy="image-field-simple-input"
     />
   );
 }

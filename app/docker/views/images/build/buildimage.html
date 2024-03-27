@@ -40,7 +40,15 @@
                         <!-- name-input -->
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">name</span>
-                          <input type="text" class="form-control" ng-model="item.Name" ng-change="checkName($index)" placeholder="e.g. my-image:my-tag" auto-focus />
+                          <input
+                            type="text"
+                            class="form-control"
+                            ng-model="item.Name"
+                            ng-change="checkName($index)"
+                            placeholder="e.g. my-image:my-tag"
+                            auto-focus
+                            data-cy="image-name-input"
+                          />
                           <span class="input-group-addon" ng-if="!item.Valid">
                             <pr-icon icon="'x'" mode="'danger'"></pr-icon>
                           </span>
@@ -101,9 +109,7 @@
                       </span>
                     </div>
                     <button class="btn btn-sm btn-primary" ngf-select="selectAdditionalFiles($files)" ngf-multiple="true">Select files</button>
-                    <span ng-repeat="item in formValues.AdditionalFiles track by $index" class="mx-2">
-                      {{ item.name }}
-                    </span>
+                    <span ng-repeat="item in formValues.AdditionalFiles track by $index" class="mx-2"> {{ item.name }} </span>
                   </div>
                 </div>
               </div>
@@ -133,7 +139,7 @@
                   <div class="form-group">
                     <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile" />
+                      <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile" data-cy="image-path-input" />
                     </div>
                   </div>
                 </div>
@@ -156,6 +162,7 @@
                   <div class="col-sm-10">
                     <input
                       type="text"
+                      data-cy="image-url-input"
                       class="form-control"
                       ng-model="formValues.URL"
                       id="image_url"
@@ -172,7 +179,7 @@
                 <div class="form-group">
                   <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile" />
+                    <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile" data-cy="image-path-input" />
                   </div>
                 </div>
               </div>

@@ -50,6 +50,7 @@ export function PortsMappingField({
         disabled={disabled}
         readOnly={readOnly}
         tooltip="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
+        data-cy="docker-containers-ports-mapping"
       />
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">
@@ -73,6 +74,7 @@ function Item({
       <div className="flex items-center gap-2">
         <InputLabeled
           size="small"
+          data-cy={`hostPort-${index}`}
           disabled={disabled}
           readOnly={readOnly}
           value={item.hostPort}
@@ -97,6 +99,7 @@ function Item({
           placeholder="e.g. 80"
           className="w-1/2"
           id={`containerPort-${index}`}
+          data-cy={`containerPort-${index}`}
         />
 
         <ButtonSelector<Protocol>

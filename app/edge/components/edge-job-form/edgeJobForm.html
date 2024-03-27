@@ -6,6 +6,7 @@
     <div class="col-sm-10">
       <input
         type="text"
+        data-cy="edgejob-name-input"
         class="form-control"
         ng-model="$ctrl.model.Name"
         ng-pattern="/^[a-zA-Z0-9][a-zA-Z0-9_.-]+$/"
@@ -43,7 +44,9 @@
     <div class="form-group">
       <label for="recurring" class="col-sm-2 control-label text-left">Recurring Edge job</label>
       <div class="col-sm-10">
-        <label class="switch"><input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" /><span class="slider round"></span></label>
+        <label class="switch"
+          ><input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" data-cy="recurring-edge-job-checkbox" /><span class="slider round"></span
+        ></label>
       </div>
     </div>
     <!-- not-recurring -->
@@ -51,7 +54,7 @@
       <div class="form-group">
         <label for="edgejob_cron" class="col-sm-2 control-label text-left">Schedule date</label>
         <div class="col-sm-10">
-          <input class="form-control" moment-picker ng-model="$ctrl.formValues.datetime" format="YYYY-MM-DD HH:mm" />
+          <input class="form-control" moment-picker ng-model="$ctrl.formValues.datetime" format="YYYY-MM-DD HH:mm" data-cy="edge-job-date-time-picker" />
         </div>
         <div class="col-sm-12 small text-muted mt-2.5"> Time should be set according to the chosen environments' timezone. </div>
         <div ng-show="edgeJobForm.datepicker.$invalid">
@@ -73,6 +76,7 @@
         <div class="col-sm-10">
           <select
             id="edgejob_value"
+            data-cy="edge-job-time-select"
             name="edgejob_value"
             class="form-control"
             ng-model="$ctrl.formValues.scheduleValue"
@@ -101,6 +105,7 @@
       <div class="col-sm-10">
         <input
           type="text"
+          data-cy="edge-job-cron-input"
           class="form-control"
           ng-model="$ctrl.model.CronExpression"
           id="edgejob_cron"
@@ -193,9 +198,7 @@
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>
-      <span class="text-danger space-left" ng-if="$ctrl.state.formValidationError">
-        {{ $ctrl.state.formValidationError }}
-      </span>
+      <span class="text-danger space-left" ng-if="$ctrl.state.formValidationError"> {{ $ctrl.state.formValidationError }} </span>
     </div>
   </div>
   <!-- !actions -->

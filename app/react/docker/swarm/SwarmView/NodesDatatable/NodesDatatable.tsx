@@ -65,6 +65,7 @@ export function NodesDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy="swarm-nodes-datatable"
     />
   );
 }

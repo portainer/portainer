@@ -39,6 +39,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
         size="medium"
         className={buttonsClasses}
         title="Edit"
+        data-cy={`edit-environment-link-${environment.Name}`}
       />
 
       <LinkButton
@@ -50,6 +51,7 @@ export function EditButtons({ environment }: { environment: Environment }) {
         size="medium"
         className={buttonsClasses}
         title="Configuration"
+        data-cy={`configure-environment-link-${environment.Name}`}
       />
     </ButtonsGrid>
   );

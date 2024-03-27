@@ -49,6 +49,7 @@ export function Details({ team, memberships, isAdmin }: Props) {
                     {isAdmin && (
                       <Button
                         color="danger"
+                        data-cy={`delete-team-${team.Name}`}
                         size="xsmall"
                         onClick={handleDeleteClick}
                         icon={Trash2}

@@ -36,8 +36,13 @@ function WaitingRoomView() {
             <Alert color="warn">
               Associating all nodes in waiting room will exceed the node limit
               of your current license. Go to{' '}
-              <Link to="portainer.licenses">Licenses</Link> page to view the
-              current usage.
+              <Link
+                to="portainer.licenses"
+                data-cy="waitingRoom-portainerLicensesLink"
+              >
+                Licenses
+              </Link>{' '}
+              page to view the current usage.
             </Alert>
           </div>
         </div>

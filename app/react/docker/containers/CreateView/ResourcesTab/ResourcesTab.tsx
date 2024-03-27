@@ -99,6 +99,7 @@ export function ResourcesTab({
               setFieldValue('sharedMemorySize', e.target.valueAsNumber)
             }
             className="w-32"
+            data-cy="shared-memory-size"
           />
           <div className="small text-muted">
             Size of /dev/shm (<b>MB</b>)

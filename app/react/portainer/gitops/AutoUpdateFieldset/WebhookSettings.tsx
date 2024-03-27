@@ -32,7 +32,11 @@ export function WebhookSettings({
     >
       <div className="flex items-center gap-2">
         <span className="text-muted">{truncateLeftRight(url)}</span>
-        <CopyButton copyText={url} color="light">
+        <CopyButton
+          copyText={url}
+          color="light"
+          data-cy="copy-webhook-link-button"
+        >
           Copy link
         </CopyButton>
       </div>

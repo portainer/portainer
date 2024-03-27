@@ -12,6 +12,7 @@ export function PrePullToggle({
       <div className="col-sm-12">
         <SwitchField
           checked={value}
+          data-cy="kube-edge-stack-pre-pull-switch"
           name="prePullImage"
           label="Pre-pull images"
           tooltip="When enabled, redeployment will be executed when image(s) is pulled successfully"

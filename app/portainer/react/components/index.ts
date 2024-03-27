@@ -75,6 +75,7 @@ export const ngModule = angular
       'buttonText',
       'className',
       'buttonClassName',
+      'data-cy',
     ])
   )
   .component(
@@ -221,6 +222,7 @@ export const ngModule = angular
       'onChange',
       'value',
       'height',
+      'data-cy',
     ])
   )
   .component(

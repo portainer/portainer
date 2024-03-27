@@ -32,6 +32,7 @@ export function CommonFields({
       >
         <Input
           name="title"
+          data-cy="custom-templates-title-input"
           placeholder="e.g. mytemplate"
           id="template-title"
           required
@@ -50,6 +51,7 @@ export function CommonFields({
       >
         <Input
           name="description"
+          data-cy="custom-templates-description-input"
           id="template-description"
           required
           value={values.Description}
@@ -62,6 +64,7 @@ export function CommonFields({
       <FormControl label="Note" inputId="template-note" errors={errors?.Note}>
         <Input
           name="note"
+          data-cy="custom-templates-note-input"
           id="template-note"
           value={values.Note}
           onChange={(e) => {
@@ -73,6 +76,7 @@ export function CommonFields({
       <FormControl label="Logo" inputId="template-logo" errors={errors?.Logo}>
         <Input
           name="logo"
+          data-cy="custom-templates-logo-input"
           id="template-logo"
           value={values.Logo}
           onChange={(e) => {

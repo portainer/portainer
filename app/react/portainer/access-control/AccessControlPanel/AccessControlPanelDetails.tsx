@@ -134,7 +134,11 @@ function getInheritanceMessage(
     return (
       <InheritanceMessage tooltip="Access control applied on a service is also applied on each container of that service.">
         Access control on this resource is inherited from the following service:
-        <Link to="docker.services.service" params={{ id: resourceId }}>
+        <Link
+          to="docker.services.service"
+          params={{ id: resourceId }}
+          data-cy="docker-access-inherited-service"
+        >
           {truncate(resourceId)}
         </Link>
       </InheritanceMessage>
@@ -149,7 +153,11 @@ function getInheritanceMessage(
       <InheritanceMessage tooltip="Access control applied on a container created using a template is also applied on each volume associated to the container.">
         Access control on this resource is inherited from the following
         container:
-        <Link to="docker.containers.container" params={{ id: resourceId }}>
+        <Link
+          to="docker.containers.container"
+          params={{ id: resourceId }}
+          data-cy="docker-access-inherited-container"
+        >
           {truncate(resourceId)}
         </Link>
       </InheritanceMessage>

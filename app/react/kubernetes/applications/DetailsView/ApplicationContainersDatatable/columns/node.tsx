@@ -14,7 +14,11 @@ export const node = columnHelper.accessor('nodeName', {
         childrenUnauthorized={nodeName}
         adminOnlyCE
       >
-        <Link to="kubernetes.cluster.node" params={{ nodeName }}>
+        <Link
+          to="kubernetes.cluster.node"
+          params={{ nodeName }}
+          data-cy={`application-container-node-${nodeName}`}
+        >
           <div className="max-w-xs truncate" title={nodeName}>
             {nodeName}
           </div>

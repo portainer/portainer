@@ -1,5 +1,7 @@
 import { List } from 'lucide-react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { CodeEditor } from '@@/CodeEditor';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
@@ -11,11 +13,12 @@ export function AdvancedMode({
   value,
   onChange,
   onSimpleModeClick,
+  'data-cy': dataCy,
 }: {
   value: Values;
   onChange: (value: Values) => void;
   onSimpleModeClick: () => void;
-}) {
+} & AutomationTestingProps) {
   const editorValue = convertToArrayOfStrings(value).join('\n');
 
   return (
@@ -26,6 +29,7 @@ export function AdvancedMode({
         icon={List}
         className="!ml-0 p-0 hover:no-underline"
         onClick={onSimpleModeClick}
+        data-cy="env-simple-mode-button"
       >
         Simple mode
       </Button>
@@ -40,6 +44,7 @@ export function AdvancedMode({
         value={editorValue}
         onChange={handleEditorChange}
         placeholder="e.g. key=value"
+        data-cy={dataCy}
       />
     </>
   );

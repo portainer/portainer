@@ -47,6 +47,7 @@ function RoleCell({
       isAdmin={isPureAdmin}
       onClick={handleUpdateRole}
       disabled={disabled}
+      username={user.Username}
     />
   );
 
@@ -65,10 +66,11 @@ function RoleCell({
 interface LeaderCellProps {
   isAdmin: boolean;
   onClick: (role: TeamRole, onSuccessMessage: string) => void;
+  username: string;
   disabled?: boolean;
 }
 
-function LeaderCell({ isAdmin, onClick, disabled }: LeaderCellProps) {
+function LeaderCell({ isAdmin, onClick, disabled, username }: LeaderCellProps) {
   return (
     <div className="flex items-center">
       <Icon className="space-right" icon={UserPlus} mode="secondary-alt" />
@@ -80,6 +82,7 @@ function LeaderCell({ isAdmin, onClick, disabled }: LeaderCellProps) {
           onClick={() => onClick(TeamRole.Member, 'User is now team member')}
           disabled={disabled}
           icon={UserX}
+          data-cy={`remove-leader-${username}`}
         >
           Member
         </Button>
@@ -91,9 +94,10 @@ function LeaderCell({ isAdmin, onClick, disabled }: LeaderCellProps) {
 interface MemberCellProps {
   onClick: (role: TeamRole, onSuccessMessage: string) => void;
   disabled?: boolean;
+  username: string;
 }
 
-function MemberCell({ onClick, disabled }: MemberCellProps) {
+function MemberCell({ onClick, disabled, username }: MemberCellProps) {
   return (
     <div className="flex items-center">
       <Icon className="space-right" icon={UserIcon} mode="secondary-alt" />
@@ -103,6 +107,7 @@ function MemberCell({ onClick, disabled }: MemberCellProps) {
         onClick={() => onClick(TeamRole.Leader, 'User is now team leader')}
         disabled={disabled}
         icon={UserPlus}
+        data-cy={`make-leader-${username}`}
       >
         Leader
       </Button>

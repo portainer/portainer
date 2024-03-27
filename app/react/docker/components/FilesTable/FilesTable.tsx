@@ -36,6 +36,7 @@ function goToParent(onClick: () => void): FileData {
         color="link"
         icon={CornerLeftUp}
         className="!m-0 !p-0"
+        data-cy="component-goToParentButton"
       >
         Go to parent
       </Button>
@@ -95,6 +96,7 @@ export function FilesTable({
         onDelete,
       })}
       disableSelect
+      data-cy="files-datatable"
       renderTableActions={() => {
         if (!isUploadAllowed) {
           return null;
@@ -103,7 +105,12 @@ export function FilesTable({
         return (
           <Authorized authorizations="DockerAgentBrowsePut">
             <div className="flex flex-row items-center">
-              <Button color="light" icon={Upload} as="label">
+              <Button
+                color="light"
+                icon={Upload}
+                as="label"
+                data-cy="docker-agent-file-upload-button"
+              >
                 <input
                   type="file"
                   className="hidden"

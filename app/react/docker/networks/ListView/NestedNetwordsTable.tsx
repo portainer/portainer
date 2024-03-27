@@ -21,6 +21,7 @@ export function NestedNetworksDatatable({
       columns={columns}
       dataset={dataset}
       aria-label="Networks table"
+      data-cy="docker-networks-nested-datatable"
     />
   );
 }

@@ -11,7 +11,15 @@
 
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" class-name="'icon'"></pr-icon>
-          <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="edgeJobs-searchInput"
+          />
         </div>
         <div class="actionBar">
           <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
@@ -27,7 +35,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="edgeJobs-selectAllCheckbox" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -66,14 +74,12 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" data-cy="edgeJobs_{{ $index }}-" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="edge.jobs.job({id: item.Id})">{{ item.Name }}</a>
               </td>
-              <td>
-                {{ item.CronExpression }}
-              </td>
+              <td> {{ item.CronExpression }} </td>
               <td>{{ item.Created | getisodatefromtimestamp }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

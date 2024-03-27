@@ -4,6 +4,7 @@
     <div class="col-sm-8 vertical-center">
       <select
         ng-if="$ctrl.templates.length"
+        data-cy="custom-template-selector"
         class="form-control"
         ng-model="$ctrl.value"
         ng-options="template.Id as template.label for template in $ctrl.templates"

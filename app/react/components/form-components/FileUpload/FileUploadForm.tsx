@@ -1,5 +1,7 @@
 import { PropsWithChildren, ReactNode } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { FileUploadField } from '@@/form-components/FileUpload/FileUploadField';
 
@@ -17,7 +19,8 @@ export function FileUploadForm({
   title = 'Select a file',
   required = false,
   description,
-}: PropsWithChildren<Props>) {
+  'data-cy': dataCy,
+}: PropsWithChildren<Props> & AutomationTestingProps) {
   return (
     <div className="file-upload-form">
       <FormSectionTitle>Upload</FormSectionTitle>
@@ -28,6 +31,7 @@ export function FileUploadForm({
         <div className="col-sm-12">
           <FileUploadField
             inputId="file-upload-field"
+            data-cy={dataCy}
             onChange={onChange}
             value={value}
             title={title}

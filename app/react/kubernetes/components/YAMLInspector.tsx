@@ -3,6 +3,7 @@ import YAML from 'yaml';
 import { Minus, Plus } from 'lucide-react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { AutomationTestingProps } from '@/types';
 
 import { WebEditorForm } from '@@/WebEditorForm';
 import { Button } from '@@/buttons';
@@ -12,15 +13,21 @@ type Props = {
   identifier: string;
   data: string;
   hideMessage?: boolean;
-};
+} & AutomationTestingProps;
 
-export function YAMLInspector({ identifier, data, hideMessage }: Props) {
+export function YAMLInspector({
+  identifier,
+  data,
+  hideMessage,
+  'data-cy': dataCy,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
   const yaml = useMemo(() => cleanYamlUnwantedFields(data), [data]);
 
   return (
     <div>
       <WebEditorForm
+        data-cy={dataCy}
         value={yaml}
         placeholder={
           hideMessage
@@ -37,6 +44,7 @@ export function YAMLInspector({ identifier, data, hideMessage }: Props) {
       <div className="flex items-center justify-between py-5">
         <Button
           icon={expanded ? Minus : Plus}
+          data-cy={`expand-collapse-yaml-${identifier}`}
           color="default"
           className="!ml-0"
           onClick={() => setExpanded(!expanded)}
@@ -48,6 +56,7 @@ export function YAMLInspector({ identifier, data, hideMessage }: Props) {
           heading="Apply YAML changes"
           message="Applies any changes that you make in the YAML editor by calling the Kubernetes API to patch the relevant resources. Any resource removals or unexpected resource additions that you make in the YAML will be ignored. Note that editing is disabled for resources in namespaces marked as system."
           buttonText="Apply changes"
+          data-cy="yaml-inspector-apply-changes-teaser-button"
         />
       </div>
     </div>

@@ -41,7 +41,7 @@ export function KubectlShellButton({ environmentId }: Props) {
       {!isSidebarOpen && (
         <SidebarTooltip
           content={
-            <span className="text-sm whitespace-nowrap">Kubectl Shell</span>
+            <span className="whitespace-nowrap text-sm">Kubectl Shell</span>
           }
         >
           <span className="flex w-full justify-center">{button}</span>

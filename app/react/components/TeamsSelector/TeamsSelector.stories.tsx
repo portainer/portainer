@@ -23,6 +23,7 @@ function Example() {
       onChange={(value) => setSelectedTeams(value)}
       teams={teams}
       placeholder="Select one or more teams"
+      dataCy="teams-selector"
     />
   );
 }

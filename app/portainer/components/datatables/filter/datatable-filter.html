@@ -14,13 +14,12 @@
           <input
             id="filter_{{ $ctrl.filterKey }}_{{ $index }}"
             type="checkbox"
+            data-cy="filter-checkbox"
             ng-value="filter.value"
             ng-checked="$ctrl.state.includes(filter.value)"
             ng-click="$ctrl.onChangeItem(filter.value)"
           />
-          <label for="filter_{{ $ctrl.filterKey }}_{{ $index }}">
-            {{ filter.label }}
-          </label>
+          <label for="filter_{{ $ctrl.filterKey }}_{{ $index }}"> {{ filter.label }} </label>
         </div>
       </div>
       <div>

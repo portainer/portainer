@@ -30,6 +30,7 @@ export function TemplateListSort({
           bindToBody
           value={value?.id ?? null}
           isClearable
+          data-cy="app-templates-sortby-selector"
         />
       </div>
       <div className={styles.sortByElement}>

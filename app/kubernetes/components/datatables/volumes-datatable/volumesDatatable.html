@@ -12,6 +12,7 @@
         <pr-icon icon="'search'"></pr-icon>
         <input
           type="text"
+          data-cy="k8s-vol-table-search"
           class="searchInput !mr-0"
           ng-model="$ctrl.state.textFilter"
           ng-change="$ctrl.onTextFilterChange()"
@@ -59,16 +60,34 @@
               <div class="menuContent">
                 <div>
                   <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                    <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                    <input
+                      id="setting_show_system"
+                      type="checkbox"
+                      ng-model="$ctrl.settings.showSystem"
+                      ng-change="$ctrl.onSettingsShowSystemChange()"
+                      data-cy="k8s-vol-table-settings-show-system"
+                    />
                     <label for="setting_show_system">Show system resources</label>
                   </div>
                   <div class="md-checkbox">
-                    <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                    <input
+                      id="setting_auto_refresh"
+                      type="checkbox"
+                      ng-model="$ctrl.settings.repeater.autoRefresh"
+                      ng-change="$ctrl.onSettingsRepeaterChange()"
+                      data-cy="k8s-vol-table-settings-auto-refresh"
+                    />
                     <label for="setting_auto_refresh">Auto refresh</label>
                   </div>
                   <div ng-if="$ctrl.settings.repeater.autoRefresh">
                     <label for="settings_refresh_rate"> Refresh rate </label>
-                    <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                    <select
+                      id="settings_refresh_rate"
+                      ng-model="$ctrl.settings.repeater.refreshRate"
+                      ng-change="$ctrl.onSettingsRepeaterChange()"
+                      class="small-select"
+                      data-cy="k8s-vol-table-settings-refresh-rate"
+                    >
                       <option value="10">10s</option>
                       <option value="30">30s</option>
                       <option value="60">1min</option>
@@ -103,7 +122,7 @@
           <th>
             <div class="flex-no-wrap flex items-center">
               <span class="md-checkbox vertical-center">
-                <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8s-vol-table-select-all" />
                 <label for="select_all"></label>
               </span>
               <table-column-header
@@ -169,7 +188,14 @@
         >
           <td>
             <span class="md-checkbox">
-              <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)" />
+              <input
+                id="select_{{ $index }}"
+                type="checkbox"
+                ng-model="item.Checked"
+                ng-click="$ctrl.selectItem(item, $event)"
+                ng-disabled="$ctrl.disableRemove(item)"
+                data-cy="k8s-vol-table-select-{{ item.PersistentVolumeClaim.Name }}"
+              />
               <label for="select_{{ $index }}"></label>
             </span>
             <a ui-sref="kubernetes.volumes.volume({ namespace: item.ResourcePool.Namespace.Name, name: item.PersistentVolumeClaim.Name })">{{ item.PersistentVolumeClaim.Name }}</a>
@@ -187,15 +213,10 @@
             <span ng-if="item.Applications.length > 1"> + {{ item.Applications.length - 1 }}</span>
             <span ng-if="!item.Applications.length">-</span>
           </td>
+          <td> {{ item.PersistentVolumeClaim.storageClass.Name }} </td>
+          <td> {{ item.PersistentVolumeClaim.Storage }} </td>
           <td>
-            {{ item.PersistentVolumeClaim.storageClass.Name }}
-          </td>
-          <td>
-            {{ item.PersistentVolumeClaim.Storage }}
-          </td>
-          <td>
-            {{ item.PersistentVolumeClaim.CreationDate | getisodate }}
-            {{ item.PersistentVolumeClaim.ApplicationOwner ? 'by ' + item.PersistentVolumeClaim.ApplicationOwner : '' }}
+            {{ item.PersistentVolumeClaim.CreationDate | getisodate }} {{ item.PersistentVolumeClaim.ApplicationOwner ? 'by ' + item.PersistentVolumeClaim.ApplicationOwner : '' }}
           </td>
         </tr>
         <tr ng-if="!$ctrl.dataset">

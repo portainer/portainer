@@ -24,7 +24,7 @@ export const namespace = columnHelper.accessor('Namespace', {
   enableColumnFilter: true,
 });
 
-function Cell({ getValue }: CellContext<Ingress, string>) {
+function Cell({ getValue, row }: CellContext<Ingress, string>) {
   const namespace = getValue();
   return (
     <Link
@@ -33,6 +33,7 @@ function Cell({ getValue }: CellContext<Ingress, string>) {
         id: namespace,
       }}
       title={namespace}
+      data-cy={`ingress-namespace-link-${row.original.Name}`}
     >
       {namespace}
     </Link>

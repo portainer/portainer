@@ -1,5 +1,6 @@
 <div class="input-group input-group-sm">
-  <select name="nodeAvailability" class="selectpicker form-control" ng-model="$ctrl.availability" ng-change="$ctrl.onChange()">
+  <select name="nodeAvailability" class="selectpicker form-control" ng-model="$ctrl.availability" ng-change="$ctrl.onChange()" data-cy="node-availability-select">
+    >
     <option value="active">Active</option>
     <option value="pause">Pause</option>
     <option value="drain">Drain</option>

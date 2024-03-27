@@ -53,6 +53,7 @@ export function SocketForm({ onCreate }: Props) {
             <div className="col-sm-12">
               <LoadingButton
                 className="wizard-connect-button vertical-center"
+                data-cy="docker-socket-connect-button"
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
@@ -94,6 +95,7 @@ function OverrideSocketFieldset() {
         <div className="col-sm-12">
           <SwitchField
             checked={values.overridePath}
+            data-cy="create-docker-env-socket-override-switch"
             onChange={(checked) => setFieldValue('overridePath', checked)}
             label="Override default socket path"
             labelClass="col-sm-3 col-lg-2"

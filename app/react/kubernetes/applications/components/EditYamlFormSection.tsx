@@ -29,6 +29,7 @@ export function EditYamlFormSection({
   return (
     <div>
       <WebEditorForm
+        data-cy="k8s-yaml-editor"
         value={values}
         readonly={!isAllowedToEdit}
         titleContent={<TitleContent isComposeFormat={isComposeFormat} />}

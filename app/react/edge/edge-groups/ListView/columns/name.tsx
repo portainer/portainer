@@ -23,7 +23,12 @@ function NameCell({
 
   return (
     <>
-      <Link to=".edit" params={{ groupId: item.Id }} title={name}>
+      <Link
+        to=".edit"
+        params={{ groupId: item.Id }}
+        title={name}
+        data-cy={`edge-group-link-${name}`}
+      >
         {name}
       </Link>
       {(item.HasEdgeJob || item.HasEdgeStack) && (

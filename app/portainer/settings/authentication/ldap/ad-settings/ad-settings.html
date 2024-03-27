@@ -48,6 +48,7 @@
           <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px">
             <input
               type="text"
+              data-cy="ldap-url"
               class="form-control"
               id="ldap_url"
               ng-model="$ctrl.settings.URLs[$index]"
@@ -77,6 +78,7 @@
         <div class="col-sm-9">
           <input
             type="text"
+            data-cy="ldap-username"
             class="form-control"
             id="ldap_username"
             ng-model="$ctrl.settings.ReaderDN"

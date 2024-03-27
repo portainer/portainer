@@ -121,6 +121,7 @@ export function GitForm({
         <div className="col-sm-12">
           <SwitchField
             label="Skip TLS Verification"
+            data-cy="gitops-skip-tls-verification-switch"
             checked={value.TLSSkipVerify || false}
             onChange={(value) => handleChange({ TLSSkipVerify: value })}
             name="TLSSkipVerify"

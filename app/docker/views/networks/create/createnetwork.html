@@ -9,7 +9,7 @@
           <div class="form-group">
             <label for="network_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork" />
+              <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork" data-cy="network-name-input" />
             </div>
           </div>
           <!-- !name-input -->
@@ -18,10 +18,24 @@
           <div class="form-group">
             <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
             <div class="col-sm-10 col-lg-11">
-              <select class="form-control" ng-options="driver for driver in availableNetworkDrivers" ng-model="config.Driver" ng-if="availableNetworkDrivers.length > 0">
+              <select
+                class="form-control"
+                ng-options="driver for driver in availableNetworkDrivers"
+                ng-model="config.Driver"
+                ng-if="availableNetworkDrivers.length > 0"
+                data-cy="network-driver-select"
+              >
                 <option disabled hidden value="">Select a driver</option>
               </select>
-              <input type="text" class="form-control" ng-model="config.Driver" id="network_driver" placeholder="e.g. driverName" ng-if="availableNetworkDrivers.length === 0" />
+              <input
+                type="text"
+                class="form-control"
+                ng-model="config.Driver"
+                id="network_driver"
+                placeholder="e.g. driverName"
+                ng-if="availableNetworkDrivers.length === 0"
+                data-cy="network-driver-input"
+              />
             </div>
           </div>
           <!-- !driver-input -->
@@ -38,11 +52,17 @@
               <div ng-repeat="option in formValues.DriverOptions" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. com.docker.network.bridge.enable_icc" />
+                  <input
+                    type="text"
+                    class="form-control"
+                    ng-model="option.name"
+                    placeholder="e.g. com.docker.network.bridge.enable_icc"
+                    data-cy="network-driver-option-name-input"
+                  />
                 </div>
                 <div class="input-group col-sm-6 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" />
+                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" data-cy="network-driver-option-value-input" />
                   <span class="input-group-btn">
                     <button class="btn btn-dangerlight" type="button" ng-click="removeDriverOption($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -64,11 +84,25 @@
             <div class="form-group">
               <label for="ipv4_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV4.Subnet" id="ipv4_network_subnet" placeholder="e.g. 172.20.0.0/16" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.Subnet"
+                  id="ipv4_network_subnet"
+                  placeholder="e.g. 172.20.0.0/16"
+                  data-cy="network-ipv4-subnet-input"
+                />
               </div>
               <label for="ipv4_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV4.Gateway" id="ipv4_network_gateway" placeholder="e.g. 172.20.10.11" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.Gateway"
+                  id="ipv4_network_gateway"
+                  placeholder="e.g. 172.20.10.11"
+                  data-cy="network-ipv4-gateway-input"
+                />
               </div>
             </div>
             <!-- !subnet-gateway-inputs -->
@@ -76,7 +110,14 @@
             <div class="form-group">
               <label for="ipv4_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV4.IPRange" id="ipv4_network_iprange" placeholder="e.g. 172.20.10.128/25" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.IPRange"
+                  id="ipv4_network_iprange"
+                  placeholder="e.g. 172.20.10.128/25"
+                  data-cy="network-ipv4-iprange-input"
+                />
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV4.AuxiliaryAddresses track by $index" class="form-group">
@@ -84,6 +125,7 @@
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
+                  data-cy="network-ipv4-auxaddr-input"
                   class="form-control"
                   ng-model="formValues.IPV4.AuxiliaryAddresses[$index]"
                   ng-change="checkIPV4AuxiliaryAddress($index)"
@@ -111,11 +153,25 @@
             <div class="form-group">
               <label for="ipv6_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.Subnet" id="ipv6_network_subnet" placeholder="e.g. 2001:db8::/48" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.Subnet"
+                  id="ipv6_network_subnet"
+                  placeholder="e.g. 2001:db8::/48"
+                  data-cy="network-ipv6-subnet-input"
+                />
               </div>
               <label for="ipv6_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.Gateway" id="ipv6_network_gateway" placeholder="e.g. 2001:db8::1" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.Gateway"
+                  id="ipv6_network_gateway"
+                  placeholder="e.g. 2001:db8::1"
+                  data-cy="network-ipv6-gateway-input"
+                />
               </div>
             </div>
             <!-- !subnet-gateway-inputs -->
@@ -123,7 +179,14 @@
             <div class="form-group">
               <label for="ipv6_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.IPRange" id="ipv6_network_iprange" placeholder="e.g. 2001:db8::/64" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.IPRange"
+                  id="ipv6_network_iprange"
+                  placeholder="e.g. 2001:db8::/64"
+                  data-cy="network-ipv6-iprange-input"
+                />
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV6.AuxiliaryAddresses track by $index" class="form-group">
@@ -131,6 +194,7 @@
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
+                  data-cy="network-ipv6-auxaddr-input"
                   class="form-control"
                   ng-model="formValues.IPV6.AuxiliaryAddresses[$index]"
                   ng-change="checkIPV6AuxiliaryAddress($index)"
@@ -160,11 +224,11 @@
               <div ng-repeat="label in formValues.Labels" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" />
+                  <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" data-cy="network-label-key-input" />
                 </div>
                 <div class="input-group col-sm-6 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="network-label-value-input" />
                   <span class="input-group-btn">
                     <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)"> <pr-icon icon="'trash-2'" size="'md'"></pr-icon> </button
                   ></span>

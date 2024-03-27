@@ -8,6 +8,7 @@ import { defaultGetRowId } from './defaultGetRowId';
 export function buildNameColumn<T extends DefaultType>(
   nameKey: keyof T,
   path: string,
+  dataCy: string,
   idParam = 'id',
   idGetter: (row: T) => string = defaultGetRowId<T>
 ): ColumnDef<T> {
@@ -35,6 +36,7 @@ export function buildNameColumn<T extends DefaultType>(
           to={path}
           params={{ [idParam]: idGetter(row.original) }}
           title={name}
+          data-cy={`${dataCy}_${name}`}
         >
           {name}
         </Link>

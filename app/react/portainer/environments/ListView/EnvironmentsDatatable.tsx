@@ -79,6 +79,7 @@ export function EnvironmentsDatatable({
             onClick={() => onRemove(selectedRows)}
             icon={Trash2}
             className="!m-0"
+            data-cy="remove-environments-button"
           >
             Remove
           </Button>
@@ -90,24 +91,33 @@ export function EnvironmentsDatatable({
               as={Link}
               color="secondary"
               icon={Plus}
-              props={{ to: 'portainer.endpoints.edgeAutoCreateScript' }}
+              props={{
+                to: 'portainer.endpoints.edgeAutoCreateScript',
+                'data-cy': 'environments-auto-onboarding-button',
+              }}
+              data-cy="environments-auto-onboarding-button"
             >
               Auto onboarding
             </Button>
           )}
-          <Link to="portainer.wizard.endpoints">
+          <Link
+            to="portainer.wizard.endpoints"
+            data-cy="environments-add-environments-link"
+          >
             <Button
               onClick={() =>
                 localStorage.setItem('wizardReferrer', 'environments')
               }
               icon={Plus}
               className="!m-0"
+              data-cy="environments-add-environments-button"
             >
               Add environment
             </Button>
           </Link>
         </div>
       )}
+      data-cy="environments-datatable"
     />
   );
 }

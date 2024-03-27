@@ -16,7 +16,7 @@ interface Props extends IconProps {
   to?: string;
   params?: object;
   children?: ReactNode;
-  dataCy?: string;
+  dataCy: string;
 }
 
 export function DashboardItem({
@@ -103,7 +103,12 @@ export function DashboardItem({
 
   if (to) {
     return (
-      <Link to={to} className="!no-underline" params={params}>
+      <Link
+        to={to}
+        className="!no-underline"
+        params={params}
+        data-cy={`${dataCy}-link`}
+      >
         {Item}
       </Link>
     );

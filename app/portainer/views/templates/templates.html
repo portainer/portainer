@@ -31,7 +31,7 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-6">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)" />
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)" data-cy="container-name-input" />
             </div>
           </div>
           <!-- !name-input -->
@@ -39,7 +39,7 @@
           <div class="form-group">
             <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
             <div class="col-sm-6">
-              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network">
+              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network" data-cy="network-select">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
@@ -52,8 +52,8 @@
               <portainer-tooltip ng-if="var.description" message="var.description"></portainer-tooltip>
             </label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
-              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="env-input-{{ $index}" />
+              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="env-select-{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
                 <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
               </select>
@@ -82,14 +82,20 @@
                     <!-- host-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">host</span>
-                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="portBinding.hostPort"
+                        placeholder="e.g. 80 or 1.2.3.4:80 (optional)"
+                        data-cy="host-port-input-{{ $index }}"
+                      />
                     </div>
                     <!-- !host-port -->
                     <pr-icon icon="'arrow-right'"></pr-icon>
                     <!-- container-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80" />
+                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80" data-cy="container-port-input-{{ $index }}" />
                     </div>
                     <!-- !container-port -->
                     <!-- protocol-actions -->
@@ -125,7 +131,7 @@
                       <!-- container-path -->
                       <div class="input-group input-group-sm col-sm-6">
                         <span class="input-group-addon">container</span>
-                        <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container" />
+                        <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container" data-cy="container-path-input-{{ $index }}" />
                       </div>
                       <!-- !container-path -->
                       <!-- volume-type -->
@@ -150,7 +156,7 @@
                         <div class="col-sm-12 input-group">
                           <span class="input-group-addon">volume</span>
                           <div class="col-sm-12 input-group">
-                            <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes">
+                            <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes" data-cy="volume-bind-select">
                               <option value="" disabled selected>Select a volume</option>
                             </select>
                           </div>
@@ -160,7 +166,7 @@
                       <!-- bind -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                         <span class="input-group-addon">host</span>
-                        <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host" />
+                        <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host" data-cy="host-path-input-{{ $index }}" />
                       </div>
                       <!-- !bind -->
                       <!-- read-only -->
@@ -192,7 +198,7 @@
                   <div class="form-inline mt-2" ng-repeat="(idx, host) in state.selectedTemplate.Hosts track by $index">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" />
+                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" data-cy="host-input-{{ $index }}" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
                       <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
@@ -216,11 +222,11 @@
                   <div class="form-inline mt-2" ng-repeat="label in state.selectedTemplate.Labels">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
+                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" data-cy="label-name-input-{{ $index }}" />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="label-value-input-{{ $index }}" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeLabel($index)">
                       <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>
@@ -238,7 +244,14 @@
             <div class="form-group mt-4">
               <label for="container_hostname" class="col-sm-2 control-label text-left">Hostname</label>
               <div class="col-sm-6">
-                <input type="text" name="container_hostname" class="form-control" ng-model="state.selectedTemplate.Hostname" placeholder="leave empty to use docker default" />
+                <input
+                  type="text"
+                  name="container_hostname"
+                  class="form-control"
+                  ng-model="state.selectedTemplate.Hostname"
+                  placeholder="leave empty to use docker default"
+                  data-cy="hostname-input"
+                />
               </div>
             </div>
             <!-- !hostname -->

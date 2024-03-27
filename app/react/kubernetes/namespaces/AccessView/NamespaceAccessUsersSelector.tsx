@@ -11,7 +11,7 @@ interface Props {
   value: Option[];
   onChange(value: readonly Option[]): void;
   options: Option[];
-  dataCy?: string;
+  dataCy: string;
   inputId?: string;
   placeholder?: string;
 }

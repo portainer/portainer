@@ -28,6 +28,7 @@ function Example({ title }: Args) {
       value={value}
       title={title}
       inputId="file-field"
+      data-cy="file-upload-field"
     />
   );
 }

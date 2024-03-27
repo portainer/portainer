@@ -42,7 +42,7 @@ export function PlacementFormSection({ values, onChange, errors }: Props) {
             following placement rules. Placement rules are based on node labels.
           </TextTip>
         )}
-        <InputList
+        <InputList<Placement>
           value={values.placements}
           onChange={(placements) => onChange({ ...values, placements })}
           renderItem={(item, onChange, index, error) => (
@@ -63,7 +63,7 @@ export function PlacementFormSection({ values, onChange, errors }: Props) {
           errors={errors?.placements}
           addLabel="Add rule"
           canUndoDelete
-          deleteButtonDataCy="k8sAppCreate-deletePlacementButton"
+          data-cy="k8sAppCreate-placement"
           disabled={Object.keys(availableNodeLabels).length === 0}
           addButtonError={
             Object.keys(availableNodeLabels).length === 0

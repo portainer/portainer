@@ -81,6 +81,7 @@ export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
                     className="flex items-center"
                     to="kubernetes.secrets.secret"
                     params={{ name: volumeConfigName, namespace }}
+                    data-cy={`secret-link-${volumeConfigName}`}
                   >
                     <Icon icon={Plus} className="!mr-1" />
                     {volumeConfigName}
@@ -90,6 +91,7 @@ export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
                     className="flex items-center"
                     to="kubernetes.configmaps.configmap"
                     params={{ name: volumeConfigName, namespace }}
+                    data-cy={`config-link-${volumeConfigName}`}
                   >
                     <Icon icon={Plus} className="!mr-1" />
                     {volumeConfigName}

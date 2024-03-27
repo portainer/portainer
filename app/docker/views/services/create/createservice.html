@@ -9,7 +9,7 @@
           <div class="form-group">
             <label for="service_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="service_name" placeholder="e.g. myService" />
+              <input type="text" class="form-control" ng-model="formValues.Name" id="service_name" placeholder="e.g. myService" data-cy="service-name-input" />
             </div>
           </div>
           <!-- !name-input -->
@@ -42,7 +42,7 @@
             <div>
               <label class="control-label col-sm-2 text-left"> Replicas </label>
               <div class="col-sm-8">
-                <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3" />
+                <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3" data-cy="docker-service-create-replica-count-input" />
               </div>
             </div>
           </div>
@@ -59,7 +59,7 @@
                 <!-- host-port -->
                 <div class="input-group col-sm-3 input-group-sm">
                   <span class="input-group-addon">host</span>
-                  <input type="text" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
+                  <input type="text" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" data-cy="host-port-input" />
                 </div>
                 <!-- !host-port -->
                 <span style="margin: 0 10px 0 10px">
@@ -68,7 +68,7 @@
                 <!-- container-port -->
                 <div class="input-group col-sm-3 input-group-sm">
                   <span class="input-group-addon">container</span>
-                  <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" />
+                  <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" data-cy="container-port-input" />
                 </div>
                 <!-- !container-port -->
                 <!-- protocol-actions -->
@@ -159,7 +159,14 @@
               <div class="form-group">
                 <label for="service_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.Command" id="service_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf" />
+                  <input
+                    type="text"
+                    class="form-control"
+                    ng-model="formValues.Command"
+                    id="service_command"
+                    placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf"
+                    data-cy="service-command-input"
+                  />
                 </div>
               </div>
               <!-- !command-input -->
@@ -167,7 +174,14 @@
               <div class="form-group">
                 <label for="service_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">Entrypoint</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.EntryPoint" id="service_entrypoint" placeholder="e.g. /bin/sh -c" />
+                  <input
+                    type="text"
+                    class="form-control"
+                    ng-model="formValues.EntryPoint"
+                    id="service_entrypoint"
+                    placeholder="e.g. /bin/sh -c"
+                    data-cy="service-entrypoint-input"
+                  />
                 </div>
               </div>
               <!-- !entrypoint-input -->
@@ -175,11 +189,11 @@
               <div class="form-group">
                 <label for="service_workingdir" class="col-sm-2 col-lg-1 control-label text-left">Working Dir</label>
                 <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="formValues.WorkingDir" id="service_workingdir" placeholder="e.g. /myapp" />
+                  <input type="text" class="form-control" ng-model="formValues.WorkingDir" id="service_workingdir" placeholder="e.g. /myapp" data-cy="service-workingdir-input" />
                 </div>
                 <label for="service_user" class="col-sm-1 control-label text-left">User</label>
                 <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="formValues.User" id="service_user" placeholder="e.g. nginx" />
+                  <input type="text" class="form-control" ng-model="formValues.User" id="service_user" placeholder="e.g. nginx" data-cy="service-user-input" />
                 </div>
               </div>
               <!-- !workdir-user-input -->
@@ -188,7 +202,7 @@
               <div class="form-group">
                 <label for="log-driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
                 <div class="col-sm-4">
-                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
+                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver" data-cy="service-creation-logging-driver">
                     <option selected value="">Default logging driver</option>
                     <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
                     <option value="none">none</option>
@@ -226,11 +240,11 @@
                   <div ng-repeat="opt in formValues.LogDriverOpts" class="mt-1">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">option</span>
-                      <input type="text" class="form-control" ng-model="opt.name" placeholder="e.g. FOO" />
+                      <input type="text" class="form-control" ng-model="opt.name" placeholder="e.g. FOO" data-cy="service-creation-logging-driver-option" />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar" />
+                      <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar" data-cy="service-creation-logging-driver-option-value" />
                     </div>
                     <button class="btn btn-dangerlight" type="button" ng-click="removeLogDriverOpt($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -264,7 +278,13 @@
                         <div class="input-group col-sm-6">
                           <div class="input-group input-group-sm w-full">
                             <span class="input-group-addon">container</span>
-                            <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container" />
+                            <input
+                              type="text"
+                              class="form-control"
+                              ng-model="volume.Target"
+                              placeholder="e.g. /path/in/container"
+                              data-cy="service-creation-volume-container-path"
+                            />
                           </div>
                           <div class="small text-warning" ng-show="!volume.Target"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Target is required. </div>
                         </div>
@@ -295,6 +315,7 @@
                               class="form-control"
                               ng-model="volume.Source"
                               ng-options="vol as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30)) for vol in availableVolumes"
+                              data-cy="volume-source-select"
                             >
                               <option selected disabled value="">Select a volume</option>
                             </select>
@@ -306,7 +327,7 @@
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'bind'">
                           <div class="input-group input-group-sm w-full">
                             <span class="input-group-addon">host</span>
-                            <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" />
+                            <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" data-cy="service-creation-volume-host-path" />
                           </div>
                           <div class="small text-warning" ng-show="!volume.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Source is required. </div>
                         </div>
@@ -337,7 +358,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="form-control" ng-model="formValues.Network">
+                  <select class="form-control" ng-model="formValues.Network" data-cy="create-service-network-select">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -356,7 +377,7 @@
                 <!-- network-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px">
                   <div ng-repeat="network in formValues.ExtraNetworks" style="margin-top: 2px">
-                    <select class="form-control" ng-model="network.Name">
+                    <select class="form-control" ng-model="network.Name" data-cy="create-service-extra-network-select-{{ $index }}">
                       <option selected disabled hidden value="">Select a network</option>
                       <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                     </select>
@@ -381,7 +402,7 @@
                   <div ng-repeat="variable in formValues.HostsEntries" style="margin-top: 2px">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
+                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" data-cy="service-creation-hosts-entry" />
                     </div>
                     <button class="btn btn-dangerlight" type="button" ng-click="removeHostsEntry($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -421,11 +442,11 @@
                   <div ng-repeat="label in formValues.Labels" style="margin-top: 2px">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" />
+                      <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" data-cy="service-creation-label" />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="service-creation-label-value" />
                     </div>
                     <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -448,11 +469,11 @@
                   <div ng-repeat="label in formValues.ContainerLabels" style="margin-top: 2px">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" />
+                      <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" data-cy="service-creation-container-label" />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="service-creation-container-label-value" />
                     </div>
                     <button class="btn btn-dangerlight" type="button" ng-click="removeContainerLabel($index)">
                       <pr-icon icon="'trash-2'" size="'md'"></pr-icon>

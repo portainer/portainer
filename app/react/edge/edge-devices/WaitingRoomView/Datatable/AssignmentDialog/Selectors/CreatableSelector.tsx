@@ -42,6 +42,7 @@ export function CreatableSelector({
       isLoading={isLoading}
       isDisabled={isLoading}
       closeMenuOnSelect={false}
+      data-cy="edge-devices-assignment-selector"
     />
   );
 

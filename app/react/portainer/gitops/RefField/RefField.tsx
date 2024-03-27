@@ -72,6 +72,7 @@ export function RefField({
     >
       <Input
         id={inputId}
+        data-cy="repository-reference-input"
         value={inputValue}
         onChange={(e) => updateInputValue(e.target.value)}
         placeholder="refs/heads/main"

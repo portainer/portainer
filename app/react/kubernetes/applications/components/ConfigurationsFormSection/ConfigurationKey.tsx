@@ -36,10 +36,15 @@ export function ConfigurationData({
     ? overrideKeysErrors[keyIndex]
     : undefined;
   return (
-    <div className="flex items-start gap-x-2 gap-y-2 flex-wrap">
+    <div className="flex flex-wrap items-start gap-x-2 gap-y-2">
       <InputGroup size="small" className="min-w-[250px]">
         <InputGroup.Addon>Key</InputGroup.Addon>
-        <InputGroup.Input type="text" value={value.key} disabled />
+        <InputGroup.Input
+          type="text"
+          value={value.key}
+          disabled
+          data-cy={`k8sAppCreate-${dataCyType}KeyInput_${configurationIndex}_${keyIndex}`}
+        />
       </InputGroup>
       <InputGroup size="small">
         <InputGroup.ButtonWrapper>

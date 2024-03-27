@@ -93,8 +93,13 @@ function RateLimitsInner({
                     You are currently using an anonymous account to pull images
                     from DockerHub and will be limited to 100 pulls every 6
                     hours. You can configure DockerHub authentication in the{' '}
-                    <Link to="portainer.registries">Registries View</Link>.
-                    Remaining pulls:{' '}
+                    <Link
+                      to="portainer.registries"
+                      data-cy="image-registry-rate-limits-registries-view-link"
+                    >
+                      Registries View
+                    </Link>
+                    . Remaining pulls:{' '}
                     <span className="font-bold">
                       {pullRateLimits.remaining}/{pullRateLimits.limit}
                     </span>

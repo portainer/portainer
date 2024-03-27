@@ -36,6 +36,7 @@ function LogsDisabledInfoPanel() {
         <Link
           to="docker.containers.new"
           params={{ from: containerId, nodeName }}
+          data-cy="redeploy-container-link"
         >
           redeploy your container
         </Link>{' '}

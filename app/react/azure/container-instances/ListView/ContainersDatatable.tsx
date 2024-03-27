@@ -32,6 +32,7 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
       titleIcon={Box}
       getRowId={(container) => container.id}
       emptyContentLabel="No container available."
+      data-cy="containers-datatable"
       renderTableActions={(selectedRows) => (
         <>
           <Authorized authorizations="AzureContainerGroupDelete">
@@ -40,14 +41,21 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
               disabled={selectedRows.length === 0}
               onClick={() => handleRemoveClick(selectedRows.map((r) => r.id))}
               icon={Trash2}
+              data-cy="remove-containers-button"
             >
               Remove
             </Button>
           </Authorized>
 
           <Authorized authorizations="AzureContainerGroupCreate">
-            <Link to="azure.containerinstances.new" className="space-left">
-              <Button icon={Plus}>Add container</Button>
+            <Link
+              to="azure.containerinstances.new"
+              className="space-left"
+              data-cy="add-container-link"
+            >
+              <Button icon={Plus} data-cy="add-container-button">
+                Add container
+              </Button>
             </Link>
           </Authorized>
         </>

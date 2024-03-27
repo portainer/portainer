@@ -75,6 +75,7 @@ export function PrivateRegistryFieldset({
             label="Use Credentials"
             labelClass="col-sm-3 col-lg-2"
             disabled={formInvalid}
+            data-cy="private-registry-use-credentials-switch"
           />
         </div>
       </div>
@@ -100,6 +101,7 @@ export function PrivateRegistryFieldset({
                   getOptionValue={(registry) => registry.Id.toString()}
                   onChange={(value) => onSelect(value?.Id)}
                   className="w-full"
+                  data-cy="private-registry-selector"
                 />
                 {method !== 'repository' && (
                   <Button
@@ -107,6 +109,7 @@ export function PrivateRegistryFieldset({
                     title="Reload"
                     icon={RefreshCw}
                     color="light"
+                    data-cy="private-registry-reload-button"
                   />
                 )}
               </div>

@@ -16,6 +16,7 @@ export function Example() {
   return (
     <SwitchField
       name="name"
+      data-cy="switch-field-example"
       checked={isChecked}
       onChange={onChange}
       label="Example"
@@ -33,6 +34,7 @@ function Template({ checked, label, labelClass }: Args) {
   return (
     <SwitchField
       name="name"
+      data-cy="switch-field-example"
       checked={checked}
       onChange={() => {}}
       label={label}

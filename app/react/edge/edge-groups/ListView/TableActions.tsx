@@ -20,9 +20,10 @@ export function TableActions({
         confirmMessage="Do you want to remove the selected Edge Group(s)?"
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
+        data-cy="remove-edge-group-button"
       />
 
-      <AddButton>Add Edge group</AddButton>
+      <AddButton data-cy="add-edge-group-button">Add Edge group</AddButton>
     </div>
   );
 

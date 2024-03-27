@@ -76,6 +76,7 @@ export function UploadLicenseDialog({
               <div className="flex w-full gap-2 [&>*]:w-1/2">
                 <Button
                   color="default"
+                  data-cy="get-license-button"
                   size="medium"
                   className="w-full"
                   onClick={goToGetLicense}
@@ -84,6 +85,7 @@ export function UploadLicenseDialog({
                 </Button>
                 <LoadingButton
                   color="primary"
+                  data-cy="start-upgrade-button"
                   size="medium"
                   loadingText="Validating License"
                   isLoading={upgradeMutation.isLoading}

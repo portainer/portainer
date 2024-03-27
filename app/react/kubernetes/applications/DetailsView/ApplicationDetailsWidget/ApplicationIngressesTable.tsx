@@ -48,6 +48,7 @@ export function ApplicationIngressesTable({
                 <Link
                   to="kubernetes.ingresses.edit"
                   params={{ name: ingressPath.ingressName, namespace }}
+                  data-cy={`ingress-link-${ingressPath.ingressName}`}
                 >
                   {ingressPath.ingressName}
                 </Link>

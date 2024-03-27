@@ -7,7 +7,7 @@ test('when isLoading is true should show spinner and loading text', async () => 
   const children = 'not visible';
 
   const { queryByText, findByText, container } = render(
-    <LoadingButton loadingText={loadingText} isLoading>
+    <LoadingButton loadingText={loadingText} isLoading data-cy="loading-button">
       {children}
     </LoadingButton>
   );
@@ -27,7 +27,11 @@ test('should show children when false', async () => {
   const children = 'visible';
 
   const { queryByText, container } = render(
-    <LoadingButton loadingText={loadingText} isLoading={false}>
+    <LoadingButton
+      loadingText={loadingText}
+      isLoading={false}
+      data-cy="loading-button"
+    >
       {children}
     </LoadingButton>
   );

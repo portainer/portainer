@@ -4,6 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { FormError } from '@@/form-components/FormError';
 import { Button } from '@@/buttons';
 import { isArrayErrorType } from '@@/form-components/formikUtils';
+import { Input } from '@@/form-components/Input';
 
 import { Annotation, AnnotationErrors } from './types';
 
@@ -37,7 +38,7 @@ export function AnnotationsForm({
           <div className="form-group col-sm-4 !m-0 !pl-0">
             <div className="input-group input-group-sm">
               <span className="input-group-addon required">Key</span>
-              <input
+              <Input
                 name={`annotation_key_${i}`}
                 type="text"
                 className="form-control form-control-sm"
@@ -46,10 +47,11 @@ export function AnnotationsForm({
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleAnnotationChange(i, 'Key', e.target.value)
                 }
+                data-cy={`annotation-key-${i}`}
               />
             </div>
             {annotationErrors?.[i]?.Key && (
-              <FormError className="mt-1 !mb-0">
+              <FormError className="!mb-0 mt-1">
                 {annotationErrors[i]?.Key}
               </FormError>
             )}
@@ -57,7 +59,7 @@ export function AnnotationsForm({
           <div className="form-group col-sm-4 !m-0 !pl-0">
             <div className="input-group input-group-sm">
               <span className="input-group-addon required">Value</span>
-              <input
+              <Input
                 name={`annotation_value_${i}`}
                 type="text"
                 className="form-control form-control-sm"
@@ -66,10 +68,11 @@ export function AnnotationsForm({
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleAnnotationChange(i, 'Value', e.target.value)
                 }
+                data-cy={`annotation-value-${i}`}
               />
             </div>
             {annotationErrors?.[i]?.Value && (
-              <FormError className="mt-1 !mb-0">
+              <FormError className="!mb-0 mt-1">
                 {annotationErrors[i]?.Value}
               </FormError>
             )}
@@ -77,6 +80,7 @@ export function AnnotationsForm({
           <div className="col-sm-3 !m-0 !pl-0">
             <Button
               size="small"
+              data-cy={`remove-annotation-${i}`}
               color="dangerlight"
               className="btn-only-icon !ml-0"
               type="button"

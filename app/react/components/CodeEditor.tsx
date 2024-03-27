@@ -7,12 +7,14 @@ import { useMemo } from 'react';
 import { createTheme } from '@uiw/codemirror-themes';
 import { tags as highlightTags } from '@lezer/highlight';
 
+import { AutomationTestingProps } from '@/types';
+
 import { CopyButton } from '@@/buttons/CopyButton';
 
 import styles from './CodeEditor.module.css';
 import { TextTip } from './Tip/TextTip';
 
-interface Props {
+interface Props extends AutomationTestingProps {
   id: string;
   placeholder?: string;
   yaml?: boolean;
@@ -67,6 +69,7 @@ export function CodeEditor({
   yaml: isYaml,
   dockerFile: isDockerFile,
   shell: isShell,
+  'data-cy': dataCy,
 }: Props) {
   const extensions = useMemo(() => {
     const extensions = [];
@@ -90,6 +93,7 @@ export function CodeEditor({
         </div>
 
         <CopyButton
+          data-cy={`copy-code-button-${id}`}
           fadeDelay={2500}
           copyText={value}
           color="link"
@@ -112,6 +116,7 @@ export function CodeEditor({
           highlightSelectionMatches: false,
           autocompletion: false,
         }}
+        data-cy={dataCy}
       />
     </>
   );

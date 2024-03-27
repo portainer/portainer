@@ -82,6 +82,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
           >
             <Button
               disabled={selectedRows.length === 0}
+              data-cy="network-removeNetworkButton"
               color="dangerlight"
               onClick={() => onRemove(selectedRows)}
               icon={Trash2}
@@ -93,7 +94,15 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
             authorizations="DockerNetworkCreate"
             data-cy="network-addNetworkButton"
           >
-            <Button icon={Plus} as={Link} props={{ to: '.new' }}>
+            <Button
+              icon={Plus}
+              as={Link}
+              props={{
+                to: '.new',
+                'data-cy': 'docker-add-network-link',
+              }}
+              data-cy="docker-add-network-button"
+            >
               Add network
             </Button>
           </Authorized>
@@ -108,6 +117,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
         </TableSettingsMenu>
       )}
       getRowId={(row) => `${row.Name}-${row.Id}`}
+      data-cy="networks-datatable"
     />
   );
 }

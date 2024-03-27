@@ -70,6 +70,7 @@ export function ContainersDatatable({
           isLoading={containersQuery.isLoading}
           isRowSelectable={(row) => !row.original.IsPortainer}
           initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+          data-cy="docker-containers-datatable"
           renderTableSettings={(tableInstance) => (
             <>
               <ColumnVisibilityMenu<DockerContainer>

@@ -70,6 +70,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="deviceImport-deviceNameInput"
                   class="form-control"
                   name="device_name"
                   placeholder="e.g. FDO-Test01"
@@ -77,7 +78,6 @@
                   ng-required="state.vouchersUploaded"
                   ng-disabled="!state.vouchersUploaded"
                   auto-focus
-                  data-cy="deviceImport-deviceNameInput"
                 />
               </div>
             </div>
@@ -104,6 +104,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="deviceImport-suffixInput"
                   class="form-control"
                   name="suffix"
                   ng-model="formValues.Suffix"
@@ -112,7 +113,6 @@
                   ng-pattern="/^[0-9]+$/"
                   placeholder="1"
                   required
-                  data-cy="deviceImport-suffixInput"
                 />
               </div>
             </div>
@@ -140,6 +140,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="deviceImport-portainerServerUrlInput"
                   class="form-control"
                   name="endpoint_url"
                   ng-model="formValues.PortainerURL"
@@ -147,7 +148,6 @@
                   ng-disabled="!state.vouchersUploaded"
                   placeholder="e.g. https://10.0.0.10:9443"
                   required
-                  data-cy="deviceImport-portainerServerUrlInput"
                 />
               </div>
             </div>
@@ -167,7 +167,14 @@
           <div class="form-group">
             <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
             <div class="col-sm-9 col-lg-10">
-              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control" ng-required="state.vouchersUploaded" ng-disabled="!state.vouchersUploaded">
+              <select
+                id="device_profile"
+                data-cy="deviceImport-deviceProfileSelect"
+                ng-model="formValues.DeviceProfile"
+                class="form-control"
+                ng-required="state.vouchersUploaded"
+                ng-disabled="!state.vouchersUploaded"
+              >
                 <option selected disabled hidden value="">Select a profile for your device</option>
                 <option ng-repeat="profile in profiles | orderBy: 'name'" ng-value="profile.id">{{ profile.name }}</option>
               </select>
@@ -190,6 +197,7 @@
               <div class="col-sm-9 col-lg-10">
                 <select
                   class="form-control"
+                  data-cy="deviceImport-deviceGroupSelect"
                   ng-options="group.Id as group.Name for group in groups"
                   ng-model="formValues.GroupId"
                   id="device_group"

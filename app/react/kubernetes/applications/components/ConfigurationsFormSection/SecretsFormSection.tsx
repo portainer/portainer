@@ -46,8 +46,7 @@ export function SecretsFormSection({
         onChange={onChange}
         errors={errors}
         isDeleteButtonHidden
-        deleteButtonDataCy="k8sAppCreate-secretRemoveButton"
-        addButtonDataCy="k8sAppCreate-secretAddButton"
+        data-cy="k8sAppCreate-secret"
         disabled={secrets.length === 0}
         addButtonError={
           secrets.length === 0

@@ -99,7 +99,7 @@ export function ApplicationSummaryWidget() {
               <>
                 {failedCreateCondition && (
                   <div
-                    className="flex gap-1 items-start alert alert-danger mb-2"
+                    className="alert alert-danger mb-2 flex items-start gap-1"
                     data-cy="k8sAppDetail-failedCreateMessage"
                   >
                     <div className="mt-0.5">
@@ -117,7 +117,7 @@ export function ApplicationSummaryWidget() {
                     </div>
                   </div>
                 )}
-                <DetailsTable>
+                <DetailsTable dataCy="k8sAppDetail-table">
                   <tr>
                     <td>Name</td>
                     <td>
@@ -152,6 +152,7 @@ export function ApplicationSummaryWidget() {
                       >
                         <Link
                           to="kubernetes.resourcePools.resourcePool"
+                          data-cy="k8sAppDetail-namespaceLink"
                           params={{ id: namespace }}
                         >
                           {namespace}

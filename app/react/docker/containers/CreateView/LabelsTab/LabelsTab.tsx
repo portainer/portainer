@@ -21,6 +21,7 @@ export function LabelsTab({
       value={values}
       item={Item}
       itemBuilder={() => ({ name: '', value: '' })}
+      data-cy="docker-container-labels"
     />
   );
 

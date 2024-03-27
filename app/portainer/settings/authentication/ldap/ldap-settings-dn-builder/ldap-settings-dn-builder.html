@@ -18,7 +18,15 @@
       <rd-widget-body>
         <div class="form-group no-margin-last-child" ng-repeat="entry in $ctrl.entries">
           <div class="col-sm-4">
-            <select class="form-control" ng-model="entry.type" ng-change="$ctrl.onEntriesChange()" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1">
+            <select
+              class="form-control"
+              ng-model="entry.type"
+              ng-change="$ctrl.onEntriesChange()"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+              data-cy="ldap-dn-builder-select"
+            >
+              >
               <option value="ou">OU Name</option>
               <option value="cn">Folder Name</option>
             </select>

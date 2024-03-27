@@ -26,5 +26,7 @@ test('should have accessibility label created from the provided resource type', 
 });
 
 function renderComponent(value = 0, icon = User, type = '') {
-  return render(<DashboardItem value={value} icon={icon} type={type} />);
+  return render(
+    <DashboardItem value={value} icon={icon} type={type} dataCy="example" />
+  );
 }

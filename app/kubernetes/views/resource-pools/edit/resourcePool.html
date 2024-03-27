@@ -100,6 +100,7 @@
                         <input
                           name="memory_limit"
                           type="number"
+                          data-cy="k8sNamespaceEdit-memoryLimitInput"
                           min="{{ ctrl.ResourceQuotaDefaults.MemoryLimit }}"
                           max="{{ ctrl.state.sliderMaxMemory }}"
                           class="form-control"
@@ -188,9 +189,7 @@
 
                   <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
                     <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Selected registries </label>
-                    <div class="col-sm-9 col-lg-4">
-                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
-                    </div>
+                    <div class="col-sm-9 col-lg-4"> {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }} </div>
                   </div>
 
                   <div ng-if="ctrl.isAdmin && !ctrl.isSystem">
@@ -300,7 +299,7 @@
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" hide-message="true" />
+                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" data-cy="k8sNamespaceEdit-yamlEditor" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>

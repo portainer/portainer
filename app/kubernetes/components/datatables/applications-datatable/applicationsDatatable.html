@@ -21,7 +21,13 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                      <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                      <input
+                        id="applications_setting_show_system"
+                        type="checkbox"
+                        ng-model="$ctrl.settings.showSystem"
+                        ng-change="$ctrl.onSettingsShowSystemChange()"
+                        data-cy="k8sApp-showSystemCheckbox"
+                      />
                       <label for="applications_setting_show_system">Show system resources</label>
                     </div>
                     <div class="md-checkbox">
@@ -100,20 +106,20 @@
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
+            data-cy="k8sApp-searchApplicationsInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
-            data-cy="k8sApp-searchApplicationsInput"
           />
         </div>
       </div>
     </div>
     <div class="toolBar !pt-0">
       <div class="w-full">
-        <div class="form-group float-right !h-[30px] min-w-[140px] mr-2">
+        <div class="form-group float-right mr-2 !h-[30px] min-w-[140px]">
           <div class="input-group">
             <span class="input-group-addon">
               <div className="flex items-center gap-1">
@@ -218,7 +224,13 @@
                   <div class="menuHeader"> Filter by application type </div>
                   <div class="menuContent">
                     <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
-                      <input id="filter_state_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
+                      <input
+                        id="filter_state_{{ $index }}"
+                        type="checkbox"
+                        ng-model="filter.display"
+                        ng-change="$ctrl.onStateFilterChange()"
+                        data-cy="k8sApp-filter-state-{{ $index }}"
+                      />
                       <label for="filter_state_{{ $index }}">{{ filter.type }}</label>
                     </div>
                   </div>
@@ -261,6 +273,7 @@
               <input
                 id="select_{{ $index }}"
                 type="checkbox"
+                data-cy="k8sApp-checkbox-{{ item.Name }}"
                 ng-model="item.Checked"
                 ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()"
                 ng-disabled="$ctrl.isSystemNamespace(item)"
@@ -307,13 +320,9 @@
             >
             <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
           </td>
-          <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.Pod">
-            {{ item.Pods[0].Status }}
-          </td>
+          <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.Pod"> {{ item.Pods[0].Status }} </td>
           <td>
-            <span>
-              {{ item.Services.length === 0 ? 'No' : 'Yes' }}
-            </span>
+            <span> {{ item.Services.length === 0 ? 'No' : 'Yes' }} </span>
           </td>
           <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
         </tr>

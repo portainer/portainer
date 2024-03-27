@@ -30,6 +30,7 @@ export function RuntimeSection({
           <div className="col-sm-12">
             <SwitchField
               labelClass="col-sm-2"
+              data-cy="docker-privileged-switch"
               label="Privileged mode"
               checked={values.privileged}
               onChange={(privileged) => handleChange({ privileged })}
@@ -43,6 +44,7 @@ export function RuntimeSection({
           <div className="col-sm-12">
             <SwitchField
               labelClass="col-sm-2"
+              data-cy="docker-init-switch"
               label="Init"
               checked={values.init}
               onChange={(init) => handleChange({ init })}

@@ -34,6 +34,7 @@ export function AdvancedForm({
           }}
           placeholder="e.g. registry:port/my-image:my-tag"
           required
+          data-cy="image-config-advanced-input"
         />
       </FormControl>
     </>

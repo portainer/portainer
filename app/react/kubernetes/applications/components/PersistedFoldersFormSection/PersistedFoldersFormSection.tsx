@@ -61,8 +61,7 @@ export function PersistedFoldersFormSection({
           isEdit && applicationValues.ApplicationType === 'StatefulSet'
         }
         canUndoDelete={isEdit}
-        deleteButtonDataCy="k8sAppCreate-persistentFolderRemoveButton"
-        addButtonDataCy="k8sAppCreate-persistentFolderAddButton"
+        data-cy="k8sAppCreate-persistentFolder"
         disabled={storageClasses.length === 0}
         addButtonError={getAddButtonError(storageClasses)}
         isAddButtonHidden={!isAddPersistentFolderButtonShown}

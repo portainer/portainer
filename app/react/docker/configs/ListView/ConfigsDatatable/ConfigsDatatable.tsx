@@ -50,6 +50,7 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
         </TableSettingsMenu>
       )}
       disableSelect={!hasWriteAccessQuery.authorized}
+      data-cy="configs-datatable"
       renderTableActions={(selectedRows) =>
         hasWriteAccessQuery.authorized && (
           <div className="flex items-center gap-3">
@@ -59,6 +60,7 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
                 color="dangerlight"
                 onClick={() => onRemoveClick(selectedRows)}
                 disabled={selectedRows.length === 0}
+                data-cy="remove-docker-configs-button"
               >
                 Remove
               </Button>
@@ -68,7 +70,11 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
               <Button
                 icon={Plus}
                 as={Link}
-                props={{ to: 'docker.configs.new' }}
+                props={{
+                  to: 'docker.configs.new',
+                  'data-cy': 'add-docker-config-link',
+                }}
+                data-cy="add-docker-config-button"
               >
                 Add config
               </Button>

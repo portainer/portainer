@@ -25,6 +25,7 @@
                 <input
                   type="text"
                   class="form-control"
+                  data-cy="hosts-entry-hostname-input-{{ $index }}"
                   ng-model="entry.hostname"
                   placeholder="e.g. example.com"
                   ng-change="updateHostsEntry(service, entry)"
@@ -37,6 +38,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="hosts-entry-ip-input-{{ $index }}"
                   class="form-control"
                   ng-model="entry.ip"
                   placeholder="e.g. 10.0.1.1"

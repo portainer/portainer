@@ -14,7 +14,11 @@ function Template({
   children,
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
-    <CopyButton copyText={copyText} displayText={displayText}>
+    <CopyButton
+      copyText={copyText}
+      displayText={displayText}
+      data-cy="copy-button"
+    >
       {children}
     </CopyButton>
   );

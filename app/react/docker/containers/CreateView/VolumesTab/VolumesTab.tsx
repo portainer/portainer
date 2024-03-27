@@ -31,6 +31,7 @@ export function VolumesTab({
           name: '',
           readOnly: false,
         })}
+        data-cy="docker-container-volumes"
       />
     </InputContext.Provider>
   );

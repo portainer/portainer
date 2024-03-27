@@ -7,6 +7,7 @@ test('render should make the file button clickable and fire onChange event after
   const { findByText, findByLabelText } = render(
     <FileUploadField
       title="test button"
+      data-cy="file-input"
       onChange={onClick}
       inputId="file-field"
     />

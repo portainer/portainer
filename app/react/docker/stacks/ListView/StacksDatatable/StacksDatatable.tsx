@@ -70,6 +70,7 @@ export function StacksDatatable({
         ),
       }}
       extendTableOptions={withGlobalFilter(globalFilterFn)}
+      data-cy="docker-stacks-datatable"
     />
   );
 }

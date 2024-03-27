@@ -18,17 +18,20 @@
             <tr>
               <td class="w-1/5">Name</td>
               <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
-                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating" />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="service.Name"
+                  ng-change="updateServiceAttribute(service, 'Name')"
+                  ng-disabled="isUpdating"
+                  data-cy="docker-service-edit-name"
+                />
               </td>
-              <td ng-if="applicationState.endpoint.apiVersion >= 1.25">
-                {{ service.Name }}
-              </td>
+              <td ng-if="applicationState.endpoint.apiVersion >= 1.25"> {{ service.Name }} </td>
             </tr>
             <tr>
               <td>ID</td>
-              <td>
-                {{ service.Id }}
-              </td>
+              <td> {{ service.Id }} </td>
             </tr>
             <tr ng-if="service.CreatedAt">
               <td>Created at</td>
@@ -53,6 +56,7 @@
                   <input
                     class="input-sm"
                     type="number"
+                    data-cy="docker-service-edit-replicas-input"
                     ng-model="service.Replicas"
                     ng-change="updateServiceAttribute(service, 'Replicas')"
                     disable-authorization="DockerServiceUpdate"

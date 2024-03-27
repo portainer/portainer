@@ -42,6 +42,7 @@ export function NodeSelector({
         value={value}
         onChange={onChange}
         options={nodesQuery.data || []}
+        data-cy="docker-agent-node-selector"
       />
     </FormControl>
   );

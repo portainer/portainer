@@ -65,6 +65,7 @@ export function NodesDatatable() {
           />
         </TableSettingsMenu>
       )}
+      data-cy="k8s-nodes-datatable"
     />
   );
 }

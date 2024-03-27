@@ -35,13 +35,18 @@ function UpdateIngressPrompt({
 
         <SwitchField
           name="noMatch"
+          data-cy="kube-update-ingress-prompt-switch"
           label={inputLabel}
           checked={value}
           onChange={setValue}
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSubmit({ noMatch: value })} color="primary">
+        <Button
+          onClick={() => onSubmit({ noMatch: value })}
+          color="primary"
+          data-cy="update-ingress-confirm-button"
+        >
           Update
         </Button>
       </Modal.Footer>

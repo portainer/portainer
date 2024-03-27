@@ -10,7 +10,16 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.name" id="profile_name" name="profile_name" placeholder="e.g. myprofile" auto-focus />
+              <input
+                type="text"
+                class="form-control"
+                ng-model="formValues.name"
+                id="profile_name"
+                name="profile_name"
+                placeholder="e.g. myprofile"
+                auto-focus
+                data-cy="profile-name-input"
+              />
             </div>
           </div>
           <!-- !name-input -->

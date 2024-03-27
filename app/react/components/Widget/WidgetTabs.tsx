@@ -46,6 +46,7 @@ export function WidgetTabs({ currentTabIndex, tabs }: Props) {
                     currentTabIndex !== index,
                 }
               )}
+              data-cy={`tab-${index}`}
             >
               <Icon icon={icon} />
               {name}

@@ -69,8 +69,13 @@ function CreateView() {
             <Widget.Body>
               <TextTip color="blue" className="mb-2">
                 Devices need to be allocated to an Edge group, visit the{' '}
-                <Link to="edge.groups">Edge Groups</Link> page to assign
-                environments and create groups.
+                <Link
+                  to="edge.groups"
+                  data-cy="update-schedules-create-edge-groups-link"
+                >
+                  Edge Groups
+                </Link>{' '}
+                page to assign environments and create groups.
               </TextTip>
 
               <Formik
@@ -106,6 +111,7 @@ function CreateView() {
                       <div className="col-sm-12">
                         <LoadingButton
                           disabled={!isValid}
+                          data-cy="update-schedules-create-submit-button"
                           isLoading={createMutation.isLoading}
                           loadingText="Creating..."
                         >

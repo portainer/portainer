@@ -10,6 +10,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-memory-reservation-input"
                 step="0.125"
                 min="0"
                 ng-model="service.ReservationMemoryBytes"
@@ -27,6 +28,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-memory-limit-input"
                 step="0.125"
                 min="0"
                 ng-model="service.LimitMemoryBytes"
@@ -44,6 +46,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-reservation-slider"
                 model="service.ReservationNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"
@@ -64,6 +67,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-limit-slider"
                 model="service.LimitNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"

@@ -20,6 +20,7 @@ function BasicExample() {
         <InputGroup.Addon>@</InputGroup.Addon>
         <InputGroup.Input
           value={value1}
+          data-cy="input"
           onChange={(e) => setValue1(e.target.value)}
           placeholder="Username"
           aria-describedby="basic-addon1"
@@ -29,6 +30,7 @@ function BasicExample() {
       <InputGroup>
         <InputGroup.Input
           value={value1}
+          data-cy="input"
           onChange={(e) => setValue1(e.target.value)}
           placeholder="Recipient's username"
           aria-describedby="basic-addon2"
@@ -40,6 +42,7 @@ function BasicExample() {
         <InputGroup.Addon>$</InputGroup.Addon>
         <InputGroup.Input
           type="number"
+          data-cy="input"
           value={valueNumber}
           onChange={(e) => setValueNumber(parseInt(e.target.value, 10))}
           aria-label="Amount (to the nearest dollar)"
@@ -52,6 +55,7 @@ function BasicExample() {
         <InputGroup.Addon>https://example.com/users/</InputGroup.Addon>
         <InputGroup.Input
           value={value1}
+          data-cy="input"
           onChange={(e) => setValue1(e.target.value)}
           id="basic-url"
           aria-describedby="basic-addon3"
@@ -75,6 +79,7 @@ function Addons() {
           </InputGroup.ButtonWrapper>
           <InputGroup.Input
             value={value1}
+            data-cy="input"
             onChange={(e) => setValue1(e.target.value)}
           />
         </InputGroup>
@@ -83,10 +88,11 @@ function Addons() {
         <InputGroup>
           <InputGroup.Input
             value={value2}
+            data-cy="input"
             onChange={(e) => setValue2(e.target.value)}
           />
           <InputGroup.Addon>
-            <input type="checkbox" />
+            <input type="checkbox" data-cy="checkbox" />
           </InputGroup.Addon>
         </InputGroup>
       </div>
@@ -102,6 +108,7 @@ function Sizing() {
         <InputGroup.Addon>Small</InputGroup.Addon>
         <InputGroup.Input
           value={value}
+          data-cy="input"
           onChange={(e) => setValue(e.target.value)}
         />
       </InputGroup>
@@ -110,6 +117,7 @@ function Sizing() {
         <InputGroup.Addon>Default</InputGroup.Addon>
         <InputGroup.Input
           value={value}
+          data-cy="input"
           onChange={(e) => setValue(e.target.value)}
         />
       </InputGroup>
@@ -118,6 +126,7 @@ function Sizing() {
         <InputGroup.Addon>Large</InputGroup.Addon>
         <InputGroup.Input
           value={value}
+          data-cy="input"
           onChange={(e) => setValue(e.target.value)}
         />
       </InputGroup>

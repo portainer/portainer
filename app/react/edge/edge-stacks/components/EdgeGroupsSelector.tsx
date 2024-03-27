@@ -85,11 +85,15 @@ function InnerSelector({
       }}
       placeholder="Select one or multiple group(s)"
       closeMenuOnSelect={false}
+      data-cy="edge-stacks-groups-selector"
     />
   ) : (
     <div className="small text-muted">
       No Edge groups are available. Head over to the{' '}
-      <Link to="edge.groups">Edge groups view</Link> to create one.
+      <Link to="edge.groups" data-cy="edge-stacks-groups-view-link">
+        Edge groups view
+      </Link>{' '}
+      to create one.
     </div>
   );
 }

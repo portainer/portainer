@@ -30,7 +30,11 @@ export const columns = _.compact([
     cell({ row: { original: env } }) {
       const { to, params } = getDashboardRoute(env);
       return (
-        <Link to={to} params={params}>
+        <Link
+          to={to}
+          params={params}
+          data-cy={`edge-stack-environment-link-${env.Name}`}
+        >
           {env.Name}
         </Link>
       );
@@ -112,7 +116,10 @@ export const columns = _.compact([
     : []),
 ]);
 
-function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
+function ErrorCell({
+  getValue,
+  row,
+}: CellContext<EdgeStackEnvironment, string>) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const value = getValue();
@@ -125,6 +132,7 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
       color="none"
       className="flex cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
+      data-cy={`edge-stack-environment-error-${row.index}`}
     >
       <div className="pr-1 pt-0.5">
         <Icon icon={isExpanded ? ChevronDown : ChevronRight} />

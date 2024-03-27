@@ -40,6 +40,7 @@ export function FDOProfilesDatatable({
           selectedItems={selectedItems}
         />
       )}
+      data-cy="fdo-profiles-datatable"
     />
   );
 }

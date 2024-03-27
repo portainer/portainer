@@ -22,6 +22,7 @@ export function LogoFieldset() {
         <div className="col-sm-12">
           <SwitchField
             label="Use custom logo"
+            data-cy="custom-logo-switch"
             checked={isEnabled}
             name="toggle_logo"
             labelClass="col-sm-3 col-lg-2"

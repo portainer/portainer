@@ -10,7 +10,7 @@ test('should display child row elements', () => {
   };
 
   const { queryByText } = render(
-    <DetailsTable>
+    <DetailsTable dataCy="details-table">
       <DetailsTable.Row label="Name">{person.name}</DetailsTable.Row>
       <DetailsTable.Row label="Id">{person.id}</DetailsTable.Row>
     </DetailsTable>

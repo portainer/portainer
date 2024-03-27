@@ -30,6 +30,7 @@ export function TimePickerInput({
       <div className="flex flex-col">
         <Button
           color="link"
+          data-cy="env-time-picker-hours-up-button"
           size="medium"
           className="!ml-0 w-full"
           icon={ChevronUp}
@@ -42,12 +43,14 @@ export function TimePickerInput({
         />
         <Input
           type="text"
+          data-cy="time-picker-hours-input"
           value={hours}
           className="w-12 !cursor-default text-center"
           disabled
         />
         <Button
           color="link"
+          data-cy="env-time-picker-hours-down-button"
           size="medium"
           className="!ml-0 w-full"
           icon={ChevronDown}
@@ -63,6 +66,7 @@ export function TimePickerInput({
       <div className="flex flex-col">
         <Button
           color="link"
+          data-cy="env-time-picker-minutes-up-button"
           size="medium"
           className="!ml-0 w-full"
           icon={ChevronUp}
@@ -75,12 +79,14 @@ export function TimePickerInput({
         />
         <Input
           type="text"
+          data-cy="time-picker-minutes-input"
           value={minutes}
           className="w-12 !cursor-default text-center"
           disabled
         />
         <Button
           color="link"
+          data-cy="env-time-picker-minutes-down-button"
           size="medium"
           className="!ml-0 w-full"
           icon={ChevronDown}
@@ -94,6 +100,7 @@ export function TimePickerInput({
       </div>
       <Button
         color="default"
+        data-cy="env-time-picker-ampm-button"
         className="h-[34px]"
         onClick={() => {
           const newTime = moment(localTime24h, valueFormat)

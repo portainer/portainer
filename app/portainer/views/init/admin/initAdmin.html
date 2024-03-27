@@ -36,7 +36,7 @@
             <div class="form-group">
               <label for="username" class="col-sm-4 control-label text-left"> Username </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="username" ng-model="formValues.Username" placeholder="e.g. admin" />
+                <input type="text" class="form-control" id="username" ng-model="formValues.Username" placeholder="e.g. admin" data-cy="init-username" />
               </div>
             </div>
             <!-- !username-input -->
@@ -92,7 +92,7 @@
             <!-- enableTelemetry-->
             <div class="form-group">
               <div class="col-sm-12 vertical-center">
-                <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
+                <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" data-cy="init-enableTelemetry" />
                 <span class="text-muted small"
                   >Allow collection of anonymous statistics. You can find more information about this in our
                   <a class="hyperlink" href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
@@ -192,12 +192,12 @@
                 <div class="col-sm-9">
                   <input
                     type="password"
+                    data-cy="init-secretAccessKeyInput"
                     class="form-control"
                     id="secret_access_key"
                     name="secret_access_key"
                     ng-model="formValues.SecretAccessKey"
                     required
-                    data-cy="init-secretAccessKeyInput"
                   />
                 </div>
               </div>
@@ -208,12 +208,12 @@
                 <div class="col-sm-9">
                   <input
                     type="text"
+                    data-cy="init-s3RegionInput"
                     class="form-control"
                     placeholder="default region is us-east-1 if left empty"
                     id="backup-s3-region"
                     name="backup-s3-region"
                     ng-model="formValues.Region"
-                    data-cy="init-s3RegionInput"
                   />
                 </div>
               </div>
@@ -235,12 +235,12 @@
                 <div class="col-sm-9">
                   <input
                     type="text"
+                    data-cy="init-s3CompatibleHostInput"
                     class="form-control"
                     id="s3-compatible-host"
                     name="s3-compatible-host"
                     ng-model="formValues.S3CompatibleHost"
                     placeholder="leave empty for AWS S3"
-                    data-cy="init-s3CompatibleHostInput"
                   />
                 </div>
               </div>
@@ -251,12 +251,12 @@
                 <div class="col-sm-9">
                   <input
                     type="text"
+                    data-cy="init-backupFilenameInput"
                     class="form-control"
                     id="backup-s3-filename"
                     name="backup-s3-filename"
                     ng-model="formValues.Filename"
                     required
-                    data-cy="init-backupFilenameInput"
                   />
                 </div>
               </div>

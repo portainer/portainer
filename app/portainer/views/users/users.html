@@ -16,13 +16,13 @@
               <div class="input-group">
                 <input
                   type="text"
+                  data-cy="user-usernameInput"
                   class="form-control"
                   id="username"
                   ng-model="formValues.Username"
                   ng-change="checkUsernameValidity()"
                   placeholder="e.g. jdoe"
                   auto-focus
-                  data-cy="user-usernameInput"
                 />
                 <span class="input-group-addon">
                   <pr-icon mode="'success'" icon="'check'" ng-if="state.validUsername"></pr-icon>

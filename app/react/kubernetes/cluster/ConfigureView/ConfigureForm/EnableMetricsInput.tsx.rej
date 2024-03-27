@@ -1,0 +1,13 @@
+diff a/app/react/kubernetes/cluster/ConfigureView/ConfigureForm/EnableMetricsInput.tsx b/app/react/kubernetes/cluster/ConfigureView/ConfigureForm/EnableMetricsInput.tsx	(rejected hunks)
+@@ -103,7 +103,10 @@ export function EnableMetricsInput({ value, error, environmentId }: Props) {
+             <TextTip color="red" icon={XCircle}>
+               Unable to reach metrics API. You can enable the metrics-server
+               addon in the{' '}
+-              <Link to="kubernetes.cluster">Cluster Details view</Link>.
++              <Link to="kubernetes.cluster" data-cy="cluster-details-view-link">
++                Cluster Details view
++              </Link>
++              .
+             </TextTip>
+           )}
+           {metricsFound === true && (

@@ -45,7 +45,11 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
       <div className="form-group">
         <div className="col-sm-12 small text-muted">
           No tags available. Head over to the
-          <Link to="portainer.tags" className="space-right space-left">
+          <Link
+            to="portainer.tags"
+            className="space-right space-left"
+            data-cy="environment-tags-view-link"
+          >
             Tags view
           </Link>
           to add tags
@@ -82,6 +86,7 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
           formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
           onCreateOption={handleCreateOption}
           aria-label="Tags"
+          data-cy="environment-tags-selector"
         />
       </FormControl>
     </>

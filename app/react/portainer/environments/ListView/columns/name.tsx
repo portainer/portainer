@@ -13,7 +13,11 @@ export const name = columnHelper.accessor('Name', {
     }
 
     return (
-      <Link to="portainer.endpoints.endpoint" params={{ id: environment.Id }}>
+      <Link
+        to="portainer.endpoints.endpoint"
+        params={{ id: environment.Id }}
+        data-cy={`environment-link-${environment.Id}`}
+      >
         {name}
       </Link>
     );

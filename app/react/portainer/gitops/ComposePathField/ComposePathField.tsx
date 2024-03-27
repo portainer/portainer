@@ -71,6 +71,7 @@ export function ComposePathField({
           ) : (
             <Input
               value={inputValue}
+              data-cy="stack-repository-path-input"
               onChange={(e) => {
                 updateInputValue(e.target.value);
               }}

@@ -45,6 +45,7 @@ export function AddLabelForm({
 
             <Button
               type="submit"
+              data-cy="hidden-containersadd-label-button"
               icon={Plus}
               disabled={!dirty || !isValid || isLoading}
             >

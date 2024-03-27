@@ -18,6 +18,7 @@ export function getActions(isServerMetricsEnabled: boolean) {
             className="flex items-center gap-1"
             to="kubernetes.applications.application.stats"
             params={{ pod: container.podName, container: container.name }}
+            data-cy={`application-container-stats-${container.name}`}
           >
             <Icon icon={BarChart} />
             Stats
@@ -27,6 +28,7 @@ export function getActions(isServerMetricsEnabled: boolean) {
           className="flex items-center gap-1"
           to="kubernetes.applications.application.logs"
           params={{ pod: container.podName, container: container.name }}
+          data-cy={`application-container-logs-${container.name}`}
         >
           <Icon icon={FileText} />
           Logs
@@ -37,6 +39,7 @@ export function getActions(isServerMetricsEnabled: boolean) {
               className="flex items-center gap-1"
               to="kubernetes.applications.application.console"
               params={{ pod: container.podName, container: container.name }}
+              data-cy={`application-container-console-${container.name}`}
             >
               <Icon icon={Terminal} />
               Console

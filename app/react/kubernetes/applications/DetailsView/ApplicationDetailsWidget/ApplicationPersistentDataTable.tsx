@@ -109,6 +109,7 @@ export function ApplicationPersistentDataTable({
                             name: `${persistedFolder.volume.persistentVolumeClaim.claimName}-${persistedFolder.volumeMount?.pod?.metadata?.name}`,
                             namespace,
                           }}
+                          data-cy={`k8sAppDetail-volMountPath-${index}`}
                         >
                           <Icon icon={Database} className="!mr-1 shrink-0" />
                           {`${persistedFolder.volume.persistentVolumeClaim.claimName}-${persistedFolder.volumeMount?.pod?.metadata?.name}`}
@@ -146,6 +147,7 @@ export function ApplicationPersistentDataTable({
                               .claimName,
                             namespace,
                           }}
+                          data-cy={`k8sAppDetail-volMountPath-${index}`}
                         >
                           <Icon icon={Database} className="!mr-1 shrink-0" />
                           {

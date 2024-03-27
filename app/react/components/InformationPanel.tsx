@@ -29,7 +29,12 @@ export function InformationPanel({
                   <span>{title}</span>
                   {!!onDismiss && (
                     <span className="small" style={{ float: 'right' }}>
-                      <Button color="link" icon={X} onClick={() => onDismiss()}>
+                      <Button
+                        color="link"
+                        icon={X}
+                        onClick={() => onDismiss()}
+                        data-cy="dismiss-information-panel-button"
+                      >
                         dismiss
                       </Button>
                     </span>

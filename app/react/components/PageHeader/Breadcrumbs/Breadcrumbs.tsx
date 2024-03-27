@@ -43,6 +43,7 @@ function renderCrumb(crumb: Crumb | string) {
         to={crumb.link}
         params={crumb.linkParams}
         className="text-blue-9 hover:text-blue-11 hover:underline th-highcontrast:text-blue-5 th-dark:text-blue-7 th-dark:hover:text-blue-9"
+        data-cy={`breadcrumb-${crumb.label}`}
       >
         {crumb.label}
       </Link>

@@ -56,6 +56,7 @@ export function NodePortServiceForm({
           <div className="text-muted vertical-center">NodePort</div>
           <Button
             icon={Trash2}
+            data-cy={`remove-service-${serviceIndex}`}
             color="dangerlight"
             className="!ml-0"
             onClick={() => {
@@ -214,6 +215,7 @@ export function NodePortServiceForm({
           <div className="flex">
             <Button
               icon={Plus}
+              data-cy={`k8sAppCreate-addNodePortButton_${serviceIndex}`}
               color="default"
               className="!ml-0"
               onClick={() => {

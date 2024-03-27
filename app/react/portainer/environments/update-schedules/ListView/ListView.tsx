@@ -77,6 +77,7 @@ export function ListView() {
           <TableActions selectedRows={selectedRows} />
         )}
         isRowSelectable={(row) => row.original.status === StatusType.Pending}
+        data-cy="environment-update-schedules-datatable"
       />
     </>
   );
@@ -95,12 +96,15 @@ function TableActions({
         color="dangerlight"
         onClick={() => handleRemove()}
         disabled={selectedRows.length === 0}
+        data-cy="remove-update-schedules-button"
       >
         Remove
       </Button>
 
-      <Link to=".create">
-        <Button>Add update & rollback schedule</Button>
+      <Link to=".create" data-cy="add-update-schedules-link">
+        <Button data-cy="add-update-schedules-button">
+          Add update & rollback schedule
+        </Button>
       </Link>
     </>
   );

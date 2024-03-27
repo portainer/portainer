@@ -121,12 +121,14 @@ export function AppIngressPathForm({
               };
               onChangeIngressPath(newIngressPath);
             }}
+            data-cy="k8sAppCreate-ingressPathHostSelect"
           />
           <InputGroup.ButtonWrapper>
             <Button
               icon={RefreshCw}
               color="default"
               onClick={() => ingressesQuery.refetch()}
+              data-cy="k8sAppCreate-ingressPathHostRefreshButton"
             />
           </InputGroup.ButtonWrapper>
         </InputGroup>
@@ -138,6 +140,7 @@ export function AppIngressPathForm({
               to="kubernetes.ingresses.create"
               target="_blank"
               rel="noopener noreferrer"
+              data-cy="k8sAppCreate-ingressPathCreateIngressLink"
             >
               create an ingress
             </Link>
@@ -153,6 +156,7 @@ export function AppIngressPathForm({
           <InputGroup.Addon required>Path</InputGroup.Addon>
           <InputGroup.Input
             value={ingressPath?.Path ?? ''}
+            data-cy={`k8sAppCreate-ingressPathPathInput-${ingressPath?.Host}`}
             placeholder="/example"
             onChange={(e) => {
               const newIngressPath = {
@@ -174,6 +178,7 @@ export function AppIngressPathForm({
           size="medium"
           className="!ml-0"
           onClick={() => onRemoveIngressPath()}
+          data-cy="k8sAppCreate-removeIngressPathButton"
         />
       </div>
     </div>

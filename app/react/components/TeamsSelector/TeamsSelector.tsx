@@ -7,7 +7,7 @@ interface Props {
   value: TeamId[] | readonly TeamId[];
   onChange(value: readonly TeamId[]): void;
   teams: Team[];
-  dataCy?: string;
+  dataCy: string;
   inputId?: string;
   placeholder?: string;
   disabled?: boolean;

@@ -57,10 +57,16 @@ export function CustomTemplatesList({
         title="Custom Templates"
         titleIcon={Edit}
         renderTableActions={() => (
-          <Button as={Link} props={{ to: '.new' }} icon={Plus}>
+          <Button
+            as={Link}
+            props={{ to: '.new', 'data-cy': 'add-custom-template-link' }}
+            icon={Plus}
+            data-cy="add-custom-template-button"
+          >
             Add Custom Template
           </Button>
         )}
+        data-cy="custom-templates-datatable-header"
       />
 
       <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">

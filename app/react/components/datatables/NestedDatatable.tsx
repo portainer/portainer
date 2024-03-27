@@ -8,13 +8,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { AutomationTestingProps } from '@/types';
+
 import { defaultGetRowId } from './defaultGetRowId';
 import { Table } from './Table';
 import { NestedTable } from './NestedTable';
 import { DatatableContent } from './DatatableContent';
 import { BasicTableSettings, DefaultType } from './types';
 
-interface Props<D extends DefaultType> {
+interface Props<D extends DefaultType> extends AutomationTestingProps {
   dataset: D[];
   columns: TableOptions<D>['columns'];
 
@@ -41,6 +43,7 @@ export function NestedDatatable<D extends DefaultType>({
   isLoading,
   initialSortBy,
   search,
+  'data-cy': dataCy,
   'aria-label': ariaLabel,
 }: Props<D>) {
   const tableInstance = useReactTable<D>({
@@ -74,6 +77,7 @@ export function NestedDatatable<D extends DefaultType>({
           emptyContentLabel={emptyContentLabel}
           renderRow={(row) => <Table.Row<D> cells={row.getVisibleCells()} />}
           aria-label={ariaLabel}
+          data-cy={dataCy}
         />
       </Table.Container>
     </NestedTable>

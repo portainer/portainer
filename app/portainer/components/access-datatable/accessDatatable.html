@@ -12,6 +12,7 @@
           <pr-icon icon="'search'" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
+            data-cy="accessDatatable-searchInput"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
@@ -46,7 +47,7 @@
               <th>
                 <div class="vertical-center">
                   <span class="md-checkbox">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="select-all-checkbox" />
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
@@ -76,7 +77,14 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-disabled="$ctrl.disableRemove(item)" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-disabled="$ctrl.disableRemove(item)"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                    data-cy="select-checkbox"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 {{ item.Name }}

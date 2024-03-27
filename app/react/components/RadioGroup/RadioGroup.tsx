@@ -27,6 +27,7 @@ export function RadioGroup<T extends string | number = string>({
             checked={selectedOption === option.value}
             onChange={() => onOptionChange(option.value)}
             style={{ margin: '0 4px 0 0' }}
+            data-cy={`radio-${option.value}`}
           />
           {option.label}
         </label>

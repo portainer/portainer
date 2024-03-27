@@ -37,15 +37,21 @@ export function SearchBar({
       <Search className="searchIcon lucide shrink-0" />
       <input
         type="text"
+        data-cy={dataCy}
         className="searchInput"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
         placeholder={placeholder}
-        data-cy={dataCy}
         aria-label="Search input"
       />
       {children}
-      <Button onClick={onClear} icon={X} color="none" disabled={!searchValue} />
+      <Button
+        onClick={onClear}
+        icon={X}
+        color="none"
+        disabled={!searchValue}
+        data-cy={`${dataCy}-clear-button`}
+      />
     </div>
   );
 }

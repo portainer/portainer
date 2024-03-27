@@ -4,7 +4,12 @@
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px" authorization="DockerServiceUpdate">
         Add a config:
-        <select class="form-control !h-[30px] !text-[13px]" ng-options="config.Name for config in filterConfigs(configs) | orderBy: 'Name'" ng-model="newConfig">
+        <select
+          class="form-control !h-[30px] !text-[13px]"
+          ng-options="config.Name for config in filterConfigs(configs) | orderBy: 'Name'"
+          ng-model="newConfig"
+          data-cy="service-configs-select"
+        >
           <option selected disabled hidden value="">Select a config</option>
         </select>
         <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)"> <pr-icon icon="'plus'"></pr-icon> add config </a>

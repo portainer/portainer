@@ -53,6 +53,7 @@ export function ProcessesDatatable({
       disableSelect
       isLoading={!dataset}
       emptyContentLabel="No processes found."
+      data-cy="docker-container-stats-processes-datatable"
     />
   );
 }

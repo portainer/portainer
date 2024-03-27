@@ -488,6 +488,7 @@ export function CreateIngressView() {
                   params={{ id: environmentId }}
                   className="text-primary"
                   target="_blank"
+                  data-cy="ingresses-create-application-link"
                 >
                   Applications
                 </Link>
@@ -613,6 +614,7 @@ export function CreateIngressView() {
           <div className="col-sm-12">
             <Button
               onClick={() => handleCreateIngressRules()}
+              data-cy="ingresses-create-button"
               disabled={Object.keys(errors).length > 0}
             >
               {isEdit ? 'Update' : 'Create'}

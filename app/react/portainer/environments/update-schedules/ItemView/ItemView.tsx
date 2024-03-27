@@ -93,8 +93,13 @@ function ItemView() {
             <Widget.Body>
               <TextTip color="blue">
                 Devices need to be allocated to an Edge group, visit the{' '}
-                <Link to="edge.groups">Edge Groups</Link> page to assign
-                environments and create groups.
+                <Link
+                  to="edge.groups"
+                  data-cy="update-schedules-edge-groups-link"
+                >
+                  Edge Groups
+                </Link>{' '}
+                page to assign environments and create groups.
               </TextTip>
 
               <Formik
@@ -159,6 +164,7 @@ function ItemView() {
                       <div className="col-sm-12">
                         <LoadingButton
                           disabled={!isValid}
+                          data-cy="update-schedule-button"
                           isLoading={updateMutation.isLoading}
                           loadingText="Updating..."
                         >
