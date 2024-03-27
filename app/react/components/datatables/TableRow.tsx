@@ -20,7 +20,7 @@ export function TableRow<D extends DefaultType = DefaultType>({
       onClick={onClick}
     >
       {cells.map((cell) => (
-        <td key={cell.id}>
+        <td key={cell.id} className={cell.column.columnDef.meta?.className}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}
