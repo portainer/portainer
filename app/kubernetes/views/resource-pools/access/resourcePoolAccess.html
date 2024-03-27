@@ -112,18 +112,5 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <access-datatable
-        ng-if="ctrl.authorizedUsersAndTeams"
-        title-text="Namespace access"
-        title-icon="user-x"
-        table-key="kubernetes_resourcepool_access"
-        order-by="Name"
-        dataset="ctrl.authorizedUsersAndTeams"
-        remove-action="ctrl.unauthorizeAccess"
-      >
-      </access-datatable>
-    </div>
-  </div>
+  <namespace-access-datatable ng-if="ctrl.authorizedUsersAndTeams" dataset="ctrl.authorizedUsersAndTeams" on-remove="(ctrl.unauthorizeAccess)"> </namespace-access-datatable>
 </div>
