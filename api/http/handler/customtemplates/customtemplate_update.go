@@ -188,7 +188,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 			}
 		}
 
-		cleanBackup, err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{
+		err := git.CloneWithBackup(handler.GitService, handler.FileService, git.CloneOptions{
 			ProjectPath:   customTemplate.ProjectPath,
 			URL:           gitConfig.URL,
 			ReferenceName: gitConfig.ReferenceName,
@@ -199,8 +199,6 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		if err != nil {
 			return httperror.InternalServerError("Unable to clone git repository directory", err)
 		}
-
-		defer cleanBackup()
 
 		commitHash, err := handler.GitService.LatestCommitID(gitConfig.URL, gitConfig.ReferenceName, repositoryUsername, repositoryPassword, gitConfig.TLSSkipVerify)
 		if err != nil {
