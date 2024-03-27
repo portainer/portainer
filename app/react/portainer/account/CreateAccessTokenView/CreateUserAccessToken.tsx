@@ -7,6 +7,8 @@ import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { Widget } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
 
+import { useSettings } from '../../settings/queries/useSettings';
+
 import { ApiKeyFormValues } from './types';
 import { getAPITokenValidationSchema } from './CreateUserAcccessToken.validation';
 import { useCreateUserAccessTokenMutation } from './useCreateUserAccessTokenMutation';
@@ -23,6 +25,10 @@ export function CreateUserAccessToken() {
   const { user } = useCurrentUser();
   const [newAPIToken, setNewAPIToken] = useState('');
   const { trackEvent } = useAnalytics();
+  const settings = useSettings();
+
+  const authenticationEnabled =
+    settings.data?.AuthenticationMethod === 1 || user.Id === 1;
 
   return (
     <>
@@ -43,9 +49,13 @@ export function CreateUserAccessToken() {
                 <Formik
                   initialValues={initialValues}
                   onSubmit={onSubmit}
-                  validationSchema={getAPITokenValidationSchema}
+                  validationSchema={getAPITokenValidationSchema(
+                    authenticationEnabled
+                  )}
                 >
-                  <CreateUserAccessTokenInnerForm />
+                  <CreateUserAccessTokenInnerForm
+                    hideAuthentication={authenticationEnabled}
+                  />
                 </Formik>
               ) : (
                 DisplayUserAccessToken(newAPIToken)
