@@ -85,6 +85,7 @@ type StandaloneCreatePayload =
         fileContent: string;
         /** Optional webhook configuration */
         webhook?: string;
+        fromAppTemplate?: boolean;
       };
     }
   | {
@@ -92,6 +93,7 @@ type StandaloneCreatePayload =
       payload: DockerBasePayload & {
         git: GitFormModel;
         relativePathSettings?: RelativePathModel;
+        fromAppTemplate?: boolean;
       };
     };
 
@@ -210,6 +212,7 @@ function createStandaloneStack({ method, payload }: StandaloneCreatePayload) {
         autoUpdate: payload.git.AutoUpdate,
         environmentId: payload.environmentId,
         additionalFiles: payload.git.AdditionalFiles,
+        fromAppTemplate: payload.fromAppTemplate,
       });
     case 'string':
       return createStandaloneStackFromFileContent({
@@ -218,6 +221,7 @@ function createStandaloneStack({ method, payload }: StandaloneCreatePayload) {
         environmentId: payload.environmentId,
         fileContent: payload.fileContent,
         webhook: payload.webhook,
+        fromAppTemplate: payload.fromAppTemplate,
       });
     default:
       throw new Error('Invalid method');
