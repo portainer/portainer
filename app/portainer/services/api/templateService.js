@@ -1,11 +1,10 @@
-import { commandStringToArray } from '@/docker/helpers/containers';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 
 angular.module('portainer.app').factory('TemplateService', TemplateServiceFactory);
 
 /* @ngInject */
-function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper, EndpointService) {
+function TemplateServiceFactory($q, Templates, EndpointService) {
   var service = {
     templates,
   };
@@ -44,44 +43,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
   function templateFile(repositoryUrl, composeFilePathInRepository) {
     return Templates.file({ repositoryUrl, composeFilePathInRepository }).$promise;
   }
-
-  service.createTemplateConfiguration = function (template, containerName, network) {
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.RegistryModel);
-    var containerConfiguration = createContainerConfiguration(template, containerName, network);
-    containerConfiguration.Image = imageConfiguration.fromImage;
-    return containerConfiguration;
-  };
-
-  function createContainerConfiguration(template, containerName, network) {
-    var configuration = TemplateHelper.getDefaultContainerConfiguration();
-    configuration.HostConfig.NetworkMode = network.Name;
-    configuration.HostConfig.Privileged = template.Privileged;
-    configuration.HostConfig.RestartPolicy = { Name: template.RestartPolicy };
-    configuration.HostConfig.ExtraHosts = template.Hosts ? template.Hosts : [];
-    configuration.name = containerName;
-    configuration.Hostname = template.Hostname;
-    configuration.Env = TemplateHelper.EnvToStringArray(template.Env);
-    configuration.Cmd = commandStringToArray(template.Command);
-    var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
-    configuration.HostConfig.PortBindings = portConfiguration.bindings;
-    configuration.ExposedPorts = portConfiguration.exposedPorts;
-    var consoleConfiguration = TemplateHelper.getConsoleConfiguration(template.Interactive);
-    configuration.OpenStdin = consoleConfiguration.openStdin;
-    configuration.Tty = consoleConfiguration.tty;
-    configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(template.Labels);
-    return configuration;
-  }
-
-  service.updateContainerConfigurationWithVolumes = function (configuration, template, generatedVolumesPile) {
-    var volumes = template.Volumes;
-    TemplateHelper.createVolumeBindings(volumes, generatedVolumesPile);
-    volumes.forEach(function (volume) {
-      if (volume.binding) {
-        configuration.Volumes[volume.container] = {};
-        configuration.HostConfig.Binds.push(volume.binding);
-      }
-    });
-  };
 
   return service;
 }

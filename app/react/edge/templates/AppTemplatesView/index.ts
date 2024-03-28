@@ -1,1 +1,0 @@
-export { AppTemplatesView } from './AppTemplatesView';

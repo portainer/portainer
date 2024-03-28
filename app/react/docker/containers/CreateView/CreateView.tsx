@@ -145,7 +145,21 @@ function CreateForm() {
     const config = toRequest(values, registry, hideCapabilities);
 
     return mutation.mutate(
-      { config, environment, values, registry, oldContainer, extraNetworks },
+      {
+        config,
+        environment,
+        values: {
+          accessControl: values.accessControl,
+          imageName: values.image.image,
+          name: values.name,
+          alwaysPull: values.alwaysPull,
+          enableWebhook: values.enableWebhook,
+          nodeName: values.nodeName,
+        },
+        registry,
+        oldContainer,
+        extraNetworks,
+      },
       {
         onSuccess() {
           sendAnalytics(values, registry);

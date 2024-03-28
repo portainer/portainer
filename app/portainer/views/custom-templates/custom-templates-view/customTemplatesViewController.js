@@ -7,21 +7,7 @@ import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/react/portainer/custom-templat
 
 class CustomTemplatesViewController {
   /* @ngInject */
-  constructor(
-    $anchorScroll,
-    $async,
-    $rootScope,
-    $state,
-    Authentication,
-    CustomTemplateService,
-    FormValidator,
-    NetworkService,
-    Notifications,
-    ResourceControlService,
-    StackService,
-    StateManager
-  ) {
-    this.$anchorScroll = $anchorScroll;
+  constructor($async, $rootScope, $state, Authentication, CustomTemplateService, FormValidator, NetworkService, Notifications, ResourceControlService, StackService, StateManager) {
     this.$async = $async;
     this.$rootScope = $rootScope;
     this.$state = $state;
@@ -228,6 +214,8 @@ class CustomTemplatesViewController {
       const variables = getVariablesFieldDefaultValues(template.Variables);
       this.onChangeTemplateVariables(variables);
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getNetworks(provider, apiVersion) {

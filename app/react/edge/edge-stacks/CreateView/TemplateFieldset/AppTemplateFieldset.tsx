@@ -1,8 +1,11 @@
 import { FormikErrors } from 'formik';
 
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import {
+  EnvVarsFieldset,
+  EnvVarsValue,
+} from '@/react/portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
 
-import { EnvVarsFieldset } from './EnvVarsFieldset';
 import { TemplateNote } from './TemplateNote';
 
 export function AppTemplateFieldset({
@@ -12,16 +15,16 @@ export function AppTemplateFieldset({
   errors,
 }: {
   template: TemplateViewModel;
-  values: Record<string, string>;
-  onChange: (value: Record<string, string>) => void;
-  errors?: FormikErrors<Record<string, string>>;
+  values: EnvVarsValue;
+  onChange: (value: EnvVarsValue) => void;
+  errors?: FormikErrors<EnvVarsValue>;
 }) {
   return (
     <>
       <TemplateNote note={template.Note} />
       <EnvVarsFieldset
         options={template.Env || []}
-        value={values}
+        values={values}
         onChange={onChange}
         errors={errors}
       />

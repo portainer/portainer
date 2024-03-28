@@ -62,7 +62,14 @@ export function useCreateOrReplaceMutation() {
 
 interface CreateOptions {
   config: CreateContainerRequest;
-  values: Values;
+  values: {
+    name: Values['name'];
+    imageName: string;
+    accessControl: Values['accessControl'];
+    nodeName?: Values['nodeName'];
+    alwaysPull?: Values['alwaysPull'];
+    enableWebhook?: Values['enableWebhook'];
+  };
   registry?: Registry;
   environment: Environment;
 }
@@ -90,14 +97,14 @@ async function create({
 }: CreateOptions) {
   await pullImageIfNeeded(
     environment.Id,
+    values.alwaysPull || false,
+    values.imageName,
     values.nodeName,
-    values.alwaysPull,
-    values.image.image,
     registry
   );
 
   const containerResponse = await createAndStart(
-    environment,
+    environment.Id,
     config,
     values.name,
     values.nodeName
@@ -106,8 +113,8 @@ async function create({
   await applyContainerSettings(
     containerResponse.Id,
     environment,
-    values.enableWebhook,
     values.accessControl,
+    values.enableWebhook,
     containerResponse.Portainer?.ResourceControl,
     registry
   );
@@ -123,33 +130,34 @@ async function replace({
 }: ReplaceOptions) {
   await pullImageIfNeeded(
     environment.Id,
+    values.alwaysPull || false,
+    values.imageName,
     values.nodeName,
-    values.alwaysPull,
-    values.image.image,
     registry
   );
 
   const containerResponse = await renameAndCreate(
-    environment,
-    values,
+    environment.Id,
+    values.name,
     oldContainer,
-    config
+    config,
+    values.nodeName
   );
 
   await applyContainerSettings(
     containerResponse.Id,
     environment,
-    values.enableWebhook,
     values.accessControl,
+    values.enableWebhook,
     containerResponse.Portainer?.ResourceControl,
     registry
   );
 
   await connectToExtraNetworks(
     environment.Id,
-    values.nodeName,
     containerResponse.Id,
-    extraNetworks
+    extraNetworks,
+    values.nodeName
   );
 
   await removeContainer(environment.Id, oldContainer.Id, {
@@ -162,33 +170,29 @@ async function replace({
  * on any failure, it will rename the old container to its original name
  */
 async function renameAndCreate(
-  environment: Environment,
-  values: Values,
+  environmentId: EnvironmentId,
+  name: string,
   oldContainer: DockerContainer,
-  config: CreateContainerRequest
+  config: CreateContainerRequest,
+  nodeName?: string
 ) {
   let renamed = false;
   try {
-    await stopContainerIfNeeded(environment.Id, values.nodeName, oldContainer);
+    await stopContainerIfNeeded(environmentId, oldContainer, nodeName);
 
     await renameContainer(
-      environment.Id,
+      environmentId,
       oldContainer.Id,
       `${oldContainer.Names[0]}-old`,
-      { nodeName: values.nodeName }
+      { nodeName }
     );
     renamed = true;
 
-    return await createAndStart(
-      environment,
-      config,
-      values.name,
-      values.nodeName
-    );
+    return await createAndStart(environmentId, config, name, nodeName);
   } catch (e) {
     if (renamed) {
-      await renameContainer(environment.Id, oldContainer.Id, values.name, {
-        nodeName: values.nodeName,
+      await renameContainer(environmentId, oldContainer.Id, name, {
+        nodeName,
       });
     }
     throw e;
@@ -201,8 +205,8 @@ async function renameAndCreate(
 async function applyContainerSettings(
   containerId: string,
   environment: Environment,
-  enableWebhook: boolean,
   accessControl: AccessControlFormData,
+  enableWebhook?: boolean,
   resourceControl?: ResourceControlResponse,
   registry?: Registry
 ) {
@@ -224,15 +228,15 @@ async function applyContainerSettings(
  * on failure, it will remove the new container
  */
 async function createAndStart(
-  environment: Environment,
+  environmentId: EnvironmentId,
   config: CreateContainerRequest,
   name: string,
-  nodeName: string
+  nodeName?: string
 ) {
   let containerId = '';
   try {
     const containerResponse = await createContainer(
-      environment.Id,
+      environmentId,
       config,
       name,
       {
@@ -242,11 +246,11 @@ async function createAndStart(
 
     containerId = containerResponse.Id;
 
-    await startContainer(environment.Id, containerResponse.Id, { nodeName });
+    await startContainer(environmentId, containerResponse.Id, { nodeName });
     return containerResponse;
   } catch (e) {
     if (containerId) {
-      await removeContainer(environment.Id, containerId, {
+      await removeContainer(environmentId, containerId, {
         nodeName,
       });
     }
@@ -257,9 +261,9 @@ async function createAndStart(
 
 async function pullImageIfNeeded(
   environmentId: EnvironmentId,
-  nodeName: string,
   pull: boolean,
   image: string,
+  nodeName?: string,
   registry?: Registry
 ) {
   if (!pull) {
@@ -322,9 +326,9 @@ async function createContainerWebhook(
 
 function connectToExtraNetworks(
   environmentId: EnvironmentId,
-  nodeName: string,
   containerId: string,
-  extraNetworks: Array<ExtraNetwork>
+  extraNetworks: Array<ExtraNetwork>,
+  nodeName?: string
 ) {
   if (!extraNetworks) {
     return null;
@@ -345,8 +349,8 @@ function connectToExtraNetworks(
 
 function stopContainerIfNeeded(
   environmentId: EnvironmentId,
-  nodeName: string,
-  container: DockerContainer
+  container: DockerContainer,
+  nodeName?: string
 ) {
   if (container.State !== 'running' || !container.Id) {
     return null;

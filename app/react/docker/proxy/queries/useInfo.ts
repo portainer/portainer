@@ -18,14 +18,15 @@ export async function getInfo(environmentId: EnvironmentId) {
 }
 
 export function useInfo<TSelect = SystemInfo>(
-  environmentId: EnvironmentId,
+  environmentId?: EnvironmentId,
   select?: (info: SystemInfo) => TSelect
 ) {
   return useQuery(
     ['environment', environmentId, 'docker', 'info'],
-    () => getInfo(environmentId),
+    () => getInfo(environmentId!),
     {
       select,
+      enabled: !!environmentId,
     }
   );
 }
@@ -36,7 +37,7 @@ export function useIsStandAlone(environmentId: EnvironmentId) {
   return !!query.data;
 }
 
-export function useIsSwarm(environmentId: EnvironmentId) {
+export function useIsSwarm(environmentId?: EnvironmentId) {
   const query = useInfo(environmentId, (info) => !!info.Swarm?.NodeID);
 
   return !!query.data;

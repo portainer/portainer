@@ -18,19 +18,20 @@ export async function getVersion(environmentId: EnvironmentId) {
 }
 
 export function useVersion<TSelect = SystemVersion>(
-  environmentId: EnvironmentId,
+  environmentId?: EnvironmentId,
   select?: (info: SystemVersion) => TSelect
 ) {
   return useQuery(
-    ['environment', environmentId, 'docker', 'version'],
-    () => getVersion(environmentId),
+    ['environment', environmentId!, 'docker', 'version'],
+    () => getVersion(environmentId!),
     {
       select,
+      enabled: !!environmentId,
     }
   );
 }
 
-export function useApiVersion(environmentId: EnvironmentId) {
+export function useApiVersion(environmentId?: EnvironmentId) {
   const query = useVersion(environmentId, (info) => info.ApiVersion);
   return query.data ? parseFloat(query.data) : 0;
 }

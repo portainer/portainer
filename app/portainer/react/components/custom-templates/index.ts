@@ -13,7 +13,6 @@ import {
 import { PlatformField } from '@/react/portainer/custom-templates/components/PlatformSelector';
 import { TemplateTypeSelector } from '@/react/portainer/custom-templates/components/TemplateTypeSelector';
 import { withFormValidation } from '@/react-tools/withFormValidation';
-import { AppTemplatesList } from '@/react/portainer/templates/app-templates/AppTemplatesList';
 import { CustomTemplatesList } from '@/react/portainer/templates/custom-templates/ListView/CustomTemplatesList';
 
 import { VariablesFieldAngular } from './variables-field';
@@ -37,18 +36,6 @@ export const ngModule = angular
       'value',
       'errors',
       'isVariablesNamesFromParent',
-    ])
-  )
-  .component(
-    'appTemplatesList',
-    r2a(withUIRouter(withCurrentUser(AppTemplatesList)), [
-      'onSelect',
-      'templates',
-      'selectedId',
-      'disabledTypes',
-      'fixedCategories',
-      'storageKey',
-      'templateLinkParams',
     ])
   )
   .component(

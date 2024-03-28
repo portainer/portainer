@@ -8,10 +8,12 @@ export function VolumeSelector({
   value,
   onChange,
   inputId,
+  allowAuto,
 }: {
   value: string;
   onChange: (value?: string) => void;
   inputId?: string;
+  allowAuto: boolean;
 }) {
   const environmentId = useEnvironmentId();
   const volumesQuery = useVolumes(environmentId, {
@@ -24,7 +26,9 @@ export function VolumeSelector({
     return null;
   }
 
-  const volumes = volumesQuery.data;
+  const volumes = allowAuto
+    ? [...volumesQuery.data, { Name: 'auto', Driver: '' }]
+    : volumesQuery.data;
 
   const selectedValue = volumes.find((vol) => vol.Name === value);
 
@@ -33,7 +37,9 @@ export function VolumeSelector({
       placeholder="Select a volume"
       options={volumes}
       getOptionLabel={(vol) =>
-        `${truncate(vol.Name, 30)} - ${truncate(vol.Driver, 30)}`
+        vol.Name !== 'auto'
+          ? `${truncate(vol.Name, 30)} - ${truncate(vol.Driver, 30)}`
+          : 'auto'
       }
       getOptionValue={(vol) => vol.Name}
       isMulti={false}
