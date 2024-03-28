@@ -36,7 +36,10 @@ export function ContainerDeployForm({
   const isEdgeAdminQuery = useIsEdgeAdmin();
   const environmentId = useEnvironmentId();
 
-  const validation = useValidation(isEdgeAdminQuery.isAdmin);
+  const validation = useValidation({
+    isAdmin: isEdgeAdminQuery.isAdmin,
+    envVarDefinitions: template.Env,
+  });
 
   const createMutation = useCreate(template);
 
@@ -90,7 +93,7 @@ export function ContainerDeployForm({
             </FormControl>
 
             <EnvVarsFieldset
-              value={values.envVars}
+              values={values.envVars}
               onChange={(values) => setFieldValue('envVars', values)}
               errors={errors.envVars}
               options={template.Env || []}

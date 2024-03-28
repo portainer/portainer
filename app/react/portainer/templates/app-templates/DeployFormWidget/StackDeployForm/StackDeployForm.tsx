@@ -45,6 +45,7 @@ export function StackDeployForm({
   const validation = useValidation({
     isAdmin: isEdgeAdminQuery.isAdmin,
     environmentId,
+    envVarDefinitions: template.Env,
   });
 
   if (isEdgeAdminQuery.isLoading) {
@@ -89,7 +90,7 @@ export function StackDeployForm({
             />
 
             <EnvVarsFieldset
-              value={values.envVars}
+              values={values.envVars}
               onChange={(values) => setFieldValue('envVars', values)}
               errors={errors.envVars}
               options={template.Env || []}

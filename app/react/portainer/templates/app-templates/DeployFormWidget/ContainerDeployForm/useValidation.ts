@@ -10,13 +10,20 @@ import { validationSchema as portSchema } from '@/react/docker/containers/Create
 import { volumesTabUtils } from '@/react/docker/containers/CreateView/VolumesTab';
 
 import { envVarsFieldsetValidation } from '../EnvVarsFieldset';
+import { TemplateEnv } from '../../types';
 
-export function useValidation(isAdmin: boolean) {
+export function useValidation({
+  isAdmin,
+  envVarDefinitions,
+}: {
+  isAdmin: boolean;
+  envVarDefinitions: Array<TemplateEnv>;
+}) {
   return useMemo(
     () =>
       object({
         accessControl: accessControlFormValidation(isAdmin),
-        envVars: envVarsFieldsetValidation(),
+        envVars: envVarsFieldsetValidation(envVarDefinitions),
         hostname: hostnameSchema,
         hosts: hostFileSchema,
         labels: labelsTabUtils.validation(),
@@ -25,6 +32,6 @@ export function useValidation(isAdmin: boolean) {
         ports: portSchema(),
         volumes: volumesTabUtils.validation(),
       }),
-    [isAdmin]
+    [envVarDefinitions, isAdmin]
   );
 }

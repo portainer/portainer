@@ -3,6 +3,8 @@ import { PortMapping } from '@/react/docker/containers/CreateView/BaseForm/Ports
 import { VolumesTabValues } from '@/react/docker/containers/CreateView/VolumesTab';
 import { LabelsTabValues } from '@/react/docker/containers/CreateView/LabelsTab';
 
+import { EnvVarsValue } from '../EnvVarsFieldset';
+
 export interface FormValues {
   name: string;
   network: string;
@@ -12,5 +14,5 @@ export interface FormValues {
   hosts: Array<string>;
   labels: LabelsTabValues;
   hostname: string;
-  envVars: Record<string, string>;
+  envVars: EnvVarsValue;
 }
