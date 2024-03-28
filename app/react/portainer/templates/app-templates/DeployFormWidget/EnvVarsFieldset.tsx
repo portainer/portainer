@@ -21,13 +21,13 @@ export function EnvVarsFieldset({
 }) {
   return (
     <>
-      {options.map((env) => (
+      {options.map((env, index) => (
         <Item
           key={env.name}
           option={env}
           value={value[env.name]}
           onChange={(value) => handleChange(env.name, value)}
-          errors={errors?.[env.name]}
+          errors={errors?.[index]}
         />
       ))}
     </>
