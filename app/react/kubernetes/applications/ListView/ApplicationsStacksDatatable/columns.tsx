@@ -6,6 +6,7 @@ import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
+import { SystemBadge } from '@@/Badge/SystemBadge';
 
 import { KubernetesStack } from '../../types';
 
@@ -23,7 +24,7 @@ export const columns = [
     cell: ({ getValue }) => {
       const value = getValue();
       return (
-        <>
+        <div className="flex gap-2">
           <Link
             to="kubernetes.resourcePools.resourcePool"
             params={{ id: value }}
@@ -31,11 +32,9 @@ export const columns = [
             {value}
           </Link>
           {KubernetesNamespaceHelper.isSystemNamespace(value) && (
-            <span className="label label-info image-tag label-margins">
-              system
-            </span>
+            <SystemBadge />
           )}
-        </>
+        </div>
       );
     },
   }),

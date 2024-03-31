@@ -8,6 +8,7 @@ import { Authorized } from '@/react/hooks/useUser';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { DecoratedVolume } from '../../types';
 import { getTableMeta } from '../tableMeta';
@@ -76,7 +77,7 @@ function Cell({
   const name = getValue();
 
   return (
-    <>
+    <div className="flex gap-2">
       <Link
         to=".volume"
         params={{
@@ -107,11 +108,7 @@ function Cell({
           </Button>
         </Authorized>
       )}
-      {item.dangling && (
-        <span className="label label-warning image-tag ml-2" role="status">
-          Unused
-        </span>
-      )}
-    </>
+      {item.dangling && <UnusedBadge />}
+    </div>
   );
 }

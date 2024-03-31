@@ -4,6 +4,7 @@ import KubernetesApplicationHelper from '@/kubernetes/helpers/application';
 import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 
 import { Link } from '@@/Link';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
 import { KubernetesStack } from '../../types';
 
@@ -26,18 +27,18 @@ export function SubRows({
         >
           <td />
           <td colSpan={span - 1}>
-            <Link
-              to="kubernetes.applications.application"
-              params={{ name: app.Name, namespace: app.ResourcePool }}
-            >
-              {app.Name}
-            </Link>
-            {KubernetesNamespaceHelper.isSystemNamespace(app.ResourcePool) &&
-              KubernetesApplicationHelper.isExternalApplication(app) && (
-                <span className="space-left label label-primary image-tag">
-                  external
-                </span>
-              )}
+            <div className="flex gap-2">
+              <Link
+                to="kubernetes.applications.application"
+                params={{ name: app.Name, namespace: app.ResourcePool }}
+              >
+                {app.Name}
+              </Link>
+              {KubernetesNamespaceHelper.isSystemNamespace(app.ResourcePool) &&
+                KubernetesApplicationHelper.isExternalApplication(app) && (
+                  <ExternalBadge />
+                )}
+            </div>
           </td>
         </tr>
       ))}
