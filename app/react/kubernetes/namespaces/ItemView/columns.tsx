@@ -3,7 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { humanize, truncate } from '@/portainer/filters/filters';
 
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
 import { isExternalApplication } from '../../applications/utils';
 import { cpuValue } from '../../applications/utils/cpuValue';
@@ -25,14 +25,14 @@ export const columns = [
         </Link>
         {isExternalApplication({ metadata: item.Metadata }) && (
           <div className="ml-2">
-            <Badge type="primary">external</Badge>
+            <ExternalBadge />
           </div>
         )}
       </>
     ),
   }),
   columnHelper.accessor('StackName', {
-    header: 'Stack Name',
+    header: 'Stack',
     cell: ({ getValue }) => getValue() || '-',
   }),
   columnHelper.accessor('Image', {
