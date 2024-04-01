@@ -4,7 +4,9 @@ import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
+import { SystemBadge } from '@@/Badge/SystemBadge';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 
@@ -35,15 +37,11 @@ export function NameCell({
         {item.PersistentVolumeClaim.Name}
       </Link>
       {isSystem ? (
-        <Badge type="info">system</Badge>
+        <SystemBadge />
       ) : (
         <>
-          {KubernetesVolumeHelper.isExternalVolume(item) && (
-            <Badge type="success">external</Badge>
-          )}
-          {!KubernetesVolumeHelper.isUsed(item) && (
-            <Badge type="warn">unused</Badge>
-          )}
+          {KubernetesVolumeHelper.isExternalVolume(item) && <ExternalBadge />}
+          {!KubernetesVolumeHelper.isUsed(item) && <UnusedBadge />}
         </>
       )}
     </>
