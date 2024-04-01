@@ -1,3 +1,6 @@
+import { ServiceType } from '@/react/kubernetes/applications/CreateView/application-services/types';
+import { AppType, DeploymentType } from '@/react/kubernetes/applications/types';
+
 import { ConfigurationVolume } from './ConfigurationVolume';
 import { PersistedFolder } from './PersistedFolder';
 
@@ -38,7 +41,7 @@ export class Application {
     Memory?: number;
   };
 
-  ServiceType: string;
+  ServiceType?: ServiceType;
 
   ServiceId: string;
 
@@ -58,11 +61,11 @@ export class Application {
 
   ConfigurationVolumes: Array<ConfigurationVolume>;
 
-  DeploymentType: 'Unknown';
+  DeploymentType?: DeploymentType;
 
   DataAccessPolicy: 'Unknown';
 
-  ApplicationType: 'Unknown';
+  ApplicationType?: AppType;
 
   RunningPodsCount: 0;
 
@@ -100,7 +103,6 @@ export class Application {
     this.Containers = [];
     this.Metadata = {};
     this.Limits = {};
-    this.ServiceType = '';
     this.ServiceId = '';
     this.ServiceName = '';
     this.HeadlessServiceName = undefined;
@@ -110,9 +112,7 @@ export class Application {
     this.Env = [];
     this.PersistedFolders = [];
     this.ConfigurationVolumes = [];
-    this.DeploymentType = 'Unknown';
     this.DataAccessPolicy = 'Unknown';
-    this.ApplicationType = 'Unknown';
     this.RunningPodsCount = 0;
     this.TotalPodsCount = 0;
     this.Yaml = '';

@@ -182,9 +182,10 @@
 
   <kubernetes-integrated-applications-datatable
     ng-if="ctrl.isUsed(item)"
-    dataset="ctrl.configuration.Applications"
+    dataset="ctrl.volume.Applications"
+    is-loading="!ctrl.volume.Applications"
     table-key="'kubernetes.volume.applications'"
-    on-refresh="(ctrl.getApplications)"
+    on-refresh="(ctrl.getVolume)"
     table-title="'Applications using this volume'"
   >
   </kubernetes-integrated-applications-datatable>
