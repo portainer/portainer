@@ -7,6 +7,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	requesthelpers "github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -62,4 +63,23 @@ func FetchEndpoint(request *http.Request) (*portainer.Endpoint, error) {
 	}
 
 	return contextData.(*portainer.Endpoint), nil
+}
+
+func CheckEndpointAuthorization(bouncer security.BouncerService) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			endpoint, err := FetchEndpoint(r)
+			if err != nil {
+				httperror.WriteError(w, http.StatusNotFound, "Unable to find an environment on request context", err)
+				return
+			}
+
+			if err = bouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
+				httperror.WriteError(w, http.StatusForbidden, "Permission denied to access environment", err)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
