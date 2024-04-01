@@ -39,7 +39,7 @@ export function NamespacesDatatable({
     })
   );
 
-  const hasWriteAuth = useAuthorizations(
+  const hasWriteAuthQuery = useAuthorizations(
     'K8sResourcePoolDetailsW',
     undefined,
     true
@@ -61,7 +61,7 @@ export function NamespacesDatatable({
       titleIcon={Layers}
       getRowId={(item) => item.Namespace.Id}
       isRowSelectable={({ original: item }) =>
-        hasWriteAuth &&
+        hasWriteAuthQuery.authorized &&
         !item.Namespace.IsSystem &&
         !isDefaultNamespace(item.Namespace.Name)
       }

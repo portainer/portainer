@@ -12,7 +12,7 @@ import { helper } from './helper';
 import { actions } from './actions';
 
 export function useColumns() {
-  const hasAuth = useAuthorizations(
+  const hasAuthQuery = useAuthorizations(
     'K8sResourcePoolsAccessManagementRW',
     undefined,
     true
@@ -87,8 +87,8 @@ export function useColumns() {
             );
           },
         }),
-        hasAuth && actions,
+        hasAuthQuery.authorized && actions,
       ]),
-    [hasAuth]
+    [hasAuthQuery.authorized]
   );
 }
