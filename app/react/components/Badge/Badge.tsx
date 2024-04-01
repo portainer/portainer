@@ -68,11 +68,8 @@ export function Badge({
   className,
   children,
 }: PropsWithChildren<Props>) {
-  const baseClasses = clsx(
-    'inline-flex items-center rounded-full',
-    'w-fit px-2 py-0.5',
-    '!text-xs font-medium'
-  );
+  const baseClasses =
+    'inline-flex w-fit items-center !text-xs font-medium rounded-full px-2 py-0.5';
 
   return (
     <span

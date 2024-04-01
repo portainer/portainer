@@ -7,6 +7,7 @@ import { useAuthorizations } from '@/react/hooks/useUser';
 import { Link } from '@@/Link';
 import { StatusBadge } from '@@/StatusBadge';
 import { Badge } from '@@/Badge';
+import { SystemBadge } from '@@/Badge/SystemBadge';
 
 import { helper } from './helper';
 import { actions } from './actions';
@@ -38,7 +39,7 @@ export function useColumns() {
                 </Link>
                 {item.Namespace.IsSystem && (
                   <span className="ml-2">
-                    <Badge type="info">system</Badge>
+                    <SystemBadge />
                   </span>
                 )}
               </>
