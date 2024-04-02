@@ -63,11 +63,13 @@ import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/Applic
 
 import { applicationsModule } from './applications';
 import { volumesModule } from './volumes';
+import { namespacesModule } from './namespaces';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
     applicationsModule,
     volumesModule,
+    namespacesModule,
   ])
   .component(
     'ingressClassDatatable',
