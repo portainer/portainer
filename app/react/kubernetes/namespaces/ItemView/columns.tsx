@@ -6,7 +6,7 @@ import { Link } from '@@/Link';
 import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
 import { isExternalApplication } from '../../applications/utils';
-import { cpuValue } from '../../applications/utils/cpuValue';
+import { cpuHumanValue } from '../../applications/utils/cpuHumanValue';
 
 import { NamespaceApp } from './types';
 
@@ -46,7 +46,7 @@ export const columns = [
   }),
   columnHelper.accessor('CPU', {
     header: 'CPU',
-    cell: ({ getValue }) => cpuValue(getValue()),
+    cell: ({ getValue }) => cpuHumanValue(getValue()),
   }),
   columnHelper.accessor('Memory', {
     header: 'Memory',

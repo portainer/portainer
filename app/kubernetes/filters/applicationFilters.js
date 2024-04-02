@@ -1,11 +1,11 @@
-import { cpuValue } from '@/react/kubernetes/applications/utils/cpuValue';
+import { cpuHumanValue } from '@/react/kubernetes/applications/utils/cpuHumanValue';
 import { nodeAffinityValues } from './application';
 
 angular
   .module('portainer.kubernetes')
   .filter('kubernetesApplicationCPUValue', function () {
     'use strict';
-    return cpuValue;
+    return cpuHumanValue;
   })
   .filter('kubernetesApplicationDataAccessPolicyIcon', function () {
     'use strict';
