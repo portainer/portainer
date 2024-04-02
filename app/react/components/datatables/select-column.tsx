@@ -17,6 +17,8 @@ export function createSelectColumn<T>(): ColumnDef<T> {
         onClick={(e) => {
           e.stopPropagation();
         }}
+        aria-label="Select all rows"
+        title="Select all rows"
       />
     ),
     cell: ({ row, table }) => (
@@ -38,6 +40,7 @@ export function createSelectColumn<T>(): ColumnDef<T> {
 
           lastSelectedId = row.id;
         }}
+        aria-label="Select row"
       />
     ),
     enableHiding: false,
