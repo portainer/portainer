@@ -158,17 +158,13 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.configuration.Used">
-    <div class="col-sm-12">
-      <kubernetes-integrated-applications-datatable
-        dataset="ctrl.configuration.Applications"
-        table-key="kubernetes.configurations.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getApplications"
-        title-text="Applications using this ConfigMap"
-        title-icon="svg-laptopcode"
-      >
-      </kubernetes-integrated-applications-datatable>
-    </div>
-  </div>
+  <kubernetes-integrated-applications-datatable
+    ng-if="ctrl.configuration.Used"
+    dataset="ctrl.configuration.Applications"
+    is-loading="ctrl.state.applicationsLoading"
+    table-key="'kubernetes.configurations.applications'"
+    on-refresh="(ctrl.getApplications)"
+    table-title="'Applications using this ConfigMap'"
+  >
+  </kubernetes-integrated-applications-datatable>
 </div>

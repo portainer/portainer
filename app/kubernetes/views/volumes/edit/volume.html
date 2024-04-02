@@ -180,17 +180,13 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.isUsed(item)">
-    <div class="col-sm-12">
-      <kubernetes-integrated-applications-datatable
-        dataset="ctrl.volume.Applications"
-        table-key="kubernetes.volume.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getVolume"
-        title-text="Applications using this volume"
-        title-icon="svg-laptopcode"
-      >
-      </kubernetes-integrated-applications-datatable>
-    </div>
-  </div>
+  <kubernetes-integrated-applications-datatable
+    ng-if="ctrl.isUsed(item)"
+    dataset="ctrl.volume.Applications"
+    is-loading="!ctrl.volume.Applications"
+    table-key="'kubernetes.volume.applications'"
+    on-refresh="(ctrl.getVolume)"
+    table-title="'Applications using this volume'"
+  >
+  </kubernetes-integrated-applications-datatable>
 </div>
