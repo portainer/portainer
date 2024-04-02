@@ -65,12 +65,14 @@ import { IntegratedAppsDatatable } from '@/react/kubernetes/components/Integrate
 import { applicationsModule } from './applications';
 import { volumesModule } from './volumes';
 import { namespacesModule } from './namespaces';
+import { clusterManagementModule } from './clusterManagement';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
     applicationsModule,
     volumesModule,
     namespacesModule,
+    clusterManagementModule,
   ])
   .component(
     'ingressClassDatatable',

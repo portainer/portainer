@@ -1,9 +1,9 @@
 export class ConfigurationVolume {
-  fileMountPath: string = '';
+  fileMountPath = '';
 
-  rootMountPath: string = '';
+  rootMountPath = '';
 
-  configurationKey: string = '';
+  configurationKey = '';
 
-  configurationName: string = '';
+  configurationName = '';
 }
