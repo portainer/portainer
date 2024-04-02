@@ -21,8 +21,8 @@
                 <pr-icon icon="'hard-drive'"></pr-icon>
                 Storage
               </uib-tab-heading>
-              <kubernetes-volumes-storages-datatable dataset="ctrl.storages" table-key="kubernetes.volumes.storages" order-by="Name" refresh-callback="ctrl.getVolumes">
-              </kubernetes-volumes-storages-datatable>
+
+              <kubernetes-volumes-storages-datatable dataset="ctrl.storages" on-refresh="(ctrl.getVolumes)"> </kubernetes-volumes-storages-datatable>
             </uib-tab>
           </uib-tabset>
         </rd-widget-body>
