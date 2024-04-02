@@ -171,6 +171,7 @@ export function Datatable<D extends DefaultType>({
   return (
     <Table.Container noWidget={noWidget} aria-label={title}>
       <DatatableHeader
+        data-cy={dataCy}
         onSearchChange={handleSearchBarChange}
         searchValue={settings.search}
         title={title}

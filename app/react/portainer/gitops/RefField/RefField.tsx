@@ -75,6 +75,7 @@ export function RefField({
         value={inputValue}
         onChange={(e) => updateInputValue(e.target.value)}
         placeholder="refs/heads/main"
+        data-cy="component-gitRefInput"
       />
     </Wrapper>
   );

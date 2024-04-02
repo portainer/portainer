@@ -68,7 +68,10 @@ export function EnvironmentItem({
         <div className="ml-2 flex justify-center self-center">
           <EnvironmentIcon type={environment.Type} />
         </div>
-        <div className="ml-3 mr-auto flex flex-col items-start justify-center gap-3">
+        <div
+          className="ml-3 mr-auto flex flex-col items-start justify-center gap-3"
+          data-cy="component-environmentLink" // using this div for data-cy ensures the mouse click doesn't overlap with EnvironmentBrowseButtons (absolute position)
+        >
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="font-bold">{environment.Name}</span>
             {isEdge ? (

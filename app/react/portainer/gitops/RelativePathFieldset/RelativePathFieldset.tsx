@@ -187,6 +187,7 @@ export function RelativePathFieldset({
                       readOnly={isEditing}
                       dirOnly
                       inputId="per_device_configs_path_input"
+                      data-cy="component-perDeviceConfigsPathInput"
                     />
                   </FormControl>
                 </div>

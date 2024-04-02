@@ -34,6 +34,7 @@ export function InputSearch({
       onChange={onChange}
       placeholder={placeholder}
       inputId={inputId}
+      data-cy="component-imageConfigInputSearch"
     />
   );
 }

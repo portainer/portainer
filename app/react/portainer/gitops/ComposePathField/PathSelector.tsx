@@ -13,6 +13,7 @@ export function PathSelector({
   dirOnly,
   readOnly,
   inputId,
+  'data-cy': dataCy,
   createdFromCustomTemplateId,
 }: {
   value: string;
@@ -22,6 +23,7 @@ export function PathSelector({
   dirOnly?: boolean;
   readOnly?: boolean;
   inputId: string;
+  'data-cy': string;
   createdFromCustomTemplateId?: number;
 }) {
   const creds = getAuthentication(model);
@@ -50,6 +52,7 @@ export function PathSelector({
       placeholder={placeholder}
       readOnly={readOnly}
       inputId={inputId}
+      data-cy={dataCy}
     />
   );
 }

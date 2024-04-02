@@ -71,6 +71,7 @@ export function StackName({
             onChange={setStackName}
             placeholder="e.g. myStack"
             inputId="stack_name"
+            data-cy="component-stackNameInput"
           />
         </div>
       </div>
