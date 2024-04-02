@@ -76,7 +76,7 @@ export enum AuthenticationMethod {
   /**
    * Internal represents the internal authentication method (authentication against Portainer API)
    */
-  Internal,
+  Internal = 1,
   /**
    * LDAP represents the LDAP authentication method (authentication against a LDAP server)
    */
