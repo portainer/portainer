@@ -37,12 +37,13 @@ export function DeploymentCounter({
 }: {
   count: number;
   total: number;
-  type?: StatusType;
+  type: StatusType;
 }) {
   return (
     <TooltipWithChildren message={getTooltip(count, total, type)}>
       <div className="h-2 w-full overflow-hidden rounded-lg">
         <progress
+          aria-label={`${getLabel(type)}`}
           className={clsx('bg-gray-4 w-full', {
             'progress-filled:bg-success-7': type === StatusType.Running,
             'progress-filled:bg-error-7': type === StatusType.Error,
@@ -57,24 +58,24 @@ export function DeploymentCounter({
   );
 }
 
-function getTooltip(count: number, total: number, type?: StatusType) {
+function getTooltip(count: number, total: number, type: StatusType) {
   const label = getLabel(type);
   return `${count} of ${total} ${label}`;
+}
 
-  function getLabel(type?: StatusType): ReactNode {
-    switch (type) {
-      case StatusType.Running:
-        return 'deployments running';
-      case StatusType.DeploymentReceived:
-        return 'deployments received';
-      case StatusType.Error:
-        return 'deployments failed';
-      case StatusType.Acknowledged:
-        return 'deployments acknowledged';
-      case StatusType.ImagesPulled:
-        return 'images pre-pulled';
-      default:
-        return '';
-    }
+function getLabel(type: StatusType): ReactNode {
+  switch (type) {
+    case StatusType.Running:
+      return 'deployments running';
+    case StatusType.DeploymentReceived:
+      return 'deployments received';
+    case StatusType.Error:
+      return 'deployments failed';
+    case StatusType.Acknowledged:
+      return 'deployments acknowledged';
+    case StatusType.ImagesPulled:
+      return 'images pre-pulled';
+    default:
+      return '';
   }
 }
