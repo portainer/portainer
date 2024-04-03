@@ -10,6 +10,12 @@ export enum Role {
   EdgeAdmin,
 }
 
+export const RoleNames: { [key in Role]: string } = {
+  [Role.Admin]: 'administrator',
+  [Role.Standard]: 'user',
+  [Role.EdgeAdmin]: 'edge administrator',
+};
+
 interface AuthorizationMap {
   [authorization: string]: boolean;
 }
