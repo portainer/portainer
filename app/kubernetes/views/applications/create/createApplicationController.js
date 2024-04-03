@@ -1128,6 +1128,9 @@ class KubernetesCreateApplicationController {
         }
 
         this.oldFormValues = angular.copy(this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.updateNamespaceLimits(this.namespaceWithQuota);
+        this.updateSliders(this.namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {
