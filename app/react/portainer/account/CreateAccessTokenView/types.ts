@@ -1,4 +1,4 @@
 export interface ApiKeyFormValues {
-  password: string | undefined;
+  password?: string;
   description: string;
 }
