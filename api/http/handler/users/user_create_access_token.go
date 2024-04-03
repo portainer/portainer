@@ -21,9 +21,6 @@ type userAccessTokenCreatePayload struct {
 }
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Password) {
-		return errors.New("invalid password: cannot be empty")
-	}
 	if govalidator.IsNull(payload.Description) {
 		return errors.New("invalid description: cannot be empty")
 	}
