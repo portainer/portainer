@@ -57,14 +57,21 @@ function Cell({ row }: CellContext<DockerContainer, string>) {
   });
 }
 
-function getPublicUrl(url: string | undefined) {
-  if (url) {
-    const match = url.match(/^(https?:\/\/)?([\w.-]+)(\/[^:/]*)?/);
-    if (match) {
-      const scheme = match[1] || 'http://';
-      const hostname = match[2];
-      return scheme + hostname;
-    }
+function getPublicUrl(url?: string): string {
+  if (!url) {
+    return '';
   }
-  return '';
+
+  // Add protocol if missing
+  const u =
+    url.startsWith('http://') || url.startsWith('https://')
+      ? url
+      : `http://${url}`;
+
+  try {
+    const parsedUrl = new URL(u);
+    return `${parsedUrl.protocol}://${parsedUrl.hostname}`;
+  } catch (error) {
+    return '';
+  }
 }
