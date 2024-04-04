@@ -7,7 +7,7 @@ import { RbacRole } from './types';
 export function useRbacRoles<T = Array<RbacRole>>({
   select,
 }: {
-  select: (roles: Array<RbacRole>) => Array<T>;
+  select: (roles: Array<RbacRole>) => T;
 }) {
   return useQuery({
     select,

@@ -62,7 +62,7 @@ function RollEdit({
 }) {
   const rolesQuery = useRbacRoles({
     select: (roles) => roles.map((r) => ({ label: r.Name, value: r.Id })),
-  }) as { data?: Array<{ label: string; value: number }> };
+  });
 
   if (!rolesQuery.data) {
     return null;
