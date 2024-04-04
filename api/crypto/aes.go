@@ -19,10 +19,13 @@ import (
 // GCM is currently considered the most secure mode for AES encryption (2024)
 
 // The encrypted file header
-const gcmHeader = "AES256-GCM"
+const (
+	gcmHeader = "AES256-GCM"
+	blockSize = 4096
+)
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
-	return AesEncryptGCM(input, output, passphrase)
+	return aesEncryptGCM(input, output, passphrase)
 }
 
 func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
@@ -37,15 +40,15 @@ func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 
 	if string(header) == gcmHeader {
 		fmt.Println("Decrypt: GCM mode")
-		return AesDecryptGCM(tee, passphrase)
+		return aesDecryptGCM(tee, passphrase)
 	}
 
 	fmt.Println("Decrypt: OFB mode")
 	// For backward compatibility. Read previous encrypted archives that have no header
-	return AesDecryptOFB(&buf, passphrase)
+	return aesDecryptOFB(&buf, passphrase)
 }
 
-func AesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
+func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	// Derive key using scrypt with a random salt
 	salt := make([]byte, 16) // 16 bytes salt
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
@@ -68,8 +71,8 @@ func AesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	}
 
 	// Generate nonce
-	nonce := make([]byte, aesgcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+	nonce, err := NewRandom(12, 4)
+	if err != nil {
 		return err
 	}
 
@@ -82,9 +85,12 @@ func AesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	if _, err := output.Write(salt); err != nil {
 		return err
 	}
-	if _, err := output.Write(nonce); err != nil {
+	if _, err := output.Write(nonce.Value()); err != nil {
 		return err
 	}
+
+	fmt.Printf("Encrypt: salt: %x\n", salt)
+	fmt.Printf("Encrypt: nonce: %x\n", nonce.Value())
 
 	// Buffer for reading plaintext blocks
 	buf := make([]byte, 4096) // Adjust buffer size as needed
@@ -101,7 +107,8 @@ func AesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 
 		// Seal encrypts the plaintext using the nonce and appends the result to dst,
 		// returning the updated slice.
-		ciphertext := aesgcm.Seal(nil, nonce, buf[:n], nil)
+		ciphertext := aesgcm.Seal(nil, nonce.Value(), buf[:n], nil)
+		nonce.Increment()
 
 		// Write ciphertext to output
 		if _, err := output.Write(ciphertext); err != nil {
@@ -112,7 +119,7 @@ func AesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	return nil
 }
 
-func AesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
+func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Read salt
 	salt := make([]byte, 16) // Salt size
 	if _, err := io.ReadFull(input, salt); err != nil {
@@ -138,14 +145,10 @@ func AesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	}
 
 	// Read nonce from the input reader
-	nonceSize := aesgcm.NonceSize()
-	nonce := make([]byte, nonceSize)
-	if _, err := io.ReadFull(input, nonce); err != nil {
+	nonce := New(aesgcm.NonceSize())
+	if err := nonce.ReadValue(input); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("Decrypt: salt: %x\n", salt)
-	fmt.Printf("Decrypt: nonce: %x\n", nonce)
 
 	// Initialize a buffer to store decrypted data
 	buf := bytes.Buffer{}
@@ -163,10 +166,12 @@ func AesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 		}
 
 		// Decrypt the block of ciphertext
-		plaintext, err := aesgcm.Open(nil, nonce, ciphertextBlock[:n], nil)
+		plaintext, err := aesgcm.Open(nil, nonce.Value(), ciphertextBlock[:n], nil)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error decrypting block: %w", err)
 		}
+
+		nonce.Increment()
 
 		// Write the decrypted plaintext to the buffer
 		if _, err := buf.Write(plaintext); err != nil {
@@ -177,41 +182,9 @@ func AesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	return &buf, nil
 }
 
-func AesDecryptCTR(input io.Reader, passphrase []byte) (io.Reader, error) {
-	// Read salt from input
-	salt := make([]byte, 16)
-	if _, err := io.ReadFull(input, salt); err != nil {
-		return nil, err
-	}
-
-	// Read IV from input
-	iv := make([]byte, aes.BlockSize)
-	if _, err := io.ReadFull(input, iv); err != nil {
-		return nil, err
-	}
-
-	// Derive encryption key from passphrase and salt using scrypt
-	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create AES cipher block
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a cipher stream
-	stream := cipher.NewCTR(block, iv)
-	reader := &cipher.StreamReader{S: stream, R: input}
-
-	return reader, nil
-}
-
-// AesDecrypt reads from input, decrypts with AES-256 and returns the reader to a read decrypted content from.
+// aesDecryptOFB reads from input, decrypts with AES-256 and returns the reader to a read decrypted content from.
 // passphrase is used to generate an encryption key.
-func AesDecryptOFB(input io.Reader, passphrase []byte) (io.Reader, error) {
+func aesDecryptOFB(input io.Reader, passphrase []byte) (io.Reader, error) {
 	var emptySalt []byte = make([]byte, 0)
 
 	// making a 32 bytes key that would correspond to AES-256

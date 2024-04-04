@@ -117,11 +117,6 @@ func Test_decryptWithDifferentPassphrase_shouldProduceWrongResult(t *testing.T) 
 	decryptedFileWriter, _ := os.Create(decryptedFilePath)
 	defer decryptedFileWriter.Close()
 
-	decryptedReader, err := AesDecrypt(encryptedFileReader, []byte("garbage"))
-	assert.Nil(t, err, "Should allow to decrypt with wrong passphrase")
-
-	io.Copy(decryptedFileWriter, decryptedReader)
-
-	decryptedContent, _ := os.ReadFile(decryptedFilePath)
-	assert.NotEqual(t, content, decryptedContent, "Original and decrypted content should NOT match")
+	_, err = AesDecrypt(encryptedFileReader, []byte("garbage"))
+	assert.NotNil(t, err, "Should not allow decrypt with wrong passphrase")
 }
