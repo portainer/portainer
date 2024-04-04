@@ -13,9 +13,10 @@ import {
   getApplicationRevisionList,
 } from './application.service';
 import type { AppKind, Application, ApplicationPatch } from './types';
-import { deletePod, getNamespacePods } from './pod.service';
+import { deletePod } from './pod.service';
 import { getNamespaceHorizontalPodAutoscalers } from './autoscaling.service';
 import { applicationIsKind, matchLabelsToLabelSelectorValue } from './utils';
+import { getNamespacePods } from './usePods';
 
 const queryKeys = {
   applicationsForCluster: (environmentId: EnvironmentId) =>
