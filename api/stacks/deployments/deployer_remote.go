@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	defaultUnpackerImage       = "portainer/compose-unpacker:latest"
+	defaultUnpackerImage       = "portainer/compose-unpacker:" + portainer.APIVersion
 	composeUnpackerImageEnvVar = "COMPOSE_UNPACKER_IMAGE"
 	composePathPrefix          = "portainer-compose-unpacker"
 )
