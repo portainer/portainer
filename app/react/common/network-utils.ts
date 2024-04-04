@@ -1,8 +1,8 @@
-export function getSchemeFromPort(port: number | undefined): string {
+export function getSchemeFromPort(port?: number): 'http' | 'https' {
   if (!port) {
     return 'http';
   }
 
-  const hostPort: string = String(port);
+  const hostPort = String(port);
   return hostPort.endsWith('443') ? 'https' : 'http';
 }
