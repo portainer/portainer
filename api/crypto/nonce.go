@@ -10,13 +10,13 @@ type Nonce struct {
 	val []byte
 }
 
-func New(size int) *Nonce {
+func NewNonce(size int) *Nonce {
 	return &Nonce{val: make([]byte, size)}
 }
 
 // NewRandom generates a new initial nonce with random and sequential parts.
 // https://www.oreilly.com/library/view/secure-programming-cookbook/0596003943/ch04s09.html
-func NewRandom(size int, randomBytes int) (*Nonce, error) {
+func NewRandomNonce(size int, randomBytes int) (*Nonce, error) {
 	// Check if size is greater than randomBytes
 	if size <= randomBytes {
 		return nil, errors.New("nonce size must be greater than the number of random bytes")
@@ -37,7 +37,7 @@ func NewRandom(size int, randomBytes int) (*Nonce, error) {
 	return &Nonce{val: nonceVal}, nil
 }
 
-func (n *Nonce) ReadValue(stream io.Reader) error {
+func (n *Nonce) Read(stream io.Reader) error {
 	_, err := io.ReadFull(stream, n.val)
 	return err
 }

@@ -21,7 +21,7 @@ import (
 // The encrypted file header
 const (
 	gcmHeader = "AES256-GCM"
-	blockSize = 4096
+	blockSize = 1024 * 1024
 )
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
@@ -71,10 +71,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	}
 
 	// Generate nonce
-	nonce, err := NewRandom(12, 4)
-	if err != nil {
-		return err
-	}
+	nonce := NewNonce(12)
 
 	// write the header
 	if _, err := output.Write([]byte(gcmHeader)); err != nil {
@@ -145,8 +142,8 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	}
 
 	// Read nonce from the input reader
-	nonce := New(aesgcm.NonceSize())
-	if err := nonce.ReadValue(input); err != nil {
+	nonce := NewNonce(aesgcm.NonceSize())
+	if err := nonce.Read(input); err != nil {
 		return nil, err
 	}
 
