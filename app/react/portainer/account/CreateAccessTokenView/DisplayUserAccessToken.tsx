@@ -4,7 +4,7 @@ import { Button, CopyButton } from '@@/buttons';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { TextTip } from '@@/Tip/TextTip';
 
-export function DisplayUserAccessToken(apikey: string) {
+export function DisplayUserAccessToken({ apikey }: { apikey: string }) {
   const router = useRouter();
   return (
     <>
