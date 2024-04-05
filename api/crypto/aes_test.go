@@ -30,12 +30,9 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 	)
 
 	//content := []byte("content")
-	content := RandStringBytes(1024)
+	content := RandStringBytes(1024 * 1024 * 100)
 
 	os.WriteFile(originFilePath, content, 0600)
-	//generateFileContent(originFilePath, 7)
-
-	//time.Sleep(2 * time.Second)
 
 	originFile, _ := os.Open(originFilePath)
 	defer originFile.Close()

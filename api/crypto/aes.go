@@ -90,7 +90,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	fmt.Printf("Encrypt: nonce: %x\n", nonce.Value())
 
 	// Buffer for reading plaintext blocks
-	buf := make([]byte, blockSize+16) // Adjust buffer size as needed
+	buf := make([]byte, blockSize) // Adjust buffer size as needed
 
 	// Encrypt plaintext in blocks
 	for {
@@ -110,7 +110,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 		ciphertext := aesgcm.Seal(nil, nonce.Value(), buf[:n], nil)
 		fmt.Println("Encrypt Nonce: ", nonce.Value())
 
-		nonce.Increment()
+		//nonce.Increment()
 
 		// Write ciphertext to output
 		n, err = output.Write(ciphertext)
@@ -118,6 +118,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 			return err
 		}
 
+		fmt.Println("data written: ", n)
 		fmt.Println("Data size: ", len(buf))
 		fmt.Println("Cyphertext size: ", len(ciphertext))
 	}
@@ -167,36 +168,34 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	i := 1
 	for {
 		// Read a block of ciphertext from the input reader
-		ciphertextBlock := make([]byte, blockSize) // Adjust block size as needed
-		n, err := input.Read(ciphertextBlock)
+		ciphertextBlock := make([]byte, blockSize+16) // Adjust block size as needed
+		n, err := io.ReadFull(input, ciphertextBlock)
 
 		fmt.Println("i=", i)
 		fmt.Println("n=", n)
 		fmt.Println("err=", err)
+		if n > 0 {
+			// Decrypt the block of ciphertext
+			plaintext, err := aesgcm.Open(nil, nonce.Value(), ciphertextBlock[:n], nil)
+			if err != nil {
+				return nil, fmt.Errorf("error decrypting block: %w", err)
+			}
 
-		if err != nil && !errors.Is(err, io.EOF) {
-			return nil, err
+			//nonce.Increment()
+
+			// Write the decrypted plaintext to the buffer
+			n, err = buf.Write(plaintext)
+			if err != nil {
+				return nil, err
+			}
 		}
+
 		if n == 0 {
 			break // Reached end of ciphertext
 		}
 
-		// Decrypt the block of ciphertext
-		plaintext, err := aesgcm.Open(nil, nonce.Value(), ciphertextBlock[:n], nil)
-		if err != nil {
-			return nil, fmt.Errorf("error decrypting block: %w", err)
-		}
-
-		nonce.Increment()
-
-		// Write the decrypted plaintext to the buffer
-		n, err = buf.Write(plaintext)
-		if err != nil {
+		if err != nil && !(errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
 			return nil, err
-		}
-
-		if n != len(plaintext) {
-			fmt.Println("Failed to write all decrypted data to buffer")
 		}
 	}
 
