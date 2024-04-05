@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var letterRunes = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letterBytes = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func RandStringBytes(n int) []byte {
 	b := make([]byte, n)
 	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return b
 }
@@ -29,8 +29,7 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 		decryptedFilePath = filepath.Join(tmpdir, "decrypted")
 	)
 
-	content := RandStringBytes(1024 * 1024 * 20)
-
+	content := RandStringBytes(1024*1024*20 + 523)
 	os.WriteFile(originFilePath, content, 0600)
 
 	originFile, _ := os.Open(originFilePath)
@@ -70,7 +69,7 @@ func Test_encryptAndDecrypt_withEmptyPassword(t *testing.T) {
 		decryptedFilePath = filepath.Join(tmpdir, "decrypted")
 	)
 
-	content := []byte("content")
+	content := RandStringBytes(1024*20 + 523)
 	os.WriteFile(originFilePath, content, 0600)
 
 	originFile, _ := os.Open(originFilePath)
@@ -109,7 +108,7 @@ func Test_decryptWithDifferentPassphrase_shouldProduceWrongResult(t *testing.T) 
 		decryptedFilePath = filepath.Join(tmpdir, "decrypted")
 	)
 
-	content := []byte("content")
+	content := RandStringBytes(1024*1024*20 + 523)
 	os.WriteFile(originFilePath, content, 0600)
 
 	originFile, _ := os.Open(originFilePath)

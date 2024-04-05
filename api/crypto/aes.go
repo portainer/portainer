@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
@@ -30,20 +31,18 @@ func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
 
 func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Read file metadata to determine how it was encrypted
-	var buf bytes.Buffer
-	tee := io.TeeReader(input, &buf)
-	header := make([]byte, len(gcmHeader))
-	_, err := tee.Read(header)
+	inputReader := bufio.NewReader(input)
+	header, err := inputReader.Peek(len(gcmHeader))
 	if err != nil {
 		return nil, err
 	}
 
 	if string(header) == gcmHeader {
-		return aesDecryptGCM(tee, passphrase)
+		return aesDecryptGCM(inputReader, passphrase)
 	}
 
 	// For backward compatibility. Read previous encrypted archives that have no header
-	return aesDecryptOFB(&buf, passphrase)
+	return aesDecryptOFB(inputReader, passphrase)
 }
 
 func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
@@ -89,12 +88,12 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 
 	// Encrypt plaintext in blocks
 	for {
-		n, err := input.Read(buf)
+		n, err := io.ReadFull(input, buf)
 		if n == 0 {
 			break // Reached end of plaintext
 		}
 
-		if err != nil && !errors.Is(err, io.EOF) {
+		if err != nil && !(errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
 			return err
 		}
 
@@ -114,6 +113,12 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 }
 
 func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
+	// Reader header
+	header := make([]byte, len(gcmHeader))
+	if _, err := io.ReadFull(input, header); err != nil {
+		return nil, err
+	}
+
 	// Read salt
 	salt := make([]byte, 16) // Salt size
 	if _, err := io.ReadFull(input, salt); err != nil {
@@ -150,7 +155,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Decrypt the ciphertext in blocks
 	for {
 		// Read a block of ciphertext from the input reader
-		ciphertextBlock := make([]byte, blockSize+16) // Adjust block size as needed
+		ciphertextBlock := make([]byte, blockSize+aesgcm.Overhead()) // Adjust block size as needed
 		n, err := io.ReadFull(input, ciphertextBlock)
 		if n > 0 {
 			// Decrypt the block of ciphertext
