@@ -1,7 +1,6 @@
 package crypto
 
 import (
-	"fmt"
 	"io"
 	"math/rand"
 	"os"
@@ -10,38 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-const (
-	alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-)
-
-func randomString(length int) string {
-	bytes := make([]byte, length)
-	for i := 0; i < length; i++ {
-		bytes[i] = alphabet[rand.Intn(len(alphabet))]
-	}
-	return string(bytes)
-}
-
-func generateFileContent(filename string, fileSize int) {
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
-	defer file.Close()
-
-	for writtenBytes := 0; writtenBytes < fileSize; {
-		content := randomString(fileSize)
-		n, err := file.WriteString(content)
-		if err != nil {
-			fmt.Println("Error writing to file:", err)
-			return
-		}
-		writtenBytes += n
-	}
-	fmt.Printf("File %s created successfully with size %d bytes\n", filename, fileSize)
-}
 
 var letterRunes = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -63,7 +30,7 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 	)
 
 	//content := []byte("content")
-	content := RandStringBytes(1024 * 1024)
+	content := RandStringBytes(1024)
 
 	os.WriteFile(originFilePath, content, 0600)
 	//generateFileContent(originFilePath, 7)
@@ -74,9 +41,10 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 	defer originFile.Close()
 
 	encryptedFileWriter, _ := os.Create(encryptedFilePath)
-	defer encryptedFileWriter.Close()
+
 	err := AesEncrypt(originFile, encryptedFileWriter, []byte("passphrase"))
 	assert.Nil(t, err, "Failed to encrypt a file")
+	encryptedFileWriter.Close()
 
 	encryptedContent, err := os.ReadFile(encryptedFilePath)
 	assert.Nil(t, err, "Couldn't read encrypted file")

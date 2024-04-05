@@ -21,7 +21,7 @@ import (
 // The encrypted file header
 const (
 	gcmHeader = "AES256-GCM"
-	blockSize = 1024
+	blockSize = 1024 * 1024
 )
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
@@ -90,27 +90,36 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	fmt.Printf("Encrypt: nonce: %x\n", nonce.Value())
 
 	// Buffer for reading plaintext blocks
-	buf := make([]byte, blockSize) // Adjust buffer size as needed
+	buf := make([]byte, blockSize+16) // Adjust buffer size as needed
 
 	// Encrypt plaintext in blocks
 	for {
 		n, err := input.Read(buf)
-		if err != nil && err != io.EOF {
-			return err
-		}
+		fmt.Println("Encrypt: n=", n)
 		if n == 0 {
 			break // Reached end of plaintext
+		}
+
+		if err != nil && !errors.Is(err, io.EOF) {
+			fmt.Println("err = ", err)
+			return err
 		}
 
 		// Seal encrypts the plaintext using the nonce and appends the result to dst,
 		// returning the updated slice.
 		ciphertext := aesgcm.Seal(nil, nonce.Value(), buf[:n], nil)
+		fmt.Println("Encrypt Nonce: ", nonce.Value())
+
 		nonce.Increment()
 
 		// Write ciphertext to output
-		if _, err := output.Write(ciphertext); err != nil {
+		n, err = output.Write(ciphertext)
+		if err != nil {
 			return err
 		}
+
+		fmt.Println("Data size: ", len(buf))
+		fmt.Println("Cyphertext size: ", len(ciphertext))
 	}
 
 	return nil
@@ -154,10 +163,17 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	fmt.Printf("Decrypt: nonce: %x\n", nonce.Value())
 
 	// Decrypt the ciphertext in blocks
+
+	i := 1
 	for {
 		// Read a block of ciphertext from the input reader
 		ciphertextBlock := make([]byte, blockSize) // Adjust block size as needed
 		n, err := input.Read(ciphertextBlock)
+
+		fmt.Println("i=", i)
+		fmt.Println("n=", n)
+		fmt.Println("err=", err)
+
 		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
 		}
@@ -174,8 +190,13 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 		nonce.Increment()
 
 		// Write the decrypted plaintext to the buffer
-		if _, err := buf.Write(plaintext); err != nil {
+		n, err = buf.Write(plaintext)
+		if err != nil {
 			return nil, err
+		}
+
+		if n != len(plaintext) {
+			fmt.Println("Failed to write all decrypted data to buffer")
 		}
 	}
 
