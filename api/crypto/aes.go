@@ -39,11 +39,9 @@ func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 	}
 
 	if string(header) == gcmHeader {
-		fmt.Println("Decrypt: GCM mode")
 		return aesDecryptGCM(tee, passphrase)
 	}
 
-	fmt.Println("Decrypt: OFB mode")
 	// For backward compatibility. Read previous encrypted archives that have no header
 	return aesDecryptOFB(&buf, passphrase)
 }
@@ -86,41 +84,30 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 		return err
 	}
 
-	fmt.Printf("Encrypt: salt: %x\n", salt)
-	fmt.Printf("Encrypt: nonce: %x\n", nonce.Value())
-
 	// Buffer for reading plaintext blocks
 	buf := make([]byte, blockSize) // Adjust buffer size as needed
 
 	// Encrypt plaintext in blocks
 	for {
 		n, err := input.Read(buf)
-		fmt.Println("Encrypt: n=", n)
 		if n == 0 {
 			break // Reached end of plaintext
 		}
 
 		if err != nil && !errors.Is(err, io.EOF) {
-			fmt.Println("err = ", err)
 			return err
 		}
 
 		// Seal encrypts the plaintext using the nonce and appends the result to dst,
 		// returning the updated slice.
 		ciphertext := aesgcm.Seal(nil, nonce.Value(), buf[:n], nil)
-		fmt.Println("Encrypt Nonce: ", nonce.Value())
-
-		//nonce.Increment()
+		nonce.Increment()
 
 		// Write ciphertext to output
-		n, err = output.Write(ciphertext)
+		_, err = output.Write(ciphertext)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println("data written: ", n)
-		fmt.Println("Data size: ", len(buf))
-		fmt.Println("Cyphertext size: ", len(ciphertext))
 	}
 
 	return nil
@@ -160,20 +147,11 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Initialize a buffer to store decrypted data
 	buf := bytes.Buffer{}
 
-	fmt.Printf("Decrypt: salt: %x\n", salt)
-	fmt.Printf("Decrypt: nonce: %x\n", nonce.Value())
-
 	// Decrypt the ciphertext in blocks
-
-	i := 1
 	for {
 		// Read a block of ciphertext from the input reader
 		ciphertextBlock := make([]byte, blockSize+16) // Adjust block size as needed
 		n, err := io.ReadFull(input, ciphertextBlock)
-
-		fmt.Println("i=", i)
-		fmt.Println("n=", n)
-		fmt.Println("err=", err)
 		if n > 0 {
 			// Decrypt the block of ciphertext
 			plaintext, err := aesgcm.Open(nil, nonce.Value(), ciphertextBlock[:n], nil)
@@ -181,7 +159,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 				return nil, fmt.Errorf("error decrypting block: %w", err)
 			}
 
-			//nonce.Increment()
+			nonce.Increment()
 
 			// Write the decrypted plaintext to the buffer
 			n, err = buf.Write(plaintext)
