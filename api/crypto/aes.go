@@ -21,7 +21,7 @@ import (
 // The encrypted file header
 const (
 	gcmHeader = "AES256-GCM"
-	blockSize = 1024 * 1024
+	blockSize = 1024
 )
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
@@ -90,7 +90,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	fmt.Printf("Encrypt: nonce: %x\n", nonce.Value())
 
 	// Buffer for reading plaintext blocks
-	buf := make([]byte, 4096) // Adjust buffer size as needed
+	buf := make([]byte, blockSize) // Adjust buffer size as needed
 
 	// Encrypt plaintext in blocks
 	for {
@@ -150,10 +150,13 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Initialize a buffer to store decrypted data
 	buf := bytes.Buffer{}
 
+	fmt.Printf("Decrypt: salt: %x\n", salt)
+	fmt.Printf("Decrypt: nonce: %x\n", nonce.Value())
+
 	// Decrypt the ciphertext in blocks
 	for {
 		// Read a block of ciphertext from the input reader
-		ciphertextBlock := make([]byte, 4096) // Adjust block size as needed
+		ciphertextBlock := make([]byte, blockSize) // Adjust block size as needed
 		n, err := input.Read(ciphertextBlock)
 		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
