@@ -60,7 +60,7 @@ export function CreateUserAccessToken() {
                   />
                 </Formik>
               ) : (
-                DisplayUserAccessToken(newAPIToken)
+                <DisplayUserAccessToken apikey={newAPIToken} />
               )}
             </Widget.Body>
           </Widget>
