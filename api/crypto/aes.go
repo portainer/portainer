@@ -1,62 +1,60 @@
 package crypto
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"errors"
+	"fmt"
 	"io"
 
 	"golang.org/x/crypto/scrypt"
 )
 
 // AesEncrypt reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key.
-// The encryption uses AES-256 in CTR mode.
+// The encryption uses AES-256 in GCM mode.
 // The decryption function supports the previous portainer backups which use OFB mode.  New archives
-// will use CTR mode and have a header to indicate the encryption mode.
+// will use GCM mode and have a header to indicate the encryption mode.
+// GCM is currently considered the most secure mode for AES encryption (2024)
 
 // The encrypted file header
-const ctrHeader = "AES256-CTR"
+const (
+	gcmHeader = "AES256-GCM"
+	blockSize = 1024 * 1024
+)
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
-	return AesEncryptCTR(input, output, passphrase)
+	return aesEncryptGCM(input, output, passphrase)
 }
 
 func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 	// Read file metadata to determine how it was encrypted
-	var buf bytes.Buffer
-	tee := io.TeeReader(input, &buf)
-	header := make([]byte, len(ctrHeader))
-	_, err := tee.Read(header)
+	inputReader := bufio.NewReader(input)
+	header, err := inputReader.Peek(len(gcmHeader))
 	if err != nil {
 		return nil, err
 	}
 
-	if string(header) == ctrHeader {
-		return AesDecryptCTR(tee, passphrase)
+	if string(header) == gcmHeader {
+		return aesDecryptGCM(inputReader, passphrase)
 	}
 
 	// For backward compatibility. Read previous encrypted archives that have no header
-	return AesDecryptOFB(&buf, passphrase)
+	return aesDecryptOFB(inputReader, passphrase)
 }
 
-func AesEncryptCTR(input io.Reader, output io.Writer, passphrase []byte) error {
-	// Generate a random salt
-	salt := make([]byte, 16)
+func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
+	// Derive key using scrypt with a random salt
+	salt := make([]byte, 16) // 16 bytes salt
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
 		return err
 	}
 
-	// Generate a random initial value
-	iv := make([]byte, aes.BlockSize)
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return err
-	}
-
-	// Derive encryption key from passphrase using scrypt
-	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32)
+	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32) // 32 bytes key
 	if err != nil {
-		return err
+		return fmt.Errorf("error reading salt: %w", err)
 	}
 
 	block, err := aes.NewCipher(key)
@@ -64,68 +62,136 @@ func AesEncryptCTR(input io.Reader, output io.Writer, passphrase []byte) error {
 		return err
 	}
 
-	// Write header, salt and initial value to output
-	if _, err := io.WriteString(output, ctrHeader); err != nil {
+	aesgcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return fmt.Errorf("error creating gcm cypher: %w", err)
+	}
+
+	// Generate nonce
+	nonce := NewNonce(aesgcm.NonceSize())
+
+	// write the header
+	if _, err := output.Write([]byte(gcmHeader)); err != nil {
 		return err
 	}
 
+	// Write nonce and salt to the output file
 	if _, err := output.Write(salt); err != nil {
 		return err
 	}
-
-	if _, err := output.Write(iv); err != nil {
+	if _, err := output.Write(nonce.Value()); err != nil {
 		return err
 	}
 
-	// Create a cipher stream
-	stream := cipher.NewCTR(block, iv)
+	// Buffer for reading plaintext blocks
+	buf := make([]byte, blockSize) // Adjust buffer size as needed
+	ciphertext := make([]byte, len(buf)+aesgcm.Overhead())
 
-	// Create a writer that encrypts data using the cipher stream and writes to the output
-	writer := &cipher.StreamWriter{S: stream, W: output}
+	// Encrypt plaintext in blocks
+	for {
+		n, err := io.ReadFull(input, buf)
+		if n == 0 {
+			break // end of plaintext input
+		}
 
-	// Encrypt and write data to the output
-	if _, err := io.Copy(writer, input); err != nil {
-		return err
+		if err != nil && !(errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
+			return err
+		}
+
+		// Seal encrypts the plaintext using the nonce returning the updated slice.
+		ciphertext = aesgcm.Seal(ciphertext[:0], nonce.Value(), buf[:n], nil)
+
+		// Write ciphertext to output
+		_, err = output.Write(ciphertext)
+		if err != nil {
+			return err
+		}
+
+		nonce.Increment()
 	}
 
 	return nil
 }
 
-func AesDecryptCTR(input io.Reader, passphrase []byte) (io.Reader, error) {
-	// Read salt from input
-	salt := make([]byte, 16)
+func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
+	// Reader header
+	header := make([]byte, len(gcmHeader))
+	if _, err := io.ReadFull(input, header); err != nil {
+		return nil, err
+	}
+
+	if string(header) != gcmHeader {
+		return nil, fmt.Errorf("invalid header")
+	}
+
+	// Read salt
+	salt := make([]byte, 16) // Salt size
 	if _, err := io.ReadFull(input, salt); err != nil {
 		return nil, err
 	}
 
-	// Read IV from input
-	iv := make([]byte, aes.BlockSize)
-	if _, err := io.ReadFull(input, iv); err != nil {
-		return nil, err
-	}
-
-	// Derive encryption key from passphrase and salt using scrypt
-	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32)
+	// Derive key using scrypt with the provided passphrase and salt
+	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32) // 32 bytes key
 	if err != nil {
 		return nil, err
 	}
 
-	// Create AES cipher block
+	// Initialize AES cipher block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create a cipher stream
-	stream := cipher.NewCTR(block, iv)
-	reader := &cipher.StreamReader{S: stream, R: input}
+	// Create GCM mode with the cipher block
+	aesgcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
 
-	return reader, nil
+	// Read nonce from the input reader
+	nonce := NewNonce(aesgcm.NonceSize())
+	if err := nonce.Read(input); err != nil {
+		return nil, err
+	}
+
+	// Initialize a buffer to store decrypted data
+	buf := bytes.Buffer{}
+	plaintext := make([]byte, blockSize)
+
+	// Decrypt the ciphertext in blocks
+	for {
+		// Read a block of ciphertext from the input reader
+		ciphertextBlock := make([]byte, blockSize+aesgcm.Overhead()) // Adjust block size as needed
+		n, err := io.ReadFull(input, ciphertextBlock)
+		if n == 0 {
+			break // end of ciphertext
+		}
+
+		if err != nil && !(errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)) {
+			return nil, err
+		}
+
+		// Decrypt the block of ciphertext
+		plaintext, err = aesgcm.Open(plaintext[:0], nonce.Value(), ciphertextBlock[:n], nil)
+		if err != nil {
+			return nil, fmt.Errorf("error decrypting block: %w", err)
+		}
+
+		// Write the decrypted plaintext to the buffer
+		_, err = buf.Write(plaintext)
+		if err != nil {
+			return nil, err
+		}
+
+		nonce.Increment()
+	}
+
+	return &buf, nil
 }
 
-// AesDecrypt reads from input, decrypts with AES-256 and returns the reader to a read decrypted content from.
+// aesDecryptOFB reads from input, decrypts with AES-256 and returns the reader to a read decrypted content from.
 // passphrase is used to generate an encryption key.
-func AesDecryptOFB(input io.Reader, passphrase []byte) (io.Reader, error) {
+func aesDecryptOFB(input io.Reader, passphrase []byte) (io.Reader, error) {
 	var emptySalt []byte = make([]byte, 0)
 
 	// making a 32 bytes key that would correspond to AES-256
