@@ -29,7 +29,7 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 		decryptedFilePath = filepath.Join(tmpdir, "decrypted")
 	)
 
-	content := RandStringBytes(1024*1024*20 + 523)
+	content := RandStringBytes(1024*1024*100 + 523)
 	os.WriteFile(originFilePath, content, 0600)
 
 	originFile, _ := os.Open(originFilePath)
