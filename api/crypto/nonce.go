@@ -14,26 +14,21 @@ func NewNonce(size int) *Nonce {
 	return &Nonce{val: make([]byte, size)}
 }
 
-// NewRandom generates a new initial nonce with random and sequential parts.
+// NewRandomNonce generates a new initial nonce with the lower byte set to a random value
 // https://www.oreilly.com/library/view/secure-programming-cookbook/0596003943/ch04s09.html
-func NewRandomNonce(size int, randomBytes int) (*Nonce, error) {
-	// Check if size is greater than randomBytes
+func NewRandomNonce(size int) (*Nonce, error) {
+	randomBytes := 1
 	if size <= randomBytes {
 		return nil, errors.New("nonce size must be greater than the number of random bytes")
 	}
 
-	// Generate random initial value for the random part
 	randomPart := make([]byte, randomBytes)
 	if _, err := rand.Read(randomPart); err != nil {
 		return nil, err
 	}
 
-	// Fill the remaining bytes with zeros
-	sequentialPart := make([]byte, size-randomBytes)
-
-	// Combine randomPart and sequentialPart to create the initial nonce
-	nonceVal := append(randomPart, sequentialPart...)
-
+	zeroPart := make([]byte, size-randomBytes)
+	nonceVal := append(randomPart, zeroPart...)
 	return &Nonce{val: nonceVal}, nil
 }
 

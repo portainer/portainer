@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 
+	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -23,6 +24,13 @@ import (
 const (
 	gcmHeader = "AES256-GCM"
 	blockSize = 1024 * 1024
+
+	// Optimised for lower memory hardware according to current OWASP recommendations
+	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
+	argon2MemoryCost = 12 * 1024
+	argon2TimeCost   = 3
+	argon2Threads    = 1
+	argon2KeyLength  = 32
 )
 
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
@@ -46,17 +54,13 @@ func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 }
 
 func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
-	// Derive key using scrypt with a random salt
+	// Derive key using argon2 with a random salt
 	salt := make([]byte, 16) // 16 bytes salt
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
 		return err
 	}
 
-	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32) // 32 bytes key
-	if err != nil {
-		return fmt.Errorf("error reading salt: %w", err)
-	}
-
+	key := argon2.IDKey(passphrase, salt, argon2TimeCost, argon2MemoryCost, argon2Threads, 32)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err
@@ -68,7 +72,10 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	}
 
 	// Generate nonce
-	nonce := NewNonce(aesgcm.NonceSize())
+	nonce, err := NewRandomNonce(aesgcm.NonceSize())
+	if err != nil {
+		return fmt.Errorf("error generating nonce: %w", err)
+	}
 
 	// write the header
 	if _, err := output.Write([]byte(gcmHeader)); err != nil {
@@ -130,11 +137,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 		return nil, err
 	}
 
-	// Derive key using scrypt with the provided passphrase and salt
-	key, err := scrypt.Key(passphrase, salt, 32768, 8, 1, 32) // 32 bytes key
-	if err != nil {
-		return nil, err
-	}
+	key := argon2.IDKey(passphrase, salt, argon2TimeCost, argon2MemoryCost, argon2Threads, 32)
 
 	// Initialize AES cipher block
 	block, err := aes.NewCipher(key)
