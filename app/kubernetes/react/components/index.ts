@@ -66,6 +66,7 @@ import { applicationsModule } from './applications';
 import { volumesModule } from './volumes';
 import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
+import { registriesModule } from './registries';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
@@ -73,6 +74,7 @@ export const ngModule = angular
     volumesModule,
     namespacesModule,
     clusterManagementModule,
+    registriesModule,
   ])
   .component(
     'ingressClassDatatable',
