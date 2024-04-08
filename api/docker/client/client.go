@@ -93,11 +93,17 @@ func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*cli
 		return nil, err
 	}
 
-	return client.NewClientWithOpts(
+	opts := []client.Opt{
 		client.WithHost(endpoint.URL),
 		client.WithAPIVersionNegotiation(),
 		client.WithHTTPClient(httpCli),
-	)
+	}
+
+	if nnTransport, ok := httpCli.Transport.(*NodeNameTransport); ok && nnTransport.TLSClientConfig != nil {
+		opts = append(opts, client.WithScheme("https"))
+	}
+
+	return client.NewClientWithOpts(opts...)
 }
 
 func createAgentClient(endpoint *portainer.Endpoint, endpointURL string, signatureService portainer.DigitalSignatureService, nodeName string, timeout *time.Duration) (*client.Client, error) {
