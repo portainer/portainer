@@ -1,6 +1,8 @@
 import { Trash2 } from 'lucide-react';
 import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { confirmDelete } from '@@/modals/confirm';
 
 import { Button } from './Button';
@@ -21,13 +23,15 @@ type ConfirmOrClick =
 export function DeleteButton({
   disabled,
   size,
+  'data-cy': dataCy,
   children,
   ...props
 }: PropsWithChildren<
-  ConfirmOrClick & {
-    size?: ComponentProps<typeof Button>['size'];
-    disabled?: boolean;
-  }
+  AutomationTestingProps &
+    ConfirmOrClick & {
+      size?: ComponentProps<typeof Button>['size'];
+      disabled?: boolean;
+    }
 >) {
   return (
     <Button
@@ -37,6 +41,7 @@ export function DeleteButton({
       onClick={() => handleClick()}
       icon={Trash2}
       className="!m-0"
+      data-cy={dataCy}
     >
       {children || 'Remove'}
     </Button>

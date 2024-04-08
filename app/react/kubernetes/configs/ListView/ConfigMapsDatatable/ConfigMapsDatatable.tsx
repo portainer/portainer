@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FileCode, Plus, Trash2 } from 'lucide-react';
+import { FileCode } from 'lucide-react';
 import { ConfigMap } from 'kubernetes-types/core/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -12,12 +12,12 @@ import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import {
   useConfigMapsForCluster,
@@ -139,16 +139,6 @@ function TableActions({
   const deleteConfigMapMutation = useMutationDeleteConfigMaps(environmentId);
 
   async function handleRemoveClick(configMaps: ConfigMap[]) {
-    const confirmed = await confirmDelete(
-      `Are you sure you want to remove the selected ${pluralize(
-        configMaps.length,
-        'ConfigMap'
-      )}?`
-    );
-    if (!confirmed) {
-      return;
-    }
-
     const configMapsToDelete = configMaps.map((configMap) => ({
       namespace: configMap.metadata?.namespace ?? '',
       name: configMap.metadata?.name ?? '',
@@ -159,41 +149,30 @@ function TableActions({
 
   return (
     <Authorized authorizations="K8sConfigMapsW">
-      <Button
-        className="btn-wrapper"
-        color="dangerlight"
+      <DeleteButton
         disabled={selectedItems.length === 0}
-        onClick={async () => {
-          handleRemoveClick(selectedItems);
-        }}
-        icon={Trash2}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
+        confirmMessage={`Are you sure you want to remove the selected ${pluralize(
+          selectedItems.length,
+          'ConfigMap'
+        )}`}
         data-cy="k8sConfig-removeConfigButton"
+      />
+
+      <AddButton
+        to="kubernetes.configmaps.new"
+        data-cy="k8sConfig-addConfigWithFormButton"
+        color="secondary"
       >
-        Remove
-      </Button>
-      <Link to="kubernetes.configmaps.new" className="ml-1">
-        <Button
-          className="btn-wrapper"
-          color="secondary"
-          icon={Plus}
-          data-cy="k8sConfig-addConfigWithFormButton"
-        >
-          Add with form
-        </Button>
-      </Link>
-      <Link
-        to="kubernetes.deploy"
+        Add with form
+      </AddButton>
+
+      <CreateFromManifestButton
         params={{
-          referrer: 'kubernetes.configurations',
           tab: 'configmaps',
         }}
-        className="ml-1"
         data-cy="k8sConfig-deployFromManifestButton"
-      >
-        <Button className="btn-wrapper" color="primary" icon={Plus}>
-          Create from manifest
-        </Button>
-      </Link>
+      />
     </Authorized>
   );
 }

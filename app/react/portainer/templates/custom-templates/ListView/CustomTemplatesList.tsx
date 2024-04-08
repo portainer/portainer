@@ -1,4 +1,4 @@
-import { Edit, Plus } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useCallback, useState } from 'react';
 
@@ -9,8 +9,7 @@ import { Table } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { createPersistedStore } from '@@/datatables/types';
 import { DatatableFooter } from '@@/datatables/DatatableFooter';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 
 import { CustomTemplatesListItem } from './CustomTemplatesListItem';
 
@@ -56,11 +55,7 @@ export function CustomTemplatesList({
         searchValue={listState.search}
         title="Custom Templates"
         titleIcon={Edit}
-        renderTableActions={() => (
-          <Button as={Link} props={{ to: '.new' }} icon={Plus}>
-            Add Custom Template
-          </Button>
-        )}
+        renderTableActions={() => <AddButton>Add Custom Template</AddButton>}
       />
 
       <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">

@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
-import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
@@ -13,10 +12,6 @@ angular.module('portainer.docker').controller('NetworksController', [
   'AgentService',
   function ($q, $scope, $state, NetworkService, Notifications, HttpRequestHelper, endpoint, AgentService) {
     $scope.removeAction = async function (selectedItems) {
-      const confirmed = await confirmDelete('Do you want to remove the selected network(s)?');
-      if (!confirmed) {
-        return null;
-      }
       var actionCount = selectedItems.length;
       angular.forEach(selectedItems, function (network) {
         HttpRequestHelper.setPortainerAgentTargetHeader(network.NodeName);

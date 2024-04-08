@@ -33,7 +33,7 @@ import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
   const {
-    params: { localEndpointId: localEndpointIdParam },
+    params: { localEndpointId: localEndpointIdParam, referrer },
   } = useCurrentStateAndParams();
 
   const [environmentIds, setEnvironmentIds] = useState<EnvironmentId[]>(() => {
@@ -130,8 +130,7 @@ export function EnvironmentCreationView() {
         ])
       ),
     });
-    if (localStorage.getItem('wizardReferrer') === 'environments') {
-      localStorage.removeItem('wizardReferrer');
+    if (referrer === 'environments') {
       router.stateService.go('portainer.endpoints');
       return;
     }

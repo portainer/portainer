@@ -1,4 +1,4 @@
-import { Plus, Network, Trash2 } from 'lucide-react';
+import { Network } from 'lucide-react';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -10,12 +10,12 @@ import {
   refreshableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
-import { Button } from '@@/buttons';
+import { AddButton } from '@@/buttons';
 import { TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
-import { Link } from '@@/Link';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { useIsSwarm } from '../../proxy/queries/useInfo';
 
@@ -80,22 +80,16 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
           <Authorized
             authorizations={['DockerNetworkDelete', 'DockerNetworkCreate']}
           >
-            <Button
+            <DeleteButton
               disabled={selectedRows.length === 0}
-              color="dangerlight"
-              onClick={() => onRemove(selectedRows)}
-              icon={Trash2}
-            >
-              Remove
-            </Button>
+              confirmMessage="Do you want to remove the selected network(s)?"
+              onConfirmed={() => onRemove(selectedRows)}
+            />
           </Authorized>
-          <Authorized
-            authorizations="DockerNetworkCreate"
-            data-cy="network-addNetworkButton"
-          >
-            <Button icon={Plus} as={Link} props={{ to: '.new' }}>
+          <Authorized authorizations="DockerNetworkCreate">
+            <AddButton data-cy="network-addNetworkButton">
               Add network
-            </Button>
+            </AddButton>
           </Authorized>
         </div>
       )}
