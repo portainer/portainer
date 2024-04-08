@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { Modal, OnSubmit, openModal } from '@@/modals';
 import { Button } from '@@/buttons';

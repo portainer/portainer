@@ -1,7 +1,7 @@
 import { useMutation } from 'react-query';
 
 import { withError } from '@/react-tools/react-query';
-import { RegistryId } from '@/react/portainer/registries/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 import axios, {
   json2formData,
   parseAxiosError,

@@ -1,6 +1,6 @@
 import { MultiValue } from 'react-select';
 
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Select } from '@@/form-components/ReactSelect';
