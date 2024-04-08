@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { Shuffle, Trash2 } from 'lucide-react';
+import { Shuffle } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -12,12 +12,11 @@ import { pluralize } from '@/portainer/helpers/strings';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import {
   useMutationDeleteServices,
@@ -95,7 +94,7 @@ export function ServicesDatatable() {
   );
 }
 
-// useServicesRowData appends the `isSyetem` property to the service data
+// useServicesRowData appends the `isSystem` property to the service data
 function useServicesRowData(
   services: Service[],
   namespaces?: Namespaces
@@ -137,26 +136,34 @@ function TableActions({ selectedItems }: TableActionsProps) {
   const deleteServicesMutation = useMutationDeleteServices(environmentId);
   const router = useRouter();
 
-  async function handleRemoveClick(services: SelectedService[]) {
-    const confirmed = await confirmDelete(
-      <>
-        <p>{`Are you sure you want to remove the selected ${pluralize(
-          services.length,
-          'service'
-        )}?`}</p>
-        <ul className="pl-6">
-          {services.map((s, index) => (
-            <li key={index}>
-              {s.Namespace}/{s.Name}
-            </li>
-          ))}
-        </ul>
-      </>
-    );
-    if (!confirmed) {
-      return null;
-    }
+  return (
+    <Authorized authorizations="K8sServicesW">
+      <DeleteButton
+        disabled={selectedItems.length === 0}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
+        confirmMessage={
+          <>
+            <p>{`Are you sure you want to remove the selected ${pluralize(
+              selectedItems.length,
+              'service'
+            )}?`}</p>
+            <ul className="pl-6">
+              {selectedItems.map((s, index) => (
+                <li key={index}>
+                  {s.Namespace}/{s.Name}
+                </li>
+              ))}
+            </ul>
+          </>
+        }
+        data-cy="k8s-remove-services-button"
+      />
 
+      <CreateFromManifestButton data-cy="k8s-create-service-button" />
+    </Authorized>
+  );
+
+  async function handleRemoveClick(services: SelectedService[]) {
     const payload: Record<string, string[]> = {};
     services.forEach((service) => {
       payload[service.Namespace] = payload[service.Namespace] || [];
@@ -182,39 +189,5 @@ function TableActions({ selectedItems }: TableActionsProps) {
         },
       }
     );
-    return services;
   }
-
-  return (
-    <div className="servicesDatatable-actions">
-      <Authorized authorizations="K8sServicesW">
-        <Button
-          className="btn-wrapper"
-          color="dangerlight"
-          disabled={selectedItems.length === 0}
-          onClick={() => handleRemoveClick(selectedItems)}
-          icon={Trash2}
-          data-cy="k8s-remove-services-button"
-        >
-          Remove
-        </Button>
-
-        <Link
-          to="kubernetes.deploy"
-          params={{ referrer: 'kubernetes.services' }}
-          className="space-left hover:no-decoration"
-          data-cy="k8s-create-service-link"
-        >
-          <Button
-            className="btn-wrapper"
-            color="primary"
-            icon="plus"
-            data-cy="k8s-create-service-button"
-          >
-            Create from manifest
-          </Button>
-        </Link>
-      </Authorized>
-    </div>
-  );
 }

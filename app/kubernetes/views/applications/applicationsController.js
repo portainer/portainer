@@ -79,11 +79,7 @@ class KubernetesApplicationsController {
   }
 
   removeStacksAction(selectedItems) {
-    confirmDelete('Are you sure that you want to remove the selected stack(s) ? This will remove all the applications associated to the stack(s).').then((confirmed) => {
-      if (confirmed) {
-        return this.$async(this.removeStacksActionAsync, selectedItems);
-      }
-    });
+    return this.$async(this.removeStacksActionAsync, selectedItems);
   }
 
   async removeActionAsync(selectedItems) {

@@ -27,12 +27,12 @@ export function DeleteButton({
   'data-cy': dataCy,
   ...props
 }: PropsWithChildren<
-  ConfirmOrClick & {
-    size?: ComponentProps<typeof Button>['size'];
-    disabled?: boolean;
-  }
-> &
-  AutomationTestingProps) {
+  AutomationTestingProps &
+    ConfirmOrClick & {
+      size?: ComponentProps<typeof Button>['size'];
+      disabled?: boolean;
+    }
+>) {
   return (
     <Button
       size={size}

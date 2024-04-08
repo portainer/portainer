@@ -1,5 +1,3 @@
-import { confirmDelete } from '@@/modals/confirm';
-
 angular.module('portainer.docker').controller('VolumesController', [
   '$q',
   '$scope',
@@ -13,28 +11,24 @@ angular.module('portainer.docker').controller('VolumesController', [
   'endpoint',
   function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
     $scope.removeAction = function (selectedItems) {
-      confirmDelete('Do you want to remove the selected volume(s)?').then((confirmed) => {
-        if (confirmed) {
-          var actionCount = selectedItems.length;
-          angular.forEach(selectedItems, function (volume) {
-            HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
-            VolumeService.remove(volume)
-              .then(function success() {
-                Notifications.success('Volume successfully removed', volume.Id);
-                var index = $scope.volumes.indexOf(volume);
-                $scope.volumes.splice(index, 1);
-              })
-              .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to remove volume');
-              })
-              .finally(function final() {
-                --actionCount;
-                if (actionCount === 0) {
-                  $state.reload();
-                }
-              });
+      var actionCount = selectedItems.length;
+      angular.forEach(selectedItems, function (volume) {
+        HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
+        VolumeService.remove(volume)
+          .then(function success() {
+            Notifications.success('Volume successfully removed', volume.Id);
+            var index = $scope.volumes.indexOf(volume);
+            $scope.volumes.splice(index, 1);
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove volume');
+          })
+          .finally(function final() {
+            --actionCount;
+            if (actionCount === 0) {
+              $state.reload();
+            }
           });
-        }
       });
     };
 

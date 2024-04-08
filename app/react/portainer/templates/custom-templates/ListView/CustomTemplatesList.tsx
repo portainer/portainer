@@ -1,4 +1,4 @@
-import { Edit, Plus } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useCallback, useState } from 'react';
 
@@ -9,8 +9,7 @@ import { Table } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { createPersistedStore } from '@@/datatables/types';
 import { DatatableFooter } from '@@/datatables/DatatableFooter';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 
 import { CustomTemplatesListItem } from './CustomTemplatesListItem';
 
@@ -57,14 +56,9 @@ export function CustomTemplatesList({
         title="Custom Templates"
         titleIcon={Edit}
         renderTableActions={() => (
-          <Button
-            as={Link}
-            props={{ to: '.new', 'data-cy': 'add-custom-template-link' }}
-            icon={Plus}
-            data-cy="add-custom-template-button"
-          >
+          <AddButton data-cy="add-custom-template-button">
             Add Custom Template
-          </Button>
+          </AddButton>
         )}
         data-cy="custom-templates-datatable-header"
       />

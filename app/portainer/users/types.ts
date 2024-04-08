@@ -1,4 +1,5 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { AuthorizationMap } from '@/react/portainer/users/RolesView/types';
 
 import { type UserId } from './types/user-id';
 
@@ -15,10 +16,6 @@ export const RoleNames: { [key in Role]: string } = {
   [Role.Standard]: 'user',
   [Role.EdgeAdmin]: 'edge administrator',
 };
-
-interface AuthorizationMap {
-  [authorization: string]: boolean;
-}
 
 export type User = {
   Id: UserId;

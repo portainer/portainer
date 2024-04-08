@@ -6,11 +6,8 @@ import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/Inte
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
-import { ApplicationSettingsPanel } from '@/react/portainer/settings/SettingsView/ApplicationSettingsPanel';
-import { KubeSettingsPanel } from '@/react/portainer/settings/SettingsView/KubeSettingsPanel';
-import { HelmCertPanel } from '@/react/portainer/settings/SettingsView/HelmCertPanel';
-import { HiddenContainersPanel } from '@/react/portainer/settings/SettingsView/HiddenContainersPanel/HiddenContainersPanel';
-import { SSLSettingsPanelWrapper } from '@/react/portainer/settings/SettingsView/SSLSettingsPanel/SSLSettingsPanel';
+import { LDAPUsersTable } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/LDAPUsersTable';
+import { LDAPGroupsTable } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/LDAPGroupsTable';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
@@ -23,20 +20,5 @@ export const settingsModule = angular
     'internalAuth',
     r2a(InternalAuth, ['onSaveSettings', 'isLoading', 'value', 'onChange'])
   )
-  .component(
-    'applicationSettingsPanel',
-    r2a(withReactQuery(ApplicationSettingsPanel), ['onSuccess', 'settings'])
-  )
-  .component(
-    'sslSettingsPanel',
-    r2a(withReactQuery(SSLSettingsPanelWrapper), [])
-  )
-  .component('helmCertPanel', r2a(withReactQuery(HelmCertPanel), []))
-  .component(
-    'hiddenContainersPanel',
-    r2a(withUIRouter(withReactQuery(HiddenContainersPanel)), [])
-  )
-  .component(
-    'kubeSettingsPanel',
-    r2a(withUIRouter(withReactQuery(KubeSettingsPanel)), ['settings'])
-  ).name;
+  .component('ldapUsersDatatable', r2a(LDAPUsersTable, ['dataset']))
+  .component('ldapGroupsDatatable', r2a(LDAPGroupsTable, ['dataset'])).name;

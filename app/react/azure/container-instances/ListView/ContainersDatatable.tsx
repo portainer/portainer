@@ -1,14 +1,13 @@
-import { Box, Plus, Trash2 } from 'lucide-react';
+import { Box } from 'lucide-react';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { Authorized } from '@/react/hooks/useUser';
 
-import { confirmDelete } from '@@/modals/confirm';
 import { Datatable } from '@@/datatables';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { columns } from './columns';
 
@@ -34,43 +33,27 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
       emptyContentLabel="No container available."
       data-cy="containers-datatable"
       renderTableActions={(selectedRows) => (
-        <>
+        <div className="flex gap-2">
           <Authorized authorizations="AzureContainerGroupDelete">
-            <Button
-              color="dangerlight"
+            <DeleteButton
               disabled={selectedRows.length === 0}
-              onClick={() => handleRemoveClick(selectedRows.map((r) => r.id))}
-              icon={Trash2}
               data-cy="remove-containers-button"
-            >
-              Remove
-            </Button>
+              onConfirmed={() =>
+                handleRemoveClick(selectedRows.map((r) => r.id))
+              }
+              confirmMessage="Are you sure you want to delete the selected containers?"
+            />
           </Authorized>
 
           <Authorized authorizations="AzureContainerGroupCreate">
-            <Link
-              to="azure.containerinstances.new"
-              className="space-left"
-              data-cy="add-container-link"
-            >
-              <Button icon={Plus} data-cy="add-container-button">
-                Add container
-              </Button>
-            </Link>
+            <AddButton data-cy="add-container-button">Add container</AddButton>
           </Authorized>
-        </>
+        </div>
       )}
     />
   );
 
   async function handleRemoveClick(containerIds: string[]) {
-    const confirmed = await confirmDelete(
-      'Are you sure you want to delete the selected containers?'
-    );
-    if (!confirmed) {
-      return null;
-    }
-
     return onRemoveClick(containerIds);
   }
 }

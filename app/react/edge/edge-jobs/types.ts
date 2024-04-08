@@ -14,7 +14,7 @@ export interface EdgeJob {
   GroupLogsCollection: Record<EnvironmentId, EndpointMeta>;
 }
 
-enum LogsStatus {
+export enum LogsStatus {
   Idle = 1,
   Pending = 2,
   Collected = 3,
@@ -23,4 +23,10 @@ enum LogsStatus {
 interface EndpointMeta {
   LogsStatus: LogsStatus;
   CollectLogs: boolean;
+}
+
+export interface JobResult {
+  Id: string;
+  EndpointId: EnvironmentId;
+  LogsStatus: LogsStatus;
 }

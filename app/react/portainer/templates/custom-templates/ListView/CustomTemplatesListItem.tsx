@@ -46,7 +46,6 @@ export function CustomTemplatesListItem({
               <Button
                 as={Link}
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                 }}
                 color="secondary"
