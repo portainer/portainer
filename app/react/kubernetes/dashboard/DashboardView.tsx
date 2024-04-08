@@ -34,7 +34,8 @@ export function DashboardView() {
   );
   const { data: services, ...servicesQuery } = useServicesForCluster(
     environmentId,
-    namespaceNames
+    namespaceNames,
+    { lookupApplications: false }
   );
   const { data: ingresses, ...ingressesQuery } = useIngresses(
     environmentId,
