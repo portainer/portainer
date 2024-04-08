@@ -14,18 +14,14 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-// AesEncrypt reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key.
-// The encryption uses AES-256 in GCM mode.
-// The decryption function supports the previous portainer backups which use OFB mode.  New archives
-// will use GCM mode and have a header to indicate the encryption mode.
-// GCM is currently considered the most secure mode for AES encryption (2024)
-
-// The encrypted file header
 const (
-	gcmHeader = "AES256-GCM"
-	blockSize = 1024 * 1024
+	// AES GCM settings
+	aesGcmHeader    = "AES256-GCM" // The encrypted file header
+	aesGcmBlockSize = 1024 * 1024  // 1MB block for aes gcm
 
-	// Optimised for lower memory hardware according to current OWASP recommendations
+	// Argon2 settings
+	// Recommded settings lower memory hardware according to current OWASP recommendations
+	// Considering some people run portainer on a NAS I think it's prudent not to assume we're on server grade hardware
 	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
 	argon2MemoryCost = 12 * 1024
 	argon2TimeCost   = 3
@@ -33,26 +29,44 @@ const (
 	argon2KeyLength  = 32
 )
 
+// AesEncrypt reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
-	return aesEncryptGCM(input, output, passphrase)
-}
-
-func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
-	// Read file metadata to determine how it was encrypted
-	inputReader := bufio.NewReader(input)
-	header, err := inputReader.Peek(len(gcmHeader))
+	err := aesEncryptGCM(input, output, passphrase)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("error encrypting file: %w", err)
 	}
 
-	if string(header) == gcmHeader {
-		return aesDecryptGCM(inputReader, passphrase)
-	}
-
-	// For backward compatibility. Read previous encrypted archives that have no header
-	return aesDecryptOFB(inputReader, passphrase)
+	return nil
 }
 
+// AesDecrypt reads from input, decrypts with AES-256 and returns the reader to read the decrypted content from
+func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
+	// Read file header to determine how it was encrypted
+	inputReader := bufio.NewReader(input)
+	header, err := inputReader.Peek(len(aesGcmHeader))
+	if err != nil {
+		return nil, fmt.Errorf("error reading encrypted backup file header: %w", err)
+	}
+
+	if string(header) == aesGcmHeader {
+		reader, err := aesDecryptGCM(inputReader, passphrase)
+		if err != nil {
+			return nil, fmt.Errorf("error decrypting file: %w", err)
+		}
+
+		return reader, nil
+	}
+
+	// Use the previous decryption routine which has no header (to support older archives)
+	reader, err := aesDecryptOFB(inputReader, passphrase)
+	if err != nil {
+		return nil, fmt.Errorf("error decrypting legacy file backup: %w", err)
+	}
+
+	return reader, nil
+}
+
+// aesEncryptGCM reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key.
 func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	// Derive key using argon2 with a random salt
 	salt := make([]byte, 16) // 16 bytes salt
@@ -68,17 +82,17 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return fmt.Errorf("error creating gcm cypher: %w", err)
+		return err
 	}
 
 	// Generate nonce
 	nonce, err := NewRandomNonce(aesgcm.NonceSize())
 	if err != nil {
-		return fmt.Errorf("error generating nonce: %w", err)
+		return err
 	}
 
 	// write the header
-	if _, err := output.Write([]byte(gcmHeader)); err != nil {
+	if _, err := output.Write([]byte(aesGcmHeader)); err != nil {
 		return err
 	}
 
@@ -91,7 +105,7 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	}
 
 	// Buffer for reading plaintext blocks
-	buf := make([]byte, blockSize) // Adjust buffer size as needed
+	buf := make([]byte, aesGcmBlockSize) // Adjust buffer size as needed
 	ciphertext := make([]byte, len(buf)+aesgcm.Overhead())
 
 	// Encrypt plaintext in blocks
@@ -108,7 +122,6 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 		// Seal encrypts the plaintext using the nonce returning the updated slice.
 		ciphertext = aesgcm.Seal(ciphertext[:0], nonce.Value(), buf[:n], nil)
 
-		// Write ciphertext to output
 		_, err = output.Write(ciphertext)
 		if err != nil {
 			return err
@@ -120,14 +133,15 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 	return nil
 }
 
+// aesDecryptGCM reads from input, decrypts with AES-256 and returns the reader to read the decrypted content from.
 func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
-	// Reader header
-	header := make([]byte, len(gcmHeader))
+	// Reader & verify header
+	header := make([]byte, len(aesGcmHeader))
 	if _, err := io.ReadFull(input, header); err != nil {
 		return nil, err
 	}
 
-	if string(header) != gcmHeader {
+	if string(header) != aesGcmHeader {
 		return nil, fmt.Errorf("invalid header")
 	}
 
@@ -159,12 +173,12 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 
 	// Initialize a buffer to store decrypted data
 	buf := bytes.Buffer{}
-	plaintext := make([]byte, blockSize)
+	plaintext := make([]byte, aesGcmBlockSize)
 
 	// Decrypt the ciphertext in blocks
 	for {
 		// Read a block of ciphertext from the input reader
-		ciphertextBlock := make([]byte, blockSize+aesgcm.Overhead()) // Adjust block size as needed
+		ciphertextBlock := make([]byte, aesGcmBlockSize+aesgcm.Overhead()) // Adjust block size as needed
 		n, err := io.ReadFull(input, ciphertextBlock)
 		if n == 0 {
 			break // end of ciphertext
@@ -180,7 +194,6 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 			return nil, fmt.Errorf("error decrypting block: %w", err)
 		}
 
-		// Write the decrypted plaintext to the buffer
 		_, err = buf.Write(plaintext)
 		if err != nil {
 			return nil, err
@@ -194,6 +207,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 
 // aesDecryptOFB reads from input, decrypts with AES-256 and returns the reader to a read decrypted content from.
 // passphrase is used to generate an encryption key.
+// note: This function used to decrypt files that were encrypted without a header i.e. old archives
 func aesDecryptOFB(input io.Reader, passphrase []byte) (io.Reader, error) {
 	var emptySalt []byte = make([]byte, 0)
 
