@@ -9,7 +9,16 @@ export default {
     type: {
       control: {
         type: 'select',
-        options: ['success', 'danger', 'warn', 'info'],
+        options: [
+          'success',
+          'danger',
+          'warn',
+          'info',
+          'successSecondary',
+          'dangerSecondary',
+          'warnSecondary',
+          'infoSecondary',
+        ],
       },
     },
   },

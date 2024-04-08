@@ -7,13 +7,17 @@ import { InputGroup } from '@@/form-components/InputGroup';
 
 import { Namespace } from './types';
 
-function transformNamespaces(namespaces: Namespace[], showSystem: boolean) {
-  return namespaces
-    .filter((ns) => showSystem || !ns.IsSystem)
-    .map(({ Name, IsSystem }) => ({
-      label: IsSystem ? `${Name} - system` : Name,
-      value: Name,
-    }));
+function transformNamespaces(namespaces: Namespace[], showSystem?: boolean) {
+  const transformedNamespaces = namespaces.map(({ Name, IsSystem }) => ({
+    label: IsSystem ? `${Name} - system` : Name,
+    value: Name,
+    isSystem: IsSystem,
+  }));
+  if (showSystem === undefined) {
+    return transformedNamespaces;
+  }
+  // only filter when showSystem is set
+  return transformedNamespaces.filter((ns) => showSystem || !ns.isSystem);
 }
 
 export function NamespaceFilter({
@@ -25,19 +29,22 @@ export function NamespaceFilter({
   namespaces: Namespace[];
   value: string;
   onChange: (value: string) => void;
-  showSystem: boolean;
+  showSystem?: boolean;
 }) {
   const transformedNamespaces = transformNamespaces(namespaces, showSystem);
 
   // sync value with displayed namespaces
   useEffect(() => {
     const names = transformedNamespaces.map((ns) => ns.value);
-    if (value && !names.find((ns) => ns === value)) {
-      onChange(
-        names.length > 0 ? names.find((ns) => ns === 'default') || names[0] : ''
-      );
+    const isSelectedNamespaceFound = names.some((ns) => ns === value);
+    if (value && !isSelectedNamespaceFound) {
+      const newNamespaceValue =
+        names.length > 0
+          ? names.find((ns) => ns === 'default') || names[0]
+          : '';
+      onChange(newNamespaceValue);
     }
-  }, [value, onChange, transformedNamespaces]);
+  }, [value, onChange, transformedNamespaces, showSystem]);
 
   return (
     <InputGroup>

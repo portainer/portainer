@@ -137,5 +137,5 @@ angular.module('portainer.docker').controller('DashboardController', [
 ]);
 
 function imagesTotalSize(images) {
-  return images.reduce((acc, image) => acc + image.VirtualSize, 0);
+  return images.reduce((acc, image) => acc + image.Size, 0);
 }

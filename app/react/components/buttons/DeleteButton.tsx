@@ -7,19 +7,31 @@ import { confirmDelete } from '@@/modals/confirm';
 
 import { Button } from './Button';
 
+type ConfirmOrClick =
+  | {
+      confirmMessage: ReactNode;
+      onConfirmed(): Promise<void> | void;
+      onClick?: never;
+    }
+  | {
+      confirmMessage?: never;
+      onConfirmed?: never;
+      /** if onClick is set, will skip confirmation (confirmation should be done on the parent) */
+      onClick(): void;
+    };
+
 export function DeleteButton({
   disabled,
-  confirmMessage,
-  onConfirmed,
   size,
   children,
   'data-cy': dataCy,
-}: PropsWithChildren<{
-  size?: ComponentProps<typeof Button>['size'];
-  disabled?: boolean;
-  confirmMessage: ReactNode;
-  onConfirmed(): Promise<void> | void;
-}> &
+  ...props
+}: PropsWithChildren<
+  ConfirmOrClick & {
+    size?: ComponentProps<typeof Button>['size'];
+    disabled?: boolean;
+  }
+> &
   AutomationTestingProps) {
   return (
     <Button
@@ -36,6 +48,11 @@ export function DeleteButton({
   );
 
   async function handleClick() {
+    const { confirmMessage, onConfirmed, onClick } = props;
+    if (onClick) {
+      return onClick();
+    }
+
     if (!(await confirmDelete(confirmMessage))) {
       return undefined;
     }

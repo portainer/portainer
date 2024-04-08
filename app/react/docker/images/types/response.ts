@@ -10,6 +10,5 @@ export type DockerImageResponse = {
   RepoTags: string[];
   SharedSize: number;
   Size: number;
-  VirtualSize: number;
   Portainer?: PortainerMetadata;
 };

@@ -77,14 +77,12 @@ export function ApplicationsStacksDatatable({
               namespaces={namespaces}
               value={namespace}
               onChange={onNamespaceChange}
-              showSystem={tableState.showSystemResources}
+              showSystem={showSystem}
             />
           </div>
 
           <div className="space-y-2">
-            <SystemResourceDescription
-              showSystemResources={tableState.showSystemResources}
-            />
+            <SystemResourceDescription showSystemResources={showSystem} />
           </div>
         </div>
       }

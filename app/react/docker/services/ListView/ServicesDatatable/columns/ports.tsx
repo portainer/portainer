@@ -3,6 +3,7 @@ import { CellContext } from '@tanstack/react-table';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
+import { getSchemeFromPort } from '@/react/common/network-utils';
 
 import { Icon } from '@@/Icon';
 
@@ -40,16 +41,20 @@ function Cell({
 
   return ports
     .filter((port) => port.PublishedPort)
-    .map((port) => (
-      <a
-        key={`${publicUrl}:${port.PublishedPort}`}
-        className="image-tag vertical-center"
-        href={`http://${publicUrl}:${port.PublishedPort}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <Icon icon={ExternalLink} />
-        {port.PublishedPort}:{port.TargetPort}
-      </a>
-    ));
+    .map((port) => {
+      const scheme = getSchemeFromPort(port.TargetPort);
+
+      return (
+        <a
+          key={`${publicUrl}:${port.PublishedPort}`}
+          className="image-tag vertical-center"
+          href={`${scheme}://${publicUrl}:${port.PublishedPort}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Icon icon={ExternalLink} />
+          {port.PublishedPort}:{port.TargetPort}
+        </a>
+      );
+    });
 }

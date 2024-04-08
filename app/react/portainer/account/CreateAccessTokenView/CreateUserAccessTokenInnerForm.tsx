@@ -6,7 +6,11 @@ import { LoadingButton } from '@@/buttons';
 
 import { ApiKeyFormValues } from './types';
 
-export function CreateUserAccessTokenInnerForm() {
+interface Props {
+  showAuthentication: boolean;
+}
+
+export function CreateUserAccessTokenInnerForm({ showAuthentication }: Props) {
   const { errors, values, handleSubmit, isValid, dirty } =
     useFormikContext<ApiKeyFormValues>();
 
@@ -16,21 +20,23 @@ export function CreateUserAccessTokenInnerForm() {
       onSubmit={handleSubmit}
       autoComplete="off"
     >
-      <FormControl
-        inputId="password"
-        label="Current password"
-        required
-        errors={errors.password}
-      >
-        <Field
-          as={Input}
-          type="password"
-          id="password"
-          name="password"
-          value={values.password}
-          autoComplete="new-password"
-        />
-      </FormControl>
+      {showAuthentication && (
+        <FormControl
+          inputId="password"
+          label="Current password"
+          required
+          errors={errors.password}
+        >
+          <Field
+            as={Input}
+            type="password"
+            id="password"
+            name="password"
+            value={values.password}
+            autoComplete="new-password"
+          />
+        </FormControl>
+      )}
       <FormControl
         inputId="description"
         label="Description"

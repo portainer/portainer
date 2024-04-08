@@ -19,6 +19,7 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
             icon={table.getIsAllRowsExpanded() ? ChevronDown : ChevronUp}
             title="Expand all"
             data-cy="expand-all-rows-button"
+            aria-label="Expand all rows"
           />
         )
       );
@@ -36,12 +37,13 @@ export function buildExpandColumn<T extends DefaultType>(): ColumnDef<T> {
           icon={row.getIsExpanded() ? ChevronDown : ChevronUp}
           title={row.getIsExpanded() ? 'Collapse' : 'Expand'}
           data-cy={`expand-row-button_${row.index}`}
+          aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
+          aria-expanded={row.getIsExpanded()}
         />
       ),
     enableColumnFilter: false,
     enableGlobalFilter: false,
     enableHiding: false,
-
     meta: {
       width: 40,
     },

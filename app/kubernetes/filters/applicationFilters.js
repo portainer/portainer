@@ -1,13 +1,11 @@
-import _ from 'lodash-es';
+import { cpuHumanValue } from '@/react/kubernetes/applications/utils/cpuHumanValue';
 import { nodeAffinityValues } from './application';
 
 angular
   .module('portainer.kubernetes')
   .filter('kubernetesApplicationCPUValue', function () {
     'use strict';
-    return function (value) {
-      return _.round(value, 2);
-    };
+    return cpuHumanValue;
   })
   .filter('kubernetesApplicationDataAccessPolicyIcon', function () {
     'use strict';
