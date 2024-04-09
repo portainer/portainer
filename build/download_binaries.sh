@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if ! [ -x "$(command -v jq)" ]; then
-  echo 'Error: jq is not installed. Get it here: https://stedolan.github.io/jq/download/' >&2
+  echo 'Error: jq is not installed. Get it here: https://jqlang.github.io/jq/download/' >&2
   exit 1
 fi
 
