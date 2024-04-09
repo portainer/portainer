@@ -191,7 +191,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 		// Decrypt the block of ciphertext
 		plaintext, err = aesgcm.Open(plaintext[:0], nonce.Value(), ciphertextBlock[:n], nil)
 		if err != nil {
-			return nil, fmt.Errorf("error decrypting block: %w", err)
+			return nil, err
 		}
 
 		_, err = buf.Write(plaintext)
