@@ -22,7 +22,7 @@ export const queryKeys = {
 export function useServicesForCluster(
   environmentId: EnvironmentId,
   namespaceNames?: string[],
-  options?: { autoRefreshRate?: number, lookupApplications?: boolean }
+  options?: { autoRefreshRate?: number; lookupApplications?: boolean }
 ) {
   return useQuery(
     queryKeys.clusterServices(environmentId),
