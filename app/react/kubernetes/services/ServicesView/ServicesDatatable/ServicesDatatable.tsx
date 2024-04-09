@@ -42,6 +42,7 @@ export function ServicesDatatable() {
     namespaceNames,
     {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
+      lookupApplications: true,
     }
   );
 

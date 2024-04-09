@@ -22,7 +22,7 @@ export const queryKeys = {
 export function useServicesForCluster(
   environmentId: EnvironmentId,
   namespaceNames?: string[],
-  options?: { autoRefreshRate?: number; lookupApplications?: boolean }
+  options?: { autoRefreshRate?: number, lookupApplications?: boolean }
 ) {
   return useQuery(
     queryKeys.clusterServices(environmentId),
@@ -32,11 +32,7 @@ export function useServicesForCluster(
       }
       const settledServicesPromise = await Promise.allSettled(
         namespaceNames.map((namespace) =>
-          getServices(
-            environmentId,
-            namespace,
-            options?.lookupApplications ?? true
-          )
+          getServices(environmentId, namespace, options?.lookupApplications)
         )
       );
       return compact(
@@ -91,7 +87,7 @@ export function useMutationDeleteServices(environmentId: EnvironmentId) {
 export async function getServices(
   environmentId: EnvironmentId,
   namespace: string,
-  lookupApplications: boolean
+  lookupApplications?: boolean
 ) {
   try {
     const { data: services } = await axios.get<Array<Service>>(
