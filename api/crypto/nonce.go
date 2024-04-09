@@ -15,6 +15,8 @@ func NewNonce(size int) *Nonce {
 }
 
 // NewRandomNonce generates a new initial nonce with the lower byte set to a random value
+// This ensures there are plenty of nonce values availble before rolling over
+// Based on ideas from the Secure Programming Cookbook for C and C++ by John Viega, Matt Messier
 // https://www.oreilly.com/library/view/secure-programming-cookbook/0596003943/ch04s09.html
 func NewRandomNonce(size int) (*Nonce, error) {
 	randomBytes := 1
