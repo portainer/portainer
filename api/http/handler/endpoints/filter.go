@@ -19,8 +19,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const edgeIntervalUseDefault = -1
-
 type EnvironmentsQuery struct {
 	search           string
 	types            []portainer.EndpointType
@@ -637,6 +635,7 @@ func getEdgeStackStatusParam(r *http.Request) (*portainer.EdgeStackStatusType, e
 }
 
 func getShortestAsyncInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
+	var edgeIntervalUseDefault int = -1
 	pingInterval := endpoint.Edge.PingInterval
 	if pingInterval == edgeIntervalUseDefault {
 		pingInterval = settings.Edge.PingInterval
