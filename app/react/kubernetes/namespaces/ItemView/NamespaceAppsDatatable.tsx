@@ -11,7 +11,7 @@ import {
 } from '@@/datatables/types';
 
 import { NamespaceApp } from './types';
-import { columns } from './columns';
+import { useColumns } from './columns';
 
 interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
 
@@ -32,6 +32,7 @@ export function NamespaceAppsDatatable({
     })
   );
   useRepeater(tableState.autoRefreshRate, onRefresh);
+  const columns = useColumns();
 
   return (
     <Datatable

@@ -24,7 +24,6 @@ export function NodeApplicationsDatatable({
   onRefresh: () => void;
   isLoading: boolean;
 }) {
-  const columns = useColumns(true);
   const tableState = useTableStateWithStorage<TableSettings>(
     'kube-node-apps',
     'Name',
@@ -33,6 +32,8 @@ export function NodeApplicationsDatatable({
     })
   );
   useRepeater(tableState.autoRefreshRate, onRefresh);
+
+  const columns = useColumns();
 
   return (
     <Datatable
