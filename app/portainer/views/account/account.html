@@ -88,18 +88,6 @@
 
 <application-settings-widget></application-settings-widget>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <access-tokens-datatable
-      title-text="Access tokens"
-      title-icon="key"
-      dataset="tokens"
-      table-key="tokens"
-      order-by="Description"
-      remove-action="removeAction"
-      ui-can-exit="uiCanExit"
-    ></access-tokens-datatable>
-  </div>
-</div>
+<access-tokens-datatable ui-can-exit="uiCanExit()"></access-tokens-datatable>
 
 <helm-repository-datatable></helm-repository-datatable>

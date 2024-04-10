@@ -615,24 +615,6 @@ input[type='checkbox'] {
   font-weight: 600;
 }
 
-/* json-tree override */
-json-tree {
-  font-size: 13px;
-  color: var(--blue-5);
-}
-
-json-tree .key {
-  color: var(--blue-3);
-  padding-right: 5px;
-}
-
-json-tree .branch-preview {
-  font-style: normal;
-  font-size: 11px;
-  opacity: 0.5;
-}
-/* !json-tree override */
-
 /* uib-progressbar override */
 .progress-bar {
   color: var(--text-progress-bar-color);

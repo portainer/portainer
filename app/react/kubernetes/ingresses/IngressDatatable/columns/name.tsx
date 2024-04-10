@@ -2,8 +2,8 @@ import { CellContext } from '@tanstack/react-table';
 
 import { Authorized } from '@/react/hooks/useUser';
 
+import { SystemBadge } from '@@/Badge/SystemBadge';
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
 
 import { Ingress } from '../../types';
 
@@ -20,7 +20,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
   const namespace = row.original.Namespace;
 
   return (
-    <div className="flex flex-nowrap whitespace-nowrap">
+    <div className="flex flex-nowrap whitespace-nowrap gap-2">
       <Authorized authorizations="K8sIngressesW" childrenUnauthorized={name}>
         <Link
           to="kubernetes.ingresses.edit"
@@ -35,11 +35,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
           {name}
         </Link>
       </Authorized>
-      {row.original.IsSystem && (
-        <Badge type="success" className="ml-2">
-          System
-        </Badge>
-      )}
+      {row.original.IsSystem && <SystemBadge />}
     </div>
   );
 }

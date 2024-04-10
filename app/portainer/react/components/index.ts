@@ -8,7 +8,6 @@ import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsB
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
-import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import {
@@ -48,6 +47,7 @@ import { environmentsModule } from './environments';
 import { registriesModule } from './registries';
 import { accountModule } from './account';
 import { usersModule } from './users';
+import { activityLogsModule } from './activity-logs';
 
 export const ngModule = angular
   .module('portainer.app.react.components', [
@@ -59,6 +59,7 @@ export const ngModule = angular
     settingsModule,
     accountModule,
     usersModule,
+    activityLogsModule,
   ])
   .component(
     'tagSelector',
@@ -241,13 +242,6 @@ export const ngModule = angular
   .component(
     'associatedEndpointsSelector',
     r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
-  )
-  .component(
-    'helmRepositoryDatatable',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(HelmRepositoryDatatable))),
-      []
-    )
   );
 
 export const componentsModule = ngModule.name;
