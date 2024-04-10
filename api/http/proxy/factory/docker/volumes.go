@@ -8,6 +8,7 @@ import (
 	"path"
 
 	"github.com/docker/docker/client"
+	"github.com/rs/zerolog/log"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
@@ -48,6 +49,14 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
+		if transport.snapshotService != nil {
+			// Filling snapshot data can improve the performance of getVolumeResourceID
+			if err = transport.snapshotService.FillSnapshotData(transport.endpoint); err != nil {
+				log.Info().Err(err).
+					Int("endpoint id", int(transport.endpoint.ID)).
+					Msg("snapshot is not filled into the endpoint.")
+			}
+		}
 		for _, volumeObject := range volumeData {
 			volume := volumeObject.(map[string]interface{})
 
