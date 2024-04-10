@@ -46,6 +46,7 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "Stack not found"
+// @failure 409 "A stack with the same name is already running on the target environment(endpoint)"
 // @failure 500 "Server error"
 // @router /stacks/{id}/migrate [post]
 func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
