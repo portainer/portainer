@@ -10,13 +10,14 @@ import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { GlobalDeploymentOptions } from '@/react/portainer/settings/types';
 
 import { DetailsTable } from '@@/DetailsTable';
-import { Badge } from '@@/Badge';
 import { Link } from '@@/Link';
 import { LoadingButton } from '@@/buttons';
 import { WidgetBody, Widget } from '@@/Widget';
 import { InlineLoader } from '@@/InlineLoader';
 import { Icon } from '@@/Icon';
 import { Note } from '@@/Note';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
+import { SystemBadge } from '@@/Badge/SystemBadge';
 
 import {
   appStackNameLabel,
@@ -127,7 +128,7 @@ export function ApplicationSummaryWidget() {
                       >
                         {name}
                         {externalApplication && !isSystemNamespace && (
-                          <Badge type="info">external</Badge>
+                          <ExternalBadge />
                         )}
                       </div>
                     </td>
@@ -156,7 +157,7 @@ export function ApplicationSummaryWidget() {
                         >
                           {namespace}
                         </Link>
-                        {isSystemNamespace && <Badge type="info">system</Badge>}
+                        {isSystemNamespace && <SystemBadge />}
                       </div>
                     </td>
                   </tr>
