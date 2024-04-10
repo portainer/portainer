@@ -19,7 +19,7 @@ import (
 // @param webhookID path string true "Stack identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
-// @failure 409 "Conflict"
+// @failure 409 "Autoupdate for the stack isn't available"
 // @failure 500 "Server error"
 // @router /stacks/webhooks/{webhookID} [post]
 func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
