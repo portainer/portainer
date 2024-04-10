@@ -8,6 +8,7 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/pendingactions"
+	"github.com/portainer/portainer/api/pendingactions/actions"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -91,7 +92,7 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 			if len(failedNamespaces) > 0 {
 				handler.PendingActionsService.Create(portainer.PendingActions{
 					EndpointID: endpointId,
-					Action:     pendingactions.DeletePortainerK8sRegistrySecrets,
+					Action:     actions.DeletePortainerK8sRegistrySecrets,
 
 					// When extracting the data, this is the type we need to pull out
 					// i.e. pendingactions.DeletePortainerK8sRegistrySecretsData
