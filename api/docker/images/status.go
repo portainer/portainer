@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	portainer "github.com/portainer/portainer/api"
 	consts "github.com/portainer/portainer/api/docker/consts"
@@ -157,7 +158,7 @@ func (c *DigestClient) ServiceImageStatus(ctx context.Context, serviceID string,
 		return Error, nil
 	}
 
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
 		All:     true,
 		Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIdLabel+"="+serviceID)),
 	})
