@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	_container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
@@ -147,7 +148,7 @@ func snapshotSwarmServices(snapshot *portainer.DockerSnapshot, cli *client.Clien
 }
 
 func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return err
 	}

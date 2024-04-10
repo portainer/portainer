@@ -13,7 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/segmentio/encoding/json"
 )
@@ -159,7 +159,7 @@ func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error)
 	resp.Body = io.NopCloser(bytes.NewReader(body))
 
 	var rs []struct {
-		types.ImageSummary
+		image.Summary
 		Portainer struct {
 			Agent struct {
 				NodeName string

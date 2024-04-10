@@ -3,7 +3,7 @@ package datastore
 import (
 	"context"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
@@ -86,7 +86,7 @@ func (migrator *PostInitMigrator) PostInitMigrateGPUs() {
 			defer dockerClient.Close()
 
 			// get all containers
-			containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+			containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
 			if err != nil {
 				log.Err(err).Msg("failed to list containers")
 				return
