@@ -3,13 +3,12 @@ import { genericHandler } from './response/handlers';
 angular.module('portainer.docker').factory('Exec', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
-  'EndpointProvider',
-  function ExecFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function ExecFactory($resource, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/exec/:id/:action',
+      API_ENDPOINT_ENDPOINTS + '/:environmentId/docker/exec/:id/:action',
       {
-        endpointId: EndpointProvider.endpointID,
+        environmentId: '@environmentId',
       },
       {
         resize: {
