@@ -43,30 +43,28 @@ func NewPostInitMigrator(
 
 // PostInitMigrate will run all post-init migrations, which require docker/kube clients for all edge or non-edge environments
 func (postInitMigrator *PostInitMigrator) PostInitMigrate() error {
-	log.Info().Msg("running post-init migrations")
 	environments, err := postInitMigrator.dataStore.Endpoint().Endpoints()
 	if err != nil {
-		log.Error().Err(err).Msg("failure getting environments")
+		log.Error().Err(err).Msg("Error getting environments")
 		return err
 	}
 
 	for _, environment := range environments {
 		// edge environments will run after the server starts, in pending actions
 		if endpointutils.IsEdgeEndpoint(&environment) {
-			log.Debug().Msgf("Adding pending 'PostInitMigrateEnvironment' action for environment %d", environment.ID)
+			log.Info().Msgf("Adding pending action 'PostInitMigrateEnvironment' for environment %d", environment.ID)
 			err = postInitMigrator.createPostInitMigrationPendingAction(environment.ID)
 			if err != nil {
 				log.Error().Err(err).Msgf("Error creating pending action for environment %d", environment.ID)
 			}
-			continue
+		} else {
+			// non-edge environments will run before the server starts.
+			err = postInitMigrator.MigrateEnvironment(&environment)
+			if err != nil {
+				log.Error().Err(err).Msgf("Error running post-init migrations for non-edge environment %d", environment.ID)
+			}
 		}
 
-		// non-edge environments will run before the server starts.
-		log.Debug().Msgf("Running post-init migrations for environment %d", environment.ID)
-		err = postInitMigrator.MigrateEnvironment(&environment)
-		if err != nil {
-			log.Error().Err(err).Msgf("Error running post-init migrations for non-edge environment %d", environment.ID)
-		}
 	}
 
 	return nil
@@ -89,7 +87,9 @@ func (postInitMigrator *PostInitMigrator) createPostInitMigrationPendingAction(e
 		return fmt.Errorf("failed to retrieve pending actions for environment %d: %w", environmentID, err)
 	}
 	for _, pendingAction := range pendingActions {
-		if pendingAction.EndpointID == environmentID && pendingAction.Action == migrateEnvPendingAction.Action && reflect.DeepEqual(pendingAction.ActionData, migrateEnvPendingAction.ActionData) {
+		if pendingAction.EndpointID == environmentID &&
+			pendingAction.Action == migrateEnvPendingAction.Action &&
+			reflect.DeepEqual(pendingAction.ActionData, migrateEnvPendingAction.ActionData) {
 			filteredPendingActions = append(filteredPendingActions, pendingAction)
 		}
 	}
@@ -131,8 +131,6 @@ func (migrator *PostInitMigrator) MigrateEnvironment(environment *portainer.Endp
 		}
 		defer dockerClient.Close()
 		migrator.MigrateGPUs(*environment, dockerClient)
-	default:
-		log.Debug().Msgf("Skipping post-init migrations for environment %d", environment.ID)
 	}
 
 	return nil
