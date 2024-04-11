@@ -39,6 +39,7 @@ function RoleCell({
           color="none"
           icon={Edit}
           onClick={() => meta.roles.setRolesValue(item.Id, type, item.Role.Id)}
+          data-cy="edit-role-button"
         >
           Edit
         </Button>
@@ -71,11 +72,18 @@ function RollEdit({
   return (
     <div className="flex items-center gap-3 max-w-xs">
       <Select
+        aria-label="Role"
+        data-cy="role-select"
         value={value}
         options={rolesQuery.data}
         onChange={(e) => onChange(parseInt(e.target.value, 10))}
       />
-      <Button color="none" icon={X} onClick={() => onChange()} />
+      <Button
+        color="none"
+        icon={X}
+        onClick={() => onChange()}
+        data-cy="cancel-role-button"
+      />
     </div>
   );
 }

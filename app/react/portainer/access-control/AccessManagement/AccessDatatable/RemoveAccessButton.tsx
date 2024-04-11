@@ -14,6 +14,7 @@ export function RemoveAccessButton({
       confirmMessage="Are you sure you want to unauthorized the selected users or teams?"
       onConfirmed={() => onClick(items)}
       disabled={items.length === 0}
+      data-cy="remove-access-button"
     />
   );
 }

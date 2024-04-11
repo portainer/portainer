@@ -24,6 +24,7 @@ export function NamespaceAccessDatatable({
 
   return (
     <Datatable
+      data-cy="kube-namespace-access-datatable"
       title="Namespace Access"
       titleIcon={UserX}
       dataset={dataset || []}

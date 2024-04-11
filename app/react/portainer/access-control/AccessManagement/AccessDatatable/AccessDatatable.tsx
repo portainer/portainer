@@ -48,6 +48,7 @@ export function AccessDatatable({
 
   return (
     <Datatable
+      data-cy="access-datatable"
       title="Access"
       titleIcon={UserX}
       dataset={dataset || []}
@@ -66,6 +67,7 @@ export function AccessDatatable({
 
           {isBE && isUpdateEnabled && (
             <Button
+              data-cy="update-access-button"
               icon={Check}
               disabled={rolesState.count === 0}
               onClick={handleUpdate}
