@@ -101,11 +101,6 @@ export function InnerForm({
                               setFieldValue('volumes', value)
                             }
                             errors={errors.volumes}
-                            allowBindMounts={
-                              isEnvironmentAdminQuery.authorized ||
-                              environment.SecuritySettings
-                                .allowBindMountsForRegularUsers
-                            }
                           />
                         ),
                       },

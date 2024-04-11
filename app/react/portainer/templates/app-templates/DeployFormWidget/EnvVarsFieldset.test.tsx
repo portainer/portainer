@@ -15,14 +15,13 @@ test('renders EnvVarsFieldset component', () => {
     { name: 'VAR2', label: 'Variable 2', preset: false },
   ] as const;
   const value = { VAR1: 'Value 1', VAR2: 'Value 2' };
-  const errors = {};
 
   render(
     <EnvVarsFieldset
       onChange={onChange}
       options={[...options]}
-      value={value}
-      errors={errors}
+      values={value}
+      errors={{}}
     />
   );
 
@@ -40,14 +39,13 @@ test('calls onChange when input value changes', async () => {
   const onChange = vi.fn();
   const options = [{ name: 'VAR1', label: 'Variable 1', preset: false }];
   const value = { VAR1: 'Value 1' };
-  const errors = {};
 
   render(
     <EnvVarsFieldset
       onChange={onChange}
       options={options}
-      value={value}
-      errors={errors}
+      values={value}
+      errors={{}}
     />
   );
 
@@ -63,15 +61,14 @@ test('calls onChange when input value changes', async () => {
 test('renders error message when there are errors', () => {
   const onChange = vi.fn();
   const options = [{ name: 'VAR1', label: 'Variable 1', preset: false }];
-  const value = { VAR1: 'Value 1' };
-  const errors = { VAR1: 'Required' };
+  const value = { VAR1: '' };
 
   render(
     <EnvVarsFieldset
       onChange={onChange}
       options={options}
-      value={value}
-      errors={errors}
+      values={value}
+      errors={{ VAR1: 'Required' }}
     />
   );
 
@@ -104,7 +101,10 @@ test('returns default values', () => {
 });
 
 test('validates env vars fieldset', () => {
-  const schema = envVarsFieldsetValidation();
+  const schema = envVarsFieldsetValidation([
+    { name: 'VAR1' },
+    { name: 'VAR2' },
+  ]);
 
   const validData = { VAR1: 'Value 1', VAR2: 'Value 2' };
   const invalidData = { VAR1: '', VAR2: 'Value 2' };

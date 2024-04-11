@@ -18,7 +18,7 @@ export function Item({
   error,
   index,
 }: ItemProps<Volume>) {
-  const allowBindMounts = useInputContext();
+  const { allowBindMounts, allowAuto } = useInputContext();
 
   return (
     <div>
@@ -61,6 +61,7 @@ export function Item({
               value={volume.name}
               onChange={(name) => setValue({ name })}
               inputId={`volume-${index}`}
+              allowAuto={allowAuto}
             />
           </InputGroup>
         )}

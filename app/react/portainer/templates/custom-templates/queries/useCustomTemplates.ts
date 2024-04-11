@@ -30,7 +30,7 @@ export function useCustomTemplates<T = Array<CustomTemplate>>({
   });
 }
 
-async function getCustomTemplates({ type, edge = false }: Params = {}) {
+async function getCustomTemplates({ type, edge }: Params = {}) {
   try {
     const { data } = await axios.get<CustomTemplate[]>(buildUrl(), {
       params: {

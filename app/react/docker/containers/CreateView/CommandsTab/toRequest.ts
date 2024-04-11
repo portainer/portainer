@@ -40,30 +40,30 @@ export function toRequest(
   }
 
   return config;
+}
 
-  function getConsoleConfig(value: ConsoleSetting): ConsoleConfig {
-    switch (value) {
-      case 'both':
-        return { OpenStdin: true, Tty: true };
-      case 'interactive':
-        return { OpenStdin: true, Tty: false };
-      case 'tty':
-        return { OpenStdin: false, Tty: true };
-      case 'none':
-      default:
-        return { OpenStdin: false, Tty: false };
-    }
+export function getConsoleConfig(value: ConsoleSetting): ConsoleConfig {
+  switch (value) {
+    case 'both':
+      return { OpenStdin: true, Tty: true };
+    case 'interactive':
+      return { OpenStdin: true, Tty: false };
+    case 'tty':
+      return { OpenStdin: false, Tty: true };
+    case 'none':
+    default:
+      return { OpenStdin: false, Tty: false };
   }
+}
 
-  function getLogConfig(
-    value: LogConfig
-  ): CreateContainerRequest['HostConfig']['LogConfig'] {
-    return {
-      Type: value.type,
-      Config: Object.fromEntries(
-        value.options.map(({ option, value }) => [option, value])
-      ),
-      // docker types - requires union while it should allow also custom string for custom plugins
-    } as CreateContainerRequest['HostConfig']['LogConfig'];
-  }
+function getLogConfig(
+  value: LogConfig
+): CreateContainerRequest['HostConfig']['LogConfig'] {
+  return {
+    Type: value.type,
+    Config: Object.fromEntries(
+      value.options.map(({ option, value }) => [option, value])
+    ),
+    // docker types - requires union while it should allow also custom string for custom plugins
+  } as CreateContainerRequest['HostConfig']['LogConfig'];
 }

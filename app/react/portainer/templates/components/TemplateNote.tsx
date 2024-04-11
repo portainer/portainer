@@ -1,16 +1,18 @@
 import sanitize from 'sanitize-html';
 
-export function TemplateNote({ note }: { note: string | undefined }) {
+import { FormSection } from '@@/form-components/FormSection';
+
+export function TemplateNote({ note }: { note?: string }) {
   if (!note) {
     return null;
   }
+
   return (
-    <div>
-      <div className="col-sm-12 form-section-title"> Information </div>
+    <FormSection title="Information">
       <div className="form-group">
         <div className="col-sm-12">
           <div
-            className="template-note"
+            className="text-xs"
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: sanitize(note),
@@ -18,6 +20,6 @@ export function TemplateNote({ note }: { note: string | undefined }) {
           />
         </div>
       </div>
-    </div>
+    </FormSection>
   );
 }

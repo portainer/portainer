@@ -228,6 +228,8 @@ class CustomTemplatesViewController {
       const variables = getVariablesFieldDefaultValues(template.Variables);
       this.onChangeTemplateVariables(variables);
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getNetworks(provider, apiVersion) {

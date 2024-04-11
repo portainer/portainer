@@ -17,7 +17,7 @@ import { getInitialTemplateValues } from '@/react/edge/edge-stacks/CreateView/Te
 import { getAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
 import { fetchFilePreview } from '@/react/portainer/templates/app-templates/queries/useFetchTemplateFile';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
-import { getDefaultValues as getAppVariablesDefaultValues } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/EnvVarsFieldset';
+import { getDefaultValues as getAppVariablesDefaultValues } from '@/react/portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
 
 export default class CreateEdgeStackViewController {
   /* @ngInject */

@@ -5,7 +5,7 @@ import { Values } from './PortsMappingField';
 export function validationSchema(): SchemaOf<Values> {
   return array(
     object({
-      hostPort: string().required('host is required'),
+      hostPort: string().default(''),
       containerPort: string().required('container is required'),
       protocol: mixed().oneOf(['tcp', 'udp']),
     })

@@ -1,5 +1,5 @@
 import { FormikErrors } from 'formik';
-import { SchemaOf, array, string } from 'yup';
+import { SchemaOf, object, string } from 'yup';
 
 import { TemplateEnv } from '@/react/portainer/templates/app-templates/types';
 
@@ -8,15 +8,17 @@ import { Input, Select } from '@@/form-components/Input';
 
 type Value = Record<string, string>;
 
+export { type Value as EnvVarsValue };
+
 export function EnvVarsFieldset({
   onChange,
   options,
-  value,
+  values,
   errors,
 }: {
   options: Array<TemplateEnv>;
   onChange: (value: Value) => void;
-  value: Value;
+  values: Value;
   errors?: FormikErrors<Value>;
 }) {
   return (
@@ -25,7 +27,7 @@ export function EnvVarsFieldset({
         <Item
           key={env.name}
           option={env}
-          value={value[env.name]}
+          value={values[env.name]}
           onChange={(value) => handleChange(env.name, value)}
           errors={errors?.[env.name]}
         />
@@ -34,7 +36,7 @@ export function EnvVarsFieldset({
   );
 
   function handleChange(name: string, envValue: string) {
-    onChange({ ...value, [name]: envValue });
+    onChange({ ...values, [name]: envValue });
   }
 }
 
@@ -94,11 +96,12 @@ export function getDefaultValues(definitions: Array<TemplateEnv>): Value {
   );
 }
 
-export function envVarsFieldsetValidation(): SchemaOf<Value> {
-  return (
-    array()
-      .transform((_, orig) => Object.values(orig))
-      // casting to return the correct type - validation works as expected
-      .of(string().required('Required')) as unknown as SchemaOf<Value>
+export function envVarsFieldsetValidation(
+  definitions: Array<TemplateEnv>
+): SchemaOf<Value> {
+  return object(
+    Object.fromEntries(
+      definitions.map((v) => [v.name, string().required('Required')])
+    )
   );
 }
