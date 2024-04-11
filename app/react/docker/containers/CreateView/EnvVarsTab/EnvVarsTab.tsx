@@ -1,6 +1,6 @@
 import {
   EnvVarValues,
-  EnvironmentVariablesPanel,
+  DefaultEnvironmentVariablesPanel as EnvironmentVariablesPanel,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 import { ArrayError } from '@@/form-components/InputList/InputList';
 

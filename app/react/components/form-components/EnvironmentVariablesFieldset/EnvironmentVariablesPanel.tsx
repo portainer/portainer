@@ -14,16 +14,19 @@ export function EnvironmentVariablesPanel({
   showHelpMessage,
   errors,
   isFoldable = false,
+  alertMessage,
 }: {
-  explanation?: string;
+  explanation?: JSX.Element;
   showHelpMessage?: boolean;
   isFoldable?: boolean;
+  alertMessage?: JSX.Element;
 } & FieldsetProps) {
   return (
     <FormSection
       title="Environment variables"
       isFoldable={isFoldable}
       defaultFolded={isFoldable}
+      className="flex flex-col w-full"
     >
       <div className="form-group">
         {!!explanation && (
@@ -31,6 +34,8 @@ export function EnvironmentVariablesPanel({
             {explanation}
           </div>
         )}
+
+        {alertMessage}
 
         <div className="col-sm-12">
           <EnvironmentVariablesFieldset
