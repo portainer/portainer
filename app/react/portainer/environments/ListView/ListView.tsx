@@ -1,8 +1,6 @@
 import { useStore } from 'zustand';
-import _ from 'lodash';
 
 import { environmentStore } from '@/react/hooks/current-environment-store';
-import { notifySuccess } from '@/portainer/services/notifications';
 
 import { PageHeader } from '@@/PageHeader';
 import { confirmDelete } from '@@/modals/confirm';
@@ -44,15 +42,11 @@ export function ListView() {
     }
 
     deletionMutation.mutate(
-      environments.map((e) => e.Id),
-      {
-        onSuccess() {
-          notifySuccess(
-            'Environments successfully removed',
-            _.map(environments, 'Name').join(', ')
-          );
-        },
-      }
+      environments.map((e) => ({
+        id: e.Id,
+        deleteCluster: false,
+        name: e.Name,
+      }))
     );
   }
 }
