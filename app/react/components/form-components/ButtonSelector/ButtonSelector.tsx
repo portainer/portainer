@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
+import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -12,6 +12,7 @@ export interface Option<T> {
   value: T;
   label?: ReactNode;
   disabled?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 interface Props<T> {
@@ -49,6 +50,7 @@ export function ButtonSelector<T extends string | number | boolean>({
           onChange={() => onChange(option.value)}
           disabled={disabled || option.disabled}
           readOnly={readOnly}
+          icon={option.icon}
         >
           {option.label || option.value.toString()}
         </OptionItem>
@@ -62,6 +64,7 @@ interface OptionItemProps {
   onChange(): void;
   disabled?: boolean;
   readOnly?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 function OptionItem({
@@ -71,6 +74,7 @@ function OptionItem({
   disabled,
   readOnly,
   'data-cy': dataCy,
+  icon,
 }: PropsWithChildren<OptionItemProps> & AutomationTestingProps) {
   return (
     <Button
@@ -84,6 +88,7 @@ function OptionItem({
         '!static !z-auto'
       )}
       data-cy={dataCy}
+      icon={icon}
     >
       {children}
       <input

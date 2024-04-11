@@ -83,3 +83,10 @@ export function nodeStatusBadge(text: NodeStatus['State']) {
 export function hideShaSum(imageName = '') {
   return imageName.split('@sha')[0];
 }
+
+export function trimContainerName(name?: string) {
+  if (name) {
+    return name.indexOf('/') === 0 ? name.slice(1) : name;
+  }
+  return '';
+}

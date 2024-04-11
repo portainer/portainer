@@ -3,7 +3,7 @@ import { JsonView, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import clsx from 'clsx';
 
-import './JsonTree.css';
+import styles from './JsonTree.module.css';
 
 export function JsonTree({ style, ...props }: ComponentProps<typeof JsonView>) {
   const currentStyle = getCurrentStyle(style);
@@ -25,17 +25,20 @@ function getCurrentStyle(style: StyleProps | undefined): StyleProps {
 
   return {
     ...defaultStyles,
-    container: 'json-tree',
-    booleanValue: 'leaf-value',
-    nullValue: 'leaf-value',
-    otherValue: 'leaf-value',
-    numberValue: 'leaf-value',
-    stringValue: 'leaf-value',
-    undefinedValue: 'leaf-value',
-    label: 'key',
-    punctuation: 'leaf-value',
-    collapseIcon: clsx(defaultStyles.collapseIcon, 'key'),
-    expandIcon: clsx(defaultStyles.expandIcon, 'key'),
-    collapsedContent: clsx(defaultStyles.collapsedContent, 'branch-preview'),
+    container: styles.jsonTree,
+    booleanValue: styles.leafValue,
+    nullValue: styles.leafValue,
+    otherValue: styles.leafValue,
+    numberValue: styles.leafValue,
+    stringValue: styles.leafValue,
+    undefinedValue: styles.leafValue,
+    label: styles.key,
+    punctuation: styles.leafValue,
+    collapseIcon: clsx(defaultStyles.collapseIcon, styles.chevronIcon),
+    expandIcon: clsx(defaultStyles.expandIcon, styles.chevronIcon),
+    collapsedContent: clsx(
+      defaultStyles.collapsedContent,
+      styles.branchPreview
+    ),
   };
 }

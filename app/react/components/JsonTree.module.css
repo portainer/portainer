@@ -1,30 +1,25 @@
 /* json-tree override */
-.json-tree,
-json-tree {
+.json-tree {
   font-size: 13px;
   color: var(--blue-5);
 }
 
-.json-tree .key,
-json-tree .key {
+.json-tree .key {
+  color: var(--text-json-tree-color);
+  padding-right: 4px;
+}
+
+.json-tree .chevronIcon {
   color: var(--text-json-tree-color);
 }
 
-json-tree .key {
-  padding-right: 5px;
-}
-
-.json-tree .branch-preview,
-json-tree .branch-preview {
+.json-tree .branch-preview {
   color: var(--text-json-tree-branch-preview-color);
   font-style: normal;
   font-size: 11px;
   opacity: 0.5;
 }
 
-.json-tree .leaf-value,
-json-tree .leaf-value {
+.json-tree .leaf-value {
   color: var(--text-json-tree-leaf-color);
 }
-
-/* !json-tree override */
