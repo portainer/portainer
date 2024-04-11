@@ -39,7 +39,7 @@ func (payload *forceUpdateServicePayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "endpoint identifier"
 // @param body body forceUpdateServicePayload true "details"
-// @success 200 {object} dockertypes.ServiceUpdateResponse "Success"
+// @success 200 {object} swarm.ServiceUpdateResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "endpoint not found"
