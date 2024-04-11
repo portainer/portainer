@@ -60,6 +60,7 @@ export interface KubernetesConfiguration {
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;
   RestrictDefaultNamespace?: boolean;
+  RestrictSecrets?: boolean;
   RestrictStandardUserIngressW?: boolean;
   IngressClasses: IngressClass[];
   IngressAvailabilityPerNamespace: boolean;
