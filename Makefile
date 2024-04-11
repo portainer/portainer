@@ -79,7 +79,8 @@ dev: ## Run both the client and server in development mode
 dev-client: ## Run the client in development mode 
 	yarn dev
 
-dev-server: build-server ## Run the server in development mode
+dev-server: ## Run the server in development mode
+	make PLATFORM=linux build-server
 	@./dev/run_container.sh
 
 
