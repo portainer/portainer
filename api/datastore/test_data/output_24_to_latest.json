@@ -677,6 +677,7 @@
             "Architecture": "",
             "BridgeNfIp6tables": false,
             "BridgeNfIptables": false,
+            "CDISpecDirs": null,
             "CPUSet": false,
             "CPUShares": false,
             "CgroupDriver": "",
