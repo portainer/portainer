@@ -33,6 +33,7 @@ export function NameCell({
           namespace: item.ResourcePool.Namespace.Name,
           name: item.PersistentVolumeClaim.Name,
         }}
+        data-cy={`volume-link-${item.PersistentVolumeClaim.Name}`}
       >
         {item.PersistentVolumeClaim.Name}
       </Link>

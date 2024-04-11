@@ -64,6 +64,7 @@ export function ImagesDatatable({
     <Datatable
       title="Images"
       titleIcon={List}
+      data-cy="docker-images-datatable"
       renderTableActions={(selectedItems) => (
         <div className="flex items-center gap-2">
           <RemoveButtonMenu selectedItems={selectedItems} onRemove={onRemove} />
@@ -130,6 +131,7 @@ function RemoveButtonMenu({
             color="dangerlight"
             disabled={selectedItems.length === 0}
             icon={ChevronDown}
+            data-cy="image-toggleRemoveButtonMenu"
           >
             <span className="sr-only">Toggle Dropdown</span>
           </MenuButton>
@@ -169,7 +171,10 @@ function ImportExportButtons({
           data-cy="image-importImageButton"
           icon={Upload}
           disabled={isExportInProgress}
-          props={{ to: 'docker.images.import' }}
+          props={{
+            to: 'docker.images.import',
+            'data-cy': 'image-importImageLink',
+          }}
         >
           Import
         </Button>

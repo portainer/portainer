@@ -159,6 +159,7 @@ function InnerForm({
               <div className="col-sm-12">
                 <SwitchField
                   label="Create an Edge stack webhook"
+                  data-cy="edge-stack-enable-webhook-switch"
                   checked={values.webhookEnabled}
                   labelClass="col-sm-3 col-lg-2"
                   onChange={(value) => setFieldValue('webhookEnabled', value)}
@@ -212,6 +213,7 @@ function InnerForm({
           <div className="col-sm-12">
             <LoadingButton
               className="!ml-0"
+              data-cy="update-stack-button"
               size="small"
               disabled={!isValid}
               isLoading={isSubmitting}

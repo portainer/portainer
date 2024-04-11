@@ -36,7 +36,13 @@ export function ServiceWidget({
     <Widget aria-label={title}>
       <Widget.Title icon={titleIcon} title={title}>
         <Authorized authorizations="DockerServiceUpdate">
-          <Button color="secondary" size="small" onClick={onAdd} icon={Plus}>
+          <Button
+            color="secondary"
+            size="small"
+            onClick={onAdd}
+            icon={Plus}
+            data-cy="service-add-button"
+          >
             {labelForAddButton}
           </Button>
         </Authorized>
@@ -51,6 +57,7 @@ export function ServiceWidget({
               type="button"
               onClick={onSubmit}
               disabled={!hasChanges || !isValid}
+              data-cy="service-apply-changes-button"
             >
               Apply changes
             </Button>
@@ -61,6 +68,7 @@ export function ServiceWidget({
                 size="small"
                 color="default"
                 icon={ChevronDown}
+                data-cy="service-reset-changes-button"
               >
                 <span className="sr-only">Toggle Dropdown</span>
               </MenuButton>

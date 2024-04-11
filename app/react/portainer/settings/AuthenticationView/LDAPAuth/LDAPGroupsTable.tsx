@@ -24,6 +24,7 @@ export function LDAPGroupsTable({ dataset }: { dataset?: Value[] }) {
       settingsManager={tableState}
       emptyContentLabel="No groups found."
       disableSelect
+      data-cy="ldap-groups-datatable"
     />
   );
 }

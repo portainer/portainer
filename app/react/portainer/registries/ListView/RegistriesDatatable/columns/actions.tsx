@@ -9,7 +9,7 @@ import { Button } from '@@/buttons';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 import { DecoratedRegistry } from '../types';
-import { RegistryId, RegistryTypes } from '../../../types/registry';
+import { RegistryTypes } from '../../../types/registry';
 
 import { columnHelper } from './helper';
 import { DefaultRegistryAction } from './DefaultRegistryAction';
@@ -32,19 +32,17 @@ function Cell({
     return <DefaultRegistryAction />;
   }
 
-  return <BrowseButton registryId={item.Id} registryType={item.Type} />;
+  return <BrowseButton registry={item} />;
 }
 
 export function BrowseButton({
-  registryId,
-  registryType,
+  registry,
   environmentId,
 }: {
-  registryId: RegistryId;
-  registryType: RegistryTypes;
+  registry: DecoratedRegistry;
   environmentId?: EnvironmentId;
 }) {
-  const canBrowse = !nonBrowsableTypes.includes(registryType);
+  const canBrowse = !nonBrowsableTypes.includes(registry.Type);
 
   if (!canBrowse) {
     return null;
@@ -58,10 +56,12 @@ export function BrowseButton({
           as={Link}
           props={{
             to: 'portainer.registries.registry.repositories',
-            params: { id: registryId, endpointId: environmentId },
+            params: { id: registry.Id, endpointId: environmentId },
+            'data-cy': `browse-registry-link-${registry.Name}`,
           }}
           disabled={isLimited}
           icon={Search}
+          data-cy={`browse-registry-button-${registry.Name}`}
         >
           Browse
         </Button>

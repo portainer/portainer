@@ -15,7 +15,7 @@ export function StorageQuotaItem() {
           <span>standard</span>
         </div>
       </FormSectionTitle>
-      <hr className="mt-2 mb-0 w-full" />
+      <hr className="mb-0 mt-2 w-full" />
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField

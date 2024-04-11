@@ -16,7 +16,16 @@
         <div class="form-group">
           <label for="template_name" class="col-sm-2 control-label text-left">Name</label>
           <div class="col-sm-6">
-            <input type="text" name="template_name" class="form-control" ng-model="$ctrl.formValues.name" ng-pattern="$ctrl.nameRegex" placeholder="e.g. myStack" required />
+            <input
+              type="text"
+              name="template_name"
+              class="form-control"
+              ng-model="$ctrl.formValues.name"
+              ng-pattern="$ctrl.nameRegex"
+              placeholder="e.g. myStack"
+              required
+              data-cy="stack-name-input"
+            />
             <div class="form-group" ng-if="stackTemplateForm.template_name.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="stackTemplateForm.template_name.$error">
@@ -39,8 +48,8 @@
             <portainer-tooltip ng-if="var.description" message="var.description"></portainer-tooltip>
           </label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
-            <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+            <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="stackFromTemplateForm-input" />
+            <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}" data-cy="stackFromTemplateForm-select">
               <option selected disabled hidden value="">Select value</option>
               <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
             </select>

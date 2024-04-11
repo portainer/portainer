@@ -142,6 +142,7 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+      'data-cy',
     ])
   )
   .component(
@@ -227,6 +228,7 @@ export const ngModule = angular
       'onRefresh',
       'tableKey',
       'tableTitle',
+      'dataCy',
     ])
   );
 

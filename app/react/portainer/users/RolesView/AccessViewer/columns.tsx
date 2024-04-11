@@ -34,7 +34,10 @@ function AccessCell({
     return (
       <>
         User access all environments
-        <Link to="portainer.settings.edgeCompute">
+        <Link
+          to="portainer.settings.edgeCompute"
+          data-cy={`manage-access-button-${item.RoleName}`}
+        >
           <Icon icon={Users} /> Manage access
         </Link>
       </>
@@ -67,13 +70,18 @@ function manageAccess(item: AccessViewerPolicyModel, isPureAdmin: boolean) {
   }
 
   return item.GroupName ? (
-    <Link to="portainer.groups.group.access" params={{ id: item.GroupId }}>
+    <Link
+      to="portainer.groups.group.access"
+      params={{ id: item.GroupId }}
+      data-cy={`manage-access-button-${item.RoleName}`}
+    >
       <Icon icon={Users} /> Manage access
     </Link>
   ) : (
     <Link
       to="portainer.endpoints.endpoint.access"
       params={{ id: item.EndpointId }}
+      data-cy={`manage-access-button-${item.RoleName}`}
     >
       <Icon icon={Users} /> Manage access
     </Link>

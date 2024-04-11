@@ -43,6 +43,7 @@ function ActionsCell({
         color="link"
         icon={TagIcon}
         onClick={() => state.setName(item.Name, tagDetails)}
+        data-cy={`retag-${item.Name}`}
       >
         Retag
       </Button>
@@ -101,12 +102,23 @@ function EditTag({
             }}
             autoFocus
             onClick={(e) => e.stopPropagation()}
+            data-cy={`retag-input-${initialName}`}
           />
 
           {errors.name && <FormError>{errors.name}</FormError>}
 
-          <Button color="none" icon={X} onClick={onCancel} />
-          <Button type="submit" color="none" icon={Check} />
+          <Button
+            color="none"
+            icon={X}
+            onClick={onCancel}
+            data-cy={`retag-cancel-${initialName}`}
+          />
+          <Button
+            type="submit"
+            color="none"
+            icon={Check}
+            data-cy={`retag-submit-${initialName}`}
+          />
         </Form>
       )}
     </Formik>

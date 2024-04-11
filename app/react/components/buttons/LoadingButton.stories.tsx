@@ -17,6 +17,7 @@ function Template({ loadingText, isLoading }: Args) {
   return (
     <LoadingButton
       loadingText={loadingText}
+      data-cy="loading-button"
       isLoading={isLoading}
       icon={Download}
     >
@@ -34,7 +35,12 @@ export const Example = Template.bind({});
 
 export function IsLoading() {
   return (
-    <LoadingButton loadingText="loading" isLoading icon={Download}>
+    <LoadingButton
+      loadingText="loading"
+      isLoading
+      icon={Download}
+      data-cy="loading-button"
+    >
       Download
     </LoadingButton>
   );

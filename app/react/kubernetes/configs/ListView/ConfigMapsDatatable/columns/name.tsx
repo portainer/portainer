@@ -58,6 +58,7 @@ function Cell({ row }: CellContext<ConfigMapRowData, string>) {
           }}
           title={name}
           className="w-fit max-w-xs truncate xl:max-w-sm 2xl:max-w-md"
+          data-cy={`configmap-name-link-${name}`}
         >
           {name}
         </Link>

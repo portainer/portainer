@@ -60,6 +60,7 @@ function Item({
       {option.select ? (
         <Select
           value={value}
+          data-cy={`env-var-select-${option.name}`}
           onChange={(e) => onChange(e.target.value)}
           options={option.select.map((o) => ({
             label: o.text,
@@ -74,6 +75,7 @@ function Item({
           onChange={(e) => onChange(e.target.value)}
           disabled={option.preset}
           id={inputId}
+          data-cy="env-var-input"
         />
       )}
     </FormControl>

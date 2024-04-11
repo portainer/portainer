@@ -38,7 +38,12 @@ const columns = [
     enableSorting: false,
     cell: ({ row, getValue }) =>
       getValue() ? (
-        <Button color="link" onClick={() => row.toggleExpanded()} icon={Search}>
+        <Button
+          color="link"
+          onClick={() => row.toggleExpanded()}
+          icon={Search}
+          data-cy={`activity-logs-inspect_${row.index}`}
+        >
           inspect
         </Button>
       ) : null,
@@ -95,6 +100,7 @@ export function ActivityLogsTable({
       totalCount={totalItems}
       disableSelect
       renderSubRow={(row) => <SubRow item={row.original} />}
+      data-cy="activity-logs-datatable"
     />
   );
 }

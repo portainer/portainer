@@ -5,10 +5,12 @@ interface Props {
   title?: string;
   target?: AnchorHTMLAttributes<HTMLAnchorElement>['target'];
   rel?: AnchorHTMLAttributes<HTMLAnchorElement>['rel'];
+  'data-cy': AnchorHTMLAttributes<HTMLAnchorElement>['data-cy'];
 }
 
 export function Link({
   children,
+  'data-cy': dataCy,
   to,
   params,
   options,
@@ -18,7 +20,7 @@ export function Link({
 
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
-    <a onClick={onClick} href={href} {...props}>
+    <a onClick={onClick} href={href} data-cy={dataCy} {...props}>
       {children}
     </a>
   );

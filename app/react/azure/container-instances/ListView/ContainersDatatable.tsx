@@ -31,11 +31,13 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
       titleIcon={Box}
       getRowId={(container) => container.id}
       emptyContentLabel="No container available."
+      data-cy="containers-datatable"
       renderTableActions={(selectedRows) => (
         <div className="flex gap-2">
           <Authorized authorizations="AzureContainerGroupDelete">
             <DeleteButton
               disabled={selectedRows.length === 0}
+              data-cy="remove-containers-button"
               onConfirmed={() =>
                 handleRemoveClick(selectedRows.map((r) => r.id))
               }
@@ -44,7 +46,7 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
           </Authorized>
 
           <Authorized authorizations="AzureContainerGroupCreate">
-            <AddButton>Add container</AddButton>
+            <AddButton data-cy="add-container-button">Add container</AddButton>
           </Authorized>
         </div>
       )}

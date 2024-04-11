@@ -42,6 +42,7 @@ export function NameCell({
           className="!ml-0 p-0"
           onClick={() => meta.onBrowse(name)}
           icon={Folder}
+          data-cy={`file-browse-${name}`}
         >
           {name}
         </Button>
@@ -86,11 +87,22 @@ function EditForm({
             value={values.name}
             onChange={(e) => setFieldValue('name', e.target.value)}
             className="input-sm w-auto"
+            data-cy={`file-rename-${originalName}`}
           />
 
-          <Button color="none" type="reset" icon={X} />
+          <Button
+            color="none"
+            type="reset"
+            icon={X}
+            data-cy={`file-reset-button-${originalName}`}
+          />
 
-          <Button color="none" type="submit" icon={Check} />
+          <Button
+            color="none"
+            type="submit"
+            icon={Check}
+            data-cy={`file-submit-button-${originalName}`}
+          />
         </Form>
       )}
     </Formik>

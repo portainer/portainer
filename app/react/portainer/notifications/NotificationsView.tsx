@@ -53,6 +53,7 @@ export function NotificationsView() {
         )}
         getRowId={(row) => row.id}
         highlightedItemId={activeItemId}
+        data-cy="notifications-datatable"
       />
     </>
   );
@@ -65,6 +66,7 @@ function TableActions({ selectedRows }: { selectedRows: ToastNotification[] }) {
     <DeleteButton
       onConfirmed={() => handleRemove()}
       disabled={selectedRows.length === 0}
+      data-cy="remove-notifications-button"
       confirmMessage="Are you sure you want to remove the selected notifications?"
     />
   );

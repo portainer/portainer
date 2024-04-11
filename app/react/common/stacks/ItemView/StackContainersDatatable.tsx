@@ -68,6 +68,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
             />
           )}
           initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+          data-cy="stack-containers-datatable"
           renderTableSettings={(tableInstance) => (
             <>
               <ColumnVisibilityMenu<DockerContainer>

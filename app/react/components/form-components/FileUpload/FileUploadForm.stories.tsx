@@ -31,6 +31,7 @@ function Example({ title }: Args) {
         description={
           <span>You can upload a Compose file from your computer.</span>
         }
+        data-cy="file-upload-form"
       />
     </div>
   );

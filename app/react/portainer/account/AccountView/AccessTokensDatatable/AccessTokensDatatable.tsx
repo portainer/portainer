@@ -27,6 +27,7 @@ export function AccessTokensDatatable({ canExit }: { canExit?: boolean }) {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} canExit={canExit} />
       )}
+      data-cy="access-tokens-datatable"
     />
   );
 }

@@ -26,6 +26,7 @@ export function RuntimeSelector({
       options={infoQuery.data || []}
       isLoading={infoQuery.isLoading}
       disabled={infoQuery.isLoading}
+      data-cy="docker-runtime-selector"
     />
   );
 }

@@ -70,8 +70,9 @@ export function VolumesDatatable({
             confirmMessage="Do you want to remove the selected volume(s)?"
             onConfirmed={() => onRemove(selectedItems)}
             disabled={selectedItems.length === 0}
+            data-cy="k8s-volumes-delete-button"
           />
-          <CreateFromManifestButton />
+          <CreateFromManifestButton data-cy="k8s-volumes-deploy-button" />
         </>
       )}
       renderTableSettings={() => (

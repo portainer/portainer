@@ -11,6 +11,7 @@ export function LinkButton({
   className,
   children,
   title = '',
+  'data-cy': dataCy,
   ...props
 }: ComponentProps<typeof Button> & ComponentProps<typeof Link>) {
   return (
@@ -24,7 +25,9 @@ export function LinkButton({
       props={{
         to,
         params,
+        'data-cy': `${dataCy}-link`,
       }}
+      data-cy={`${dataCy}-button`}
     >
       {children}
     </Button>

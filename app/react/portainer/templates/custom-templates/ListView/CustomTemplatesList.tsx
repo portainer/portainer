@@ -55,7 +55,12 @@ export function CustomTemplatesList({
         searchValue={listState.search}
         title="Custom Templates"
         titleIcon={Edit}
-        renderTableActions={() => <AddButton>Add Custom Template</AddButton>}
+        renderTableActions={() => (
+          <AddButton data-cy="add-custom-template-button">
+            Add Custom Template
+          </AddButton>
+        )}
+        data-cy="custom-templates-datatable-header"
       />
 
       <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">

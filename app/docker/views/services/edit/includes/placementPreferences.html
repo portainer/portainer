@@ -24,6 +24,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-preference-strategy-input-{{ $index }}"
                   class="form-control"
                   ng-model="preference.strategy"
                   placeholder="e.g. node.role"
@@ -37,6 +38,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-preference-value-input-{{ $index }}"
                   class="form-control"
                   ng-model="preference.value"
                   placeholder="e.g. manager"

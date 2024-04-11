@@ -25,7 +25,11 @@ function Cell({
   }
 
   return (
-    <Link to=".user" params={{ id: item.Id }}>
+    <Link
+      to=".user"
+      params={{ id: item.Id }}
+      data-cy={`user-link-${item.Username}`}
+    >
       {name}
     </Link>
   );

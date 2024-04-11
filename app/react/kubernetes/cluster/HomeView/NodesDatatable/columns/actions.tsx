@@ -38,6 +38,7 @@ function ActionsCell({
           to="kubernetes.cluster.node.stats"
           params={{ nodeName }}
           className="flex items-center p-1"
+          data-cy="nodeStatsButton"
         >
           <Icon icon={BarChart} />
         </Link>

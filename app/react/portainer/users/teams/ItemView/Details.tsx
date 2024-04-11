@@ -51,6 +51,7 @@ export function Details({ team, memberships, isAdmin }: Props) {
                           size="xsmall"
                           onConfirmed={handleDeleteClick}
                           confirmMessage="Do you want to delete this team? Users in this team will not be deleted."
+                          data-cy={`delete-team-${team.Name}`}
                         >
                           Delete this team
                         </DeleteButton>

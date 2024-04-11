@@ -92,6 +92,7 @@ export function GitFormUrlField({
 
             <Button
               onClick={onRefresh}
+              data-cy="component-gitUrlRefreshButton"
               size="medium"
               className="vertical-center"
               color="light"

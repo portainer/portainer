@@ -10,7 +10,7 @@ import { EnvironmentGroup } from '../../types';
 const columnHelper = createColumnHelper<EnvironmentGroup>();
 
 export const columns = [
-  buildNameColumn<EnvironmentGroup>('Name', '.group'),
+  buildNameColumn<EnvironmentGroup>('Name', '.group', 'environment-group-name'),
   columnHelper.display({
     header: 'Actions',
     cell: ActionsCell,
@@ -26,9 +26,11 @@ function ActionsCell({
       props={{
         to: '.group.access',
         params: { id: item.Id },
+        'data-cy': `manage-access-link_${item.Name}`,
       }}
       color="link"
       icon={Users}
+      data-cy={`manage-access-button_${item.Name}`}
     >
       Manage access
     </Button>

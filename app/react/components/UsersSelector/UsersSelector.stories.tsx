@@ -24,6 +24,7 @@ function Example() {
       onChange={setSelectedUsers}
       users={users}
       placeholder="Select one or more users"
+      dataCy="users-selector"
     />
   );
 }

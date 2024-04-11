@@ -15,6 +15,7 @@ import { InlineLoader } from '@@/InlineLoader';
 import { Select } from '@@/form-components/ReactSelect';
 import { Card } from '@@/Card';
 import { InputGroup } from '@@/form-components/InputGroup';
+import { Input } from '@@/form-components/Input';
 
 import { AnnotationsForm } from '../../annotations/AnnotationsForm';
 
@@ -182,6 +183,7 @@ export function IngressForm({
                           : 'No namespaces available'
                       }
                       noOptionsMessage={() => 'No namespaces available'}
+                      data-cy="k8sAppCreate-namespaceSelect"
                     />
                   )}
                 </div>
@@ -204,7 +206,7 @@ export function IngressForm({
                   {isEdit ? (
                     rule.IngressName
                   ) : (
-                    <input
+                    <Input
                       name="ingress_name"
                       type="text"
                       className="form-control"
@@ -214,6 +216,7 @@ export function IngressForm({
                         handleIngressChange('IngressName', e.target.value)
                       }
                       disabled={isEdit}
+                      data-cy="k8sAppCreate-ingressNameInput"
                     />
                   )}
                   {errors.ingressName && !isEdit && (
@@ -262,6 +265,7 @@ export function IngressForm({
                           )
                         }
                         noOptionsMessage={() => 'No ingress classes available'}
+                        data-cy="k8sAppCreate-ingressClassSelect"
                       />
                       {errors.className && (
                         <FormError className="error-inline mt-1">
@@ -318,6 +322,7 @@ export function IngressForm({
                 <span>
                   <Button
                     className="btn btn-sm btn-light !ml-0 mb-2"
+                    data-cy="add-annotation-button"
                     onClick={() => addNewAnnotation()}
                     icon={Plus}
                   >
@@ -408,6 +413,7 @@ export function IngressForm({
                         </InputGroup.Addon>
                         <InputGroup.Input
                           name={`ingress_host_${hostIndex}`}
+                          data-cy={`ingress-host_${hostIndex}`}
                           id={`ingress_host_${hostIndex}`}
                           type="text"
                           className="form-control form-control-sm"
@@ -457,6 +463,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No TLS secrets available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-tlsSelect_${hostIndex}`}
                         />
                         {!host.NoHost && (
                           <div className="input-group-btn">
@@ -464,6 +471,7 @@ export function IngressForm({
                               className="btn btn-light btn-sm !ml-0 !rounded-l-none"
                               onClick={() => reloadTLSCerts()}
                               icon={RefreshCw}
+                              data-cy={`k8sAppCreate-tlsRefreshButton_${hostIndex}`}
                             />
                           </div>
                         )}
@@ -478,6 +486,7 @@ export function IngressForm({
                           params={{ id: environmentID }}
                           className="text-primary"
                           target="_blank"
+                          data-cy={`k8sAppCreate-createSecretLink_${hostIndex}`}
                         >
                           Create secret
                         </Link>{' '}
@@ -553,6 +562,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No services available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-serviceSelect_${hostIndex}_${pathIndex}`}
                         />
                       </InputGroup>
                       {errors[
@@ -614,6 +624,7 @@ export function IngressForm({
                               }
                               noOptionsMessage={() => 'No ports available'}
                               size="sm"
+                              data-cy={`k8sAppCreate-servicePortSelect_${hostIndex}_${pathIndex}`}
                             />
                           </InputGroup>
                           {errors[
@@ -672,6 +683,7 @@ export function IngressForm({
                           }
                           noOptionsMessage={() => 'No path types available'}
                           size="sm"
+                          data-cy={`k8sAppCreate-pathTypeSelect_${hostIndex}_${pathIndex}`}
                         />
                       </InputGroup>
                       {errors[
@@ -748,8 +760,7 @@ export function IngressForm({
                     type="button"
                     onClick={() => addNewIngressRoute(hostIndex)}
                     icon={Plus}
-                    size="small"
-                    color="default"
+                    data-cy={`k8sAppCreate-addPathButton_${hostIndex}`}
                   >
                     Add path
                   </Button>
@@ -766,8 +777,7 @@ export function IngressForm({
                 type="button"
                 onClick={() => addNewIngressHost()}
                 icon={Plus}
-                color="default"
-                size="small"
+                data-cy="k8sAppCreate-addHostButton"
               >
                 Add new host
               </Button>
@@ -778,8 +788,7 @@ export function IngressForm({
                 onClick={() => addNewIngressHost(true)}
                 disabled={hasNoHostRule}
                 icon={Plus}
-                color="default"
-                size="small"
+                data-cy="k8sAppCreate-addFallbackButton"
               >
                 Add fallback rule
               </Button>

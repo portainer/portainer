@@ -56,7 +56,7 @@ export function TableActions({
 
       {isAddActionVisible && (
         <Authorized authorizations="DockerServiceCreate">
-          <AddButton>Add service</AddButton>
+          <AddButton data-cy="docker-add-service-button">Add service</AddButton>
         </Authorized>
       )}
     </div>

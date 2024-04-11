@@ -89,6 +89,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
       >
         <FileUploadField
           required
+          data-cy="helm-cert-panel-file-upload-field"
           inputId="ca-cert-field"
           name="clientCertFile"
           onChange={(file) => setFieldValue('clientCertFile', file)}
@@ -101,6 +102,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         isLoading={isLoading}
         submitLabel="Apply changes"
         loadingText="Saving in progress..."
+        data-cy="helm-cert-panel-submit-button"
       />
     </Form>
   );

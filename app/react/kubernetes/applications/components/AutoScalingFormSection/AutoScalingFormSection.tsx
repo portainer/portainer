@@ -29,6 +29,7 @@ export function AutoScalingFormSection({
       {!isMetricsEnabled && <NoMetricsServerWarning />}
       <SwitchField
         disabled={!isMetricsEnabled}
+        data-cy="k8sAppCreate-autoScaleSwitch"
         label="Enable auto scaling for this application"
         labelClass="col-sm-3 col-lg-2"
         checked={values.isUsed}
@@ -50,9 +51,9 @@ export function AutoScalingFormSection({
         }}
       />
       {values.isUsed && (
-        <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-x-4 gap-y-2 my-3">
-          <div className="flex flex-col min-w-fit">
-            <label htmlFor="min-instances" className="font-normal text-xs">
+        <div className="my-3 grid w-full grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
+          <div className="flex min-w-fit flex-col">
+            <label htmlFor="min-instances" className="text-xs font-normal">
               Minimum instances
             </label>
             <Input
@@ -71,8 +72,8 @@ export function AutoScalingFormSection({
             />
             {errors?.minReplicas && <FormError>{errors.minReplicas}</FormError>}
           </div>
-          <div className="flex flex-col min-w-fit">
-            <label htmlFor="max-instances" className="font-normal text-xs">
+          <div className="flex min-w-fit flex-col">
+            <label htmlFor="max-instances" className="text-xs font-normal">
               Maximum instances
             </label>
             <Input
@@ -90,10 +91,10 @@ export function AutoScalingFormSection({
             />
             {errors?.maxReplicas && <FormError>{errors.maxReplicas}</FormError>}
           </div>
-          <div className="flex flex-col min-w-fit">
+          <div className="flex min-w-fit flex-col">
             <label
               htmlFor="cpu-threshold"
-              className="font-normal text-xs flex items-center"
+              className="flex items-center text-xs font-normal"
             >
               Target CPU usage (<b>%</b>)
               <Tooltip message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances." />
@@ -135,7 +136,10 @@ function NoMetricsServerWarning() {
       {isAdmin && (
         <>
           Server metrics features must be enabled in the{' '}
-          <Link to="kubernetes.cluster.setup">
+          <Link
+            to="kubernetes.cluster.setup"
+            data-cy="environment-configuration-view"
+          >
             environment configuration view
           </Link>
           .

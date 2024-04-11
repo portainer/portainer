@@ -19,7 +19,12 @@ export function Code({ children, showCopyButton }: Props) {
       <code className={styles.code}>{children}</code>
 
       {showCopyButton && (
-        <Button color="link" className={styles.copyButton} onClick={handleCopy}>
+        <Button
+          color="link"
+          className={styles.copyButton}
+          onClick={handleCopy}
+          data-cy="code-copy-button"
+        >
           <Icon
             icon={copiedSuccessfully ? Check : Copy}
             className="!ml-1"

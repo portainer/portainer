@@ -22,6 +22,7 @@ function Template({ icon, label }: StoryProps) {
         params={{ endpointId: 1 }}
         icon={icon}
         label={label}
+        data-cy="sidebar-item"
       />
     </ul>
   );

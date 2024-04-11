@@ -50,19 +50,23 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
         </TableSettingsMenu>
       )}
       disableSelect={!hasWriteAccessQuery.authorized}
+      data-cy="configs-datatable"
       renderTableActions={(selectedRows) =>
         hasWriteAccessQuery.authorized && (
           <div className="flex items-center gap-3">
             <Authorized authorizations="DockerConfigDelete">
               <DeleteButton
                 disabled={selectedRows.length === 0}
+                data-cy="remove-docker-configs-button"
                 onConfirmed={() => onRemoveClick(selectedRows)}
                 confirmMessage="Do you want to remove the selected config(s)?"
               />
             </Authorized>
 
             <Authorized authorizations="DockerConfigCreate">
-              <AddButton>Add config</AddButton>
+              <AddButton data-cy="add-docker-config-button">
+                Add config
+              </AddButton>
             </Authorized>
           </div>
         )

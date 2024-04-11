@@ -31,6 +31,7 @@ export function SubRows({
               <Link
                 to="kubernetes.applications.application"
                 params={{ name: app.Name, namespace: app.ResourcePool }}
+                data-cy={`app-stack-application-link-${app.Name}`}
               >
                 {app.Name}
               </Link>

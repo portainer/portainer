@@ -37,6 +37,7 @@ export function RbacRolesDatatable({
       emptyContentLabel="No role available."
       settingsManager={tableState}
       disableSelect
+      data-cy="rbac-roles-datatable"
     />
   );
 }

@@ -20,9 +20,10 @@ export function TableActions({
         disabled={selectedItems.length === 0}
         confirmMessage="Are you sure you want to remove the selected environment group(s)?"
         onConfirmed={handleRemove}
+        data-cy="remove-environment-groups-button"
       />
 
-      <AddButton>Add group</AddButton>
+      <AddButton data-cy="add-environment-group-button">Add group</AddButton>
     </>
   );
 

@@ -22,9 +22,14 @@ export function TableActions({
         disabled={selectedItems.length === 0}
         confirmMessage="Do you want to remove the selected access token(s)? Any script or application using these tokens will no longer be able to invoke the Portainer API."
         onConfirmed={handleRemove}
+        data-cy="access-tokens-delete-button"
       />
 
-      <AddButton to=".new-access-token" disabled={!canExit}>
+      <AddButton
+        to=".new-access-token"
+        disabled={!canExit}
+        data-cy="access-tokens-add-button"
+      >
         Add access token
       </AddButton>
     </>

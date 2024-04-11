@@ -82,6 +82,7 @@ export function ItemView() {
                   id="subscription-input"
                   value={container.subscriptionName}
                   readOnly
+                  data-cy="aci-container-subscription-input"
                 />
               </FormControl>
 
@@ -91,6 +92,7 @@ export function ItemView() {
                   id="resourceGroup-input"
                   value={container.resourceGroupName}
                   readOnly
+                  data-cy="aci-container-resourceGroup-input"
                 />
               </FormControl>
 
@@ -100,6 +102,7 @@ export function ItemView() {
                   id="location-input"
                   value={container.location}
                   readOnly
+                  data-cy="aci-container-location-input"
                 />
               </FormControl>
 
@@ -111,6 +114,7 @@ export function ItemView() {
                   id="name-input"
                   readOnly
                   value={container.name}
+                  data-cy="aci-container-name-input"
                 />
               </FormControl>
 
@@ -120,6 +124,7 @@ export function ItemView() {
                   id="image-input"
                   value={container.imageName}
                   readOnly
+                  data-cy="aci-container-image-input"
                 />
               </FormControl>
 
@@ -129,6 +134,7 @@ export function ItemView() {
                   id="os-input"
                   readOnly
                   value={container.osType}
+                  data-cy="aci-container-os-input"
                 />
               </FormControl>
 
@@ -140,6 +146,7 @@ export function ItemView() {
                   id="public-ip"
                   readOnly
                   value={container.ipAddress}
+                  data-cy="aci-container-public-ip"
                 />
               </FormControl>
 
@@ -153,6 +160,7 @@ export function ItemView() {
                   placeholder="1"
                   readOnly
                   value={container.cpu}
+                  data-cy="aci-container-cpu-input"
                 />
               </FormControl>
 
@@ -164,6 +172,7 @@ export function ItemView() {
                   placeholder="1"
                   readOnly
                   value={container.memory}
+                  data-cy="aci-container-memory-input"
                 />
               </FormControl>
             </WidgetBody>

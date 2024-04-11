@@ -18,6 +18,7 @@ export function EnvironmentVariableItem({
         <div className="w-1/2">
           <InputLabeled
             className="w-full"
+            data-cy={`env-name_${index}`}
             label="name"
             required
             value={item.name}
@@ -31,7 +32,7 @@ export function EnvironmentVariableItem({
           />
           {error && (
             <div>
-              <FormError className="mt-1 !mb-0">
+              <FormError className="!mb-0 mt-1">
                 {Object.values(error)[0]}
               </FormError>
             </div>
@@ -39,6 +40,7 @@ export function EnvironmentVariableItem({
         </div>
         <InputLabeled
           className="w-1/2"
+          data-cy={`env-value_${index}`}
           label="value"
           value={item.value}
           onChange={(e) => handleChange({ value: e.target.value })}

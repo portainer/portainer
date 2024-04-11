@@ -102,11 +102,17 @@ export function AccessControlPanelForm({
 
           <div className="form-group">
             <div className="col-sm-12">
-              <Button size="small" color="default" onClick={onCancelClick}>
+              <Button
+                size="small"
+                color="default"
+                onClick={onCancelClick}
+                data-cy="cancel-access-control-update-button"
+              >
                 Cancel
               </Button>
               <LoadingButton
                 size="small"
+                data-cy="update-access-control-button"
                 color="primary"
                 type="submit"
                 isLoading={isSubmitting}

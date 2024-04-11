@@ -33,9 +33,7 @@
                   <tbody>
                     <tr>
                       <td class="w-[40%] !border-none !pl-0">Name</td>
-                      <td class="!border-none">
-                        {{ ctrl.configuration.Name }}
-                      </td>
+                      <td class="!border-none"> {{ ctrl.configuration.Name }} </td>
                     </tr>
                     <tr>
                       <td class="!pl-0">Namespace</td>
@@ -75,7 +73,7 @@
                 YAML
               </uib-tab-heading>
               <div class="px-5 !pt-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'configuration-yaml'" data="ctrl.configuration.Yaml" hide-message="true" />
+                <kube-yaml-inspector data-cy="k8sConfigDetail-yamlInspector" identifier="'configuration-yaml'" data="ctrl.configuration.Yaml" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>

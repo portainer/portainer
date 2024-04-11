@@ -28,14 +28,23 @@ export function FDOProfilesDatatableActions({
 
   return (
     <>
-      <Link to="portainer.endpoints.profile" className="space-left">
-        <Button disabled={!isFDOEnabled} icon={PlusCircle}>
+      <Link
+        to="portainer.endpoints.profile"
+        className="space-left"
+        data-cy="fdo-add-profile-link"
+      >
+        <Button
+          disabled={!isFDOEnabled}
+          icon={PlusCircle}
+          data-cy="fdo-add-profile-button"
+        >
           Add Profile
         </Button>
       </Link>
 
       <Button
         disabled={!isFDOEnabled || selectedItems.length !== 1}
+        data-cy="fdo-duplicate-profile-button"
         onClick={() => onDuplicateProfileClick()}
         icon={PlusCircle}
       >
@@ -46,6 +55,7 @@ export function FDOProfilesDatatableActions({
         disabled={!isFDOEnabled || selectedItems.length === 0}
         onConfirmed={() => onDeleteProfileClick()}
         confirmMessage="This action will delete the selected profile(s). Continue?"
+        data-cy="fdo-remove-profile-button"
       />
     </>
   );

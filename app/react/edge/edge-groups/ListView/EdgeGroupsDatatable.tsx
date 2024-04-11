@@ -32,6 +32,7 @@ export function EdgeGroupsDatatable() {
       isRowSelectable={({ original: item }) =>
         !(item.HasEdgeStack || item.HasEdgeJob || item.HasEdgeConfig)
       }
+      data-cy="edge-groups-datatable"
     />
   );
 }

@@ -52,6 +52,7 @@ export function AuthenticationLogsTable({
       isServerSidePagination
       totalCount={totalItems}
       disableSelect
+      data-cy="authentication-logs-datatable"
     />
   );
 }

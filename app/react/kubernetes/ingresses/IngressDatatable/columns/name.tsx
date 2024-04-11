@@ -30,6 +30,7 @@ function Cell({ row, getValue }: CellContext<Ingress, string>) {
             name,
           }}
           title={name}
+          data-cy={`ingress-name-link-${name}`}
         >
           {name}
         </Link>

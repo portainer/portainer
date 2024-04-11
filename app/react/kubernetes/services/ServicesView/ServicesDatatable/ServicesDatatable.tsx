@@ -90,6 +90,7 @@ export function ServicesDatatable() {
         />
       }
       renderRow={servicesRenderRow}
+      data-cy="k8s-services-datatable"
     />
   );
 }
@@ -156,9 +157,10 @@ function TableActions({ selectedItems }: TableActionsProps) {
             </ul>
           </>
         }
+        data-cy="k8s-remove-services-button"
       />
 
-      <CreateFromManifestButton />
+      <CreateFromManifestButton data-cy="k8s-create-service-button" />
     </Authorized>
   );
 

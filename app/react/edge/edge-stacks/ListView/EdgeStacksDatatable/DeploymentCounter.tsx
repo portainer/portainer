@@ -23,6 +23,7 @@ export function DeploymentCounterLink({
         className="hover:no-underline"
         to="edge.stacks.edit"
         params={{ stackId, tab: 1, status: type }}
+        data-cy="deployment-counter-link"
       >
         <DeploymentCounter count={count} type={type} total={total} />
       </Link>

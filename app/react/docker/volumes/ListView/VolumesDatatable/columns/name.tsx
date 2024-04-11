@@ -85,6 +85,7 @@ function Cell({
           nodeName: item.NodeName,
         }}
         className="monospaced"
+        data-cy={`volume-link-${name}`}
       >
         {truncate(name, 40)}
       </Link>
@@ -102,7 +103,9 @@ function Cell({
                 id: item.Id,
                 nodeName: item.NodeName,
               },
+              'data-cy': `volume-browse-link-${name}`,
             }}
+            data-cy={`volume-browse-button-${name}`}
           >
             browse
           </Button>

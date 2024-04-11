@@ -46,6 +46,7 @@ export function GitlabProjectTable({
         value.map(({ Id }) => `${Id}`)
       )}
       isRowSelectable={({ original: item }) => item.RegistryEnabled}
+      data-cy="gitlab-projects-datatable"
     />
   );
 }

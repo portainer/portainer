@@ -12,7 +12,7 @@ interface Props {
   value: string[];
   onChange(value: string[]): void;
   namespaces: Namespace[];
-  dataCy?: string;
+  dataCy: string;
   inputId?: string;
   placeholder?: string;
 }

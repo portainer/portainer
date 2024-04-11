@@ -33,6 +33,7 @@ export function FilterBar({
               icon={DownloadIcon}
               onClick={onExport}
               className="!ml-0"
+              data-cy="activity-logs-export-csv-button"
             >
               Export as CSV
             </Button>

@@ -20,9 +20,10 @@ export function TableActions({
         confirmMessage="Do you want to remove the selected Edge Job(s)?"
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
+        data-cy="remove-edge-jobs-button"
       />
 
-      <AddButton>Add Edge job</AddButton>
+      <AddButton data-cy="add-edge-job-button">Add Edge job</AddButton>
     </div>
   );
 

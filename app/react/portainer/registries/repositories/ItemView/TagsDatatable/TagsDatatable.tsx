@@ -41,6 +41,7 @@ export function TagsDatatable({
           <DeleteButton
             confirmMessage="Are you sure you want to remove the selected tags?"
             onConfirmed={() => onRemove(selectedItems)}
+            data-cy="remove-registry-tags-button"
           />
         )
       }
@@ -52,6 +53,7 @@ export function TagsDatatable({
         },
         table: 'registry-repository-tags',
       })}
+      data-cy="registry-tags-datatable"
     />
   );
 }

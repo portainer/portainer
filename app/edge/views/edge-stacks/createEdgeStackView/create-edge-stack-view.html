@@ -11,6 +11,7 @@
             <div class="col-sm-11">
               <input
                 type="text"
+                data-cy="edgeStackCreate-nameInput"
                 class="form-control"
                 ng-model="$ctrl.formValues.Name"
                 id="stack_name"
@@ -19,7 +20,6 @@
                 placeholder="e.g. mystack"
                 auto-focus
                 required
-                data-cy="edgeStackCreate-nameInput"
               />
               <div class="help-block" ng-show="$ctrl.form.$invalid">
                 <div class="small text-warning">
@@ -90,9 +90,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
                 <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
-                {{ $ctrl.state.formValidationError }}
-              </span>
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px"> {{ $ctrl.state.formValidationError }} </span>
             </div>
           </div>
           <!-- !actions -->

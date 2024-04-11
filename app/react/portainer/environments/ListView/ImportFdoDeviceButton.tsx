@@ -20,7 +20,11 @@ export function ImportFdoDeviceButton() {
 
   return (
     <div className="ml-[5px]">
-      <AddButton color="secondary" to="portainer.endpoints.importDevice">
+      <AddButton
+        color="secondary"
+        to="portainer.endpoints.importDevice"
+        data-cy="import-fdo-device-button"
+      >
         Import FDO device
       </AddButton>
     </div>

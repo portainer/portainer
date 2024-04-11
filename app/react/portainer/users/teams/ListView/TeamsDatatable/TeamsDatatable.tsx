@@ -16,7 +16,7 @@ import { DeleteButton } from '@@/buttons/DeleteButton';
 const storageKey = 'teams';
 
 const columns: ColumnDef<Team>[] = [
-  buildNameColumn<Team>('Name', 'portainer.teams.team'),
+  buildNameColumn<Team>('Name', 'portainer.teams.team', 'teams-name'),
 ];
 
 interface Props {
@@ -43,10 +43,12 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
             onConfirmed={() => handleRemoveClick(selectedRows)}
             disabled={selectedRows.length === 0}
             confirmMessage="Are you sure you want to remove the selected teams?"
+            data-cy="remove-teams-button"
           />
         )
       }
       emptyContentLabel="No teams found"
+      data-cy="teams-datatable"
     />
   );
 

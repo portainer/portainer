@@ -70,11 +70,14 @@ export function NamespacesDatatable({
           <DeleteButton
             onClick={() => onRemove(selectedItems)}
             disabled={selectedItems.length === 0}
+            data-cy="delete-namespace-button"
           />
 
-          <AddButton color="secondary">Add with form</AddButton>
+          <AddButton color="secondary" data-cy="add-namespace-form-button">
+            Add with form
+          </AddButton>
 
-          <CreateFromManifestButton />
+          <CreateFromManifestButton data-cy="k8s-namespaces-deploy-button" />
         </Authorized>
       )}
       renderTableSettings={() => (

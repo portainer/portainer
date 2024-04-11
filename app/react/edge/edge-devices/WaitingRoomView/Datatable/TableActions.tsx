@@ -38,6 +38,7 @@ export function TableActions({
       <DeleteButton
         onConfirmed={() => handleRemoveDevice(selectedRows)}
         disabled={selectedRows.length === 0}
+        data-cy="remove-device-button"
         confirmMessage="You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup."
       >
         Remove Device
@@ -58,6 +59,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateAndAssign(selectedRows)}
+            data-cy="associate-and-assign-button"
             disabled={
               selectedRows.length === 0 || licenseOverused || !isPureAdmin
             }
@@ -84,6 +86,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateDevice(selectedRows)}
+            data-cy="associate-device-button"
             disabled={selectedRows.length === 0 || licenseOverused}
             icon={Check}
           >

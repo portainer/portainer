@@ -90,6 +90,7 @@ export function IngressDatatable() {
         />
       }
       disableSelect={useCheckboxes()}
+      data-cy="k8s-ingresses-datatable"
     />
   );
 
@@ -114,15 +115,15 @@ export function IngressDatatable() {
         <DeleteButton
           disabled={selectedFlatRows.length === 0}
           onConfirmed={() => handleRemoveClick(selectedFlatRows)}
-          data-cy="k8sSecret-removeSecretButton"
           confirmMessage="Are you sure you want to delete the selected ingresses?"
+          data-cy="remove-ingresses-button"
         />
 
-        <AddButton to=".create" color="secondary">
+        <AddButton to=".create" color="secondary" data-cy="add-ingress-button">
           Add with form
         </AddButton>
 
-        <CreateFromManifestButton />
+        <CreateFromManifestButton data-cy="k8s-ingress-deploy-button" />
       </Authorized>
     );
   }

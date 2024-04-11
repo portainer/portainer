@@ -17,6 +17,7 @@ const columns = [
     'Name',
     'portainer.registries.registry.repository.tag',
     'tag',
+    'registry-tag-name',
     (item) => item.Name
   ),
   helper.display({

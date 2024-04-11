@@ -41,10 +41,16 @@ function ActionsCell({
     case LogsStatus.Collected:
       return (
         <>
-          <Button onClick={() => tableMeta.downloadLogs(item.EndpointId)}>
+          <Button
+            onClick={() => tableMeta.downloadLogs(item.EndpointId)}
+            data-cy={`edge-job-download-logs-${item.Endpoint.Name}`}
+          >
             Download logs
           </Button>
-          <Button onClick={() => tableMeta.clearLogs(item.EndpointId)}>
+          <Button
+            onClick={() => tableMeta.clearLogs(item.EndpointId)}
+            data-cy={`edge-job-clear-logs-${item.Endpoint.Name}`}
+          >
             Clear logs
           </Button>
         </>
@@ -52,7 +58,10 @@ function ActionsCell({
     case LogsStatus.Idle:
     default:
       return (
-        <Button onClick={() => tableMeta.collectLogs(item.EndpointId)}>
+        <Button
+          onClick={() => tableMeta.collectLogs(item.EndpointId)}
+          data-cy={`edge-job-retrieve-logs-${item.Endpoint.Name}`}
+        >
           Retrieve logs
         </Button>
       );

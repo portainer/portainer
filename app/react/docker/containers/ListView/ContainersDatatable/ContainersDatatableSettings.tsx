@@ -16,7 +16,8 @@ export function ContainersDatatableSettings({
   return (
     <>
       <Checkbox
-        id="settings-container-truncate-nae"
+        id="settings-container-truncate-name"
+        data-cy="settings-container-truncate-name"
         label="Truncate container name"
         checked={settings.truncateContainerName > 0}
         onChange={() =>

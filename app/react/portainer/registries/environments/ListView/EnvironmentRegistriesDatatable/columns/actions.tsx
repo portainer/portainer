@@ -40,17 +40,18 @@ function Cell({
             color="link"
             icon={Users}
             as={Link}
-            props={{ to: '.access', params: { id: item.Id } }}
+            props={{
+              to: '.access',
+              params: { id: item.Id },
+              'data-cy': `manage-access-link-${item.Name}`,
+            }}
+            data-cy={`registry-manage-access-button-${item.Name}`}
           >
             Manage access
           </Button>
         </Authorized>
       )}
-      <BrowseButton
-        registryId={item.Id}
-        registryType={item.Type}
-        environmentId={environmentId}
-      />
+      <BrowseButton registry={item} environmentId={environmentId} />
     </>
   );
 }

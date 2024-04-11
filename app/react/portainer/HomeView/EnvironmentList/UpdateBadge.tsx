@@ -28,6 +28,7 @@ export function UpdateBadge() {
           'th-dark:bg-blue-3 th-dark:text-blue-8 th-dark:hover:bg-blue-5 th-dark:hover:text-blue-8',
           'th-highcontrast:border-white th-highcontrast:bg-transparent th-highcontrast:text-white th-highcontrast:hover:bg-gray-warm-7 th-highcontrast:hover:text-white'
         )}
+        data-cy="home-schedule-update-link"
       >
         Schedule Update
       </Link>

@@ -37,7 +37,7 @@ export function StorageClassDatatable({ storageClassValues }: Props) {
                           checked
                         )
                       }
-                      className="mr-2 mb-0"
+                      className="mb-0 mr-2"
                       id={`kubeSetup-storageToggle${storageClassValue.Name}`}
                       name={`kubeSetup-storageToggle${storageClassValue.Name}`}
                       data-cy={`kubeSetup-storageToggle${storageClassValue.Name}`}
@@ -68,7 +68,7 @@ export function StorageClassDatatable({ storageClassValues }: Props) {
                           checked
                         )
                       }
-                      className="mr-2 mb-0"
+                      className="mb-0 mr-2"
                       data-cy={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
                       id={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}
                       name={`kubeSetup-storageExpansionToggle${storageClassValue.Name}`}

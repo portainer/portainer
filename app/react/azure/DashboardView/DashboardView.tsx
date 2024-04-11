@@ -34,6 +34,7 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
+              dataCy="subscriptions-count"
               isLoading={subscriptionsQuery.isLoading}
               isRefetching={subscriptionsQuery.isRefetching}
               icon={Subscription}
@@ -42,6 +43,7 @@ export function DashboardView() {
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
               <DashboardItem
                 value={resourceGroupsCount}
+                dataCy="resource-groups-count"
                 isLoading={resourceGroupsQuery.isLoading}
                 icon={Package}
                 type="Resource group"

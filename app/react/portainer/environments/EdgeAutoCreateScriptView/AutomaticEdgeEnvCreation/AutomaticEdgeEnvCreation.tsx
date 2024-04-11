@@ -75,8 +75,13 @@ export function AutomaticEdgeEnvCreation() {
         {!edgeComputeConfigurationOK ? (
           <TextTip color="orange">
             In order to use this feature, please turn on Edge Compute features{' '}
-            <Link to="portainer.settings.edgeCompute">here</Link> and have
-            Portainer API server URL and tunnel server address properly
+            <Link
+              to="portainer.settings.edgeCompute"
+              data-cy="edge-disabled-portainer-edge-settings-link"
+            >
+              here
+            </Link>{' '}
+            and have Portainer API server URL and tunnel server address properly
             configured.
           </TextTip>
         ) : (
@@ -147,7 +152,12 @@ function EdgeKeyInfo({
           <code>{edgeKey}</code>
         </div>
 
-        <CopyButton copyText={edgeKey}>Copy token</CopyButton>
+        <CopyButton
+          copyText={edgeKey}
+          data-cy="edge-auto-create-copy-token-button"
+        >
+          Copy token
+        </CopyButton>
       </FormSection>
 
       <hr />
@@ -159,19 +169,28 @@ function EdgeKeyInfo({
         showMetaFields
       >
         <FormControl label="Portainer API server URL">
-          <Input value={url} readOnly />
+          <Input value={url} readOnly data-cy="edge-auto-create-url-input" />
         </FormControl>
 
         {!asyncMode && (
           <FormControl label="Portainer tunnel server address">
-            <Input value={tunnelUrl} readOnly />
+            <Input
+              value={tunnelUrl}
+              readOnly
+              data-cy="edge-auto-create-tunnel-address-input"
+            />
           </FormControl>
         )}
 
         <TextTip color="blue">
           Portainer Server URL{' '}
           {!asyncMode ? 'and tunnel server address are' : 'is'} set{' '}
-          <Link to="portainer.settings.edgeCompute">here</Link>
+          <Link
+            to="portainer.settings.edgeCompute"
+            data-cy="server-url-portainer-edge-settings-link"
+          >
+            here
+          </Link>
         </TextTip>
       </EdgeScriptForm>
     </>

@@ -39,7 +39,11 @@ export function StackName({
           <br />
           You can leave the stack name empty, or even turn off Kubernetes Stacks
           functionality entirely via{' '}
-          <Link to="portainer.settings" target="_blank">
+          <Link
+            to="portainer.settings"
+            target="_blank"
+            data-cy="k8s-deploy-stack-input-settings-link"
+          >
             Kubernetes Settings
           </Link>
           .
@@ -71,6 +75,7 @@ export function StackName({
             onChange={setStackName}
             placeholder="e.g. myStack"
             inputId="stack_name"
+            data-cy="k8s-deploy-stack-input"
           />
         </div>
       </div>

@@ -55,7 +55,11 @@ export function ScheduledTimeField({ disabled }: Props) {
             minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
           />
         ) : (
-          <Input defaultValue={value} disabled />
+          <Input
+            defaultValue={value}
+            disabled
+            data-cy="update-schedules-time-input"
+          />
         )}
       </FormControl>
       {!disabled && value && (

@@ -65,6 +65,7 @@
             ng-disabled="$ctrl.settings.OAuthAutoMapTeamMemberships"
             ng-model="$ctrl.settings.DefaultTeamID"
             ng-options="team.Id as team.Name for team in $ctrl.teams"
+            data-cy="default-team-select"
           >
             <option value="">No team</option>
           </select>
@@ -106,7 +107,14 @@
       </label>
       <div class="col-sm-9 col-lg-10">
         <div class="col-xs-11 col-lg-10">
-          <input type="text" class="form-control" id="oauth_token_claim_name" ng-model="$ctrl.settings.TeamMemberships.OAuthClaimName" placeholder="groups" />
+          <input
+            type="text"
+            class="form-control"
+            id="oauth_token_claim_name"
+            ng-model="$ctrl.settings.TeamMemberships.OAuthClaimName"
+            placeholder="groups"
+            data-cy="oauth-token-claim-name"
+          />
         </div>
       </div>
     </div>
@@ -122,13 +130,14 @@
         <div class="col-sm-12 form-inline" ng-repeat="mapping in $ctrl.settings.TeamMemberships.OAuthClaimMappings" style="margin-top: 0.75em">
           <div class="input-group input-group-sm col-sm-5">
             <span class="input-group-addon">claim value regex</span>
-            <input type="text" class="form-control" ng-model="mapping.ClaimValRegex" />
+            <input type="text" class="form-control" ng-model="mapping.ClaimValRegex" data-cy="claim-value-regex" />
           </div>
           <span style="margin: 0px 0.5em">maps to</span>
           <div class="input-group input-group-sm col-sm-3 col-lg-4">
             <span class="input-group-addon">team</span>
             <select
               class="form-control"
+              data-cy="team-select"
               ng-init="mapping.Team = mapping.Team || $ctrl.settings.DefaultTeamID"
               ng-model="mapping.Team"
               ng-options="team.Id as team.Name for team in $ctrl.teams"
@@ -159,7 +168,7 @@
 
       <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
         <div class="col-xs-11">
-          <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
+          <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams" data-cy="default-team-select">
             <option value="">No team</option>
           </select>
         </div>
@@ -191,9 +200,7 @@
     </div>
 
     <div class="form-group">
-      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-        {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
-      </label>
+      <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left"> {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }} </label>
       <div class="col-sm-9 col-lg-10">
         <input
           type="password"
@@ -217,6 +224,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-authorization-uri"
           class="form-control"
           id="oauth_authorization_uri"
           ng-model="$ctrl.settings.AuthorizationURI"
@@ -235,6 +243,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-access-token-uri"
           class="form-control"
           id="oauth_access_token_uri"
           ng-model="$ctrl.settings.AccessTokenURI"
@@ -253,6 +262,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-resource-uri"
           class="form-control"
           id="oauth_resource_uri"
           ng-model="$ctrl.settings.ResourceURI"
@@ -273,6 +283,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-redirect-uri"
           class="form-control"
           id="oauth_redirect_uri"
           ng-model="$ctrl.settings.RedirectURI"
@@ -293,6 +304,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-logout-url"
           class="form-control"
           id="oauth_logout_url"
           ng-model="$ctrl.settings.LogoutURI"
@@ -312,6 +324,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-user-identifier"
           class="form-control"
           id="oauth_user_identifier"
           ng-model="$ctrl.settings.UserIdentifier"
@@ -332,6 +345,7 @@
       <div class="col-sm-9 col-lg-10">
         <input
           type="text"
+          data-cy="oauth-scopes"
           class="form-control"
           id="oauth_scopes"
           ng-model="$ctrl.settings.Scopes"
@@ -364,6 +378,7 @@
         <div class="col-sm-9 col-lg-10">
           <input
             type="text"
+            data-cy="oauth-microsoft-tenant-id"
             class="form-control"
             id="oauth_microsoft_tenant_id"
             placeholder="xxxxxxxxxxxxxxxxxxxx"
@@ -386,6 +401,7 @@
         <div class="col-sm-9 col-lg-10">
           <input
             type="text"
+            data-cy="oauth-client-id"
             id="oauth_client_id"
             ng-model="$ctrl.settings.ClientID"
             placeholder="xxxxxxxxxxxxxxxxxxxx"
@@ -397,9 +413,7 @@
       </div>
 
       <div class="form-group">
-        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-          {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
-        </label>
+        <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left"> {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }} </label>
         <div class="col-sm-9 col-lg-10">
           <input
             type="password"

@@ -108,7 +108,8 @@ export function Datatable<D extends DefaultType>({
   );
 
   const allColumns = useMemo(
-    () => _.compact([!disableSelect && createSelectColumn<D>(), ...columns]),
+    () =>
+      _.compact([!disableSelect && createSelectColumn<D>(dataCy), ...columns]),
     [disableSelect, columns]
   );
 
@@ -179,6 +180,7 @@ export function Datatable<D extends DefaultType>({
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
+        data-cy={`${dataCy}-header`}
       />
 
       <DatatableContent<D>

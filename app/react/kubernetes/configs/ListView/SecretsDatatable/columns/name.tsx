@@ -59,6 +59,7 @@ function Cell({ row }: CellContext<SecretRowData, string>) {
           }}
           title={name}
           className="w-fit max-w-xs truncate xl:max-w-sm 2xl:max-w-md"
+          data-cy={`secret-name-link-${name}`}
         >
           {name}
         </Link>
