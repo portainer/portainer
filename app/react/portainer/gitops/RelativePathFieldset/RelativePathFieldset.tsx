@@ -198,7 +198,7 @@ export function RelativePathFieldset({
                     with an Edge Group. Only configurations that match the
                     selected rule will be accessible through their corresponding
                     paths. Deployments that rely on accessing the configuration
-                    may experience errors?.
+                    may experience errors.
                   </TextTip>
                 </div>
               </div>
