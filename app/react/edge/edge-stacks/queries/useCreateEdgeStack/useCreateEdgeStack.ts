@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { RegistryId } from '@/react/portainer/registries/types/registry';

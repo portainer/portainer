@@ -1,4 +1,4 @@
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { PlusCircle } from 'lucide-react';
 
@@ -103,6 +103,6 @@ export function FDOProfilesDatatableActions({
       })
     );
 
-    await queryClient.invalidateQueries('fdo_profiles');
+    await queryClient.invalidateQueries(['fdo_profiles']);
   }
 }

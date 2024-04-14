@@ -28,7 +28,7 @@ export function useInitialValues({
   } = useCurrentStateAndParams();
 
   const fileContentQuery = useFetchTemplateFile(appTemplateId);
-  if (fileContentQuery.isLoading) {
+  if (fileContentQuery.isInitialLoading) {
     return undefined;
   }
 

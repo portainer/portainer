@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 import { RefreshCcw } from 'lucide-react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { string, StringSchema } from 'yup';
 
 import {

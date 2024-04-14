@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { compact } from 'lodash';
 import { ServiceList } from 'kubernetes-types/core/v1';
 

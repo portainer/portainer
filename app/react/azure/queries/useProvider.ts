@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -14,9 +14,10 @@ export function useProvider(
   environmentId: EnvironmentId,
   subscriptions: Subscription[] = []
 ) {
-  const queries = useQueries(
-    subscriptions.map((subscription) => ({
+  const queries = useQueries({
+    queries: subscriptions.map((subscription) => ({
       queryKey: queryKeys.provider(environmentId, subscription.subscriptionId),
+
       queryFn: async () => {
         const provider = await getContainerInstanceProvider(
           environmentId,
@@ -24,9 +25,10 @@ export function useProvider(
         );
         return [subscription.subscriptionId, provider] as const;
       },
+
       ...withError('Unable to retrieve Azure providers'),
-    }))
-  );
+    })),
+  });
 
   return {
     providers: Object.fromEntries(
