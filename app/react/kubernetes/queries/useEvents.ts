@@ -5,20 +5,25 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
-import { parseKubernetesAxiosError } from '../../axiosError';
+import { parseKubernetesAxiosError } from '../axiosError';
 
-async function getNamespaceEvents(
+type Params = {
+  labelSelector?: string;
+  fieldSelector?: string;
+};
+
+async function getEvents(
   environmentId: EnvironmentId,
-  namespace: string,
-  labelSelector?: string
+  namespace?: string,
+  params?: Params
 ) {
   try {
     const { data } = await axios.get<EventList>(
-      `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/events`,
+      namespace
+        ? `/endpoints/${environmentId}/kubernetes/api/v1/events`
+        : `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/events`,
       {
-        params: {
-          labelSelector,
-        },
+        params,
       }
     );
     return data.items;
@@ -27,22 +32,15 @@ async function getNamespaceEvents(
   }
 }
 
-export function useNamespaceEventsQuery(
+export function useEvents(
   environmentId: EnvironmentId,
-  namespace: string,
+  namespace?: string,
   options?: { autoRefreshRate?: number },
-  labelSelector?: string
+  params?: Params
 ) {
   return useQuery(
-    [
-      'environments',
-      environmentId,
-      'kubernetes',
-      'events',
-      namespace,
-      labelSelector,
-    ],
-    () => getNamespaceEvents(environmentId, namespace, labelSelector),
+    ['environments', environmentId, 'kubernetes', namespace, 'events', params],
+    () => getEvents(environmentId, namespace, params),
     {
       ...withError('Unable to retrieve events'),
       refetchInterval() {
