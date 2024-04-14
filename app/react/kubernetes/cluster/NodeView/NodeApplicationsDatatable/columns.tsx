@@ -26,6 +26,7 @@ export function useColumns(areStacksVisible: boolean) {
               <Link
                 to="kubernetes.resourcePools.resourcePool"
                 params={{ id: namespace }}
+                data-cy={`namespace-link-${namespace}`}
               >
                 {namespace}
               </Link>

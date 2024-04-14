@@ -1,5 +1,5 @@
 import { ComponentType } from 'react';
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 import { withReactQuery } from '@/react-tools/withReactQuery';
 

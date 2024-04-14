@@ -10,13 +10,13 @@
       <pr-icon icon="'search'" class="vertical-center"></pr-icon>
       <input
         type="text"
+        data-cy="k8sConfigDetail-eventsTableSearchInput"
         class="searchInput ml-1"
         ng-model="$ctrl.state.textFilter"
         ng-change="$ctrl.onTextFilterChange()"
         placeholder="Search for an event..."
         auto-focus
         ng-model-options="{ debounce: 300 }"
-        data-cy="k8sConfigDetail-eventsTableSearchInput"
       />
     </div>
     <div class="settings">
@@ -28,12 +28,24 @@
             <div class="menuContent">
               <div>
                 <div class="md-checkbox">
-                  <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                  <input
+                    id="setting_auto_refresh"
+                    type="checkbox"
+                    ng-model="$ctrl.settings.repeater.autoRefresh"
+                    ng-change="$ctrl.onSettingsRepeaterChange()"
+                    data-cy="k8sConfigDetail-eventsTableAutoRefreshCheckbox"
+                  />
                   <label for="setting_auto_refresh">Auto refresh</label>
                 </div>
                 <div ng-if="$ctrl.settings.repeater.autoRefresh">
                   <label for="settings_refresh_rate"> Refresh rate </label>
-                  <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                  <select
+                    id="settings_refresh_rate"
+                    ng-model="$ctrl.settings.repeater.refreshRate"
+                    ng-change="$ctrl.onSettingsRepeaterChange()"
+                    class="small-select"
+                    data-cy="k8sConfigDetail-eventsTableRefreshRateSelect"
+                  >
                     <option value="10">10s</option>
                     <option value="30">30s</option>
                     <option value="60">1min</option>

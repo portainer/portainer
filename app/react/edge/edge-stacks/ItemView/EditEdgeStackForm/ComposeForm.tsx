@@ -54,6 +54,7 @@ export function ComposeForm({
       )}
 
       <WebEditorForm
+        data-cy="compose-editor"
         value={values.content}
         yaml
         id="compose-editor"

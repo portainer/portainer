@@ -19,6 +19,7 @@ export function PlatformField({
     <FormControl label="Platform" required inputId="template-platform">
       <Select
         name="platform"
+        data-cy="custom-tempalte-platform-select"
         id="template-platform"
         required
         options={platformOptions}

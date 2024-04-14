@@ -9,6 +9,7 @@ test('render should include description', async () => {
       title="test button"
       onChange={onClick}
       description={<span>test description</span>}
+      data-cy="test"
     />
   );
 

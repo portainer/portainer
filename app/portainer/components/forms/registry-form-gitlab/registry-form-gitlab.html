@@ -13,7 +13,7 @@
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required data-cy="registry-username-input" />
       <div class="help-block" ng-show="registryFormGitlab.registry_username.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_username.$error">
@@ -76,7 +76,16 @@
       <portainer-tooltip message="'URL of Gitlab instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required />
+      <input
+        type="text"
+        class="form-control"
+        id="instance_url"
+        name="instance_url"
+        ng-model="$ctrl.model.Gitlab.InstanceURL"
+        placeholder="https://gitlab.com"
+        required
+        data-cy="instance-url-input"
+      />
       <div class="help-block" ng-show="registryFormGitlab.instance_url.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.instance_url.$error">
@@ -97,7 +106,16 @@
       <portainer-tooltip message="'URL of Gitlab registry instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required />
+      <input
+        type="text"
+        class="form-control"
+        id="registry_url"
+        name="registry_url"
+        ng-model="$ctrl.model.URL"
+        placeholder="https://registry.gitlab.com"
+        required
+        data-cy="registry-url-input"
+      />
       <div class="help-block" ng-show="registryFormGitlab.registry_url.$invalid">
         <div class="small text-warning">
           <div ng-messages="registryFormGitlab.registry_url.$error">
@@ -130,24 +148,15 @@
       If you can't select a project, make sure that registry feature is activated on it.
     </span>
   </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <gitlab-projects-datatable
-        title-text="GitLab projects"
-        title-icon="list"
-        dataset="$ctrl.projects"
-        table-key="gitlab_projects"
-        state="$ctrl.state.gitlab"
-        order-by="Name"
-      ></gitlab-projects-datatable>
-    </div>
-  </div>
+
+  <gitlab-project-selector dataset="$ctrl.projects" value="$ctrl.selectedRegistries" on-change="($ctrl.onChangeRegistries)"></gitlab-project-selector>
+
   <div class="form-group">
     <div class="col-sm-12">
       <button
-        ng-click="$ctrl.createRegistries()"
+        ng-click="$ctrl.createRegistries($ctrl.selectedRegistries)"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !$ctrl.state.gitlab.selectedItemCount"
+        ng-disabled="$ctrl.actionInProgress || !$ctrl.selectedRegistries.length"
         button-spinner="$ctrl.actionInProgress"
         analytics-on
         analytics-category="portainer"

@@ -11,7 +11,7 @@ import { columnHelper } from './helper';
 export const namespace = columnHelper.accessor('Namespace', {
   header: 'Namespace',
   id: 'namespace',
-  cell: ({ getValue }) => {
+  cell: ({ getValue, row }) => {
     const namespace = getValue();
 
     return (
@@ -21,6 +21,7 @@ export const namespace = columnHelper.accessor('Namespace', {
           id: namespace,
         }}
         title={namespace}
+        data-cy={`service-namespace-link-${row.original.Name}`}
       >
         {namespace}
       </Link>

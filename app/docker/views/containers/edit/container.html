@@ -72,7 +72,7 @@
     <rd-widget>
       <rd-widget-header icon="box" title-text="Container status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
+        <table class="table" data-cy="container-status-table">
           <tbody>
             <tr>
               <td class="col-xs-6 col-sm-4 col-md-3 col-lg-3">ID</td>
@@ -88,7 +88,7 @@
               </td>
               <td ng-if="container.edit">
                 <form ng-submit="renameContainer()">
-                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" />
+                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" data-cy="containerNameInput" />
                   <a href="" ng-click="container.edit = false;">
                     <pr-icon icon="'x'"></pr-icon>
                   </a>
@@ -327,7 +327,7 @@
     <rd-widget>
       <rd-widget-header icon="database" title-text="Volumes"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
+        <table class="table" data-cy="container-volumes-table">
           <thead>
             <tr>
               <th>Host/volume</th>

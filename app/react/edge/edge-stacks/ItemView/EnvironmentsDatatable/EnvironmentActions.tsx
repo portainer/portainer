@@ -25,8 +25,13 @@ export function EnvironmentActions({ environment }: Props) {
           to="edge.browse.containers"
           params={{ environmentId: environment.Id, edgeStackId }}
           className="!text-inherit hover:!no-underline"
+          data-cy="browse-snapshot-link"
         >
-          <Button color="none" title="Browse Snapshot">
+          <Button
+            color="none"
+            title="Browse Snapshot"
+            data-cy="browse-snapshot-button"
+          >
             <Icon icon={Search} className="searchIcon" />
           </Button>
         </Link>

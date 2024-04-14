@@ -59,13 +59,13 @@ import { deploymentTypeValidation } from '@/react/kubernetes/applications/compon
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
 import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
-import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/HelmInsightsBox';
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
 import { applicationsModule } from './applications';
 import { volumesModule } from './volumes';
 import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
+import { registriesModule } from './registries';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
@@ -73,6 +73,7 @@ export const ngModule = angular
     volumesModule,
     namespacesModule,
     clusterManagementModule,
+    registriesModule,
   ])
   .component(
     'ingressClassDatatable',
@@ -99,7 +100,6 @@ export const ngModule = angular
       'value',
     ])
   )
-  .component('helmInsightsBox', r2a(HelmInsightsBox, []))
   .component(
     'namespaceAccessUsersSelector',
     r2a(NamespaceAccessUsersSelector, [
@@ -140,6 +140,7 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+      'data-cy',
     ])
   )
   .component(
@@ -225,6 +226,7 @@ export const ngModule = angular
       'onRefresh',
       'tableKey',
       'tableTitle',
+      'dataCy',
     ])
   );
 

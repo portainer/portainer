@@ -2,6 +2,7 @@ import { PropsWithChildren, useEffect, useMemo } from 'react';
 import { useTransitionHook } from '@uirouter/react';
 
 import { BROWSER_OS_PLATFORM } from '@/react/constants';
+import { AutomationTestingProps } from '@/types';
 
 import { CodeEditor } from '@@/CodeEditor';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -51,7 +52,7 @@ export const editorConfig = {
   win: otherEditorConfig,
 } as const;
 
-interface Props {
+interface Props extends AutomationTestingProps {
   value: string;
   onChange: (value: string) => void;
 
@@ -77,6 +78,7 @@ export function WebEditorForm({
   children,
   error,
   height,
+  'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
     <div>
@@ -105,6 +107,7 @@ export function WebEditorForm({
               value={value}
               onChange={onChange}
               height={height}
+              data-cy={dataCy}
             />
           </div>
         </div>

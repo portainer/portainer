@@ -15,19 +15,30 @@ function Template({
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
     <ButtonGroup size={size}>
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={Square} color="danger" onClick={() => {}}>
+      <Button icon={Square} color="danger" onClick={() => {}} data-cy="button">
         Stop
       </Button>
-      <Button icon={RefreshCw} color="primary" onClick={() => {}}>
+      <Button
+        icon={RefreshCw}
+        color="primary"
+        onClick={() => {}}
+        data-cy="button"
+      >
         Restart
       </Button>
-      <Button icon={Play} color="primary" disabled onClick={() => {}}>
+      <Button
+        icon={Play}
+        color="primary"
+        disabled
+        onClick={() => {}}
+        data-cy="button"
+      >
         Resume
       </Button>
-      <Button icon={Trash2} color="danger" onClick={() => {}}>
+      <Button icon={Trash2} color="danger" onClick={() => {}} data-cy="button">
         Remove
       </Button>
     </ButtonGroup>
@@ -42,16 +53,21 @@ Primary.args = {
 export function Xsmall() {
   return (
     <ButtonGroup size="xsmall">
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={Square} color="danger" onClick={() => {}}>
+      <Button icon={Square} color="danger" onClick={() => {}} data-cy="button">
         Stop
       </Button>
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={RefreshCw} color="primary" onClick={() => {}}>
+      <Button
+        icon={RefreshCw}
+        color="primary"
+        onClick={() => {}}
+        data-cy="button"
+      >
         Restart
       </Button>
     </ButtonGroup>
@@ -61,16 +77,21 @@ export function Xsmall() {
 export function Small() {
   return (
     <ButtonGroup size="small">
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={Square} color="danger" onClick={() => {}}>
+      <Button icon={Square} color="danger" onClick={() => {}} data-cy="button">
         Stop
       </Button>
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={RefreshCw} color="primary" onClick={() => {}}>
+      <Button
+        icon={RefreshCw}
+        color="primary"
+        onClick={() => {}}
+        data-cy="button"
+      >
         Restart
       </Button>
     </ButtonGroup>
@@ -80,16 +101,21 @@ export function Small() {
 export function Large() {
   return (
     <ButtonGroup size="large">
-      <Button icon={Play} color="primary" onClick={() => {}}>
+      <Button icon={Play} color="primary" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={Square} color="danger" onClick={() => {}}>
+      <Button icon={Square} color="danger" onClick={() => {}} data-cy="button">
         Stop
       </Button>
-      <Button icon={Play} color="light" onClick={() => {}}>
+      <Button icon={Play} color="light" onClick={() => {}} data-cy="button">
         Start
       </Button>
-      <Button icon={RefreshCw} color="primary" onClick={() => {}}>
+      <Button
+        icon={RefreshCw}
+        color="primary"
+        onClick={() => {}}
+        data-cy="button"
+      >
         Restart
       </Button>
     </ButtonGroup>

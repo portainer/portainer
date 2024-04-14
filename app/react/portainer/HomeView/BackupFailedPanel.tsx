@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
 import { getBackupStatus } from '@/portainer/services/api/backup.service';
@@ -20,8 +20,10 @@ export function BackupFailedPanel() {
       <TextTip>
         The latest automated backup has failed at {isoDate(status.TimestampUTC)}
         . For details please see the log files and have a look at the{' '}
-        <Link to="portainer.settings">settings</Link> to verify the backup
-        configuration.
+        <Link to="portainer.settings" data-cy="backup-failed-settings-link">
+          settings
+        </Link>{' '}
+        to verify the backup configuration.
       </TextTip>
     </InformationPanel>
   );

@@ -86,8 +86,14 @@ export class EdgeJobController {
   async collectLogsAsync(endpointId) {
     try {
       await this.EdgeJobService.collectLogs(this.edgeJob.Id, endpointId);
-      const result = _.find(this.results, (result) => result.EndpointId === endpointId);
-      result.LogsStatus = 2;
+      this.results = this.results.map((result) =>
+        result.EndpointId === endpointId
+          ? {
+              ...result,
+              LogsStatus: 2,
+            }
+          : result
+      );
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to collect logs');
     }
@@ -99,8 +105,14 @@ export class EdgeJobController {
   async clearLogsAsync(endpointId) {
     try {
       await this.EdgeJobService.clearLogs(this.edgeJob.Id, endpointId);
-      const result = _.find(this.results, (result) => result.EndpointId === endpointId);
-      result.LogsStatus = 1;
+      this.results = this.results.map((result) =>
+        result.EndpointId === endpointId
+          ? {
+              ...result,
+              LogsStatus: 1,
+            }
+          : result
+      );
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to clear logs');
     }

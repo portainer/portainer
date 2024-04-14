@@ -50,6 +50,7 @@ export function IngressClassDatatable({
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        data-cy="ingress-class-datatable"
       />
     </div>
   );
@@ -59,6 +60,7 @@ export function IngressClassDatatable({
       <div className="flex items-start">
         <ButtonGroup>
           <Button
+            data-cy="disallow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === true).length ===
               0
@@ -72,6 +74,7 @@ export function IngressClassDatatable({
             Disallow selected
           </Button>
           <Button
+            data-cy="allow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === false)
                 .length === 0

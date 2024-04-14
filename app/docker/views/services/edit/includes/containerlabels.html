@@ -25,6 +25,7 @@
                 <span class="input-group-addon fit-text-size">name</span>
                 <input
                   type="text"
+                  data-cy="container-label-key-{{ $index }}"
                   class="form-control"
                   ng-model="label.key"
                   placeholder="e.g. com.example.foo"
@@ -39,6 +40,7 @@
                 <span class="input-group-addon fit-text-size">value</span>
                 <input
                   type="text"
+                  data-cy="container-label-value_{{ $index }}"
                   class="form-control"
                   ng-model="label.value"
                   placeholder="e.g. bar"

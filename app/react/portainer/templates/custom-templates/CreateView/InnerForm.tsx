@@ -96,6 +96,7 @@ export function InnerForm({
 
       {isEditor && (
         <WebEditorForm
+          data-cy="custom-template-creation-editor"
           id="custom-template-creation-editor"
           value={values.FileContent}
           onChange={handleChangeFileContent}
@@ -113,6 +114,7 @@ export function InnerForm({
           value={values.File}
           onChange={(value) => setFieldValue('File', value)}
           required
+          data-cy="custom-template-creation-file-upload"
         />
       )}
 
@@ -178,6 +180,7 @@ export function InnerForm({
         isValid={isValid}
         loadingText="Creating custom template..."
         submitLabel="Create custom template"
+        data-cy="custom-template-creation-submit-button"
       />
     </Form>
   );

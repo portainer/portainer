@@ -31,16 +31,18 @@ export function DevicesField({
       label="Devices"
       errors={errors}
       itemBuilder={() => ({ pathOnHost: '', pathInContainer: '' })}
+      data-cy="docker-container-devices"
     />
   );
 }
 
-function Item({ item, onChange, error }: ItemProps<Device>) {
+function Item({ item, onChange, error, index }: ItemProps<Device>) {
   return (
     <div className="w-full">
       <div className="flex w-full gap-4">
         <InputLabeled
           value={item.pathOnHost}
+          data-cy={`device-path-on-host_${index}`}
           onChange={(e) => onChange({ ...item, pathOnHost: e.target.value })}
           label="host"
           placeholder="e.g. /dev/tty0"
@@ -49,6 +51,7 @@ function Item({ item, onChange, error }: ItemProps<Device>) {
         />
         <InputLabeled
           value={item.pathInContainer}
+          data-cy={`device-path-on-container_${index}`}
           onChange={(e) =>
             onChange({ ...item, pathInContainer: e.target.value })
           }

@@ -2,6 +2,8 @@ import { ComponentProps, PropsWithChildren } from 'react';
 import clsx from 'clsx';
 import { Check, Copy } from 'lucide-react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Icon } from '@@/Icon';
 
 import { Button } from '../Button';
@@ -9,7 +11,7 @@ import { Button } from '../Button';
 import styles from './CopyButton.module.css';
 import { useCopy } from './useCopy';
 
-export interface Props {
+export interface Props extends AutomationTestingProps {
   copyText: string;
   fadeDelay?: number;
   displayText?: string;
@@ -26,6 +28,7 @@ export function CopyButton({
   color,
   indicatorPosition = 'right',
   children,
+  'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   const { handleCopy, copiedSuccessfully } = useCopy(copyText, fadeDelay);
 
@@ -57,6 +60,7 @@ export function CopyButton({
         type="button"
         icon={Copy}
         disabled={!copyText}
+        data-cy={dataCy}
       >
         {children}
       </Button>

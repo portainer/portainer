@@ -31,6 +31,7 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
     <>
       <Button
         onClick={handleClick}
+        data-cy="download-kubeconfig-button"
         size="medium"
         className="!m-0"
         icon={Download}

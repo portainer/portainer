@@ -23,12 +23,10 @@ class PorAccessManagementController {
     });
   }
 
-  updateAction() {
+  updateAction(updatedUserAccesses, updatedTeamAccesses) {
     const entity = this.accessControlledEntity;
     const oldUserAccessPolicies = entity.UserAccessPolicies;
     const oldTeamAccessPolicies = entity.TeamAccessPolicies;
-    const updatedUserAccesses = _.filter(this.authorizedUsersAndTeams, { Updated: true, Type: 'user', Inherited: false });
-    const updatedTeamAccesses = _.filter(this.authorizedUsersAndTeams, { Updated: true, Type: 'team', Inherited: false });
 
     const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, updatedUserAccesses, updatedTeamAccesses);
     this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;

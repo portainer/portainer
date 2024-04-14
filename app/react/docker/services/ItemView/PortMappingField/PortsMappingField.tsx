@@ -64,7 +64,7 @@ export function PortsMappingField({
       isValid={!errors}
     >
       {values.length > 0 ? (
-        <Table>
+        <Table data-cy="service-published-ports-table">
           <thead>
             <tr>
               <th>Host port</th>
@@ -123,6 +123,7 @@ function Item({
               onChange={(value) => handleChange('hostPort', value)}
               id={`hostPort-${index}`}
               label="host"
+              data-cy={`hostPort-${index}`}
             />
           </div>
         </td>
@@ -132,6 +133,7 @@ function Item({
             onChange={(value) => handleChange('containerPort', value)}
             id={`containerPort-${index}`}
             label="container"
+            data-cy={`containerPort-${index}`}
           />
         </td>
         <td>
@@ -154,6 +156,7 @@ function Item({
             ]}
             disabled={disabled}
             aria-label="publish mode"
+            data-cy={`publishMode-${index}`}
           />
         </td>
         <td>
@@ -161,6 +164,7 @@ function Item({
             icon={Trash2}
             color="dangerlight"
             onClick={() => onRemove()}
+            data-cy={`remove-port-${index}`}
           />
         </td>
       </tr>

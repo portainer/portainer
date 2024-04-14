@@ -1,11 +1,4 @@
-import {
-  ChevronDown,
-  Download,
-  List,
-  Plus,
-  Trash2,
-  Upload,
-} from 'lucide-react';
+import { ChevronDown, Download, List, Trash2, Upload } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuPopover } from '@reach/menu-button';
 import { positionRight } from '@reach/popover';
 import { useMemo } from 'react';
@@ -21,7 +14,7 @@ import {
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
-import { Button, ButtonGroup, LoadingButton } from '@@/buttons';
+import { AddButton, Button, ButtonGroup, LoadingButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { ButtonWithRef } from '@@/buttons/Button';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
@@ -71,6 +64,7 @@ export function ImagesDatatable({
     <Datatable
       title="Images"
       titleIcon={List}
+      data-cy="docker-images-datatable"
       renderTableActions={(selectedItems) => (
         <div className="flex items-center gap-2">
           <RemoveButtonMenu selectedItems={selectedItems} onRemove={onRemove} />
@@ -82,14 +76,12 @@ export function ImagesDatatable({
           />
 
           <Authorized authorizations="DockerImageBuild">
-            <Button
-              as={Link}
-              props={{ to: 'docker.images.build' }}
+            <AddButton
+              to="docker.images.build"
               data-cy="image-buildImageButton"
-              icon={Plus}
             >
               Build a new image
-            </Button>
+            </AddButton>
           </Authorized>
         </div>
       )}
@@ -139,6 +131,7 @@ function RemoveButtonMenu({
             color="dangerlight"
             disabled={selectedItems.length === 0}
             icon={ChevronDown}
+            data-cy="image-toggleRemoveButtonMenu"
           >
             <span className="sr-only">Toggle Dropdown</span>
           </MenuButton>
@@ -178,7 +171,10 @@ function ImportExportButtons({
           data-cy="image-importImageButton"
           icon={Upload}
           disabled={isExportInProgress}
-          props={{ to: 'docker.images.import' }}
+          props={{
+            to: 'docker.images.import',
+            'data-cy': 'image-importImageLink',
+          }}
         >
           Import
         </Button>

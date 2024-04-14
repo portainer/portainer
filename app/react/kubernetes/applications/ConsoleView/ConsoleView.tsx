@@ -11,6 +11,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
 import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
+import { Input } from '@@/form-components/Input';
 
 interface StringDictionary {
   [index: string]: string;
@@ -129,7 +130,7 @@ export function ConsoleView() {
                   <span className="input-group-addon">
                     <Icon icon={TerminalIcon} className="mr-1" />
                   </span>
-                  <input
+                  <Input
                     type="text"
                     className="form-control"
                     placeholder="/bin/bash"
@@ -141,12 +142,14 @@ export function ConsoleView() {
                     // https://portainer.atlassian.net/browse/EE-5752
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
+                    data-cy="console-command-input"
                   />
                 </div>
               </div>
               <div className="row mt-4">
                 <Button
                   className="btn btn-primary !ml-0"
+                  data-cy="connect-console-button"
                   onClick={
                     connectionStatus === 'closed'
                       ? connectConsole

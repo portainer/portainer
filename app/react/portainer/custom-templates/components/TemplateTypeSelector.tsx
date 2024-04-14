@@ -19,6 +19,7 @@ export function TemplateTypeSelector({
     <FormControl label="Type" required inputId="template-type">
       <Select
         name="type"
+        data-cy="custom-template-template-type"
         id="template-type"
         required
         options={typeOptions}

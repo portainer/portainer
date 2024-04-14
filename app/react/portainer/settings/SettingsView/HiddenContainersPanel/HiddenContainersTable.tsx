@@ -19,6 +19,7 @@ export function HiddenContainersTable({
       headers={['Name', 'Value', '']}
       className="table-hover"
       emptyMessage="No filter available."
+      dataCy="hidden-containers-table"
     >
       {labels.map((label, index) => (
         <DetailsTable.Row
@@ -27,6 +28,7 @@ export function HiddenContainersTable({
           columns={[
             <Button
               color="danger"
+              data-cy="hidden-containers-remove-filter-button"
               size="xsmall"
               icon={Trash2}
               onClick={() => onDelete(label.name)}

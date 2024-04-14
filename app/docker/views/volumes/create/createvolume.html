@@ -9,7 +9,7 @@
           <div class="form-group">
             <label for="volume_name" class="col-sm-2 col-md-1 control-label text-left">Name</label>
             <div class="col-sm-10 col-md-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="volume_name" placeholder="e.g. myVolume" />
+              <input type="text" class="form-control" ng-model="formValues.Name" id="volume_name" placeholder="e.g. myVolume" data-cy="volume-name-input" />
             </div>
           </div>
           <!-- !name-input -->
@@ -18,10 +18,24 @@
           <div class="form-group">
             <label for="volume_driver" class="col-sm-2 col-md-1 control-label text-left">Driver</label>
             <div class="col-sm-10 col-md-11">
-              <select class="form-control" ng-options="driver for driver in availableVolumeDrivers" ng-model="formValues.Driver" ng-if="availableVolumeDrivers.length > 0">
+              <select
+                class="form-control"
+                ng-options="driver for driver in availableVolumeDrivers"
+                ng-model="formValues.Driver"
+                ng-if="availableVolumeDrivers.length > 0"
+                data-cy="volume-driver-select"
+              >
                 <option disabled hidden value="">Select a driver</option>
               </select>
-              <input type="text" class="form-control" ng-model="formValues.Driver" id="volume_driver" placeholder="e.g. driverName" ng-if="availableVolumeDrivers.length === 0" />
+              <input
+                type="text"
+                class="form-control"
+                ng-model="formValues.Driver"
+                id="volume_driver"
+                placeholder="e.g. driverName"
+                ng-if="availableVolumeDrivers.length === 0"
+                data-cy="volume-driver-input"
+              />
             </div>
           </div>
           <!-- !driver-input -->
@@ -41,11 +55,11 @@
               <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint" />
+                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint" data-cy="driver-option-name-input" />
                 </div>
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host" />
+                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host" data-cy="driver-option-value-input" />
                 </div>
                 <button class="btn btn-sm btn-light" type="button" ng-click="removeDriverOption($index)">
                   <pr-icon icon="'trash-2'" class-name="'icon-secondary icon-md'"></pr-icon>

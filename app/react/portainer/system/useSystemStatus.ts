@@ -1,5 +1,4 @@
-import { useQuery } from 'react-query';
-import { RetryValue } from 'react-query/types/core/retryer';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { UserId } from '@/portainer/users/types';
@@ -43,7 +42,7 @@ export function useSystemStatus<T = StatusResponse>({
 }: {
   select?: (status: StatusResponse) => T;
   enabled?: boolean;
-  retry?: RetryValue<unknown>;
+  retry?: UseQueryOptions['retry'];
   onSuccess?: (data: T) => void;
 } = {}) {
   return useQuery(queryKey, () => getSystemStatus(), {

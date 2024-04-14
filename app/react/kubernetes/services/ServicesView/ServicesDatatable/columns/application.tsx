@@ -30,6 +30,7 @@ function Cell({ row, getValue }: CellContext<Service, string>) {
         name: appName,
       }}
       title={appName}
+      data-cy={`service-application-link-${appName}`}
     >
       {appName}
     </Link>

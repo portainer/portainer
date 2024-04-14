@@ -273,8 +273,7 @@ angular
         url: '/groups',
         views: {
           'content@': {
-            templateUrl: './views/groups/groups.html',
-            controller: 'GroupsController',
+            component: 'environmentGroupsListView',
           },
         },
         data: {
@@ -357,8 +356,7 @@ angular
         url: '/registries',
         views: {
           'content@': {
-            templateUrl: './views/registries/registries.html',
-            controller: 'RegistriesController',
+            component: 'registriesView',
           },
         },
         data: {

@@ -23,6 +23,7 @@ export function Example({ disabled }: Args) {
   return (
     <Select
       value={value}
+      data-cy="select"
       onChange={(e) => setValue(parseInt(e.target.value, 10))}
       disabled={disabled}
       options={options}

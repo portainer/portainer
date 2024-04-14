@@ -46,7 +46,6 @@ export function CustomTemplatesListItem({
               <Button
                 as={Link}
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                 }}
                 color="secondary"
@@ -55,12 +54,15 @@ export function CustomTemplatesListItem({
                   params: {
                     id: template.Id,
                   },
+                  'data-cy': `custom-templates-edit-link-${template.Id}`,
                 }}
                 icon={Edit}
+                data-cy={`custom-templates-edit-button-${template.Id}`}
               >
                 Edit
               </Button>
               <Button
+                data-cy="custom-templates-delete-"
                 onClick={(e) => {
                   onDelete(template.Id);
                   e.stopPropagation();

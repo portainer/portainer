@@ -26,12 +26,14 @@ function Template({ totalSteps = 5 }: Args) {
       <Stepper currentStep={currentStep} steps={steps} />
       <Button
         onClick={() => setCurrentStep(currentStep - 1)}
+        data-cy="previous-button"
         disabled={currentStep <= 1}
       >
         Previous
       </Button>
       <Button
         onClick={() => setCurrentStep(currentStep + 1)}
+        data-cy="next-button"
         disabled={currentStep >= steps.length}
       >
         Next

@@ -21,9 +21,10 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
         <div className="col-sm-12">
           <SwitchField
             label="TLS"
-            labelClass="col-sm-3 col-lg-2"
+            data-cy="enable-tls-switch"
             checked={values.tls}
             onChange={(checked) => handleChange({ tls: checked })}
+            labelClass="col-sm-3 col-lg-2"
           />
         </div>
       </div>
@@ -34,6 +35,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
             <div className="col-sm-12">
               <SwitchField
                 label="Skip Certification Verification"
+                data-cy="skip-verify-switch"
                 checked={!!values.skipVerify}
                 onChange={(checked) => handleChange({ skipVerify: checked })}
                 labelClass="col-sm-3 col-lg-2"
@@ -50,6 +52,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
               >
                 <FileUploadField
                   inputId="ca-cert-field"
+                  data-cy="ca-cert-file-upload"
                   onChange={(file) => handleChange({ caCertFile: file })}
                   value={values.caCertFile}
                 />
@@ -61,6 +64,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
               >
                 <FileUploadField
                   inputId="cert-field"
+                  data-cy="cert-file-upload"
                   onChange={(file) => handleChange({ certFile: file })}
                   value={values.certFile}
                 />
@@ -72,6 +76,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
               >
                 <FileUploadField
                   inputId="tls-key-field"
+                  data-cy="tls-key-file-upload"
                   onChange={(file) => handleChange({ keyFile: file })}
                   value={values.keyFile}
                 />

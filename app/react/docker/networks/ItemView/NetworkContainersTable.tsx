@@ -56,6 +56,7 @@ export function NetworkContainersTable({
                   nodeName,
                 }}
                 title={container.Name}
+                data-cy={`networkDetails-containerName-${container.Name}`}
               >
                 {container.Name}
               </Link>

@@ -12,6 +12,7 @@ export function RetryDeployToggle({
       <div className="col-sm-12">
         <SwitchField
           checked={value}
+          data-cy="edge-stack-retry-deploy-toggle"
           name="retryDeploy"
           label="Retry deployment"
           tooltip="When enabled, this will allow the edge agent to retry deployment if failed to deploy initially"

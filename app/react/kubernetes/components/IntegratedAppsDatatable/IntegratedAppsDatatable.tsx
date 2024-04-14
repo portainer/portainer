@@ -21,12 +21,14 @@ export function IntegratedAppsDatatable({
   isLoading,
   tableKey,
   tableTitle,
+  dataCy,
 }: {
   dataset: Array<IntegratedApp>;
   onRefresh: () => void;
   isLoading: boolean;
   tableKey: string;
   tableTitle: string;
+  dataCy: string;
 }) {
   const tableState = useTableStateWithStorage<TableSettings>(
     tableKey,
@@ -54,6 +56,7 @@ export function IntegratedAppsDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy={dataCy}
     />
   );
 }

@@ -20,6 +20,7 @@ export const columns = [
         <Link
           to="kubernetes.applications.application"
           params={{ name: item.Name, namespace: item.ResourcePool }}
+          data-cy={`application-link-${item.Name}`}
         >
           {item.Name}
         </Link>

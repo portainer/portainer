@@ -34,6 +34,7 @@ export function useColumns() {
                   params={{
                     id: name,
                   }}
+                  data-cy={`namespace-link-${name}`}
                 >
                   {name}
                 </Link>

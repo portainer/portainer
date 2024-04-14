@@ -510,11 +510,10 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
 
     var templates = {
       name: 'docker.templates',
-      url: '/templates',
+      url: '/templates?template',
       views: {
         'content@': {
-          templateUrl: '~Portainer/views/templates/templates.html',
-          controller: 'TemplatesController',
+          component: 'appTemplatesView',
         },
       },
       data: {
@@ -603,7 +602,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/registries',
       views: {
         'content@': {
-          component: 'endpointRegistriesView',
+          component: 'environmentRegistriesView',
         },
       },
       data: {
@@ -616,7 +615,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/registries',
       views: {
         'content@': {
-          component: 'endpointRegistriesView',
+          component: 'environmentRegistriesView',
         },
       },
       data: {

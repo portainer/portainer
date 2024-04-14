@@ -46,8 +46,7 @@ export function ConfigMapsFormSection({
         onChange={onChange}
         errors={errors}
         isDeleteButtonHidden
-        deleteButtonDataCy="k8sAppCreate-configRemoveButton"
-        addButtonDataCy="k8sAppCreate-configAddButton"
+        data-cy="k8sAppCreate-config"
         disabled={configMaps.length === 0}
         addButtonError={
           configMaps.length === 0

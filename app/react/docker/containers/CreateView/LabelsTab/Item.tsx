@@ -4,7 +4,7 @@ import { ItemProps } from '@@/form-components/InputList';
 
 import { Label } from './types';
 
-export function Item({ item, onChange, error }: ItemProps<Label>) {
+export function Item({ item, onChange, error, index }: ItemProps<Label>) {
   return (
     <div className="w-full">
       <div className="flex w-full gap-4">
@@ -12,6 +12,7 @@ export function Item({ item, onChange, error }: ItemProps<Label>) {
           <InputGroup.Addon>name</InputGroup.Addon>
           <InputGroup.Input
             value={item.name}
+            data-cy={`label-name_${index}`}
             onChange={(e) => onChange({ ...item, name: e.target.value })}
             placeholder="e.g. com.example.foo"
           />
@@ -20,6 +21,7 @@ export function Item({ item, onChange, error }: ItemProps<Label>) {
           <InputGroup.Addon>value</InputGroup.Addon>
           <InputGroup.Input
             value={item.value}
+            data-cy={`label-value${index}`}
             onChange={(e) => onChange({ ...item, value: e.target.value })}
             placeholder="e.g. bar"
           />

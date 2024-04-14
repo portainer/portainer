@@ -1,5 +1,5 @@
 import { Box, Database, FileCode, Layers, Lock, Shuffle } from 'lucide-react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import Route from '@/assets/ico/route.svg?c';
@@ -34,7 +34,8 @@ export function DashboardView() {
   );
   const { data: services, ...servicesQuery } = useServicesForCluster(
     environmentId,
-    namespaceNames
+    namespaceNames,
+    { lookupApplications: false }
   );
   const { data: ingresses, ...ingressesQuery } = useIngresses(
     environmentId,

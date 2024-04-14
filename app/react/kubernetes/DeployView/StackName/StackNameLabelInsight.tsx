@@ -13,7 +13,11 @@ export function StackNameLabelInsight() {
         <>
           <br />
           Kubernetes Stacks functionality can be turned off entirely via{' '}
-          <Link to="portainer.settings" target="_blank">
+          <Link
+            to="portainer.settings"
+            target="_blank"
+            data-cy="k8s-deploy-settings-link"
+          >
             Kubernetes Settings
           </Link>
           .
