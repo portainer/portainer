@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -20,9 +21,6 @@ type userAccessTokenCreatePayload struct {
 }
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Password) {
-		return errors.New("invalid password: cannot be empty")
-	}
 	if govalidator.IsNull(payload.Description) {
 		return errors.New("invalid description: cannot be empty")
 	}
@@ -44,6 +42,7 @@ type accessTokenResponse struct {
 // @summary Generate an API key for a user
 // @description Generates an API key for a user.
 // @description Only the calling user can generate a token for themselves.
+// @description Password is required only for internal authentication.
 // @description **Access policy**: restricted
 // @tags users
 // @security jwt
@@ -94,9 +93,21 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
 	}
 
-	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
+	internalAuth, err := handler.usesInternalAuthentication(portainer.UserID(userID))
 	if err != nil {
-		return httperror.Forbidden("Current password doesn't match", errors.New("Current password does not match the password provided. Please try again"))
+		return httperror.InternalServerError("Unable to determine the authentication method", err)
+	}
+
+	if internalAuth {
+		// Internal auth requires the password field and must not be empty
+		if govalidator.IsNull(payload.Password) {
+			return httperror.BadRequest("Invalid request payload", errors.New("invalid password: cannot be empty"))
+		}
+
+		err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
+		if err != nil {
+			return httperror.Forbidden("Current password doesn't match", errors.New("Current password does not match the password provided. Please try again"))
+		}
 	}
 
 	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(*user, payload.Description)
@@ -106,4 +117,19 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 
 	w.WriteHeader(http.StatusCreated)
 	return response.JSON(w, accessTokenResponse{rawAPIKey, *apiKey})
+}
+
+func (handler *Handler) usesInternalAuthentication(userid portainer.UserID) (bool, error) {
+	// userid 1 is the admin user and always uses internal auth
+	if userid == 1 {
+		return true, nil
+	}
+
+	// otherwise determine the auth method from the settings
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return false, fmt.Errorf("unable to retrieve the settings from the database: %w", err)
+	}
+
+	return settings.AuthenticationMethod == portainer.AuthenticationInternal, nil
 }
