@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/system"
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/pkg/errors"
@@ -211,9 +212,9 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	if err != nil {
 		return errors.Wrap(err, "unable to create unpacker container")
 	}
-	defer cli.ContainerRemove(ctx, unpackerContainer.ID, types.ContainerRemoveOptions{})
+	defer cli.ContainerRemove(ctx, unpackerContainer.ID, container.RemoveOptions{})
 
-	if err := cli.ContainerStart(ctx, unpackerContainer.ID, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(ctx, unpackerContainer.ID, container.StartOptions{}); err != nil {
 		return errors.Wrap(err, "start unpacker container error")
 	}
 
@@ -228,7 +229,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 
 	stdErr := &bytes.Buffer{}
 
-	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get logs from unpacker container")
 	} else {
@@ -335,6 +336,6 @@ func getTargetSocketBind(osType string) string {
 
 // Per https://stackoverflow.com/a/50590287 and Docker's LocalNodeState possible values
 // `LocalNodeStateInactive` means the node is not in a swarm cluster
-func isNotInASwarm(info *types.Info) bool {
+func isNotInASwarm(info *system.Info) bool {
 	return info.Swarm.LocalNodeState == swarm.LocalNodeStateInactive
 }

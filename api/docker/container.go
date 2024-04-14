@@ -119,7 +119,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 		for _, network := range container.NetworkSettings.Networks {
 			cli.NetworkConnect(ctx, network.NetworkID, containerId, network)
 		}
-		cli.ContainerStart(ctx, containerId, types.ContainerStartOptions{})
+		cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{})
 	})
 
 	log.Debug().Str("container", strings.Split(container.Name, "/")[1]).Msg("starting to create a new container")
@@ -135,7 +135,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	c.sr.push(func() {
 		log.Debug().Str("container_id", create.ID).Msg("removing the new container")
 		cli.ContainerStop(ctx, create.ID, dockercontainer.StopOptions{})
-		cli.ContainerRemove(ctx, create.ID, types.ContainerRemoveOptions{})
+		cli.ContainerRemove(ctx, create.ID, dockercontainer.RemoveOptions{})
 	})
 
 	if err != nil {
@@ -164,14 +164,14 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	// 8. start the new container
 	log.Debug().Str("container_id", newContainerId).Msg("starting the new container")
-	err = cli.ContainerStart(ctx, newContainerId, types.ContainerStartOptions{})
+	err = cli.ContainerStart(ctx, newContainerId, dockercontainer.StartOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "start container error")
 	}
 
 	// 9. delete the old container
 	log.Debug().Str("container_id", containerId).Msg("starting to remove the old container")
-	_ = cli.ContainerRemove(ctx, containerId, types.ContainerRemoveOptions{})
+	_ = cli.ContainerRemove(ctx, containerId, dockercontainer.RemoveOptions{})
 
 	c.sr.disable()
 

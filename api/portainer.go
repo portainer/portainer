@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
@@ -242,8 +244,8 @@ type (
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
 		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
-		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Images     []image.Summary           `json:"Images" swaggerignore:"true"`
+		Info       system.Info               `json:"Info" swaggerignore:"true"`
 		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 

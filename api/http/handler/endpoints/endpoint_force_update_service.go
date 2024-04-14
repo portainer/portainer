@@ -12,8 +12,8 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/docker/docker/api/types"
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 )
 
@@ -39,7 +39,7 @@ func (payload *forceUpdateServicePayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "endpoint identifier"
 // @param body body forceUpdateServicePayload true "details"
-// @success 200 {object} dockertypes.ServiceUpdateResponse "Success"
+// @success 200 {object} swarm.ServiceUpdateResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "endpoint not found"
@@ -94,7 +94,7 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	go func() {
 		images.EvictImageStatus(payload.ServiceID)
 		images.EvictImageStatus(service.Spec.Labels[consts.SwarmStackNameLabel])
-		containers, _ := dockerClient.ContainerList(context.TODO(), types.ContainerListOptions{
+		containers, _ := dockerClient.ContainerList(context.TODO(), container.ListOptions{
 			All:     true,
 			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIdLabel+"="+payload.ServiceID)),
 		})
