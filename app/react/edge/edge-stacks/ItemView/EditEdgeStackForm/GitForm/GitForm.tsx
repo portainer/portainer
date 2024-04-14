@@ -252,7 +252,13 @@ function InnerForm({
           errors={errors.authentication}
         />
 
-        {isBE && <RelativePathFieldset value={values.relativePath} isEditing />}
+        {isBE && (
+          <RelativePathFieldset
+            values={values.relativePath}
+            isEditing
+            onChange={() => {}}
+          />
+        )}
 
         <EnvironmentVariablesPanel
           onChange={(value) => setFieldValue('envVars', value)}

@@ -13,7 +13,6 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
 import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
-import { TemplateFieldset } from '@/react/edge/edge-stacks/CreateView/TemplateFieldset/TemplateFieldset';
 
 import { edgeJobsModule } from './edge-jobs';
 
@@ -102,10 +101,6 @@ const ngModule = angular
       'onChange',
       'value',
     ])
-  )
-  .component(
-    'edgeStackCreateTemplateFieldset',
-    r2a(withReactQuery(TemplateFieldset), ['setValues', 'values', 'errors'])
   );
 
 export const componentsModule = ngModule.name;

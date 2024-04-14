@@ -12,17 +12,36 @@ import { buildUrl } from './build-url';
 
 export function useAppTemplates<T = Array<TemplateViewModel>>({
   select,
-}: { select?: (templates: Array<TemplateViewModel>) => T } = {}) {
-  const registriesQuery = useRegistries();
+  enabled = true,
+}: {
+  select?: (templates: Array<TemplateViewModel>) => T;
+  enabled?: boolean;
+} = {}) {
+  const registriesQuery = useRegistries({ enabled });
 
   return useQuery(
     ['templates'],
     () => getTemplatesWithRegistry(registriesQuery.data),
     {
-      enabled: !!registriesQuery.data,
+      enabled: !!registriesQuery.data && enabled,
       select,
     }
   );
+}
+
+export function useAppTemplate(
+  id: AppTemplate['id'] | undefined,
+  { enabled = true }: { enabled?: boolean } = {}
+) {
+  const templateListQuery = useAppTemplates({ enabled: !!id && enabled });
+
+  const template = templateListQuery.data?.find((t) => t.Id === id);
+
+  return {
+    data: template,
+    isLoading: templateListQuery.isLoading,
+    error: templateListQuery.error,
+  };
 }
 
 async function getTemplatesWithRegistry(

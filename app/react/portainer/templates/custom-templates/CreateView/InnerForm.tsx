@@ -160,7 +160,7 @@ export function InnerForm({
               ...values,
               EdgeSettings: applySetStateAction(
                 edgeSetValues,
-                values.EdgeSettings
+                values.EdgeSettings!
               ),
             }))
           }

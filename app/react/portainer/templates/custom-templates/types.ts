@@ -1,5 +1,7 @@
 import { UserId } from '@/portainer/users/types';
 import { StackType } from '@/react/common/stacks/types';
+import { StaggerConfig } from '@/react/edge/edge-stacks/types';
+import { getDefaultStaggerConfig } from '@/react/edge/edge-stacks/components/StaggerFieldset.types';
 
 import { ResourceControlResponse } from '../../access-control/types';
 import { RelativePathModel, RepoConfigResponse } from '../../gitops/types';
@@ -105,6 +107,12 @@ export type EdgeTemplateSettings = {
   PrivateRegistryId: RegistryId | undefined;
 
   RelativePathSettings: RelativePathModel;
+
+  /**
+   * StaggerConfig is the configuration for staggered update
+   * required only on BE
+   */
+  StaggerConfig: StaggerConfig;
 };
 
 export type CustomTemplateFileContent = {
@@ -113,7 +121,9 @@ export type CustomTemplateFileContent = {
 
 export const CustomTemplateKubernetesType = StackType.Kubernetes;
 
-export function getDefaultEdgeTemplateSettings() {
+export function getDefaultEdgeTemplateSettings():
+  | EdgeTemplateSettings
+  | undefined {
   if (!isBE) {
     return undefined;
   }
@@ -123,5 +133,6 @@ export function getDefaultEdgeTemplateSettings() {
     RetryDeploy: false,
     PrivateRegistryId: undefined,
     RelativePathSettings: getDefaultRelativePathModel(),
+    StaggerConfig: getDefaultStaggerConfig(),
   };
 }
