@@ -153,19 +153,11 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 		return err
 	}
 
-	runningContainers := 0
-	stoppedContainers := 0
-	healthyContainers := 0
-	unhealthyContainers := 0
 	stacks := make(map[string]struct{})
 	gpuUseSet := make(map[string]struct{})
 	gpuUseAll := false
 	for _, container := range containers {
-		if container.State == "exited" || container.State == "stopped" {
-			stoppedContainers++
-		} else if container.State == "running" {
-			runningContainers++
-
+		if container.State == "running" {
 			// snapshot GPUs
 			response, err := cli.ContainerInspect(context.Background(), container.ID)
 			if err != nil {
@@ -202,15 +194,6 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			}
 		}
 
-		if container.State == "healthy" {
-			runningContainers++
-			healthyContainers++
-		}
-
-		if container.State == "unhealthy" {
-			unhealthyContainers++
-		}
-
 		for k, v := range container.Labels {
 			if k == consts.ComposeStackNameLabel {
 				stacks[v] = struct{}{}
@@ -226,11 +209,13 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.GpuUseAll = gpuUseAll
 	snapshot.GpuUseList = gpuUseList
 
-	snapshot.ContainerCount = len(containers)
-	snapshot.RunningContainerCount = runningContainers
-	snapshot.StoppedContainerCount = stoppedContainers
-	snapshot.HealthyContainerCount = healthyContainers
-	snapshot.UnhealthyContainerCount = unhealthyContainers
+	stats := CalculateContainerStats(containers)
+
+	snapshot.ContainerCount = stats.Total
+	snapshot.RunningContainerCount = stats.Running
+	snapshot.StoppedContainerCount = stats.Stopped
+	snapshot.HealthyContainerCount = stats.Healthy
+	snapshot.UnhealthyContainerCount = stats.Unhealthy
 	snapshot.StackCount += len(stacks)
 	for _, container := range containers {
 		snapshot.SnapshotRaw.Containers = append(snapshot.SnapshotRaw.Containers, portainer.DockerContainerSnapshot{Container: container})

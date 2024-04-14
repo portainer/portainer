@@ -5,4 +5,5 @@ const (
 	SwarmStackNameLabel   = "com.docker.stack.namespace"
 	SwarmServiceIdLabel   = "com.docker.swarm.service.id"
 	SwarmNodeIdLabel      = "com.docker.swarm.node.id"
+	HideStackLabel        = "io.portainer.hideStack"
 )

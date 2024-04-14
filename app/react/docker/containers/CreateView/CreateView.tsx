@@ -101,17 +101,21 @@ function CreateForm() {
   return (
     <>
       {isDuplicating && (
-        <InformationPanel title-text="Caution">
-          <TextTip>
-            The new container may fail to start if the image is changed, and
-            settings from the previous container aren&apos;t compatible. Common
-            causes include entrypoint, cmd or{' '}
-            <HelpLink docLink="/user/docker/containers/advanced">
-              other settings
-            </HelpLink>{' '}
-            set by an image.
-          </TextTip>
-        </InformationPanel>
+        <div className="row">
+          <div className="col-sm-12">
+            <InformationPanel title-text="Caution">
+              <TextTip>
+                The new container may fail to start if the image is changed, and
+                settings from the previous container aren&apos;t compatible.
+                Common causes include entrypoint, cmd or{' '}
+                <HelpLink docLink="/user/docker/containers/advanced">
+                  other settings
+                </HelpLink>{' '}
+                set by an image.
+              </TextTip>
+            </InformationPanel>
+          </div>
+        </div>
       )}
 
       <Formik
