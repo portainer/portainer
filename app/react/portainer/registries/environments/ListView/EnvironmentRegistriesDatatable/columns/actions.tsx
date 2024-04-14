@@ -43,7 +43,6 @@ function Cell({
             props={{
               to: '.access',
               params: { id: item.Id },
-              'data-cy': `manage-access-link-${item.Name}`,
             }}
             data-cy={`registry-manage-access-button-${item.Name}`}
           >

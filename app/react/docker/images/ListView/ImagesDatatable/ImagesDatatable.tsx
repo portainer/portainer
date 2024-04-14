@@ -173,7 +173,6 @@ function ImportExportButtons({
           disabled={isExportInProgress}
           props={{
             to: 'docker.images.import',
-            'data-cy': 'image-importImageLink',
           }}
         >
           Import
