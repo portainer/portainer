@@ -13,7 +13,7 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import {
   EnvironmentVariablesFieldset,
-  DefaultEnvironmentVariablesPanel as EnvironmentVariablesPanel,
+  EnvironmentVariablesPanel,
   StackEnvironmentVariablesPanel,
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
