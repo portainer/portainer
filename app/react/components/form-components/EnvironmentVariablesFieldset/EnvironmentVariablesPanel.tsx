@@ -16,7 +16,7 @@ export function EnvironmentVariablesPanel({
   isFoldable = false,
   alertMessage,
 }: {
-  explanation?: React.ReactNode | string;
+  explanation?: React.ReactNode;
   showHelpMessage?: boolean;
   isFoldable?: boolean;
   alertMessage?: React.ReactNode;
