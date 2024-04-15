@@ -87,6 +87,12 @@ export enum AuthenticationMethod {
   OAuth,
 }
 
+export enum OAuthStyle {
+  AutoDetect = 0,
+  InParams,
+  InHeader,
+}
+
 type Feature = string;
 
 export interface DefaultRegistry {
