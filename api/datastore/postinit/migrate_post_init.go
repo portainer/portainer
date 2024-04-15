@@ -141,6 +141,7 @@ func (migrator *PostInitMigrator) MigrateIngresses(environment portainer.Endpoin
 	if !environment.PostInitMigrations.MigrateIngresses {
 		return
 	}
+	log.Debug().Msgf("Migrating ingresses for environment %d", environment.ID)
 
 	err := migrator.kubeFactory.MigrateEndpointIngresses(&environment, migrator.dataStore, kubeclient)
 	if err != nil {
@@ -161,6 +162,7 @@ func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient
 		if !environment.PostInitMigrations.MigrateGPUs {
 			return nil
 		}
+		log.Debug().Msgf("Migrating GPUs for environment %d", e.ID)
 
 		// get all containers
 		containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
