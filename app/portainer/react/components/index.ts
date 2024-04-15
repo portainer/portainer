@@ -13,6 +13,7 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 import {
   EnvironmentVariablesFieldset,
   EnvironmentVariablesPanel,
+  StackEnvironmentVariablesPanel,
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 import { Icon } from '@@/Icon';
@@ -261,5 +262,15 @@ withFormValidation(
   withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
   'environmentVariablesPanel',
   ['explanation', 'showHelpMessage', 'isFoldable'],
+  envVarValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(
+    withControlledInput(StackEnvironmentVariablesPanel, { values: 'onChange' })
+  ),
+  'stackEnvironmentVariablesPanel',
+  ['showHelpMessage', 'isFoldable'],
   envVarValidation
 );

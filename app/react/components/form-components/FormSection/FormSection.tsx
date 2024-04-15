@@ -11,6 +11,7 @@ interface Props {
   isFoldable?: boolean;
   defaultFolded?: boolean;
   titleClassName?: string;
+  className?: string;
 }
 
 export function FormSection({
@@ -20,11 +21,12 @@ export function FormSection({
   isFoldable = false,
   defaultFolded = isFoldable,
   titleClassName,
+  className,
 }: PropsWithChildren<Props>) {
   const [isExpanded, setIsExpanded] = useState(!defaultFolded);
 
   return (
-    <>
+    <div className={className}>
       <FormSectionTitle
         htmlFor={isFoldable ? `foldingButton${title}` : ''}
         titleSize={titleSize}
@@ -52,6 +54,6 @@ export function FormSection({
       </FormSectionTitle>
 
       {isExpanded && children}
-    </>
+    </div>
   );
 }
