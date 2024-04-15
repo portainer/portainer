@@ -631,6 +631,7 @@
     "LogoURL": "",
     "OAuthSettings": {
       "AccessTokenURI": "",
+      "AuthStyle": 0,
       "AuthorizationURI": "",
       "ClientID": "",
       "DefaultTeamID": 0,
