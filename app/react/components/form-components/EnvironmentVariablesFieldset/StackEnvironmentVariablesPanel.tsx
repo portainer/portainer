@@ -65,27 +65,3 @@ export function StackEnvironmentVariablesPanel({
     />
   );
 }
-
-export function DefaultEnvironmentVariablesPanel({
-  explanation,
-  onChange,
-  values,
-  errors,
-  showHelpMessage,
-  isFoldable = false,
-}: {
-  showHelpMessage?: boolean;
-  explanation?: string;
-  isFoldable?: boolean;
-} & FieldsetProps) {
-  return (
-    <EnvironmentVariablesPanel
-      explanation={<div>{explanation}</div>}
-      onChange={onChange}
-      values={values}
-      errors={errors}
-      isFoldable={isFoldable}
-      showHelpMessage={showHelpMessage}
-    />
-  );
-}

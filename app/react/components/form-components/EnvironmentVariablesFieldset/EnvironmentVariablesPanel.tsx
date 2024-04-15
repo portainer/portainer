@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import React, { ComponentProps } from 'react';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
@@ -16,10 +16,10 @@ export function EnvironmentVariablesPanel({
   isFoldable = false,
   alertMessage,
 }: {
-  explanation?: JSX.Element;
+  explanation?: React.ReactNode | string;
   showHelpMessage?: boolean;
   isFoldable?: boolean;
-  alertMessage?: JSX.Element;
+  alertMessage?: React.ReactNode;
 } & FieldsetProps) {
   return (
     <FormSection
