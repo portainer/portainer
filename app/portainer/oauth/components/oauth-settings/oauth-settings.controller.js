@@ -4,6 +4,7 @@ import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.ser
 import { ModalType } from '@@/modals';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
+import { OAuthStyle } from '@/react/portainer/settings/types';
 
 import providers, { getProviderByUrl } from './providers';
 
@@ -21,6 +22,21 @@ export default class OAuthSettingsController {
       provider: 'custom',
       overrideConfiguration: false,
       microsoftTenantID: '',
+      // The options are based on oauth2 lib definition @https://pkg.go.dev/golang.org/x/oauth2#AuthStyle
+      availableAuthStyleOptions: [
+        {
+          key: 'Auto Detect',
+          value: OAuthStyle.AutoDetect,
+        },
+        {
+          key: 'In Params',
+          value: OAuthStyle.InParams,
+        },
+        {
+          key: 'In Header',
+          value: OAuthStyle.InHeader,
+        },
+      ],
     };
 
     this.$onInit = this.$onInit.bind(this);
@@ -54,6 +70,7 @@ export default class OAuthSettingsController {
       this.settings.LogoutURI = provider.logoutUrl;
       this.settings.UserIdentifier = provider.userIdentifier;
       this.settings.Scopes = provider.scopes;
+      this.settings.AuthStyle = provider.authStyle;
 
       if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
         this.onMicrosoftTenantIDChange();
