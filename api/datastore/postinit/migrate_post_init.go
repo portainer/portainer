@@ -74,7 +74,6 @@ func (postInitMigrator *PostInitMigrator) PostInitMigrate() error {
 // this function exists for readability, not reusability
 // TODO: This should be moved into pending actions as part of the pending action migration
 func (postInitMigrator *PostInitMigrator) createPostInitMigrationPendingAction(environmentID portainer.EndpointID) error {
-	var filteredPendingActions []portainer.PendingActions
 	migrateEnvPendingAction := portainer.PendingActions{
 		EndpointID: environmentID,
 		Action:     actions.PostInitMigrateEnvironment,
@@ -90,14 +89,11 @@ func (postInitMigrator *PostInitMigrator) createPostInitMigrationPendingAction(e
 		if pendingAction.EndpointID == environmentID &&
 			pendingAction.Action == migrateEnvPendingAction.Action &&
 			reflect.DeepEqual(pendingAction.ActionData, migrateEnvPendingAction.ActionData) {
-			filteredPendingActions = append(filteredPendingActions, pendingAction)
+			log.Debug().Msgf("Migration pending action for environment %d already exists, skipping creating another", environmentID)
+			return nil
 		}
 	}
 
-	if len(pendingActions) >= 0 {
-		log.Debug().Msgf("Migration pending action for environment %d already exists, skipping creating another", environmentID)
-		return nil
-	}
 	// If there are no pending actions for the given endpoint, create one
 	err = postInitMigrator.dataStore.PendingActions().Create(&migrateEnvPendingAction)
 	if err != nil {
