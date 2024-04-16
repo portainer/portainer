@@ -1,0 +1,40 @@
+linters:
+  # Disable all linters, the defaults don't pass on our code yet
+  disable-all: true
+
+  # Enable these for now
+  enable:
+    - unused
+    - depguard
+    - gosimple
+    - govet
+    - errorlint
+    - exportloopref
+
+linters-settings:
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: 'encoding/json'
+            desc: 'use github.com/segmentio/encoding/json'
+          - pkg: 'github.com/sirupsen/logrus'
+            desc: 'logging is allowed only by github.com/rs/zerolog'
+          - pkg: 'golang.org/x/exp'
+            desc: 'exp is not allowed'
+          - pkg: 'github.com/portainer/libcrypto'
+            desc: 'use github.com/portainer/portainer/pkg/libcrypto'
+          - pkg: 'github.com/portainer/libhttp'
+            desc: 'use github.com/portainer/portainer/pkg/libhttp'
+        files:
+          - '!**/*_test.go'
+          - '!**/base.go'
+          - '!**/base_tx.go'
+
+# errorlint is causing a typecheck error for some reason. The go compiler will report these
+# anyway, so ignore them from the linter
+issues:
+  exclude-rules:
+    - path: ./
+      linters:
+        - typecheck
