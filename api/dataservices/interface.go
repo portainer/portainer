@@ -73,6 +73,7 @@ type (
 	PendingActionsService interface {
 		BaseCRUD[portainer.PendingActions, portainer.PendingActionsID]
 		GetNextIdentifier() int
+		DeleteByEndpointID(ID portainer.EndpointID) error
 	}
 
 	// EdgeStackService represents a service to manage Edge stacks

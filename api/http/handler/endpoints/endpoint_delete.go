@@ -179,6 +179,12 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 		}
 	}
 
+	// delete the pending actions
+	err = tx.PendingActions().DeleteByEndpointID(endpoint.ID)
+	if err != nil {
+		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msgf("Unable to delete pending actions")
+	}
+
 	err = tx.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		return httperror.InternalServerError("Unable to delete the environment from the database", err)
