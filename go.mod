@@ -164,3 +164,4 @@ require (
 
 // Remove below line when the "determinstic key" patch for Chisel merged
 replace github.com/jpillora/chisel => github.com/portainer/chisel v0.0.0-20230704222304-426f515c6c25
+
