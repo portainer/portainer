@@ -60,7 +60,6 @@ import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/co
 import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
-import { ResourceEventsDatatable } from '@/react/kubernetes/components/EventsDatatable/ResourceEventsDatatable';
 
 import { applicationsModule } from './applications';
 import { volumesModule } from './volumes';
@@ -196,13 +195,6 @@ export const ngModule = angular
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(ApplicationEventsDatatable))),
       []
-    )
-  )
-  .component(
-    'resourceEventsDatatable',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(ResourceEventsDatatable))),
-      ['resourceId', 'storageKey', 'namespace']
     )
   )
   .component(

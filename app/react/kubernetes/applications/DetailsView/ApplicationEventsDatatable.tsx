@@ -76,7 +76,8 @@ export function useApplicationEvents(
     application
   );
 
-  const { data: events, ...eventsQuery } = useEvents(environmentId, namespace, {
+  const { data: events, ...eventsQuery } = useEvents(environmentId, {
+    namespace,
     autoRefreshRate: options?.autoRefreshRate
       ? options.autoRefreshRate * 1000
       : undefined,
