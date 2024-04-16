@@ -1,25 +1,56 @@
 name: Test
-on: push
+
+env:
+  GO_VERSION: 1.21.6
+  NODE_VERSION: 18.x
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+      - release/*
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  push:
+    branches:
+      - master
+      - develop
+      - release/*
+
 jobs:
   test-client:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - run: yarn --frozen-lockfile
 
       - name: Run tests
-        run: yarn jest --maxWorkers=2
+        run: make test-client ARGS="--maxWorkers=2 --minWorkers=1"
   test-server:
+    strategy:
+      matrix:
+        config:
+          - { platform: linux, arch: amd64 }
+          - { platform: linux, arch: arm64 }
+          - { platform: windows, arch: amd64, version: 1809 }
+          - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.19.5
+          go-version: ${{ env.GO_VERSION }}
       - name: Run tests
         run: make test-server
