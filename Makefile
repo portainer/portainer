@@ -102,8 +102,7 @@ lint-client: ## Lint client code
 	yarn lint
 
 lint-server: ## Lint server code
-	cd api && go vet ./...
-
+	 golangci-lint run --timeout=10m -c .golangci.yaml
 
 ##@ Extension
 .PHONY: dev-extension
