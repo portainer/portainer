@@ -78,9 +78,11 @@ export function useApplicationEvents(
 
   const { data: events, ...eventsQuery } = useEvents(environmentId, {
     namespace,
-    autoRefreshRate: options?.autoRefreshRate
-      ? options.autoRefreshRate * 1000
-      : undefined,
+    queryOptions: {
+      autoRefreshRate: options?.autoRefreshRate
+        ? options.autoRefreshRate * 1000
+        : undefined,
+    },
   });
 
   // related events are events that have the application id, or the id of a service or pod from the application

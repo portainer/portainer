@@ -27,18 +27,18 @@ export function ResourceEventsDatatable({
     params: { endpointId },
   } = useCurrentStateAndParams();
 
-  const eventParams = resourceId
+  const params = resourceId
     ? { fieldSelector: `involvedObject.uid=${resourceId}` }
     : {};
-  const useEventOptions = {
-    ...eventParams,
+  const resourceEventsQuery = useEvents(endpointId, {
     namespace,
-    autoRefeshRate: tableState.autoRefreshRate
-      ? tableState.autoRefreshRate * 1000
-      : undefined,
-  };
-
-  const resourceEventsQuery = useEvents(endpointId, useEventOptions);
+    params,
+    queryOptions: {
+      autoRefreshRate: tableState.autoRefreshRate
+        ? tableState.autoRefreshRate * 1000
+        : undefined,
+    },
+  });
   const nodeEvents = resourceEventsQuery.data || [];
 
   return (

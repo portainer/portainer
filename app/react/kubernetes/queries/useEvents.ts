@@ -9,17 +9,19 @@ import { parseKubernetesAxiosError } from '../axiosError';
 
 import { queryKeys as environmentQueryKeys } from './query-keys';
 
-type Options = {
+type RequestOptions = {
   /** if undefined, events are fetched at the cluster scope */
   namespace?: string;
-  /** https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-  labelSelector?: string;
-  /** https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors */
-  fieldSelector?: string;
+  params?: {
+    /** https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
+    labelSelector?: string;
+    /** https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors */
+    fieldSelector?: string;
+  };
 };
 
 const queryKeys = {
-  base: (environmentId: number, { namespace, ...params }: Options) => {
+  base: (environmentId: number, { namespace, params }: RequestOptions) => {
     if (namespace) {
       return [
         ...environmentQueryKeys.base(environmentId),
@@ -32,8 +34,11 @@ const queryKeys = {
   },
 };
 
-async function getEvents(environmentId: EnvironmentId, options?: Options) {
-  const { namespace, ...params } = options ?? {};
+async function getEvents(
+  environmentId: EnvironmentId,
+  options?: RequestOptions
+) {
+  const { namespace, params } = options ?? {};
   try {
     const { data } = await axios.get<EventList>(
       namespace
@@ -50,22 +55,23 @@ async function getEvents(environmentId: EnvironmentId, options?: Options) {
 }
 
 type QueryOptions = {
-  autoRefreshRate?: number;
-} & Options;
+  queryOptions?: {
+    autoRefreshRate?: number;
+  };
+} & RequestOptions;
 
 export function useEvents(
   environmentId: EnvironmentId,
   options?: QueryOptions
 ) {
-  const { autoRefreshRate, labelSelector, fieldSelector, namespace } =
-    options ?? {};
+  const { queryOptions, params, namespace } = options ?? {};
   return useQuery(
-    queryKeys.base(environmentId, { labelSelector, fieldSelector, namespace }),
-    () => getEvents(environmentId, { labelSelector, fieldSelector, namespace }),
+    queryKeys.base(environmentId, { params, namespace }),
+    () => getEvents(environmentId, { params, namespace }),
     {
       ...withError('Unable to retrieve events'),
       refetchInterval() {
-        return autoRefreshRate ?? false;
+        return queryOptions?.autoRefreshRate ?? false;
       },
     }
   );

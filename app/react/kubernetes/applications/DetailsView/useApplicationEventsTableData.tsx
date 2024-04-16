@@ -50,7 +50,9 @@ export function useApplicationEventsTableData() {
   );
   const { data: events, ...eventsQuery } = useEvents(environmentId, {
     namespace,
-    autoRefreshRate: appEventsTableState.autoRefreshRate * 1000,
+    queryOptions: {
+      autoRefreshRate: appEventsTableState.autoRefreshRate * 1000,
+    },
   });
 
   // related events are events that have the application id, or the id of a service or pod from the application
