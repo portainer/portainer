@@ -181,16 +181,18 @@ func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient
 			for _, deviceRequest := range deviceRequests {
 				if deviceRequest.Driver == "nvidia" {
 					environment.EnableGPUManagement = true
-					// set the MigrateGPUs flag to false so we don't run this again
-					environment.PostInitMigrations.MigrateGPUs = false
-					err = tx.Endpoint().UpdateEndpoint(environment.ID, environment)
-					if err != nil {
-						log.Error().Err(err).Msgf("Error updating EnableGPUManagement flag for environment %d", environment.ID)
-					}
 					break containersLoop
 				}
 			}
 		}
+
+		// set the MigrateGPUs flag to false so we don't run this again
+		environment.PostInitMigrations.MigrateGPUs = false
+		err = tx.Endpoint().UpdateEndpoint(environment.ID, environment)
+		if err != nil {
+			log.Error().Err(err).Msgf("Error updating EnableGPUManagement flag for environment %d", environment.ID)
+		}
+
 		return nil
 	})
 }
