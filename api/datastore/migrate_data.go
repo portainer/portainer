@@ -86,6 +86,7 @@ func (store *Store) newMigratorParameters(version *models.Version) *migrator.Mig
 		EdgeStackService:        store.EdgeStackService,
 		EdgeJobService:          store.EdgeJobService,
 		TunnelServerService:     store.TunnelServerService,
+		PendingActionsService:   store.PendingActionsService,
 	}
 }
 
