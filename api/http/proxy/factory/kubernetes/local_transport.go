@@ -35,7 +35,7 @@ func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint,
 	return transport, nil
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	_, err := transport.prepareRoundTrip(request)
 	if err != nil {

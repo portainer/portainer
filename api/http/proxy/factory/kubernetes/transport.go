@@ -125,7 +125,7 @@ func (transport *baseTransport) prepareRoundTrip(request *http.Request) (string,
 	return token, nil
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *baseTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return transport.proxyKubernetesRequest(request)
 }
