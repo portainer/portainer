@@ -1,4 +1,4 @@
-module github.com/portainer/portainer/api
+module github.com/portainer/portainer
 
 go 1.20
 
