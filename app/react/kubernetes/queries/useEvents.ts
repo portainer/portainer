@@ -28,9 +28,13 @@ const queryKeys = {
         'events',
         namespace,
         params,
-      ];
+      ] as const;
     }
-    return [...environmentQueryKeys.base(environmentId), 'events', params];
+    return [
+      ...environmentQueryKeys.base(environmentId),
+      'events',
+      params,
+    ] as const;
   },
 };
 
@@ -41,9 +45,7 @@ async function getEvents(
   const { namespace, params } = options ?? {};
   try {
     const { data } = await axios.get<EventList>(
-      namespace
-        ? `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/events`
-        : `/endpoints/${environmentId}/kubernetes/api/v1/events`,
+      buildUrl(environmentId, namespace),
       {
         params,
       }
@@ -75,4 +77,10 @@ export function useEvents(
       },
     }
   );
+}
+
+function buildUrl(environmentId: EnvironmentId, namespace?: string) {
+  return namespace
+    ? `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/events`
+    : `/endpoints/${environmentId}/kubernetes/api/v1/events`;
 }
