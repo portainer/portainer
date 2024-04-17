@@ -11,21 +11,31 @@ on:
       - master
       - develop
       - release/*
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+env:
+  GO_VERSION: 1.21.6
+  NODE_VERSION: 18.x
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - uses: actions/setup-go@v4
         with:
-          go-version: 1.19.5
+          go-version: ${{ env.GO_VERSION }}
       - run: yarn --frozen-lockfile
       - name: Run linters
         uses: wearerequired/lint-action@v1
@@ -41,6 +51,5 @@ jobs:
       - name: GolangCI-Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.54.1
-          working-directory: api
+          version: v1.55.2
           args: --timeout=10m -c .golangci.yaml
