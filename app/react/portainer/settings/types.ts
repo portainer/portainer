@@ -87,6 +87,9 @@ export enum AuthenticationMethod {
   OAuth,
 }
 
+/**
+ * The definition are based on oauth2 lib definition @https://pkg.go.dev/golang.org/x/oauth2#AuthStyle
+ */
 export enum OAuthStyle {
   AutoDetect = 0,
   InParams,
