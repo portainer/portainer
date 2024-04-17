@@ -66,6 +66,8 @@ function getTooltip(count: number, total: number, type?: StatusType) {
     switch (type) {
       case StatusType.Running:
         return 'deployments running';
+      case StatusType.Completed:
+        return 'deployments completed';
       case StatusType.DeploymentReceived:
         return 'deployments received';
       case StatusType.Error:
