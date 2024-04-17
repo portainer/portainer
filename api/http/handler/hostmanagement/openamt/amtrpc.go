@@ -155,7 +155,7 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // runContainer should be used to run a short command that returns information to stdout
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
-	opts := types.ContainerListOptions{All: true}
+	opts := container.ListOptions{All: true}
 	opts.Filters = filters.NewArgs()
 	opts.Filters.Add("name", containerName)
 	existingContainers, err := docker.ContainerList(ctx, opts)
@@ -170,7 +170,7 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 	}
 
 	if len(existingContainers) > 0 {
-		err = docker.ContainerRemove(ctx, existingContainers[0].ID, types.ContainerRemoveOptions{Force: true})
+		err = docker.ContainerRemove(ctx, existingContainers[0].ID, container.RemoveOptions{Force: true})
 		if err != nil {
 			log.Error().
 				Str("image_name", imageName).
@@ -211,7 +211,7 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		return "", err
 	}
 
-	err = docker.ContainerStart(ctx, created.ID, types.ContainerStartOptions{})
+	err = docker.ContainerStart(ctx, created.ID, container.StartOptions{})
 	if err != nil {
 		log.Error().
 			Str("image_name", imageName).
@@ -243,14 +243,14 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 
 	log.Debug().Int64("status", statusCode).Msg("container wait status")
 
-	out, err := docker.ContainerLogs(ctx, created.ID, types.ContainerLogsOptions{ShowStdout: true})
+	out, err := docker.ContainerLogs(ctx, created.ID, container.LogsOptions{ShowStdout: true})
 	if err != nil {
 		log.Error().Err(err).Str("image_name", imageName).Str("container_name", containerName).Msg("getting container log")
 
 		return "", err
 	}
 
-	err = docker.ContainerRemove(ctx, created.ID, types.ContainerRemoveOptions{})
+	err = docker.ContainerRemove(ctx, created.ID, container.RemoveOptions{})
 	if err != nil {
 		log.Error().
 			Str("image_name", imageName).

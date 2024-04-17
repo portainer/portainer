@@ -169,13 +169,12 @@
 
               <!-- environment-variables -->
               <div ng-if="stack">
-                <environment-variables-panel
+                <stack-environment-variables-panel
                   values="formValues.Env"
-                  explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
                   on-change="(handleEnvVarChange)"
                   show-help-message="true"
                   is-foldable="true"
-                ></environment-variables-panel>
+                ></stack-environment-variables-panel>
               </div>
               <!-- !environment-variables -->
 

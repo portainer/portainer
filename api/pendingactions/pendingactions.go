@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
 )
@@ -57,9 +58,22 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 		return fmt.Errorf("failed to retrieve environment %d: %w", id, err)
 	}
 
-	if endpoint.Status != portainer.EndpointStatusUp {
+	isKubernetesEndpoint := endpointutils.IsKubernetesEndpoint(endpoint) && !endpointutils.IsEdgeEndpoint(endpoint)
+
+	// EndpointStatusUp is only relevant for non-Kubernetes endpoints
+	// Sometimes the endpoint is UP but the status is not updated in the database
+	if !isKubernetesEndpoint && endpoint.Status != portainer.EndpointStatusUp {
 		log.Debug().Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
-		return fmt.Errorf("environment %q (id: %d) is not up: %w", endpoint.Name, id, err)
+		return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
+	}
+
+	// For Kubernetes endpoints, we need to check if the endpoint is up by creating a kube client
+	if isKubernetesEndpoint {
+		_, err := service.clientFactory.GetKubeClient(endpoint)
+		if err != nil {
+			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
+			return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
+		}
 	}
 
 	pendingActions, err := service.dataStore.PendingActions().ReadAll()

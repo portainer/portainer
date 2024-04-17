@@ -21,6 +21,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
@@ -190,7 +191,7 @@ func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoin
 		}
 	}
 
-	containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return false, err
 	}
