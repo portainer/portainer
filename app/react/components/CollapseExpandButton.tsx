@@ -2,16 +2,13 @@ import { ChevronDown } from 'lucide-react';
 import { ComponentProps } from 'react';
 import clsx from 'clsx';
 
-import { Button } from '@@/buttons';
-
 import { Icon } from './Icon';
 
 export function CollapseExpandButton({
   onClick,
   isExpanded,
-  className,
   ...props
-}: { isExpanded: boolean } & ComponentProps<typeof Button>) {
+}: { isExpanded: boolean } & ComponentProps<'button'>) {
   return (
     <button
       onClick={(e) => {
@@ -25,10 +22,7 @@ export function CollapseExpandButton({
       aria-label={isExpanded ? 'Collapse' : 'Expand'}
       aria-expanded={isExpanded}
       type="button"
-      className={clsx(
-        'flex-none border-none bg-transparent flex items-center p-0 px-3 group',
-        className
-      )}
+      className="flex-none border-none bg-transparent flex items-center p-0 px-3 group"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >
