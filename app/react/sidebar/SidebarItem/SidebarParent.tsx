@@ -1,11 +1,11 @@
 import clsx from 'clsx';
-import { ChevronDown } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
+import { CollapseExpandButton } from '@@/CollapseExpandButton';
 
 import { useSidebarState } from '../useSidebarState';
 
@@ -79,29 +79,11 @@ export function SidebarParent({
           </Link>
         </button>
         {isSidebarOpen && (
-          <button
-            type="button"
-            className="flex-none border-none bg-transparent flex items-center group p-0 px-3 h-8"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsExpanded((isExpanded) => !isExpanded);
-            }}
-            title={isExpanded ? 'Collapse' : 'Expand'}
-            aria-expanded={isExpanded}
-            aria-controls={listId}
-          >
-            <div className="flex items-center group-hover:bg-blue-5 be:group-hover:bg-gray-5 group-hover:th-dark:bg-gray-true-7 group-hover:bg-opacity-10 be:group-hover:bg-opacity-10 rounded-full p-[3px] transition ease-in-out">
-              <Icon
-                icon={ChevronDown}
-                size="md"
-                className={clsx('transition ease-in-out', {
-                  'rotate-180': isExpanded,
-                  'rotate-0': !isExpanded,
-                })}
-              />
-            </div>
-          </button>
+          <SidebarExpandButton
+            onClick={() => setIsExpanded((isExpanded) => !isExpanded)}
+            isExpanded={isExpanded}
+            listId={listId}
+          />
         )}
       </div>
     </Wrapper>
@@ -143,5 +125,25 @@ export function SidebarParent({
     >
       <span>{parentItem}</span>
     </SidebarTooltip>
+  );
+}
+
+function SidebarExpandButton({
+  isExpanded,
+  listId,
+  onClick,
+}: {
+  onClick(): void;
+  isExpanded: boolean;
+  listId: string;
+}) {
+  return (
+    <CollapseExpandButton
+      isExpanded={isExpanded}
+      onClick={onClick}
+      aria-controls={listId}
+      data-cy="expand-button"
+      className="flex-none border-none bg-transparent flex items-center group p-0 px-3 h-8"
+    />
   );
 }
