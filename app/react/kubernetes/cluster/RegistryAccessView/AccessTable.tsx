@@ -35,7 +35,6 @@ export function AccessTable({
       titleIcon={UserX}
       dataset={dataset}
       columns={columns}
-      emptyContentLabel="No namespace has been authorized yet."
       settingsManager={tableState}
       renderTableActions={(selectedItems) => (
         <DeleteButton

@@ -60,7 +60,6 @@ export function AccessDatatable({
         roles: rolesState,
       })}
       isRowSelectable={({ original: item }) => !inheritFrom || !item.Inherited}
-      emptyContentLabel="No authorized users or teams."
       renderTableActions={(selectedItems) => (
         <>
           <RemoveAccessButton items={selectedItems} onClick={onRemove} />

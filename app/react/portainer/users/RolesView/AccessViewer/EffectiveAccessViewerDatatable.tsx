@@ -25,11 +25,6 @@ export function EffectiveAccessViewerDatatable({
           user
         </TextTip>
       }
-      emptyContentLabel={
-        dataset
-          ? 'The selected user does not have access to any environment(s)'
-          : 'Select a user to show associated access and role'
-      }
       disableSelect
       data-cy="effective-access-viewer-datatable"
     />

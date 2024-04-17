@@ -64,7 +64,6 @@ export function PlacementsDatatable({
           />
         </TableSettingsMenu>
       )}
-      emptyContentLabel="No node available."
       renderSubRow={(row) => (
         <SubRow node={row.original} cellCount={row.getVisibleCells().length} />
       )}

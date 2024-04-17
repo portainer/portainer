@@ -98,7 +98,6 @@ export function ImagesDatatable({
       isLoading={imagesQuery.isLoading}
       settingsManager={tableState}
       columns={columns}
-      emptyContentLabel="No images found"
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh

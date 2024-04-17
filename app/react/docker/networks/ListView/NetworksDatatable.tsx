@@ -74,7 +74,6 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
           )}
         </>
       )}
-      emptyContentLabel="No networks available."
       renderTableActions={(selectedRows) => (
         <div className="flex gap-3">
           <Authorized

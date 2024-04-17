@@ -70,7 +70,6 @@ export function HelmRepositoryDatatable() {
       renderTableActions={(selectedRows) => (
         <HelmRepositoryDatatableActions selectedItems={selectedRows} />
       )}
-      emptyContentLabel="No Helm repository found"
       isLoading={helmReposQuery.isLoading}
       isRowSelectable={(row) => !row.original.Global}
       data-cy="helm-repositories-datatable"

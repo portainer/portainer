@@ -22,7 +22,6 @@ interface Props {
   values: IngressControllerClassMap[] | undefined;
   initialValues: IngressControllerClassMap[] | undefined;
   isLoading: boolean;
-  noIngressControllerLabel: string;
   view: string;
 }
 
@@ -32,7 +31,6 @@ export function IngressClassDatatable({
   initialValues,
   values,
   isLoading,
-  noIngressControllerLabel,
   view,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
@@ -44,7 +42,6 @@ export function IngressClassDatatable({
         dataset={values || []}
         columns={columns}
         isLoading={isLoading}
-        emptyContentLabel={noIngressControllerLabel}
         title="Ingress Controllers"
         titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}

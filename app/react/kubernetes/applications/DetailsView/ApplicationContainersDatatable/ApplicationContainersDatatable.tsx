@@ -55,7 +55,6 @@ export function ApplicationContainersDatatable() {
         podsQuery.isLoading ||
         useServerMetricsQuery.isLoading
       }
-      emptyContentLabel="No containers found"
       title="Application containers"
       titleIcon={Server}
       getRowId={(row) => row.podName} // use pod name because it's unique (name is not unique)

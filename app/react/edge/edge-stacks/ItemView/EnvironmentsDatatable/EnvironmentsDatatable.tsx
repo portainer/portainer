@@ -111,7 +111,6 @@ export function EnvironmentsDatatable() {
       page={page}
       onPageChange={setPage}
       totalCount={environmentsQuery.totalCount}
-      emptyContentLabel="No environment available."
       disableSelect
       description={
         <div className="w-1/4">

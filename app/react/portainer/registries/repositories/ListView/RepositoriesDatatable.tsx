@@ -16,7 +16,6 @@ export function RepositoriesDatatable({ dataset }: { dataset?: Repository[] }) {
       dataset={dataset || []}
       isLoading={!dataset}
       settingsManager={tableState}
-      emptyContentLabel="No repository available."
       disableSelect
       data-cy="registry-repositories-datatable"
     />

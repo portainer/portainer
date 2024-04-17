@@ -84,7 +84,6 @@ export const ngModule = angular
       'initialIngressControllers',
       'allowNoneIngressClass',
       'isLoading',
-      'noIngressControllerLabel',
       'view',
     ])
   )

@@ -30,7 +30,6 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
       title="Containers"
       titleIcon={Box}
       getRowId={(container) => container.id}
-      emptyContentLabel="No container available."
       data-cy="containers-datatable"
       renderTableActions={(selectedRows) => (
         <div className="flex gap-2">

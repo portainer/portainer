@@ -104,7 +104,6 @@ export function ConfigMapsDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={configMapsQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No ConfigMaps found"
       title="ConfigMaps"
       titleIcon={FileCode}
       getRowId={(row) => row.metadata?.uid ?? ''}

@@ -70,7 +70,6 @@ export function ApplicationsStacksDatatable({
         <SubRows stack={row.original} span={row.getVisibleCells().length} />
       )}
       noWidget
-      emptyContentLabel="No stack available."
       description={
         <div className="w-full">
           <div className="float-right mr-2 min-w-[140px]">

@@ -36,7 +36,6 @@ export function Datatable() {
       dataset={environments}
       title="Edge Devices Waiting Room"
       titleIcon={Box}
-      emptyContentLabel="No Edge Devices found"
       renderTableActions={(selectedRows) => (
         <TableActions selectedRows={selectedRows} />
       )}

@@ -21,7 +21,6 @@ export function LDAPUsersTable({ dataset }: { dataset?: string[] }) {
       title="Users"
       titleIcon={Users}
       settingsManager={tableState}
-      emptyContentLabel="No users found."
       disableSelect
       data-cy="ldap-users-datatable"
     />
