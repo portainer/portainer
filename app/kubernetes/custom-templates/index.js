@@ -1,8 +1,6 @@
 import angular from 'angular';
 
-import { kubeCustomTemplatesView } from './kube-custom-templates-view';
-
-export default angular.module('portainer.kubernetes.custom-templates', []).config(config).component('kubeCustomTemplatesView', kubeCustomTemplatesView).name;
+export default angular.module('portainer.kubernetes.custom-templates', []).config(config).name;
 
 function config($stateRegistryProvider) {
   const templates = {
@@ -17,7 +15,7 @@ function config($stateRegistryProvider) {
 
     views: {
       'content@': {
-        component: 'kubeCustomTemplatesView',
+        component: 'customTemplatesView',
       },
     },
     data: {

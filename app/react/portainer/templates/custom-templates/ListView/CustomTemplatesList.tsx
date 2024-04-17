@@ -22,13 +22,15 @@ export function CustomTemplatesList({
   storageKey,
 }: {
   templates?: CustomTemplate[];
-  onSelect?: (template: CustomTemplate['Id']) => void;
-  onDelete: (template: CustomTemplate['Id']) => void;
+  onSelect?: (templateId: CustomTemplate['Id']) => void;
+  onDelete: (templateId: CustomTemplate['Id']) => void;
   selectedId?: CustomTemplate['Id'];
-  templateLinkParams?: (template: CustomTemplate) => {
-    to: string;
-    params: object;
-  };
+  templateLinkParams?: (template: CustomTemplate) =>
+    | {
+        to: string;
+        params: object;
+      }
+    | undefined;
   storageKey: string;
 }) {
   const [page, setPage] = useState(0);
