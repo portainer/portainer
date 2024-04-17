@@ -341,20 +341,8 @@
         />
       </div>
     </div>
-    <div class="form-group">
-      <label for="oauth_authstyle" class="col-sm-3 col-lg-2 control-label text-left">
-        Auth Style
-        <portainer-tooltip message="'Auth Style specifies how the endpoint wants the client ID & client secret sent.'"></portainer-tooltip>
-      </label>
-      <div class="col-sm-9 col-lg-10">
-        <select
-          id="oauth_authstyle"
-          class="form-control"
-          ng-model="$ctrl.settings.AuthStyle"
-          ng-options="opt.value as opt.key for opt in $ctrl.state.availableAuthStyleOptions"
-        ></select>
-      </div>
-    </div>
+
+    <oauth-auth-style value="$ctrl.settings.AuthStyle" on-change="($ctrl.onChangeAuthStyle)"></oauth-auth-style>
     <save-auth-settings-button
       on-save-settings="($ctrl.onSaveSettings)"
       save-button-state="($ctrl.saveButtonState)"
