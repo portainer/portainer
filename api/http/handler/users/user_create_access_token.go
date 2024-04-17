@@ -115,7 +115,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("Internal Server Error", err)
 	}
 
-	return response.JSON(w, accessTokenResponse{rawAPIKey, *apiKey})
+	return response.JSONWithStatus(w, accessTokenResponse{rawAPIKey, *apiKey}, http.StatusCreated)
 }
 
 func (handler *Handler) usesInternalAuthentication(userID portainer.UserID) (bool, error) {
