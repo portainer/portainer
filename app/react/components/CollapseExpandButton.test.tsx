@@ -24,7 +24,7 @@ it('should call the onClick handler when the button is clicked', async () => {
   expect(onClick).toHaveBeenCalledTimes(1);
 });
 
-it.only('should prevent default and stop propagation when the button is clicked', async () => {
+it('should prevent default and stop propagation when the button is clicked', async () => {
   const user = userEvent.setup();
   const onClick = vi.fn();
   const onOuterClick = vi.fn();
