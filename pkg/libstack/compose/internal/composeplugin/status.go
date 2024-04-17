@@ -51,7 +51,12 @@ func getServiceStatus(service service) (libstack.Status, string) {
 		return libstack.StatusRunning, ""
 	case "removing":
 		return libstack.StatusRemoving, ""
-	case "exited", "dead":
+	case "exited":
+		if service.ExitCode != 0 {
+			return libstack.StatusError, fmt.Sprintf("service %s exited with code %d", service.Name, service.ExitCode)
+		}
+		return libstack.StatusCompleted, ""
+	case "dead":
 		if service.ExitCode != 0 {
 			return libstack.StatusError, fmt.Sprintf("service %s exited with code %d", service.Name, service.ExitCode)
 		}
@@ -94,7 +99,9 @@ func aggregateStatuses(services []service) (libstack.Status, string) {
 		return libstack.StatusStarting, ""
 	case statusCounts[libstack.StatusRemoving] > 0:
 		return libstack.StatusRemoving, ""
-	case statusCounts[libstack.StatusRunning] == servicesCount:
+	case statusCounts[libstack.StatusCompleted] == servicesCount:
+		return libstack.StatusCompleted, ""
+	case statusCounts[libstack.StatusRunning]+statusCounts[libstack.StatusCompleted] == servicesCount:
 		return libstack.StatusRunning, ""
 	case statusCounts[libstack.StatusStopped] == servicesCount:
 		return libstack.StatusStopped, ""
@@ -106,15 +113,19 @@ func aggregateStatuses(services []service) (libstack.Status, string) {
 
 }
 
-func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, status libstack.Status) <-chan string {
-	errorMessageCh := make(chan string)
+func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, status libstack.Status) <-chan libstack.WaitResult {
+	waitResultCh := make(chan libstack.WaitResult)
+	waitResult := libstack.WaitResult{
+		Status: status,
+	}
 
 	go func() {
 	OUTER:
 		for {
 			select {
 			case <-ctx.Done():
-				errorMessageCh <- fmt.Sprintf("failed to wait for status: %s", ctx.Err().Error())
+				waitResult.ErrorMsg = fmt.Sprintf("failed to wait for status: %s", ctx.Err().Error())
+				waitResultCh <- waitResult
 			default:
 			}
 
@@ -129,7 +140,7 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 					Msg("no output from docker compose ps")
 
 				if status == libstack.StatusRemoved {
-					errorMessageCh <- ""
+					waitResultCh <- waitResult
 					return
 				}
 
@@ -165,18 +176,25 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 			}
 
 			if len(services) == 0 && status == libstack.StatusRemoved {
-				errorMessageCh <- ""
+				waitResultCh <- waitResult
 				return
 			}
 
 			aggregateStatus, errorMessage := aggregateStatuses(services)
 			if aggregateStatus == status {
-				errorMessageCh <- ""
+				waitResultCh <- waitResult
+				return
+			}
+
+			if status == libstack.StatusRunning && aggregateStatus == libstack.StatusCompleted {
+				waitResult.Status = libstack.StatusCompleted
+				waitResultCh <- waitResult
 				return
 			}
 
 			if errorMessage != "" {
-				errorMessageCh <- errorMessage
+				waitResult.ErrorMsg = errorMessage
+				waitResultCh <- waitResult
 				return
 			}
 
@@ -188,5 +206,5 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 		}
 	}()
 
-	return errorMessageCh
+	return waitResultCh
 }
