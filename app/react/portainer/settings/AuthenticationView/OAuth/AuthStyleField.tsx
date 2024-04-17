@@ -5,8 +5,8 @@ import { FormControl, Size } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
 
 interface Props {
-  value: number;
-  onChange(value: number): void;
+  value: OAuthStyle;
+  onChange(value: OAuthStyle): void;
   label?: string;
   tooltip?: string;
   readonly?: boolean;
