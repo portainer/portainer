@@ -24,7 +24,6 @@ angular
     settingsModule,
     featureFlagModule,
     userActivityModule,
-    'portainer.shared.datatable',
     servicesModule,
     reactModule,
     sidebarModule,
