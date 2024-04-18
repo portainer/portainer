@@ -1,7 +1,6 @@
 import { ComponentProps } from 'react';
 
 import { Alert } from '@@/Alert';
-import { Link } from '@@/Link';
 
 import { EnvironmentVariablesFieldset } from './EnvironmentVariablesFieldset';
 import { EnvironmentVariablesPanel } from './EnvironmentVariablesPanel';
@@ -23,13 +22,14 @@ export function StackEnvironmentVariablesPanel({
       explanation={
         <div>
           You may use{' '}
-          <Link
-            to="https://docs.portainer.io/v/2.20/user/docker/stacks/add#environment-variables"
+          <a
+            href="https://docs.portainer.io/v/2.20/user/docker/stacks/add#environment-variables"
             target="_blank"
             data-cy="stack-env-vars-help-link"
+            rel="noreferrer noopener"
           >
             environment variables in your compose file
-          </Link>
+          </a>
           . The environment variable values set below will be used as
           substitutions in the compose file. Note that you may also reference a
           stack.env file in your compose file. A stack.env file contains the
