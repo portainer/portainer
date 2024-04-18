@@ -1,3 +1,5 @@
+import { useRouter } from '@uirouter/react';
+
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
@@ -21,6 +23,7 @@ export function useCreate({
   template: TemplateViewModel | CustomTemplate | undefined;
   templateType: 'app' | 'custom' | undefined;
 }) {
+  const router = useRouter();
   const mutation = useCreateEdgeStack();
   const { user } = useCurrentUser();
   const { trackEvent } = useAnalytics();
@@ -44,7 +47,11 @@ export function useCreate({
       ),
     });
 
-    mutation.mutate(getPayload(method, values));
+    mutation.mutate(getPayload(method, values), {
+      onSuccess: () => {
+        router.stateService.go('^');
+      },
+    });
 
     function getPayload(
       method: 'string' | 'file' | 'git',
