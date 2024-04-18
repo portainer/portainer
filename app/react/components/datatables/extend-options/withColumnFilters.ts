@@ -20,6 +20,10 @@ export function withColumnFilters<D extends DefaultType>(
       onColumnFiltersChange: (updater) => {
         onChange(applySetStateAction(updater, filters));
       },
+      initialState: {
+        ...options.initialState,
+        columnFilters: filters,
+      },
     };
   };
 }

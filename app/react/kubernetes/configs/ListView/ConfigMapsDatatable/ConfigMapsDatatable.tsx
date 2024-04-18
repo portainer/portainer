@@ -5,8 +5,11 @@ import { CronJob, Job } from 'kubernetes-types/batch/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
-import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
@@ -17,9 +20,14 @@ import { useJobs } from '@/react/kubernetes/applications/useJobs';
 import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { useTableState } from '@@/datatables/useTableState';
+import { AddButton } from '@@/buttons';
 import { DeleteButton } from '@@/buttons/DeleteButton';
-import { AddButton } from '@@/buttons/AddButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import {
   useConfigMapsForCluster,
@@ -31,11 +39,20 @@ import { getIsConfigMapInUse } from './utils';
 import { ConfigMapRowData } from './types';
 import { columns } from './columns';
 
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
+
 const storageKey = 'k8sConfigMapsDatatable';
-const settingsStore = createStore(storageKey);
 
 export function ConfigMapsDatatable() {
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const { authorized: canWrite } = useAuthorizations(['K8sConfigMapsW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
@@ -109,6 +126,9 @@ export function ConfigMapsDatatable() {
         />
       }
       data-cy="k8s-configmaps-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
     />
   );
 }

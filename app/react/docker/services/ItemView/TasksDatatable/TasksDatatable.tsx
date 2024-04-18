@@ -1,15 +1,24 @@
 import { List } from 'lucide-react';
 
 import { Datatable } from '@@/datatables';
-import { createPersistedStore } from '@@/datatables/types';
-import { useTableState } from '@@/datatables/useTableState';
+import {
+  BasicTableSettings,
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { useColumns } from './columns';
 import { DecoratedTask } from './types';
 
 const storageKey = 'docker-service-tasks';
-const store = createPersistedStore(storageKey);
+
+interface TableSettings
+  extends BasicTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function TasksDatatable({
   dataset,
@@ -20,7 +29,13 @@ export function TasksDatatable({
   isSlotColumnVisible: boolean;
   serviceName: string;
 }) {
-  const tableState = useTableState(store, storageKey);
+  const tableState = useTableStateWithStorage<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const columns = useColumns(isSlotColumnVisible);
 
   return (
@@ -31,7 +46,11 @@ export function TasksDatatable({
       columns={columns}
       dataset={dataset}
       emptyContentLabel="No task available."
-      extendTableOptions={withMeta({ table: 'tasks', serviceName })}
+      extendTableOptions={mergeOptions(
+        withMeta({ table: 'tasks', serviceName }),
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
+      disableSelect
       data-cy="docker-service-tasks-datatable"
     />
   );

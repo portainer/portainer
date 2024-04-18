@@ -10,6 +10,8 @@ import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
   BasicTableSettings,
   createPersistedStore,
+  FilteredColumnsTableSettings,
+  filteredColumnsSettings,
   refreshableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
@@ -18,6 +20,8 @@ import { AddButton, Button, ButtonGroup, LoadingButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { ButtonWithRef } from '@@/buttons/Button';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { ImagesListResponse, useImages } from '../../queries/useImages';
 
@@ -28,13 +32,15 @@ const tableKey = 'images';
 
 export interface TableSettings
   extends BasicTableSettings,
-    RefreshableTableSettings {}
+    RefreshableTableSettings,
+    FilteredColumnsTableSettings {}
 
 const settingsStore = createPersistedStore<TableSettings>(
   tableKey,
   'tags',
   (set) => ({
     ...refreshableSettings(set),
+    ...filteredColumnsSettings(set),
   })
 );
 
@@ -65,6 +71,9 @@ export function ImagesDatatable({
       title="Images"
       titleIcon={List}
       data-cy="docker-images-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
       renderTableActions={(selectedItems) => (
         <div className="flex items-center gap-2">
           <RemoveButtonMenu selectedItems={selectedItems} onRemove={onRemove} />

@@ -66,7 +66,6 @@ export function StacksDatatable({
         columnVisibility: Object.fromEntries(
           tableState.hiddenColumns.map((col) => [col, false])
         ),
-        columnFilters: tableState.columnFilters,
       }}
       extendTableOptions={mergeOptions(
         withGlobalFilter(globalFilterFn),
