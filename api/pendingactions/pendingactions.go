@@ -164,6 +164,7 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 		err := postInitMigrator.MigrateEnvironment(endpoint)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error running post-init migrations for edge environment %d", endpoint.ID)
+			return fmt.Errorf("failed running post-init migrations for edge environment %d: %w", endpoint.ID, err)
 		}
 
 		return nil
