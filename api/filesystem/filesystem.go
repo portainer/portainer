@@ -934,7 +934,7 @@ func FileExists(filePath string) (bool, error) {
 func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
 	// 1. Backup the source directory to a different folder
 	backupDir := fmt.Sprintf("%s-%s", filepath.Dir(originalPath), "backup")
-	err := MoveDirectory(originalPath, backupDir)
+	err := MoveDirectory(originalPath, backupDir, false)
 	if err != nil {
 		return fmt.Errorf("failed to backup source directory: %w", err)
 	}
@@ -973,14 +973,14 @@ func restoreBackup(src, backupDir string) error {
 		return fmt.Errorf("failed to delete destination directory: %w", err)
 	}
 
-	err = MoveDirectory(backupDir, src)
+	err = MoveDirectory(backupDir, src, false)
 	if err != nil {
 		return fmt.Errorf("failed to restore backup directory: %w", err)
 	}
 	return nil
 }
 
-func MoveDirectory(originalPath, newPath string) error {
+func MoveDirectory(originalPath, newPath string, overwriteTargetPath bool) error {
 	if _, err := os.Stat(originalPath); err != nil {
 		return err
 	}
@@ -991,7 +991,13 @@ func MoveDirectory(originalPath, newPath string) error {
 	}
 
 	if alreadyExists {
-		return errors.New("Target path already exists")
+		if !overwriteTargetPath {
+			return fmt.Errorf("Target path already exists")
+		}
+
+		if err = os.RemoveAll(newPath); err != nil {
+			return fmt.Errorf("failed to overwrite path %s: %s", newPath, err.Error())
+		}
 	}
 
 	return os.Rename(originalPath, newPath)
