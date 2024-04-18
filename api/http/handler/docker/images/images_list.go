@@ -64,7 +64,9 @@ func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *http
 
 	imageUsageSet := set.Set[string]{}
 	if withUsage {
-		containers, err := cli.ContainerList(r.Context(), container.ListOptions{})
+		containers, err := cli.ContainerList(r.Context(), container.ListOptions{
+			All: true,
+		})
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve Docker containers", err)
 		}
