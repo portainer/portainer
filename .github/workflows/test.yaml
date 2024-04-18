@@ -1,7 +1,7 @@
 name: Test
 
 env:
-  GO_VERSION: 1.21.6
+  GO_VERSION: 1.21.9
   NODE_VERSION: 18.x
 
 on:
