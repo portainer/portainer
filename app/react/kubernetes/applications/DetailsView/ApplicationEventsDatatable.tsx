@@ -2,6 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
 
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { useTableState } from '@@/datatables/useTableState';
 
@@ -10,9 +11,9 @@ import {
   useApplicationPods,
   useApplicationServices,
 } from '../application.queries';
-import { EventsDatatable } from '../../components/KubernetesEventsDatatable';
-
-import { useNamespaceEventsQuery } from './useNamespaceEventsQuery';
+import { EventsDatatable } from '../../components/EventsDatatable';
+import { useEvents } from '../../queries/useEvents';
+import { AppKind } from '../types';
 
 const storageKey = 'k8sAppEventsDatatable';
 const settingsStore = createStore(storageKey, { id: 'Date', desc: true });
@@ -23,41 +24,73 @@ export function ApplicationEventsDatatable() {
     params: {
       namespace,
       name,
-      'resource-type': resourceType,
+      'resource-type': appKind,
       endpointId: environmentId,
     },
   } = useCurrentStateAndParams();
 
+  const { relatedEvents, isInitialLoading } = useApplicationEvents(
+    environmentId,
+    namespace,
+    name,
+    appKind,
+    {
+      autoRefreshRate: tableState.autoRefreshRate,
+    }
+  );
+
+  return (
+    <EventsDatatable
+      dataset={relatedEvents}
+      tableState={tableState}
+      isLoading={isInitialLoading}
+      data-cy="k8sAppDetail-eventsTable"
+      noWidget
+    />
+  );
+}
+
+export function useApplicationEvents(
+  environmentId: EnvironmentId,
+  namespace: string,
+  name: string,
+  appKind?: AppKind,
+  options?: { autoRefreshRate?: number; yaml?: boolean }
+) {
   const { data: application, ...applicationQuery } = useApplication(
     environmentId,
     namespace,
     name,
-    resourceType
+    appKind
   );
-  const { data: services, ...servicesQuery } = useApplicationServices(
+  const servicesQuery = useApplicationServices(
     environmentId,
     namespace,
     name,
     application
   );
-  const { data: pods, ...podsQuery } = useApplicationPods(
+  const podsQuery = useApplicationPods(
     environmentId,
     namespace,
     name,
     application
   );
-  const { data: events, ...eventsQuery } = useNamespaceEventsQuery(
-    environmentId,
+
+  const { data: events, ...eventsQuery } = useEvents(environmentId, {
     namespace,
-    {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
-    }
-  );
+    queryOptions: {
+      autoRefreshRate: options?.autoRefreshRate
+        ? options.autoRefreshRate * 1000
+        : undefined,
+    },
+  });
 
   // related events are events that have the application id, or the id of a service or pod from the application
   const relatedEvents = useMemo(() => {
-    const serviceIds = services?.map((service) => service?.metadata?.uid);
-    const podIds = pods?.map((pod) => pod?.metadata?.uid);
+    const serviceIds = servicesQuery.data?.map(
+      (service) => service?.metadata?.uid
+    );
+    const podIds = podsQuery.data?.map((pod) => pod?.metadata?.uid);
     return (
       events?.filter(
         (event) =>
@@ -66,20 +99,13 @@ export function ApplicationEventsDatatable() {
           podIds?.includes(event.involvedObject.uid)
       ) || []
     );
-  }, [application?.metadata?.uid, events, pods, services]);
+  }, [application?.metadata?.uid, events, podsQuery.data, servicesQuery.data]);
 
-  return (
-    <EventsDatatable
-      dataset={relatedEvents}
-      tableState={tableState}
-      isLoading={
-        applicationQuery.isLoading ||
-        eventsQuery.isLoading ||
-        servicesQuery.isLoading ||
-        podsQuery.isLoading
-      }
-      data-cy="k8sAppDetail-eventsTable"
-      noWidget
-    />
-  );
+  const isInitialLoading =
+    applicationQuery.isInitialLoading ||
+    servicesQuery.isInitialLoading ||
+    podsQuery.isInitialLoading ||
+    eventsQuery.isInitialLoading;
+
+  return { relatedEvents, isInitialLoading };
 }
