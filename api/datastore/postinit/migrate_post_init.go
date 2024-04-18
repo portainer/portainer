@@ -114,9 +114,11 @@ func (migrator *PostInitMigrator) MigrateEnvironment(environment *portainer.Endp
 			log.Error().Err(err).Msgf("Error creating kubeclient for environment: %d", environment.ID)
 			return err
 		}
-		// there are no error checks here because we want to run all migrations.
-		// If one environment fails, it is logged and the next one runs.
-		migrator.MigrateIngresses(*environment, kubeclient)
+		// if one environment fails, it is logged and the next migration runs. The error is returned at the end and handled by pending actions
+		err = migrator.MigrateIngresses(*environment, kubeclient)
+		if err != nil {
+			return err
+		}
 		return nil
 	case endpointutils.IsDockerEndpoint(environment):
 		// get the docker client for the environment, and skip all docker migrations if there's an error
@@ -132,27 +134,29 @@ func (migrator *PostInitMigrator) MigrateEnvironment(environment *portainer.Endp
 	return nil
 }
 
-func (migrator *PostInitMigrator) MigrateIngresses(environment portainer.Endpoint, kubeclient *cli.KubeClient) {
+func (migrator *PostInitMigrator) MigrateIngresses(environment portainer.Endpoint, kubeclient *cli.KubeClient) error {
 	// Early exit if we do not need to migrate!
 	if !environment.PostInitMigrations.MigrateIngresses {
-		return
+		return nil
 	}
 	log.Debug().Msgf("Migrating ingresses for environment %d", environment.ID)
 
 	err := migrator.kubeFactory.MigrateEndpointIngresses(&environment, migrator.dataStore, kubeclient)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error migrating ingresses for environment %d", environment.ID)
+		return err
 	}
+	return nil
 }
 
 // MigrateGPUs will check all docker endpoints for containers with GPUs and set EnableGPUManagement to true if any are found
 // If there's an error getting the containers, we'll log it and move on
-func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient *client.Client) {
-	migrator.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient *client.Client) error {
+	return migrator.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		environment, err := tx.Endpoint().Endpoint(e.ID)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error getting environment %d", environment.ID)
-			return nil
+			return err
 		}
 		// Early exit if we do not need to migrate!
 		if !environment.PostInitMigrations.MigrateGPUs {
@@ -164,7 +168,7 @@ func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient
 		containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
 		if err != nil {
 			log.Error().Err(err).Msgf("failed to list containers for environment %d", environment.ID)
-			return nil
+			return err
 		}
 
 		// check for a gpu on each container. If even one GPU is found, set EnableGPUManagement to true for the whole environment
@@ -191,6 +195,7 @@ func (migrator *PostInitMigrator) MigrateGPUs(e portainer.Endpoint, dockerClient
 		err = tx.Endpoint().UpdateEndpoint(environment.ID, environment)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error updating EnableGPUManagement flag for environment %d", environment.ID)
+			return err
 		}
 
 		return nil
