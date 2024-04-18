@@ -86,6 +86,7 @@ export function NamespaceInnerForm({
             view="namespace"
             isLoading={ingressClassesQuery.isLoading}
             initialValues={initialValues.ingressClasses}
+            noIngressControllerLabel="No ingress controllers available in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster."
           />
         </FormSection>
       )}

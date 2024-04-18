@@ -22,7 +22,8 @@ interface Props {
   values: IngressControllerClassMap[] | undefined;
   initialValues: IngressControllerClassMap[] | undefined;
   isLoading: boolean;
-  view: string;
+  noIngressControllerLabel: string;
+  view: 'namespace' | 'cluster';
 }
 
 export function IngressClassDatatable({
@@ -31,6 +32,7 @@ export function IngressClassDatatable({
   initialValues,
   values,
   isLoading,
+  noIngressControllerLabel,
   view,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
@@ -91,11 +93,18 @@ export function IngressClassDatatable({
 
   function renderIngressClassDescription() {
     return (
-      <div className="text-muted flex w-full flex-col !text-xs">
-        <div className="mt-1">{description}</div>
-        {initialValues && values && isUnsavedChanges(initialValues, values) && (
-          <TextTip>Unsaved changes.</TextTip>
+      <div className="flex flex-col gap-3">
+        {!isLoading && values && values.length === 0 && (
+          <TextTip>{noIngressControllerLabel}</TextTip>
         )}
+        <div className="text-muted flex w-full flex-col !text-xs">
+          <div className="mt-1">{description}</div>
+          {initialValues &&
+            values &&
+            isUnsavedChanges(initialValues, values) && (
+              <TextTip>Unsaved changes.</TextTip>
+            )}
+        </div>
       </div>
     );
   }

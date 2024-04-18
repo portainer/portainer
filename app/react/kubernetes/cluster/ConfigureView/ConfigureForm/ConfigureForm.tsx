@@ -181,6 +181,7 @@ function InnerForm({
             initialValues={initialValues.ingressClasses}
             isLoading={isIngressClassesLoading}
             view="cluster"
+            noIngressControllerLabel="No supported ingress controllers found."
           />
           <div className="form-group">
             <div className="col-sm-12">
