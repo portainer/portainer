@@ -89,6 +89,7 @@ func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 // @param body body registryCreatePayload true "Registry details"
 // @success 200 {object} portainer.Registry "Success"
 // @failure 400 "Invalid request"
+// @failure 409 "Another registry with the same name or same URL & credentials already exists"
 // @failure 500 "Server error"
 // @router /registries [post]
 func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

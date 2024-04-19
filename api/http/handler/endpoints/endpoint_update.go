@@ -69,6 +69,7 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "Environment(Endpoint) not found"
+// @failure 409 "Name is not unique"
 // @failure 500 "Server error"
 // @router /endpoints/{id} [put]
 func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
