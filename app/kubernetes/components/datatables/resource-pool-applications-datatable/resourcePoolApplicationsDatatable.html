@@ -68,9 +68,9 @@
                   ng-click="$ctrl.changeOrderBy('Name')"
                 ></table-column-header>
               </th>
-              <th>
+              <th ng-if="!$ctrl.deploymentOptions.hideStacksFunctionality">
                 <table-column-header
-                  col-title="'StackName'"
+                  col-title="'Stack'"
                   can-sort="true"
                   is-sorted="$ctrl.state.orderBy === 'StackName'"
                   is-sorted-desc="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"

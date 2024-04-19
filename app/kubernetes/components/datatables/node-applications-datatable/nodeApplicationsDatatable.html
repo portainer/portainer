@@ -70,7 +70,7 @@
                   ng-click="$ctrl.changeOrderBy('Name')"
                 ></table-column-header>
               </th>
-              <th>
+              <th ng-if="!$ctrl.deploymentOptions.hideStacksFunctionality">
                 <table-column-header
                   col-title="'Stack'"
                   can-sort="true"
