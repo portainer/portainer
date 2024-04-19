@@ -1,10 +1,6 @@
 <page-header title="'Roles'" breadcrumbs="['Role management']" reload="true"> </page-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <roles-datatable title-text="Roles" dataset="$ctrl.roles" table-key="roles"></roles-datatable>
-  </div>
-</div>
+<rbac-roles-datatable dataset="$ctrl.roles"></rbac-roles-datatable>
 
 <div class="row">
   <access-viewer> </access-viewer>

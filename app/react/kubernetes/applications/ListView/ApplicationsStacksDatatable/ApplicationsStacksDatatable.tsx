@@ -47,10 +47,11 @@ export function ApplicationsStacksDatatable({
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
 
+  const { setShowSystemResources } = tableState;
+
   useEffect(() => {
-    tableState.setShowSystemResources(showSystem || false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSystem]);
+    setShowSystemResources(showSystem || false);
+  }, [showSystem, setShowSystemResources]);
 
   const { authorized } = useAuthorizations('K8sApplicationsW');
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -72,7 +73,7 @@ export function ApplicationsStacksDatatable({
       emptyContentLabel="No stack available."
       description={
         <div className="w-full">
-          <div className="min-w-[140px] float-right mr-2">
+          <div className="float-right mr-2 min-w-[140px]">
             <NamespaceFilter
               namespaces={namespaces}
               value={namespace}
@@ -96,6 +97,7 @@ export function ApplicationsStacksDatatable({
         />
       )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
+      data-cy="applications-stacks-datatable"
     />
   );
 }

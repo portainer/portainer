@@ -19,6 +19,7 @@
         <div class="col-sm-9 col-lg-10">
           <input
             type="text"
+            data-cy="macvlan-network-card-input"
             class="form-control"
             name="network_card"
             ng-model="$ctrl.data.ParentNetworkCard"
@@ -69,6 +70,7 @@
             ng-model="$ctrl.data.SelectedNetworkConfig"
             name="config_network"
             ng-required="$ctrl.requiredConfigSelection()"
+            data-cy="macvlanConfigNetworkSelector"
           >
             <option selected disabled hidden value="">Select a network</option>
           </select>

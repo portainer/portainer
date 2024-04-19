@@ -51,8 +51,10 @@ export function AccessTable({
             </>
           }
           onConfirmed={() => onRemove(selectedItems)}
+          data-cy="remove-registry-access-button"
         />
       )}
+      data-cy="registry-access-datatable"
     />
   );
 }

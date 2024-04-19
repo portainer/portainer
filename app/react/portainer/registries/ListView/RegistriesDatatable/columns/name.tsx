@@ -36,7 +36,11 @@ export function NameCell({
   return (
     <>
       {isEdgeAdminQuery.isAdmin && hasLink ? (
-        <Link to="portainer.registries.registry" params={{ id: item.Id }}>
+        <Link
+          to="portainer.registries.registry"
+          params={{ id: item.Id }}
+          data-cy={`registry-link-${item.Name}`}
+        >
           {item.Name}
         </Link>
       ) : (

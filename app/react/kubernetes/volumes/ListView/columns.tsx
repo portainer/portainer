@@ -16,6 +16,7 @@ export const columns = [
         <Link
           to="kubernetes.resourcePools.resourcePool"
           params={{ id: namespace }}
+          data-cy={`volume-namespace-link-${namespace}`}
         >
           {namespace}
         </Link>
@@ -37,6 +38,7 @@ export const columns = [
               name: item.Applications[0].Name,
               namespace: item.ResourcePool.Namespace.Name,
             }}
+            data-cy={`volume-application-link-${item.Applications[0].Name}`}
           >
             {item.Applications[0].Name}
           </Link>

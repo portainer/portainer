@@ -115,6 +115,7 @@ export function AppIngressPathsForm({
               to="kubernetes.ingresses"
               target="_blank"
               rel="noopener noreferrer"
+              data-cy="applicationCreate-ingressesLink"
             >
               Ingresses screen
             </Link>{' '}
@@ -153,6 +154,7 @@ export function AppIngressPathsForm({
         <div className="flex w-full flex-wrap gap-2">
           <Button
             icon={Plus}
+            data-cy={`applicationCreate-addIngressPath-${serviceIndex}-${portIndex}`}
             className="!ml-0"
             size="small"
             color="default"

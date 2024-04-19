@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { withError } from '@/react-tools/react-query';
 import { RegistryId } from '@/react/portainer/registries/types/registry';

@@ -9,7 +9,7 @@ import { EdgeJob } from '../types';
 const columnHelper = createColumnHelper<EdgeJob>();
 
 export const columns = [
-  buildNameColumn<EdgeJob>('Name', '.job'),
+  buildNameColumn<EdgeJob>('Name', '.job', 'edge-job-name'),
   columnHelper.accessor('CronExpression', {
     header: 'Cron Expression',
   }),

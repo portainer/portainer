@@ -2,14 +2,13 @@ import { FormikErrors } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-import { InputList, ItemProps } from '@@/form-components/InputList';
-import { InputGroup } from '@@/form-components/InputGroup';
-import { FormError } from '@@/form-components/FormError';
 
 import { NetworkSelector } from '../../components/NetworkSelector';
 
 import { CONTAINER_MODE, Values } from './types';
 import { ContainerSelector } from './ContainerSelector';
+import { HostsFileEntries } from './HostsFileEntries';
+import { HostnameField } from './HostnameField';
 
 export function NetworkTab({
   values,
@@ -39,19 +38,17 @@ export function NetworkTab({
         </FormControl>
       )}
 
-      <FormControl label="Hostname" errors={errors?.hostname}>
-        <Input
-          value={values.hostname}
-          onChange={(e) => setFieldValue('hostname', e.target.value)}
-          placeholder="e.g. web01"
-        />
-      </FormControl>
+      <HostnameField
+        value={values.hostname}
+        onChange={(value) => setFieldValue('hostname', value)}
+      />
 
       <FormControl label="Domain Name" errors={errors?.domain}>
         <Input
           value={values.domain}
           onChange={(e) => setFieldValue('domain', e.target.value)}
           placeholder="e.g. example.com"
+          data-cy="docker-container-domain-input"
         />
       </FormControl>
 
@@ -60,6 +57,7 @@ export function NetworkTab({
           value={values.macAddress}
           onChange={(e) => setFieldValue('macAddress', e.target.value)}
           placeholder="e.g. 12-34-56-78-9a-bc"
+          data-cy="docker-container-mac-address-input"
         />
       </FormControl>
 
@@ -68,6 +66,7 @@ export function NetworkTab({
           value={values.ipv4Address}
           onChange={(e) => setFieldValue('ipv4Address', e.target.value)}
           placeholder="e.g. 172.20.0.7"
+          data-cy="docker-container-ipv4-address-input"
         />
       </FormControl>
 
@@ -76,6 +75,7 @@ export function NetworkTab({
           value={values.ipv6Address}
           onChange={(e) => setFieldValue('ipv6Address', e.target.value)}
           placeholder="e.g. a:b:c:d::1234"
+          data-cy="docker-container-ipv6-address-input"
         />
       </FormControl>
 
@@ -84,6 +84,7 @@ export function NetworkTab({
           value={values.primaryDns}
           onChange={(e) => setFieldValue('primaryDns', e.target.value)}
           placeholder="e.g. 1.1.1.1, 2606:4700:4700::1111"
+          data-cy="docker-container-primary-dns-input"
         />
       </FormControl>
 
@@ -92,43 +93,15 @@ export function NetworkTab({
           value={values.secondaryDns}
           onChange={(e) => setFieldValue('secondaryDns', e.target.value)}
           placeholder="e.g. 1.0.0.1, 2606:4700:4700::1001"
+          data-cy="docker-container-secondary-dns-input"
         />
       </FormControl>
 
-      <InputList
-        label="Hosts file entries"
-        value={values.hostsFileEntries}
-        onChange={(hostsFileEntries) =>
-          setFieldValue('hostsFileEntries', hostsFileEntries)
-        }
+      <HostsFileEntries
+        values={values.hostsFileEntries}
+        onChange={(v) => setFieldValue('hostsFileEntries', v)}
         errors={errors?.hostsFileEntries}
-        item={HostsFileEntryItem}
-        itemBuilder={() => ''}
       />
-    </div>
-  );
-}
-
-function HostsFileEntryItem({
-  item,
-  onChange,
-  disabled,
-  error,
-  readOnly,
-}: ItemProps<string>) {
-  return (
-    <div>
-      <InputGroup>
-        <InputGroup.Addon>value</InputGroup.Addon>
-        <Input
-          value={item}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          readOnly={readOnly}
-        />
-      </InputGroup>
-
-      {error && <FormError>{error}</FormError>}
     </div>
   );
 }

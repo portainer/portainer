@@ -32,7 +32,7 @@ export function PlacementItem({
   return (
     <div className="w-full">
       <div className="flex w-full gap-2">
-        <div className="basis-1/2 grow">
+        <div className="grow basis-1/2">
           <Select
             options={labelOptions}
             value={{ label: item.label, value: item.label }}
@@ -54,7 +54,7 @@ export function PlacementItem({
             <FormError>{placementError.label}</FormError>
           )}
         </div>
-        <div className="basis-1/2 grow">
+        <div className="grow basis-1/2">
           <Select
             options={valueOptions}
             value={valueOptions?.find((option) => option.value === item.value)}

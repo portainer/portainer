@@ -2,17 +2,19 @@ import { mixed, object, SchemaOf, string } from 'yup';
 
 import { variablesFieldValidation } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
+import { envVarsFieldsetValidation } from '@/react/portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
+import { TemplateEnv } from '@/react/portainer/templates/app-templates/types';
 
-import { envVarsFieldsetValidation } from './EnvVarsFieldset';
-
-export function validation({
-  definitions,
+function validation({
+  customVariablesDefinitions,
+  envVarDefinitions,
 }: {
-  definitions: VariableDefinition[];
+  customVariablesDefinitions: VariableDefinition[];
+  envVarDefinitions: Array<TemplateEnv>;
 }) {
   return object({
     type: string().oneOf(['custom', 'app']).required(),
-    envVars: envVarsFieldsetValidation()
+    envVars: envVarsFieldsetValidation(envVarDefinitions)
       .optional()
       .when('type', {
         is: 'app',
@@ -20,7 +22,7 @@ export function validation({
       }),
     file: mixed().optional(),
     template: object().optional().default(null),
-    variables: variablesFieldValidation(definitions)
+    variables: variablesFieldValidation(customVariablesDefinitions)
       .optional()
       .when('type', {
         is: 'custom',

@@ -14,6 +14,7 @@ export function SaveAuthSettingsButton({ onSubmit, isLoading }: Props) {
         <div className="col-sm-12">
           <LoadingButton
             loadingText="Saving..."
+            data-cy="save-auth-settings-button"
             isLoading={isLoading}
             onClick={() => onSubmit()}
           >

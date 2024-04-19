@@ -24,7 +24,7 @@ import { createOwnershipColumn } from '../../components/datatable/createOwnershi
 const columnHelper = createColumnHelper<SecretViewModel>();
 
 const columns = [
-  buildNameColumn<SecretViewModel>('Name', '.secret'),
+  buildNameColumn<SecretViewModel>('Name', '.secret', 'docker-secrets-name'),
   columnHelper.accessor((item) => isoDate(item.CreatedAt), {
     header: 'Creation Date',
   }),
@@ -69,6 +69,7 @@ export function SecretsDatatable({
       disableSelect={!hasWriteAccessQuery.authorized}
       settingsManager={tableState}
       emptyContentLabel="No secret available."
+      data-cy="docker-secrets-datatable"
       renderTableActions={(selectedItems) =>
         hasWriteAccessQuery.authorized && (
           <TableActions selectedItems={selectedItems} onRemove={onRemove} />

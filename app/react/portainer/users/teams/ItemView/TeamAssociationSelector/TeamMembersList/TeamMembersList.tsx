@@ -62,6 +62,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
               onClick={() => handleRemoveMembers(users.map((user) => user.Id))}
               disabled={disabled || users.length === 0}
               icon={UserX}
+              data-cy="remove-all-users-button"
             >
               Remove all users
             </Button>
@@ -76,6 +77,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
           search,
           setSearch,
         }}
+        data-cy="team-members-datatable"
       />
     </RowProvider>
   );

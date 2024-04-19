@@ -67,6 +67,7 @@ export function VolumesDatatable({
         table: 'volumes',
         isBrowseVisible,
       })}
+      data-cy="docker-volumes-datatable"
     />
   );
 }

@@ -26,13 +26,22 @@ function RegistrySelectPrompt({ onSubmit, defaultValue, registries }: Props) {
           onChange={setRegistryId}
           value={registryId}
           options={options}
+          data-cy="registry-select-selector"
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onSubmit()} color="default">
+        <Button
+          onClick={() => onSubmit()}
+          color="default"
+          data-cy="registry-select-cancel-button"
+        >
           Cancel
         </Button>
-        <Button onClick={() => onSubmit(registryId)} color="primary">
+        <Button
+          onClick={() => onSubmit(registryId)}
+          color="primary"
+          data-cy="registry-select-update-button"
+        >
           Update
         </Button>
       </Modal.Footer>

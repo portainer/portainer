@@ -6,7 +6,15 @@
     <div class="form-group col-md-12">
       <label for="nfs_address" class="col-sm-2 col-md-1 control-label required text-left">Address</label>
       <div class="col-sm-10 col-md-11">
-        <input type="text" class="form-control" ng-model="$ctrl.data.serverAddress" name="nfs_address" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx" required />
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.data.serverAddress"
+          name="nfs_address"
+          placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx"
+          required
+          data-cy="nfs-address-input"
+        />
       </div>
     </div>
     <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_address.$invalid">
@@ -21,7 +29,14 @@
     <div class="form-group col-md-12">
       <label for="nfs_version" class="col-sm-2 col-md-1 control-label text-left">NFS Version</label>
       <div class="col-sm-10 col-md-11">
-        <select class="form-control" ng-model="$ctrl.data.version" name="nfs_version" ng-options="version for version in $ctrl.data.versions" required></select>
+        <select
+          class="form-control"
+          ng-model="$ctrl.data.version"
+          name="nfs_version"
+          ng-options="version for version in $ctrl.data.versions"
+          required
+          data-cy="nfs-version-select"
+        ></select>
       </div>
     </div>
     <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_version.$invalid">
@@ -38,6 +53,7 @@
       <div class="col-sm-10 col-md-11">
         <input
           type="text"
+          data-cy="nfs-mountpoint-input"
           class="form-control"
           ng-model="$ctrl.data.mountPoint"
           name="nfs_mountpoint"
@@ -61,7 +77,7 @@
         <portainer-tooltip message="'Comma separated list of options'"></portainer-tooltip>
       </label>
       <div class="col-sm-10 col-md-11">
-        <input type="text" class="form-control" ng-model="$ctrl.data.options" name="nfs_options" placeholder="e.g. rw,noatime,tcp ..." required />
+        <input type="text" class="form-control" ng-model="$ctrl.data.options" name="nfs_options" placeholder="e.g. rw,noatime,tcp ..." required data-cy="nfs-options-input" />
       </div>
     </div>
     <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_options.$invalid">

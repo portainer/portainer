@@ -112,24 +112,6 @@ function ContainerServiceFactory($q, Container, $timeout) {
     return deferred.promise;
   };
 
-  service.createAndStartContainer = function (environmentId, configuration) {
-    var deferred = $q.defer();
-    var container;
-    service
-      .createContainer(environmentId, configuration)
-      .then(function success(data) {
-        container = data;
-        return service.startContainer(environmentId, container.Id);
-      })
-      .then(function success() {
-        deferred.resolve(container);
-      })
-      .catch(function error(err) {
-        deferred.reject(err);
-      });
-    return deferred.promise;
-  };
-
   service.createExec = function (environmentId, execConfig) {
     var deferred = $q.defer();
 

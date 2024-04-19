@@ -16,7 +16,9 @@ func (tx *StoreTx) IsErrObjectNotFound(err error) bool {
 
 func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService { return nil }
 
-func (tx *StoreTx) PendingActions() dataservices.PendingActionsService { return nil }
+func (tx *StoreTx) PendingActions() dataservices.PendingActionsService {
+	return tx.store.PendingActionsService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) EdgeGroup() dataservices.EdgeGroupService {
 	return tx.store.EdgeGroupService.Tx(tx.tx)

@@ -11,6 +11,7 @@
             <div class="col-sm-11">
               <input
                 type="text"
+                data-cy="stack-name-input"
                 class="form-control"
                 ng-model="formValues.Name"
                 id="stack_name"
@@ -152,12 +153,7 @@
           </div>
 
           <!-- environment-variables -->
-          <environment-variables-panel
-            values="formValues.Env"
-            explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’'"
-            on-change="(handleEnvVarChange)"
-          >
-          </environment-variables-panel>
+          <stack-environment-variables-panel values="formValues.Env" on-change="(handleEnvVarChange)" show-alert="true"> </stack-environment-variables-panel>
           <!-- !environment-variables -->
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- actions -->

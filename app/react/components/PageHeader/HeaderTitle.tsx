@@ -16,7 +16,10 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
   return (
     <div className="flex justify-between whitespace-normal pt-3">
       <div className="flex items-center gap-2">
-        <h1 className="m-0 text-2xl font-medium text-gray-11 th-highcontrast:text-white th-dark:text-white">
+        <h1
+          className="m-0 text-2xl font-medium text-gray-11 th-highcontrast:text-white th-dark:text-white"
+          data-cy="page-title"
+        >
           {title}
         </h1>
         {children && <>{children}</>}

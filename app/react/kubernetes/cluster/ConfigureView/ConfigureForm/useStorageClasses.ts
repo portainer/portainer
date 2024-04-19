@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { StorageClass, StorageClassList } from 'kubernetes-types/storage/v1';
 
 import axios from '@/portainer/services/axios';

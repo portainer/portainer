@@ -72,6 +72,7 @@ export function SidebarParent({
                 'justify-center': !isSidebarOpen,
               }
             )}
+            data-cy={`${dataCy}-link`}
           >
             <Icon icon={icon} />
             {isSidebarOpen && <span className="pl-4">{title}</span>}

@@ -31,6 +31,7 @@ export function EffectiveAccessViewerDatatable({
           : 'Select a user to show associated access and role'
       }
       disableSelect
+      data-cy="effective-access-viewer-datatable"
     />
   );
 }

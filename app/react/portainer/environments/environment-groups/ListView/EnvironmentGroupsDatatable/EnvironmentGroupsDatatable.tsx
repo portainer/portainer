@@ -27,6 +27,7 @@ export function EnvironmentGroupsDatatable() {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
       )}
+      data-cy="environment-groups-datatable"
     />
   );
 }

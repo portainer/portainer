@@ -99,7 +99,11 @@ export function withControlledInput<T>(
             (value: T[keyof T]) => {
               // update the state with the value coming from WrappedComponent
               setControlledValues(
-                (c) => ({ ...c, [valueKey]: value }) as KeyRecord<T>
+                (c) =>
+                  ({
+                    ...c,
+                    [valueKey]: value,
+                  }) as KeyRecord<T>
               );
 
               // call the bound handler func to update the value outside of React

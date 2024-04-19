@@ -29,6 +29,7 @@ export function EdgeJobsDatatable() {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
       )}
+      data-cy="edge-jobs-datatable"
     />
   );
 }

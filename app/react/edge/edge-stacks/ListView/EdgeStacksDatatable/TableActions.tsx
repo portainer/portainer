@@ -19,6 +19,7 @@ export function TableActions({
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
         confirmMessage="Are you sure you want to remove the selected Edge stack(s)?"
+        data-cy="edgeStack-removeStackButton"
       />
 
       <AddButton data-cy="edgeStack-addStackButton">Add stack</AddButton>

@@ -23,8 +23,8 @@ type ConfirmOrClick =
 export function DeleteButton({
   disabled,
   size,
-  'data-cy': dataCy,
   children,
+  'data-cy': dataCy,
   ...props
 }: PropsWithChildren<
   AutomationTestingProps &

@@ -43,8 +43,10 @@ export function TagsDatatable({
           disabled={selectedItems.length === 0}
           confirmMessage="Are you sure you want to remove the selected tag(s)?"
           onConfirmed={() => onRemove(selectedItems)}
+          data-cy="remove-tag-button"
         />
       )}
+      data-cy="tags-datatable"
     />
   );
 }

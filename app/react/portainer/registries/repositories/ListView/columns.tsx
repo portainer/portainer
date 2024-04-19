@@ -49,6 +49,7 @@ function NameCell({ getValue }: CellContext<Repository, string>) {
       to="portainer.registries.registry.repository"
       params={{ repository: name, endpointId: environmentId }}
       title={name}
+      data-cy={`repository-name-link-${name}`}
     >
       {name}
     </Link>

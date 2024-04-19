@@ -59,7 +59,7 @@ export function SidebarItem({
   return (
     <SidebarTooltip
       content={
-        <div className="bg-blue-8 be:bg-gray-8 th-dark:bg-gray-true-8 th-highcontrast:bg-black th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white rounded">
+        <div className="rounded bg-blue-8 be:bg-gray-8 th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white th-highcontrast:bg-black th-dark:bg-gray-true-8">
           <Wrapper label={label}>
             <ItemAnchor
               href={anchorProps.href}
@@ -86,7 +86,7 @@ type ItemAnchorProps = {
   className: string;
   isOpen: boolean;
   isSubMenu: boolean;
-  dataCy?: string;
+  dataCy: string;
 };
 
 function ItemAnchor({

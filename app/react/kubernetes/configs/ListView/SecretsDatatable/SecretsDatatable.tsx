@@ -103,6 +103,7 @@ export function SecretsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-secrets-datatable"
     />
   );
 }

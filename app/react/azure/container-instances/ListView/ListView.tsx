@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { deleteContainerGroup } from '@/react/azure/services/container-groups.service';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';

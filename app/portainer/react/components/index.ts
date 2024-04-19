@@ -8,12 +8,12 @@ import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsB
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
 import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
-import { HelmRepositoryDatatable } from '@/react/portainer/account/AccountView/HelmRepositoryDatatable';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
 import {
   EnvironmentVariablesFieldset,
   EnvironmentVariablesPanel,
+  StackEnvironmentVariablesPanel,
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 import { Icon } from '@@/Icon';
@@ -48,6 +48,8 @@ import { environmentsModule } from './environments';
 import { registriesModule } from './registries';
 import { accountModule } from './account';
 import { usersModule } from './users';
+import { activityLogsModule } from './activity-logs';
+import { rbacModule } from './rbac';
 
 export const ngModule = angular
   .module('portainer.app.react.components', [
@@ -59,6 +61,8 @@ export const ngModule = angular
     settingsModule,
     accountModule,
     usersModule,
+    activityLogsModule,
+    rbacModule,
   ])
   .component(
     'tagSelector',
@@ -77,6 +81,7 @@ export const ngModule = angular
       'buttonText',
       'className',
       'buttonClassName',
+      'data-cy',
     ])
   )
   .component(
@@ -223,6 +228,7 @@ export const ngModule = angular
       'onChange',
       'value',
       'height',
+      'data-cy',
     ])
   )
   .component(
@@ -239,13 +245,6 @@ export const ngModule = angular
   .component(
     'associatedEndpointsSelector',
     r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
-  )
-  .component(
-    'helmRepositoryDatatable',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(HelmRepositoryDatatable))),
-      []
-    )
   );
 
 export const componentsModule = ngModule.name;
@@ -263,5 +262,15 @@ withFormValidation(
   withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
   'environmentVariablesPanel',
   ['explanation', 'showHelpMessage', 'isFoldable'],
+  envVarValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(
+    withControlledInput(StackEnvironmentVariablesPanel, { values: 'onChange' })
+  ),
+  'stackEnvironmentVariablesPanel',
+  ['showHelpMessage', 'isFoldable'],
   envVarValidation
 );

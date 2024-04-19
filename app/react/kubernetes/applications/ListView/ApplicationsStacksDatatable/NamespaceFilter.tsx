@@ -56,6 +56,7 @@ export function NamespaceFilter({
       </InputGroup.Addon>
       <Select
         className="!h-[30px] py-1"
+        data-cy="app-stacks-namespace-filter"
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         options={[

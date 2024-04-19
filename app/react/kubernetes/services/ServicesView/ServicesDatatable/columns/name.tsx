@@ -1,6 +1,7 @@
 import { Authorized } from '@/react/hooks/useUser';
 
-import { Badge } from '@@/Badge';
+import { SystemBadge } from '@@/Badge/SystemBadge';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
 import { columnHelper } from './helper';
 
@@ -31,19 +32,13 @@ export const name = columnHelper.accessor(
         !row.original.Labels['io.portainer.kubernetes.application.owner'];
 
       return (
-        <div className="flex">
+        <div className="flex gap-2">
           <Authorized authorizations="K8sServiceW" childrenUnauthorized={name}>
             {name}
 
-            {row.original.IsSystem && (
-              <Badge type="success" className="ml-2">
-                System
-              </Badge>
-            )}
+            {row.original.IsSystem && <SystemBadge />}
 
-            {isExternal && !row.original.IsSystem && (
-              <Badge className="ml-2">External</Badge>
-            )}
+            {isExternal && !row.original.IsSystem && <ExternalBadge />}
           </Authorized>
         </div>
       );

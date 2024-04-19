@@ -40,11 +40,15 @@ export function TeamsField({
           onChange={onChange}
           value={value}
           inputId="teams-selector"
+          dataCy="teams-selector"
         />
       ) : (
         <span className="small text-muted">
           You have not yet created any teams. Head over to the{' '}
-          <Link to="portainer.teams">Teams view</Link> to manage teams.
+          <Link to="portainer.teams" data-cy="teams-view-link">
+            Teams view
+          </Link>{' '}
+          to manage teams.
         </span>
       )}
     </FormControl>

@@ -73,7 +73,14 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="container_name" ng-model="endpoint.Name" placeholder="e.g. kubernetes-cluster01 / docker-prod01" />
+              <input
+                type="text"
+                data-cy="container-name-input"
+                class="form-control"
+                id="container_name"
+                ng-model="endpoint.Name"
+                placeholder="e.g. kubernetes-cluster01 / docker-prod01"
+              />
             </div>
           </div>
           <!-- !name-input -->
@@ -93,6 +100,7 @@
               <input
                 ng-disabled="endpointType === 'local' || state.azureEndpoint"
                 type="text"
+                data-cy="endpoint-url-input"
                 class="form-control"
                 id="endpoint_url"
                 ng-model="endpoint.URL"
@@ -109,7 +117,14 @@
               </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
+              <input
+                type="text"
+                class="form-control"
+                id="endpoint_public_url"
+                ng-model="endpoint.PublicURL"
+                placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com"
+                data-cy="public-url-input"
+              />
             </div>
           </div>
 
@@ -138,7 +153,13 @@
           <div class="form-group">
             <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left"> Group </label>
             <div class="col-sm-9 col-lg-10">
-              <select ng-options="group.Id as group.Name for group in groups" ng-model="endpoint.GroupId" id="endpoint_group" class="form-control"></select>
+              <select
+                ng-options="group.Id as group.Name for group in groups"
+                ng-model="endpoint.GroupId"
+                id="endpoint_group"
+                class="form-control"
+                data-cy="endpoint-group-select"
+              ></select>
             </div>
           </div>
           <!-- !group -->
@@ -152,14 +173,30 @@
             <div class="form-group">
               <label for="endpoint_managementinfoVersion" class="col-sm-3 col-lg-2 control-label text-left"> AMT Version </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfoVersion" ng-model="endpoint.ManagementInfo['AMT']" placeholder="Loading..." />
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoVersion"
+                  ng-model="endpoint.ManagementInfo['AMT']"
+                  placeholder="Loading..."
+                  data-cy="endpoint-managementinfoVersion"
+                />
               </div>
             </div>
 
             <div class="form-group">
               <label for="endpoint_managementinfoUUID" class="col-sm-3 col-lg-2 control-label text-left"> UUID </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfoUUID" ng-model="endpoint.ManagementInfo['UUID']" placeholder="Loading..." />
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoUUID"
+                  ng-model="endpoint.ManagementInfo['UUID']"
+                  placeholder="Loading..."
+                  data-cy="endpoint-managementinfoUUID"
+                />
               </div>
             </div>
 
@@ -168,6 +205,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="endpoint-managementinfoBuildNumber"
                   ng-disabled="true"
                   class="form-control"
                   id="endpoint_managementinfoBuildNumber"
@@ -182,6 +220,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="endpoint-managementinfoControlMode"
                   ng-disabled="true"
                   class="form-control"
                   id="endpoint_managementinfoControlMode"
@@ -196,6 +235,7 @@
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
+                  data-cy="endpoint-managementinfoDNSSuffix"
                   ng-disabled="true"
                   class="form-control"
                   id="endpoint_managementinfoDNSSuffix"

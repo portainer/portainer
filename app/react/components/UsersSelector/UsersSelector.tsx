@@ -7,7 +7,7 @@ interface Props {
   value: UserId[];
   onChange(value: UserId[]): void;
   users: User[];
-  dataCy?: string;
+  dataCy: string;
   inputId?: string;
   placeholder?: string;
   disabled?: boolean;

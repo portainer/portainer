@@ -15,6 +15,7 @@ export const name = columnHelper.accessor('Name', {
           to=".network"
           params={{ id: item.Id, nodeName: item.NodeName }}
           title={item.Name}
+          data-cy={`network-link-${item.Name}`}
         >
           {truncate(item.Name, 40)}
         </Link>

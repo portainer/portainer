@@ -52,6 +52,7 @@ export function NodeApplicationsDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy="node-applications-datatable"
     />
   );
 }

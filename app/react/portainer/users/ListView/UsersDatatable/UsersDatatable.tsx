@@ -33,8 +33,10 @@ export function UsersDatatable({
           disabled={selectedItems.length === 0}
           confirmMessage="Do you want to remove the selected users? They will not be able to login into Portainer anymore."
           onConfirmed={() => onRemove(selectedItems)}
+          data-cy="remove-users-button"
         />
       )}
+      data-cy="users-datatable"
     />
   );
 }

@@ -35,6 +35,7 @@ export function RegistriesDatatable() {
         </>
       )}
       isRowSelectable={(row) => !!row.original.Id}
+      data-cy="registries-datatable"
     />
   );
 }

@@ -50,7 +50,12 @@ export function EdgeAgentTab({ onCreate, commands, asyncMode = false }: Props) {
 
           <div className="row">
             <div className="flex justify-end">
-              <Button color="primary" type="reset" onClick={handleReset}>
+              <Button
+                color="primary"
+                type="reset"
+                onClick={handleReset}
+                data-cy="edge-agent-tab-add-environment-button"
+              >
                 Add another environment
               </Button>
             </div>

@@ -154,7 +154,7 @@ angular
       url: '/templates?template',
       views: {
         'content@': {
-          component: 'edgeAppTemplatesView',
+          component: 'appTemplatesView',
         },
       },
       data: {

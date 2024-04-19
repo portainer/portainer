@@ -27,17 +27,20 @@ export function useColumns() {
         columnHelper.accessor('Name', {
           header: 'Name',
           cell: ({ row: { original: item } }) => (
-            <div className="flex gap-2">
+            <>
               <Link
                 to="kubernetes.applications.application"
                 params={{ name: item.Name, namespace: item.ResourcePool }}
+                data-cy={`application-link-${item.Name}`}
               >
                 {item.Name}
               </Link>
               {isExternalApplication({ metadata: item.Metadata }) && (
-                <ExternalBadge />
+                <div className="ml-2">
+                  <ExternalBadge />
+                </div>
               )}
-            </div>
+            </>
           ),
         }),
         !hideStacksQuery.data &&

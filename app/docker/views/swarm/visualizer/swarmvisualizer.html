@@ -57,7 +57,7 @@
               <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" size="'sm'" style="display: none"></pr-icon>
             </label>
             <div class="col-sm-2">
-              <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
+              <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control" data-cy="swarm-refreshRate-select">
                 <option value="5">5s</option>
                 <option value="10">10s</option>
                 <option value="30">30s</option>
@@ -97,9 +97,7 @@
               <div class="node_labels" ng-if="node.Labels.length > 0 && state.DisplayNodeLabels">
                 <div>Labels</div>
                 <div class="node_label" ng-repeat="label in node.Labels">
-                  <span class="label_key">
-                    {{ label.key }}
-                  </span>
+                  <span class="label_key"> {{ label.key }} </span>
                   <span class="label_value" ng-if="label.value"> = {{ label.value }} </span>
                 </div>
               </div>

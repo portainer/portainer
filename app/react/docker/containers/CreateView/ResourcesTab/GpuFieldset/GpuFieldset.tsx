@@ -136,6 +136,7 @@ export function GpuFieldset({
             onChange={toggleEnableGpu}
             className="ml-2"
             disabled={!enableGpuManagement}
+            data-cy="docker-containers-gpu-enabled-switch"
           />
         </div>
         {enableGpuManagement && values.enabled && (
@@ -150,6 +151,7 @@ export function GpuFieldset({
               onChange={onChangeSelectedGpus}
               options={options}
               components={{ MultiValueRemove }}
+              data-cy="docker-containers-gpu-select"
             />
           </div>
         )}
@@ -170,6 +172,7 @@ export function GpuFieldset({
                 options={NvidiaCapabilitiesOptions}
                 components={{ Option }}
                 onChange={onChangeSelectedCaps}
+                data-cy="docker-containers-gpu-capabilities-select"
               />
             </div>
           </div>

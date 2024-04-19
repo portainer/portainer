@@ -34,6 +34,7 @@ export function EnvironmentRegistriesDatatable() {
       titleIcon={Radio}
       renderTableActions={() => <AddButton />}
       disableSelect
+      data-cy="environment-registries-datatable"
     />
   );
 }

@@ -39,6 +39,7 @@ export function MacvlanNodesSelector({
       isLoading={!dataset}
       emptyContentLabel="No node available"
       settingsManager={tableState}
+      data-cy="macvlan-nodes-selector-datatable"
       extendTableOptions={mergeOptions(
         withMeta({
           table: 'nodes',

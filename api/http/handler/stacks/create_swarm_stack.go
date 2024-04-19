@@ -188,6 +188,7 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 // @param body body swarmStackFromGitRepositoryPayload true "stack config"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
 // @router /stacks/create/swarm/repository [post]
 func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {

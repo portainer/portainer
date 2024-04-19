@@ -18,7 +18,11 @@ export function useColumns(isStackColumnVisible?: boolean) {
     () =>
       _.compact([
         buildExpandColumn<ServiceViewModel>(),
-        buildNameColumn<ServiceViewModel>('Name', 'docker.services.service'),
+        buildNameColumn<ServiceViewModel>(
+          'Name',
+          'docker.services.service',
+          'docker-services-name'
+        ),
         isStackColumnVisible &&
           columnHelper.accessor((item) => item.StackName || '-', {
             header: 'Stack',

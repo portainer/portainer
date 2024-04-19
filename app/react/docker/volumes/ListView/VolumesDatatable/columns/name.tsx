@@ -8,6 +8,7 @@ import { Authorized } from '@/react/hooks/useUser';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { DecoratedVolume } from '../../types';
 import { getTableMeta } from '../tableMeta';
@@ -76,7 +77,7 @@ function Cell({
   const name = getValue();
 
   return (
-    <>
+    <div className="flex gap-2">
       <Link
         to=".volume"
         params={{
@@ -84,6 +85,7 @@ function Cell({
           nodeName: item.NodeName,
         }}
         className="monospaced"
+        data-cy={`volume-link-${name}`}
       >
         {truncate(name, 40)}
       </Link>
@@ -101,17 +103,15 @@ function Cell({
                 id: item.Id,
                 nodeName: item.NodeName,
               },
+              'data-cy': `volume-browse-link-${name}`,
             }}
+            data-cy={`volume-browse-button-${name}`}
           >
             browse
           </Button>
         </Authorized>
       )}
-      {item.dangling && (
-        <span className="label label-warning image-tag ml-2" role="status">
-          Unused
-        </span>
-      )}
-    </>
+      {item.dangling && <UnusedBadge />}
+    </div>
   );
 }

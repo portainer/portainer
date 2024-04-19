@@ -1,3 +1,5 @@
+import { AutomationTestingProps } from '@/types';
+
 import { InputLabeled } from '@@/form-components/Input/InputLabeled';
 import { Checkbox } from '@@/form-components/Checkbox';
 
@@ -10,6 +12,7 @@ export function RangeOrNumberField({
   readOnly,
   id,
   label,
+  'data-cy': dataCy,
 }: {
   value: Range | number | undefined;
   onChange: (value: Range | number | undefined) => void;
@@ -17,10 +20,10 @@ export function RangeOrNumberField({
   readOnly?: boolean;
   id: string;
   label: string;
-}) {
+} & AutomationTestingProps) {
   return (
     <div className="flex gap-2 items-center">
-      <RangeCheckbox value={value} onChange={onChange} />
+      <RangeCheckbox value={value} onChange={onChange} data-cy={dataCy} />
       {isRange(value) ? (
         <RangeInput
           value={value}
@@ -29,6 +32,7 @@ export function RangeOrNumberField({
           disabled={disabled}
           readOnly={readOnly}
           id={id}
+          data-cy={dataCy}
         />
       ) : (
         <InputLabeled
@@ -42,6 +46,7 @@ export function RangeOrNumberField({
           value={value || ''}
           type="number"
           onChange={(e) => onChange(getNumber(e.target.valueAsNumber))}
+          data-cy={dataCy}
         />
       )}
     </div>
@@ -55,6 +60,7 @@ function RangeInput({
   readOnly,
   id,
   label,
+  'data-cy': dataCy,
 }: {
   value: Range;
   onChange: (value: Range) => void;
@@ -62,7 +68,7 @@ function RangeInput({
   readOnly?: boolean;
   id: string;
   label: string;
-}) {
+} & AutomationTestingProps) {
   return (
     <div className="flex items-center gap-2">
       <label className="font-normal m-0">{label}</label>
@@ -77,6 +83,7 @@ function RangeInput({
         readOnly={readOnly}
         id={id}
         type="number"
+        data-cy={`${dataCy}-start`}
       />
 
       <InputLabeled
@@ -90,6 +97,7 @@ function RangeInput({
         readOnly={readOnly}
         id={id}
         type="number"
+        data-cy={`${dataCy}-end`}
       />
     </div>
   );
@@ -106,10 +114,11 @@ function getNumber(value: number) {
 function RangeCheckbox({
   value,
   onChange,
+  'data-cy': dataCy,
 }: {
   value: Range | number | undefined;
   onChange: (value: Range | number | undefined) => void;
-}) {
+} & AutomationTestingProps) {
   const isValueRange = isRange(value);
   return (
     <Checkbox
@@ -122,6 +131,7 @@ function RangeCheckbox({
           onChange(value.start);
         }
       }}
+      data-cy={`${dataCy}-range-checkbox`}
     />
   );
 }

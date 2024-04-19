@@ -57,6 +57,7 @@ export function ResultsDatatable({
         downloadLogs: onDownloadLogs,
         clearLogs: onClearLogs,
       })}
+      data-cy="edge-job-results-datatable"
     />
   );
 

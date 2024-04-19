@@ -97,19 +97,25 @@ export function NotificationsMenu() {
         {reducedNotifications?.length > 0 ? (
           <>
             <div className={notificationStyles.notifications}>
-              {reducedNotifications.map((notification) => (
+              {reducedNotifications.map((notification, index) => (
                 <MenuLink
                   to="portainer.notifications"
                   params={{ id: notification.id }}
                   notification={notification}
                   key={notification.id}
                   onDelete={() => onDelete(notification.id)}
+                  data-cy={`notification-delete-button_${index}`}
                 />
               ))}
             </div>
 
             <div className={notificationStyles.notificationLink}>
-              <Link to="portainer.notifications">View all notifications</Link>
+              <Link
+                to="portainer.notifications"
+                data-cy="notifications-see-all-link"
+              >
+                View all notifications
+              </Link>
             </div>
           </>
         ) : (

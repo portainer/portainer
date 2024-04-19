@@ -35,7 +35,12 @@ export function AMTButton({
 
   return (
     <>
-      <Button onClick={openDialog} icon={Link} color="light">
+      <Button
+        onClick={openDialog}
+        icon={Link}
+        color="light"
+        data-cy="associate-amt-button"
+      >
         Associate with OpenAMT
       </Button>
       {isOpenDialog && (

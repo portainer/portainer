@@ -66,6 +66,7 @@ export function StorageDatatable({
       )}
       getRowCanExpand={(row) => row.original.Volumes.length > 0}
       renderSubRow={(row) => <SubRow item={row.original} />}
+      data-cy="k8s-storage-datatable"
     />
   );
 }
@@ -83,6 +84,7 @@ function SubRow({ item }: { item: StorageClassViewModel }) {
                 name: vol.PersistentVolumeClaim.Name,
                 namespace: vol.PersistentVolumeClaim.Namespace,
               }}
+              data-cy={`volume-link-${vol.PersistentVolumeClaim.Name}`}
             >
               {vol.PersistentVolumeClaim.Name}
             </Link>

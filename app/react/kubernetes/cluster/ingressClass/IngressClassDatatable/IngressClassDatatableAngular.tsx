@@ -105,6 +105,7 @@ export function IngressClassDatatableAngular({
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        data-cy="k8s-ingress-classes-datatable"
       />
     </div>
   );
@@ -127,6 +128,7 @@ export function IngressClassDatatableAngular({
                 false
               )
             }
+            data-cy="k8s-disallow-selected-ingress-controllers-button"
           >
             Disallow selected
           </Button>
@@ -144,6 +146,7 @@ export function IngressClassDatatableAngular({
                 true
               )
             }
+            data-cy="k8s-allow-selected-ingress-controllers-button"
           >
             Allow selected
           </Button>

@@ -62,6 +62,7 @@ export function ContainerNetworksDatatable({
         table: 'container-networks',
         containerId: container.Id,
       })}
+      data-cy="container-networks-datatable"
     />
   );
 }

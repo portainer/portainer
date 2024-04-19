@@ -25,6 +25,7 @@ export function ContextHelp() {
         )}
         title="Help"
         rel="noreferrer"
+        data-cy="context-help-button"
       >
         <HelpCircle className="lucide" />
       </a>

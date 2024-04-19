@@ -82,6 +82,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
           >
             <DeleteButton
               disabled={selectedRows.length === 0}
+              data-cy="network-removeNetworkButton"
               confirmMessage="Do you want to remove the selected network(s)?"
               onConfirmed={() => onRemove(selectedRows)}
             />
@@ -102,6 +103,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
         </TableSettingsMenu>
       )}
       getRowId={(row) => `${row.Name}-${row.Id}`}
+      data-cy="networks-datatable"
     />
   );
 }

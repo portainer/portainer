@@ -51,6 +51,7 @@ export function NamespaceAppsDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy="namespace-apps-datatable"
     />
   );
 }

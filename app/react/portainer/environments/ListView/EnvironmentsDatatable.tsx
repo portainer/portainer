@@ -78,6 +78,7 @@ export function EnvironmentsDatatable({
             onClick={() => onRemove(selectedRows)}
             icon={Trash2}
             className="!m-0"
+            data-cy="remove-environments-button"
           >
             Remove
           </Button>
@@ -87,6 +88,7 @@ export function EnvironmentsDatatable({
           {isBE && (
             <AddButton
               color="secondary"
+              data-cy="environments-auto-onboarding-button"
               to="portainer.endpoints.edgeAutoCreateScript"
             >
               Auto onboarding
@@ -96,11 +98,13 @@ export function EnvironmentsDatatable({
           <AddButton
             to="portainer.wizard.endpoints"
             params={{ referrer: 'environments' }}
+            data-cy="environments-add-environments-button"
           >
             Add environment
           </AddButton>
         </div>
       )}
+      data-cy="environments-datatable"
     />
   );
 }

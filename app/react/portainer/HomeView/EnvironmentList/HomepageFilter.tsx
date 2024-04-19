@@ -23,7 +23,12 @@ function Option<TValue = number>(props: OptionProps<OptionType<TValue>, true>) {
         {...props}
       >
         <div className="flex items-center gap-2">
-          <input type="checkbox" checked={isSelected} onChange={() => null} />
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => null}
+            data-cy={`homepage-filter-option-${label}`}
+          />
           <label className="whitespace-nowrap">{label}</label>
         </div>
       </components.Option>
@@ -46,6 +51,7 @@ export function HomepageFilter<TValue = number>({
       components={{ Option }}
       onChange={(option) => onChange([...option])}
       bindToBody
+      data-cy="homepage-filter"
     />
   );
 }

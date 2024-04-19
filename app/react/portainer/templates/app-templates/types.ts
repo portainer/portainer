@@ -1,3 +1,5 @@
+import { RestartPolicy } from 'docker-types/generated/1.41';
+
 import { BasicTableSettings } from '@@/datatables/types';
 
 import { Pair } from '../../settings/types';
@@ -152,7 +154,7 @@ export interface AppTemplate {
    * Container restart policy.
    * @example "on-failure"
    */
-  restart_policy?: string;
+  restart_policy?: RestartPolicy['Name'];
 
   /**
    * Container hostname.
@@ -181,7 +183,7 @@ export interface TemplateRepository {
 /**
  * TemplateVolume represents a template volume configuration.
  */
-interface TemplateVolume {
+export interface TemplateVolume {
   /**
    * Path inside the container.
    * @example "/data"

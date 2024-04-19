@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
@@ -30,7 +30,7 @@ export function useCustomTemplates<T = Array<CustomTemplate>>({
   });
 }
 
-async function getCustomTemplates({ type, edge = false }: Params = {}) {
+async function getCustomTemplates({ type, edge }: Params = {}) {
   try {
     const { data } = await axios.get<CustomTemplate[]>(buildUrl(), {
       params: {

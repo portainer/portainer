@@ -103,6 +103,7 @@ export function ConfigMapsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-configmaps-datatable"
     />
   );
 }

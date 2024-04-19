@@ -21,6 +21,7 @@ export function NameCell({
       to="azure.containerinstances.container"
       params={{ id: container.id }}
       className="hover:underline"
+      data-cy={`aci-container-${container.id}`}
     >
       {name}
     </Link>

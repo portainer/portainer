@@ -8,7 +8,11 @@ import { actions } from './actions';
 export const columns = [
   buildExpandColumn<TableNetwork>(),
   {
-    ...buildNameColumn<TableNetwork>('name', 'docker.networks.network'),
+    ...buildNameColumn<TableNetwork>(
+      'name',
+      'docker.networks.network',
+      'docker-networks-name'
+    ),
     header: 'Network',
   },
   columnHelper.accessor((item) => item.IPAddress || '-', {

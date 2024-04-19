@@ -17,13 +17,18 @@ export function DisplayUserAccessToken({ apikey }: { apikey: string }) {
         <div className="inline-flex">
           <div className="">{apikey}</div>
           <div>
-            <CopyButton copyText={apikey} color="link" />
+            <CopyButton
+              copyText={apikey}
+              color="link"
+              data-cy="create-access-token-copy-button"
+            />
           </div>
         </div>
         <hr />
       </div>
       <Button
         type="button"
+        data-cy="create-access-token-done-button"
         onClick={() => router.stateService.go('portainer.account')}
       >
         Done

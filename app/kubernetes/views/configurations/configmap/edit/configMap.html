@@ -33,9 +33,7 @@
                   <tbody>
                     <tr>
                       <td class="w-[40%] !border-none !pl-0">Name</td>
-                      <td class="!border-none">
-                        {{ ctrl.configuration.Name }}
-                      </td>
+                      <td class="!border-none"> {{ ctrl.configuration.Name }} </td>
                     </tr>
                     <tr>
                       <td class="!pl-0">Namespace</td>
@@ -57,17 +55,11 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                title-icon="history"
-                dataset="ctrl.events"
-                table-key="kubernetes.configuration.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
-              >
-              </kubernetes-events-datatable>
+              <resource-events-datatable
+                resource-id="ctrl.configuration.Id"
+                storage-key="'kubernetes.configmap.events'"
+                namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+              ></resource-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()" data-cy="k8sConfigDetail-yamlTab">
               <uib-tab-heading>
@@ -75,7 +67,7 @@
                 YAML
               </uib-tab-heading>
               <div class="px-5 !pt-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'configuration-yaml'" data="ctrl.configuration.Yaml" hide-message="true" />
+                <kube-yaml-inspector data-cy="k8sConfigDetail-yamlInspector" identifier="'configuration-yaml'" data="ctrl.configuration.Yaml" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>

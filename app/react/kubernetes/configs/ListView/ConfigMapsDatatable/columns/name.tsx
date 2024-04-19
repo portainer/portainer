@@ -3,8 +3,10 @@ import { CellContext } from '@tanstack/react-table';
 import { Authorized } from '@/react/hooks/useUser';
 import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
+import { SystemBadge } from '@@/Badge/SystemBadge';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
 
 import { ConfigMapRowData } from '../types';
 import { configurationOwnerUsernameLabel } from '../../../constants';
@@ -47,7 +49,7 @@ function Cell({ row }: CellContext<ConfigMapRowData, string>) {
 
   return (
     <Authorized authorizations="K8sConfigMapsR" childrenUnauthorized={name}>
-      <div className="flex">
+      <div className="flex gap-2">
         <Link
           to="kubernetes.configmaps.configmap"
           params={{
@@ -56,22 +58,13 @@ function Cell({ row }: CellContext<ConfigMapRowData, string>) {
           }}
           title={name}
           className="w-fit max-w-xs truncate xl:max-w-sm 2xl:max-w-md"
+          data-cy={`configmap-name-link-${name}`}
         >
           {name}
         </Link>
-        {isSystemConfigMap && (
-          <Badge type="success" className="ml-2">
-            System
-          </Badge>
-        )}
-        {!isSystemToken && !hasConfigurationOwner && (
-          <Badge className="ml-2">External</Badge>
-        )}
-        {!row.original.inUse && !isSystemConfigMap && (
-          <Badge type="warn" className="ml-2">
-            Unused
-          </Badge>
-        )}
+        {isSystemConfigMap && <SystemBadge />}
+        {!isSystemToken && !hasConfigurationOwner && <ExternalBadge />}
+        {!row.original.inUse && !isSystemConfigMap && <UnusedBadge />}
       </div>
     </Authorized>
   );
