@@ -201,6 +201,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @param Gpus formData string false "List of GPUs - json stringified array of {name, value} structs"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
+// @failure 409 "Name is not unique"
 // @failure 500 "Server error"
 // @router /endpoints [post]
 func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

@@ -63,7 +63,7 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 // @param body body resourceControlCreatePayload true "Resource control details"
 // @success 200 {object} portainer.ResourceControl "Success"
 // @failure 400 "Invalid request"
-// @failure 409 "Resource control already exists"
+// @failure 409 "A resource control is already associated to this resource"
 // @failure 500 "Server error"
 // @router /resource_controls [post]
 func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
