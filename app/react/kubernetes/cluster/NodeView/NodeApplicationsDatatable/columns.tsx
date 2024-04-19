@@ -1,19 +1,25 @@
-import { useMemo } from 'react';
 import _ from 'lodash';
+import { useMemo } from 'react';
 
 import { humanize, truncate } from '@/portainer/filters/filters';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { Link } from '@@/Link';
 
 import { helper } from './columns.helper';
 import { name } from './columns.name';
 
-export function useColumns(areStacksVisible: boolean) {
+export function useColumns() {
+  const hideStacksQuery = usePublicSettings<boolean>({
+    select: (settings) =>
+      settings.GlobalDeploymentOptions.hideStacksFunctionality,
+  });
+
   return useMemo(
     () =>
       _.compact([
         name,
-        areStacksVisible &&
+        !hideStacksQuery.data &&
           helper.accessor('StackName', {
             header: 'Stack',
             cell: ({ getValue }) => getValue() || '-',
@@ -53,6 +59,6 @@ export function useColumns(areStacksVisible: boolean) {
           cell: ({ getValue }) => humanize(getValue()),
         }),
       ]),
-    [areStacksVisible]
+    [hideStacksQuery.data]
   );
 }
