@@ -20,7 +20,7 @@ Portainer CE is updated regularly. We aim to do an update release every couple o
 
 ## Getting started
 
-- [Deploy Portainer](https://docs.portainer.io/start/install)
+- [Deploy Portainer](https://docs.portainer.io/start/install-ce)
 - [Documentation](https://docs.portainer.io)
 - [Contribute to the project](https://docs.portainer.io/contribute/contribute)
 
