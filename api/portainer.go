@@ -12,6 +12,7 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/pkg/featureflags"
+	"golang.org/x/oauth2"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -758,19 +759,20 @@ type (
 
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
-		KubeSecretKey        []byte `json:"KubeSecretKey"`
+		ClientID             string           `json:"ClientID"`
+		ClientSecret         string           `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string           `json:"AccessTokenURI"`
+		AuthorizationURI     string           `json:"AuthorizationURI"`
+		ResourceURI          string           `json:"ResourceURI"`
+		RedirectURI          string           `json:"RedirectURI"`
+		UserIdentifier       string           `json:"UserIdentifier"`
+		Scopes               string           `json:"Scopes"`
+		OAuthAutoCreateUsers bool             `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID           `json:"DefaultTeamID"`
+		SSO                  bool             `json:"SSO"`
+		LogoutURI            string           `json:"LogoutURI"`
+		KubeSecretKey        []byte           `json:"KubeSecretKey"`
+		AuthStyle            oauth2.AuthStyle `json:"AuthStyle"`
 	}
 
 	// Pair defines a key/value string pair

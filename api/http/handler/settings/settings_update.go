@@ -13,6 +13,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"golang.org/x/oauth2"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -95,6 +96,9 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 
+	if payload.OAuthSettings.AuthStyle < oauth2.AuthStyleAutoDetect || payload.OAuthSettings.AuthStyle > oauth2.AuthStyleInHeader {
+		return errors.New("Invalid OAuth AuthStyle")
+	}
 	return nil
 }
 
@@ -225,6 +229,7 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
 		settings.OAuthSettings.KubeSecretKey = kubeSecret
+		settings.OAuthSettings.AuthStyle = payload.OAuthSettings.AuthStyle
 	}
 
 	if payload.EnableEdgeComputeFeatures != nil {
