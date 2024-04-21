@@ -1,3 +1,5 @@
+import './datatable.css';
+
 import {
   Table as TableInstance,
   TableState,

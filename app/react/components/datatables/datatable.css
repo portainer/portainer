@@ -49,7 +49,7 @@
   display: inline-flex;
 }
 
-.datatable .searchBar {
+.searchBar {
   border: 1px solid var(--border-searchbar);
   background: var(--bg-searchbar);
   border-radius: 5px;
@@ -57,15 +57,10 @@
   font-size: 14px;
 }
 
-.datatable .searchInput {
-  background: none;
-  border: none;
-  width: 90%;
-}
-
 .toolBar .searchBar {
   margin-right: 10px;
   display: inline-flex;
+  min-height: 30px;
   flex-basis: 7rem;
   flex-grow: 1;
   flex-shrink: 1;
@@ -74,18 +69,20 @@
   max-width: 14rem;
 }
 
-.datatable .searchBar input[type='text'] {
-  border: 0px !important;
+.searchBar .searchInput {
+  background: none;
+  border: none;
+  width: 90%;
 }
 
-.datatable .searchIcon {
+.searchBar .searchIcon {
   @apply text-gray-7;
   @apply th-dark:text-gray-warm-5;
   margin-right: 5px;
 }
 
-.datatable .searchInput:active,
-.datatable .searchInput:focus {
+.searchBar .searchInput:active,
+.searchBar .searchInput:focus {
   outline: none;
 }
 
