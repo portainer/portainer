@@ -355,6 +355,8 @@
         />
       </div>
     </div>
+
+    <oauth-auth-style value="$ctrl.settings.AuthStyle" on-change="($ctrl.onChangeAuthStyle)"></oauth-auth-style>
     <save-auth-settings-button
       on-save-settings="($ctrl.onSaveSettings)"
       save-button-state="($ctrl.saveButtonState)"
