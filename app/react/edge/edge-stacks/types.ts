@@ -10,6 +10,8 @@ import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { EdgeGroup } from '../edge-groups/types';
 
+import { type StaggerConfig } from './components/StaggerFieldset.types';
+
 export {
   type StaggerConfig,
   StaggerOption,
@@ -55,6 +57,7 @@ export interface DeploymentStatus {
 }
 
 interface EdgeStackDeploymentInfo {
+  Version: number;
   FileVersion: number;
   ConfigHash: string;
 }
@@ -94,9 +97,11 @@ export type EdgeStack = RelativePathModel & {
   GitConfig?: RepoConfigResponse;
   Prune: boolean;
   RetryDeploy: boolean;
-  Webhook?: string;
+  Webhook: string;
   StackFileVersion?: number;
+  PreviousDeploymentInfo: EdgeStackDeploymentInfo;
   EnvVars?: EnvVar[];
+  StaggerConfig?: StaggerConfig;
   SupportRelativePath: boolean;
   FilesystemPath?: string;
 };

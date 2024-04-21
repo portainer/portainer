@@ -229,6 +229,8 @@ export const ngModule = angular
       'value',
       'height',
       'data-cy',
+      'versions',
+      'onVersionChange',
     ])
   )
   .component(
