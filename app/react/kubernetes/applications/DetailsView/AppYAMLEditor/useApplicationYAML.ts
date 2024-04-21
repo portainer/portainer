@@ -75,12 +75,12 @@ export function useApplicationYAML() {
   }, [applicationYAML, autoScalarYAML, servicesYAML]);
 
   const isApplicationYAMLLoading =
-    applicationQuery.isLoading ||
-    servicesQuery.isLoading ||
-    autoScalarsQuery.isLoading ||
-    applicationYAMLQuery.isLoading ||
-    servicesYAMLQuery.isLoading ||
-    autoScalarYAMLQuery.isLoading;
+    applicationQuery.isInitialLoading ||
+    servicesQuery.isInitialLoading ||
+    autoScalarsQuery.isInitialLoading ||
+    applicationYAMLQuery.isInitialLoading ||
+    servicesYAMLQuery.isInitialLoading ||
+    autoScalarYAMLQuery.isInitialLoading;
 
   return { fullApplicationYaml, isApplicationYAMLLoading };
 }

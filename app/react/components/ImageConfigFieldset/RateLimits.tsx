@@ -38,7 +38,7 @@ export function RateLimits({
 
   if (
     !environmentQuery.data ||
-    registryQuery.isLoading ||
+    registryQuery.isInitialLoading ||
     !isDockerHubRegistry
   ) {
     return null;
