@@ -17,7 +17,7 @@ export function useAllowKubeToSelectCompose(edgeStack: EdgeStack) {
     .includes(EnvironmentType.EdgeAgentOnKubernetes);
 
   return (
-    initiallyContainsKubeEnv ||
-    edgeStack.DeploymentType === DeploymentType.Kubernetes
+    initiallyContainsKubeEnv &&
+    edgeStack.DeploymentType === DeploymentType.Compose
   );
 }
