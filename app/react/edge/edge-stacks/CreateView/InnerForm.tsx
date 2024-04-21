@@ -96,7 +96,7 @@ export function InnerForm({
 
       {values.method !== 'repository' && (
         <WebhookSwitch
-          onChange={(value) => setFieldValue('webhookId', value)}
+          onChange={(value) => setFieldValue('enableWebhook', value)}
           value={values.enableWebhook}
         />
       )}

@@ -3,10 +3,10 @@ import _ from 'lodash';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
 import { Select } from '@@/form-components/ReactSelect';
-import { FormSection } from '@@/form-components/FormSection';
 import { FormError } from '@@/form-components/FormError';
 import { Link } from '@@/Link';
 import { FormControl } from '@@/form-components/FormControl';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
 import { useEdgeGroups } from '../../edge-groups/queries/useEdgeGroups';
 
@@ -29,20 +29,30 @@ export function EdgeGroupsSelector({
   isGroupVisible = () => true,
   required,
 }: Props) {
+  const inputId = 'edge-groups-selector';
   const selector = (
     <InnerSelector
       value={value}
       onChange={onChange}
       isGroupVisible={isGroupVisible}
+      inputId={inputId}
     />
   );
 
   return horizontal ? (
-    <FormControl errors={error} label="Edge Groups" required={required}>
+    <FormControl
+      errors={error}
+      label="Edge Groups"
+      required={required}
+      inputId={inputId}
+    >
       {selector}
     </FormControl>
   ) : (
-    <FormSection title={`Edge Groups${required ? ' *' : ''}`}>
+    <>
+      <FormSectionTitle htmlFor={inputId}>{`Edge Groups${
+        required ? ' *' : ''
+      }`}</FormSectionTitle>
       <div className="form-group">
         <div className="col-sm-12">{selector} </div>
         {error && (
@@ -51,7 +61,7 @@ export function EdgeGroupsSelector({
           </div>
         )}
       </div>
-    </FormSection>
+    </>
   );
 }
 
@@ -59,10 +69,12 @@ function InnerSelector({
   value,
   onChange,
   isGroupVisible,
+  inputId,
 }: {
   isGroupVisible(group: EdgeGroup): boolean;
   value: SingleValue[];
   onChange: (value: SingleValue[]) => void;
+  inputId: string;
 }) {
   const edgeGroupsQuery = useEdgeGroups();
 
@@ -86,6 +98,7 @@ function InnerSelector({
       placeholder="Select one or multiple group(s)"
       closeMenuOnSelect={false}
       data-cy="edge-stacks-groups-selector"
+      inputId={inputId}
     />
   ) : (
     <div className="small text-muted">

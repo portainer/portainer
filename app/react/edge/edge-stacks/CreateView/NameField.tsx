@@ -29,7 +29,7 @@ export function NameField({
         onChange={(e) => onChange(e.target.value)}
         value={value}
         required
-        data-cy="edge-stack-create-name-input"
+        data-cy="edgeStackCreate-nameInput"
       />
     </FormControl>
   );
