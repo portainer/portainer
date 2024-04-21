@@ -78,6 +78,7 @@ export function OAuthSettingsViewModel(data) {
   this.DefaultTeamID = data.DefaultTeamID;
   this.SSO = data.SSO;
   this.LogoutURI = data.LogoutURI;
+  this.AuthStyle = data.AuthStyle;
 }
 
 export function EdgeSettingsViewModel(data = {}) {

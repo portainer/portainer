@@ -11,6 +11,7 @@ import { KubeSettingsPanel } from '@/react/portainer/settings/SettingsView/KubeS
 import { HelmCertPanel } from '@/react/portainer/settings/SettingsView/HelmCertPanel';
 import { HiddenContainersPanel } from '@/react/portainer/settings/SettingsView/HiddenContainersPanel/HiddenContainersPanel';
 import { SSLSettingsPanelWrapper } from '@/react/portainer/settings/SettingsView/SSLSettingsPanel/SSLSettingsPanel';
+import { AuthStyleField } from '@/react/portainer/settings/AuthenticationView/OAuth';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
@@ -39,4 +40,15 @@ export const settingsModule = angular
   .component(
     'kubeSettingsPanel',
     r2a(withUIRouter(withReactQuery(KubeSettingsPanel)), ['settings'])
+  )
+  .component(
+    'oauthAuthStyle',
+    r2a(AuthStyleField, [
+      'value',
+      'onChange',
+      'label',
+      'tooltip',
+      'readonly',
+      'size',
+    ])
   ).name;
