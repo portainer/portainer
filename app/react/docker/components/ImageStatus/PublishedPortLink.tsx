@@ -23,15 +23,11 @@ export function PublishedPortLink({ hostURL, hostPort, containerPort }: Props) {
 }
 
 function generateContainerURL(
-  hostURL: string | undefined,
-  hostPort: string | number | undefined,
-  containerPort: string | number | undefined
+  hostURL?: string,
+  hostPort?: string | number,
+  containerPort?: string | number
 ) {
-  if (!hostURL || !hostPort || !containerPort) {
-    return `${hostURL}:${hostPort}`;
-  }
-
-  const url = stripTrailingSlash(hostURL.toLowerCase());
+  const url = stripTrailingSlash(hostURL?.toLowerCase());
 
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     if (String(containerPort).endsWith('443')) {
@@ -44,6 +40,9 @@ function generateContainerURL(
   return `${url}:${hostPort}`;
 }
 
-function stripTrailingSlash(url: string) {
+function stripTrailingSlash(url?: string) {
+  if (!url) {
+    return '';
+  }
   return url.endsWith('/') ? url.slice(0, -1) : url;
 }
