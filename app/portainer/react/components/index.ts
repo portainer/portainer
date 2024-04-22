@@ -268,7 +268,11 @@ withFormValidation(
 withFormValidation(
   ngModule,
   withUIRouter(
-    withControlledInput(StackEnvironmentVariablesPanel, { values: 'onChange' })
+    withReactQuery(
+      withControlledInput(StackEnvironmentVariablesPanel, {
+        values: 'onChange',
+      })
+    )
   ),
   'stackEnvironmentVariablesPanel',
   ['showHelpMessage', 'isFoldable'],
