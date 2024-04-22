@@ -1,6 +1,7 @@
 import { ComponentProps } from 'react';
 
 import { Alert } from '@@/Alert';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 import { EnvironmentVariablesFieldset } from './EnvironmentVariablesFieldset';
 import { EnvironmentVariablesPanel } from './EnvironmentVariablesPanel';
@@ -23,7 +24,9 @@ export function StackEnvironmentVariablesPanel({
         <div>
           You may use{' '}
           <a
-            href="https://docs.portainer.io/v/2.20/user/docker/stacks/add#environment-variables"
+            href={`${useDocsUrl(
+              '/user/docker/stacks/add#environment-variables'
+            )}`}
             target="_blank"
             data-cy="stack-env-vars-help-link"
             rel="noreferrer noopener"
