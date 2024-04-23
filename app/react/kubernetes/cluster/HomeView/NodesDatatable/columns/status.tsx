@@ -23,14 +23,12 @@ function StatusCell({
   }
 
   return (
-    <div className="whitespace-nowrap">
+    <div className="inline-flex whitespace-nowrap gap-x-2">
       <StatusBadge color={status === 'Ready' ? 'success' : 'warning'}>
         {status}
       </StatusBadge>
       {node.spec?.unschedulable && (
-        <StatusBadge color="warning" className="mt-2">
-          SchedulingDisabled
-        </StatusBadge>
+        <StatusBadge color="warning">SchedulingDisabled</StatusBadge>
       )}
     </div>
   );
