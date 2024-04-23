@@ -7,23 +7,24 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/datastore/postinit"
+	dockerClient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/pendingactions/actions"
 	"github.com/rs/zerolog/log"
-)
-
-const (
-	CleanNAPWithOverridePolicies      = "CleanNAPWithOverridePolicies"
-	DeletePortainerK8sRegistrySecrets = "DeletePortainerK8sRegistrySecrets"
 )
 
 type (
 	PendingActionsService struct {
 		authorizationService *authorization.Service
-		clientFactory        *kubecli.ClientFactory
+		kubeFactory          *kubecli.ClientFactory
+		dockerFactory        *dockerClient.ClientFactory
 		dataStore            dataservices.DataStore
 		shutdownCtx          context.Context
+		assetsPath           string
+		kubernetesDeployer   portainer.KubernetesDeployer
 
 		mu sync.Mutex
 	}
@@ -31,15 +32,21 @@ type (
 
 func NewService(
 	dataStore dataservices.DataStore,
-	clientFactory *kubecli.ClientFactory,
+	kubeFactory *kubecli.ClientFactory,
+	dockerFactory *dockerClient.ClientFactory,
 	authorizationService *authorization.Service,
 	shutdownCtx context.Context,
+	assetsPath string,
+	kubernetesDeployer portainer.KubernetesDeployer,
 ) *PendingActionsService {
 	return &PendingActionsService{
 		dataStore:            dataStore,
 		shutdownCtx:          shutdownCtx,
 		authorizationService: authorizationService,
-		clientFactory:        clientFactory,
+		kubeFactory:          kubeFactory,
+		dockerFactory:        dockerFactory,
+		assetsPath:           assetsPath,
+		kubernetesDeployer:   kubernetesDeployer,
 		mu:                   sync.Mutex{},
 	}
 }
@@ -69,7 +76,7 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 
 	// For Kubernetes endpoints, we need to check if the endpoint is up by creating a kube client
 	if isKubernetesEndpoint {
-		_, err := service.clientFactory.GetKubeClient(endpoint)
+		_, err := service.kubeFactory.GetKubeClient(endpoint)
 		if err != nil {
 			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
 			return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
@@ -109,7 +116,7 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 	}()
 
 	switch pendingAction.Action {
-	case CleanNAPWithOverridePolicies:
+	case actions.CleanNAPWithOverridePolicies:
 		if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
 			service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, nil)
 			return nil
@@ -128,7 +135,7 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 		}
 
 		return nil
-	case DeletePortainerK8sRegistrySecrets:
+	case actions.DeletePortainerK8sRegistrySecrets:
 		if pendingAction.ActionData == nil {
 			return nil
 		}
@@ -142,6 +149,22 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 		if err != nil {
 			log.Warn().Err(err).Int("endpoint_id", int(endpoint.ID)).Msgf("Unable to delete kubernetes registry secrets")
 			return fmt.Errorf("failed to delete kubernetes registry secrets for environment %d: %w", endpoint.ID, err)
+		}
+
+		return nil
+
+	case actions.PostInitMigrateEnvironment:
+		postInitMigrator := postinit.NewPostInitMigrator(
+			service.kubeFactory,
+			service.dockerFactory,
+			service.dataStore,
+			service.assetsPath,
+			service.kubernetesDeployer,
+		)
+		err := postInitMigrator.MigrateEnvironment(endpoint)
+		if err != nil {
+			log.Error().Err(err).Msgf("Error running post-init migrations for edge environment %d", endpoint.ID)
+			return fmt.Errorf("failed running post-init migrations for edge environment %d: %w", endpoint.ID, err)
 		}
 
 		return nil
