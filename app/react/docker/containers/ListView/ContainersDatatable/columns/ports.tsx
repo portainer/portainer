@@ -1,11 +1,8 @@
 import _ from 'lodash';
-import { ExternalLink } from 'lucide-react';
 import { CellContext } from '@tanstack/react-table';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
-import { getSchemeFromPort } from '@/react/common/network-utils';
-
-import { Icon } from '@@/Icon';
+import { PublishedPortLink } from '@/react/docker/components/ImageStatus/PublishedPortLink';
 
 import { useRowContext } from '../RowContext';
 
@@ -32,46 +29,12 @@ function Cell({ row }: CellContext<DockerContainer, string>) {
     return '-';
   }
 
-  const publicURL = getPublicUrl(environment.PublicURL);
-
-  return _.uniqBy(ports, 'public').map((port) => {
-    let url = publicURL || port.host || '';
-    if (!url.startsWith('http')) {
-      const scheme = getSchemeFromPort(port.private);
-      url = `${scheme}://${url}`;
-    }
-    url = `${url}:${port.public}`;
-
-    return (
-      <a
-        key={`${port.host}:${port.public}`}
-        className="image-tag"
-        href={url}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <Icon icon={ExternalLink} />
-        {port.public}:{port.private}
-      </a>
-    );
-  });
-}
-
-function getPublicUrl(url?: string): string {
-  if (!url) {
-    return '';
-  }
-
-  // Add protocol if missing
-  const u =
-    url.startsWith('http://') || url.startsWith('https://')
-      ? url
-      : `http://${url}`;
-
-  try {
-    const parsedUrl = new URL(u);
-    return `${parsedUrl.protocol}://${parsedUrl.hostname}`;
-  } catch (error) {
-    return '';
-  }
+  return _.uniqBy(ports, 'public').map((port) => (
+    <PublishedPortLink
+      key={`${port.host}:${port.public}`}
+      hostPort={port.public}
+      containerPort={port.private}
+      hostURL={environment.PublicURL || port.host}
+    />
+  ));
 }
