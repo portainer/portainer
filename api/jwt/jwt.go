@@ -13,6 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const year = time.Hour * 24 * 365
+
 // scope represents JWT scopes that are supported in JWT claims.
 type scope string
 
@@ -29,7 +31,7 @@ type claims struct {
 	Role                int    `json:"role"`
 	Scope               scope  `json:"scope"`
 	ForceChangePassword bool   `json:"forceChangePassword"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 var (
@@ -98,7 +100,7 @@ func (service *Service) defaultExpireAt() time.Time {
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.Time, error) {
 	expiryTime := service.defaultExpireAt()
-	token, err := service.generateSignedToken(data, expiryTime.Unix(), defaultScope)
+	token, err := service.generateSignedToken(data, expiryTime, defaultScope)
 	return token, expiryTime, err
 }
 
@@ -121,7 +123,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 			if err != nil {
 				return nil, errInvalidJWTToken
 			}
-			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
+			if user.TokenIssueAt > cl.RegisteredClaims.ExpiresAt.Unix() {
 				return nil, errInvalidJWTToken
 			}
 
@@ -156,7 +158,7 @@ func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration
 	service.userSessionTimeout = userSessionDuration
 }
 
-func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt int64, scope scope) (string, error) {
+func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt time.Time, scope scope) (string, error) {
 	secret, found := service.secrets[scope]
 	if !found {
 		return "", fmt.Errorf("invalid scope: %v", scope)
@@ -170,7 +172,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	if settings.IsDockerDesktopExtension {
 		// Set expiration to 99 years for docker desktop extension.
 		log.Info().Msg("detected docker desktop extension mode")
-		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
+		expiresAt = time.Now().Add(year * 99)
 	}
 
 	cl := claims{
@@ -179,10 +181,13 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		Role:                int(data.Role),
 		Scope:               scope,
 		ForceChangePassword: data.ForceChangePassword,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiresAt,
-			IssuedAt:  time.Now().Unix(),
-		},
+	}
+
+	if !expiresAt.IsZero() {
+		cl.RegisteredClaims = jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		}
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cl)
