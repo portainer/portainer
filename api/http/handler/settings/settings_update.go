@@ -96,8 +96,10 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 
-	if payload.OAuthSettings.AuthStyle < oauth2.AuthStyleAutoDetect || payload.OAuthSettings.AuthStyle > oauth2.AuthStyleInHeader {
-		return errors.New("Invalid OAuth AuthStyle")
+	if payload.OAuthSettings != nil {
+		if payload.OAuthSettings.AuthStyle < oauth2.AuthStyleAutoDetect || payload.OAuthSettings.AuthStyle > oauth2.AuthStyleInHeader {
+			return errors.New("Invalid OAuth AuthStyle")
+		}
 	}
 	return nil
 }
