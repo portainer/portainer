@@ -3,6 +3,8 @@ import _ from 'lodash-es';
 
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 import { options } from '@/react/portainer/settings/AuthenticationView/InternalAuth/options';
+import { SERVER_TYPES } from '@/react/portainer/settings/AuthenticationView/ldap-options';
+import { AuthenticationMethod } from '@/react/portainer/settings/types';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
@@ -52,13 +54,13 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     $scope.authMethod = value;
 
     if (value === 4) {
-      $scope.settings.AuthenticationMethod = 2;
-      $scope.formValues.ldap.serverType = 2;
+      $scope.settings.AuthenticationMethod = AuthenticationMethod.LDAP;
+      $scope.formValues.ldap.serverType = SERVER_TYPES.AD;
       return;
     }
 
     if (value === 2) {
-      $scope.settings.AuthenticationMethod = 2;
+      $scope.settings.AuthenticationMethod = AuthenticationMethod.LDAP;
       $scope.formValues.ldap.serverType = $scope.formValues.ldap.ldapSettings.ServerType;
       return;
     }
@@ -77,19 +79,19 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
       return false;
     }
 
-    if (value === 4) {
-      return $scope.settings.AuthenticationMethod === 2 && $scope.formValues.ldap.serverType === 2;
+    if (value === AuthenticationMethod.AD) {
+      return $scope.settings.AuthenticationMethod === AuthenticationMethod.LDAP && $scope.formValues.ldap.serverType === SERVER_TYPES.AD;
     }
 
-    if (value === 2) {
-      return $scope.settings.AuthenticationMethod === 2 && $scope.formValues.ldap.serverType !== 2;
+    if (value === AuthenticationMethod.LDAP) {
+      return $scope.settings.AuthenticationMethod === AuthenticationMethod.LDAP && $scope.formValues.ldap.serverType !== SERVER_TYPES.AD;
     }
 
     return $scope.settings.AuthenticationMethod === value;
   };
 
   $scope.isOauthEnabled = function isOauthEnabled() {
-    return $scope.settings && $scope.settings.AuthenticationMethod === 3;
+    return $scope.settings && $scope.settings.AuthenticationMethod === AuthenticationMethod.OAuth;
   };
 
   $scope.LDAPConnectivityCheck = LDAPConnectivityCheck;
@@ -152,7 +154,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
     const tlscaFile = tlscaCert !== $scope.settings.LDAPSettings.TLSConfig.TLSCACert ? tlscaCert : null;
 
-    const isADServer = $scope.formValues.ldap.serverType === 2;
+    const isADServer = $scope.formValues.ldap.serverType === SERVER_TYPES.AD;
 
     const settings = isADServer ? $scope.formValues.ldap.adSettings : $scope.formValues.ldap.ldapSettings;
 
@@ -185,15 +187,25 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
   $scope.isLDAPFormValid = isLDAPFormValid;
   function isLDAPFormValid() {
-    const ldapSettings = $scope.formValues.ldap.serverType === 2 ? $scope.formValues.ldap.adSettings : $scope.formValues.ldap.ldapSettings;
+    const ldapSettings = $scope.formValues.ldap.serverType === SERVER_TYPES.AD ? $scope.formValues.ldap.adSettings : $scope.formValues.ldap.ldapSettings;
     const isTLSMode = ldapSettings.TLSConfig.TLS || ldapSettings.StartTLS;
 
     return (
       _.compact(ldapSettings.URLs).length &&
-      (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
+      (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && isLDAPPasswordValid(ldapSettings.Password))) &&
       (!isTLSMode || (isTLSMode && $scope.formValues.TLSCACert) || ldapSettings.TLSConfig.TLSSkipVerify) &&
       (!$scope.settings.LDAPSettings.AdminAutoPopulate || ($scope.settings.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups.length > 0))
     );
+  }
+
+  // isLDAPPasswordValid is used to validate the password field in the LDAP settings form, and avoids the password field to be required when the form is in edit mode
+  function isLDAPPasswordValid(password) {
+    // if isEdit and it doesn't switch between AD and LDAP, then an empty password is valid
+    if ($scope.state.isEditLDAP && $scope.state.initialServerType === $scope.formValues.ldap.serverType) {
+      return true;
+    }
+    // otherwise the password is required
+    return !!password;
   }
 
   $scope.isOAuthTeamMembershipFormValid = isOAuthTeamMembershipFormValid;
@@ -223,8 +235,8 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
         $scope.OAuthSettings = settings.OAuthSettings;
         $scope.authMethod = settings.AuthenticationMethod;
-        if (settings.AuthenticationMethod === 2 && settings.LDAPSettings.ServerType === 2) {
-          $scope.authMethod = 4;
+        if (settings.AuthenticationMethod === AuthenticationMethod.LDAP && settings.LDAPSettings.ServerType === SERVER_TYPES.AD) {
+          $scope.authMethod = AuthenticationMethod.AD;
         }
 
         if (settings.LDAPSettings.URL) {
@@ -237,15 +249,17 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
           settings.LDAPSettings.URLs.push('');
         }
         if (!settings.LDAPSettings.ServerType) {
-          settings.LDAPSettings.ServerType = 0;
+          settings.LDAPSettings.ServerType = SERVER_TYPES.CUSTOM;
         }
 
         $scope.formValues.ldap.serverType = settings.LDAPSettings.ServerType;
-        if (settings.LDAPSettings.ServerType === 2) {
+        if (settings.LDAPSettings.ServerType === SERVER_TYPES.AD) {
           $scope.formValues.ldap.adSettings = settings.LDAPSettings;
         } else {
           $scope.formValues.ldap.ldapSettings = Object.assign($scope.formValues.ldap.ldapSettings, settings.LDAPSettings);
         }
+        $scope.state.isEditLDAP = settings.LDAPSettings.ServerType === SERVER_TYPES.AD || settings.LDAPSettings.ServerType === SERVER_TYPES.LDAP;
+        $scope.state.initialServerType = settings.LDAPSettings.ServerType;
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve application settings');
