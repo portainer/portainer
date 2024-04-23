@@ -1,7 +1,7 @@
 import { IFormController } from 'angular';
 import { FormikErrors } from 'formik';
 
-import { GitFormModel } from '@/react/portainer/gitops/types';
+import { DeployMethod, GitFormModel } from '@/react/portainer/gitops/types';
 import { validateGitForm } from '@/react/portainer/gitops/GitForm';
 import { notifyError } from '@/portainer/services/notifications';
 import { IAuthenticationService } from '@/portainer/services/types';
@@ -25,6 +25,8 @@ export default class GitFormController {
   onChange?: (value: GitFormModel) => void;
 
   createdFromCustomTemplateId?: number;
+
+  deployMethod?: DeployMethod;
 
   /* @ngInject */
   constructor(
@@ -67,7 +69,8 @@ export default class GitFormController {
       this.errors = await validateGitForm(
         this.gitCredentials,
         value,
-        isCreatedFromCustomTemplate
+        isCreatedFromCustomTemplate,
+        this.deployMethod
       );
       if (this.errors && Object.keys(this.errors).length > 0) {
         this.gitForm?.$setValidity('gitForm', false, this.gitForm);

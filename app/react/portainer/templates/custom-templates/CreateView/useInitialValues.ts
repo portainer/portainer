@@ -23,6 +23,10 @@ export function useInitialValues({
 
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 
+  // don't make the file path 'docker-compose.yml' in a kube environment. Keep it empty with the existing 'manifest.yml' placeholder
+  const initialFilePathInRepository =
+    type === StackType.Kubernetes ? '' : 'docker-compose.yml';
+
   const {
     params: { fileContent = '' },
   } = useCurrentStateAndParams();
@@ -49,7 +53,7 @@ export function useInitialValues({
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
-      ComposeFilePathInRepository: 'docker-compose.yml',
+      ComposeFilePathInRepository: initialFilePathInRepository,
       AdditionalFiles: [],
       RepositoryURLValid: true,
       TLSSkipVerify: false,
