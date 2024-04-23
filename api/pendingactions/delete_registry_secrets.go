@@ -17,7 +17,7 @@ func (service *PendingActionsService) DeleteKubernetesRegistrySecrets(endpoint *
 		return nil
 	}
 
-	kubeClient, err := service.clientFactory.GetKubeClient(endpoint)
+	kubeClient, err := service.kubeFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

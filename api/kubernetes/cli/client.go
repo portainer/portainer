@@ -10,6 +10,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/rs/zerolog/log"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
@@ -290,106 +291,111 @@ func buildLocalConfig() (*rest.Config, error) {
 	return config, nil
 }
 
-func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint) error {
-	// classes is a list of controllers which have been manually added to the
-	// cluster setup view. These need to all be allowed globally, but then
-	// blocked in specific namespaces which they were not previously allowed in.
-	classes := e.Kubernetes.Configuration.IngressClasses
-
-	// We need a kube client to gather namespace level permissions. In pre-2.16
-	// versions of portainer, the namespace level permissions were stored by
-	// creating an actual ingress rule in the cluster with a particular
-	// annotation indicating that it's name (the class name) should be allowed.
-	cli, err := factory.GetKubeClient(e)
-	if err != nil {
-		return err
-	}
-
-	detected, err := cli.GetIngressControllers()
-	if err != nil {
-		return err
-	}
-
-	// newControllers is a set of all currently detected controllers.
-	newControllers := make(map[string]struct{})
-	for _, controller := range detected {
-		newControllers[controller.ClassName] = struct{}{}
-	}
-
-	namespaces, err := cli.GetNamespaces()
-	if err != nil {
-		return err
-	}
-
-	// Set of namespaces, if any, in which "allow none" should be true.
-	allow := make(map[string]map[string]struct{})
-	for _, c := range classes {
-		allow[c.Name] = make(map[string]struct{})
-	}
-	allow["none"] = make(map[string]struct{})
-
-	for namespace := range namespaces {
-		// Compare old annotations with currently detected controllers.
-		ingresses, err := cli.GetIngresses(namespace)
+func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint, datastore dataservices.DataStore, cli *KubeClient) error {
+	return datastore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		environment, err := tx.Endpoint().Endpoint(e.ID)
 		if err != nil {
-			return fmt.Errorf("failure getting ingresses during migration")
+			log.Error().Err(err).Msgf("Error retrieving environment %d", e.ID)
+			return err
 		}
-		for _, ingress := range ingresses {
-			oldController, ok := ingress.Annotations["ingress.portainer.io/ingress-type"]
-			if !ok {
-				// Skip rules without our old annotation.
-				continue
-			}
 
-			if _, ok := newControllers[oldController]; ok {
-				// Skip rules which match a detected controller.
-				// TODO: Allow this particular controller.
-				allow[oldController][ingress.Namespace] = struct{}{}
-				continue
-			}
+		// classes is a list of controllers which have been manually added to the
+		// cluster setup view. These need to all be allowed globally, but then
+		// blocked in specific namespaces which they were not previously allowed in.
+		classes := environment.Kubernetes.Configuration.IngressClasses
 
-			allow["none"][ingress.Namespace] = struct{}{}
+		// In pre-2.16 versions of portainer, the namespace level permissions were stored by
+		// creating an actual ingress rule in the cluster with a particular
+		// annotation indicating that it's name (the class name) should be allowed.
+		detected, err := cli.GetIngressControllers()
+		if err != nil {
+			log.Error().Err(err).Msgf("Error getting ingress controllers in environment %d", environment.ID)
+			return err
 		}
-	}
 
-	// Locally, disable "allow none" for namespaces not inside shouldAllowNone.
-	var newClasses []portainer.KubernetesIngressClassConfig
-	for _, c := range classes {
-		var blocked []string
+		// newControllers is a set of all currently detected controllers.
+		newControllers := make(map[string]struct{})
+		for _, controller := range detected {
+			newControllers[controller.ClassName] = struct{}{}
+		}
+
+		namespaces, err := cli.GetNamespaces()
+		if err != nil {
+			log.Error().Err(err).Msgf("Error getting namespaces in environment %d", environment.ID)
+			return err
+		}
+
+		// Set of namespaces, if any, in which "allow none" should be true.
+		allow := make(map[string]map[string]struct{})
+		for _, c := range classes {
+			allow[c.Name] = make(map[string]struct{})
+		}
+		allow["none"] = make(map[string]struct{})
+
 		for namespace := range namespaces {
-			if _, ok := allow[c.Name][namespace]; ok {
-				continue
+			// Compare old annotations with currently detected controllers.
+			ingresses, err := cli.GetIngresses(namespace)
+			if err != nil {
+				log.Error().Err(err).Msgf("Error getting ingresses in environment %d", environment.ID)
+				return err
 			}
-			blocked = append(blocked, namespace)
+			for _, ingress := range ingresses {
+				oldController, ok := ingress.Annotations["ingress.portainer.io/ingress-type"]
+				if !ok {
+					// Skip rules without our old annotation.
+					continue
+				}
+
+				if _, ok := newControllers[oldController]; ok {
+					// Skip rules which match a detected controller.
+					// TODO: Allow this particular controller.
+					allow[oldController][ingress.Namespace] = struct{}{}
+					continue
+				}
+
+				allow["none"][ingress.Namespace] = struct{}{}
+			}
 		}
 
-		newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
-			Name:              c.Name,
-			Type:              c.Type,
-			GloballyBlocked:   false,
-			BlockedNamespaces: blocked,
-		})
-	}
-
-	// Handle "none".
-	if len(allow["none"]) != 0 {
-		e.Kubernetes.Configuration.AllowNoneIngressClass = true
-		var disallowNone []string
-		for namespace := range namespaces {
-			if _, ok := allow["none"][namespace]; ok {
-				continue
+		// Locally, disable "allow none" for namespaces not inside shouldAllowNone.
+		var newClasses []portainer.KubernetesIngressClassConfig
+		for _, c := range classes {
+			var blocked []string
+			for namespace := range namespaces {
+				if _, ok := allow[c.Name][namespace]; ok {
+					continue
+				}
+				blocked = append(blocked, namespace)
 			}
-			disallowNone = append(disallowNone, namespace)
-		}
-		newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
-			Name:              "none",
-			Type:              "custom",
-			GloballyBlocked:   false,
-			BlockedNamespaces: disallowNone,
-		})
-	}
 
-	e.Kubernetes.Configuration.IngressClasses = newClasses
-	e.PostInitMigrations.MigrateIngresses = false
-	return factory.dataStore.Endpoint().UpdateEndpoint(e.ID, e)
+			newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
+				Name:              c.Name,
+				Type:              c.Type,
+				GloballyBlocked:   false,
+				BlockedNamespaces: blocked,
+			})
+		}
+
+		// Handle "none".
+		if len(allow["none"]) != 0 {
+			environment.Kubernetes.Configuration.AllowNoneIngressClass = true
+			var disallowNone []string
+			for namespace := range namespaces {
+				if _, ok := allow["none"][namespace]; ok {
+					continue
+				}
+				disallowNone = append(disallowNone, namespace)
+			}
+			newClasses = append(newClasses, portainer.KubernetesIngressClassConfig{
+				Name:              "none",
+				Type:              "custom",
+				GloballyBlocked:   false,
+				BlockedNamespaces: disallowNone,
+			})
+		}
+
+		environment.Kubernetes.Configuration.IngressClasses = newClasses
+		environment.PostInitMigrations.MigrateIngresses = false
+		return tx.Endpoint().UpdateEndpoint(environment.ID, environment)
+	})
 }
