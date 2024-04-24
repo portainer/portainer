@@ -131,7 +131,7 @@ func GetNamespace(manifestYaml []byte) (string, error) {
 	}
 
 	if _, ok := m["metadata"]; ok {
-		if kind == "Namespace" {
+		if strings.EqualFold(kind, "namespace") {
 			if namespace, ok := m["metadata"].(map[string]interface{})["name"]; ok {
 				return namespace.(string), nil
 			}
