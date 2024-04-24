@@ -38,10 +38,14 @@ export function ActivityLogsView() {
 
   return (
     <>
-      <PageHeader title="User Activity" breadcrumbs="Activity Logs" reload />
+      <PageHeader
+        title="User activity logs"
+        breadcrumbs="User activity logs"
+        reload
+      />
 
       <div className="mx-4">
-        <BEOverlay featureId={FeatureId.ACTIVITY_AUDIT}>
+        <BEOverlay className="m-2" featureId={FeatureId.ACTIVITY_AUDIT}>
           <FilterBar
             value={range}
             onChange={setRange}
