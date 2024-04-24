@@ -1,8 +1,8 @@
-<page-header title="'User Activity'" breadcrumbs="['User authentication activity']" reload="true"> </page-header>
+<page-header title="'User authentication logs'" breadcrumbs="['User authentication logs']" reload="true"> </page-header>
 
 <div class="be-indicator-container limited-be mx-4">
   <div>
-    <div class="limited-be-link vertical-center"><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator></div>
+    <div class="limited-be-link vertical-center"><be-feature-indicator class="m-2" feature="$ctrl.limitedFeature"></be-feature-indicator></div>
     <div class="limited-be-content">
       <rd-widget>
         <rd-widget-body>
@@ -16,7 +16,7 @@
           </div>
           <p class="text-muted small vertical-center">
             <pr-icon icon="'info'" class-name="'icon icon-sm icon-primary'"></pr-icon>
-            Portainer user authentication activity logs have a maximum retention of 7 days.
+            Portainer user authentication logs have a maximum retention of 7 days.
           </p>
           <div>
             <button type="button" class="btn btn-sm btn-primary" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled
