@@ -125,12 +125,22 @@ func GetNamespace(manifestYaml []byte) (string, error) {
 		return "", errors.Wrap(err, "failed to unmarshal yaml manifest when obtaining namespace")
 	}
 
-	if _, ok := m["metadata"]; ok {
-		if namespace, ok := m["metadata"].(map[string]interface{})["namespace"]; ok {
-			return namespace.(string), nil
-		}
+	kind, ok := m["kind"].(string)
+	if !ok {
+		return "", errors.New("invalid kubernetes manifest, missing 'kind' field")
 	}
 
+	if _, ok := m["metadata"]; ok {
+		if kind == "Namespace" {
+			if namespace, ok := m["metadata"].(map[string]interface{})["name"]; ok {
+				return namespace.(string), nil
+			}
+		} else {
+			if namespace, ok := m["metadata"].(map[string]interface{})["namespace"]; ok {
+				return namespace.(string), nil
+			}
+		}
+	}
 	return "", nil
 }
 
