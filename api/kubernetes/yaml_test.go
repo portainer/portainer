@@ -648,7 +648,7 @@ func Test_GetNamespace(t *testing.T) {
 			input: `apiVersion: v1
 kind: Namespace
 metadata:
-  namespace: test-namespace
+  name: test-namespace
 `,
 			want: "test-namespace",
 		},
