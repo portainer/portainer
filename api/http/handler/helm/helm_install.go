@@ -61,8 +61,7 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.InternalServerError("Unable to install a chart", err)
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	return response.JSON(w, release)
+	return response.JSONWithStatus(w, release, http.StatusCreated)
 }
 
 func (p *installChartPayload) Validate(_ *http.Request) error {
