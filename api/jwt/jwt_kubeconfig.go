@@ -20,7 +20,7 @@ func (service *Service) GenerateTokenForKubeconfig(data *portainer.TokenData) (s
 
 	expiryAt := time.Now().Add(expiryDuration)
 	if expiryDuration == time.Duration(0) {
-		expiryAt = time.Time{}
+		expiryAt = time.Unix(0, 0)
 	}
 
 	return service.generateSignedToken(data, expiryAt, kubeConfigScope)
