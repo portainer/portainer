@@ -131,14 +131,19 @@ func GetNamespace(manifestYaml []byte) (string, error) {
 	}
 
 	if _, ok := m["metadata"]; ok {
+		var namespace interface{}
+		var ok bool
 		if strings.EqualFold(kind, "namespace") {
-			if namespace, ok := m["metadata"].(map[string]interface{})["name"]; ok {
-				return namespace.(string), nil
-			}
+			namespace, ok = m["metadata"].(map[string]interface{})["name"]
 		} else {
-			if namespace, ok := m["metadata"].(map[string]interface{})["namespace"]; ok {
-				return namespace.(string), nil
+			namespace, ok = m["metadata"].(map[string]interface{})["namespace"]
+		}
+
+		if ok {
+			if v, ok := namespace.(string); ok {
+				return v, nil
 			}
+			return "", errors.New("invalid kubernetes manifest, 'namespace' field is not a string")
 		}
 	}
 	return "", nil
