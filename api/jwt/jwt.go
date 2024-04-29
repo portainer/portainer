@@ -188,7 +188,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	}
 
 	// If expiresAt is set to a zero value, the token should never expire
-	if expiresAt == time.Unix(0, 0) {
+	if expiresAt.IsZero() {
 		cl.RegisteredClaims.ExpiresAt = nil
 	}
 
