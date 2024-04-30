@@ -164,12 +164,17 @@
                 disabled="!$ctrl.isDockerStandaloneEnv"
               ></por-switch-field>
             </div>
+
+            <div class="col-sm-12">
+              <text-tip children="'GPU support is currently limited to NVIDIA graphics cards only.'" color="'blue'" />
+            </div>
+
             <div class="col-sm-12">
               <div class="pl-4">
                 <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
               </div>
             </div>
-            <div class="col-sm-12">
+            <div class="col-sm-12 mt-4">
               <por-switch-field
                 label="'Show image up to date indicators for Stacks, Services and Containers'"
                 checked="false"

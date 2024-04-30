@@ -37,6 +37,7 @@ import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { CodeEditor } from '@@/CodeEditor';
 import { HelpLink } from '@@/HelpLink';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -230,6 +231,10 @@ export const ngModule = angular
       'height',
       'data-cy',
     ])
+  )
+  .component(
+    'textTip',
+    r2a(TextTip, ['className', 'color', 'icon', 'inline', 'children'])
   )
   .component(
     'groupAssociationTable',
