@@ -174,7 +174,10 @@
                 <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
               </div>
             </div>
-            <div class="col-sm-12 mt-4">
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
               <por-switch-field
                 label="'Show image up to date indicators for Stacks, Services and Containers'"
                 checked="false"
