@@ -28,6 +28,6 @@ export async function getVolumes(environmentId: EnvironmentId) {
 
     return data.Volumes;
   } catch (error) {
-    throw parseAxiosError(error as Error, 'Unable to retrieve volumes');
+    throw parseAxiosError(error, 'Unable to retrieve volumes');
   }
 }

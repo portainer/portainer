@@ -1,6 +1,6 @@
 import { RawAxiosRequestHeaders } from 'axios';
 
-const AgentTargetHeader = 'X-PortainerAgent-Target';
+import { agentTargetHeader } from '@/portainer/services/axios';
 
 export function addNodeName(
   nodeName?: string,
@@ -12,6 +12,6 @@ export function addNodeName(
 
   return {
     ...headers,
-    [AgentTargetHeader]: nodeName,
+    [agentTargetHeader]: nodeName,
   };
 }
