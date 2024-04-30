@@ -47,6 +47,9 @@ export function KubernetesResourcePoolService(
           if (quotaAttempt.status === 'fulfilled') {
             pool.Quota = quotaAttempt.value;
             pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+          } else {
+            const ns = await KubernetesNamespaceService.get(name);
+            pool.Yaml = '---\n' + ns.Yaml;
           }
         }
         return pool;
