@@ -108,9 +108,9 @@ func waitForStatus(deployer libstack.Deployer, ctx context.Context, stackName st
 
 	statusCh := deployer.WaitForStatus(ctx, stackName, requiredStatus)
 	result := <-statusCh
-	if result == "" {
-		return requiredStatus, "", nil
+	if result.ErrorMsg == "" {
+		return result.Status, "", nil
 	}
 
-	return libstack.StatusError, result, nil
+	return libstack.StatusError, result.ErrorMsg, nil
 }

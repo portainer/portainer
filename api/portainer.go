@@ -1728,6 +1728,8 @@ const (
 	EdgeStackStatusRollingBack
 	// EdgeStackStatusRolledBack represents an Edge stack which has rolled back
 	EdgeStackStatusRolledBack
+	// EdgeStackStatusCompleted represents a completed Edge stack
+	EdgeStackStatusCompleted
 )
 
 const (

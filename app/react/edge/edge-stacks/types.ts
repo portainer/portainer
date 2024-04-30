@@ -44,6 +44,8 @@ export enum StatusType {
   RollingBack,
   /** PausedRemoving represents an Edge stack which has been rolled back */
   RolledBack,
+  /** Completed represents a completed Edge stack */
+  Completed,
 }
 
 export interface DeploymentStatus {
