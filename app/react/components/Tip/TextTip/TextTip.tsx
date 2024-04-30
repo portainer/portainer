@@ -10,6 +10,7 @@ export interface Props {
   icon?: React.ReactNode;
   color?: Color;
   className?: string;
+  childrenWrapperClassName?: string;
   inline?: boolean;
   children: ReactNode;
 }
@@ -20,6 +21,7 @@ export function TextTip({
   inline = true,
   className,
   children,
+  childrenWrapperClassName,
 }: Props) {
   return (
     <div
@@ -31,8 +33,7 @@ export function TextTip({
       role="status"
     >
       <Icon icon={icon} mode={getMode(color)} className="!mt-0.5 flex-none" />
-
-      <span className="text-muted">{children}</span>
+      <span className={childrenWrapperClassName}>{children}</span>
     </div>
   );
 }

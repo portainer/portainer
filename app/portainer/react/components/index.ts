@@ -234,7 +234,14 @@ export const ngModule = angular
   )
   .component(
     'textTip',
-    r2a(TextTip, ['className', 'color', 'icon', 'inline', 'children'])
+    r2a(TextTip, [
+      'className',
+      'color',
+      'icon',
+      'inline',
+      'children',
+      'childrenWrapperClassName',
+    ])
   )
   .component(
     'groupAssociationTable',
