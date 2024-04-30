@@ -13,20 +13,26 @@ type Deployer interface {
 	Remove(ctx context.Context, projectName string, filePaths []string, options Options) error
 	Pull(ctx context.Context, filePaths []string, options Options) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
-	WaitForStatus(ctx context.Context, name string, status Status) <-chan string
+	WaitForStatus(ctx context.Context, name string, status Status) <-chan WaitResult
 }
 
 type Status string
 
 const (
-	StatusUnknown  Status = "unknown"
-	StatusStarting Status = "starting"
-	StatusRunning  Status = "running"
-	StatusStopped  Status = "stopped"
-	StatusError    Status = "error"
-	StatusRemoving Status = "removing"
-	StatusRemoved  Status = "removed"
+	StatusUnknown   Status = "unknown"
+	StatusStarting  Status = "starting"
+	StatusRunning   Status = "running"
+	StatusStopped   Status = "stopped"
+	StatusError     Status = "error"
+	StatusRemoving  Status = "removing"
+	StatusRemoved   Status = "removed"
+	StatusCompleted Status = "completed"
 )
+
+type WaitResult struct {
+	Status   Status
+	ErrorMsg string
+}
 
 type Options struct {
 	WorkingDir  string
