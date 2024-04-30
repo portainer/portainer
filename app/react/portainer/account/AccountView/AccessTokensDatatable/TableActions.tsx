@@ -9,10 +9,8 @@ import { useDeleteAccessTokensMutation } from './useDeleteAccessTokensMutation';
 
 export function TableActions({
   selectedItems,
-  canExit,
 }: {
   selectedItems: AccessToken[];
-  canExit?: boolean;
 }) {
   const deleteMutation = useDeleteAccessTokensMutation();
 
@@ -25,11 +23,7 @@ export function TableActions({
         data-cy="access-tokens-delete-button"
       />
 
-      <AddButton
-        to=".new-access-token"
-        disabled={!canExit}
-        data-cy="access-tokens-add-button"
-      >
+      <AddButton to=".new-access-token" data-cy="access-tokens-add-button">
         Add access token
       </AddButton>
     </>

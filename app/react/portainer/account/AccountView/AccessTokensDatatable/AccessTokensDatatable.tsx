@@ -12,7 +12,7 @@ import { TableActions } from './TableActions';
 const tableKey = 'access-tokens';
 const store = createPersistedStore(tableKey);
 
-export function AccessTokensDatatable({ canExit }: { canExit?: boolean }) {
+export function AccessTokensDatatable() {
   const query = useAccessTokens();
   const tableState = useTableState(store, tableKey);
 
@@ -25,7 +25,7 @@ export function AccessTokensDatatable({ canExit }: { canExit?: boolean }) {
       title="Access tokens"
       titleIcon={Key}
       renderTableActions={(selectedItems) => (
-        <TableActions selectedItems={selectedItems} canExit={canExit} />
+        <TableActions selectedItems={selectedItems} />
       )}
       data-cy="access-tokens-datatable"
     />
