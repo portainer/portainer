@@ -93,6 +93,7 @@ body:
       description: We only provide support for the most recent version of Portainer and the previous 3 versions. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
       multiple: false
       options:
+        - '2.20.2'
         - '2.20.1'
         - '2.20.0'
         - '2.19.5'
