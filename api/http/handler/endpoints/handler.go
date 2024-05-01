@@ -71,6 +71,8 @@ func NewHandler(bouncer security.BouncerService, demoService *demo.Service) *Han
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/remove",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDeleteMultiple))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/snapshot",
