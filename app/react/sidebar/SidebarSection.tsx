@@ -4,19 +4,24 @@ import { useSidebarState } from './useSidebarState';
 
 interface Props {
   title: ReactNode;
+  hoverText?: string;
   showTitleWhenOpen?: boolean;
   'aria-label'?: string;
 }
 
 export function SidebarSection({
   title,
+  hoverText,
   children,
   showTitleWhenOpen,
   'aria-label': ariaLabel,
 }: PropsWithChildren<Props>) {
   return (
     <div>
-      <SidebarSectionTitle showWhenOpen={showTitleWhenOpen}>
+      <SidebarSectionTitle
+        showWhenOpen={showTitleWhenOpen}
+        hoverText={hoverText}
+      >
         {title}
       </SidebarSectionTitle>
 
@@ -32,10 +37,12 @@ export function SidebarSection({
 
 interface TitleProps {
   showWhenOpen?: boolean;
+  hoverText?: string;
 }
 
 export function SidebarSectionTitle({
   showWhenOpen,
+  hoverText,
   children,
 }: PropsWithChildren<TitleProps>) {
   const { isOpen } = useSidebarState();
@@ -45,7 +52,10 @@ export function SidebarSectionTitle({
   }
 
   return (
-    <li className="ml-3 text-sm text-gray-3 transition-all duration-500 ease-in-out be:text-gray-6">
+    <li
+      title={hoverText}
+      className="ml-3 text-sm text-gray-3 transition-all duration-500 ease-in-out be:text-gray-6"
+    >
       {children}
     </li>
   );
