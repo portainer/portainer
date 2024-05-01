@@ -236,7 +236,7 @@ func (m *Migrator) initMigrations() {
 		m.updateAppTemplatesVersionForDB110,
 		m.updateResourceOverCommitToDB110,
 	)
-	m.addMigrations("2.22",
+	m.addMigrations("2.20.2",
 		m.cleanPendingActionsForDeletedEndpointsForDB111,
 	)
 
