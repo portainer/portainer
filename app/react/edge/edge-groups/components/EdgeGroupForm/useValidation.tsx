@@ -1,24 +1,19 @@
-import { SchemaOf, array, boolean, number, object, string } from 'yup';
+import { SchemaOf, array, boolean, number, object } from 'yup';
 import { useMemo } from 'react';
 
-import { useEdgeGroups } from '../../queries/useEdgeGroups';
+import { EdgeGroup } from '../../types';
 
 import { FormValues } from './types';
+import { useNameValidation } from './NameField';
 
-export function useValidation(): SchemaOf<FormValues> {
-  const edgeGroupsQuery = useEdgeGroups();
-
+export function useValidation({
+  id,
+}: { id?: EdgeGroup['Id'] } = {}): SchemaOf<FormValues> {
+  const nameValidation = useNameValidation(id);
   return useMemo(
     () =>
       object({
-        name: string()
-          .required('Name is required')
-          .test({
-            name: 'is-unique',
-            test: (value) =>
-              !edgeGroupsQuery.data?.find((group) => group.Name === value),
-            message: 'Name must be unique',
-          }),
+        name: nameValidation,
         dynamic: boolean().default(false),
         environmentIds: array(number().required()),
         partialMatch: boolean().default(false),
@@ -27,6 +22,6 @@ export function useValidation(): SchemaOf<FormValues> {
           then: (schema) => schema.min(1, 'Tags are required'),
         }),
       }),
-    [edgeGroupsQuery.data]
+    [nameValidation]
   );
 }

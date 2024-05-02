@@ -45,7 +45,7 @@ angular
       url: '/:groupId',
       views: {
         'content@': {
-          component: 'editEdgeGroupView',
+          component: 'edgeGroupsItemView',
         },
       },
     };
