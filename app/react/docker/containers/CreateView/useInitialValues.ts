@@ -57,7 +57,7 @@ export interface Values extends BaseFormValues {
   env: EnvVarValues;
 }
 
-export function useInitialValues(submitting: boolean) {
+export function useInitialValues(submitting: boolean, isWindows: boolean) {
   const {
     params: { nodeName, from },
   } = useCurrentStateAndParams();
@@ -86,7 +86,7 @@ export function useInitialValues(submitting: boolean) {
 
   if (!from) {
     return {
-      initialValues: defaultValues(isPureAdmin, user.Id, nodeName),
+      initialValues: defaultValues(isPureAdmin, user.Id, nodeName, isWindows),
     };
   }
 
@@ -151,12 +151,13 @@ export function useInitialValues(submitting: boolean) {
 function defaultValues(
   isPureAdmin: boolean,
   currentUserId: UserId,
-  nodeName: string
+  nodeName: string,
+  isWindows: boolean
 ): Values {
   return {
     commands: commandsTabUtils.getDefaultViewModel(),
     volumes: volumesTabUtils.getDefaultViewModel(),
-    network: networkTabUtils.getDefaultViewModel(),
+    network: networkTabUtils.getDefaultViewModel(isWindows), // windows containers should default to the nat network, not the bridge
     labels: labelsTabUtils.getDefaultViewModel(),
     restartPolicy: restartPolicyTabUtils.getDefaultViewModel(),
     resources: resourcesTabUtils.getDefaultViewModel(),
