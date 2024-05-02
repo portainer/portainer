@@ -11,6 +11,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -94,10 +95,14 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	go func() {
 		images.EvictImageStatus(payload.ServiceID)
 		images.EvictImageStatus(service.Spec.Labels[consts.SwarmStackNameLabel])
-		containers, _ := dockerClient.ContainerList(context.TODO(), container.ListOptions{
+		// ignore errors from this cleanup function, log them instead
+		containers, err := dockerClient.ContainerList(context.TODO(), container.ListOptions{
 			All:     true,
 			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIdLabel+"="+payload.ServiceID)),
 		})
+		if err != nil {
+			log.Warn().Err(err).Str("Environment", endpoint.Name).Msg("Error listing containers")
+		}
 
 		for _, container := range containers {
 			images.EvictImageStatus(container.ID)
