@@ -165,13 +165,14 @@
               ></por-switch-field>
             </div>
 
-            <div class="col-sm-12">
-              <text-tip children="'GPU support is currently limited to NVIDIA graphics cards only.'" color="'blue'" />
-            </div>
-
-            <div class="col-sm-12">
-              <div class="pl-4">
-                <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+            <div ng-if="$ctrl.state.enableGPUManagement">
+              <div class="col-sm-12">
+                <text-tip children="'GPU support is currently limited to NVIDIA graphics cards only.'" color="'blue'" />
+              </div>
+              <div class="col-sm-12">
+                <div class="pl-4">
+                  <gpus-list ng-if="$ctrl.state.enableGPUManagement" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+                </div>
               </div>
             </div>
           </div>
