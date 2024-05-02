@@ -30,6 +30,12 @@ export function useInfo<TSelect = SystemInfo>(
   );
 }
 
+export function useIsWindows(environmentId: EnvironmentId) {
+  const query = useInfo(environmentId, (info) => info.OSType === 'windows');
+
+  return !!query.data;
+}
+
 export function useIsStandAlone(environmentId: EnvironmentId) {
   const query = useInfo(environmentId, (info) => !info.Swarm?.NodeID);
 
