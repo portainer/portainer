@@ -2,15 +2,15 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { truncate } from 'lodash';
 import { useMemo, useState } from 'react';
 
+import { useTags } from '@/portainer/tags/queries';
+import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
+import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { Environment } from '@/react/portainer/environments/types';
-import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
-import { useTags } from '@/portainer/tags/queries';
-import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { AutomationTestingProps } from '@/types';
 
-import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 import { Datatable, TableRow } from '@@/datatables';
+import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 
 type DecoratedEnvironment = Environment & {
   Tags: string[];
@@ -41,12 +41,12 @@ const columns = [
 export function EdgeGroupAssociationTable({
   title,
   query,
-  onClickRow,
+  onClickRow = () => {},
   'data-cy': dataCy,
 }: {
   title: string;
   query: EnvironmentsQueryParams;
-  onClickRow: (env: Environment) => void;
+  onClickRow?: (env: Environment) => void;
 } & AutomationTestingProps) {
   const tableState = useTableStateWithoutStorage('Name');
   const [page, setPage] = useState(0);

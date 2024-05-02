@@ -34,7 +34,7 @@ export async function createEdgeGroup(requestPayload: CreateGroupPayload) {
   }
 }
 
-export function useCreateGroupMutation() {
+export function useCreateEdgeGroupMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(
