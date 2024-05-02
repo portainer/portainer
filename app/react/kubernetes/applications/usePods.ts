@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Pod, PodList } from 'kubernetes-types/core/v1';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';

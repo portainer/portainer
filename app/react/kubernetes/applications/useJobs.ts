@@ -1,5 +1,5 @@
 import { Job, JobList } from 'kubernetes-types/batch/v1';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withError } from '@/react-tools/react-query';
