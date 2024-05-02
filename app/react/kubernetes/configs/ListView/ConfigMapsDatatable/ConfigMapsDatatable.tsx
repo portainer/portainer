@@ -1,23 +1,25 @@
 import { useMemo } from 'react';
 import { FileCode } from 'lucide-react';
-import { ConfigMap } from 'kubernetes-types/core/v1';
+import { ConfigMap, Pod } from 'kubernetes-types/core/v1';
+import { CronJob, Job } from 'kubernetes-types/batch/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
-import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { usePods } from '@/react/kubernetes/applications/usePods';
+import { useJobs } from '@/react/kubernetes/applications/useJobs';
+import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { AddButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
+import { AddButton } from '@@/buttons/AddButton';
 
 import {
   useConfigMapsForCluster,
@@ -55,10 +57,11 @@ export function ConfigMapsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
-    environmentId,
-    namespaceNames
-  );
+  const podsQuery = usePods(environmentId, namespaceNames);
+  const jobsQuery = useJobs(environmentId, namespaceNames);
+  const cronJobsQuery = useCronJobs(environmentId, namespaceNames);
+  const isInUseLoading =
+    podsQuery.isLoading || jobsQuery.isLoading || cronJobsQuery.isLoading;
 
   const filteredConfigMaps = useMemo(
     () =>
@@ -71,8 +74,10 @@ export function ConfigMapsDatatable() {
   );
   const configMapRowData = useConfigMapRowData(
     filteredConfigMaps,
-    applications ?? [],
-    applicationsQuery.isLoading,
+    podsQuery.data ?? [],
+    jobsQuery.data ?? [],
+    cronJobsQuery.data ?? [],
+    isInUseLoading,
     namespaces
   );
 
@@ -112,8 +117,10 @@ export function ConfigMapsDatatable() {
 // and wraps with useMemo to prevent unnecessary calculations
 function useConfigMapRowData(
   configMaps: ConfigMap[],
-  applications: Application[],
-  applicationsLoading: boolean,
+  pods: Pod[],
+  jobs: Job[],
+  cronJobs: CronJob[],
+  isInUseLoading: boolean,
   namespaces?: Namespaces
 ): ConfigMapRowData[] {
   return useMemo(
@@ -122,12 +129,13 @@ function useConfigMapRowData(
         ...configMap,
         inUse:
           // if the apps are loading, set inUse to true to hide the 'unused' badge
-          applicationsLoading || getIsConfigMapInUse(configMap, applications),
+          isInUseLoading ||
+          getIsConfigMapInUse(configMap, pods, jobs, cronJobs),
         isSystem: namespaces
           ? namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
           : false,
       })),
-    [configMaps, applicationsLoading, applications, namespaces]
+    [configMaps, isInUseLoading, pods, jobs, cronJobs, namespaces]
   );
 }
 
