@@ -345,7 +345,7 @@ class KubernetesResourcePoolController {
 
         const name = this.$state.params.id;
 
-        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get('', { getQuota: true })]);
+        const [nodes, pool] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get(name)]);
 
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
@@ -353,7 +353,7 @@ class KubernetesResourcePoolController {
           this.initialIngressControllers = structuredClone(this.ingressControllers);
         }
 
-        this.pool = _.find(pools, { Namespace: { Name: name } });
+        this.pool = pool;
         this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
