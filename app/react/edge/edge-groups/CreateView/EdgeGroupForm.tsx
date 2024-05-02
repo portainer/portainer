@@ -1,4 +1,6 @@
 import { Field, Form, Formik, useFormikContext } from 'formik';
+import { SchemaOf, array, boolean, number, object, string } from 'yup';
+import { useMemo } from 'react';
 
 import { TagId } from '@/portainer/tags/types';
 import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
@@ -14,6 +16,7 @@ import { buildConfirmButton } from '@@/modals/utils';
 
 import { AssociatedEdgeEnvironmentsSelector } from '../../components/AssociatedEdgeEnvironmentsSelector';
 import { EdgeGroupAssociationTable } from '../../components/EdgeGroupAssociationTable';
+import { useEdgeGroups } from '../queries/useEdgeGroups';
 
 import { groupTypeOptions } from './group-type-options';
 import { tagOptions } from './tag-options';
@@ -35,8 +38,11 @@ export function EdgeGroupForm({
   isLoading: boolean;
   initialValues?: FormValues;
 }) {
+  const validation = useValidation();
   return (
     <Formik
+      validationSchema={validation}
+      validateOnMount
       initialValues={
         initialValues || {
           name: '',
@@ -134,7 +140,7 @@ function StaticGroupFieldset({ isEdit }: { isEdit?: boolean }) {
 }
 
 function DynamicGroupFieldset() {
-  const { values, setFieldValue } = useFormikContext<FormValues>();
+  const { values, setFieldValue, errors } = useFormikContext<FormValues>();
   return (
     <>
       <FormSection title="Tags">
@@ -150,6 +156,7 @@ function DynamicGroupFieldset() {
         <TagSelector
           value={values.tagIds}
           onChange={(tagIds) => setFieldValue('tagIds', tagIds)}
+          errors={errors.tagIds}
         />
       </FormSection>
 
@@ -163,5 +170,31 @@ function DynamicGroupFieldset() {
         }}
       />
     </>
+  );
+}
+
+function useValidation(): SchemaOf<FormValues> {
+  const edgeGroupsQuery = useEdgeGroups();
+
+  return useMemo(
+    () =>
+      object({
+        name: string()
+          .required('Name is required')
+          .test({
+            name: 'is-unique',
+            test: (value) =>
+              !edgeGroupsQuery.data?.find((group) => group.Name === value),
+            message: 'Name must be unique',
+          }),
+        dynamic: boolean().default(false),
+        environmentIds: array(number().required()),
+        partialMatch: boolean().default(false),
+        tagIds: array(number().required()).when('dynamic', {
+          is: true,
+          then: (schema) => schema.min(1, 'Tags are required'),
+        }),
+      }),
+    [edgeGroupsQuery.data]
   );
 }
