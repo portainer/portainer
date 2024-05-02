@@ -5,9 +5,10 @@ import { DockerContainer } from '../../types';
 
 import { CONTAINER_MODE, Values } from './types';
 
-export function getDefaultViewModel() {
+export function getDefaultViewModel(isWindows: boolean) {
+  const networkMode = isWindows ? 'nat' : 'bridge';
   return {
-    networkMode: 'bridge',
+    networkMode,
     hostname: '',
     domain: '',
     macAddress: '',
