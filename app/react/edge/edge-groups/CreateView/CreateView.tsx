@@ -6,8 +6,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 
 import { useCreateEdgeGroupMutation } from '../queries/useCreateEdgeGroupMutation';
-
-import { EdgeGroupForm } from './EdgeGroupForm';
+import { EdgeGroupForm } from '../components/EdgeGroupForm/EdgeGroupForm';
 
 export function CreateView() {
   const mutation = useCreateEdgeGroupMutation();

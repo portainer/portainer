@@ -1,8 +1,8 @@
 import { confirmDestructive } from '@@/modals/confirm';
 import { EdgeTypes } from '@/react/portainer/environments/types';
 import { buildConfirmButton } from '@@/modals/utils';
-import { tagOptions } from '@/react/edge/edge-groups/CreateView/tag-options';
-import { groupTypeOptions } from '@/react/edge/edge-groups/CreateView/group-type-options';
+import { tagOptions } from '@/react/edge/edge-groups/components/EdgeGroupForm/tag-options';
+import { groupTypeOptions } from '@/react/edge/edge-groups/components/EdgeGroupForm/group-type-options';
 
 export class EdgeGroupFormController {
   /* @ngInject */
