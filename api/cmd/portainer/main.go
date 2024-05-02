@@ -462,7 +462,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService(*flags.BaseURL, *flags.AddrHTTPS, sslSettings.CertPath)
 
-	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService, snapshotService)
+	proxyManager := proxy.NewManager(kubernetesClientFactory)
 
 	reverseTunnelService.ProxyManager = proxyManager
 
@@ -489,6 +489,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed initializing snapshot service")
 	}
 	snapshotService.Start()
+
+	proxyManager.NewProxyFactory(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService, snapshotService)
 
 	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
 	if err != nil {
