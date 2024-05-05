@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
@@ -283,7 +284,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	stackPayload := createStackPayloadFromComposeGitPayload(payload.Name,
-		payload.RepositoryURL,
+		strings.TrimSuffix(payload.RepositoryURL, "/"),
 		payload.RepositoryReferenceName,
 		payload.RepositoryUsername,
 		payload.RepositoryPassword,
