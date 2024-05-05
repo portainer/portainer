@@ -36,7 +36,7 @@
   <!-- edge-job-method-select -->
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
 
-  <box-selector slim="true" radio-name="'configuration'" value="$ctrl.formValues.cronMethod" options="$ctrl.cronMethods" on-change="($ctrl.onCronMethodChange)"></box-selector>
+  <box-selector slim="true" radio-name="'configurationold'" value="$ctrl.formValues.cronMethod" options="$ctrl.cronMethods" on-change="($ctrl.onCronMethodChange)"></box-selector>
 
   <!-- !edge-job-method-select -->
   <!-- basic-edge-job -->
@@ -44,9 +44,10 @@
     <div class="form-group">
       <label for="recurring" class="col-sm-2 control-label text-left">Recurring Edge job</label>
       <div class="col-sm-10">
-        <label class="switch"
-          ><input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" data-cy="recurring-edge-job-checkbox" /><span class="slider round"></span
-        ></label>
+        <label class="switch">
+          <input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" id="recurring" data-cy="recurring-edge-job-checkbox" />
+          <span class="slider round"></span>
+        </label>
       </div>
     </div>
     <!-- not-recurring -->
@@ -135,7 +136,7 @@
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title"> Job content </div>
-    <box-selector value="$ctrl.formValues.method" options="$ctrl.buildMethods" radio-name="buildMethod" on-change="($ctrl.onBuildMethodChange)" slim="true"></box-selector>
+    <box-selector value="$ctrl.formValues.method" options="$ctrl.buildMethods" radio-name="'buildMethodolds'" on-change="($ctrl.onBuildMethodChange)" slim="true"></box-selector>
   </div>
   <!-- !execution-method -->
 

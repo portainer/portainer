@@ -11,7 +11,7 @@ export interface Option<T extends string | number>
 }
 
 interface Props<T extends string | number> extends AutomationTestingProps {
-  options: Option<T>[];
+  options: Array<Option<T>> | ReadonlyArray<Option<T>>;
 }
 
 export function Select<T extends number | string>({
