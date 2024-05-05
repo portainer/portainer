@@ -56,7 +56,7 @@ export function DashboardView() {
               icon={LayersIcon}
               type="Stack"
               value={dashboardStats.stacks}
-              dataCy="stacks"
+              data-cy="stacks"
             />
           )}
 
@@ -66,7 +66,7 @@ export function DashboardView() {
               icon={ShuffleIcon}
               type="Service"
               value={dashboardStats.services}
-              dataCy="services"
+              data-cy="services"
             />
           )}
 
@@ -75,7 +75,7 @@ export function DashboardView() {
             icon={BoxIcon}
             type="Container"
             value={dashboardStats.containers.total}
-            dataCy="containers"
+            data-cy="containers"
           >
             <ContainerStatus stats={dashboardStats.containers} />
           </DashboardItem>
@@ -85,7 +85,7 @@ export function DashboardView() {
             icon={ListIcon}
             type="Image"
             value={dashboardStats.images.total}
-            dataCy="images"
+            data-cy="images"
           >
             <ImagesTotalSize imagesTotalSize={dashboardStats.images.size} />
           </DashboardItem>
@@ -95,7 +95,7 @@ export function DashboardView() {
             icon={DatabaseIcon}
             type="Volume"
             value={dashboardStats.volumes}
-            dataCy="volumes"
+            data-cy="volumes"
           />
 
           <DashboardItem
@@ -103,7 +103,7 @@ export function DashboardView() {
             icon={NetworkIcon}
             type="Network"
             value={dashboardStats.networks}
-            dataCy="networks"
+            data-cy="networks"
           />
 
           {env.EnableGPUManagement && isStandalone && (
@@ -111,7 +111,7 @@ export function DashboardView() {
               icon={CpuIcon}
               type="GPU"
               value={env.Gpus.length}
-              dataCy="gpus"
+              data-cy="gpus"
             />
           )}
         </DashboardGrid>

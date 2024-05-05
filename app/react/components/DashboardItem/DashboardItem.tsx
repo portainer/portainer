@@ -4,10 +4,11 @@ import { Loader2 } from 'lucide-react';
 
 import { Icon, IconProps } from '@/react/components/Icon';
 import { pluralize } from '@/portainer/helpers/strings';
+import { AutomationTestingProps } from '@/types';
 
 import { Link } from '@@/Link';
 
-interface Props extends IconProps {
+interface Props extends IconProps, AutomationTestingProps {
   type: string;
   pluralType?: string; // in case the pluralise function isn't suitable
   isLoading?: boolean;
@@ -16,7 +17,6 @@ interface Props extends IconProps {
   to?: string;
   params?: object;
   children?: ReactNode;
-  dataCy: string;
 }
 
 export function DashboardItem({
@@ -29,7 +29,7 @@ export function DashboardItem({
   to,
   params,
   children,
-  dataCy,
+  'data-cy': dataCy,
 }: Props) {
   const Item = (
     <div

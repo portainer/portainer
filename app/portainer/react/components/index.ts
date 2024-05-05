@@ -154,7 +154,7 @@ export const ngModule = angular
       'pluralType',
       'isLoading',
       'isRefetching',
-      'dataCy',
+      'data-cy',
       'iconClass',
     ])
   )

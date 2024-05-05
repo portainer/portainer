@@ -70,7 +70,7 @@ export function DashboardView() {
             icon={Layers}
             to="kubernetes.resourcePools"
             type="Namespace"
-            dataCy="dashboard-namespace"
+            data-cy="dashboard-namespace"
           />
           <DashboardItem
             value={applications?.length}
@@ -81,7 +81,7 @@ export function DashboardView() {
             icon={Box}
             to="kubernetes.applications"
             type="Application"
-            dataCy="dashboard-application"
+            data-cy="dashboard-application"
           />
           <DashboardItem
             value={services?.length}
@@ -92,7 +92,7 @@ export function DashboardView() {
             icon={Shuffle}
             to="kubernetes.services"
             type="Service"
-            dataCy="dashboard-service"
+            data-cy="dashboard-service"
           />
           <DashboardItem
             value={ingresses?.length}
@@ -104,7 +104,7 @@ export function DashboardView() {
             to="kubernetes.ingresses"
             type="Ingress"
             pluralType="Ingresses"
-            dataCy="dashboard-ingress"
+            data-cy="dashboard-ingress"
           />
           <DashboardItem
             value={configMaps?.length}
@@ -116,7 +116,7 @@ export function DashboardView() {
             to="kubernetes.configurations"
             params={{ tab: 'configmaps' }}
             type="ConfigMap"
-            dataCy="dashboard-configmaps"
+            data-cy="dashboard-configmaps"
           />
           <DashboardItem
             value={secrets?.length}
@@ -128,7 +128,7 @@ export function DashboardView() {
             to="kubernetes.configurations"
             params={{ tab: 'secrets' }}
             type="Secret"
-            dataCy="dashboard-secrets"
+            data-cy="dashboard-secrets"
           />
           <DashboardItem
             value={pvcs?.length}
@@ -139,7 +139,7 @@ export function DashboardView() {
             icon={Database}
             to="kubernetes.volumes"
             type="Volume"
-            dataCy="dashboard-volume"
+            data-cy="dashboard-volume"
           />
         </DashboardGrid>
       </div>
