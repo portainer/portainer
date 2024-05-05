@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { useState } from 'react';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
@@ -6,7 +7,7 @@ import { Select } from '@@/form-components/ReactSelect';
 import { FormError } from '@@/form-components/FormError';
 import { Link } from '@@/Link';
 import { FormControl } from '@@/form-components/FormControl';
-import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { FormSection } from '@@/form-components/FormSection';
 
 import { useEdgeGroups } from '../../edge-groups/queries/useEdgeGroups';
 
@@ -29,7 +30,8 @@ export function EdgeGroupsSelector({
   isGroupVisible = () => true,
   required,
 }: Props) {
-  const inputId = 'edge-groups-selector';
+  const [inputId] = useState(() => _.uniqueId('edge-groups-selector-'));
+
   const selector = (
     <InnerSelector
       value={value}
@@ -49,10 +51,7 @@ export function EdgeGroupsSelector({
       {selector}
     </FormControl>
   ) : (
-    <>
-      <FormSectionTitle htmlFor={inputId}>{`Edge Groups${
-        required ? ' *' : ''
-      }`}</FormSectionTitle>
+    <FormSection title={`Edge Groups${required ? ' *' : ''}`} htmlFor={inputId}>
       <div className="form-group">
         <div className="col-sm-12">{selector} </div>
         {error && (
@@ -61,7 +60,7 @@ export function EdgeGroupsSelector({
           </div>
         )}
       </div>
-    </>
+    </FormSection>
   );
 }
 
