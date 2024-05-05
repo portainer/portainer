@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -11,7 +10,6 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
-	dockerconsts "github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
@@ -74,7 +72,7 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 	}
 
 	isSwarmManager := info.Swarm.ControlAvailable && info.Swarm.NodeID != ""
-	serviceCount := 0
+
 	var services []swarm.Service
 	if isSwarmManager {
 		servicesRes, err := cli.ServiceList(r.Context(), types.ServiceListOptions{})
@@ -82,7 +80,6 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 			return httperror.InternalServerError("Unable to retrieve Docker services", err)
 		}
 
-		serviceCount = len(services)
 		services = servicesRes
 	}
 
@@ -106,9 +103,14 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 		return httperror.InternalServerError("Unable to retrieve user", err)
 	}
 
-	stacksCount, err := countStacks(environment, user, h, containers, isSwarmManager, services)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve stacks", err)
+	stackCount := 0
+	if environment.SecuritySettings.AllowStackManagementForRegularUsers || user.Role == portainer.AdministratorRole {
+		stacks, err := utils.GetDockerStacks(h.dataStore, environment.ID, containers, services)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve stacks", err)
+		}
+
+		stackCount = len(stacks)
 	}
 
 	return response.JSON(w, dashboardResponse{
@@ -117,50 +119,9 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 			Total: len(images),
 			Size:  totalSize,
 		},
-		Services: serviceCount,
+		Services: len(services),
 		Volumes:  len(volumes.Volumes),
 		Networks: len(networks),
-		Stacks:   stacksCount,
+		Stacks:   stackCount,
 	})
-}
-
-func countStacks(environment *portainer.Endpoint, user *portainer.User, h *Handler, containers []types.Container, isSwarmManager bool, services []swarm.Service) (int, error) {
-	if !environment.SecuritySettings.AllowStackManagementForRegularUsers && !security.IsAdminRole(user.Role) {
-		return 0, nil
-	}
-
-	stacks, err := h.dataStore.Stack().ReadAll()
-	if err != nil {
-		return 0, fmt.Errorf("Unable to retrieve stacks: %w", err)
-	}
-
-	stacksCount := 0
-	for _, stack := range stacks {
-		if stack.EndpointID == environment.ID {
-			stacksCount++
-		}
-	}
-
-	for _, container := range containers {
-		if isExternalComposeStack(container.Labels) {
-			stacksCount++
-		}
-	}
-
-	if isSwarmManager {
-		for _, service := range services {
-			if isExternalSwarmStack(service.Spec.Labels) {
-				stacksCount++
-			}
-		}
-	}
-	return stacksCount, nil
-}
-
-func isExternalComposeStack(labels map[string]string) bool {
-	return labels[dockerconsts.HideStackLabel] == "" && labels[dockerconsts.ComposeStackNameLabel] != ""
-}
-
-func isExternalSwarmStack(labels map[string]string) bool {
-	return labels[dockerconsts.HideStackLabel] == "" && labels[dockerconsts.SwarmStackNameLabel] != ""
 }
