@@ -81,10 +81,12 @@ function buildImageFullURIWithRegistry(image: string, registry: Registry) {
   }
 
   function buildImageURIForGithub(image: string, registry: Registry) {
+    const imageName = image.startsWith('/') ? image.slice(1) : image;
+
     const namespace = registry.Github.UseOrganisation
       ? registry.Github.OrganisationName
       : registry.Username;
-    return `${registry.URL}/${namespace}/${image}`;
+    return `${registry.URL}/${namespace}/${imageName}`;
   }
 
   function buildImageURIForGitLab(image: string, registry: Registry) {
