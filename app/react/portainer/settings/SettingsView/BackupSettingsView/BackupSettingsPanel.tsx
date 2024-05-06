@@ -12,6 +12,8 @@ import { BackupS3Form } from './BackupS3Form';
 export function BackupSettingsPanel() {
   const [backupType, setBackupType] = useState(options[0].value);
 
+  console.log(backupType);
+
   return (
     <Widget>
       <WidgetTitle icon={Download} title="Back up Portainer" />
