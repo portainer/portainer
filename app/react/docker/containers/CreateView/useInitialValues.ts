@@ -66,9 +66,10 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
 
   const networksQuery = useNetworksForSelector();
 
-  const fromContainerQuery = useContainer(environmentId, from, {
+  const fromContainerQuery = useContainer(environmentId, from, nodeName, {
     enabled: !submitting,
   });
+
   const runningContainersQuery = useContainers(environmentId, {
     enabled: !!from,
   });
