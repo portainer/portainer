@@ -7,8 +7,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/pendingactions/actions"
+	"github.com/portainer/portainer/api/pendingactions/handlers"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -96,7 +96,7 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 
 					// When extracting the data, this is the type we need to pull out
 					// i.e. pendingactions.DeletePortainerK8sRegistrySecretsData
-					ActionData: pendingactions.DeletePortainerK8sRegistrySecretsData{
+					ActionData: handlers.DeletePortainerK8sRegistrySecretsData{
 						RegistryID: registry.ID,
 						Namespaces: failedNamespaces,
 					},

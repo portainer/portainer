@@ -386,8 +386,12 @@ type (
 		ID         PendingActionsID `json:"ID"`
 		EndpointID EndpointID       `json:"EndpointID"`
 		Action     string           `json:"Action"`
-		ActionData interface{}      `json:"ActionData"`
+		ActionData any              `json:"ActionData"`
 		CreatedAt  int64            `json:"CreatedAt"`
+	}
+
+	PendingActionHandler interface {
+		Execute(PendingActions, *Endpoint) error
 	}
 
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required

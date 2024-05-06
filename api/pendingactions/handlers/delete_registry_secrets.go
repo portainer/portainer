@@ -1,23 +1,49 @@
-package pendingactions
+package handlers
 
 import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/authorization"
+	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
 )
+
+type HandlerDeleteRegistrySecrets struct {
+	authorizationService *authorization.Service
+	dataStore            dataservices.DataStore
+	kubeFactory          *kubecli.ClientFactory
+}
+
+func NewHandlerDeleteRegistrySecrets(
+	authorizationService *authorization.Service,
+	dataStore dataservices.DataStore,
+	kubeFactory *kubecli.ClientFactory,
+) *HandlerDeleteRegistrySecrets {
+	return &HandlerDeleteRegistrySecrets{
+		authorizationService: authorizationService,
+		dataStore:            dataStore,
+		kubeFactory:          kubeFactory,
+	}
+}
 
 type DeletePortainerK8sRegistrySecretsData struct {
 	RegistryID portainer.RegistryID `json:"RegistryID"`
 	Namespaces []string             `json:"Namespaces"`
 }
 
-func (service *PendingActionsService) DeleteKubernetesRegistrySecrets(endpoint *portainer.Endpoint, registryData *DeletePortainerK8sRegistrySecretsData) error {
-	if endpoint == nil || registryData == nil {
+func (h *HandlerDeleteRegistrySecrets) Execute(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
+	if endpoint == nil || pendingAction.ActionData == nil {
 		return nil
 	}
 
-	kubeClient, err := service.kubeFactory.GetKubeClient(endpoint)
+	registryData, err := convertToDeletePortainerK8sRegistrySecretsData(pendingAction.ActionData)
+	if err != nil || registryData == nil {
+		return err
+	}
+
+	kubeClient, err := h.kubeFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return err
 	}
@@ -33,13 +59,13 @@ func (service *PendingActionsService) DeleteKubernetesRegistrySecrets(endpoint *
 }
 
 // Failure in this code is basically a bug.  So if we get one we should log it and continue.
-func convertToDeletePortainerK8sRegistrySecretsData(actionData interface{}) (*DeletePortainerK8sRegistrySecretsData, error) {
+func convertToDeletePortainerK8sRegistrySecretsData(actionData any) (*DeletePortainerK8sRegistrySecretsData, error) {
 	var registryData DeletePortainerK8sRegistrySecretsData
 
 	// Due to the way data is stored and subsequently read from the database, we can't directly type assert the actionData to
-	// the type DeletePortainerK8sRegistrySecretsData.  It's stored as a map[string]interface{} and we need to extract the
+	// the type DeletePortainerK8sRegistrySecretsData.  It's stored as a map[string]any and we need to extract the
 	// data from that map.
-	if data, ok := actionData.(map[string]interface{}); ok {
+	if data, ok := actionData.(map[string]any); ok {
 		for key, value := range data {
 			switch key {
 			case "Namespaces":
@@ -52,7 +78,7 @@ func convertToDeletePortainerK8sRegistrySecretsData(actionData interface{}) (*De
 					}
 				} else {
 					// we shouldn't ever see this.  It's a bug if we do.
-					log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: Failed to convert Namespaces to []interface{}")
+					log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: Failed to convert Namespaces to []any")
 				}
 			case "RegistryID":
 				if registryID, ok := value.(float64); ok {
