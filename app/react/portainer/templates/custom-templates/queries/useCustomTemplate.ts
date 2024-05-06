@@ -17,9 +17,12 @@ export async function getCustomTemplate(id: CustomTemplate['Id']) {
   }
 }
 
-export function useCustomTemplate(id?: CustomTemplate['Id']) {
+export function useCustomTemplate(
+  id?: CustomTemplate['Id'],
+  { enabled = true }: { enabled?: boolean } = {}
+) {
   return useQuery(queryKeys.item(id!), () => getCustomTemplate(id!), {
     ...withGlobalError('Unable to retrieve custom template'),
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 }

@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { GitAuthModel, GitFormModel } from '@/react/portainer/gitops/types';
+import { GitAuthModel } from '@/react/portainer/gitops/types';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { UserId } from '@/portainer/users/types';
 
@@ -82,9 +82,9 @@ export function useSaveCredentialsIfRequired() {
   }
 }
 
-export async function saveGitCredentialsIfNeeded(
+export async function saveGitCredentialsIfNeeded<TGit extends GitAuthModel>(
   userId: UserId,
-  gitModel: GitFormModel
+  gitModel: TGit
 ) {
   let credentialsId = gitModel.RepositoryGitCredentialID;
   let username = gitModel.RepositoryUsername;

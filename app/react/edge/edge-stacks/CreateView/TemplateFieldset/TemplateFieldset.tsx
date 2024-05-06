@@ -1,49 +1,38 @@
-import { SetStateAction, useEffect, useState } from 'react';
+import { SetStateAction } from 'react';
 import { FormikErrors } from 'formik';
 
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
 import { getDefaultValues as getAppVariablesDefaultValues } from '../../../../portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
 
 import { TemplateSelector } from './TemplateSelector';
-import { SelectedTemplateValue, Values } from './types';
+import { Values } from './types';
 import { CustomTemplateFieldset } from './CustomTemplateFieldset';
 import { AppTemplateFieldset } from './AppTemplateFieldset';
 
 export function TemplateFieldset({
-  values: initialValues,
-  setValues: setInitialValues,
+  values,
+  setValues,
   errors,
 }: {
   errors?: FormikErrors<Values>;
   values: Values;
   setValues: (values: SetStateAction<Values>) => void;
 }) {
-  const [values, setControlledValues] = useState(initialValues); // todo remove when all view is in react
-
-  useEffect(() => {
-    if (
-      initialValues.type !== values.type ||
-      initialValues.template?.Id !== values.template?.Id
-    ) {
-      setControlledValues(initialValues);
-    }
-  }, [initialValues, values]);
-
   return (
     <>
       <TemplateSelector
-        error={
-          typeof errors?.template === 'string' ? errors?.template : undefined
-        }
+        error={errors?.templateId}
         value={values}
         onChange={handleChangeTemplate}
       />
-      {values.template && (
+      {values.templateId && (
         <>
           {values.type === 'custom' && (
             <CustomTemplateFieldset
-              template={values.template}
+              templateId={values.templateId}
               values={values.variables}
               onChange={(variables) =>
                 setValues((values) => ({ ...values, variables }))
@@ -54,7 +43,7 @@ export function TemplateFieldset({
 
           {values.type === 'app' && (
             <AppTemplateFieldset
-              template={values.template}
+              templateId={values.templateId}
               values={values.envVars}
               onChange={(envVars) =>
                 setValues((values) => ({ ...values, envVars }))
@@ -67,36 +56,36 @@ export function TemplateFieldset({
     </>
   );
 
-  function setValues(values: SetStateAction<Values>) {
-    setControlledValues(values);
-    setInitialValues(values);
-  }
-
-  function handleChangeTemplate(value?: SelectedTemplateValue) {
+  function handleChangeTemplate(
+    template: TemplateViewModel | CustomTemplate | undefined,
+    type: 'app' | 'custom' | undefined
+  ): void {
     setValues(() => {
-      if (!value || !value.type || !value.template) {
+      if (!template || !type) {
         return {
           type: undefined,
-          template: undefined,
+          templateId: undefined,
           variables: [],
           envVars: {},
         };
       }
 
-      if (value.type === 'app') {
+      if (type === 'app') {
         return {
-          template: value.template,
-          type: value.type,
+          templateId: template.Id,
+          type,
           variables: [],
-          envVars: getAppVariablesDefaultValues(value.template.Env || []),
+          envVars: getAppVariablesDefaultValues(
+            (template as TemplateViewModel).Env || []
+          ),
         };
       }
 
       return {
-        template: value.template,
-        type: value.type,
+        templateId: template.Id,
+        type,
         variables: getVariablesFieldDefaultValues(
-          value.template.Variables || []
+          (template as CustomTemplate).Variables || []
         ),
         envVars: {},
       };
@@ -106,10 +95,9 @@ export function TemplateFieldset({
 
 export function getInitialTemplateValues(): Values {
   return {
-    template: undefined,
+    templateId: undefined,
     type: undefined,
     variables: [],
-    file: '',
     envVars: {},
   };
 }
