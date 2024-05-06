@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/tag"
+	pendingActionActions "github.com/portainer/portainer/api/pendingactions/actions"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -159,7 +160,9 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 							err := handler.PendingActionsService.Create(portainer.PendingActions{
 								EndpointID: endpointID,
 								Action:     "CleanNAPWithOverridePolicies",
-								ActionData: endpointGroupID,
+								ActionData: &pendingActionActions.CleanNAPWithOverridePoliciesPayload{
+									EndpointGroupID: endpointGroupID,
+								},
 							})
 							if err != nil {
 								log.Error().Err(err).Msgf("Unable to create pending action to clean NAP with override policies for endpoint (%d) and endpoint group (%d).", endpointID, endpointGroupID)
