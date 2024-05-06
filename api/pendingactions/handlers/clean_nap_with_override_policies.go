@@ -24,7 +24,7 @@ func NewHandlerCleanNAPWithOverridePolicies(
 	}
 }
 
-func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
+func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
 		h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, nil)
 		return nil

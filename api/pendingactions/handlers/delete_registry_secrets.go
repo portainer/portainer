@@ -33,7 +33,7 @@ type DeletePortainerK8sRegistrySecretsData struct {
 	Namespaces []string             `json:"Namespaces"`
 }
 
-func (h *HandlerDeleteRegistrySecrets) Execute(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
+func (h *HandlerDeleteRegistrySecrets) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	if endpoint == nil || pendingAction.ActionData == nil {
 		return nil
 	}
@@ -69,7 +69,7 @@ func convertToDeletePortainerK8sRegistrySecretsData(actionData any) (*DeletePort
 		for key, value := range data {
 			switch key {
 			case "Namespaces":
-				if namespaces, ok := value.([]interface{}); ok {
+				if namespaces, ok := value.([]any); ok {
 					registryData.Namespaces = make([]string, len(namespaces))
 					for i, ns := range namespaces {
 						if namespace, ok := ns.(string); ok {

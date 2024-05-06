@@ -74,7 +74,7 @@ func (postInitMigrator *PostInitMigrator) PostInitMigrate() error {
 // this function exists for readability, not reusability
 // TODO: This should be moved into pending actions as part of the pending action migration
 func (postInitMigrator *PostInitMigrator) createPostInitMigrationPendingAction(environmentID portainer.EndpointID) error {
-	migrateEnvPendingAction := portainer.PendingActions{
+	migrateEnvPendingAction := portainer.PendingAction{
 		EndpointID: environmentID,
 		Action:     actions.PostInitMigrateEnvironment,
 	}

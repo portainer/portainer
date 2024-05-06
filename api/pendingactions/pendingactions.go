@@ -24,8 +24,9 @@ func NewService(
 	kubeFactory *kubecli.ClientFactory,
 ) *PendingActionsService {
 	return &PendingActionsService{
-		dataStore: dataStore,
-		mu:        sync.Mutex{},
+		dataStore:   dataStore,
+		kubeFactory: kubeFactory,
+		mu:          sync.Mutex{},
 	}
 }
 
@@ -33,7 +34,7 @@ func (service *PendingActionsService) RegisterHandler(name string, handler porta
 	handlers[name] = handler
 }
 
-func (service *PendingActionsService) Create(r portainer.PendingActions) error {
+func (service *PendingActionsService) Create(r portainer.PendingAction) error {
 	return service.dataStore.PendingActions().Create(&r)
 }
 
@@ -89,7 +90,7 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 	return nil
 }
 
-func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
+func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	log.Debug().Msgf("Executing pending action %s for environment %d", pendingAction.Action, pendingAction.EndpointID)
 
 	defer func() {

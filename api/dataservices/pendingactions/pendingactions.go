@@ -14,11 +14,11 @@ const (
 )
 
 type Service struct {
-	dataservices.BaseDataService[portainer.PendingActions, portainer.PendingActionsID]
+	dataservices.BaseDataService[portainer.PendingAction, portainer.PendingActionID]
 }
 
 type ServiceTx struct {
-	dataservices.BaseDataServiceTx[portainer.PendingActions, portainer.PendingActionsID]
+	dataservices.BaseDataServiceTx[portainer.PendingAction, portainer.PendingActionID]
 }
 
 func NewService(connection portainer.Connection) (*Service, error) {
@@ -28,20 +28,20 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		BaseDataService: dataservices.BaseDataService[portainer.PendingActions, portainer.PendingActionsID]{
+		BaseDataService: dataservices.BaseDataService[portainer.PendingAction, portainer.PendingActionID]{
 			Bucket:     BucketName,
 			Connection: connection,
 		},
 	}, nil
 }
 
-func (s Service) Create(config *portainer.PendingActions) error {
+func (s Service) Create(config *portainer.PendingAction) error {
 	return s.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return s.Tx(tx).Create(config)
 	})
 }
 
-func (s Service) Update(ID portainer.PendingActionsID, config *portainer.PendingActions) error {
+func (s Service) Update(ID portainer.PendingActionID, config *portainer.PendingAction) error {
 	return s.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return s.Tx(tx).Update(ID, config)
 	})
@@ -55,7 +55,7 @@ func (s Service) DeleteByEndpointID(ID portainer.EndpointID) error {
 
 func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 	return ServiceTx{
-		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.PendingActions, portainer.PendingActionsID]{
+		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.PendingAction, portainer.PendingActionID]{
 			Bucket:     BucketName,
 			Connection: service.Connection,
 			Tx:         tx,
@@ -63,16 +63,16 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 	}
 }
 
-func (s ServiceTx) Create(config *portainer.PendingActions) error {
+func (s ServiceTx) Create(config *portainer.PendingAction) error {
 	return s.Tx.CreateObject(BucketName, func(id uint64) (int, interface{}) {
-		config.ID = portainer.PendingActionsID(id)
+		config.ID = portainer.PendingActionID(id)
 		config.CreatedAt = time.Now().Unix()
 
 		return int(config.ID), config
 	})
 }
 
-func (s ServiceTx) Update(ID portainer.PendingActionsID, config *portainer.PendingActions) error {
+func (s ServiceTx) Update(ID portainer.PendingActionID, config *portainer.PendingAction) error {
 	return s.BaseDataServiceTx.Update(ID, config)
 }
 

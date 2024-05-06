@@ -39,7 +39,7 @@ func NewHandlerPostInitMigrateEnvironment(
 	}
 }
 
-func (h *HandlerPostInitMigrateEnvironment) Execute(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
+func (h *HandlerPostInitMigrateEnvironment) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	postInitMigrator := postinit.NewPostInitMigrator(
 		h.kubeFactory,
 		h.dockerFactory,

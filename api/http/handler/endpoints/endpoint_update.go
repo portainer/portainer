@@ -266,7 +266,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil)
 			if err != nil {
-				handler.PendingActionsService.Create(portainer.PendingActions{
+				handler.PendingActionsService.Create(portainer.PendingAction{
 					EndpointID: endpoint.ID,
 					Action:     "CleanNAPWithOverridePolicies",
 					ActionData: nil,
