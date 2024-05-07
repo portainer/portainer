@@ -10,7 +10,7 @@ export default class AuthLogsViewController {
 
     this.limitedFeature = FeatureId.ACTIVITY_AUDIT;
     this.state = {
-      keyword: 'f',
+      keyword: '',
       date: {
         from: 0,
         to: 0,
