@@ -70,33 +70,33 @@ export function RollbackApplicationButton({
     patchAppMutation.isLoading;
 
   const rollbackButton = (
-    <div className="flex gap-x-2">
-      <Button
-        ng-if="!ctrl.isExternalApplication()"
-        type="button"
-        color="light"
-        size="small"
-        className="!ml-0"
-        disabled={isRollbackNotAvailable}
-        onClick={() => rollbackApplication()}
-        data-cy="k8sAppDetail-rollbackButton"
-      >
-        <Icon icon={RotateCcw} className="mr-1" />
-        Rollback to previous configuration
-      </Button>
-      <Tooltip message="Only one level of rollback is available, i.e. if you roll back from v2 to v1, and then roll back again, you will end up back at v2. Note that service changes and autoscaler rule changes are not included in rollback functionality. This is how Kubernetes works natively." />
-    </div>
+    <Button
+      ng-if="!ctrl.isExternalApplication()"
+      type="button"
+      color="light"
+      size="small"
+      className="!ml-0"
+      disabled={isRollbackNotAvailable}
+      onClick={() => rollbackApplication()}
+      data-cy="k8sAppDetail-rollbackButton"
+    >
+      <Icon icon={RotateCcw} className="mr-1" />
+      Rollback to previous configuration
+    </Button>
   );
 
   return (
     <Authorized authorizations="K8sApplicationDetailsW">
-      {isRollbackNotAvailable ? (
-        <TooltipWithChildren message="Cannot roll back to previous configuration as none currently exists">
-          <span>{rollbackButton}</span>
-        </TooltipWithChildren>
-      ) : (
-        rollbackButton
-      )}
+      <div className="flex gap-x-2">
+        {isRollbackNotAvailable ? (
+          <TooltipWithChildren message="Cannot roll back to previous configuration as none currently exists">
+            <span>{rollbackButton}</span>
+          </TooltipWithChildren>
+        ) : (
+          rollbackButton
+        )}
+        <Tooltip message="Only one level of rollback is available, i.e. if you roll back from v2 to v1, and then roll back again, you will end up back at v2. Note that service changes and autoscaler rule changes are not included in rollback functionality. This is how Kubernetes works natively." />
+      </div>
     </Authorized>
   );
 
