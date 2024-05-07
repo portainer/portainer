@@ -159,8 +159,8 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 						go func(endpointID portainer.EndpointID, endpointGroupID portainer.EndpointGroupID) {
 							err := handler.PendingActionsService.Create(portainer.PendingAction{
 								EndpointID: endpointID,
-								Action:     "CleanNAPWithOverridePolicies",
-								ActionData: &pendingActionActions.CleanNAPWithOverridePoliciesPayload{
+								Action:     pendingActionActions.CleanNAPWithOverridePolicies,
+								ActionData: &pendingActionActions.CleanNAPWithOverridePolicies{
 									EndpointGroupID: endpointGroupID,
 								},
 							})

@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"fmt"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -15,26 +16,22 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 
 		testData := []struct {
 			Name          string
-			PendingAction portainer.PendingActions
-			Expected      *actions.CleanNAPWithOverridePoliciesPayload
+			PendingAction portainer.PendingAction
+			Expected      any
 			Err           bool
 		}{
 			{
 				Name: "test actiondata with EndpointGroupID 1",
-				PendingAction: portainer.PendingActions{
+				PendingAction: portainer.PendingAction{
 					EndpointID: 1,
 					Action:     "CleanNAPWithOverridePolicies",
-					ActionData: &actions.CleanNAPWithOverridePoliciesPayload{
-						EndpointGroupID: 1,
-					},
+					ActionData: portainer.EndpointGroupID(1),
 				},
-				Expected: &actions.CleanNAPWithOverridePoliciesPayload{
-					EndpointGroupID: 1,
-				},
+				Expected: portainer.EndpointGroupID(1),
 			},
 			{
 				Name: "test actionData nil",
-				PendingAction: portainer.PendingActions{
+				PendingAction: portainer.PendingAction{
 					EndpointID: 2,
 					Action:     "CleanNAPWithOverridePolicies",
 					ActionData: nil,
@@ -43,7 +40,7 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 			},
 			{
 				Name: "test actionData empty and expected error",
-				PendingAction: portainer.PendingActions{
+				PendingAction: portainer.PendingAction{
 					EndpointID: 2,
 					Action:     "CleanNAPWithOverridePolicies",
 					ActionData: "",
@@ -68,22 +65,25 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 
 			for _, endpointPendingAction := range pendingActions {
 				t.Run(d.Name, func(t *testing.T) {
-					if endpointPendingAction.Action == "CleanNAPWithOverridePolicies" {
-						actionData, err := actions.ConvertCleanNAPWithOverridePoliciesPayload(endpointPendingAction.ActionData)
+					if endpointPendingAction.Action == actions.CleanNAPWithOverridePolicies {
+						var endpointGroupID portainer.EndpointGroupID
+						err := endpointPendingAction.UnmarshallActionData(&endpointGroupID)
+
+						fmt.Printf("endpointGroupID: %v err=%v\n", endpointGroupID, err)
+
 						if d.Err && err == nil {
 							t.Error(err)
 						}
 
-						if d.Expected == nil && actionData != nil {
-							t.Errorf("expected nil , got %d", actionData)
+						if d.Expected == nil && endpointGroupID != 0 {
+							t.Errorf("expected nil, got %d", endpointGroupID)
 						}
 
-						if d.Expected != nil && actionData == nil {
-							t.Errorf("expected not nil , got %d", actionData)
-						}
-
-						if d.Expected != nil && actionData.EndpointGroupID != d.Expected.EndpointGroupID {
-							t.Errorf("expected EndpointGroupID %d , got %d", d.Expected.EndpointGroupID, actionData.EndpointGroupID)
+						if d.Expected != nil {
+							expected := d.Expected.(portainer.EndpointGroupID)
+							if d.Expected != nil && expected != endpointGroupID {
+								t.Errorf("expected EndpointGroupID %d, got %d", expected, endpointGroupID)
+							}
 						}
 					}
 				})
