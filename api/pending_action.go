@@ -17,8 +17,9 @@ type (
 	}
 )
 
-// We marshal the ActionData field to a string so that unmarshalling
-// to specific types later is much easier.
+// MarshalJSON marshals the PendingAction struct to JSON
+// and converts the ActionData field to an embedded json string
+// This makes unmarshalling the ActionData field easier
 func (pa PendingAction) MarshalJSON() ([]byte, error) {
 	// Create a map to hold the marshalled fields
 	data := map[string]any{
@@ -38,6 +39,7 @@ func (pa PendingAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(data)
 }
 
+// Unmarshal the ActionData field from a string to a specific type.
 func (pa PendingAction) UnmarshallActionData(v any) error {
 	s, ok := pa.ActionData.(string)
 	if !ok {
