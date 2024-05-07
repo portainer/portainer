@@ -32,7 +32,7 @@ export function BackupS3Form() {
   const updateS3Mutate = useUpdateBackupS3SettingsMutation();
 
   const settingsQuery = useBackupS3Settings({ enabled: isBE });
-  if (settingsQuery.isLoading) {
+  if (settingsQuery.isInitialLoading) {
     return null;
   }
 
@@ -58,7 +58,10 @@ export function BackupS3Form() {
       validateOnMount
     >
       {({ values, errors, isSubmitting, setFieldValue, isValid }) => (
-        <BEOverlay featureId={FeatureId.S3_BACKUP_SETTING}>
+        <BEOverlay
+          featureId={FeatureId.S3_BACKUP_SETTING}
+          variant="form-section"
+        >
           <Form className="form-horizontal">
             <div className="form-group">
               <div className="col-sm-12">
