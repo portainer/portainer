@@ -160,9 +160,7 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 							err := handler.PendingActionsService.Create(portainer.PendingAction{
 								EndpointID: endpointID,
 								Action:     pendingActionActions.CleanNAPWithOverridePolicies,
-								ActionData: &pendingActionActions.CleanNAPWithOverridePolicies{
-									EndpointGroupID: endpointGroupID,
-								},
+								ActionData: endpointGroupID,
 							})
 							if err != nil {
 								log.Error().Err(err).Msgf("Unable to create pending action to clean NAP with override policies for endpoint (%d) and endpoint group (%d).", endpointID, endpointGroupID)
