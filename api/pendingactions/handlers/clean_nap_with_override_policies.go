@@ -25,12 +25,23 @@ func NewHandlerCleanNAPWithOverridePolicies(
 }
 
 func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
-	if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
+	if pendingAction.ActionData == nil {
 		h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, nil)
 		return nil
 	}
 
-	endpointGroupID := pendingAction.ActionData.(portainer.EndpointGroupID)
+	var endpointGroupID portainer.EndpointGroupID
+	err := pendingAction.UnmarshallActionData(&endpointGroupID)
+	if err != nil {
+		log.Error().Err(err).Msgf("Error unmarshalling endpoint group ID for cleaning NAP with override policies for environment %d", endpoint.ID)
+		return fmt.Errorf("failed to unmarshal endpoint group ID for cleaning NAP with override policies for environment %d: %w", endpoint.ID, err)
+	}
+
+	if endpointGroupID == 0 {
+		h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, nil)
+		return nil
+	}
+
 	endpointGroup, err := h.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
 	if err != nil {
 		log.Error().Err(err).Msgf("Error reading environment group to clean NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)

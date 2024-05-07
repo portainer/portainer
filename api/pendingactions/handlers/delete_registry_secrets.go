@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/rs/zerolog/log"
 )
 
 type HandlerDeleteRegistrySecrets struct {
@@ -33,13 +30,14 @@ type DeletePortainerK8sRegistrySecretsData struct {
 	Namespaces []string             `json:"Namespaces"`
 }
 
-func (h *HandlerDeleteRegistrySecrets) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
-	if endpoint == nil || pendingAction.ActionData == nil {
+func (h *HandlerDeleteRegistrySecrets) Execute(pa portainer.PendingAction, endpoint *portainer.Endpoint) error {
+	if endpoint == nil || pa.ActionData == nil {
 		return nil
 	}
 
-	registryData, err := convertToDeletePortainerK8sRegistrySecretsData(pendingAction.ActionData)
-	if err != nil || registryData == nil {
+	var registryData DeletePortainerK8sRegistrySecretsData
+	err := pa.UnmarshallActionData(&registryData)
+	if err != nil {
 		return err
 	}
 
@@ -56,47 +54,4 @@ func (h *HandlerDeleteRegistrySecrets) Execute(pendingAction portainer.PendingAc
 	}
 
 	return nil
-}
-
-// Failure in this code is basically a bug.  So if we get one we should log it and continue.
-func convertToDeletePortainerK8sRegistrySecretsData(actionData any) (*DeletePortainerK8sRegistrySecretsData, error) {
-	var registryData DeletePortainerK8sRegistrySecretsData
-
-	// Due to the way data is stored and subsequently read from the database, we can't directly type assert the actionData to
-	// the type DeletePortainerK8sRegistrySecretsData.  It's stored as a map[string]any and we need to extract the
-	// data from that map.
-	if data, ok := actionData.(map[string]any); ok {
-		for key, value := range data {
-			switch key {
-			case "Namespaces":
-				if namespaces, ok := value.([]any); ok {
-					registryData.Namespaces = make([]string, len(namespaces))
-					for i, ns := range namespaces {
-						if namespace, ok := ns.(string); ok {
-							registryData.Namespaces[i] = namespace
-						}
-					}
-				} else {
-					// we shouldn't ever see this.  It's a bug if we do.
-					log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: Failed to convert Namespaces to []any")
-				}
-			case "RegistryID":
-				if registryID, ok := value.(float64); ok {
-					registryData.RegistryID = portainer.RegistryID(registryID)
-				} else {
-					// we shouldn't ever see this.  It's a bug if we do.
-					log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: Failed to convert RegistryID to float64")
-				}
-			}
-		}
-
-		log.Debug().Msgf("DeletePortainerK8sRegistrySecrets: %+v", registryData)
-	} else {
-		// this should not happen.  It's a bug if it does. As the actionData is defined
-		// by what portainer puts in it.  It never comes from a user or external source so it shouldn't fail.
-		// Nevertheless we should check it in case of db corruption or developer mistake down the road
-		return nil, fmt.Errorf("type assertion failed in convertToDeletePortainerK8sRegistrySecretsData")
-	}
-
-	return &registryData, nil
 }
