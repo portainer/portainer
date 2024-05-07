@@ -147,10 +147,10 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
 	defer cache.Del(endpointID)
 
-	tunnel := service.getTunnelDetails(endpointID)
-
 	service.mu.Lock()
 	defer service.mu.Unlock()
+
+	tunnel := service.getTunnelDetails(endpointID)
 
 	if tunnel.Port == 0 {
 		endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
