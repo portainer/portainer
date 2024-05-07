@@ -1,12 +1,17 @@
 import { FormikErrors } from 'formik';
 import { SchemaOf, string } from 'yup';
+import { useMemo } from 'react';
 
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
 import { EdgeStack } from '../types';
+import { useEdgeStacks } from '../queries/useEdgeStacks';
+import { useEdgeGroups } from '../../edge-groups/queries/useEdgeGroups';
+import { EdgeGroup } from '../../edge-groups/types';
 
 export function NameField({
   onChange,
@@ -24,7 +29,7 @@ export function NameField({
         onChange={(e) => onChange(e.target.value)}
         value={value}
         required
-        data-cy="edge-stack-create-name-input"
+        data-cy="edgeStackCreate-nameInput"
       />
     </FormControl>
   );
@@ -48,4 +53,24 @@ export function nameValidation(
   }
 
   return schema;
+}
+
+export function useNameValidation() {
+  const edgeStacksQuery = useEdgeStacks();
+  const edgeGroupsQuery = useEdgeGroups({
+    select: (groups) =>
+      Object.fromEntries(groups.map((g) => [g.Id, g.EndpointTypes])),
+  });
+  const edgeGroupsType = edgeGroupsQuery.data;
+
+  return useMemo(
+    () => (groupIds: Array<EdgeGroup['Id']>) =>
+      nameValidation(
+        edgeStacksQuery.data || [],
+        groupIds
+          .flatMap((g) => edgeGroupsType?.[g])
+          ?.includes(EnvironmentType.EdgeAgentOnDocker)
+      ),
+    [edgeGroupsType, edgeStacksQuery.data]
+  );
 }

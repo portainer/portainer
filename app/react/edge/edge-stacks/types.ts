@@ -101,7 +101,4 @@ export type EdgeStack = RelativePathModel & {
   FilesystemPath?: string;
 };
 
-export enum EditorType {
-  Compose,
-  Kubernetes,
-}
+export { DeploymentType as EditorType };

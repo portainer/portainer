@@ -6,8 +6,8 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { FileUploadField } from '@@/form-components/FileUpload/FileUploadField';
 
 export interface Props {
-  onChange(value: unknown): void;
-  value?: File;
+  onChange(value?: File): void;
+  value: File | undefined;
   title?: string;
   required?: boolean;
   description: ReactNode;

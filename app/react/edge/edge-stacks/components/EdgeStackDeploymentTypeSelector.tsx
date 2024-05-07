@@ -1,6 +1,4 @@
-import _ from 'lodash';
-
-import { EditorType } from '@/react/edge/edge-stacks/types';
+import { DeploymentType } from '@/react/edge/edge-stacks/types';
 
 import { BoxSelector } from '@@/BoxSelector';
 import { BoxSelectorOption } from '@@/BoxSelector/types';
@@ -10,8 +8,8 @@ import {
 } from '@@/BoxSelector/common-options/deployment-methods';
 
 interface Props {
-  value: number;
-  onChange(value: number): void;
+  value: DeploymentType;
+  onChange(value: DeploymentType): void;
   hasDockerEndpoint: boolean;
   hasKubeEndpoint: boolean;
   allowKubeToSelectCompose?: boolean;
@@ -24,10 +22,10 @@ export function EdgeStackDeploymentTypeSelector({
   hasKubeEndpoint,
   allowKubeToSelectCompose,
 }: Props) {
-  const deploymentOptions: BoxSelectorOption<number>[] = _.compact([
+  const deploymentOptions: BoxSelectorOption<DeploymentType>[] = [
     {
       ...compose,
-      value: EditorType.Compose,
+      value: DeploymentType.Compose,
       disabled: () => !allowKubeToSelectCompose && hasKubeEndpoint,
       tooltip: () =>
         hasKubeEndpoint
@@ -36,7 +34,7 @@ export function EdgeStackDeploymentTypeSelector({
     },
     {
       ...kubernetes,
-      value: EditorType.Kubernetes,
+      value: DeploymentType.Kubernetes,
       disabled: () => hasDockerEndpoint,
       tooltip: () =>
         hasDockerEndpoint
@@ -44,7 +42,7 @@ export function EdgeStackDeploymentTypeSelector({
           : '',
       iconType: 'logo',
     },
-  ]);
+  ];
 
   return (
     <>

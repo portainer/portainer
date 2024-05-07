@@ -1,9 +1,8 @@
-import { useCallback } from 'react';
+import { FormikErrors } from 'formik';
 
 import { GitFormModel } from '@/react/portainer/gitops/types';
 import { PathSelector } from '@/react/portainer/gitops/ComposePathField/PathSelector';
 import { dummyGitForm } from '@/react/portainer/gitops/RelativePathFieldset/utils';
-import { useValidation } from '@/react/portainer/gitops/RelativePathFieldset/useValidation';
 import { useEnableFsPath } from '@/react/portainer/gitops/RelativePathFieldset/useEnableFsPath';
 
 import { SwitchField } from '@@/form-components/SwitchField';
@@ -15,27 +14,22 @@ import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 import { RelativePathModel, getPerDevConfigsFilterType } from './types';
 
 interface Props {
-  value: RelativePathModel;
+  values: RelativePathModel;
   gitModel?: GitFormModel;
-  onChange?: (value: Partial<RelativePathModel>) => void;
+  onChange: (value: RelativePathModel) => void;
   isEditing?: boolean;
   hideEdgeConfigs?: boolean;
+  errors?: FormikErrors<RelativePathModel>;
 }
 
 export function RelativePathFieldset({
-  value,
+  values: value,
   gitModel,
-  onChange,
+  onChange = () => {},
   isEditing,
   hideEdgeConfigs,
+  errors,
 }: Props) {
-  const innerOnChange = useCallback(
-    (value: Partial<RelativePathModel>) => onChange && onChange(value),
-    [onChange]
-  );
-
-  const { errors } = useValidation(value);
-
   const { enableFsPath0, enableFsPath1, toggleFsPath } = useEnableFsPath(value);
 
   const gitoptsEdgeConfigDocUrl = useDocsUrl(
@@ -63,7 +57,7 @@ export function RelativePathFieldset({
             checked={value.SupportRelativePath}
             onChange={(value) => {
               toggleFsPath(0, value);
-              innerOnChange({ SupportRelativePath: value });
+              handleChange({ SupportRelativePath: value });
             }}
           />
         </div>
@@ -83,7 +77,7 @@ export function RelativePathFieldset({
             <div className="col-sm-12">
               <FormControl
                 label="Local filesystem path"
-                errors={errors.FilesystemPath}
+                errors={errors?.FilesystemPath}
               >
                 <Input
                   name="FilesystemPath"
@@ -92,7 +86,7 @@ export function RelativePathFieldset({
                   disabled={isEditing || !enableFsPath0}
                   value={value.FilesystemPath}
                   onChange={(e) =>
-                    innerOnChange({ FilesystemPath: e.target.value })
+                    handleChange({ FilesystemPath: e.target.value })
                   }
                 />
               </FormControl>
@@ -124,7 +118,7 @@ export function RelativePathFieldset({
                 checked={!!value.SupportPerDeviceConfigs}
                 onChange={(value) => {
                   toggleFsPath(1, value);
-                  innerOnChange({ SupportPerDeviceConfigs: value });
+                  handleChange({ SupportPerDeviceConfigs: value });
                 }}
               />
             </div>
@@ -147,7 +141,7 @@ export function RelativePathFieldset({
                   <div className="col-sm-12">
                     <FormControl
                       label="Local filesystem path"
-                      errors={errors.FilesystemPath}
+                      errors={errors?.FilesystemPath}
                     >
                       <Input
                         name="FilesystemPath"
@@ -156,7 +150,7 @@ export function RelativePathFieldset({
                         disabled={isEditing || !enableFsPath1}
                         value={value.FilesystemPath}
                         onChange={(e) =>
-                          innerOnChange({ FilesystemPath: e.target.value })
+                          handleChange({ FilesystemPath: e.target.value })
                         }
                       />
                     </FormControl>
@@ -178,13 +172,13 @@ export function RelativePathFieldset({
                 <div className="col-sm-12">
                   <FormControl
                     label="Directory"
-                    errors={errors.PerDeviceConfigsPath}
+                    errors={errors?.PerDeviceConfigsPath}
                     inputId="per_device_configs_path_input"
                   >
                     <PathSelector
                       value={value.PerDeviceConfigsPath || ''}
                       onChange={(value) =>
-                        innerOnChange({ PerDeviceConfigsPath: value })
+                        handleChange({ PerDeviceConfigsPath: value })
                       }
                       placeholder="config"
                       model={gitModel || dummyGitForm}
@@ -216,7 +210,7 @@ export function RelativePathFieldset({
                       value={value.PerDeviceConfigsMatchType}
                       data-cy="per-device-configs-match-type-select"
                       onChange={(e) =>
-                        innerOnChange({
+                        handleChange({
                           PerDeviceConfigsMatchType: getPerDevConfigsFilterType(
                             e.target.value
                           ),
@@ -249,7 +243,7 @@ export function RelativePathFieldset({
                       value={value.PerDeviceConfigsGroupMatchType}
                       data-cy="per-device-configs-group-match-type-select"
                       onChange={(e) =>
-                        innerOnChange({
+                        handleChange({
                           PerDeviceConfigsGroupMatchType:
                             getPerDevConfigsFilterType(e.target.value),
                         })
@@ -301,4 +295,8 @@ export function RelativePathFieldset({
       )}
     </>
   );
+
+  function handleChange(newValue: Partial<RelativePathModel>) {
+    onChange({ ...value, ...newValue });
+  }
 }

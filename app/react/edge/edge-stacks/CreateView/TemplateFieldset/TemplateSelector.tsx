@@ -4,6 +4,8 @@ import { GroupBase } from 'react-select';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { useAppTemplates } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
 import { TemplateType } from '@/react/portainer/templates/app-templates/types';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
+import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select as ReactSelect } from '@@/form-components/ReactSelect';
@@ -16,10 +18,13 @@ export function TemplateSelector({
   error,
 }: {
   value: SelectedTemplateValue;
-  onChange: (value: SelectedTemplateValue) => void;
+  onChange: (
+    template: TemplateViewModel | CustomTemplate | undefined,
+    type: 'app' | 'custom' | undefined
+  ) => void;
   error?: string;
 }) {
-  const { getTemplate, options } = useOptions();
+  const { options, getTemplate } = useOptions();
 
   return (
     <FormControl label="Template" inputId="template_selector" errors={error}>
@@ -28,26 +33,20 @@ export function TemplateSelector({
         formatGroupLabel={GroupLabel}
         placeholder="Select an Edge stack template"
         value={{
-          label: value.template?.Title,
-          id: value.template?.Id,
+          templateId: value.templateId,
           type: value.type,
         }}
         onChange={(value) => {
           if (!value) {
-            onChange({
-              template: undefined,
-              type: undefined,
-            });
+            onChange(undefined, undefined);
             return;
           }
 
-          const { id, type } = value;
-          if (!id || type === undefined) {
+          const { templateId, type } = value;
+          if (!templateId || type === undefined) {
             return;
           }
-
-          const template = getTemplate({ id, type });
-          onChange({ template, type } as SelectedTemplateValue);
+          onChange(getTemplate({ type, id: templateId }), type);
         }}
         options={options}
         data-cy="edge-stacks-create-template-selector"
@@ -80,7 +79,8 @@ function useOptions() {
           options:
             appTemplatesQuery.data?.map((template) => ({
               label: `${template.Title} - ${template.Description}`,
-              id: template.Id,
+
+              templateId: template.Id,
               type: 'app' as 'app' | 'custom',
             })) || [],
         },
@@ -90,14 +90,16 @@ function useOptions() {
             customTemplatesQuery.data && customTemplatesQuery.data.length > 0
               ? customTemplatesQuery.data.map((template) => ({
                   label: `${template.Title} - ${template.Description}`,
-                  id: template.Id,
+
+                  templateId: template.Id,
                   type: 'custom' as 'app' | 'custom',
                 }))
               : [
                   {
                     label: 'No edge custom templates available',
-                    id: 0,
-                    type: 'custom' as 'app' | 'custom',
+
+                    templateId: undefined,
+                    type: undefined,
                   },
                 ],
         },

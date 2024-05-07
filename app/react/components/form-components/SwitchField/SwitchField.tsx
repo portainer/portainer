@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import uuid from 'uuid';
-import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
+import { ComponentProps, PropsWithChildren, ReactNode, useState } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { AutomationTestingProps } from '@/types';
@@ -33,7 +33,7 @@ export function SwitchField({
   checked,
   label,
   index,
-  name = uuid(),
+  name,
   labelClass,
   fieldClass,
   'data-cy': dataCy,
@@ -44,13 +44,14 @@ export function SwitchField({
   setTooltipHtmlMessage,
   valueExplanation,
 }: PropsWithChildren<Props>) {
+  const [toggleId] = useState(() => `toggle_${uuid()}`);
   const toggleName = name ? `toggle_${name}` : '';
 
   return (
     <div className={clsx(styles.root, fieldClass)}>
       <label
         className={clsx('space-right control-label !p-0 text-left', labelClass)}
-        htmlFor={toggleName}
+        htmlFor={toggleId}
       >
         {label}
         {tooltip && (
@@ -60,7 +61,7 @@ export function SwitchField({
       <Switch
         className={clsx('space-right', switchClass)}
         name={toggleName}
-        id={toggleName}
+        id={toggleId}
         checked={checked}
         disabled={disabled}
         onChange={onChange}

@@ -8,10 +8,10 @@ import { Link } from '@@/Link';
 
 export function LogView() {
   const {
-    params: { endpointId: environmentId, id: containerId },
+    params: { endpointId: environmentId, id: containerId, nodeName },
   } = useCurrentStateAndParams();
 
-  const containerQuery = useContainer(environmentId, containerId);
+  const containerQuery = useContainer(environmentId, containerId, nodeName);
   if (!containerQuery.data || containerQuery.isLoading) {
     return null;
   }
