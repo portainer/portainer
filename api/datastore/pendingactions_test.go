@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -68,8 +67,6 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 					if endpointPendingAction.Action == actions.CleanNAPWithOverridePolicies {
 						var endpointGroupID portainer.EndpointGroupID
 						err := endpointPendingAction.UnmarshallActionData(&endpointGroupID)
-
-						fmt.Printf("endpointGroupID: %v err=%v\n", endpointGroupID, err)
 
 						if d.Err && err == nil {
 							t.Error(err)
