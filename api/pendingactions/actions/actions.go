@@ -1,7 +1,7 @@
 package actions
 
 const (
-	CleanNAPWithOverridePolicies = "CleanNAPWithOverridePolicies"
-	DeleteK8sRegistrySecrets     = "DeleteK8sRegistrySecrets"
-	PostInitMigrateEnvironment   = "PostInitMigrateEnvironment"
+	CleanNAPWithOverridePolicies      = "CleanNAPWithOverridePolicies"
+	DeletePortainerK8sRegistrySecrets = "DeletePortainerK8sRegistrySecrets"
+	PostInitMigrateEnvironment        = "PostInitMigrateEnvironment"
 )
