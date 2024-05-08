@@ -6,14 +6,38 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/pendingactions/actions"
 	"github.com/rs/zerolog/log"
 )
 
-type HandlerCleanNAPWithOverridePolicies struct {
-	authorizationService *authorization.Service
-	dataStore            dataservices.DataStore
+type (
+	cleanNAPWithOverridePolicies struct {
+		EndpointGroupID portainer.EndpointGroupID
+	}
+
+	HandlerCleanNAPWithOverridePolicies struct {
+		authorizationService *authorization.Service
+		dataStore            dataservices.DataStore
+	}
+)
+
+// NewCleanNAPWithOverridePolicies creates a new CleanNAPWithOverridePolicies pending action
+func NewCleanNAPWithOverridePolicies(endpointID portainer.EndpointID, gid *portainer.EndpointGroupID) portainer.PendingAction {
+	pendingAction := portainer.PendingAction{
+		EndpointID: endpointID,
+		Action:     actions.CleanNAPWithOverridePolicies,
+	}
+
+	if gid != nil {
+		pendingAction.ActionData = cleanNAPWithOverridePolicies{
+			EndpointGroupID: *gid,
+		}
+	}
+
+	return pendingAction
 }
 
+// NewHandlerCleanNAPWithOverridePolicies creates a new handler to execute CleanNAPWithOverridePolicies pending action
 func NewHandlerCleanNAPWithOverridePolicies(
 	authorizationService *authorization.Service,
 	dataStore dataservices.DataStore,
@@ -30,22 +54,22 @@ func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.Pe
 		return nil
 	}
 
-	var endpointGroupID portainer.EndpointGroupID
-	err := pendingAction.UnmarshallActionData(&endpointGroupID)
+	var payload cleanNAPWithOverridePolicies
+	err := pendingAction.UnmarshallActionData(&payload)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error unmarshalling endpoint group ID for cleaning NAP with override policies for environment %d", endpoint.ID)
 		return fmt.Errorf("failed to unmarshal endpoint group ID for cleaning NAP with override policies for environment %d: %w", endpoint.ID, err)
 	}
 
-	if endpointGroupID == 0 {
+	if payload.EndpointGroupID == 0 {
 		h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, nil)
 		return nil
 	}
 
-	endpointGroup, err := h.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
+	endpointGroup, err := h.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(payload.EndpointGroupID))
 	if err != nil {
 		log.Error().Err(err).Msgf("Error reading environment group to clean NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)
-		return fmt.Errorf("failed to retrieve environment group %d: %w", endpointGroupID, err)
+		return fmt.Errorf("failed to retrieve environment group %d: %w", payload.EndpointGroupID, err)
 	}
 
 	err = h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, endpointGroup)

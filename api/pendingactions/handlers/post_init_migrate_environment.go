@@ -21,6 +21,7 @@ type HandlerPostInitMigrateEnvironment struct {
 	kubernetesDeployer   portainer.KubernetesDeployer
 }
 
+// NewPostInitMigrateEnvironment creates a new PostInitMigrateEnvironment pending action
 func NewHandlerPostInitMigrateEnvironment(
 	authorizationService *authorization.Service,
 	dataStore dataservices.DataStore,
