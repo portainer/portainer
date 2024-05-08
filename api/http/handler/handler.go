@@ -199,7 +199,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/kubernetes"):
 		http.StripPrefix("/api", h.KubernetesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/docker"):
-		http.StripPrefix("/api/docker", h.DockerHandler).ServeHTTP(w, r)
+		http.StripPrefix("/api", h.DockerHandler).ServeHTTP(w, r)
 
 	// Helm subpath under kubernetes -> /api/endpoints/{id}/kubernetes/helm
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints/") && strings.Contains(r.URL.Path, "/kubernetes/helm"):
