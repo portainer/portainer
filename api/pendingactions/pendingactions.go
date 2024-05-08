@@ -117,12 +117,18 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 
 	switch pendingAction.Action {
 	case actions.CleanNAPWithOverridePolicies:
-		if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
+		pendingActionData, err := actions.ConvertCleanNAPWithOverridePoliciesPayload(pendingAction.ActionData)
+		if err != nil {
+			return fmt.Errorf("failed to parse pendingActionData for CleanNAPWithOverridePoliciesPayload")
+		}
+
+		if pendingActionData == nil || pendingActionData.EndpointGroupID == 0 {
 			service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, nil)
 			return nil
 		}
 
-		endpointGroupID := pendingAction.ActionData.(portainer.EndpointGroupID)
+		endpointGroupID := pendingActionData.EndpointGroupID
+
 		endpointGroup, err := service.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
 		if err != nil {
 			log.Error().Err(err).Msgf("Error reading environment group to clean NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)
