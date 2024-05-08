@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
@@ -17,6 +18,26 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type DeleteMultiplePayload struct {
+	Endpoints []struct {
+		ID            int    `json:"id"`
+		Name          string `json:"name"`
+		DeleteCluster bool   `json:"deleteCluster"`
+	} `json:"environments"`
+}
+
+func (payload *DeleteMultiplePayload) Validate(r *http.Request) error {
+	if payload == nil || len(payload.Endpoints) == 0 {
+		return fmt.Errorf("invalid request payload; you must provide a list of nodes to delete")
+	}
+	return nil
+}
+
+type DeleteMultipleResp struct {
+	Name string `json:"name"`
+	Err  error  `json:"err"`
+}
+
 // @id EndpointDelete
 // @summary Remove an environment(endpoint)
 // @description Remove an environment(endpoint).
@@ -31,6 +52,7 @@ import (
 // @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id} [delete]
+// @deprecated
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -60,6 +82,53 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.Empty(w)
+}
+
+// @id EndpointDeleteMultiple
+// @summary Remove multiple environment(endpoint)s
+// @description Remove multiple environment(endpoint)s.
+// @description **Access policy**: administrator
+// @tags endpoints
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body DeleteMultiplePayload true "List of endpoints to delete"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Environment(Endpoint) not found"
+// @failure 500 "Server error"
+// @router /endpoints/remove [post]
+func (handler *Handler) endpointDeleteMultiple(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var p DeleteMultiplePayload
+	err := request.DecodeAndValidateJSONPayload(r, &p)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	var resps []DeleteMultipleResp
+	for _, e := range p.Endpoints {
+		// Demo endpoints cannot be deleted.
+		if handler.demoService.IsDemoEnvironment(portainer.EndpointID(e.ID)) {
+			resps = append(resps, DeleteMultipleResp{
+				Name: e.Name,
+				Err:  httperrors.ErrNotAvailableInDemo,
+			})
+			continue
+		}
+
+		// Attempt deletion.
+		err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return handler.deleteEndpoint(
+				tx,
+				portainer.EndpointID(e.ID),
+				e.DeleteCluster,
+			)
+		})
+		resps = append(resps, DeleteMultipleResp{Name: e.Name, Err: err})
+	}
+	return response.JSON(w, resps)
 }
 
 func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID portainer.EndpointID, deleteCluster bool) error {
