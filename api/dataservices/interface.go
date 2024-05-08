@@ -71,7 +71,7 @@ type (
 	}
 
 	PendingActionsService interface {
-		BaseCRUD[portainer.PendingActions, portainer.PendingActionsID]
+		BaseCRUD[portainer.PendingAction, portainer.PendingActionID]
 		GetNextIdentifier() int
 		DeleteByEndpointID(ID portainer.EndpointID) error
 	}

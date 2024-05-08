@@ -381,15 +381,6 @@ type (
 	// EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
-	PendingActionsID int
-	PendingActions   struct {
-		ID         PendingActionsID `json:"ID"`
-		EndpointID EndpointID       `json:"EndpointID"`
-		Action     string           `json:"Action"`
-		ActionData interface{}      `json:"ActionData"`
-		CreatedAt  int64            `json:"CreatedAt"`
-	}
-
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
 	Endpoint struct {

@@ -239,8 +239,11 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.20.2",
 		m.cleanPendingActionsForDeletedEndpointsForDB111,
 	)
+	m.addMigrations("2.22.0",
+		m.migratePendingActionsDataForDB130,
+	)
 
-	// Add new migrations below...
+	// Add new migrations above...
 	// One function per migration, each versions migration funcs in the same file.
 }
 
