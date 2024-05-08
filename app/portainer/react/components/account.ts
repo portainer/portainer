@@ -26,7 +26,8 @@ export const accountModule = angular
   )
   .component(
     'accessTokensDatatable',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(AccessTokensDatatable))), [
-      'canExit',
-    ])
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(AccessTokensDatatable))),
+      []
+    )
   ).name;
