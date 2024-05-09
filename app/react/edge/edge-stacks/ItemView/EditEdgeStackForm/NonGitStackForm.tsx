@@ -104,7 +104,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
 
   async function handleSubmit(values: FormValues) {
     let rePullImage = false;
-    if (values.deploymentType === DeploymentType.Compose) {
+    if (isBE && values.deploymentType === DeploymentType.Compose) {
       const defaultToggle = values.prePullImage;
       const result = await confirmStackUpdate(
         'Do you want to force an update of the stack?',
