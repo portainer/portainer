@@ -32,7 +32,7 @@ func NewEdgeTransport(dataStore dataservices.DataStore, signatureService portain
 	return transport
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	token, err := transport.getRoundTripToken(request, transport.tokenManager)
 	if err != nil {

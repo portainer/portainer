@@ -31,7 +31,7 @@ export function useSidebarSrefActive(
   const { state: { name: stateName = '' } = {} } = useCurrentStateAndParams();
   const anchorProps = useSrefActive(to, params || {}, activeClassName, options);
 
-  // overwrite the className to '' if the the current route is in ignorePaths
+  // overwrite the className to '' if the current route is in ignorePaths
   const isIgnorePathInRoute = pathOptions.ignorePaths?.some((path) =>
     stateName.includes(path)
   );
@@ -39,7 +39,7 @@ export function useSidebarSrefActive(
     return { ...anchorProps, className: '' };
   }
 
-  // overwrite the className to activeClassName if the the current route is in includePaths
+  // overwrite the className to activeClassName if the current route is in includePaths
   const isIncludePathInRoute = pathOptions.includePaths?.some((path) =>
     stateName.includes(path)
   );

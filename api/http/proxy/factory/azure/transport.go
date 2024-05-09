@@ -46,7 +46,7 @@ func NewTransport(credentials *portainer.AzureCredentials, dataStore dataservice
 	}
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return transport.proxyAzureRequest(request)
 }

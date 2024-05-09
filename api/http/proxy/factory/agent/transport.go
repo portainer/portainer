@@ -22,7 +22,7 @@ func NewTransport(signatureService portainer.DigitalSignatureService, httpTransp
 	return transport
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {

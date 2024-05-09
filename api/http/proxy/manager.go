@@ -33,7 +33,7 @@ func NewManager(dataStore dataservices.DataStore, signatureService portainer.Dig
 	}
 }
 
-// CreateAndRegisterEndpointProxy creates a new HTTP reverse proxy based on environment(endpoint) properties and and adds it to the registered proxies.
+// CreateAndRegisterEndpointProxy creates a new HTTP reverse proxy based on environment(endpoint) properties and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
 func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	proxy, err := manager.proxyFactory.NewEndpointProxy(endpoint)
@@ -45,7 +45,7 @@ func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpo
 	return proxy, nil
 }
 
-// CreateAgentProxyServer creates a new HTTP reverse proxy based on environment(endpoint) properties and and adds it to the registered proxies.
+// CreateAgentProxyServer creates a new HTTP reverse proxy based on environment(endpoint) properties and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
 func (manager *Manager) CreateAgentProxyServer(endpoint *portainer.Endpoint) (*factory.ProxyServer, error) {
 	return manager.proxyFactory.NewAgentProxy(endpoint)
