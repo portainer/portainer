@@ -46,7 +46,7 @@ func (service *PendingActionsService) Create(action portainer.PendingAction) err
 		// Same endpoint, same action and data, don't create a repeat
 		if dba.EndpointID == action.EndpointID && dba.Action == action.Action &&
 			reflect.DeepEqual(dba.ActionData, action.ActionData) {
-			log.Debug().Msgf("pending action %s already exists for environment %d", action.Action, action.EndpointID)
+			log.Debug().Msgf("pending action %s already exists for environment %d, skipping...", action.Action, action.EndpointID)
 			return nil
 		}
 	}
@@ -54,37 +54,35 @@ func (service *PendingActionsService) Create(action portainer.PendingAction) err
 	return service.dataStore.PendingActions().Create(&action)
 }
 
-func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
+func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
 	endpoint, err := service.dataStore.Endpoint().Endpoint(id)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve environment %d: %w", id, err)
+		log.Debug().Msgf("failed to retrieve environment %d: %v", id, err)
+		return
 	}
 
 	isKubernetesEndpoint := endpointutils.IsKubernetesEndpoint(endpoint) && !endpointutils.IsEdgeEndpoint(endpoint)
 
 	// EndpointStatusUp is only relevant for non-Kubernetes endpoints
 	// Sometimes the endpoint is UP but the status is not updated in the database
-	if !isKubernetesEndpoint && endpoint.Status != portainer.EndpointStatusUp {
-		log.Debug().Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
-		return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
-	}
-
-	// For Kubernetes endpoints, we need to check if the endpoint is up by creating a kube client
-	if isKubernetesEndpoint {
-		_, err := service.kubeFactory.GetKubeClient(endpoint)
-		if err != nil {
-			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
-			return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
+	if !isKubernetesEndpoint {
+		if endpoint.Status != portainer.EndpointStatusUp {
+			return
+		}
+	} else {
+		// For Kubernetes endpoints, we need to check if the client can be created
+		if _, err := service.kubeFactory.GetKubeClient(endpoint); err != nil {
+			return
 		}
 	}
 
 	pendingActions, err := service.dataStore.PendingActions().ReadAll()
 	if err != nil {
-		log.Error().Err(err).Msgf("failed to retrieve pending actions")
-		return fmt.Errorf("failed to retrieve pending actions for environment %d: %w", id, err)
+		log.Warn().Msgf("failed to read pending actions: %v", err)
+		return
 	}
 
 	log.Debug().Msgf("Executing pending actions for environment %d", id)
@@ -93,21 +91,19 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 			log.Debug().Msgf("Executing pendingAction id=%d, action=%s", pendingAction.ID, pendingAction.Action)
 			err := service.executePendingAction(pendingAction, endpoint)
 			if err != nil {
-				log.Warn().Err(err).Msgf("failed to execute pending action")
-				return fmt.Errorf("failed to execute pending action: %w", err)
+				log.Warn().Msgf("failed to execute pending action: %v", err)
+				return
 			}
 
 			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
 			if err != nil {
-				log.Error().Err(err).Msgf("failed to delete pending action")
-				return fmt.Errorf("failed to delete pending action: %w", err)
+				log.Warn().Msgf("failed to delete pending action: %w", err)
+				return
 			}
 
 			log.Debug().Msgf("Pending action %d finished", pendingAction.ID)
 		}
 	}
-
-	return nil
 }
 
 func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
