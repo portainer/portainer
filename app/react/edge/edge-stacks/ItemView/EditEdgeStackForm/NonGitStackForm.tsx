@@ -13,7 +13,10 @@ import {
 } from '@/react/edge/edge-stacks/types';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { WebhookSettings } from '@/react/portainer/gitops/AutoUpdateFieldset/WebhookSettings';
-import { baseEdgeStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import {
+  baseEdgeStackWebhookUrl,
+  createWebhookId,
+} from '@/portainer/helpers/webhookHelper';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { confirmStackUpdate } from '@/react/common/stacks/common/confirm-stack-update';
@@ -138,7 +141,9 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
         rePullImage,
         retryDeploy: values.retryDeploy,
         updateVersion,
-        webhook: values.webhookEnabled ? edgeStack.Webhook : undefined,
+        webhook: values.webhookEnabled
+          ? edgeStack.Webhook || createWebhookId()
+          : undefined,
         envVars: values.envVars,
         rollbackTo: values.rollbackTo,
         staggerConfig: values.staggerConfig,
