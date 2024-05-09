@@ -1,5 +1,7 @@
 import clsx from 'clsx';
-import { ReactNode } from 'react';
+import { ComponentProps, ReactNode } from 'react';
+
+import { Button } from '@@/buttons';
 
 import styles from './NavTabs.module.css';
 
@@ -8,10 +10,11 @@ export interface Option<T extends string | number = string> {
   children?: ReactNode;
   id: T;
   hidden?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 interface Props<T extends string | number> {
-  options: Option<T>[];
+  options: Array<Option<T>> | ReadonlyArray<Option<T>>;
   selectedId?: T;
   onSelect?(id: T): void;
   disabled?: boolean;
@@ -47,18 +50,16 @@ export function NavTabs<T extends string | number = string>({
               >
                 {/* rule disabled because `nav-tabs` requires an anchor */}
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                <a
+                <Button
+                  color="none"
                   onClick={() => handleSelect(option)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelect(option);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  as="a"
+                  data-cy="nav-tab-button"
+                  className="!flex"
+                  icon={option.icon}
                 >
                   {option.label}
-                </a>
+                </Button>
               </li>
             )
         )}

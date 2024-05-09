@@ -51,7 +51,7 @@ export function InnerForm({
     isSubmitting,
     dirty,
   } = useFormikContext<FormValues>();
-
+  console.log({ isEditorReadonly, isSubmitting, isLoading });
   usePreventExit(
     initialValues.FileContent,
     values.FileContent,

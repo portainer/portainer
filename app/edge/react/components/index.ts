@@ -6,22 +6,15 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
-import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
-import { EditEdgeStackForm } from '@/react/edge/edge-stacks/ItemView/EditEdgeStackForm/EditEdgeStackForm';
-import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
-import { EnvironmentsDatatable } from '@/react/edge/edge-stacks/ItemView/EnvironmentsDatatable';
 
 import { edgeJobsModule } from './edge-jobs';
 
 const ngModule = angular
   .module('portainer.edge.react.components', [edgeJobsModule])
-  .component(
-    'edgeStackEnvironmentsDatatable',
-    r2a(withUIRouter(withReactQuery(EnvironmentsDatatable)), [])
-  )
+
   .component(
     'edgeGroupsSelector',
     r2a(withUIRouter(withReactQuery(EdgeGroupsSelector)), [
@@ -62,27 +55,6 @@ const ngModule = angular
       'isDefaultHidden',
       'readonly',
       'fieldSettings',
-    ])
-  )
-  .component(
-    'edgeStackDeploymentTypeSelector',
-    r2a(withReactQuery(EdgeStackDeploymentTypeSelector), [
-      'value',
-      'onChange',
-      'hasDockerEndpoint',
-      'hasKubeEndpoint',
-      'allowKubeToSelectCompose',
-    ])
-  )
-  .component(
-    'editEdgeStackForm',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(EditEdgeStackForm))), [
-      'edgeStack',
-      'fileContent',
-      'isSubmitting',
-      'onEditorChange',
-      'onSubmit',
-      'allowKubeToSelectCompose',
     ])
   )
   .component(
