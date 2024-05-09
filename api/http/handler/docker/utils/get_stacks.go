@@ -22,9 +22,9 @@ type StackViewModel struct {
 }
 
 // GetDockerStacks retrieves all the stacks associated to a specific environment filtered by the user's access.
-func GetDockerStacks(tx dataservices.DataStoreTx, securityContext *security.RestrictedRequestContext, environmentID portainer.EndpointID, containers []types.Container, services []swarm.Service) ([]StackViewModel, error) {
+func GetDockerStacks(datastore dataservices.DataStore, securityContext *security.RestrictedRequestContext, environmentID portainer.EndpointID, containers []types.Container, services []swarm.Service) ([]StackViewModel, error) {
 
-	stacks, err := tx.Stack().ReadAll()
+	stacks, err := datastore.Stack().ReadAll()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve stacks: %w", err)
 	}
@@ -73,7 +73,7 @@ func GetDockerStacks(tx dataservices.DataStoreTx, securityContext *security.Rest
 		stacksList = append(stacksList, *stack)
 	}
 
-	return FilterByResourceControl(tx, stacksList, portainer.StackResourceControl, securityContext, func(c StackViewModel) string {
+	return FilterByResourceControl(datastore, stacksList, portainer.StackResourceControl, securityContext, func(c StackViewModel) string {
 		return c.Name
 	})
 }
