@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { queryKeys } from '../queries/utils';
@@ -26,10 +26,16 @@ interface DashboardResponse {
 
 export function useDashboard(envId: EnvironmentId) {
   return useQuery({
-    queryFn: () =>
-      axios
-        .get<DashboardResponse>(`${buildDockerUrl(envId)}/dashboard`)
-        .then((res) => res.data),
+    queryFn: async () => {
+      try {
+        const res = await axios.get<DashboardResponse>(
+          `${buildDockerUrl(envId)}/dashboard`
+        );
+        return res.data;
+      } catch (error) {
+        throw parseAxiosError(error);
+      }
+    },
     queryKey: [...queryKeys.root(envId), 'dashboard'] as const,
   });
 }
