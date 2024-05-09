@@ -65,7 +65,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		DockerClientFactory:  factory.dockerClientFactory,
 	}
 
-	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport, factory.gitService)
+	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport, factory.gitService, factory.snapshotService)
 	if err != nil {
 		return nil, err
 	}
