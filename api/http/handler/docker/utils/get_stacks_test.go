@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	portaineree "github.com/portainer/portainer/api"
 	dockerconsts "github.com/portainer/portainer/api/docker/consts"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
@@ -45,47 +46,49 @@ func TestHandler_getDockerStacks(t *testing.T) {
 		},
 	}
 
+	stack1 := portaineree.Stack{
+		ID:         1,
+		Name:       "stack1",
+		EndpointID: 1,
+		Type:       portainer.DockerComposeStack,
+	}
+
 	datastore := testhelpers.NewDatastore(
 		testhelpers.WithEndpoints([]portaineree.Endpoint{*environment}),
 		testhelpers.WithStacks([]portaineree.Stack{
-			{
-				ID:         1,
-				Name:       "stack1",
-				EndpointID: 1,
-			},
+			stack1,
 			{
 				ID:         2,
 				Name:       "stack2",
 				EndpointID: 2,
+				Type:       portainer.DockerSwarmStack,
 			},
 		}),
 	)
 
-	stacksList, err := GetDockerStacks(datastore, environment.ID, containers, services)
+	stacksList, err := GetDockerStacks(datastore, &security.RestrictedRequestContext{
+		IsAdmin: true,
+	}, environment.ID, containers, services)
 	assert.NoError(t, err)
 	assert.Len(t, stacksList, 3)
 
 	expectedStacks := []StackViewModel{
 		{
-			InternalStack: &portaineree.Stack{
-				ID:         1,
-				Name:       "stack1",
-				EndpointID: 1,
-			},
-			ID:         1,
-			Name:       "stack1",
-			IsExternal: false,
-			IsOrphaned: false,
+			InternalStack: &stack1,
+			ID:            1,
+			Name:          "stack1",
+			IsExternal:    false,
+			Type:          portainer.DockerComposeStack,
 		},
 		{
 			Name:       "stack2",
 			IsExternal: true,
-			IsOrphaned: false,
+			Type:       portainer.DockerComposeStack,
 		},
 		{
 			Name:       "stack3",
 			IsExternal: true,
-			IsOrphaned: false,
+			Type:       portainer.DockerSwarmStack,
 		},
 	}
 
