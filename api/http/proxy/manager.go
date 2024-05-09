@@ -25,17 +25,24 @@ type (
 )
 
 // NewManager initializes a new proxy Service
-func NewManager(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *dockerclient.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager, gitService portainer.GitService) *Manager {
+func NewManager(kubernetesClientFactory *cli.ClientFactory) *Manager {
 	return &Manager{
 		endpointProxies:  cmap.New(),
 		k8sClientFactory: kubernetesClientFactory,
-		proxyFactory:     factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService),
 	}
+}
+
+func (manager *Manager) NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *dockerclient.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager, gitService portainer.GitService, snapshotService portainer.SnapshotService) {
+	manager.proxyFactory = factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService, snapshotService)
 }
 
 // CreateAndRegisterEndpointProxy creates a new HTTP reverse proxy based on environment(endpoint) properties and and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
 func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	if manager.proxyFactory == nil {
+		return nil, fmt.Errorf("proxy factory not init")
+	}
+
 	proxy, err := manager.proxyFactory.NewEndpointProxy(endpoint)
 	if err != nil {
 		return nil, err
@@ -48,6 +55,9 @@ func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpo
 // CreateAgentProxyServer creates a new HTTP reverse proxy based on environment(endpoint) properties and and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
 func (manager *Manager) CreateAgentProxyServer(endpoint *portainer.Endpoint) (*factory.ProxyServer, error) {
+	if manager.proxyFactory == nil {
+		return nil, fmt.Errorf("proxy factory not init")
+	}
 	return manager.proxyFactory.NewAgentProxy(endpoint)
 }
 
@@ -74,5 +84,8 @@ func (manager *Manager) DeleteEndpointProxy(endpointID portainer.EndpointID) {
 
 // CreateGitlabProxy creates a new HTTP reverse proxy that can be used to send requests to the Gitlab API
 func (manager *Manager) CreateGitlabProxy(url string) (http.Handler, error) {
+	if manager.proxyFactory == nil {
+		return nil, fmt.Errorf("proxy factory not init")
+	}
 	return manager.proxyFactory.NewGitlabProxy(url)
 }
