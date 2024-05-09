@@ -25,7 +25,7 @@ type (
 func NewDeleteK8sRegistrySecrets(endpointID portainer.EndpointID, registryID portainer.RegistryID, namespaces []string) portainer.PendingAction {
 	return portainer.PendingAction{
 		EndpointID: endpointID,
-		Action:     actions.DeleteK8sRegistrySecrets,
+		Action:     actions.DeletePortainerK8sRegistrySecrets,
 		ActionData: &deleteK8sRegistrySecretsData{
 			RegistryID: registryID,
 			Namespaces: namespaces,
