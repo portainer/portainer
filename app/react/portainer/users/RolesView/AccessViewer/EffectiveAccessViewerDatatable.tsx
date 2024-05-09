@@ -15,7 +15,7 @@ export function EffectiveAccessViewerDatatable({
   if (dataset?.length === 0) {
     return (
       <TextTip color="blue">
-        The selected user does not have access to any environment(s)
+        The selected user does not have access to any environments.
       </TextTip>
     );
   }
@@ -30,7 +30,7 @@ export function EffectiveAccessViewerDatatable({
       description={
         <TextTip color="blue">
           Effective role for each environment will be displayed for the selected
-          user
+          user.
         </TextTip>
       }
       disableSelect
