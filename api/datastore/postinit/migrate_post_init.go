@@ -2,8 +2,6 @@ package postinit
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -74,28 +72,11 @@ func (postInitMigrator *PostInitMigrator) PostInitMigrate() error {
 // this function exists for readability, not reusability
 // TODO: This should be moved into pending actions as part of the pending action migration
 func (postInitMigrator *PostInitMigrator) createPostInitMigrationPendingAction(environmentID portainer.EndpointID) error {
-	migrateEnvPendingAction := portainer.PendingAction{
+	// If there are no pending actions for the given endpoint, create one
+	err := postInitMigrator.dataStore.PendingActions().Create(&portainer.PendingAction{
 		EndpointID: environmentID,
 		Action:     actions.PostInitMigrateEnvironment,
-	}
-
-	// Get all pending actions and filter them by endpoint, action and action args that are equal to the migrateEnvPendingAction
-	pendingActions, err := postInitMigrator.dataStore.PendingActions().ReadAll()
-	if err != nil {
-		log.Error().Err(err).Msgf("Error retrieving pending actions")
-		return fmt.Errorf("failed to retrieve pending actions for environment %d: %w", environmentID, err)
-	}
-	for _, pendingAction := range pendingActions {
-		if pendingAction.EndpointID == environmentID &&
-			pendingAction.Action == migrateEnvPendingAction.Action &&
-			reflect.DeepEqual(pendingAction.ActionData, migrateEnvPendingAction.ActionData) {
-			log.Debug().Msgf("Migration pending action for environment %d already exists, skipping creating another", environmentID)
-			return nil
-		}
-	}
-
-	// If there are no pending actions for the given endpoint, create one
-	err = postInitMigrator.dataStore.PendingActions().Create(&migrateEnvPendingAction)
+	})
 	if err != nil {
 		log.Error().Err(err).Msgf("Error creating pending action for environment %d", environmentID)
 	}

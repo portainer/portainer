@@ -2,6 +2,7 @@ package pendingactions
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
@@ -34,8 +35,24 @@ func (service *PendingActionsService) RegisterHandler(name string, handler porta
 	handlers[name] = handler
 }
 
-func (service *PendingActionsService) Create(r portainer.PendingAction) error {
-	return service.dataStore.PendingActions().Create(&r)
+func (service *PendingActionsService) Create(action portainer.PendingAction) error {
+
+	// Check if this pendingAction already exists
+	pendingActions, err := service.dataStore.PendingActions().ReadAll()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve pending actions: %w", err)
+	}
+
+	for _, dba := range pendingActions {
+		// Same endpoint, same action and data, don't create a repeat
+		if dba.EndpointID == action.EndpointID && dba.Action == action.Action &&
+			reflect.DeepEqual(dba.ActionData, action.ActionData) {
+			log.Debug().Msgf("pending action %s already exists for environment %d", action.Action, action.EndpointID)
+			return nil
+		}
+	}
+
+	return service.dataStore.PendingActions().Create(&action)
 }
 
 func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
