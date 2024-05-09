@@ -36,7 +36,6 @@ func (service *PendingActionsService) RegisterHandler(name string, handler porta
 }
 
 func (service *PendingActionsService) Create(action portainer.PendingAction) error {
-
 	// Check if this pendingAction already exists
 	pendingActions, err := service.dataStore.PendingActions().ReadAll()
 	if err != nil {
@@ -88,19 +87,23 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 		return fmt.Errorf("failed to retrieve pending actions for environment %d: %w", id, err)
 	}
 
-	for _, endpointPendingAction := range pendingActions {
-		if endpointPendingAction.EndpointID == id {
-			err := service.executePendingAction(endpointPendingAction, endpoint)
+	log.Debug().Msgf("Executing pending actions for environment %d", id)
+	for _, pendingAction := range pendingActions {
+		if pendingAction.EndpointID == id {
+			log.Debug().Msgf("Executing pendingAction id=%d, action=%s", pendingAction.ID, pendingAction.Action)
+			err := service.executePendingAction(pendingAction, endpoint)
 			if err != nil {
 				log.Warn().Err(err).Msgf("failed to execute pending action")
 				return fmt.Errorf("failed to execute pending action: %w", err)
 			}
 
-			err = service.dataStore.PendingActions().Delete(endpointPendingAction.ID)
+			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
 			if err != nil {
 				log.Error().Err(err).Msgf("failed to delete pending action")
 				return fmt.Errorf("failed to delete pending action: %w", err)
 			}
+
+			log.Debug().Msgf("Pending action %d finished", pendingAction.ID)
 		}
 	}
 
@@ -108,10 +111,10 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 }
 
 func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
-	log.Debug().Msgf("Executing pending action %s for environment %d", pendingAction.Action, pendingAction.EndpointID)
-
 	defer func() {
-		log.Debug().Msgf("End executing pending action %s for environment %d", pendingAction.Action, pendingAction.EndpointID)
+		if r := recover(); r != nil {
+			log.Error().Msgf("Recovered from panic while executing pending action %s for environment %d: %v", pendingAction.Action, pendingAction.EndpointID, r)
+		}
 	}()
 
 	handler, ok := handlers[pendingAction.Action]
