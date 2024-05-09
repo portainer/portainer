@@ -135,7 +135,7 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 
 		stackCount := 0
 		if environment.SecuritySettings.AllowStackManagementForRegularUsers || context.IsAdmin {
-			stacks, err := utils.GetDockerStacks(tx, context, environment.ID, containers, services)
+			stacks, err := utils.GetDockerStacks(h.dataStore, context, environment.ID, containers, services)
 			if err != nil {
 				return httperror.InternalServerError("Unable to retrieve stacks", err)
 			}

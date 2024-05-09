@@ -40,7 +40,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	}
 
 	// endpoints
-	endpointRouter := h.PathPrefix("/{id}").Subrouter()
+	endpointRouter := h.PathPrefix("/docker/{id}").Subrouter()
 	endpointRouter.Use(bouncer.AuthenticatedAccess)
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"), dockerOnlyMiddleware)
 
