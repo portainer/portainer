@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 	"golang.org/x/oauth2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/version"
 )
 
 type (
@@ -1487,6 +1488,8 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
+		ServerVersion() (*version.Info, error)
+
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		IsRBACEnabled() (bool, error)
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
