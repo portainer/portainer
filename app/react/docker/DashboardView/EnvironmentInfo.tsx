@@ -56,7 +56,7 @@ export function EnvironmentInfo() {
           )}
 
           <GpuInfo
-            gpus={environment.Gpus}
+            gpus={environment.Gpus || []}
             snapshot={environment.Snapshots[0]}
           />
 

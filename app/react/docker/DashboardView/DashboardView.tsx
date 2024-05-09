@@ -110,7 +110,7 @@ export function DashboardView() {
             <DashboardItem
               icon={CpuIcon}
               type="GPU"
-              value={env.Gpus.length}
+              value={env.Gpus?.length}
               data-cy="gpus"
             />
           )}
