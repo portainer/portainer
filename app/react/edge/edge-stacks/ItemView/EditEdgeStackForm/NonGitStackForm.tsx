@@ -210,7 +210,7 @@ function InnerForm({
   const hasKubeEndpoint = hasType(EnvironmentType.EdgeAgentOnKubernetes);
   const hasDockerEndpoint = hasType(EnvironmentType.EdgeAgentOnDocker);
 
-  if (staggerUpdateStatus && !staggerUpdateStatus.isSuccess) {
+  if (isBE && !staggerUpdateStatus.isSuccess) {
     return null;
   }
 
