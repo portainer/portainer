@@ -21,7 +21,8 @@ func TestEndpointDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	handler := NewHandler(testhelpers.NewTestRequestBouncer(), demo.NewService())
 	handler.DataStore = store
-	handler.ProxyManager = proxy.NewManager(nil, nil, nil, nil, nil, nil, nil)
+	handler.ProxyManager = proxy.NewManager(nil)
+	handler.ProxyManager.NewProxyFactory(nil, nil, nil, nil, nil, nil, nil, nil)
 
 	// Create all the environments and add them to the same edge group
 
