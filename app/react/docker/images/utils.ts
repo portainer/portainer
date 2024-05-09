@@ -81,7 +81,7 @@ function buildImageFullURIWithRegistry(image: string, registry: Registry) {
   }
 
   function buildImageURIForGithub(image: string, registry: Registry) {
-    const imageName = image.split('/').pop();
+    const imageName = image.startsWith('/') ? image.slice(1) : image;
 
     const namespace = registry.Github.UseOrganisation
       ? registry.Github.OrganisationName
