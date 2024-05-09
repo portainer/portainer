@@ -1,7 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { mutationOptions, withError } from '@/react-tools/react-query';
+import {
+  mutationOptions,
+  withError,
+  withInvalidate,
+} from '@/react-tools/react-query';
 import { buildUrl } from '@/react/edge/edge-stacks/queries/buildUrl';
 import {
   DeploymentType,
@@ -11,6 +15,8 @@ import {
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
+
+import { queryKeys } from '../../queries/query-keys';
 
 export interface UpdateEdgeStackPayload {
   id: EdgeStack['Id'];
@@ -30,9 +36,14 @@ export interface UpdateEdgeStackPayload {
 }
 
 export function useUpdateEdgeStackMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation(
     updateEdgeStack,
-    mutationOptions(withError('Failed updating stack'))
+    mutationOptions(
+      withError('Failed updating stack'),
+      withInvalidate(queryClient, [queryKeys.base()])
+    )
   );
 }
 

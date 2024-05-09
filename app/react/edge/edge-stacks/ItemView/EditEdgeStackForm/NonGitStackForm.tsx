@@ -94,7 +94,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
         isLoading={mutation.isLoading}
         allowKubeToSelectCompose={allowKubeToSelectCompose}
         versionOptions={versionOptions}
-        originalContent={fileContent}
+        isSaved={mutation.isSuccess}
       />
     </Formik>
   );
@@ -164,19 +164,17 @@ function getVersions(edgeStack: EdgeStack): Array<number> | undefined {
 }
 
 function InnerForm({
-  onEditorChange = () => {},
   edgeStack,
   isLoading,
-  originalContent,
   allowKubeToSelectCompose,
   versionOptions,
+  isSaved,
 }: {
   edgeStack: EdgeStack;
   isLoading: boolean;
-  originalContent: string;
-  onEditorChange?: (content: string) => void;
   allowKubeToSelectCompose: boolean;
   versionOptions: number[] | undefined;
+  isSaved: boolean;
 }) {
   const {
     values,
@@ -184,9 +182,10 @@ function InnerForm({
     isValid,
     errors,
     setFieldError,
-    isSubmitting,
+    initialValues,
   } = useFormikContext<FormValues>();
-  usePreventExit(originalContent, values.content, !isSubmitting && !isLoading);
+
+  usePreventExit(initialValues.content, values.content, !isSaved);
 
   const { getCachedContent, setContentCache } = useCachedContent();
   const { hasType } = useValidateEnvironmentTypes(values.edgeGroups);
@@ -364,7 +363,6 @@ function InnerForm({
   function handleContentChange(type: DeploymentType, content: string) {
     setFieldValue('content', content);
     setContentCache(type, content);
-    onEditorChange(content);
   }
 
   async function handleVersionChange(newVersion: number) {
