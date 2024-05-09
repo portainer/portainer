@@ -88,7 +88,7 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 	log.Debug().Msgf("Executing pending actions for environment %d", id)
 	for _, pendingAction := range pendingActions {
 		if pendingAction.EndpointID == id {
-			log.Debug().Msgf("Executing pendingAction id=%d, action=%s", pendingAction.ID, pendingAction.Action)
+			log.Debug().Msgf("executing pending action id=%d, action=%s", pendingAction.ID, pendingAction.Action)
 			err := service.executePendingAction(pendingAction, endpoint)
 			if err != nil {
 				log.Warn().Msgf("failed to execute pending action: %v", err)
@@ -97,11 +97,11 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 
 			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
 			if err != nil {
-				log.Warn().Msgf("failed to delete pending action: %w", err)
+				log.Warn().Msgf("failed to delete pending action: %v", err)
 				return
 			}
 
-			log.Debug().Msgf("Pending action %d finished", pendingAction.ID)
+			log.Debug().Msgf("pending action %d finished", pendingAction.ID)
 		}
 	}
 }
@@ -109,13 +109,13 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Error().Msgf("Recovered from panic while executing pending action %s for environment %d: %v", pendingAction.Action, pendingAction.EndpointID, r)
+			log.Error().Msgf("recovered from panic while executing pending action %s for environment %d: %v", pendingAction.Action, pendingAction.EndpointID, r)
 		}
 	}()
 
 	handler, ok := handlers[pendingAction.Action]
 	if !ok {
-		log.Warn().Msgf("No handler found for pending action %s", pendingAction.Action)
+		log.Warn().Msgf("no handler found for pending action %s", pendingAction.Action)
 		return nil
 	}
 
