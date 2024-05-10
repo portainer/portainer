@@ -36,7 +36,7 @@ export function PlacementsDatatable({
     <ExpandableDatatable
       isLoading={isLoading}
       getRowCanExpand={(row) => !row.original.acceptsApplication}
-      title="Placement constraints/preferences"
+      title="Nodes vs. placement constraints/preferences"
       titleIcon={Minimize2}
       dataset={dataset}
       settingsManager={tableState}
@@ -51,8 +51,8 @@ export function PlacementsDatatable({
           </TextTip>
         ) : (
           <TextTip color="blue">
-            The placement table helps you understand whether or not this
-            application can be deployed on a specific node.
+            The table below shows whether or not this application can be
+            deployed on the nodes listed.
           </TextTip>
         )
       }
