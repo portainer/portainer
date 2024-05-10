@@ -245,7 +245,21 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		}
 
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
-
+		if err != nil {
+			// If the error pertains to a missing manifest file, we can safely ignore it.
+			// This allows us to clean up relevant records in the stack, such as the stack
+			// database entry and the /compose/stack folder. This suppression is safe
+			// because before the current API (/stacks/{id} [delete]) is called, another
+			// API has already removed the Kubernetes application deployments/pods by
+			// sending the delete request (/apis/apps/v1/namespaces/default/deployments/xx)
+			// to the Kubernetes cluster API endpoint via the Portainer endpoint proxy.
+			// See @https://github.com/portainer/portainer/blob/release/2.20/app/kubernetes/views/applications/applicationsController.js#L96
+			for _, manifest := range manifestFiles {
+				if _, statErr := os.Stat(manifest); os.IsNotExist(statErr) {
+					return nil
+				}
+			}
+		}
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
 

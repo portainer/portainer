@@ -76,15 +76,17 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
-	envFilePath, err := createEnvFile(stack)
-	if err != nil {
-		return errors.Wrap(err, "failed to create env file")
+	projectPath := stack.ProjectPath
+	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+		// If the target path is removed or renamed, but not synced with
+		// the database record, specifying the project path that does not exist
+		// as a command working directory can cause the failure while deleting stack
+		projectPath = ""
 	}
 
 	err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.Options{
-		WorkingDir:  stack.ProjectPath,
-		EnvFilePath: envFilePath,
-		Host:        url,
+		WorkingDir: projectPath,
+		Host:       url,
 	})
 
 	return errors.Wrap(err, "failed to remove a stack")
@@ -148,18 +150,19 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	}
 	defer envfile.Close()
 
-	copyDefaultEnvFile(stack, envfile)
+	// Copy from default .env file
+	defaultEnvPath := path.Join(stack.ProjectPath, path.Dir(stack.EntryPoint), ".env")
+	copyDefaultEnvFileIfExists(envfile, defaultEnvPath)
 
-	for _, v := range stack.Env {
-		envfile.WriteString(fmt.Sprintf("%s=%s\n", v.Name, v.Value))
-	}
+	// Copy from stack env vars
+	copyConfigEnvVarsIfExists(envfile, stack.Env)
 
 	return "stack.env", nil
 }
 
 // copyDefaultEnvFile copies the default .env file if it exists to the provided writer
-func copyDefaultEnvFile(stack *portainer.Stack, w io.Writer) {
-	defaultEnvFile, err := os.Open(path.Join(path.Join(stack.ProjectPath, path.Dir(stack.EntryPoint)), ".env"))
+func copyDefaultEnvFileIfExists(w io.Writer, defaultEnvFilePath string) {
+	defaultEnvFile, err := os.Open(defaultEnvFilePath)
 	if err != nil {
 		// If cannot open a default file, then don't need to copy it.
 		// We could as well stat it and check if it exists, but this is more efficient.
@@ -172,4 +175,11 @@ func copyDefaultEnvFile(stack *portainer.Stack, w io.Writer) {
 		io.WriteString(w, "\n")
 	}
 	// If couldn't copy the .env file, then ignore the error and try to continue
+}
+
+// copyConfigEnvVarsIfExists write the environment variables from stack configuration to target file
+func copyConfigEnvVarsIfExists(w io.Writer, envs []portainer.Pair) {
+	for _, v := range envs {
+		io.WriteString(w, fmt.Sprintf("%s=%s\n", v.Name, v.Value))
+	}
 }
