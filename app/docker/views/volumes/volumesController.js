@@ -1,3 +1,5 @@
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
+
 angular.module('portainer.docker').controller('VolumesController', [
   '$q',
   '$scope',
@@ -10,11 +12,10 @@ angular.module('portainer.docker').controller('VolumesController', [
   'Authentication',
   'endpoint',
   function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
-    $scope.removeAction = function (selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (volume) {
+    $scope.removeAction = async function (selectedItems) {
+      async function doRemove(volume) {
         HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
-        VolumeService.remove(volume)
+        return VolumeService.remove(volume)
           .then(function success() {
             Notifications.success('Volume successfully removed', volume.Id);
             var index = $scope.volumes.indexOf(volume);
@@ -22,14 +23,11 @@ angular.module('portainer.docker').controller('VolumesController', [
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove volume');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     };
 
     $scope.getVolumes = getVolumes;
