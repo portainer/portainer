@@ -87,6 +87,7 @@ overrides:
         version: 'detect'
 
     rules:
+      no-console: error
       import/order:
         [
           'error',
