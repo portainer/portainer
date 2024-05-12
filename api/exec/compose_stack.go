@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -77,7 +78,7 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 	}
 
 	projectPath := stack.ProjectPath
-	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+	if exists, err := filesystem.FileExists(projectPath); err != nil && !exists {
 		// If the target path is removed or renamed, but not synced with
 		// the database record, specifying the project path that does not exist
 		// as a command working directory can cause the failure while deleting stack
