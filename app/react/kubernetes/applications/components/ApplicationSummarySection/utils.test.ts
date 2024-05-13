@@ -284,6 +284,11 @@ const createComplicatedStatefulSetSummaries: Array<Summary> = [
   },
   {
     action: 'Create',
+    kind: 'PersistentVolumeClaim',
+    name: 'my-app-6be07c40-de3a-4775-a29b-19a60890052e-my-app-0',
+  },
+  {
+    action: 'Create',
     kind: 'HorizontalPodAutoscaler',
     name: 'my-app',
   },
@@ -464,6 +469,11 @@ const updateComplicatedStatefulSetSummaries: Array<Summary> = [
     name: 'my-app-3',
     type: 'LoadBalancer',
   },
+  {
+    action: 'Create',
+    kind: 'PersistentVolumeClaim',
+    name: 'test-6be07c40-de3a-4775-a29b-19a60890052e-test-0-my-app-0',
+  },
 ];
 
 const updateDeploymentToStatefulSetSummaries: Array<Summary> = [
@@ -476,6 +486,11 @@ const updateDeploymentToStatefulSetSummaries: Array<Summary> = [
     action: 'Create',
     kind: 'StatefulSet',
     name: 'my-app',
+  },
+  {
+    action: 'Create',
+    kind: 'PersistentVolumeClaim',
+    name: 'test-6be07c40-de3a-4775-a29b-19a60890052e-test-0-my-app-0',
   },
   {
     action: 'Create',
