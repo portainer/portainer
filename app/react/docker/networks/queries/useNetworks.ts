@@ -54,6 +54,6 @@ export async function getNetworks(
               network.Attachable === true)
         );
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve networks');
+    throw parseAxiosError(err, 'Unable to retrieve networks');
   }
 }

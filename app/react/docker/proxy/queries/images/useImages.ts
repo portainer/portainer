@@ -31,6 +31,6 @@ async function getImages(environmentId: EnvironmentId) {
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve images');
+    throw parseAxiosError(err, 'Unable to retrieve images');
   }
 }

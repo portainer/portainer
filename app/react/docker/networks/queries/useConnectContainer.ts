@@ -1,5 +1,4 @@
 import { EndpointSettings } from 'docker-types/generated/1.41';
-import { RawAxiosRequestHeaders } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -11,6 +10,7 @@ import {
 } from '@/react-tools/react-query';
 
 import { queryKeys as dockerQueryKeys } from '../../queries/utils';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { buildUrl } from './buildUrl';
 
@@ -56,18 +56,15 @@ export async function connectContainer({
     };
   }
 
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
-  }
+  const headers = addNodeHeader(nodeName);
 
   try {
     await axios.post(
       buildUrl(environmentId, { id: networkId, action: 'connect' }),
-      payload
+      payload,
+      { headers }
     );
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to connect container');
+    throw parseAxiosError(err, 'Unable to connect container');
   }
 }

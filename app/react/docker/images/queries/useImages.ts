@@ -51,6 +51,6 @@ async function getImages(
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve images');
+    throw parseAxiosError(err, 'Unable to retrieve images');
   }
 }

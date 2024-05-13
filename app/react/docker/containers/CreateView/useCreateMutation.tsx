@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RawAxiosRequestHeaders } from 'axios';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import {
@@ -38,6 +37,7 @@ import { PortainerResponse } from '../../types';
 import { connectContainer } from '../../networks/queries/useConnectContainer';
 import { DockerContainer } from '../types';
 import { queryKeys } from '../queries/query-keys';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { CreateContainerRequest } from './types';
 import { Values } from './useInitialValues';
@@ -286,11 +286,7 @@ async function createContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const headers: RawAxiosRequestHeaders = {};
-
-    if (nodeName) {
-      headers['X-PortainerAgent-Target'] = nodeName;
-    }
+    const headers = addNodeHeader(nodeName);
 
     const { data } = await axios.post<
       PortainerResponse<{ Id: string; Warnings: Array<string> }>

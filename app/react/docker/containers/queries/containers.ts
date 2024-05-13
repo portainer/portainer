@@ -1,16 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import axios, {
-  agentTargetHeader,
-  parseAxiosError,
-} from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
 
 import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
 import { toListViewModel } from '../utils';
 import { DockerContainer } from '../types';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { Filters } from './types';
 import { queryKeys } from './query-keys';
@@ -52,16 +50,13 @@ export async function getContainers(
   environmentId: EnvironmentId,
   { all = true, filters, nodeName }: UseContainers = {}
 ) {
+  const headers = addNodeHeader(nodeName);
   try {
     const { data } = await axios.get<DockerContainerResponse[]>(
       urlBuilder(environmentId, undefined, 'json'),
       {
         params: { all, filters: filters && JSON.stringify(filters) },
-        headers: nodeName
-          ? {
-              [agentTargetHeader]: nodeName,
-            }
-          : undefined,
+        headers,
       }
     );
     return data.map((c) => toListViewModel(c));
