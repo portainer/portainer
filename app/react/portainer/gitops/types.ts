@@ -52,6 +52,8 @@ export type GitNewCredentialModel = {
 
 export type GitAuthModel = GitCredentialsModel & GitNewCredentialModel;
 
+export type DeployMethod = 'compose' | 'manifest';
+
 export interface GitFormModel extends GitAuthModel {
   RepositoryURL: string;
   RepositoryURLValid?: boolean;

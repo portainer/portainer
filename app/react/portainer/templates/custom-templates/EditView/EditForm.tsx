@@ -6,6 +6,8 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useEnvironmentDeploymentOptions } from '@/react/portainer/environments/queries/useEnvironment';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { isKubernetesEnvironment } from '@/react/portainer/environments/utils';
+import { DeployMethod } from '@/react/portainer/gitops/types';
+import { StackType } from '@/react/common/stacks/types';
 
 import { CustomTemplate } from '../types';
 import { useUpdateTemplateMutation } from '../queries/useUpdateTemplateMutation';
@@ -32,10 +34,13 @@ export function EditForm({
   const router = useRouter();
   const disableEditor = useDisableEditor(isGit);
   const mutation = useUpdateTemplateMutation();
+  const deployMethod: DeployMethod =
+    template.Type === StackType.Kubernetes ? 'manifest' : 'compose';
   const validation = useValidation({
     viewType,
     isGit,
     templateId: template.Id,
+    deployMethod,
   });
 
   const fileContentQuery = useCustomTemplateFile(template.Id);

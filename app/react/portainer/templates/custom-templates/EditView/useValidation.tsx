@@ -10,6 +10,7 @@ import { useGitCredentials } from '@/react/portainer/account/git-credentials/git
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
+import { DeployMethod } from '@/react/portainer/gitops/types';
 
 import { CustomTemplate } from '../types';
 import { TemplateViewType } from '../useViewType';
@@ -18,10 +19,12 @@ export function useValidation({
   isGit,
   templateId,
   viewType,
+  deployMethod,
 }: {
   isGit: boolean;
   templateId: CustomTemplate['Id'];
   viewType: TemplateViewType;
+  deployMethod: DeployMethod;
 }) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
@@ -47,7 +50,11 @@ export function useValidation({
         FileContent: string().required('Template is required.'),
 
         Git: isGit
-          ? buildGitValidationSchema(gitCredentialsQuery.data || [], false)
+          ? buildGitValidationSchema(
+              gitCredentialsQuery.data || [],
+              false,
+              deployMethod
+            )
           : mixed(),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
@@ -64,6 +71,7 @@ export function useValidation({
       isGit,
       templateId,
       viewType,
+      deployMethod,
     ]
   );
 }
