@@ -45,6 +45,7 @@ func hijackRequest(
 
 	err = <-errorChan
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
+		log.Debug().Msgf("Unexpected close error: %v\n", err)
 		return err
 	}
 

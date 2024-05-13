@@ -1,7 +1,9 @@
 package websocket
 
 import (
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/rs/zerolog/log"
@@ -110,6 +112,16 @@ func hijackAttachStartOperation(
 		return err
 	}
 
+	// When we set up a TCP connection for hijack, there could be long periods
+	// of inactivity (a long running command with no output) that in certain
+	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
+	// state. Setting TCP KeepAlive on the socket connection will prohibit
+	// ECONNTIMEOUT unless the socket connection truly is broken
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
+		tcpConn.SetKeepAlive(true)
+		tcpConn.SetKeepAlivePeriod(30 * time.Second)
+	}
+
 	attachStartRequest, err := createAttachStartRequest(attachID)
 	if err != nil {
 		return err
@@ -119,7 +131,6 @@ func hijackAttachStartOperation(
 }
 
 func createAttachStartRequest(attachID string) (*http.Request, error) {
-
 	request, err := http.NewRequest("POST", "/containers/"+attachID+"/attach?stdin=1&stdout=1&stderr=1&stream=1", nil)
 	if err != nil {
 		return nil, err
