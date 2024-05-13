@@ -10,7 +10,7 @@ import {
 } from '@/react-tools/react-query';
 
 import { queryKeys as dockerQueryKeys } from '../../queries/utils';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { buildUrl } from './buildUrl';
 
@@ -56,7 +56,7 @@ export async function connectContainer({
     };
   }
 
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
 
   try {
     await axios.post(

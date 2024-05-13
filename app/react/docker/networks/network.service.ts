@@ -2,7 +2,7 @@ import { ContainerId } from '@/react/docker/containers/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { addNodeName } from '../proxy/addNodeName';
+import { addNodeHeader } from '../proxy/addNodeHeader';
 
 import { NetworkId, DockerNetwork } from './types';
 
@@ -13,7 +13,7 @@ export async function getNetwork(
   networkId: NetworkId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     const { data: network } = await axios.get<DockerNetwork>(
       buildUrl(environmentId, networkId),

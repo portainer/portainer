@@ -2,7 +2,7 @@ import { RawAxiosRequestHeaders } from 'axios';
 
 import { agentTargetHeader } from '@/portainer/services/axios';
 
-export function addNodeName(
+export function addNodeHeader(
   nodeName?: string,
   headers: RawAxiosRequestHeaders = {}
 ) {

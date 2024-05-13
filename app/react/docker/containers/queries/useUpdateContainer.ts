@@ -4,7 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { urlBuilder } from '../containers.service';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 /**
  * UpdateConfig holds the mutable attributes of a Container.
@@ -22,7 +22,7 @@ export async function updateContainer(
   config: UpdateConfig,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
 
   try {
     await axios.post<{ Warnings: string[] }>(

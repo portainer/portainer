@@ -3,7 +3,7 @@ import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { genericHandler } from '@/docker/rest/response/handlers';
 
-import { addNodeName } from '../proxy/addNodeName';
+import { addNodeHeader } from '../proxy/addNodeHeader';
 
 import { ContainerId } from './types';
 
@@ -12,7 +12,7 @@ export async function startContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(environmentId, id, 'start'),
@@ -29,7 +29,7 @@ export async function stopContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(urlBuilder(endpointId, id, 'stop'), {}, { headers });
   } catch (e) {
@@ -43,7 +43,7 @@ export async function recreateContainer(
   pullImage: boolean,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       `/docker/${endpointId}/containers/${id}/recreate`,
@@ -62,7 +62,7 @@ export async function restartContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(endpointId, id, 'restart'),
@@ -79,7 +79,7 @@ export async function killContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(urlBuilder(endpointId, id, 'kill'), {}, { headers });
   } catch (e) {
@@ -92,7 +92,7 @@ export async function pauseContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(endpointId, id, 'pause'),
@@ -109,7 +109,7 @@ export async function resumeContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(endpointId, id, 'unpause'),
@@ -127,7 +127,7 @@ export async function renameContainer(
   name: string,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(endpointId, id, 'rename'),
@@ -151,7 +151,7 @@ export async function removeContainer(
     removeVolumes,
   }: { removeVolumes?: boolean; nodeName?: string } = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     const { data } = await axios.delete<null | { message: string }>(
       urlBuilder(endpointId, containerId),

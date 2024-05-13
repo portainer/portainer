@@ -37,7 +37,7 @@ import { PortainerResponse } from '../../types';
 import { connectContainer } from '../../networks/queries/useConnectContainer';
 import { DockerContainer } from '../types';
 import { queryKeys } from '../queries/query-keys';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { CreateContainerRequest } from './types';
 import { Values } from './useInitialValues';
@@ -286,7 +286,7 @@ async function createContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const headers = addNodeName(nodeName);
+    const headers = addNodeHeader(nodeName);
 
     const { data } = await axios.post<
       PortainerResponse<{ Id: string; Warnings: Array<string> }>

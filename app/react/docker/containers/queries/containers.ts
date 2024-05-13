@@ -8,7 +8,7 @@ import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
 import { toListViewModel } from '../utils';
 import { DockerContainer } from '../types';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { Filters } from './types';
 import { queryKeys } from './query-keys';
@@ -50,7 +50,7 @@ export async function getContainers(
   environmentId: EnvironmentId,
   { all = true, filters, nodeName }: UseContainers = {}
 ) {
-  const headers = addNodeName(nodeName);
+  const headers = addNodeHeader(nodeName);
   try {
     const { data } = await axios.get<DockerContainerResponse[]>(
       urlBuilder(environmentId, undefined, 'json'),

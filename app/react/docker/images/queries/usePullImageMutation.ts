@@ -5,7 +5,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { buildImageFullURI } from '../utils';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { encodeRegistryCredentials } from './encodeRegistryCredentials';
 import { buildProxyUrl } from './build-url';
@@ -36,7 +36,7 @@ export async function pullImage({
     'X-Registry-Auth': authenticationDetails,
   };
 
-  const headers = addNodeName(nodeName, authHeaders);
+  const headers = addNodeHeader(nodeName, authHeaders);
 
   try {
     await axios.post(buildProxyUrl(environmentId, { action: 'create' }), null, {
