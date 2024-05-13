@@ -153,34 +153,44 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 
 	// Copy from default .env file
 	defaultEnvPath := path.Join(stack.ProjectPath, path.Dir(stack.EntryPoint), ".env")
-	copyDefaultEnvFileIfExists(envfile, defaultEnvPath)
+	if err = copyDefaultEnvFileIfExists(envfile, defaultEnvPath); err != nil {
+		return "", err
+	}
 
 	// Copy from stack env vars
-	copyConfigEnvVarsIfExists(envfile, stack.Env)
+	if err = copyConfigEnvVarsIfExists(envfile, stack.Env); err != nil {
+		return "", err
+	}
 
 	return "stack.env", nil
 }
 
 // copyDefaultEnvFile copies the default .env file if it exists to the provided writer
-func copyDefaultEnvFileIfExists(w io.Writer, defaultEnvFilePath string) {
+func copyDefaultEnvFileIfExists(w io.Writer, defaultEnvFilePath string) error {
 	defaultEnvFile, err := os.Open(defaultEnvFilePath)
 	if err != nil {
 		// If cannot open a default file, then don't need to copy it.
 		// We could as well stat it and check if it exists, but this is more efficient.
-		return
+		return nil
 	}
 
 	defer defaultEnvFile.Close()
 
 	if _, err = io.Copy(w, defaultEnvFile); err == nil {
-		io.WriteString(w, "\n")
+		if _, err = fmt.Fprintf(w, "\n"); err != nil {
+			return fmt.Errorf("failed to copy default env file: %w", err)
+		}
 	}
+	return nil
 	// If couldn't copy the .env file, then ignore the error and try to continue
 }
 
 // copyConfigEnvVarsIfExists write the environment variables from stack configuration to target file
-func copyConfigEnvVarsIfExists(w io.Writer, envs []portainer.Pair) {
+func copyConfigEnvVarsIfExists(w io.Writer, envs []portainer.Pair) error {
 	for _, v := range envs {
-		io.WriteString(w, fmt.Sprintf("%s=%s\n", v.Name, v.Value))
+		if _, err := fmt.Fprintf(w, "%s=%s\n", v.Name, v.Value); err != nil {
+			return fmt.Errorf("failed to copy config env vars: %w", err)
+		}
 	}
+	return nil
 }
