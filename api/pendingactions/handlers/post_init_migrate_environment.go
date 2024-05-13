@@ -40,7 +40,13 @@ func NewHandlerPostInitMigrateEnvironment(
 	}
 }
 
-func (h *HandlerPostInitMigrateEnvironment) Execute(_ portainer.PendingAction, endpoint *portainer.Endpoint) error {
+func (h *HandlerPostInitMigrateEnvironment) Execute(pa portainer.PendingAction) error {
+	endpoint, err := h.dataStore.Endpoint().Endpoint(pa.EndpointID)
+	if err != nil {
+		log.Debug().Msgf("failed to retrieve environment %d: %v", pa.EndpointID, err)
+		return nil
+	}
+
 	postInitMigrator := postinit.NewPostInitMigrator(
 		h.kubeFactory,
 		h.dockerFactory,
@@ -48,7 +54,7 @@ func (h *HandlerPostInitMigrateEnvironment) Execute(_ portainer.PendingAction, e
 		h.assetsPath,
 		h.kubernetesDeployer,
 	)
-	err := postInitMigrator.MigrateEnvironment(endpoint)
+	err = postInitMigrator.MigrateEnvironment(endpoint)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error running post-init migrations for edge environment %d", endpoint.ID)
 		return fmt.Errorf("failed running post-init migrations for edge environment %d: %w", endpoint.ID, err)

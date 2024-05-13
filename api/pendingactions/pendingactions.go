@@ -89,7 +89,7 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 	for _, pendingAction := range pendingActions {
 		if pendingAction.EndpointID == id {
 			log.Debug().Msgf("executing pending action id=%d, action=%s", pendingAction.ID, pendingAction.Action)
-			err := service.executePendingAction(pendingAction, endpoint)
+			err := service.executePendingAction(pendingAction)
 			if err != nil {
 				log.Warn().Msgf("failed to execute pending action: %v", err)
 				return
@@ -106,7 +106,7 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 	}
 }
 
-func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
+func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction) error {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error().Msgf("recovered from panic while executing pending action %s for environment %d: %v", pendingAction.Action, pendingAction.EndpointID, r)
@@ -119,5 +119,5 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 		return nil
 	}
 
-	return handler.Execute(pendingAction, endpoint)
+	return handler.Execute(pendingAction)
 }

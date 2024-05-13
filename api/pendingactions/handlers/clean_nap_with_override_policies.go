@@ -48,14 +48,20 @@ func NewHandlerCleanNAPWithOverridePolicies(
 	}
 }
 
-func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
-	if pendingAction.ActionData == nil {
+func (h *HandlerCleanNAPWithOverridePolicies) Execute(pa portainer.PendingAction) error {
+	endpoint, err := h.dataStore.Endpoint().Endpoint(pa.EndpointID)
+	if err != nil {
+		log.Debug().Msgf("failed to retrieve environment %d: %v", pa.EndpointID, err)
+		return nil
+	}
+
+	if pa.ActionData == nil {
 		h.authorizationService.CleanNAPWithOverridePolicies(h.dataStore, endpoint, nil)
 		return nil
 	}
 
 	var payload cleanNAPWithOverridePolicies
-	err := pendingAction.UnmarshallActionData(&payload)
+	err = pa.UnmarshallActionData(&payload)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error unmarshalling endpoint group ID for cleaning NAP with override policies for environment %d", endpoint.ID)
 		return fmt.Errorf("failed to unmarshal endpoint group ID for cleaning NAP with override policies for environment %d: %w", endpoint.ID, err)

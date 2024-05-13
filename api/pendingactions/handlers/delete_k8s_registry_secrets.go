@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/pendingactions/actions"
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -46,13 +47,19 @@ func NewHandlerDeleteRegistrySecrets(
 	}
 }
 
-func (h *HandlerDeleteK8sRegistrySecrets) Execute(pa portainer.PendingAction, endpoint *portainer.Endpoint) error {
-	if endpoint == nil || pa.ActionData == nil {
+func (h *HandlerDeleteK8sRegistrySecrets) Execute(pa portainer.PendingAction) error {
+	if pa.ActionData == nil {
+		return nil
+	}
+
+	endpoint, err := h.dataStore.Endpoint().Endpoint(pa.EndpointID)
+	if err != nil {
+		log.Debug().Msgf("failed to retrieve environment %d: %v", pa.EndpointID, err)
 		return nil
 	}
 
 	var registryData deleteK8sRegistrySecretsData
-	err := pa.UnmarshallActionData(&registryData)
+	err = pa.UnmarshallActionData(&registryData)
 	if err != nil {
 		return err
 	}

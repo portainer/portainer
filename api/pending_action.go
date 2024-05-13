@@ -13,7 +13,7 @@ type (
 	}
 
 	PendingActionHandler interface {
-		Execute(PendingAction, *Endpoint) error
+		Execute(PendingAction) error
 	}
 )
 
