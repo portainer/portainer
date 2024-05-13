@@ -85,6 +85,10 @@ export enum AuthenticationMethod {
    * OAuth represents the OAuth authentication method (authentication against a authorization server)
    */
   OAuth,
+  /**
+   * AD represents the Active Directory authentication method (authentication against a Microsoft Active Directory server)
+   */
+  AD,
 }
 
 /**
