@@ -17,7 +17,7 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { relativePathValidation } from '@/react/portainer/gitops/RelativePathFieldset/validation';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
-import { GitFormModel } from '@/react/portainer/gitops/types';
+import { DeployMethod, GitFormModel } from '@/react/portainer/gitops/types';
 
 import { envVarValidation } from '@@/form-components/EnvironmentVariablesFieldset';
 import { file } from '@@/form-components/yup-file-validation';
@@ -76,10 +76,17 @@ export function useValidation({
           }),
           git: mixed().when('method', {
             is: 'repository',
-            then: buildGitValidationSchema(
-              gitCredentialsQuery.data || [],
-              !!customTemplate
-            ),
+            then: () => {
+              const deploymentMethod: DeployMethod =
+                values.deploymentType === DeploymentType.Compose
+                  ? 'compose'
+                  : 'manifest';
+              return buildGitValidationSchema(
+                gitCredentialsQuery.data || [],
+                !!customTemplate,
+                deploymentMethod
+              );
+            },
           }) as SchemaOf<GitFormModel>,
           relativePath: relativePathValidation(),
           useManifestNamespaces: boolean().default(false),

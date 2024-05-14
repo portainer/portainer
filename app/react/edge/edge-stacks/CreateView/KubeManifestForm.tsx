@@ -95,6 +95,7 @@ export function KubeManifestForm({
 
       {method === git.value && (
         <GitForm
+          deployMethod="manifest"
           errors={errors?.git}
           value={values.git}
           onChange={(gitValues) =>
