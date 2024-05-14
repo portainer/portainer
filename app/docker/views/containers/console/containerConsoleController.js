@@ -47,7 +47,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     $scope.containerCommands = [];
 
     // Ensure the socket is closed before leaving the view
-    $scope.$on('$stateChangeStart', function () {
+    $scope.$on('$destroy', function () {
       $scope.disconnect();
     });
 
@@ -167,6 +167,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
     function initTerm(url, resizeRestCall) {
       let resizefun = resize.bind(this, resizeRestCall);
+      let closeTerminal = false;
+      let commandBuffer = '';
 
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
@@ -188,8 +190,20 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         socket.send('clear\n');
 
         term.onData(function (data) {
+          if (data === '\x04' && commandBuffer == '') {
+            // If the user types CTRL+D, close the terminal
+            closeTerminal = true;
+          } else if (data === '\r') {
+            if (commandBuffer.trim() === 'exit') {
+              closeTerminal = true;
+            }
+            commandBuffer = '';
+          } else {
+            commandBuffer += data;
+          }
           socket.send(data);
         });
+
         var terminal_container = document.getElementById('terminal-container');
         term.open(terminal_container);
         term.focus();
@@ -213,6 +227,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           Notifications.error('Failure', err, 'Connection error');
         };
         socket.onclose = function () {
+          if (closeTerminal) {
+            $scope.disconnect();
+          }
           $scope.$apply();
         };
 
