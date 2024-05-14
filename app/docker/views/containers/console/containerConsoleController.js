@@ -121,7 +121,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ExecService.resizeTTY.bind(this, endpoint.Id, params.id));
+          initTerm(url, ExecService.resizeTTY.bind(this, endpoint.Id, params.id), isLinuxTerminalCommand(execConfig.Cmd[0]));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to exec into container');
@@ -165,7 +165,12 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       restcall(termWidth + add, termHeight + add, 1);
     }
 
-    function initTerm(url, resizeRestCall) {
+    function isLinuxTerminalCommand(command) {
+      const validShellCommands = ['ash', 'bash', 'dash', 'sh'];
+      return validShellCommands.includes(command);
+    }
+
+    function initTerm(url, resizeRestCall, isLinuxTerm = false) {
       let resizefun = resize.bind(this, resizeRestCall);
 
       if ($transition$.params().nodeName) {
@@ -185,11 +190,17 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         let commandBuffer = '';
 
         $scope.state = states.connected;
-        term = new Terminal();
-        socket.send('export LANG=C.UTF-8\n');
-        socket.send('export LC_ALL=C.UTF-8\n');
-        socket.send(`echo -e "\\033[2J\\033[H"\n`);
 
+        if (isLinuxTerm) {
+          // linux terminals support xterm
+          socket.send('export TERM="xterm-256color"\n');
+          socket.send('export LANG=C.UTF-8\n');
+          socket.send('export LC_ALL=C.UTF-8\n');
+          socket.send('alias ls="ls --color=auto"\n');
+          socket.send('echo -e "\\033[2J\\033[H"\n');
+        }
+
+        term = new Terminal();
         term.onData(function (data) {
           socket.send(data);
 
