@@ -213,7 +213,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           Notifications.error('Failure', err, 'Connection error');
         };
         socket.onclose = function () {
-          $scope.disconnect();
           $scope.$apply();
         };
 
