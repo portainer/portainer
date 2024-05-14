@@ -188,7 +188,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         term = new Terminal();
         socket.send('export LANG=C.UTF-8\n');
         socket.send('export LC_ALL=C.UTF-8\n');
-        socket.send('clear\n');
+        socket.send(`echo -e "\\033[2J\\033[H"\n`);
 
         term.onData(function (data) {
           socket.send(data);
