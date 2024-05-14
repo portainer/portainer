@@ -1,12 +1,12 @@
 package websocket
 
 import (
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"time"
+
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/rs/zerolog/log"
 
 	portainer "github.com/portainer/portainer/api"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -107,7 +107,7 @@ func hijackAttachStartOperation(
 	attachID string,
 	token string,
 ) error {
-	dial, err := initDial(endpoint)
+	conn, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
@@ -117,24 +117,20 @@ func hijackAttachStartOperation(
 	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
 	// state. Setting TCP KeepAlive on the socket connection will prohibit
 	// ECONNTIMEOUT unless the socket connection truly is broken
-	if tcpConn, ok := dial.(*net.TCPConn); ok {
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
 		tcpConn.SetKeepAlive(true)
 		tcpConn.SetKeepAlivePeriod(30 * time.Second)
 	}
-
-	httpConn := httputil.NewClientConn(dial, nil)
-	defer httpConn.Close()
 
 	attachStartRequest, err := createAttachStartRequest(attachID)
 	if err != nil {
 		return err
 	}
 
-	return hijackRequest(websocketConn, httpConn, attachStartRequest, token)
+	return hijackRequest(websocketConn, conn, attachStartRequest, token)
 }
 
 func createAttachStartRequest(attachID string) (*http.Request, error) {
-
 	request, err := http.NewRequest("POST", "/containers/"+attachID+"/attach?stdin=1&stdout=1&stderr=1&stream=1", nil)
 	if err != nil {
 		return nil, err
