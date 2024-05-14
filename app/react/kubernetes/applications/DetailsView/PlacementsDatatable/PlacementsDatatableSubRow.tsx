@@ -170,6 +170,7 @@ function UnmatchedAffinitiesInfo({
             'datatable-highlighted': isHighlighted,
             'datatable-unhighlighted': !isHighlighted,
           })}
+          key={aff.map((term) => term.key).join('')}
         >
           <td />
           <td colSpan={cellCount - 1}>
