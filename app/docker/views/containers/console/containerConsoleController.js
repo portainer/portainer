@@ -167,8 +167,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
     function initTerm(url, resizeRestCall) {
       let resizefun = resize.bind(this, resizeRestCall);
-      let closeTerminal = false;
-      let commandBuffer = '';
 
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
@@ -183,6 +181,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       socket = new WebSocket(url);
 
       socket.onopen = function () {
+        let closeTerminal = false;
+        let commandBuffer = '';
+
         $scope.state = states.connected;
         term = new Terminal();
         socket.send('export LANG=C.UTF-8\n');
@@ -222,13 +223,17 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           term.write(e.data);
         };
         socket.onerror = function (err) {
-          $scope.disconnect();
+          if (closeTerminal) {
+            $scope.disconnect();
+          } else {
+            Notifications.error('Failure', err, 'Connection error');
+          }
           $scope.$apply();
-          Notifications.error('Failure', err, 'Connection error');
         };
         socket.onclose = function () {
           if (closeTerminal) {
             $scope.disconnect();
+            closeTerminal = false;
           }
           $scope.$apply();
         };
