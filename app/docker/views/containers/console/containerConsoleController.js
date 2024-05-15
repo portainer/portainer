@@ -47,7 +47,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     $scope.containerCommands = [];
 
     // Ensure the socket is closed before leaving the view
-    $scope.$on('$stateChangeStart', function () {
+    $scope.$on('$destroy', function () {
       $scope.disconnect();
     });
 
@@ -181,6 +181,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       socket = new WebSocket(url);
 
       socket.onopen = function () {
+        let closeTerminal = false;
+        let commandBuffer = '';
+
         $scope.state = states.connected;
         term = new Terminal();
         socket.send('export LANG=C.UTF-8\n');
@@ -189,7 +192,22 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
         term.onData(function (data) {
           socket.send(data);
+
+          // This code is detect whether the user has typed CTRL+D
+          // or exit in the terminal
+          if (data === '\x04') {
+            // If the user types CTRL+D, close the terminal
+            closeTerminal = true;
+          } else if (data === '\r') {
+            if (commandBuffer.trim() === 'exit') {
+              closeTerminal = true;
+            }
+            commandBuffer = '';
+          } else {
+            commandBuffer += data;
+          }
         });
+
         var terminal_container = document.getElementById('terminal-container');
         term.open(terminal_container);
         term.focus();
@@ -207,13 +225,20 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         socket.onmessage = function (e) {
           term.write(e.data);
         };
+
         socket.onerror = function (err) {
-          $scope.disconnect();
+          if (closeTerminal) {
+            $scope.disconnect();
+          } else {
+            Notifications.error('Failure', err, 'Connection error');
+          }
           $scope.$apply();
-          Notifications.error('Failure', err, 'Connection error');
         };
+
         socket.onclose = function () {
-          $scope.disconnect();
+          if (closeTerminal) {
+            $scope.disconnect();
+          }
           $scope.$apply();
         };
 
