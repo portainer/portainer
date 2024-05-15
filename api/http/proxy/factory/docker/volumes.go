@@ -150,7 +150,9 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 
 		_, err = cli.VolumeInspect(context.Background(), volumeID)
 		if err == nil {
-			return nil, errors.New("a volume with the same name already exists")
+			return &http.Response{
+				StatusCode: http.StatusConflict,
+			}, errors.New("a volume with the same name already exists")
 		}
 	}
 
