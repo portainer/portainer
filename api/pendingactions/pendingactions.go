@@ -76,10 +76,11 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
 
 	// For Kubernetes endpoints, we need to check if the endpoint is up by creating a kube client
 	if isKubernetesEndpoint {
-		_, err := service.kubeFactory.GetKubeClient(endpoint)
-		if err != nil {
-			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
-			return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
+		if client, _ := service.kubeFactory.GetKubeClient(endpoint); client != nil {
+			if _, err = client.ServerVersion(); err != nil {
+				log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
+				return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, id)
+			}
 		}
 	}
 
