@@ -191,7 +191,11 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         socket.send('clear\n');
 
         term.onData(function (data) {
-          if (data === '\x04' && commandBuffer == '') {
+          socket.send(data);
+
+          // This code is detect whether the user has typed CTRL+D
+          // or exit in the terminal
+          if (data === '\x04') {
             // If the user types CTRL+D, close the terminal
             closeTerminal = true;
           } else if (data === '\r') {
@@ -202,7 +206,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           } else {
             commandBuffer += data;
           }
-          socket.send(data);
         });
 
         var terminal_container = document.getElementById('terminal-container');
@@ -222,6 +225,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         socket.onmessage = function (e) {
           term.write(e.data);
         };
+
         socket.onerror = function (err) {
           if (closeTerminal) {
             $scope.disconnect();
@@ -230,10 +234,10 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           }
           $scope.$apply();
         };
+
         socket.onclose = function () {
           if (closeTerminal) {
             $scope.disconnect();
-            closeTerminal = false;
           }
           $scope.$apply();
         };
