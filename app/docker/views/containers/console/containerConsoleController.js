@@ -121,7 +121,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ExecService.resizeTTY.bind(this, params.id));
+          initTerm(url, ExecService.resizeTTY.bind(this, endpoint.Id, params.id), isLinuxTerminalCommand(execConfig.Cmd[0]));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to exec into container');
@@ -165,7 +165,12 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       restcall(termWidth + add, termHeight + add, 1);
     }
 
-    function initTerm(url, resizeRestCall) {
+    function isLinuxTerminalCommand(command) {
+      const validShellCommands = ['ash', 'bash', 'dash', 'sh'];
+      return validShellCommands.includes(command);
+    }
+
+    function initTerm(url, resizeRestCall, isLinuxTerm = false) {
       let resizefun = resize.bind(this, resizeRestCall);
 
       if ($transition$.params().nodeName) {
@@ -183,13 +188,20 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       socket.onopen = function () {
         $scope.state = states.connected;
         term = new Terminal();
-        socket.send('export LANG=C.UTF-8\n');
-        socket.send('export LC_ALL=C.UTF-8\n');
-        socket.send('clear\n');
+
+        if (isLinuxTerm) {
+          // linux terminals support xterm
+          socket.send('export LANG=C.UTF-8\n');
+          socket.send('export LC_ALL=C.UTF-8\n');
+          socket.send('export TERM="xterm-256color"\n');
+          socket.send('alias ls="ls --color=auto"\n');
+          socket.send('echo -e "\\033[2J\\033[H"\n');
+        }
 
         term.onData(function (data) {
           socket.send(data);
         });
+
         var terminal_container = document.getElementById('terminal-container');
         term.open(terminal_container);
         term.focus();
@@ -207,11 +219,13 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         socket.onmessage = function (e) {
           term.write(e.data);
         };
+
         socket.onerror = function (err) {
           $scope.disconnect();
-          $scope.$apply();
           Notifications.error('Failure', err, 'Connection error');
+          $scope.$apply();
         };
+
         socket.onclose = function () {
           $scope.disconnect();
           $scope.$apply();
