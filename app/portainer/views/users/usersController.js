@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -69,10 +70,9 @@ angular.module('portainer.app').controller('UsersController', [
         });
     };
 
-    function deleteSelectedUsers(selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (user) {
-        UserService.deleteUser(user.Id)
+    async function deleteSelectedUsers(selectedItems) {
+      async function doRemove(user) {
+        return UserService.deleteUser(user.Id)
           .then(function success() {
             Notifications.success('User successfully removed', user.Username);
             var index = $scope.users.indexOf(user);
@@ -80,14 +80,10 @@ angular.module('portainer.app').controller('UsersController', [
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove user');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     }
 
     $scope.removeAction = function (selectedItems) {
