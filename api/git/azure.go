@@ -27,9 +27,9 @@ const (
 func isAzureUrl(s string) bool {
 	condition := strings.Contains(s, azureDevOpsHost) ||
 		strings.Contains(s, visualStudioHostSuffix)
-	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
 	if azureDevOpsServerHostOK {
-		return condition || strings.Contains(s, azureDevOpsServerHost)
+		return condition || strings.Contains(s, azureDevOpsServerURL)
 	}
 	return condition
 }
@@ -59,16 +59,10 @@ type azureClient struct {
 }
 
 func NewAzureClient() *azureClient {
-	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
-	azureDevOpsServerBaseUrl, azureDevOpsServerBaseUrlOK := os.LookupEnv("AZURE_DEVOPS_SERVER_BASE_URL")
-	if azureDevOpsServerHostOK && azureDevOpsServerBaseUrlOK {
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
+	if azureDevOpsServerURLOK {
 		return &azureClient{
-			baseUrl: "https://" + azureDevOpsServerHost + "/" + azureDevOpsServerBaseUrl,
-		}
-	}
-	if azureDevOpsServerHostOK {
-		return &azureClient{
-			baseUrl: "https://" + azureDevOpsServerHost,
+			baseUrl: azureDevOpsServerURL,
 		}
 	}
 	return &azureClient{
@@ -258,24 +252,28 @@ func parseHttpUrl(rawUrl string) (*azureOptions, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HTTP url")
 	}
-	azureDevOpsServerHost, azureDevOpsServerHostOK := os.LookupEnv("AZURE_DEVOPS_SERVER_HOST")
-	azureDevOpsServerBaseUrl, azureDevOpsServerBaseUrlOK := os.LookupEnv("AZURE_DEVOPS_SERVER_BASE_URL")
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
+	if azureDevOpsServerURLOK {
+		azureDevOpsServerParsedURL, err := url.Parse(rawUrl)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse Azure DevOps Server url")
+		}
+	}
 	opt := azureOptions{}
 	switch {
-	case (u.Host == azureDevOpsHost) || (azureDevOpsServerHostOK && u.Host == azureDevOpsServerHost):
-		path := strings.Split(u.Path, "/")
-		if azureDevOpsServerBaseUrlOK {
-			path = strings.Split(strings.ReplaceAll(u.Path, azureDevOpsServerBaseUrl+"/", ""), "/")
-		}
+	case azureDevOpsServerURLOK && u.Host == azureDevOpsServerParsedURL.host:
+		path = strings.Split(strings.ReplaceAll(u.Path, azureDevOpsServerParsedURL.path, ""), "/")
 		if len(path) != 5 {
-			expectedUrl := expectedAzureDevOpsHttpUrl
-			if azureDevOpsServerHostOK && azureDevOpsServerBaseUrlOK {
-				expectedUrl = "https://" + azureDevOpsServerHost + "/" + azureDevOpsServerBaseUrl + "/Organisation/Project/_git/Repository"
-			}
-			if azureDevOpsServerHostOK {
-				expectedUrl = "https://" + azureDevOpsServerHost + "/Organisation/Project/_git/Repository"
-			}
+			expectedUrl =  azureDevOpsServerURL + "/{Collection}/{Project}/_git/{Repository}"
 			return nil, errors.Errorf("want url %s, got %s", expectedUrl, u)
+		}
+		opt.organisation = path[1] //In case of AzureDevops Server Organisation is replaced with Collection but their logic is the same
+		opt.project = path[2]
+		opt.repository = path[4]
+	case u.Host == azureDevOpsHost:
+		path := strings.Split(u.Path, "/")
+		if len(path) != 5 {
+			return nil, errors.Errorf("want url %s, got %s", expectedAzureDevOpsHttpUrl, u)
 		}
 		opt.organisation = path[1]
 		opt.project = path[2]
