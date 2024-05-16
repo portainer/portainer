@@ -28,7 +28,7 @@ func isAzureUrl(s string) bool {
 	condition := strings.Contains(s, azureDevOpsHost) ||
 		strings.Contains(s, visualStudioHostSuffix)
 	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
-	if azureDevOpsServerHostOK {
+	if azureDevOpsServerURLOK {
 		return condition || strings.Contains(s, azureDevOpsServerURL)
 	}
 	return condition
