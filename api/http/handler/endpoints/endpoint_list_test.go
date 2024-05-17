@@ -194,7 +194,7 @@ func setupEndpointListHandler(t *testing.T, endpoints []portainer.Endpoint) *Han
 
 	bouncer := testhelpers.NewTestRequestBouncer()
 
-	handler := NewHandler(bouncer, nil)
+	handler := NewHandler(bouncer)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
 	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil, nil)
