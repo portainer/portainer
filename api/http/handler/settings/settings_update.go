@@ -149,11 +149,6 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		return nil, httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
 
-	if handler.demoService.IsDemo() {
-		payload.EnableTelemetry = nil
-		payload.LogoURL = nil
-	}
-
 	if payload.AuthenticationMethod != nil {
 		settings.AuthenticationMethod = portainer.AuthenticationMethod(*payload.AuthenticationMethod)
 	}

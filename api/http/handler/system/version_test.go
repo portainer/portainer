@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/datastore"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
@@ -40,7 +39,7 @@ func Test_getSystemVersion(t *testing.T) {
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService)
 
-	h := NewHandler(requestBouncer, &portainer.Status{}, &demo.Service{}, store, nil)
+	h := NewHandler(requestBouncer, &portainer.Status{}, store, nil)
 
 	// generate standard and admin user tokens
 	jwt, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})

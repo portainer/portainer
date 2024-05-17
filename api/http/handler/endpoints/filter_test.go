@@ -194,7 +194,7 @@ func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) *Handler {
 	is.NoError(err, "error creating a user")
 
 	bouncer := testhelpers.NewTestRequestBouncer()
-	handler := NewHandler(bouncer, nil)
+	handler := NewHandler(bouncer)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
 
