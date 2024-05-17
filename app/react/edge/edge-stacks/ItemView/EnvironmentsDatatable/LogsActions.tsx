@@ -35,7 +35,8 @@ export function LogsActions({ environmentId, edgeStackId }: Props) {
   return (
     <>
       <Button
-        color="none"
+        className="p-0"
+        color="link"
         title="Retrieve logs"
         onClick={handleCollectLogs}
         data-cy="edge-stack-logs-collect-button"
@@ -48,11 +49,12 @@ export function LogsActions({ environmentId, edgeStackId }: Props) {
         />
       </Button>
       <Button
-        color="none"
-        data-cy="edge-stack-logs-download-button"
+        className="p-0"
+        color="link"
         title="Download logs"
         disabled={status !== 'collected'}
         onClick={handleDownloadLogs}
+        data-cy="edge-stack-logs-download-button"
       >
         <Icon
           icon={clsx({
@@ -62,7 +64,8 @@ export function LogsActions({ environmentId, edgeStackId }: Props) {
         />
       </Button>
       <Button
-        color="none"
+        className="p-0"
+        color="link"
         title="Delete logs"
         disabled={status !== 'collected'}
         onClick={handleDeleteLogs}
