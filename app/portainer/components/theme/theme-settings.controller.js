@@ -41,8 +41,6 @@ export default class ThemeSettingsController {
 
   $onInit() {
     return this.$async(async () => {
-      const state = this.StateManager.getState();
-
       this.state = {
         userId: null,
         themeColor: 'auto',
