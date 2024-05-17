@@ -1,13 +1,8 @@
 import { useField } from 'formik';
 
-import { useIsDemo } from '@/react/portainer/system/useSystemStatus';
-
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { DemoAlert } from './DemoAlert';
-
 export function EnableTelemetryField() {
-  const isDemoQuery = useIsDemo();
   const [{ value }, , { setValue }] = useField<boolean>('enableTelemetry');
 
   return (
@@ -20,11 +15,8 @@ export function EnableTelemetryField() {
           checked={value}
           name="toggle_enableTelemetry"
           onChange={(checked) => setValue(checked)}
-          disabled={isDemoQuery.data}
         />
       </div>
-
-      <DemoAlert />
 
       <div className="col-sm-12 text-muted small mt-2">
         You can find more information about this in our{' '}

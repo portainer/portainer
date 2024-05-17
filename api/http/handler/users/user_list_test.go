@@ -12,7 +12,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/datastore"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/testhelpers"
@@ -40,7 +39,7 @@ func Test_userList(t *testing.T) {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	passwordChecker := security.NewPasswordStrengthChecker(store.SettingsService)
 
-	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, &demo.Service{}, passwordChecker)
+	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, passwordChecker)
 	h.DataStore = store
 
 	// generate admin user tokens

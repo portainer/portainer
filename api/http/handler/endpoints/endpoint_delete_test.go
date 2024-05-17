@@ -9,7 +9,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 )
@@ -19,7 +18,7 @@ func TestEndpointDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	_, store := datastore.MustNewTestStore(t, true, false)
 
-	handler := NewHandler(testhelpers.NewTestRequestBouncer(), demo.NewService())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
 	handler.DataStore = store
 	handler.ProxyManager = proxy.NewManager(nil)
 	handler.ProxyManager.NewProxyFactory(nil, nil, nil, nil, nil, nil, nil, nil)

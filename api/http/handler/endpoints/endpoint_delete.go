@@ -9,7 +9,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -67,10 +66,6 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid boolean query parameter", err)
 	}
 
-	if handler.demoService.IsDemoEnvironment(portainer.EndpointID(endpointID)) {
-		return httperror.Forbidden(httperrors.ErrNotAvailableInDemo.Error(), httperrors.ErrNotAvailableInDemo)
-	}
-
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
 	})
@@ -112,15 +107,6 @@ func (handler *Handler) endpointDeleteMultiple(w http.ResponseWriter, r *http.Re
 
 	err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		for _, e := range p.Endpoints {
-			// Demo endpoints cannot be deleted.
-			if handler.demoService.IsDemoEnvironment(portainer.EndpointID(e.ID)) {
-				resps = append(resps, DeleteMultipleResp{
-					Name: e.Name,
-					Err:  httperrors.ErrNotAvailableInDemo,
-				})
-				continue
-			}
-
 			// Attempt deletion.
 			err := handler.deleteEndpoint(
 				tx,

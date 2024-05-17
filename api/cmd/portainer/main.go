@@ -20,7 +20,6 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/datastore/postinit"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/exec"
@@ -509,14 +508,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	applicationStatus := initStatus(instanceID)
 
-	demoService := demo.NewService()
-	if *flags.DemoEnvironment {
-		err := demoService.Init(dataStore, cryptoService)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed initializing demo environment")
-		}
-	}
-
 	// channel to control when the admin user is created
 	adminCreationDone := make(chan struct{}, 1)
 
@@ -631,7 +622,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
-		DemoService:                 demoService,
 		UpgradeService:              upgradeService,
 		AdminCreationDone:           adminCreationDone,
 		PendingActionsService:       pendingActionsService,

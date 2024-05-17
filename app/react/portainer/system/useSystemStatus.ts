@@ -15,11 +15,6 @@ export interface StatusResponse {
   Edition: string;
   Version: string;
   InstanceID: string;
-  DemoEnvironment: {
-    Enabled: boolean;
-    Users: Array<UserId>;
-    Environments: Array<EnvironmentId>;
-  };
 }
 
 export async function getSystemStatus() {
@@ -51,11 +46,5 @@ export function useSystemStatus<T = StatusResponse>({
     retry,
     retryDelay: 1000,
     onSuccess,
-  });
-}
-
-export function useIsDemo() {
-  return useSystemStatus({
-    select: (status) => status.DemoEnvironment.Enabled,
   });
 }

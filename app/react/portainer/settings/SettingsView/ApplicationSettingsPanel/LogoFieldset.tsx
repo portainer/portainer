@@ -1,18 +1,13 @@
 import { useField, Field } from 'formik';
 
-import { useIsDemo } from '@/react/portainer/system/useSystemStatus';
-
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { useToggledValue } from '../useToggledValue';
 
-import { DemoAlert } from './DemoAlert';
-
 export function LogoFieldset() {
   const [{ name }, { error }] = useField<string>('logo');
-  const isDemoQuery = useIsDemo();
 
   const [isEnabled, setIsEnabled] = useToggledValue('logo');
 
@@ -26,12 +21,9 @@ export function LogoFieldset() {
             checked={isEnabled}
             name="toggle_logo"
             labelClass="col-sm-3 col-lg-2"
-            disabled={isDemoQuery.data}
             onChange={(checked) => setIsEnabled(checked)}
           />
         </div>
-
-        <DemoAlert />
       </div>
 
       {isEnabled && (
