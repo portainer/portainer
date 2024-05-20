@@ -121,7 +121,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ExecService.resizeTTY.bind(this, endpoint.Id, params.id), isLinuxTerminalCommand(execConfig.Cmd[0]));
+          const isLinuxCommand = execConfig.Cmd ? isLinuxTerminalCommand(execConfig.Cmd[0]) : false;
+          initTerm(url, ExecService.resizeTTY.bind(this, params.id), isLinuxCommand);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to exec into container');
