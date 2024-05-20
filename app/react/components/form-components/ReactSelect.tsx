@@ -74,7 +74,6 @@ export function Select<
       <TooManyResultsSelector
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
-        options={options}
         size={size}
       />
     );
@@ -82,7 +81,6 @@ export function Select<
 
   return (
     <Component
-      options={options}
       className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
