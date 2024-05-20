@@ -60,16 +60,14 @@ export function Select<
   className,
   isCreatable = false,
   size = 'md',
-  options,
-  getOptionValue,
-  isItemVisible = (item, search) =>
-    !!getOptionValue?.(item).toLowerCase().includes(search.toLowerCase()),
+
   ...props
 }: Props<Option, IsMulti, Group> &
   AutomationTestingProps & {
     isItemVisible?: (item: Option, search: string) => boolean;
   }) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
+  const { options } = props;
 
   if ((options?.length || 0) > 1000) {
     return (
@@ -77,7 +75,6 @@ export function Select<
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         options={options}
-        isItemVisible={isItemVisible}
         size={size}
       />
     );
@@ -85,6 +82,7 @@ export function Select<
 
   return (
     <Component
+      options={options}
       className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
@@ -134,16 +132,19 @@ export function TooManyResultsSelector<
 >({
   options,
   isLoading,
-  isItemVisible,
+  getOptionValue,
+  isItemVisible = (item, search) =>
+    !!getOptionValue?.(item).toLowerCase().includes(search.toLowerCase()),
   ...props
 }: RegularProps<Option, IsMulti, Group> & {
-  isItemVisible: (item: Option, search: string) => boolean;
+  isItemVisible?: (item: Option, search: string) => boolean;
 }) {
   const defaultOptions = useMemo(() => options?.slice(0, 100), [options]);
 
   return (
     <Async
       isLoading={isLoading}
+      getOptionValue={getOptionValue}
       loadOptions={(search: string) =>
         filterOptions<Option, Group>(options, isItemVisible, search)
       }
