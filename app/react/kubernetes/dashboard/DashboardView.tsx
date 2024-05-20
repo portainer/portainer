@@ -8,47 +8,15 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 import { DashboardItem } from '@@/DashboardItem/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
 
-import { useApplicationsQuery } from '../applications/application.queries';
-import { usePVCsQuery } from '../volumes/usePVCsQuery';
-import { useServicesForCluster } from '../services/service';
-import { useIngresses } from '../ingresses/queries';
-import { useConfigMapsForCluster } from '../configs/configmap.service';
-import { useSecretsForCluster } from '../configs/secret.service';
-import { useNamespacesQuery } from '../namespaces/queries/useNamespacesQuery';
-
 import { EnvironmentInfo } from './EnvironmentInfo';
+import { useGetDashboardQuery } from './queries/getDashboardQuery';
 
 export function DashboardView() {
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } =
-    useNamespacesQuery(environmentId);
-  const namespaceNames = namespaces && Object.keys(namespaces);
-  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
-    environmentId,
-    namespaceNames
-  );
-  const { data: pvcs, ...pvcsQuery } = usePVCsQuery(
-    environmentId,
-    namespaceNames
-  );
-  const { data: services, ...servicesQuery } = useServicesForCluster(
-    environmentId,
-    namespaceNames,
-    { lookupApplications: false }
-  );
-  const { data: ingresses, ...ingressesQuery } = useIngresses(
-    environmentId,
-    namespaceNames
-  );
-  const { data: configMaps, ...configMapsQuery } = useConfigMapsForCluster(
-    environmentId,
-    namespaceNames
-  );
-  const { data: secrets, ...secretsQuery } = useSecretsForCluster(
-    environmentId,
-    namespaceNames
-  );
+  const dashboardQuery = useGetDashboardQuery(environmentId);
+
+  const dashboard = dashboardQuery.data;
 
   return (
     <>
@@ -64,42 +32,36 @@ export function DashboardView() {
         <EnvironmentInfo />
         <DashboardGrid>
           <DashboardItem
-            value={namespaceNames?.length}
-            isLoading={namespacesQuery.isLoading}
-            isRefetching={namespacesQuery.isRefetching}
+            value={dashboard?.namespacesCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Layers}
             to="kubernetes.resourcePools"
             type="Namespace"
             data-cy="dashboard-namespace"
           />
           <DashboardItem
-            value={applications?.length}
-            isLoading={applicationsQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              applicationsQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.applicationsCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={Box}
             to="kubernetes.applications"
             type="Application"
             data-cy="dashboard-application"
           />
           <DashboardItem
-            value={services?.length}
-            isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              servicesQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.servicesCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={Shuffle}
             to="kubernetes.services"
             type="Service"
             data-cy="dashboard-service"
           />
           <DashboardItem
-            value={ingresses?.length}
-            isLoading={ingressesQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              ingressesQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.ingressesCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={Route}
             to="kubernetes.ingresses"
             type="Ingress"
@@ -107,11 +69,9 @@ export function DashboardView() {
             data-cy="dashboard-ingress"
           />
           <DashboardItem
-            value={configMaps?.length}
-            isLoading={configMapsQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              configMapsQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.configMapsCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={FileCode}
             to="kubernetes.configurations"
             params={{ tab: 'configmaps' }}
@@ -119,11 +79,9 @@ export function DashboardView() {
             data-cy="dashboard-configmaps"
           />
           <DashboardItem
-            value={secrets?.length}
-            isLoading={secretsQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              secretsQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.secretsCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={Lock}
             to="kubernetes.configurations"
             params={{ tab: 'secrets' }}
@@ -131,11 +89,9 @@ export function DashboardView() {
             data-cy="dashboard-secrets"
           />
           <DashboardItem
-            value={pvcs?.length}
-            isLoading={pvcsQuery.isLoading || namespacesQuery.isLoading}
-            isRefetching={
-              pvcsQuery.isRefetching || namespacesQuery.isRefetching
-            }
+            value={dashboard?.volumesCount}
+            isLoading={dashboardQuery.isLoading}
+            isRefetching={dashboardQuery.isLoading}
             icon={Database}
             to="kubernetes.volumes"
             type="Volume"
