@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"runtime"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/internal/concurrent"
@@ -12,10 +11,6 @@ import (
 )
 
 func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
-	defer func() {
-		runtime.GC() // this function consumes a lot of memory. force free it asap
-	}()
-
 	dashboardData := models.K8sDashboard{}
 
 	// Get a list of all the namespaces first
@@ -28,49 +23,60 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 		return func(ctx context.Context) (interface{}, error) {
 			data := models.K8sDashboard{}
 
-			apps, err := kcl.GetApplications(namespace, "")
+			// get naked pods
+			nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
 			if err != nil {
+				// skip namespaces we're not allowed access to.  But don't return an error
 				if errors.IsForbidden(err) {
 					return nil, nil
 				}
 
 				return nil, err
 			}
-			data.ApplicationsCount = len(apps)
 
-			services, err := kcl.GetServices(namespace, false)
+			// apps (deployments, statefulsets, daemonsets)
+			applicationCount, err := getApplicationsCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
 			}
-			data.ServicesCount = len(services)
+			data.ApplicationsCount = applicationCount + int64(len(nakedPods))
 
-			ingresses, err := kcl.GetIngresses(namespace)
+			// services
+			serviceCount, err := getServicesCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
 			}
-			data.IngressesCount = len(ingresses)
+			data.ServicesCount = serviceCount
 
-			count, err := getConfigMapCount(kcl, namespace)
+			/// ingresses
+			ingressesCount, err := getIngressesCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
 			}
-			data.ConfigMapsCount = count
+			data.IngressesCount = ingressesCount
 
-			secretClient := kcl.cli.CoreV1().Secrets(namespace)
-			secrets, err := secretClient.List(context.Background(), v1.ListOptions{})
+			// configmaps
+			configMapCount, err := getConfigMapsCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
 			}
-			data.SecretsCount = len(secrets.Items)
+			data.ConfigMapsCount = configMapCount
 
-			volumesClient := kcl.cli.CoreV1().PersistentVolumeClaims(namespace)
-			volumes, err := volumesClient.List(context.Background(), v1.ListOptions{})
+			// secrets
+			secretsCount, err := getSecretsCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
 			}
-			data.VolumesCount = len(volumes.Items)
+			data.SecretsCount = secretsCount
 
-			// Count this namespace as accessable for this user
+			// volumes
+			volumesCount, err := getVolumesCount(ctx, kcl, namespace)
+			if err != nil {
+				return nil, err
+			}
+			data.VolumesCount = volumesCount
+
+			// count this namespace for the user
 			data.NamespacesCount = 1
 
 			return data, nil
@@ -82,7 +88,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 		dashboardTasks = append(dashboardTasks, getNamespaceCounts(ns.Name))
 	}
 
-	// Fetch all the dashboard data concurrently
+	// Fetch all the data for each namespace concurrently
 	results, err := concurrent.Run(context.TODO(), maxConcurrency, dashboardTasks...)
 	if err != nil {
 		return dashboardData, err
@@ -102,22 +108,150 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 	return dashboardData, nil
 }
 
-// Get the total count of configMaps for the given namespace
-func getConfigMapCount(kcl *KubeClient, namespace string) (int, error) {
+// Get applications excluding nakedpods
+func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
+	options := v1.ListOptions{Limit: 1}
+
+	// deployments
+	deployments, err := kcl.cli.AppsV1().Deployments(namespace).List(ctx, options)
+	if err != nil {
+		return 0, err
+	}
+
+	count := int64(0)
+	if len(deployments.Items) > 0 {
+		count = 1
+		remainingItemsCount := deployments.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count += *remainingItemsCount
+		}
+	}
+
+	// StatefulSets
+	statefulSets, err := kcl.cli.AppsV1().StatefulSets(namespace).List(ctx, options)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(statefulSets.Items) > 0 {
+		count += 1
+		remainingItemsCount := statefulSets.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count += *remainingItemsCount
+		}
+	}
+
+	// Daemonsets
+	daemonsets, err := kcl.cli.AppsV1().DaemonSets(namespace).List(ctx, options)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(daemonsets.Items) > 0 {
+		count += 1
+		remainingItemsCount := daemonsets.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count += *remainingItemsCount
+		}
+	}
+
+	return count, nil
+}
+
+// Get the total count of services for the given namespace
+func getServicesCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
 	options := v1.ListOptions{
-		Limit: 50,
+		Limit: 1,
 	}
-	count := 0
-	for {
-		configMaps, err := kcl.cli.CoreV1().ConfigMaps(namespace).List(context.Background(), options)
-		if err != nil {
-			return count, err
-		}
-		count += len(configMaps.Items)
-		if configMaps.Continue == "" {
-			break
-		}
-		options.Continue = configMaps.Continue
+	var count int64 = 0
+	services, err := kcl.cli.CoreV1().Services(namespace).List(ctx, options)
+	if err != nil {
+		return 0, err
 	}
+
+	if len(services.Items) > 0 {
+		count = 0
+		remainingItemsCount := services.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count = *remainingItemsCount
+		}
+	}
+
+	return count, nil
+}
+
+// Get the total count of ingresses for the given namespace
+func getIngressesCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
+	ingresses, err := kcl.cli.NetworkingV1().Ingresses(namespace).List(ctx, v1.ListOptions{Limit: 1})
+	if err != nil {
+		return 0, err
+	}
+
+	count := int64(0)
+	if len(ingresses.Items) > 0 {
+		count = 1
+		remainingItemsCount := ingresses.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count = *remainingItemsCount
+		}
+	}
+
+	return count, nil
+}
+
+// Get the total count of configMaps for the given namespace
+func getConfigMapsCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
+	configMaps, err := kcl.cli.CoreV1().ConfigMaps(namespace).List(ctx, v1.ListOptions{Limit: 1})
+	if err != nil {
+		return 0, err
+	}
+
+	count := int64(0)
+	if len(configMaps.Items) > 0 {
+		count = 1
+		remainingItemsCount := configMaps.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count = *remainingItemsCount
+		}
+	}
+
+	return count, nil
+}
+
+// Get the total count of secrets for the given namespace
+func getSecretsCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
+	secrets, err := kcl.cli.CoreV1().Secrets(namespace).List(ctx, v1.ListOptions{Limit: 1})
+	if err != nil {
+		return 0, err
+	}
+
+	count := int64(0)
+	if len(secrets.Items) > 0 {
+		count = 1
+		remainingItemsCount := secrets.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count = *remainingItemsCount
+		}
+	}
+
+	return count, nil
+}
+
+// Get the total count of volumes for the given namespace
+func getVolumesCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
+	volumes, err := kcl.cli.CoreV1().PersistentVolumeClaims(namespace).List(ctx, v1.ListOptions{Limit: 1})
+	if err != nil {
+		return 0, err
+	}
+
+	count := int64(0)
+	if len(volumes.Items) > 0 {
+		count = 1
+		remainingItemsCount := volumes.GetRemainingItemCount()
+		if remainingItemsCount != nil {
+			count = *remainingItemsCount
+		}
+	}
+
 	return count, nil
 }
