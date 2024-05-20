@@ -25,7 +25,6 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 
 			// apps (deployments, statefulsets, daemonsets)
 			applicationCount, err := getApplicationsCount(ctx, kcl, namespace)
-			// skip namespaces we're not allowed access to.  But don't return an error
 			if err != nil {
 				// skip namespaces we're not allowed access to.  But don't return an error
 				if errors.IsForbidden(err) {
@@ -34,7 +33,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 				return nil, err
 			}
 
-			// get naked pods
+			// + (naked pods)
 			nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
 			if err != nil {
 				return nil, err
