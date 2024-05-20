@@ -26,19 +26,14 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 			// apps (deployments, statefulsets, daemonsets)
 			applicationCount, err := getApplicationsCount(ctx, kcl, namespace)
 			if err != nil {
-				// skip namespaces we're not allowed access to.  But don't return an error
+				// skip namespaces we're not allowed access to.  But don't return an error so that we
+				// can still count the other namespaces.  Returning an error here will stop concurrent.Run
 				if errors.IsForbidden(err) {
 					return nil, nil
 				}
 				return nil, err
 			}
-
-			// + (naked pods)
-			nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
-			if err != nil {
-				return nil, err
-			}
-			data.ApplicationsCount = applicationCount + int64(len(nakedPods))
+			data.ApplicationsCount = applicationCount
 
 			// services
 			serviceCount, err := getServicesCount(ctx, kcl, namespace)
@@ -47,7 +42,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 			}
 			data.ServicesCount = serviceCount
 
-			/// ingresses
+			// ingresses
 			ingressesCount, err := getIngressesCount(ctx, kcl, namespace)
 			if err != nil {
 				return nil, err
@@ -93,6 +88,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 		return dashboardData, err
 	}
 
+	// Sum up the results
 	for i := range results {
 		data, _ := results[i].Result.(models.K8sDashboard)
 		dashboardData.NamespacesCount += data.NamespacesCount
@@ -110,6 +106,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 // Get applications excluding nakedpods
 func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string) (int64, error) {
 	options := v1.ListOptions{Limit: 1}
+	count := int64(0)
 
 	// deployments
 	deployments, err := kcl.cli.AppsV1().Deployments(namespace).List(ctx, options)
@@ -117,12 +114,11 @@ func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string
 		return 0, err
 	}
 
-	count := int64(0)
 	if len(deployments.Items) > 0 {
-		count = 1
+		count = 1 // first deployment
 		remainingItemsCount := deployments.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count += *remainingItemsCount
+			count += *remainingItemsCount // add the remaining deployments if any
 		}
 	}
 
@@ -133,10 +129,10 @@ func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string
 	}
 
 	if len(statefulSets.Items) > 0 {
-		count += 1
+		count += 1 // + first statefulset
 		remainingItemsCount := statefulSets.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count += *remainingItemsCount
+			count += *remainingItemsCount // add the remaining statefulsets if any
 		}
 	}
 
@@ -147,14 +143,20 @@ func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string
 	}
 
 	if len(daemonsets.Items) > 0 {
-		count += 1
+		count += 1 // + first daemonset
 		remainingItemsCount := daemonsets.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count += *remainingItemsCount
+			count += *remainingItemsCount // add the remaining daemonsets if any
 		}
 	}
 
-	return count, nil
+	// + (naked pods)
+	nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
+	if err != nil {
+		return 0, err
+	}
+
+	return count + int64(len(nakedPods)), nil
 }
 
 // Get the total count of services for the given namespace
@@ -169,10 +171,10 @@ func getServicesCount(ctx context.Context, kcl *KubeClient, namespace string) (i
 	}
 
 	if len(services.Items) > 0 {
-		count = 0
+		count = 1 // first service
 		remainingItemsCount := services.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount
+			count = *remainingItemsCount // add the remaining services if any
 		}
 	}
 
@@ -188,10 +190,10 @@ func getIngressesCount(ctx context.Context, kcl *KubeClient, namespace string) (
 
 	count := int64(0)
 	if len(ingresses.Items) > 0 {
-		count = 1
+		count = 1 // first ingress
 		remainingItemsCount := ingresses.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount
+			count = *remainingItemsCount // add the remaining ingresses if any
 		}
 	}
 
@@ -207,10 +209,10 @@ func getConfigMapsCount(ctx context.Context, kcl *KubeClient, namespace string) 
 
 	count := int64(0)
 	if len(configMaps.Items) > 0 {
-		count = 1
+		count = 1 // first configmap
 		remainingItemsCount := configMaps.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount
+			count = *remainingItemsCount // add the remaining configmaps if any
 		}
 	}
 
@@ -226,10 +228,10 @@ func getSecretsCount(ctx context.Context, kcl *KubeClient, namespace string) (in
 
 	count := int64(0)
 	if len(secrets.Items) > 0 {
-		count = 1
+		count = 1 // first secret
 		remainingItemsCount := secrets.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount
+			count = *remainingItemsCount // add the remaining secrets if any
 		}
 	}
 
@@ -245,10 +247,10 @@ func getVolumesCount(ctx context.Context, kcl *KubeClient, namespace string) (in
 
 	count := int64(0)
 	if len(volumes.Items) > 0 {
-		count = 1
+		count = 1 // first volume
 		remainingItemsCount := volumes.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount
+			count = *remainingItemsCount // add the remaining volumes if any
 		}
 	}
 
