@@ -83,12 +83,12 @@ import (
 
 // Result contains the result and any error returned from running a client task function
 type Result struct {
-	Result interface{} // the result of running the task function
-	Err    error       // any error that occurred while running the task function
+	Result any   // the result of running the task function
+	Err    error // any error that occurred while running the task function
 }
 
 // Func is a function returns a result or error
-type Func func(ctx context.Context) (interface{}, error)
+type Func func(ctx context.Context) (any, error)
 
 // Run runs a list of functions returns the results
 func Run(ctx context.Context, maxConcurrency int, tasks ...Func) ([]Result, error) {
