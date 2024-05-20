@@ -1,12 +1,16 @@
 import ReactSelectCreatable, {
   CreatableProps as ReactSelectCreatableProps,
 } from 'react-select/creatable';
+import ReactSelectAsync, {
+  AsyncProps as ReactSelectAsyncProps,
+} from 'react-select/async';
 import ReactSelect, {
   GroupBase,
+  OptionsOrGroups,
   Props as ReactSelectProps,
 } from 'react-select';
 import clsx from 'clsx';
-import { RefAttributes } from 'react';
+import { RefAttributes, useMemo } from 'react';
 import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import './ReactSelect.css';
@@ -56,9 +60,28 @@ export function Select<
   className,
   isCreatable = false,
   size = 'md',
+  options,
+  getOptionValue,
+  isItemVisible = (item, search) =>
+    !!getOptionValue?.(item).toLowerCase().includes(search.toLowerCase()),
   ...props
-}: Props<Option, IsMulti, Group> & AutomationTestingProps) {
+}: Props<Option, IsMulti, Group> &
+  AutomationTestingProps & {
+    isItemVisible?: (item: Option, search: string) => boolean;
+  }) {
   const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
+
+  if ((options?.length || 0) > 1000) {
+    return (
+      <TooManyResultsSelector
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...props}
+        options={options}
+        isItemVisible={isItemVisible}
+        size={size}
+      />
+    );
+  }
 
   return (
     <Component
@@ -83,4 +106,84 @@ export function Creatable<
       {...props}
     />
   );
+}
+
+export function Async<
+  Option = DefaultOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>({
+  className,
+  size,
+  ...props
+}: ReactSelectAsyncProps<Option, IsMulti, Group> & { size?: 'sm' | 'md' }) {
+  return (
+    <ReactSelectAsync
+      className={clsx(className, 'portainer-selector-root', size)}
+      classNamePrefix="portainer-selector"
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+    />
+  );
+}
+
+export function TooManyResultsSelector<
+  Option = DefaultOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>({
+  options,
+  isLoading,
+  isItemVisible,
+  ...props
+}: RegularProps<Option, IsMulti, Group> & {
+  isItemVisible: (item: Option, search: string) => boolean;
+}) {
+  const defaultOptions = useMemo(() => options?.slice(0, 100), [options]);
+
+  return (
+    <Async
+      isLoading={isLoading}
+      loadOptions={(search: string) =>
+        filterOptions<Option, Group>(options, isItemVisible, search)
+      }
+      defaultOptions={defaultOptions}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+    />
+  );
+}
+
+function filterOptions<
+  Option = DefaultOption,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>(
+  options: OptionsOrGroups<Option, Group> | undefined,
+  isItemVisible: (item: Option, search: string) => boolean,
+  search: string
+): Promise<OptionsOrGroups<Option, Group> | undefined> {
+  return Promise.resolve<OptionsOrGroups<Option, Group> | undefined>(
+    options
+      ?.filter((item) =>
+        isGroup(item)
+          ? item.options.some((ni) => isItemVisible(ni, search))
+          : isItemVisible(item, search)
+      )
+      .slice(0, 100)
+  );
+}
+
+function isGroup<
+  Option = DefaultOption,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>(option: Option | Group): option is Group {
+  if (!option) {
+    return false;
+  }
+
+  if (typeof option !== 'object') {
+    return false;
+  }
+
+  return 'options' in option;
 }

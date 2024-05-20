@@ -22,16 +22,13 @@ export function VolumeSelector({
     },
   });
 
-  if (!volumesQuery.data) {
-    return null;
-  }
+  const initialVolumes = volumesQuery.data || [];
 
   const volumes = allowAuto
-    ? [...volumesQuery.data, { Name: 'auto', Driver: '' }]
-    : volumesQuery.data;
+    ? [...initialVolumes, { Name: 'auto', Driver: '' }]
+    : initialVolumes;
 
   const selectedValue = volumes.find((vol) => vol.Name === value);
-
   return (
     <Select
       placeholder="Select a volume"
@@ -47,6 +44,7 @@ export function VolumeSelector({
       onChange={(vol) => onChange(vol?.Name)}
       inputId={inputId}
       data-cy="docker-containers-volume-selector"
+      size="sm"
     />
   );
 }
