@@ -17,7 +17,7 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @success 200 {array} models.K8sDashboard "Success"
+// @success 200 {array} kubernetes.K8sDashboard "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/dashboard [get]
