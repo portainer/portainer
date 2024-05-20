@@ -20,7 +20,7 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 	}
 
 	getNamespaceCounts := func(namespace string) concurrent.Func {
-		return func(ctx context.Context) (interface{}, error) {
+		return func(ctx context.Context) (any, error) {
 			data := models.K8sDashboard{}
 
 			// apps (deployments, statefulsets, daemonsets)
@@ -174,7 +174,7 @@ func getServicesCount(ctx context.Context, kcl *KubeClient, namespace string) (i
 		count = 1 // first service
 		remainingItemsCount := services.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount // add the remaining services if any
+			count += *remainingItemsCount // add the remaining services if any
 		}
 	}
 
@@ -193,7 +193,7 @@ func getIngressesCount(ctx context.Context, kcl *KubeClient, namespace string) (
 		count = 1 // first ingress
 		remainingItemsCount := ingresses.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount // add the remaining ingresses if any
+			count += *remainingItemsCount // add the remaining ingresses if any
 		}
 	}
 
@@ -212,7 +212,7 @@ func getConfigMapsCount(ctx context.Context, kcl *KubeClient, namespace string) 
 		count = 1 // first configmap
 		remainingItemsCount := configMaps.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount // add the remaining configmaps if any
+			count += *remainingItemsCount // add the remaining configmaps if any
 		}
 	}
 
@@ -231,7 +231,7 @@ func getSecretsCount(ctx context.Context, kcl *KubeClient, namespace string) (in
 		count = 1 // first secret
 		remainingItemsCount := secrets.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount // add the remaining secrets if any
+			count += *remainingItemsCount // add the remaining secrets if any
 		}
 	}
 
@@ -250,7 +250,7 @@ func getVolumesCount(ctx context.Context, kcl *KubeClient, namespace string) (in
 		count = 1 // first volume
 		remainingItemsCount := volumes.GetRemainingItemCount()
 		if remainingItemsCount != nil {
-			count = *remainingItemsCount // add the remaining volumes if any
+			count += *remainingItemsCount // add the remaining volumes if any
 		}
 	}
 
