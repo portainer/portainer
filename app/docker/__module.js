@@ -150,8 +150,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/dashboard',
       views: {
         'content@': {
-          templateUrl: './views/dashboard/dashboard.html',
-          controller: 'DashboardController',
+          component: 'dockerDashboardView',
         },
       },
       data: {

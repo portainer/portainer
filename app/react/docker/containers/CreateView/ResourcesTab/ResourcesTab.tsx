@@ -111,7 +111,7 @@ export function ResourcesTab({
         <GpuFieldset
           values={values.gpu}
           onChange={(gpu) => setFieldValue('gpu', gpu)}
-          gpus={environment.Gpus}
+          gpus={environment.Gpus || []}
           enableGpuManagement={environment.EnableGPUManagement}
           usedGpus={gpuUseList}
           usedAllGpus={gpuUseAll}

@@ -22,13 +22,17 @@ function WaitingRoomView() {
         reload
       />
 
-      <InformationPanel>
-        <TextTip color="blue">
-          Only environments generated from the AEEC script will appear here,
-          manually added environments and edge devices will bypass the waiting
-          room.
-        </TextTip>
-      </InformationPanel>
+      <div className="row">
+        <div className="col-sm-12">
+          <InformationPanel>
+            <TextTip color="blue">
+              Only environments generated from the AEEC script will appear here,
+              manually added environments and edge devices will bypass the
+              waiting room.
+            </TextTip>
+          </InformationPanel>
+        </div>
+      </div>
 
       {licenseOverused && (
         <div className="row">

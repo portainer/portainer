@@ -8,12 +8,16 @@ export function ListView() {
     <>
       <PageHeader title="Registries" breadcrumbs="Registry management" reload />
 
-      <InformationPanel title="Information">
-        <span className="small text-muted">
-          View registries via an environment to manage access for user(s) and/or
-          team(s)
-        </span>
-      </InformationPanel>
+      <div className="row">
+        <div className="col-sm-12">
+          <InformationPanel title="Information">
+            <span className="small text-muted">
+              View registries via an environment to manage access for user(s)
+              and/or team(s)
+            </span>
+          </InformationPanel>
+        </div>
+      </div>
 
       <RegistriesDatatable />
     </>
