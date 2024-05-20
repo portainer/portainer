@@ -25,6 +25,8 @@ const (
 	DefaultKubeClientBurst = 100
 )
 
+const maxConcurrency = 30
+
 type (
 	// ClientFactory is used to create Kubernetes clients
 	ClientFactory struct {
