@@ -9,13 +9,18 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
-import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { createPersistedStore } from '@@/datatables/types';
+import { useTableState } from '@@/datatables/useTableState';
 
 import { useEdgeStack } from '../../queries/useEdgeStack';
 
 import { EdgeStackEnvironment } from './types';
 import { columns } from './columns';
+
+const tableKey = 'edge-stacks-environment';
+
+const settingsStore = createPersistedStore(tableKey);
 
 export function EnvironmentsDatatable() {
   const {
@@ -40,7 +45,7 @@ export function EnvironmentsDatatable() {
     'status',
     (value) => (value ? parseInt(value, 10) : undefined)
   );
-  const tableState = useTableStateWithoutStorage('name');
+  const tableState = useTableState(settingsStore, tableKey);
   const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
     page: page + 1,
