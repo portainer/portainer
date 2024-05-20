@@ -23,19 +23,19 @@ func (kcl *KubeClient) GetDashboard() (models.K8sDashboard, error) {
 		return func(ctx context.Context) (interface{}, error) {
 			data := models.K8sDashboard{}
 
-			// get naked pods
-			nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
+			// apps (deployments, statefulsets, daemonsets)
+			applicationCount, err := getApplicationsCount(ctx, kcl, namespace)
+			// skip namespaces we're not allowed access to.  But don't return an error
 			if err != nil {
 				// skip namespaces we're not allowed access to.  But don't return an error
 				if errors.IsForbidden(err) {
 					return nil, nil
 				}
-
 				return nil, err
 			}
 
-			// apps (deployments, statefulsets, daemonsets)
-			applicationCount, err := getApplicationsCount(ctx, kcl, namespace)
+			// get naked pods
+			nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
 			if err != nil {
 				return nil, err
 			}
