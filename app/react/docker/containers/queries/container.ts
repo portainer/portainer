@@ -10,7 +10,10 @@ import {
 import { RawAxiosRequestHeaders } from 'axios';
 
 import { PortainerResponse } from '@/react/docker/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  agentTargetHeader,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 import { ContainerId } from '@/react/docker/containers/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { queryClient } from '@/react-tools/react-query';
@@ -115,7 +118,7 @@ async function getContainer(
     const headers: RawAxiosRequestHeaders = {};
 
     if (nodeName) {
-      headers['X-PortainerAgent-Target'] = nodeName;
+      headers[agentTargetHeader] = nodeName;
     }
 
     const { data } = await axios.get<ContainerResponse>(
