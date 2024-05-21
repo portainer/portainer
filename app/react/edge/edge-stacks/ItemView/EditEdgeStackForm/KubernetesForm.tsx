@@ -35,7 +35,7 @@ export function KubernetesForm({
       <WebEditorForm
         data-cy="kube-manifest-editor"
         value={values.content}
-        yaml
+        type="yaml"
         id="kube-manifest-editor"
         placeholder="Define or paste the content of your manifest here"
         onChange={(value) =>

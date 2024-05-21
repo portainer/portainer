@@ -15,12 +15,11 @@ import styles from './CodeEditor.module.css';
 import { TextTip } from './Tip/TextTip';
 import { StackVersionSelector } from './StackVersionSelector';
 
+type Type = 'yaml' | 'shell' | 'dockerfile';
 interface Props extends AutomationTestingProps {
   id: string;
   placeholder?: string;
-  yaml?: boolean;
-  dockerFile?: boolean;
-  shell?: boolean;
+  type?: Type;
   readonly?: boolean;
   onChange: (value: string) => void;
   value: string;
@@ -62,6 +61,12 @@ const dockerFileLanguage = new LanguageSupport(
 );
 const shellLanguage = new LanguageSupport(StreamLanguage.define(shell));
 
+const docTypeExtensionMap: Record<Type, LanguageSupport> = {
+  yaml: yamlLanguage,
+  dockerfile: dockerFileLanguage,
+  shell: shellLanguage,
+};
+
 export function CodeEditor({
   id,
   onChange,
@@ -71,26 +76,18 @@ export function CodeEditor({
   versions,
   onVersionChange,
   height = '500px',
-  yaml: isYaml,
-  dockerFile: isDockerFile,
-  shell: isShell,
+  type,
   'data-cy': dataCy,
 }: Props) {
   const [isRollback, setIsRollback] = useState(false);
 
   const extensions = useMemo(() => {
     const extensions = [];
-    if (isYaml) {
-      extensions.push(yamlLanguage);
-    }
-    if (isDockerFile) {
-      extensions.push(dockerFileLanguage);
-    }
-    if (isShell) {
-      extensions.push(shellLanguage);
+    if (type && docTypeExtensionMap[type]) {
+      extensions.push(docTypeExtensionMap[type]);
     }
     return extensions;
-  }, [isYaml, isDockerFile, isShell]);
+  }, [type]);
 
   function handleVersionChange(version: number) {
     if (versions && versions.length > 1) {

@@ -37,7 +37,7 @@ export function YAMLInspector({
         readonly
         hideTitle
         id={identifier}
-        yaml
+        type="yaml"
         height={expanded ? '800px' : '500px'}
         onChange={() => {}} // all kube yaml inspectors in CE are read only
       />
