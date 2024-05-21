@@ -250,7 +250,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 				if exists, fileExistsErr := filesystem.FileExists(manifest); fileExistsErr != nil || !exists {
 					// If removal has failed and one of the manifest files is missing,
 					// we can consider this stack as removed
-					log.Warn().Err(err).Msgf("failed to find manifest %s, but stack deletion will continue", manifest)
+					log.Warn().Err(fileExistsErr).Msgf("failed to find manifest %s, but stack deletion will continue", manifest)
 					return nil
 				}
 			}
