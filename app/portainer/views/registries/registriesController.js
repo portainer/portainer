@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { confirmDelete } from '@@/modals/confirm';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 angular.module('portainer.app').controller('RegistriesController', [
   '$q',
@@ -32,10 +33,9 @@ angular.module('portainer.app').controller('RegistriesController', [
       });
     };
 
-    function deleteSelectedRegistries(selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (registry) {
-        RegistryService.deleteRegistry(registry.Id)
+    async function deleteSelectedRegistries(selectedItems) {
+      async function doRemove(registry) {
+        return RegistryService.deleteRegistry(registry.Id)
           .then(function success() {
             Notifications.success('Registry successfully removed', registry.Name);
             var index = $scope.registries.indexOf(registry);
@@ -43,14 +43,11 @@ angular.module('portainer.app').controller('RegistriesController', [
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove registry');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     }
 
     function initView() {
