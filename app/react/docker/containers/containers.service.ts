@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -5,7 +7,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withAgentTargetHeader } from '../proxy/queries/utils';
 import { buildDockerProxyUrl } from '../proxy/queries/buildDockerProxyUrl';
 
-import { ContainerId } from './types';
+import { ContainerId, ContainerLogsParams } from './types';
 
 export async function startContainer(
   environmentId: EnvironmentId,
@@ -166,5 +168,24 @@ export async function removeContainer(
     }
   } catch (e) {
     throw parseAxiosError(e, 'Unable to remove container');
+  }
+}
+
+export async function getContainerLogs(
+  environmentId: EnvironmentId,
+  containerId: ContainerId,
+  params?: ContainerLogsParams
+): Promise<string> {
+  try {
+    const { data } = await axios.get<string>(
+      buildDockerProxyUrl(environmentId, 'containers', containerId, 'logs'),
+      {
+        params: _.pickBy(params),
+      }
+    );
+
+    return data;
+  } catch (e) {
+    throw parseAxiosError(e, 'Unable to get container logs');
   }
 }

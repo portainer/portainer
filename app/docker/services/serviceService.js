@@ -3,7 +3,10 @@ import { createService } from '@/react/docker/services/queries/useCreateServiceM
 import { getService } from '@/react/docker/services/queries/useService';
 import { getServices } from '@/react/docker/services/queries/useServices';
 import { updateService } from '@/react/docker/services/queries/useUpdateServiceMutation';
+import { getServiceLogs } from '@/react/docker/services/queries/useServiceLogs';
+
 import { ServiceViewModel } from '../models/service';
+import { formatLogs } from '../helpers/logHelper';
 
 angular.module('portainer.docker').factory('ServiceService', ServiceServiceFactory);
 
@@ -36,5 +39,26 @@ function ServiceServiceFactory(AngularToReact) {
         registryId,
       })
     ), // service create
+    logs: AngularToReact.useAxios(serviceLogsAngularJS), // service logs
   };
+
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {ServiceId} id
+   * @param {boolean?} stdout
+   * @param {boolean?} stderr
+   * @param {boolean?} timestamps
+   * @param {number?} since
+   * @param {number?} tail
+   */
+  async function serviceLogsAngularJS(environmentId, id, stdout = false, stderr = false, timestamps = false, since = 0, tail = 'all') {
+    const data = await getServiceLogs(environmentId, id, {
+      since,
+      stderr,
+      stdout,
+      tail,
+      timestamps,
+    });
+    return formatLogs(data, { stripHeaders: true, withTimestamps: !!timestamps });
+  }
 }

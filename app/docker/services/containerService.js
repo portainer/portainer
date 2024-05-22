@@ -9,6 +9,7 @@ import {
   startContainer,
   stopContainer,
   recreateContainer,
+  getContainerLogs,
 } from '@/react/docker/containers/containers.service';
 import { getContainers } from '@/react/docker/containers/queries/useContainers';
 import { getContainer } from '@/react/docker/containers/queries/useContainer';
@@ -20,6 +21,7 @@ import { containerTop } from '@/react/docker/containers/queries/useContainerTop'
 
 import { ContainerDetailsViewModel } from '../models/containerDetails';
 import { ContainerStatsViewModel } from '../models/containerStats';
+import { formatLogs } from '../helpers/logHelper';
 
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);
 
@@ -43,6 +45,7 @@ function ContainerServiceFactory() {
     containerStats: containerStatsAngularJS, // container stats
     containerTop, // container stats
     inspect: getContainer, // container inspect
+    logs: containerLogsAngularJS, // container logs
   };
 
   /**
@@ -88,5 +91,26 @@ function ContainerServiceFactory() {
   async function containerStatsAngularJS(environmentId, id) {
     const data = await containerStats(environmentId, id);
     return new ContainerStatsViewModel(data);
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {Containerid} id
+   * @param {boolean?} stdout
+   * @param {boolean?} stderr
+   * @param {boolean?} timestamps
+   * @param {number?} since
+   * @param {number?} tail
+   * @param {boolean?} stripHeaders
+   */
+  async function containerLogsAngularJS(environmentId, id, stdout = false, stderr = false, timestamps = false, since = 0, tail = 'all', stripHeaders) {
+    const data = await getContainerLogs(environmentId, id, {
+      since,
+      stderr,
+      stdout,
+      tail,
+      timestamps,
+    });
+    return formatLogs(data, { stripHeaders, withTimestamps: !!timestamps });
   }
 }

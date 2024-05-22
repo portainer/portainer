@@ -47,3 +47,11 @@ type DecoratedDockerContainer = {
  */
 export type ContainerListViewModel = DecoratedDockerContainer &
   Omit<DockerContainerResponse, keyof DecoratedDockerContainer>;
+
+export type ContainerLogsParams = {
+  stdout?: boolean;
+  stderr?: boolean;
+  timestamps?: boolean;
+  since?: number;
+  tail?: number;
+};
