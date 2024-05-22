@@ -161,7 +161,7 @@ async function replace({
   );
 
   await removeContainer(environment.Id, oldContainer.Id, {
-    nodeName: values.nodeName,
+    nodeName: oldContainer.NodeName,
   });
 }
 
@@ -178,13 +178,17 @@ async function renameAndCreate(
 ) {
   let renamed = false;
   try {
-    await stopContainerIfNeeded(environmentId, oldContainer, nodeName);
+    await stopContainerIfNeeded(
+      environmentId,
+      oldContainer,
+      oldContainer.NodeName
+    );
 
     await renameContainer(
       environmentId,
       oldContainer.Id,
       `${oldContainer.Names[0]}-old`,
-      { nodeName }
+      { nodeName: oldContainer.NodeName }
     );
     renamed = true;
 
@@ -192,7 +196,7 @@ async function renameAndCreate(
   } catch (e) {
     if (renamed) {
       await renameContainer(environmentId, oldContainer.Id, name, {
-        nodeName,
+        nodeName: oldContainer.NodeName,
       });
     }
     throw e;
