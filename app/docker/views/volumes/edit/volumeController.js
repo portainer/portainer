@@ -21,7 +21,7 @@ angular.module('portainer.docker').controller('VolumeController', [
     $scope.removeVolume = function removeVolume() {
       confirmDelete('Do you want to remove this volume?').then((confirmed) => {
         if (confirmed) {
-          VolumeService.remove($scope.volume)
+          VolumeService.remove($scope.volume.Id)
             .then(function success() {
               Notifications.success('Volume successfully removed', $transition$.params().id);
               $state.go('docker.volumes', {});

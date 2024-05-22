@@ -6,7 +6,7 @@ import { useTableState } from '@@/datatables/useTableState';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
 
-import { DockerContainer } from '../../types';
+import { ContainerListViewModel } from '../../types';
 
 import { TableNetwork } from './types';
 import { columns } from './columns';
@@ -21,7 +21,7 @@ export function ContainerNetworksDatatable({
   nodeName,
 }: {
   dataset: NetworkSettings['Networks'];
-  container: DockerContainer;
+  container: ContainerListViewModel;
   nodeName?: string;
 }) {
   const tableState = useTableState(store, storageKey);

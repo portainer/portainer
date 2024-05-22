@@ -1,7 +1,7 @@
 import { DockerNetwork } from '@/react/docker/networks/types';
 
-import { ContainerJSON } from '../../queries/container';
-import { DockerContainer } from '../../types';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
+import { ContainerListViewModel } from '../../types';
 
 import { CONTAINER_MODE, Values } from './types';
 
@@ -22,9 +22,9 @@ export function getDefaultViewModel(isWindows: boolean) {
 }
 
 export function toViewModel(
-  config: ContainerJSON,
+  config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<DockerContainer> = []
+  runningContainers: Array<ContainerListViewModel> = []
 ): Values {
   const dns = config.HostConfig?.Dns;
   const [primaryDns = '', secondaryDns = ''] = dns || [];
@@ -62,9 +62,9 @@ export function toViewModel(
 }
 
 function getNetworkMode(
-  config: ContainerJSON,
+  config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<DockerContainer> = []
+  runningContainers: Array<ContainerListViewModel> = []
 ) {
   let networkMode = config.HostConfig?.NetworkMode || '';
   if (!networkMode) {

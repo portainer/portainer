@@ -2,32 +2,32 @@ import { Volume } from 'docker-types/generated/1.41';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { IResource } from '@/react/docker/components/datatable/createOwnershipColumn';
-import { PortainerMetadata } from '@/react/docker/types';
+import { PortainerResponse } from '@/react/docker/types';
 
 export class VolumeViewModel implements IResource {
-  Id: string;
+  Id: Volume['Name'];
 
-  CreatedAt: string | undefined;
+  CreatedAt?: Volume['CreatedAt'];
 
-  Driver: string;
+  Driver: Volume['Driver'];
 
-  Options: Record<string, string>;
+  Options: Volume['Options'];
 
-  Labels: Record<string, string>;
+  Labels: Volume['Labels'];
 
-  StackName?: string;
+  Mountpoint: Volume['Mountpoint'];
 
-  Mountpoint: string;
+  // Portainer properties
 
   ResourceId?: string;
 
   NodeName?: string;
 
+  StackName?: string;
+
   ResourceControl?: ResourceControlViewModel;
 
-  constructor(
-    data: Volume & { Portainer?: PortainerMetadata; ResourceID?: string }
-  ) {
+  constructor(data: PortainerResponse<Volume> & { ResourceID?: string }) {
     this.Id = data.Name;
     this.CreatedAt = data.CreatedAt;
     this.Driver = data.Driver;

@@ -8,14 +8,12 @@ angular.module('portainer.docker').controller('VolumesController', [
   'ServiceService',
   'VolumeHelper',
   'Notifications',
-  'HttpRequestHelper',
   'Authentication',
   'endpoint',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, Authentication, endpoint) {
     $scope.removeAction = async function (selectedItems) {
       async function doRemove(volume) {
-        HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
-        return VolumeService.remove(volume)
+        return VolumeService.remove(volume.Id, volume.NodeName)
           .then(function success() {
             Notifications.success('Volume successfully removed', volume.Id);
             var index = $scope.volumes.indexOf(volume);
@@ -36,8 +34,8 @@ angular.module('portainer.docker').controller('VolumesController', [
       var endpointRole = $scope.applicationState.endpoint.mode.role;
 
       $q.all({
-        attached: VolumeService.volumes({ filters: { dangling: ['false'] } }),
-        dangling: VolumeService.volumes({ filters: { dangling: ['true'] } }),
+        attached: VolumeService.volumes({ dangling: ['false'] }),
+        dangling: VolumeService.volumes({ dangling: ['true'] }),
         services: endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? ServiceService.services() : [],
       })
         .then(function success(data) {

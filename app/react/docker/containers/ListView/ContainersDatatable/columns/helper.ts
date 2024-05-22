@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { DockerContainer } from '../../../types';
+import { ContainerListViewModel } from '../../../types';
 
-export const columnHelper = createColumnHelper<DockerContainer>();
+export const columnHelper = createColumnHelper<ContainerListViewModel>();

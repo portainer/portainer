@@ -21,7 +21,7 @@ import { useIsSwarm } from '../../proxy/queries/useInfo';
 
 import { useColumns } from './columns';
 import { DecoratedNetwork } from './types';
-import { NestedNetworksDatatable } from './NestedNetwordsTable';
+import { NestedNetworksDatatable } from './NestedNetworksTable';
 
 const storageKey = 'docker.networks';
 

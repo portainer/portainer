@@ -1,9 +1,9 @@
-import { ContainerJSON } from '@/react/docker/containers/queries/container';
+import { ContainerDetailsJSON } from '@/react/docker/containers/queries/useContainer';
 
 import { capabilities } from './types';
 import { Values } from './CapabilitiesTab';
 
-export function toViewModel(config: ContainerJSON): Values {
+export function toViewModel(config: ContainerDetailsJSON): Values {
   const { CapAdd, CapDrop } = getDefaults(config);
 
   const missingCaps = capabilities
@@ -15,7 +15,7 @@ export function toViewModel(config: ContainerJSON): Values {
 
   return [...CapAdd, ...missingCaps];
 
-  function getDefaults(config: ContainerJSON) {
+  function getDefaults(config: ContainerDetailsJSON) {
     return {
       CapAdd: config.HostConfig?.CapAdd || [],
       CapDrop: config.HostConfig?.CapDrop || [],

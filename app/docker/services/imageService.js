@@ -1,208 +1,92 @@
-import _ from 'lodash';
+import { groupBy } from 'lodash';
+
 import { getUniqueTagListFromImages } from '@/react/docker/images/utils';
+import { getImage } from '@/react/docker/proxy/queries/images/useImage';
+import { parseAxiosError } from '@/portainer/services/axios';
+import { getImages } from '@/react/docker/proxy/queries/images/useImages';
+import { getContainers } from '@/react/docker/containers/queries/useContainers';
+import { getImageHistory } from '@/react/docker/proxy/queries/images/useImageHistory';
+import { pullImage } from '@/react/docker/images/queries/usePullImageMutation';
+import { pushImage } from '@/react/docker/images/queries/usePushImageMutation';
+import { removeImage } from '@/react/docker/proxy/queries/images/useRemoveImageMutation';
+import { tagImage } from '@/react/docker/proxy/queries/images/useTagImageMutation';
+import { downloadImages } from '@/react/docker/proxy/queries/images/useDownloadImages';
+import { uploadImages } from '@/react/docker/proxy/queries/images/useUploadImageMutation';
+
 import { ImageViewModel } from '../models/image';
 import { ImageDetailsViewModel } from '../models/imageDetails';
 import { ImageLayerViewModel } from '../models/imageLayer';
 
-angular.module('portainer.docker').factory('ImageService', [
-  '$q',
-  'Image',
-  'ImageHelper',
-  'RegistryService',
-  'HttpRequestHelper',
-  'ContainerService',
-  'FileUploadService',
-  function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService, FileUploadService) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('ImageService', ImageServiceFactory);
 
-    service.image = function (imageId) {
-      var deferred = $q.defer();
-      Image.get({ id: imageId })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message });
-          } else {
-            var image = new ImageDetailsViewModel(data);
-            deferred.resolve(image);
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve image details', err: err });
-        });
-      return deferred.promise;
-    };
+/* @ngInject */
+function ImageServiceFactory(AngularToReact) {
+  return {
+    image: AngularToReact.useAxios(imageAngularJS), // container console + image edit
+    images: AngularToReact.useAxios(imagesAngularJS), // por image registry controller + dashboard + service edit
+    history: AngularToReact.useAxios(historyAngularJS), // image edit
+    pushImage: AngularToReact.useAxios(pushImageAngularJS), // image edit
+    pullImage: AngularToReact.useAxios(pullImageAngularJS), // images list + image edit + templates list
+    tagImage: AngularToReact.useAxios(tagImage), // image edit + image import
+    downloadImages: AngularToReact.useAxios(downloadImages), // image list + image edit
+    uploadImage: AngularToReact.useAxios(uploadImages), // image import
+    deleteImage: AngularToReact.useAxios(removeImage), // image list + image edit
+    getUniqueTagListFromImages, // por image registry controller + service edit
+  };
 
-    service.images = function ({ environmentId, withUsage } = {}) {
-      var deferred = $q.defer();
+  async function imageAngularJS(environmentId, imageId) {
+    const image = await getImage(environmentId, imageId);
+    return new ImageDetailsViewModel(image);
+  }
 
-      $q.all({
-        containers: withUsage ? ContainerService.containers(environmentId, 1) : [],
-        images: Image.query({}).$promise,
-      })
-        .then(function success(data) {
-          var containers = data.containers;
-          const containerByImageId = _.groupBy(containers, 'ImageID');
-
-          var images = data.images.map(function (item) {
-            item.Used = !!containerByImageId[item.Id] && containerByImageId[item.Id].length > 0;
-            return new ImageViewModel(item);
-          });
-
-          deferred.resolve(images);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve images', err: err });
-        });
-      return deferred.promise;
-    };
-
-    service.history = function (imageId) {
-      var deferred = $q.defer();
-      Image.history({ id: imageId })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message });
-          } else {
-            var layers = [];
-            var order = data.length;
-            angular.forEach(data, function (imageLayer) {
-              layers.push(new ImageLayerViewModel(order, imageLayer));
-              order--;
-            });
-            deferred.resolve(layers);
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve image details', err: err });
-        });
-      return deferred.promise;
-    };
-
-    service.pushImage = pushImage;
-    /**
-     *
-     * @param {PorImageRegistryModel} registryModel
-     */
-    function pushImage(registryModel) {
-      var deferred = $q.defer();
-
-      var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
-      HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
-
-      const imageConfiguration = ImageHelper.createImageConfigForContainer(registryModel);
-
-      Image.push({ imageName: imageConfiguration.fromImage })
-        .$promise.then(function success(data) {
-          if (data[data.length - 1].error) {
-            deferred.reject({ msg: data[data.length - 1].error });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to push image tag', err: err });
-        });
-      return deferred.promise;
+  async function imagesAngularJS(environmentId, withUsage) {
+    try {
+      const [containers, images] = await Promise.all([withUsage ? getContainers(environmentId) : [], getImages(environmentId)]);
+      const containerByImageId = groupBy(containers, 'ImageID');
+      return images.map((item) => new ImageViewModel(item, !!containerByImageId[item.Id] && containerByImageId[item.Id].length > 0));
+    } catch (e) {
+      throw parseAxiosError(e, 'Unable to retrieve images');
     }
+  }
 
-    /**
-     * PULL IMAGE
-     */
-
-    function pullImageAndIgnoreErrors(imageConfiguration) {
-      var deferred = $q.defer();
-
-      Image.create({}, imageConfiguration)
-        .$promise.catch(() => {
-          // left empty to ignore errors
-        })
-        .finally(function final() {
-          deferred.resolve();
-        });
-
-      return deferred.promise;
+  async function historyAngularJS(environmentId, imageId) {
+    try {
+      const layers = await getImageHistory(environmentId, imageId);
+      return layers.reverse().map((layer, idx) => new ImageLayerViewModel(idx, layer));
+    } catch (e) {
+      throw parseAxiosError(e, 'Unable to retrieve image history');
     }
+  }
 
-    function pullImageAndAcknowledgeErrors(imageConfiguration) {
-      var deferred = $q.defer();
+  /**
+   * type PorImageRegistryModel = {
+   *   UseRegistry: bool;
+   *   Registry?: Registry;
+   *   Image: string;
+   * }
+   */
 
-      Image.create({}, imageConfiguration)
-        .$promise.then(function success(data) {
-          var err = data.length > 0 && data[data.length - 1].message;
-          if (err) {
-            var detail = data[data.length - 1];
-            deferred.reject({ msg: detail.message });
-          } else {
-            deferred.resolve(data);
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to pull image', err: err });
-        });
+  /**
+   * @param {EnvironmentId} environmentId Autofilled by AngularToReact
+   * @param {PorImageRegistryModel} registryModel
+   */
+  async function pushImageAngularJS(environmentId, registryModel) {
+    const { UseRegistry, Registry, Image } = registryModel;
+    const registry = UseRegistry ? Registry : undefined;
+    return pushImage({ environmentId, image: Image, registry });
+  }
 
-      return deferred.promise;
-    }
-
-    service.pullImage = pullImage;
-
-    /**
-     *
-     * @param {PorImageRegistryModel} registry
-     * @param {bool} ignoreErrors
-     */
-    function pullImage(registry, ignoreErrors) {
-      var authenticationDetails = registry.Registry.Authentication ? RegistryService.encodedCredentials(registry.Registry) : '';
-      HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
-
-      var imageConfiguration = ImageHelper.createImageConfigForContainer(registry);
-
-      if (ignoreErrors) {
-        return pullImageAndIgnoreErrors(imageConfiguration);
-      }
-      return pullImageAndAcknowledgeErrors(imageConfiguration);
-    }
-
-    /**
-     * ! PULL IMAGE
-     */
-
-    service.tagImage = function (id, image) {
-      return Image.tag({ id: id, repo: image }).$promise;
-    };
-
-    /**
-     *
-     * @param {Array<{tags: Array<string>; id: string;}>} images
-     * @returns {Promise<unknown>}
-     */
-    service.downloadImages = function (images) {
-      var names = ImageHelper.getImagesNamesForDownload(images);
-      return Image.download(names).$promise;
-    };
-
-    service.uploadImage = function (file) {
-      return FileUploadService.loadImages(file);
-    };
-
-    service.deleteImage = function (id, forceRemoval) {
-      var deferred = $q.defer();
-      Image.remove({ id: id, force: forceRemoval })
-        .$promise.then(function success(data) {
-          if (data[0].message) {
-            deferred.reject({ msg: data[0].message });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to remove image', err: err });
-        });
-      return deferred.promise;
-    };
-
-    service.getUniqueTagListFromImages = getUniqueTagListFromImages;
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId Autofilled by AngularToReact
+   * @param {PorImageRegistryModel} registryModel
+   * @param {bool?} ignoreErrors
+   * @param {string?} nodeName
+   * @returns
+   */
+  async function pullImageAngularJS(environmentId, registryModel, ignoreErrors, nodeName) {
+    const { UseRegistry, Registry, Image } = registryModel;
+    const registry = UseRegistry ? Registry : undefined;
+    const file = pullImage({ environmentId, ignoreErrors, image: Image, nodeName, registry });
+    return { file };
+  }
+}

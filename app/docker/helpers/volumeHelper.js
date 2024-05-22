@@ -3,14 +3,6 @@ angular.module('portainer.docker').factory('VolumeHelper', [
     'use strict';
     var helper = {};
 
-    helper.createDriverOptions = function (optionArray) {
-      var options = {};
-      optionArray.forEach(function (option) {
-        options[option.name] = option.value;
-      });
-      return options;
-    };
-
     helper.isVolumeUsedByAService = function (volume, services) {
       for (var i = 0; i < services.length; i++) {
         var service = services[i];

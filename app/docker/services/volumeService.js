@@ -1,97 +1,77 @@
+import { getVolumes } from '@/react/docker/volumes/queries/useVolumes';
+import { getVolume } from '@/react/docker/volumes/queries/useVolume';
+import { removeVolume } from '@/react/docker/volumes/queries/useRemoveVolumeMutation';
+import { createVolume } from '@/react/docker/volumes/queries/useCreateVolumeMutation';
+
 import { VolumeViewModel } from '../models/volume';
 
-angular.module('portainer.docker').factory('VolumeService', [
-  '$q',
-  'Volume',
-  'VolumeHelper',
-  function VolumeServiceFactory($q, Volume, VolumeHelper) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('VolumeService', VolumeServiceFactory);
 
-    service.volumes = function (params) {
-      var deferred = $q.defer();
-      Volume.query(params)
-        .$promise.then(function success(data) {
-          var volumes = data.Volumes || [];
-          volumes = volumes.map(function (item) {
-            return new VolumeViewModel(item);
-          });
-          deferred.resolve(volumes);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve volumes', err: err });
-        });
-      return deferred.promise;
+/* @ngInject */
+function VolumeServiceFactory(AngularToReact) {
+  return {
+    volumes: AngularToReact.useAxios(volumesAngularJS), // dashboard + service create + service edit + volume list
+    volume: AngularToReact.useAxios(volumeAngularJS), // volume edit
+    getVolumes: AngularToReact.useAxios(getVolumesAngularJS), // template list
+    remove: AngularToReact.useAxios(removeAngularJS), // volume list + volume edit
+    createVolumeConfiguration, // volume create
+    createVolume: AngularToReact.useAxios(createAngularJS), // volume create
+  };
+
+  /**
+   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {Filters} filters
+   */
+  async function volumesAngularJS(environmentId, filters) {
+    const data = await getVolumes(environmentId, filters);
+    return data.map((v) => new VolumeViewModel(v));
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {string} id
+   */
+  async function volumeAngularJS(environmentId, id) {
+    const data = await getVolume(environmentId, id);
+    return new VolumeViewModel(data);
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   */
+  async function getVolumesAngularJS(environmentId) {
+    return getVolumes(environmentId);
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {string} name
+   * @param {string?} nodeName
+   */
+  async function removeAngularJS(environmentId, name, nodeName) {
+    return removeVolume(environmentId, name, { nodeName });
+  }
+
+  /**
+   * @param {string} name
+   * @param {string} driver
+   * @param {{name: string; value: string;}[]} driverOptions
+   */
+  function createVolumeConfiguration(name, driver, driverOptions) {
+    return {
+      Name: name,
+      Driver: driver,
+      DriverOpts: driverOptions.reduce((res, { name, value }) => ({ ...res, [name]: value }), {}),
     };
+  }
 
-    service.volume = function (id) {
-      var deferred = $q.defer();
-      Volume.get({ id: id })
-        .$promise.then(function success(data) {
-          var volume = new VolumeViewModel(data);
-          deferred.resolve(volume);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve volume details', err: err });
-        });
-      return deferred.promise;
-    };
-
-    service.getVolumes = function () {
-      return Volume.query({}).$promise;
-    };
-
-    service.remove = function (volume) {
-      var deferred = $q.defer();
-
-      Volume.remove({ id: volume.Id })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message, err: data.message });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to remove volume', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.createVolumeConfiguration = function (name, driver, driverOptions) {
-      var volumeConfiguration = {
-        Name: name,
-        Driver: driver,
-        DriverOpts: VolumeHelper.createDriverOptions(driverOptions),
-      };
-      return volumeConfiguration;
-    };
-
-    service.createVolume = function (volumeConfiguration) {
-      var deferred = $q.defer();
-      Volume.create(volumeConfiguration)
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message });
-          } else {
-            var volume = new VolumeViewModel(data);
-            deferred.resolve(volume);
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create volume', err: err });
-        });
-      return deferred.promise;
-    };
-
-    service.createVolumes = function (volumeConfigurations) {
-      var createVolumeQueries = volumeConfigurations.map(function (volumeConfiguration) {
-        return service.createVolume(volumeConfiguration);
-      });
-      return $q.all(createVolumeQueries);
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {VolumeConfiguration} volumeConfiguration
+   * @param {string?} nodeName
+   */
+  async function createAngularJS(environmentId, volumeConfiguration, nodeName) {
+    const data = await createVolume(environmentId, volumeConfiguration, { nodeName });
+    return new VolumeViewModel(data);
+  }
+}

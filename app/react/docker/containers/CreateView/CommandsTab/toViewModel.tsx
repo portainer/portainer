@@ -2,7 +2,7 @@ import { HostConfig } from 'docker-types/generated/1.41';
 
 import { commandArrayToString } from '@/docker/helpers/containers';
 
-import { ContainerJSON } from '../../queries/container';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
 
 import { ConsoleConfig, ConsoleSetting } from './ConsoleSettings';
 import { LogConfig } from './LoggerConfig';
@@ -19,7 +19,7 @@ export function getDefaultViewModel(): Values {
   };
 }
 
-export function toViewModel(config: ContainerJSON): Values {
+export function toViewModel(config: ContainerDetailsJSON): Values {
   if (!config.Config) {
     return getDefaultViewModel();
   }

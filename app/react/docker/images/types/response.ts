@@ -1,6 +1,6 @@
-import { PortainerMetadata } from '../../types';
+import { PortainerResponse } from '../../types';
 
-export type DockerImageResponse = {
+export type DockerImageResponse = PortainerResponse<{
   Containers: number;
   Created: number;
   Id: string;
@@ -10,5 +10,4 @@ export type DockerImageResponse = {
   RepoTags: string[];
   SharedSize: number;
   Size: number;
-  Portainer?: PortainerMetadata;
-};
+}>;

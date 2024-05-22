@@ -35,10 +35,9 @@ angular.module('portainer.docker').controller('ImagesController', [
       const registryModel = $scope.formValues.RegistryModel;
 
       var nodeName = $scope.formValues.NodeName;
-      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
       $scope.state.actionInProgress = true;
-      ImageService.pullImage(registryModel, false)
+      ImageService.pullImage(registryModel, false, nodeName)
         .then(function success(data) {
           var err = data[data.length - 1].errorDetail;
           if (err) {

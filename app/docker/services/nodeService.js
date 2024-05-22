@@ -1,73 +1,41 @@
+import { getNode } from '@/react/docker/proxy/queries/nodes/useNode';
+import { getNodes } from '@/react/docker/proxy/queries/nodes/useNodes';
+import { updateNode } from '@/react/docker/proxy/queries/nodes/useUpdateNodeMutation';
+
 import { NodeViewModel } from '../models/node';
 
-angular.module('portainer.docker').factory('NodeService', [
-  '$q',
-  'Node',
-  function NodeServiceFactory($q, Node) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('NodeService', NodeServiceFactory);
 
-    service.nodes = nodes;
-    service.node = node;
-    service.updateNode = updateNode;
-    service.getActiveManager = getActiveManager;
+/* @ngInject */
+function NodeServiceFactory(AngularToReact) {
+  return {
+    nodes: AngularToReact.useAxios(nodesAngularJS), // macvlan form + services list + service create + service edit + swarm visualizer + stack edit
+    node: AngularToReact.useAxios(nodeAngularJS), // node browser + node details
+    updateNode: AngularToReact.useAxios(updateNodeAngularJS), // swarm node details panel
+  };
 
-    function node(id) {
-      var deferred = $q.defer();
-      Node.get({ id: id })
-        .$promise.then(function onNodeLoaded(rawNode) {
-          var node = new NodeViewModel(rawNode);
-          return deferred.resolve(node);
-        })
-        .catch(function onFailed(err) {
-          deferred.reject({ msg: 'Unable to retrieve node', err: err });
-        });
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {NodeId} id
+   */
+  async function nodeAngularJS(environmentId, id) {
+    const data = await getNode(environmentId, id);
+    return new NodeViewModel(data);
+  }
 
-      return deferred.promise;
-    }
+  /**
+   * @param {EnvironmentId} environmentId
+   */
+  async function nodesAngularJS(environmentId) {
+    const data = await getNodes(environmentId);
+    return data.map((n) => new NodeViewModel(n));
+  }
 
-    function nodes() {
-      var deferred = $q.defer();
-
-      Node.query({})
-        .$promise.then(function success(data) {
-          var nodes = data.map(function (item) {
-            return new NodeViewModel(item);
-          });
-          deferred.resolve(nodes);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve nodes', err: err });
-        });
-
-      return deferred.promise;
-    }
-
-    function updateNode(node) {
-      return Node.update({ id: node.Id, version: node.Version }, node).$promise;
-    }
-
-    function getActiveManager() {
-      var deferred = $q.defer();
-
-      service
-        .nodes()
-        .then(function success(data) {
-          for (var i = 0; i < data.length; ++i) {
-            var node = data[i];
-            if (node.Role === 'manager' && node.Availability === 'active' && node.Status === 'ready' && node.Addr !== '0.0.0.0') {
-              deferred.resolve(node);
-              break;
-            }
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve nodes', err: err });
-        });
-
-      return deferred.promise;
-    }
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {NodeSpec & { Id: string; Version: number }} nodeConfig
+   */
+  async function updateNodeAngularJS(environmentId, nodeConfig) {
+    return updateNode(environmentId, nodeConfig.Id, nodeConfig, nodeConfig.Version);
+  }
+}

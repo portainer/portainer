@@ -1,7 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 import { useSref } from '@uirouter/react';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
+import type { ContainerListViewModel } from '@/react/docker/containers/types';
 
 import { columnHelper } from './helper';
 
@@ -11,7 +11,7 @@ export const image = columnHelper.accessor('Image', {
   cell: ImageCell,
 });
 
-function ImageCell({ getValue }: CellContext<DockerContainer, string>) {
+function ImageCell({ getValue }: CellContext<ContainerListViewModel, string>) {
   const imageName = getValue();
   const linkProps = useSref('docker.images.image', { id: imageName });
   const shortImageName = trimSHASum(imageName);

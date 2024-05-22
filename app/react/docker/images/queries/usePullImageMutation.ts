@@ -1,14 +1,13 @@
-import { RawAxiosRequestHeaders } from 'axios';
-
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { buildImageFullURI } from '../utils';
-import { addNodeHeader } from '../../proxy/addNodeHeader';
-
-import { encodeRegistryCredentials } from './encodeRegistryCredentials';
-import { buildProxyUrl } from './build-url';
+import {
+  withRegistryAuthHeader,
+  withAgentTargetHeader,
+} from '../../proxy/queries/utils';
+import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
 
 interface PullImageOptions {
   environmentId: EnvironmentId;
@@ -25,31 +24,27 @@ export async function pullImage({
   nodeName,
   registry,
 }: PullImageOptions) {
-  const authenticationDetails =
-    registry && registry.Authentication
-      ? encodeRegistryCredentials(registry.Id)
-      : '';
-
   const imageURI = buildImageFullURI(image, registry);
 
-  const authHeaders: RawAxiosRequestHeaders = {
-    'X-Registry-Auth': authenticationDetails,
-  };
-
-  const headers = addNodeHeader(nodeName, authHeaders);
-
   try {
-    await axios.post(buildProxyUrl(environmentId, { action: 'create' }), null, {
-      params: {
-        fromImage: imageURI,
-      },
-      headers,
-    });
+    await axios.post(
+      buildDockerProxyUrl(environmentId, 'images', 'create'),
+      null,
+      {
+        params: {
+          fromImage: imageURI,
+        },
+        headers: {
+          ...withRegistryAuthHeader(registry?.Id),
+          ...withAgentTargetHeader(nodeName),
+        },
+      }
+    );
   } catch (err) {
     if (ignoreErrors) {
       return;
     }
 
-    throw parseAxiosError(err as Error, 'Unable to pull image');
+    throw parseAxiosError(err, 'Unable to pull image');
   }
 }

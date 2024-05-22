@@ -16,6 +16,7 @@ declare module 'react' {
   }
 }
 
-export type WithRequiredProperty<Type, Key extends keyof Type> = Type & {
-  [Property in Key]-?: Type[Property];
-};
+export type WithRequiredProperties<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
+
+export type ValueOf<T extends Record<string, unknown>> = T[keyof T];

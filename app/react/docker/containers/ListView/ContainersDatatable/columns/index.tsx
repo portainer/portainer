@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { useMemo } from 'react';
 
 import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
-import { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 
 import { created } from './created';
 import { host } from './host';
@@ -32,7 +32,7 @@ export function useColumns(
         isHostColumnVisible && host,
         isGPUsColumnVisible && gpus,
         ports,
-        createOwnershipColumn<DockerContainer>(),
+        createOwnershipColumn<ContainerListViewModel>(),
       ]),
     [isHostColumnVisible, isGPUsColumnVisible]
   );
