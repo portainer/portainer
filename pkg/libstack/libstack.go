@@ -35,6 +35,7 @@ type WaitResult struct {
 }
 
 type Options struct {
+	// WorkingDir is the working directory for the command execution
 	WorkingDir  string
 	Host        string
 	ProjectName string
@@ -42,6 +43,10 @@ type Options struct {
 	EnvFilePath string
 	// Env is a list of environment variables to pass to the command, example: "FOO=bar"
 	Env []string
+	// ProjectDir is the working directory for containers created by docker compose file.
+	// By default, it is an empty string, which means it corresponds to the path of the compose file itself.
+	// This is particularly helpful when mounting a relative path.
+	ProjectDir string
 }
 
 type DeployOptions struct {
