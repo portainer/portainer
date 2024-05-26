@@ -2,7 +2,8 @@ import { useFormikContext } from 'formik';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { FormValues } from './types';
+import { FormValues } from '../../CreateView/types';
+
 import { RecurringFieldset, defaultCronExpression } from './RecurringFieldset';
 import { ScheduledDateFieldset } from './ScheduledDateFieldset';
 

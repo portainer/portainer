@@ -12,17 +12,14 @@ import { useMemo } from 'react';
 
 import { file } from '@@/form-components/yup-file-validation';
 
-import { EdgeJob } from '../../types';
+import { useNameValidation } from '../components/EdgeJobForm/NameField';
+import { cronValidation } from '../components/EdgeJobForm/AdvancedCronFieldset';
+import { timeOptions } from '../components/EdgeJobForm/RecurringFieldset';
 
 import { FormValues } from './types';
-import { useNameValidation } from './NameField';
-import { cronValidation } from './AdvancedCronFieldset';
-import { timeOptions } from './RecurringFieldset';
 
-export function useValidation({
-  id,
-}: { id?: EdgeJob['Id'] } = {}): SchemaOf<FormValues> {
-  const nameValidation = useNameValidation(id);
+export function useValidation(): SchemaOf<FormValues> {
+  const nameValidation = useNameValidation();
   return useMemo(
     () =>
       object({
