@@ -21,12 +21,12 @@ export function useDeleteEnvironmentsMutation() {
       const resp = await deleteEnvironments(environments);
 
       if (resp === null) {
-        return {deleted: environments, errors: []};
+        return { deleted: environments, errors: [] };
       }
 
       return {
-        deleted: environments.filter(e => e.id in (resp.deleted || [])),
-        errors: environments.filter(e => e.id in (resp.errors || [])),
+        deleted: environments.filter((e) => e.id in (resp.deleted || [])),
+        errors: environments.filter((e) => e.id in (resp.errors || [])),
       };
     },
     {
@@ -34,14 +34,14 @@ export function useDeleteEnvironmentsMutation() {
       onSuccess: ({ deleted, errors }) => {
         queryClient.invalidateQueries(['environments']);
         // show an error message for each env that failed to delete
-        errors.forEach(e => {
+        errors.forEach((e) => {
           notifyError(`Failed to remove environment ${e.name}`, undefined);
         });
         // show one summary message for all successful deletes
         if (deleted.length) {
           notifySuccess(
             `${pluralize(deleted.length, 'Environment')} successfully removed`,
-            deleted.map(d => d.name).join(', ')
+            deleted.map((d) => d.name).join(', ')
           );
         }
       },
@@ -53,9 +53,10 @@ async function deleteEnvironments(
   environments: { id: EnvironmentId; deleteCluster?: boolean }[]
 ) {
   try {
-    const { data } = await axios.delete<
-      { deleted: EnvironmentId[]; errors: EnvironmentId[] } | null
-    >(buildUrl(), {
+    const { data } = await axios.delete<{
+      deleted: EnvironmentId[];
+      errors: EnvironmentId[];
+    } | null>(buildUrl(), {
       data: { endpoints: environments },
     });
     return data;
