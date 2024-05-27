@@ -98,7 +98,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to delete the specified environments."
-// @router /endpoints/remove [delete]
+// @router /endpoints [delete]
 func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var p endpointDeleteBatchPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &p); err != nil {
