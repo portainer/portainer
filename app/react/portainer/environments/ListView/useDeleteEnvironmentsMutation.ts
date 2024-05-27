@@ -25,8 +25,10 @@ export function useDeleteEnvironmentsMutation() {
       }
 
       return {
-        deleted: environments.filter((e) => e.id in (resp.deleted || [])),
-        errors: environments.filter((e) => e.id in (resp.errors || [])),
+        deleted: environments.filter((e) =>
+          (resp.deleted || []).includes(e.id)
+        ),
+        errors: environments.filter((e) => (resp.errors || []).includes(e.id)),
       };
     },
     {
