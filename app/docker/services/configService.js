@@ -8,17 +8,30 @@ import { ConfigViewModel } from '../models/config';
 angular.module('portainer.docker').factory('ConfigService', ConfigServiceFactory);
 
 /* @ngInspect */
-function ConfigServiceFactory() {
+function ConfigServiceFactory(AngularToReact) {
+  const { useAxios } = AngularToReact;
+
   return {
-    configs: async (environmentId) => {
-      const data = await getConfigs(environmentId);
-      return data.map((c) => new ConfigViewModel(c));
-    }, // config list + service create + service edit
-    config: async (environmentId, configId) => {
-      const data = await getConfig(environmentId, configId);
-      return new ConfigViewModel(data);
-    }, // config create + config edit
-    remove: deleteConfig, // config list + config edit
-    create: createConfig, // config create
+    configs: useAxios(listConfigsAngularJS), // config list + service create + service edit
+    config: useAxios(getConfigAngularJS), // config create + config edit
+    remove: useAxios(deleteConfig), // config list + config edit
+    create: useAxios(createConfig), // config create
   };
+
+  /**
+   * @param {EnvironmentId} environmentId
+   */
+  async function listConfigsAngularJS(environmentId) {
+    const data = await getConfigs(environmentId);
+    return data.map((c) => new ConfigViewModel(c));
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {ConfigId} configId
+   */
+  async function getConfigAngularJS(environmentId, configId) {
+    const data = await getConfig(environmentId, configId);
+    return new ConfigViewModel(data);
+  }
 }

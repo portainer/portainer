@@ -9,17 +9,19 @@ angular.module('portainer.docker').factory('VolumeService', VolumeServiceFactory
 
 /* @ngInject */
 function VolumeServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    volumes: AngularToReact.useAxios(volumesAngularJS), // dashboard + service create + service edit + volume list
-    volume: AngularToReact.useAxios(volumeAngularJS), // volume edit
-    getVolumes: AngularToReact.useAxios(getVolumesAngularJS), // template list
-    remove: AngularToReact.useAxios(removeAngularJS), // volume list + volume edit
+    volumes: useAxios(injectEnvironmentId(volumesAngularJS)), // dashboard + service create + service edit + volume list
+    volume: useAxios(injectEnvironmentId(volumeAngularJS)), // volume edit
+    getVolumes: useAxios(injectEnvironmentId(getVolumesAngularJS)), // template list
+    remove: useAxios(injectEnvironmentId(removeAngularJS)), // volume list + volume edit
+    createVolume: useAxios(injectEnvironmentId(createAngularJS)), // volume create
     createVolumeConfiguration, // volume create
-    createVolume: AngularToReact.useAxios(createAngularJS), // volume create
   };
 
   /**
-   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {EnvironmentId} environmentId Injected
    * @param {Filters} filters
    */
   async function volumesAngularJS(environmentId, filters) {
@@ -28,7 +30,7 @@ function VolumeServiceFactory(AngularToReact) {
   }
 
   /**
-   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {EnvironmentId} environmentId Injected
    * @param {string} id
    */
   async function volumeAngularJS(environmentId, id) {
@@ -37,14 +39,14 @@ function VolumeServiceFactory(AngularToReact) {
   }
 
   /**
-   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {EnvironmentId} environmentId Injected
    */
   async function getVolumesAngularJS(environmentId) {
     return getVolumes(environmentId);
   }
 
   /**
-   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {EnvironmentId} environmentId Injected
    * @param {string} name
    * @param {string?} nodeName
    */
@@ -66,7 +68,7 @@ function VolumeServiceFactory(AngularToReact) {
   }
 
   /**
-   * @param {EnvironmentId} environmentId autofilled by AngularToReact
+   * @param {EnvironmentId} environmentId Injected
    * @param {VolumeConfiguration} volumeConfiguration
    * @param {string?} nodeName
    */

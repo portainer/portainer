@@ -10,12 +10,14 @@ import { ImageBuildModel } from '../models/build';
 angular.module('portainer.docker').factory('BuildService', BuildServiceFactory);
 
 /* @ngInject */
-function BuildServiceFactory() {
+function BuildServiceFactory(AngularToReact) {
+  const { useAxios } = AngularToReact;
+
   return {
-    buildImageFromUpload: buildImageFromUploadAngularJS, // build image
-    buildImageFromURL: buildImageFromURLAngularJS, // build image
-    buildImageFromDockerfileContent: buildImageFromDockerfileContentAngularJS, // build image
-    buildImageFromDockerfileContentAndFiles: buildImageFromDockerfileContentAndFilesAngularJS, // build image
+    buildImageFromUpload: useAxios(buildImageFromUploadAngularJS), // build image
+    buildImageFromURL: useAxios(buildImageFromURLAngularJS), // build image
+    buildImageFromDockerfileContent: useAxios(buildImageFromDockerfileContentAngularJS), // build image
+    buildImageFromDockerfileContentAndFiles: useAxios(buildImageFromDockerfileContentAndFilesAngularJS), // build image
   };
 
   /**

@@ -6,6 +6,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { withAgentTargetHeader } from '../proxy/queries/utils';
 import { buildDockerProxyUrl } from '../proxy/queries/buildDockerProxyUrl';
+import { buildDockerUrl } from '../queries/utils/buildDockerUrl';
 
 import { ContainerId, ContainerLogsParams } from './types';
 
@@ -51,7 +52,7 @@ export async function recreateContainer(
 ) {
   try {
     await axios.post<void>(
-      buildDockerProxyUrl(endpointId, 'containers', id, 'recreate'),
+      buildDockerUrl(endpointId, 'containers', id, 'recreate'),
       {
         PullImage: pullImage,
       },

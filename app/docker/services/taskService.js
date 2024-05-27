@@ -9,17 +9,27 @@ angular.module('portainer.docker').factory('TaskService', TaskServiceFactory);
 
 /* @ngInject */
 function TaskServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    task: AngularToReact.useAxios(taskAngularJS), // task edit
-    tasks: AngularToReact.useAxios(tasksAngularJS), // services list + service edit + swarm visualizer + stack edit
-    logs: AngularToReact.useAxios(taskLogsAngularJS), // task logs
+    task: useAxios(injectEnvironmentId(taskAngularJS)), // task edit
+    tasks: useAxios(injectEnvironmentId(tasksAngularJS)), // services list + service edit + swarm visualizer + stack edit
+    logs: useAxios(injectEnvironmentId(taskLogsAngularJS)), // task logs
   };
 
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {TaskId} id
+   */
   async function taskAngularJS(environmentId, id) {
     const data = await getTask(environmentId, id);
     return new TaskViewModel(data);
   }
 
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {*} filters
+   */
   async function tasksAngularJS(environmentId, filters) {
     const data = await getTasks(environmentId, filters);
     return data.map((t) => new TaskViewModel(t));

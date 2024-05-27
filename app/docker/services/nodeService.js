@@ -8,10 +8,12 @@ angular.module('portainer.docker').factory('NodeService', NodeServiceFactory);
 
 /* @ngInject */
 function NodeServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    nodes: AngularToReact.useAxios(nodesAngularJS), // macvlan form + services list + service create + service edit + swarm visualizer + stack edit
-    node: AngularToReact.useAxios(nodeAngularJS), // node browser + node details
-    updateNode: AngularToReact.useAxios(updateNodeAngularJS), // swarm node details panel
+    nodes: useAxios(injectEnvironmentId(nodesAngularJS)), // macvlan form + services list + service create + service edit + swarm visualizer + stack edit
+    node: useAxios(injectEnvironmentId(nodeAngularJS)), // node browser + node details
+    updateNode: useAxios(injectEnvironmentId(updateNodeAngularJS)), // swarm node details panel
   };
 
   /**

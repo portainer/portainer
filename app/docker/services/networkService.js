@@ -11,13 +11,15 @@ angular.module('portainer.docker').factory('NetworkService', NetworkServiceFacto
 
 /* @ngInject */
 function NetworkServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    create: AngularToReact.useAxios(createNetwork), // create network
-    network: AngularToReact.useAxios(networkAngularJS), // service edit
-    networks: AngularToReact.useAxios(networksAngularJS), // macvlan form + container edit + dashboard + service create + service edit + custom templates list + templates list
-    remove: AngularToReact.useAxios(deleteNetwork), // networks list
-    disconnectContainer: AngularToReact.useAxios(disconnectContainer), // container edit
-    connectContainer: AngularToReact.useAxios(connectContainerAngularJS), // container edit
+    create: useAxios(injectEnvironmentId(createNetwork)), // create network
+    network: useAxios(injectEnvironmentId(networkAngularJS)), // service edit
+    networks: useAxios(injectEnvironmentId(networksAngularJS)), // macvlan form + container edit + dashboard + service create + service edit + custom templates list + templates list
+    remove: useAxios(injectEnvironmentId(deleteNetwork)), // networks list
+    disconnectContainer: useAxios(injectEnvironmentId(disconnectContainer)), // container edit
+    connectContainer: useAxios(injectEnvironmentId(connectContainerAngularJS)), // container edit
   };
 
   /**

@@ -6,20 +6,40 @@ angular.module('portainer.docker').factory('PluginService', PluginServiceFactory
 
 /* @ngInject */
 function PluginServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    volumePlugins: AngularToReact.useAxios(async (environmentId, systemOnly) => {
-      const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
-      return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Volume');
-    }), // volume create
-    networkPlugins: AngularToReact.useAxios(async (environmentId, systemOnly) => {
-      const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
-      return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Network');
-    }), // network create
-    loggingPlugins: AngularToReact.useAxios(async (environmentId, systemOnly) => {
-      const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
-      return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Log');
-    }), // service create + service edit
+    volumePlugins: useAxios(injectEnvironmentId(volumePlugins)), // volume create
+    networkPlugins: useAxios(injectEnvironmentId(networksPlugins)), // network create
+    loggingPlugins: useAxios(injectEnvironmentId(loggingPlugins)), // service create + service edit
   };
+}
+
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function volumePlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Volume');
+}
+
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function networksPlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Network');
+}
+
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function loggingPlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Log');
 }
 
 async function getAllPlugins(environmentId) {

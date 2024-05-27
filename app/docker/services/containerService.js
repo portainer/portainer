@@ -26,26 +26,28 @@ import { formatLogs } from '../helpers/logHelper';
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);
 
 /* @ngInject */
-function ContainerServiceFactory() {
+function ContainerServiceFactory(AngularToReact) {
+  const { useAxios } = AngularToReact;
+
   return {
-    killContainer, // container edit
-    pauseContainer, // container edit
-    renameContainer, // container edit
-    restartContainer, // container edit
-    resumeContainer, // container edit
-    startContainer, // container edit
-    stopContainer, // container edit
-    recreateContainer, // container edit
-    remove: removeContainer, // container edit
-    container: getContainerAngularJS, // container console  + container edit + container stats
-    containers: getContainers, // dashboard + services list + service edit + voluem edit + stackservice + stack create + stack edit
-    resizeTTY: resizeTTYAngularJS, // container console
-    updateRestartPolicy: updateRestartPolicyAngularJS, // container edit
-    createExec, // container console
-    containerStats: containerStatsAngularJS, // container stats
-    containerTop, // container stats
-    inspect: getContainer, // container inspect
-    logs: containerLogsAngularJS, // container logs
+    killContainer: useAxios(killContainer), // container edit
+    pauseContainer: useAxios(pauseContainer), // container edit
+    renameContainer: useAxios(renameContainer), // container edit
+    restartContainer: useAxios(restartContainer), // container edit
+    resumeContainer: useAxios(resumeContainer), // container edit
+    startContainer: useAxios(startContainer), // container edit
+    stopContainer: useAxios(stopContainer), // container edit
+    recreateContainer: useAxios(recreateContainer), // container edit
+    remove: useAxios(removeContainer), // container edit
+    container: useAxios(getContainerAngularJS), // container console  + container edit + container stats
+    containers: useAxios(getContainers), // dashboard + services list + service edit + voluem edit + stackservice + stack create + stack edit
+    resizeTTY: useAxios(resizeTTYAngularJS), // container console
+    updateRestartPolicy: useAxios(updateRestartPolicyAngularJS), // container edit
+    createExec: useAxios(createExec), // container console
+    containerStats: useAxios(containerStatsAngularJS), // container stats
+    containerTop: useAxios(containerTop), // container stats
+    inspect: useAxios(getContainer), // container inspect
+    logs: useAxios(containerLogsAngularJS), // container logs
   };
 
   /**

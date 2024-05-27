@@ -8,16 +8,18 @@ angular.module('portainer.docker').factory('SystemService', SystemServiceFactory
 
 /* @ngInject */
 function SystemServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    info: AngularToReact.useAxios(getInfo), // dashboard + docker host view + docker host browser + swarm inspect views + stateManager (update endpoint state)
-    ping, // docker/__module onEnter abstract /docker subpath
-    version: AngularToReact.useAxios(getVersion), // docker host view + swarm inspect view + stateManager (update endpoint state)
-    events: AngularToReact.useAxios(eventsAngularJS), // events list
+    info: useAxios(injectEnvironmentId(getInfo)), // dashboard + docker host view + docker host browser + swarm inspect views + stateManager (update endpoint state)
+    ping: useAxios(ping), // docker/__module onEnter abstract /docker subpath
+    version: useAxios(injectEnvironmentId(getVersion)), // docker host view + swarm inspect view + stateManager (update endpoint state)
+    events: useAxios(injectEnvironmentId(eventsAngularJS)), // events list
   };
 
   /**
-   * @param {EnvironmentId} environmentId
-   * @param {*} param1
+   * @param {EnvironmentId} environmentId Injected
+   * @param {{since: string; until: string;}} param1
    */
   async function eventsAngularJS(environmentId, { since, until }) {
     const data = await getEvents(environmentId, { since, until });

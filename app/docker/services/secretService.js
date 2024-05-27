@@ -9,18 +9,27 @@ angular.module('portainer.docker').factory('SecretService', SecretServiceFactory
 
 /* @ngInject */
 function SecretServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    secret: AngularToReact.useAxios(secretAngularJS), // secret edit
-    secrets: AngularToReact.useAxios(secretsAngularJS), // secret list + service create + service edit
-    remove: AngularToReact.useAxios(removeSecret), // secret list + secret edit
-    create: AngularToReact.useAxios(createSecret), // secret create
+    secret: useAxios(injectEnvironmentId(secretAngularJS)), // secret edit
+    secrets: useAxios(injectEnvironmentId(secretsAngularJS)), // secret list + service create + service edit
+    remove: useAxios(injectEnvironmentId(removeSecret)), // secret list + secret edit
+    create: useAxios(injectEnvironmentId(createSecret)), // secret create
   };
 
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {SecretId} id
+   */
   async function secretAngularJS(environmentId, id) {
     const data = await getSecret(environmentId, id);
     return new SecretViewModel(data);
   }
 
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   */
   async function secretsAngularJS(environmentId) {
     const data = await getSecrets(environmentId);
     return data.map((s) => new SecretViewModel(s));

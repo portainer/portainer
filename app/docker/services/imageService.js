@@ -21,16 +21,18 @@ angular.module('portainer.docker').factory('ImageService', ImageServiceFactory);
 
 /* @ngInject */
 function ImageServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    image: AngularToReact.useAxios(imageAngularJS), // container console + image edit
-    images: AngularToReact.useAxios(imagesAngularJS), // por image registry controller + dashboard + service edit
-    history: AngularToReact.useAxios(historyAngularJS), // image edit
-    pushImage: AngularToReact.useAxios(pushImageAngularJS), // image edit
-    pullImage: AngularToReact.useAxios(pullImageAngularJS), // images list + image edit + templates list
-    tagImage: AngularToReact.useAxios(tagImage), // image edit + image import
-    downloadImages: AngularToReact.useAxios(downloadImages), // image list + image edit
-    uploadImage: AngularToReact.useAxios(uploadImages), // image import
-    deleteImage: AngularToReact.useAxios(removeImage), // image list + image edit
+    image: useAxios(injectEnvironmentId(imageAngularJS)), // container console + image edit
+    images: useAxios(injectEnvironmentId(imagesAngularJS)), // por image registry controller + dashboard + service edit
+    history: useAxios(injectEnvironmentId(historyAngularJS)), // image edit
+    pushImage: useAxios(injectEnvironmentId(pushImageAngularJS)), // image edit
+    pullImage: useAxios(injectEnvironmentId(pullImageAngularJS)), // images list + image edit + templates list
+    tagImage: useAxios(injectEnvironmentId(tagImage)), // image edit + image import
+    downloadImages: useAxios(injectEnvironmentId(downloadImages)), // image list + image edit
+    uploadImage: useAxios(injectEnvironmentId(uploadImages)), // image import
+    deleteImage: useAxios(injectEnvironmentId(removeImage)), // image list + image edit
     getUniqueTagListFromImages, // por image registry controller + service edit
   };
 
@@ -79,14 +81,11 @@ function ImageServiceFactory(AngularToReact) {
   /**
    * @param {EnvironmentId} environmentId Autofilled by AngularToReact
    * @param {PorImageRegistryModel} registryModel
-   * @param {bool?} ignoreErrors
    * @param {string?} nodeName
-   * @returns
    */
-  async function pullImageAngularJS(environmentId, registryModel, ignoreErrors, nodeName) {
+  async function pullImageAngularJS(environmentId, registryModel, nodeName) {
     const { UseRegistry, Registry, Image } = registryModel;
     const registry = UseRegistry ? Registry : undefined;
-    const file = pullImage({ environmentId, ignoreErrors, image: Image, nodeName, registry });
-    return { file };
+    return pullImage({ environmentId, image: Image, nodeName, registry });
   }
 }

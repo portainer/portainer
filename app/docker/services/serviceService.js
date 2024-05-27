@@ -12,38 +12,71 @@ angular.module('portainer.docker').factory('ServiceService', ServiceServiceFacto
 
 /* @ngInject */
 function ServiceServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
+
   return {
-    services: AngularToReact.useAxios(async (environmentId, filters) => {
-      const data = await getServices(environmentId, filters);
-      return data.map((s) => new ServiceViewModel(s));
-    }), // dashboard + service list + swarm visualizer + volume list + stackservice + stack edit
-    service: AngularToReact.useAxios(async (environmentId, serviceId) => {
-      const data = await getService(environmentId, serviceId);
-      return new ServiceViewModel(data);
-    }), // service edit + task edit
-    remove: AngularToReact.useAxios(async (environmentId, service) => removeService(environmentId, service.Id)), // service edit
-    update: AngularToReact.useAxios(async (environmentId, service, config, rollback) =>
-      updateService({
-        environmentId,
-        config,
-        serviceId: service.Id,
-        version: service.Version,
-        registryId: config.registryId,
-        rollback,
-      })
-    ), // service edit
-    create: AngularToReact.useAxios(async (environmentId, config, registryId) =>
-      createService({
-        environmentId,
-        config,
-        registryId,
-      })
-    ), // service create
-    logs: AngularToReact.useAxios(serviceLogsAngularJS), // service logs
+    services: useAxios(injectEnvironmentId(getServicesAngularJS)), // dashboard + service list + swarm visualizer + volume list + stackservice + stack edit
+    service: useAxios(injectEnvironmentId(getServiceAngularJS)), // service edit + task edit
+    remove: useAxios(injectEnvironmentId(removeServiceAngularJS)), // service edit
+    update: useAxios(injectEnvironmentId(updateServiceAngularJS)), // service edit
+    create: useAxios(injectEnvironmentId(createServiceAngularJS)), // service create
+    logs: useAxios(injectEnvironmentId(serviceLogsAngularJS)), // service logs
   };
 
   /**
-   * @param {EnvironmentId} environmentId
+   * @param {EnvironmentId} environmentId Injected
+   * @param {*} filters
+   */
+  async function getServicesAngularJS(environmentId, filters) {
+    const data = await getServices(environmentId, filters);
+    return data.map((s) => new ServiceViewModel(s));
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceId} serviceId
+   */
+  async function getServiceAngularJS(environmentId, serviceId) {
+    const data = await getService(environmentId, serviceId);
+    return new ServiceViewModel(data);
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceViewModel} service
+   */
+  async function removeServiceAngularJS(environmentId, service) {
+    return removeService(environmentId, service.Id);
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceViewModel} service
+   * @param {ServiceUpdateConfig} config
+   * @param {string?} rollback
+   */
+  async function updateServiceAngularJS(environmentId, service, config, rollback) {
+    return updateService({
+      environmentId,
+      config,
+      serviceId: service.Id,
+      version: service.Version,
+      registryId: config.registryId,
+      rollback,
+    });
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {Service} config
+   * @param {RegistryId} registryId
+   */
+  async function createServiceAngularJS(environmentId, config, registryId) {
+    return createService({ environmentId, config, registryId });
+  }
+
+  /**
+   * @param {EnvironmentId} environmentId Injected
    * @param {ServiceId} id
    * @param {boolean?} stdout
    * @param {boolean?} stderr
