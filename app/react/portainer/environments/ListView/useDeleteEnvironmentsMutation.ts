@@ -18,30 +18,32 @@ export function useDeleteEnvironmentsMutation() {
         deleteCluster?: boolean;
       }[]
     ) => {
-      const resps = await deleteEnvironments(environments);
-      const successfulDeletions = resps.filter((r) => r.err === null);
-      const failedDeletions = resps.filter((r) => r.err !== null);
-      return { successfulDeletions, failedDeletions };
+      const resp = await deleteEnvironments(environments);
+
+      if (resp === null) {
+        return { deleted: environments, errors: [] };
+      }
+
+      return {
+        deleted: environments.filter((e) =>
+          (resp.deleted || []).includes(e.id)
+        ),
+        errors: environments.filter((e) => (resp.errors || []).includes(e.id)),
+      };
     },
     {
       ...withError('Unable to delete environment(s)'),
-      onSuccess: ({ successfulDeletions, failedDeletions }) => {
+      onSuccess: ({ deleted, errors }) => {
         queryClient.invalidateQueries(['environments']);
         // show an error message for each env that failed to delete
-        failedDeletions.forEach((deletion) => {
-          notifyError(
-            `Failed to remove environment`,
-            new Error(deletion.err ? deletion.err.Message : '') as Error
-          );
+        errors.forEach((e) => {
+          notifyError(`Failed to remove environment ${e.name}`, undefined);
         });
         // show one summary message for all successful deletes
-        if (successfulDeletions.length) {
+        if (deleted.length) {
           notifySuccess(
-            `${pluralize(
-              successfulDeletions.length,
-              'Environment'
-            )} successfully removed`,
-            successfulDeletions.map((deletion) => deletion.name).join(', ')
+            `${pluralize(deleted.length, 'Environment')} successfully removed`,
+            deleted.map((d) => d.name).join(', ')
           );
         }
       },
@@ -53,10 +55,11 @@ async function deleteEnvironments(
   environments: { id: EnvironmentId; deleteCluster?: boolean }[]
 ) {
   try {
-    const { data } = await axios.post<
-      { name: string; err: { Message: string } | null }[]
-    >(buildUrl(undefined, 'remove'), {
-      environments,
+    const { data } = await axios.delete<{
+      deleted: EnvironmentId[];
+      errors: EnvironmentId[];
+    } | null>(buildUrl(), {
+      data: { endpoints: environments },
     });
     return data;
   } catch (e) {
