@@ -26,12 +26,12 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 	urlString := endpoint.URL
 
 	if endpointutils.IsEdgeEndpoint(endpoint) {
-		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+		tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed starting tunnel")
 		}
 
-		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+		urlString = "http://" + tunnelAddr
 	}
 
 	endpointURL, err := url.ParseURL(urlString)

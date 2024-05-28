@@ -57,8 +57,6 @@ func NewService(
 // NewBackgroundSnapshotter queues snapshots of existing edge environments that
 // do not have one already
 func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService portainer.ReverseTunnelService) {
-	var endpointIDs []portainer.EndpointID
-
 	err := dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		endpoints, err := tx.Endpoint().Endpoints()
 		if err != nil {
@@ -73,7 +71,7 @@ func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService po
 			s, err := tx.Snapshot().Read(e.ID)
 			if dataservices.IsErrObjectNotFound(err) ||
 				(err == nil && s.Docker == nil && s.Kubernetes == nil) {
-				endpointIDs = append(endpointIDs, e.ID)
+				tunnelService.Open(&e)
 			}
 		}
 
@@ -82,11 +80,6 @@ func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService po
 	if err != nil {
 		log.Error().Err(err).Msg("background snapshotter failure")
 		return
-	}
-
-	for _, endpointID := range endpointIDs {
-		tunnelService.SetTunnelStatusToActive(endpointID)
-		time.Sleep(10 * time.Second)
 	}
 }
 

@@ -5,14 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"net"
 	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/pkg/libcrypto"
 
 	"github.com/dchest/uniuri"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -20,16 +24,179 @@ const (
 	maxAvailablePort = 65535
 )
 
+// Open will mark the tunnel as REQUIRED so the agent opens it
+func (s *Service) Open(endpoint *portainer.Endpoint) error {
+	if !endpointutils.IsEdgeEndpoint(endpoint) {
+		return errors.New("cannot open a tunnel for non-edge environments")
+	}
+
+	if endpoint.Edge.AsyncMode {
+		return errors.New("cannot open a tunnel for async edge environments")
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.activeTunnels[endpoint.ID]; ok {
+		return nil
+	}
+
+	defer cache.Del(endpoint.ID)
+
+	tun := &portainer.TunnelDetails{
+		Status:       portainer.EdgeAgentManagementRequired,
+		Port:         s.getUnusedPort(),
+		LastActivity: time.Now(),
+	}
+
+	username, password := generateRandomCredentials()
+
+	if s.chiselServer != nil {
+		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tun.Port)
+
+		if err := s.chiselServer.AddUser(username, password, authorizedRemote); err != nil {
+			return err
+		}
+	}
+
+	credentials, err := encryptCredentials(username, password, endpoint.EdgeID)
+	if err != nil {
+		return err
+	}
+
+	tun.Credentials = credentials
+
+	s.activeTunnels[endpoint.ID] = tun
+
+	return nil
+}
+
+// close removes the tunnel from the map so the agent will close it
+func (s *Service) close(endpointID portainer.EndpointID) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	tun, ok := s.activeTunnels[endpointID]
+	if !ok {
+		return
+	}
+
+	if len(tun.Credentials) > 0 && s.chiselServer != nil {
+		user, _, _ := strings.Cut(tun.Credentials, ":")
+		s.chiselServer.DeleteUser(user)
+	}
+
+	if s.ProxyManager != nil {
+		s.ProxyManager.DeleteEndpointProxy(endpointID)
+	}
+
+	delete(s.activeTunnels, endpointID)
+
+	cache.Del(endpointID)
+}
+
+// Config returns the tunnel details needed for the agent to connect
+func (s *Service) Config(endpointID portainer.EndpointID) portainer.TunnelDetails {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if tun, ok := s.activeTunnels[endpointID]; ok {
+		return *tun
+	}
+
+	return portainer.TunnelDetails{Status: portainer.EdgeAgentIdle}
+}
+
+// TunnelAddr returns the address of the local tunnel, including the port, it
+// will block until the tunnel is ready
+func (s *Service) TunnelAddr(endpoint *portainer.Endpoint) (string, error) {
+	if err := s.Open(endpoint); err != nil {
+		return "", err
+	}
+
+	tun := s.Config(endpoint.ID)
+	checkinInterval := time.Duration(s.tryEffectiveCheckinInterval(endpoint)) * time.Second
+
+	for t0 := time.Now(); ; {
+		if time.Since(t0) > 2*checkinInterval {
+			s.close(endpoint.ID)
+
+			return "", errors.New("unable to open the tunnel")
+		}
+
+		// Check if the tunnel is established
+		conn, err := net.DialTCP("tcp", nil, &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: tun.Port})
+		if err != nil {
+			time.Sleep(checkinInterval / 100)
+
+			continue
+		}
+
+		conn.Close()
+
+		break
+	}
+
+	s.UpdateLastActivity(endpoint.ID)
+
+	return fmt.Sprintf("127.0.0.1:%d", tun.Port), nil
+}
+
+// tryEffectiveCheckinInterval avoids a potential deadlock by returning a
+// previous known value after a timeout
+func (s *Service) tryEffectiveCheckinInterval(endpoint *portainer.Endpoint) int {
+	ch := make(chan int, 1)
+
+	go func() {
+		ch <- edge.EffectiveCheckinInterval(s.dataStore, endpoint)
+	}()
+
+	select {
+	case <-time.After(50 * time.Millisecond):
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+
+		return s.defaultCheckinInterval
+	case i := <-ch:
+		s.mu.Lock()
+		s.defaultCheckinInterval = i
+		s.mu.Unlock()
+
+		return i
+	}
+}
+
+// UpdateLastActivity sets the current timestamp to avoid the tunnel timeout
+func (s *Service) UpdateLastActivity(endpointID portainer.EndpointID) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if tun, ok := s.activeTunnels[endpointID]; ok {
+		tun.LastActivity = time.Now()
+	}
+}
+
 // NOTE: it needs to be called with the lock acquired
 // getUnusedPort is used to generate an unused random port in the dynamic port range.
 // Dynamic ports (also called private ports) are 49152 to 65535.
 func (service *Service) getUnusedPort() int {
 	port := randomInt(minAvailablePort, maxAvailablePort)
 
-	for _, tunnel := range service.tunnelDetailsMap {
+	for _, tunnel := range service.activeTunnels {
 		if tunnel.Port == port {
 			return service.getUnusedPort()
 		}
+	}
+
+	conn, err := net.DialTCP("tcp", nil, &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: port})
+	if err == nil {
+		conn.Close()
+
+		log.Debug().
+			Int("port", port).
+			Msg("selected port is in use, trying a different one")
+
+		return service.getUnusedPort()
 	}
 
 	return port
@@ -39,152 +206,10 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
 
-// NOTE: it needs to be called with the lock acquired
-func (service *Service) getTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
-
-	if tunnel, ok := service.tunnelDetailsMap[endpointID]; ok {
-		return tunnel
-	}
-
-	tunnel := &portainer.TunnelDetails{
-		Status: portainer.EdgeAgentIdle,
-	}
-
-	service.tunnelDetailsMap[endpointID] = tunnel
-
-	cache.Del(endpointID)
-
-	return tunnel
-}
-
-// GetTunnelDetails returns information about the tunnel associated to an environment(endpoint).
-func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) portainer.TunnelDetails {
-	service.mu.Lock()
-	defer service.mu.Unlock()
-
-	return *service.getTunnelDetails(endpointID)
-}
-
-// GetActiveTunnel retrieves an active tunnel which allows communicating with edge agent
-func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (portainer.TunnelDetails, error) {
-	if endpoint.Edge.AsyncMode {
-		return portainer.TunnelDetails{}, errors.New("cannot open tunnel on async endpoint")
-	}
-
-	tunnel := service.GetTunnelDetails(endpoint.ID)
-
-	if tunnel.Status == portainer.EdgeAgentActive {
-		// update the LastActivity
-		service.SetTunnelStatusToActive(endpoint.ID)
-	}
-
-	if tunnel.Status == portainer.EdgeAgentIdle || tunnel.Status == portainer.EdgeAgentManagementRequired {
-		err := service.SetTunnelStatusToRequired(endpoint.ID)
-		if err != nil {
-			return portainer.TunnelDetails{}, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
-		}
-
-		if endpoint.EdgeCheckinInterval == 0 {
-			settings, err := service.dataStore.Settings().Settings()
-			if err != nil {
-				return portainer.TunnelDetails{}, fmt.Errorf("failed fetching settings from db: %w", err)
-			}
-
-			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
-		}
-
-		time.Sleep(2 * time.Duration(endpoint.EdgeCheckinInterval) * time.Second)
-	}
-
-	return service.GetTunnelDetails(endpoint.ID), nil
-}
-
-// SetTunnelStatusToActive update the status of the tunnel associated to the specified environment(endpoint).
-// It sets the status to ACTIVE.
-func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {
-	service.mu.Lock()
-	tunnel := service.getTunnelDetails(endpointID)
-	tunnel.Status = portainer.EdgeAgentActive
-	tunnel.Credentials = ""
-	tunnel.LastActivity = time.Now()
-	service.mu.Unlock()
-
-	cache.Del(endpointID)
-}
-
-// SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
-// It sets the status to IDLE.
-// It removes any existing credentials associated to the tunnel.
-func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
-	service.mu.Lock()
-
-	tunnel := service.getTunnelDetails(endpointID)
-	tunnel.Status = portainer.EdgeAgentIdle
-	tunnel.Port = 0
-	tunnel.LastActivity = time.Now()
-
-	credentials := tunnel.Credentials
-	if credentials != "" {
-		tunnel.Credentials = ""
-
-		if service.chiselServer != nil {
-			service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
-		}
-	}
-
-	service.ProxyManager.DeleteEndpointProxy(endpointID)
-
-	service.mu.Unlock()
-
-	cache.Del(endpointID)
-}
-
-// SetTunnelStatusToRequired update the status of the tunnel associated to the specified environment(endpoint).
-// It sets the status to REQUIRED.
-// If no port is currently associated to the tunnel, it will associate a random unused port to the tunnel
-// and generate temporary credentials that can be used to establish a reverse tunnel on that port.
-// Credentials are encrypted using the Edge ID associated to the environment(endpoint).
-func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
-	defer cache.Del(endpointID)
-
-	tunnel := service.getTunnelDetails(endpointID)
-
-	service.mu.Lock()
-	defer service.mu.Unlock()
-
-	if tunnel.Port == 0 {
-		endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
-		if err != nil {
-			return err
-		}
-
-		tunnel.Status = portainer.EdgeAgentManagementRequired
-		tunnel.Port = service.getUnusedPort()
-		tunnel.LastActivity = time.Now()
-
-		username, password := generateRandomCredentials()
-		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnel.Port)
-
-		if service.chiselServer != nil {
-			err = service.chiselServer.AddUser(username, password, authorizedRemote)
-			if err != nil {
-				return err
-			}
-		}
-
-		credentials, err := encryptCredentials(username, password, endpoint.EdgeID)
-		if err != nil {
-			return err
-		}
-		tunnel.Credentials = credentials
-	}
-
-	return nil
-}
-
 func generateRandomCredentials() (string, string) {
 	username := uniuri.NewLen(8)
 	password := uniuri.NewLen(8)
+
 	return username, password
 }
 

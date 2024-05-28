@@ -18,12 +18,12 @@ import (
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tunnel, err := handler.ReverseTunnelService.GetActiveTunnel(params.endpoint)
+	tunnelAddr, err := handler.ReverseTunnelService.TunnelAddr(params.endpoint)
 	if err != nil {
 		return err
 	}
 
-	agentURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
+	agentURL, err := url.Parse("http://" + tunnelAddr)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (handler *Handler) doProxyWebsocketRequest(
 	}
 
 	if isEdge {
-		handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+		handler.ReverseTunnelService.UpdateLastActivity(params.endpoint.ID)
 		handler.ReverseTunnelService.KeepTunnelAlive(params.endpoint.ID, r.Context(), portainer.WebSocketKeepAlive)
 	}
 
