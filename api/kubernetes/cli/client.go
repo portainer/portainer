@@ -253,7 +253,7 @@ func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*re
 	if err != nil {
 		return nil, errors.Wrap(err, "failed activating tunnel")
 	}
-	endpointURL := "http://" + tunnelAddr
+	endpointURL := fmt.Sprintf("http://%s/kubernetes", tunnelAddr)
 
 	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
 	if err != nil {
