@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"maps"
 	"net/http"
@@ -50,12 +49,12 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeNam
 	case portainer.AgentOnDockerEnvironment:
 		return createAgentClient(endpoint, endpoint.URL, factory.signatureService, nodeName, timeout)
 	case portainer.EdgeAgentOnDockerEnvironment:
-		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+		tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
 		if err != nil {
 			return nil, err
 		}
 
-		endpointURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+		endpointURL := "http://" + tunnelAddr
 
 		return createAgentClient(endpoint, endpointURL, factory.signatureService, nodeName, timeout)
 	}
