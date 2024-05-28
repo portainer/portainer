@@ -1296,7 +1296,6 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -1557,13 +1556,13 @@ type (
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		StopTunnelServer() error
-		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetTunnelStatusToActive(endpointID EndpointID)
-		SetTunnelStatusToRequired(endpointID EndpointID) error
-		SetTunnelStatusToIdle(endpointID EndpointID)
+		GenerateEdgeKey(apiURL, tunnelAddr string, endpointIdentifier int) string
+		Open(endpoint *Endpoint) error
+		Config(endpointID EndpointID) TunnelDetails
+		TunnelAddr(endpoint *Endpoint) (string, error)
+		UpdateLastActivity(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		GetTunnelDetails(endpointID EndpointID) TunnelDetails
-		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
+		EdgeJobs(endpointId EndpointID) []EdgeJob
 		AddEdgeJob(endpoint *Endpoint, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
@@ -1878,8 +1877,6 @@ const (
 	EdgeAgentIdle string = "IDLE"
 	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge environment(endpoint)
 	EdgeAgentManagementRequired string = "REQUIRED"
-	// EdgeAgentActive represents an active state for a tunnel connected to an Edge environment(endpoint)
-	EdgeAgentActive string = "ACTIVE"
 )
 
 // represents an authorization type
