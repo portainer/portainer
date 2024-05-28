@@ -1,5 +1,6 @@
 import { createStore } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { ColumnFiltersState } from '@tanstack/react-table';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
 
@@ -73,6 +74,22 @@ export function refreshableSettings<T extends RefreshableTableSettings>(
     autoRefreshRate: 0,
     setAutoRefreshRate: (autoRefreshRate: number) =>
       set((s) => ({ ...s, autoRefreshRate })),
+  };
+}
+
+export interface FilteredColumnsTableSettings {
+  columnFilters: ColumnFiltersState;
+  setColumnFilters(columns: ColumnFiltersState): void;
+}
+
+export function filteredColumnsSettings<T extends FilteredColumnsTableSettings>(
+  set: ZustandSetFunc<T>
+): FilteredColumnsTableSettings {
+  return {
+    columnFilters: [],
+    setColumnFilters(columns) {
+      set((s) => ({ ...s, columnFilters: columns }));
+    },
   };
 }
 

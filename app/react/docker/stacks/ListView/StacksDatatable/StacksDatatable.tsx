@@ -5,21 +5,19 @@ import { useAuthorizations, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Datatable } from '@@/datatables';
-import { useTableState } from '@@/datatables/useTableState';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { defaultGlobalFilterFn } from '@@/datatables/Datatable';
 import { withGlobalFilter } from '@@/datatables/extend-options/withGlobalFilter';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { isExternalStack, isOrphanedStack } from '../../view-models/utils';
 
 import { TableActions } from './TableActions';
 import { TableSettingsMenus } from './TableSettingsMenus';
-import { createStore } from './store';
+import { useStore } from './store';
 import { useColumns } from './columns';
 import { DecoratedStack } from './types';
-
-const tableKey = 'docker_stacks';
-const settingsStore = createStore(tableKey);
 
 export function StacksDatatable({
   onRemove,
@@ -32,7 +30,7 @@ export function StacksDatatable({
   isImageNotificationEnabled: boolean;
   dataset: Array<DecoratedStack>;
 }) {
-  const tableState = useTableState(settingsStore, tableKey);
+  const tableState = useStore();
   useRepeater(tableState.autoRefreshRate, onReload);
   const isAdminQuery = useIsEdgeAdmin();
   const { authorized: canManageStacks } = useAuthorizations([
@@ -69,7 +67,10 @@ export function StacksDatatable({
           tableState.hiddenColumns.map((col) => [col, false])
         ),
       }}
-      extendTableOptions={withGlobalFilter(globalFilterFn)}
+      extendTableOptions={mergeOptions(
+        withGlobalFilter(globalFilterFn),
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
       data-cy="docker-stacks-datatable"
     />
   );
