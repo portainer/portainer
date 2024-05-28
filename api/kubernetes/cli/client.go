@@ -249,11 +249,11 @@ func (factory *ClientFactory) buildAgentConfig(endpoint *portainer.Endpoint) (*r
 }
 
 func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*rest.Config, error) {
-	tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+	tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed activating tunnel")
 	}
-	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
+	endpointURL := fmt.Sprintf("http://%s/kubernetes", tunnelAddr)
 
 	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
 	if err != nil {

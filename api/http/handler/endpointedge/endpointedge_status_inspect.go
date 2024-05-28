@@ -15,6 +15,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -134,7 +135,7 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 
 	// Take an initial snapshot
 	if endpoint.LastCheckInDate == 0 {
-		handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
+		handler.ReverseTunnelService.Open(endpoint)
 	}
 
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
@@ -153,33 +154,20 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		return nil, httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
-	checkinInterval := endpoint.EdgeCheckinInterval
-	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := tx.Settings().Settings()
-		if err != nil {
-			return nil, httperror.InternalServerError("Unable to retrieve settings from the database", err)
-		}
-		checkinInterval = settings.EdgeAgentCheckinInterval
-	}
-
-	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
+	tunnel := handler.ReverseTunnelService.Config(endpoint.ID)
 
 	statusResponse := endpointEdgeStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
-		CheckinInterval: checkinInterval,
+		CheckinInterval: edge.EffectiveCheckinInterval(tx, endpoint),
 		Credentials:     tunnel.Credentials,
 	}
 
-	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
+	schedules, handlerErr := handler.buildSchedules(endpoint.ID)
 	if handlerErr != nil {
 		return nil, handlerErr
 	}
 	statusResponse.Schedules = schedules
-
-	if tunnel.Status == portainer.EdgeAgentManagementRequired {
-		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
-	}
 
 	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(tx, endpoint.ID)
 	if handlerErr != nil {
@@ -213,9 +201,9 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 	}
 }
 
-func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
+func (handler *Handler) buildSchedules(endpointID portainer.EndpointID) ([]edgeJobResponse, *httperror.HandlerError) {
 	schedules := []edgeJobResponse{}
-	for _, job := range tunnel.Jobs {
+	for _, job := range handler.ReverseTunnelService.EdgeJobs(endpointID) {
 		var collectLogs bool
 		if _, ok := job.GroupLogsCollection[endpointID]; ok {
 			collectLogs = job.GroupLogsCollection[endpointID].CollectLogs

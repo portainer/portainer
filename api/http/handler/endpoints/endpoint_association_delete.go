@@ -59,8 +59,6 @@ func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http
 		return httperror.InternalServerError("Failed persisting environment in database", err)
 	}
 
-	handler.ReverseTunnelService.SetTunnelStatusToIdle(endpoint.ID)
-
 	return response.Empty(w)
 }
 

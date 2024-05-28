@@ -138,9 +138,7 @@ func (transport *Transport) executeDockerRequest(request *http.Request) (*http.R
 	}
 
 	if err == nil {
-		transport.reverseTunnelService.SetTunnelStatusToActive(transport.endpoint.ID)
-	} else {
-		transport.reverseTunnelService.SetTunnelStatusToIdle(transport.endpoint.ID)
+		transport.reverseTunnelService.UpdateLastActivity(transport.endpoint.ID)
 	}
 
 	return response, err
