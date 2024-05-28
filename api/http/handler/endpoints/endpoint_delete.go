@@ -17,43 +17,41 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type DeleteMultiplePayload struct {
-	Endpoints []struct {
-		ID            int    `json:"id"`
-		Name          string `json:"name"`
-		DeleteCluster bool   `json:"deleteCluster"`
-	} `json:"environments"`
+type endpointDeleteRequest struct {
+	ID            int  `json:"id"`
+	DeleteCluster bool `json:"deleteCluster"`
 }
 
-func (payload *DeleteMultiplePayload) Validate(r *http.Request) error {
+type endpointDeleteBatchPayload struct {
+	Endpoints []endpointDeleteRequest `json:"endpoints"`
+}
+
+type endpointDeleteBatchPartialResponse struct {
+	Deleted []int `json:"deleted"`
+	Errors  []int `json:"errors"`
+}
+
+func (payload *endpointDeleteBatchPayload) Validate(r *http.Request) error {
 	if payload == nil || len(payload.Endpoints) == 0 {
-		return fmt.Errorf("invalid request payload; you must provide a list of nodes to delete")
+		return fmt.Errorf("invalid request payload. You must provide a list of environments to delete")
 	}
 
 	return nil
 }
 
-type DeleteMultipleResp struct {
-	Name string `json:"name"`
-	Err  error  `json:"err"`
-}
-
 // @id EndpointDelete
-// @summary Remove an environment(endpoint)
-// @description Remove an environment(endpoint).
-// @description **Access policy**: administrator
+// @summary Remove an environment
+// @description Remove the environment associated to the specified identifier and optionally clean-up associated resources.
+// @description **Access policy**: Administrator only.
 // @tags endpoints
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @param id path int true "Environment(Endpoint) identifier"
-// @success 204 "Success"
-// @failure 400 "Invalid request"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
+// @success 204 "Environment successfully deleted."
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 404 "Unable to find the environment with the specified identifier inside the database."
+// @failure 500 "Server error occurred while attempting to delete the environment."
 // @router /endpoints/{id} [delete]
-// @deprecated
-// Deprecated: use endpointDeleteMultiple instead.
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -81,49 +79,54 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	return response.Empty(w)
 }
 
-// @id EndpointDeleteMultiple
-// @summary Remove multiple environment(endpoint)s
-// @description Remove multiple environment(endpoint)s.
-// @description **Access policy**: administrator
+// @id EndpointDeleteBatch
+// @summary Remove multiple environments
+// @description Remove multiple environments and optionally clean-up associated resources.
+// @description **Access policy**: Administrator only.
 // @tags endpoints
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param body body DeleteMultiplePayload true "List of endpoints to delete"
-// @success 204 "Success"
-// @failure 400 "Invalid request"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
-// @router /endpoints/remove [post]
-func (handler *Handler) endpointDeleteMultiple(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var p DeleteMultiplePayload
+// @param body body endpointDeleteBatchPayload true "List of environments to delete, with optional deleteCluster flag to clean-up assocaited resources (cloud environments only)"
+// @success 204 "Environment(s) successfully deleted."
+// @failure 207 {object} endpointDeleteBatchPartialResponse "Partial success. Some environments were deleted successfully, while others failed."
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to delete the specified environments."
+// @router /endpoints [delete]
+func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var p endpointDeleteBatchPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &p); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	var resps []DeleteMultipleResp
+	resp := endpointDeleteBatchPartialResponse{
+		Deleted: []int{},
+		Errors:  []int{},
+	}
 
-	err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		for _, e := range p.Endpoints {
-			// Attempt deletion.
-			err := handler.deleteEndpoint(
-				tx,
-				portainer.EndpointID(e.ID),
-				e.DeleteCluster,
-			)
+			if err := handler.deleteEndpoint(tx, portainer.EndpointID(e.ID), e.DeleteCluster); err != nil {
+				resp.Errors = append(resp.Errors, e.ID)
+				log.Warn().Err(err).Int("environment_id", e.ID).Msg("Unable to remove environment")
 
-			resps = append(resps, DeleteMultipleResp{Name: e.Name, Err: err})
+				continue
+			}
+
+			resp.Deleted = append(resp.Deleted, e.ID)
 		}
 
 		return nil
-	})
-	if err != nil {
+	}); err != nil {
 		return httperror.InternalServerError("Unable to delete environments", err)
 	}
 
-	return response.JSON(w, resps)
+	if len(resp.Errors) > 0 {
+		return response.JSONWithStatus(w, resp, http.StatusPartialContent)
+	}
+
+	return response.Empty(w)
 }
 
 func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID portainer.EndpointID, deleteCluster bool) error {
