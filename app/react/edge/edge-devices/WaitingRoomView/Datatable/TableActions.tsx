@@ -1,7 +1,7 @@
 import { Check, CheckCircle } from 'lucide-react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
+import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/ListView/useDeleteEnvironmentsMutation';
 import { Environment } from '@/react/portainer/environments/types';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
@@ -124,7 +124,7 @@ export function TableActions({
 
   async function handleRemoveDevice(devices: Environment[]) {
     removeMutation.mutate(
-      devices.map((d) => d.Id),
+      devices.map((d) => ({ id: d.Id, name: d.Name })),
       {
         onSuccess() {
           notifySuccess('Success', 'Edge devices were hidden successfully');
