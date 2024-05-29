@@ -126,6 +126,10 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 		command.WithHost(options.Host)
 	}
 
+	if options.ProjectDir != "" {
+		command.WithProjectDirectory(options.ProjectDir)
+	}
+
 	var stderr bytes.Buffer
 
 	args := []string{}
@@ -235,6 +239,10 @@ func (command *composeCommand) WithProjectName(projectName string) {
 
 func (command *composeCommand) WithEnvFilePath(envFilePath string) {
 	command.globalArgs = append(command.globalArgs, "--env-file", envFilePath)
+}
+
+func (command *composeCommand) WithProjectDirectory(projectDir string) {
+	command.globalArgs = append(command.globalArgs, "--project-directory", projectDir)
 }
 
 func (command *composeCommand) ToArgs() []string {
