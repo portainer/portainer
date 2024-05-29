@@ -85,7 +85,7 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 		if client, _ := service.kubeFactory.GetKubeClient(endpoint); client != nil {
 			if _, err = client.ServerVersion(); err != nil {
 				log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, environmentID)
-				return fmt.Errorf("environment %q (id: %d) is not up", endpoint.Name, environmentID)
+				return
 			}
 		}
 	}
