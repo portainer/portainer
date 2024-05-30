@@ -4,6 +4,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/errors"
 )
@@ -34,6 +35,7 @@ type testDatastore struct {
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
 	pendingActionsService   dataservices.PendingActionsService
+	connection              portainer.Connection
 }
 
 func (d *testDatastore) Backup(path string) (string, error)                  { return "", nil }
@@ -88,6 +90,10 @@ func (d *testDatastore) PendingActions() dataservices.PendingActionsService {
 	return d.pendingActionsService
 }
 
+func (d *testDatastore) Connection() portainer.Connection {
+	return d.connection
+}
+
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false
 }
@@ -105,7 +111,8 @@ type datastoreOption = func(d *testDatastore)
 // NewDatastore creates new instance of testDatastore.
 // Will apply options before returning, opts will be applied from left to right.
 func NewDatastore(options ...datastoreOption) *testDatastore {
-	d := testDatastore{}
+	conn, _ := database.NewDatabase("boltdb", "", nil)
+	d := testDatastore{connection: conn}
 	for _, o := range options {
 		o(&d)
 	}
