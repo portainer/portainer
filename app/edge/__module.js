@@ -106,14 +106,11 @@ angular
 
     const edgeJob = {
       name: 'edge.jobs.job',
-      url: '/:id',
+      url: '/:id?tab',
       views: {
         'content@': {
-          component: 'edgeJobView',
+          component: 'endJobsItemView',
         },
-      },
-      params: {
-        tab: 0,
       },
     };
 

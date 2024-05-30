@@ -3,6 +3,9 @@ import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { Button } from '@@/buttons';
 
 import { LogsStatus } from '../../types';
+import { useDownloadLogsMutation } from '../../queries/jobResults/useDownloadLogsMutation';
+import { useClearLogsMutation } from '../../queries/jobResults/useClearLogsMutation';
+import { useCollectLogsMutation } from '../../queries/jobResults/useCollectLogsMutation';
 
 import { DecoratedJobResult, getTableMeta } from './types';
 
@@ -29,6 +32,11 @@ function ActionsCell({
   table,
 }: CellContext<DecoratedJobResult, unknown>) {
   const tableMeta = getTableMeta(table.options.meta);
+  const id = tableMeta.jobId;
+
+  const downloadLogsMutation = useDownloadLogsMutation(id);
+  const clearLogsMutations = useClearLogsMutation(id);
+  const collectLogsMutation = useCollectLogsMutation(id);
 
   switch (item.LogsStatus) {
     case LogsStatus.Pending:
@@ -42,14 +50,14 @@ function ActionsCell({
       return (
         <>
           <Button
-            onClick={() => tableMeta.downloadLogs(item.EndpointId)}
-            data-cy={`edge-job-download-logs-${item.Endpoint.Name}`}
+            onClick={() => downloadLogsMutation.mutate(item.EndpointId)}
+            data-cy={`edge-job-download-logs-${item.Endpoint?.Name}`}
           >
             Download logs
           </Button>
           <Button
-            onClick={() => tableMeta.clearLogs(item.EndpointId)}
-            data-cy={`edge-job-clear-logs-${item.Endpoint.Name}`}
+            onClick={() => clearLogsMutations.mutate(item.EndpointId)}
+            data-cy={`edge-job-clear-logs-${item.Endpoint?.Name}`}
           >
             Clear logs
           </Button>
@@ -59,8 +67,8 @@ function ActionsCell({
     default:
       return (
         <Button
-          onClick={() => tableMeta.collectLogs(item.EndpointId)}
-          data-cy={`edge-job-retrieve-logs-${item.Endpoint.Name}`}
+          onClick={() => collectLogsMutation.mutate(item.EndpointId)}
+          data-cy={`edge-job-retrieve-logs-${item.Endpoint?.Name}`}
         >
           Retrieve logs
         </Button>

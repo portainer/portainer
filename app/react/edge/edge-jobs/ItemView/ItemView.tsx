@@ -9,8 +9,8 @@ import { NavTabs } from '@@/NavTabs';
 
 import { useEdgeJob } from '../queries/useEdgeJob';
 
-// import { ResultsDatatable } from './ResultsDatatable/ResultsDatatable';
-import { UpdateEdgeJobForm } from './UpdateEdgeJobForm';
+import { UpdateEdgeJobForm } from './UpdateEdgeJobForm/UpdateEdgeJobForm';
+import { ResultsDatatable } from './ResultsDatatable/ResultsDatatable';
 
 const tabs = [
   {
@@ -27,7 +27,11 @@ const tabs = [
 
 export function ItemView() {
   const id = useIdParam();
-  const [tab = 0, setTab] = useParamState<number>('tab');
+
+  const [tabId = 0, setTabId] = useParamState('tab', (param) =>
+    param ? parseInt(param, 10) : 0
+  );
+
   const edgeJobQuery = useEdgeJob(id);
 
   if (!edgeJobQuery.data) {
@@ -48,14 +52,20 @@ export function ItemView() {
           <Widget>
             <Widget.Body>
               <NavTabs
-                selectedId={tab}
-                onSelect={(id) => setTab(id)}
+                selectedId={tabId}
+                onSelect={(id) => {
+                  setTabId(id);
+                }}
                 options={tabs}
               />
 
-              {tab === tabs[0].id && <UpdateEdgeJobForm edgeJob={edgeJob} />}
+              {tabId === tabs[0].id && <UpdateEdgeJobForm edgeJob={edgeJob} />}
 
-              {/* {tab === tabs[1].id && <ResultsDatatable />} */}
+              {tabId === tabs[1].id && (
+                <div className="mt-4">
+                  <ResultsDatatable jobId={edgeJob.Id} />
+                </div>
+              )}
             </Widget.Body>
           </Widget>
         </div>

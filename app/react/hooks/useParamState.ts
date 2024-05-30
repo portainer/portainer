@@ -14,7 +14,7 @@ export function useParamState<T>(
   return [
     state,
     (value?: T) => {
-      router.stateService.go('.', { [param]: value }, {});
+      router.stateService.go('.', { [param]: value }, { reload: false });
     },
   ] as const;
 }

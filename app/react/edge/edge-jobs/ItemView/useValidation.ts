@@ -15,7 +15,7 @@ import { useNameValidation } from '../components/EdgeJobForm/NameField';
 import { cronValidation } from '../components/EdgeJobForm/AdvancedCronFieldset';
 import { timeOptions } from '../components/EdgeJobForm/RecurringFieldset';
 
-import { FormValues } from './types';
+import { FormValues } from './UpdateEdgeJobForm/types';
 
 export function useValidation({
   id,

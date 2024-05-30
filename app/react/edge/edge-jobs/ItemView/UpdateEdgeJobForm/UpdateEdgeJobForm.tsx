@@ -9,20 +9,20 @@ import { FormActions } from '@@/form-components/FormActions';
 import { FormSection } from '@@/form-components/FormSection';
 import { WebEditorForm } from '@@/WebEditorForm';
 
-import { NameField } from '../components/EdgeJobForm/NameField';
-import { JobConfigurationFieldset } from '../components/EdgeJobForm/JobConfigurationFieldset';
+import { NameField } from '../../components/EdgeJobForm/NameField';
+import { JobConfigurationFieldset } from '../../components/EdgeJobForm/JobConfigurationFieldset';
 import {
   UpdatePayload,
   useUpdateEdgeJobMutation,
-} from '../queries/useUpdateEdgeJobMutation';
+} from '../../queries/useUpdateEdgeJobMutation';
 import {
   toRecurringRequest,
   toRecurringViewModel,
-} from '../components/EdgeJobForm/parseRecurringValues';
-import { EdgeJobResponse } from '../queries/useEdgeJob';
-import { useEdgeJobFile } from '../queries/useEdgeJobFile';
+} from '../../components/EdgeJobForm/parseRecurringValues';
+import { EdgeJobResponse } from '../../queries/useEdgeJob';
+import { useEdgeJobFile } from '../../queries/useEdgeJobFile';
+import { useValidation } from '../useValidation';
 
-import { useValidation } from './useValidation';
 import { FormValues } from './types';
 
 export function UpdateEdgeJobForm({ edgeJob }: { edgeJob: EdgeJobResponse }) {

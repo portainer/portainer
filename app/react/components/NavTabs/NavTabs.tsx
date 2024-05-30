@@ -75,8 +75,6 @@ export function NavTabs<T extends string | number = string>({
       return;
     }
 
-    if (option.children) {
-      onSelect(option.id);
-    }
+    onSelect(option.id);
   }
 }

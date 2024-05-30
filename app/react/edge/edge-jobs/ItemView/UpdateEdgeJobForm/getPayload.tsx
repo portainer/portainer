@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { UpdatePayload } from '../queries/useUpdateEdgeJobMutation';
+import { UpdatePayload } from '../../queries/useUpdateEdgeJobMutation';
 
 import { FormValues } from './types';
 
