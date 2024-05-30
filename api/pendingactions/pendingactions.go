@@ -55,10 +55,9 @@ func (service *PendingActionsService) Create(r portainer.PendingActions) error {
 	return service.dataStore.PendingActions().Create(&r)
 }
 
-func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
+func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 	// Run in a goroutine to avoid blocking the main thread due to db tx	=
 	go service.execute(id)
-	return nil
 }
 
 func (service *PendingActionsService) execute(environmentID portainer.EndpointID) {
