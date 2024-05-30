@@ -55,12 +55,17 @@ func (service *PendingActionsService) Create(action portainer.PendingAction) err
 }
 
 func (service *PendingActionsService) Execute(id portainer.EndpointID) {
+	// Run in a goroutine to avoid blocking the main thread due to db tx	=
+	go service.execute(id)
+}
+
+func (service *PendingActionsService) execute(environmentID portainer.EndpointID) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	endpoint, err := service.dataStore.Endpoint().Endpoint(id)
+	endpoint, err := service.dataStore.Endpoint().Endpoint(environmentID)
 	if err != nil {
-		log.Debug().Msgf("failed to retrieve environment %d: %v", id, err)
+		log.Debug().Msgf("failed to retrieve environment %d: %v", environmentID, err)
 		return
 	}
 
@@ -77,12 +82,12 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 		// creating a kube client and performing a simple operation
 		client, err := service.kubeFactory.GetKubeClient(endpoint)
 		if err != nil {
-			log.Debug().Msgf("failed to create Kubernetes client for environment %d: %v", id, err)
+			log.Debug().Msgf("failed to create Kubernetes client for environment %d: %v", environmentID, err)
 			return
 		}
 
 		if _, err = client.ServerVersion(); err != nil {
-			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
+			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, environmentID)
 			return
 		}
 	}
@@ -93,20 +98,29 @@ func (service *PendingActionsService) Execute(id portainer.EndpointID) {
 		return
 	}
 
-	log.Debug().Msgf("Executing pending actions for environment %d", id)
-	for _, pendingAction := range pendingActions {
-		if pendingAction.EndpointID == id {
+	if len(pendingActions) > 0 {
+		log.Debug().Msgf("Found %d pending actions", len(pendingActions))
+		log.Debug().Msgf("PendingActions %+v", pendingActions)
+	}
+
+	for i, pendingAction := range pendingActions {
+		if pendingAction.EndpointID == environmentID {
+			if i == 0 {
+				// We have at least 1 pending action for this environment
+				log.Debug().Msgf("Executing pending actions for environment %d", environmentID)
+			}
+
 			log.Debug().Msgf("executing pending action id=%d, action=%s", pendingAction.ID, pendingAction.Action)
 			err := service.executePendingAction(pendingAction, endpoint)
 			if err != nil {
 				log.Warn().Msgf("failed to execute pending action: %v", err)
-				return
+				continue
 			}
 
 			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
 			if err != nil {
 				log.Warn().Msgf("failed to delete pending action: %v", err)
-				return
+				continue
 			}
 
 			log.Debug().Msgf("pending action %d finished", pendingAction.ID)
