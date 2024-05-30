@@ -23,26 +23,24 @@ import {
 import { StackType } from '@/react/common/stacks/types';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { AdvancedSettings } from '@/react/portainer/templates/app-templates/DeployFormWidget/AdvancedSettings';
+import { useSwarmId } from '@/react/docker/proxy/queries/useSwarm';
 
 import { Button } from '@@/buttons';
 import { FormActions } from '@@/form-components/FormActions';
 import { FormSection } from '@@/form-components/FormSection';
 import { WebEditorForm } from '@@/WebEditorForm';
-
-import { useSwarmId } from '../../proxy/queries/useSwarm';
+import { Link } from '@@/Link';
 
 import { FormValues } from './types';
 import { useValidation } from './useValidation';
 
 export function DeployForm({
   template,
-  unselect,
   templateFile,
   isDeployable,
 }: {
   template: CustomTemplate;
   templateFile: string;
-  unselect: () => void;
   isDeployable: boolean;
 }) {
   const router = useRouter();
@@ -157,7 +155,12 @@ export function DeployForm({
           >
             <Button
               type="reset"
-              onClick={() => unselect()}
+              as={Link}
+              props={{
+                to: '.',
+                'data-cy': 'cancel-stack-creation',
+                params: { template: null },
+              }}
               color="default"
               data-cy="cancel-stack-creation"
             >

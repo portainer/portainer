@@ -15,20 +15,20 @@ import { CustomTemplatesListItem } from './CustomTemplatesListItem';
 
 export function CustomTemplatesList({
   templates,
-  onSelect,
   onDelete,
   selectedId,
   templateLinkParams,
   storageKey,
 }: {
   templates?: CustomTemplate[];
-  onSelect?: (template: CustomTemplate['Id']) => void;
-  onDelete: (template: CustomTemplate['Id']) => void;
+  onDelete: (templateId: CustomTemplate['Id']) => void;
   selectedId?: CustomTemplate['Id'];
-  templateLinkParams?: (template: CustomTemplate) => {
-    to: string;
-    params: object;
-  };
+  templateLinkParams?: (template: CustomTemplate) =>
+    | {
+        to: string;
+        params: object;
+      }
+    | undefined;
   storageKey: string;
 }) {
   const [page, setPage] = useState(0);
@@ -68,7 +68,6 @@ export function CustomTemplatesList({
           <CustomTemplatesListItem
             key={template.Id}
             template={template}
-            onSelect={onSelect}
             isSelected={template.Id === selectedId}
             onDelete={onDelete}
             linkParams={templateLinkParams?.(template)}

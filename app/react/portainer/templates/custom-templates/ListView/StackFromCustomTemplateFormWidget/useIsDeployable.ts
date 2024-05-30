@@ -1,9 +1,8 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { StackType } from '@/react/common/stacks/types';
+import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
 
-import { useIsSwarm } from '../../proxy/queries/useInfo';
-
-export function useIsDeployable(type: StackType) {
+export function useIsDeployable(type: StackType | undefined) {
   const environmentId = useEnvironmentId();
 
   const isSwarm = useIsSwarm(environmentId);

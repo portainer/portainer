@@ -25,17 +25,18 @@ export function FormActions({
     <FormSection title="Actions">
       <div className="form-group">
         <div className="col-sm-12">
-          <LoadingButton
-            className="!ml-0"
-            loadingText={loadingText}
-            isLoading={isLoading}
-            disabled={!isValid}
-            data-cy={dataCy}
-          >
-            {submitLabel}
-          </LoadingButton>
-
-          {children}
+          <div className="flex item-center gap-3">
+            <LoadingButton
+              className="!ml-0"
+              loadingText={loadingText}
+              isLoading={isLoading}
+              disabled={!isValid}
+              data-cy={dataCy}
+            >
+              {submitLabel}
+            </LoadingButton>
+            {children}
+          </div>
         </div>
       </div>
     </FormSection>

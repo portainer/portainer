@@ -6,12 +6,17 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { CreateView } from '@/react/portainer/templates/custom-templates/CreateView';
 import { EditView } from '@/react/portainer/templates/custom-templates/EditView';
 import { AppTemplatesView } from '@/react/portainer/templates/app-templates/AppTemplatesView';
+import { ListView } from '@/react/portainer/templates/custom-templates/ListView/ListView';
 
 export const templatesModule = angular
   .module('portainer.app.react.views.templates', [])
   .component(
     'appTemplatesView',
     r2a(withCurrentUser(withUIRouter(AppTemplatesView)), [])
+  )
+  .component(
+    'customTemplatesView',
+    r2a(withCurrentUser(withUIRouter(ListView)), [])
   )
   .component(
     'createCustomTemplatesView',

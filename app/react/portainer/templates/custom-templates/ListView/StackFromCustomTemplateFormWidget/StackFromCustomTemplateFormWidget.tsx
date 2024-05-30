@@ -1,6 +1,7 @@
 import { DeployWidget } from '@/react/portainer/templates/components/DeployWidget';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { useCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
+import { useCustomTemplate } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplate';
 
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -9,18 +10,20 @@ import { DeployForm } from './DeployForm';
 import { TemplateLoadError } from './TemplateLoadError';
 
 export function StackFromCustomTemplateFormWidget({
-  template,
-  unselect,
+  templateId,
 }: {
-  template: CustomTemplate;
-  unselect: () => void;
+  templateId: CustomTemplate['Id'];
 }) {
-  const isDeployable = useIsDeployable(template.Type);
-  const fileQuery = useCustomTemplateFile(template.Id);
+  const templateQuery = useCustomTemplate(templateId);
 
-  if (fileQuery.isLoading) {
+  const isDeployable = useIsDeployable(templateQuery.data?.Type);
+  const fileQuery = useCustomTemplateFile(templateId);
+
+  if (fileQuery.isLoading || !templateQuery.data) {
     return null;
   }
+
+  const template = templateQuery.data;
 
   return (
     <DeployWidget
@@ -44,10 +47,10 @@ export function StackFromCustomTemplateFormWidget({
           </div>
         </div>
       )}
+
       {fileQuery.isSuccess && isDeployable && (
         <DeployForm
           template={template}
-          unselect={unselect}
           templateFile={fileQuery.data}
           isDeployable={isDeployable}
         />
