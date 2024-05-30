@@ -82,7 +82,8 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 }
 
 func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
-	_, err := datastore.Backup(filepath.Join(backupDirPath, "portainer.db"))
+	dbFileName := datastore.Connection().GetDatabaseFileName()
+	_, err := datastore.Backup(filepath.Join(backupDirPath, dbFileName))
 	return err
 }
 
