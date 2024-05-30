@@ -52,10 +52,11 @@ export interface SettableColumnsTableSettings {
 }
 
 export function hiddenColumnsSettings<T extends SettableColumnsTableSettings>(
-  set: ZustandSetFunc<T>
+  set: ZustandSetFunc<T>,
+  initialHiddenColumns: string[] = []
 ): SettableColumnsTableSettings {
   return {
-    hiddenColumns: [],
+    hiddenColumns: initialHiddenColumns,
     setHiddenColumns: (hiddenColumns: string[]) =>
       set((s) => ({ ...s, hiddenColumns })),
   };
@@ -67,10 +68,11 @@ export interface RefreshableTableSettings {
 }
 
 export function refreshableSettings<T extends RefreshableTableSettings>(
-  set: ZustandSetFunc<T>
+  set: ZustandSetFunc<T>,
+  autoRefreshRate = 0
 ): RefreshableTableSettings {
   return {
-    autoRefreshRate: 0,
+    autoRefreshRate,
     setAutoRefreshRate: (autoRefreshRate: number) =>
       set((s) => ({ ...s, autoRefreshRate })),
   };
@@ -96,6 +98,7 @@ export function createPersistedStore<T extends BasicTableSettings>(
         }) as T,
       {
         name: keyBuilder(`datatable_settings_${storageKey}`),
+        version: 1,
       }
     )
   );
