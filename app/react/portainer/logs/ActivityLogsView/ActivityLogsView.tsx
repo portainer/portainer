@@ -38,32 +38,37 @@ export function ActivityLogsView() {
 
   return (
     <>
-      <PageHeader title="User Activity" breadcrumbs="Activity Logs" reload />
+      <PageHeader
+        title="User activity logs"
+        breadcrumbs="User activity logs"
+        reload
+      />
 
       <div className="mx-4">
-        <BEOverlay featureId={FeatureId.ACTIVITY_AUDIT}>
-          <FilterBar
-            value={range}
-            onChange={setRange}
-            onExport={handleExport}
-          />
-
-          <div className="-mx-[15px] mt-4">
-            <ActivityLogsTable
-              sort={tableState.sortBy}
-              onChangeSort={(value) =>
-                tableState.setSortBy(value?.id, value?.desc || false)
-              }
-              limit={tableState.pageSize}
-              onChangeLimit={tableState.setPageSize}
-              keyword={tableState.search}
-              onChangeKeyword={tableState.setSearch}
-              currentPage={page}
-              onChangePage={setPage}
-              totalItems={logsQuery.data?.totalCount || 0}
-              dataset={logsQuery.data?.logs}
-            />
+        <BEOverlay variant="multi-widget" featureId={FeatureId.ACTIVITY_AUDIT}>
+          <div className="row">
+            <div className="col-sm-12">
+              <FilterBar
+                value={range}
+                onChange={setRange}
+                onExport={handleExport}
+              />
+            </div>
           </div>
+          <ActivityLogsTable
+            sort={tableState.sortBy}
+            onChangeSort={(value) =>
+              tableState.setSortBy(value?.id, value?.desc || false)
+            }
+            limit={tableState.pageSize}
+            onChangeLimit={tableState.setPageSize}
+            keyword={tableState.search}
+            onChangeKeyword={tableState.setSearch}
+            currentPage={page}
+            onChangePage={setPage}
+            totalItems={logsQuery.data?.totalCount || 0}
+            dataset={logsQuery.data?.logs}
+          />
         </BEOverlay>
       </div>
     </>

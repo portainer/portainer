@@ -6,11 +6,15 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/pkg/featureflags"
+	"golang.org/x/oauth2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/version"
 )
 
 type (
@@ -120,7 +124,6 @@ type (
 		Assets                    *string
 		Data                      *string
 		FeatureFlags              *[]string
-		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
@@ -242,8 +245,8 @@ type (
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
 		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
-		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Images     []image.Summary           `json:"Images" swaggerignore:"true"`
+		Info       system.Info               `json:"Info" swaggerignore:"true"`
 		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
@@ -377,15 +380,6 @@ type (
 
 	// EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
-
-	PendingActionsID int
-	PendingActions   struct {
-		ID         PendingActionsID `json:"ID"`
-		EndpointID EndpointID       `json:"EndpointID"`
-		Action     string           `json:"Action"`
-		ActionData interface{}      `json:"ActionData"`
-		CreatedAt  int64            `json:"CreatedAt"`
-	}
 
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
@@ -756,19 +750,20 @@ type (
 
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
-		KubeSecretKey        []byte `json:"KubeSecretKey"`
+		ClientID             string           `json:"ClientID"`
+		ClientSecret         string           `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string           `json:"AccessTokenURI"`
+		AuthorizationURI     string           `json:"AuthorizationURI"`
+		ResourceURI          string           `json:"ResourceURI"`
+		RedirectURI          string           `json:"RedirectURI"`
+		UserIdentifier       string           `json:"UserIdentifier"`
+		Scopes               string           `json:"Scopes"`
+		OAuthAutoCreateUsers bool             `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID           `json:"DefaultTeamID"`
+		SSO                  bool             `json:"SSO"`
+		LogoutURI            string           `json:"LogoutURI"`
+		KubeSecretKey        []byte           `json:"KubeSecretKey"`
+		AuthStyle            oauth2.AuthStyle `json:"AuthStyle"`
 	}
 
 	// Pair defines a key/value string pair
@@ -1301,7 +1296,6 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -1492,6 +1486,8 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
+		ServerVersion() (*version.Info, error)
+
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		IsRBACEnabled() (bool, error)
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
@@ -1508,6 +1504,8 @@ type (
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
+		GetApplications(namespace, kind string) ([]models.K8sApplication, error)
+		GetApplication(namespace, kind, name string) (models.K8sApplication, error)
 		GetMetrics() (models.K8sMetrics, error)
 		GetStorage() ([]KubernetesStorageClassConfig, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo, owner string) error
@@ -1558,13 +1556,13 @@ type (
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		StopTunnelServer() error
-		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetTunnelStatusToActive(endpointID EndpointID)
-		SetTunnelStatusToRequired(endpointID EndpointID) error
-		SetTunnelStatusToIdle(endpointID EndpointID)
+		GenerateEdgeKey(apiURL, tunnelAddr string, endpointIdentifier int) string
+		Open(endpoint *Endpoint) error
+		Config(endpointID EndpointID) TunnelDetails
+		TunnelAddr(endpoint *Endpoint) (string, error)
+		UpdateLastActivity(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		GetTunnelDetails(endpointID EndpointID) TunnelDetails
-		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
+		EdgeJobs(endpointId EndpointID) []EdgeJob
 		AddEdgeJob(endpoint *Endpoint, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
@@ -1724,6 +1722,8 @@ const (
 	EdgeStackStatusRollingBack
 	// EdgeStackStatusRolledBack represents an Edge stack which has rolled back
 	EdgeStackStatusRolledBack
+	// EdgeStackStatusCompleted represents a completed Edge stack
+	EdgeStackStatusCompleted
 )
 
 const (
@@ -1877,8 +1877,6 @@ const (
 	EdgeAgentIdle string = "IDLE"
 	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge environment(endpoint)
 	EdgeAgentManagementRequired string = "REQUIRED"
-	// EdgeAgentActive represents an active state for a tunnel connected to an Edge environment(endpoint)
-	EdgeAgentActive string = "ACTIVE"
 )
 
 // represents an authorization type

@@ -24,7 +24,7 @@ function Template({ value, icon, type }: StoryProps) {
       value={value}
       icon={icon}
       type={type}
-      dataCy="data-cy-example"
+      data-cy="data-cy-example"
     />
   );
 }
@@ -43,7 +43,7 @@ export function WithLink() {
         value={1}
         icon={List}
         type="Example resource"
-        dataCy="data-cy-example"
+        data-cy="data-cy-example"
       />
     </Link>
   );
@@ -55,7 +55,7 @@ export function WithChildren() {
       value={1}
       icon={List}
       type="Example resource"
-      dataCy="data-cy-example"
+      data-cy="data-cy-example"
     >
       <div>Children</div>
     </DashboardItem>

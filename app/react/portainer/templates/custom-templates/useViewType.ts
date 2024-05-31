@@ -4,15 +4,19 @@ export type TemplateViewType = 'kube' | 'docker' | 'edge';
 
 export function useViewType(): TemplateViewType {
   const {
-    state: { name },
+    state: { name = '' },
   } = useCurrentStateAndParams();
-  if (name?.includes('kubernetes')) {
+  if (name.includes('kubernetes')) {
     return 'kube';
   }
 
-  if (name?.includes('docker')) {
+  if (name.includes('docker')) {
     return 'docker';
   }
 
-  return 'edge';
+  if (name.includes('edge')) {
+    return 'edge';
+  }
+
+  throw new Error(`Unknown view type: ${name}`);
 }

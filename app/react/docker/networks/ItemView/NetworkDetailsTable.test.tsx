@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
@@ -38,19 +38,17 @@ test('Network details values should be visible', async () => {
 
 test(`System networks shouldn't show a delete button`, async () => {
   const systemNetwork = getNetwork('bridge');
-  const { queryByText } = await renderComponent(true, systemNetwork);
+  await renderComponent(true, systemNetwork);
 
-  const deleteButton = queryByText('Delete this network');
-  expect(deleteButton).toBeNull();
+  expect(screen.queryByText('Delete this network')).toBeNull();
 });
 
 test('Non system networks should have a delete button', async () => {
   const nonSystemNetwork = getNetwork('non system network');
 
-  const { queryByText } = await renderComponent(true, nonSystemNetwork);
+  await renderComponent(true, nonSystemNetwork);
 
-  const button = queryByText('Delete this network');
-  expect(button).toBeVisible();
+  await expect(screen.findByText('Delete this network')).resolves.toBeVisible();
 });
 
 async function renderComponent(isAdmin: boolean, network: DockerNetwork) {

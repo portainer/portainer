@@ -1,5 +1,5 @@
 import { useRouter } from '@uirouter/react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';

@@ -1,5 +1,5 @@
 import { ComponentType } from 'react';
-import { QueryClientProvider } from 'react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 import { queryClient as defaultQueryClient } from './react-query';
 

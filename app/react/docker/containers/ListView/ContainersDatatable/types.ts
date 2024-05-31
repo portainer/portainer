@@ -1,5 +1,6 @@
 import {
   BasicTableSettings,
+  FilteredColumnsTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
 } from '@@/datatables/types';
@@ -15,7 +16,8 @@ export interface TableSettings
   extends BasicTableSettings,
     SettableColumnsTableSettings,
     SettableQuickActionsTableSettings<QuickAction>,
-    RefreshableTableSettings {
+    RefreshableTableSettings,
+    FilteredColumnsTableSettings {
   truncateContainerName: number;
   setTruncateContainerName: (value: number) => void;
 }

@@ -13,6 +13,7 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 import {
   EnvironmentVariablesFieldset,
   EnvironmentVariablesPanel,
+  StackEnvironmentVariablesPanel,
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 import { Icon } from '@@/Icon';
@@ -153,7 +154,7 @@ export const ngModule = angular
       'pluralType',
       'isLoading',
       'isRefetching',
-      'dataCy',
+      'data-cy',
       'iconClass',
     ])
   )
@@ -228,6 +229,8 @@ export const ngModule = angular
       'value',
       'height',
       'data-cy',
+      'versions',
+      'onVersionChange',
     ])
   )
   .component(
@@ -261,5 +264,19 @@ withFormValidation(
   withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
   'environmentVariablesPanel',
   ['explanation', 'showHelpMessage', 'isFoldable'],
+  envVarValidation
+);
+
+withFormValidation(
+  ngModule,
+  withUIRouter(
+    withReactQuery(
+      withControlledInput(StackEnvironmentVariablesPanel, {
+        values: 'onChange',
+      })
+    )
+  ),
+  'stackEnvironmentVariablesPanel',
+  ['showHelpMessage', 'isFoldable'],
   envVarValidation
 );

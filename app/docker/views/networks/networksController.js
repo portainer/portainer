@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
@@ -12,10 +13,9 @@ angular.module('portainer.docker').controller('NetworksController', [
   'AgentService',
   function ($q, $scope, $state, NetworkService, Notifications, HttpRequestHelper, endpoint, AgentService) {
     $scope.removeAction = async function (selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (network) {
+      async function doRemove(network) {
         HttpRequestHelper.setPortainerAgentTargetHeader(network.NodeName);
-        NetworkService.remove(network.Id)
+        return NetworkService.remove(network.Id)
           .then(function success() {
             Notifications.success('Network successfully removed', network.Name);
             var index = $scope.networks.indexOf(network);
@@ -23,14 +23,11 @@ angular.module('portainer.docker').controller('NetworksController', [
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove network');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     };
 
     $scope.getNetworks = getNetworks;

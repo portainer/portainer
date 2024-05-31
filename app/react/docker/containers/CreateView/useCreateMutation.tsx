@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
-import { RawAxiosRequestHeaders } from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import {
@@ -38,6 +37,7 @@ import { PortainerResponse } from '../../types';
 import { connectContainer } from '../../networks/queries/useConnectContainer';
 import { DockerContainer } from '../types';
 import { queryKeys } from '../queries/query-keys';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { CreateContainerRequest } from './types';
 import { Values } from './useInitialValues';
@@ -161,7 +161,7 @@ async function replace({
   );
 
   await removeContainer(environment.Id, oldContainer.Id, {
-    nodeName: values.nodeName,
+    nodeName: oldContainer.NodeName,
   });
 }
 
@@ -178,13 +178,17 @@ async function renameAndCreate(
 ) {
   let renamed = false;
   try {
-    await stopContainerIfNeeded(environmentId, oldContainer, nodeName);
+    await stopContainerIfNeeded(
+      environmentId,
+      oldContainer,
+      oldContainer.NodeName
+    );
 
     await renameContainer(
       environmentId,
       oldContainer.Id,
       `${oldContainer.Names[0]}-old`,
-      { nodeName }
+      { nodeName: oldContainer.NodeName }
     );
     renamed = true;
 
@@ -192,7 +196,7 @@ async function renameAndCreate(
   } catch (e) {
     if (renamed) {
       await renameContainer(environmentId, oldContainer.Id, name, {
-        nodeName,
+        nodeName: oldContainer.NodeName,
       });
     }
     throw e;
@@ -286,11 +290,7 @@ async function createContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const headers: RawAxiosRequestHeaders = {};
-
-    if (nodeName) {
-      headers['X-PortainerAgent-Target'] = nodeName;
-    }
+    const headers = addNodeHeader(nodeName);
 
     const { data } = await axios.post<
       PortainerResponse<{ Id: string; Warnings: Array<string> }>

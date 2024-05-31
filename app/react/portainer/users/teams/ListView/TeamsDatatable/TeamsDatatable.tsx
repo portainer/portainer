@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 

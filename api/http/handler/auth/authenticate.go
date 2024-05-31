@@ -75,7 +75,12 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 		if settings.AuthenticationMethod == portainer.AuthenticationInternal ||
 			settings.AuthenticationMethod == portainer.AuthenticationOAuth ||
 			(settings.AuthenticationMethod == portainer.AuthenticationLDAP && !settings.LDAPSettings.AutoCreateUsers) {
-			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
+			// avoid username enumeration timing attack by creating a fake user
+			// https://en.wikipedia.org/wiki/Timing_attack
+			user = &portainer.User{
+				Username: "portainer-fake-username",
+				Password: "$2a$10$abcdefghijklmnopqrstuvwx..ABCDEFGHIJKLMNOPQRSTUVWXYZ12", // fake but valid format bcrypt hash
+			}
 		}
 	}
 
@@ -112,7 +117,11 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
 	err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings)
 	if err != nil {
-		return httperror.Forbidden("Only initial admin is allowed to login without oauth", err)
+		if errors.Is(err, httperrors.ErrUnauthorized) {
+			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
+		}
+
+		return httperror.InternalServerError("Unable to authenticate user against LDAP", err)
 	}
 
 	if user == nil {

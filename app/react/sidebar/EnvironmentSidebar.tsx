@@ -64,6 +64,7 @@ function Content({ environment, onClear }: ContentProps) {
   return (
     <SidebarSection
       title={<Title environment={environment} onClear={onClear} />}
+      hoverText={environment.Name}
       aria-label={environment.Name}
       showTitleWhenOpen
     >

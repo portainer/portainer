@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   Plugin,
   PluginInterfaceType,
@@ -20,7 +20,7 @@ export async function getPlugins(environmentId: EnvironmentId) {
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve plugins');
+    throw parseAxiosError(e, 'Unable to retrieve plugins');
   }
 }
 

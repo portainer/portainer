@@ -16,7 +16,6 @@ import (
 
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
@@ -55,8 +54,7 @@ func Test_backupHandlerWithoutPassword_shouldCreateATarballArchive(t *testing.T)
 		gate,
 		"./test_assets/handler_test",
 		func() {},
-		adminMonitor,
-		&demo.Service{}).backup(w, r)
+		adminMonitor).backup(w, r)
 	assert.Nil(t, handlerErr, "Handler should not fail")
 
 	response := w.Result()
@@ -99,8 +97,7 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 		gate,
 		"./test_assets/handler_test",
 		func() {},
-		adminMonitor,
-		&demo.Service{}).backup(w, r)
+		adminMonitor).backup(w, r)
 	assert.Nil(t, handlerErr, "Handler should not fail")
 
 	response := w.Result()

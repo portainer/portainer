@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { SystemVersion } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -13,7 +13,7 @@ export async function getVersion(environmentId: EnvironmentId) {
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve version');
+    throw parseAxiosError(err, 'Unable to retrieve version');
   }
 }
 

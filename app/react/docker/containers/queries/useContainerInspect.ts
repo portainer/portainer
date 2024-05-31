@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -6,7 +6,7 @@ import { genericHandler } from '@/docker/rest/response/handlers';
 
 import { ContainerId } from '../types';
 import { urlBuilder } from '../containers.service';
-import { addNodeName } from '../../proxy/addNodeName';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 import { queryKeys } from './query-keys';
 import { ContainerJSON } from './container';
@@ -30,7 +30,7 @@ export async function inspectContainer(
   try {
     const { data } = await axios.get<ContainerJSON>(
       urlBuilder(environmentId, id, 'json'),
-      { transformResponse: genericHandler, headers: addNodeName(nodeName) }
+      { transformResponse: genericHandler, headers: addNodeHeader(nodeName) }
     );
     return data;
   } catch (e) {

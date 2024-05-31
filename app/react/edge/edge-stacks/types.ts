@@ -10,6 +10,8 @@ import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { EdgeGroup } from '../edge-groups/types';
 
+import { type StaggerConfig } from './components/StaggerFieldset.types';
+
 export {
   type StaggerConfig,
   StaggerOption,
@@ -44,6 +46,8 @@ export enum StatusType {
   RollingBack,
   /** PausedRemoving represents an Edge stack which has been rolled back */
   RolledBack,
+  /** Completed represents a completed Edge stack */
+  Completed,
 }
 
 export interface DeploymentStatus {
@@ -53,6 +57,7 @@ export interface DeploymentStatus {
 }
 
 interface EdgeStackDeploymentInfo {
+  Version: number;
   FileVersion: number;
   ConfigHash: string;
 }
@@ -92,14 +97,13 @@ export type EdgeStack = RelativePathModel & {
   GitConfig?: RepoConfigResponse;
   Prune: boolean;
   RetryDeploy: boolean;
-  Webhook?: string;
+  Webhook: string;
   StackFileVersion?: number;
+  PreviousDeploymentInfo: EdgeStackDeploymentInfo;
   EnvVars?: EnvVar[];
+  StaggerConfig?: StaggerConfig;
   SupportRelativePath: boolean;
   FilesystemPath?: string;
 };
 
-export enum EditorType {
-  Compose,
-  Kubernetes,
-}
+export { DeploymentType as EditorType };

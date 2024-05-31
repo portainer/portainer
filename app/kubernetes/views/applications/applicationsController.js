@@ -90,7 +90,7 @@ class KubernetesApplicationsController {
         } else {
           await this.KubernetesApplicationService.delete(application);
 
-          if (application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
+          if (application.Metadata.labels && application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
             // Update applications in stack
             const stack = this.state.stacks.find((x) => x.Name === application.StackName);
             const index = stack.Applications.indexOf(application);

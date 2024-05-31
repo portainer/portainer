@@ -6,6 +6,7 @@ test('render should include description', async () => {
   const onClick = vi.fn();
   const { findByText } = render(
     <FileUploadForm
+      value={undefined}
       title="test button"
       onChange={onClick}
       description={<span>test description</span>}

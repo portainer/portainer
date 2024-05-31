@@ -4,14 +4,22 @@ import { useMemo } from 'react';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
-import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
-import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
@@ -29,10 +37,18 @@ interface SelectedIngress {
 }
 const storageKey = 'ingressClassesNameSpace';
 
-const settingsStore = createStore(storageKey);
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function IngressDatatable() {
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const environmentId = useEnvironmentId();
 
   const { authorized: canAccessSystemResources } = useAuthorizations(
@@ -91,6 +107,9 @@ export function IngressDatatable() {
       }
       disableSelect={useCheckboxes()}
       data-cy="k8s-ingresses-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
     />
   );
 

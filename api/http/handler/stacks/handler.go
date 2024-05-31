@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -21,6 +22,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
@@ -190,13 +192,13 @@ func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoin
 		}
 	}
 
-	containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := dockerClient.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return false, err
 	}
 
 	for _, container := range containers {
-		containerNS, ok := container.Labels["com.docker.compose.project"]
+		containerNS, ok := container.Labels[consts.ComposeStackNameLabel]
 
 		if ok && containerNS == name {
 			return false, nil

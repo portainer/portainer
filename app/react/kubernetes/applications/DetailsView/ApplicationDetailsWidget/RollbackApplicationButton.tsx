@@ -12,6 +12,7 @@ import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import {
   useApplicationRevisionList,
@@ -86,13 +87,16 @@ export function RollbackApplicationButton({
 
   return (
     <Authorized authorizations="K8sApplicationDetailsW">
-      {isRollbackNotAvailable ? (
-        <TooltipWithChildren message="Cannot roll back to previous configuration as none currently exists">
-          <span>{rollbackButton}</span>
-        </TooltipWithChildren>
-      ) : (
-        rollbackButton
-      )}
+      <div className="flex gap-x-2">
+        {isRollbackNotAvailable ? (
+          <TooltipWithChildren message="Cannot roll back to previous configuration as none currently exists">
+            <span>{rollbackButton}</span>
+          </TooltipWithChildren>
+        ) : (
+          rollbackButton
+        )}
+        <Tooltip message="Only one level of rollback is available, i.e. if you roll back from v2 to v1, and then roll back again, you will end up back at v2. Note that service changes and autoscaler rule changes are not included in rollback functionality. This is how Kubernetes works natively." />
+      </div>
     </Authorized>
   );
 

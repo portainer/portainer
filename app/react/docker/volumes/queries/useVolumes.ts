@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Volume } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -28,6 +28,6 @@ export async function getVolumes(environmentId: EnvironmentId) {
 
     return data.Volumes;
   } catch (error) {
-    throw parseAxiosError(error as Error, 'Unable to retrieve volumes');
+    throw parseAxiosError(error, 'Unable to retrieve volumes');
   }
 }

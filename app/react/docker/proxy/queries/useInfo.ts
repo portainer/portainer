@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { SystemInfo } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -13,7 +13,7 @@ export async function getInfo(environmentId: EnvironmentId) {
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve version');
+    throw parseAxiosError(err, 'Unable to retrieve version');
   }
 }
 
@@ -32,6 +32,14 @@ export function useInfo<TSelect = SystemInfo>(
       enabled: !!environmentId && enabled,
     }
   );
+}
+
+export function useIsWindows(environmentId: EnvironmentId) {
+  const query = useInfo(environmentId, {
+    select: (info) => info.OSType === 'windows',
+  });
+
+  return !!query.data;
 }
 
 export function useIsStandAlone(environmentId: EnvironmentId) {
@@ -63,4 +71,12 @@ export function useSystemLimits(environmentId: EnvironmentId) {
     : 32768;
 
   return { maxCpu, maxMemory };
+}
+
+export function useIsSwarmManager(environmentId: EnvironmentId) {
+  const query = useInfo(environmentId, {
+    select: (info) => !!info.Swarm?.NodeID && info.Swarm.ControlAvailable,
+  });
+
+  return !!query.data;
 }

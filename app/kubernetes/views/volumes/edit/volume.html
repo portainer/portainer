@@ -156,17 +156,12 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                title-icon="file-text"
-                dataset="ctrl.events"
-                table-key="kubernetes.volume.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
+              <resource-events-datatable
+                namespace="ctrl.volume.ResourcePool.Namespace.Name"
+                storage-key="'kubernetes.volume.events'"
+                resource-id="ctrl.volume.PersistentVolumeClaim.Id"
               >
-              </kubernetes-events-datatable>
+              </resource-events-datatable>
             </uib-tab>
 
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">

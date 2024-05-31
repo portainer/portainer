@@ -35,7 +35,7 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param body body tagCreatePayload true "Tag details"
 // @success 200 {object} portainer.Tag "Success"
-// @failure 409 "Tag name exists"
+// @failure 409 "This name is already associated to a tag"
 // @failure 500 "Server error"
 // @router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

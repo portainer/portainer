@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
 	"github.com/portainer/portainer/api/dataservices/fdoprofile"
+	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/role"
@@ -58,6 +59,7 @@ type (
 		edgeStackService        *edgestack.Service
 		edgeJobService          *edgejob.Service
 		TunnelServerService     *tunnelserver.Service
+		pendingActionsService   *pendingactions.Service
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
@@ -85,6 +87,7 @@ type (
 		EdgeStackService        *edgestack.Service
 		EdgeJobService          *edgejob.Service
 		TunnelServerService     *tunnelserver.Service
+		PendingActionsService   *pendingactions.Service
 	}
 )
 
@@ -114,6 +117,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		edgeStackService:        parameters.EdgeStackService,
 		edgeJobService:          parameters.EdgeJobService,
 		TunnelServerService:     parameters.TunnelServerService,
+		pendingActionsService:   parameters.PendingActionsService,
 	}
 
 	migrator.initMigrations()
@@ -232,8 +236,14 @@ func (m *Migrator) initMigrations() {
 		m.updateAppTemplatesVersionForDB110,
 		m.updateResourceOverCommitToDB110,
 	)
+	m.addMigrations("2.20.2",
+		m.cleanPendingActionsForDeletedEndpointsForDB111,
+	)
+	m.addMigrations("2.22.0",
+		m.migratePendingActionsDataForDB130,
+	)
 
-	// Add new migrations below...
+	// Add new migrations above...
 	// One function per migration, each versions migration funcs in the same file.
 }
 

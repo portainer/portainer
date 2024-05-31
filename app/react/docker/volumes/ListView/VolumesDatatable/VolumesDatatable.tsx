@@ -4,6 +4,8 @@ import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import {
   BasicTableSettings,
+  FilteredColumnsTableSettings,
+  filteredColumnsSettings,
   RefreshableTableSettings,
   createPersistedStore,
   refreshableSettings,
@@ -11,13 +13,17 @@ import {
 import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { DecoratedVolume } from '../types';
 
 import { TableActions } from './TableActions';
 import { useColumns } from './columns';
 
-interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
+interface TableSettings
+  extends BasicTableSettings,
+    RefreshableTableSettings,
+    FilteredColumnsTableSettings {}
 
 const storageKey = 'docker-volumes';
 const store = createPersistedStore<TableSettings>(
@@ -25,6 +31,7 @@ const store = createPersistedStore<TableSettings>(
   undefined,
   (set) => ({
     ...refreshableSettings(set),
+    ...filteredColumnsSettings(set),
   })
 );
 
@@ -63,10 +70,16 @@ export function VolumesDatatable({
           />
         </TableSettingsMenu>
       )}
-      extendTableOptions={withMeta({
-        table: 'volumes',
-        isBrowseVisible,
-      })}
+      extendTableOptions={
+        (withMeta({
+          table: 'volumes',
+          isBrowseVisible,
+        }),
+        withColumnFilters(
+          tableState.columnFilters,
+          tableState.setColumnFilters
+        ))
+      }
       data-cy="docker-volumes-datatable"
     />
   );

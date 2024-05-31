@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { createVolume } from '@/react/docker/volumes/queries/useCreateVolume';

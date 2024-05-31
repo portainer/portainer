@@ -2,13 +2,13 @@ package endpoints
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -17,19 +17,40 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type endpointDeleteRequest struct {
+	ID            int  `json:"id"`
+	DeleteCluster bool `json:"deleteCluster"`
+}
+
+type endpointDeleteBatchPayload struct {
+	Endpoints []endpointDeleteRequest `json:"endpoints"`
+}
+
+type endpointDeleteBatchPartialResponse struct {
+	Deleted []int `json:"deleted"`
+	Errors  []int `json:"errors"`
+}
+
+func (payload *endpointDeleteBatchPayload) Validate(r *http.Request) error {
+	if payload == nil || len(payload.Endpoints) == 0 {
+		return fmt.Errorf("invalid request payload. You must provide a list of environments to delete")
+	}
+
+	return nil
+}
+
 // @id EndpointDelete
-// @summary Remove an environment(endpoint)
-// @description Remove an environment(endpoint).
-// @description **Access policy**: administrator
+// @summary Remove an environment
+// @description Remove the environment associated to the specified identifier and optionally clean-up associated resources.
+// @description **Access policy**: Administrator only.
 // @tags endpoints
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @param id path int true "Environment(Endpoint) identifier"
-// @success 204 "Success"
-// @failure 400 "Invalid request"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
+// @success 204 "Environment successfully deleted."
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 404 "Unable to find the environment with the specified identifier inside the database."
+// @failure 500 "Server error occurred while attempting to delete the environment."
 // @router /endpoints/{id} [delete]
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
@@ -43,10 +64,6 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid boolean query parameter", err)
 	}
 
-	if handler.demoService.IsDemoEnvironment(portainer.EndpointID(endpointID)) {
-		return httperror.Forbidden(httperrors.ErrNotAvailableInDemo.Error(), httperrors.ErrNotAvailableInDemo)
-	}
-
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
 	})
@@ -57,6 +74,56 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 
 		return httperror.InternalServerError("Unexpected error", err)
+	}
+
+	return response.Empty(w)
+}
+
+// @id EndpointDeleteBatch
+// @summary Remove multiple environments
+// @description Remove multiple environments and optionally clean-up associated resources.
+// @description **Access policy**: Administrator only.
+// @tags endpoints
+// @security ApiKeyAuth || jwt
+// @accept json
+// @produce json
+// @param body body endpointDeleteBatchPayload true "List of environments to delete, with optional deleteCluster flag to clean-up assocaited resources (cloud environments only)"
+// @success 204 "Environment(s) successfully deleted."
+// @failure 207 {object} endpointDeleteBatchPartialResponse "Partial success. Some environments were deleted successfully, while others failed."
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to delete the specified environments."
+// @router /endpoints [delete]
+func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var p endpointDeleteBatchPayload
+	if err := request.DecodeAndValidateJSONPayload(r, &p); err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	resp := endpointDeleteBatchPartialResponse{
+		Deleted: []int{},
+		Errors:  []int{},
+	}
+
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		for _, e := range p.Endpoints {
+			if err := handler.deleteEndpoint(tx, portainer.EndpointID(e.ID), e.DeleteCluster); err != nil {
+				resp.Errors = append(resp.Errors, e.ID)
+				log.Warn().Err(err).Int("environment_id", e.ID).Msg("Unable to remove environment")
+
+				continue
+			}
+
+			resp.Deleted = append(resp.Deleted, e.ID)
+		}
+
+		return nil
+	}); err != nil {
+		return httperror.InternalServerError("Unable to delete environments", err)
+	}
+
+	if len(resp.Errors) > 0 {
+		return response.JSONWithStatus(w, resp, http.StatusPartialContent)
 	}
 
 	return response.Empty(w)
@@ -177,6 +244,12 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 				}
 			}
 		}
+	}
+
+	// delete the pending actions
+	err = tx.PendingActions().DeleteByEndpointID(endpoint.ID)
+	if err != nil {
+		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msgf("Unable to delete pending actions")
 	}
 
 	err = tx.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))

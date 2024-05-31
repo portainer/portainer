@@ -51,7 +51,6 @@ export function InnerForm({
     isSubmitting,
     dirty,
   } = useFormikContext<FormValues>();
-
   usePreventExit(
     initialValues.FileContent,
     values.FileContent,
@@ -167,7 +166,7 @@ export function InnerForm({
           setValues={(edgeValues) =>
             setFieldValue(
               'EdgeSettings',
-              applySetStateAction(edgeValues, values.EdgeSettings)
+              applySetStateAction(edgeValues, values.EdgeSettings!)
             )
           }
           gitConfig={values.Git}

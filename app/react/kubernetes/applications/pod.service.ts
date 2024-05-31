@@ -1,4 +1,4 @@
-import { Pod, PodList } from 'kubernetes-types/core/v1';
+import { Pod } from 'kubernetes-types/core/v1';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -6,37 +6,6 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { parseKubernetesAxiosError } from '../axiosError';
 
 import { ApplicationPatch } from './types';
-
-export async function getNamespacePods(
-  environmentId: EnvironmentId,
-  namespace: string,
-  labelSelector?: string
-) {
-  try {
-    const { data } = await axios.get<PodList>(
-      buildUrl(environmentId, namespace),
-      {
-        params: {
-          labelSelector,
-        },
-      }
-    );
-    const items = (data.items || []).map(
-      (pod) =>
-        <Pod>{
-          ...pod,
-          kind: 'Pod',
-          apiVersion: data.apiVersion,
-        }
-    );
-    return items;
-  } catch (e) {
-    throw parseKubernetesAxiosError(
-      e,
-      `Unable to retrieve pods in namespace '${namespace}'`
-    );
-  }
-}
 
 export async function getPod<T extends Pod | string = Pod>(
   environmentId: EnvironmentId,

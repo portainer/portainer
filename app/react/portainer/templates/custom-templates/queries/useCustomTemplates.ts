@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
@@ -20,6 +20,8 @@ type Params = {
   edge?: boolean;
 };
 
+export { type Params as CustomTemplatesListParams };
+
 export function useCustomTemplates<T = Array<CustomTemplate>>({
   select,
   params,
@@ -37,6 +39,9 @@ async function getCustomTemplates({ type, edge }: Params = {}) {
         // deconstruct to make sure we don't pass other params
         type,
         edge,
+      },
+      paramsSerializer: {
+        indexes: null,
       },
     });
     return data;

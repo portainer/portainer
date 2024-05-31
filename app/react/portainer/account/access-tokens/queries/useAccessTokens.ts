@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

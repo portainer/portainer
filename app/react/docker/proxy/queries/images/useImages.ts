@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ImageSummary } from 'docker-types/generated/1.41';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -31,6 +31,6 @@ async function getImages(environmentId: EnvironmentId) {
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve images');
+    throw parseAxiosError(err, 'Unable to retrieve images');
   }
 }

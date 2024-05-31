@@ -85,6 +85,19 @@ export enum AuthenticationMethod {
    * OAuth represents the OAuth authentication method (authentication against a authorization server)
    */
   OAuth,
+  /**
+   * AD represents the Active Directory authentication method (authentication against a Microsoft Active Directory server)
+   */
+  AD,
+}
+
+/**
+ * The definition are based on oauth2 lib definition @https://pkg.go.dev/golang.org/x/oauth2#AuthStyle
+ */
+export enum OAuthStyle {
+  AutoDetect = 0,
+  InParams,
+  InHeader,
 }
 
 type Feature = string;

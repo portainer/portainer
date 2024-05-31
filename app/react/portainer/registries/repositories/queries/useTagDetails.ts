@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { Environment } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';

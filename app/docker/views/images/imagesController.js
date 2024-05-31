@@ -3,6 +3,7 @@ import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
 import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 angular.module('portainer.docker').controller('ImagesController', [
   '$scope',
@@ -157,24 +158,20 @@ angular.module('portainer.docker').controller('ImagesController', [
      * @param {Array<import('@/react/docker/images/queries/useImages').ImagesListResponse>} selectedItems
      * @param {boolean} force
      */
-    function removeAction(selectedItems, force) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (image) {
+    async function removeAction(selectedItems, force) {
+      async function doRemove(image) {
         HttpRequestHelper.setPortainerAgentTargetHeader(image.nodeName);
-        ImageService.deleteImage(image.id, force)
+        return ImageService.deleteImage(image.id, force)
           .then(function success() {
             Notifications.success('Image successfully removed', image.id);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove image');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     }
 
     $scope.setPullImageValidity = setPullImageValidity;

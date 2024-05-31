@@ -2,9 +2,9 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
 import { Pod, Taint, Node } from 'kubernetes-types/core/v1';
 import _ from 'lodash';
-import * as JsonPatch from 'fast-json-patch';
 
 import { useNodesQuery } from '@/react/kubernetes/cluster/HomeView/nodes.service';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from '@/kubernetes/pod/models';
 
 import {
   BasicTableSettings,
@@ -15,7 +15,7 @@ import {
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useApplication, useApplicationPods } from '../../application.queries';
-import { NodePlacementRowData } from '../types';
+import { Affinity, Label, NodePlacementRowData } from '../types';
 
 interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
 
@@ -162,6 +162,68 @@ function computeTolerations(nodes: Node[], pod: Pod): NodePlacementRowData[] {
   return nodePlacements;
 }
 
+function getUnmatchedNodeSelectorLabels(node: Node, pod: Pod): Label[] {
+  const nodeLabels = node.metadata?.labels || {};
+  const podNodeSelectorLabels = pod.spec?.nodeSelector || {};
+
+  return Object.entries(podNodeSelectorLabels)
+    .filter(([key, value]) => nodeLabels[key] !== value)
+    .map(([key, value]) => ({
+      key,
+      value,
+    }));
+}
+
+// Function to get unmatched required node affinities
+function getUnmatchedRequiredNodeAffinities(node: Node, pod: Pod): Affinity[] {
+  const basicNodeAffinity =
+    pod.spec?.affinity?.nodeAffinity
+      ?.requiredDuringSchedulingIgnoredDuringExecution;
+
+  const unmatchedRequiredNodeAffinities: Affinity[] =
+    basicNodeAffinity?.nodeSelectorTerms.map(
+      (selectorTerm) =>
+        selectorTerm.matchExpressions?.flatMap((matchExpression) => {
+          const exists = !!node.metadata?.labels?.[matchExpression.key];
+          const isIn =
+            exists &&
+            _.includes(
+              matchExpression.values,
+              node.metadata?.labels?.[matchExpression.key]
+            );
+
+          // Check if the match expression is satisfied
+          if (
+            (matchExpression.operator === 'Exists' && exists) ||
+            (matchExpression.operator === 'DoesNotExist' && !exists) ||
+            (matchExpression.operator === 'In' && isIn) ||
+            (matchExpression.operator === 'NotIn' && !isIn) ||
+            (matchExpression.operator === 'Gt' &&
+              exists &&
+              parseInt(node.metadata?.labels?.[matchExpression.key] || '', 10) >
+                parseInt(matchExpression.values?.[0] || '', 10)) ||
+            (matchExpression.operator === 'Lt' &&
+              exists &&
+              parseInt(node.metadata?.labels?.[matchExpression.key] || '', 10) <
+                parseInt(matchExpression.values?.[0] || '', 10))
+          ) {
+            return [];
+          }
+
+          // Return the unmatched affinity
+          return [
+            {
+              key: matchExpression.key,
+              operator:
+                matchExpression.operator as KubernetesPodNodeAffinityNodeSelectorRequirementOperators,
+              values: matchExpression.values?.join(', ') || '',
+            },
+          ];
+        }) || []
+    ) || [];
+  return unmatchedRequiredNodeAffinities;
+}
+
 // Node requirement depending on the operator value
 // https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
 function computeAffinities(
@@ -173,76 +235,32 @@ function computeAffinities(
     (node, nodeIndex) => {
       let { acceptsApplication } = nodePlacements[nodeIndex];
 
-      if (pod.spec?.nodeSelector) {
-        const patch = JsonPatch.compare(
-          node.metadata?.labels || {},
-          pod.spec.nodeSelector
-        );
-        _.remove(patch, { op: 'remove' });
-        const unmatchedNodeSelectorLabels = patch.map((operation) => ({
-          key: _.trimStart(operation.path, '/'),
-          value: operation.op,
-        }));
-        if (unmatchedNodeSelectorLabels.length) {
-          acceptsApplication = false;
-        }
+      // check node selectors for unmatched labels
+      const unmatchedNodeSelectorLabels = getUnmatchedNodeSelectorLabels(
+        node,
+        pod
+      );
+
+      // check node affinities that are required during scheduling
+      const unmatchedRequiredNodeAffinities =
+        getUnmatchedRequiredNodeAffinities(node, pod);
+
+      // If there are any unmatched affinities or node labels, the node does not accept the application
+      if (
+        unmatchedRequiredNodeAffinities.length ||
+        unmatchedNodeSelectorLabels.length
+      ) {
+        acceptsApplication = false;
       }
 
-      const basicNodeAffinity =
-        pod.spec?.affinity?.nodeAffinity
-          ?.requiredDuringSchedulingIgnoredDuringExecution;
-      if (basicNodeAffinity) {
-        const unmatchedTerms = basicNodeAffinity.nodeSelectorTerms.map(
-          (selectorTerm) => {
-            const unmatchedExpressions = selectorTerm.matchExpressions?.flatMap(
-              (matchExpression) => {
-                const exists = {}.hasOwnProperty.call(
-                  node.metadata?.labels,
-                  matchExpression.key
-                );
-                const isIn =
-                  exists &&
-                  _.includes(
-                    matchExpression.values,
-                    node.metadata?.labels?.[matchExpression.key]
-                  );
-                if (
-                  (matchExpression.operator === 'Exists' && exists) ||
-                  (matchExpression.operator === 'DoesNotExist' && !exists) ||
-                  (matchExpression.operator === 'In' && isIn) ||
-                  (matchExpression.operator === 'NotIn' && !isIn) ||
-                  (matchExpression.operator === 'Gt' &&
-                    exists &&
-                    parseInt(
-                      node.metadata?.labels?.[matchExpression.key] || '',
-                      10
-                    ) > parseInt(matchExpression.values?.[0] || '', 10)) ||
-                  (matchExpression.operator === 'Lt' &&
-                    exists &&
-                    parseInt(
-                      node.metadata?.labels?.[matchExpression.key] || '',
-                      10
-                    ) < parseInt(matchExpression.values?.[0] || '', 10))
-                ) {
-                  return [];
-                }
-                return [true];
-              }
-            );
-
-            return unmatchedExpressions;
-          }
-        );
-
-        _.remove(unmatchedTerms, (i) => !i);
-        if (unmatchedTerms.length) {
-          acceptsApplication = false;
-        }
-      }
-      return {
+      const nodePlacementRowData: NodePlacementRowData = {
         ...nodePlacements[nodeIndex],
         acceptsApplication,
+        unmatchedNodeSelectorLabels,
+        unmatchedNodeAffinities: unmatchedRequiredNodeAffinities,
       };
+
+      return nodePlacementRowData;
     }
   );
   return nodePlacementsFromAffinities;

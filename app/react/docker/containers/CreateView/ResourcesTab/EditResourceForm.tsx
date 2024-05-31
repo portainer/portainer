@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { useState } from 'react';
 import { FormikHelpers } from 'formik/dist/types';

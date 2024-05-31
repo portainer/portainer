@@ -52,7 +52,7 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 // @success 200 {object} portainer.Registry "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "Registry not found"
-// @failure 409 "Another registry with the same URL already exists"
+// @failure 409 "Another registry with the same name or same URL & credentials already exists"
 // @failure 500 "Server error"
 // @router /registries/{id} [put]
 func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

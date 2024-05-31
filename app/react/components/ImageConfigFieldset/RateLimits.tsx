@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -38,7 +38,7 @@ export function RateLimits({
 
   if (
     !environmentQuery.data ||
-    registryQuery.isLoading ||
+    registryQuery.isInitialLoading ||
     !isDockerHubRegistry
   ) {
     return null;

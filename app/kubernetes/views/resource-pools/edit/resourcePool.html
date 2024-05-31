@@ -286,15 +286,7 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                dataset="ctrl.events"
-                table-key="kubernetes.resourcepool.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
-              ></kubernetes-events-datatable>
+              <resource-events-datatable namespace="ctrl.pool.Namespace.Name" storage-key="'kubernetes.resourcepool.events'"> </resource-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>

@@ -3,12 +3,11 @@ import React from 'react';
 import { pushStateLocationPlugin, UIRouter } from '@uirouter/react';
 import { initialize as initMSW, mswLoader } from 'msw-storybook-addon';
 import { handlers } from '../app/setup-tests/server-handlers';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 initMSW(
   {
     onUnhandledRequest: ({ method, url }) => {
-      console.log(method, url);
       if (url.startsWith('/api')) {
         console.error(`Unhandled ${method} request to ${url}.
 

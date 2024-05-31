@@ -88,23 +88,7 @@ function getCreatedApplicationResourcesNew(
     }) || [];
 
   // persistent volume claim (pvc) summaries
-  const pvcSummaries: Array<Summary> =
-    // apps with a isolated data access policy are statefulsets.
-    // statefulset pvcs are defined in spec.volumeClaimTemplates.
-    // https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage
-    formValues.DataAccessPolicy === 'Shared'
-      ? formValues.PersistedFolders?.filter(
-          // only create pvc summaries for new pvcs
-          (volume) => !volume.existingVolume?.PersistentVolumeClaim.Name
-        ).map((volume) => ({
-          action: 'Create',
-          kind: 'PersistentVolumeClaim',
-          name:
-            volume.existingVolume?.PersistentVolumeClaim.Name ||
-            volume.persistentVolumeClaimName ||
-            '',
-        })) || []
-      : [];
+  const pvcSummaries: Array<Summary> = getPVCSummaries(formValues);
 
   // horizontal pod autoscaler summaries
   const hpaSummary: Array<Summary> =
@@ -181,36 +165,10 @@ function getUpdatedApplicationResources(
   const ingressSummaries = getIngressUpdateSummary(oldIngresses, newIngresses);
 
   // persistent volume claim (pvc) summaries
-  const pvcSummaries: Array<Summary> =
-    // apps with a isolated data access policy are statefulsets.
-    // statefulset pvcs are defined in spec.volumeClaimTemplates.
-    // https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage
-    newFormValues.DataAccessPolicy === 'Shared'
-      ? newFormValues.PersistedFolders?.filter(
-          // only create pvc summaries for new pvcs
-          (volume) => !volume.existingVolume?.PersistentVolumeClaim.Name
-        ).flatMap((newVolume) => {
-          const oldVolume = oldFormValues.PersistedFolders?.find(
-            (oldVolume) =>
-              oldVolume.persistentVolumeClaimName ===
-              newVolume.persistentVolumeClaimName
-          );
-          if (!oldVolume) {
-            return [
-              {
-                action: 'Create',
-                kind: 'PersistentVolumeClaim',
-                name:
-                  newVolume.existingVolume?.PersistentVolumeClaim.Name ||
-                  newVolume.persistentVolumeClaimName ||
-                  '',
-              },
-            ];
-          }
-          // updating a pvc is not supported
-          return [];
-        }) || []
-      : [];
+  const pvcSummaries: Array<Summary> = getPVCSummaries(
+    newFormValues,
+    oldFormValues
+  );
 
   // TODO: horizontal pod autoscaler summaries
   const createHPASummary: Array<Summary> =
@@ -264,6 +222,77 @@ function getUpdatedApplicationResources(
     ...pvcSummaries,
     ...hpaSummaries,
   ];
+}
+
+function getPVCSummaries(
+  newFormValues: ApplicationFormValues,
+  oldFormValues?: ApplicationFormValues
+): Array<Summary> {
+  // only create pvc summaries for new pvcs
+  const newVolumeClaims =
+    newFormValues.PersistedFolders?.filter((volume) => {
+      // if the volume is an existing volume
+      if (volume.existingVolume?.PersistentVolumeClaim.Name) {
+        return false;
+      }
+      // to be sure the volume is new, check if it was in the old form values
+      const oldVolume = oldFormValues?.PersistedFolders?.find(
+        (oldVolume) =>
+          oldVolume.persistentVolumeClaimName ===
+          volume.persistentVolumeClaimName
+      );
+      if (oldVolume) {
+        return false;
+      }
+      return true;
+    }) || [];
+
+  if (newFormValues.DataAccessPolicy === 'Shared') {
+    return newVolumeClaims.map((newVolume) => {
+      const name =
+        newVolume.existingVolume?.PersistentVolumeClaim.Name ||
+        newVolume.persistentVolumeClaimName ||
+        '';
+      return {
+        action: 'Create',
+        kind: 'PersistentVolumeClaim',
+        name,
+      };
+    });
+  }
+
+  if (newFormValues.DataAccessPolicy === 'Isolated') {
+    // apps with a isolated data access policy are statefulsets.
+    // statefulset pvcs are defined in spec.volumeClaimTemplates.
+    // they aren't directly created with manifests, but are created when the statefulset is created (1 PVC PER POD), so should be included
+    // https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#stable-storage
+
+    // for each volume claim, there is a PVC created per pod
+    const newFormReplicas = newFormValues.ReplicaCount || 0;
+    const newPVCAppendedIndexStrings = Array.from(
+      { length: newFormReplicas },
+      (_, i) => i
+    );
+    const PVCSummariesFromNewVolumeClaims: Summary[] = newVolumeClaims.flatMap(
+      (volume) =>
+        newPVCAppendedIndexStrings.map((appendedIndex) => {
+          const prefixName =
+            volume.existingVolume?.PersistentVolumeClaim.Name ||
+            volume.persistentVolumeClaimName ||
+            '';
+          return {
+            action: 'Create',
+            kind: 'PersistentVolumeClaim',
+            // name in the same way that the statefulset would name it
+            name: `${prefixName}-${newFormValues.Name}-${appendedIndex}`,
+          };
+        })
+    );
+    // kubernetes blocks editing statefulset volume claims, so we don't need to handle updating them
+    return PVCSummariesFromNewVolumeClaims;
+  }
+
+  return [];
 }
 
 // getServiceUpdateResourceSummary replicates KubernetesServiceService.patch

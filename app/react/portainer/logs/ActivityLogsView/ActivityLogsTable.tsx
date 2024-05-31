@@ -75,7 +75,7 @@ export function ActivityLogsTable({
 }) {
   return (
     <ExpandableDatatable<ActivityLog>
-      title="Activity Logs"
+      title="Activity logs"
       titleIcon={History}
       columns={columns}
       dataset={dataset || []}

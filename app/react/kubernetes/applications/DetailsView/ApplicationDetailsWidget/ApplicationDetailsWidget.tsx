@@ -27,6 +27,7 @@ import { ApplicationAutoScalingTable } from './ApplicationAutoScalingTable';
 import { ApplicationEnvVarsTable } from './ApplicationEnvVarsTable';
 import { ApplicationVolumeConfigsTable } from './ApplicationVolumeConfigsTable';
 import { ApplicationPersistentDataTable } from './ApplicationPersistentDataTable';
+import { PlacementsTable } from './PlacementsTable';
 
 export function ApplicationDetailsWidget() {
   const stateAndParams = useCurrentStateAndParams();
@@ -140,6 +141,7 @@ export function ApplicationDetailsWidget() {
               appName={name}
               app={app}
             />
+            {!externalApp && <PlacementsTable app={app} />}
           </WidgetBody>
         </Widget>
       </div>

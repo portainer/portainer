@@ -1,3 +1,5 @@
+import './datatable.css';
+
 import {
   Table as TableInstance,
   TableState,
@@ -110,7 +112,7 @@ export function Datatable<D extends DefaultType>({
   const allColumns = useMemo(
     () =>
       _.compact([!disableSelect && createSelectColumn<D>(dataCy), ...columns]),
-    [disableSelect, columns]
+    [disableSelect, dataCy, columns]
   );
 
   const tableInstance = useReactTable<D>(

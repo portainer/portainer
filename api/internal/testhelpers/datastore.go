@@ -337,3 +337,96 @@ func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
 		d.endpoint = &stubEndpointService{endpoints: endpoints}
 	}
 }
+
+type stubStacksService struct {
+	stacks []portainer.Stack
+}
+
+func (s *stubStacksService) BucketName() string { return "stacks" }
+
+func (s *stubStacksService) Create(stack *portainer.Stack) error {
+	return nil
+}
+
+func (s *stubStacksService) Update(ID portainer.StackID, stack *portainer.Stack) error {
+	return nil
+}
+
+func (s *stubStacksService) Delete(ID portainer.StackID) error {
+	return nil
+}
+
+func (s *stubStacksService) Read(ID portainer.StackID) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.ID == ID {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) ReadAll() ([]portainer.Stack, error) {
+	return s.stacks, nil
+}
+
+func (s *stubStacksService) StacksByEndpointID(endpointID portainer.EndpointID) ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.EndpointID == endpointID {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) RefreshableStacks() ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.AutoUpdate != nil {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) StackByName(name string) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.Name == name {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) StacksByName(name string) ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.Name == name {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) StackByWebhookID(webhookID string) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook == webhookID {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) GetNextIdentifier() int {
+	return len(s.stacks)
+}
+
+// WithStacks option will instruct testDatastore to return provided stacks
+func WithStacks(stacks []portainer.Stack) datastoreOption {
+	return func(d *testDatastore) {
+		d.stack = &stubStacksService{stacks: stacks}
+	}
+}

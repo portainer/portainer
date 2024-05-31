@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -17,9 +17,12 @@ export async function getCustomTemplate(id: CustomTemplate['Id']) {
   }
 }
 
-export function useCustomTemplate(id?: CustomTemplate['Id']) {
+export function useCustomTemplate(
+  id?: CustomTemplate['Id'],
+  { enabled = true }: { enabled?: boolean } = {}
+) {
   return useQuery(queryKeys.item(id!), () => getCustomTemplate(id!), {
     ...withGlobalError('Unable to retrieve custom template'),
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 }

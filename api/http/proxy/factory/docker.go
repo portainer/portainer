@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -35,8 +34,11 @@ func (factory *ProxyFactory) newDockerLocalProxy(endpoint *portainer.Endpoint) (
 func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	rawURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
-		tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-		rawURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+		tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		rawURL = "http://" + tunnelAddr
 	}
 
 	endpointURL, err := url.ParseURL(rawURL)
@@ -65,7 +67,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		DockerClientFactory:  factory.dockerClientFactory,
 	}
 
-	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport, factory.gitService)
+	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport, factory.gitService, factory.snapshotService)
 	if err != nil {
 		return nil, err
 	}

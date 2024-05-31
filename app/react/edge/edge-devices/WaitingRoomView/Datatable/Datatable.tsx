@@ -1,3 +1,5 @@
+import { Box } from 'lucide-react';
+
 import { Datatable as GenericDatatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
@@ -33,6 +35,7 @@ export function Datatable() {
       columns={columns}
       dataset={environments}
       title="Edge Devices Waiting Room"
+      titleIcon={Box}
       emptyContentLabel="No Edge Devices found"
       renderTableActions={(selectedRows) => (
         <TableActions selectedRows={selectedRows} />

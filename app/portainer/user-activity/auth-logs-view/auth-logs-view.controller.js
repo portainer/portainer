@@ -10,7 +10,7 @@ export default class AuthLogsViewController {
 
     this.limitedFeature = FeatureId.ACTIVITY_AUDIT;
     this.state = {
-      keyword: 'f',
+      keyword: '',
       date: {
         from: 0,
         to: 0,
@@ -85,7 +85,7 @@ export default class AuthLogsViewController {
     return this.$async(async () => {
       this.state.logs = null;
       try {
-        const { logs, totalCount } = { logs: [{}, {}, {}, {}, {}], totalCount: 5 };
+        const { logs, totalCount } = { logs: [], totalCount: 0 };
         this.state.logs = decorateLogs(logs);
         this.state.totalItems = totalCount;
       } catch (err) {

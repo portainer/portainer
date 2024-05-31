@@ -195,6 +195,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
 // @router /stacks/create/kubernetes/repository [post]
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {

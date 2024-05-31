@@ -1,9 +1,8 @@
 import { ContainerId } from '@/react/docker/containers/types';
-import axios, {
-  agentTargetHeader,
-  parseAxiosError,
-} from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+
+import { addNodeHeader } from '../proxy/addNodeHeader';
 
 import { NetworkId, DockerNetwork } from './types';
 
@@ -14,20 +13,15 @@ export async function getNetwork(
   networkId: NetworkId,
   { nodeName }: { nodeName?: string } = {}
 ) {
+  const headers = addNodeHeader(nodeName);
   try {
     const { data: network } = await axios.get<DockerNetwork>(
       buildUrl(environmentId, networkId),
-      nodeName
-        ? {
-            headers: {
-              [agentTargetHeader]: nodeName,
-            },
-          }
-        : undefined
+      { headers }
     );
     return network;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve network details');
+    throw parseAxiosError(e, 'Unable to retrieve network details');
   }
 }
 
@@ -39,7 +33,7 @@ export async function deleteNetwork(
     await axios.delete(buildUrl(environmentId, networkId));
     return networkId;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to remove network');
+    throw parseAxiosError(e, 'Unable to remove network');
   }
 }
 
@@ -55,10 +49,7 @@ export async function disconnectContainer(
     });
     return { networkId, environmentId };
   } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to disconnect container from network'
-    );
+    throw parseAxiosError(e, 'Unable to disconnect container from network');
   }
 }
 

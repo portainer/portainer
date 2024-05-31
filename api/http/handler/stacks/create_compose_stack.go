@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
@@ -229,6 +230,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 // @param body body composeStackFromGitRepositoryPayload true "stack config"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
 // @router /stacks/create/standalone/repository [post]
 func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
@@ -282,7 +284,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	stackPayload := createStackPayloadFromComposeGitPayload(payload.Name,
-		payload.RepositoryURL,
+		strings.TrimSuffix(payload.RepositoryURL, "/"),
 		payload.RepositoryReferenceName,
 		payload.RepositoryUsername,
 		payload.RepositoryPassword,

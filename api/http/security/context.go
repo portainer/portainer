@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type (
@@ -48,4 +49,18 @@ func RetrieveRestrictedRequestContext(request *http.Request) (*RestrictedRequest
 
 	requestContext := contextData.(*RestrictedRequestContext)
 	return requestContext, nil
+}
+
+func RetrieveUserFromRequest(r *http.Request, tx dataservices.DataStoreTx) (*portainer.User, error) {
+	rrc, err := RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := tx.User().Read(rrc.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

@@ -8,14 +8,20 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestPingAgentPanic(t *testing.T) {
-	endpointID := portainer.EndpointID(1)
+	endpoint := &portainer.Endpoint{
+		ID:   1,
+		Type: portainer.EdgeAgentOnDockerEnvironment,
+	}
 
-	s := NewService(nil, nil, nil)
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	s := NewService(store, nil, nil)
 
 	defer func() {
 		require.Nil(t, recover())
@@ -36,10 +42,10 @@ func TestPingAgentPanic(t *testing.T) {
 		errCh <- srv.Serve(ln)
 	}()
 
-	s.getTunnelDetails(endpointID)
-	s.tunnelDetailsMap[endpointID].Port = ln.Addr().(*net.TCPAddr).Port
+	s.Open(endpoint)
+	s.activeTunnels[endpoint.ID].Port = ln.Addr().(*net.TCPAddr).Port
 
-	require.Error(t, s.pingAgent(endpointID))
+	require.Error(t, s.pingAgent(endpoint.ID))
 	require.NoError(t, srv.Shutdown(context.Background()))
 	require.ErrorIs(t, <-errCh, http.ErrServerClosed)
 }

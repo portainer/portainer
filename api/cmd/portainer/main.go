@@ -19,7 +19,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/datastore/migrator"
-	"github.com/portainer/portainer/api/demo"
+	"github.com/portainer/portainer/api/datastore/postinit"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/exec"
@@ -42,6 +42,8 @@ import (
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/pendingactions"
+	"github.com/portainer/portainer/api/pendingactions/actions"
+	"github.com/portainer/portainer/api/pendingactions/handlers"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/featureflags"
@@ -457,19 +459,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	authorizationService := authorization.NewService(dataStore)
 	authorizationService.K8sClientFactory = kubernetesClientFactory
 
-	pendingActionsService := pendingactions.NewService(dataStore, kubernetesClientFactory, authorizationService, shutdownCtx)
-
-	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx, pendingActionsService)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed initializing snapshot service")
-	}
-	snapshotService.Start()
-
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
 
 	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService(*flags.BaseURL, *flags.AddrHTTPS, sslSettings.CertPath)
 
-	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService)
+	proxyManager := proxy.NewManager(kubernetesClientFactory)
 
 	reverseTunnelService.ProxyManager = proxyManager
 
@@ -489,6 +483,19 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, proxyManager, *flags.Assets)
 
+	pendingActionsService := pendingactions.NewService(dataStore, kubernetesClientFactory)
+	pendingActionsService.RegisterHandler(actions.CleanNAPWithOverridePolicies, handlers.NewHandlerCleanNAPWithOverridePolicies(authorizationService, dataStore))
+	pendingActionsService.RegisterHandler(actions.DeletePortainerK8sRegistrySecrets, handlers.NewHandlerDeleteRegistrySecrets(authorizationService, dataStore, kubernetesClientFactory))
+	pendingActionsService.RegisterHandler(actions.PostInitMigrateEnvironment, handlers.NewHandlerPostInitMigrateEnvironment(authorizationService, dataStore, kubernetesClientFactory, dockerClientFactory, *flags.Assets, kubernetesDeployer))
+
+	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx, pendingActionsService)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed initializing snapshot service")
+	}
+	snapshotService.Start()
+
+	proxyManager.NewProxyFactory(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService, snapshotService)
+
 	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing helm package manager")
@@ -500,14 +507,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	applicationStatus := initStatus(instanceID)
-
-	demoService := demo.NewService()
-	if *flags.DemoEnvironment {
-		err := demoService.Init(dataStore, cryptoService)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed initializing demo environment")
-		}
-	}
 
 	// channel to control when the admin user is created
 	adminCreationDone := make(chan struct{}, 1)
@@ -578,10 +577,12 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	// but some more complex migrations require access to a kubernetes or docker
 	// client. Therefore we run a separate migration process just before
 	// starting the server.
-	postInitMigrator := datastore.NewPostInitMigrator(
+	postInitMigrator := postinit.NewPostInitMigrator(
 		kubernetesClientFactory,
 		dockerClientFactory,
 		dataStore,
+		*flags.Assets,
+		kubernetesDeployer,
 	)
 	if err := postInitMigrator.PostInitMigrate(); err != nil {
 		log.Fatal().Err(err).Msg("failure during post init migrations")
@@ -621,7 +622,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
-		DemoService:                 demoService,
 		UpgradeService:              upgradeService,
 		AdminCreationDone:           adminCreationDone,
 		PendingActionsService:       pendingActionsService,
@@ -650,6 +650,7 @@ func main() {
 			Msg("starting Portainer")
 
 		err := server.Start()
+
 		log.Info().Err(err).Msg("HTTP server exited")
 	}
 }

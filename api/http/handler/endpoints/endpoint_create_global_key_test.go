@@ -10,10 +10,7 @@ import (
 )
 
 func TestEmptyGlobalKey(t *testing.T) {
-	handler := NewHandler(
-		helper.NewTestRequestBouncer(),
-		nil,
-	)
+	handler := NewHandler(helper.NewTestRequestBouncer())
 
 	req, err := http.NewRequest(http.MethodPost, "https://portainer.io:9443/endpoints/global-key", nil)
 	if err != nil {

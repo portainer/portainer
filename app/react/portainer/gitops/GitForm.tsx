@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ComposePathField } from '@/react/portainer/gitops/ComposePathField';
 import { RefField } from '@/react/portainer/gitops/RefField';
 import { GitFormUrlField } from '@/react/portainer/gitops/GitFormUrlField';
-import { GitFormModel } from '@/react/portainer/gitops/types';
+import { DeployMethod, GitFormModel } from '@/react/portainer/gitops/types';
 import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
 
 import { FormSection } from '@@/form-components/FormSection';
@@ -24,7 +24,7 @@ interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
-  deployMethod?: 'compose' | 'manifest';
+  deployMethod?: DeployMethod;
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
@@ -142,17 +142,24 @@ export function GitForm({
 export async function validateGitForm(
   gitCredentials: Array<GitCredential>,
   formValues: GitFormModel,
-  isCreatedFromCustomTemplate: boolean
+  isCreatedFromCustomTemplate: boolean,
+  deployMethod: DeployMethod = 'compose'
 ) {
   return validateForm<GitFormModel>(
-    () => buildGitValidationSchema(gitCredentials, isCreatedFromCustomTemplate),
+    () =>
+      buildGitValidationSchema(
+        gitCredentials,
+        isCreatedFromCustomTemplate,
+        deployMethod
+      ),
     formValues
   );
 }
 
 export function buildGitValidationSchema(
   gitCredentials: Array<GitCredential>,
-  isCreatedFromCustomTemplate: boolean
+  isCreatedFromCustomTemplate: boolean,
+  deployMethod: DeployMethod
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
@@ -171,7 +178,9 @@ export function buildGitValidationSchema(
       .required('Repository URL is required'),
     RepositoryReferenceName: refFieldValidation(),
     ComposeFilePathInRepository: string().required(
-      'Compose file path is required'
+      deployMethod === 'compose'
+        ? 'Compose file path is required'
+        : 'Manifest file path is required'
     ),
     AdditionalFiles: array(string().required('Path is required')).default([]),
     RepositoryURLValid: boolean().default(false),

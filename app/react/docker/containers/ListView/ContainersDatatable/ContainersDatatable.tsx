@@ -15,6 +15,8 @@ import {
 } from '@@/datatables/ColumnVisibilityMenu';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { useContainers } from '../../queries/containers';
 
@@ -92,6 +94,12 @@ export function ContainersDatatable({
           )}
           dataset={containersQuery.data || []}
           emptyContentLabel="No containers found"
+          extendTableOptions={mergeOptions(
+            withColumnFilters(
+              tableState.columnFilters,
+              tableState.setColumnFilters
+            )
+          )}
         />
       </TableSettingsProvider>
     </RowProvider>

@@ -40,7 +40,7 @@ func Test_userGetAccessTokens(t *testing.T) {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	passwordChecker := security.NewPasswordStrengthChecker(store.SettingsService)
 
-	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil, passwordChecker)
+	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, passwordChecker)
 	h.DataStore = store
 
 	// generate standard and admin user tokens

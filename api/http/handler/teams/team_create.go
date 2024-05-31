@@ -38,7 +38,7 @@ func (payload *teamCreatePayload) Validate(r *http.Request) error {
 // @param body body teamCreatePayload true "details"
 // @success 200 {object} portainer.Team "Success"
 // @failure 400 "Invalid request"
-// @failure 409 "Team already exists"
+// @failure 409 "A team with the same name already exists"
 // @failure 500 "Server error"
 // @router /teams [post]
 func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

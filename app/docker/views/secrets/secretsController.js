@@ -1,3 +1,5 @@
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
+
 angular.module('portainer.docker').controller('SecretsController', [
   '$scope',
   '$state',
@@ -5,9 +7,8 @@ angular.module('portainer.docker').controller('SecretsController', [
   'Notifications',
   function ($scope, $state, SecretService, Notifications) {
     $scope.removeAction = async function (selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (secret) {
-        SecretService.remove(secret.Id)
+      async function doRemove(secret) {
+        return SecretService.remove(secret.Id)
           .then(function success() {
             Notifications.success('Secret successfully removed', secret.Name);
             var index = $scope.secrets.indexOf(secret);
@@ -15,14 +16,11 @@ angular.module('portainer.docker').controller('SecretsController', [
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove secret');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
           });
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     };
 
     $scope.getSecrets = getSecrets;
