@@ -9,8 +9,8 @@ export class EdgeJobFormController {
     this.$scope = $scope;
     this.$async = $async;
 
-    this.cronMethods = cronMethodOptions;
-    this.buildMethods = [editor, upload];
+    this.cronMethods = cronMethodOptions.map((o) => ({ ...o, id: o.id + '-old' }));
+    this.buildMethods = [editor, upload].map((o) => ({ ...o, id: o.id + '-old' }));
 
     this.state = {
       formValidationError: '',
@@ -70,10 +70,12 @@ export class EdgeJobFormController {
 
   onChangeModel(model) {
     const defaultTime = moment().add('hours', 1);
+    const scheduled = this.scheduleValues.find((v) => v.cron === model.CronExpression);
+
     this.formValues = {
       datetime: model.CronExpression ? cronToDatetime(model.CronExpression, defaultTime) : defaultTime,
-      scheduleValue: this.formValues.scheduleValue,
-      cronMethod: model.Recurring ? 'advanced' : 'basic',
+      scheduleValue: scheduled || this.scheduleValues[0],
+      cronMethod: model.Recurring && !scheduled ? 'advanced' : 'basic',
       method: this.formValues.method,
     };
   }

@@ -59,6 +59,7 @@ interface Props extends AutomationTestingProps {
   id: string;
   placeholder?: string;
   yaml?: boolean;
+  shell?: boolean;
   readonly?: boolean;
   titleContent?: React.ReactNode;
   hideTitle?: boolean;
@@ -77,6 +78,7 @@ export function WebEditorForm({
   hideTitle,
   readonly,
   yaml,
+  shell,
   children,
   error,
   versions,
@@ -108,6 +110,7 @@ export function WebEditorForm({
               placeholder={placeholder}
               readonly={readonly}
               yaml={yaml}
+              shell={shell}
               value={value}
               onChange={onChange}
               versions={versions}

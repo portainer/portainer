@@ -1,8 +1,6 @@
-import DateTimePicker from 'react-datetime-picker';
-import { Calendar, X } from 'lucide-react';
+import { useField } from 'formik';
 import { useMemo } from 'react';
 import { string } from 'yup';
-import { useField } from 'formik';
 
 import {
   isoDate,
@@ -10,25 +8,18 @@ import {
   TIME_FORMAT,
 } from '@/portainer/filters/filters';
 
-import { FormControl } from '@@/form-components/FormControl';
-import { Input } from '@@/form-components/Input';
+import { DateTimeField, FORMAT } from '@@/DateTimeField';
 import { TextTip } from '@@/Tip/TextTip';
 
 import { FormValues } from './types';
-
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
 
 interface Props {
   disabled?: boolean;
 }
 
-export const FORMAT = 'YYYY-MM-DD HH:mm';
-
 export function ScheduledTimeField({ disabled }: Props) {
   const [{ name, value }, { error }, { setValue }] =
     useField<FormValues['scheduledTime']>('scheduledTime');
-
   const dateValue = useMemo(() => parseIsoDate(value, FORMAT), [value]);
 
   if (!value) {
@@ -37,31 +28,19 @@ export function ScheduledTimeField({ disabled }: Props) {
 
   return (
     <>
-      <FormControl label="Schedule date & time" errors={error}>
-        {!disabled ? (
-          <DateTimePicker
-            format="y-MM-dd HH:mm"
-            className="form-control [&>div]:border-0"
-            onChange={(date) => {
-              const dateToSave =
-                date || new Date(Date.now() + 24 * 60 * 60 * 1000);
-              setValue(isoDate(dateToSave.valueOf(), FORMAT));
-            }}
-            name={name}
-            value={dateValue}
-            calendarIcon={<Calendar className="lucide" />}
-            clearIcon={<X className="lucide" />}
-            disableClock
-            minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
-          />
-        ) : (
-          <Input
-            defaultValue={value}
-            disabled
-            data-cy="update-schedules-time-input"
-          />
-        )}
-      </FormControl>
+      <DateTimeField
+        label="Schedule date & time"
+        minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
+        onChange={(date) => {
+          const dateToSave = date || new Date(Date.now() + 24 * 60 * 60 * 1000);
+          setValue(isoDate(dateToSave.valueOf(), FORMAT));
+        }}
+        error={error}
+        disabled={disabled}
+        name={name}
+        value={dateValue}
+        data-cy="update-schedules-time-input"
+      />
       {!disabled && value && (
         <TextTip color="blue">
           If time zone is not set on edge agent then UTC+0 will be used.

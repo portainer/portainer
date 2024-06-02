@@ -122,7 +122,7 @@ angular
       url: '/new',
       views: {
         'content@': {
-          component: 'createEdgeJobView',
+          component: 'edgeJobsCreateView',
         },
       },
     };
