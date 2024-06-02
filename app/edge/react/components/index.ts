@@ -1,14 +1,13 @@
 import angular from 'angular';
 
-import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
+import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
-import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
-import { withUIRouter } from '@/react-tools/withUIRouter';
-import { EdgeGroupAssociationTable } from '@/react/edge/components/EdgeGroupAssociationTable';
-import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
+import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 
 import { edgeJobsModule } from './edge-jobs';
 
@@ -58,19 +57,11 @@ const ngModule = angular
     ])
   )
   .component(
-    'edgeGroupAssociationTable',
-    r2a(withReactQuery(EdgeGroupAssociationTable), [
-      'onClickRow',
-      'query',
-      'title',
-      'data-cy',
-    ])
-  )
-  .component(
     'associatedEdgeEnvironmentsSelector',
     r2a(withReactQuery(AssociatedEdgeEnvironmentsSelector), [
       'onChange',
       'value',
+      'error',
     ])
   );
 

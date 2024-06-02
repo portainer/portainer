@@ -1,11 +1,11 @@
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useCreateGroupMutation } from '@/react/edge/edge-groups/queries/useCreateEdgeGroupMutation';
+import { useCreateEdgeGroupMutation } from '@/react/edge/edge-groups/queries/useCreateEdgeGroupMutation';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
 import { CreatableSelector } from './CreatableSelector';
 
 export function EdgeGroupsSelector() {
-  const createMutation = useCreateGroupMutation();
+  const createMutation = useCreateEdgeGroupMutation();
 
   const edgeGroupsQuery = useEdgeGroups({
     select: (edgeGroups) =>

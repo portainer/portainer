@@ -11,6 +11,7 @@ interface Props extends AutomationTestingProps {
   loadingText: string;
   isLoading: boolean;
   isValid: boolean;
+  errors?: unknown;
 }
 
 export function FormActions({
@@ -19,6 +20,7 @@ export function FormActions({
   isLoading,
   children,
   isValid,
+  errors,
   'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
@@ -35,6 +37,13 @@ export function FormActions({
             >
               {submitLabel}
             </LoadingButton>
+
+            {!isValid && (
+              <div className="hidden" data-cy="errors">
+                {JSON.stringify(errors)}
+              </div>
+            )}
+
             {children}
           </div>
         </div>

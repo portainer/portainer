@@ -70,6 +70,7 @@ export const ngModule = angular
       'allowCreate',
       'onChange',
       'value',
+      'errors',
     ])
   )
   .component(

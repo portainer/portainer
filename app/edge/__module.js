@@ -35,7 +35,7 @@ angular
       url: '/new',
       views: {
         'content@': {
-          component: 'createEdgeGroupView',
+          component: 'edgeGroupsCreateView',
         },
       },
     };
@@ -45,7 +45,7 @@ angular
       url: '/:groupId',
       views: {
         'content@': {
-          component: 'editEdgeGroupView',
+          component: 'edgeGroupsItemView',
         },
       },
     };
