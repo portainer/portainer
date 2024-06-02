@@ -121,6 +121,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         isValid={isValid}
         data-cy="edgeJobCreate-addJobButton"
         loadingText="In progress..."
+        errors={errors}
       />
     </Form>
   );

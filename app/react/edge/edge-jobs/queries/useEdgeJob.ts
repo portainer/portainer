@@ -9,7 +9,7 @@ import { buildUrl } from './build-url';
 import { queryKeys } from './query-keys';
 
 export interface EdgeJobResponse extends Omit<EdgeJob, 'Endpoints'> {
-  Endpoints: Array<EnvironmentId>;
+  Endpoints: Array<EnvironmentId> | null;
 }
 
 async function getEdgeJob(id: EdgeJobResponse['Id']) {

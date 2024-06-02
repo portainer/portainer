@@ -42,8 +42,8 @@ export function UpdateEdgeJobForm({ edgeJob }: { edgeJob: EdgeJobResponse }) {
       initialValues={{
         name: edgeJob.Name,
 
-        edgeGroupIds: edgeJob.EdgeGroups,
-        environmentIds: edgeJob.Endpoints,
+        edgeGroupIds: edgeJob.EdgeGroups || [],
+        environmentIds: edgeJob.Endpoints || [],
         fileContent: fileQuery.data,
         ...toRecurringViewModel({
           cronExpression: edgeJob.CronExpression,
@@ -106,6 +106,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         isValid={isValid}
         data-cy="updateJobButton"
         loadingText="In progress..."
+        errors={errors}
       />
     </Form>
   );
