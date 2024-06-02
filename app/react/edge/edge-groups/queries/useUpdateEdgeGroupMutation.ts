@@ -28,7 +28,7 @@ export async function updateEdgeGroup({
   ...requestPayload
 }: UpdateGroupPayload) {
   try {
-    const { data: group } = await axios.post<EdgeGroup>(
+    const { data: group } = await axios.put<EdgeGroup>(
       buildUrl({ id }),
       requestPayload
     );

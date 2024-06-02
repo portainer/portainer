@@ -58,11 +58,12 @@ function InnerForm({
   isLoading: boolean;
   isCreate: boolean;
 }) {
-  const { values, setFieldValue, isValid } = useFormikContext<FormValues>();
+  const { values, setFieldValue, isValid, errors } =
+    useFormikContext<FormValues>();
 
   return (
     <Form className="form-horizontal">
-      <NameField />
+      <NameField errors={errors.name} />
 
       <FormSection title="Group type">
         <BoxSelector
@@ -82,6 +83,7 @@ function InnerForm({
         isValid={isValid}
         data-cy="edgeGroupCreate-addGroupButton"
         loadingText="In progress..."
+        errors={errors}
       />
     </Form>
   );

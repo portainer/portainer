@@ -61,6 +61,7 @@ const ngModule = angular
     r2a(withReactQuery(AssociatedEdgeEnvironmentsSelector), [
       'onChange',
       'value',
+      'error',
     ])
   );
 

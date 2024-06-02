@@ -5,6 +5,7 @@ import {
   EnvironmentId,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
+import { withError } from '@/react-tools/react-query';
 
 import { EdgeGroup } from '../types';
 
@@ -36,8 +37,11 @@ export function useEdgeGroup<T = EdgeGroup>(
     select?: (groups: EdgeGroup) => T;
   } = {}
 ) {
-  return useQuery(queryKeys.item(id!), () => getEdgeGroup(id!), {
+  return useQuery({
+    queryKey: queryKeys.item(id!),
+    queryFn: () => getEdgeGroup(id!),
     select,
     enabled: !!id,
+    ...withError('Failed fetching edge group'),
   });
 }

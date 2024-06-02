@@ -4,6 +4,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
+import { Redirect } from '@@/Redirect';
 
 import { useUpdateEdgeGroupMutation } from '../queries/useUpdateEdgeGroupMutation';
 import { EdgeGroupForm } from '../components/EdgeGroupForm/EdgeGroupForm';
@@ -17,6 +18,10 @@ export function ItemView() {
   const mutation = useUpdateEdgeGroupMutation();
   const router = useRouter();
 
+  if (groupQuery.isError) {
+    return <Redirect to="edge.groups" />;
+  }
+
   if (!groupQuery.data) {
     return null;
   }
@@ -25,7 +30,7 @@ export function ItemView() {
   return (
     <>
       <PageHeader
-        title="Create edge group"
+        title="Edit edge group"
         breadcrumbs={[
           { label: 'Edge groups', link: 'edge.groups' },
           group.Name,

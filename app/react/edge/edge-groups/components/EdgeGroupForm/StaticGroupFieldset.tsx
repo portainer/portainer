@@ -9,13 +9,14 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { FormValues } from './types';
 
 export function StaticGroupFieldset({ isEdit }: { isEdit?: boolean }) {
-  const { values, setFieldValue } = useFormikContext<FormValues>();
+  const { values, setFieldValue, errors } = useFormikContext<FormValues>();
 
   return (
     <FormSection title="Associated environments">
       <div className="form-group">
         <AssociatedEdgeEnvironmentsSelector
           value={values.environmentIds}
+          error={errors.environmentIds}
           onChange={async (environmentIds, meta) => {
             if (meta.type === 'remove' && isEdit) {
               const confirmed = await confirmDestructive({

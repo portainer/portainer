@@ -69,15 +69,17 @@ export function TagSelector({
     <>
       {value.length > 0 && (
         <FormControl label="Selected tags">
-          {selectedTags.map((tag) => (
-            <TagButton
-              key={tag.value}
-              title="Remove tag"
-              value={tag.value}
-              label={tag.label}
-              onRemove={() => handleRemove(tag.value)}
-            />
-          ))}
+          <div data-cy="selected-tags">
+            {selectedTags.map((tag) => (
+              <TagButton
+                key={tag.value}
+                title="Remove tag"
+                value={tag.value}
+                label={tag.label}
+                onRemove={() => handleRemove(tag.value)}
+              />
+            ))}
+          </div>
         </FormControl>
       )}
 
