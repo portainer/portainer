@@ -70,7 +70,6 @@ export function ListView() {
         settingsManager={tableState}
         title="Update & rollback"
         titleIcon={Clock}
-        emptyContentLabel="No schedules found"
         isLoading={listQuery.isLoading}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />

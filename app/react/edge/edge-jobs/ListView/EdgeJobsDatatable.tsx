@@ -23,7 +23,6 @@ export function EdgeJobsDatatable() {
       isLoading={jobsQuery.isLoading}
       dataset={jobsQuery.data || []}
       settingsManager={tableState}
-      emptyContentLabel="No Edge jobs available."
       title="Edge Jobs"
       titleIcon={Clock}
       renderTableActions={(selectedItems) => (

@@ -40,7 +40,6 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
       settingsManager={tableState}
       title="Configs"
       titleIcon={Clipboard}
-      emptyContentLabel="No config available."
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh

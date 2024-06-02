@@ -104,7 +104,6 @@ export function SecretsDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={secretsQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No secrets found"
       title="Secrets"
       titleIcon={Lock}
       getRowId={(row) => row.metadata?.uid ?? ''}

@@ -47,7 +47,6 @@ export function NotificationsView() {
         titleIcon={Bell}
         dataset={userNotifications}
         settingsManager={tableState}
-        emptyContentLabel="No notifications found"
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}

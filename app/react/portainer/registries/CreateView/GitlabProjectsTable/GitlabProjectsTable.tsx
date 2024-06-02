@@ -38,7 +38,6 @@ export function GitlabProjectTable({
       columns={columns}
       dataset={dataset}
       settingsManager={tableState}
-      emptyContentLabel="No projects available."
       title="Gitlab projects"
       titleIcon={ListIcon}
       extendTableOptions={withControlledSelected(

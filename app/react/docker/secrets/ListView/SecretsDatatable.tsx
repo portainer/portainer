@@ -68,7 +68,6 @@ export function SecretsDatatable({
       isLoading={!dataset}
       disableSelect={!hasWriteAccessQuery.authorized}
       settingsManager={tableState}
-      emptyContentLabel="No secret available."
       data-cy="docker-secrets-datatable"
       renderTableActions={(selectedItems) =>
         hasWriteAccessQuery.authorized && (

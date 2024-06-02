@@ -12,6 +12,14 @@ export function EffectiveAccessViewerDatatable({
 }) {
   const tableState = useTableStateWithStorage('access-viewer', 'Environment');
 
+  if (dataset?.length === 0) {
+    return (
+      <TextTip color="blue">
+        The selected user does not have access to any environments.
+      </TextTip>
+    );
+  }
+
   return (
     <Datatable
       dataset={dataset || []}
@@ -22,13 +30,8 @@ export function EffectiveAccessViewerDatatable({
       description={
         <TextTip color="blue">
           Effective role for each environment will be displayed for the selected
-          user
+          user.
         </TextTip>
-      }
-      emptyContentLabel={
-        dataset
-          ? 'The selected user does not have access to any environment(s)'
-          : 'Select a user to show associated access and role'
       }
       disableSelect
       data-cy="effective-access-viewer-datatable"

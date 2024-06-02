@@ -47,7 +47,6 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
           />
         )
       }
-      emptyContentLabel="No teams found"
       data-cy="teams-datatable"
     />
   );

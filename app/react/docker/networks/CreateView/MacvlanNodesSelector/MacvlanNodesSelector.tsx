@@ -37,7 +37,6 @@ export function MacvlanNodesSelector({
       columns={columns}
       dataset={dataset || []}
       isLoading={!dataset}
-      emptyContentLabel="No node available"
       settingsManager={tableState}
       data-cy="macvlan-nodes-selector-datatable"
       extendTableOptions={mergeOptions(

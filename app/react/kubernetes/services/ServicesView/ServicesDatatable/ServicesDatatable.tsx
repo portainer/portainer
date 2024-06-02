@@ -84,7 +84,6 @@ export function ServicesDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}

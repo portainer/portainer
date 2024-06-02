@@ -34,7 +34,6 @@ export function RbacRolesDatatable({
       dataset={dataset || []}
       columns={columns}
       isLoading={!dataset}
-      emptyContentLabel="No role available."
       settingsManager={tableState}
       disableSelect
       data-cy="rbac-roles-datatable"

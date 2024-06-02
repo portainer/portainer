@@ -31,7 +31,6 @@ export function EventsDatatable({
       columns={columns}
       settingsManager={tableState}
       isLoading={isLoading}
-      emptyContentLabel="No event available."
       title="Events"
       titleIcon={History}
       getRowId={(row) => row.metadata?.uid || ''}

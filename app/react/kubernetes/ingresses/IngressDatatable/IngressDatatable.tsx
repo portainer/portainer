@@ -89,7 +89,6 @@ export function IngressDatatable() {
       dataset={ingressesWithIsSystem}
       columns={columns}
       isLoading={ingressesQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No supported ingresses found"
       title="Ingresses"
       titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}

@@ -35,7 +35,6 @@ export function TagsDatatable({
       dataset={dataset || []}
       isLoading={!dataset}
       settingsManager={tableState}
-      emptyContentLabel="No tags available."
       renderTableActions={(selectedItems) =>
         advancedFeaturesAvailable && (
           <DeleteButton

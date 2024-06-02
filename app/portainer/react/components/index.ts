@@ -236,7 +236,6 @@ export const ngModule = angular
   .component(
     'groupAssociationTable',
     r2a(withReactQuery(GroupAssociationTable), [
-      'emptyContentLabel',
       'onClickRow',
       'query',
       'title',

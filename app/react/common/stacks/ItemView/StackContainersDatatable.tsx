@@ -87,7 +87,6 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
           )}
           dataset={containersQuery.data || []}
           isLoading={!containersQuery.data}
-          emptyContentLabel="No containers found"
         />
       </TableSettingsProvider>
     </RowProvider>

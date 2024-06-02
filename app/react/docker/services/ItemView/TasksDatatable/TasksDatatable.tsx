@@ -1,15 +1,15 @@
 import { List } from 'lucide-react';
 
 import { Datatable } from '@@/datatables';
-import {
-  BasicTableSettings,
-  type FilteredColumnsTableSettings,
-  filteredColumnsSettings,
-} from '@@/datatables/types';
-import { useTableStateWithStorage } from '@@/datatables/useTableState';
-import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
+import { withMeta } from '@@/datatables/extend-options/withMeta';
+import {
+  BasicTableSettings,
+  filteredColumnsSettings,
+  type FilteredColumnsTableSettings,
+} from '@@/datatables/types';
+import { useTableStateWithStorage } from '@@/datatables/useTableState';
 
 import { useColumns } from './columns';
 import { DecoratedTask } from './types';
@@ -45,7 +45,6 @@ export function TasksDatatable({
       settingsManager={tableState}
       columns={columns}
       dataset={dataset}
-      emptyContentLabel="No task available."
       extendTableOptions={mergeOptions(
         withMeta({ table: 'tasks', serviceName }),
         withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)

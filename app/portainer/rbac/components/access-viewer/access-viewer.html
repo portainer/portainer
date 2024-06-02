@@ -17,8 +17,9 @@
                 </por-select>
               </div>
             </div>
-
-            <effective-access-viewer-datatable dataset="$ctrl.userRoles"> </effective-access-viewer-datatable>
+            <div ng-if="$ctrl.selectedUserId">
+              <effective-access-viewer-datatable ng-if="$ctrl.selectedUserId" dataset="$ctrl.userRoles"> </effective-access-viewer-datatable>
+            </div>
           </form>
         </rd-widget-body>
       </rd-widget>

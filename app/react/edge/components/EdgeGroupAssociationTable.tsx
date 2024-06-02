@@ -41,13 +41,11 @@ const columns = [
 export function EdgeGroupAssociationTable({
   title,
   query,
-  emptyContentLabel,
   onClickRow,
   'data-cy': dataCy,
 }: {
   title: string;
   query: EnvironmentsQueryParams;
-  emptyContentLabel: string;
   onClickRow: (env: Environment) => void;
 } & AutomationTestingProps) {
   const tableState = useTableStateWithoutStorage('Name');
@@ -97,7 +95,6 @@ export function EdgeGroupAssociationTable({
           onClick={() => onClickRow(row.original)}
         />
       )}
-      emptyContentLabel={emptyContentLabel}
       data-cy={dataCy}
       disableSelect
     />

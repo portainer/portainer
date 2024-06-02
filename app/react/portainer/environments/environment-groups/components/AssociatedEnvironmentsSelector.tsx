@@ -25,7 +25,6 @@ export function AssociatedEnvironmentsSelector({
           <div className="w-1/2">
             <GroupAssociationTable
               title="Available environments"
-              emptyContentLabel="No environment available"
               query={{
                 groupIds: [1],
                 excludeIds: value,
@@ -41,7 +40,6 @@ export function AssociatedEnvironmentsSelector({
           <div className="w-1/2">
             <GroupAssociationTable
               title="Associated environments"
-              emptyContentLabel="No associated environment'"
               query={{
                 endpointIds: value,
               }}

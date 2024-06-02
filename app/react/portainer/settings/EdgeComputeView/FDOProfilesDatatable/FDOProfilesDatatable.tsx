@@ -31,7 +31,6 @@ export function FDOProfilesDatatable({
       title="Device Profiles"
       titleIcon={List}
       disableSelect={!isFDOEnabled}
-      emptyContentLabel="No profiles found"
       getRowId={(row) => row.id.toString()}
       isLoading={isLoading}
       renderTableActions={(selectedItems) => (
