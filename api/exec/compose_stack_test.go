@@ -23,6 +23,7 @@ func Test_createEnvFile(t *testing.T) {
 			name: "should not add env file option if stack doesn't have env variables",
 			stack: &portainer.Stack{
 				ProjectPath: dir,
+				Env:         nil,
 			},
 			expected: "",
 		},

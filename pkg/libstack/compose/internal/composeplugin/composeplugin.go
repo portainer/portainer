@@ -136,7 +136,12 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 	args = append(args, command.ToArgs()...)
 
 	cmd := exec.Command(program, args...)
-	cmd.Dir = options.WorkingDir
+	if options.WorkingDir != "" {
+		// Specify an non-exist working directory will cause the failure
+		// of the "docker-compose down" command even if the project name
+		// is correct.
+		cmd.Dir = options.WorkingDir
+	}
 
 	if wrapper.configPath != "" || len(options.Env) > 0 {
 		cmd.Env = os.Environ()

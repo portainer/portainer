@@ -157,7 +157,10 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = &stderr
-	cmd.Dir = workingDir
+
+	if workingDir != "" {
+		cmd.Dir = workingDir
+	}
 
 	if env != nil {
 		cmd.Env = os.Environ()
