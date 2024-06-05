@@ -14,6 +14,7 @@ import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { DecoratedVolume } from '../types';
 
@@ -69,16 +70,13 @@ export function VolumesDatatable({
           />
         </TableSettingsMenu>
       )}
-      extendTableOptions={
-        (withMeta({
+      extendTableOptions={mergeOptions(
+        withMeta({
           table: 'volumes',
           isBrowseVisible,
         }),
-        withColumnFilters(
-          tableState.columnFilters,
-          tableState.setColumnFilters
-        ))
-      }
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
       data-cy="docker-volumes-datatable"
     />
   );
