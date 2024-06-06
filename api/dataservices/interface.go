@@ -36,6 +36,7 @@ type (
 	}
 
 	DataStore interface {
+		Connection() portainer.Connection
 		Open() (newStore bool, err error)
 		Init() error
 		Close() error
