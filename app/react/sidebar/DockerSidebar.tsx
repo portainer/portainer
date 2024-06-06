@@ -38,10 +38,9 @@ export function DockerSidebar({ environmentId, environment }: Props) {
     isEnvironmentAdmin ||
     environment.SecuritySettings.allowStackManagementForRegularUsers;
 
-  const envInfoQuery = useInfo(
-    environmentId,
-    (info) => !!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable
-  );
+  const envInfoQuery = useInfo(environmentId, {
+    select: (info) => !!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable,
+  });
 
   const apiVersion = useApiVersion(environmentId);
 
@@ -207,6 +206,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
             isSubMenu
             to={featSubMenuTo}
             params={{ endpointId: environmentId }}
+            data-cy="portainerSidebar-docker-setup"
           />
         </Authorized>
 
@@ -215,6 +215,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           isSubMenu
           to={registrySubMenuTo}
           params={{ endpointId: environmentId }}
+          data-cy="portainerSidebar-docker-registries"
         />
       </SidebarParent>
     </>

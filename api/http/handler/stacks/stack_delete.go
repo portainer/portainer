@@ -245,7 +245,16 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		}
 
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
-
+		if err != nil {
+			for _, manifest := range manifestFiles {
+				if exists, fileExistsErr := filesystem.FileExists(manifest); fileExistsErr != nil || !exists {
+					// If removal has failed and one of the manifest files is missing,
+					// we can consider this stack as removed
+					log.Warn().Err(fileExistsErr).Msgf("failed to find manifest %s, but stack deletion will continue", manifest)
+					return nil
+				}
+			}
+		}
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
 

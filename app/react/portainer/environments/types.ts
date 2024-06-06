@@ -60,6 +60,7 @@ export interface KubernetesConfiguration {
   EnableResourceOverCommit?: boolean;
   ResourceOverCommitPercentage?: number;
   RestrictDefaultNamespace?: boolean;
+  RestrictSecrets?: boolean;
   RestrictStandardUserIngressW?: boolean;
   IngressClasses: IngressClass[];
   IngressAvailabilityPerNamespace: boolean;
@@ -143,7 +144,7 @@ export type Environment = {
   AMTDeviceGUID?: string;
   Edge: EnvironmentEdge;
   SecuritySettings: EnvironmentSecuritySettings;
-  Gpus: { name: string; value: string }[];
+  Gpus?: { name: string; value: string }[];
   EnableImageNotification: boolean;
   LocalTimeZone?: string;
 

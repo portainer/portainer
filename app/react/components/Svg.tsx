@@ -3,7 +3,6 @@
 import dataflow from '@/assets/ico/dataflow-1.svg?c';
 import git from '@/assets/ico/git.svg?c';
 import kube from '@/assets/ico/kube.svg?c';
-import laptopcode from '@/assets/ico/laptop-code.svg?c';
 import ldap from '@/assets/ico/ldap.svg?c';
 import linux from '@/assets/ico/linux.svg?c';
 import memory from '@/assets/ico/memory.svg?c';
@@ -40,7 +39,6 @@ export const SvgIcons = {
   dataflow,
   dockericon,
   git,
-  laptopcode,
   ldap,
   linux,
   memory,

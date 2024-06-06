@@ -24,7 +24,6 @@ export function EdgeGroupsDatatable() {
       columns={columns}
       dataset={edgeGroupsQuery.data || []}
       settingsManager={tableState}
-      emptyContentLabel="No Edge group available."
       isLoading={edgeGroupsQuery.isLoading}
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
@@ -32,6 +31,7 @@ export function EdgeGroupsDatatable() {
       isRowSelectable={({ original: item }) =>
         !(item.HasEdgeStack || item.HasEdgeJob || item.HasEdgeConfig)
       }
+      data-cy="edge-groups-datatable"
     />
   );
 }

@@ -1,5 +1,6 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
+import sanitize from 'sanitize-html';
 
 import { useUIState } from '@/react/hooks/useUIState';
 
@@ -23,17 +24,21 @@ export function MotdPanel() {
   return (
     <>
       {!!motd.Style && <style>{motd.Style}</style>}
-      <InformationPanel
-        onDismiss={() => onDismiss(motd.Hash)}
-        title={motd.Title}
-        wrapperStyle={camelCaseKeys(motd.ContentLayout)}
-        bodyClassName="motd-body"
-      >
-        <span className="text-muted">
-          {/* eslint-disable-next-line react/no-danger */}
-          <p dangerouslySetInnerHTML={{ __html: motd.Message }} />
-        </span>
-      </InformationPanel>
+      <div className="row">
+        <div className="col-sm-12">
+          <InformationPanel
+            onDismiss={() => onDismiss(motd.Hash)}
+            title={motd.Title}
+            wrapperStyle={camelCaseKeys(motd.ContentLayout)}
+            bodyClassName="motd-body"
+          >
+            <span className="text-muted">
+              {/* eslint-disable-next-line react/no-danger */}
+              <p dangerouslySetInnerHTML={{ __html: sanitize(motd.Message) }} />
+            </span>
+          </InformationPanel>
+        </div>
+      </div>
     </>
   );
 
@@ -43,7 +48,7 @@ export function MotdPanel() {
 }
 
 function useMotd() {
-  const { data } = useQuery('motd', () => getMotd());
+  const { data } = useQuery(['motd'], () => getMotd());
   return data;
 }
 

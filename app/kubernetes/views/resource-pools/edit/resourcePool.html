@@ -100,6 +100,7 @@
                         <input
                           name="memory_limit"
                           type="number"
+                          data-cy="k8sNamespaceEdit-memoryLimitInput"
                           min="{{ ctrl.ResourceQuotaDefaults.MemoryLimit }}"
                           max="{{ ctrl.state.sliderMaxMemory }}"
                           class="form-control"
@@ -188,9 +189,7 @@
 
                   <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
                     <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Selected registries </label>
-                    <div class="col-sm-9 col-lg-4">
-                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
-                    </div>
+                    <div class="col-sm-9 col-lg-4"> {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }} </div>
                   </div>
 
                   <div ng-if="ctrl.isAdmin && !ctrl.isSystem">
@@ -287,20 +286,12 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                dataset="ctrl.events"
-                table-key="kubernetes.resourcepool.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
-              ></kubernetes-events-datatable>
+              <resource-events-datatable namespace="ctrl.pool.Namespace.Name" storage-key="'kubernetes.resourcepool.events'"> </resource-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" hide-message="true" />
+                <kube-yaml-inspector identifier="'namespace-yaml'" data="ctrl.pool.Yaml" data-cy="k8sNamespaceEdit-yamlEditor" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>
@@ -309,33 +300,8 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-resource-pool-applications-datatable
-        dataset="ctrl.applications"
-        table-key="kubernetes.resourcepool.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getApplications"
-        loading="ctrl.state.applicationsLoading"
-        title-text="Applications running in this namespace"
-        title-icon="code"
-      >
-      </kubernetes-resource-pool-applications-datatable>
-    </div>
-  </div>
-
-  <div class="row" ng-if="ctrl.ingresses && ctrl.ingresses.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-resource-pool-ingresses-datatable
-        dataset="ctrl.ingresses"
-        table-key="kubernetes.resourcepool.ingresses"
-        order-by="Name"
-        refresh-callback="ctrl.getIngresses"
-        loading="ctrl.state.ingressesLoading"
-        title-text="Ingress routes and applications"
-        title-icon="database"
-      >
-      </kubernetes-resource-pool-ingresses-datatable>
-    </div>
+  <div ng-if="ctrl.applications && ctrl.applications.length > 0">
+    <kubernetes-namespace-applications-datatable dataset="ctrl.applications" on-refresh="(ctrl.getApplications)" is-loading="ctrl.state.applicationsLoading">
+    </kubernetes-namespace-applications-datatable>
   </div>
 </div>

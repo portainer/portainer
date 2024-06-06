@@ -1,6 +1,6 @@
 import { MultiValue } from 'react-select';
 
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Select } from '@@/form-components/ReactSelect';
@@ -24,11 +24,15 @@ export function RegistriesSelector({
   return (
     <>
       {options.length === 0 && (
-        <p className="text-muted text-xs mb-1 mt-2">
+        <p className="text-muted mb-1 mt-2 text-xs">
           {isPureAdmin ? (
             <span>
               No registries available. Head over to the{' '}
-              <Link to="portainer.registries" target="_blank">
+              <Link
+                to="portainer.registries"
+                target="_blank"
+                data-cy="namespace-permissions-registries-selector"
+              >
                 registry view
               </Link>{' '}
               to define a container registry.

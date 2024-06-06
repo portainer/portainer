@@ -3,18 +3,5 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row">
-    <div class="col-sm-12">
-      <kubernetes-resource-pools-datatable
-        restrict-default-namespace="ctrl.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace"
-        dataset="ctrl.resourcePools"
-        table-key="kubernetes.resourcePools"
-        order-by="Name"
-        remove-action="ctrl.removeAction"
-        refresh-callback="ctrl.getResourcePools"
-        endpoint="ctrl.endpoint"
-        data-cy="k8sNamespace-namespaceTable"
-      ></kubernetes-resource-pools-datatable>
-    </div>
-  </div>
+  <kubernetes-namespaces-datatable dataset="ctrl.resourcePools" on-remove="(ctrl.removeAction)" on-refresh="(ctrl.getResourcePools)"></kubernetes-namespaces-datatable>
 </div>

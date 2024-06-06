@@ -1,10 +1,8 @@
 import _ from 'lodash';
-import { ExternalLink } from 'lucide-react';
 import { CellContext } from '@tanstack/react-table';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
-
-import { Icon } from '@@/Icon';
+import { PublishedPortLink } from '@/react/docker/components/ImageStatus/PublishedPortLink';
 
 import { useRowContext } from '../RowContext';
 
@@ -31,18 +29,12 @@ function Cell({ row }: CellContext<DockerContainer, string>) {
     return '-';
   }
 
-  const { PublicURL: publicUrl } = environment;
-
   return _.uniqBy(ports, 'public').map((port) => (
-    <a
+    <PublishedPortLink
       key={`${port.host}:${port.public}`}
-      className="image-tag"
-      href={`http://${publicUrl || port.host}:${port.public}`}
-      target="_blank"
-      rel="noreferrer"
-    >
-      <Icon icon={ExternalLink} />
-      {port.public}:{port.private}
-    </a>
+      hostPort={port.public}
+      containerPort={port.private}
+      hostURL={environment.PublicURL || port.host}
+    />
   ));
 }

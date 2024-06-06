@@ -5,7 +5,6 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
-import { confirmDelete } from '@@/modals/confirm';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
 
 class KubernetesApplicationsController {
@@ -79,11 +78,7 @@ class KubernetesApplicationsController {
   }
 
   removeStacksAction(selectedItems) {
-    confirmDelete('Are you sure that you want to remove the selected stack(s) ? This will remove all the applications associated to the stack(s).').then((confirmed) => {
-      if (confirmed) {
-        return this.$async(this.removeStacksActionAsync, selectedItems);
-      }
-    });
+    return this.$async(this.removeStacksActionAsync, selectedItems);
   }
 
   async removeActionAsync(selectedItems) {
@@ -95,7 +90,7 @@ class KubernetesApplicationsController {
         } else {
           await this.KubernetesApplicationService.delete(application);
 
-          if (application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
+          if (application.Metadata.labels && application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
             // Update applications in stack
             const stack = this.state.stacks.find((x) => x.Name === application.StackName);
             const index = stack.Applications.indexOf(application);
@@ -122,11 +117,7 @@ class KubernetesApplicationsController {
   }
 
   removeAction(selectedItems) {
-    confirmDelete('Do you want to remove the selected application(s)?').then((confirmed) => {
-      if (confirmed) {
-        return this.$async(this.removeActionAsync, selectedItems);
-      }
-    });
+    this.$async(() => this.removeActionAsync(selectedItems));
   }
 
   onPublishingModeClick(application) {
@@ -173,7 +164,9 @@ class KubernetesApplicationsController {
   }
 
   setSystemResources(flag) {
-    this.state.isSystemResources = flag;
+    return this.$scope.$applyAsync(() => {
+      this.state.isSystemResources = flag;
+    });
   }
 
   getApplications() {

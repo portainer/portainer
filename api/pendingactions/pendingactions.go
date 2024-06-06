@@ -1,137 +1,145 @@
 package pendingactions
 
 import (
-	"context"
 	"fmt"
+	"reflect"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	CleanNAPWithOverridePolicies      = "CleanNAPWithOverridePolicies"
-	DeletePortainerK8sRegistrySecrets = "DeletePortainerK8sRegistrySecrets"
-)
+type PendingActionsService struct {
+	kubeFactory *kubecli.ClientFactory
+	dataStore   dataservices.DataStore
+	mu          sync.Mutex
+}
 
-type (
-	PendingActionsService struct {
-		authorizationService *authorization.Service
-		clientFactory        *kubecli.ClientFactory
-		dataStore            dataservices.DataStore
-		shutdownCtx          context.Context
-
-		mu sync.Mutex
-	}
-)
+var handlers = make(map[string]portainer.PendingActionHandler)
 
 func NewService(
 	dataStore dataservices.DataStore,
-	clientFactory *kubecli.ClientFactory,
-	authorizationService *authorization.Service,
-	shutdownCtx context.Context,
+	kubeFactory *kubecli.ClientFactory,
 ) *PendingActionsService {
 	return &PendingActionsService{
-		dataStore:            dataStore,
-		shutdownCtx:          shutdownCtx,
-		authorizationService: authorizationService,
-		clientFactory:        clientFactory,
-		mu:                   sync.Mutex{},
+		dataStore:   dataStore,
+		kubeFactory: kubeFactory,
+		mu:          sync.Mutex{},
 	}
 }
 
-func (service *PendingActionsService) Create(r portainer.PendingActions) error {
-	return service.dataStore.PendingActions().Create(&r)
+func (service *PendingActionsService) RegisterHandler(name string, handler portainer.PendingActionHandler) {
+	handlers[name] = handler
 }
 
-func (service *PendingActionsService) Execute(id portainer.EndpointID) error {
+func (service *PendingActionsService) Create(action portainer.PendingAction) error {
+	// Check if this pendingAction already exists
+	pendingActions, err := service.dataStore.PendingActions().ReadAll()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve pending actions: %w", err)
+	}
 
+	for _, dba := range pendingActions {
+		// Same endpoint, same action and data, don't create a repeat
+		if dba.EndpointID == action.EndpointID && dba.Action == action.Action &&
+			reflect.DeepEqual(dba.ActionData, action.ActionData) {
+			log.Debug().Msgf("pending action %s already exists for environment %d, skipping...", action.Action, action.EndpointID)
+			return nil
+		}
+	}
+
+	return service.dataStore.PendingActions().Create(&action)
+}
+
+func (service *PendingActionsService) Execute(id portainer.EndpointID) {
+	// Run in a goroutine to avoid blocking the main thread due to db tx	=
+	go service.execute(id)
+}
+
+func (service *PendingActionsService) execute(environmentID portainer.EndpointID) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	endpoint, err := service.dataStore.Endpoint().Endpoint(id)
+	endpoint, err := service.dataStore.Endpoint().Endpoint(environmentID)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve environment %d: %w", id, err)
+		log.Debug().Msgf("failed to retrieve environment %d: %v", environmentID, err)
+		return
 	}
 
-	if endpoint.Status != portainer.EndpointStatusUp {
-		log.Debug().Msgf("Environment %q (id: %d) is not up", endpoint.Name, id)
-		return fmt.Errorf("environment %q (id: %d) is not up: %w", endpoint.Name, id, err)
+	isKubernetesEndpoint := endpointutils.IsKubernetesEndpoint(endpoint) && !endpointutils.IsEdgeEndpoint(endpoint)
+
+	// EndpointStatusUp is only relevant for non-Kubernetes endpoints
+	// Sometimes the endpoint is UP but the status is not updated in the database
+	if !isKubernetesEndpoint {
+		if endpoint.Status != portainer.EndpointStatusUp {
+			return
+		}
+	} else {
+		// For Kubernetes endpoints, we need to check if the endpoint is up by
+		// creating a kube client and performing a simple operation
+		client, err := service.kubeFactory.GetKubeClient(endpoint)
+		if err != nil {
+			log.Debug().Msgf("failed to create Kubernetes client for environment %d: %v", environmentID, err)
+			return
+		}
+
+		if _, err = client.ServerVersion(); err != nil {
+			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, environmentID)
+			return
+		}
 	}
 
 	pendingActions, err := service.dataStore.PendingActions().ReadAll()
 	if err != nil {
-		log.Error().Err(err).Msgf("failed to retrieve pending actions")
-		return fmt.Errorf("failed to retrieve pending actions for environment %d: %w", id, err)
+		log.Warn().Msgf("failed to read pending actions: %v", err)
+		return
 	}
 
-	for _, endpointPendingAction := range pendingActions {
-		if endpointPendingAction.EndpointID == id {
-			err := service.executePendingAction(endpointPendingAction, endpoint)
-			if err != nil {
-				log.Warn().Err(err).Msgf("failed to execute pending action")
-				return fmt.Errorf("failed to execute pending action: %w", err)
+	if len(pendingActions) > 0 {
+		log.Debug().Msgf("Found %d pending actions", len(pendingActions))
+		log.Debug().Msgf("PendingActions %+v", pendingActions)
+	}
+
+	for i, pendingAction := range pendingActions {
+		if pendingAction.EndpointID == environmentID {
+			if i == 0 {
+				// We have at least 1 pending action for this environment
+				log.Debug().Msgf("Executing pending actions for environment %d", environmentID)
 			}
 
-			err = service.dataStore.PendingActions().Delete(endpointPendingAction.ID)
+			log.Debug().Msgf("executing pending action id=%d, action=%s", pendingAction.ID, pendingAction.Action)
+			err := service.executePendingAction(pendingAction, endpoint)
 			if err != nil {
-				log.Error().Err(err).Msgf("failed to delete pending action")
-				return fmt.Errorf("failed to delete pending action: %w", err)
+				log.Warn().Msgf("failed to execute pending action: %v", err)
+				continue
 			}
+
+			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
+			if err != nil {
+				log.Warn().Msgf("failed to delete pending action: %v", err)
+				continue
+			}
+
+			log.Debug().Msgf("pending action %d finished", pendingAction.ID)
 		}
 	}
-
-	return nil
 }
 
-func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingActions, endpoint *portainer.Endpoint) error {
-	log.Debug().Msgf("Executing pending action %s for environment %d", pendingAction.Action, pendingAction.EndpointID)
-
+func (service *PendingActionsService) executePendingAction(pendingAction portainer.PendingAction, endpoint *portainer.Endpoint) error {
 	defer func() {
-		log.Debug().Msgf("End executing pending action %s for environment %d", pendingAction.Action, pendingAction.EndpointID)
+		if r := recover(); r != nil {
+			log.Error().Msgf("recovered from panic while executing pending action %s for environment %d: %v", pendingAction.Action, pendingAction.EndpointID, r)
+		}
 	}()
 
-	switch pendingAction.Action {
-	case CleanNAPWithOverridePolicies:
-		if (pendingAction.ActionData == nil) || (pendingAction.ActionData.(portainer.EndpointGroupID) == 0) {
-			service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, nil)
-			return nil
-		}
-
-		endpointGroupID := pendingAction.ActionData.(portainer.EndpointGroupID)
-		endpointGroup, err := service.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
-		if err != nil {
-			log.Error().Err(err).Msgf("Error reading environment group to clean NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)
-			return fmt.Errorf("failed to retrieve environment group %d: %w", endpointGroupID, err)
-		}
-		err = service.authorizationService.CleanNAPWithOverridePolicies(service.dataStore, endpoint, endpointGroup)
-		if err != nil {
-			log.Error().Err(err).Msgf("Error cleaning NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)
-			return fmt.Errorf("failed to clean NAP with override policies for environment %d and environment group %d: %w", endpoint.ID, endpointGroup.ID, err)
-		}
-
-		return nil
-	case DeletePortainerK8sRegistrySecrets:
-		if pendingAction.ActionData == nil {
-			return nil
-		}
-
-		registryData, err := convertToDeletePortainerK8sRegistrySecretsData(pendingAction.ActionData)
-		if err != nil {
-			return fmt.Errorf("failed to parse pendingActionData: %w", err)
-		}
-
-		err = service.DeleteKubernetesRegistrySecrets(endpoint, registryData)
-		if err != nil {
-			log.Warn().Err(err).Int("endpoint_id", int(endpoint.ID)).Msgf("Unable to delete kubernetes registry secrets")
-			return fmt.Errorf("failed to delete kubernetes registry secrets for environment %d: %w", endpoint.ID, err)
-		}
-
+	handler, ok := handlers[pendingAction.Action]
+	if !ok {
+		log.Warn().Msgf("no handler found for pending action %s", pendingAction.Action)
 		return nil
 	}
 
-	return nil
+	return handler.Execute(pendingAction, endpoint)
 }

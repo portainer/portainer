@@ -23,6 +23,7 @@ export function NonAdminUpgradeDialog({
         <div className="flex w-full gap-2">
           <Button
             color="default"
+            data-cy="non-admin-cancel-upgrade"
             size="medium"
             className="w-1/3"
             onClick={() => onDismiss()}
@@ -38,6 +39,7 @@ export function NonAdminUpgradeDialog({
           >
             <Button
               color="primary"
+              data-cy="non-admin-learn-about-business-edition"
               size="medium"
               className="w-full"
               icon={ExternalLink}

@@ -615,24 +615,6 @@ input[type='checkbox'] {
   font-weight: 600;
 }
 
-/* json-tree override */
-json-tree {
-  font-size: 13px;
-  color: var(--blue-5);
-}
-
-json-tree .key {
-  color: var(--blue-3);
-  padding-right: 5px;
-}
-
-json-tree .branch-preview {
-  font-style: normal;
-  font-size: 11px;
-  opacity: 0.5;
-}
-/* !json-tree override */
-
 /* uib-progressbar override */
 .progress-bar {
   color: var(--text-progress-bar-color);
@@ -728,4 +710,22 @@ input[style*='background-image: url("data:image/png'] {
 
 input:-webkit-autofill {
   @apply caret-[--grey-25] th-highcontrast:caret-white th-dark:caret-white;
+}
+
+/*
+rules for styling the progress bar on both chrome and firefox
+first rule is for firefox and the second rule is for chrome
+
+use the `.progress-filled` tailwind variant util to style the filled value of the progress bar, 
+and the usual styles to style the unfilled value.
+
+see app/react/edge/edge-stacks/ListView/EdgeStacksDatatable/DeploymentCounter.tsx for an example
+*/
+
+progress {
+  appearance: none;
+}
+
+progress::-webkit-progress-bar {
+  background-color: transparent;
 }

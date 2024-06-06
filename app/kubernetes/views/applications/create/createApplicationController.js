@@ -263,7 +263,12 @@ class KubernetesCreateApplicationController {
           { stackFile: this.stackFileContent, stackName: this.formValues.StackName }
         );
         this.state.isEditorDirty = false;
-        this.$window.location.reload();
+        this.Notifications.success('Success', 'Request to update application successfully submitted');
+        this.$state.go(
+          'kubernetes.applications.application',
+          { name: this.application.Name, namespace: this.application.ResourcePool, endpointId: this.endpoint.Id },
+          { inherit: false }
+        );
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
       } finally {
@@ -1128,6 +1133,9 @@ class KubernetesCreateApplicationController {
         }
 
         this.oldFormValues = angular.copy(this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.updateNamespaceLimits(this.namespaceWithQuota);
+        this.updateSliders(this.namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

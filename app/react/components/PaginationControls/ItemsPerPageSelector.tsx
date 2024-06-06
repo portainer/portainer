@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import { useState } from 'react';
+
 interface Props {
   value: number;
   onChange(value: number): void;
@@ -5,10 +8,17 @@ interface Props {
 }
 
 export function ItemsPerPageSelector({ value, onChange, showAll }: Props) {
+  const [id] = useState(() => `${_.uniqueId()}-items-per-page`);
   return (
     <span className="limitSelector">
-      <span className="space-right">Items per page</span>
+      <label
+        className="space-right text-xs text-[--text-main-color] font-normal"
+        htmlFor={id}
+      >
+        Items per page
+      </label>
       <select
+        id={id}
         className="form-control"
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}

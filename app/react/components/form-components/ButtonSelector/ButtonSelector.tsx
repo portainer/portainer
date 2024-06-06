@@ -1,5 +1,7 @@
 import clsx from 'clsx';
-import { PropsWithChildren, ReactNode } from 'react';
+import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
+
+import { AutomationTestingProps } from '@/types';
 
 import { ButtonGroup, Size } from '@@/buttons/ButtonGroup';
 import { Button } from '@@/buttons';
@@ -10,6 +12,7 @@ export interface Option<T> {
   value: T;
   label?: ReactNode;
   disabled?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 interface Props<T> {
@@ -42,10 +45,12 @@ export function ButtonSelector<T extends string | number | boolean>({
       {options.map((option) => (
         <OptionItem
           key={option.value.toString()}
+          data-cy={`button-selector-option-${option.value}`}
           selected={value === option.value}
           onChange={() => onChange(option.value)}
           disabled={disabled || option.disabled}
           readOnly={readOnly}
+          icon={option.icon}
         >
           {option.label || option.value.toString()}
         </OptionItem>
@@ -59,6 +64,7 @@ interface OptionItemProps {
   onChange(): void;
   disabled?: boolean;
   readOnly?: boolean;
+  icon?: ComponentProps<typeof Button>['icon'];
 }
 
 function OptionItem({
@@ -67,7 +73,9 @@ function OptionItem({
   onChange,
   disabled,
   readOnly,
-}: PropsWithChildren<OptionItemProps>) {
+  'data-cy': dataCy,
+  icon,
+}: PropsWithChildren<OptionItemProps> & AutomationTestingProps) {
   return (
     <Button
       color="light"
@@ -79,10 +87,13 @@ function OptionItem({
         },
         '!static !z-auto'
       )}
+      data-cy={dataCy}
+      icon={icon}
     >
       {children}
       <input
         type="radio"
+        data-cy={`${dataCy}-radio-input`}
         checked={selected}
         onChange={onChange}
         disabled={disabled}

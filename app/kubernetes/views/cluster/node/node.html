@@ -40,19 +40,21 @@
                     <tr>
                       <td>Status</td>
                       <td>
-                        <span class="label label-{{ ctrl.node.Status | kubernetesNodeStatusColor }}">
-                          {{ ctrl.node.Status }}
-                        </span>
-                        <span ng-if="ctrl.node.Status == 'Warning'" class="text text-warning">
-                          {{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }}
-                        </span>
+                        <span class="label label-{{ ctrl.node.Status | kubernetesNodeStatusColor }}"> {{ ctrl.node.Status }} </span>
+                        <span ng-if="ctrl.node.Status == 'Warning'" class="text text-warning"> {{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }} </span>
                       </td>
                     </tr>
                     <tr>
                       <td class="col-xs-3"> Availability </td>
                       <td class="col-xs-9">
                         <div class="flex flex-col">
-                          <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
+                          <select
+                            class="form-control"
+                            data-cy="node-availability-select"
+                            name="availability"
+                            style="display: inline-block; width: 16rem"
+                            ng-model="ctrl.formValues.Availability"
+                          >
                             <option>{{ ctrl.availabilities.ACTIVE }}</option>
                             <option>{{ ctrl.availabilities.PAUSE }}</option>
                             <option>{{ ctrl.availabilities.DRAIN }}</option>
@@ -99,6 +101,7 @@
                       <span class="input-group-addon">Key</span>
                       <input
                         type="text"
+                        data-cy="label-key-input-{{ $index }}"
                         class="form-control"
                         name="label_key_{{ $index }}"
                         ng-model="label.Key"
@@ -111,6 +114,7 @@
                       <span class="input-group-addon">Value</span>
                       <input
                         type="text"
+                        data-cy="label-value-input-{{ $index }}"
                         class="form-control"
                         name="label_value_{{ $index }}"
                         ng-change="ctrl.onChangeLabel($index)"
@@ -158,15 +162,31 @@
                   <div class="form-inline" ng-repeat="taint in ctrl.formValues.Taints" style="padding: 3px 0 3px 0">
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Key</span>
-                      <input type="text" class="form-control" name="taint_key_{{ $index }}" ng-model="taint.Key" ng-change="ctrl.onChangeTaintKey($index)" required />
+                      <input
+                        type="text"
+                        data-cy="taint-key-input-{{ $index }}"
+                        class="form-control"
+                        name="taint_key_{{ $index }}"
+                        ng-model="taint.Key"
+                        ng-change="ctrl.onChangeTaintKey($index)"
+                        required
+                      />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" name="taint_value_{{ $index }}" ng-model="taint.Value" ng-change="ctrl.onChangeTaint($index)" />
+                      <input
+                        type="text"
+                        data-cy="taint-value-input-{{ $index }}"
+                        class="form-control"
+                        name="taint_value_{{ $index }}"
+                        ng-model="taint.Value"
+                        ng-change="ctrl.onChangeTaint($index)"
+                      />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Effect</span>
                       <select
+                        data-cy="taint_effect_{{ $index }}"
                         id="taint_effect_{{ $index }}"
                         name="taint_effect_{{ $index }}"
                         class="form-control"
@@ -231,23 +251,14 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                dataset="ctrl.events"
-                table-key="kubernetes.node.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
-              >
-              </kubernetes-events-datatable>
+              <resource-events-datatable resource-id="ctrl.node.Id" storage-key="'kubernetes.node.events'"></resource-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.node.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center">
                 <div class="flex-center gap-1"> <pr-icon icon="'code'" size="'sm'"></pr-icon> YAML </div>
               </uib-tab-heading>
               <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'node-yaml'" data="ctrl.node.Yaml" hide-message="true" />
+                <kube-yaml-inspector identifier="'node-yaml'" data="ctrl.node.Yaml" hide-message="true" data-cy="node-yaml-inspector" />
               </div>
             </uib-tab>
           </uib-tabset>
@@ -256,17 +267,11 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-node-applications-datatable
-        dataset="ctrl.applications"
-        table-key="kubernetes.node.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getApplications"
-        loading="ctrl.state.applicationsLoading"
-        title-text="Applications running on this node"
-      >
-      </kubernetes-node-applications-datatable>
-    </div>
-  </div>
+  <kubernetes-node-applications-datatable
+    ng-if="ctrl.applications && ctrl.applications.length > 0"
+    dataset="ctrl.applications"
+    on-refresh="(ctrl.getApplications)"
+    is-loading="ctrl.state.applicationsLoading"
+  >
+  </kubernetes-node-applications-datatable>
 </div>

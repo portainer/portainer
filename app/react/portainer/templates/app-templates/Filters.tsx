@@ -56,6 +56,7 @@ export function Filters({
             bindToBody
             isClearable
             aria-label="Category filter"
+            data-cy="app-templates-category-filter"
           />
         </div>
       )}
@@ -73,6 +74,7 @@ export function Filters({
             bindToBody
             isClearable
             aria-label="Type filter"
+            data-cy="app-templates-type-filter"
           />
         </div>
       )}

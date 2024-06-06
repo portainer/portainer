@@ -31,6 +31,7 @@ export function ContainerSelector({
       onChange={onChange}
       options={containersQuery.data || []}
       isLoading={containersQuery.isLoading}
+      data-cy="docker-container-selector"
     />
   );
 }

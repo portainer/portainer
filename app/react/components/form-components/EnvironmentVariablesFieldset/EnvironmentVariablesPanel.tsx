@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import React, { ComponentProps } from 'react';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
@@ -14,16 +14,19 @@ export function EnvironmentVariablesPanel({
   showHelpMessage,
   errors,
   isFoldable = false,
+  alertMessage,
 }: {
-  explanation?: string;
+  explanation?: React.ReactNode;
   showHelpMessage?: boolean;
   isFoldable?: boolean;
+  alertMessage?: React.ReactNode;
 } & FieldsetProps) {
   return (
     <FormSection
       title="Environment variables"
       isFoldable={isFoldable}
       defaultFolded={isFoldable}
+      className="flex flex-col w-full"
     >
       <div className="form-group">
         {!!explanation && (
@@ -31,6 +34,8 @@ export function EnvironmentVariablesPanel({
             {explanation}
           </div>
         )}
+
+        {alertMessage}
 
         <div className="col-sm-12">
           <EnvironmentVariablesFieldset

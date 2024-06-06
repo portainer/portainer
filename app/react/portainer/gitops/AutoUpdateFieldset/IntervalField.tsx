@@ -26,6 +26,7 @@ export function IntervalField({
     >
       <Input
         mRef={ref}
+        data-cy="repository-fetch-interval-input"
         id="repository_fetch_interval"
         name="repository_fetch_interval"
         placeholder="5m"

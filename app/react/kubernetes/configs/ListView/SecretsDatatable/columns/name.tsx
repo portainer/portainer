@@ -3,8 +3,10 @@ import { CellContext } from '@tanstack/react-table';
 import { Authorized } from '@/react/hooks/useUser';
 import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
+import { SystemBadge } from '@@/Badge/SystemBadge';
+import { ExternalBadge } from '@@/Badge/ExternalBadge';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 import { Link } from '@@/Link';
-import { Badge } from '@@/Badge';
 
 import { SecretRowData } from '../types';
 import { configurationOwnerUsernameLabel } from '../../../constants';
@@ -57,22 +59,14 @@ function Cell({ row }: CellContext<SecretRowData, string>) {
           }}
           title={name}
           className="w-fit max-w-xs truncate xl:max-w-sm 2xl:max-w-md"
+          data-cy={`secret-name-link-${name}`}
         >
           {name}
         </Link>
-        {isSystemSecret && (
-          <Badge type="success" className="ml-2">
-            System
-          </Badge>
-        )}
-        {!isSystemToken && !hasConfigurationOwner && (
-          <Badge className="ml-2">External</Badge>
-        )}
-        {!row.original.inUse && !isSystemSecret && (
-          <Badge type="warn" className="ml-2">
-            Unused
-          </Badge>
-        )}
+
+        {isSystemSecret && <SystemBadge />}
+        {!isSystemToken && !hasConfigurationOwner && <ExternalBadge />}
+        {!row.original.inUse && !isSystemSecret && <UnusedBadge />}
       </div>
     </Authorized>
   );

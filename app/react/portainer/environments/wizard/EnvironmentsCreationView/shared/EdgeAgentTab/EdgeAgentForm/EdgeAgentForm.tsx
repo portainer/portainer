@@ -76,6 +76,7 @@ export function EdgeAgentForm({ onCreate, readonly, asyncMode }: Props) {
               <div className="col-sm-12">
                 <LoadingButton
                   className="vertical-center"
+                  data-cy="edge-agent-form-submit-button"
                   isLoading={createMutation.isLoading}
                   loadingText="Creating environment..."
                   disabled={!isValid}

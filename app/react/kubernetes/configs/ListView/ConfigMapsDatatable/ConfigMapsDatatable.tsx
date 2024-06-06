@@ -1,23 +1,33 @@
 import { useMemo } from 'react';
-import { FileCode, Plus, Trash2 } from 'lucide-react';
-import { ConfigMap } from 'kubernetes-types/core/v1';
+import { FileCode } from 'lucide-react';
+import { ConfigMap, Pod } from 'kubernetes-types/core/v1';
+import { CronJob, Job } from 'kubernetes-types/batch/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
-import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
-import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { usePods } from '@/react/kubernetes/applications/usePods';
+import { useJobs } from '@/react/kubernetes/applications/useJobs';
+import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
-import { useTableState } from '@@/datatables/useTableState';
+import { AddButton } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import {
   useConfigMapsForCluster,
@@ -29,11 +39,20 @@ import { getIsConfigMapInUse } from './utils';
 import { ConfigMapRowData } from './types';
 import { columns } from './columns';
 
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
+
 const storageKey = 'k8sConfigMapsDatatable';
-const settingsStore = createStore(storageKey);
 
 export function ConfigMapsDatatable() {
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const { authorized: canWrite } = useAuthorizations(['K8sConfigMapsW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
@@ -55,10 +74,11 @@ export function ConfigMapsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
-    environmentId,
-    namespaceNames
-  );
+  const podsQuery = usePods(environmentId, namespaceNames);
+  const jobsQuery = useJobs(environmentId, namespaceNames);
+  const cronJobsQuery = useCronJobs(environmentId, namespaceNames);
+  const isInUseLoading =
+    podsQuery.isLoading || jobsQuery.isLoading || cronJobsQuery.isLoading;
 
   const filteredConfigMaps = useMemo(
     () =>
@@ -71,8 +91,10 @@ export function ConfigMapsDatatable() {
   );
   const configMapRowData = useConfigMapRowData(
     filteredConfigMaps,
-    applications ?? [],
-    applicationsQuery.isLoading,
+    podsQuery.data ?? [],
+    jobsQuery.data ?? [],
+    cronJobsQuery.data ?? [],
+    isInUseLoading,
     namespaces
   );
 
@@ -82,7 +104,6 @@ export function ConfigMapsDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={configMapsQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No ConfigMaps found"
       title="ConfigMaps"
       titleIcon={FileCode}
       getRowId={(row) => row.metadata?.uid ?? ''}
@@ -103,6 +124,10 @@ export function ConfigMapsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-configmaps-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
     />
   );
 }
@@ -111,8 +136,10 @@ export function ConfigMapsDatatable() {
 // and wraps with useMemo to prevent unnecessary calculations
 function useConfigMapRowData(
   configMaps: ConfigMap[],
-  applications: Application[],
-  applicationsLoading: boolean,
+  pods: Pod[],
+  jobs: Job[],
+  cronJobs: CronJob[],
+  isInUseLoading: boolean,
   namespaces?: Namespaces
 ): ConfigMapRowData[] {
   return useMemo(
@@ -121,12 +148,13 @@ function useConfigMapRowData(
         ...configMap,
         inUse:
           // if the apps are loading, set inUse to true to hide the 'unused' badge
-          applicationsLoading || getIsConfigMapInUse(configMap, applications),
+          isInUseLoading ||
+          getIsConfigMapInUse(configMap, pods, jobs, cronJobs),
         isSystem: namespaces
           ? namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
           : false,
       })),
-    [configMaps, applicationsLoading, applications, namespaces]
+    [configMaps, isInUseLoading, pods, jobs, cronJobs, namespaces]
   );
 }
 
@@ -139,16 +167,6 @@ function TableActions({
   const deleteConfigMapMutation = useMutationDeleteConfigMaps(environmentId);
 
   async function handleRemoveClick(configMaps: ConfigMap[]) {
-    const confirmed = await confirmDelete(
-      `Are you sure you want to remove the selected ${pluralize(
-        configMaps.length,
-        'ConfigMap'
-      )}?`
-    );
-    if (!confirmed) {
-      return;
-    }
-
     const configMapsToDelete = configMaps.map((configMap) => ({
       namespace: configMap.metadata?.namespace ?? '',
       name: configMap.metadata?.name ?? '',
@@ -159,41 +177,30 @@ function TableActions({
 
   return (
     <Authorized authorizations="K8sConfigMapsW">
-      <Button
-        className="btn-wrapper"
-        color="dangerlight"
+      <DeleteButton
         disabled={selectedItems.length === 0}
-        onClick={async () => {
-          handleRemoveClick(selectedItems);
-        }}
-        icon={Trash2}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
+        confirmMessage={`Are you sure you want to remove the selected ${pluralize(
+          selectedItems.length,
+          'ConfigMap'
+        )}`}
         data-cy="k8sConfig-removeConfigButton"
+      />
+
+      <AddButton
+        to="kubernetes.configmaps.new"
+        data-cy="k8sConfig-addConfigWithFormButton"
+        color="secondary"
       >
-        Remove
-      </Button>
-      <Link to="kubernetes.configmaps.new" className="ml-1">
-        <Button
-          className="btn-wrapper"
-          color="secondary"
-          icon={Plus}
-          data-cy="k8sConfig-addConfigWithFormButton"
-        >
-          Add with form
-        </Button>
-      </Link>
-      <Link
-        to="kubernetes.deploy"
+        Add with form
+      </AddButton>
+
+      <CreateFromManifestButton
         params={{
-          referrer: 'kubernetes.configurations',
           tab: 'configmaps',
         }}
-        className="ml-1"
         data-cy="k8sConfig-deployFromManifestButton"
-      >
-        <Button className="btn-wrapper" color="primary" icon={Plus}>
-          Create from manifest
-        </Button>
-      </Link>
+      />
     </Authorized>
   );
 }

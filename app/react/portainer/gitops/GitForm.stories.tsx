@@ -6,7 +6,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 
 import { GitForm, buildGitValidationSchema } from './GitForm';
-import { GitFormModel } from './types';
+import { DeployMethod, GitFormModel } from './types';
 
 export default {
   component: GitForm,
@@ -45,7 +45,7 @@ interface Args {
   isAdditionalFilesFieldVisible: boolean;
   isAuthExplanationVisible: boolean;
   isDockerStandalone: boolean;
-  deployMethod: 'compose' | 'manifest';
+  deployMethod: DeployMethod;
   isForcePullVisible: boolean;
 }
 
@@ -73,7 +73,7 @@ export function Primary({
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={() => buildGitValidationSchema([], false)}
+      validationSchema={() => buildGitValidationSchema([], false, 'compose')}
       onSubmit={() => {}}
     >
       {({ values, errors, setValues }) => (

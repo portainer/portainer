@@ -1,5 +1,7 @@
 import { ReactNode, useState } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { ModalType, type ButtonOptions } from './types';
@@ -16,6 +18,7 @@ function SwitchPrompt({
   modalType,
   message,
   defaultValue = false,
+  'data-cy': dataCy,
 }: {
   onSubmit: OnSubmit<{ value: boolean }>;
   title: string;
@@ -24,7 +27,7 @@ function SwitchPrompt({
   modalType?: ModalType;
   message?: ReactNode;
   defaultValue?: boolean;
-}) {
+} & AutomationTestingProps) {
   const [value, setValue] = useState(defaultValue);
 
   return (
@@ -36,6 +39,7 @@ function SwitchPrompt({
           {message && <div className="mb-3">{message}</div>}
           <SwitchField
             name="value"
+            data-cy={dataCy}
             label={switchLabel}
             checked={value}
             onChange={setValue}
@@ -56,12 +60,15 @@ export async function openSwitchPrompt(
     modalType,
     message,
     defaultValue,
+    'data-cy': dataCy,
   }: {
     confirmButton?: ButtonOptions<true>;
     modalType?: ModalType;
     message?: ReactNode;
     defaultValue?: boolean;
-  } = {}
+  } & AutomationTestingProps = {
+    'data-cy': 'switch-prompt',
+  }
 ) {
   return openModal(SwitchPrompt, {
     confirmButton,
@@ -70,5 +77,6 @@ export async function openSwitchPrompt(
     modalType,
     message,
     defaultValue,
+    'data-cy': dataCy,
   });
 }

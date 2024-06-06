@@ -15,7 +15,7 @@ import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
-import { getPod, getNamespacePods, patchPod } from './pod.service';
+import { getPod, patchPod } from './pod.service';
 import { filterRevisionsByOwnerUid, getNakedPods } from './utils';
 import {
   AppKind,
@@ -24,6 +24,7 @@ import {
   ApplicationPatch,
 } from './types';
 import { appRevisionAnnotation } from './constants';
+import { getNamespacePods } from './usePods';
 
 // This file contains services for Kubernetes apps/v1 resources (Deployments, DaemonSets, StatefulSets)
 

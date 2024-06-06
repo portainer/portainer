@@ -14,6 +14,7 @@ export async function confirmStackUpdate(
       confirmButton: buildConfirmButton('Update'),
       modalType: ModalType.Warn,
       defaultValue,
+      'data-cy': 'confirm-stack-update',
     }
   );
 

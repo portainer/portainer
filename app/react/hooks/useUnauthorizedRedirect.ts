@@ -10,7 +10,7 @@ type AuthorizationOptions = {
 
 type RedirectOptions = {
   to: string;
-  params: Record<string, unknown>;
+  params?: Record<string, unknown>;
 };
 
 /**

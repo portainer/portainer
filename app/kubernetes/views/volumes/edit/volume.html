@@ -56,7 +56,7 @@
                       <td>Access Modes</td>
                       <td data-cy="k8sVolDetail-volAccessPolicy">
                         <div ng-repeat="(index, accessPolicy) in ctrl.state.volumeSharedAccessPolicies" class="flex flex-col gap-y-1">
-                          <div class="items-center flex gap-x-1">
+                          <div class="flex items-center gap-x-1">
                             {{ accessPolicy }}
                             <portainer-tooltip
                               ng-if="ctrl.state.volumeSharedAccessPolicyTooltips[index]"
@@ -95,6 +95,7 @@
                             <div class="input-group input-group-sm">
                               <input
                                 type="number"
+                                data-cy="k8sVolDetail-increaseSizeInput"
                                 class="form-control"
                                 name="size"
                                 ng-model="ctrl.state.volumeSize"
@@ -155,23 +156,18 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable
-                title-text="Events"
-                title-icon="file-text"
-                dataset="ctrl.events"
-                table-key="kubernetes.volume.events"
-                order-by="Date"
-                reverse-order="true"
-                loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents"
+              <resource-events-datatable
+                namespace="ctrl.volume.ResourcePool.Namespace.Name"
+                storage-key="'kubernetes.volume.events'"
+                resource-id="ctrl.volume.PersistentVolumeClaim.Id"
               >
-              </kubernetes-events-datatable>
+              </resource-events-datatable>
             </uib-tab>
 
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center" data-cy="k8sVolDetail-volYamlTab"> <pr-icon icon="'code'"></pr-icon> YAML </uib-tab-heading>
               <div class="px-5" ng-if="ctrl.state.showEditorTab">
-                <kube-yaml-inspector identifier="'volume-yaml'" data="ctrl.volume.PersistentVolumeClaim.Yaml" hide-message="true" />
+                <kube-yaml-inspector data-cy="k8sVolDetail-volYaml" identifier="'volume-yaml'" data="ctrl.volume.PersistentVolumeClaim.Yaml" hide-message="true" />
               </div>
             </uib-tab>
           </uib-tabset>
@@ -180,17 +176,13 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.isUsed(item)">
-    <div class="col-sm-12">
-      <kubernetes-integrated-applications-datatable
-        dataset="ctrl.volume.Applications"
-        table-key="kubernetes.volume.applications"
-        order-by="Name"
-        refresh-callback="ctrl.getVolume"
-        title-text="Applications using this volume"
-        title-icon="svg-laptopcode"
-      >
-      </kubernetes-integrated-applications-datatable>
-    </div>
-  </div>
+  <kubernetes-integrated-applications-datatable
+    ng-if="ctrl.isUsed(item)"
+    dataset="ctrl.volume.Applications"
+    is-loading="!ctrl.volume.Applications"
+    table-key="'kubernetes.volume.applications'"
+    on-refresh="(ctrl.getVolume)"
+    table-title="'Applications using this volume'"
+  >
+  </kubernetes-integrated-applications-datatable>
 </div>

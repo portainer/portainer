@@ -51,7 +51,6 @@ export function NodesDatatable({
       columns={columns}
       dataset={dataset || []}
       isLoading={!dataset}
-      emptyContentLabel="No node available"
       settingsManager={tableState}
       extendTableOptions={withMeta({
         table: 'nodes',
@@ -65,6 +64,7 @@ export function NodesDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy="swarm-nodes-datatable"
     />
   );
 }

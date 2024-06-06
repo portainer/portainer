@@ -28,6 +28,7 @@ export function VariableFieldItem({
     >
       <Input
         name={`variables.${definition.name}`}
+        data-cy={`custom-template-variables-${definition.name}`}
         id={inputId}
         value={value}
         onChange={(e) => onChange(e.target.value)}

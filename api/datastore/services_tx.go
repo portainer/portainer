@@ -16,7 +16,9 @@ func (tx *StoreTx) IsErrObjectNotFound(err error) bool {
 
 func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService { return nil }
 
-func (tx *StoreTx) PendingActions() dataservices.PendingActionsService { return nil }
+func (tx *StoreTx) PendingActions() dataservices.PendingActionsService {
+	return tx.store.PendingActionsService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) EdgeGroup() dataservices.EdgeGroupService {
 	return tx.store.EdgeGroupService.Tx(tx.tx)
@@ -68,7 +70,10 @@ func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 }
 
 func (tx *StoreTx) SSLSettings() dataservices.SSLSettingsService { return nil }
-func (tx *StoreTx) Stack() dataservices.StackService             { return nil }
+
+func (tx *StoreTx) Stack() dataservices.StackService {
+	return tx.store.StackService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) Tag() dataservices.TagService {
 	return tx.store.TagService.Tx(tx.tx)
@@ -78,7 +83,8 @@ func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService {
 	return tx.store.TeamMembershipService.Tx(tx.tx)
 }
 
-func (tx *StoreTx) Team() dataservices.TeamService                 { return nil }
+func (tx *StoreTx) Team() dataservices.TeamService { return nil }
+
 func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService { return nil }
 
 func (tx *StoreTx) User() dataservices.UserService {

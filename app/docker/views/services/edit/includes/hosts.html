@@ -25,6 +25,7 @@
                 <input
                   type="text"
                   class="form-control"
+                  data-cy="hosts-entry-hostname-input-{{ $index }}"
                   ng-model="entry.hostname"
                   placeholder="e.g. example.com"
                   ng-change="updateHostsEntry(service, entry)"
@@ -37,6 +38,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="hosts-entry-ip-input-{{ $index }}"
                   class="form-control"
                   ng-model="entry.ip"
                   placeholder="e.g. 10.0.1.1"
@@ -60,7 +62,7 @@
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Hosts'])" ng-click="updateService(service)">Apply changes</button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
+            <pr-icon icon="'chevron-down'"></pr-icon>
           </button>
           <ul class="dropdown-menu">
             <li><a ng-click="cancelChanges(service, ['Hosts'])">Reset changes</a></li>

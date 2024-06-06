@@ -68,6 +68,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
             />
           )}
           initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+          data-cy="stack-containers-datatable"
           renderTableSettings={(tableInstance) => (
             <>
               <ColumnVisibilityMenu<DockerContainer>
@@ -85,8 +86,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
             </>
           )}
           dataset={containersQuery.data || []}
-          isLoading={containersQuery.isLoading}
-          emptyContentLabel="No containers found"
+          isLoading={!containersQuery.data}
         />
       </TableSettingsProvider>
     </RowProvider>

@@ -18,7 +18,7 @@ export function Item({
   error,
   index,
 }: ItemProps<Volume>) {
-  const allowBindMounts = useInputContext();
+  const { allowBindMounts, allowAuto } = useInputContext();
 
   return (
     <div>
@@ -31,6 +31,7 @@ export function Item({
           size="small"
           className="flex-1"
           id={`container-path-${index}`}
+          data-cy={`container-path_${index}`}
         />
 
         {allowBindMounts && (
@@ -60,6 +61,7 @@ export function Item({
               value={volume.name}
               onChange={(name) => setValue({ name })}
               inputId={`volume-${index}`}
+              allowAuto={allowAuto}
             />
           </InputGroup>
         )}
@@ -73,6 +75,7 @@ export function Item({
             value={volume.name}
             onChange={(e) => setValue({ name: e.target.value })}
             id={`host-path-${index}`}
+            data-cy={`host-path_${index}`}
           />
         )}
 

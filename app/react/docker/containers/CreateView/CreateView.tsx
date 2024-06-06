@@ -17,10 +17,10 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
+import { HelpLink } from '@@/HelpLink';
 
 import { useContainers } from '../queries/containers';
-import { useSystemLimits } from '../../proxy/queries/useInfo';
+import { useSystemLimits, useIsWindows } from '../../proxy/queries/useInfo';
 
 import { useCreateOrReplaceMutation } from './useCreateMutation';
 import { useValidation } from './validation';
@@ -48,6 +48,7 @@ export function CreateView() {
 function CreateForm() {
   const environmentId = useEnvironmentId();
   const router = useRouter();
+  const isWindows = useIsWindows(environmentId);
   const { trackEvent } = useAnalytics();
   const isAdminQuery = useIsEdgeAdmin();
   const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin({
@@ -57,7 +58,8 @@ function CreateForm() {
 
   const mutation = useCreateOrReplaceMutation();
   const initialValuesQuery = useInitialValues(
-    mutation.isLoading || mutation.isSuccess
+    mutation.isLoading || mutation.isSuccess,
+    isWindows
   );
   const registriesQuery = useEnvironmentRegistries(environmentId);
 
@@ -78,17 +80,17 @@ function CreateForm() {
     isDockerhubRateLimited,
   });
 
-  const createContDocUrl = useDocsUrl('/docker/containers/create');
-
   if (!envQuery.data || !initialValuesQuery) {
     return null;
   }
 
   const environment = envQuery.data;
 
+  // if windows, hide capabilities. this is because capadd and capdel are not supported on windows
   const hideCapabilities =
-    !environment.SecuritySettings.allowContainerCapabilitiesForRegularUsers &&
-    !isEnvironmentAdmin;
+    (!environment.SecuritySettings.allowContainerCapabilitiesForRegularUsers &&
+      !isEnvironmentAdmin) ||
+    isWindows;
 
   const {
     isDuplicating = false,
@@ -99,17 +101,21 @@ function CreateForm() {
   return (
     <>
       {isDuplicating && (
-        <InformationPanel title-text="Caution">
-          <TextTip>
-            The new container may fail to start if the image is changed, and
-            settings from the previous container aren&apos;t compatible. Common
-            causes include entrypoint, cmd or
-            <a href={createContDocUrl} target="_blank" rel="noreferrer">
-              other settings
-            </a>{' '}
-            set by an image.
-          </TextTip>
-        </InformationPanel>
+        <div className="row">
+          <div className="col-sm-12">
+            <InformationPanel title-text="Caution">
+              <TextTip>
+                The new container may fail to start if the image is changed, and
+                settings from the previous container aren&apos;t compatible.
+                Common causes include entrypoint, cmd or{' '}
+                <HelpLink docLink="/user/docker/containers/advanced">
+                  other settings
+                </HelpLink>{' '}
+                set by an image.
+              </TextTip>
+            </InformationPanel>
+          </div>
+        </div>
       )}
 
       <Formik
@@ -147,7 +153,21 @@ function CreateForm() {
     const config = toRequest(values, registry, hideCapabilities);
 
     return mutation.mutate(
-      { config, environment, values, registry, oldContainer, extraNetworks },
+      {
+        config,
+        environment,
+        values: {
+          accessControl: values.accessControl,
+          imageName: values.image.image,
+          name: values.name,
+          alwaysPull: values.alwaysPull,
+          enableWebhook: values.enableWebhook,
+          nodeName: values.nodeName,
+        },
+        registry,
+        oldContainer,
+        extraNetworks,
+      },
       {
         onSuccess() {
           sendAnalytics(values, registry);

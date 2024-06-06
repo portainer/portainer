@@ -30,8 +30,8 @@ export interface Stack {
   Id: number;
   Name: string;
   Type: StackType;
-  EndpointID: number;
-  SwarmID: string;
+  EndpointId: number;
+  SwarmId: string;
   EntryPoint: string;
   Env: {
     name: string;

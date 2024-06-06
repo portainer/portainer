@@ -2,7 +2,7 @@ import {
   HorizontalPodAutoscaler,
   HorizontalPodAutoscalerList,
 } from 'kubernetes-types/autoscaling/v1';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';

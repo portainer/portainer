@@ -14,7 +14,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
@@ -63,7 +62,6 @@ func Test_restoreArchive_usingCombinationOfPasswords(t *testing.T) {
 				"./test_assets/handler_test",
 				func() {},
 				adminMonitor,
-				&demo.Service{},
 			)
 
 			//backup
@@ -96,7 +94,6 @@ func Test_restoreArchive_shouldFailIfSystemWasAlreadyInitialized(t *testing.T) {
 		"./test_assets/handler_test",
 		func() {},
 		adminMonitor,
-		&demo.Service{},
 	)
 
 	//backup

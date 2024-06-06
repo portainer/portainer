@@ -29,6 +29,7 @@ function Cell({
     <Authorized authorizations="DockerNetworkDisconnect">
       <LoadingButton
         color="dangerlight"
+        data-cy="disconnect-network-button"
         isLoading={disconnectMutation.isLoading}
         loadingText="Leaving network..."
         type="button"

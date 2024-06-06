@@ -19,14 +19,19 @@ export function EnvironmentActions({ environment }: Props) {
   } = useCurrentStateAndParams();
 
   return (
-    <div className="space-x-2">
-      {environment.Snapshots.length > 0 && (
+    <div>
+      {environment.Snapshots.length > 0 && environment.Edge.AsyncMode && (
         <Link
           to="edge.browse.containers"
           params={{ environmentId: environment.Id, edgeStackId }}
-          className="!text-inherit hover:!no-underline"
+          className="hover:!no-underline"
+          data-cy="browse-snapshot-link"
         >
-          <Button color="none" title="Browse Snapshot">
+          <Button
+            color="none"
+            title="Browse Snapshot"
+            data-cy="browse-snapshot-button"
+          >
             <Icon icon={Search} className="searchIcon" />
           </Button>
         </Link>

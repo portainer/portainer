@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/csrf"
@@ -61,7 +60,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
-	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
@@ -110,7 +108,6 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
-	DemoService                 *demo.Service
 	UpgradeService              upgrade.Service
 	AdminCreationDone           chan struct{}
 	PendingActionsService       *pendingactions.PendingActionsService
@@ -146,7 +143,6 @@ func (server *Server) Start() error {
 		server.FileService.GetDatastorePath(),
 		server.ShutdownTrigger,
 		adminMonitor,
-		server.DemoService,
 	)
 
 	var roleHandler = roles.NewHandler(requestBouncer)
@@ -171,7 +167,7 @@ func (server *Server) Start() error {
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
 	edgeTemplatesHandler.DataStore = server.DataStore
 
-	var endpointHandler = endpoints.NewHandler(requestBouncer, server.DemoService)
+	var endpointHandler = endpoints.NewHandler(requestBouncer)
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = server.ProxyManager
@@ -227,7 +223,7 @@ func (server *Server) Start() error {
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
 
-	var settingsHandler = settings.NewHandler(requestBouncer, server.DemoService)
+	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.DataStore = server.DataStore
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JWTService = server.JWTService
@@ -270,7 +266,6 @@ func (server *Server) Start() error {
 
 	var systemHandler = system.NewHandler(requestBouncer,
 		server.Status,
-		server.DemoService,
 		server.DataStore,
 		server.UpgradeService)
 
@@ -282,7 +277,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService, server.DemoService, passwordStrengthChecker)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService, passwordStrengthChecker)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 	userHandler.AdminCreationDone = server.AdminCreationDone
@@ -382,7 +377,8 @@ func (server *Server) Start() error {
 
 	go shutdown(server.ShutdownCtx, httpsServer)
 
-	go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
+	// Temporarily disable for EE-6905 until we have a solution for the snapshotter
+	// go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
 
 	return httpsServer.ListenAndServeTLS("", "")
 }

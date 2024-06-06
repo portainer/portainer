@@ -129,7 +129,7 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
             </span>
 
             <div
-              className={clsx(styles.tools, 'max-h-32 overflow-auto space-y-2')}
+              className={clsx(styles.tools, 'max-h-32 space-y-2 overflow-auto')}
             >
               {Build.Env.map((envVar) => (
                 <div key={envVar}>
@@ -141,7 +141,11 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button className="w-full" onClick={closeModal}>
+        <Button
+          className="w-full"
+          onClick={closeModal}
+          data-cy="portainerBuildInfoModal-CloseButton"
+        >
           Ok
         </Button>
       </Modal.Footer>

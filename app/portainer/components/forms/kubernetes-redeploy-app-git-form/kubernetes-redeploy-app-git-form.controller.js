@@ -132,8 +132,8 @@ class KubernetesRedeployAppGitFormController {
 
         this.state.redeployInProgress = true;
         await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
-        this.Notifications.success('Success', 'Pulled and redeployed stack successfully');
-        await this.$state.reload();
+        this.Notifications.success('Success', 'Pulled and redeployed application successfully');
+        this.$state.go('kubernetes.applications.application', { name: this.appName, namespace: this.namespace, endpointId: this.endpointId }, { inherit: false });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
       } finally {
@@ -170,6 +170,8 @@ class KubernetesRedeployAppGitFormController {
   }
 
   $onInit() {
+    this.endpointId = this.$state.params.endpointId;
+    this.appName = this.$state.params.name;
     this.formValues.RefName = this.stack.GitConfig.ReferenceName;
     this.formValues.TLSSkipVerify = this.stack.GitConfig.TLSSkipVerify;
 

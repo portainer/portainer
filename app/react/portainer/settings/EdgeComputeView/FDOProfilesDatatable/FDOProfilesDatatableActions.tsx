@@ -1,6 +1,6 @@
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import * as notifications from '@/portainer/services/notifications';
@@ -9,10 +9,10 @@ import {
   duplicateProfile,
 } from '@/portainer/hostmanagement/fdo/fdo.service';
 
-import { confirm, confirmDestructive } from '@@/modals/confirm';
+import { confirm } from '@@/modals/confirm';
 import { Link } from '@@/Link';
 import { Button } from '@@/buttons';
-import { buildConfirmButton } from '@@/modals/utils';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 interface Props {
   isFDOEnabled: boolean;
@@ -27,30 +27,37 @@ export function FDOProfilesDatatableActions({
   const queryClient = useQueryClient();
 
   return (
-    <div className="actionBar">
-      <Link to="portainer.endpoints.profile" className="space-left">
-        <Button disabled={!isFDOEnabled} icon={PlusCircle}>
+    <>
+      <Link
+        to="portainer.endpoints.profile"
+        className="space-left"
+        data-cy="fdo-add-profile-link"
+      >
+        <Button
+          disabled={!isFDOEnabled}
+          icon={PlusCircle}
+          data-cy="fdo-add-profile-button"
+        >
           Add Profile
         </Button>
       </Link>
 
       <Button
         disabled={!isFDOEnabled || selectedItems.length !== 1}
+        data-cy="fdo-duplicate-profile-button"
         onClick={() => onDuplicateProfileClick()}
         icon={PlusCircle}
       >
         Duplicate
       </Button>
 
-      <Button
-        disabled={!isFDOEnabled || selectedItems.length < 1}
-        color="danger"
-        onClick={() => onDeleteProfileClick()}
-        icon={Trash2}
-      >
-        Remove
-      </Button>
-    </div>
+      <DeleteButton
+        disabled={!isFDOEnabled || selectedItems.length === 0}
+        onConfirmed={() => onDeleteProfileClick()}
+        confirmMessage="This action will delete the selected profile(s). Continue?"
+        data-cy="fdo-remove-profile-button"
+      />
+    </>
   );
 
   async function onDuplicateProfileClick() {
@@ -80,16 +87,6 @@ export function FDOProfilesDatatableActions({
   }
 
   async function onDeleteProfileClick() {
-    const confirmed = await confirmDestructive({
-      title: 'Are you sure?',
-      message: 'This action will delete the selected profile(s). Continue?',
-      confirmButton: buildConfirmButton('Remove', 'danger'),
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
     await Promise.all(
       selectedItems.map(async (profile) => {
         try {
@@ -106,6 +103,6 @@ export function FDOProfilesDatatableActions({
       })
     );
 
-    await queryClient.invalidateQueries('fdo_profiles');
+    await queryClient.invalidateQueries(['fdo_profiles']);
   }
 }

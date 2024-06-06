@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
@@ -36,5 +36,9 @@ export async function getSystemVersion() {
 }
 
 export function useSystemVersion() {
-  return useQuery(queryKey, () => getSystemVersion());
+  return useQuery(queryKey, () => getSystemVersion(), {
+    // 24 hour stale time to reduce the number of requests to avoid github api rate limits
+    // a hard refresh of the browser will still trigger a new request
+    staleTime: 24 * 60 * 60 * 1000,
+  });
 }

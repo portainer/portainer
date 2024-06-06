@@ -53,7 +53,6 @@ export function NodesDatatable() {
         kubernetesEndpointsQuery.isLoading ||
         environmentQuery.isLoading
       }
-      emptyContentLabel="No Nodes found"
       title="Nodes"
       titleIcon={HardDrive}
       getRowId={(row) => row.metadata?.uid ?? ''}
@@ -65,6 +64,7 @@ export function NodesDatatable() {
           />
         </TableSettingsMenu>
       )}
+      data-cy="k8s-nodes-datatable"
     />
   );
 }

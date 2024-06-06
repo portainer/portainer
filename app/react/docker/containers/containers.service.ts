@@ -1,9 +1,9 @@
-import { RawAxiosRequestHeaders } from 'axios';
-
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { genericHandler } from '@/docker/rest/response/handlers';
+
+import { addNodeHeader } from '../proxy/addNodeHeader';
 
 import { ContainerId } from './types';
 
@@ -12,12 +12,7 @@ export async function startContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
-  }
-
+  const headers = addNodeHeader(nodeName);
   try {
     await axios.post<void>(
       urlBuilder(environmentId, id, 'start'),
@@ -34,13 +29,12 @@ export async function stopContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(urlBuilder(endpointId, id, 'stop'), {}, { headers });
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed stopping container');
   }
-
-  await axios.post<void>(urlBuilder(endpointId, id, 'stop'), {}, { headers });
 }
 
 export async function recreateContainer(
@@ -49,19 +43,18 @@ export async function recreateContainer(
   pullImage: boolean,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(
+      `/docker/${endpointId}/containers/${id}/recreate`,
+      {
+        PullImage: pullImage,
+      },
+      { headers }
+    );
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed recreating container');
   }
-
-  await axios.post<void>(
-    `/docker/${endpointId}/containers/${id}/recreate`,
-    {
-      PullImage: pullImage,
-    },
-    { headers }
-  );
 }
 
 export async function restartContainer(
@@ -69,17 +62,16 @@ export async function restartContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(
+      urlBuilder(endpointId, id, 'restart'),
+      {},
+      { headers }
+    );
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed restarting container');
   }
-
-  await axios.post<void>(
-    urlBuilder(endpointId, id, 'restart'),
-    {},
-    { headers }
-  );
 }
 
 export async function killContainer(
@@ -87,13 +79,12 @@ export async function killContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(urlBuilder(endpointId, id, 'kill'), {}, { headers });
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed killing container');
   }
-
-  await axios.post<void>(urlBuilder(endpointId, id, 'kill'), {}, { headers });
 }
 
 export async function pauseContainer(
@@ -101,13 +92,16 @@ export async function pauseContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(
+      urlBuilder(endpointId, id, 'pause'),
+      {},
+      { headers }
+    );
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed pausing container');
   }
-
-  await axios.post<void>(urlBuilder(endpointId, id, 'pause'), {}, { headers });
 }
 
 export async function resumeContainer(
@@ -115,17 +109,16 @@ export async function resumeContainer(
   id: ContainerId,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(
+      urlBuilder(endpointId, id, 'unpause'),
+      {},
+      { headers }
+    );
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed resuming container');
   }
-
-  await axios.post<void>(
-    urlBuilder(endpointId, id, 'unpause'),
-    {},
-    { headers }
-  );
 }
 
 export async function renameContainer(
@@ -134,17 +127,20 @@ export async function renameContainer(
   name: string,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
+  const headers = addNodeHeader(nodeName);
+  try {
+    await axios.post<void>(
+      urlBuilder(endpointId, id, 'rename'),
+      {},
+      {
+        params: { name },
+        transformResponse: genericHandler,
+        headers,
+      }
+    );
+  } catch (e) {
+    throw parseAxiosError(e, 'Failed renaming container');
   }
-
-  await axios.post<void>(
-    urlBuilder(endpointId, id, 'rename'),
-    {},
-    { params: { name }, transformResponse: genericHandler, headers }
-  );
 }
 
 export async function removeContainer(
@@ -155,13 +151,8 @@ export async function removeContainer(
     removeVolumes,
   }: { removeVolumes?: boolean; nodeName?: string } = {}
 ) {
+  const headers = addNodeHeader(nodeName);
   try {
-    const headers: RawAxiosRequestHeaders = {};
-
-    if (nodeName) {
-      headers['X-PortainerAgent-Target'] = nodeName;
-    }
-
     const { data } = await axios.delete<null | { message: string }>(
       urlBuilder(endpointId, containerId),
       {
@@ -175,7 +166,7 @@ export async function removeContainer(
       throw new PortainerError(data.message);
     }
   } catch (e) {
-    throw new PortainerError('Unable to remove container', e as Error);
+    throw parseAxiosError(e, 'Failed removing container');
   }
 }
 

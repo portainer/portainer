@@ -1,13 +1,17 @@
 import { render, screen } from '@testing-library/react';
+import { HttpResponse, http } from 'msw';
 
+import { EnvVarType } from '@/react/portainer/templates/app-templates/view-model';
 import {
-  EnvVarType,
-  TemplateViewModel,
-} from '@/react/portainer/templates/app-templates/view-model';
+  AppTemplate,
+  TemplateType,
+} from '@/react/portainer/templates/app-templates/types';
+import { server } from '@/setup-tests/server';
+import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { AppTemplateFieldset } from './AppTemplateFieldset';
 
-test('renders AppTemplateFieldset component', () => {
+test('renders AppTemplateFieldset component', async () => {
   const testedEnv = {
     name: 'VAR2',
     label: 'Variable 2',
@@ -27,27 +31,44 @@ test('renders AppTemplateFieldset component', () => {
     testedEnv,
   ];
   const template = {
-    Note: 'This is a template note',
-    Env: env,
-  } as TemplateViewModel;
+    id: 1,
+    note: 'This is a template note',
+    env,
+    type: TemplateType.ComposeStack,
+    categories: ['edge'],
+    title: 'Template title',
+    description: 'Template description',
+    administrator_only: false,
+    image: 'template-image',
+    repository: {
+      url: '',
+      stackfile: '',
+    },
+  } satisfies AppTemplate;
 
   const values: Record<string, string> = {
     VAR1: 'value1',
     VAR2: 'value2',
   };
 
-  const onChange = vi.fn();
-
-  render(
-    <AppTemplateFieldset
-      template={template}
-      values={values}
-      onChange={onChange}
-    />
+  server.use(
+    http.get('/api/templates', () =>
+      HttpResponse.json({ version: '3', templates: [template] })
+    ),
+    http.get('/api/registries', () => HttpResponse.json([]))
   );
 
-  const templateNoteElement = screen.getByText('This is a template note');
-  expect(templateNoteElement).toBeInTheDocument();
+  const onChange = vi.fn();
+  const Wrapped = withTestQueryProvider(AppTemplateFieldset);
+  render(
+    <Wrapped templateId={template.id} values={values} onChange={onChange} />
+  );
+
+  screen.debug();
+
+  await expect(
+    screen.findByText('This is a template note')
+  ).resolves.toBeInTheDocument();
 
   const envVarsFieldsetElement = screen.getByLabelText(testedEnv.label, {
     exact: false,

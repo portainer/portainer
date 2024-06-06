@@ -59,12 +59,22 @@ import { deploymentTypeValidation } from '@/react/kubernetes/applications/compon
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
 import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
-import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/HelmInsightsBox';
+import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
 import { applicationsModule } from './applications';
+import { volumesModule } from './volumes';
+import { namespacesModule } from './namespaces';
+import { clusterManagementModule } from './clusterManagement';
+import { registriesModule } from './registries';
 
 export const ngModule = angular
-  .module('portainer.kubernetes.react.components', [applicationsModule])
+  .module('portainer.kubernetes.react.components', [
+    applicationsModule,
+    volumesModule,
+    namespacesModule,
+    clusterManagementModule,
+    registriesModule,
+  ])
   .component(
     'ingressClassDatatable',
     r2a(IngressClassDatatableAngular, [
@@ -74,7 +84,6 @@ export const ngModule = angular
       'initialIngressControllers',
       'allowNoneIngressClass',
       'isLoading',
-      'noIngressControllerLabel',
       'view',
     ])
   )
@@ -90,7 +99,6 @@ export const ngModule = angular
       'value',
     ])
   )
-  .component('helmInsightsBox', r2a(HelmInsightsBox, []))
   .component(
     'namespaceAccessUsersSelector',
     r2a(NamespaceAccessUsersSelector, [
@@ -131,6 +139,7 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+      'data-cy',
     ])
   )
   .component(
@@ -206,6 +215,17 @@ export const ngModule = angular
       'isLoading',
       'showSystem',
       'setSystemResources',
+    ])
+  )
+  .component(
+    'kubernetesIntegratedApplicationsDatatable',
+    r2a(withUIRouter(withCurrentUser(IntegratedAppsDatatable)), [
+      'dataset',
+      'isLoading',
+      'onRefresh',
+      'tableKey',
+      'tableTitle',
+      'dataCy',
     ])
   );
 

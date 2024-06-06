@@ -4,7 +4,17 @@
   <div class="form-group">
     <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-azure-registry" required auto-focus />
+      <input
+        type="text"
+        class="form-control"
+        id="registry_name"
+        name="registry_name"
+        ng-model="$ctrl.model.Name"
+        placeholder="my-azure-registry"
+        required
+        auto-focus
+        data-cy="registry-name-input"
+      />
       <div class="help-block" ng-show="$ctrl.registryFormAzure.registry_name.$invalid">
         <div class="small text-warning">
           <div ng-messages="$ctrl.registryFormAzure.registry_name.$error">
@@ -29,7 +39,16 @@
       <portainer-tooltip message="'URL of an Azure Container Registry. Any protocol will be stripped.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="myproject.azurecr.io" required />
+      <input
+        type="text"
+        class="form-control"
+        id="registry_url"
+        name="registry_url"
+        ng-model="$ctrl.model.URL"
+        placeholder="myproject.azurecr.io"
+        required
+        data-cy="registry-url-input"
+      />
       <div class="help-block" ng-show="$ctrl.registryFormAzure.registry_url.$invalid">
         <div class="small text-warning">
           <div ng-messages="$ctrl.registryFormAzure.registry_url.$error">
@@ -47,7 +66,7 @@
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required data-cy="registry-username-input" />
       <div class="help-block" ng-show="$ctrl.registryFormAzure.registry_username.$invalid">
         <div class="small text-warning">
           <div ng-messages="$ctrl.registryFormAzure.registry_username.$error">

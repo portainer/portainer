@@ -34,7 +34,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 			return httperror.InternalServerError("No Edge agent registered with the environment", errors.New("No agent available"))
 		}
 
-		_, err := handler.ReverseTunnelService.GetActiveTunnel(endpoint)
+		_, err := handler.ReverseTunnelService.TunnelAddr(endpoint)
 		if err != nil {
 			return httperror.InternalServerError("Unable to get the active tunnel", err)
 		}

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   ContainerConfig,
   ContainerState,
@@ -7,9 +7,13 @@ import {
   MountPoint,
   NetworkSettings,
 } from 'docker-types/generated/1.41';
+import { RawAxiosRequestHeaders } from 'axios';
 
 import { PortainerResponse } from '@/react/docker/types';
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, {
+  agentTargetHeader,
+  parseAxiosError,
+} from '@/portainer/services/axios';
 import { ContainerId } from '@/react/docker/containers/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { queryClient } from '@/react-tools/react-query';
@@ -75,11 +79,15 @@ export interface ContainerJSON {
 export function useContainer(
   environmentId: EnvironmentId,
   containerId?: ContainerId,
+  nodeName?: string,
   { enabled }: { enabled?: boolean } = {}
 ) {
   return useQuery(
     containerId ? queryKeys.container(environmentId, containerId) : [],
-    () => (containerId ? getContainer(environmentId, containerId) : undefined),
+    () =>
+      containerId
+        ? getContainer(environmentId, containerId, nodeName)
+        : undefined,
     {
       meta: {
         title: 'Failure',
@@ -103,11 +111,19 @@ export type ContainerResponse = PortainerResponse<ContainerJSON>;
 
 async function getContainer(
   environmentId: EnvironmentId,
-  containerId: ContainerId
+  containerId: ContainerId,
+  nodeName?: string
 ) {
   try {
+    const headers: RawAxiosRequestHeaders = {};
+
+    if (nodeName) {
+      headers[agentTargetHeader] = nodeName;
+    }
+
     const { data } = await axios.get<ContainerResponse>(
-      urlBuilder(environmentId, containerId, 'json')
+      urlBuilder(environmentId, containerId, 'json'),
+      { headers }
     );
     return data;
   } catch (error) {

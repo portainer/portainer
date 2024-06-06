@@ -40,14 +40,16 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	}
 
 	// endpoints
-	endpointRouter := h.PathPrefix("/{id}").Subrouter()
-	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
-	endpointRouter.Use(dockerOnlyMiddleware)
+	endpointRouter := h.PathPrefix("/docker/{id}").Subrouter()
+	endpointRouter.Use(bouncer.AuthenticatedAccess)
+	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"), dockerOnlyMiddleware)
 
-	containersHandler := containers.NewHandler("/{id}/containers", bouncer, dataStore, dockerClientFactory, containerService)
+	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.dashboard)).Methods(http.MethodGet)
+
+	containersHandler := containers.NewHandler("/docker/{id}/containers", bouncer, dataStore, dockerClientFactory, containerService)
 	endpointRouter.PathPrefix("/containers").Handler(containersHandler)
 
-	imagesHandler := images.NewHandler("/{id}/images", bouncer, dockerClientFactory)
+	imagesHandler := images.NewHandler("/docker/{id}/images", bouncer, dockerClientFactory)
 	endpointRouter.PathPrefix("/images").Handler(imagesHandler)
 	return h
 }

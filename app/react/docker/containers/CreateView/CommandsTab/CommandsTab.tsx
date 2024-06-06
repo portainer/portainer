@@ -61,6 +61,7 @@ export function CommandsTab({
             value={values.workingDir}
             onChange={(e) => setFieldValue('workingDir', e.target.value)}
             placeholder="e.g. /myapp"
+            data-cy="working-dir-input"
           />
         </FormControl>
         <FormControl
@@ -73,6 +74,7 @@ export function CommandsTab({
             value={values.user}
             onChange={(e) => setFieldValue('user', e.target.value)}
             placeholder="e.g. nginx"
+            data-cy="user-input"
           />
         </FormControl>
       </div>

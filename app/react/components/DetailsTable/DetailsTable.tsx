@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import { Children, PropsWithChildren } from 'react';
 
 type Props = {
+  dataCy: string;
   headers?: string[];
-  dataCy?: string;
   className?: string;
   emptyMessage?: string;
 };

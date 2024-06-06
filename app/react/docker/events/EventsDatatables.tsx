@@ -48,7 +48,7 @@ export function EventsDatatable({ dataset }: { dataset: Array<DockerEvent> }) {
       title="Events"
       titleIcon={Clock}
       disableSelect
-      emptyContentLabel="No event available."
+      data-cy="docker-events-datatable"
     />
   );
 }

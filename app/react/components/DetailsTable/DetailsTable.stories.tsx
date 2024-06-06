@@ -17,7 +17,7 @@ export default {
 
 function Template({ key1, val1, key2, val2 }: Args) {
   return (
-    <DetailsTable>
+    <DetailsTable dataCy="details-table">
       <DetailsRow label={key1}>{val1}</DetailsRow>
       <DetailsRow label={key2}>{val2}</DetailsRow>
     </DetailsTable>

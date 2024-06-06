@@ -23,8 +23,8 @@ export function TasksDatatable({
       columns={columns}
       dataset={dataset}
       search={search}
-      emptyContentLabel="No task matching filter."
       aria-label="Tasks table"
+      data-cy="docker-service-tasks-nested-datatable"
     />
   );
 }

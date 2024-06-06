@@ -48,7 +48,7 @@ func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 // @failure 500
 // @failure 400
 // @failure 503 "Edge compute features are disabled"
-// @router /edge_jobs/{id} [post]
+// @router /edge_jobs/{id} [put]
 func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

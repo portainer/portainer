@@ -1,13 +1,13 @@
-import { Clipboard, Plus, Trash2 } from 'lucide-react';
+import { Clipboard } from 'lucide-react';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useRepeater } from '@@/datatables/useRepeater';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { DockerConfig } from '../../types';
 
@@ -17,7 +17,7 @@ import { createStore } from './store';
 interface Props {
   dataset: Array<DockerConfig>;
   onRemoveClick: (configs: Array<DockerConfig>) => void;
-  onRefresh: () => Promise<void>;
+  onRefresh: () => void;
 }
 
 const storageKey = 'docker_configs';
@@ -40,7 +40,6 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
       settingsManager={tableState}
       title="Configs"
       titleIcon={Clipboard}
-      emptyContentLabel="No config available."
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
@@ -50,28 +49,23 @@ export function ConfigsDatatable({ dataset, onRefresh, onRemoveClick }: Props) {
         </TableSettingsMenu>
       )}
       disableSelect={!hasWriteAccessQuery.authorized}
+      data-cy="configs-datatable"
       renderTableActions={(selectedRows) =>
         hasWriteAccessQuery.authorized && (
           <div className="flex items-center gap-3">
             <Authorized authorizations="DockerConfigDelete">
-              <Button
-                icon={Trash2}
-                color="dangerlight"
-                onClick={() => onRemoveClick(selectedRows)}
+              <DeleteButton
                 disabled={selectedRows.length === 0}
-              >
-                Remove
-              </Button>
+                data-cy="remove-docker-configs-button"
+                onConfirmed={() => onRemoveClick(selectedRows)}
+                confirmMessage="Do you want to remove the selected config(s)?"
+              />
             </Authorized>
 
             <Authorized authorizations="DockerConfigCreate">
-              <Button
-                icon={Plus}
-                as={Link}
-                props={{ to: 'docker.configs.new' }}
-              >
+              <AddButton data-cy="add-docker-config-button">
                 Add config
-              </Button>
+              </AddButton>
             </Authorized>
           </div>
         )

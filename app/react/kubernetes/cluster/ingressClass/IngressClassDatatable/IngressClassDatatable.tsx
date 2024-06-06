@@ -23,7 +23,7 @@ interface Props {
   initialValues: IngressControllerClassMap[] | undefined;
   isLoading: boolean;
   noIngressControllerLabel: string;
-  view: string;
+  view: 'namespace' | 'cluster';
 }
 
 export function IngressClassDatatable({
@@ -44,12 +44,12 @@ export function IngressClassDatatable({
         dataset={values || []}
         columns={columns}
         isLoading={isLoading}
-        emptyContentLabel={noIngressControllerLabel}
         title="Ingress Controllers"
         titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        data-cy="ingress-class-datatable"
       />
     </div>
   );
@@ -59,6 +59,7 @@ export function IngressClassDatatable({
       <div className="flex items-start">
         <ButtonGroup>
           <Button
+            data-cy="disallow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === true).length ===
               0
@@ -72,6 +73,7 @@ export function IngressClassDatatable({
             Disallow selected
           </Button>
           <Button
+            data-cy="allow-ingress-controllers-button"
             disabled={
               selectedRows.filter((row) => row.Availability === false)
                 .length === 0
@@ -91,11 +93,18 @@ export function IngressClassDatatable({
 
   function renderIngressClassDescription() {
     return (
-      <div className="text-muted flex w-full flex-col !text-xs">
-        <div className="mt-1">{description}</div>
-        {initialValues && values && isUnsavedChanges(initialValues, values) && (
-          <TextTip>Unsaved changes.</TextTip>
+      <div className="flex flex-col gap-3">
+        {!isLoading && values && values.length === 0 && (
+          <TextTip>{noIngressControllerLabel}</TextTip>
         )}
+        <div className="text-muted flex w-full flex-col !text-xs">
+          <div className="mt-1">{description}</div>
+          {initialValues &&
+            values &&
+            isUnsavedChanges(initialValues, values) && (
+              <TextTip>Unsaved changes.</TextTip>
+            )}
+        </div>
       </div>
     );
   }

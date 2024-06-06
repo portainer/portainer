@@ -36,7 +36,6 @@ export function EdgeStacksDatatable() {
       dataset={edgeStacksQuery.data || []}
       initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
       settingsManager={tableState}
-      emptyContentLabel="No stack available."
       isLoading={edgeStacksQuery.isLoading}
       renderTableSettings={(tableInstance) => (
         <TableSettingsMenus
@@ -47,6 +46,7 @@ export function EdgeStacksDatatable() {
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />
       )}
+      data-cy="edge-stacks-datatable"
     />
   );
 }

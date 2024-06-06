@@ -126,13 +126,22 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 		command.WithHost(options.Host)
 	}
 
+	if options.ProjectDir != "" {
+		command.WithProjectDirectory(options.ProjectDir)
+	}
+
 	var stderr bytes.Buffer
 
 	args := []string{}
 	args = append(args, command.ToArgs()...)
 
 	cmd := exec.Command(program, args...)
-	cmd.Dir = options.WorkingDir
+	if options.WorkingDir != "" {
+		// Specify an non-exist working directory will cause the failure
+		// of the "docker-compose down" command even if the project name
+		// is correct.
+		cmd.Dir = options.WorkingDir
+	}
 
 	if wrapper.configPath != "" || len(options.Env) > 0 {
 		cmd.Env = os.Environ()
@@ -235,6 +244,10 @@ func (command *composeCommand) WithProjectName(projectName string) {
 
 func (command *composeCommand) WithEnvFilePath(envFilePath string) {
 	command.globalArgs = append(command.globalArgs, "--env-file", envFilePath)
+}
+
+func (command *composeCommand) WithProjectDirectory(projectDir string) {
+	command.globalArgs = append(command.globalArgs, "--project-directory", projectDir)
 }
 
 func (command *composeCommand) ToArgs() []string {

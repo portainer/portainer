@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { RestartPolicy } from 'docker-types/generated/1.41';
 
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
@@ -47,7 +48,7 @@ export class TemplateViewModel {
 
   Interactive!: boolean;
 
-  RestartPolicy!: string;
+  RestartPolicy!: RestartPolicy['Name'];
 
   Hosts!: string[];
 
@@ -58,14 +59,14 @@ export class TemplateViewModel {
   Volumes!: {
     container: string;
     readonly: boolean;
-    type: string;
+    type: 'bind' | 'auto';
     bind: string | null;
   }[];
 
   Ports!: {
     hostPort: string | undefined;
     containerPort: string;
-    protocol: string;
+    protocol: 'tcp' | 'udp';
   }[];
 
   constructor(template: AppTemplate, version: string) {
@@ -134,7 +135,7 @@ function templatePorts(data: AppTemplate) {
           hostAndContainerPort.length > 1
             ? hostAndContainerPort[1]
             : hostAndContainerPort[0],
-        protocol: portAndProtocol[1],
+        protocol: portAndProtocol[1] as 'tcp' | 'udp',
       };
     }) || []
   );
@@ -145,7 +146,7 @@ function templateVolumes(data: AppTemplate) {
     data.volumes?.map((v) => ({
       container: v.container,
       readonly: v.readonly || false,
-      type: v.bind ? 'bind' : 'auto',
+      type: (v.bind ? 'bind' : 'auto') as 'bind' | 'auto',
       bind: v.bind ? v.bind : null,
     })) || []
   );

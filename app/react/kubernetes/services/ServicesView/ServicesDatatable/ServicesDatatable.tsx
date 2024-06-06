@@ -1,23 +1,31 @@
-import { useMemo } from 'react';
-import { Shuffle, Trash2 } from 'lucide-react';
+import { Shuffle } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
-import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
-import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import {
   useMutationDeleteServices,
@@ -26,13 +34,20 @@ import {
 import { Service } from '../../types';
 
 import { columns } from './columns';
-import { createStore } from './datatable-store';
 
 const storageKey = 'k8sServicesDatatable';
-const settingsStore = createStore(storageKey);
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function ServicesDatatable() {
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const environmentId = useEnvironmentId();
   const { data: namespaces, ...namespacesQuery } =
     useNamespacesQuery(environmentId);
@@ -42,6 +57,7 @@ export function ServicesDatatable() {
     namespaceNames,
     {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
+      lookupApplications: true,
     }
   );
 
@@ -68,7 +84,6 @@ export function ServicesDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
@@ -90,11 +105,15 @@ export function ServicesDatatable() {
         />
       }
       renderRow={servicesRenderRow}
+      data-cy="k8s-services-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
     />
   );
 }
 
-// useServicesRowData appends the `isSyetem` property to the service data
+// useServicesRowData appends the `isSystem` property to the service data
 function useServicesRowData(
   services: Service[],
   namespaces?: Namespaces
@@ -136,26 +155,34 @@ function TableActions({ selectedItems }: TableActionsProps) {
   const deleteServicesMutation = useMutationDeleteServices(environmentId);
   const router = useRouter();
 
-  async function handleRemoveClick(services: SelectedService[]) {
-    const confirmed = await confirmDelete(
-      <>
-        <p>{`Are you sure you want to remove the selected ${pluralize(
-          services.length,
-          'service'
-        )}?`}</p>
-        <ul className="pl-6">
-          {services.map((s, index) => (
-            <li key={index}>
-              {s.Namespace}/{s.Name}
-            </li>
-          ))}
-        </ul>
-      </>
-    );
-    if (!confirmed) {
-      return null;
-    }
+  return (
+    <Authorized authorizations="K8sServicesW">
+      <DeleteButton
+        disabled={selectedItems.length === 0}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
+        confirmMessage={
+          <>
+            <p>{`Are you sure you want to remove the selected ${pluralize(
+              selectedItems.length,
+              'service'
+            )}?`}</p>
+            <ul className="pl-6">
+              {selectedItems.map((s, index) => (
+                <li key={index}>
+                  {s.Namespace}/{s.Name}
+                </li>
+              ))}
+            </ul>
+          </>
+        }
+        data-cy="k8s-remove-services-button"
+      />
 
+      <CreateFromManifestButton data-cy="k8s-create-service-button" />
+    </Authorized>
+  );
+
+  async function handleRemoveClick(services: SelectedService[]) {
     const payload: Record<string, string[]> = {};
     services.forEach((service) => {
       payload[service.Namespace] = payload[service.Namespace] || [];
@@ -181,32 +208,5 @@ function TableActions({ selectedItems }: TableActionsProps) {
         },
       }
     );
-    return services;
   }
-
-  return (
-    <div className="servicesDatatable-actions">
-      <Authorized authorizations="K8sServicesW">
-        <Button
-          className="btn-wrapper"
-          color="dangerlight"
-          disabled={selectedItems.length === 0}
-          onClick={() => handleRemoveClick(selectedItems)}
-          icon={Trash2}
-        >
-          Remove
-        </Button>
-
-        <Link
-          to="kubernetes.deploy"
-          params={{ referrer: 'kubernetes.services' }}
-          className="space-left hover:no-decoration"
-        >
-          <Button className="btn-wrapper" color="primary" icon="plus">
-            Create from manifest
-          </Button>
-        </Link>
-      </Authorized>
-    </div>
-  );
 }

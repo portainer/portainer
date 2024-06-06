@@ -1,6 +1,8 @@
 import { ComponentProps, InputHTMLAttributes } from 'react';
 import clsx from 'clsx';
 
+import { AutomationTestingProps } from '@/types';
+
 import { InputGroup } from '../InputGroup';
 
 export function InputLabeled({
@@ -17,7 +19,8 @@ export function InputLabeled({
   className?: string;
   size?: ComponentProps<typeof InputGroup>['size'];
   needsDeletion?: boolean;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'children'>) {
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'children'> &
+  AutomationTestingProps) {
   return (
     <InputGroup
       className={clsx(className, needsDeletion && 'striked')}

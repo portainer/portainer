@@ -3,6 +3,7 @@ import { CellContext } from '@tanstack/react-table';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';
+import { getSchemeFromPort } from '@/react/common/network-utils';
 
 import { Icon } from '@@/Icon';
 
@@ -27,10 +28,17 @@ function PortsCell({
     return '-';
   }
 
-  return ports.map((port) => (
-    <a className="image-tag" href={`http://${ip}:${port.host}`} key={port.host}>
-      <Icon icon={ExternalLink} className="mr-1" />
-      {ip}:{port.host}
-    </a>
-  ));
+  return ports.map((port) => {
+    const scheme = getSchemeFromPort(port.host);
+    return (
+      <a
+        className="image-tag"
+        href={`${scheme}://${ip}:${port.host}`}
+        key={port.host}
+      >
+        <Icon icon={ExternalLink} className="mr-1" />
+        {ip}:{port.host}
+      </a>
+    );
+  });
 }

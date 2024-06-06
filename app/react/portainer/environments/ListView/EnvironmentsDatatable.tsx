@@ -1,4 +1,4 @@
-import { HardDrive, Plus, Trash2 } from 'lucide-react';
+import { HardDrive, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
@@ -6,8 +6,7 @@ import { useGroups } from '@/react/portainer/environments/environment-groups/que
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton, Button } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { isBE } from '../../feature-flags/feature-flags.service';
@@ -79,6 +78,7 @@ export function EnvironmentsDatatable({
             onClick={() => onRemove(selectedRows)}
             icon={Trash2}
             className="!m-0"
+            data-cy="remove-environments-button"
           >
             Remove
           </Button>
@@ -86,28 +86,25 @@ export function EnvironmentsDatatable({
           <ImportFdoDeviceButton />
 
           {isBE && (
-            <Button
-              as={Link}
+            <AddButton
               color="secondary"
-              icon={Plus}
-              props={{ to: 'portainer.endpoints.edgeAutoCreateScript' }}
+              data-cy="environments-auto-onboarding-button"
+              to="portainer.endpoints.edgeAutoCreateScript"
             >
               Auto onboarding
-            </Button>
+            </AddButton>
           )}
-          <Link to="portainer.wizard.endpoints">
-            <Button
-              onClick={() =>
-                localStorage.setItem('wizardReferrer', 'environments')
-              }
-              icon={Plus}
-              className="!m-0"
-            >
-              Add environment
-            </Button>
-          </Link>
+
+          <AddButton
+            to="portainer.wizard.endpoints"
+            params={{ referrer: 'environments' }}
+            data-cy="environments-add-environments-button"
+          >
+            Add environment
+          </AddButton>
         </div>
       )}
+      data-cy="environments-datatable"
     />
   );
 }

@@ -1,13 +1,12 @@
 import { Fragment } from 'react';
-import { Network, Trash2 } from 'lucide-react';
+import { Network } from 'lucide-react';
 
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
 import { Authorized } from '@/react/hooks/useUser';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
-import { Button } from '@@/buttons';
-import { Icon } from '@@/Icon';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { isSystemNetwork } from '../network.helper';
 import { DockerNetwork, IPConfig } from '../types';
@@ -38,21 +37,18 @@ export function NetworkDetailsTable({
         <DetailsTable.Row label="Id">
           {network.Id}
           {allowRemoveNetwork && (
-            <Authorized authorizations="DockerNetworkDelete">
-              <Button
-                data-cy="networkDetails-deleteNetwork"
-                size="xsmall"
-                color="danger"
-                onClick={() => onRemoveNetworkClicked()}
-              >
-                <Icon
-                  icon={Trash2}
-                  className="space-right"
-                  aria-hidden="true"
-                />
-                Delete this network
-              </Button>
-            </Authorized>
+            <span className="ml-2">
+              <Authorized authorizations="DockerNetworkDelete">
+                <DeleteButton
+                  data-cy="networkDetails-deleteNetwork"
+                  size="xsmall"
+                  onConfirmed={onRemoveNetworkClicked}
+                  confirmMessage="Do you want to delete the network?"
+                >
+                  Delete this network
+                </DeleteButton>
+              </Authorized>
+            </span>
           )}
         </DetailsTable.Row>
         <DetailsTable.Row label="Driver">{network.Driver}</DetailsTable.Row>

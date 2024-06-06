@@ -6,8 +6,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
@@ -269,30 +268,6 @@ class KubernetesResourcePoolController {
   }
   /* #endregion */
 
-  /* #region  GET INGRESSES */
-  getIngresses() {
-    return this.$async(async () => {
-      this.state.ingressesLoading = true;
-      try {
-        const namespace = this.pool.Namespace.Name;
-        this.allIngresses = await this.KubernetesIngressService.get(this.state.hasWriteAuthorization ? '' : namespace);
-        this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
-        _.forEach(this.ingresses, (ing) => {
-          ing.Namespace = namespace;
-          _.forEach(ing.Paths, (path) => {
-            const application = _.find(this.applications, { ServiceName: path.ServiceName });
-            path.ApplicationName = application && application.Name ? application.Name : '-';
-          });
-        });
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
-      } finally {
-        this.state.ingressesLoading = false;
-      }
-    });
-  }
-  /* #endregion */
-
   /* #region  GET REGISTRIES */
   getRegistries() {
     return this.$async(async () => {
@@ -359,7 +334,6 @@ class KubernetesResourcePoolController {
           ingressesLoading: true,
           viewReady: false,
           eventWarningCount: 0,
-          canUseIngress: false,
           useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),
@@ -371,7 +345,7 @@ class KubernetesResourcePoolController {
 
         const name = this.$state.params.id;
 
-        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get('', { getQuota: true })]);
+        const [nodes, pool] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get(name)]);
 
         this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
@@ -379,7 +353,7 @@ class KubernetesResourcePoolController {
           this.initialIngressControllers = structuredClone(this.ingressControllers);
         }
 
-        this.pool = _.find(pools, { Namespace: { Name: name } });
+        this.pool = pool;
         this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
@@ -406,17 +380,6 @@ class KubernetesResourcePoolController {
 
         await this.getEvents();
         await this.getApplications();
-
-        if (this.state.canUseIngress) {
-          await this.getIngresses();
-          const ingressClasses = this.endpoint.Kubernetes.Configuration.IngressClasses;
-          this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
-          _.forEach(this.formValues.IngressClasses, (ic) => {
-            if (ic.Hosts.length === 0) {
-              ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
-            }
-          });
-        }
 
         await this.getRegistries();
 

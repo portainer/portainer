@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/upgrade"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -18,21 +17,18 @@ type Handler struct {
 	*mux.Router
 	status         *portainer.Status
 	dataStore      dataservices.DataStore
-	demoService    *demo.Service
 	upgradeService upgrade.Service
 }
 
 // NewHandler creates a handler to manage status operations.
 func NewHandler(bouncer security.BouncerService,
 	status *portainer.Status,
-	demoService *demo.Service,
 	dataStore dataservices.DataStore,
 	upgradeService upgrade.Service) *Handler {
 
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		dataStore:      dataStore,
-		demoService:    demoService,
 		status:         status,
 		upgradeService: upgradeService,
 	}

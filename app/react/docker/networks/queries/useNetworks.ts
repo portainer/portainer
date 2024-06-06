@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -54,6 +54,6 @@ export async function getNetworks(
               network.Attachable === true)
         );
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve networks');
+    throw parseAxiosError(err, 'Unable to retrieve networks');
   }
 }

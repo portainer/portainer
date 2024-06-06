@@ -5,7 +5,7 @@ import {
   QueryClient,
   QueryKey,
   QueryOptions,
-} from 'react-query';
+} from '@tanstack/react-query';
 
 import { notifyError } from '@/portainer/services/notifications';
 
@@ -76,6 +76,11 @@ function mergeOptions<T>(options: T[]) {
 
 export function createQueryClient() {
   return new QueryClient({
+    defaultOptions: {
+      queries: {
+        networkMode: 'offlineFirst',
+      },
+    },
     mutationCache: new MutationCache({
       onError: (error, variable, context, mutation) => {
         handleError(error, mutation.meta?.error);

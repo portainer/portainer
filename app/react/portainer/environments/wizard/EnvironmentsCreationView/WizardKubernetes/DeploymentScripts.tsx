@@ -110,7 +110,9 @@ function DeployCode({
       )}
       <Code>{code}</Code>
       <div className="mt-2">
-        <CopyButton copyText={code}>Copy command</CopyButton>
+        <CopyButton copyText={code} data-cy="copy-deploy-agent-command-button">
+          Copy command
+        </CopyButton>
       </div>
     </>
   );

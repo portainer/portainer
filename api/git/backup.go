@@ -38,7 +38,7 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 		}
 	}
 
-	err = filesystem.MoveDirectory(options.ProjectPath, backupProjectPath)
+	err = filesystem.MoveDirectory(options.ProjectPath, backupProjectPath, true)
 	if err != nil {
 		return cleanFn, errors.WithMessage(err, "Unable to move git repository directory")
 	}
@@ -48,7 +48,7 @@ func CloneWithBackup(gitService portainer.GitService, fileService portainer.File
 	err = gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password, options.TLSSkipVerify)
 	if err != nil {
 		cleanUp = false
-		restoreError := filesystem.MoveDirectory(backupProjectPath, options.ProjectPath)
+		restoreError := filesystem.MoveDirectory(backupProjectPath, options.ProjectPath, false)
 		if restoreError != nil {
 			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
 		}

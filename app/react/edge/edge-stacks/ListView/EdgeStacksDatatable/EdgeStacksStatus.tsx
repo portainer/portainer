@@ -84,6 +84,16 @@ function getStatus(
     };
   }
 
+  const allCompleted = envStatus.every((s) => s.Type === StatusType.Completed);
+
+  if (allCompleted) {
+    return {
+      label: 'Completed',
+      icon: CheckCircle,
+      mode: 'success',
+    };
+  }
+
   const allRunning = envStatus.every(
     (s) =>
       s.Type === StatusType.Running ||

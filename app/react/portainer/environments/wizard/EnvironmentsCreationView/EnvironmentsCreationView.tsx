@@ -33,7 +33,7 @@ import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
   const {
-    params: { localEndpointId: localEndpointIdParam },
+    params: { localEndpointId: localEndpointIdParam, referrer },
   } = useCurrentStateAndParams();
 
   const [environmentIds, setEnvironmentIds] = useState<EnvironmentId[]>(() => {
@@ -93,10 +93,17 @@ export function EnvironmentCreationView() {
                     'flex justify-between'
                   )}
                 >
-                  <Button disabled={isFirstStep} onClick={onPreviousClick}>
+                  <Button
+                    disabled={isFirstStep}
+                    onClick={onPreviousClick}
+                    data-cy="environment-wizard-previous-button"
+                  >
                     <Icon icon={ArrowLeft} /> Previous
                   </Button>
-                  <Button onClick={onNextClick}>
+                  <Button
+                    onClick={onNextClick}
+                    data-cy="environment-wizard-next-button"
+                  >
                     {isLastStep ? 'Close' : 'Next'}
                     <Icon icon={ArrowRight} />
                   </Button>
@@ -130,8 +137,7 @@ export function EnvironmentCreationView() {
         ])
       ),
     });
-    if (localStorage.getItem('wizardReferrer') === 'environments') {
-      localStorage.removeItem('wizardReferrer');
+    if (referrer === 'environments') {
       router.stateService.go('portainer.endpoints');
       return;
     }

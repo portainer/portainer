@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -26,15 +25,14 @@ type Handler struct {
 	JWTService      portainer.JWTService
 	LDAPService     portainer.LDAPService
 	SnapshotService portainer.SnapshotService
-	demoService     *demo.Service
 }
 
 // NewHandler creates a handler to manage settings operations.
-func NewHandler(bouncer security.BouncerService, demoService *demo.Service) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
-		Router:      mux.NewRouter(),
-		demoService: demoService,
+		Router: mux.NewRouter(),
 	}
+
 	h.Handle("/settings",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
 	h.Handle("/settings",

@@ -11,6 +11,7 @@ interface Props extends AutomationTestingProps {
   loadingText: string;
   isLoading: boolean;
   isValid: boolean;
+  errors?: unknown;
 }
 
 export function FormActions({
@@ -19,23 +20,32 @@ export function FormActions({
   isLoading,
   children,
   isValid,
+  errors,
   'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
     <FormSection title="Actions">
       <div className="form-group">
         <div className="col-sm-12">
-          <LoadingButton
-            className="!ml-0"
-            loadingText={loadingText}
-            isLoading={isLoading}
-            disabled={!isValid}
-            data-cy={dataCy}
-          >
-            {submitLabel}
-          </LoadingButton>
+          <div className="flex item-center gap-3">
+            <LoadingButton
+              className="!ml-0"
+              loadingText={loadingText}
+              isLoading={isLoading}
+              disabled={!isValid}
+              data-cy={dataCy}
+            >
+              {submitLabel}
+            </LoadingButton>
 
-          {children}
+            {!isValid && (
+              <div className="hidden" data-cy="errors">
+                {JSON.stringify(errors)}
+              </div>
+            )}
+
+            {children}
+          </div>
         </div>
       </div>
     </FormSection>

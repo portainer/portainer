@@ -1,4 +1,4 @@
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { Pod } from 'kubernetes-types/core/v1';
 
@@ -7,7 +7,7 @@ import { useStackFile } from '@/react/common/stacks/stack.service';
 import { useNamespaceQuery } from '@/react/kubernetes/namespaces/queries/useNamespaceQuery';
 
 import { Widget, WidgetBody } from '@@/Widget';
-import { Button } from '@@/buttons';
+import { AddButton, Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 
@@ -27,6 +27,7 @@ import { ApplicationAutoScalingTable } from './ApplicationAutoScalingTable';
 import { ApplicationEnvVarsTable } from './ApplicationEnvVarsTable';
 import { ApplicationVolumeConfigsTable } from './ApplicationVolumeConfigsTable';
 import { ApplicationPersistentDataTable } from './ApplicationPersistentDataTable';
+import { PlacementsTable } from './PlacementsTable';
 
 export function ApplicationDetailsWidget() {
   const stateAndParams = useCurrentStateAndParams();
@@ -67,7 +68,10 @@ export function ApplicationDetailsWidget() {
             {!isSystemNamespace && (
               <div className="mb-4 flex flex-wrap gap-2">
                 <Authorized authorizations="K8sApplicationDetailsW">
-                  <Link to="kubernetes.applications.application.edit">
+                  <Link
+                    to="kubernetes.applications.application.edit"
+                    data-cy="k8sAppDetail-editAppLink"
+                  >
                     <Button
                       type="button"
                       color="light"
@@ -102,23 +106,15 @@ export function ApplicationDetailsWidget() {
                   />
                 )}
                 {appStackFileQuery.data && (
-                  <Link
+                  <AddButton
                     to="kubernetes.templates.custom.new"
+                    data-cy="k8sAppDetail-createCustomTemplateButton"
                     params={{
                       fileContent: appStackFileQuery.data.StackFileContent,
                     }}
                   >
-                    <Button
-                      type="button"
-                      color="primary"
-                      size="small"
-                      className="hover:decoration-none !ml-0"
-                      data-cy="k8sAppDetail-createCustomTemplateButton"
-                    >
-                      <Icon icon={Plus} className="mr-1" />
-                      Create template from application
-                    </Button>
-                  </Link>
+                    Create template from application
+                  </AddButton>
                 )}
               </div>
             )}
@@ -145,6 +141,7 @@ export function ApplicationDetailsWidget() {
               appName={name}
               app={app}
             />
+            {!externalApp && <PlacementsTable app={app} />}
           </WidgetBody>
         </Widget>
       </div>

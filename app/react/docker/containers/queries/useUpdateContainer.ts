@@ -1,10 +1,10 @@
 import { Resources, RestartPolicy } from 'docker-types/generated/1.41';
-import { RawAxiosRequestHeaders } from 'axios';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { urlBuilder } from '../containers.service';
+import { addNodeHeader } from '../../proxy/addNodeHeader';
 
 /**
  * UpdateConfig holds the mutable attributes of a Container.
@@ -22,11 +22,7 @@ export async function updateContainer(
   config: UpdateConfig,
   { nodeName }: { nodeName?: string } = {}
 ) {
-  const headers: RawAxiosRequestHeaders = {};
-
-  if (nodeName) {
-    headers['X-PortainerAgent-Target'] = nodeName;
-  }
+  const headers = addNodeHeader(nodeName);
 
   try {
     await axios.post<{ Warnings: string[] }>(

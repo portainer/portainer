@@ -1,15 +1,19 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
+import { StackType } from '@/react/common/stacks/types';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 
-import { useViewType } from '../useViewType';
+import { TemplateViewType, useViewType } from '../useViewType';
 
 import { CreateForm } from './CreateForm';
 
 export function CreateView() {
   const viewType = useViewType();
   const environmentId = useEnvironmentId(false);
+  const isSwarm = useIsSwarm(environmentId, { enabled: viewType === 'docker' });
+  const defaultType = getDefaultType(viewType, isSwarm);
 
   return (
     <div>
@@ -25,11 +29,29 @@ export function CreateView() {
         <div className="col-sm-12">
           <Widget>
             <Widget.Body>
-              <CreateForm viewType={viewType} environmentId={environmentId} />
+              <CreateForm
+                viewType={viewType}
+                environmentId={environmentId}
+                defaultType={defaultType}
+              />
             </Widget.Body>
           </Widget>
         </div>
       </div>
     </div>
   );
+}
+
+function getDefaultType(
+  viewType: TemplateViewType,
+  isSwarm: boolean
+): StackType {
+  switch (viewType) {
+    case 'docker':
+      return isSwarm ? StackType.DockerSwarm : StackType.DockerCompose;
+    case 'kube':
+      return StackType.Kubernetes;
+    default:
+      return StackType.DockerCompose;
+  }
 }

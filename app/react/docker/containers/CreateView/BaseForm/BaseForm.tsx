@@ -11,9 +11,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
-import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
-import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { ImageConfigFieldset, ImageConfigValues } from '@@/ImageConfigFieldset';
 import { LoadingButton } from '@@/buttons';
@@ -23,6 +21,7 @@ import {
   PortsMappingField,
   Values as PortMappingValue,
 } from './PortsMappingField';
+import { NameField } from './NameField';
 
 export interface Values {
   name: string;
@@ -74,18 +73,14 @@ export function BaseForm({
   return (
     <Widget>
       <Widget.Body>
-        <FormControl label="Name" inputId="name-input" errors={errors?.name}>
-          <Input
-            id="name-input"
-            value={values.name}
-            onChange={(e) => {
-              const name = e.target.value;
-              onChangeName(name);
-              setFieldValue('name', name);
-            }}
-            placeholder="e.g. myContainer"
-          />
-        </FormControl>
+        <NameField
+          value={values.name}
+          onChange={(name) => {
+            setFieldValue('name', name);
+            onChangeName(name);
+          }}
+          error={errors?.name}
+        />
 
         <FormSection title="Image Configuration">
           <ImageConfigFieldset
@@ -108,6 +103,7 @@ export function BaseForm({
                     setFieldValue('alwaysPull', alwaysPull)
                   }
                   labelClass="col-sm-3 col-lg-2"
+                  data-cy="always-pull-switch"
                 />
               </div>
             </div>
@@ -121,6 +117,7 @@ export function BaseForm({
                 <div className="col-sm-12">
                   <SwitchField
                     label="Create a container webhook"
+                    data-cy="container-webhook-switch"
                     tooltip="Create a webhook (or callback URI) to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
                     checked={values.enableWebhook}
                     onChange={(enableWebhook) =>
@@ -140,6 +137,7 @@ export function BaseForm({
             <div className="col-sm-12">
               <SwitchField
                 label="Publish all exposed ports to random host ports"
+                data-cy="publish-all-ports-switch"
                 tooltip="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."
                 checked={values.publishAllPorts}
                 onChange={(publishAllPorts) =>
@@ -179,6 +177,7 @@ export function BaseForm({
           <div className="col-sm-12">
             <SwitchField
               label="Auto remove"
+              data-cy="container-auto-remove-switch"
               tooltip="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
               checked={values.autoRemove}
               onChange={(autoRemove) => setFieldValue('autoRemove', autoRemove)}
@@ -191,6 +190,7 @@ export function BaseForm({
           <div className="col-sm-12">
             <LoadingButton
               loadingText="Deployment in progress..."
+              data-cy="deploy-container-button"
               isLoading={isLoading}
               disabled={!isValid}
             >

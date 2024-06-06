@@ -1,23 +1,33 @@
 import { useMemo } from 'react';
-import { Lock, Plus, Trash2 } from 'lucide-react';
-import { Secret } from 'kubernetes-types/core/v1';
+import { Lock } from 'lucide-react';
+import { Pod, Secret } from 'kubernetes-types/core/v1';
+import { CronJob, Job } from 'kubernetes-types/batch/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
-import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
-import { Application } from '@/react/kubernetes/applications/types';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { usePods } from '@/react/kubernetes/applications/usePods';
+import { useJobs } from '@/react/kubernetes/applications/useJobs';
+import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
-import { useTableState } from '@@/datatables/useTableState';
+import { AddButton } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import {
   useSecretsForCluster,
@@ -30,17 +40,26 @@ import { SecretRowData } from './types';
 import { columns } from './columns';
 
 const storageKey = 'k8sSecretsDatatable';
-const settingsStore = createStore(storageKey);
+
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function SecretsDatatable() {
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
+  const environmentId = useEnvironmentId();
   const { authorized: canWrite } = useAuthorizations(['K8sSecretsW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
 
-  const environmentId = useEnvironmentId();
   const { data: namespaces, ...namespacesQuery } = useNamespacesQuery(
     environmentId,
     {
@@ -55,10 +74,11 @@ export function SecretsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
-    environmentId,
-    namespaceNames
-  );
+  const podsQuery = usePods(environmentId, namespaceNames);
+  const jobsQuery = useJobs(environmentId, namespaceNames);
+  const cronJobsQuery = useCronJobs(environmentId, namespaceNames);
+  const isInUseLoading =
+    podsQuery.isLoading || jobsQuery.isLoading || cronJobsQuery.isLoading;
 
   const filteredSecrets = useMemo(
     () =>
@@ -71,8 +91,10 @@ export function SecretsDatatable() {
   );
   const secretRowData = useSecretRowData(
     filteredSecrets,
-    applications ?? [],
-    applicationsQuery.isLoading,
+    podsQuery.data ?? [],
+    jobsQuery.data ?? [],
+    cronJobsQuery.data ?? [],
+    isInUseLoading,
     namespaces
   );
 
@@ -82,7 +104,6 @@ export function SecretsDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={secretsQuery.isLoading || namespacesQuery.isLoading}
-      emptyContentLabel="No secrets found"
       title="Secrets"
       titleIcon={Lock}
       getRowId={(row) => row.metadata?.uid ?? ''}
@@ -103,6 +124,10 @@ export function SecretsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-secrets-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
     />
   );
 }
@@ -111,8 +136,10 @@ export function SecretsDatatable() {
 // and wraps with useMemo to prevent unnecessary calculations
 function useSecretRowData(
   secrets: Secret[],
-  applications: Application[],
-  applicationsLoading: boolean,
+  pods: Pod[],
+  jobs: Job[],
+  cronJobs: CronJob[],
+  isInUseLoading: boolean,
   namespaces?: Namespaces
 ): SecretRowData[] {
   return useMemo(
@@ -121,12 +148,12 @@ function useSecretRowData(
         ...secret,
         inUse:
           // if the apps are loading, set inUse to true to hide the 'unused' badge
-          applicationsLoading || getIsSecretInUse(secret, applications),
+          isInUseLoading || getIsSecretInUse(secret, pods, jobs, cronJobs),
         isSystem: namespaces
           ? namespaces?.[secret.metadata?.namespace ?? '']?.IsSystem
           : false,
       })),
-    [secrets, applicationsLoading, applications, namespaces]
+    [secrets, isInUseLoading, pods, jobs, cronJobs, namespaces]
   );
 }
 
@@ -135,16 +162,6 @@ function TableActions({ selectedItems }: { selectedItems: SecretRowData[] }) {
   const deleteSecretMutation = useMutationDeleteSecrets(environmentId);
 
   async function handleRemoveClick(secrets: SecretRowData[]) {
-    const confirmed = await confirmDelete(
-      `Are you sure you want to remove the selected ${pluralize(
-        secrets.length,
-        'secret'
-      )}?`
-    );
-    if (!confirmed) {
-      return;
-    }
-
     const secretsToDelete = secrets.map((secret) => ({
       namespace: secret.metadata?.namespace ?? '',
       name: secret.metadata?.name ?? '',
@@ -155,41 +172,28 @@ function TableActions({ selectedItems }: { selectedItems: SecretRowData[] }) {
 
   return (
     <Authorized authorizations="K8sSecretsW">
-      <Button
-        className="btn-wrapper"
-        color="dangerlight"
+      <DeleteButton
         disabled={selectedItems.length === 0}
-        onClick={async () => {
-          handleRemoveClick(selectedItems);
-        }}
-        icon={Trash2}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
         data-cy="k8sSecret-removeSecretButton"
+        confirmMessage={`Are you sure you want to remove the selected ${pluralize(
+          selectedItems.length,
+          'secret'
+        )}?`}
+      />
+      <AddButton
+        to="kubernetes.secrets.new"
+        data-cy="k8sSecret-addSecretWithFormButton"
+        color="secondary"
       >
-        Remove
-      </Button>
-      <Link to="kubernetes.secrets.new" className="ml-1">
-        <Button
-          className="btn-wrapper"
-          color="secondary"
-          icon={Plus}
-          data-cy="k8sSecret-addSecretWithFormButton"
-        >
-          Add with form
-        </Button>
-      </Link>
-      <Link
-        to="kubernetes.deploy"
+        Add with form
+      </AddButton>
+      <CreateFromManifestButton
         params={{
-          referrer: 'kubernetes.configurations',
           tab: 'secrets',
         }}
-        className="ml-1"
         data-cy="k8sSecret-deployFromManifestButton"
-      >
-        <Button className="btn-wrapper" color="primary" icon={Plus}>
-          Create from manifest
-        </Button>
-      </Link>
+      />
     </Authorized>
   );
 }

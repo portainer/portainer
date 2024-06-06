@@ -1,7 +1,7 @@
 import { FormikErrors } from 'formik';
 import { MultiValue } from 'react-select';
 
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 

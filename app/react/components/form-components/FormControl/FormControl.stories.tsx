@@ -42,6 +42,7 @@ function TextField({
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        data-cy="input"
       />
     </FormControl>
   );
@@ -79,6 +80,7 @@ function SelectField({
     >
       <Select
         className="form-control"
+        data-cy="select"
         value={value}
         onChange={(e) => setValue(parseInt(e.target.value, 10))}
         options={options}

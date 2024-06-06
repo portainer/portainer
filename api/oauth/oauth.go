@@ -172,8 +172,9 @@ func getResource(token string, configuration *portainer.OAuthSettings) (map[stri
 
 func buildConfig(configuration *portainer.OAuthSettings) *oauth2.Config {
 	endpoint := oauth2.Endpoint{
-		AuthURL:  configuration.AuthorizationURI,
-		TokenURL: configuration.AccessTokenURI,
+		AuthURL:   configuration.AuthorizationURI,
+		TokenURL:  configuration.AccessTokenURI,
+		AuthStyle: configuration.AuthStyle,
 	}
 
 	return &oauth2.Config{

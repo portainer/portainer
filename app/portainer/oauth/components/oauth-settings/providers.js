@@ -1,4 +1,5 @@
 import { baseHref } from '@/portainer/helpers/pathHelper';
+import { OAuthStyle } from '@/react/portainer/settings/types';
 
 export default {
   microsoft: {
@@ -8,6 +9,7 @@ export default {
     logoutUrl: `https://login.microsoftonline.com/TENANT_ID/oauth2/v2.0/logout`,
     userIdentifier: 'userPrincipalName',
     scopes: 'profile openid',
+    authStyle: OAuthStyle.InParams,
   },
   google: {
     authUrl: 'https://accounts.google.com/o/oauth2/auth',
@@ -16,6 +18,7 @@ export default {
     logoutUrl: `https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=${window.location.origin}${baseHref()}#!/auth`,
     userIdentifier: 'email',
     scopes: 'profile email',
+    authStyle: OAuthStyle.InParams,
   },
   github: {
     authUrl: 'https://github.com/login/oauth/authorize',
@@ -24,8 +27,9 @@ export default {
     logoutUrl: `https://github.com/logout`,
     userIdentifier: 'login',
     scopes: 'id email name',
+    authStyle: OAuthStyle.AutoDetect,
   },
-  custom: { authUrl: '', accessTokenUrl: '', resourceUrl: '', logoutUrl: '', userIdentifier: '', scopes: '' },
+  custom: { authUrl: '', accessTokenUrl: '', resourceUrl: '', logoutUrl: '', userIdentifier: '', scopes: '', authStyle: OAuthStyle.AutoDetect },
 };
 
 export function getProviderByUrl(providerAuthURL = '') {

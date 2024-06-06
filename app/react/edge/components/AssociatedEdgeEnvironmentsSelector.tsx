@@ -1,16 +1,21 @@
 import { EdgeTypes, EnvironmentId } from '@/react/portainer/environments/types';
 
+import { FormError } from '@@/form-components/FormError';
+import { ArrayError } from '@@/form-components/InputList/InputList';
+
 import { EdgeGroupAssociationTable } from './EdgeGroupAssociationTable';
 
 export function AssociatedEdgeEnvironmentsSelector({
   onChange,
   value,
+  error,
 }: {
   onChange: (
     value: EnvironmentId[],
     meta: { type: 'add' | 'remove'; value: EnvironmentId }
   ) => void;
   value: EnvironmentId[];
+  error?: ArrayError<Array<EnvironmentId>>;
 }) {
   return (
     <>
@@ -20,12 +25,19 @@ export function AssociatedEdgeEnvironmentsSelector({
         environment entry to move it from one table to the other.
       </div>
 
+      {error && (
+        <div className="col-sm-12">
+          <FormError>
+            {typeof error === 'string' ? error : error.join(', ')}
+          </FormError>
+        </div>
+      )}
+
       <div className="col-sm-12 mt-4">
         <div className="flex">
           <div className="w-1/2">
             <EdgeGroupAssociationTable
               title="Available environments"
-              emptyContentLabel="No environment available"
               query={{
                 types: EdgeTypes,
                 excludeIds: value,
@@ -41,7 +53,6 @@ export function AssociatedEdgeEnvironmentsSelector({
           <div className="w-1/2">
             <EdgeGroupAssociationTable
               title="Associated environments"
-              emptyContentLabel="No associated environment'"
               query={{
                 types: EdgeTypes,
                 endpointIds: value,
@@ -54,6 +65,7 @@ export function AssociatedEdgeEnvironmentsSelector({
                   );
                 }
               }}
+              data-cy="edgeGroupCreate-associatedEndpointsTable"
             />
           </div>
         </div>

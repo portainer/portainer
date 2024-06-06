@@ -21,6 +21,7 @@ export function OverridableInput({
       <InputGroup.ButtonWrapper>
         <Button
           color="light"
+          data-cy={`docker-container-default-${id}`}
           size="medium"
           className={clsx('!ml-0', { active: !override })}
           onClick={() => onChange(null)}
@@ -29,6 +30,7 @@ export function OverridableInput({
         </Button>
         <Button
           color="light"
+          data-cy={`docker-container-override-${id}`}
           size="medium"
           className={clsx({ active: override })}
           onClick={() => onChange('')}
@@ -38,6 +40,7 @@ export function OverridableInput({
       </InputGroup.ButtonWrapper>
       <InputGroup.Input
         disabled={!override}
+        data-cy={`docker-container-input-${id}`}
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         id={id}

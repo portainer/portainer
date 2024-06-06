@@ -1,10 +1,8 @@
-import { ExternalLink } from 'lucide-react';
 import { CellContext } from '@tanstack/react-table';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
-
-import { Icon } from '@@/Icon';
+import { PublishedPortLink } from '@/react/docker/components/ImageStatus/PublishedPortLink';
 
 import { columnHelper } from './helper';
 
@@ -36,20 +34,13 @@ function Cell({
     return '-';
   }
 
-  const { PublicURL: publicUrl } = environmentQuery.data;
-
   return ports
     .filter((port) => port.PublishedPort)
     .map((port) => (
-      <a
-        key={`${publicUrl}:${port.PublishedPort}`}
-        className="image-tag vertical-center"
-        href={`http://${publicUrl}:${port.PublishedPort}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <Icon icon={ExternalLink} />
-        {port.PublishedPort}:{port.TargetPort}
-      </a>
+      <PublishedPortLink
+        hostPort={port.PublishedPort}
+        containerPort={port.TargetPort}
+        hostURL={environmentQuery.data.PublicURL}
+      />
     ));
 }

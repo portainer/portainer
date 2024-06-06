@@ -48,17 +48,5 @@
     </rd-widget>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <strings-datatable
-      title-text="Access"
-      title-icon="user-x"
-      table-key="access_registry_resourcepools"
-      dataset="$ctrl.savedResourcePools"
-      empty-dataset-message="No namespace has been authorized yet."
-      on-remove="($ctrl.handleRemove)"
-      column-header="Namespace"
-    >
-    </strings-datatable>
-  </div>
-</div>
+
+<kube-registry-access-table dataset="$ctrl.savedResourcePools" on-remove="($ctrl.handleRemove)"></kube-registry-access-table>

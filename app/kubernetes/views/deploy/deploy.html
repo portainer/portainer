@@ -33,7 +33,7 @@
                   </label>
                   <div class="col-sm-8 vertical-center pt-3">
                     <label class="switch">
-                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" data-cy="use-namespce-from-menifest" />
                       <span class="slider round"></span>
                     </label>
                   </div>
@@ -44,6 +44,7 @@
                   <div class="col-sm-8">
                     <select
                       ng-if="!ctrl.formValues.namespace_toggle || ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                      data-cy="namespace-select"
                       ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"
@@ -71,6 +72,7 @@
                   <div class="col-sm-8" ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
                     <input
                       type="text"
+                      data-cy="name-input"
                       class="form-control"
                       ng-model="ctrl.formValues.Name"
                       id="name"
@@ -87,7 +89,7 @@
                 </div>
 
                 <div ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
-                  <div class="w-fit mb-4">
+                  <div class="mb-4 w-fit">
                     <stack-name-label-insight></stack-name-label-insight>
                   </div>
                   <kube-stack-name stack-name="ctrl.formValues.StackName" set-stack-name="(ctrl.setStackName)" stacks="ctrl.stacks"></kube-stack-name>
@@ -175,11 +177,11 @@
                     <div class="col-sm-8">
                       <input
                         type="text"
+                        data-cy="k8sAppDeploy-urlFileUrl"
                         class="form-control"
                         ng-model="ctrl.formValues.ManifestURL"
                         id="manifest_url"
                         placeholder="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/controllers/nginx-deployment.yaml"
-                        data-cy="k8sAppDeploy-urlFileUrl"
                       />
                     </div>
                   </div>

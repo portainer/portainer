@@ -13,7 +13,9 @@ interface Props {
 export function ListView({ endpoint: environment }: Props) {
   const isAgent = isAgentEnvironment(environment.Type);
 
-  const envInfoQuery = useInfo(environment.Id, (info) => !!info.Swarm?.NodeID);
+  const envInfoQuery = useInfo(environment.Id, {
+    select: (info) => !!info.Swarm?.NodeID,
+  });
 
   const isSwarmManager = !!envInfoQuery.data;
   const isHostColumnVisible = isAgent && isSwarmManager;

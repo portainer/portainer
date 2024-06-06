@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Briefcase } from 'lucide-react';
 
@@ -11,32 +11,39 @@ import { Icon } from '@@/Icon';
 import { getFeatureDetails } from './utils';
 
 export interface Props {
-  featureId?: FeatureId;
+  featureId: FeatureId;
   showIcon?: boolean;
   className?: string;
+  children?: (isLimited: boolean) => ReactNode;
 }
 
 export function BEFeatureIndicator({
   featureId,
-  children,
+  children = () => null,
   showIcon = true,
   className = '',
-}: PropsWithChildren<Props>) {
-  const { url, limitedToBE } = getFeatureDetails(featureId);
+}: Props) {
+  const { url, limitedToBE = false } = getFeatureDetails(featureId);
 
-  if (!limitedToBE) {
-    return null;
-  }
   return (
-    <a
-      className={clsx('be-indicator vertical-center text-xs', className)}
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-      {showIcon && <Icon icon={Briefcase} className="be-indicator-icon mr-1" />}
-      <span className="be-indicator-label break-words">Business Feature</span>
-    </a>
+    <>
+      {limitedToBE && (
+        <a
+          className={clsx('be-indicator vertical-center text-xs', className)}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {showIcon && (
+            <Icon icon={Briefcase} className="be-indicator-icon mr-1" />
+          )}
+          <span className="be-indicator-label break-words">
+            Business Feature
+          </span>
+        </a>
+      )}
+
+      {children(limitedToBE)}
+    </>
   );
 }

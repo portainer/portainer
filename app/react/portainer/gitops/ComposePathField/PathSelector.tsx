@@ -50,6 +50,7 @@ export function PathSelector({
       placeholder={placeholder}
       readOnly={readOnly}
       inputId={inputId}
+      data-cy="git-ops-path-selector"
     />
   );
 }

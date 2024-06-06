@@ -38,8 +38,13 @@ export function PageInput({ onChange, totalPages }: Props) {
         step={1}
         onChange={handleChange}
         onKeyPress={preventNotNumber}
+        data-cy="pagination-go-to-page-input"
       />
-      <Button type="submit" disabled={!isValid}>
+      <Button
+        type="submit"
+        disabled={!isValid}
+        data-cy="pagination-go-to-page-button"
+      >
         Go
       </Button>
     </form>

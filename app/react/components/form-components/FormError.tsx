@@ -9,6 +9,10 @@ interface Props {
 }
 
 export function FormError({ children, className }: PropsWithChildren<Props>) {
+  if (!children) {
+    return null;
+  }
+
   return (
     <div
       className={clsx(

@@ -1,11 +1,4 @@
-import {
-  ChevronDown,
-  Download,
-  List,
-  Plus,
-  Trash2,
-  Upload,
-} from 'lucide-react';
+import { ChevronDown, Download, List, Trash2, Upload } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuPopover } from '@reach/menu-button';
 import { positionRight } from '@reach/popover';
 import { useMemo } from 'react';
@@ -17,14 +10,18 @@ import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
   BasicTableSettings,
   createPersistedStore,
+  FilteredColumnsTableSettings,
+  filteredColumnsSettings,
   refreshableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
-import { Button, ButtonGroup, LoadingButton } from '@@/buttons';
+import { AddButton, Button, ButtonGroup, LoadingButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { ButtonWithRef } from '@@/buttons/Button';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { ImagesListResponse, useImages } from '../../queries/useImages';
 
@@ -35,13 +32,15 @@ const tableKey = 'images';
 
 export interface TableSettings
   extends BasicTableSettings,
-    RefreshableTableSettings {}
+    RefreshableTableSettings,
+    FilteredColumnsTableSettings {}
 
 const settingsStore = createPersistedStore<TableSettings>(
   tableKey,
   'tags',
   (set) => ({
     ...refreshableSettings(set),
+    ...filteredColumnsSettings(set),
   })
 );
 
@@ -71,6 +70,10 @@ export function ImagesDatatable({
     <Datatable
       title="Images"
       titleIcon={List}
+      data-cy="docker-images-datatable"
+      extendTableOptions={mergeOptions(
+        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
+      )}
       renderTableActions={(selectedItems) => (
         <div className="flex items-center gap-2">
           <RemoveButtonMenu selectedItems={selectedItems} onRemove={onRemove} />
@@ -82,14 +85,12 @@ export function ImagesDatatable({
           />
 
           <Authorized authorizations="DockerImageBuild">
-            <Button
-              as={Link}
-              props={{ to: 'docker.images.build' }}
+            <AddButton
+              to="docker.images.build"
               data-cy="image-buildImageButton"
-              icon={Plus}
             >
               Build a new image
-            </Button>
+            </AddButton>
           </Authorized>
         </div>
       )}
@@ -97,7 +98,6 @@ export function ImagesDatatable({
       isLoading={imagesQuery.isLoading}
       settingsManager={tableState}
       columns={columns}
-      emptyContentLabel="No images found"
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
@@ -139,6 +139,7 @@ function RemoveButtonMenu({
             color="dangerlight"
             disabled={selectedItems.length === 0}
             icon={ChevronDown}
+            data-cy="image-toggleRemoveButtonMenu"
           >
             <span className="sr-only">Toggle Dropdown</span>
           </MenuButton>
@@ -178,7 +179,10 @@ function ImportExportButtons({
           data-cy="image-importImageButton"
           icon={Upload}
           disabled={isExportInProgress}
-          props={{ to: 'docker.images.import' }}
+          props={{
+            to: 'docker.images.import',
+            'data-cy': 'image-importImageLink',
+          }}
         >
           Import
         </Button>

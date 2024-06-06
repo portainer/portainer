@@ -3,7 +3,7 @@ import { MultiValue } from 'react-select';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
@@ -83,10 +83,10 @@ export function NamespaceInnerForm({
             onChange={(classes) => setFieldValue('ingressClasses', classes)}
             values={values.ingressClasses}
             description="Enable the ingress controllers that users can select when publishing applications in this namespace."
-            noIngressControllerLabel="No ingress controllers available in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster."
             view="namespace"
             isLoading={ingressClassesQuery.isLoading}
             initialValues={initialValues.ingressClasses}
+            noIngressControllerLabel="No ingress controllers available in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster."
           />
         </FormSection>
       )}

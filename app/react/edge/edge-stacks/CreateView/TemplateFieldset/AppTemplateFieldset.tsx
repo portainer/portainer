@@ -1,27 +1,37 @@
 import { FormikErrors } from 'formik';
 
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
-
-import { EnvVarsFieldset } from './EnvVarsFieldset';
-import { TemplateNote } from './TemplateNote';
+import { useAppTemplate } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
+import { TemplateNote } from '@/react/portainer/templates/components/TemplateNote';
+import {
+  EnvVarsFieldset,
+  EnvVarsValue,
+} from '@/react/portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
 
 export function AppTemplateFieldset({
-  template,
+  templateId,
   values,
   onChange,
   errors,
 }: {
-  template: TemplateViewModel;
-  values: Record<string, string>;
-  onChange: (value: Record<string, string>) => void;
-  errors?: FormikErrors<Record<string, string>>;
+  templateId: TemplateViewModel['Id'];
+  values: EnvVarsValue;
+  onChange: (value: EnvVarsValue) => void;
+  errors?: FormikErrors<EnvVarsValue>;
 }) {
+  const templateQuery = useAppTemplate(templateId);
+  if (!templateQuery.data) {
+    return null;
+  }
+
+  const template = templateQuery.data;
+
   return (
     <>
       <TemplateNote note={template.Note} />
       <EnvVarsFieldset
         options={template.Env || []}
-        value={values}
+        values={values}
         onChange={onChange}
         errors={errors}
       />
