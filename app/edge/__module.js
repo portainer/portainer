@@ -109,7 +109,7 @@ angular
       url: '/:id?tab',
       views: {
         'content@': {
-          component: 'endJobsItemView',
+          component: 'edgeJobsItemView',
         },
       },
     };
