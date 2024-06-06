@@ -1,6 +1,5 @@
 import { Form, Formik, useFormikContext } from 'formik';
 import { useRouter } from '@uirouter/react';
-import moment from 'moment';
 
 import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 import { AssociatedEdgeEnvironmentsSelector } from '@/react/edge/components/AssociatedEdgeEnvironmentsSelector';
@@ -14,15 +13,19 @@ import { WebEditorForm } from '@@/WebEditorForm';
 import { FileUploadForm } from '@@/form-components/FileUpload';
 
 import { NameField } from '../components/EdgeJobForm/NameField';
-import { FormValues } from '../components/EdgeJobForm/types';
-import { useValidation } from '../components/EdgeJobForm/useValidation';
 import { JobConfigurationFieldset } from '../components/EdgeJobForm/JobConfigurationFieldset';
 import {
   BasePayload,
   CreateEdgeJobPayload,
   useCreateEdgeJobMutation,
 } from '../queries/useCreateEdgeJobMutation/useCreateEdgeJobMutation';
-import { defaultCronExpression } from '../components/EdgeJobForm/RecurringFieldset';
+import {
+  toRecurringRequest,
+  toRecurringViewModel,
+} from '../components/EdgeJobForm/parseRecurringValues';
+
+import { FormValues } from './types';
+import { useValidation } from './useValidation';
 
 export function CreateEdgeJobForm() {
   const mutation = useCreateEdgeJobMutation();
@@ -35,16 +38,12 @@ export function CreateEdgeJobForm() {
       validateOnMount
       initialValues={{
         name: '',
-        recurring: false,
-        cronExpression: '',
-        recurringOption: defaultCronExpression,
         method: 'editor',
-        cronMethod: 'basic',
-        dateTime: new Date(),
         edgeGroupIds: [],
         environmentIds: [],
         file: undefined,
         fileContent: '',
+        ...toRecurringViewModel(),
       }}
       onSubmit={(values) => {
         mutation.mutate(getPayload(values.method, values), {
@@ -122,6 +121,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         isValid={isValid}
         data-cy="edgeJobCreate-addJobButton"
         loadingText="In progress..."
+        errors={errors}
       />
     </Form>
   );
@@ -162,42 +162,7 @@ function getPayload(
       name: values.name,
       edgeGroups: values.edgeGroupIds,
       endpoints: values.environmentIds,
-      ...getRecurringConfig(values),
+      ...toRecurringRequest(values),
     };
-  }
-
-  function getRecurringConfig(values: FormValues): {
-    recurring: boolean;
-    cronExpression: string;
-  } {
-    if (values.cronMethod !== 'basic') {
-      return {
-        recurring: true,
-        cronExpression: values.cronExpression,
-      };
-    }
-
-    if (values.recurring) {
-      return {
-        recurring: true,
-        cronExpression: values.recurringOption,
-      };
-    }
-
-    return {
-      recurring: false,
-      cronExpression: dateTimeToCron(values.dateTime),
-    };
-
-    function dateTimeToCron(datetime: Date) {
-      const date = moment(datetime);
-      return [
-        date.minutes(),
-        date.hours(),
-        date.date(),
-        date.month() + 1,
-        '*',
-      ].join(' ');
-    }
   }
 }

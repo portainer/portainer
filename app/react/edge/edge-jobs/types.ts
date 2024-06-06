@@ -5,7 +5,7 @@ export interface EdgeJob {
   Created: number;
   CronExpression: string;
   Endpoints: Record<EnvironmentId, EndpointMeta>;
-  EdgeGroups: number[];
+  EdgeGroups: number[] | null;
   Name: string;
   ScriptPath: string;
   Recurring: boolean;

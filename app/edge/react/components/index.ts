@@ -9,10 +9,8 @@ import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInInt
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 
-import { edgeJobsModule } from './edge-jobs';
-
 const ngModule = angular
-  .module('portainer.edge.react.components', [edgeJobsModule])
+  .module('portainer.edge.react.components', [])
 
   .component(
     'edgeGroupsSelector',

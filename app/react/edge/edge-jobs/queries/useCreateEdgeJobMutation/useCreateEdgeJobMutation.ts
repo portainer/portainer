@@ -1,13 +1,20 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { withInvalidate } from '@/react-tools/react-query';
+
+import { queryKeys } from '../query-keys';
 
 import { createJobFromFile } from './createJobFromFile';
 import { createJobFromFileContent } from './createJobFromFileContent';
 
 export function useCreateEdgeJobMutation() {
-  return useMutation(createEdgeJob);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createEdgeJob,
+    ...withInvalidate(queryClient, [queryKeys.base()]),
+  });
 }
 
 export type BasePayload = {

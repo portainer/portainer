@@ -1,67 +1,93 @@
 import { List } from 'lucide-react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
-import { EnvironmentId } from '@/react/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
+import { useEnvironmentList } from '@/react/portainer/environments/queries';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
-import { useRepeater } from '@@/datatables/useRepeater';
 
-import { LogsStatus } from '../../types';
+import { EdgeJob, JobResult, LogsStatus } from '../../types';
+import { useJobResults } from '../../queries/jobResults/useJobResults';
 
-import { DecoratedJobResult } from './types';
 import { columns } from './columns';
 import { createStore } from './datatable-store';
 
 const tableKey = 'edge-job-results';
 const store = createStore(tableKey);
 
-export function ResultsDatatable({
-  dataset,
-  onCollectLogs,
-  onClearLogs,
-  onDownloadLogs,
-  onRefresh,
-}: {
-  dataset: Array<DecoratedJobResult>;
-
-  onCollectLogs(envId: EnvironmentId): void;
-  onDownloadLogs(envId: EnvironmentId): void;
-  onClearLogs(envId: EnvironmentId): void;
-  onRefresh(): void;
-}) {
-  const anyCollecting = dataset.some(
-    (r) => r.LogsStatus === LogsStatus.Pending
-  );
+export function ResultsDatatable({ jobId }: { jobId: EdgeJob['Id'] }) {
   const tableState = useTableState(store, tableKey);
 
-  const { setAutoRefreshRate } = tableState;
+  const jobResultsQuery = useJobResults(jobId, {
+    refetchInterval(dataset) {
+      const anyCollecting = dataset?.some(
+        (r) => r.LogsStatus === LogsStatus.Pending
+      );
 
-  useEffect(() => {
-    setAutoRefreshRate(anyCollecting ? 5 : 0);
-  }, [anyCollecting, setAutoRefreshRate]);
+      if (anyCollecting) {
+        return 5000;
+      }
 
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+      return tableState.autoRefreshRate * 1000;
+    },
+  });
+
+  const environmentIds = jobResultsQuery.data?.map(
+    (result) => result.EndpointId
+  );
+
+  const environmentsQuery = useEnvironmentList(
+    { endpointIds: environmentIds },
+    { enabled: !!environmentIds && !jobResultsQuery.isLoading }
+  );
+
+  const dataset = useMemo(
+    () =>
+      jobResultsQuery.isLoading || environmentsQuery.isLoading
+        ? []
+        : associateEndpointsToResults(
+            jobResultsQuery.data || [],
+            environmentsQuery.environments
+          ),
+    [
+      environmentsQuery.environments,
+      environmentsQuery.isLoading,
+      jobResultsQuery.data,
+      jobResultsQuery.isLoading,
+    ]
+  );
+
   return (
     <Datatable
       disableSelect
       columns={columns}
       dataset={dataset}
+      isLoading={jobResultsQuery.isLoading || environmentsQuery.isLoading}
       title="Results"
       titleIcon={List}
       settingsManager={tableState}
       extendTableOptions={withMeta({
         table: 'edge-job-results',
-        collectLogs: handleCollectLogs,
-        downloadLogs: onDownloadLogs,
-        clearLogs: onClearLogs,
+        jobId,
       })}
       data-cy="edge-job-results-datatable"
     />
   );
+}
 
-  function handleCollectLogs(envId: EnvironmentId) {
-    onCollectLogs(envId);
-  }
+function associateEndpointsToResults(
+  results: Array<JobResult>,
+  environments: Array<Environment>
+) {
+  return results.map((result) => {
+    const environment = environments.find(
+      (environment) => environment.Id === result.EndpointId
+    );
+    return {
+      ...result,
+      Endpoint: environment,
+    };
+  });
 }

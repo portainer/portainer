@@ -1,19 +1,14 @@
-import {
-  Environment,
-  EnvironmentId,
-} from '@/react/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
-import { JobResult } from '../../types';
+import { EdgeJob, JobResult } from '../../types';
 
 export interface DecoratedJobResult extends JobResult {
-  Endpoint: Environment;
+  Endpoint?: Environment;
 }
 
 interface TableMeta {
   table: 'edge-job-results';
-  collectLogs(envId: EnvironmentId): void;
-  downloadLogs(envId: EnvironmentId): void;
-  clearLogs(envId: EnvironmentId): void;
+  jobId: EdgeJob['Id'];
 }
 
 function isTableMeta(meta: unknown): meta is TableMeta {
