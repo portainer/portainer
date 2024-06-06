@@ -1,3 +1,4 @@
+import { addHours, getDate, getHours, getMinutes, getMonth } from 'date-fns';
 import moment from 'moment';
 
 import { defaultCronExpression, timeOptions } from './RecurringFieldset';
@@ -37,13 +38,12 @@ export function toRecurringRequest(
     cronExpression: dateTimeToCron(values.dateTime),
   };
 
-  function dateTimeToCron(datetime: Date) {
-    const date = moment(datetime);
+  function dateTimeToCron(date: Date) {
     return [
-      date.minutes(),
-      date.hours(),
-      date.date(),
-      date.month() + 1,
+      getMinutes(date),
+      getHours(date),
+      getDate(date),
+      getMonth(date) + 1,
       '*',
     ].join(' ');
   }
@@ -55,7 +55,7 @@ export function toRecurringViewModel(
     recurring: true,
   }
 ): RecurringViewModel {
-  const defaultTime = moment().add('hours', 1);
+  const defaultTime = addHours(new Date(), 1);
   const scheduled = timeOptions.find((v) => v.value === cronExpression);
 
   return {
@@ -64,15 +64,15 @@ export function toRecurringViewModel(
     recurringOption: scheduled?.value || defaultCronExpression,
     cronMethod: recurring && !scheduled ? 'advanced' : 'basic',
     dateTime: cronExpression
-      ? cronToDateTime(cronExpression, defaultTime).toDate()
-      : defaultTime.toDate(),
+      ? cronToDateTime(cronExpression, defaultTime)
+      : defaultTime,
   };
 }
 
-function cronToDateTime(cron: string, defaultTime: moment.Moment) {
+function cronToDateTime(cron: string, defaultTime: Date): Date {
   const strings = cron.split(' ');
   if (strings.length > 4) {
-    return moment(cron, 'm H D M');
+    return moment(cron, 'm H D M').toDate();
   }
 
   return defaultTime;
