@@ -44,9 +44,6 @@ func (handler *Handler) duplicateProfile(w http.ResponseWriter, r *http.Request)
 	}
 
 	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
-	if err != nil {
-		return httperror.InternalServerError("Unable to duplicate Profile", err)
-	}
 
 	newProfile := &portainer.FDOProfile{
 		ID:   portainer.FDOProfileID(profileID),
