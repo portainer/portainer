@@ -76,7 +76,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 }
 
 func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, payload endpointGroupUpdatePayload) (*portainer.EndpointGroup, error) {
-	endpointGroup, err := tx.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
+	endpointGroup, err := tx.EndpointGroup().Read(endpointGroupID)
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
 	} else if err != nil {

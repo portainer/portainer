@@ -99,7 +99,7 @@ func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 	return &models.Version{
 		SchemaVersion: dbVersionToSemanticVersion(dbVersion),
 		Edition:       edition,
-		InstanceID:    string(instanceId),
+		InstanceID:    instanceId,
 	}, nil
 }
 

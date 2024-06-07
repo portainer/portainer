@@ -46,7 +46,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	registryID := webhook.RegistryID
 	webhookType := webhook.WebhookType
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {

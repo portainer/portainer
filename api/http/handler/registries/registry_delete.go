@@ -90,7 +90,7 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 
 			if len(failedNamespaces) > 0 {
 				handler.PendingActionsService.Create(
-					handlers.NewDeleteK8sRegistrySecrets(portainer.EndpointID(endpointId), registry.ID, failedNamespaces),
+					handlers.NewDeleteK8sRegistrySecrets(endpointId, registry.ID, failedNamespaces),
 				)
 			}
 		}

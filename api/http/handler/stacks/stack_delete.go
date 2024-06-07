@@ -234,7 +234,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 					return errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
 				}
 
-				err = filesystem.WriteToFile(manifestFilePath, []byte(manifestContent))
+				err = filesystem.WriteToFile(manifestFilePath, manifestContent)
 				if err != nil {
 					return errors.Wrap(err, "failed to create temp manifest file")
 				}

@@ -82,7 +82,7 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerIngressClassDetected = true
 		endpointService.UpdateEndpoint(
-			portainer.EndpointID(endpoint.ID),
+			endpoint.ID,
 			endpoint,
 		)
 	}()
@@ -107,7 +107,7 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = endpointService.UpdateEndpoint(
-		portainer.EndpointID(endpoint.ID),
+		endpoint.ID,
 		endpoint,
 	)
 	if err != nil {
@@ -123,7 +123,7 @@ func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService datas
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerMetricsDetected = true
 		endpointService.UpdateEndpoint(
-			portainer.EndpointID(endpoint.ID),
+			endpoint.ID,
 			endpoint,
 		)
 	}()
@@ -162,7 +162,7 @@ func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.En
 	}
 	endpoint.Kubernetes.Configuration.StorageClasses = storage
 	err = endpointService.UpdateEndpoint(
-		portainer.EndpointID(endpoint.ID),
+		endpoint.ID,
 		endpoint,
 	)
 	if err != nil {
@@ -179,7 +179,7 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerStorageDetected = true
 		endpointService.UpdateEndpoint(
-			portainer.EndpointID(endpoint.ID),
+			endpoint.ID,
 			endpoint,
 		)
 	}()

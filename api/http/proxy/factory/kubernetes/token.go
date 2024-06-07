@@ -77,7 +77,7 @@ func (manager *tokenManager) UpdateUserServiceAccountsForEndpoint(endpointID por
 		userIDs = append(userIDs, u)
 	}
 	for t := range endpoint.TeamAccessPolicies {
-		memberships, _ := manager.dataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(t))
+		memberships, _ := manager.dataStore.TeamMembership().TeamMembershipsByTeamID(t)
 		for _, membership := range memberships {
 			userIDs = append(userIDs, membership.UserID)
 		}

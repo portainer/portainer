@@ -62,7 +62,7 @@ func (handler *Handler) listRegistries(tx dataservices.DataStoreTx, r *http.Requ
 		return nil, httperror.InternalServerError("Unable to retrieve user from the database", err)
 	}
 
-	endpoint, err := tx.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {

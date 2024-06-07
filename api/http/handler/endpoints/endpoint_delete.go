@@ -130,7 +130,7 @@ func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Reque
 }
 
 func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID portainer.EndpointID, deleteCluster bool) error {
-	endpoint, err := tx.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -252,7 +252,7 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msgf("Unable to delete pending actions")
 	}
 
-	err = tx.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
+	err = tx.Endpoint().DeleteEndpoint(endpointID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to delete the environment from the database", err)
 	}

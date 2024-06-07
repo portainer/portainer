@@ -432,7 +432,7 @@ func edgeGroupMatchSearchCriteria(
 func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []portainer.EndpointType) []portainer.Endpoint {
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointType := range endpointTypes {
-		typeSet[portainer.EndpointType(endpointType)] = true
+		typeSet[endpointType] = true
 	}
 
 	n := 0

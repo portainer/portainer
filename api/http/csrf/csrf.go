@@ -22,7 +22,7 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 	}
 
 	handler = gorillacsrf.Protect(
-		[]byte(token),
+		token,
 		gorillacsrf.Path("/"),
 		gorillacsrf.Secure(false),
 	)(handler)
