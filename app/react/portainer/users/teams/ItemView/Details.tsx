@@ -1,19 +1,13 @@
 import { useRouter } from '@uirouter/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import {
-  mutationOptions,
-  withError,
-  withInvalidate,
-} from '@/react-tools/react-query';
 
 import { Widget } from '@@/Widget';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { Team, TeamId, TeamMembership, TeamRole } from '../types';
-import { deleteTeam } from '../teams.service';
+import { Team, TeamMembership, TeamRole } from '../types';
+import { useDeleteTeamMutation } from '../queries/useDeleteTeamMutation';
 
 interface Props {
   team: Team;
@@ -22,7 +16,7 @@ interface Props {
 }
 
 export function Details({ team, memberships, isAdmin }: Props) {
-  const deleteMutation = useDeleteTeam();
+  const deleteMutation = useDeleteTeamMutation();
   const router = useRouter();
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
@@ -79,16 +73,4 @@ export function Details({ team, memberships, isAdmin }: Props) {
     router.stateService.go('portainer.teams');
     deleteMutation.mutate(team.Id);
   }
-}
-
-function useDeleteTeam() {
-  const queryClient = useQueryClient();
-  return useMutation(
-    (id: TeamId) => deleteTeam(id),
-
-    mutationOptions(
-      withError('Unable to delete team'),
-      withInvalidate(queryClient, [['teams']])
-    )
-  );
 }
