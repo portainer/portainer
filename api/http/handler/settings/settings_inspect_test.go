@@ -106,8 +106,6 @@ func TestHandler_settingsInspect(t *testing.T) {
 				CommandInterval:  10,
 				PingInterval:     10,
 				SnapshotInterval: 10,
-
-				AsyncMode: true,
 			},
 		}
 
@@ -148,8 +146,8 @@ func TestHandler_settingsInspect(t *testing.T) {
 		hideFields(settings)
 
 		actualSettings := &portainer.Settings{}
-
 		err = json.Unmarshal(rr.Body.Bytes(), actualSettings)
+		assert.NoError(t, err)
 
 		assert.EqualExportedValues(t, settings, actualSettings)
 	})
