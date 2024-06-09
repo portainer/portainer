@@ -13,7 +13,7 @@ import (
 // @id settingsInspect
 // @summary Retrieve Portainer settings
 // @description Retrieve settings. Will returns settings based on the user role.
-// @description **Access policy**: public
+// @description **Access policy**: authenticated
 // @tags settings
 // @produce json
 // @success 200 {object} settingsInspectResponse "Success"
