@@ -78,11 +78,6 @@ function StateManagerFactory($async, $q, SystemService, InfoHelper, LocalStorage
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateSnapshotInterval = function (interval) {
-    state.application.snapshotInterval = interval;
-    LocalStorage.storeApplicationState(state.application);
-  };
-
   manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
     state.application.enableTelemetry = enableTelemetry;
     $analytics.setOptOut(!enableTelemetry);
