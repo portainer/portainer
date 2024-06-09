@@ -6,8 +6,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
-import { GlobalDeploymentOptions } from '@/react/portainer/settings/types';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 import { DetailsTable } from '@@/DetailsTable';
 import { Link } from '@@/Link';
@@ -74,10 +73,9 @@ export function ApplicationSummaryWidget() {
     setApplicationNoteFormValues(applicationNote || '');
   }, [applicationNote]);
 
-  const globalDeploymentOptionsQuery =
-    usePublicSettings<GlobalDeploymentOptions>({
-      select: (settings) => settings.GlobalDeploymentOptions,
-    });
+  const globalDeploymentOptionsQuery = useSettings({
+    select: (settings) => settings.GlobalDeploymentOptions,
+  });
 
   const failedCreateCondition = application?.status?.conditions?.find(
     (condition) => condition.reason === 'FailedCreate'

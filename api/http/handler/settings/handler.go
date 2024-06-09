@@ -11,12 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func hideFields(settings *portainer.Settings) {
-	settings.LDAPSettings.Password = ""
-	settings.OAuthSettings.ClientSecret = ""
-	settings.OAuthSettings.KubeSecretKey = nil
-}
-
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
 	*mux.Router
@@ -33,12 +27,17 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 		Router: mux.NewRouter(),
 	}
 
-	h.Handle("/settings",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
-	h.Handle("/settings",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
-	h.Handle("/settings/public",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.settingsPublic))).Methods(http.MethodGet)
+	adminRouter := h.NewRoute().Subrouter()
+	adminRouter.Use(bouncer.AdminAccess)
+	adminRouter.Handle("/settings", httperror.LoggerHandler(h.settingsUpdate)).Methods(http.MethodPut)
+
+	authenticatedRouter := h.NewRoute().Subrouter()
+	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
+	authenticatedRouter.Handle("/settings", httperror.LoggerHandler(h.settingsInspect)).Methods(http.MethodGet)
+
+	publicRouter := h.NewRoute().Subrouter()
+	publicRouter.Use(bouncer.PublicAccess)
+	publicRouter.Handle("/settings/public", httperror.LoggerHandler(h.settingsPublic)).Methods(http.MethodGet)
 
 	return h
 }

@@ -9,9 +9,10 @@ import { EnvironmentGroup } from '@/react/portainer/environments/environment-gro
 import { Tag } from '@/portainer/tags/types';
 import { StatusResponse } from '@/react/portainer/system/useSystemStatus';
 import { createMockTeams } from '@/react-tools/test-mocks';
-import { PublicSettingsResponse } from '@/react/portainer/settings/types';
+import { PublicSettingsResponse } from '@/react/portainer/settings/queries/usePublicSettings';
 import { UserId } from '@/portainer/users/types';
 import { VersionResponse } from '@/react/portainer/system/useSystemVersion';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { azureHandlers } from './setup-handlers/azure';
 import { dockerHandlers } from './setup-handlers/docker';
@@ -72,16 +73,10 @@ export const handlers = [
   }),
   http.get<never, never, Partial<PublicSettingsResponse>>(
     '/api/settings/public',
-    () =>
-      HttpResponse.json({
-        Edge: {
-          AsyncMode: false,
-          CheckinInterval: 60,
-          CommandInterval: 60,
-          PingInterval: 60,
-          SnapshotInterval: 60,
-        },
-      })
+    () => HttpResponse.json({})
+  ),
+  http.get<never, never, Partial<Settings>>('/api/settings', () =>
+    HttpResponse.json({})
   ),
   http.get<never, never, Partial<StatusResponse>>('/api/status', () =>
     HttpResponse.json({})

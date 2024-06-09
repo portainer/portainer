@@ -1,21 +1,10 @@
 import moment from 'moment';
+import { getPublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
 angular.module('portainer.app').factory('StateManager', StateManagerFactory);
 
 /* @ngInject */
-function StateManagerFactory(
-  $async,
-  $q,
-  SystemService,
-  InfoHelper,
-  LocalStorage,
-  SettingsService,
-  StatusService,
-  APPLICATION_CACHE_VALIDITY,
-  AgentPingService,
-  $analytics,
-  EndpointProvider
-) {
+function StateManagerFactory($async, $q, SystemService, InfoHelper, LocalStorage, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService, $analytics, EndpointProvider) {
   var manager = {};
 
   var state = {
@@ -94,11 +83,6 @@ function StateManagerFactory(
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateEnableEdgeComputeFeatures = function updateEnableEdgeComputeFeatures(enableEdgeComputeFeatures) {
-    state.application.enableEdgeComputeFeatures = enableEdgeComputeFeatures;
-    LocalStorage.storeApplicationState(state.application);
-  };
-
   manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
     state.application.enableTelemetry = enableTelemetry;
     $analytics.setOptOut(!enableTelemetry);
@@ -112,8 +96,6 @@ function StateManagerFactory(
 
     state.application.enableTelemetry = settings.EnableTelemetry;
     state.application.logo = settings.LogoURL;
-    state.application.snapshotInterval = settings.SnapshotInterval;
-    state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
     state.application.validity = moment().unix();
   }
 
@@ -121,7 +103,7 @@ function StateManagerFactory(
     var deferred = $q.defer();
 
     $q.all({
-      settings: SettingsService.publicSettings(),
+      settings: getPublicSettings(),
       status: StatusService.status(),
     })
       .then(function success(data) {

@@ -3,33 +3,33 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import {
   mutationOptions,
-  withError,
   withInvalidate,
+  withError,
 } from '@/react-tools/react-query';
 
-import { ExperimentalFeatures } from '../types';
+import { DefaultRegistry } from '../types';
 import { buildUrl } from '../build-url';
 
 import { queryKeys } from './queryKeys';
 
-export function useUpdateExperimentalSettingsMutation() {
+export function useUpdateDefaultRegistrySettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    updateExperimentalSettings,
+    (payload: Partial<DefaultRegistry>) => updateDefaultRegistry(payload),
     mutationOptions(
       withInvalidate(queryClient, [queryKeys.base()]),
-      withError('Unable to update experimental settings')
+      withError('Unable to update default registry settings')
     )
   );
 }
 
-async function updateExperimentalSettings(
-  settings: Partial<ExperimentalFeatures>
+export async function updateDefaultRegistry(
+  defaultRegistry: Partial<DefaultRegistry>
 ) {
   try {
-    await axios.put(buildUrl('experimental'), settings);
+    await axios.put(buildUrl('default_registry'), defaultRegistry);
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to update experimental settings');
+    throw parseAxiosError(e, 'Unable to update default registry settings');
   }
 }

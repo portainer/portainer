@@ -2,7 +2,7 @@ import { Link } from 'lucide-react';
 import { useState } from 'react';
 
 import { Environment } from '@/react/portainer/environments/types';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 import { Query } from '@/react/portainer/environments/queries/useEnvironmentList';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
 
@@ -18,9 +18,8 @@ export function AMTButton({
   envQueryParams: Query;
 }) {
   const [isOpenDialog, setOpenDialog] = useState(false);
-  const isOpenAmtEnabledQuery = usePublicSettings({
-    select: (settings) =>
-      settings.EnableEdgeComputeFeatures && settings.IsAMTEnabled,
+  const isOpenAmtEnabledQuery = useSettings({
+    select: (settings) => settings.isAMTEnabled,
   });
 
   const isOpenAMTEnabled = !!isOpenAmtEnabledQuery.data;

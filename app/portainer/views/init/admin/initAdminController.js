@@ -1,5 +1,6 @@
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { restoreOptions } from '@/react/portainer/init/InitAdminView/restore-options';
+import { getPublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
@@ -92,7 +93,7 @@ angular.module('portainer.app').controller('InitAdminController', [
     }
 
     function createAdministratorFlow() {
-      SettingsService.publicSettings()
+      getPublicSettings()
         .then(function success(data) {
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
         })

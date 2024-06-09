@@ -1,5 +1,6 @@
 import angular from 'angular';
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
+import { getPublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
 class LogoutController {
   /* @ngInject */
@@ -26,7 +27,7 @@ class LogoutController {
    */
   async logoutAsync() {
     const error = this.$transition$.params().error;
-    const settings = await this.SettingsService.publicSettings();
+    const settings = await getPublicSettings();
 
     try {
       await this.Authentication.logout();
@@ -35,8 +36,9 @@ class LogoutController {
       dispatchCacheRefreshEvent();
 
       this.LocalStorage.storeLogoutReason(error);
-      if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
-        this.$window.location.href = settings.OAuthLogoutURI;
+      const logoutUri = settings.OAuthLogoutURI;
+      if (logoutUri && this.Authentication.getUserDetails().ID !== 1) {
+        this.$window.location.href = logoutUri;
       } else {
         this.$state.go('portainer.auth', { reload: true });
       }

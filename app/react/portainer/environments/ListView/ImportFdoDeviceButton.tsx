@@ -9,10 +9,10 @@ import {
 export function ImportFdoDeviceButton() {
   const flagEnabledQuery = useFeatureFlag(FeatureFlag.FDO);
 
-  const isFDOEnabledQuery = useSettings(
-    (settings) => settings.fdoConfiguration.enabled,
-    flagEnabledQuery.data
-  );
+  const isFDOEnabledQuery = useSettings({
+    select: (settings) => settings.isFDOEnabled,
+    enabled: flagEnabledQuery.data,
+  });
 
   if (!isFDOEnabledQuery.data || !flagEnabledQuery.data) {
     return null;

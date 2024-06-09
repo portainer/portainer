@@ -127,8 +127,8 @@ export default class DockerFeaturesConfigurationController {
           gpus,
         };
 
-        const publicSettings = await this.SettingsService.publicSettings();
-        const analyticsAllowed = publicSettings.EnableTelemetry;
+        const appSettings = await this.SettingsService.settings();
+        const analyticsAllowed = appSettings.EnableTelemetry;
         if (analyticsAllowed) {
           // send analytics if GPU management is changed (with the new state)
           if (this.initialEnableGPUManagement !== this.state.enableGPUManagement) {

@@ -4,7 +4,7 @@ import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { Registry, RegistryTypes } from '../types/registry';
-import { usePublicSettings } from '../../settings/queries';
+import { useSettings } from '../../settings/queries';
 
 import { queryKeys } from './query-keys';
 
@@ -36,9 +36,8 @@ export function useGenericRegistriesQuery<T = Registry[]>(
     hideDefault: hideDefaultOverride,
   }: GenericRegistriesQueryOptions<T> = {}
 ) {
-  const hideDefaultRegistryQuery = usePublicSettings({
+  const hideDefaultRegistryQuery = useSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
-    // We don't need the hideDefaultRegistry info if we're overriding it to true
     enabled: enabled && !hideDefaultOverride,
   });
 

@@ -100,7 +100,7 @@ export enum OAuthStyle {
   InHeader,
 }
 
-type Feature = string;
+export type Feature = string;
 
 export interface DefaultRegistry {
   Hide: boolean;
@@ -110,17 +110,29 @@ export interface ExperimentalFeatures {
   OpenAIIntegration: boolean;
 }
 
+export interface InternalAuthSettings {
+  RequiredPasswordLength: number;
+}
+
+export interface EdgeSettings {
+  PingInterval: number;
+  SnapshotInterval: number;
+  CommandInterval: number;
+  AsyncMode: boolean;
+  TunnelServerAddress: string;
+}
+
 export interface Settings {
   LogoURL: string;
   CustomLoginBanner: string;
   BlackListedLabels: Pair[];
   AuthenticationMethod: AuthenticationMethod;
-  InternalAuthSettings: { RequiredPasswordLength: number };
+  InternalAuthSettings: InternalAuthSettings;
   LDAPSettings: LDAPSettings;
   OAuthSettings: OAuthSettings;
   openAMTConfiguration: OpenAMTConfiguration;
   fdoConfiguration: FDOConfiguration;
-  FeatureFlagSettings: { [key: Feature]: boolean };
+  Features: { [key: Feature]: boolean };
   SnapshotInterval: string;
   TemplatesURL: string;
   EnableEdgeComputeFeatures: boolean;
@@ -134,28 +146,10 @@ export interface Settings {
   AgentSecret: string;
   EdgePortainerUrl: string;
   EdgeAgentCheckinInterval: number;
-  EdgeCommandInterval: number;
-  EdgePingInterval: number;
-  EdgeSnapshotInterval: number;
-  DisplayDonationHeader: boolean;
-  DisplayExternalContributors: boolean;
-  EnableHostManagementFeatures: boolean;
+  DefaultRegistry: DefaultRegistry;
   ExperimentalFeatures?: ExperimentalFeatures;
-  AllowVolumeBrowserForRegularUsers: boolean;
-  AllowBindMountsForRegularUsers: boolean;
-  AllowPrivilegedModeForRegularUsers: boolean;
-  AllowHostNamespaceForRegularUsers: boolean;
-  AllowStackManagementForRegularUsers: boolean;
-  AllowDeviceMappingForRegularUsers: boolean;
-  AllowContainerCapabilitiesForRegularUsers: boolean;
   GlobalDeploymentOptions?: GlobalDeploymentOptions;
-  Edge: {
-    PingInterval: number;
-    SnapshotInterval: number;
-    CommandInterval: number;
-    AsyncMode: boolean;
-    TunnelServerAddress: string;
-  };
+  Edge: EdgeSettings;
 }
 
 export interface GlobalDeploymentOptions {
@@ -172,53 +166,4 @@ export interface GlobalDeploymentOptions {
   minApplicationNoteLength: number;
 
   hideStacksFunctionality: boolean;
-}
-
-export interface PublicSettingsResponse {
-  /** URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string  */
-  LogoURL: string;
-  /** The content in plaintext used to display in the login page. Will hide when value is empty string (only on BE) */
-  CustomLoginBanner: string;
-  /** Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth */
-  AuthenticationMethod: AuthenticationMethod;
-  /** The minimum required length for a password of any user when using internal auth mode */
-  RequiredPasswordLength: number;
-  /** Deployment options for encouraging deployment as code (only on BE) */
-  GlobalDeploymentOptions: GlobalDeploymentOptions;
-  /** Whether edge compute features are enabled */
-  EnableEdgeComputeFeatures: boolean;
-  /** Supported feature flags */
-  Features: { [key: Feature]: boolean };
-  /** The URL used for oauth login */
-  OAuthLoginURI: string;
-  /** The URL used for oauth logout */
-  OAuthLogoutURI: string;
-  /** Whether portainer internal auth view will be hidden (only on BE) */
-  OAuthHideInternalAuth: boolean;
-  /** Whether telemetry is enabled */
-  EnableTelemetry: boolean;
-  /** The expiry of a Kubeconfig */
-  KubeconfigExpiry: string;
-  /** Whether team sync is enabled */
-  TeamSync: boolean;
-  /** Whether FDO is enabled */
-  IsFDOEnabled: boolean;
-  /** Whether AMT is enabled */
-  IsAMTEnabled: boolean;
-  /** Whether to hide default registry (only on BE) */
-  DefaultRegistry?: {
-    Hide: boolean;
-  };
-  Edge: {
-    /** Whether the device has been started in edge async mode */
-    AsyncMode: boolean;
-    /** The ping interval for edge agent - used in edge async mode [seconds] */
-    PingInterval: number;
-    /** The snapshot interval for edge agent - used in edge async mode [seconds] */
-    SnapshotInterval: number;
-    /** The command list interval for edge agent - used in edge async mode [seconds] */
-    CommandInterval: number;
-    /** The check in interval for edge agent (in seconds) - used in non async mode [seconds] */
-    CheckinInterval: number;
-  };
 }

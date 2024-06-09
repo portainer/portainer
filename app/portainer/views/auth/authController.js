@@ -2,6 +2,7 @@ import angular from 'angular';
 import uuidv4 from 'uuid/v4';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
+import { getPublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
 class AuthenticationController {
   /* @ngInject */
@@ -233,7 +234,7 @@ class AuthenticationController {
 
   async onInit() {
     try {
-      const settings = await this.SettingsService.publicSettings();
+      const settings = await getPublicSettings();
       this.state.showOAuthLogin = settings.AuthenticationMethod === 3;
       this.state.showStandardLogin = !this.state.showOAuthLogin;
       this.state.OAuthLoginURI = settings.OAuthLoginURI;

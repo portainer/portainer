@@ -143,6 +143,12 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	return response.JSON(w, settings)
 }
 
+func hideFields(settings *portainer.Settings) {
+	settings.LDAPSettings.Password = ""
+	settings.OAuthSettings.ClientSecret = ""
+	settings.OAuthSettings.KubeSecretKey = nil
+}
+
 func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload settingsUpdatePayload) (*portainer.Settings, error) {
 	settings, err := tx.Settings().Settings()
 	if err != nil {

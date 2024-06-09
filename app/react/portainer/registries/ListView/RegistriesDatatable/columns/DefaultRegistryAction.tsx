@@ -4,7 +4,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import {
-  usePublicSettings,
+  useSettings,
   useUpdateDefaultRegistrySettingsMutation,
 } from '@/react/portainer/settings/queries';
 
@@ -13,7 +13,7 @@ import { Button } from '@@/buttons';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 export function DefaultRegistryAction() {
-  const settingsQuery = usePublicSettings({
+  const settingsQuery = useSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
   });
   const defaultRegistryMutation = useUpdateDefaultRegistrySettingsMutation();

@@ -146,8 +146,16 @@ type stubUserService struct {
 	users []portainer.User
 }
 
-func (s *stubUserService) BucketName() string                                      { return "users" }
-func (s *stubUserService) Read(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
+func (s *stubUserService) BucketName() string { return "users" }
+func (s *stubUserService) Read(ID portainer.UserID) (*portainer.User, error) {
+	for _, user := range s.users {
+		if user.ID == ID {
+			return &user, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
 func (s *stubUserService) ReadAll() ([]portainer.User, error)                      { return s.users, nil }
 func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {

@@ -8,7 +8,7 @@ import { AuthenticationMethod } from '@/react/portainer/settings/types';
 import { Widget } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
 
-import { usePublicSettings } from '../../settings/queries/usePublicSettings';
+import { useSettings } from '../../settings/queries';
 
 import { ApiKeyFormValues } from './types';
 import { getAPITokenValidationSchema } from './CreateUserAcccessToken.validation';
@@ -26,7 +26,7 @@ export function CreateUserAccessToken() {
   const { user } = useCurrentUser();
   const [newAPIToken, setNewAPIToken] = useState('');
   const { trackEvent } = useAnalytics();
-  const settings = usePublicSettings();
+  const settings = useSettings();
 
   const requirePassword =
     settings.data?.AuthenticationMethod === AuthenticationMethod.Internal ||

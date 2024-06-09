@@ -939,6 +939,18 @@ type (
 		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
 	}
 
+	EdgeSettings struct {
+		// The command list interval for edge agent - used in edge async mode (in seconds)
+		CommandInterval int `json:"CommandInterval" example:"5"`
+		// The ping interval for edge agent - used in edge async mode (in seconds)
+		PingInterval int `json:"PingInterval" example:"5"`
+		// The snapshot interval for edge agent - used in edge async mode (in seconds)
+		SnapshotInterval int `json:"SnapshotInterval" example:"5"`
+
+		// Deprecated 2.18
+		AsyncMode bool
+	}
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -984,33 +996,28 @@ type (
 		// EdgePortainerURL is the URL that is exposed to edge agents
 		EdgePortainerURL string `json:"EdgePortainerUrl"`
 
-		Edge struct {
-			// The command list interval for edge agent - used in edge async mode (in seconds)
-			CommandInterval int `json:"CommandInterval" example:"5"`
-			// The ping interval for edge agent - used in edge async mode (in seconds)
-			PingInterval int `json:"PingInterval" example:"5"`
-			// The snapshot interval for edge agent - used in edge async mode (in seconds)
-			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-
-			// Deprecated 2.18
-			AsyncMode bool
-		}
+		Edge                     EdgeSettings
+		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension,omitempty"`
 
 		// Deprecated fields
-		DisplayDonationHeader       bool `json:"DisplayDonationHeader,omitempty"`
 		DisplayExternalContributors bool `json:"DisplayExternalContributors,omitempty"`
 
 		// Deprecated fields v26
-		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures,omitempty"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers,omitempty"`
-		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers,omitempty"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers,omitempty"`
-		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers,omitempty"`
-		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers,omitempty"`
-		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers,omitempty"`
+		EnableHostManagementFeatures bool `json:"EnableHostManagementFeatures,omitempty"`
+		// Deprecated fields v26
+		AllowVolumeBrowserForRegularUsers bool `json:"AllowVolumeBrowserForRegularUsers,omitempty"`
+		// Deprecated fields v26
+		AllowBindMountsForRegularUsers bool `json:"AllowBindMountsForRegularUsers,omitempty"`
+		// Deprecated fields v26
+		AllowPrivilegedModeForRegularUsers bool `json:"AllowPrivilegedModeForRegularUsers,omitempty"`
+		// Deprecated fields v26
+		AllowHostNamespaceForRegularUsers bool `json:"AllowHostNamespaceForRegularUsers,omitempty"`
+		// Deprecated fields v26
+		AllowStackManagementForRegularUsers bool `json:"AllowStackManagementForRegularUsers,omitempty"`
+		// Deprecated fields v26
+		AllowDeviceMappingForRegularUsers bool `json:"AllowDeviceMappingForRegularUsers,omitempty"`
+		// Deprecated fields v26
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers,omitempty"`
-
-		IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension,omitempty"`
 	}
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
@@ -1864,6 +1871,10 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+	// EdgeAdminRole represent a user that has access to resources of all environments
+	// like AdministratorRole but doesn't have access to Portainer settings
+	// not used in CE, but added to make code sync easier
+	EdgeAdminRole
 )
 
 const (

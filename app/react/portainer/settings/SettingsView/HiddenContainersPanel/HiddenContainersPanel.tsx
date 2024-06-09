@@ -12,7 +12,9 @@ import { AddLabelForm } from './AddLabelForm';
 import { HiddenContainersTable } from './HiddenContainersTable';
 
 export function HiddenContainersPanel() {
-  const settingsQuery = useSettings((settings) => settings.BlackListedLabels);
+  const settingsQuery = useSettings({
+    select: (settings) => settings.BlackListedLabels,
+  });
   const mutation = useUpdateSettingsMutation();
 
   if (!settingsQuery.data) {

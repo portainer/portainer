@@ -5,7 +5,9 @@ import {
   useContext,
   useMemo,
   PropsWithChildren,
+  useEffect,
 } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { isEdgeAdmin, isPureAdmin } from '@/portainer/users/user.helpers';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -14,6 +16,7 @@ import { useLoadCurrentUser } from '@/portainer/users/queries/useLoadCurrentUser
 
 import { useEnvironment } from '../portainer/environments/queries';
 import { isBE } from '../portainer/feature-flags/feature-flags.service';
+import { queryKeys as settingsQueryKeys } from '../portainer/settings/queries';
 
 interface State {
   user?: User;
@@ -207,6 +210,8 @@ interface UserProviderProps {
 export function UserProvider({ children }: UserProviderProps) {
   const userQuery = useLoadCurrentUser();
 
+  useReloadSettings(userQuery.data?.Role);
+
   const providerState = useMemo(
     () => ({ user: userQuery.data }),
     [userQuery.data]
@@ -221,4 +226,11 @@ export function UserProvider({ children }: UserProviderProps) {
       {children}
     </UserContext.Provider>
   );
+}
+
+function useReloadSettings(userRole?: User['Role']) {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    queryClient.invalidateQueries(settingsQueryKeys.base());
+  }, [queryClient, userRole]);
 }

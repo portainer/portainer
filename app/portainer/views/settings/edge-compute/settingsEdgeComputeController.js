@@ -7,14 +7,13 @@ import { configureAMT } from 'Portainer/hostmanagement/open-amt/open-amt.service
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
 
 /* @ngInject */
-export default function SettingsEdgeComputeController($q, $async, $state, Notifications, SettingsService, StateManager) {
+export default function SettingsEdgeComputeController($q, $async, $state, Notifications, SettingsService) {
   var ctrl = this;
 
   this.onSubmitEdgeCompute = async function (settings) {
     try {
       await SettingsService.update(settings);
       Notifications.success('Success', 'Settings updated');
-      StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
       $state.reload();
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to update settings');

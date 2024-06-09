@@ -76,11 +76,11 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.forceChangePassword = userDetails.forceChangePassword;
       $scope.isInitialAdmin = userDetails.ID === 1;
 
-      SettingsService.publicSettings()
-        .then(function success(data) {
-          $scope.AuthenticationMethod = data.AuthenticationMethod;
+      SettingsService.settings()
+        .then(function success(settings) {
+          $scope.AuthenticationMethod = settings.AuthenticationMethod;
 
-          if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
+          if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== settings.InternalAuthSettings.RequiredPasswordLength) {
             StateManager.clearPasswordChangeSkips();
           }
 
@@ -89,8 +89,8 @@ angular.module('portainer.app').controller('AccountController', [
               ? state.UI.timesPasswordChangeSkipped[$scope.userID.toString()]
               : 0;
 
-          $scope.requiredPasswordLength = data.RequiredPasswordLength;
-          StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
+          $scope.requiredPasswordLength = settings.InternalAuthSettings.RequiredPasswordLength;
+          StateManager.setRequiredPasswordLength(settings.InternalAuthSettings.RequiredPasswordLength);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

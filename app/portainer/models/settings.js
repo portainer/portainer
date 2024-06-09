@@ -22,24 +22,6 @@ export function SettingsViewModel(data) {
   this.EdgePortainerUrl = data.EdgePortainerUrl;
 }
 
-export function PublicSettingsViewModel(settings) {
-  this.AuthenticationMethod = settings.AuthenticationMethod;
-  this.TeamSync = settings.TeamSync;
-  this.RequiredPasswordLength = settings.RequiredPasswordLength;
-  this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-  this.EnforceEdgeID = settings.EnforceEdgeID;
-  this.LogoURL = settings.LogoURL;
-  this.OAuthLoginURI = settings.OAuthLoginURI;
-  this.EnableTelemetry = settings.EnableTelemetry;
-  this.OAuthLogoutURI = settings.OAuthLogoutURI;
-  this.KubeconfigExpiry = settings.KubeconfigExpiry;
-  this.Features = settings.Features;
-  this.Edge = new EdgeSettingsViewModel(settings.Edge);
-  this.DefaultRegistry = settings.DefaultRegistry;
-  this.IsAMTEnabled = settings.IsAMTEnabled;
-  this.IsFDOEnabled = settings.IsFDOEnabled;
-}
-
 export function InternalAuthSettingsViewModel(data) {
   this.RequiredPasswordLength = data.RequiredPasswordLength;
 }
