@@ -131,39 +131,45 @@ type publicSettingsResponse struct {
 	// Supported feature flags
 	Features map[featureflags.Feature]bool `json:"Features"`
 
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	GlobalDeploymentOptions portainer.GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	KubeconfigExpiry string `example:"24h" default:"0"`
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	IsFDOEnabled bool
-	// Deprecated
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	IsAMTEnabled bool
 
-	// Deprecated
+	// Deprecated v2.22
+	// please use `GET /api/settings`
+	DefaultRegistry struct {
+		Hide bool `json:"Hide" example:"false"`
+	}
+
+	// Deprecated v2.22
 	// please use `GET /api/settings`
 	Edge struct {
-		// Deprecated
+		// Deprecated v2.22
 		// please use `GET /api/settings`
 		PingInterval int `json:"PingInterval" example:"60"`
-		// Deprecated
+		// Deprecated v2.22
 		// please use `GET /api/settings`
 		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
-		// Deprecated
+		// Deprecated v2.22
 		// please use `GET /api/settings`
 		CommandInterval int `json:"CommandInterval" example:"60"`
-		// Deprecated
+		// Deprecated v2.22
 		// please use `GET /api/settings`
 		CheckinInterval int `example:"60"`
 	}
