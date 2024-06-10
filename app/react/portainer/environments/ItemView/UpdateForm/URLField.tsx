@@ -1,11 +1,19 @@
-import { useField } from 'formik';
+import { FormikErrors } from 'formik';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-export function URLField({ disabled }: { disabled?: boolean }) {
-  const [{ value, onChange }, { error }] = useField('url');
-
+export function URLField({
+  disabled,
+  value,
+  onChange = () => {},
+  error,
+}: {
+  disabled?: boolean;
+  value: string;
+  onChange?: (value: string) => void;
+  error?: FormikErrors<string>;
+}) {
   return (
     <FormControl
       label="Environment URL"
@@ -18,7 +26,7 @@ export function URLField({ disabled }: { disabled?: boolean }) {
         name="url"
         id="endpoint_url"
         value={value}
-        onChange={onChange}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375"
         data-cy="url-input"
       />

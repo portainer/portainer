@@ -5,14 +5,11 @@ import { TLSConfig } from '@@/TLSFieldset/types';
 
 import { EnvironmentGroupId } from '../../environment-groups/types';
 
-import { AzureFormValues } from './AzureConfiguration';
-
 export interface FormValues {
   name: string;
   url: string;
   publicUrl: string;
   tlsConfig: TLSConfig;
-  azure: AzureFormValues;
   meta: {
     tagIds: TagId[];
     groupId: EnvironmentGroupId;

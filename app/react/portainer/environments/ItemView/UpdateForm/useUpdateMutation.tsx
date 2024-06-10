@@ -11,7 +11,7 @@ import {
   UpdateEnvironmentPayload,
   useUpdateEnvironmentMutation,
 } from '../../queries/useUpdateEnvironmentMutation';
-import { isDockerEnvironment, isKubernetesEnvironment } from '../../utils';
+import { isDockerEnvironment } from '../../utils';
 
 import { FormValues } from './types';
 
@@ -20,11 +20,9 @@ export function useUpdateMutation(
   {
     isEdge,
     isLocal,
-    isAzure,
   }: {
     isEdge: boolean;
     isLocal: boolean;
-    isAzure: boolean;
   }
 ) {
   const updateMutation = useUpdateEnvironmentMutation();
@@ -37,10 +35,10 @@ export function useUpdateMutation(
   };
 
   async function handleSubmit(values: FormValues) {
-    if (
-      isEdge &&
-      _.difference(environment.TagIds, values.meta.tagIds).length > 0
-    ) {
+    const hasRemovedTags =
+      _.difference(environment.TagIds, values.meta.tagIds).length > 0;
+
+    if (isEdge && hasRemovedTags) {
       const confirmed = await confirmDestructive({
         title: 'Confirm action',
         message:
@@ -58,9 +56,6 @@ export function useUpdateMutation(
       PublicURL: values.publicUrl,
       GroupID: values.meta.groupId,
       TagIDs: values.meta.tagIds,
-      AzureApplicationID: values.azure.applicationId,
-      AzureTenantID: values.azure.tenantId,
-      AzureAuthenticationKey: values.azure.authKey,
       EdgeCheckinInterval: values.edge.checkInInterval,
       Edge: {
         CommandInterval: values.edge.CommandInterval,
@@ -69,7 +64,7 @@ export function useUpdateMutation(
       },
     };
 
-    if (isLocal && !isAzure && !isKubernetesEnvironment(environment.Type)) {
+    if (!isLocal && environment.Type !== EnvironmentType.AgentOnKubernetes) {
       payload.URL = `tcp://${values.url}`;
 
       if (isDockerEnvironment(environment.Type)) {

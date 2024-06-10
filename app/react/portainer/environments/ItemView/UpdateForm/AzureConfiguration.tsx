@@ -1,7 +1,8 @@
+import { useFormikContext } from 'formik';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
-import { FieldsetValues, SetFieldValue } from '@@/form-components/formikUtils';
 
 export interface AzureFormValues {
   applicationId: string;
@@ -9,13 +10,9 @@ export interface AzureFormValues {
   authKey: string;
 }
 
-export function AzureEnvironmentConfiguration({
-  values,
-  errors,
-  setFieldValue,
-}: FieldsetValues<AzureFormValues> & {
-  setFieldValue: SetFieldValue<AzureFormValues>;
-}) {
+export function AzureEnvironmentConfiguration() {
+  const { errors, values, setFieldValue } = useFormikContext<AzureFormValues>();
+
   return (
     <FormSection title="Azure Configuration">
       <FormControl

@@ -130,7 +130,7 @@ export interface UpdateEnvironmentPayload extends TLSFiles {
    */
   EdgeCheckinInterval?: number;
 
-  Edge: {
+  Edge?: {
     PingInterval?: number;
     SnapshotInterval?: number;
     CommandInterval?: number;
