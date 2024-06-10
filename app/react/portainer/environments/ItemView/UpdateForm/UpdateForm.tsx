@@ -73,13 +73,17 @@ export function UpdateForm({ environment }: { environment: Environment }) {
 
   if (environment.Type === EnvironmentType.Azure) {
     return (
-      <AzureForm
-        environment={environment}
-        onSuccessUpdate={(name) => {
-          notifySuccess('Environment updated', name);
-          router.stateService.go(redirectTo || '^');
-        }}
-      />
+      <Widget>
+        <Widget.Body>
+          <AzureForm
+            environment={environment}
+            onSuccessUpdate={(name) => {
+              notifySuccess('Environment updated', name);
+              router.stateService.go(redirectTo || '^');
+            }}
+          />
+        </Widget.Body>
+      </Widget>
     );
   }
 
