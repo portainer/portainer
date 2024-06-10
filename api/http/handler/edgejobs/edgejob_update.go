@@ -71,7 +71,7 @@ func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *h
 }
 
 func (handler *Handler) updateEdgeJob(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID, payload edgeJobUpdatePayload) (*portainer.EdgeJob, error) {
-	edgeJob, err := tx.EdgeJob().Read(portainer.EdgeJobID(edgeJobID))
+	edgeJob, err := tx.EdgeJob().Read(edgeJobID)
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -137,7 +137,7 @@ func (handler *Handler) updateEdgeSchedule(tx dataservices.DataStoreTx, edgeJob 
 		}
 
 		for _, endpointID := range endpoints {
-			endpointsToRemove[portainer.EndpointID(endpointID)] = true
+			endpointsToRemove[endpointID] = true
 		}
 
 		edgeJob.EdgeGroups = nil

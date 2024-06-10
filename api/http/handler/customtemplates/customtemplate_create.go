@@ -482,7 +482,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
-	projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
+	projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, payload.FileContent)
 	if err != nil {
 		return nil, err
 	}

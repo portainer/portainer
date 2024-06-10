@@ -616,7 +616,7 @@ func (store *Store) Import(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal([]byte(s), &backup)
+	err = json.Unmarshal(s, &backup)
 	if err != nil {
 		return err
 	}

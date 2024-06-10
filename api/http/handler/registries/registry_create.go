@@ -108,7 +108,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	registry := &portainer.Registry{
-		Type:             portainer.RegistryType(payload.Type),
+		Type:             payload.Type,
 		Name:             payload.Name,
 		URL:              payload.URL,
 		BaseURL:          payload.BaseURL,

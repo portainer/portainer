@@ -775,7 +775,7 @@ func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool,
 }
 
 func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.EndpointSecuritySettings, error) {
-	endpoint, err := transport.dataStore.Endpoint().Endpoint(portainer.EndpointID(transport.endpoint.ID))
+	endpoint, err := transport.dataStore.Endpoint().Endpoint(transport.endpoint.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -78,7 +78,7 @@ func (handler *Handler) getEdgeJobLobs(tx dataservices.DataStoreTx, endpointID p
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
-	edgeJob, err := tx.EdgeJob().Read(portainer.EdgeJobID(edgeJobID))
+	edgeJob, err := tx.EdgeJob().Read(edgeJobID)
 	if tx.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an edge job with the specified identifier inside the database", err)
 	} else if err != nil {

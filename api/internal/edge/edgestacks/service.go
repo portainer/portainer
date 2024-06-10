@@ -161,7 +161,7 @@ func (service *Service) DeleteEdgeStack(tx dataservices.DataStoreTx, edgeStackID
 		}
 	}
 
-	err = tx.EdgeStack().DeleteEdgeStack(portainer.EdgeStackID(edgeStackID))
+	err = tx.EdgeStack().DeleteEdgeStack(edgeStackID)
 	if err != nil {
 		return errors.WithMessage(err, "Unable to remove the edge stack from the database")
 	}

@@ -35,7 +35,7 @@ func Test_apiKeyCacheGet(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(string(test.digest), func(t *testing.T) {
+		t.Run(test.digest, func(t *testing.T) {
 			_, _, found := keyCache.Get(test.digest)
 			is.Equal(test.found, found)
 		})

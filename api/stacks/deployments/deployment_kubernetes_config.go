@@ -66,7 +66,7 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 			return errors.Wrap(err, "failed to add application labels")
 		}
 
-		err = filesystem.WriteToFile(manifestFilePath, []byte(manifestContent))
+		err = filesystem.WriteToFile(manifestFilePath, manifestContent)
 		if err != nil {
 			return errors.Wrap(err, "failed to create temp manifest file")
 		}

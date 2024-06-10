@@ -141,7 +141,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 	}
 
 	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
-		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
+		canCreate, err := handler.userCanCreateStack(securityContext, endpoint.ID)
 
 		if err != nil {
 			return false, fmt.Errorf("failed to get user from the database: %w", err)

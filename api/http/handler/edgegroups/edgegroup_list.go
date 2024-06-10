@@ -69,7 +69,7 @@ func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error)
 	for _, orgEdgeGroup := range edgeGroups {
 		usedByEdgeJob := false
 		for _, edgeJob := range edgeJobs {
-			if slices.Contains(edgeJob.EdgeGroups, portainer.EdgeGroupID(orgEdgeGroup.ID)) {
+			if slices.Contains(edgeJob.EdgeGroups, orgEdgeGroup.ID) {
 				usedByEdgeJob = true
 				break
 			}

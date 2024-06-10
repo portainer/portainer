@@ -287,7 +287,7 @@ func (service *Service) checkTunnels() {
 				Msg("unable to snapshot Edge environment")
 		}
 
-		service.close(portainer.EndpointID(endpointID))
+		service.close(endpointID)
 
 		return
 	}

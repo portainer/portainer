@@ -66,7 +66,7 @@ func (h *HandlerCleanNAPWithOverridePolicies) Execute(pendingAction portainer.Pe
 		return nil
 	}
 
-	endpointGroup, err := h.dataStore.EndpointGroup().Read(portainer.EndpointGroupID(payload.EndpointGroupID))
+	endpointGroup, err := h.dataStore.EndpointGroup().Read(payload.EndpointGroupID)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error reading environment group to clean NAP with override policies for environment %d and environment group %d", endpoint.ID, endpointGroup.ID)
 		return fmt.Errorf("failed to retrieve environment group %d: %w", payload.EndpointGroupID, err)

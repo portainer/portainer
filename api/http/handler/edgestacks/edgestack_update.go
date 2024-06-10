@@ -80,7 +80,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID portainer.EdgeStackID, payload updateEdgeStackPayload) (*portainer.EdgeStack, error) {
-	stack, err := tx.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	stack, err := tx.EdgeStack().EdgeStack(stackID)
 	if err != nil {
 		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
