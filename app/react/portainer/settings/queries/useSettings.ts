@@ -40,34 +40,80 @@ interface AuthenticatedResponse extends PublicSettingsResponse {
 }
 
 interface EdgeAdminResponse extends AuthenticatedResponse {
+  /** Only available for edge-admins */
   Edge?: EdgeSettings;
-  /** TrustOnFirstConnect makes Portainer accepting edge agent connection by default */
+  /**
+   * TrustOnFirstConnect makes Portainer accepting edge agent connection by default
+   *
+   * Only available for edge-admins
+   * */
   TrustOnFirstConnect: boolean;
-  /** EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone */
+  /**
+   * EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
+   *
+   * Only available for edge-admins
+   * */
   EnforceEdgeID: boolean;
-  /** EdgePortainerUrl is the URL that is exposed to edge agents */
+  /**
+   * EdgePortainerUrl is the URL that is exposed to edge agents
+   *
+   * Only available for edge-admins
+   * */
   EdgePortainerUrl: string;
-  /** The default check in interval for edge agent (in seconds) */
+  /**
+   * The default check in interval for edge agent (in seconds)
+   *
+   * Only available for edge-admins
+   * */
   EdgeAgentCheckinInterval: number;
 }
 
 interface AdminResponse extends EdgeAdminResponse {
-  /** A list of label name & value that will be used to hide containers when querying containers */
+  /**
+   * A list of label name & value that will be used to hide containers when querying containers
+   *
+   * Only available for admins
+   * */
   BlackListedLabels?: Pair[];
+  /** Only available for admins */
   LDAPSettings?: LDAPSettings;
+  /** Only available for admins */
   OAuthSettings?: OAuthSettings;
+  /** Only available for admins */
   InternalAuthSettings?: InternalAuthSettings;
+  /** Only available for admins */
   openAMTConfiguration?: OpenAMTConfiguration;
+  /** Only available for admins */
   fdoConfiguration?: FDOConfiguration;
-  /** The interval in which environment(endpoint) snapshots are created */
+  /**
+   * The interval in which environment(endpoint) snapshots are created
+   *
+   * Only available for admins
+   * */
   SnapshotInterval: string;
-  /** URL to the templates that will be displayed in the UI when navigating to App Templates */
+  /**
+   * URL to the templates that will be displayed in the UI when navigating to App Templates
+   *
+   * Only available for admins
+   * */
   TemplatesURL: string;
-  /** The duration of a user session */
+  /**
+   * The duration of a user session
+   *
+   * Only available for admins
+   * */
   UserSessionTimeout: string;
-  /** KubectlImage, defaults to portainer/kubectl-shell */
+  /**
+   * KubectlImage, defaults to portainer/kubectl-shell
+   *
+   * Only available for admins
+   * */
   KubectlShellImage: string;
-  /** Container environment parameter AGENT_SECRET */
+  /**
+   * Container environment parameter AGENT_SECRET
+   *
+   * Only available for admins
+   * */
   AgentSecret: string;
 }
 
