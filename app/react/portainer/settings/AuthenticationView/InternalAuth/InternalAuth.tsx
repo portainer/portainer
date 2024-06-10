@@ -1,4 +1,4 @@
-import { Settings } from '@/react/portainer/settings/types';
+import { InternalAuthSettings } from '@/react/portainer/settings/types';
 
 import { confirmDestructive } from '@@/modals/confirm';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
@@ -10,7 +10,7 @@ import { SaveAuthSettingsButton } from './SaveAuthSettingsButton';
 export interface Props {
   onSaveSettings(): void;
   isLoading: boolean;
-  value: Settings['InternalAuthSettings'];
+  value: InternalAuthSettings;
   onChange(value: number): void;
 }
 

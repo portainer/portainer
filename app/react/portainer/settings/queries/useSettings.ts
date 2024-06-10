@@ -40,7 +40,7 @@ interface AuthenticatedResponse extends PublicSettingsResponse {
 }
 
 interface EdgeAdminResponse extends AuthenticatedResponse {
-  Edge: EdgeSettings;
+  Edge?: EdgeSettings;
   /** TrustOnFirstConnect makes Portainer accepting edge agent connection by default */
   TrustOnFirstConnect: boolean;
   /** EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone */
@@ -53,12 +53,12 @@ interface EdgeAdminResponse extends AuthenticatedResponse {
 
 interface AdminResponse extends EdgeAdminResponse {
   /** A list of label name & value that will be used to hide containers when querying containers */
-  BlackListedLabels: Pair[];
-  LDAPSettings: LDAPSettings;
-  OAuthSettings: OAuthSettings;
-  InternalAuthSettings: InternalAuthSettings;
-  openAMTConfiguration: OpenAMTConfiguration;
-  fdoConfiguration: FDOConfiguration;
+  BlackListedLabels?: Pair[];
+  LDAPSettings?: LDAPSettings;
+  OAuthSettings?: OAuthSettings;
+  InternalAuthSettings?: InternalAuthSettings;
+  openAMTConfiguration?: OpenAMTConfiguration;
+  fdoConfiguration?: FDOConfiguration;
   /** The interval in which environment(endpoint) snapshots are created */
   SnapshotInterval: string;
   /** URL to the templates that will be displayed in the UI when navigating to App Templates */

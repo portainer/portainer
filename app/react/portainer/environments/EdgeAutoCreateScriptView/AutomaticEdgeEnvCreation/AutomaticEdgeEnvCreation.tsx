@@ -99,7 +99,7 @@ export function AutomaticEdgeEnvCreation() {
               edgeKey={edgeKey}
               isLoading={edgeKeyMutation.isLoading}
               url={url}
-              tunnelUrl={settings?.Edge.TunnelServerAddress}
+              tunnelUrl={settings?.Edge?.TunnelServerAddress || ''}
             />
           </>
         )}
@@ -116,7 +116,7 @@ export function AutomaticEdgeEnvCreation() {
       settings &&
       settings.EnableEdgeComputeFeatures &&
       settings.EdgePortainerUrl &&
-      settings.Edge.TunnelServerAddress
+      settings.Edge?.TunnelServerAddress
     );
   }
 }

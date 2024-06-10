@@ -121,7 +121,7 @@ angular.module('portainer.app').controller('UsersController', [
           users = assignAuthMethod(users, $scope.AuthenticationMethod);
           $scope.users = users;
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
-          $scope.requiredPasswordLength = data.settings.InternalAuthSettings.RequiredPasswordLength;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
           $scope.teamSync = data.settings.TeamSync;
         })
         .catch(function error(err) {

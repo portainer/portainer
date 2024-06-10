@@ -125,13 +125,13 @@ export interface EdgeSettings {
 export interface Settings {
   LogoURL: string;
   CustomLoginBanner: string;
-  BlackListedLabels: Pair[];
+  BlackListedLabels?: Pair[];
   AuthenticationMethod: AuthenticationMethod;
-  InternalAuthSettings: InternalAuthSettings;
-  LDAPSettings: LDAPSettings;
-  OAuthSettings: OAuthSettings;
-  openAMTConfiguration: OpenAMTConfiguration;
-  fdoConfiguration: FDOConfiguration;
+  InternalAuthSettings?: InternalAuthSettings;
+  LDAPSettings?: LDAPSettings;
+  OAuthSettings?: OAuthSettings;
+  openAMTConfiguration?: OpenAMTConfiguration;
+  fdoConfiguration?: FDOConfiguration;
   Features: { [key: Feature]: boolean };
   SnapshotInterval: string;
   TemplatesURL: string;
@@ -149,7 +149,7 @@ export interface Settings {
   DefaultRegistry: DefaultRegistry;
   ExperimentalFeatures?: ExperimentalFeatures;
   GlobalDeploymentOptions?: GlobalDeploymentOptions;
-  Edge: EdgeSettings;
+  Edge?: EdgeSettings;
 }
 
 export interface GlobalDeploymentOptions {
