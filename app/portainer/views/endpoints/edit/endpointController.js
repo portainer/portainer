@@ -11,6 +11,7 @@ import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
 import { buildConfirmButton } from '@@/modals/utils';
 import { getInfo } from '@/react/docker/proxy/queries/useInfo';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -21,13 +22,11 @@ function EndpointController(
   $state,
   $transition$,
   $filter,
-  clipboard,
   EndpointService,
   GroupService,
 
   Notifications,
-  Authentication,
-  SettingsService
+  Authentication
 ) {
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
@@ -296,7 +295,7 @@ function EndpointController(
   async function initView() {
     return $async(async () => {
       try {
-        const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
+        const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), getSettings()]);
 
         if (isDockerAPIEnvironment(endpoint)) {
           $scope.state.showTLSConfig = true;

@@ -5,6 +5,7 @@ import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settin
 import { options } from '@/react/portainer/settings/AuthenticationView/InternalAuth/options';
 import { SERVER_TYPES } from '@/react/portainer/settings/AuthenticationView/ldap-options';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
@@ -225,7 +226,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
   function initView() {
     $q.all({
-      settings: SettingsService.settings(),
+      settings: getSettings(),
       teams: TeamService.teams(),
     })
       .then(function success(data) {

@@ -7,9 +7,7 @@ angular.module('portainer.app').factory('Settings', [
       API_ENDPOINT_SETTINGS + '/:subResource/:action',
       {},
       {
-        get: { method: 'GET' },
         update: { method: 'PUT', ignoreLoadingBar: true },
-        checkLDAPConnectivity: { method: 'PUT', params: { subResource: 'authentication', action: 'checkLDAP' } },
       }
     );
   },

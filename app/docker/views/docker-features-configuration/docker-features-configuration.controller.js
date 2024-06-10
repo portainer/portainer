@@ -1,14 +1,14 @@
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 export default class DockerFeaturesConfigurationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $analytics, EndpointService, SettingsService, Notifications, StateManager) {
+  constructor($async, $scope, $state, $analytics, EndpointService, Notifications, StateManager) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.$analytics = $analytics;
     this.EndpointService = EndpointService;
-    this.SettingsService = SettingsService;
     this.Notifications = Notifications;
     this.StateManager = StateManager;
 
@@ -127,7 +127,7 @@ export default class DockerFeaturesConfigurationController {
           gpus,
         };
 
-        const appSettings = await this.SettingsService.settings();
+        const appSettings = await getSettings();
         const analyticsAllowed = appSettings.EnableTelemetry;
         if (analyticsAllowed) {
           // send analytics if GPU management is changed (with the new state)

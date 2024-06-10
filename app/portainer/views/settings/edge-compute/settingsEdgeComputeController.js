@@ -3,6 +3,7 @@ import angular from 'angular';
 
 import { configureFDO } from '@/portainer/hostmanagement/fdo/fdo.service';
 import { configureAMT } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
 
@@ -43,7 +44,7 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
   function initView() {
     $async(async () => {
       try {
-        const settings = await SettingsService.settings();
+        const settings = await getSettings();
 
         const defaultMTLS = {
           ..._.get(settings, 'Edge.MTLS', {}),
