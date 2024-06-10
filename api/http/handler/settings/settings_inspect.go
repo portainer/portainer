@@ -10,14 +10,16 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
 
-// @id settingsInspect
-// @summary Retrieve Portainer settings
-// @description Retrieve settings. Will returns settings based on the user role.
-// @description **Access policy**: authenticated
+// @id SettingsInspect
+// @summary Retrieve the settings of the Portainer instance
+// @description Get the settings of the Portainer instance. Will return either all the settings or a subset of settings based on the user role.
+// @description **Access policy**: Authenticated user.
 // @tags settings
+// @security ApiKeyAuth || jwt
 // @produce json
-// @success 200 {object} settingsInspectResponse "Success"
-// @failure 500 "Server error"
+// @success 200 {object} settingsInspectResponse "The settings object"
+// @failure 401 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve the settings."
 // @router /settings [get]
 func (handler *Handler) settingsInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var roleBasedResponse interface{}

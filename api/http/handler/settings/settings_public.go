@@ -8,13 +8,12 @@ import (
 )
 
 // @id SettingsPublic
-// @summary Retrieve Portainer public settings
-// @description Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.
-// @description **Access policy**: public
+// @summary Retrieve the public settings of the Portainer instance
+// @description Get the settings of the Portainer instance. Will return only a subset of settings.
 // @tags settings
 // @produce json
-// @success 200 {object} publicSettingsResponse "Success"
-// @failure 500 "Server error"
+// @success 200 {object} publicSettingsResponse "The settings object"
+// @failure 500 "Server error occurred while attempting to retrieve the settings."
 // @router /settings/public [get]
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
