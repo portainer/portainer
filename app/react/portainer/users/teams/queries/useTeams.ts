@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { withGlobalError } from '@/react-tools/react-query';
 
 import { Team } from '../types';
 
 import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
 
 export function useTeams<T = Team[]>(
   onlyLedTeams = false,
@@ -17,17 +19,13 @@ export function useTeams<T = Team[]>(
     select?: (data: Team[]) => T;
   } = {}
 ) {
-  const teams = useQuery(
-    ['teams', { onlyLedTeams, environmentId }],
-    () => getTeams(onlyLedTeams, environmentId),
-    {
-      meta: {
-        error: { title: 'Failure', message: 'Unable to load teams' },
-      },
-      enabled,
-      select,
-    }
-  );
+  const teams = useQuery({
+    queryKey: queryKeys.list({ onlyLedTeams, environmentId }),
+    queryFn: () => getTeams(onlyLedTeams, environmentId),
+    ...withGlobalError('Unable to load teams'),
+    enabled,
+    select,
+  });
 
   return teams;
 }

@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
-import { notifyError } from '@/portainer/services/notifications';
 import { UserId } from '@/portainer/users/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
 
 import { TeamId, TeamMembership, TeamMembershipId } from '../types';
 
 import { buildMembershipUrl } from './build-membership-url';
+import { queryKeys } from './query-keys';
 
 export function useRemoveMemberMutation(
   teamId: TeamId,
@@ -15,8 +16,8 @@ export function useRemoveMemberMutation(
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    (userIds: UserId[]) =>
+  return useMutation({
+    mutationFn: (userIds: UserId[]) =>
       promiseSequence(
         userIds.map((userId) => () => {
           const membership = teamMemberships.find(
@@ -28,15 +29,9 @@ export function useRemoveMemberMutation(
           return deleteTeamMembership(membership.Id);
         })
       ),
-    {
-      onError(error) {
-        notifyError('Failure', error as Error, 'Failure to add membership');
-      },
-      onSuccess() {
-        queryClient.invalidateQueries(['teams', teamId, 'memberships']);
-      },
-    }
-  );
+    ...withGlobalError('Failure to remove membership'),
+    ...withInvalidate(queryClient, [queryKeys.memberships(teamId)]),
+  });
 }
 
 async function deleteTeamMembership(id: TeamMembershipId) {

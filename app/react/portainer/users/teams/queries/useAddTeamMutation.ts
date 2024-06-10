@@ -2,11 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { UserId } from '@/portainer/users/types';
+import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
 
 import { TeamRole } from '../types';
 
 import { createTeamMembership } from './useAddMemberMutation';
 import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
 
 interface CreatePayload {
   name: string;
@@ -16,16 +18,10 @@ interface CreatePayload {
 export function useAddTeamMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation(createTeam, {
-    meta: {
-      error: {
-        title: 'Failure',
-        message: 'Failed to create team',
-      },
-    },
-    onSuccess() {
-      return queryClient.invalidateQueries(['teams']);
-    },
+  return useMutation({
+    mutationFn: createTeam,
+    ...withGlobalError('Failed to create team'),
+    ...withInvalidate(queryClient, [queryKeys.base()]),
   });
 }
 
