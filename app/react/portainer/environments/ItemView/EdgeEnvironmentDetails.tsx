@@ -8,15 +8,9 @@ export function EdgeEnvironmentDetails({
 }: {
   environment: Environment;
 }) {
-  return (
-    <div className="row">
-      <div>
-        {environment.EdgeID ? (
-          <EdgeAssociationInfo environment={environment} />
-        ) : (
-          <EdgeDeploymentInfo environment={environment} />
-        )}
-      </div>
-    </div>
+  return environment.EdgeID ? (
+    <EdgeAssociationInfo environment={environment} />
+  ) : (
+    <EdgeDeploymentInfo environment={environment} />
   );
 }

@@ -33,12 +33,16 @@ export function ItemView() {
         reload
       />
 
-      {isEdge && <EdgeEnvironmentDetails environment={environmentQuery.data} />}
+      <div className="mx-[15px]">
+        {isEdge && (
+          <EdgeEnvironmentDetails environment={environmentQuery.data} />
+        )}
 
-      <KubeDetails environment={environmentQuery.data} />
+        <KubeDetails environment={environmentQuery.data} />
 
-      <div className="mt-4">
-        <UpdateForm environment={environmentQuery.data} />
+        <div className="mt-4">
+          <UpdateForm environment={environmentQuery.data} />
+        </div>
       </div>
     </>
   );

@@ -33,42 +33,38 @@ export function Microk8sClusterDetails({
   }
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <WidgetTitle icon={Kube} title="MicroK8s cluster details" />
-          <WidgetBody loading={addonsQuery.isLoading || nodesQuery.isLoading}>
-            <DetailsTable dataCy="microk8s-cluster-details-table">
-              <DetailsTable.Row label="Addons" colClassName="w-1/2">
-                {addonsQuery.isError && 'Unable to get addons'}
-                {!addonNames?.length &&
-                  addonsQuery.isSuccess &&
-                  'No addons installed'}
-                {addonNames?.length && addonNames.join(', ')}
-              </DetailsTable.Row>
-              <DetailsTable.Row label="Kubernetes version" colClassName="w-1/2">
-                {addonsQuery.isError && 'Unable to find kubernetes version'}
-                {!!currentVersion && currentVersion}
-              </DetailsTable.Row>
-              <DetailsTable.Row label="Node count" colClassName="w-1/2">
-                {nodesQuery.isError && 'Unable to get node count'}
-                {nodes && nodes.length}
-              </DetailsTable.Row>
-            </DetailsTable>
-            <TextTip color="blue">
-              You can{' '}
-              <Link
-                to="kubernetes.cluster"
-                params={{ endpointId: environmentId }}
-                data-cy="cluster-details-view-link"
-              >
-                manage the cluster
-              </Link>{' '}
-              to upgrade, add/remove nodes or enable/disable addons.
-            </TextTip>
-          </WidgetBody>
-        </Widget>
-      </div>
-    </div>
+    <Widget>
+      <WidgetTitle icon={Kube} title="MicroK8s cluster details" />
+      <WidgetBody loading={addonsQuery.isLoading || nodesQuery.isLoading}>
+        <DetailsTable dataCy="microk8s-cluster-details-table">
+          <DetailsTable.Row label="Addons" colClassName="w-1/2">
+            {addonsQuery.isError && 'Unable to get addons'}
+            {!addonNames?.length &&
+              addonsQuery.isSuccess &&
+              'No addons installed'}
+            {addonNames?.length && addonNames.join(', ')}
+          </DetailsTable.Row>
+          <DetailsTable.Row label="Kubernetes version" colClassName="w-1/2">
+            {addonsQuery.isError && 'Unable to find kubernetes version'}
+            {!!currentVersion && currentVersion}
+          </DetailsTable.Row>
+          <DetailsTable.Row label="Node count" colClassName="w-1/2">
+            {nodesQuery.isError && 'Unable to get node count'}
+            {nodes && nodes.length}
+          </DetailsTable.Row>
+        </DetailsTable>
+        <TextTip color="blue">
+          You can{' '}
+          <Link
+            to="kubernetes.cluster"
+            params={{ endpointId: environmentId }}
+            data-cy="cluster-details-view-link"
+          >
+            manage the cluster
+          </Link>{' '}
+          to upgrade, add/remove nodes or enable/disable addons.
+        </TextTip>
+      </WidgetBody>
+    </Widget>
   );
 }
