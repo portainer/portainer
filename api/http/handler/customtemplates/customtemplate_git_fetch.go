@@ -70,8 +70,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to download git repository")
 
-		if err != nil {
-			rbErr := rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
+		if rbErr := rollbackCustomTemplate(backupPath, customTemplate.ProjectPath); rbErr != nil {
 			return httperror.InternalServerError("Failed to rollback the custom template folder", rbErr)
 		}
 
