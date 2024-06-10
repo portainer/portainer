@@ -2,7 +2,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 
-import { useContainers } from '../../queries/containers';
+import { useContainers } from '../../queries/useContainers';
 import { ContainerStatus } from '../../types';
 
 export function ContainerSelector({

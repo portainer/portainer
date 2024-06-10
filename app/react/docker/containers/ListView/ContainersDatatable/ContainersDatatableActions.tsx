@@ -8,7 +8,7 @@ import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request
 import {
   ContainerId,
   ContainerStatus,
-  DockerContainer,
+  ContainerListViewModel,
 } from '@/react/docker/containers/types';
 import {
   killContainer,
@@ -29,7 +29,7 @@ type ContainerServiceAction = (
 ) => Promise<void>;
 
 interface Props {
-  selectedItems: DockerContainer[];
+  selectedItems: ContainerListViewModel[];
   isAddActionVisible: boolean;
   endpointId: EnvironmentId;
 }
@@ -175,7 +175,7 @@ export function ContainersDatatableActions({
     </div>
   );
 
-  function onStartClick(selectedItems: DockerContainer[]) {
+  function onStartClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully started';
     const errorMessage = 'Unable to start container';
     executeActionOnContainerList(
@@ -186,7 +186,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onStopClick(selectedItems: DockerContainer[]) {
+  function onStopClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully stopped';
     const errorMessage = 'Unable to stop container';
     executeActionOnContainerList(
@@ -197,7 +197,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onRestartClick(selectedItems: DockerContainer[]) {
+  function onRestartClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully restarted';
     const errorMessage = 'Unable to restart container';
     executeActionOnContainerList(
@@ -208,7 +208,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onKillClick(selectedItems: DockerContainer[]) {
+  function onKillClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully killed';
     const errorMessage = 'Unable to kill container';
     executeActionOnContainerList(
@@ -219,7 +219,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onPauseClick(selectedItems: DockerContainer[]) {
+  function onPauseClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully paused';
     const errorMessage = 'Unable to pause container';
     executeActionOnContainerList(
@@ -230,7 +230,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  function onResumeClick(selectedItems: DockerContainer[]) {
+  function onResumeClick(selectedItems: ContainerListViewModel[]) {
     const successMessage = 'Container successfully resumed';
     const errorMessage = 'Unable to resume container';
     executeActionOnContainerList(
@@ -241,7 +241,7 @@ export function ContainersDatatableActions({
     );
   }
 
-  async function onRemoveClick(selectedItems: DockerContainer[]) {
+  async function onRemoveClick(selectedItems: ContainerListViewModel[]) {
     const isOneContainerRunning = selectedItems.some(
       (container) => container.State === 'running'
     );
@@ -259,7 +259,7 @@ export function ContainersDatatableActions({
   }
 
   async function executeActionOnContainerList(
-    containers: DockerContainer[],
+    containers: ContainerListViewModel[],
     action: ContainerServiceAction,
     successMessage: string,
     errorMessage: string
@@ -283,7 +283,7 @@ export function ContainersDatatableActions({
   }
 
   async function removeSelectedContainers(
-    containers: DockerContainer[],
+    containers: ContainerListViewModel[],
     removeVolumes: boolean
   ) {
     for (let i = 0; i < containers.length; i += 1) {

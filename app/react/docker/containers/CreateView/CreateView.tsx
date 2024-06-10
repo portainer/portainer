@@ -19,7 +19,7 @@ import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 import { HelpLink } from '@@/HelpLink';
 
-import { useContainers } from '../queries/containers';
+import { useContainers } from '../queries/useContainers';
 import { useSystemLimits, useIsWindows } from '../../proxy/queries/useInfo';
 
 import { useCreateOrReplaceMutation } from './useCreateMutation';

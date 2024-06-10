@@ -1,8 +1,8 @@
-import { ContainerJSON } from '../../queries/container';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
 
 import { RestartPolicy } from './types';
 
-export function toViewModel(config: ContainerJSON): RestartPolicy {
+export function toViewModel(config: ContainerDetailsJSON): RestartPolicy {
   switch (config.HostConfig?.RestartPolicy?.Name) {
     case 'always':
       return RestartPolicy.Always;

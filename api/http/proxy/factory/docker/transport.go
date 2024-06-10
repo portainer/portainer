@@ -84,11 +84,25 @@ func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, er
 	return transport.ProxyDockerRequest(request)
 }
 
+var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*http.Response, error){
+	"configs":    (*Transport).proxyConfigRequest,
+	"containers": (*Transport).proxyContainerRequest,
+	"services":   (*Transport).proxyServiceRequest,
+	"volumes":    (*Transport).proxyVolumeRequest,
+	"networks":   (*Transport).proxyNetworkRequest,
+	"secrets":    (*Transport).proxySecretRequest,
+	"swarm":      (*Transport).proxySwarmRequest,
+	"nodes":      (*Transport).proxyNodeRequest,
+	"tasks":      (*Transport).proxyTaskRequest,
+	"build":      (*Transport).proxyBuildRequest,
+	"images":     (*Transport).proxyImageRequest,
+	"v2":         (*Transport).proxyAgentRequest,
+}
+
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
-	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
-	request.URL.Path = requestPath
+	unversionedPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 
 	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
@@ -100,34 +114,12 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 	}
 
-	switch {
-	case strings.HasPrefix(requestPath, "/configs"):
-		return transport.proxyConfigRequest(request)
-	case strings.HasPrefix(requestPath, "/containers"):
-		return transport.proxyContainerRequest(request)
-	case strings.HasPrefix(requestPath, "/services"):
-		return transport.proxyServiceRequest(request)
-	case strings.HasPrefix(requestPath, "/volumes"):
-		return transport.proxyVolumeRequest(request)
-	case strings.HasPrefix(requestPath, "/networks"):
-		return transport.proxyNetworkRequest(request)
-	case strings.HasPrefix(requestPath, "/secrets"):
-		return transport.proxySecretRequest(request)
-	case strings.HasPrefix(requestPath, "/swarm"):
-		return transport.proxySwarmRequest(request)
-	case strings.HasPrefix(requestPath, "/nodes"):
-		return transport.proxyNodeRequest(request)
-	case strings.HasPrefix(requestPath, "/tasks"):
-		return transport.proxyTaskRequest(request)
-	case strings.HasPrefix(requestPath, "/build"):
-		return transport.proxyBuildRequest(request)
-	case strings.HasPrefix(requestPath, "/images"):
-		return transport.proxyImageRequest(request)
-	case strings.HasPrefix(requestPath, "/v2"):
-		return transport.proxyAgentRequest(request)
-	default:
-		return transport.executeDockerRequest(request)
+	prefix := strings.Split(strings.TrimPrefix(unversionedPath, "/"), "/")[0]
+
+	if proxyFunc := prefixProxyFuncMap[prefix]; proxyFunc != nil {
+		return proxyFunc(transport, request, unversionedPath)
 	}
+	return transport.executeDockerRequest(request)
 }
 
 func (transport *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
@@ -144,8 +136,8 @@ func (transport *Transport) executeDockerRequest(request *http.Request) (*http.R
 	return response, err
 }
 
-func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, error) {
-	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
+func (transport *Transport) proxyAgentRequest(r *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := strings.TrimPrefix(unversionedPath, "/v2")
 
 	switch {
 	case strings.HasPrefix(requestPath, "/browse"):
@@ -203,8 +195,10 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 	return transport.executeDockerRequest(r)
 }
 
-func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyConfigRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/configs/create":
 		return transport.decorateGenericResourceCreationOperation(request, configObjectIdentifier, portainer.ConfigResourceControl)
 
@@ -225,8 +219,10 @@ func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Res
 	}
 }
 
-func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyContainerRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/containers/create":
 		return transport.decorateContainerCreationOperation(request, containerObjectIdentifier, portainer.ContainerResourceControl)
 
@@ -261,8 +257,10 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 	}
 }
 
-func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyServiceRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/services/create":
 		return transport.decorateServiceCreationOperation(request)
 
@@ -292,8 +290,10 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 	}
 }
 
-func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyVolumeRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/volumes/create":
 		return transport.decorateVolumeResourceCreationOperation(request, portainer.VolumeResourceControl)
 
@@ -309,8 +309,10 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 	}
 }
 
-func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyNetworkRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/networks/create":
 		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
 
@@ -330,8 +332,10 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Re
 	}
 }
 
-func (transport *Transport) proxySecretRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxySecretRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/secrets/create":
 		return transport.decorateGenericResourceCreationOperation(request, secretObjectIdentifier, portainer.SecretResourceControl)
 
@@ -351,8 +355,8 @@ func (transport *Transport) proxySecretRequest(request *http.Request) (*http.Res
 	}
 }
 
-func (transport *Transport) proxyNodeRequest(request *http.Request) (*http.Response, error) {
-	requestPath := request.URL.Path
+func (transport *Transport) proxyNodeRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
 
 	// assume /nodes/{id}
 	if path.Base(requestPath) != "nodes" {
@@ -362,8 +366,10 @@ func (transport *Transport) proxyNodeRequest(request *http.Request) (*http.Respo
 	return transport.executeDockerRequest(request)
 }
 
-func (transport *Transport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxySwarmRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/swarm":
 		return transport.rewriteOperation(request, swarmInspectOperation)
 	default:
@@ -372,8 +378,10 @@ func (transport *Transport) proxySwarmRequest(request *http.Request) (*http.Resp
 	}
 }
 
-func (transport *Transport) proxyTaskRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyTaskRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/tasks":
 		return transport.rewriteOperation(request, transport.taskListOperation)
 	default:
@@ -382,7 +390,7 @@ func (transport *Transport) proxyTaskRequest(request *http.Request) (*http.Respo
 	}
 }
 
-func (transport *Transport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
+func (transport *Transport) proxyBuildRequest(request *http.Request, _ string) (*http.Response, error) {
 	err := transport.updateDefaultGitBranch(request)
 	if err != nil {
 		return nil, err
@@ -408,8 +416,10 @@ func (transport *Transport) updateDefaultGitBranch(request *http.Request) error 
 	return nil
 }
 
-func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Response, error) {
-	switch requestPath := request.URL.Path; requestPath {
+func (transport *Transport) proxyImageRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
 	case "/images/create":
 		return transport.replaceRegistryAuthenticationHeader(request)
 	default:

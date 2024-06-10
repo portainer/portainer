@@ -3,6 +3,7 @@ import { Server, Trash2 } from 'lucide-react';
 import { Authorized } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Icon } from '@/react/components/Icon';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
@@ -10,7 +11,7 @@ import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
 import { NetworkContainer, NetworkId } from '../types';
-import { useDisconnectContainer } from '../queries';
+import { useDisconnectContainer } from '../queries/useDisconnectContainerMutation';
 
 type Props = {
   networkContainers: NetworkContainer[];
@@ -33,7 +34,10 @@ export function NetworkContainersTable({
   environmentId,
   networkId,
 }: Props) {
-  const disconnectContainer = useDisconnectContainer();
+  const disconnectContainer = useDisconnectContainer({
+    environmentId,
+    networkId,
+  });
 
   if (networkContainers.length === 0) {
     return null;
@@ -72,11 +76,18 @@ export function NetworkContainersTable({
                   color="dangerlight"
                   onClick={() => {
                     if (container.Id) {
-                      disconnectContainer.mutate({
-                        containerId: container.Id,
-                        environmentId,
-                        networkId,
-                      });
+                      disconnectContainer.mutate(
+                        {
+                          containerId: container.Id,
+                        },
+                        {
+                          onSuccess: () =>
+                            notifySuccess(
+                              'Container successfully disconnected',
+                              networkId
+                            ),
+                        }
+                      );
                     }
                   }}
                 >

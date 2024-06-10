@@ -1,5 +1,5 @@
 import { AccessControlFormData } from '@/react/portainer/access-control/types';
-import { PortainerMetadata } from '@/react/docker/types';
+import { PortainerResponse } from '@/react/docker/types';
 
 import { PortMapping } from './container-instances/CreateView/PortsMappingField';
 
@@ -47,14 +47,13 @@ interface ContainerGroupProperties {
   osType: OS;
 }
 
-export type ContainerGroup = {
+export type ContainerGroup = PortainerResponse<{
   id: string;
   name: string;
   location: string;
   type: string;
   properties: ContainerGroupProperties;
-  Portainer?: PortainerMetadata;
-};
+}>;
 
 export interface Subscription {
   subscriptionId: string;

@@ -4,16 +4,16 @@ import { SystemInfo } from 'docker-types/generated/1.41';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { buildUrl } from './build-url';
+import { buildDockerProxyUrl } from './buildDockerProxyUrl';
 
 export async function getInfo(environmentId: EnvironmentId) {
   try {
     const { data } = await axios.get<SystemInfo>(
-      buildUrl(environmentId, 'info')
+      buildDockerProxyUrl(environmentId, 'info')
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err, 'Unable to retrieve version');
+    throw parseAxiosError(err, 'Unable to retrieve system info');
   }
 }
 

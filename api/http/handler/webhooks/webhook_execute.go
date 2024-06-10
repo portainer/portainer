@@ -122,6 +122,7 @@ func (handler *Handler) executeServiceWebhook(
 			_ = rc.Close()
 		}(rc)
 	}
+
 	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
 
 	if err != nil {

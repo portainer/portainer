@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { buildUrl } from '../../proxy/queries/build-url';
 import { DockerNetwork } from '../types';
+import { withFiltersQueryParam } from '../../proxy/queries/utils';
+import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
 
 import { queryKeys } from './queryKeys';
 import { NetworksQuery } from './types';
@@ -29,17 +30,18 @@ export function useNetworks<T = Array<DockerNetwork>>(
   );
 }
 
+/**
+ * Raw docker API proxy
+ */
 export async function getNetworks(
   environmentId: EnvironmentId,
   { local, swarm, swarmAttachable, filters }: NetworksQuery
 ) {
   try {
     const { data } = await axios.get<Array<DockerNetwork>>(
-      buildUrl(environmentId, 'networks'),
-      filters && {
-        params: {
-          filters,
-        },
+      buildDockerProxyUrl(environmentId, 'networks'),
+      {
+        params: { ...withFiltersQueryParam(filters) },
       }
     );
 

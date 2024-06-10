@@ -1,4 +1,4 @@
-import { ping } from '@/docker/services/ping';
+import { ping } from '@/react/docker/proxy/queries/usePing';
 import { environmentStore } from '@/react/hooks/current-environment-store';
 import {
   Environment,

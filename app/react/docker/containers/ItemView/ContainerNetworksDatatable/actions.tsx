@@ -2,8 +2,9 @@ import { CellContext } from '@tanstack/react-table';
 import { useRouter } from '@uirouter/react';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { useDisconnectContainer } from '@/react/docker/networks/queries';
+import { useDisconnectContainer } from '@/react/docker/networks/queries/useDisconnectContainerMutation';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { LoadingButton } from '@@/buttons';
 
@@ -16,14 +17,19 @@ export const actions = columnHelper.display({
 });
 
 function Cell({
-  row,
+  row: {
+    original: { id: networkId },
+  },
   table: {
     options: { meta },
   },
 }: CellContext<TableNetwork, unknown>) {
   const router = useRouter();
   const environmentId = useEnvironmentId();
-  const disconnectMutation = useDisconnectContainer();
+  const disconnectMutation = useDisconnectContainer({
+    environmentId,
+    networkId,
+  });
 
   return (
     <Authorized authorizations="DockerNetworkDisconnect">
@@ -47,12 +53,11 @@ function Cell({
 
     disconnectMutation.mutate(
       {
-        environmentId,
-        networkId: row.original.id,
         containerId: meta.containerId,
       },
       {
         onSuccess() {
+          notifySuccess('Container successfully disconnected', networkId);
           router.stateService.reload();
         },
       }

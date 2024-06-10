@@ -1,66 +1,37 @@
+import { getSecret } from '@/react/docker/proxy/queries/secrets/useSecret';
+import { getSecrets } from '@/react/docker/proxy/queries/secrets/useSecrets';
+import { removeSecret } from '@/react/docker/proxy/queries/secrets/useRemoveSecretMutation';
+import { createSecret } from '@/react/docker/proxy/queries/secrets/useCreateSecretMutation';
+
 import { SecretViewModel } from '../models/secret';
 
-angular.module('portainer.docker').factory('SecretService', [
-  '$q',
-  'Secret',
-  function SecretServiceFactory($q, Secret) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('SecretService', SecretServiceFactory);
 
-    service.secret = function (secretId) {
-      var deferred = $q.defer();
+/* @ngInject */
+function SecretServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      Secret.get({ id: secretId })
-        .$promise.then(function success(data) {
-          var secret = new SecretViewModel(data);
-          deferred.resolve(secret);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve secret details', err: err });
-        });
+  return {
+    secret: useAxios(injectEnvironmentId(secretAngularJS)), // secret edit
+    secrets: useAxios(injectEnvironmentId(secretsAngularJS)), // secret list + service create + service edit
+    remove: useAxios(injectEnvironmentId(removeSecret)), // secret list + secret edit
+    create: useAxios(injectEnvironmentId(createSecret)), // secret create
+  };
 
-      return deferred.promise;
-    };
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {SecretId} id
+   */
+  async function secretAngularJS(environmentId, id) {
+    const data = await getSecret(environmentId, id);
+    return new SecretViewModel(data);
+  }
 
-    service.secrets = function () {
-      var deferred = $q.defer();
-
-      Secret.query({})
-        .$promise.then(function success(data) {
-          var secrets = data.map(function (item) {
-            return new SecretViewModel(item);
-          });
-          deferred.resolve(secrets);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve secrets', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.remove = function (secretId) {
-      var deferred = $q.defer();
-
-      Secret.remove({ id: secretId })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to remove secret', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.create = function (secretConfig) {
-      return Secret.create(secretConfig).$promise;
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   */
+  async function secretsAngularJS(environmentId) {
+    const data = await getSecrets(environmentId);
+    return data.map((s) => new SecretViewModel(s));
+  }
+}

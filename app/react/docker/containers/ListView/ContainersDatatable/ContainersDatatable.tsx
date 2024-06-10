@@ -1,6 +1,6 @@
 import { Box } from 'lucide-react';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 import { Environment } from '@/react/portainer/environments/types';
 
@@ -18,7 +18,7 @@ import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilter
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useContainers } from '../../queries/containers';
+import { useContainers } from '../../queries/useContainers';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';
@@ -75,7 +75,7 @@ export function ContainersDatatable({
           data-cy="docker-containers-datatable"
           renderTableSettings={(tableInstance) => (
             <>
-              <ColumnVisibilityMenu<DockerContainer>
+              <ColumnVisibilityMenu<ContainerListViewModel>
                 table={tableInstance}
                 onChange={(hiddenColumns) => {
                   tableState.setHiddenColumns(hiddenColumns);

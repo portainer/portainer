@@ -230,11 +230,8 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     }
 
     function createNetwork(context) {
-      HttpRequestHelper.setPortainerAgentTargetHeader(context.nodeName);
-      HttpRequestHelper.setPortainerAgentManagerOperation(context.managerOperation);
-
       $scope.state.actionInProgress = true;
-      NetworkService.create(context.networkConfiguration)
+      NetworkService.create(context.networkConfiguration, { nodeName: context.nodeName, agentManagerOperation: context.managerOperation })
         .then(function success(data) {
           const userId = context.userDetails.ID;
           const accessControlData = context.accessControlData;
