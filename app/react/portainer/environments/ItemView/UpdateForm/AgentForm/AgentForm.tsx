@@ -2,51 +2,51 @@ import { Form, Formik } from 'formik';
 
 import { FormSection } from '@@/form-components/FormSection';
 
-import { NameField } from '../../common/NameField';
-import { MetadataFieldset } from '../../common/MetadataFieldset';
-import { Environment, EnvironmentId } from '../../types';
-import { EnvironmentMetadata } from '../../environment.service/create';
+import { Environment, EnvironmentType } from '../../../types';
+import { MetadataFieldset } from '../../../common/MetadataFieldset';
+import { NameField } from '../../../common/NameField';
 import {
   UpdateEnvironmentPayload,
   useUpdateEnvironmentMutation,
-} from '../../queries/useUpdateEnvironmentMutation';
+} from '../../../queries/useUpdateEnvironmentMutation';
+import { EnvironmentFormActions } from '../EnvironmentFormActions';
+import { PublicIPField } from '../PublicIPField';
 
-import { URLField } from './URLField';
-import { AzureEnvironmentConfiguration } from './AzureConfiguration';
-import { EnvironmentFormActions } from './EnvironmentFormActions';
+import { AgentAddressField } from './AgentEnvironmentAddress';
 
 interface FormValues {
   name: string;
 
-  meta: EnvironmentMetadata;
+  url: string;
+  publicUrl: string;
 
-  applicationId: string;
-  tenantId: string;
-  authKey: string;
+  meta: {
+    tagIds: number[];
+    groupId: number;
+  };
 }
 
-export function AzureForm({
+export function AgentForm({
   environment,
   onSuccessUpdate,
 }: {
   environment: Environment;
   onSuccessUpdate: (name: string) => void;
 }) {
-  const { handleSubmit, isLoading } = useUpdateAzureEnvironment(
-    environment.Id,
+  const { handleSubmit, isLoading } = useUpdateMutation(
+    environment,
     onSuccessUpdate
   );
+
   const initialValues: FormValues = {
     name: environment.Name,
+    url: environment.URL,
+    publicUrl: environment.PublicURL || '',
 
     meta: {
       tagIds: environment.TagIds,
       groupId: environment.GroupId,
     },
-
-    applicationId: environment.AzureCredentials?.ApplicationID || '',
-    tenantId: environment.AzureCredentials?.TenantID || '',
-    authKey: environment.AzureCredentials?.AuthenticationKey || '',
   };
 
   return (
@@ -55,9 +55,10 @@ export function AzureForm({
         <Form className="form-horizontal">
           <FormSection title="Configuration">
             <NameField />
-            <URLField disabled value={environment.URL} />
+            <AgentAddressField />
+            <PublicIPField />
           </FormSection>
-          <AzureEnvironmentConfiguration />
+
           <MetadataFieldset />
           <EnvironmentFormActions isLoading={isLoading} isValid={isValid} />
         </Form>
@@ -66,8 +67,8 @@ export function AzureForm({
   );
 }
 
-function useUpdateAzureEnvironment(
-  envId: EnvironmentId,
+export function useUpdateMutation(
+  environment: Environment,
   onSuccessUpdate: (name: string) => void
 ) {
   const updateMutation = useUpdateEnvironmentMutation();
@@ -80,15 +81,21 @@ function useUpdateAzureEnvironment(
   async function handleSubmit(values: FormValues) {
     const payload: UpdateEnvironmentPayload = {
       Name: values.name,
+      PublicURL: values.publicUrl,
       GroupID: values.meta.groupId,
       TagIDs: values.meta.tagIds,
-      AzureApplicationID: values.applicationId,
-      AzureTenantID: values.tenantId,
-      AzureAuthenticationKey: values.authKey,
     };
 
+    if (environment.Type === EnvironmentType.AgentOnDocker) {
+      payload.URL = `tcp://${values.url}`;
+    }
+
+    if (environment.Type === EnvironmentType.AgentOnKubernetes) {
+      payload.URL = values.url;
+    }
+
     updateMutation.mutate(
-      { id: envId, payload },
+      { id: environment.Id, payload },
       {
         onSuccess: () => onSuccessUpdate(values.name),
       }
