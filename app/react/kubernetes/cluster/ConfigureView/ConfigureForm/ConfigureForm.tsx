@@ -149,15 +149,23 @@ function InnerForm({
     <Form className="form-horizontal">
       <div className="flex flex-col">
         <FormSection title="Networking - Services">
-          <TextTip color="blue" className="mb-2">
-            Enabling the load balancer feature will allow users to expose
-            applications they deploy over an external IP address assigned by the
-            cloud provider.
-          </TextTip>
-          <TextTip color="orange" className="mb-4">
-            If you want to use this feature, ensure your cloud provider allows
-            you to create load balancers. This may incur costs.
-          </TextTip>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="blue" inline={false}>
+                Enabling the load balancer feature will allow users to expose
+                applications they deploy over an external IP address assigned by
+                the cloud provider.
+              </TextTip>
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="orange" inline={false}>
+                If you want to use this feature, ensure your cloud provider
+                allows you to create load balancers. This may incur costs.
+              </TextTip>
+            </div>
+          </div>
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
@@ -239,11 +247,15 @@ function InnerForm({
               />
             </div>
           </div>
-          <TextTip color="blue" className="mb-5">
-            You may set up ingress defaults (hostnames and annotations) via
-            Create/Edit ingress. Users may then select them via the hostname
-            dropdown in Create/Edit application.
-          </TextTip>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="blue" inline={false}>
+                You may set up ingress defaults (hostnames and annotations) via
+                Create/Edit ingress. Users may then select them via the hostname
+                dropdown in Create/Edit application.
+              </TextTip>
+            </div>
+          </div>
         </FormSection>
         <FormSection title="Change Window Settings">
           <div className="form-group">
@@ -263,12 +275,17 @@ function InnerForm({
         </FormSection>
         <FormSection title="Security">
           {!isRBACEnabled && isRBACEnabledQuery.isSuccess && <RBACAlert />}
-          <TextTip color="blue">
-            <p>
-              By default, all the users have access to the default namespace.
-              Enable this option to set accesses on the default namespace.
-            </p>
-          </TextTip>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="blue" inline={false}>
+                <p>
+                  By default, all the users have access to the default
+                  namespace. Enable this option to set accesses on the default
+                  namespace.
+                </p>
+              </TextTip>
+            </div>
+          </div>
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
@@ -305,22 +322,30 @@ function InnerForm({
             header="Allow resource over-commit - UI-only change in 2.20"
             content="Resource over-commit has always been ENABLED in Portainer CE. However, the toggle was incorrectly shown as OFF. This has now been corrected but please note that no functionality has been removed."
           />
-          <TextTip color="blue">
-            <p>
-              By DISABLING resource over-commit (highly recommended), you can
-              ONLY assign namespaces CPU and memory resources that are less (in
-              aggregate) than the cluster total minus any system resource
-              reservation.
-            </p>
-          </TextTip>
-          <TextTip color="orange">
-            <p>
-              By ENABLING resource over-commit, you can assign namespaces more
-              resources than are physically available in the cluster. This may
-              lead to unexpected deployment failures if there are insufficient
-              resources to service demand.
-            </p>
-          </TextTip>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="blue" inline={false}>
+                <p>
+                  By DISABLING resource over-commit (highly recommended), you
+                  can ONLY assign namespaces CPU and memory resources that are
+                  less (in aggregate) than the cluster total minus any system
+                  resource reservation.
+                </p>
+              </TextTip>
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-sm-12">
+              <TextTip color="orange" inline={false}>
+                <p>
+                  By ENABLING resource over-commit, you can assign namespaces
+                  more resources than are physically available in the cluster.
+                  This may lead to unexpected deployment failures if there are
+                  insufficient resources to service demand.
+                </p>
+              </TextTip>
+            </div>
+          </div>
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
@@ -348,33 +373,42 @@ function InnerForm({
         </FormSection>
         <FormSection title="Available storage options">
           {initialValues.storageClasses.length === 0 && (
-            <TextTip color="orange" className="mb-4">
-              Unable to detect any storage class available to persist data.
-              Users won&apos;t be able to persist application data inside this
-              cluster.
-            </TextTip>
+            <div className="form-group">
+              <div className="col-sm-12">
+                <TextTip color="orange" inline={false}>
+                  Unable to detect any storage class available to persist data.
+                  Users won&apos;t be able to persist application data inside
+                  this cluster.
+                </TextTip>
+              </div>
+            </div>
           )}
           {initialValues.storageClasses.length > 0 && (
             <>
-              <TextTip color="blue">
-                <p>
-                  Select which storage options will be available for use when
-                  deploying applications. Have a look at your storage driver
-                  documentation to figure out which access policy to configure
-                  and if the volume expansion capability is supported.
-                </p>
-                <p>
-                  You can find more information about access modes{' '}
-                  <a
-                    href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    in the official Kubernetes documentation
-                  </a>
-                  .
-                </p>
-              </TextTip>
+              <div className="form-group">
+                <div className="col-sm-12">
+                  <TextTip color="blue" inline={false}>
+                    <p>
+                      Select which storage options will be available for use
+                      when deploying applications. Have a look at your storage
+                      driver documentation to figure out which access policy to
+                      configure and if the volume expansion capability is
+                      supported.
+                    </p>
+                    <p>
+                      You can find more information about access modes{' '}
+                      <a
+                        href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        in the official Kubernetes documentation
+                      </a>
+                      .
+                    </p>
+                  </TextTip>
+                </div>
+              </div>
               <StorageClassDatatable
                 storageClassValues={values.storageClasses}
               />
