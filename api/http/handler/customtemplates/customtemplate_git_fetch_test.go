@@ -2,6 +2,7 @@ package customtemplates
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/fs"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
@@ -47,6 +49,19 @@ type TestFileService struct {
 
 func (f *TestFileService) GetFileContent(projectPath, configFilePath string) ([]byte, error) {
 	return os.ReadFile(filepath.Join(projectPath, configFilePath))
+}
+
+type InvalidTestGitService struct {
+	portainer.GitService
+	targetFilePath string
+}
+
+func (g *InvalidTestGitService) CloneRepository(dest, repoUrl, refName, username, password string, tlsSkipVerify bool) error {
+	return errors.New("simulate network error")
+}
+
+func (g *InvalidTestGitService) LatestCommitID(repositoryURL, referenceName, username, password string, tlsSkipVerify bool) (string, error) {
+	return "", nil
 }
 
 func createTestFile(targetPath string) error {
@@ -173,5 +188,29 @@ func Test_customTemplateGitFetch(t *testing.T) {
 		testFileContent = "gfedcba"
 
 		singleAPIRequest(h, jwt2, is, "gfedcba")
+	})
+
+	t.Run("restore git repository if it is failed to download the new git repository", func(t *testing.T) {
+		invalidGitService := &InvalidTestGitService{
+			targetFilePath: filepath.Join(template1.ProjectPath, template1.GitConfig.ConfigFilePath),
+		}
+		h := NewHandler(requestBouncer, store, fileService, invalidGitService)
+
+		req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBuffer([]byte("{}")))
+		testhelpers.AddTestSecurityCookie(req, jwt1)
+
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, req)
+
+		is.Equal(http.StatusInternalServerError, rr.Code)
+
+		var errResp httperror.HandlerError
+		err = json.NewDecoder(rr.Body).Decode(&errResp)
+		assert.NoError(t, err, "failed to parse error body")
+
+		assert.FileExists(t, gitService.targetFilePath, "previous git repository is not restored")
+		fileContent, err := os.ReadFile(gitService.targetFilePath)
+		assert.NoError(t, err, "failed to read target file")
+		assert.Equal(t, "gfedcba", string(fileContent))
 	})
 }
