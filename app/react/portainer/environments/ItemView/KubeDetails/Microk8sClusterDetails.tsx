@@ -8,7 +8,7 @@ import { DetailsTable } from '@@/DetailsTable';
 import { TextTip } from '@@/Tip/TextTip';
 import { Link } from '@@/Link';
 
-import { EnvironmentId } from '../types';
+import { EnvironmentId } from '../../types';
 
 export function Microk8sClusterDetails({
   environmentId,

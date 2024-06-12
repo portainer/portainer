@@ -3,7 +3,7 @@ import KubeIcon from '@/assets/ico/kube.svg?c';
 import { Widget } from '@@/Widget';
 import { Button } from '@@/buttons';
 
-import { CloudProviderSettings } from '../types';
+import { CloudProviderSettings } from '../../types';
 
 export function KaaSClusterDetails({ info }: { info: CloudProviderSettings }) {
   return (

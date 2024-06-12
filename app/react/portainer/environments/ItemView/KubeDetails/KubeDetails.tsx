@@ -1,6 +1,6 @@
-import { isEdgeEnvironment, isKubernetesEnvironment } from '../utils';
-import { Environment, EnvironmentStatus } from '../types';
-import { k8sInstallTitles } from '../wizard/EnvironmentsCreationView/WizardK8sInstall/types';
+import { isEdgeEnvironment, isKubernetesEnvironment } from '../../utils';
+import { Environment, EnvironmentStatus } from '../../types';
+import { k8sInstallTitles } from '../../wizard/EnvironmentsCreationView/WizardK8sInstall/types';
 
 import { KubeConfigureInstructions } from './KubeConfigureInstructions';
 import { Microk8sClusterDetails } from './Microk8sClusterDetails';

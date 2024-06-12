@@ -4,7 +4,7 @@ import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 import { Link } from '@@/Link';
 
-import { EnvironmentId } from '../types';
+import { EnvironmentId } from '../../types';
 
 export function KubeConfigureInstructions({
   environmentId,
