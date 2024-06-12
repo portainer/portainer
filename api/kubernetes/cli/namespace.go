@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/rs/zerolog/log"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -64,8 +65,8 @@ func (kcl *KubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, er
 // CreateNamespace creates a new ingress in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 	portainerLabels := map[string]string{
-		"io.portainer.kubernetes.resourcepool.name":  info.Name,
-		"io.portainer.kubernetes.resourcepool.owner": info.Owner,
+		"io.portainer.kubernetes.resourcepool.name":  stackutils.SanitizeLabel(info.Name),
+		"io.portainer.kubernetes.resourcepool.owner": stackutils.SanitizeLabel(info.Owner),
 	}
 
 	var ns v1.Namespace
