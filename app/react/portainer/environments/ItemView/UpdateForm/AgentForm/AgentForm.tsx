@@ -3,6 +3,7 @@ import { Form, Formik } from 'formik';
 import { Environment } from '@/react/portainer/environments/types';
 import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
 import { NameField } from '@/react/portainer/environments/common/NameField';
+import { stripProtocol } from '@/portainer/filters/filters';
 
 import { FormSection } from '@@/form-components/FormSection';
 
@@ -27,7 +28,7 @@ export function AgentForm({
 
   const initialValues: FormValues = {
     name: environment.Name,
-    url: environment.URL,
+    url: stripProtocol(environment.URL),
     publicUrl: environment.PublicURL || '',
 
     meta: {

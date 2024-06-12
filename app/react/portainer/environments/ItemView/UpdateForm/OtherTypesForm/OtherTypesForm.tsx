@@ -7,6 +7,7 @@ import {
   isLocalEnvironment,
 } from '@/react/portainer/environments/utils';
 import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
+import { stripProtocol } from '@/portainer/filters/filters';
 
 import { TLSFieldset } from '@@/TLSFieldset';
 import { FormSection } from '@@/form-components/FormSection';
@@ -39,7 +40,7 @@ export function OtherTypesForm({
 
   const initialValues: FormValues = {
     name: environment.Name,
-    url: environment.URL,
+    url: stripProtocol(environment.URL),
     publicUrl: environment.PublicURL || '',
 
     tlsConfig: {

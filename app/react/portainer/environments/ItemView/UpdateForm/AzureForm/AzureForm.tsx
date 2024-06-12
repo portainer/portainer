@@ -3,6 +3,7 @@ import { Form, Formik } from 'formik';
 import { NameField } from '@/react/portainer/environments/common/NameField';
 import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
 import { Environment } from '@/react/portainer/environments/types';
+import { stripProtocol } from '@/portainer/filters/filters';
 
 import { FormSection } from '@@/form-components/FormSection';
 
@@ -37,13 +38,15 @@ export function AzureForm({
     authKey: environment.AzureCredentials?.AuthenticationKey || '',
   };
 
+  const url = stripProtocol(environment.URL);
+
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
       {({ isValid }) => (
         <Form className="form-horizontal">
           <FormSection title="Configuration">
             <NameField />
-            <URLField disabled value={environment.URL} />
+            <URLField disabled value={url} />
           </FormSection>
           <AzureEnvironmentConfiguration />
           <MetadataFieldset />
