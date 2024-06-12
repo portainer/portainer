@@ -72,7 +72,7 @@ export function ResultsDatatable({ jobId }: { jobId: EdgeJob['Id'] }) {
       extendTableOptions={mergeOptions(
         withMeta({
           table: 'edge-job-results',
-          jobId, 
+          jobId,
         })
       )}
       data-cy="edge-job-results-datatable"
