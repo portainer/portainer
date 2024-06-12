@@ -7,9 +7,8 @@ import { Widget } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { Environment } from '../types';
-
-import { EdgeKeyDisplay } from './EdgeKeyDisplay';
+import { Environment } from '../../types';
+import { EdgeKeyDisplay } from '../../common/EdgeKeyDisplay';
 
 export function EdgeDeploymentInfo({
   environment,

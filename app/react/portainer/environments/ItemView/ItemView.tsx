@@ -6,7 +6,7 @@ import { useEnvironment } from '../queries';
 import { isEdgeEnvironment } from '../utils';
 
 import { UpdateForm } from './UpdateForm/UpdateForm';
-import { EdgeEnvironmentDetails } from './EdgeEnvironmentDetails';
+import { EdgeEnvironmentDetails } from './EdgeDetails/EdgeEnvironmentDetails';
 import { KubeDetails } from './KubeDetails/KubeDetails';
 
 export function ItemView() {

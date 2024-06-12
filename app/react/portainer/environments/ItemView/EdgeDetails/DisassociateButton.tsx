@@ -2,8 +2,8 @@ import { notifySuccess } from '@/portainer/services/notifications';
 
 import { LoadingButton } from '@@/buttons';
 
-import { Environment } from '../types';
-import { useDisassociateEdgeEnvironment } from '../queries/useDisassociateEdgeEnvironment';
+import { Environment } from '../../types';
+import { useDisassociateEdgeEnvironment } from '../../queries/useDisassociateEdgeEnvironment';
 
 import { confirmDisassociate } from './ConfirmDisassociateModel';
 

@@ -5,7 +5,7 @@ import { Environment } from '@/react/portainer/environments/types';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { CommandTab } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { OS, EdgeInfo } from '@/react/edge/components/EdgeScriptForm/types';
-import { EdgeKeyDisplay } from '@/react/portainer/environments/ItemView/EdgeKeyDisplay';
+import { EdgeKeyDisplay } from '@/react/portainer/environments/common/EdgeKeyDisplay';
 
 import { Button } from '@@/buttons';
 

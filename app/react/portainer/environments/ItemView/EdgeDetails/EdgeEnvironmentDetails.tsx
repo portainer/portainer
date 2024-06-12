@@ -1,4 +1,4 @@
-import { Environment } from '../types';
+import { Environment } from '../../types';
 
 import { EdgeDeploymentInfo } from './EdgeDeploymentInfo';
 import { EdgeAssociationInfo } from './EdgeAssociationInfo';

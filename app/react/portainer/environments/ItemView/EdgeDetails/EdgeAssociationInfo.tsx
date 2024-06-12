@@ -1,8 +1,8 @@
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { getPlatformTypeName } from '../utils';
-import { Environment } from '../types';
+import { getPlatformTypeName } from '../../utils';
+import { Environment } from '../../types';
 
 import { DisassociateButton } from './DisassociateButton';
 
