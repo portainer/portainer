@@ -8,6 +8,10 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 )
 
+var (
+	labelRegexp = regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
+)
+
 func UserIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
 	isAdmin := user.Role == portainer.AdministratorRole
 
@@ -39,8 +43,7 @@ func ResourceControlID(endpointID portainer.EndpointID, name string) string {
 
 // convert string to valid kubernetes label by replacing invalid characters with periods
 func SanitizeLabel(value string) string {
-	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
-	return re.ReplaceAllString(value, ".")
+	return labelRegexp.ReplaceAllString(value, ".")
 }
 
 // IsGitStack checks if the stack is a git stack or not
