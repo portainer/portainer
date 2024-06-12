@@ -1,11 +1,9 @@
-import { useRouter } from '@uirouter/react';
-
 import { Button, CopyButton } from '@@/buttons';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { TextTip } from '@@/Tip/TextTip';
+import { Link } from '@@/Link';
 
 export function DisplayUserAccessToken({ apikey }: { apikey: string }) {
-  const router = useRouter();
   return (
     <>
       <FormSectionTitle>New access token</FormSectionTitle>
@@ -27,9 +25,11 @@ export function DisplayUserAccessToken({ apikey }: { apikey: string }) {
         <hr />
       </div>
       <Button
-        type="button"
+        as={Link}
+        props={{
+          to: 'portainer.account',
+        }}
         data-cy="create-access-token-done-button"
-        onClick={() => router.stateService.go('portainer.account')}
       >
         Done
       </Button>

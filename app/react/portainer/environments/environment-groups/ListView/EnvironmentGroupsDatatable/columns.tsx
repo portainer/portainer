@@ -26,7 +26,6 @@ function ActionsCell({
       props={{
         to: '.group.access',
         params: { id: item.Id },
-        'data-cy': `manage-access-link_${item.Name}`,
       }}
       color="link"
       icon={Users}

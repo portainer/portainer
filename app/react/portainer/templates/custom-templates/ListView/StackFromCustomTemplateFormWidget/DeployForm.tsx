@@ -158,7 +158,6 @@ export function DeployForm({
               as={Link}
               props={{
                 to: '.',
-                'data-cy': 'cancel-stack-creation',
                 params: { template: null },
               }}
               color="default"

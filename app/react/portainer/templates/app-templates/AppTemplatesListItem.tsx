@@ -46,7 +46,6 @@ export function AppTemplatesListItem({
                   appTemplateId: template.Id,
                   type: duplicateCustomTemplateType,
                 },
-                'data-cy': `app-templates-duplicate-${template.Name}`,
               }}
             >
               Copy as Custom
