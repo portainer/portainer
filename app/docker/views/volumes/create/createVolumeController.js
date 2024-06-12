@@ -97,7 +97,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       }
       driverOptions.push({ name: 'o', value: options });
 
-      var mountPoint = data.mountPoint[0] === ':' ? data.mountPoint : ':' + data.mountPoint;
+      var mountPoint = data.mountPoint.indexOf(':') === -1 ? ':' + data.mountPoint : data.mountPoint;
       driverOptions.push({ name: 'device', value: mountPoint });
     }
 
