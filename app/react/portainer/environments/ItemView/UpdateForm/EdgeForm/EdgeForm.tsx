@@ -1,41 +1,25 @@
 import { Form, Formik } from 'formik';
-import _ from 'lodash';
 
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-
-import { TextTip } from '@@/Tip/TextTip';
-import { FormSection } from '@@/form-components/FormSection';
-import { confirmDestructive } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
-
-import { isDockerEnvironment } from '../../../utils';
-import { Environment, EnvironmentStatus } from '../../../types';
-import { MetadataFieldset } from '../../../common/MetadataFieldset';
-import { NameField } from '../../../common/NameField';
-import { EnvironmentMetadata } from '../../../environment.service/create';
+import { isDockerEnvironment } from '@/react/portainer/environments/utils';
 import {
-  UpdateEnvironmentPayload,
-  useUpdateEnvironmentMutation,
-} from '../../../queries/useUpdateEnvironmentMutation';
+  Environment,
+  EnvironmentStatus,
+} from '@/react/portainer/environments/types';
+import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
+import { NameField } from '@/react/portainer/environments/common/NameField';
+
+import { FormSection } from '@@/form-components/FormSection';
+import { TextTip } from '@@/Tip/TextTip';
+
 import { EnvironmentFormActions } from '../EnvironmentFormActions';
 import { PublicIPField } from '../PublicIPField';
 
 import { AmtInfo } from './AMTInfo';
-
-interface FormValues {
-  name: string;
-
-  publicUrl: string;
-
-  meta: EnvironmentMetadata;
-
-  checkInInterval: number;
-  CommandInterval: number;
-  PingInterval: number;
-  SnapshotInterval: number;
-}
+import { useUpdateMutation } from './useUpdateMutation';
+import { FormValues } from './types';
 
 export function EdgeForm({
   environment,
@@ -116,56 +100,4 @@ export function EdgeForm({
       )}
     </Formik>
   );
-}
-
-export function useUpdateMutation(
-  environment: Environment,
-  onSuccessUpdate: (name: string) => void
-) {
-  const updateMutation = useUpdateEnvironmentMutation();
-
-  return {
-    handleSubmit,
-    isLoading: updateMutation.isLoading,
-  };
-
-  async function handleSubmit(values: FormValues) {
-    const hasRemovedTags =
-      _.difference(environment.TagIds, values.meta.tagIds || []).length > 0;
-
-    if (hasRemovedTags) {
-      const confirmed = await confirmDestructive({
-        title: 'Confirm action',
-        message:
-          'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
-        confirmButton: buildConfirmButton(),
-      });
-
-      if (!confirmed) {
-        return;
-      }
-    }
-
-    const payload: UpdateEnvironmentPayload = {
-      Name: values.name,
-      PublicURL: values.publicUrl,
-      GroupID: values.meta.groupId,
-      TagIDs: values.meta.tagIds,
-      EdgeCheckinInterval: values.checkInInterval,
-      Edge: {
-        CommandInterval: values.CommandInterval,
-        PingInterval: values.PingInterval,
-        SnapshotInterval: values.SnapshotInterval,
-      },
-    };
-
-    payload.URL = `tcp://${environment.URL}`;
-
-    updateMutation.mutate(
-      { id: environment.Id, payload },
-      {
-        onSuccess: () => onSuccessUpdate(values.name),
-      }
-    );
-  }
 }

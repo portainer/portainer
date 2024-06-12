@@ -10,7 +10,7 @@ import { isAgentEnvironment, isEdgeEnvironment } from '../../utils';
 import { AzureForm } from './AzureForm/AzureForm';
 import { AgentForm } from './AgentForm/AgentForm';
 import { EdgeForm } from './EdgeForm/EdgeForm';
-import { OtherTypesForm } from './OtherTypesForm';
+import { OtherTypesForm } from './OtherTypesForm/OtherTypesForm';
 
 export function UpdateForm({ environment }: { environment: Environment }) {
   const router = useRouter();

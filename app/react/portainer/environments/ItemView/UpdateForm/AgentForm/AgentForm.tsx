@@ -1,30 +1,17 @@
 import { Form, Formik } from 'formik';
 
+import { Environment } from '@/react/portainer/environments/types';
+import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
+import { NameField } from '@/react/portainer/environments/common/NameField';
+
 import { FormSection } from '@@/form-components/FormSection';
 
-import { Environment, EnvironmentType } from '../../../types';
-import { MetadataFieldset } from '../../../common/MetadataFieldset';
-import { NameField } from '../../../common/NameField';
-import {
-  UpdateEnvironmentPayload,
-  useUpdateEnvironmentMutation,
-} from '../../../queries/useUpdateEnvironmentMutation';
 import { EnvironmentFormActions } from '../EnvironmentFormActions';
 import { PublicIPField } from '../PublicIPField';
 
 import { AgentAddressField } from './AgentEnvironmentAddress';
-
-interface FormValues {
-  name: string;
-
-  url: string;
-  publicUrl: string;
-
-  meta: {
-    tagIds: number[];
-    groupId: number;
-  };
-}
+import { FormValues } from './types';
+import { useUpdateMutation } from './useUpdateMutation';
 
 export function AgentForm({
   environment,
@@ -65,40 +52,4 @@ export function AgentForm({
       )}
     </Formik>
   );
-}
-
-export function useUpdateMutation(
-  environment: Environment,
-  onSuccessUpdate: (name: string) => void
-) {
-  const updateMutation = useUpdateEnvironmentMutation();
-
-  return {
-    handleSubmit,
-    isLoading: updateMutation.isLoading,
-  };
-
-  async function handleSubmit(values: FormValues) {
-    const payload: UpdateEnvironmentPayload = {
-      Name: values.name,
-      PublicURL: values.publicUrl,
-      GroupID: values.meta.groupId,
-      TagIDs: values.meta.tagIds,
-    };
-
-    if (environment.Type === EnvironmentType.AgentOnDocker) {
-      payload.URL = `tcp://${values.url}`;
-    }
-
-    if (environment.Type === EnvironmentType.AgentOnKubernetes) {
-      payload.URL = values.url;
-    }
-
-    updateMutation.mutate(
-      { id: environment.Id, payload },
-      {
-        onSuccess: () => onSuccessUpdate(values.name),
-      }
-    );
-  }
 }

@@ -1,29 +1,17 @@
 import { Form, Formik } from 'formik';
 
+import { NameField } from '@/react/portainer/environments/common/NameField';
+import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
+import { Environment } from '@/react/portainer/environments/types';
+
 import { FormSection } from '@@/form-components/FormSection';
 
-import { NameField } from '../../../common/NameField';
-import { MetadataFieldset } from '../../../common/MetadataFieldset';
-import { Environment, EnvironmentId } from '../../../types';
-import { EnvironmentMetadata } from '../../../environment.service/create';
-import {
-  UpdateEnvironmentPayload,
-  useUpdateEnvironmentMutation,
-} from '../../../queries/useUpdateEnvironmentMutation';
 import { URLField } from '../URLField';
 import { EnvironmentFormActions } from '../EnvironmentFormActions';
 
 import { AzureEnvironmentConfiguration } from './AzureConfiguration';
-
-interface FormValues {
-  name: string;
-
-  meta: EnvironmentMetadata;
-
-  applicationId: string;
-  tenantId: string;
-  authKey: string;
-}
+import { FormValues } from './types';
+import { useUpdateAzureEnvironment } from './useUpdateAzureEnvironment';
 
 export function AzureForm({
   environment,
@@ -64,34 +52,4 @@ export function AzureForm({
       )}
     </Formik>
   );
-}
-
-function useUpdateAzureEnvironment(
-  envId: EnvironmentId,
-  onSuccessUpdate: (name: string) => void
-) {
-  const updateMutation = useUpdateEnvironmentMutation();
-
-  return {
-    handleSubmit,
-    isLoading: updateMutation.isLoading,
-  };
-
-  async function handleSubmit(values: FormValues) {
-    const payload: UpdateEnvironmentPayload = {
-      Name: values.name,
-      GroupID: values.meta.groupId,
-      TagIDs: values.meta.tagIds,
-      AzureApplicationID: values.applicationId,
-      AzureTenantID: values.tenantId,
-      AzureAuthenticationKey: values.authKey,
-    };
-
-    updateMutation.mutate(
-      { id: envId, payload },
-      {
-        onSuccess: () => onSuccessUpdate(values.name),
-      }
-    );
-  }
 }

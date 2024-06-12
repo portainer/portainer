@@ -1,11 +1,10 @@
 import { useAMTInfo } from '@/react/edge/edge-devices/open-amt/useAmtInfo';
+import { EnvironmentId } from '@/react/portainer/environments/types';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
-
-import { EnvironmentId } from '../../../types';
-import { useSettings } from '../../../../settings/queries';
 
 export function AmtInfo({ environmentId }: { environmentId: EnvironmentId }) {
   const isAmtEnabledQuery = useSettings(
