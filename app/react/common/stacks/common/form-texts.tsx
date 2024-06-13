@@ -33,7 +33,7 @@ export const textByType = {
             (Deployment, Secret, ConfigMap...)
           </p>
           <p>
-            You can get more information about Kubernetes file format in the
+            You can get more information about Kubernetes file format in the{' '}
             <a
               href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/"
               target="_blank"

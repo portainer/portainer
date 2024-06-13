@@ -117,7 +117,18 @@ class KubernetesDeployController {
   }
 
   setStackName(name) {
-    this.formValues.StackName = name;
+    return this.$async(async () => {
+      // this regex is to satisfy k8s label validation rules
+      const regex = /^(([a-zA-Z0-9](?:(?:[-a-zA-Z0-9_.]){0,61}[a-zA-Z0-9])?))$/;
+      if (regex.test(name) || name === '') {
+        this.state.stackNameError = '';
+      } else {
+        this.state.stackNameError =
+          "Stack must consist of alphanumeric characters, '-', '_' or '.', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').";
+      }
+
+      this.formValues.StackName = name;
+    });
   }
 
   renderTemplate() {
@@ -197,9 +208,9 @@ class KubernetesDeployController {
     const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
     const isURLFormInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.URL && _.isEmpty(this.formValues.ManifestURL);
     const isCustomTemplateInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.CUSTOM_TEMPLATE && _.isEmpty(this.formValues.EditorContent);
-
+    const isStackNameInvalid = this.state.stackNameError !== '';
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
-    return isWebEditorInvalid || isURLFormInvalid || isCustomTemplateInvalid || this.state.actionInProgress || isNamespaceInvalid;
+    return isWebEditorInvalid || isURLFormInvalid || isCustomTemplateInvalid || this.state.actionInProgress || isNamespaceInvalid || isStackNameInvalid;
   }
 
   onChangeFormValues(newValues) {

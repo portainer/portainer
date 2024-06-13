@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { TemplateType } from '@/react/portainer/templates/app-templates/types';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/react/portainer/custom-templates/components/CommonFields';
 import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app').controller('TemplatesController', [
@@ -47,6 +48,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     $scope.enabledTypes = [TemplateType.Container, TemplateType.ComposeStack];

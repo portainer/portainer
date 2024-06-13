@@ -186,9 +186,18 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  onChangeStackName(stackName) {
+  onChangeStackName(name) {
     return this.$async(async () => {
-      this.formValues.StackName = stackName;
+      // this regex is to satisfy k8s label validation rules
+      const k8sLabelRegex = /^(([a-zA-Z0-9](?:(?:[-a-zA-Z0-9_.]){0,61}[a-zA-Z0-9])?))$/;
+      if (k8sLabelRegex.test(name) || name === '') {
+        this.state.stackNameError = '';
+      } else {
+        this.state.stackNameError =
+          "Stack must consist of alphanumeric characters, '-', '_' or '.', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').";
+      }
+
+      this.formValues.StackName = name;
     });
   }
 
@@ -644,7 +653,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
+    const stackNameInvalid = this.state.stackNameError !== '';
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || stackNameInvalid;
   }
 
   isUpdateApplicationViaWebEditorButtonDisabled() {

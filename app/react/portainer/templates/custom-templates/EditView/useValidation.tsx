@@ -55,7 +55,6 @@ export function useValidation({
         commonFieldsValidation({
           templates: customTemplatesQuery.data,
           currentTemplateId: templateId,
-          viewType,
         })
       ),
     [
