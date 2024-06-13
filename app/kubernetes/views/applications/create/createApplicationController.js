@@ -28,6 +28,7 @@ import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateV
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
+import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -188,9 +189,7 @@ class KubernetesCreateApplicationController {
 
   onChangeStackName(name) {
     return this.$async(async () => {
-      // this regex is to satisfy k8s label validation rules
-      const k8sLabelRegex = /^(([a-zA-Z0-9](?:(?:[-a-zA-Z0-9_.]){0,61}[a-zA-Z0-9])?))$/;
-      if (k8sLabelRegex.test(name) || name === '') {
+      if (KUBE_STACK_NAME_VALIDATION_REGEX.test(name) || name === '') {
         this.state.stackNameError = '';
       } else {
         this.state.stackNameError =
