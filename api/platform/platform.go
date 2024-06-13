@@ -65,7 +65,7 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 	info, err := dockerCli.Info(context.Background())
 	if err != nil {
 		if client.IsErrConnectionFailed(err) {
-			log.Warn().
+			log.Debug().
 				Err(err).
 				Msg("failed to retrieve docker info")
 			return "", nil
