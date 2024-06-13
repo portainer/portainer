@@ -12,6 +12,7 @@ import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/p
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -119,9 +120,7 @@ class KubernetesDeployController {
 
   setStackName(name) {
     return this.$async(async () => {
-      // this regex is to satisfy k8s label validation rules
-      const regex = /^(([a-zA-Z0-9](?:(?:[-a-zA-Z0-9_.]){0,61}[a-zA-Z0-9])?))$/;
-      if (regex.test(name) || name === '') {
+      if (KUBE_STACK_NAME_VALIDATION_REGEX.test(name) || name === '') {
         this.state.stackNameError = '';
       } else {
         this.state.stackNameError =
