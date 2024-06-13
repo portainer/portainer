@@ -128,6 +128,7 @@ class KubernetesCreateApplicationController {
       // a validation message will be shown. isExistingCPUReservationUnchanged and isExistingMemoryReservationUnchanged (with available resources being exceeded) is used to decide whether to show the message or not.
       isExistingCPUReservationUnchanged: false,
       isExistingMemoryReservationUnchanged: false,
+      stackNameError: '',
     };
 
     this.isAdmin = this.Authentication.isAdmin();

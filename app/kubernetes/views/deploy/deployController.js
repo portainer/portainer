@@ -58,6 +58,7 @@ class KubernetesDeployController {
       templateLoadFailed: false,
       isEditorReadOnly: false,
       selectedHelmChart: '',
+      stackNameError: '',
     };
 
     this.currentUser = {
