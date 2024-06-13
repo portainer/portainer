@@ -92,7 +92,12 @@
                   <div class="mb-4 w-fit">
                     <stack-name-label-insight></stack-name-label-insight>
                   </div>
-                  <kube-stack-name stack-name="ctrl.formValues.StackName" set-stack-name="(ctrl.setStackName)" stacks="ctrl.stacks"></kube-stack-name>
+                  <kube-stack-name
+                    stack-name="ctrl.formValues.StackName"
+                    set-stack-name="(ctrl.setStackName)"
+                    stacks="ctrl.stacks"
+                    error="ctrl.state.stackNameError"
+                  ></kube-stack-name>
                 </div>
                 <!-- !namespace -->
 

@@ -63,7 +63,7 @@ export function DeployForm({
   const isGit = !!template.GitConfig;
 
   const initialValues: FormValues = {
-    name: template.Title || '',
+    name: '',
     variables: getVariablesFieldDefaultValues(template.Variables),
     accessControl: parseAccessControlFormData(
       isEdgeAdminQuery.isAdmin,
@@ -86,6 +86,7 @@ export function DeployForm({
               value={values.name}
               onChange={(v) => setFieldValue('name', v)}
               errors={errors.name}
+              placeholder="e.g. mystack"
             />
           </FormSection>
 

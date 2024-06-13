@@ -72,7 +72,6 @@ export function useValidation({
       }).concat(
         commonFieldsValidation({
           templates: customTemplatesQuery.data,
-          viewType,
         })
       ),
     [
