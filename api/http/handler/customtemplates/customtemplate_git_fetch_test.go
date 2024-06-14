@@ -90,7 +90,7 @@ func singleAPIRequest(h *Handler, jwt string, is *assert.Assertions, expect stri
 		FileContent string
 	}
 
-	req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBuffer([]byte("{}")))
+	req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBufferString("{}"))
 	testhelpers.AddTestSecurityCookie(req, jwt)
 
 	rr := httptest.NewRecorder()
@@ -196,7 +196,7 @@ func Test_customTemplateGitFetch(t *testing.T) {
 		}
 		h := NewHandler(requestBouncer, store, fileService, invalidGitService)
 
-		req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBuffer([]byte("{}")))
+		req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBufferString("{}"))
 		testhelpers.AddTestSecurityCookie(req, jwt1)
 
 		rr := httptest.NewRecorder()

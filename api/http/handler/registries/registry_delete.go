@@ -32,8 +32,7 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
-	}
-	if !securityContext.IsAdmin {
+	} else if !securityContext.IsAdmin {
 		return httperror.Forbidden("Permission denied to delete registry", httperrors.ErrResourceAccessDenied)
 	}
 
@@ -47,21 +46,16 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %q from the database", registry.Name), err)
 	}
 
-	err = handler.DataStore.Registry().Delete(portainer.RegistryID(registryID))
-	if err != nil {
+	if err := handler.DataStore.Registry().Delete(portainer.RegistryID(registryID)); err != nil {
 		return httperror.InternalServerError("Unable to remove the registry from the database", err)
 	}
 
-	err = handler.deleteKubernetesSecrets(registry)
-	if err != nil {
-		return httperror.InternalServerError("Unable to delete registry secrets", err)
-	}
+	handler.deleteKubernetesSecrets(registry)
 
 	return response.Empty(w)
 }
 
-func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) error {
-
+func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) {
 	for endpointId, access := range registry.RegistryAccesses {
 		if access.Namespaces != nil {
 			// Obtain a kubeclient for the endpoint
@@ -69,6 +63,7 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 			if err != nil {
 				// Skip environments that can't be loaded from the DB
 				log.Warn().Err(err).Msgf("Unable to load the environment with id %d from the database", endpointId)
+
 				continue
 			}
 
@@ -76,13 +71,14 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 			if err != nil {
 				// Skip environments that can't get a kubeclient from
 				log.Warn().Err(err).Msgf("Unable to get kubernetes client for environment %d", endpointId)
+
 				continue
 			}
 
 			failedNamespaces := make([]string, 0)
+
 			for _, ns := range access.Namespaces {
-				err = cli.DeleteRegistrySecret(registry.ID, ns)
-				if err != nil {
+				if err := cli.DeleteRegistrySecret(registry.ID, ns); err != nil {
 					failedNamespaces = append(failedNamespaces, ns)
 					log.Warn().Err(err).Msgf("Unable to delete registry secret %q from namespace %q for environment %d. Retrying offline", cli.RegistrySecretName(registry.ID), ns, endpointId)
 				}
@@ -95,6 +91,4 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) er
 			}
 		}
 	}
-
-	return nil
 }

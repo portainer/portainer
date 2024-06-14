@@ -15,7 +15,6 @@ type filterTestCase[T any] struct {
 }
 
 func TestFilter(t *testing.T) {
-
 	intTestCases := []filterTestCase[int]{
 		{
 			name:     "Filter even numbers",
@@ -59,7 +58,6 @@ func TestFilter(t *testing.T) {
 	}
 
 	runTestCases(t, stringTestCases)
-
 }
 
 func runTestCases[T any](t *testing.T, testCases []filterTestCase[T]) {
@@ -85,9 +83,7 @@ func TestMap(t *testing.T) {
 			name:     "Map integers to strings",
 			input:    []int{1, 2, 3, 4, 5},
 			expected: []string{"1", "2", "3", "4", "5"},
-			mapper: func(n int) string {
-				return strconv.Itoa(n)
-			},
+			mapper:   strconv.Itoa,
 		},
 	}
 

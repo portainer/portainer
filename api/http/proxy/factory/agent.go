@@ -86,7 +86,7 @@ func (proxy *ProxyServer) start() error {
 		err := proxy.server.Serve(listener)
 		log.Debug().Str("host", proxyHost).Msg("exiting proxy server")
 
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Debug().Str("host", proxyHost).Err(err).Msg("proxy server exited with an error")
 		}
 	}()

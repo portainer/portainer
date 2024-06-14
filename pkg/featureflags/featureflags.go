@@ -49,6 +49,7 @@ func IsEnabled(feat Feature) bool {
 // IsSupported returns true if the feature is supported
 func IsSupported(feat Feature) bool {
 	_, ok := featureFlags[feat]
+
 	return ok
 }
 
@@ -81,14 +82,15 @@ func Parse(features []string, supportedFeatures []Feature) {
 	if env != "" {
 		envFeatures = strings.Split(env, ",")
 	}
+
 	features = append(features, envFeatures...)
 
 	// loop through feature flags to check if they are supported
 	for _, feat := range features {
 		f := Feature(strings.ToLower(feat))
-		_, ok := featureFlags[f]
-		if !ok {
+		if _, ok := featureFlags[f]; !ok {
 			log.Warn().Str("feature", f.String()).Msgf("unknown feature flag")
+
 			continue
 		}
 

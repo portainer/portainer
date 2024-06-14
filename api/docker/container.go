@@ -7,12 +7,12 @@ import (
 	"github.com/docker/docker/api/types"
 	dockercontainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/images"
+
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -37,9 +37,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 		return nil, errors.Wrap(err, "create client error")
 	}
 
-	defer func(cli *client.Client) {
-		cli.Close()
-	}(cli)
+	defer cli.Close()
 
 	log.Debug().Str("container_id", containerId).Msg("starting to fetch container information")
 

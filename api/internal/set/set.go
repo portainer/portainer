@@ -14,6 +14,7 @@ func (s Set[T]) Add(key T) {
 // Contains returns true if the set contains the key.
 func (s Set[T]) Contains(key T) bool {
 	_, ok := s[key]
+
 	return ok
 }
 
@@ -47,18 +48,17 @@ func (s Set[T]) Keys() []T {
 
 // Clear removes all keys from the set.
 func (s Set[T]) Copy() Set[T] {
-	copy := make(Set[T])
+	c := make(Set[T])
 
 	for key := range s {
-		copy.Add(key)
+		c.Add(key)
 	}
 
-	return copy
+	return c
 }
 
 // Difference returns a new set containing the keys that are in the first set but not in the second set.
 func (set Set[T]) Difference(second Set[T]) Set[T] {
-
 	difference := set.Copy()
 
 	for key := range second {
@@ -106,5 +106,6 @@ func ToSet[T SetKey](keys []T) Set[T] {
 	for _, key := range keys {
 		set.Add(key)
 	}
+
 	return set
 }

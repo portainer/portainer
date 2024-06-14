@@ -79,7 +79,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 	return transport, nil
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return transport.ProxyDockerRequest(request)
 }
@@ -489,63 +489,65 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 }
 
 func (transport *Transport) restrictedResourceOperation(request *http.Request, resourceID string, dockerResourceID string, resourceType portainer.ResourceControlType, volumeBrowseRestrictionCheck bool) (*http.Response, error) {
-	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
 
-	if tokenData.Role != portainer.AdministratorRole {
-		if volumeBrowseRestrictionCheck {
-			securitySettings, err := transport.fetchEndpointSecuritySettings()
-			if err != nil {
-				return nil, err
-			}
+	if tokenData.Role == portainer.AdministratorRole {
+		return transport.executeDockerRequest(request)
+	}
 
-			if !securitySettings.AllowVolumeBrowserForRegularUsers {
-				return utils.WriteAccessDeniedResponse()
-			}
-		}
-
-		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if volumeBrowseRestrictionCheck {
+		securitySettings, err := transport.fetchEndpointSecuritySettings()
 		if err != nil {
 			return nil, err
 		}
 
-		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, membership := range teamMemberships {
-			userTeamIDs = append(userTeamIDs, membership.TeamID)
-		}
-
-		resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
-		if err != nil {
-			return nil, err
-		}
-
-		resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-		if resourceControl == nil {
-			agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-			if dockerResourceID == "" {
-				dockerResourceID = resourceID
-			}
-
-			// This resource was created outside of portainer,
-			// is part of a Docker service or part of a Docker Swarm/Compose stack.
-			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(dockerResourceID, agentTargetHeader, resourceType, resourceControls)
-			if err != nil {
-				return nil, err
-			}
-
-			if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
-				return utils.WriteAccessDeniedResponse()
-			}
-		}
-
-		if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		if !securitySettings.AllowVolumeBrowserForRegularUsers {
 			return utils.WriteAccessDeniedResponse()
 		}
 	}
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range teamMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl == nil {
+		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
+
+		if dockerResourceID == "" {
+			dockerResourceID = resourceID
+		}
+
+		// This resource was created outside of portainer,
+		// is part of a Docker service or part of a Docker Swarm/Compose stack.
+		inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(dockerResourceID, agentTargetHeader, resourceType, resourceControls)
+		if err != nil {
+			return nil, err
+		}
+
+		if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+			return utils.WriteAccessDeniedResponse()
+		}
+	}
+
+	if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		return utils.WriteAccessDeniedResponse()
+	}
+
 	return transport.executeDockerRequest(request)
 }
 
@@ -587,8 +589,7 @@ func (transport *Transport) rewriteOperation(request *http.Request, operation re
 }
 
 func (transport *Transport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
-	err := operation(request)
-	if err != nil {
+	if err := operation(request); err != nil {
 		return nil, err
 	}
 
@@ -653,21 +654,22 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusOK {
-		resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
-		if err != nil {
-			if dataservices.IsErrObjectNotFound(err) {
-				return response, nil
-			}
+	if response.StatusCode != http.StatusNoContent && response.StatusCode != http.StatusOK {
+		return response, nil
+	}
 
-			return response, err
+	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
+	if err != nil {
+		if dataservices.IsErrObjectNotFound(err) {
+			return response, nil
 		}
 
-		if resourceControl != nil {
-			err = transport.dataStore.ResourceControl().Delete(resourceControl.ID)
-			if err != nil {
-				return response, err
-			}
+		return response, err
+	}
+
+	if resourceControl != nil {
+		if err := transport.dataStore.ResourceControl().Delete(resourceControl.ID); err != nil {
+			return response, err
 		}
 	}
 
@@ -683,6 +685,7 @@ func (transport *Transport) executeRequestAndRewriteResponse(request *http.Reque
 	if response.StatusCode == http.StatusOK {
 		err = operation(response, executor)
 	}
+
 	return response, err
 }
 
@@ -724,16 +727,18 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	}
 	accessContext.registries = registries
 
-	if user.Role != portainer.AdministratorRole {
-		accessContext.isAdmin = false
-
-		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		accessContext.teamMemberships = teamMemberships
+	if user.Role == portainer.AdministratorRole {
+		return accessContext, nil
 	}
+
+	accessContext.isAdmin = false
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	accessContext.teamMemberships = teamMemberships
 
 	return accessContext, nil
 }
@@ -756,21 +761,23 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 		resourceControls: resourceControls,
 	}
 
-	if tokenData.Role != portainer.AdministratorRole {
-		operationContext.isAdmin = false
-
-		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, membership := range teamMemberships {
-			userTeamIDs = append(userTeamIDs, membership.TeamID)
-		}
-
-		operationContext.userTeamIDs = userTeamIDs
+	if tokenData.Role == portainer.AdministratorRole {
+		return operationContext, nil
 	}
+
+	operationContext.isAdmin = false
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range teamMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	operationContext.userTeamIDs = userTeamIDs
 
 	return operationContext, nil
 }

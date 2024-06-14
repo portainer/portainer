@@ -1,4 +1,4 @@
-// Package error provides error/logging functions that can be used in conjuction with http.Handler.
+// Package error provides error/logging functions that can be used in conjunction with http.Handler.
 package error
 
 import (
@@ -21,8 +21,7 @@ type (
 )
 
 func (handler LoggerHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	err := handler(rw, r)
-	if err != nil {
+	if err := handler(rw, r); err != nil {
 		writeErrorResponse(rw, err)
 	}
 }
@@ -34,6 +33,7 @@ func capitalize(s string) string {
 
 	// Capitalize the first letter of the word or sentence
 	firstLetter := unicode.ToUpper(rune(s[0]))
+
 	return string(firstLetter) + s[1:]
 }
 
@@ -42,7 +42,12 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 		err.Err = errors.New(capitalize(err.Message))
 	}
 
-	log.Debug().CallerSkipFrame(2).Err(err.Err).Int("status_code", err.StatusCode).Str("msg", err.Message).Msg("HTTP error")
+	log.Debug().
+		CallerSkipFrame(2).
+		Err(err.Err).
+		Int("status_code", err.StatusCode).
+		Str("msg", err.Message).
+		Msg("HTTP error")
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
