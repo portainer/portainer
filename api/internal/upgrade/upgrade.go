@@ -35,9 +35,7 @@ type service struct {
 	kubernetesClientFactory   *kubecli.ClientFactory
 	dockerClientFactory       *dockerclient.ClientFactory
 	dockerComposeStackManager portainer.ComposeStackManager
-	dataStore                 dataservices.DataStore
 	fileService               portainer.FileService
-	stackDeployer             deployments.StackDeployer
 
 	isUpdating bool
 
@@ -59,9 +57,7 @@ func NewService(
 		kubernetesClientFactory:   kubernetesClientFactory,
 		dockerClientFactory:       dockerClientFactory,
 		dockerComposeStackManager: dockerComposeStackManager,
-		dataStore:                 dataStore,
 		fileService:               fileService,
-		stackDeployer:             stackDeployer,
 	}, nil
 }
 
