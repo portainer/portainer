@@ -1367,10 +1367,20 @@ type (
 		AbortOnContainerExit bool
 	}
 
+	ComposeRunOptions struct {
+		// Remove will remove the container after it has stopped
+		Remove bool
+		// Args are the arguments to pass to the container
+		Args []string
+		// Detached will run the container in the background
+		Detached bool
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
+		Run(ctx context.Context, stack *Stack, endpoint *Endpoint, serviceName string, options ComposeRunOptions) error
 		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeUpOptions) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error

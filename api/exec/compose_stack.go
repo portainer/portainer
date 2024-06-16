@@ -67,6 +67,37 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 	return errors.Wrap(err, "failed to deploy a stack")
 }
 
+// Run runs a one-off command on a service. Wraps `docker-compose run` command
+func (manager *ComposeStackManager) Run(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, serviceName string, options portainer.ComposeRunOptions) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	if err != nil {
+		return errors.Wrap(err, "failed to fetch environment proxy")
+	}
+
+	if proxy != nil {
+		defer proxy.Close()
+	}
+
+	envFilePath, err := createEnvFile(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to create env file")
+	}
+
+	filePaths := stackutils.GetStackFilePaths(stack, true)
+	err = manager.deployer.Run(ctx, filePaths, serviceName, libstack.RunOptions{
+		Options: libstack.Options{
+			WorkingDir:  stack.ProjectPath,
+			EnvFilePath: envFilePath,
+			Host:        url,
+			ProjectName: stack.Name,
+		},
+		Remove:   options.Remove,
+		Args:     options.Args,
+		Detached: options.Detached,
+	})
+	return errors.Wrap(err, "failed to deploy a stack")
+}
+
 // Down stops and removes containers, networks, images, and volumes
 func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)

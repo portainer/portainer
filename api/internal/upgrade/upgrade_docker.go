@@ -67,17 +67,14 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 	)
 
 	tempStack := &portainer.Stack{
-		Name:         projectName,
-		ProjectPath:  filePath,
-		EntryPoint:   fileName,
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
-		Type:         portainer.DockerComposeStack,
-		Env:          []portainer.Pair{},
+		Name:        projectName,
+		ProjectPath: filePath,
+		EntryPoint:  fileName,
 	}
 
-	err = service.dockerComposeStackManager.Up(ctx, tempStack, environment, portainer.ComposeUpOptions{
-		ForceRecreate: true,
+	err = service.dockerComposeStackManager.Run(ctx, tempStack, environment, "updater", portainer.ComposeRunOptions{
+		Remove:   true,
+		Detached: true,
 	})
 
 	if err != nil {
