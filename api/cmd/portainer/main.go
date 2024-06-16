@@ -532,7 +532,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
-	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer, kubernetesClientFactory)
+	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer, kubernetesClientFactory, dockerClientFactory, composeStackManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing upgrade service")
 	}

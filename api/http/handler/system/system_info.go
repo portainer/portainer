@@ -45,9 +45,9 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 
 	}
 
-	platform, err := plf.DetermineContainerPlatform()
+	_, platform, err := handler.getLocalEndpoint()
 	if err != nil {
-		return httperror.InternalServerError("Unable to determine container platform", err)
+		return httperror.InternalServerError("Failed to guess local endpoint", err)
 	}
 
 	return response.JSON(w, &systemInfoResponse{

@@ -38,7 +38,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
-func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, forceRecreate bool) error {
+func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, options portainer.ComposeUpOptions) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch environment proxy")
@@ -61,7 +61,8 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 			Host:        url,
 			ProjectName: stack.Name,
 		},
-		ForceRecreate: forceRecreate,
+		ForceRecreate:        options.ForceRecreate,
+		AbortOnContainerExit: options.AbortOnContainerExit,
 	})
 	return errors.Wrap(err, "failed to deploy a stack")
 }

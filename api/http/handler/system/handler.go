@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/upgrade"
+	"github.com/portainer/portainer/api/platform"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
@@ -18,6 +19,8 @@ type Handler struct {
 	status         *portainer.Status
 	dataStore      dataservices.DataStore
 	upgradeService upgrade.Service
+	environment    *portainer.Endpoint
+	platform       platform.ContainerPlatform
 }
 
 // NewHandler creates a handler to manage status operations.

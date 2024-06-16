@@ -1357,11 +1357,21 @@ type (
 		ValidateFlags(flags *CLIFlags) error
 	}
 
+	ComposeUpOptions struct {
+		// ForceRecreate forces to recreate containers
+		ForceRecreate bool
+		// AbortOnContainerExit will stop the deployment if a container exits.
+		// This is useful when running a onetime task.
+		//
+		// When this is set, docker compose will output its logs to stdout
+		AbortOnContainerExit bool
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeUpOptions) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
