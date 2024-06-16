@@ -43,10 +43,8 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	environment, platform, err := handler.getLocalEndpoint()
-	if err != nil {
-		return httperror.InternalServerError("Failed to guess local endpoint", err)
-	}
+	environment := handler.platformService.GetLocalEnvironment()
+	platform := handler.platformService.GetPlatform()
 
 	err = handler.upgradeService.Upgrade(platform, environment, payload.License)
 	if err != nil {

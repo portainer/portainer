@@ -45,10 +45,7 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 
 	}
 
-	_, platform, err := handler.getLocalEndpoint()
-	if err != nil {
-		return httperror.InternalServerError("Failed to guess local endpoint", err)
-	}
+	platform := handler.platformService.GetPlatform()
 
 	return response.JSON(w, &systemInfoResponse{
 		EdgeAgents: edgeAgents,

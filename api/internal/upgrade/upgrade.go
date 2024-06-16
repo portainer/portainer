@@ -7,7 +7,6 @@ import (
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	plf "github.com/portainer/portainer/api/platform"
-	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,7 +30,6 @@ type Service interface {
 }
 
 type service struct {
-	composeDeployer           libstack.Deployer
 	kubernetesClientFactory   *kubecli.ClientFactory
 	dockerClientFactory       *dockerclient.ClientFactory
 	dockerComposeStackManager portainer.ComposeStackManager
@@ -43,7 +41,6 @@ type service struct {
 
 func NewService(
 	assetsPath string,
-	composeDeployer libstack.Deployer,
 	kubernetesClientFactory *kubecli.ClientFactory,
 	dockerClientFactory *dockerclient.ClientFactory,
 	dockerComposeStackManager portainer.ComposeStackManager,
@@ -52,7 +49,6 @@ func NewService(
 
 	return &service{
 		assetsPath:                assetsPath,
-		composeDeployer:           composeDeployer,
 		kubernetesClientFactory:   kubernetesClientFactory,
 		dockerClientFactory:       dockerClientFactory,
 		dockerComposeStackManager: dockerComposeStackManager,

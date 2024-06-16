@@ -16,24 +16,25 @@ import (
 // Handler is the HTTP handler used to handle status operations.
 type Handler struct {
 	*mux.Router
-	status         *portainer.Status
-	dataStore      dataservices.DataStore
-	upgradeService upgrade.Service
-	environment    *portainer.Endpoint
-	platform       platform.ContainerPlatform
+	status          *portainer.Status
+	dataStore       dataservices.DataStore
+	upgradeService  upgrade.Service
+	platformService platform.Service
 }
 
 // NewHandler creates a handler to manage status operations.
 func NewHandler(bouncer security.BouncerService,
 	status *portainer.Status,
 	dataStore dataservices.DataStore,
+	platformService platform.Service,
 	upgradeService upgrade.Service) *Handler {
 
 	h := &Handler{
-		Router:         mux.NewRouter(),
-		dataStore:      dataStore,
-		status:         status,
-		upgradeService: upgradeService,
+		Router:          mux.NewRouter(),
+		dataStore:       dataStore,
+		status:          status,
+		upgradeService:  upgradeService,
+		platformService: platformService,
 	}
 
 	router := h.PathPrefix("/system").Subrouter()
