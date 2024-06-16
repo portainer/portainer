@@ -538,7 +538,15 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed initializing platform service")
 	}
 
-	upgradeService, err := upgrade.NewService(*flags.Assets, kubernetesClientFactory, dockerClientFactory, composeStackManager)
+	upgradeService, err := upgrade.NewService(
+		*flags.Assets,
+		kubernetesClientFactory,
+		dockerClientFactory,
+		composeStackManager,
+		dataStore,
+		fileService,
+		stackDeployer,
+	)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing upgrade service")
 	}

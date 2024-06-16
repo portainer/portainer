@@ -1,7 +1,6 @@
 package upgrade
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"github.com/docker/docker/api/types/image"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/stackbuilders"
 
 	"github.com/cbroglie/mustache"
 	"github.com/pkg/errors"
@@ -53,17 +54,15 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 		return errors.Wrap(err, "failed to render upgrade template")
 	}
 
-	tmpDir := os.TempDir()
+	composeStackBuilder := stackbuilders.CreateComposeStackFileContentBuilder(
+		&security.RestrictedRequestContext{IsAdmin: true},
+		service.dataStore,
+		service.fileService,
+		service.stackDeployer,
+	)
+	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
 
 	timeId := time.Now().Unix()
-	fileName := fmt.Sprintf("upgrade-%d.yml", timeId)
-	filePath := filesystem.JoinPaths(tmpDir, fileName)
-
-	r := bytes.NewReader([]byte(composeFile))
-	err = filesystem.CreateFile(filePath, r)
-	if err != nil {
-		return errors.Wrap(err, "failed to create upgrade compose file")
-	}
 
 	projectName := fmt.Sprintf(
 		"portainer-upgrade-%d-%s",
@@ -71,21 +70,13 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 		strings.ReplaceAll(version, ".", "-"),
 	)
 
-	tempStack := &portainer.Stack{
-		Name:        projectName,
-		ProjectPath: tmpDir,
-		EntryPoint:  fileName,
-	}
-
-	err = service.dockerComposeStackManager.Up(ctx, tempStack, environment, portainer.ComposeUpOptions{
-		ForceRecreate:        true,
-		AbortOnContainerExit: true,
-	})
-
-	// optimally, server was restarted by the updater, so we should not reach this point
-
-	if err != nil {
-		return errors.Wrap(err, "failed to deploy upgrade stack")
+	_, httpErr := stackBuilderDirector.Build(&stackbuilders.StackPayload{
+		Name:             projectName,
+		StackFileContent: composeFile,
+		ComposeFormat:    true,
+	}, environment)
+	if httpErr != nil {
+		return errors.Wrap(httpErr.Err, "failed to deploy upgrade stack")
 	}
 
 	return errors.New("upgrade failed: server should have been restarted by the updater")

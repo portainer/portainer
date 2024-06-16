@@ -13,33 +13,49 @@ import (
 )
 
 type Service interface {
-	GetLocalEnvironment() *portainer.Endpoint
-	GetPlatform() ContainerPlatform
-}
-
-func NewService(dataStore dataservices.DataStore) (Service, error) {
-	environment, platform, err := guessLocalEnvironment(dataStore)
-	if err != nil {
-		return nil, fmt.Errorf("failed to guess local environment: %w", err)
-	}
-
-	return &service{
-		environment: environment,
-		platform:    platform,
-	}, nil
+	GetLocalEnvironment() (*portainer.Endpoint, error)
+	GetPlatform() (ContainerPlatform, error)
 }
 
 type service struct {
+	dataStore   dataservices.DataStore
 	environment *portainer.Endpoint
 	platform    ContainerPlatform
 }
 
-func (service *service) GetLocalEnvironment() *portainer.Endpoint {
-	return service.environment
+func NewService(dataStore dataservices.DataStore) (Service, error) {
+
+	return &service{
+		dataStore: dataStore,
+	}, nil
 }
 
-func (service *service) GetPlatform() ContainerPlatform {
-	return service.platform
+func (service *service) GetLocalEnvironment() (*portainer.Endpoint, error) {
+	if service.environment == nil {
+		environment, platform, err := guessLocalEnvironment(service.dataStore)
+		if err != nil {
+			return nil, err
+		}
+
+		service.environment = environment
+		service.platform = platform
+	}
+
+	return service.environment, nil
+}
+
+func (service *service) GetPlatform() (ContainerPlatform, error) {
+	if service.environment == nil {
+		environment, platform, err := guessLocalEnvironment(service.dataStore)
+		if err != nil {
+			return "", err
+		}
+
+		service.environment = environment
+		service.platform = platform
+	}
+
+	return service.platform, nil
 }
 
 var platformToEndpointType = map[ContainerPlatform][]portainer.EndpointType{

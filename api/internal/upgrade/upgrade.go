@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	plf "github.com/portainer/portainer/api/platform"
+	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,6 +35,9 @@ type service struct {
 	kubernetesClientFactory   *kubecli.ClientFactory
 	dockerClientFactory       *dockerclient.ClientFactory
 	dockerComposeStackManager portainer.ComposeStackManager
+	dataStore                 dataservices.DataStore
+	fileService               portainer.FileService
+	stackDeployer             deployments.StackDeployer
 
 	isUpdating bool
 
@@ -44,7 +49,9 @@ func NewService(
 	kubernetesClientFactory *kubecli.ClientFactory,
 	dockerClientFactory *dockerclient.ClientFactory,
 	dockerComposeStackManager portainer.ComposeStackManager,
-
+	dataStore dataservices.DataStore,
+	fileService portainer.FileService,
+	stackDeployer deployments.StackDeployer,
 ) (Service, error) {
 
 	return &service{
@@ -52,6 +59,9 @@ func NewService(
 		kubernetesClientFactory:   kubernetesClientFactory,
 		dockerClientFactory:       dockerClientFactory,
 		dockerComposeStackManager: dockerComposeStackManager,
+		dataStore:                 dataStore,
+		fileService:               fileService,
+		stackDeployer:             stackDeployer,
 	}, nil
 }
 

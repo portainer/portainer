@@ -42,10 +42,12 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 		if endpointutils.IsEdgeEndpoint(&environment) {
 			edgeAgents++
 		}
-
 	}
 
-	platform := handler.platformService.GetPlatform()
+	platform, err := handler.platformService.GetPlatform()
+	if err != nil {
+		return httperror.InternalServerError("Failed to get platform", err)
+	}
 
 	return response.JSON(w, &systemInfoResponse{
 		EdgeAgents: edgeAgents,
