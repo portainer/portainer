@@ -2,7 +2,8 @@ package deployments
 
 import (
 	"fmt"
-	"log"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -24,6 +25,7 @@ type ComposeStackDeploymentConfig struct {
 }
 
 func CreateComposeStackDeploymentConfig(securityContext *security.RestrictedRequestContext, stack *portainer.Stack, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, fileService portainer.FileService, deployer StackDeployer, forcePullImage, forceCreate bool) (*ComposeStackDeploymentConfig, error) {
+
 	user, err := dataStore.User().Read(securityContext.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load user information from the database: %w", err)
@@ -60,7 +62,7 @@ func (config *ComposeStackDeploymentConfig) GetUsername() string {
 
 func (config *ComposeStackDeploymentConfig) Deploy() error {
 	if config.FileService == nil || config.StackDeployer == nil {
-		log.Println("[deployment, compose] file service or stack deployer is not initialised")
+		log.Debug().Msg("file service or stack deployer is not initialized")
 		return errors.New("file service or stack deployer cannot be nil")
 	}
 

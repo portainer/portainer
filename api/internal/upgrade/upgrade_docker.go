@@ -54,13 +54,14 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 		return errors.Wrap(err, "failed to render upgrade template")
 	}
 
-	composeStackBuilder := stackbuilders.CreateComposeStackFileContentBuilder(
-		&security.RestrictedRequestContext{IsAdmin: true},
-		service.dataStore,
-		service.fileService,
-		service.stackDeployer,
+	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(
+		stackbuilders.CreateComposeStackFileContentBuilder(
+			&security.RestrictedRequestContext{IsAdmin: true, UserID: 1},
+			service.dataStore,
+			service.fileService,
+			service.stackDeployer,
+		),
 	)
-	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
 
 	timeId := time.Now().Unix()
 
@@ -70,16 +71,19 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 		strings.ReplaceAll(version, ".", "-"),
 	)
 
-	_, httpErr := stackBuilderDirector.Build(&stackbuilders.StackPayload{
-		Name:             projectName,
-		StackFileContent: composeFile,
-		ComposeFormat:    true,
-	}, environment)
+	_, httpErr := stackBuilderDirector.Build(
+		&stackbuilders.StackPayload{
+			Name:             projectName,
+			StackFileContent: composeFile,
+			ComposeFormat:    true,
+		},
+		environment,
+	)
 	if httpErr != nil {
 		return errors.Wrap(httpErr.Err, "failed to deploy upgrade stack")
 	}
 
-	return errors.New("upgrade failed: server should have been restarted by the updater")
+	return nil
 }
 
 func (service *service) checkImageForDocker(ctx context.Context, environment *portainer.Endpoint, imageName string, skipPullImage bool) error {
