@@ -28,6 +28,7 @@ import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateV
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
+import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -127,6 +128,7 @@ class KubernetesCreateApplicationController {
       // a validation message will be shown. isExistingCPUReservationUnchanged and isExistingMemoryReservationUnchanged (with available resources being exceeded) is used to decide whether to show the message or not.
       isExistingCPUReservationUnchanged: false,
       isExistingMemoryReservationUnchanged: false,
+      stackNameError: '',
     };
 
     this.isAdmin = this.Authentication.isAdmin();
@@ -186,9 +188,16 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  onChangeStackName(stackName) {
+  onChangeStackName(name) {
     return this.$async(async () => {
-      this.formValues.StackName = stackName;
+      if (KUBE_STACK_NAME_VALIDATION_REGEX.test(name) || name === '') {
+        this.state.stackNameError = '';
+      } else {
+        this.state.stackNameError =
+          "Stack must consist of alphanumeric characters, '-', '_' or '.', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').";
+      }
+
+      this.formValues.StackName = name;
     });
   }
 
@@ -649,7 +658,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
+    const stackNameInvalid = this.state.stackNameError !== '';
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || stackNameInvalid;
   }
 
   isUpdateApplicationViaWebEditorButtonDisabled() {

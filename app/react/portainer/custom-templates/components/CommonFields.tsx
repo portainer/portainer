@@ -95,14 +95,10 @@ export function CommonFields({
 export function validation({
   currentTemplateId,
   templates = [],
-  viewType = 'docker',
 }: {
   currentTemplateId?: CustomTemplate['Id'];
   templates?: Array<CustomTemplate>;
-  viewType?: 'kube' | 'docker' | 'edge';
 } = {}): SchemaOf<Values> {
-  const titlePattern = titlePatternValidation(viewType);
-
   return object({
     Title: string()
       .required('Title is required.')
@@ -116,31 +112,12 @@ export function validation({
               template.Title === value && template.Id !== currentTemplateId
           )
       )
-      .matches(titlePattern.pattern, titlePattern.error),
+      .max(
+        200,
+        'Custom template title must be less than or equal to 200 characters'
+      ),
     Description: string().required('Description is required.'),
     Note: string().default(''),
     Logo: string().default(''),
   });
-}
-
-export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
-
-const KUBE_TEMPLATE_NAME_VALIDATION_REGEX =
-  '^(([a-z0-9](?:(?:[-a-z0-9_.]){0,61}[a-z0-9])?))$'; // alphanumeric, lowercase, can contain dashes, dots and underscores, max 63 characters
-
-function titlePatternValidation(type: 'kube' | 'docker' | 'edge') {
-  switch (type) {
-    case 'kube':
-      return {
-        pattern: new RegExp(KUBE_TEMPLATE_NAME_VALIDATION_REGEX),
-        error:
-          "This field must consist of lower-case alphanumeric characters, '.', '_' or '-', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').",
-      };
-    default:
-      return {
-        pattern: new RegExp(TEMPLATE_NAME_VALIDATION_REGEX),
-        error:
-          "This field must consist of lower-case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').",
-      };
-  }
 }
