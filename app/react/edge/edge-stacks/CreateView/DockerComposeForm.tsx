@@ -13,12 +13,12 @@ import {
   edgeStackTemplate,
   upload,
 } from '@@/BoxSelector/common-options/build-methods';
-import { WebEditorForm } from '@@/WebEditorForm';
 import { FileUploadForm } from '@@/form-components/FileUpload';
 
 import { TemplateFieldset } from './TemplateFieldset/TemplateFieldset';
 import { useRenderTemplate } from './useRenderTemplate';
 import { DockerFormValues } from './types';
+import { DockerContentField } from './DockerContentField';
 
 const buildMethods = [editor, upload, git, edgeStackTemplate] as const;
 
@@ -78,26 +78,12 @@ export function DockerComposeForm({
 
       {(method === editor.value ||
         (method === edgeStackTemplate.value && template)) && (
-        <WebEditorForm
-          id="stack-creation-editor"
+        <DockerContentField
           value={values.fileContent}
           onChange={(value) => handleChange({ fileContent: value })}
-          yaml
-          placeholder="Define or paste the content of your docker compose file here"
-          error={errors?.fileContent}
           readonly={method === edgeStackTemplate.value && !!template?.GitConfig}
-          data-cy="stack-creation-editor"
-        >
-          You can get more information about Compose file format in the{' '}
-          <a
-            href="https://docs.docker.com/compose/compose-file/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            official documentation
-          </a>
-          .
-        </WebEditorForm>
+          error={errors?.fileContent}
+        />
       )}
 
       {method === upload.value && (

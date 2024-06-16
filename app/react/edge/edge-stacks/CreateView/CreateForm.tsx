@@ -120,10 +120,10 @@ function useTemplate(
   id: number | undefined
 ) {
   const customTemplateQuery = useCustomTemplate(id, {
-    enabled: !!id && type === 'custom',
+    enabled: type === 'custom',
   });
   const appTemplateQuery = useAppTemplate(id, {
-    enabled: !!id && type === 'app',
+    enabled: type === 'app',
   });
 
   return {
