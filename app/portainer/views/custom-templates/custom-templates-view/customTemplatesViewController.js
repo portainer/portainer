@@ -218,7 +218,7 @@ class CustomTemplatesViewController {
       return o.Name === 'bridge';
     });
 
-    this.formValues.name = template.Title ? template.Title : '';
+    this.formValues.name = '';
     this.state.selectedTemplate = template;
     this.$anchorScroll('view-top');
     const applicationState = this.StateManager.getState();

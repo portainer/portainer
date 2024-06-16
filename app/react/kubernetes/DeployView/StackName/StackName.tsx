@@ -6,6 +6,7 @@ import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { AutocompleteSelect } from '@@/form-components/AutocompleteSelect';
+import { FormError } from '@@/form-components/FormError';
 
 type Props = {
   stackName: string;
@@ -13,6 +14,7 @@ type Props = {
   stacks?: string[];
   inputClassName?: string;
   textTip?: string;
+  error?: string;
 };
 
 export function StackName({
@@ -21,6 +23,7 @@ export function StackName({
   stacks = [],
   inputClassName,
   textTip = "Enter or select a 'stack' name to group multiple deployments together, or else leave empty to ignore.",
+  error = '',
 }: Props) {
   const isAdminQuery = useIsEdgeAdmin();
   const stackResults = useMemo(
@@ -50,9 +53,11 @@ export function StackName({
 
   return (
     <>
-      <TextTip className="mb-4" color="blue">
-        {textTip}
-      </TextTip>
+      {textTip ? (
+        <TextTip className="mb-4" color="blue">
+          {textTip}
+        </TextTip>
+      ) : null}
       <div className="form-group">
         <label
           htmlFor="stack_name"
@@ -72,6 +77,7 @@ export function StackName({
             placeholder="e.g. myStack"
             inputId="stack_name"
           />
+          {error ? <FormError>{error}</FormError> : null}
         </div>
       </div>
     </>

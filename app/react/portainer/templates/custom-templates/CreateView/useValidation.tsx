@@ -65,7 +65,6 @@ export function useValidation({
       }).concat(
         commonFieldsValidation({
           templates: customTemplatesQuery.data,
-          viewType,
         })
       ),
     [customTemplatesQuery.data, gitCredentialsQuery.data, viewType]

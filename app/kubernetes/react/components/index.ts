@@ -142,7 +142,14 @@ export const ngModule = angular
         ),
         { stackName: 'setStackName' }
       ),
-      ['setStackName', 'stackName', 'stacks', 'inputClassName', 'textTip']
+      [
+        'setStackName',
+        'stackName',
+        'stacks',
+        'inputClassName',
+        'textTip',
+        'error',
+      ]
     )
   )
   .component(

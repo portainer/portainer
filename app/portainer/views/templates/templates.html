@@ -2,15 +2,18 @@
 
 <div class="row">
   <!-- stack-form -->
-  <stack-from-template-form
-    ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)"
-    template="state.selectedTemplate"
-    form-values="formValues"
-    state="state"
-    create-template="createTemplate"
-    unselect-template="unselectTemplate"
-  >
-  </stack-from-template-form>
+  <div class="col-sm-12">
+    <stack-from-template-form
+      ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)"
+      template="state.selectedTemplate"
+      form-values="formValues"
+      name-regex="state.templateNameRegex"
+      state="state"
+      create-template="createTemplate"
+      unselect-template="unselectTemplate"
+    >
+    </stack-from-template-form>
+  </div>
   <!-- !stack-form -->
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 1">
