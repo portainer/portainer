@@ -124,10 +124,14 @@ export function InnerForm({
       <StaggerFieldset
         isEdit={false}
         values={values.staggerConfig}
-        onChange={(value) =>
-          Object.entries(value).forEach(([key, value]) =>
-            setFieldValue(`staggerConfig.${key}`, value)
-          )
+        onChange={(newStaggerValues) =>
+          setValues((values) => ({
+            ...values,
+            staggerConfig: {
+              ...values.staggerConfig,
+              ...newStaggerValues,
+            },
+          }))
         }
       />
 
