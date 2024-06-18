@@ -35,7 +35,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 
-	// Gnerate a temp http GET request based on the current PUT request
+	// Generate a temp http GET request based on the current PUT request
 	validationRequest := &http.Request{
 		Method: http.MethodGet,
 		URL:    request.URL,
