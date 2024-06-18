@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -73,7 +74,6 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 // NeedsEncryptionMigration returns true if database encryption is enabled and
 // we have an un-encrypted DB that requires migration to an encrypted DB
 func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
-
 	// Cases:  Note, we need to check both portainer.db and portainer.edb
 	// to determine if it's a new store.   We only need to differentiate between cases 2,3 and 5
 
@@ -121,11 +121,11 @@ func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-
 	log.Info().Str("filename", connection.GetDatabaseFileName()).Msg("loading PortainerDB")
 
 	// Now we open the db
 	databasePath := connection.GetDatabaseFilePath()
+
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{
 		Timeout:         1 * time.Second,
 		InitialMmapSize: connection.InitialMmapSize,
@@ -178,6 +178,7 @@ func (connection *DbConnection) ViewTx(fn func(portainer.Transaction) error) err
 func (connection *DbConnection) BackupTo(w io.Writer) error {
 	return connection.View(func(tx *bolt.Tx) error {
 		_, err := tx.WriteTo(w)
+
 		return err
 	})
 }
@@ -192,6 +193,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 	if err != nil {
 		return err
 	}
+
 	return os.WriteFile(filename, b, 0600)
 }
 
@@ -212,7 +214,7 @@ func keyToString(b []byte) string {
 
 	v := binary.BigEndian.Uint64(b)
 	if v <= math.MaxInt32 {
-		return fmt.Sprintf("%d", v)
+		return strconv.FormatUint(v, 10)
 	}
 
 	return string(b)
@@ -321,22 +323,22 @@ func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id [
 	})
 }
 
-func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAll(bucketName, obj, append)
+		return tx.GetAll(bucketName, obj, appendFn)
 	})
 }
 
 // TODO: decide which Unmarshal to use, and use one...
-func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAllWithJsoniter(bucketName, obj, append)
+		return tx.GetAllWithJsoniter(bucketName, obj, appendFn)
 	})
 }
 
-func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, append)
+		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, appendFn)
 	})
 }
 
@@ -345,14 +347,13 @@ func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error)
 	buckets := map[string]interface{}{}
 
 	err := connection.View(func(tx *bolt.Tx) error {
-		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
 			seqId := bucket.Sequence()
 			buckets[bucketName] = int(seqId)
+
 			return nil
 		})
-
-		return err
 	})
 
 	return buckets, err
@@ -366,6 +367,7 @@ func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error 
 		id, ok := v.(float64) // JSON ints are unmarshalled to interface as float64. See: https://pkg.go.dev/encoding/json#Decoder.Decode
 		if !ok {
 			log.Error().Str("bucket", bucketName).Msg("failed to restore metadata to bucket, skipped")
+
 			continue
 		}
 

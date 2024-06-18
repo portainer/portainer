@@ -2,7 +2,7 @@ package oauth
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -16,7 +16,7 @@ func getUsername(datamap map[string]interface{}, configuration *portainer.OAuthS
 	if !ok {
 		username, ok := datamap[configuration.UserIdentifier].(float64)
 		if ok && username != 0 {
-			return fmt.Sprint(int(username)), nil
+			return strconv.Itoa(int(username)), nil
 		}
 	}
 

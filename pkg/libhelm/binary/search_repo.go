@@ -65,7 +65,7 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		}
 	}
 
-	// Allow redirect behavior to be overriden if specified.
+	// Allow redirect behavior to be overridden if specified.
 	if client.CheckRedirect == nil {
 		client.CheckRedirect = defaultCheckRedirect
 	}

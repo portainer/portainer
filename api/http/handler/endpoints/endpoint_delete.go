@@ -64,10 +64,9 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid boolean query parameter", err)
 	}
 
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
-	})
-	if err != nil {
+	}); err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
 			return handlerError
@@ -87,7 +86,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 // @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param body body endpointDeleteBatchPayload true "List of environments to delete, with optional deleteCluster flag to clean-up assocaited resources (cloud environments only)"
+// @param body body endpointDeleteBatchPayload true "List of environments to delete, with optional deleteCluster flag to clean-up associated resources (cloud environments only)"
 // @success 204 "Environment(s) successfully deleted."
 // @failure 207 {object} endpointDeleteBatchPartialResponse "Partial success. Some environments were deleted successfully, while others failed."
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
@@ -139,28 +138,24 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 
 	if endpoint.TLSConfig.TLS {
 		folder := strconv.Itoa(int(endpointID))
-		err = handler.FileService.DeleteTLSFiles(folder)
-		if err != nil {
+		if err := handler.FileService.DeleteTLSFiles(folder); err != nil {
 			log.Error().Err(err).Msgf("Unable to remove TLS files from disk when deleting endpoint %d", endpointID)
 		}
 	}
 
-	err = tx.Snapshot().Delete(endpointID)
-	if err != nil {
+	if err := tx.Snapshot().Delete(endpointID); err != nil {
 		log.Warn().Err(err).Msgf("Unable to remove the snapshot from the database")
 	}
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 
 	if len(endpoint.UserAccessPolicies) > 0 || len(endpoint.TeamAccessPolicies) > 0 {
-		err = handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx)
-		if err != nil {
+		if err := handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx); err != nil {
 			log.Warn().Err(err).Msgf("Unable to update user authorizations")
 		}
 	}
 
-	err = tx.EndpointRelation().DeleteEndpointRelation(endpoint.ID)
-	if err != nil {
+	if err := tx.EndpointRelation().DeleteEndpointRelation(endpoint.ID); err != nil {
 		log.Warn().Err(err).Msgf("Unable to remove environment relation from the database")
 	}
 
@@ -189,8 +184,7 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 			return e == endpoint.ID
 		})
 
-		err = tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup)
-		if err != nil {
+		if err := tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup); err != nil {
 			log.Warn().Err(err).Msgf("Unable to update edge group")
 		}
 	}
@@ -247,13 +241,11 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	// delete the pending actions
-	err = tx.PendingActions().DeleteByEndpointID(endpoint.ID)
-	if err != nil {
+	if err := tx.PendingActions().DeleteByEndpointID(endpoint.ID); err != nil {
 		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msgf("Unable to delete pending actions")
 	}
 
-	err = tx.Endpoint().DeleteEndpoint(endpointID)
-	if err != nil {
+	if err := tx.Endpoint().DeleteEndpoint(endpointID); err != nil {
 		return httperror.InternalServerError("Unable to delete the environment from the database", err)
 	}
 

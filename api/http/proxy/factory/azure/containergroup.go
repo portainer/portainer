@@ -26,17 +26,16 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 }
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
-
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	//add a lock before processing existence check
+	// Add a lock before processing existence check
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 
-	//generate a temp http GET request based on the current PUT request
+	// Generate a temp http GET request based on the current PUT request
 	validationRequest := &http.Request{
 		Method: http.MethodGet,
 		URL:    request.URL,
@@ -45,9 +44,9 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 		},
 	}
 
-	//fire the request to Azure API to validate if there is an existing container instance with the same name
-	//positive - reject the request
-	//negative - continue the process
+	// Fire the request to Azure API to validate if there is an existing container instance with the same name
+	// positive - reject the request
+	// negative - continue the process
 	validationResponse, err := http.DefaultTransport.RoundTrip(validationRequest)
 	if err != nil {
 		return validationResponse, err
@@ -63,6 +62,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 			"message": "A container instance with the same name already exists inside the selected resource group",
 		}
 		err = utils.RewriteResponse(resp, errObj, http.StatusConflict)
+
 		return resp, err
 	}
 

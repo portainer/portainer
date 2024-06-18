@@ -7,11 +7,13 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/tag"
 	"github.com/portainer/portainer/api/pendingactions/handlers"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -53,17 +55,17 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	var payload endpointGroupUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var endpointGroup *portainer.EndpointGroup
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		endpointGroup, err = handler.updateEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID), payload)
+
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -151,25 +153,20 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		}
 
 		for _, endpoint := range endpoints {
-			if endpoint.GroupID == endpointGroup.ID {
-				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(tx, &endpoint, endpointGroup)
-					if err != nil {
-						// Update flag with endpoint and continue
-						go func(endpointID portainer.EndpointID, endpointGroupID portainer.EndpointGroupID) {
-							err := handler.PendingActionsService.Create(handlers.NewCleanNAPWithOverridePolicies(endpointID, &endpointGroupID))
-							if err != nil {
-								log.Error().Err(err).Msgf("Unable to create pending action to clean NAP with override policies for endpoint (%d) and endpoint group (%d).", endpointID, endpointGroupID)
-							}
-						}(endpoint.ID, endpointGroup.ID)
-					}
+			if endpoint.GroupID == endpointGroup.ID && endpointutils.IsKubernetesEndpoint(&endpoint) {
+				if err := handler.AuthorizationService.CleanNAPWithOverridePolicies(tx, &endpoint, endpointGroup); err != nil {
+					// Update flag with endpoint and continue
+					go func(endpointID portainer.EndpointID, endpointGroupID portainer.EndpointGroupID) {
+						if err := handler.PendingActionsService.Create(handlers.NewCleanNAPWithOverridePolicies(endpointID, &endpointGroupID)); err != nil {
+							log.Error().Err(err).Msgf("Unable to create pending action to clean NAP with override policies for endpoint (%d) and endpoint group (%d).", endpointID, endpointGroupID)
+						}
+					}(endpoint.ID, endpointGroup.ID)
 				}
 			}
 		}
 	}
 
-	err = tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup)
-	if err != nil {
+	if err := tx.EndpointGroup().Update(endpointGroup.ID, endpointGroup); err != nil {
 		return nil, httperror.InternalServerError("Unable to persist environment group changes inside the database", err)
 	}
 
@@ -177,13 +174,11 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		endpoints, err := tx.Endpoint().Endpoints()
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
-
 		}
 
 		for _, endpoint := range endpoints {
 			if endpoint.GroupID == endpointGroup.ID {
-				err = handler.updateEndpointRelations(tx, &endpoint, endpointGroup)
-				if err != nil {
+				if err := handler.updateEndpointRelations(tx, &endpoint, endpointGroup); err != nil {
 					return nil, httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
 				}
 			}

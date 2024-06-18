@@ -3,7 +3,6 @@ package webhooks
 import (
 	"context"
 	"errors"
-	"io"
 	"net/http"
 	"strings"
 
@@ -26,15 +25,12 @@ import (
 // @failure 500
 // @router /webhooks/{id} [post]
 func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")
-
 	if err != nil {
 		return httperror.InternalServerError("Invalid service id parameter", err)
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
-
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a webhook with this token", err)
 	} else if err != nil {
@@ -118,15 +114,12 @@ func (handler *Handler) executeServiceWebhook(
 		if err != nil {
 			return httperror.NotFound("Error pulling image with the specified tag", err)
 		}
-		defer func(rc io.ReadCloser) {
-			_ = rc.Close()
-		}(rc)
+		defer rc.Close()
 	}
 
-	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
-
-	if err != nil {
+	if _, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions); err != nil {
 		return httperror.InternalServerError("Error updating service", err)
 	}
+
 	return response.Empty(w)
 }

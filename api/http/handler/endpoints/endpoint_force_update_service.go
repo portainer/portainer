@@ -98,7 +98,7 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 		// ignore errors from this cleanup function, log them instead
 		containers, err := dockerClient.ContainerList(context.TODO(), container.ListOptions{
 			All:     true,
-			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIdLabel+"="+payload.ServiceID)),
+			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIDLabel+"="+payload.ServiceID)),
 		})
 		if err != nil {
 			log.Warn().Err(err).Str("Environment", endpoint.Name).Msg("Error listing containers")

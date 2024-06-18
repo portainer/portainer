@@ -1,7 +1,6 @@
 package url
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 )
@@ -16,7 +15,7 @@ func ParseURL(endpointURL string) (*url.URL, error) {
 		!strings.HasPrefix(endpointURL, "//") &&
 		!strings.HasPrefix(endpointURL, `unix:`) &&
 		!strings.HasPrefix(endpointURL, `npipe:`) {
-		endpointURL = fmt.Sprintf("//%s", endpointURL)
+		endpointURL = "//" + endpointURL
 	}
 
 	return url.Parse(endpointURL)

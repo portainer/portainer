@@ -275,7 +275,7 @@ func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
 }
 
 // mwAuthenticateFirst authenticates a request an auth token.
-// A result of a first succeded token lookup would be used for the authentication.
+// A result of a first succeeded token lookup would be used for the authentication.
 func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var token *portainer.TokenData

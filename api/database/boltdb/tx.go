@@ -74,9 +74,10 @@ func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, ma
 
 func (tx *DbTransaction) GetNextIdentifier(bucketName string) int {
 	bucket := tx.tx.Bucket([]byte(bucketName))
+
 	id, err := bucket.NextSequence()
 	if err != nil {
-		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifer")
+		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifier")
 		return 0
 	}
 

@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -20,7 +20,7 @@ import (
 // - The shell pod will be automatically removed after a specified max life (prevent zombie pods)
 // - The shell pod will be automatically removed if request is cancelled (or client closes websocket connection)
 func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*portainer.KubernetesShellPod, error) {
-	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(portainer.WebSocketKeepAlive.Seconds()))
+	maxPodKeepAliveSecondsStr := strconv.Itoa(int(portainer.WebSocketKeepAlive.Seconds()))
 
 	podPrefix := userShellPodPrefix(serviceAccountName)
 
@@ -57,9 +57,10 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	// Wait for pod to reach ready state
 	timeoutCtx, cancelFunc := context.WithTimeout(ctx, 20*time.Second)
 	defer cancelFunc()
-	err = kcl.waitForPodStatus(timeoutCtx, v1.PodRunning, shellPod)
-	if err != nil {
+
+	if err := kcl.waitForPodStatus(timeoutCtx, v1.PodRunning, shellPod); err != nil {
 		kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
+
 		return nil, errors.Wrap(err, "aborting pod creation; error waiting for shell pod ready status")
 	}
 
@@ -91,7 +92,6 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, pod *v1.Pod) error {
 	log.Debug().Str("pod", pod.Name).Msg("waiting for pod ready")
 
-	pollDelay := 500 * time.Millisecond
 	for {
 		select {
 		case <-ctx.Done():
@@ -106,7 +106,7 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, 
 				return nil
 			}
 
-			<-time.After(pollDelay)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }

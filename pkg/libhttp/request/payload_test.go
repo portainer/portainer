@@ -22,7 +22,6 @@ func (p *requestPayload) Validate(r *http.Request) error {
 }
 
 func Test_GetPayload(t *testing.T) {
-
 	payload := requestPayload{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -34,6 +33,7 @@ func Test_GetPayload(t *testing.T) {
 	}
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(payloadJSON))
+
 	newPayload, err := request.GetPayload[requestPayload](r)
 	if err != nil {
 		t.Fatal(err)

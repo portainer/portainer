@@ -5,20 +5,20 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID portainer.EndpointID, namespace string) (in bool) {
+func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID portainer.EndpointID, namespace string) bool {
 	for _, ns := range registry.RegistryAccesses[endpointID].Namespaces {
 		if ns == namespace {
 			return true
 		}
 	}
 
-	return
+	return false
 }
 
-func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, namespace string) (err error) {
+func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, namespace string) error {
 	registries, err := dataStore.Registry().ReadAll()
 	if err != nil {
-		return
+		return err
 	}
 
 	for _, registry := range registries {
@@ -30,21 +30,18 @@ func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, da
 			continue
 		}
 
-		err = EnsureRegTokenValid(dataStore, &registry)
-		if err != nil {
-			return
+		if err := EnsureRegTokenValid(dataStore, &registry); err != nil {
+			return err
 		}
 
-		err = cli.DeleteRegistrySecret(registry.ID, namespace)
-		if err != nil {
-			return
+		if err := cli.DeleteRegistrySecret(registry.ID, namespace); err != nil {
+			return err
 		}
 
-		err = cli.CreateRegistrySecret(&registry, namespace)
-		if err != nil {
-			return
+		if err := cli.CreateRegistrySecret(&registry, namespace); err != nil {
+			return err
 		}
 	}
 
-	return
+	return nil
 }
