@@ -4,8 +4,6 @@ import { setupCache, buildMemoryStorage } from 'axios-cache-interceptor';
 
 import { buildDockerProxyUrl } from '@/react/docker/proxy/queries/buildDockerProxyUrl';
 
-import PortainerError from '../error';
-
 import { MAX_DOCKER_API_VERSION } from './dockerMaxApiVersion';
 
 const envVersionAxios = Axios.create({
@@ -56,9 +54,7 @@ export async function dockerMaxAPIVersionInterceptor(
     }
     return config;
   } catch (err) {
-    throw new PortainerError(
-      'An error occurred while trying to limit request to the maximum supported Docker API version',
-      err
-    );
+    // if the interceptor errors, return the original config
+    return rawConfig;
   }
 }

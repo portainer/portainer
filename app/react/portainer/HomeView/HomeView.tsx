@@ -1,6 +1,8 @@
+import { useStore } from 'zustand';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect, useState } from 'react';
 
+import { environmentStore } from '@/react/hooks/current-environment-store';
 import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoints } from '@/react/portainer/environments/environment.service';
 import { isEdgeEnvironment } from '@/react/portainer/environments/utils';
@@ -18,6 +20,8 @@ import { LicenseNodePanel } from './LicenseNodePanel';
 import { BackupFailedPanel } from './BackupFailedPanel';
 
 export function HomeView() {
+  const { clear: clearStore } = useStore(environmentStore);
+
   const { params } = useCurrentStateAndParams();
   const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] = useState(
     !!params.redirect
@@ -40,14 +44,19 @@ export function HomeView() {
           endpointId: params.environmentId,
         });
       } else {
-        router.stateService.go('portainer.home', {}, { inherit: false });
+        clearStore();
+        router.stateService.go(
+          'portainer.home',
+          {},
+          { reload: true, inherit: false }
+        );
       }
     }
 
     if (params.redirect) {
       redirect();
     }
-  }, [params, setConnectingToEdgeEndpoint, router]);
+  }, [params, setConnectingToEdgeEndpoint, router, clearStore]);
 
   return (
     <>
