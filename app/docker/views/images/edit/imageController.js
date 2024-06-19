@@ -182,7 +182,7 @@ angular.module('portainer.docker').controller('ImageController', [
         return;
       }
 
-      confirmImageExport(function (confirmed) {
+      confirmImageExport().then(function (confirmed) {
         if (!confirmed) {
           return;
         }

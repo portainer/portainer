@@ -7,9 +7,10 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DashboardView } from '@/react/docker/DashboardView/DashboardView';
 
 import { containersModule } from './containers';
+import { imagesModule } from './images';
 
 export const viewsModule = angular
-  .module('portainer.docker.react.views', [containersModule])
+  .module('portainer.docker.react.views', [containersModule, imagesModule])
   .component(
     'dockerDashboardView',
     r2a(withUIRouter(withCurrentUser(DashboardView)), [])

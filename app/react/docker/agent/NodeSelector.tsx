@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { FormikErrors } from 'formik';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -11,9 +12,11 @@ import { useAgentNodes } from './queries/useAgentNodes';
 export function NodeSelector({
   value,
   onChange,
+  error,
 }: {
   value: string;
   onChange: (value: string) => void;
+  error?: FormikErrors<string>;
 }) {
   const environmentId = useEnvironmentId();
 
@@ -36,7 +39,7 @@ export function NodeSelector({
   }, [nodesQuery.data, onChange, value]);
 
   return (
-    <FormControl label="Node" inputId="node-selector">
+    <FormControl label="Node" inputId="node-selector" errors={error}>
       <PortainerSelect
         inputId="node-selector"
         value={value}
