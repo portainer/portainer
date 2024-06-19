@@ -16,7 +16,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       parent: 'endpoint',
       url: '/docker',
       abstract: true,
-      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, Notifications, StateManager, SystemService) {
+      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, Notifications, StateManager, SystemService, EndpointProvider) {
         return $async(async () => {
           const dockerTypes = [PortainerEndpointTypes.DockerEnvironment, PortainerEndpointTypes.AgentOnDockerEnvironment, PortainerEndpointTypes.EdgeAgentOnDockerEnvironment];
 
@@ -44,9 +44,11 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
               params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'docker.dashboard' };
             } else {
+              EndpointProvider.clean();
               Notifications.error('Failed loading environment', e);
             }
             $state.go('portainer.home', params, { reload: true, inherit: false });
+            return false;
           }
 
           async function checkEndpointStatus(endpoint) {

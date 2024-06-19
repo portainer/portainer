@@ -63,12 +63,13 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         $state,
         endpoint,
         KubernetesHealthService,
-        KubernetesNamespaceService,
         Notifications,
         StateManager,
         $http,
         Authentication,
-        UserService
+        UserService,
+        EndpointService,
+        EndpointProvider
       ) {
         return $async(async () => {
           // if the user wants to use front end cache for performance, set the angular caching settings
@@ -93,39 +94,57 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             $state.go('portainer.home');
             return;
           }
+
           try {
-            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
-              //edge
-              try {
-                await KubernetesHealthService.ping(endpoint.Id);
-                endpoint.Status = EnvironmentStatus.Up;
-              } catch (e) {
-                endpoint.Status = EnvironmentStatus.Down;
-              }
+            const status = await checkEndpointStatus(
+              endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+                ? KubernetesHealthService.ping(endpoint.Id)
+                : // use selfsubject access review to check if we can connect to the kubernetes environment
+                  // because it gets a fast response, and is accessible to all users
+                  getSelfSubjectAccessReview(endpoint.Id, 'default')
+            );
+
+            if (endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
+              await updateEndpointStatus(endpoint, status);
+            }
+            endpoint.Status = status;
+
+            if (endpoint.Status === EnvironmentStatus.Down) {
+              throw new Error(
+                endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+                  ? 'Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.'
+                  : `The environment named ${endpoint.Name} is unreachable.`
+              );
             }
 
             await StateManager.updateEndpointState(endpoint);
-
-            if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment && endpoint.Status === EnvironmentStatus.Down) {
-              throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
-            }
-
-            // use selfsubject access review to check if we can connect to the kubernetes environment
-            // because it's gets a fast response, and is accessible to all users
-            try {
-              await getSelfSubjectAccessReview(endpoint.Id, 'default');
-            } catch (e) {
-              throw new Error(`The environment named ${endpoint.Name} is unreachable.`);
-            }
           } catch (e) {
             let params = {};
 
             if (endpoint.Type == PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
               params = { redirect: true, environmentId: endpoint.Id, environmentName: endpoint.Name, route: 'kubernetes.dashboard' };
             } else {
+              EndpointProvider.clean();
               Notifications.error('Failed loading environment', e);
             }
             $state.go('portainer.home', params, { reload: true, inherit: false });
+            return false;
+          }
+
+          async function checkEndpointStatus(promise) {
+            try {
+              await promise;
+              return EnvironmentStatus.Up;
+            } catch (e) {
+              return EnvironmentStatus.Down;
+            }
+          }
+
+          async function updateEndpointStatus(endpoint, status) {
+            if (endpoint.Status === status) {
+              return;
+            }
+            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
           }
         });
       },
