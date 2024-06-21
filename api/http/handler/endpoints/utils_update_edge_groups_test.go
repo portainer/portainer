@@ -10,7 +10,6 @@ import (
 )
 
 func Test_updateEdgeGroups(t *testing.T) {
-
 	createGroups := func(store *datastore.Store, names []string) ([]portainer.EdgeGroup, error) {
 		groups := make([]portainer.EdgeGroup, len(names))
 		for index, name := range names {
@@ -21,8 +20,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 				Endpoints: make([]portainer.EndpointID, 0),
 			}
 
-			err := store.EdgeGroup().Create(group)
-			if err != nil {
+			if err := store.EdgeGroup().Create(group); err != nil {
 				return nil, err
 			}
 
@@ -42,6 +40,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 					return
 				}
 			}
+
 			is.Fail("expected endpoint to be in group")
 		}
 	}
@@ -52,6 +51,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 			for j, tag := range groups {
 				if tag.Name == tagName {
 					result[i] = groups[j]
+
 					break
 				}
 			}
@@ -88,6 +88,7 @@ func Test_updateEdgeGroups(t *testing.T) {
 		}
 
 		expectedGroups := groupsByName(groups, testCase.groupsToApply)
+
 		expectedIDs := make([]portainer.EdgeGroupID, len(expectedGroups))
 		for i, tag := range expectedGroups {
 			expectedIDs[i] = tag.ID

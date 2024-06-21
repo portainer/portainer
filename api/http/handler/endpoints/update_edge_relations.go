@@ -6,7 +6,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/set"
+	"github.com/portainer/portainer/api/set"
 )
 
 // updateEdgeRelations updates the edge stacks associated to an edge endpoint

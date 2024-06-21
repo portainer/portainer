@@ -27,6 +27,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 	if payload.Role != 1 && payload.Role != 2 {
 		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
+
 	return nil
 }
 
@@ -49,8 +50,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 // @router /users [post]
 func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload userCreatePayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -89,11 +89,11 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		}
 	}
 
-	err = handler.DataStore.User().Create(user)
-	if err != nil {
+	if err := handler.DataStore.User().Create(user); err != nil {
 		return httperror.InternalServerError("Unable to persist user inside the database", err)
 	}
 
 	hideFields(user)
+
 	return response.JSON(w, user)
 }

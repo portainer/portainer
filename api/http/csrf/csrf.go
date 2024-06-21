@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	gorillacsrf "github.com/gorilla/csrf"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/urfave/negroni"
 )
 
@@ -16,8 +16,7 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 	handler = withSendCSRFToken(handler)
 
 	token := make([]byte, 32)
-	_, err := rand.Read(token)
-	if err != nil {
+	if _, err := rand.Read(token); err != nil {
 		return nil, fmt.Errorf("failed to generate CSRF token: %w", err)
 	}
 
@@ -32,7 +31,6 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 
 func withSendCSRFToken(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		sw := negroni.NewResponseWriter(w)
 
 		sw.Before(func(sw negroni.ResponseWriter) {
@@ -44,16 +42,15 @@ func withSendCSRFToken(handler http.Handler) http.Handler {
 		})
 
 		handler.ServeHTTP(sw, r)
-
 	})
 }
 
 func withSkipCSRF(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		skip, err := security.ShouldSkipCSRFCheck(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, err.Error(), err)
+
 			return
 		}
 

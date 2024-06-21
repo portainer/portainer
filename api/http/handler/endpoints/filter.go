@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
@@ -254,6 +254,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		if err != nil {
 			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
 		}
+
 		if edgeGroup.Dynamic {
 			endpointIDs, err := edgegroups.GetEndpointsByTags(datastore, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
@@ -261,6 +262,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 			}
 			edgeGroup.Endpoints = endpointIDs
 		}
+
 		envIds = append(envIds, edgeGroup.Endpoints...)
 	}
 
@@ -275,7 +277,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		envIds = envIds[:n]
 	}
 
-	uniqueIds := unique.Unique(envIds)
+	uniqueIds := slicesx.Unique(envIds)
 	filteredEndpoints := filteredEndpointsByIds(endpoints, uniqueIds)
 
 	return filteredEndpoints, nil

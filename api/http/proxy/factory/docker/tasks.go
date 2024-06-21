@@ -7,9 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 )
 
-const (
-	taskServiceObjectIdentifier = "ServiceID"
-)
+const taskServiceObjectIdentifier = "ServiceID"
 
 // taskListOperation extracts the response as a JSON array, loop through the tasks array
 // and filter the containers based on resource controls before rewriting the response.
@@ -46,5 +44,6 @@ func selectorTaskLabels(responseObject map[string]interface{}) map[string]interf
 			return utils.GetJSONObject(containerSpecObject, "Labels")
 		}
 	}
+
 	return nil
 }

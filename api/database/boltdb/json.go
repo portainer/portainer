@@ -46,8 +46,8 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 			return errors.Wrap(err, "Failed decrypting object")
 		}
 	}
-	e := json.Unmarshal(data, object)
-	if e != nil {
+
+	if e := json.Unmarshal(data, object); e != nil {
 		// Special case for the VERSION bucket. Here we're not using json
 		// So we need to return it as a string
 		s, ok := object.(*string)
@@ -57,6 +57,7 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 
 		*s = string(data)
 	}
+
 	return err
 }
 
@@ -71,7 +72,7 @@ func encrypt(plaintext []byte, passphrase []byte) (encrypted []byte, err error) 
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return encrypted, err
 	}
 

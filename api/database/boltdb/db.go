@@ -203,6 +203,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 func (connection *DbConnection) ConvertToKey(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
+
 	return b
 }
 

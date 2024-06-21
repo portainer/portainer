@@ -78,6 +78,7 @@ func (tx *DbTransaction) GetNextIdentifier(bucketName string) int {
 	id, err := bucket.NextSequence()
 	if err != nil {
 		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifier")
+
 		return 0
 	}
 

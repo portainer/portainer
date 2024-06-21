@@ -19,12 +19,12 @@ func Test_updateUserRemovesAccessTokens(t *testing.T) {
 
 	_, store := datastore.MustNewTestStore(t, true, true)
 
-	// create standard user
+	// Create standard user
 	user := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
 	err := store.User().Create(user)
 	is.NoError(err, "error creating user")
 
-	// setup services
+	// Setup services
 	jwtService, err := jwt.NewService("1h", store)
 	is.NoError(err, "Error initiating jwt service")
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())

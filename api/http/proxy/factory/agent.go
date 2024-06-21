@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/url"
+	"github.com/portainer/portainer/api/url"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

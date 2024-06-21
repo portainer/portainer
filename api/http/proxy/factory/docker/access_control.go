@@ -105,8 +105,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 
 		resourceControl := authorization.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
 
-		err := transport.dataStore.ResourceControl().Create(resourceControl)
-		if err != nil {
+		if err := transport.dataStore.ResourceControl().Create(resourceControl); err != nil {
 			return nil, err
 		}
 
@@ -119,8 +118,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := authorization.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
-	err := transport.dataStore.ResourceControl().Create(resourceControl)
-	if err != nil {
+	if err := transport.dataStore.ResourceControl().Create(resourceControl); err != nil {
 		log.Error().
 			Str("resource", resourceIdentifier).
 			Err(err).
@@ -170,6 +168,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 		systemResourceControl := findSystemNetworkResourceControl(responseObject)
 		if systemResourceControl != nil {
 			responseObject = decorateObject(responseObject, systemResourceControl)
+
 			return utils.RewriteResponse(response, responseObject, http.StatusOK)
 		}
 	}
@@ -188,6 +187,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 
 	if executor.operationContext.isAdmin || (resourceControl != nil && authorization.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
 		responseObject = decorateObject(responseObject, resourceControl)
+
 		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
@@ -221,6 +221,7 @@ func (transport *Transport) decorateResourceList(parameters *resourceOperationPa
 			if systemResourceControl != nil {
 				resourceObject = decorateObject(resourceObject, systemResourceControl)
 				decoratedResourceData = append(decoratedResourceData, resourceObject)
+
 				continue
 			}
 		}
@@ -264,6 +265,7 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 			if systemResourceControl != nil {
 				resourceObject = decorateObject(resourceObject, systemResourceControl)
 				filteredResourceData = append(filteredResourceData, resourceObject)
+
 				continue
 			}
 		}
@@ -277,6 +279,7 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 			if context.isAdmin {
 				filteredResourceData = append(filteredResourceData, resourceObject)
 			}
+
 			continue
 		}
 
@@ -334,11 +337,13 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpointID portainer.EndpointID) string {
 	if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != "" {
 		stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName]
+
 		return stackutils.ResourceControlID(endpointID, stackName)
 	}
 
 	if resourceLabelsObject[resourceLabelForDockerComposeStackName] != "" {
 		stackName := resourceLabelsObject[resourceLabelForDockerComposeStackName]
+
 		return stackutils.ResourceControlID(endpointID, stackName)
 	}
 
@@ -352,5 +357,6 @@ func decorateObject(object map[string]interface{}, resourceControl *portainer.Re
 
 	portainerMetadata := object["Portainer"].(map[string]interface{})
 	portainerMetadata["ResourceControl"] = resourceControl
+
 	return object
 }

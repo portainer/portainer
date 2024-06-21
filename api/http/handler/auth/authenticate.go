@@ -56,8 +56,7 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 // @router /auth [post]
 func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload authenticatePayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -104,8 +103,7 @@ func isUserInitialAdmin(user *portainer.User) bool {
 }
 
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
-	err := handler.CryptoService.CompareHashAndData(user.Password, password)
-	if err != nil {
+	if err := handler.CryptoService.CompareHashAndData(user.Password, password); err != nil {
 		return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 	}
 
@@ -115,8 +113,7 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 }
 
 func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
-	err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings)
-	if err != nil {
+	if err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings); err != nil {
 		if errors.Is(err, httperrors.ErrUnauthorized) {
 			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 		}
@@ -131,14 +128,12 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 			PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 		}
 
-		err = handler.DataStore.User().Create(user)
-		if err != nil {
+		if err := handler.DataStore.User().Create(user); err != nil {
 			return httperror.InternalServerError("Unable to persist user inside the database", err)
 		}
 	}
 
-	err = handler.syncUserTeamsWithLDAPGroups(user, ldapSettings)
-	if err != nil {
+	if err := handler.syncUserTeamsWithLDAPGroups(user, ldapSettings); err != nil {
 		log.Warn().Err(err).Msg("unable to automatically sync user teams with ldap")
 	}
 
@@ -186,7 +181,6 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 
 	for _, team := range teams {
 		if teamExists(team.Name, userGroups) {
-
 			if teamMembershipExists(team.ID, userMemberships) {
 				continue
 			}
@@ -197,8 +191,7 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 				Role:   portainer.TeamMember,
 			}
 
-			err := handler.DataStore.TeamMembership().Create(membership)
-			if err != nil {
+			if err := handler.DataStore.TeamMembership().Create(membership); err != nil {
 				return err
 			}
 		}

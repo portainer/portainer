@@ -34,12 +34,10 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	}
 
 	var registries []portainer.Registry
-	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		registries, err = handler.listRegistries(tx, r, portainer.EndpointID(endpointID))
 		return err
-	})
-
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -104,11 +102,9 @@ func (handler *Handler) filterKubernetesEndpointRegistries(r *http.Request, regi
 	}
 
 	if namespaceParam != "" {
-		authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin)
-		if err != nil {
+		if authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin); err != nil {
 			return nil, httperror.NotFound("Unable to check for namespace authorization", err)
-		}
-		if !authorized {
+		} else if !authorized {
 			return nil, httperror.Forbidden("User is not authorized to use namespace", errors.New("user is not authorized to use namespace"))
 		}
 
