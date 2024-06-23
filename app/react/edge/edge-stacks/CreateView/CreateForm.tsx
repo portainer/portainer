@@ -10,6 +10,7 @@ import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templat
 import { useAppTemplate } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 import { getDefaultValues as getEnvVarDefaultValues } from '@/react/portainer/templates/app-templates/DeployFormWidget/EnvVarsFieldset';
+import { parseAutoUpdateResponse } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 
 import { Widget } from '@@/Widget';
 
@@ -56,7 +57,7 @@ export function CreateForm() {
     retryDeploy: false,
     staggerConfig: getDefaultStaggerConfig(),
     method: templateParams.id ? 'template' : 'editor',
-    git: toGitFormModel(),
+    git: toGitFormModel(undefined, parseAutoUpdateResponse()),
     relativePath: getDefaultRelativePathModel(),
     enableWebhook: false,
     fileContent: '',
