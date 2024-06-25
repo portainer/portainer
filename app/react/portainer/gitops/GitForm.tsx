@@ -7,6 +7,7 @@ import { RefField } from '@/react/portainer/gitops/RefField';
 import { GitFormUrlField } from '@/react/portainer/gitops/GitFormUrlField';
 import { DeployMethod, GitFormModel } from '@/react/portainer/gitops/types';
 import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { validateForm } from '@@/form-components/validate-form';
@@ -102,7 +103,7 @@ export function GitForm({
         />
       )}
 
-      {value.AutoUpdate && (
+      {isBE && value.AutoUpdate && (
         <AutoUpdateFieldset
           environmentType={environmentType}
           webhookId={webhookId || ''}
