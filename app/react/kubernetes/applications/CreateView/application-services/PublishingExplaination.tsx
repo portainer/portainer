@@ -5,7 +5,7 @@ import { FormSection } from '@@/form-components/FormSection';
 export function PublishingExplaination() {
   return (
     <FormSection title="Explanation" isFoldable titleSize="sm">
-      <div className="mb-4 flex flex-col items-start lg:flex-row">
+      <div className="w-full mb-4 flex flex-col items-start lg:flex-row">
         <img
           src={ingressDiagram}
           alt="ingress explaination"
