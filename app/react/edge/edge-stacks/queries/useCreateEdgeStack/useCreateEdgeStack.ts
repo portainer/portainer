@@ -9,6 +9,7 @@ import {
 } from '@/react/portainer/gitops/types';
 import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 import { UserId } from '@/portainer/users/types';
+import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 
 import { DeploymentType, StaggerConfig } from '../../types';
 
@@ -144,6 +145,6 @@ async function createStackAndGitCredential(
       payload.relativePathSettings?.PerDeviceConfigsMatchType,
     perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
     tlsSkipVerify: newGitModel.TLSSkipVerify,
-    autoUpdate: newGitModel.AutoUpdate,
+    autoUpdate: transformAutoUpdateViewModel(newGitModel.AutoUpdate),
   });
 }
