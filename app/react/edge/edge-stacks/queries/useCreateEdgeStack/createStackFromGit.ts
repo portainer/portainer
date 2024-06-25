@@ -2,7 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
-import { ciAutoUpdateResponse } from '@/react/portainer/gitops/types';
+import { AutoUpdateResponse } from '@/react/portainer/gitops/types';
 
 import { DeploymentType, EdgeStack, StaggerConfig } from '../../types';
 import { buildUrl } from '../buildUrl';
