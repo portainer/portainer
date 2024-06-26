@@ -17,7 +17,7 @@ angular.module('portainer.docker').controller('HostViewController', [
 
     this.engineDetails = {};
     this.hostDetails = {};
-    this.devices = null;
+    this.devices = undefined;
     this.disks = null;
 
     function initView() {
