@@ -111,5 +111,6 @@ func (store *Store) finishMigrateLegacyVersion(versionToWrite *models.Version) e
 	store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyEditionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
+
 	return err
 }

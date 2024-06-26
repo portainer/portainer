@@ -58,8 +58,8 @@ func (s Set[T]) Copy() Set[T] {
 }
 
 // Difference returns a new set containing the keys that are in the first set but not in the second set.
-func (set Set[T]) Difference(second Set[T]) Set[T] {
-	difference := set.Copy()
+func (s Set[T]) Difference(second Set[T]) Set[T] {
+	difference := s.Copy()
 
 	for key := range second {
 		difference.Remove(key)

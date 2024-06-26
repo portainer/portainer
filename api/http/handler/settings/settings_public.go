@@ -71,6 +71,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 	}
 
 	publicSettings := generatePublicSettings(settings)
+
 	return response.JSON(w, publicSettings)
 }
 
@@ -96,7 +97,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 
 	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
-	//if OAuth authentication is on, compose the related fields from application settings
+	// If OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
 		publicSettings.OAuthLogoutURI = appSettings.OAuthSettings.LogoutURI
 		publicSettings.OAuthLoginURI = fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s",
@@ -104,16 +105,18 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 			appSettings.OAuthSettings.ClientID,
 			appSettings.OAuthSettings.RedirectURI,
 			appSettings.OAuthSettings.Scopes)
-		//control prompt=login param according to the SSO setting
+
+		// Control prompt=login param according to the SSO setting
 		if !appSettings.OAuthSettings.SSO {
 			publicSettings.OAuthLoginURI += "&prompt=login"
 		}
 	}
-	//if LDAP authentication is on, compose the related fields from application settings
+	// If LDAP authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationLDAP && appSettings.LDAPSettings.GroupSearchSettings != nil {
 		if len(appSettings.LDAPSettings.GroupSearchSettings) > 0 {
 			publicSettings.TeamSync = len(appSettings.LDAPSettings.GroupSearchSettings[0].GroupBaseDN) > 0
 		}
 	}
+
 	return publicSettings
 }

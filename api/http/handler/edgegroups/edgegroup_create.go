@@ -36,22 +36,24 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 func calculateEndpointsOrTags(tx dataservices.DataStoreTx, edgeGroup *portainer.EdgeGroup, endpoints []portainer.EndpointID, tagIDs []portainer.TagID) error {
 	if edgeGroup.Dynamic {
 		edgeGroup.TagIDs = tagIDs
-	} else {
-		endpointIDs := []portainer.EndpointID{}
 
-		for _, endpointID := range endpoints {
-			endpoint, err := tx.Endpoint().Endpoint(endpointID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve environment from the database", err)
-			}
+		return nil
+	}
 
-			if endpointutils.IsEdgeEndpoint(endpoint) {
-				endpointIDs = append(endpointIDs, endpoint.ID)
-			}
+	endpointIDs := []portainer.EndpointID{}
+
+	for _, endpointID := range endpoints {
+		endpoint, err := tx.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 		}
 
-		edgeGroup.Endpoints = endpointIDs
+		if endpointutils.IsEdgeEndpoint(endpoint) {
+			endpointIDs = append(endpointIDs, endpoint.ID)
+		}
 	}
+
+	edgeGroup.Endpoints = endpointIDs
 
 	return nil
 }
@@ -71,13 +73,13 @@ func calculateEndpointsOrTags(tx dataservices.DataStoreTx, edgeGroup *portainer.
 // @router /edge_groups [post]
 func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeGroupCreatePayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var edgeGroup *portainer.EdgeGroup
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+
+	err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeGroups, err := tx.EdgeGroup().ReadAll()
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
@@ -101,8 +103,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 			return err
 		}
 
-		err = tx.EdgeGroup().Create(edgeGroup)
-		if err != nil {
+		if err := tx.EdgeGroup().Create(edgeGroup); err != nil {
 			return httperror.InternalServerError("Unable to persist the Edge group inside the database", err)
 		}
 

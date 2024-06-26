@@ -26,12 +26,12 @@ func Test_userList(t *testing.T) {
 
 	_, store := datastore.MustNewTestStore(t, true, true)
 
-	// create admin and standard user(s)
+	// Create admin and standard user(s)
 	adminUser := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
 	err := store.User().Create(adminUser)
 	is.NoError(err, "error creating admin user")
 
-	// setup services
+	// Setup services
 	jwtService, err := jwt.NewService("1h", store)
 	is.NoError(err, "Error initiating jwt service")
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -42,7 +42,7 @@ func Test_userList(t *testing.T) {
 	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, passwordChecker)
 	h.DataStore = store
 
-	// generate admin user tokens
+	// Generate admin user tokens
 	adminJWT, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})
 
 	// Case 1: the user is given the endpoint access directly
@@ -54,12 +54,12 @@ func Test_userList(t *testing.T) {
 	err = store.User().Create(userWithoutEndpointAccess)
 	is.NoError(err, "error creating user")
 
-	// create environment group
+	// Create environment group
 	endpointGroup := &portainer.EndpointGroup{ID: 1, Name: "default-endpoint-group"}
 	err = store.EndpointGroup().Create(endpointGroup)
 	is.NoError(err, "error creating endpoint group")
 
-	// create endpoint and user access policies
+	// Create endpoint and user access policies
 	userAccessPolicies := make(portainer.UserAccessPolicies, 0)
 	userAccessPolicies[userWithEndpointAccess.ID] = portainer.AccessPolicy{RoleID: portainer.RoleID(userWithEndpointAccess.Role)}
 
@@ -129,7 +129,7 @@ func Test_userList(t *testing.T) {
 	err = store.User().Create(userUnderGroup)
 	is.NoError(err, "error creating user")
 
-	// create environment group including a user
+	// Create environment group including a user
 	userAccessPoliciesUnderGroup := make(portainer.UserAccessPolicies, 0)
 	userAccessPoliciesUnderGroup[userUnderGroup.ID] = portainer.AccessPolicy{RoleID: portainer.RoleID(userUnderGroup.Role)}
 
@@ -137,7 +137,7 @@ func Test_userList(t *testing.T) {
 	err = store.EndpointGroup().Create(endpointGroupWithUser)
 	is.NoError(err, "error creating endpoint group")
 
-	// create endpoint
+	// Create endpoint
 	endpointUnderGroupWithUser := &portainer.Endpoint{ID: 2, GroupID: endpointGroupWithUser.ID}
 	err = store.Endpoint().Create(endpointUnderGroupWithUser)
 	is.NoError(err, "error creating endpoint")
@@ -182,7 +182,7 @@ func Test_userList(t *testing.T) {
 	err = store.TeamMembership().Create(teamMembership)
 	is.NoError(err, "error creating team membership")
 
-	// create environment group including a team
+	// Create environment group including a team
 	teamAccessPoliciesUnderGroup := make(portainer.TeamAccessPolicies, 0)
 	teamAccessPoliciesUnderGroup[teamUnderGroup.ID] = portainer.AccessPolicy{RoleID: portainer.RoleID(userUnderTeam.Role)}
 
@@ -190,7 +190,7 @@ func Test_userList(t *testing.T) {
 	err = store.EndpointGroup().Create(endpointGroupWithTeam)
 	is.NoError(err, "error creating endpoint group")
 
-	// create endpoint
+	// Create endpoint
 	endpointUnderGroupWithTeam := &portainer.Endpoint{ID: 3, GroupID: endpointGroupWithTeam.ID}
 	err = store.Endpoint().Create(endpointUnderGroupWithTeam)
 	is.NoError(err, "error creating endpoint")
@@ -233,12 +233,12 @@ func Test_userList(t *testing.T) {
 	err = store.TeamMembership().Create(teamMembershipWithEndpointAccess)
 	is.NoError(err, "error creating team membership")
 
-	// create environment group
+	// Create environment group
 	endpointGroupWithoutTeam := &portainer.EndpointGroup{ID: 4, Name: "endpoint-group-without-team"}
 	err = store.EndpointGroup().Create(endpointGroupWithoutTeam)
 	is.NoError(err, "error creating endpoint group")
 
-	// create endpoint and team access policies
+	// Create endpoint and team access policies
 	teamAccessPolicies := make(portainer.TeamAccessPolicies, 0)
 	teamAccessPolicies[teamWithEndpointAccess.ID] = portainer.AccessPolicy{RoleID: portainer.RoleID(userUnderTeamWithEndpointAccess.Role)}
 

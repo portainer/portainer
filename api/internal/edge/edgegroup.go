@@ -4,7 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/tag"
+	"github.com/portainer/portainer/api/tag"
 )
 
 // EdgeGroupRelatedEndpoints returns a list of environments(endpoints) related to this Edge group

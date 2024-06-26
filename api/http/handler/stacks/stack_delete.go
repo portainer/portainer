@@ -89,8 +89,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	if !isOrphaned {
-		err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-		if err != nil {
+		if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 			return httperror.Forbidden("Permission denied to access endpoint", err)
 		}
 
@@ -119,25 +118,21 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
-	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
-	if err != nil {
+	if err := handler.deleteStack(securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	err = handler.DataStore.Stack().Delete(portainer.StackID(id))
-	if err != nil {
+	if err := handler.DataStore.Stack().Delete(portainer.StackID(id)); err != nil {
 		return httperror.InternalServerError("Unable to remove the stack from the database", err)
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
-		if err != nil {
+		if err := handler.DataStore.ResourceControl().Delete(resourceControl.ID); err != nil {
 			return httperror.InternalServerError("Unable to remove the associated resource control from the database", err)
 		}
 	}
 
-	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
-	if err != nil {
+	if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
 		log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 	}
 
@@ -169,8 +164,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return httperror.InternalServerError("Unable to find the endpoint associated to the stack inside the database", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access endpoint", err)
 	}
 
@@ -179,8 +173,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		Type: portainer.DockerSwarmStack,
 	}
 
-	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
-	if err != nil {
+	if err := handler.deleteStack(securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError("Unable to delete stack", err)
 	}
 
@@ -255,6 +248,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 				}
 			}
 		}
+
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
 
@@ -369,18 +363,18 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		if err != nil {
 			log.Err(err).Msgf("Unable to delete Kubernetes stack `%d`", stack.ID)
 			errors = append(errors, err)
+
 			continue
 		}
 
-		err = handler.DataStore.Stack().Delete(stack.ID)
-		if err != nil {
+		if err := handler.DataStore.Stack().Delete(stack.ID); err != nil {
 			errors = append(errors, err)
 			log.Err(err).Msgf("Unable to remove the stack `%d` from the database", stack.ID)
+
 			continue
 		}
 
-		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
-		if err != nil {
+		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
 			errors = append(errors, err)
 			log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 		}

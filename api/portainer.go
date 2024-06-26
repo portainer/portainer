@@ -12,6 +12,7 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/pkg/featureflags"
+
 	"golang.org/x/oauth2"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
@@ -322,14 +323,14 @@ type (
 		Name   string                         `json:"Name"`
 		Status map[EndpointID]EdgeStackStatus `json:"Status"`
 		// StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
-		CreationDate   int64         `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
-		ProjectPath    string        `json:"ProjectPath"`
-		EntryPoint     string        `json:"EntryPoint"`
-		Version        int           `json:"Version"`
-		NumDeployments int           `json:"NumDeployments"`
-		ManifestPath   string
-		DeploymentType EdgeStackDeploymentType
+		CreationDate   int64                   `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID           `json:"EdgeGroups"`
+		ProjectPath    string                  `json:"ProjectPath"`
+		EntryPoint     string                  `json:"EntryPoint"`
+		Version        int                     `json:"Version"`
+		NumDeployments int                     `json:"NumDeployments"`
+		ManifestPath   string                  `json:"ManifestPath"`
+		DeploymentType EdgeStackDeploymentType `json:"DeploymentType"`
 		// Uses the manifest's namespaces instead of the default one
 		UseManifestNamespaces bool
 
@@ -554,23 +555,22 @@ type (
 
 	// Extension represents a deprecated Portainer extension
 	Extension struct {
-		// Extension Identifier
-		ID               ExtensionID        `json:"Id" example:"1"`
-		Enabled          bool               `json:"Enabled"`
-		Name             string             `json:"Name,omitempty"`
-		ShortDescription string             `json:"ShortDescription,omitempty"`
-		Description      string             `json:"Description,omitempty"`
-		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
-		Price            string             `json:"Price,omitempty"`
-		PriceDescription string             `json:"PriceDescription,omitempty"`
-		Deal             bool               `json:"Deal,omitempty"`
-		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty"`
-		Version          string             `json:"Version"`
-		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty"`
-		Logo             string             `json:"Logo,omitempty"`
+		ID               ExtensionID                 `json:"Id" example:"1"`
+		Enabled          bool                        `json:"Enabled"`
+		Name             string                      `json:"Name,omitempty"`
+		ShortDescription string                      `json:"ShortDescription,omitempty"`
+		Description      string                      `json:"Description,omitempty"`
+		DescriptionURL   string                      `json:"DescriptionURL,omitempty"`
+		Price            string                      `json:"Price,omitempty"`
+		PriceDescription string                      `json:"PriceDescription,omitempty"`
+		Deal             bool                        `json:"Deal,omitempty"`
+		Available        bool                        `json:"Available,omitempty"`
+		License          ExtensionLicenseInformation `json:"License,omitempty"`
+		Version          string                      `json:"Version"`
+		UpdateAvailable  bool                        `json:"UpdateAvailable"`
+		ShopURL          string                      `json:"ShopURL,omitempty"`
+		Images           []string                    `json:"Images,omitempty"`
+		Logo             string                      `json:"Logo,omitempty"`
 	}
 
 	// ExtensionID represents a extension identifier
@@ -737,8 +737,8 @@ type (
 		Groups []string
 	}
 
-	// LicenseInformation represents information about an extension license
-	LicenseInformation struct {
+	// ExtensionLicenseInformation represents information about an extension license
+	ExtensionLicenseInformation struct {
 		LicenseKey string `json:"LicenseKey,omitempty"`
 		Company    string `json:"Company,omitempty"`
 		Expiration string `json:"Expiration,omitempty"`
@@ -939,6 +939,18 @@ type (
 		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
 	}
 
+	Edge struct {
+		// The command list interval for edge agent - used in edge async mode (in seconds)
+		CommandInterval int `json:"CommandInterval" example:"5"`
+		// The ping interval for edge agent - used in edge async mode (in seconds)
+		PingInterval int `json:"PingInterval" example:"5"`
+		// The snapshot interval for edge agent - used in edge async mode (in seconds)
+		SnapshotInterval int `json:"SnapshotInterval" example:"5"`
+
+		// Deprecated 2.18
+		AsyncMode bool `json:"AsyncMode,omitempty" example:"false"`
+	}
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -984,17 +996,7 @@ type (
 		// EdgePortainerURL is the URL that is exposed to edge agents
 		EdgePortainerURL string `json:"EdgePortainerUrl"`
 
-		Edge struct {
-			// The command list interval for edge agent - used in edge async mode (in seconds)
-			CommandInterval int `json:"CommandInterval" example:"5"`
-			// The ping interval for edge agent - used in edge async mode (in seconds)
-			PingInterval int `json:"PingInterval" example:"5"`
-			// The snapshot interval for edge agent - used in edge async mode (in seconds)
-			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-
-			// Deprecated 2.18
-			AsyncMode bool
-		}
+		Edge Edge `json:"Edge"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool `json:"DisplayDonationHeader,omitempty"`

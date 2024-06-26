@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/chisel/crypto"
 	"github.com/portainer/portainer/api/dataservices"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -37,9 +38,11 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 			log.Info().Msg("ServerInfo object not found")
 			return nil
 		}
+
 		log.Error().
 			Err(err).
 			Msg("Failed to read ServerInfo from DB")
+
 		return err
 	}
 
@@ -49,14 +52,15 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 			log.Error().
 				Err(err).
 				Msg("Failed to read ServerInfo from DB")
+
 			return err
 		}
 
-		err = m.fileService.StoreChiselPrivateKey(key)
-		if err != nil {
+		if err := m.fileService.StoreChiselPrivateKey(key); err != nil {
 			log.Error().
 				Err(err).
 				Msg("Failed to save Chisel private key to disk")
+
 			return err
 		}
 	} else {
@@ -64,14 +68,14 @@ func (m *Migrator) convertSeedToPrivateKeyForDB100() error {
 	}
 
 	serverInfo.PrivateKeySeed = ""
-	err = m.TunnelServerService.UpdateInfo(serverInfo)
-	if err != nil {
+	if err := m.TunnelServerService.UpdateInfo(serverInfo); err != nil {
 		log.Error().
 			Err(err).
 			Msg("Failed to clean private key seed in DB")
 	} else {
 		log.Info().Msg("Success to migrate private key seed to private key file")
 	}
+
 	return err
 }
 
@@ -84,9 +88,8 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 	}
 
 	for _, edgeStack := range edgeStacks {
-
 		for environmentID, environmentStatus := range edgeStack.Status {
-			// skip if status is already updated
+			// Skip if status is already updated
 			if len(environmentStatus.Status) > 0 {
 				continue
 			}
@@ -146,8 +149,7 @@ func (m *Migrator) updateEdgeStackStatusForDB100() error {
 			edgeStack.Status[environmentID] = environmentStatus
 		}
 
-		err = m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack)
-		if err != nil {
+		if err := m.edgeStackService.UpdateEdgeStack(edgeStack.ID, &edgeStack); err != nil {
 			return err
 		}
 	}

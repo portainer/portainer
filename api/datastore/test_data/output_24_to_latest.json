@@ -583,7 +583,6 @@
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
     "Edge": {
-      "AsyncMode": false,
       "CommandInterval": 0,
       "PingInterval": 0,
       "SnapshotInterval": 0

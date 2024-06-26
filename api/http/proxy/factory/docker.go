@@ -8,7 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
-	"github.com/portainer/portainer/api/internal/url"
+	"github.com/portainer/portainer/api/url"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/rs/zerolog/log"

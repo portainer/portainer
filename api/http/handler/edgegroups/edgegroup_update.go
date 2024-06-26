@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -113,7 +113,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
-		endpointsToUpdate := unique.Unique(append(newRelatedEndpoints, oldRelatedEndpoints...))
+		endpointsToUpdate := slicesx.Unique(append(newRelatedEndpoints, oldRelatedEndpoints...))
 
 		edgeJobs, err := tx.EdgeJob().ReadAll()
 		if err != nil {

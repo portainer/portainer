@@ -7,7 +7,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/slicesx"
 )
 
 // filterByResourceControl filters a list of items based on the user's role and the resource control associated to the item.
@@ -16,7 +16,7 @@ func FilterByResourceControl[T any](tx dataservices.DataStoreTx, items []T, rcTy
 		return items, nil
 	}
 
-	userTeamIDs := slices.Map(securityContext.UserMemberships, func(membership portainer.TeamMembership) portainer.TeamID {
+	userTeamIDs := slicesx.Map(securityContext.UserMemberships, func(membership portainer.TeamMembership) portainer.TeamID {
 		return membership.TeamID
 	})
 
@@ -32,5 +32,6 @@ func FilterByResourceControl[T any](tx dataservices.DataStoreTx, items []T, rcTy
 		}
 
 	}
+
 	return filteredItems, nil
 }

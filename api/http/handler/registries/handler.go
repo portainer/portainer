@@ -97,13 +97,13 @@ func (handler *Handler) userHasRegistryAccess(r *http.Request) (hasAccess bool, 
 	if err != nil {
 		return false, false, err
 	}
+
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		return false, false, err
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return false, false, err
 	}
 

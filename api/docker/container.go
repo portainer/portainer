@@ -36,7 +36,6 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	if err != nil {
 		return nil, errors.Wrap(err, "create client error")
 	}
-
 	defer cli.Close()
 
 	log.Debug().Str("container_id", containerId).Msg("starting to fetch container information")

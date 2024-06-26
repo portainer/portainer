@@ -3,8 +3,8 @@ package cli
 import (
 	"context"
 
+	"github.com/portainer/portainer/api/concurrent"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/concurrent"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

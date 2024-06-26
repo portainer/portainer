@@ -18,6 +18,7 @@ import (
 
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type endpointTestCase struct {
@@ -99,8 +100,7 @@ func mustSetupHandler(t *testing.T) *Handler {
 	}
 	settings.TrustOnFirstConnect = true
 
-	err = store.Settings().UpdateSettings(settings)
-	if err != nil {
+	if err = store.Settings().UpdateSettings(settings); err != nil {
 		t.Fatalf("could not update settings: %s", err)
 	}
 
@@ -122,8 +122,7 @@ func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelat
 		return nil
 	}
 
-	err = handler.DataStore.Endpoint().Create(&endpoint)
-	if err != nil {
+	if err := handler.DataStore.Endpoint().Create(&endpoint); err != nil {
 		return err
 	}
 
@@ -134,14 +133,13 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 	handler := mustSetupHandler(t)
 	endpointID := portainer.EndpointID(45)
 
-	err := createEndpoint(handler, portainer.Endpoint{
+	if err := createEndpoint(handler, portainer.Endpoint{
 		ID:     endpointID,
 		Name:   "endpoint-id-45",
 		Type:   portainer.EdgeAgentOnDockerEnvironment,
 		URL:    "https://portainer.io:9443",
 		EdgeID: "edge-id",
-	}, portainer.EndpointRelation{EndpointID: endpointID})
-	if err != nil {
+	}, portainer.EndpointRelation{EndpointID: endpointID}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -201,8 +199,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err := createEndpoint(handler, endpoint, endpointRelation)
-	if err != nil {
+	if err := createEndpoint(handler, endpoint, endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 
@@ -212,6 +209,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
+
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
 	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
@@ -246,8 +244,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err := createEndpoint(handler, endpoint, endpointRelation)
-	if err != nil {
+	if err := createEndpoint(handler, endpoint, endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 
@@ -255,6 +252,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
+
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, edgeId)
 	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
@@ -308,10 +306,11 @@ func TestEdgeStackStatus(t *testing.T) {
 			edgeStack.ID: true,
 		},
 	}
-	handler.DataStore.EdgeStack().Create(edgeStack.ID, &edgeStack)
 
-	err := createEndpoint(handler, endpoint, endpointRelation)
-	if err != nil {
+	err := handler.DataStore.EdgeStack().Create(edgeStack.ID, &edgeStack)
+	require.NoError(t, err)
+
+	if err := createEndpoint(handler, endpoint, endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 
@@ -319,6 +318,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
+
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
 	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
@@ -330,8 +330,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	}
 
 	var data endpointEdgeStatusInspectResponse
-	err = json.NewDecoder(rec.Body).Decode(&data)
-	if err != nil {
+	if err := json.NewDecoder(rec.Body).Decode(&data); err != nil {
 		t.Fatal("error decoding response:", err)
 	}
 
@@ -357,8 +356,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err := createEndpoint(handler, endpoint, endpointRelation)
-	if err != nil {
+	if err := createEndpoint(handler, endpoint, endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 
@@ -384,6 +382,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
+
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
 	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
@@ -395,8 +394,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 	}
 
 	var data endpointEdgeStatusInspectResponse
-	err = json.NewDecoder(rec.Body).Decode(&data)
-	if err != nil {
+	if err := json.NewDecoder(rec.Body).Decode(&data); err != nil {
 		t.Fatal("error decoding response:", err)
 	}
 

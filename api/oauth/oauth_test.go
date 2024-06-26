@@ -16,8 +16,7 @@ func Test_getOAuthToken(t *testing.T) {
 
 	t.Run("getOAuthToken fails upon invalid code", func(t *testing.T) {
 		code := ""
-		_, err := getOAuthToken(code, config)
-		if err == nil {
+		if _, err := getOAuthToken(code, config); err == nil {
 			t.Errorf("getOAuthToken should fail upon providing invalid code; code=%v", code)
 		}
 	})
@@ -91,22 +90,19 @@ func Test_getResource(t *testing.T) {
 	defer srv.Close()
 
 	t.Run("should fail upon missing Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource("", config)
-		if err == nil {
+		if _, err := getResource("", config); err == nil {
 			t.Errorf("getResource should fail if access token is not provided in auth bearer header")
 		}
 	})
 
 	t.Run("should fail upon providing incorrect Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource("incorrect-token", config)
-		if err == nil {
+		if _, err := getResource("incorrect-token", config); err == nil {
 			t.Errorf("getResource should fail if incorrect access token provided in auth bearer header")
 		}
 	})
 
 	t.Run("should succeed upon providing correct Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource(oauthtest.AccessToken, config)
-		if err != nil {
+		if _, err := getResource(oauthtest.AccessToken, config); err != nil {
 			t.Errorf("getResource should succeed if correct access token provided in auth bearer header")
 		}
 	})
@@ -120,8 +116,7 @@ func Test_Authenticate(t *testing.T) {
 		srv, config := oauthtest.RunOAuthServer(code, &portainer.OAuthSettings{})
 		defer srv.Close()
 
-		_, err := authService.Authenticate(code, config)
-		if err == nil {
+		if _, err := authService.Authenticate(code, config); err == nil {
 			t.Error("Authenticate should fail to extract username from resource if incorrect UserIdentifier provided")
 		}
 	})
