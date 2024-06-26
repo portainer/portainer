@@ -61,6 +61,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
@@ -380,9 +381,7 @@ func (server *Server) Start() error {
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
-
-	// Temporarily disable for EE-6905 until we have a solution for the snapshotter
-	// go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
+	go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
 
 	return httpsServer.ListenAndServeTLS("", "")
 }
