@@ -2,7 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
-import { AutoUpdateModel } from '@/react/portainer/gitops/types';
+import { AutoUpdateResponse } from '@/react/portainer/gitops/types';
 
 import { DeploymentType, EdgeStack, StaggerConfig } from '../../types';
 import { buildUrl } from '../buildUrl';
@@ -42,7 +42,7 @@ export type GitRepositoryPayload = {
   /** TLSSkipVerify skips SSL verification when cloning the Git repository */
   tlsSkipVerify?: boolean;
   /** Optional GitOps update configuration */
-  autoUpdate?: AutoUpdateModel;
+  autoUpdate: AutoUpdateResponse | null;
   /** Whether the stack supports relative path volume */
   supportRelativePath?: boolean;
   /** Local filesystem path */

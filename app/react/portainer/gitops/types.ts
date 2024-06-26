@@ -71,13 +71,17 @@ export interface GitFormModel extends GitAuthModel {
   AutoUpdate?: AutoUpdateModel;
 }
 
-export function toGitFormModel(response?: RepoConfigResponse): GitFormModel {
+export function toGitFormModel(
+  response?: RepoConfigResponse,
+  autoUpdate?: AutoUpdateModel
+): GitFormModel {
   if (!response) {
     return {
       RepositoryURL: '',
       ComposeFilePathInRepository: '',
       RepositoryAuthentication: false,
       TLSSkipVerify: false,
+      AutoUpdate: autoUpdate,
     };
   }
 
@@ -96,5 +100,6 @@ export function toGitFormModel(response?: RepoConfigResponse): GitFormModel {
     RepositoryPassword: Authentication?.Password,
     RepositoryGitCredentialID: Authentication?.GitCredentialID,
     TLSSkipVerify,
+    AutoUpdate: autoUpdate,
   };
 }
