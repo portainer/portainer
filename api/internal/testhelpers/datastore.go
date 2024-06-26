@@ -38,12 +38,12 @@ type testDatastore struct {
 	connection              portainer.Connection
 }
 
-func (d *testDatastore) Backup(path string) (string, error)                  { return "", nil }
-func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
-func (d *testDatastore) Init() error                                         { return nil }
-func (d *testDatastore) Close() error                                        { return nil }
-func (d *testDatastore) UpdateTx(func(dataservices.DataStoreTx) error) error { return nil }
-func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { return nil }
+func (d *testDatastore) Backup(path string) (string, error)                   { return "", nil }
+func (d *testDatastore) Open() (bool, error)                                  { return false, nil }
+func (d *testDatastore) Init() error                                          { return nil }
+func (d *testDatastore) Close() error                                         { return nil }
+func (d *testDatastore) UpdateTx(func(dataservices.DataStoreTx) error) error  { return nil }
+func (d *testDatastore) ViewTx(fn func(dataservices.DataStoreTx) error) error { return fn(d) }
 
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
@@ -146,8 +146,16 @@ type stubUserService struct {
 	users []portainer.User
 }
 
-func (s *stubUserService) BucketName() string                                      { return "users" }
-func (s *stubUserService) Read(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
+func (s *stubUserService) BucketName() string { return "users" }
+func (s *stubUserService) Read(ID portainer.UserID) (*portainer.User, error) {
+	for _, user := range s.users {
+		if user.ID == ID {
+			return &user, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
 func (s *stubUserService) ReadAll() ([]portainer.User, error)                      { return s.users, nil }
 func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {

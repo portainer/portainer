@@ -13,8 +13,10 @@ export function PasswordCheckHint({
   passwordValid,
   forceChangePassword,
 }: Props) {
-  const settingsQuery = usePublicSettings();
-  const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
+  const minPassLengthQuery = usePublicSettings({
+    select: (settings) => settings.RequiredPasswordLength,
+  });
+  const minPasswordLength = minPassLengthQuery.data;
 
   return (
     <div>

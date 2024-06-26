@@ -3,12 +3,12 @@ import { type EnvironmentGroupId } from '@/react/portainer/environments/environm
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 import {
   EdgeStack,
   StatusType as EdgeStackStatusType,
 } from '@/react/edge/edge-stacks/types';
 
-import { getPublicSettings } from '../../settings/settings.service';
 import type {
   Environment,
   EnvironmentId,
@@ -133,17 +133,17 @@ export async function snapshotEndpoints() {
 }
 
 export async function getDeploymentOptions(environmentId: EnvironmentId) {
-  const publicSettings = await getPublicSettings();
+  const settings = await getSettings();
   const endpoint = await getEndpoint(environmentId);
 
   if (
-    publicSettings.GlobalDeploymentOptions.perEnvOverride &&
+    settings.GlobalDeploymentOptions?.perEnvOverride &&
     endpoint.DeploymentOptions?.overrideGlobalOptions
   ) {
     return endpoint.DeploymentOptions;
   }
 
-  return publicSettings.GlobalDeploymentOptions;
+  return settings.GlobalDeploymentOptions;
 }
 
 export async function snapshotEndpoint(id: EnvironmentId) {

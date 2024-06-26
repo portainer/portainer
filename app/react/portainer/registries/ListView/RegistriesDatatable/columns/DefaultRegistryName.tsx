@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 export function DefaultRegistryName() {
-  const settingsQuery = usePublicSettings({
+  const settingsQuery = useSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
   });
 

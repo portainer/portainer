@@ -1,4 +1,5 @@
 import { useRouter } from '@uirouter/react';
+import { useEffect } from 'react';
 
 import { FeatureFlag, useFeatureFlag } from './useFeatureFlag';
 
@@ -8,11 +9,11 @@ export function useRedirectFeatureFlag(
 ) {
   const router = useRouter();
 
-  useFeatureFlag(flag, {
-    onSuccess(isEnabled) {
-      if (!isEnabled) {
-        router.stateService.go(to);
-      }
-    },
-  });
+  const query = useFeatureFlag(flag);
+
+  useEffect(() => {
+    if (!query.isLoading && !query.data) {
+      router.stateService.go(to);
+    }
+  }, [query.data, query.isLoading, router.stateService, to]);
 }

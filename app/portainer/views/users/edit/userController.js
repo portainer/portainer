@@ -1,6 +1,7 @@
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { confirm, confirmChangePassword, confirmDelete } from '@@/modals/confirm';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 angular.module('portainer.app').controller('UserController', [
   '$q',
@@ -9,9 +10,8 @@ angular.module('portainer.app').controller('UserController', [
   '$transition$',
   'UserService',
   'Notifications',
-  'SettingsService',
   'Authentication',
-  function ($q, $scope, $state, $transition$, UserService, Notifications, SettingsService, Authentication) {
+  function ($q, $scope, $state, $transition$, UserService, Notifications, Authentication) {
     $scope.state = {
       updatePasswordError: '',
     };
@@ -115,7 +115,7 @@ angular.module('portainer.app').controller('UserController', [
 
       $q.all({
         user: UserService.user($transition$.params().id),
-        settings: SettingsService.publicSettings(),
+        settings: getSettings(),
       })
         .then(function success(data) {
           var user = data.user;

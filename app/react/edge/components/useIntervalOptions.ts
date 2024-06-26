@@ -24,10 +24,10 @@ export function useIntervalOptions(
   const [{ value: defaultValue }] = initialOptions;
   const [options, setOptions] = useState<Option[]>(initialOptions);
 
-  const settingsQuery = useSettings(
-    (settings) => _.get(settings, fieldName, 0) as number,
-    !isDefaultHidden
-  );
+  const settingsQuery = useSettings({
+    select: (settings) => _.get(settings, fieldName, 0) as number,
+    enabled: !isDefaultHidden,
+  });
 
   useEffect(() => {
     if (isDefaultHidden) {

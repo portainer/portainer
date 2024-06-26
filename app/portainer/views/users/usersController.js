@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
+import { getSettings } from '@/react/portainer/settings/queries/useSettings';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -11,8 +12,7 @@ angular.module('portainer.app').controller('UsersController', [
   'TeamMembershipService',
   'Notifications',
   'Authentication',
-  'SettingsService',
-  function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, Notifications, Authentication, SettingsService) {
+  function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, Notifications, Authentication) {
     $scope.state = {
       userCreationError: '',
       validUsername: false,
@@ -112,7 +112,7 @@ angular.module('portainer.app').controller('UsersController', [
         users: UserService.users(true),
         teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
         memberships: TeamMembershipService.memberships(),
-        settings: SettingsService.publicSettings(),
+        settings: getSettings(),
       })
         .then(function success(data) {
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;

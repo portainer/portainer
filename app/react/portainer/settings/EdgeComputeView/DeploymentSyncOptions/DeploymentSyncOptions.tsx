@@ -44,9 +44,9 @@ export function DeploymentSyncOptions() {
 
   const initialValues: FormValues = {
     Edge: {
-      CommandInterval: settingsQuery.data.Edge.CommandInterval,
-      PingInterval: settingsQuery.data.Edge.PingInterval,
-      SnapshotInterval: settingsQuery.data.Edge.SnapshotInterval,
+      CommandInterval: settingsQuery.data.Edge?.CommandInterval || 0,
+      PingInterval: settingsQuery.data.Edge?.PingInterval || 0,
+      SnapshotInterval: settingsQuery.data.Edge?.SnapshotInterval || 0,
     },
     EdgeAgentCheckinInterval: settingsQuery.data.EdgeAgentCheckinInterval,
   };

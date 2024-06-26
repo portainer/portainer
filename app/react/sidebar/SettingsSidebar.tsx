@@ -8,7 +8,10 @@ import {
   Bell,
 } from 'lucide-react';
 
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import {
+  usePublicSettings,
+  useSettings,
+} from '@/react/portainer/settings/queries';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { SidebarItem } from './SidebarItem';
@@ -226,7 +229,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
 }
 
 function EdgeUpdatesSidebarItem() {
-  const settingsQuery = usePublicSettings();
+  const settingsQuery = useSettings();
 
   if (!isBE || !settingsQuery.data?.EnableEdgeComputeFeatures) {
     return null;

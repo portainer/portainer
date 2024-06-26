@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { useMemo } from 'react';
 
 import { humanize, truncate } from '@/portainer/filters/filters';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 import { Link } from '@@/Link';
 
@@ -10,9 +10,9 @@ import { helper } from './columns.helper';
 import { name } from './columns.name';
 
 export function useColumns() {
-  const hideStacksQuery = usePublicSettings<boolean>({
+  const hideStacksQuery = useSettings({
     select: (settings) =>
-      settings.GlobalDeploymentOptions.hideStacksFunctionality,
+      !!settings.GlobalDeploymentOptions?.hideStacksFunctionality,
   });
 
   return useMemo(

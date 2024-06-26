@@ -8,7 +8,7 @@ import {
   EnvironmentType,
 } from '@/react/portainer/environments/types';
 import { usePaginationLimitState } from '@/react/hooks/usePaginationLimitState';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 import {
   Query,
   useEnvironmentList,
@@ -37,7 +37,7 @@ export function KubeconfigPrompt({
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
 
-  const expiryQuery = usePublicSettings({
+  const expiryQuery = useSettings({
     select: (settings) => expiryMessage(settings.KubeconfigExpiry),
   });
 

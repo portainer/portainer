@@ -3,7 +3,7 @@ import { Home } from 'lucide-react';
 
 import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
 import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
-import { usePublicSettings } from '@/react/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 import styles from './Sidebar.module.css';
 import { EdgeComputeSidebar } from './EdgeComputeSidebar';
@@ -30,7 +30,7 @@ function InnerSidebar() {
   const isTeamLeader = useIsCurrentUserTeamLeader();
   const { isOpen } = useSidebarState();
 
-  const settingsQuery = usePublicSettings();
+  const settingsQuery = useSettings();
 
   if (!settingsQuery.data || isAdminQuery.isLoading) {
     return null;

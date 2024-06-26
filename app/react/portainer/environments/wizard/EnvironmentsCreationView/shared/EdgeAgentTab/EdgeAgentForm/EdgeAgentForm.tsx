@@ -115,7 +115,7 @@ export function buildInitialValues(settings: Settings): FormValues {
     name: '',
     portainerUrl: settings.EdgePortainerUrl || buildApiUrlDefaultValue(),
     tunnelServerAddr:
-      settings.Edge.TunnelServerAddress || buildTunnelDefaultValue(),
+      settings.Edge?.TunnelServerAddress || buildTunnelDefaultValue(),
     pollFrequency: 0,
     meta: {
       groupId: 1,

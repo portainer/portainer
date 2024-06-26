@@ -4,7 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withError } from '@/react-tools/react-query';
 
 import { ExperimentalFeatures } from '../types';
-import { buildUrl } from '../settings.service';
+import { buildUrl } from '../build-url';
 
 import { queryKeys } from './queryKeys';
 
