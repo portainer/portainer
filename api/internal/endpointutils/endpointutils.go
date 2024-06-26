@@ -109,6 +109,8 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 		updatedClass.Type = controllers[i].Type
 		updatedClasses = append(updatedClasses, updatedClass)
 	}
+
+	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 }
 
 func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
