@@ -79,21 +79,26 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 	if endpoint.Kubernetes.Flags.IsServerIngressClassDetected {
 		return
 	}
+
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerIngressClassDetected = true
-		endpointService.UpdateEndpoint(
-			endpoint.ID,
-			endpoint,
-		)
+
+		if err := endpointService.UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+			log.Debug().Err(err).Msg("unable to store found IngressClasses inside the database")
+		}
 	}()
+
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for ingress class detection")
+
 		return
 	}
+
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
 		log.Debug().Err(err).Msg("failed to fetch ingressclasses")
+
 		return
 	}
 
@@ -106,42 +111,34 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 	}
 
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = endpointService.UpdateEndpoint(
-		endpoint.ID,
-		endpoint,
-	)
-	if err != nil {
-		log.Debug().Err(err).Msg("unable to store found IngressClasses inside the database")
-		return
-	}
 }
 
 func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) {
 	if endpoint.Kubernetes.Flags.IsServerMetricsDetected {
 		return
 	}
+
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerMetricsDetected = true
-		endpointService.UpdateEndpoint(
-			endpoint.ID,
-			endpoint,
-		)
+		if err := endpointService.UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+			log.Debug().Err(err).Msg("unable to enable UseServerMetrics inside the database")
+		}
 	}()
+
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for initial metrics detection")
+
 		return
 	}
-	_, err = cli.GetMetrics()
-	if err != nil {
+
+	if _, err := cli.GetMetrics(); err != nil {
 		log.Debug().Err(err).Msg("unable to fetch metrics: leaving metrics collection disabled.")
+
 		return
 	}
+
 	endpoint.Kubernetes.Configuration.UseServerMetrics = true
-	if err != nil {
-		log.Debug().Err(err).Msg("unable to enable UseServerMetrics inside the database")
-		return
-	}
 }
 
 func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) error {
