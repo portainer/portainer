@@ -200,17 +200,6 @@ angular
         },
       };
 
-      var deviceImport = {
-        name: 'portainer.endpoints.importDevice',
-        url: '/device',
-        views: {
-          'content@': {
-            templateUrl: './views/devices/import/importDevice.html',
-            controller: 'ImportDeviceController',
-          },
-        },
-      };
-
       const edgeAutoCreateScript = {
         name: 'portainer.endpoints.edgeAutoCreateScript',
         url: '/aeec',
@@ -464,7 +453,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeAutoCreateScript);
-      $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);
