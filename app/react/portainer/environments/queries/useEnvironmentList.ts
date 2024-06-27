@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { withError } from '@/react-tools/react-query';
 
-import { EnvironmentStatus, EnvironmentType } from '../types';
+import { EnvironmentStatus } from '../types';
 import {
   EnvironmentsQueryParams,
   getEnvironments,
@@ -61,9 +61,9 @@ export function useEnvironmentList(
     staleTime,
   }: {
     refetchInterval?:
-      | number
-      | false
-      | ((data?: GetEndpointsResponse) => false | number);
+    | number
+    | false
+    | ((data?: GetEndpointsResponse) => false | number);
     staleTime?: number;
     enabled?: boolean;
   } = {}
