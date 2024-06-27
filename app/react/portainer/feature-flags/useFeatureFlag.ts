@@ -1,6 +1,6 @@
 import { usePublicSettings } from '../settings/queries';
 
-export enum FeatureFlag { }
+export enum FeatureFlag {}
 
 export function useFeatureFlag(
   flag: FeatureFlag,
