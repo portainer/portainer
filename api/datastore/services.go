@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
-	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
 	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
@@ -55,7 +54,6 @@ type Store struct {
 	EndpointService           *endpoint.Service
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
-	FDOProfilesService        *fdoprofile.Service
 	HelmUserRepositoryService *helmuserrepository.Service
 	RegistryService           *registry.Service
 	ResourceControlService    *resourcecontrol.Service
@@ -137,12 +135,6 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ExtensionService = extensionService
-
-	fdoProfilesService, err := fdoprofile.NewService(store.connection)
-	if err != nil {
-		return err
-	}
-	store.FDOProfilesService = fdoProfilesService
 
 	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
 	if err != nil {
@@ -287,11 +279,6 @@ func (store *Store) EndpointGroup() dataservices.EndpointGroupService {
 // EndpointRelation gives access to the EndpointRelation data management layer
 func (store *Store) EndpointRelation() dataservices.EndpointRelationService {
 	return store.EndpointRelationService
-}
-
-// FDOProfile gives access to the FDOProfile data management layer
-func (store *Store) FDOProfile() dataservices.FDOProfileService {
-	return store.FDOProfilesService
 }
 
 // HelmUserRepository access the helm user repository settings

@@ -6,7 +6,6 @@ export function SettingsViewModel(data) {
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.openAMTConfiguration = data.openAMTConfiguration;
-  this.fdoConfiguration = data.fdoConfiguration;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
@@ -37,7 +36,6 @@ export function PublicSettingsViewModel(settings) {
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
   this.DefaultRegistry = settings.DefaultRegistry;
   this.IsAMTEnabled = settings.IsAMTEnabled;
-  this.IsFDOEnabled = settings.IsFDOEnabled;
 }
 
 export function InternalAuthSettingsViewModel(data) {

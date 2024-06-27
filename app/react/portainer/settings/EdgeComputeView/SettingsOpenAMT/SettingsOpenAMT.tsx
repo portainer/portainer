@@ -253,7 +253,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      data-cy="settings-fdoButton"
+                      data-cy="settings-OpenAMTButton"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
