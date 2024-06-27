@@ -29,7 +29,7 @@ export type GitRepositoryPayload = {
   filePathInRepository?: string;
   /** List of identifiers of EdgeGroups */
   edgeGroups: Array<EdgeGroup['Id']>;
-  /** Deployment type to deploy this stack. Valid values are: 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'. Compose is enabled only for docker environments, kubernetes is enabled only for kubernetes environments, nomad is enabled only for nomad environments */
+  /** Deployment type to deploy this stack. Valid values are: 0 - 'compose', 1 - 'kubernetes'. Compose is enabled only for docker environments, kubernetes is enabled only for kubernetes environments */
   deploymentType: DeploymentType;
   /** List of Registries to use for this stack */
   registries?: Array<RegistryId>;
