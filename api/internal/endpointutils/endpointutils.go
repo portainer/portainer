@@ -142,30 +142,37 @@ func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService datas
 }
 
 func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.EndpointService, factory *cli.ClientFactory) error {
+	if endpoint.Kubernetes.Flags.IsServerStorageDetected {
+		return nil
+	}
+
+	defer func() {
+		endpoint.Kubernetes.Flags.IsServerStorageDetected = true
+		if err := endpointService.UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+			log.Info().Err(err).Msg("unable to enable storage class inside the database")
+		}
+	}()
+
 	cli, err := factory.GetKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create Kubernetes client for initial storage detection")
+
 		return err
 	}
 
 	storage, err := cli.GetStorage()
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to fetch storage classes: leaving storage classes disabled")
+
 		return err
-	}
-	if len(storage) == 0 {
+	} else if len(storage) == 0 {
 		log.Info().Err(err).Msg("zero storage classes found: they may be still building, retrying in 30 seconds")
+
 		return fmt.Errorf("zero storage classes found: they may be still building, retrying in 30 seconds")
 	}
+
 	endpoint.Kubernetes.Configuration.StorageClasses = storage
-	err = endpointService.UpdateEndpoint(
-		portainer.EndpointID(endpoint.ID),
-		endpoint,
-	)
-	if err != nil {
-		log.Debug().Err(err).Msg("unable to enable storage class inside the database")
-		return err
-	}
+
 	return nil
 }
 
