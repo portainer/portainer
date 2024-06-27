@@ -61,9 +61,9 @@ export function useEnvironmentList(
     staleTime,
   }: {
     refetchInterval?:
-    | number
-    | false
-    | ((data?: GetEndpointsResponse) => false | number);
+      | number
+      | false
+      | ((data?: GetEndpointsResponse) => false | number);
     staleTime?: number;
     enabled?: boolean;
   } = {}
