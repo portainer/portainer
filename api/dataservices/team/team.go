@@ -59,7 +59,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 func (service *Service) Create(team *portainer.Team) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			team.ID = portainer.TeamID(id)
 			return int(team.ID), team
 		},

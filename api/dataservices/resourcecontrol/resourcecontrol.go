@@ -52,7 +52,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},
-		func(obj interface{}) (interface{}, error) {
+		func(obj any) (any, error) {
 			rc, ok := obj.(*portainer.ResourceControl)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to ResourceControl object")
@@ -84,7 +84,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 func (service *Service) Create(resourceControl *portainer.ResourceControl) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			resourceControl.ID = portainer.ResourceControlID(id)
 			return int(resourceControl.ID), resourceControl
 		},

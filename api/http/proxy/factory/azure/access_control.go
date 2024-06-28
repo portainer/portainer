@@ -47,12 +47,12 @@ func (transport *Transport) createAzureRequestContext(request *http.Request) (*a
 	return context, nil
 }
 
-func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
+func decorateObject(object map[string]any, resourceControl *portainer.ResourceControl) map[string]any {
 	if object["Portainer"] == nil {
-		object["Portainer"] = make(map[string]interface{})
+		object["Portainer"] = make(map[string]any)
 	}
 
-	portainerMetadata := object["Portainer"].(map[string]interface{})
+	portainerMetadata := object["Portainer"].(map[string]any)
 	portainerMetadata["ResourceControl"] = resourceControl
 
 	return object
@@ -88,18 +88,18 @@ func (transport *Transport) userCanDeleteContainerGroup(request *http.Request, c
 	return authorization.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl)
 }
 
-func (transport *Transport) decorateContainerGroups(containerGroups []interface{}, context *azureRequestContext) []interface{} {
-	decoratedContainerGroups := make([]interface{}, 0)
+func (transport *Transport) decorateContainerGroups(containerGroups []any, context *azureRequestContext) []any {
+	decoratedContainerGroups := make([]any, 0)
 
 	for _, containerGroup := range containerGroups {
-		containerGroup = transport.decorateContainerGroup(containerGroup.(map[string]interface{}), context)
+		containerGroup = transport.decorateContainerGroup(containerGroup.(map[string]any), context)
 		decoratedContainerGroups = append(decoratedContainerGroups, containerGroup)
 	}
 
 	return decoratedContainerGroups
 }
 
-func (transport *Transport) decorateContainerGroup(containerGroup map[string]interface{}, context *azureRequestContext) map[string]interface{} {
+func (transport *Transport) decorateContainerGroup(containerGroup map[string]any, context *azureRequestContext) map[string]any {
 	containerGroupId, ok := containerGroup["id"].(string)
 	if ok {
 		resourceControl := transport.findResourceControl(containerGroupId, context)
@@ -113,13 +113,13 @@ func (transport *Transport) decorateContainerGroup(containerGroup map[string]int
 	return containerGroup
 }
 
-func (transport *Transport) filterContainerGroups(containerGroups []interface{}, context *azureRequestContext) []interface{} {
-	filteredContainerGroups := make([]interface{}, 0)
+func (transport *Transport) filterContainerGroups(containerGroups []any, context *azureRequestContext) []any {
+	filteredContainerGroups := make([]any, 0)
 
 	for _, containerGroup := range containerGroups {
 		userCanAccessResource := false
-		containerGroup := containerGroup.(map[string]interface{})
-		portainerObject, ok := containerGroup["Portainer"].(map[string]interface{})
+		containerGroup := containerGroup.(map[string]any)
+		portainerObject, ok := containerGroup["Portainer"].(map[string]any)
 		if ok {
 			resourceControl, ok := portainerObject["ResourceControl"].(*portainer.ResourceControl)
 			if ok {
@@ -135,7 +135,7 @@ func (transport *Transport) filterContainerGroups(containerGroups []interface{},
 	return filteredContainerGroups
 }
 
-func (transport *Transport) removeResourceControl(containerGroup map[string]interface{}, context *azureRequestContext) error {
+func (transport *Transport) removeResourceControl(containerGroup map[string]any, context *azureRequestContext) error {
 	containerGroupID, ok := containerGroup["id"].(string)
 	if !ok {
 		log.Debug().Msg("missing ID in container group")

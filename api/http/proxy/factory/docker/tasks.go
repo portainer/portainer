@@ -36,7 +36,7 @@ func (transport *Transport) taskListOperation(response *http.Response, executor 
 // selectorServiceLabels retrieve the labels object associated to the task object.
 // Labels are available under the "Spec.ContainerSpec.Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
-func selectorTaskLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorTaskLabels(responseObject map[string]any) map[string]any {
 	taskSpecObject := utils.GetJSONObject(responseObject, "Spec")
 	if taskSpecObject != nil {
 		containerSpecObject := utils.GetJSONObject(taskSpecObject, "ContainerSpec")

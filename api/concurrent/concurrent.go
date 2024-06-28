@@ -17,11 +17,11 @@ func (kcl *KubeClient) GetConfigMapsAndSecrets(namespace string) ([]models.K8sCo
 	// use closures to capture the current kube client and namespace by declaring wrapper functions
 	// that match the interface signature for concurrent.Func
 
-	listConfigMaps := func(ctx context.Context) (interface{}, error) {
+	listConfigMaps := func(ctx context.Context) (any, error) {
 		return kcl.cli.CoreV1().ConfigMaps(namespace).List(context.Background(), meta.ListOptions{})
 	}
 
-	listSecrets := func(ctx context.Context) (interface{}, error) {
+	listSecrets := func(ctx context.Context) (any, error) {
 		return kcl.cli.CoreV1().Secrets(namespace).List(context.Background(), meta.ListOptions{})
 	}
 

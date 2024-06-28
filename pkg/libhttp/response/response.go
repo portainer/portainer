@@ -13,13 +13,13 @@ import (
 
 // JSON encodes data to rw in JSON format. Returns a pointer to a
 // HandlerError if encoding fails.
-func JSON(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
+func JSON(rw http.ResponseWriter, data any) *httperror.HandlerError {
 	return JSONWithStatus(rw, data, http.StatusOK)
 }
 
 // JSONWithStatus encodes data to rw in JSON format with a specific status code.
 // Returns a pointer to a HandlerError if encoding fails.
-func JSONWithStatus(rw http.ResponseWriter, data interface{}, status int) *httperror.HandlerError {
+func JSONWithStatus(rw http.ResponseWriter, data any, status int) *httperror.HandlerError {
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(status)
 
@@ -37,7 +37,7 @@ func JSONWithStatus(rw http.ResponseWriter, data interface{}, status int) *httpe
 
 // JSON encodes data to rw in YAML format. Returns a pointer to a
 // HandlerError if encoding fails.
-func YAML(rw http.ResponseWriter, data interface{}) *httperror.HandlerError {
+func YAML(rw http.ResponseWriter, data any) *httperror.HandlerError {
 	rw.Header().Set("Content-Type", "text/yaml")
 
 	strData, ok := data.(string)

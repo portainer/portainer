@@ -107,7 +107,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 
 	cases := []struct {
 		Name               string
-		Payload            interface{}
+		Payload            any
 		ExpectedStatusCode int
 		Method             string
 	}{

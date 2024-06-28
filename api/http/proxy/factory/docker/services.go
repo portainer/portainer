@@ -80,7 +80,7 @@ func (transport *Transport) serviceInspectOperation(response *http.Response, exe
 // API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func selectorServiceLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorServiceLabels(responseObject map[string]any) map[string]any {
 	serviceSpecObject := utils.GetJSONObject(responseObject, "Spec")
 	if serviceSpecObject != nil {
 		return utils.GetJSONObject(serviceSpecObject, "Labels")

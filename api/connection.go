@@ -5,21 +5,21 @@ import (
 )
 
 type ReadTransaction interface {
-	GetObject(bucketName string, key []byte, object interface{}) error
-	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
-	GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error
+	GetObject(bucketName string, key []byte, object any) error
+	GetAll(bucketName string, obj any, append func(o any) (any, error)) error
+	GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj any, append func(o any) (any, error)) error
 }
 
 type Transaction interface {
 	ReadTransaction
 
 	SetServiceName(bucketName string) error
-	UpdateObject(bucketName string, key []byte, object interface{}) error
+	UpdateObject(bucketName string, key []byte, object any) error
 	DeleteObject(bucketName string, key []byte) error
-	CreateObject(bucketName string, fn func(uint64) (int, interface{})) error
-	CreateObjectWithId(bucketName string, id int, obj interface{}) error
-	CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error
-	DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error
+	CreateObject(bucketName string, fn func(uint64) (int, any)) error
+	CreateObjectWithId(bucketName string, id int, obj any) error
+	CreateObjectWithStringId(bucketName string, id []byte, obj any) error
+	DeleteAllObjects(bucketName string, obj any, matching func(o any) (id int, ok bool)) error
 	GetNextIdentifier(bucketName string) int
 }
 
@@ -45,8 +45,8 @@ type Connection interface {
 	NeedsEncryptionMigration() (bool, error)
 	SetEncrypted(encrypted bool)
 
-	BackupMetadata() (map[string]interface{}, error)
-	RestoreMetadata(s map[string]interface{}) error
+	BackupMetadata() (map[string]any, error)
+	RestoreMetadata(s map[string]any) error
 
 	UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error
 	ConvertToKey(v int) []byte

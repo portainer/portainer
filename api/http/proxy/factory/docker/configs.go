@@ -75,7 +75,7 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 // API schema references:
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigList
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigInspect
-func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorConfigLabels(responseObject map[string]any) map[string]any {
 	if secretSpec := utils.GetJSONObject(responseObject, "Spec"); secretSpec != nil {
 		return utils.GetJSONObject(secretSpec, "Labels")
 	}

@@ -12,13 +12,13 @@ const dummyLogoURL = "example.com"
 
 // initTestingDBConn creates a settings service with raw database DB connection
 // for unit testing usage only since using NewStore will cause cycle import inside migrator pkg
-func initTestingSettingsService(dbConn portainer.Connection, preSetObj map[string]interface{}) error {
+func initTestingSettingsService(dbConn portainer.Connection, preSetObj map[string]any) error {
 	//insert a obj
 	return dbConn.UpdateObject("settings", []byte("SETTINGS"), preSetObj)
 }
 
 func setup(store *Store) error {
-	dummySettingsObj := map[string]interface{}{
+	dummySettingsObj := map[string]any{
 		"LogoURL": dummyLogoURL,
 	}
 

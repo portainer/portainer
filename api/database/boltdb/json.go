@@ -14,7 +14,7 @@ import (
 var errEncryptedStringTooShort = errors.New("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error) {
+func (connection *DbConnection) MarshalObject(object any) ([]byte, error) {
 	buf := &bytes.Buffer{}
 
 	// Special case for the VERSION bucket. Here we're not using json
@@ -38,7 +38,7 @@ func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error
 }
 
 // UnmarshalObject decodes an object from binary data
-func (connection *DbConnection) UnmarshalObject(data []byte, object interface{}) error {
+func (connection *DbConnection) UnmarshalObject(data []byte, object any) error {
 	var err error
 	if connection.getEncryptionKey() != nil {
 		data, err = decrypt(data, connection.getEncryptionKey())
