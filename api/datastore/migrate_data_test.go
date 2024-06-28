@@ -321,7 +321,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 // importJSON reads input JSON and commits it to a portainer datastore.Store.
 // Errors are logged with the testing package.
 func importJSON(t *testing.T, r io.Reader, store *Store) error {
-	objects := make(map[string]interface{})
+	objects := make(map[string]any)
 
 	// Parse json into map of objects.
 	d := json.NewDecoder(r)
@@ -337,9 +337,9 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 	for k, v := range objects {
 		switch k {
 		case "version":
-			versions, ok := v.(map[string]interface{})
+			versions, ok := v.(map[string]any)
 			if !ok {
-				t.Logf("failed casting %s to map[string]interface{}", k)
+				t.Logf("failed casting %s to map[string]any", k)
 			}
 
 			// New format db
@@ -404,9 +404,9 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 			}
 
 		case "dockerhub":
-			obj, ok := v.([]interface{})
+			obj, ok := v.([]any)
 			if !ok {
-				t.Logf("failed to cast %s to []interface{}", k)
+				t.Logf("failed to cast %s to []any", k)
 			}
 			err := con.CreateObjectWithStringId(
 				k,
@@ -418,9 +418,9 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 			}
 
 		case "ssl":
-			obj, ok := v.(map[string]interface{})
+			obj, ok := v.(map[string]any)
 			if !ok {
-				t.Logf("failed to case %s to map[string]interface{}", k)
+				t.Logf("failed to case %s to map[string]any", k)
 			}
 			err := con.CreateObjectWithStringId(
 				k,
@@ -432,9 +432,9 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 			}
 
 		case "settings":
-			obj, ok := v.(map[string]interface{})
+			obj, ok := v.(map[string]any)
 			if !ok {
-				t.Logf("failed to case %s to map[string]interface{}", k)
+				t.Logf("failed to case %s to map[string]any", k)
 			}
 			err := con.CreateObjectWithStringId(
 				k,
@@ -446,9 +446,9 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 			}
 
 		case "tunnel_server":
-			obj, ok := v.(map[string]interface{})
+			obj, ok := v.(map[string]any)
 			if !ok {
-				t.Logf("failed to case %s to map[string]interface{}", k)
+				t.Logf("failed to case %s to map[string]any", k)
 			}
 			err := con.CreateObjectWithStringId(
 				k,
@@ -462,18 +462,18 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 			continue
 
 		default:
-			objlist, ok := v.([]interface{})
+			objlist, ok := v.([]any)
 			if !ok {
-				t.Logf("failed to cast %s to []interface{}", k)
+				t.Logf("failed to cast %s to []any", k)
 			}
 
 			for _, obj := range objlist {
-				value, ok := obj.(map[string]interface{})
+				value, ok := obj.(map[string]any)
 				if !ok {
-					t.Logf("failed to cast %v to map[string]interface{}", obj)
+					t.Logf("failed to cast %v to map[string]any", obj)
 				} else {
 					var ok bool
-					var id interface{}
+					var id any
 					switch k {
 					case "endpoint_relations":
 						// TODO: need to make into an int, then do that weird

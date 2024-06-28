@@ -25,7 +25,7 @@ func Test_MarshalObjectUnencrypted(t *testing.T) {
 	uuid := uuid.Must(uuid.NewV4())
 
 	tests := []struct {
-		object   interface{}
+		object   any
 		expected string
 	}{
 		{
@@ -57,7 +57,7 @@ func Test_MarshalObjectUnencrypted(t *testing.T) {
 			expected: uuid.String(),
 		},
 		{
-			object:   map[string]interface{}{"key": "value"},
+			object:   map[string]any{"key": "value"},
 			expected: `{"key":"value"}`,
 		},
 		{
@@ -73,11 +73,11 @@ func Test_MarshalObjectUnencrypted(t *testing.T) {
 			expected: `["1","2","3"]`,
 		},
 		{
-			object:   []map[string]interface{}{{"key1": "value1"}, {"key2": "value2"}},
+			object:   []map[string]any{{"key1": "value1"}, {"key2": "value2"}},
 			expected: `[{"key1":"value1"},{"key2":"value2"}]`,
 		},
 		{
-			object:   []interface{}{1, "2", false, map[string]interface{}{"key1": "value1"}},
+			object:   []any{1, "2", false, map[string]any{"key1": "value1"}},
 			expected: `[1,"2",false,{"key1":"value1"}]`,
 		},
 	}

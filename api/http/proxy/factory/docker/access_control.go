@@ -22,7 +22,7 @@ const (
 )
 
 type (
-	resourceLabelsObjectSelector func(map[string]interface{}) map[string]interface{}
+	resourceLabelsObjectSelector func(map[string]any) map[string]any
 	resourceOperationParameters  struct {
 		resourceIdentifierAttribute string
 		resourceType                portainer.ResourceControlType
@@ -47,7 +47,7 @@ func getUniqueElements(items string) []string {
 	return result
 }
 
-func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
+func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]any, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
 
@@ -155,7 +155,7 @@ func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resour
 	return nil, nil
 }
 
-func (transport *Transport) applyAccessControlOnResource(parameters *resourceOperationParameters, responseObject map[string]interface{}, response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) applyAccessControlOnResource(parameters *resourceOperationParameters, responseObject map[string]any, response *http.Response, executor *operationExecutor) error {
 	if responseObject[parameters.resourceIdentifierAttribute] == nil {
 		log.Warn().
 			Str("identifier_attribute", parameters.resourceIdentifierAttribute).
@@ -194,7 +194,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 	return utils.RewriteAccessDeniedResponse(response)
 }
 
-func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
+func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []any, executor *operationExecutor) ([]any, error) {
 	if executor.operationContext.isAdmin {
 		return transport.decorateResourceList(parameters, resourceData, executor.operationContext.resourceControls)
 	}
@@ -202,11 +202,11 @@ func (transport *Transport) applyAccessControlOnResourceList(parameters *resourc
 	return transport.filterResourceList(parameters, resourceData, executor.operationContext)
 }
 
-func (transport *Transport) decorateResourceList(parameters *resourceOperationParameters, resourceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
-	decoratedResourceData := make([]interface{}, 0)
+func (transport *Transport) decorateResourceList(parameters *resourceOperationParameters, resourceData []any, resourceControls []portainer.ResourceControl) ([]any, error) {
+	decoratedResourceData := make([]any, 0)
 
 	for _, resource := range resourceData {
-		resourceObject := resource.(map[string]interface{})
+		resourceObject := resource.(map[string]any)
 
 		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
 			log.Warn().
@@ -244,11 +244,11 @@ func (transport *Transport) decorateResourceList(parameters *resourceOperationPa
 	return decoratedResourceData, nil
 }
 
-func (transport *Transport) filterResourceList(parameters *resourceOperationParameters, resourceData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
-	filteredResourceData := make([]interface{}, 0)
+func (transport *Transport) filterResourceList(parameters *resourceOperationParameters, resourceData []any, context *restrictedDockerOperationContext) ([]any, error) {
+	filteredResourceData := make([]any, 0)
 
 	for _, resource := range resourceData {
-		resourceObject := resource.(map[string]interface{})
+		resourceObject := resource.(map[string]any)
 		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
 			log.Warn().
 				Str("identifier_attribute", parameters.resourceIdentifierAttribute).
@@ -292,7 +292,7 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 	return filteredResourceData, nil
 }
 
-func (transport *Transport) findResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceLabelsObject map[string]interface{}, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func (transport *Transport) findResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceLabelsObject map[string]any, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceIdentifier, resourceType, resourceControls)
 	if resourceControl != nil {
 		return resourceControl, nil
@@ -350,12 +350,12 @@ func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpoi
 	return ""
 }
 
-func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
+func decorateObject(object map[string]any, resourceControl *portainer.ResourceControl) map[string]any {
 	if object["Portainer"] == nil {
-		object["Portainer"] = make(map[string]interface{})
+		object["Portainer"] = make(map[string]any)
 	}
 
-	portainerMetadata := object["Portainer"].(map[string]interface{})
+	portainerMetadata := object["Portainer"].(map[string]any)
 	portainerMetadata["ResourceControl"] = resourceControl
 
 	return object

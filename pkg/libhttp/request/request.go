@@ -43,7 +43,7 @@ func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) (
 
 // RetrieveMultiPartFormJSONValue decodes the value of some form data as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the form data value is not found.
-func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target interface{}, optional bool) error {
+func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target any, optional bool) error {
 	value, err := RetrieveMultiPartFormValue(request, name, optional)
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func RetrieveBooleanQueryParameter(request *http.Request, name string, optional 
 
 // RetrieveJSONQueryParameter decodes the value of a query parameter as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the query parameter is not found.
-func RetrieveJSONQueryParameter(request *http.Request, name string, target interface{}, optional bool) error {
+func RetrieveJSONQueryParameter(request *http.Request, name string, target any, optional bool) error {
 	queryParameter, err := RetrieveQueryParameter(request, name, optional)
 	if err != nil {
 		return err

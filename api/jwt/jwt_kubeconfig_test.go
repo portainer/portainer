@@ -66,7 +66,7 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 				return
 			}
 
-			parsedToken, err := jwt.ParseWithClaims(got, &claims{}, func(token *jwt.Token) (interface{}, error) {
+			parsedToken, err := jwt.ParseWithClaims(got, &claims{}, func(token *jwt.Token) (any, error) {
 				return service.secrets[kubeConfigScope], nil
 			})
 			assert.NoError(t, err, "failed to parse generated token")

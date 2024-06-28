@@ -45,7 +45,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 
 	// The "Volumes" field contains the list of volumes as an array of JSON objects
 	if responseObject["Volumes"] != nil {
-		volumeData := responseObject["Volumes"].([]interface{})
+		volumeData := responseObject["Volumes"].([]any)
 
 		if transport.snapshotService != nil {
 			// Filling snapshot data can improve the performance of getVolumeResourceID
@@ -57,7 +57,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 		}
 
 		for _, volumeObject := range volumeData {
-			volume := volumeObject.(map[string]interface{})
+			volume := volumeObject.(map[string]any)
 
 			if err := transport.decorateVolumeResponseWithResourceID(volume); err != nil {
 				return fmt.Errorf("failed decorating volume response: %w", err)
@@ -105,7 +105,7 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject map[string]interface{}) error {
+func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject map[string]any) error {
 	if responseObject["Name"] == nil {
 		return errors.New("missing identifier in Docker resource detail response")
 	}
@@ -125,7 +125,7 @@ func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject 
 // API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorVolumeLabels(responseObject map[string]any) map[string]any {
 	return utils.GetJSONObject(responseObject, "Labels")
 }
 

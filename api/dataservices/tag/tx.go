@@ -15,7 +15,7 @@ type ServiceTx struct {
 func (service ServiceTx) Create(tag *portainer.Tag) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			tag.ID = portainer.TagID(id)
 			return int(tag.ID), tag
 		},

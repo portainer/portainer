@@ -19,7 +19,7 @@ func (service ServiceTx) UpdateEdgeGroupFunc(ID portainer.EdgeGroupID, updateFun
 func (service ServiceTx) Create(group *portainer.EdgeGroup) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			group.ID = portainer.EdgeGroupID(id)
 			return int(group.ID), group
 		},

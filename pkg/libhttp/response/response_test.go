@@ -16,7 +16,7 @@ func TestJSONWithStatus(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		data   interface{}
+		data   any
 		status int
 	}{
 		{
@@ -57,7 +57,7 @@ func TestJSON(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		data   interface{}
+		data   any
 		status int
 	}{
 		{
@@ -88,7 +88,7 @@ func TestJSON(t *testing.T) {
 func TestYAML(t *testing.T) {
 	tests := []struct {
 		name     string
-		data     interface{}
+		data     any
 		expected string
 		invalid  bool
 	}{
@@ -105,7 +105,7 @@ func TestYAML(t *testing.T) {
 		},
 		{
 			name: "doesn't support an Object",
-			data: map[string]interface{}{
+			data: map[string]any{
 				"key": "value",
 			},
 			expected: "",

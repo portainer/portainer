@@ -54,7 +54,7 @@ func setLoggingMode(mode string) {
 	}
 }
 
-func formatMessage(i interface{}) string {
+func formatMessage(i any) string {
 	if i == nil {
 		return ""
 	}

@@ -385,7 +385,7 @@ type storeExport struct {
 	User               []portainer.User               `json:"users,omitempty"`
 	Version            models.Version                 `json:"version,omitempty"`
 	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
-	Metadata           map[string]interface{}         `json:"metadata,omitempty"`
+	Metadata           map[string]any                 `json:"metadata,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {

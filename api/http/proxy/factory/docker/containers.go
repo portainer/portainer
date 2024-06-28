@@ -102,7 +102,7 @@ func (transport *Transport) containerInspectOperation(response *http.Response, e
 // This selector is specific to the containerInspect Docker operation.
 // Labels are available under the "Config.Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-func selectorContainerLabelsFromContainerInspectOperation(responseObject map[string]interface{}) map[string]interface{} {
+func selectorContainerLabelsFromContainerInspectOperation(responseObject map[string]any) map[string]any {
 	containerConfigObject := utils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
 		containerLabelsObject := utils.GetJSONObject(containerConfigObject, "Labels")
@@ -115,18 +115,18 @@ func selectorContainerLabelsFromContainerInspectOperation(responseObject map[str
 // This selector is specific to the containerList Docker operation.
 // Labels are available under the "Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func selectorContainerLabelsFromContainerListOperation(responseObject map[string]interface{}) map[string]interface{} {
+func selectorContainerLabelsFromContainerListOperation(responseObject map[string]any) map[string]any {
 	containerLabelsObject := utils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject
 }
 
 // filterContainersWithLabels loops through a list of containers, and filters containers that do not contains
 // any labels in the labels black list.
-func filterContainersWithBlackListedLabels(containerData []interface{}, labelBlackList []portainer.Pair) ([]interface{}, error) {
-	filteredContainerData := make([]interface{}, 0)
+func filterContainersWithBlackListedLabels(containerData []any, labelBlackList []portainer.Pair) ([]any, error) {
+	filteredContainerData := make([]any, 0)
 
 	for _, container := range containerData {
-		containerObject := container.(map[string]interface{})
+		containerObject := container.(map[string]any)
 
 		containerLabels := selectorContainerLabelsFromContainerListOperation(containerObject)
 		if containerLabels != nil {
@@ -141,7 +141,7 @@ func filterContainersWithBlackListedLabels(containerData []interface{}, labelBla
 	return filteredContainerData, nil
 }
 
-func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelBlackList []portainer.Pair) bool {
+func containerHasBlackListedLabel(containerLabels map[string]any, labelBlackList []portainer.Pair) bool {
 	for key, value := range containerLabels {
 		labelName := key
 		labelValue := value.(string)
@@ -159,13 +159,13 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool                   `json:"Privileged"`
-			PidMode    string                 `json:"PidMode"`
-			Devices    []interface{}          `json:"Devices"`
-			Sysctls    map[string]interface{} `json:"Sysctls"`
-			CapAdd     []string               `json:"CapAdd"`
-			CapDrop    []string               `json:"CapDrop"`
-			Binds      []string               `json:"Binds"`
+			Privileged bool           `json:"Privileged"`
+			PidMode    string         `json:"PidMode"`
+			Devices    []any          `json:"Devices"`
+			Sysctls    map[string]any `json:"Sysctls"`
+			CapAdd     []string       `json:"CapAdd"`
+			CapDrop    []string       `json:"CapDrop"`
+			Binds      []string       `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 

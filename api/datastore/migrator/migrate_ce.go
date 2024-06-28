@@ -15,7 +15,7 @@ func migrationError(err error, context string) error {
 	return errors.Wrap(err, "failed in "+context)
 }
 
-func GetFunctionName(i interface{}) string {
+func GetFunctionName(i any) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 

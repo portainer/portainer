@@ -111,7 +111,7 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.T
 func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
 	scope := parseScope(token)
 	secret := service.secrets[scope]
-	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			return nil, msg

@@ -1421,7 +1421,7 @@ type (
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
-		WriteJSONToFile(path string, content interface{}) error
+		WriteJSONToFile(path string, content any) error
 		FileExists(path string) (bool, error)
 		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
 		GetEdgeJobFolder(identifier string) string

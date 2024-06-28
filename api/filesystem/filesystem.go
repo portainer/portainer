@@ -599,7 +599,7 @@ func (service *Service) Rename(oldPath, newPath string) error {
 }
 
 // WriteJSONToFile writes JSON to the specified file.
-func (service *Service) WriteJSONToFile(path string, content interface{}) error {
+func (service *Service) WriteJSONToFile(path string, content any) error {
 	jsonContent, err := json.Marshal(content)
 	if err != nil {
 		return err

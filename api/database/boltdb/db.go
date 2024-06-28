@@ -229,7 +229,7 @@ func (connection *DbConnection) SetServiceName(bucketName string) error {
 }
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a database.
-func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) GetObject(bucketName string, key []byte, object any) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(bucketName, key, object)
 	})
@@ -244,7 +244,7 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 }
 
 // UpdateObject is a generic function used to update an object inside a database.
-func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.UpdateObject(bucketName, key, object)
 	})
@@ -285,7 +285,7 @@ func (connection *DbConnection) DeleteObject(bucketName string, key []byte) erro
 
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
-func (connection *DbConnection) DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error {
+func (connection *DbConnection) DeleteAllObjects(bucketName string, obj any, matching func(o any) (id int, ok bool)) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.DeleteAllObjects(bucketName, obj, matching)
 	})
@@ -304,41 +304,41 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 }
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
-func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
+func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, any)) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObject(bucketName, fn)
 	})
 }
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
-func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObjectWithId(bucketName, id, obj)
 	})
 }
 
 // CreateObjectWithStringId creates a new object in the bucket, using the specified id
-func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObjectWithStringId(bucketName, id, obj)
 	})
 }
 
-func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAll(bucketName string, obj any, appendFn func(o any) (any, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetAll(bucketName, obj, appendFn)
 	})
 }
 
-func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj any, appendFn func(o any) (any, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, appendFn)
 	})
 }
 
 // BackupMetadata will return a copy of the boltdb sequence numbers for all buckets.
-func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error) {
-	buckets := map[string]interface{}{}
+func (connection *DbConnection) BackupMetadata() (map[string]any, error) {
+	buckets := map[string]any{}
 
 	err := connection.View(func(tx *bolt.Tx) error {
 		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
@@ -354,7 +354,7 @@ func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error)
 }
 
 // RestoreMetadata will restore the boltdb sequence numbers for all buckets.
-func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error {
+func (connection *DbConnection) RestoreMetadata(s map[string]any) error {
 	var err error
 
 	for bucketName, v := range s {
