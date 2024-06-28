@@ -4,14 +4,14 @@ import (
 	"context"
 	"strings"
 
-	"github.com/docker/docker/api/types"
-	dockercontainer "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/images"
 
+	"github.com/docker/docker/api/types"
+	dockercontainer "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -54,8 +54,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	}
 
 	if imageTag != "" {
-		err = img.WithTag(imageTag)
-		if err != nil {
+		if err := img.WithTag(imageTag); err != nil {
 			return nil, errors.Wrapf(err, "set image tag error %s", imageTag)
 		}
 
@@ -67,23 +66,20 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	// 1. pull image if you need force pull
 	if forcePullImage {
 		puller := images.NewPuller(cli, images.NewRegistryClient(c.dataStore), c.dataStore)
-		err = puller.Pull(ctx, img)
-		if err != nil {
+		if err := puller.Pull(ctx, img); err != nil {
 			return nil, errors.Wrapf(err, "pull image error %s", img.FullName())
 		}
 	}
 
 	// 2. stop the current container
 	log.Debug().Str("container_id", containerId).Msg("starting to stop the container")
-	err = cli.ContainerStop(ctx, containerId, dockercontainer.StopOptions{})
-	if err != nil {
+	if err := cli.ContainerStop(ctx, containerId, dockercontainer.StopOptions{}); err != nil {
 		return nil, errors.Wrap(err, "stop container error")
 	}
 
 	// 3. rename the current container
 	log.Debug().Str("container_id", containerId).Msg("starting to rename the container")
-	err = cli.ContainerRename(ctx, containerId, container.Name+"-old")
-	if err != nil {
+	if err := cli.ContainerRename(ctx, containerId, container.Name+"-old"); err != nil {
 		return nil, errors.Wrap(err, "rename container error")
 	}
 
@@ -94,8 +90,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	// 4. disconnect all networks from the current container
 	for name, network := range container.NetworkSettings.Networks {
 		// This allows new container to use the same IP address if specified
-		err = cli.NetworkDisconnect(ctx, network.NetworkID, containerId, true)
-		if err != nil {
+		if err := cli.NetworkDisconnect(ctx, network.NetworkID, containerId, true); err != nil {
 			return nil, errors.Wrap(err, "disconnect network from old container error")
 		}
 
@@ -113,9 +108,11 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	c.sr.push(func() {
 		log.Debug().Str("container_id", containerId).Str("container", container.Name).Msg("restoring the container")
 		cli.ContainerRename(ctx, containerId, container.Name)
+
 		for _, network := range container.NetworkSettings.Networks {
 			cli.NetworkConnect(ctx, network.NetworkID, containerId, network)
 		}
+
 		cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{})
 	})
 
@@ -147,22 +144,19 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	log.Debug().Str("container_id", newContainerId).Msg("connecting networks to container")
 	networks := container.NetworkSettings.Networks
 	for key, network := range networks {
-		_, ok := networkWithCreation.EndpointsConfig[key]
-		if ok {
+		if _, ok := networkWithCreation.EndpointsConfig[key]; ok {
 			// skip the network that is used during container creation
 			continue
 		}
 
-		err = cli.NetworkConnect(ctx, network.NetworkID, newContainerId, network)
-		if err != nil {
+		if err := cli.NetworkConnect(ctx, network.NetworkID, newContainerId, network); err != nil {
 			return nil, errors.Wrap(err, "connect container network error")
 		}
 	}
 
 	// 8. start the new container
 	log.Debug().Str("container_id", newContainerId).Msg("starting the new container")
-	err = cli.ContainerStart(ctx, newContainerId, dockercontainer.StartOptions{})
-	if err != nil {
+	if err := cli.ContainerStart(ctx, newContainerId, dockercontainer.StartOptions{}); err != nil {
 		return nil, errors.Wrap(err, "start container error")
 	}
 

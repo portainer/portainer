@@ -32,8 +32,7 @@ func (service *Service) RegisterUpdateStackFunction(
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
+	if err := connection.SetServiceName(BucketName); err != nil {
 		return nil, err
 	}
 
@@ -65,8 +64,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 	var endpointRelation portainer.EndpointRelation
 	identifier := service.connection.ConvertToKey(int(endpointID))
 
-	err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
-	if err != nil {
+	if err := service.connection.GetObject(BucketName, identifier, &endpointRelation); err != nil {
 		return nil, err
 	}
 
@@ -161,19 +159,24 @@ func (service *Service) updateEdgeStacksAfterRelationChange(previousRelationStat
 	// list how many time this stack is referenced in all relations
 	// in order to update the stack deployments count
 	for refStackId, refStackEnabled := range stacksToUpdate {
-		if refStackEnabled {
-			numDeployments := 0
-			for _, r := range relations {
-				for sId, enabled := range r.EdgeStacks {
-					if enabled && sId == refStackId {
-						numDeployments += 1
-					}
+		if !refStackEnabled {
+			continue
+		}
+
+		numDeployments := 0
+
+		for _, r := range relations {
+			for sId, enabled := range r.EdgeStacks {
+				if enabled && sId == refStackId {
+					numDeployments += 1
 				}
 			}
+		}
 
-			service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
-				edgeStack.NumDeployments = numDeployments
-			})
+		if err := service.updateStackFn(refStackId, func(edgeStack *portainer.EdgeStack) {
+			edgeStack.NumDeployments = numDeployments
+		}); err != nil {
+			log.Error().Err(err).Msg("could not update the number of deployments")
 		}
 	}
 }

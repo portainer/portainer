@@ -135,7 +135,7 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 
 	// Take an initial snapshot
 	if endpoint.LastCheckInDate == 0 {
-		handler.ReverseTunnelService.Open(endpoint)
+		_ = handler.ReverseTunnelService.Open(endpoint)
 	}
 
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
