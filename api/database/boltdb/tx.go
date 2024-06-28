@@ -132,19 +132,6 @@ func (tx *DbTransaction) GetAll(bucketName string, obj interface{}, appendFn fun
 	})
 }
 
-func (tx *DbTransaction) GetAllWithJsoniter(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
-	bucket := tx.tx.Bucket([]byte(bucketName))
-
-	return bucket.ForEach(func(k []byte, v []byte) error {
-		err := tx.conn.UnmarshalObject(v, obj)
-		if err == nil {
-			obj, err = appendFn(obj)
-		}
-
-		return err
-	})
-}
-
 func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	cursor := tx.tx.Bucket([]byte(bucketName)).Cursor()
 

@@ -330,13 +330,6 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 	})
 }
 
-// TODO: decide which Unmarshal to use, and use one...
-func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
-	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAllWithJsoniter(bucketName, obj, appendFn)
-	})
-}
-
 func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, appendFn)
