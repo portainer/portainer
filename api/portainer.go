@@ -96,24 +96,6 @@ type (
 	// PowerState represents an AMT managed device power state
 	PowerState int
 
-	FDOConfiguration struct {
-		Enabled       bool   `json:"enabled"`
-		OwnerURL      string `json:"ownerURL"`
-		OwnerUsername string `json:"ownerUsername"`
-		OwnerPassword string `json:"ownerPassword"`
-	}
-
-	// FDOProfileID represents a fdo profile id
-	FDOProfileID int
-
-	FDOProfile struct {
-		ID            FDOProfileID `json:"id"`
-		Name          string       `json:"name"`
-		FilePath      string       `json:"filePath"`
-		NumberDevices int          `json:"numberDevices"`
-		DateCreated   int64        `json:"dateCreated"`
-	}
-
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -963,7 +945,6 @@ type (
 		LDAPSettings         LDAPSettings                  `json:"LDAPSettings"`
 		OAuthSettings        OAuthSettings                 `json:"OAuthSettings"`
 		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration"`
-		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration"`
 		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -1456,7 +1437,6 @@ type (
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
-		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
 		GetDefaultChiselPrivateKeyPath() string
 		StoreChiselPrivateKey(privateKey []byte) error
@@ -1646,13 +1626,7 @@ const (
 )
 
 // List of supported features
-const (
-	FeatureFdo = "fdo"
-)
-
-var SupportedFeatureFlags = []featureflags.Feature{
-	FeatureFdo,
-}
+var SupportedFeatureFlags = []featureflags.Feature{}
 
 const (
 	_ AuthenticationMethod = iota

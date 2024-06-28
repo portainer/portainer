@@ -32,7 +32,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
-	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
@@ -239,8 +238,6 @@ func (server *Server) Start() error {
 	openAMTHandler.DataStore = server.DataStore
 	openAMTHandler.DockerClientFactory = server.DockerClientFactory
 
-	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore, server.FileService)
-
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
@@ -316,7 +313,6 @@ func (server *Server) Start() error {
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		OpenAMTHandler:         openAMTHandler,
-		FDOHandler:             fdoHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

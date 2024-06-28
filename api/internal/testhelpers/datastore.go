@@ -17,7 +17,6 @@ type testDatastore struct {
 	endpoint                dataservices.EndpointService
 	endpointGroup           dataservices.EndpointGroupService
 	endpointRelation        dataservices.EndpointRelationService
-	fdoProfile              dataservices.FDOProfileService
 	helmUserRepository      dataservices.HelmUserRepositoryService
 	registry                dataservices.RegistryService
 	resourceControl         dataservices.ResourceControlService
@@ -54,10 +53,6 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
-
-func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
-	return d.fdoProfile
-}
 
 func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService {
 	return d.endpointRelation

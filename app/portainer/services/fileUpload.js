@@ -195,15 +195,5 @@ function FileUploadFactory($q, Upload) {
     return $q.all(queue);
   };
 
-  service.uploadOwnershipVoucher = function (voucherFile) {
-    return Upload.upload({
-      url: 'api/fdo/register',
-      data: {
-        voucher: voucherFile,
-      },
-      ignoreLoadingBar: true,
-    });
-  };
-
   return service;
 }

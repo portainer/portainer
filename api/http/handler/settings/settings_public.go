@@ -36,8 +36,6 @@ type publicSettingsResponse struct {
 	// Whether team sync is enabled
 	TeamSync bool `json:"TeamSync" example:"true"`
 
-	// Whether FDO is enabled
-	IsFDOEnabled bool
 	// Whether AMT is enabled
 	IsAMTEnabled bool
 
@@ -86,7 +84,6 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  featureflags.FeatureFlags(),
-		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 

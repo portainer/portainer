@@ -200,17 +200,6 @@ angular
         },
       };
 
-      var deviceImport = {
-        name: 'portainer.endpoints.importDevice',
-        url: '/device',
-        views: {
-          'content@': {
-            templateUrl: './views/devices/import/importDevice.html',
-            controller: 'ImportDeviceController',
-          },
-        },
-      };
-
       const edgeAutoCreateScript = {
         name: 'portainer.endpoints.edgeAutoCreateScript',
         url: '/aeec',
@@ -221,26 +210,6 @@ angular
         },
         data: {
           docs: '/admin/environments/aeec',
-        },
-      };
-
-      var addFDOProfile = {
-        name: 'portainer.endpoints.profile',
-        url: '/profile',
-        views: {
-          'content@': {
-            component: 'addProfileView',
-          },
-        },
-      };
-
-      var editFDOProfile = {
-        name: 'portainer.endpoints.profile.edit',
-        url: '/:id',
-        views: {
-          'content@': {
-            component: 'editProfileView',
-          },
         },
       };
 
@@ -484,9 +453,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeAutoCreateScript);
-      $stateRegistryProvider.register(deviceImport);
-      $stateRegistryProvider.register(addFDOProfile);
-      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);

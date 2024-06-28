@@ -19,7 +19,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
-	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
@@ -69,7 +68,6 @@ type Handler struct {
 	SettingsHandler        *settings.Handler
 	SSLHandler             *ssl.Handler
 	OpenAMTHandler         *openamt.Handler
-	FDOHandler             *fdo.Handler
 	StackHandler           *stacks.Handler
 	StorybookHandler       *storybook.Handler
 	SystemHandler          *system.Handler
@@ -252,8 +250,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.SSLHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/open_amt"):
 		http.StripPrefix("/api", h.OpenAMTHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/fdo"):
-		http.StripPrefix("/api", h.FDOHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/teams"):
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):

@@ -648,12 +648,6 @@
     "TemplatesURL": "",
     "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
-    "fdoConfiguration": {
-      "enabled": false,
-      "ownerPassword": "",
-      "ownerURL": "",
-      "ownerUsername": ""
-    },
     "openAMTConfiguration": {
       "certFileContent": "",
       "certFileName": "",
