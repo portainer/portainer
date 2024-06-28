@@ -7,7 +7,6 @@ import (
 type ReadTransaction interface {
 	GetObject(bucketName string, key []byte, object interface{}) error
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
-	GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error
 }
 

@@ -82,7 +82,7 @@ func (service ServiceTx) DeleteEndpoint(ID portainer.EndpointID) error {
 func (service ServiceTx) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	return endpoints, service.tx.GetAllWithJsoniter(
+	return endpoints, service.tx.GetAll(
 		BucketName,
 		&portainer.Endpoint{},
 		dataservices.AppendFn(&endpoints),
