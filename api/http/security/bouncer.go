@@ -11,9 +11,9 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
-	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -376,7 +376,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
 		// update the last used time of the key
 		apiKey.LastUsed = now
-		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+		_ = bouncer.apiKeyService.UpdateAPIKey(&apiKey)
 	}
 
 	return tokenData, nil

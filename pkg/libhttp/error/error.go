@@ -56,7 +56,7 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	enc.SetSortMapKeys(false)
 	enc.SetAppendNewline(false)
 
-	enc.Encode(&errorResponse{Message: err.Message, Details: capitalize(err.Err.Error())})
+	_ = enc.Encode(&errorResponse{Message: err.Message, Details: capitalize(err.Err.Error())})
 }
 
 // WriteError is a convenience function that creates a new HandlerError before calling writeErrorResponse.
