@@ -78,7 +78,7 @@ func (payload *edgeStackFromFileUploadPayload) Validate(r *http.Request) error {
 // @param Name formData string true "Name of the stack"
 // @param file formData file true "Content of the Stack file"
 // @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
-// @param DeploymentType formData int true "deploy type 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'"
+// @param DeploymentType formData int true "deploy type 0 - 'compose', 1 - 'kubernetes'"
 // @param Registries formData string false "JSON stringified array of Registry ids to use for this stack"
 // @param UseManifestNamespaces formData bool false "Uses the manifest's namespaces instead of the default one, relevant only for kube environments"
 // @param PrePullImage formData bool false "Pre Pull image"
