@@ -19,6 +19,15 @@ import (
 
 const containerObjectIdentifier = "Id"
 
+var (
+	ErrPrivilegedModeForbidden        = errors.New("forbidden to use privileged mode")
+	ErrPIDHostNamespaceForbidden      = errors.New("forbidden to use pid host namespace")
+	ErrDeviceMappingForbidden         = errors.New("forbidden to use device mapping")
+	ErrSysCtlSettingsForbidden        = errors.New("forbidden to use sysctl settings")
+	ErrContainerCapabilitiesForbidden = errors.New("forbidden to use container capabilities")
+	ErrBindMountsForbidden            = errors.New("forbidden to use bind mounts")
+)
+
 func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID portainer.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	container, err := dockerClient.ContainerInspect(context.Background(), containerID)
 	if err != nil {
@@ -108,6 +117,7 @@ func selectorContainerLabelsFromContainerInspectOperation(responseObject map[str
 		containerLabelsObject := utils.GetJSONObject(containerConfigObject, "Labels")
 		return containerLabelsObject
 	}
+
 	return nil
 }
 
@@ -117,6 +127,7 @@ func selectorContainerLabelsFromContainerInspectOperation(responseObject map[str
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
 func selectorContainerLabelsFromContainerListOperation(responseObject map[string]any) map[string]any {
 	containerLabelsObject := utils.GetJSONObject(responseObject, "Labels")
+
 	return containerLabelsObject
 }
 
@@ -129,13 +140,12 @@ func filterContainersWithBlackListedLabels(containerData []any, labelBlackList [
 		containerObject := container.(map[string]any)
 
 		containerLabels := selectorContainerLabelsFromContainerListOperation(containerObject)
-		if containerLabels != nil {
-			if !containerHasBlackListedLabel(containerLabels, labelBlackList) {
-				filteredContainerData = append(filteredContainerData, containerObject)
-			}
-		} else {
-			filteredContainerData = append(filteredContainerData, containerObject)
+
+		if containerHasBlackListedLabel(containerLabels, labelBlackList) {
+			continue
 		}
+
+		filteredContainerData = append(filteredContainerData, containerObject)
 	}
 
 	return filteredContainerData, nil
@@ -195,35 +205,34 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		partialContainer := &PartialContainer{}
-		err = json.Unmarshal(body, partialContainer)
-		if err != nil {
+		if err := json.Unmarshal(body, partialContainer); err != nil {
 			return nil, err
 		}
 
 		if !securitySettings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
-			return forbiddenResponse, errors.New("forbidden to use privileged mode")
+			return forbiddenResponse, ErrPrivilegedModeForbidden
 		}
 
 		if !securitySettings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
-			return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+			return forbiddenResponse, ErrPIDHostNamespaceForbidden
 		}
 
 		if !securitySettings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
-			return forbiddenResponse, errors.New("forbidden to use device mapping")
+			return forbiddenResponse, ErrDeviceMappingForbidden
 		}
 
 		if !securitySettings.AllowSysctlSettingForRegularUsers && len(partialContainer.HostConfig.Sysctls) > 0 {
-			return forbiddenResponse, errors.New("forbidden to use sysctl settings")
+			return forbiddenResponse, ErrSysCtlSettingsForbidden
 		}
 
 		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
-			return nil, errors.New("forbidden to use container capabilities")
+			return nil, ErrContainerCapabilitiesForbidden
 		}
 
 		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
 			for _, bind := range partialContainer.HostConfig.Binds {
 				if strings.HasPrefix(bind, "/") {
-					return forbiddenResponse, errors.New("forbidden to use bind mounts")
+					return forbiddenResponse, ErrBindMountsForbidden
 				}
 			}
 		}

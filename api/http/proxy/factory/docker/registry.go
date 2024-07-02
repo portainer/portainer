@@ -29,31 +29,36 @@ type (
 
 func createRegistryAuthenticationHeader(
 	dataStore dataservices.DataStore,
-	registryId portainer.RegistryID,
+	registryID portainer.RegistryID,
 	accessContext *registryAccessContext,
 ) (authenticationHeader registryAuthenticationHeader, err error) {
-	if registryId == 0 { // dockerhub (anonymous)
+	if registryID == 0 { // dockerhub (anonymous)
 		authenticationHeader.Serveraddress = "docker.io"
-	} else { // any "custom" registry
-		var matchingRegistry *portainer.Registry
-		for _, registry := range accessContext.registries {
-			registry := registry
-			if registry.ID == registryId &&
-				(accessContext.isAdmin ||
-					security.AuthorizedRegistryAccess(&registry, accessContext.user, accessContext.teamMemberships, accessContext.endpointID)) {
-				matchingRegistry = &registry
-				break
-			}
+
+		return
+	}
+
+	// Any "custom" registry
+	var matchingRegistry *portainer.Registry
+
+	for _, registry := range accessContext.registries {
+		registry := registry
+		if registry.ID == registryID &&
+			(accessContext.isAdmin ||
+				security.AuthorizedRegistryAccess(&registry, accessContext.user, accessContext.teamMemberships, accessContext.endpointID)) {
+			matchingRegistry = &registry
+
+			break
+		}
+	}
+
+	if matchingRegistry != nil {
+		if err = registryutils.EnsureRegTokenValid(dataStore, matchingRegistry); err != nil {
+			return
 		}
 
-		if matchingRegistry != nil {
-			err = registryutils.EnsureRegTokenValid(dataStore, matchingRegistry)
-			if err != nil {
-				return
-			}
-			authenticationHeader.Serveraddress = matchingRegistry.URL
-			authenticationHeader.Username, authenticationHeader.Password, err = registryutils.GetRegEffectiveCredential(matchingRegistry)
-		}
+		authenticationHeader.Serveraddress = matchingRegistry.URL
+		authenticationHeader.Username, authenticationHeader.Password, err = registryutils.GetRegEffectiveCredential(matchingRegistry)
 	}
 
 	return

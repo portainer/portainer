@@ -59,6 +59,7 @@ type (
 		operationContext *restrictedDockerOperationContext
 		labelBlackList   []portainer.Pair
 	}
+
 	restrictedOperationRequest func(*http.Response, *operationExecutor) error
 	operationRequest           func(*http.Request) error
 )
@@ -85,18 +86,18 @@ func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, er
 }
 
 var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*http.Response, error){
+	"build":      (*Transport).proxyBuildRequest,
 	"configs":    (*Transport).proxyConfigRequest,
 	"containers": (*Transport).proxyContainerRequest,
-	"services":   (*Transport).proxyServiceRequest,
-	"volumes":    (*Transport).proxyVolumeRequest,
-	"networks":   (*Transport).proxyNetworkRequest,
-	"secrets":    (*Transport).proxySecretRequest,
-	"swarm":      (*Transport).proxySwarmRequest,
-	"nodes":      (*Transport).proxyNodeRequest,
-	"tasks":      (*Transport).proxyTaskRequest,
-	"build":      (*Transport).proxyBuildRequest,
 	"images":     (*Transport).proxyImageRequest,
+	"networks":   (*Transport).proxyNetworkRequest,
+	"nodes":      (*Transport).proxyNodeRequest,
+	"secrets":    (*Transport).proxySecretRequest,
+	"services":   (*Transport).proxyServiceRequest,
+	"swarm":      (*Transport).proxySwarmRequest,
+	"tasks":      (*Transport).proxyTaskRequest,
 	"v2":         (*Transport).proxyAgentRequest,
+	"volumes":    (*Transport).proxyVolumeRequest,
 }
 
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
@@ -119,6 +120,7 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 	if proxyFunc := prefixProxyFuncMap[prefix]; proxyFunc != nil {
 		return proxyFunc(transport, request, unversionedPath)
 	}
+
 	return transport.executeDockerRequest(request)
 }
 
@@ -141,7 +143,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request, unversionedPath s
 
 	switch {
 	case strings.HasPrefix(requestPath, "/browse"):
-		// host file browser request
+		// Host file browser request
 		volumeIDParameter, found := r.URL.Query()["volumeID"]
 		if !found || len(volumeIDParameter) < 1 {
 			return transport.administratorOperation(r)
@@ -154,7 +156,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request, unversionedPath s
 			return nil, err
 		}
 
-		// volume browser request
+		// Volume browser request
 		return transport.restrictedResourceOperation(r, resourceID, volumeName, portainer.VolumeResourceControl, true)
 	case strings.HasPrefix(requestPath, "/dockerhub"):
 		requestPath, registryIdString := path.Split(r.URL.Path)
@@ -206,7 +208,7 @@ func (transport *Transport) proxyConfigRequest(request *http.Request, unversione
 		return transport.rewriteOperation(request, transport.configListOperation)
 
 	default:
-		// assume /configs/{id}
+		// Assume /configs/{id}
 		configID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
@@ -242,6 +244,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request, unversi
 			if action == "json" {
 				return transport.rewriteOperation(request, transport.containerInspectOperation)
 			}
+
 			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 		} else if match, _ := path.Match("/containers/*", requestPath); match {
 			// Handle /containers/{id} requests
@@ -253,6 +256,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request, unversi
 
 			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 		}
+
 		return transport.executeDockerRequest(request)
 	}
 }
@@ -273,6 +277,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request, unversion
 			// Handle /services/{id}/{action} requests
 			serviceID := path.Base(path.Dir(requestPath))
 			transport.decorateRegistryAuthenticationHeader(request)
+
 			return transport.restrictedResourceOperation(request, serviceID, serviceID, portainer.ServiceResourceControl, false)
 		} else if match, _ := path.Match("/services/*", requestPath); match {
 			// Handle /services/{id} requests
@@ -284,8 +289,10 @@ func (transport *Transport) proxyServiceRequest(request *http.Request, unversion
 			case http.MethodDelete:
 				return transport.executeGenericResourceDeletionOperation(request, serviceID, serviceID, portainer.ServiceResourceControl)
 			}
+
 			return transport.restrictedResourceOperation(request, serviceID, serviceID, portainer.ServiceResourceControl, false)
 		}
+
 		return transport.executeDockerRequest(request)
 	}
 }
@@ -304,7 +311,7 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request, unversione
 		return transport.rewriteOperation(request, transport.volumeListOperation)
 
 	default:
-		// assume /volumes/{name}
+		// Assume /volumes/{name}
 		return transport.restrictedVolumeOperation(requestPath, request)
 	}
 }
@@ -320,7 +327,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request, unversion
 		return transport.rewriteOperation(request, transport.networkListOperation)
 
 	default:
-		// assume /networks/{id}
+		// Assume /networks/{id}
 		networkID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
@@ -328,6 +335,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request, unversion
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, networkID, networkID, portainer.NetworkResourceControl)
 		}
+
 		return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
 	}
 }
@@ -343,7 +351,7 @@ func (transport *Transport) proxySecretRequest(request *http.Request, unversione
 		return transport.rewriteOperation(request, transport.secretListOperation)
 
 	default:
-		// assume /secrets/{id}
+		// Assume /secrets/{id}
 		secretID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
@@ -351,6 +359,7 @@ func (transport *Transport) proxySecretRequest(request *http.Request, unversione
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, secretID, secretID, portainer.SecretResourceControl)
 		}
+
 		return transport.restrictedResourceOperation(request, secretID, secretID, portainer.SecretResourceControl, false)
 	}
 }
@@ -358,7 +367,7 @@ func (transport *Transport) proxySecretRequest(request *http.Request, unversione
 func (transport *Transport) proxyNodeRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
 	requestPath := unversionedPath
 
-	// assume /nodes/{id}
+	// Assume /nodes/{id}
 	if path.Base(requestPath) != "nodes" {
 		return transport.administratorOperation(request)
 	}
@@ -373,7 +382,7 @@ func (transport *Transport) proxySwarmRequest(request *http.Request, unversioned
 	case "/swarm":
 		return transport.rewriteOperation(request, swarmInspectOperation)
 	default:
-		// assume /swarm/{action}
+		// Assume /swarm/{action}
 		return transport.administratorOperation(request)
 	}
 }
@@ -385,33 +394,37 @@ func (transport *Transport) proxyTaskRequest(request *http.Request, unversionedP
 	case "/tasks":
 		return transport.rewriteOperation(request, transport.taskListOperation)
 	default:
-		// assume /tasks/{id}
+		// Assume /tasks/{id}
 		return transport.executeDockerRequest(request)
 	}
 }
 
 func (transport *Transport) proxyBuildRequest(request *http.Request, _ string) (*http.Response, error) {
-	err := transport.updateDefaultGitBranch(request)
-	if err != nil {
+	if err := transport.updateDefaultGitBranch(request); err != nil {
 		return nil, err
 	}
+
 	return transport.interceptAndRewriteRequest(request, buildOperation)
 }
 
 func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
 	remote := request.URL.Query().Get("remote")
-	if strings.HasSuffix(remote, ".git") {
-		repositoryURL := remote[:len(remote)-4]
-		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "", false)
-		if err != nil {
-			return err
-		}
-		newRemote := fmt.Sprintf("%s#%s", remote, latestCommitID)
 
-		q := request.URL.Query()
-		q.Set("remote", newRemote)
-		request.URL.RawQuery = q.Encode()
+	if !strings.HasSuffix(remote, ".git") {
+		return nil
 	}
+
+	repositoryURL := remote[:len(remote)-4]
+	latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "", false)
+	if err != nil {
+		return err
+	}
+
+	newRemote := fmt.Sprintf("%s#%s", remote, latestCommitID)
+
+	q := request.URL.Query()
+	q.Set("remote", newRemote)
+	request.URL.RawQuery = q.Encode()
 
 	return nil
 }
@@ -426,6 +439,7 @@ func (transport *Transport) proxyImageRequest(request *http.Request, unversioned
 		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
 			return transport.replaceRegistryAuthenticationHeader(request)
 		}
+
 		return transport.executeDockerRequest(request)
 	}
 }
@@ -444,46 +458,45 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 
 	originalHeader := request.Header.Get("X-Registry-Auth")
 
-	if originalHeader != "" {
-
-		decodedHeaderData, err := base64.StdEncoding.DecodeString(originalHeader)
-		if err != nil {
-			return err
-		}
-
-		var originalHeaderData portainerRegistryAuthenticationHeader
-		err = json.Unmarshal(decodedHeaderData, &originalHeaderData)
-		if err != nil {
-			return err
-		}
-
-		// delete header and exist function without error if Front End
-		// passes empty json. This is to restore original behavior which
-		// never originally passed this header
-		if string(decodedHeaderData) == "{}" {
-			request.Header.Del("X-Registry-Auth")
-			return nil
-		}
-
-		// only set X-Registry-Auth if registryId is defined
-		if originalHeaderData.RegistryId == nil {
-			return nil
-		}
-
-		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, *originalHeaderData.RegistryId, accessContext)
-		if err != nil {
-			return err
-		}
-
-		headerData, err := json.Marshal(authenticationHeader)
-		if err != nil {
-			return err
-		}
-
-		header := base64.URLEncoding.EncodeToString(headerData)
-
-		request.Header.Set("X-Registry-Auth", header)
+	if originalHeader == "" {
+		return nil
 	}
+
+	decodedHeaderData, err := base64.StdEncoding.DecodeString(originalHeader)
+	if err != nil {
+		return err
+	}
+
+	var originalHeaderData portainerRegistryAuthenticationHeader
+	if err := json.Unmarshal(decodedHeaderData, &originalHeaderData); err != nil {
+		return err
+	}
+
+	// Delete header and exist function without error if Front End
+	// passes empty json. This is to restore original behavior which
+	// never originally passed this header
+	if string(decodedHeaderData) == "{}" {
+		request.Header.Del("X-Registry-Auth")
+
+		return nil
+	}
+
+	// Only set X-Registry-Auth if registryId is defined
+	if originalHeaderData.RegistryId == nil {
+		return nil
+	}
+
+	authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, *originalHeaderData.RegistryId, accessContext)
+	if err != nil {
+		return err
+	}
+
+	headerData, err := json.Marshal(authenticationHeader)
+	if err != nil {
+		return err
+	}
+
+	request.Header.Set("X-Registry-Auth", base64.URLEncoding.EncodeToString(headerData))
 
 	return nil
 }
@@ -659,11 +672,9 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 	}
 
 	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
-	if err != nil {
-		if dataservices.IsErrObjectNotFound(err) {
-			return response, nil
-		}
-
+	if dataservices.IsErrObjectNotFound(err) {
+		return response, nil
+	} else if err != nil {
 		return response, err
 	}
 

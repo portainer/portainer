@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/rs/zerolog/log"
@@ -23,7 +24,8 @@ const (
 
 type (
 	resourceLabelsObjectSelector func(map[string]any) map[string]any
-	resourceOperationParameters  struct {
+
+	resourceOperationParameters struct {
 		resourceIdentifierAttribute string
 		resourceType                portainer.ResourceControlType
 		labelsObjectSelector        resourceLabelsObjectSelector
@@ -31,28 +33,18 @@ type (
 )
 
 func getUniqueElements(items string) []string {
-	result := []string{}
-	seen := make(map[string]struct{})
-	for _, item := range strings.Split(items, ",") {
-		v := strings.TrimSpace(item)
-		if v == "" {
-			continue
-		}
-		if _, ok := seen[v]; !ok {
-			result = append(result, v)
-			seen[v] = struct{}{}
-		}
-	}
+	xs := strings.Split(items, ",")
+	xs = slicesx.Map(xs, strings.TrimSpace)
+	xs = slicesx.Filter(xs, func(x string) bool { return len(x) > 0 })
 
-	return result
+	return slicesx.Unique(xs)
 }
 
 func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]any, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
 
-		err := transport.dataStore.ResourceControl().Create(resourceControl)
-		if err != nil {
+		if err := transport.dataStore.ResourceControl().Create(resourceControl); err != nil {
 			return nil, err
 		}
 
@@ -61,6 +53,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 
 	teamNames := make([]string, 0)
 	userNames := make([]string, 0)
+
 	if labelsObject[resourceLabelForPortainerTeamResourceControl] != nil {
 		concatenatedTeamNames := labelsObject[resourceLabelForPortainerTeamResourceControl].(string)
 		teamNames = getUniqueElements(concatenatedTeamNames)
@@ -71,48 +64,48 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		userNames = getUniqueElements(concatenatedUserNames)
 	}
 
-	if len(teamNames) > 0 || len(userNames) > 0 {
-		teamIDs := make([]portainer.TeamID, 0)
-		userIDs := make([]portainer.UserID, 0)
-
-		for _, name := range teamNames {
-			team, err := transport.dataStore.Team().TeamByName(name)
-			if err != nil {
-				log.Warn().
-					Str("name", name).
-					Str("resource_id", resourceID).
-					Msg("unknown team name in access control label, ignoring access control rule for this team")
-
-				continue
-			}
-
-			teamIDs = append(teamIDs, team.ID)
-		}
-
-		for _, name := range userNames {
-			user, err := transport.dataStore.User().UserByUsername(name)
-			if err != nil {
-				log.Warn().
-					Str("name", name).
-					Str("resource_id", resourceID).
-					Msg("unknown user name in access control label, ignoring access control rule for this user")
-
-				continue
-			}
-
-			userIDs = append(userIDs, user.ID)
-		}
-
-		resourceControl := authorization.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
-
-		if err := transport.dataStore.ResourceControl().Create(resourceControl); err != nil {
-			return nil, err
-		}
-
-		return resourceControl, nil
+	if len(teamNames) == 0 && len(userNames) == 0 {
+		return nil, nil
 	}
 
-	return nil, nil
+	teamIDs := make([]portainer.TeamID, 0)
+	userIDs := make([]portainer.UserID, 0)
+
+	for _, name := range teamNames {
+		team, err := transport.dataStore.Team().TeamByName(name)
+		if err != nil {
+			log.Warn().
+				Str("name", name).
+				Str("resource_id", resourceID).
+				Msg("unknown team name in access control label, ignoring access control rule for this team")
+
+			continue
+		}
+
+		teamIDs = append(teamIDs, team.ID)
+	}
+
+	for _, name := range userNames {
+		user, err := transport.dataStore.User().UserByUsername(name)
+		if err != nil {
+			log.Warn().
+				Str("name", name).
+				Str("resource_id", resourceID).
+				Msg("unknown user name in access control label, ignoring access control rule for this user")
+
+			continue
+		}
+
+		userIDs = append(userIDs, user.ID)
+	}
+
+	resourceControl := authorization.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
+
+	if err := transport.dataStore.ResourceControl().Create(resourceControl); err != nil {
+		return nil, err
+	}
+
+	return resourceControl, nil
 }
 
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
@@ -298,40 +291,40 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 		return resourceControl, nil
 	}
 
-	if resourceLabelsObject != nil {
-		if resourceLabelsObject[resourceLabelForDockerServiceID] != nil {
-			inheritedServiceIdentifier := resourceLabelsObject[resourceLabelForDockerServiceID].(string)
-			resourceControl = authorization.GetResourceControlByResourceIDAndType(inheritedServiceIdentifier, portainer.ServiceResourceControl, resourceControls)
-
-			if resourceControl != nil {
-				return resourceControl, nil
-			}
-		}
-
-		if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != nil {
-			stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName].(string)
-			stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
-			resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
-
-			if resourceControl != nil {
-				return resourceControl, nil
-			}
-		}
-
-		if resourceLabelsObject[resourceLabelForDockerComposeStackName] != nil {
-			stackName := resourceLabelsObject[resourceLabelForDockerComposeStackName].(string)
-			stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
-			resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
-
-			if resourceControl != nil {
-				return resourceControl, nil
-			}
-		}
-
-		return transport.newResourceControlFromPortainerLabels(resourceLabelsObject, resourceIdentifier, resourceType)
+	if resourceLabelsObject == nil {
+		return nil, nil
 	}
 
-	return nil, nil
+	if resourceLabelsObject[resourceLabelForDockerServiceID] != nil {
+		inheritedServiceIdentifier := resourceLabelsObject[resourceLabelForDockerServiceID].(string)
+		resourceControl = authorization.GetResourceControlByResourceIDAndType(inheritedServiceIdentifier, portainer.ServiceResourceControl, resourceControls)
+
+		if resourceControl != nil {
+			return resourceControl, nil
+		}
+	}
+
+	if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != nil {
+		stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName].(string)
+		stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
+		resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
+
+		if resourceControl != nil {
+			return resourceControl, nil
+		}
+	}
+
+	if resourceLabelsObject[resourceLabelForDockerComposeStackName] != nil {
+		stackName := resourceLabelsObject[resourceLabelForDockerComposeStackName].(string)
+		stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
+		resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
+
+		if resourceControl != nil {
+			return resourceControl, nil
+		}
+	}
+
+	return transport.newResourceControlFromPortainerLabels(resourceLabelsObject, resourceIdentifier, resourceType)
 }
 
 func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpointID portainer.EndpointID) string {

@@ -44,40 +44,42 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 	}
 
 	// The "Volumes" field contains the list of volumes as an array of JSON objects
-	if responseObject["Volumes"] != nil {
-		volumeData := responseObject["Volumes"].([]any)
-
-		if transport.snapshotService != nil {
-			// Filling snapshot data can improve the performance of getVolumeResourceID
-			if err = transport.snapshotService.FillSnapshotData(transport.endpoint); err != nil {
-				log.Info().Err(err).
-					Int("endpoint id", int(transport.endpoint.ID)).
-					Msg("snapshot is not filled into the endpoint.")
-			}
-		}
-
-		for _, volumeObject := range volumeData {
-			volume := volumeObject.(map[string]any)
-
-			if err := transport.decorateVolumeResponseWithResourceID(volume); err != nil {
-				return fmt.Errorf("failed decorating volume response: %w", err)
-			}
-		}
-
-		resourceOperationParameters := &resourceOperationParameters{
-			resourceIdentifierAttribute: volumeObjectIdentifier,
-			resourceType:                portainer.VolumeResourceControl,
-			labelsObjectSelector:        selectorVolumeLabels,
-		}
-
-		volumeData, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, volumeData, executor)
-		if err != nil {
-			return err
-		}
-
-		// Overwrite the original volume list
-		responseObject["Volumes"] = volumeData
+	if responseObject["Volumes"] == nil {
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
+
+	volumeData := responseObject["Volumes"].([]any)
+
+	if transport.snapshotService != nil {
+		// Filling snapshot data can improve the performance of getVolumeResourceID
+		if err = transport.snapshotService.FillSnapshotData(transport.endpoint); err != nil {
+			log.Info().Err(err).
+				Int("endpoint id", int(transport.endpoint.ID)).
+				Msg("snapshot is not filled into the endpoint.")
+		}
+	}
+
+	for _, volumeObject := range volumeData {
+		volume := volumeObject.(map[string]any)
+
+		if err := transport.decorateVolumeResponseWithResourceID(volume); err != nil {
+			return fmt.Errorf("failed decorating volume response: %w", err)
+		}
+	}
+
+	resourceOperationParameters := &resourceOperationParameters{
+		resourceIdentifierAttribute: volumeObjectIdentifier,
+		resourceType:                portainer.VolumeResourceControl,
+		labelsObjectSelector:        selectorVolumeLabels,
+	}
+
+	volumeData, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, volumeData, executor)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the original volume list
+	responseObject["Volumes"] = volumeData
 
 	return utils.RewriteResponse(response, responseObject, http.StatusOK)
 }
