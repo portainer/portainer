@@ -22,7 +22,7 @@ on:
 env:
   DOCKER_HUB_REPO: portainerci/portainer-ce
   EXTENSION_HUB_REPO: portainerci/portainer-docker-extension
-  GO_VERSION: 1.21.9
+  GO_VERSION: 1.22.5
   NODE_VERSION: 18.x
 
 jobs:
