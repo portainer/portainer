@@ -54,20 +54,12 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 			return errors.Wrap(err, "failed to read manifest file")
 		}
 
-		if config.stack.IsComposeFormat {
-			manifestContent, err = config.kubernetesDeployer.ConvertCompose(manifestContent)
-			if err != nil {
-				return errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
-			}
-		}
-
 		manifestContent, err = k.AddAppLabels(manifestContent, config.appLabels.ToMap())
 		if err != nil {
 			return errors.Wrap(err, "failed to add application labels")
 		}
 
-		err = filesystem.WriteToFile(manifestFilePath, manifestContent)
-		if err != nil {
+		if err := filesystem.WriteToFile(manifestFilePath, manifestContent); err != nil {
 			return errors.Wrap(err, "failed to create temp manifest file")
 		}
 

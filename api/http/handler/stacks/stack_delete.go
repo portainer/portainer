@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -202,40 +201,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 	}
 
 	if stack.Type == portainer.KubernetesStack {
-		var manifestFiles []string
-
-		//if it is a compose format kub stack, create a temp dir and convert the manifest files into it
-		//then process the remove operation
-		if stack.IsComposeFormat {
-			fileNames := stackutils.GetStackFilePaths(stack, false)
-			tmpDir, err := os.MkdirTemp("", "kube_delete")
-			if err != nil {
-				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
-			}
-
-			defer os.RemoveAll(tmpDir)
-
-			for _, fileName := range fileNames {
-				manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
-				manifestContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
-				if err != nil {
-					return errors.Wrap(err, "failed to read manifest file")
-				}
-
-				manifestContent, err = handler.KubernetesDeployer.ConvertCompose(manifestContent)
-				if err != nil {
-					return errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
-				}
-
-				err = filesystem.WriteToFile(manifestFilePath, manifestContent)
-				if err != nil {
-					return errors.Wrap(err, "failed to create temp manifest file")
-				}
-				manifestFiles = append(manifestFiles, manifestFilePath)
-			}
-		} else {
-			manifestFiles = stackutils.GetStackFilePaths(stack, true)
-		}
+		manifestFiles := stackutils.GetStackFilePaths(stack, true)
 
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
 		if err != nil {

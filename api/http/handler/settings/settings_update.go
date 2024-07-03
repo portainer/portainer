@@ -13,10 +13,10 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-	"golang.org/x/oauth2"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
 )
 
 type settingsUpdatePayload struct {
@@ -36,8 +36,6 @@ type settingsUpdatePayload struct {
 	// Deployment options for encouraging deployment as code
 	GlobalDeploymentOptions  *portainer.GlobalDeploymentOptions // The default check in interval for edge agent (in seconds)
 	EdgeAgentCheckinInterval *int                               `example:"5"`
-	// Show the Kompose build option (discontinued in 2.18)
-	ShowKomposeBuildOption *bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures *bool `example:"true"`
 	// The duration of a user session
@@ -76,22 +74,19 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	}
 
 	if payload.UserSessionTimeout != nil {
-		_, err := time.ParseDuration(*payload.UserSessionTimeout)
-		if err != nil {
+		if _, err := time.ParseDuration(*payload.UserSessionTimeout); err != nil {
 			return errors.New("Invalid user session timeout")
 		}
 	}
 
 	if payload.KubeconfigExpiry != nil {
-		_, err := time.ParseDuration(*payload.KubeconfigExpiry)
-		if err != nil {
+		if _, err := time.ParseDuration(*payload.KubeconfigExpiry); err != nil {
 			return errors.New("Invalid Kubeconfig Expiry")
 		}
 	}
 
 	if payload.EdgePortainerURL != nil && *payload.EdgePortainerURL != "" {
-		_, err := edge.ParseHostForEdge(*payload.EdgePortainerURL)
-		if err != nil {
+		if _, err := edge.ParseHostForEdge(*payload.EdgePortainerURL); err != nil {
 			return err
 		}
 	}
@@ -101,6 +96,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 			return errors.New("Invalid OAuth AuthStyle")
 		}
 	}
+
 	return nil
 }
 
@@ -126,11 +122,11 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	var settings *portainer.Settings
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		settings, err = handler.updateSettings(tx, payload)
+
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -166,25 +162,18 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		settings.GlobalDeploymentOptions = *payload.GlobalDeploymentOptions
 	}
 
-	if payload.ShowKomposeBuildOption != nil {
-		settings.ShowKomposeBuildOption = *payload.ShowKomposeBuildOption
-	}
-
 	if payload.HelmRepositoryURL != nil {
+		settings.HelmRepositoryURL = ""
 		if *payload.HelmRepositoryURL != "" {
-
 			newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 
 			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
-				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL, nil)
-				if err != nil {
+				if err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL, nil); err != nil {
 					return nil, httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
 				}
 			}
 
 			settings.HelmRepositoryURL = newHelmRepo
-		} else {
-			settings.HelmRepositoryURL = ""
 		}
 	}
 
@@ -223,6 +212,7 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		if kubeSecret == nil {
 			kubeSecret = settings.OAuthSettings.KubeSecretKey
 		}
+
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
 		settings.OAuthSettings.KubeSecretKey = kubeSecret
@@ -272,8 +262,7 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		settings.EnableTelemetry = *payload.EnableTelemetry
 	}
 
-	err = handler.updateTLS(settings)
-	if err != nil {
+	if err := handler.updateTLS(settings); err != nil {
 		return nil, err
 	}
 
@@ -281,8 +270,7 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 		settings.KubectlShellImage = *payload.KubectlShellImage
 	}
 
-	err = tx.Settings().UpdateSettings(settings)
-	if err != nil {
+	if err := tx.Settings().UpdateSettings(settings); err != nil {
 		return nil, httperror.InternalServerError("Unable to persist settings changes inside the database", err)
 	}
 
@@ -304,8 +292,8 @@ func (handler *Handler) updateTLS(settings *portainer.Settings) error {
 	}
 
 	settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
-	err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath)
-	if err != nil {
+
+	if err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath); err != nil {
 		return httperror.InternalServerError("Unable to remove TLS files from disk", err)
 	}
 

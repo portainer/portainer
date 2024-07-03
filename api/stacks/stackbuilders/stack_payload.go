@@ -23,8 +23,6 @@ type StackPayload struct {
 	FromAppTemplate bool `example:"false"`
 	// Kubernetes stack name
 	StackName string
-	// Whether the kubernetes stack config file is compose format
-	ComposeFormat bool
 	// Kubernetes stack namespace
 	Namespace string
 	// Path to the k8s Stack file. Used by k8s git repository method
