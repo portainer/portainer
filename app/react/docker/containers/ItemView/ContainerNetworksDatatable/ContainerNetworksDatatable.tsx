@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Network } from 'lucide-react';
 import { EndpointSettings, NetworkSettings } from 'docker-types/generated/1.41';
 
@@ -9,7 +10,7 @@ import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { ContainerListViewModel } from '../../types';
 
 import { TableNetwork } from './types';
-import { columns } from './columns';
+import { buildColumns } from './columns';
 import { ConnectNetworkForm } from './ConnectNetworkForm';
 
 const storageKey = 'container-networks';
@@ -25,6 +26,7 @@ export function ContainerNetworksDatatable({
   nodeName?: string;
 }) {
   const tableState = useTableState(store, storageKey);
+  const columns = useMemo(() => buildColumns({ nodeName }), [nodeName]);
 
   const networks: Array<TableNetwork> = Object.entries(dataset || {})
     .filter(isNetworkDefined)
