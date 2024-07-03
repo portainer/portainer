@@ -94,7 +94,7 @@ export function ItemView() {
 
   async function onRemoveNetworkClicked() {
     deleteNetworkMutation.mutate(
-      { networkId },
+      { networkId, nodeName },
       {
         onSuccess: () => {
           notifySuccess('Network successfully removed', networkId);

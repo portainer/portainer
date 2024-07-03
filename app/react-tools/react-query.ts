@@ -37,7 +37,9 @@ export function withInvalidate(
   return {
     onSuccess() {
       const promise = Promise.all(
-        queryKeysToInvalidate.map((keys) => queryClient.invalidateQueries(keys))
+        queryKeysToInvalidate.map((keys) =>
+          queryClient.invalidateQueries(keys, { refetchType: 'none' })
+        )
       );
       return skipRefresh
         ? undefined // don't wait for queries to refresh before setting state to success
