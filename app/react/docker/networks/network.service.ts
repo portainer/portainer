@@ -33,10 +33,20 @@ export async function getNetwork(
 
 export async function deleteNetwork(
   environmentId: EnvironmentId,
-  networkId: NetworkId
+  networkId: NetworkId,
+  { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    await axios.delete(buildUrl(environmentId, networkId));
+    await axios.delete(
+      buildUrl(environmentId, networkId),
+      nodeName
+        ? {
+            headers: {
+              [agentTargetHeader]: nodeName,
+            },
+          }
+        : undefined
+    );
     return networkId;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to remove network');

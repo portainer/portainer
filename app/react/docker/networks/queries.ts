@@ -42,10 +42,12 @@ export function useDeleteNetwork() {
     ({
       environmentId,
       networkId,
+      nodeName,
     }: {
       environmentId: EnvironmentId;
       networkId: NetworkId;
-    }) => deleteNetwork(environmentId, networkId),
+      nodeName?: string;
+    }) => deleteNetwork(environmentId, networkId, { nodeName }),
     {
       onSuccess: (networkId) => {
         notifySuccess('Network successfully removed', networkId);
