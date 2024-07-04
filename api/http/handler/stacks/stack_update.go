@@ -153,7 +153,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
-		// sanitize password in the http response to minimise possible security leaks
+		// Sanitize password in the http response to minimise possible security leaks
 		stack.GitConfig.Authentication.Password = ""
 	}
 

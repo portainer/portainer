@@ -88,8 +88,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
@@ -98,44 +97,36 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	//only check resource control when it is a DockerSwarmStack or a DockerComposeStack
+	// Only check resource control when it is a DockerSwarmStack or a DockerComposeStack
 	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
-
 		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve a resource control associated to the stack", err)
 		}
 
-		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-		if err != nil {
+		if access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl); err != nil {
 			return httperror.InternalServerError("Unable to verify user authorizations to validate stack access", err)
-		}
-		if !access {
+		} else if !access {
 			return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 		}
 	}
 
-	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
-	if err != nil {
+	if canManage, err := handler.userCanManageStacks(securityContext, endpoint); err != nil {
 		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
-	}
-	if !canManage {
+	} else if !canManage {
 		errMsg := "Stack management is disabled for non-admin users"
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	var payload stackGitRedployPayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.Env = payload.Env
 	if stack.Type == portainer.DockerSwarmStack {
-		stack.Option = &portainer.StackOption{
-			Prune: payload.Prune,
-		}
+		stack.Option = &portainer.StackOption{Prune: payload.Prune}
 	}
 
 	if stack.Type == portainer.KubernetesStack {
@@ -171,9 +162,8 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	defer clean()
 
-	httpErr := handler.deployStack(r, stack, payload.PullImage, endpoint)
-	if httpErr != nil {
-		return httpErr
+	if err := handler.deployStack(r, stack, payload.PullImage, endpoint); err != nil {
+		return err
 	}
 
 	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword, stack.GitConfig.TLSSkipVerify)
@@ -190,13 +180,12 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	stack.UpdateDate = time.Now().Unix()
 	stack.Status = portainer.StackStatusActive
 
-	err = handler.DataStore.Stack().Update(stack.ID, stack)
-	if err != nil {
+	if err := handler.DataStore.Stack().Update(stack.ID, stack); err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", errors.Wrap(err, "failed to update the stack"))
 	}
 
 	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
-		// sanitize password in the http response to minimise possible security leaks
+		// Sanitize password in the http response to minimise possible security leaks
 		stack.GitConfig.Authentication.Password = ""
 	}
 
@@ -204,10 +193,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint) *httperror.HandlerError {
-	var (
-		deploymentConfiger deployments.StackDeploymentConfiger
-		err                error
-	)
+	var deploymentConfiger deployments.StackDeploymentConfiger
 
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
@@ -238,6 +224,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
+
 	case portainer.KubernetesStack:
 		handler.stackCreationMutex.Lock()
 		defer handler.stackCreationMutex.Unlock()
@@ -263,13 +250,14 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
+
 	default:
 		return httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
 	}
 
-	err = deploymentConfiger.Deploy()
-	if err != nil {
+	if err := deploymentConfiger.Deploy(); err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
+
 	return nil
 }

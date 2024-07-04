@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"os"
@@ -258,21 +259,10 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		return err
 	}
 
-	if *flags.SnapshotInterval != "" {
-		settings.SnapshotInterval = *flags.SnapshotInterval
-	}
-
-	if *flags.Logo != "" {
-		settings.LogoURL = *flags.Logo
-	}
-
-	if *flags.EnableEdgeComputeFeatures {
-		settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	}
-
-	if *flags.Templates != "" {
-		settings.TemplatesURL = *flags.Templates
-	}
+	settings.SnapshotInterval = *cmp.Or(flags.SnapshotInterval, &settings.SnapshotInterval)
+	settings.LogoURL = *cmp.Or(flags.Logo, &settings.LogoURL)
+	settings.EnableEdgeComputeFeatures = *cmp.Or(flags.EnableEdgeComputeFeatures, &settings.EnableEdgeComputeFeatures)
+	settings.TemplatesURL = *cmp.Or(flags.Templates, &settings.TemplatesURL)
 
 	if *flags.Labels != nil {
 		settings.BlackListedLabels = *flags.Labels

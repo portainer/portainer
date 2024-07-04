@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"cmp"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -97,12 +98,9 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Name != nil {
 		name := *payload.Name
-		isUnique, err := handler.isNameUnique(name, endpoint.ID)
-		if err != nil {
+		if isUnique, err := handler.isNameUnique(name, endpoint.ID); err != nil {
 			return httperror.InternalServerError("Unable to check if name is unique", err)
-		}
-
-		if !isUnique {
+		} else if !isUnique {
 			return httperror.Conflict("Name is not unique", nil)
 		}
 
@@ -114,17 +112,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		updateEndpointProxy = true
 	}
 
-	if payload.PublicURL != nil {
-		endpoint.PublicURL = *payload.PublicURL
-	}
-
 	if payload.Gpus != nil {
 		endpoint.Gpus = payload.Gpus
 	}
 
-	if payload.EdgeCheckinInterval != nil {
-		endpoint.EdgeCheckinInterval = *payload.EdgeCheckinInterval
-	}
+	endpoint.PublicURL = *cmp.Or(payload.PublicURL, &endpoint.PublicURL)
+	endpoint.EdgeCheckinInterval = *cmp.Or(payload.EdgeCheckinInterval, &endpoint.EdgeCheckinInterval)
 
 	updateRelations := false
 
@@ -304,9 +297,5 @@ func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpoin
 		return true
 	}
 
-	if payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify {
-		return true
-	}
-
-	return false
+	return payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify
 }
