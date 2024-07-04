@@ -16,12 +16,11 @@ angular.module('portainer.docker').controller('ContainerController', [
   '$async',
   'ContainerService',
   'ImageHelper',
-  'NetworkService',
   'Notifications',
   'HttpRequestHelper',
   'Authentication',
   'endpoint',
-  function ($q, $scope, $state, $transition$, $filter, $async, ContainerService, ImageHelper, NetworkService, Notifications, HttpRequestHelper, Authentication, endpoint) {
+  function ($q, $scope, $state, $transition$, $filter, $async, ContainerService, ImageHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
     $scope.resourceType = ResourceControlType.Container;
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
@@ -38,8 +37,6 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     $scope.state = {
       recreateContainerInProgress: false,
-      joinNetworkInProgress: false,
-      leaveNetworkInProgress: false,
       pullImageValidity: false,
     };
 
@@ -202,36 +199,6 @@ angular.module('portainer.docker').controller('ContainerController', [
         });
     };
 
-    $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
-      $scope.state.leaveNetworkInProgress = true;
-      NetworkService.disconnectContainer(networkId, container.Id)
-        .then(function success() {
-          Notifications.success('Container left network', container.Id);
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to disconnect container from network');
-        })
-        .finally(function final() {
-          $scope.state.leaveNetworkInProgress = false;
-        });
-    };
-
-    $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
-      $scope.state.joinNetworkInProgress = true;
-      NetworkService.connectContainer(networkId, container.Id)
-        .then(function success() {
-          Notifications.success('Container joined network', container.Id);
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect container to network');
-        })
-        .finally(function final() {
-          $scope.state.joinNetworkInProgress = false;
-        });
-    };
-
     async function commitContainerAsync() {
       $scope.config.commitInProgress = true;
       const registryModel = $scope.config.RegistryModel;
@@ -325,17 +292,6 @@ angular.module('portainer.docker').controller('ContainerController', [
         return $q.reject(err);
       }
     }
-
-    var provider = $scope.applicationState.endpoint.mode.provider;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    NetworkService.networks(provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE', false, provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25)
-      .then(function success(data) {
-        var networks = data;
-        $scope.availableNetworks = networks;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve networks');
-      });
 
     update();
   },
