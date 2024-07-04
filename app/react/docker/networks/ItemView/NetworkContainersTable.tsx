@@ -79,6 +79,7 @@ export function NetworkContainersTable({
                       disconnectContainer.mutate(
                         {
                           containerId: container.Id,
+                          nodeName,
                         },
                         {
                           onSuccess: () =>

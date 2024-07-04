@@ -3,7 +3,7 @@ import { buildNameColumnFromObject } from '@@/datatables/buildNameColumn';
 
 import { TableNetwork } from './types';
 import { columnHelper } from './helper';
-import { actions } from './actions';
+import { buildActions } from './actions';
 
 export function buildColumns({ nodeName }: { nodeName?: string } = {}) {
   return [
@@ -32,6 +32,6 @@ export function buildColumns({ nodeName }: { nodeName?: string } = {}) {
       id: 'macAddress',
       enableSorting: false,
     }),
-    actions,
+    buildActions({ nodeName }),
   ];
 }
