@@ -8,7 +8,7 @@ mkdir -p dist
 BUILDNUMBER=${BUILDNUMBER:-"N/A"}
 CONTAINER_IMAGE_TAG=${CONTAINER_IMAGE_TAG:-"N/A"}
 NODE_VERSION=${NODE_VERSION:-$(node -v)}
-YARN_VERSION=${YARN_VERSION:-$(yarn --version))}
+YARN_VERSION=${YARN_VERSION:-$(yarn --version)}
 WEBPACK_VERSION=${WEBPACK_VERSION:-$(yarn list webpack --depth=0 | grep webpack | awk -F@ '{print $2}')}
 GO_VERSION=${GO_VERSION:-$(go version | awk '{print $3}')}
 GIT_COMMIT_HASH=${GIT_COMMIT_HASH:-$(git rev-parse --short HEAD)}

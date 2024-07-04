@@ -75,6 +75,7 @@ export function NetworkContainersTable({
                         containerId: container.Id,
                         environmentId,
                         networkId,
+                        nodeName,
                       });
                     }
                   }}
