@@ -14,11 +14,11 @@ export class HostDetailsPanelController {
   }
 
   async getFilesForPathAsync(path) {
-    const isBrowseEnabledOrig = this.isBrowseEnabled;
-    this.isBrowseEnabled = false;
-
-    await this.HostBrowserService.ls(this.environmentId, path);
-    this.isBrowseEnabled = isBrowseEnabledOrig;
+    try {
+      await this.HostBrowserService.ls(this.environmentId, path);
+    } catch (err) {
+      this.isBrowseEnabled = false;
+    }
   }
 
   $onInit() {
