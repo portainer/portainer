@@ -15,8 +15,11 @@
               <td>{{ disk.Vendor }}</td>
               <td>{{ disk.Size | humansize }}</td>
             </tr>
-            <tr ng-if="!$ctrl.disks">
+            <tr ng-if="$ctrl.disks === undefined">
               <td colspan="2" class="text-muted text-center">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.disks === null">
+              <td colspan="2" class="text-muted text-center"> Failed to load devices. </td>
             </tr>
             <tr ng-if="$ctrl.disks.length === 0">
               <td colspan="2" class="text-muted text-center"> No disks available. </td>
