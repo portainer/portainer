@@ -349,15 +349,5 @@
   </div>
 </div>
 
-<docker-container-networks-datatable
-  ng-if="container.NetworkSettings.Networks"
-  dataset="container.NetworkSettings.Networks"
-  container="container"
-  available-networks="availableNetworks"
-  on-join="(containerJoinNetwork)"
-  join-in-progress="state.joinNetworkInProgress"
-  on-leave="(containerLeaveNetwork)"
-  leave-in-progress="state.leaveNetworkInProgress"
-  node-name="nodeName"
->
+<docker-container-networks-datatable ng-if="container.NetworkSettings.Networks" dataset="container.NetworkSettings.Networks" container="container" node-name="nodeName">
 </docker-container-networks-datatable>

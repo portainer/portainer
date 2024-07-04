@@ -70,22 +70,6 @@ angular.module('portainer.docker').factory('NetworkService', [
       return Network.remove({ id: id }).$promise;
     };
 
-    service.disconnectContainer = function (networkId, containerId, force) {
-      return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
-    };
-
-    service.connectContainer = function (networkId, containerId, aliases) {
-      var payload = {
-        Container: containerId,
-      };
-      if (aliases) {
-        payload.EndpointConfig = {
-          Aliases: aliases,
-        };
-      }
-      return Network.connect({ id: networkId }, payload).$promise;
-    };
-
     return service;
   },
 ]);
