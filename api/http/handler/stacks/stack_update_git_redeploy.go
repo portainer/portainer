@@ -164,12 +164,10 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		TLSSkipVerify: stack.GitConfig.TLSSkipVerify,
 	}
 
-	clean, err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
+	err := git.CloneWithBackup(handler.GitService, handler.FileService, cloneOptions)
 	if err != nil {
 		return httperror.InternalServerError("Unable to clone git repository directory", err)
 	}
-
-	defer clean()
 
 	httpErr := handler.deployStack(r, stack, payload.PullImage, endpoint)
 	if httpErr != nil {
