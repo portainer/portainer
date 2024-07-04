@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"cmp"
 	"errors"
 	"net/http"
 
@@ -83,18 +84,16 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	var payload registryUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	if payload.Name != nil {
-		registry.Name = *payload.Name
-	}
-	// enforce name uniqueness across registries
-	// check is performed even if Name didn't change (Name not in payload) as we need
-	// to enforce this rule on updates not performed with frontend (e.g. on direct API requests)
-	// see https://portainer.atlassian.net/browse/EE-2706 for more details
+	registry.Name = *cmp.Or(payload.Name, &registry.Name)
+
+	// Enforce name uniqueness across registries check is performed even if Name
+	// didn't change (Name not in payload) as we need to enforce this rule on
+	// updates not performed with frontend (e.g. on direct API requests)
+	// See https://portainer.atlassian.net/browse/EE-2706 for more details
 	for _, r := range registries {
 		if r.ID != registry.ID && r.Name == registry.Name {
 			return httperror.Conflict("Another registry with the same name already exists", errors.New("A registry is already defined with this name"))
@@ -172,12 +171,9 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if payload.Quay != nil {
-		registry.Quay = *payload.Quay
-	}
+	registry.Quay = *cmp.Or(payload.Quay, &registry.Quay)
 
-	err = handler.DataStore.Registry().Update(registry.ID, registry)
-	if err != nil {
+	if err := handler.DataStore.Registry().Update(registry.ID, registry); err != nil {
 		return httperror.InternalServerError("Unable to persist registry changes inside the database", err)
 	}
 
@@ -185,10 +181,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 }
 
 func syncConfig(registry *portainer.Registry) *portainer.RegistryManagementConfiguration {
-	config := registry.ManagementConfiguration
-	if config == nil {
-		config = &portainer.RegistryManagementConfiguration{}
-	}
+	config := cmp.Or(registry.ManagementConfiguration, &portainer.RegistryManagementConfiguration{})
 
 	config.Authentication = registry.Authentication
 	config.Username = registry.Username
@@ -200,20 +193,17 @@ func syncConfig(registry *portainer.Registry) *portainer.RegistryManagementConfi
 }
 
 func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *portainer.Registry, endpointAccess portainer.RegistryAccessPolicies) error {
-
 	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return err
 	}
 
 	for _, namespace := range endpointAccess.Namespaces {
-		err := cli.DeleteRegistrySecret(registry.ID, namespace)
-		if err != nil {
+		if err := cli.DeleteRegistrySecret(registry.ID, namespace); err != nil {
 			return err
 		}
 
-		err = cli.CreateRegistrySecret(registry, namespace)
-		if err != nil {
+		if err := cli.CreateRegistrySecret(registry, namespace); err != nil {
 			return err
 		}
 	}

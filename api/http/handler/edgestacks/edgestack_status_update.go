@@ -63,17 +63,15 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	var payload updateStatusPayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var stack *portainer.EdgeStack
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -106,8 +104,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 		return nil, handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
 	}
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
 		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
@@ -126,8 +123,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 
 	updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
 
-	err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
-	if err != nil {
+	if err := tx.EdgeStack().UpdateEdgeStack(stackID, stack); err != nil {
 		return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
 	}
 
@@ -137,6 +133,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 func updateEnvStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
 	if deploymentStatus.Type == portainer.EdgeStackStatusRemoved {
 		delete(stack.Status, environmentId)
+
 		return
 	}
 
