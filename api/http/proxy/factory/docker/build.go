@@ -19,6 +19,8 @@ type postDockerfileRequest struct {
 	Content string
 }
 
+var ErrUploadedFilesNotFound = errors.New("uploaded files not found to build image")
+
 // buildOperation inspects the "Content-Type" header to determine if it needs to alter the request.
 //
 // If the value of the header is empty, it means that a Dockerfile is posted via upload, the function
@@ -69,13 +71,12 @@ func buildOperation(request *http.Request) error {
 		}
 
 	case "multipart/form-data":
-		err := request.ParseMultipartForm(32 * OneMegabyte) // limit parser memory to 32MB
-		if err != nil {
+		if err := request.ParseMultipartForm(32 * OneMegabyte); err != nil {
 			return err
 		}
 
 		if request.MultipartForm == nil || request.MultipartForm.File == nil {
-			return errors.New("uploaded files not found to build image")
+			return ErrUploadedFilesNotFound
 		}
 
 		tfb := archive.NewTarFileInBuffer()

@@ -17,12 +17,15 @@ func init() {
 
 func (transport *Transport) applyPortainerContainers(resources []any) ([]any, error) {
 	decoratedResourceData := make([]any, 0)
+
 	for _, resource := range resources {
 		responseObject, ok := resource.(map[string]any)
 		if !ok {
 			decoratedResourceData = append(decoratedResourceData, resource)
+
 			continue
 		}
+
 		responseObject, _ = transport.applyPortainerContainer(responseObject)
 		decoratedResourceData = append(decoratedResourceData, responseObject)
 	}

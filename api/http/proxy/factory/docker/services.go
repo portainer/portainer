@@ -59,8 +59,8 @@ func (transport *Transport) serviceListOperation(response *http.Response, execut
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the service based on resource control and either rewrite an access denied response or a decorated service.
 func (transport *Transport) serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
-	//ServiceInspect response is a JSON object
-	//https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
+	// ServiceInspect response is a JSON object
+	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
@@ -85,6 +85,7 @@ func selectorServiceLabels(responseObject map[string]any) map[string]any {
 	if serviceSpecObject != nil {
 		return utils.GetJSONObject(serviceSpecObject, "Labels")
 	}
+
 	return nil
 }
 
@@ -108,33 +109,34 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 		return nil, err
 	}
 
-	if !isAdminOrEndpointAdmin {
-		securitySettings, err := transport.fetchEndpointSecuritySettings()
-		if err != nil {
-			return nil, err
-		}
+	if isAdminOrEndpointAdmin {
+		return transport.replaceRegistryAuthenticationHeader(request)
+	}
 
-		body, err := io.ReadAll(request.Body)
-		if err != nil {
-			return nil, err
-		}
+	securitySettings, err := transport.fetchEndpointSecuritySettings()
+	if err != nil {
+		return nil, err
+	}
 
-		partialService := &PartialService{}
-		err = json.Unmarshal(body, partialService)
-		if err != nil {
-			return nil, err
-		}
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
 
-		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialService.TaskTemplate.ContainerSpec.Mounts) > 0) {
-			for _, mount := range partialService.TaskTemplate.ContainerSpec.Mounts {
-				if mount.Type == "bind" {
-					return forbiddenResponse, errors.New("forbidden to use bind mounts")
-				}
+	partialService := &PartialService{}
+	if err := json.Unmarshal(body, partialService); err != nil {
+		return nil, err
+	}
+
+	if !securitySettings.AllowBindMountsForRegularUsers && (len(partialService.TaskTemplate.ContainerSpec.Mounts) > 0) {
+		for _, mount := range partialService.TaskTemplate.ContainerSpec.Mounts {
+			if mount.Type == "bind" {
+				return forbiddenResponse, errors.New("forbidden to use bind mounts")
 			}
 		}
-
-		request.Body = io.NopCloser(bytes.NewBuffer(body))
 	}
+
+	request.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	return transport.replaceRegistryAuthenticationHeader(request)
 }
