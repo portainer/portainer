@@ -2,7 +2,7 @@ module github.com/portainer/portainer
 
 go 1.21
 
-toolchain go1.21.9
+toolchain go1.21.11
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.2
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.14.0
 	github.com/cbroglie/mustache v1.4.0
-	github.com/containers/image/v5 v5.29.0
+	github.com/containers/image/v5 v5.30.1
 	github.com/coreos/go-semver v0.3.0
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/docker/cli v26.0.1+incompatible
