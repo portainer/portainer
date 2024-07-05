@@ -7,6 +7,8 @@ on:
 
 env:
   GO_VERSION: 1.22.5
+  DOCKER_HUB_REPO: portainerci/portainer-ce
+  DOCKER_HUB_IMAGE_TAG: develop
 
 jobs:
   client-dependencies:
@@ -112,7 +114,7 @@ jobs:
         uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress portainerci/portainer:develop
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress ${{ env.DOCKER_HUB_REPO }}:${{ env.DOCKER_HUB_IMAGE_TAG }}
 
       - name: upload Trivy image security scan result as artifact
         uses: actions/upload-artifact@v3
@@ -141,7 +143,7 @@ jobs:
         continue-on-error: true
         with:
           command: cves
-          image: portainerci/portainer:develop
+          image: ${{ env.DOCKER_HUB_REPO }}:${{ env.DOCKER_HUB_IMAGE_TAG }}
           sarif-file: image-docker-scout.json
           dockerhub-user: ${{ secrets.DOCKER_HUB_USERNAME }}
           dockerhub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
