@@ -20,6 +20,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type stackStatusResponse struct {
@@ -93,6 +94,8 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
 	}
 
+	firstConn := endpoint.LastCheckInDate == 0
+
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
@@ -107,7 +110,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	var statusResponse *endpointEdgeStatusInspectResponse
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID))
+		statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID), firstConn)
 		return err
 	})
 	if err != nil {
@@ -122,7 +125,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	return cacheResponse(w, endpoint.ID, *statusResponse)
 }
 
-func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID) (*endpointEdgeStatusInspectResponse, error) {
+func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID, firstConn bool) (*endpointEdgeStatusInspectResponse, error) {
 	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return nil, err
@@ -134,8 +137,10 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 	}
 
 	// Take an initial snapshot
-	if endpoint.LastCheckInDate == 0 {
-		_ = handler.ReverseTunnelService.Open(endpoint)
+	if firstConn {
+		if err := handler.ReverseTunnelService.Open(endpoint); err != nil {
+			log.Error().Err(err).Msg("could not open the tunnel")
+		}
 	}
 
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)

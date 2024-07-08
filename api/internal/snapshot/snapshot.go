@@ -64,14 +64,16 @@ func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService po
 		}
 
 		for _, e := range endpoints {
-			if !endpointutils.IsEdgeEndpoint(&e) {
+			if !endpointutils.IsEdgeEndpoint(&e) || e.Edge.AsyncMode {
 				continue
 			}
 
 			s, err := tx.Snapshot().Read(e.ID)
 			if dataservices.IsErrObjectNotFound(err) ||
 				(err == nil && s.Docker == nil && s.Kubernetes == nil) {
-				_ = tunnelService.Open(&e)
+				if err := tunnelService.Open(&e); err != nil {
+					log.Error().Err(err).Msg("could not open the tunnel")
+				}
 			}
 		}
 
