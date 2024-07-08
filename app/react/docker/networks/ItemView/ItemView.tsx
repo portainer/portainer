@@ -100,7 +100,7 @@ export function ItemView() {
 
     if (confirmed) {
       deleteNetworkMutation.mutate(
-        { environmentId, networkId },
+        { environmentId, networkId, nodeName },
         {
           onSuccess: () => {
             router.stateService.go('docker.networks');
