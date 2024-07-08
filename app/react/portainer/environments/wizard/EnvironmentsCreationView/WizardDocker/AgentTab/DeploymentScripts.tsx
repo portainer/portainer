@@ -101,6 +101,7 @@ function linuxStandaloneCommand(agentVersion: string, agentSecret: string) {
   --restart=always \\
   -v /var/run/docker.sock:/var/run/docker.sock \\
   -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
+  -v /:/host \\
   portainer/agent:${agentVersion}
 `;
 }
@@ -121,6 +122,7 @@ docker service create \\
   --constraint 'node.platform.os == linux' \\
   --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  --mount type=bind,src=//,dst=/host \\
   portainer/agent:${agentVersion}
 `;
 }
