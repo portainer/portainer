@@ -42,7 +42,6 @@ func createRegistryAuthenticationHeader(
 	var matchingRegistry *portainer.Registry
 
 	for _, registry := range accessContext.registries {
-		registry := registry
 		if registry.ID == registryID &&
 			(accessContext.isAdmin ||
 				security.AuthorizedRegistryAccess(&registry, accessContext.user, accessContext.teamMemberships, accessContext.endpointID)) {
@@ -52,14 +51,16 @@ func createRegistryAuthenticationHeader(
 		}
 	}
 
-	if matchingRegistry != nil {
-		if err = registryutils.EnsureRegTokenValid(dataStore, matchingRegistry); err != nil {
-			return
-		}
-
-		authenticationHeader.Serveraddress = matchingRegistry.URL
-		authenticationHeader.Username, authenticationHeader.Password, err = registryutils.GetRegEffectiveCredential(matchingRegistry)
+	if matchingRegistry == nil {
+		return
 	}
+
+	if err = registryutils.EnsureRegTokenValid(dataStore, matchingRegistry); err != nil {
+		return
+	}
+
+	authenticationHeader.Serveraddress = matchingRegistry.URL
+	authenticationHeader.Username, authenticationHeader.Password, err = registryutils.GetRegEffectiveCredential(matchingRegistry)
 
 	return
 }

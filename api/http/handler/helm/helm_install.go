@@ -51,8 +51,7 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 // @router /endpoints/{id}/kubernetes/helm [post]
 func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload installChartPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid Helm install payload", err)
 	}
 
@@ -69,15 +68,19 @@ func (p *installChartPayload) Validate(_ *http.Request) error {
 	if p.Repo == "" {
 		required = append(required, "repo")
 	}
+
 	if p.Name == "" {
 		required = append(required, "name")
 	}
+
 	if p.Namespace == "" {
 		required = append(required, "namespace")
 	}
+
 	if p.Chart == "" {
 		required = append(required, "chart")
 	}
+
 	if len(required) > 0 {
 		return fmt.Errorf("required field(s) missing: %s", strings.Join(required, ", "))
 	}
@@ -94,6 +97,7 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 	if httperr != nil {
 		return nil, httperr.Err
 	}
+
 	installOpts := options.InstallOptions{
 		Name:      p.Name,
 		Chart:     p.Chart,
@@ -112,15 +116,16 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 			return nil, err
 		}
 		defer os.Remove(file.Name())
-		_, err = file.WriteString(p.Values)
-		if err != nil {
+
+		if _, err := file.WriteString(p.Values); err != nil {
 			file.Close()
 			return nil, err
 		}
-		err = file.Close()
-		if err != nil {
+
+		if err := file.Close(); err != nil {
 			return nil, err
 		}
+
 		installOpts.ValuesFile = file.Name()
 	}
 
@@ -134,8 +139,7 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 		return nil, err
 	}
 
-	err = handler.updateHelmAppManifest(r, manifest, installOpts.Namespace)
-	if err != nil {
+	if err := handler.updateHelmAppManifest(r, manifest, installOpts.Namespace); err != nil {
 		return nil, err
 	}
 
@@ -151,12 +155,14 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to retrieve user details from authentication token")
 	}
+
 	user, err := handler.dataStore.User().Read(tokenData.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to load user information from the database")
 	}
 
 	appLabels := kubernetes.GetHelmAppLabels(installOpts.Name, user.Username)
+
 	labeledManifest, err := kubernetes.AddAppLabels([]byte(manifest), appLabels)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to label helm release manifest")
@@ -180,16 +186,15 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 		return errors.Wrap(err, "unable to retrieve user details from authentication token")
 	}
 
-	// extract list of yaml resources from helm manifest
+	// Extract list of YAML resources from Helm manifest
 	yamlResources, err := kubernetes.ExtractDocuments(manifest, nil)
 	if err != nil {
 		return errors.Wrap(err, "unable to extract documents from helm release manifest")
 	}
 
-	// deploy individual resources in parallel
+	// Deploy individual resources in parallel
 	g := new(errgroup.Group)
 	for _, resource := range yamlResources {
-		resource := resource // https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
 			tmpfile, err := os.CreateTemp("", "helm-manifest-*")
 			if err != nil {
@@ -214,9 +219,11 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 			}
 
 			_, err = handler.kubernetesDeployer.Deploy(tokenData.ID, endpoint, []string{tmpfile.Name()}, resourceNamespace)
+
 			return err
 		})
 	}
+
 	if err := g.Wait(); err != nil {
 		return errors.Wrap(err, "unable to patch helm release using kubectl")
 	}
