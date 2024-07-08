@@ -954,8 +954,6 @@ type (
 		GlobalDeploymentOptions GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
-		// Show the Kompose build option (discontinued in 2.18)
-		ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 		// Whether edge compute features are enabled
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures"`
 		// The duration of a user session
@@ -1052,8 +1050,6 @@ type (
 		FromAppTemplate bool `example:"false"`
 		// Kubernetes namespace if stack is a kube application
 		Namespace string `example:"default"`
-		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
-		IsComposeFormat bool `example:"false"`
 	}
 
 	// StackOption represents the options for stack deployment
@@ -1512,7 +1508,6 @@ type (
 	KubernetesDeployer interface {
 		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		ConvertCompose(data []byte) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes environment(endpoint) snapshots
