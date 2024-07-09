@@ -24,14 +24,24 @@ const (
 	maxAvailablePort = 65535
 )
 
+var (
+	ErrNonEdgeEnv = errors.New("cannot open a tunnel for non-edge environments")
+	ErrAsyncEnv   = errors.New("cannot open a tunnel for async edge environments")
+	ErrInvalidEnv = errors.New("cannot open a tunnel for an invalid environment")
+)
+
 // Open will mark the tunnel as REQUIRED so the agent opens it
 func (s *Service) Open(endpoint *portainer.Endpoint) error {
 	if !endpointutils.IsEdgeEndpoint(endpoint) {
-		return errors.New("cannot open a tunnel for non-edge environments")
+		return ErrNonEdgeEnv
 	}
 
 	if endpoint.Edge.AsyncMode {
-		return errors.New("cannot open a tunnel for async edge environments")
+		return ErrAsyncEnv
+	}
+
+	if endpoint.ID == 0 || endpoint.EdgeID == "" {
+		return ErrInvalidEnv
 	}
 
 	s.mu.Lock()

@@ -15,8 +15,9 @@ import (
 
 func TestPingAgentPanic(t *testing.T) {
 	endpoint := &portainer.Endpoint{
-		ID:   1,
-		Type: portainer.EdgeAgentOnDockerEnvironment,
+		ID:     1,
+		EdgeID: "test-edge-id",
+		Type:   portainer.EdgeAgentOnDockerEnvironment,
 	}
 
 	_, store := datastore.MustNewTestStore(t, true, true)
@@ -42,7 +43,8 @@ func TestPingAgentPanic(t *testing.T) {
 		errCh <- srv.Serve(ln)
 	}()
 
-	s.Open(endpoint)
+	err = s.Open(endpoint)
+	require.NoError(t, err)
 	s.activeTunnels[endpoint.ID].Port = ln.Addr().(*net.TCPAddr).Port
 
 	require.Error(t, s.pingAgent(endpoint.ID))
