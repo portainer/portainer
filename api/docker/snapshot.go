@@ -5,14 +5,15 @@ import (
 	"strings"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/docker/consts"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	_container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
-	portainer "github.com/portainer/portainer/api"
-	dockerclient "github.com/portainer/portainer/api/docker/client"
-	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/rs/zerolog/log"
 )
 
@@ -40,8 +41,7 @@ func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*p
 }
 
 func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.DockerSnapshot, error) {
-	_, err := cli.Ping(context.Background())
-	if err != nil {
+	if _, err := cli.Ping(context.Background()); err != nil {
 		return nil, err
 	}
 
@@ -49,49 +49,42 @@ func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.Dock
 		StackCount: 0,
 	}
 
-	err = snapshotInfo(snapshot, cli)
-	if err != nil {
+	if err := snapshotInfo(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot engine information")
 	}
 
 	if snapshot.Swarm {
-		err = snapshotSwarmServices(snapshot, cli)
-		if err != nil {
+		if err := snapshotSwarmServices(snapshot, cli); err != nil {
 			log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot Swarm services")
 		}
 
-		err = snapshotNodes(snapshot, cli)
-		if err != nil {
+		if err := snapshotNodes(snapshot, cli); err != nil {
 			log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot Swarm nodes")
 		}
 	}
 
-	err = snapshotContainers(snapshot, cli)
-	if err != nil {
+	if err := snapshotContainers(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot containers")
 	}
 
-	err = snapshotImages(snapshot, cli)
-	if err != nil {
+	if err := snapshotImages(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot images")
 	}
 
-	err = snapshotVolumes(snapshot, cli)
-	if err != nil {
+	if err := snapshotVolumes(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot volumes")
 	}
 
-	err = snapshotNetworks(snapshot, cli)
-	if err != nil {
+	if err := snapshotNetworks(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot networks")
 	}
 
-	err = snapshotVersion(snapshot, cli)
-	if err != nil {
+	if err := snapshotVersion(snapshot, cli); err != nil {
 		log.Warn().Str("environment", endpoint.Name).Err(err).Msg("unable to snapshot engine version")
 	}
 
 	snapshot.Time = time.Now().Unix()
+
 	return snapshot, nil
 }
 
@@ -106,6 +99,7 @@ func snapshotInfo(snapshot *portainer.DockerSnapshot, cli *client.Client) error 
 	snapshot.TotalCPU = info.NCPU
 	snapshot.TotalMemory = info.MemTotal
 	snapshot.SnapshotRaw.Info = info
+
 	return nil
 }
 
@@ -114,15 +108,19 @@ func snapshotNodes(snapshot *portainer.DockerSnapshot, cli *client.Client) error
 	if err != nil {
 		return err
 	}
+
 	var nanoCpus int64
 	var totalMem int64
+
 	for _, node := range nodes {
 		nanoCpus += node.Description.Resources.NanoCPUs
 		totalMem += node.Description.Resources.MemoryBytes
 	}
+
 	snapshot.TotalCPU = int(nanoCpus / 1e9)
 	snapshot.TotalMemory = totalMem
 	snapshot.NodeCount = len(nodes)
+
 	return nil
 }
 
@@ -144,6 +142,7 @@ func snapshotSwarmServices(snapshot *portainer.DockerSnapshot, cli *client.Clien
 
 	snapshot.ServiceCount = len(services)
 	snapshot.StackCount += len(stacks)
+
 	return nil
 }
 
@@ -156,9 +155,10 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	stacks := make(map[string]struct{})
 	gpuUseSet := make(map[string]struct{})
 	gpuUseAll := false
+
 	for _, container := range containers {
 		if container.State == "running" {
-			// snapshot GPUs
+			// Snapshot GPUs
 			response, err := cli.ContainerInspect(context.Background(), container.ID)
 			if err != nil {
 				// Inspect a container will fail when the container runs on a different
@@ -177,7 +177,6 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			} else {
 				var gpuOptions *_container.DeviceRequest = nil
 				for _, deviceRequest := range response.HostConfig.Resources.DeviceRequests {
-					deviceRequest := deviceRequest
 					if deviceRequest.Driver == "nvidia" || deviceRequest.Capabilities[0][0] == "gpu" {
 						gpuOptions = &deviceRequest
 					}
@@ -187,6 +186,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 					if gpuOptions.Count == -1 {
 						gpuUseAll = true
 					}
+
 					for _, id := range gpuOptions.DeviceIDs {
 						gpuUseSet[id] = struct{}{}
 					}
@@ -217,9 +217,11 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	snapshot.HealthyContainerCount = stats.Healthy
 	snapshot.UnhealthyContainerCount = stats.Unhealthy
 	snapshot.StackCount += len(stacks)
+
 	for _, container := range containers {
 		snapshot.SnapshotRaw.Containers = append(snapshot.SnapshotRaw.Containers, portainer.DockerContainerSnapshot{Container: container})
 	}
+
 	return nil
 }
 
@@ -231,6 +233,7 @@ func snapshotImages(snapshot *portainer.DockerSnapshot, cli *client.Client) erro
 
 	snapshot.ImageCount = len(images)
 	snapshot.SnapshotRaw.Images = images
+
 	return nil
 }
 
@@ -242,6 +245,7 @@ func snapshotVolumes(snapshot *portainer.DockerSnapshot, cli *client.Client) err
 
 	snapshot.VolumeCount = len(volumes.Volumes)
 	snapshot.SnapshotRaw.Volumes = volumes
+
 	return nil
 }
 
@@ -250,7 +254,9 @@ func snapshotNetworks(snapshot *portainer.DockerSnapshot, cli *client.Client) er
 	if err != nil {
 		return err
 	}
+
 	snapshot.SnapshotRaw.Networks = networks
+
 	return nil
 }
 
@@ -259,6 +265,8 @@ func snapshotVersion(snapshot *portainer.DockerSnapshot, cli *client.Client) err
 	if err != nil {
 		return err
 	}
+
 	snapshot.SnapshotRaw.Version = version
+
 	return nil
 }
