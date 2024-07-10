@@ -40,10 +40,12 @@ func Test_generateRandomKey(t *testing.T) {
 
 	t.Run("Generated keys are unique", func(t *testing.T) {
 		keys := make(map[string]bool)
-		for i := 0; i < 100; i++ {
+
+		for range 100 {
 			key := GenerateRandomKey(8)
 			_, ok := keys[string(key)]
 			is.False(ok)
+
 			keys[string(key)] = true
 		}
 	})

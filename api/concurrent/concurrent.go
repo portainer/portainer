@@ -93,6 +93,7 @@ type Func func(ctx context.Context) (any, error)
 // Run runs a list of functions returns the results
 func Run(ctx context.Context, maxConcurrency int, tasks ...Func) ([]Result, error) {
 	var wg sync.WaitGroup
+
 	resultsChan := make(chan Result, len(tasks))
 	taskChan := make(chan Func, len(tasks))
 
@@ -101,6 +102,7 @@ func Run(ctx context.Context, maxConcurrency int, tasks ...Func) ([]Result, erro
 
 	runTask := func() {
 		defer wg.Done()
+
 		for fn := range taskChan {
 			result, err := fn(localCtx)
 			resultsChan <- Result{Result: result, Err: err}
@@ -113,7 +115,7 @@ func Run(ctx context.Context, maxConcurrency int, tasks ...Func) ([]Result, erro
 	}
 
 	// Start worker goroutines
-	for i := 0; i < maxConcurrency; i++ {
+	for range maxConcurrency {
 		wg.Add(1)
 		go runTask()
 	}
@@ -135,8 +137,10 @@ func Run(ctx context.Context, maxConcurrency int, tasks ...Func) ([]Result, erro
 	for r := range resultsChan {
 		if r.Err != nil {
 			cancelCtx()
+
 			return nil, r.Err
 		}
+
 		results = append(results, r)
 	}
 

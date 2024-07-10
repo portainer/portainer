@@ -29,7 +29,7 @@ func TestTagDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	var tagIDs []portainer.TagID
 
-	for i := 0; i < tagsCount; i++ {
+	for i := range tagsCount {
 		tagID := portainer.TagID(i) + 1
 
 		if err := store.Tag().Create(&portainer.Tag{

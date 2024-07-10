@@ -13,7 +13,9 @@ import (
 
 // IsLocalEndpoint returns true if this is a local environment(endpoint)
 func IsLocalEndpoint(endpoint *portainer.Endpoint) bool {
-	return strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") || endpoint.Type == 5
+	return strings.HasPrefix(endpoint.URL, "unix://") ||
+		strings.HasPrefix(endpoint.URL, "npipe://") ||
+		endpoint.Type == portainer.KubernetesLocalEnvironment
 }
 
 // IsKubernetesEndpoint returns true if this is a kubernetes environment(endpoint)
@@ -61,6 +63,7 @@ func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []portainer.E
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}
+
 	return filteredEndpoints
 }
 
@@ -187,12 +190,15 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 			endpoint,
 		)
 	}()
+
 	log.Info().Msg("attempting to detect storage classes in the cluster")
+
 	err := storageDetect(endpoint, endpointService, factory)
 	if err == nil {
 		return
 	}
 	log.Err(err).Msg("error while detecting storage classes")
+
 	go func() {
 		// Retry after 30 seconds if the initial detection failed.
 		log.Info().Msg("retrying storage detection in 30 seconds")
@@ -203,38 +209,41 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 }
 
 func UpdateEdgeEndpointHeartbeat(endpoint *portainer.Endpoint, settings *portainer.Settings) {
-	if IsEdgeEndpoint(endpoint) {
-		endpoint.QueryDate = time.Now().Unix()
-		checkInInterval := getEndpointCheckinInterval(endpoint, settings)
-		endpoint.Heartbeat = endpoint.QueryDate-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
+	if !IsEdgeEndpoint(endpoint) {
+		return
 	}
+
+	endpoint.QueryDate = time.Now().Unix()
+	checkInInterval := getEndpointCheckinInterval(endpoint, settings)
+	endpoint.Heartbeat = endpoint.QueryDate-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
 }
 
 func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
-	if endpoint.Edge.AsyncMode {
-		defaultInterval := 60
-		intervals := [][]int{
-			{endpoint.Edge.PingInterval, settings.Edge.PingInterval},
-			{endpoint.Edge.CommandInterval, settings.Edge.CommandInterval},
-			{endpoint.Edge.SnapshotInterval, settings.Edge.SnapshotInterval},
+	if !endpoint.Edge.AsyncMode {
+		if endpoint.EdgeCheckinInterval > 0 {
+			return endpoint.EdgeCheckinInterval
 		}
 
-		for i := 0; i < len(intervals); i++ {
-			effectiveInterval := intervals[i][0]
-			if effectiveInterval <= 0 {
-				effectiveInterval = intervals[i][1]
-			}
-			if effectiveInterval > 0 && effectiveInterval < defaultInterval {
-				defaultInterval = effectiveInterval
-			}
+		return settings.EdgeAgentCheckinInterval
+	}
+
+	defaultInterval := 60
+	intervals := [][]int{
+		{endpoint.Edge.PingInterval, settings.Edge.PingInterval},
+		{endpoint.Edge.CommandInterval, settings.Edge.CommandInterval},
+		{endpoint.Edge.SnapshotInterval, settings.Edge.SnapshotInterval},
+	}
+
+	for i := range len(intervals) {
+		effectiveInterval := intervals[i][0]
+		if effectiveInterval <= 0 {
+			effectiveInterval = intervals[i][1]
 		}
 
-		return defaultInterval
+		if effectiveInterval > 0 && effectiveInterval < defaultInterval {
+			defaultInterval = effectiveInterval
+		}
 	}
 
-	if endpoint.EdgeCheckinInterval > 0 {
-		return endpoint.EdgeCheckinInterval
-	}
-
-	return settings.EdgeAgentCheckinInterval
+	return defaultInterval
 }
