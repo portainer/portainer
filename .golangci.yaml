@@ -10,6 +10,7 @@ linters:
     - govet
     - errorlint
     - copyloopvar
+    - intrange
 
 linters-settings:
   depguard:

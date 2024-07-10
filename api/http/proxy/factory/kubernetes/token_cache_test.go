@@ -27,7 +27,7 @@ func failFunc(t *testing.T) func() (string, error) {
 func TestTokenCacheDataRace(t *testing.T) {
 	ch := make(chan struct{})
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		var tokenCache1, tokenCache2 *tokenCache
 
 		mgr := NewTokenCacheManager()

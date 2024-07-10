@@ -33,7 +33,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 
 	b := stackBuilder{t: t, store: store}
 	b.createNewStack(newGuidString(t))
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		b.createNewStack("")
 	}
 	webhookID := newGuidString(t)

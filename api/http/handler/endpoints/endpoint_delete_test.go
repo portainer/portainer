@@ -27,7 +27,7 @@ func TestEndpointDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	var endpointIDs []portainer.EndpointID
 
-	for i := 0; i < endpointsCount; i++ {
+	for i := range endpointsCount {
 		endpointID := portainer.EndpointID(i) + 1
 
 		if err := store.Endpoint().Create(&portainer.Endpoint{

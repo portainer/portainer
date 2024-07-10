@@ -157,28 +157,33 @@ func Test_customTemplateGitFetch(t *testing.T) {
 	t.Run("can return the expected file content by multiple calls from one user", func(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(5)
-		for i := 0; i < 5; i++ {
+
+		for range 5 {
 			go func() {
 				singleAPIRequest(h, jwt1, is, "abcdefg")
 				wg.Done()
 			}()
 		}
+
 		wg.Wait()
 	})
 
 	t.Run("can return the expected file content by multiple calls from different users", func(t *testing.T) {
 		var wg sync.WaitGroup
 		wg.Add(10)
-		for i := 0; i < 10; i++ {
+
+		for i := range 10 {
 			go func(j int) {
 				if j%2 == 0 {
 					singleAPIRequest(h, jwt1, is, "abcdefg")
 				} else {
 					singleAPIRequest(h, jwt2, is, "abcdefg")
 				}
+
 				wg.Done()
 			}(i)
 		}
+
 		wg.Wait()
 	})
 
