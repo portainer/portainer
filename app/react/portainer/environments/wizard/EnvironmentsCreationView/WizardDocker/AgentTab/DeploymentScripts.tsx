@@ -122,6 +122,7 @@ docker service create \\
   --constraint 'node.platform.os == linux' \\
   --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  --mount type=bind,src=//,dst=/host \\
   portainer/agent:${agentVersion}
 `;
 }
