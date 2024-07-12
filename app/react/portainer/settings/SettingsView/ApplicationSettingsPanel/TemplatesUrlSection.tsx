@@ -22,7 +22,7 @@ export function TemplatesUrlSection() {
             You can specify the URL to your own template definitions file here.
             See{' '}
             <a href={buildTemplateDocUrl} target="_blank" rel="noreferrer">
-              Portainer documentation
+              documentation
             </a>{' '}
             for more details.
           </p>

@@ -2,7 +2,7 @@
 <html lang="en" ng-app="<%= name %>" ng-strict-di data-edition="<%= process.env.PORTAINER_EDITION %>">
   <head>
     <meta charset="utf-8" />
-    <title>Portainer</title>
+    <title>App Manager</title>
     <meta name="description" content="" />
     <meta name="author" content="<%= author %>" />
     <meta http-equiv="cache-control" content="no-cache" />
@@ -59,12 +59,12 @@
                 <!-- loading box logo -->
                 <div class="row">
                   <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
-                  <img ng-if="!logo" src="<%=require('./assets/images/logo_alt.svg')%>" class="simple-box-logo" alt="Portainer" />
+                  <img ng-if="!logo" src="<%=require('./assets/images/NextZEN-ngang2.png')%>" class="simple-box-logo" alt="Portainer" />
                 </div>
                 <!-- !loading box logo -->
                 <!-- panel -->
                 <div class="ml-0 mr-0 flex items-center justify-center text-center">
-                  Loading Portainer...
+                  Loading ...
                   <!-- adding the svg inline means that the settings icon loads in time (vs pr-icon) and with the correct color (vs img) -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

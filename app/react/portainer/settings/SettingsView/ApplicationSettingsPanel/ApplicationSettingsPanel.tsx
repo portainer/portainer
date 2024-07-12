@@ -15,8 +15,8 @@ import { type Settings } from '../../types';
 import { validation } from './validation';
 import { Values } from './types';
 import { LogoFieldset } from './LogoFieldset';
-import { ScreenBannerFieldset } from './ScreenBannerFieldset';
-import { TemplatesUrlSection } from './TemplatesUrlSection';
+// import { ScreenBannerFieldset } from './ScreenBannerFieldset';
+// import { TemplatesUrlSection } from './TemplatesUrlSection';
 import { EnableTelemetryField } from './EnableTelemetryField';
 
 export function ApplicationSettingsPanel({
@@ -105,9 +105,9 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
 
       <EnableTelemetryField />
 
-      <ScreenBannerFieldset />
+      {/* <ScreenBannerFieldset /> */}
 
-      <TemplatesUrlSection />
+      {/* <TemplatesUrlSection /> */}
 
       <div className="form-group">
         <div className="col-sm-12">

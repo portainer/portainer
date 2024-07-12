@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 
-import { ContextHelp } from '@@/PageHeader/ContextHelp';
+// import { ContextHelp } from '@@/PageHeader/ContextHelp';
 
 import { useHeaderContext } from './HeaderContainer';
 import { NotificationsMenu } from './NotificationsMenu';
@@ -26,7 +26,7 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
       </div>
       <div className="flex items-end">
         <NotificationsMenu />
-        <ContextHelp />
+        {/* <ContextHelp /> */}
         {!window.ddExtension && <UserMenu />}
       </div>
     </div>

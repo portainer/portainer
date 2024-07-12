@@ -1,15 +1,7 @@
-import {
-  Users,
-  Award,
-  Settings,
-  HardDrive,
-  Radio,
-  FileText,
-  Bell,
-} from 'lucide-react';
+import { Users, Settings, Radio, Bell } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+// import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
@@ -47,26 +39,26 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             isSubMenu
             data-cy="portainerSidebar-users"
           />
-          <SidebarItem
+          {/* <SidebarItem
             to="portainer.teams"
             label="Teams"
             isSubMenu
             data-cy="portainerSidebar-teams"
-          />
+          /> */}
 
-          {isPureAdmin && (
+          {/* {isPureAdmin && (
             <SidebarItem
               to="portainer.roles"
               label="Roles"
               isSubMenu
               data-cy="portainerSidebar-roles"
             />
-          )}
+          )} */}
         </SidebarParent>
       )}
       {isPureAdmin && (
         <>
-          <SidebarParent
+          {/* <SidebarParent
             label="Environment-related"
             icon={HardDrive}
             to="portainer.endpoints"
@@ -101,7 +93,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               data-cy="portainerSidebar-environmentTags"
             />
             <EdgeUpdatesSidebarItem />
-          </SidebarParent>
+          </SidebarParent> */}
 
           <SidebarItem
             label="Registries"
@@ -110,16 +102,16 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             data-cy="portainerSidebar-registries"
           />
 
-          {isBE && (
+          {/* {isBE && (
             <SidebarItem
               to="portainer.licenses"
               label="Licenses"
               icon={Award}
               data-cy="portainerSidebar-licenses"
             />
-          )}
+          )} */}
 
-          <SidebarParent
+          {/* <SidebarParent
             label="Logs"
             to="portainer.authLogs"
             icon={FileText}
@@ -141,10 +133,10 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               isSubMenu
               data-cy="portainerSidebar-activityLogs"
             />
-          </SidebarParent>
+          </SidebarParent> */}
         </>
       )}
-      {isBE && !isPureAdmin && isAdmin && (
+      {/* {isBE && !isPureAdmin && isAdmin && (
         <SidebarParent
           label="Environment-related"
           icon={HardDrive}
@@ -154,7 +146,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
         >
           <EdgeUpdatesSidebarItem />
         </SidebarParent>
-      )}
+      )} */}
 
       <SidebarItem
         to="portainer.notifications"
@@ -181,31 +173,31 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             ]}
             data-cy="portainerSidebar-generalSettings"
           />
-          {!window.ddExtension && (
+          {/* {!window.ddExtension && (
             <SidebarItem
               to="portainer.settings.authentication"
               label="Authentication"
               isSubMenu
               data-cy="portainerSidebar-authentication"
             />
-          )}
-          {isBE && (
+          )} */}
+          {/* {isBE && (
             <SidebarItem
               to="portainer.settings.sharedcredentials"
               label="Shared Credentials"
               isSubMenu
               data-cy="portainerSidebar-cloud"
             />
-          )}
+          )} */}
 
-          <SidebarItem
+          {/* <SidebarItem
             to="portainer.settings.edgeCompute"
             label="Edge Compute"
             isSubMenu
             data-cy="portainerSidebar-edgeCompute"
-          />
+          /> */}
 
-          <SidebarItem.Wrapper label="Help / About">
+          {/* <SidebarItem.Wrapper label="Help / About">
             <a
               href={
                 process.env.PORTAINER_EDITION === 'CE'
@@ -218,26 +210,26 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             >
               Help / About
             </a>
-          </SidebarItem.Wrapper>
+          </SidebarItem.Wrapper> */}
         </SidebarParent>
       )}
     </SidebarSection>
   );
 }
 
-function EdgeUpdatesSidebarItem() {
-  const settingsQuery = usePublicSettings();
+// function EdgeUpdatesSidebarItem() {
+//   const settingsQuery = usePublicSettings();
 
-  if (!isBE || !settingsQuery.data?.EnableEdgeComputeFeatures) {
-    return null;
-  }
+//   if (!isBE || !settingsQuery.data?.EnableEdgeComputeFeatures) {
+//     return null;
+//   }
 
-  return (
-    <SidebarItem
-      to="portainer.endpoints.updateSchedules"
-      label="Update & Rollback"
-      isSubMenu
-      data-cy="portainerSidebar-updateSchedules"
-    />
-  );
-}
+//   return (
+//     <SidebarItem
+//       to="portainer.endpoints.updateSchedules"
+//       label="Update & Rollback"
+//       isSubMenu
+//       data-cy="portainerSidebar-updateSchedules"
+//     />
+//   );
+// }

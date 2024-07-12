@@ -1,13 +1,12 @@
 import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import clsx from 'clsx';
 
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
-import smallLogo from '@/assets/ico/logomark.svg';
+import smallLogo from '@/assets/ico/favicon-32x32.png';
+import fullLogo from '@/assets/images/NextZEN-ngang2.png';
 
 import { Link } from '@@/Link';
 
-import fullLogoBE from './portainer_logo-BE.svg';
-import fullLogoCE from './portainer_logo-CE.svg';
+// import fullLogoBE from './portainer_logo-BE.svg';
 import { useSidebarState } from './useSidebarState';
 import styles from './Header.module.css';
 
@@ -35,25 +34,7 @@ export function Header({ logo: customLogo }: Props) {
               'text-gray-3',
               'th-dark:text-gray-warm-6'
             )}
-          >
-            <span className="font-medium">Powered by</span>
-            <span className="font-semibold">
-              {isBE ? (
-                'portainer business'
-              ) : (
-                <a
-                  href="https://www.portainer.io/install-BE-now"
-                  className={clsx(
-                    'hover:underline',
-                    'text-blue-6 hover:text-blue-8',
-                    'th-dark:text-blue-7 th-dark:hover:text-blue-9'
-                  )}
-                >
-                  portainer community
-                </a>
-              )}
-            </span>
-          </div>
+          />
         )}
       </div>
 
@@ -88,7 +69,8 @@ function getLogo(isOpen: boolean, customLogo?: string) {
     return smallLogo;
   }
 
-  return isBE ? fullLogoBE : fullLogoCE;
+  // return isBE ? fullLogoBE : fullLogoCE;
+  return fullLogo;
 }
 
 function Logo({

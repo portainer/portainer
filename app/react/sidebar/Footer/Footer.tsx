@@ -7,7 +7,7 @@ import { UpdateNotification } from './UpdateNotifications';
 import { BuildInfoModalButton } from './BuildInfoModal';
 import '@reach/dialog/styles.css';
 import styles from './Footer.module.css';
-import Logo from './portainer_logo.svg?c';
+// import Logo from './portainer_logo.svg?c';
 
 export function Footer() {
   return isBE ? <BEFooter /> : <CEFooter />;
@@ -19,8 +19,8 @@ function CEFooter() {
       <UpdateNotification />
 
       <FooterContent>
-        <Logo width="90px" height="100%" />
-        <span>Community Edition</span>
+        {/* <Logo width="90px" height="100%" />
+        <span>Community Edition</span> */}
 
         <BuildInfoModalButton />
       </FooterContent>
