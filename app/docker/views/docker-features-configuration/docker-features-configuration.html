@@ -14,7 +14,7 @@
                 label="'Enable host management features'"
                 tooltip="'Enable host management features: host system browsing and advanced host details.'"
                 label-class="'col-sm-7 col-lg-4'"
-                disabled="!$ctrl.isAgent"
+                disabled="$ctrl.isAgent"
                 on-change="($ctrl.onChangeEnableHostManagementFeatures)"
               ></por-switch-field>
             </div>
@@ -28,7 +28,7 @@
                 tooltip="'When enabled, regular users will be able to use Portainer volume management features.'"
                 label-class="'col-sm-7 col-lg-4'"
                 on-change="($ctrl.onChangeAllowVolumeBrowserForRegularUsers)"
-                disabled="!$ctrl.isAgent"
+                disabled="$ctrl.isAgent"
               ></por-switch-field>
             </div>
           </div>
