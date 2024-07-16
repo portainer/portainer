@@ -15,7 +15,7 @@ import { buildConfirmButton } from '@@/modals/utils';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
-import { MotdPanel } from './MotdPanel';
+// import { MotdPanel } from './MotdPanel';
 import { LicenseNodePanel } from './LicenseNodePanel';
 import { BackupFailedPanel } from './BackupFailedPanel';
 
@@ -68,7 +68,7 @@ export function HomeView() {
 
       {process.env.PORTAINER_EDITION !== 'CE' && <LicenseNodePanel />}
 
-      <MotdPanel />
+      {/* <MotdPanel /> */}
 
       {process.env.PORTAINER_EDITION !== 'CE' && <BackupFailedPanel />}
 

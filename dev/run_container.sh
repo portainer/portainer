@@ -1,11 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-PORTAINER_DATA=${PORTAINER_DATA:-/tmp/portainer}
+PORTAINER_DATA=${PORTAINER_DATA:-/tmp/appmanager}
 PORTAINER_PROJECT=${PORTAINER_PROJECT:-$(pwd)}
 PORTAINER_FLAGS=${PORTAINER_FLAGS:-}
 
 docker rm -f portainer
+docker rm -f appmanager
 
 docker run -d \
   -p 8000:8000 \
@@ -16,6 +17,6 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock:z \
   -v /var/run/docker.sock:/var/run/alternative.sock:z \
   -v /tmp:/tmp \
-  --name portainer \
-  portainer/base \
+  --name appmanager \
+  kaysar12/appbase \
   /app/portainer $PORTAINER_FLAGS

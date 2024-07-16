@@ -3,10 +3,10 @@
   <div class="simple-box container">
     <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
       <!-- simple box logo -->
-      <div class="row">
+      <!-- <div class="row">
         <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
         <img ng-if="!logo" src="~@/assets/images/logo_alt.svg" class="simple-box-logo" alt="Portainer" />
-      </div>
+      </div> -->
       <!-- !simple box logo -->
       <!-- init password panel -->
       <div class="panel panel-default">
@@ -18,7 +18,7 @@
                 <pr-icon icon="'chevron-down'" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
                 <pr-icon icon="'chevron-right'" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
               </span>
-              <span class="form-section-title">New Portainer installation</span>
+              <span class="form-section-title">New installation</span>
             </a>
           </div>
           <!-- !toggle -->
@@ -90,12 +90,12 @@
             </div>
             <!-- !actions -->
             <!-- enableTelemetry-->
-            <div class="form-group">
+            <!-- <div class="form-group">
               <div class="col-sm-12 vertical-center">
                 <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" data-cy="init-enableTelemetry" />
                 <span class="text-muted small">Allow collection of anonymous statistics.</span>
               </div>
-            </div>
+            </div>-->
             <!-- !enableTelemetry-->
           </form>
           <!-- !init password form -->
@@ -113,7 +113,7 @@
                 ><pr-icon icon="'chevron-down'" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
                 <pr-icon icon="'chevron-right'" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
               ></span>
-              <span class="form-section-title">Restore Portainer from backup</span>
+              <span class="form-section-title">Restore from backup</span>
             </a>
           </div>
           <!-- !toggle -->
@@ -124,7 +124,7 @@
             <div class="form-group">
               <div class="col-sm-9">
                 <span class="small text-muted">
-                  This will restore the Portainer metadata which contains information about the environments, stacks and applications, as well as the configured users.
+                  This will restore the metadata which contains information about the environments, stacks and applications, as well as the configured users.
                 </span>
               </div>
             </div>
@@ -275,10 +275,10 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted"> You are about to restore Portainer from this backup. </span>
+                <span class="small text-muted"> You are about to restore App manager from this backup. </span>
               </div>
               <div class="col-sm-12">
-                <span class="small text-muted"> After restoring has completed, please log in as a user that was known by the Portainer that was restored. </span>
+                <span class="small text-muted"> After restoring has completed, please log in as a user that was known by the instance that was restored. </span>
               </div>
             </div>
             <!-- !note -->
@@ -293,8 +293,8 @@
                   button-spinner="state.backupInProgress"
                   data-cy="init-restorePortainerButton"
                 >
-                  <span ng-hide="state.backupInProgress">Restore Portainer</span>
-                  <span ng-show="state.backupInProgress">Restoring Portainer...</span>
+                  <span ng-hide="state.backupInProgress">Restore AppManager</span>
+                  <span ng-show="state.backupInProgress">Restoring AppManager...</span>
                 </button>
               </div>
             </div>

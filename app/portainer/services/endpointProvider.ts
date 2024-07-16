@@ -10,7 +10,7 @@ interface State {
   pingInterval: NodeJS.Timer | null;
 }
 
-const DEFAULT_TITLE = 'Portainer';
+const DEFAULT_TITLE = 'App Manager';
 
 /* @ngInject */
 export function EndpointProvider() {

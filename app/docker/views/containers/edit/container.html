@@ -123,20 +123,6 @@
               <td>Finished</td>
               <td>{{ container.State.FinishedAt | getisodate }}</td>
             </tr>
-            <tr ng-if="isAdmin && displayCreateWebhookButton && applicationState.endpoint.type !== 4">
-              <td colspan="6">
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <por-switch-field
-                      tooltip="'Webhook (or callback URI) used to automate the recreation of this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
-                      label-class="'col-sm-2'"
-                      label="'Container webhook'"
-                      feature-id="'container-webhook'"
-                    ></por-switch-field>
-                  </div>
-                </div>
-              </td>
-            </tr>
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
