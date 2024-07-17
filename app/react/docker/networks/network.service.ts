@@ -56,13 +56,24 @@ export async function deleteNetwork(
 export async function disconnectContainer(
   environmentId: EnvironmentId,
   networkId: NetworkId,
-  containerId: ContainerId
+  containerId: ContainerId,
+  nodeName?: string
 ) {
   try {
-    await axios.post(buildUrl(environmentId, networkId, 'disconnect'), {
-      Container: containerId,
-      Force: false,
-    });
+    await axios.post(
+      buildUrl(environmentId, networkId, 'disconnect'),
+      {
+        Container: containerId,
+        Force: false,
+      },
+      nodeName
+        ? {
+            headers: {
+              [agentTargetHeader]: nodeName,
+            },
+          }
+        : undefined
+    );
     return { networkId, environmentId };
   } catch (e) {
     throw parseAxiosError(

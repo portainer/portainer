@@ -67,11 +67,13 @@ export function useDisconnectContainer() {
       containerId,
       environmentId,
       networkId,
+      nodeName,
     }: {
       containerId: ContainerId;
       environmentId: EnvironmentId;
       networkId: NetworkId;
-    }) => disconnectContainer(environmentId, networkId, containerId),
+      nodeName?: string;
+    }) => disconnectContainer(environmentId, networkId, containerId, nodeName),
     {
       onSuccess: ({ networkId, environmentId }) => {
         notifySuccess('Container successfully disconnected', networkId);
