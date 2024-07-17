@@ -2,7 +2,6 @@ import { createNetwork } from '@/react/docker/networks/queries/useCreateNetworkM
 import { getNetwork } from '@/react/docker/networks/queries/useNetwork';
 import { getNetworks } from '@/react/docker/networks/queries/useNetworks';
 import { deleteNetwork } from '@/react/docker/networks/queries/useDeleteNetworkMutation';
-import { disconnectContainer } from '@/react/docker/networks/queries/useDisconnectContainerMutation';
 import { connectContainer } from '@/react/docker/networks/queries/useConnectContainerMutation';
 
 import { NetworkViewModel } from '../models/network';
@@ -18,7 +17,6 @@ function NetworkServiceFactory(AngularToReact) {
     network: useAxios(injectEnvironmentId(networkAngularJS)), // service edit
     networks: useAxios(injectEnvironmentId(networksAngularJS)), // macvlan form + container edit + dashboard + service create + service edit + custom templates list + templates list
     remove: useAxios(injectEnvironmentId(deleteNetwork)), // networks list
-    disconnectContainer: useAxios(injectEnvironmentId(disconnectContainer)), // container edit
     connectContainer: useAxios(injectEnvironmentId(connectContainerAngularJS)), // container edit
   };
 

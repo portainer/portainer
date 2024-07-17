@@ -9,6 +9,7 @@ import {
 } from '@/react-tools/react-query';
 
 import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
+import { withAgentTargetHeader } from '../../proxy/queries/utils';
 import { ContainerId } from '../../containers/types';
 import { NetworkId } from '../types';
 
@@ -24,8 +25,13 @@ export function useDisconnectContainer({
   const client = useQueryClient();
 
   return useMutation(
-    ({ containerId }: { containerId: ContainerId }) =>
-      disconnectContainer(environmentId, networkId, containerId),
+    ({
+      containerId,
+      nodeName,
+    }: {
+      containerId: ContainerId;
+      nodeName?: string;
+    }) => disconnectContainer(environmentId, networkId, containerId, nodeName),
     mutationOptions(
       withInvalidate(client, [queryKeys.item(environmentId, networkId)]),
       withError('Unable to disconnect container from network')
@@ -43,7 +49,8 @@ export function useDisconnectContainer({
 export async function disconnectContainer(
   environmentId: EnvironmentId,
   networkId: NetworkId,
-  containerId: ContainerId
+  containerId: ContainerId,
+  nodeName?: string
 ) {
   try {
     await axios.post(
@@ -51,7 +58,8 @@ export async function disconnectContainer(
       {
         Container: containerId,
         Force: false,
-      }
+      },
+      { headers: { ...withAgentTargetHeader(nodeName) } }
     );
     return { networkId, environmentId };
   } catch (err) {
