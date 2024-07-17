@@ -1,6 +1,6 @@
-FROM portainer/base as production
+FROM kaysar12/appbase as production
 
-LABEL org.opencontainers.image.title="Portainer" \
+LABEL org.opencontainers.image.title="AppManager" \
   org.opencontainers.image.description="Docker container management made simple, with the world’s most popular GUI-based container management platform." \
   org.opencontainers.image.vendor="Portainer.io" \
   com.docker.desktop.extension.api.version=">= 0.2.2" \
