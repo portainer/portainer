@@ -24,7 +24,7 @@ fieldset[disabled] .btn {
   box-shadow: none;
 }
 
-.btn.btn-primary {
+/* .btn.btn-primary {
   @apply border-blue-8 bg-blue-8 text-white;
   @apply hover:border-blue-9 hover:bg-blue-9 hover:text-white;
   @apply th-dark:hover:border-blue-7 th-dark:hover:bg-blue-7;
@@ -32,9 +32,9 @@ fieldset[disabled] .btn {
 
 .btn.btn-primary:active,
 .btn.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
+.open>.dropdown-toggle.btn-primary {
   @apply border-blue-5 bg-blue-9;
-}
+} */
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
@@ -161,4 +161,29 @@ a.hyperlink {
 
 a.no-decoration {
   text-decoration: none;
+}
+
+/* /root/portainer/app/assets/css/button.css */
+.btn.btn-primary {
+  border-color: #162951;
+  background-color: #162951;
+  color: white;
+}
+
+.btn.btn-primary:hover {
+  border-color: #162951;
+  background-color: #162951;
+  color: white;
+}
+
+.th-dark .btn.btn-primary:hover {
+  border-color: #1d4ed8;
+  background-color: #1d4ed8;
+}
+
+.btn.btn-primary:active,
+.btn.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  border-color: #162951;
+  background-color: #162951;
 }

@@ -1,6 +1,6 @@
 .root {
-  background-color: var(--bg-sidebar-nav-color);
-  border-color: var(--border-sidebar-color);
+  background-color: var(--color-primary-dark-blue);
+  border-color: var(--color-primary-dark-blue);
 }
 
 .closeBtn {

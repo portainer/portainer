@@ -89,7 +89,7 @@ export function EnvironmentBrowseButtons({
           data-cy={`disconnect-link-${environment.Name}`}
           icon={WifiOff}
           onClick={onClickDisconnect}
-          className="!m-0 w-full !py-0 opacity-60"
+          className="!m-0 w-full !py-0 opacity-80"
           size="medium"
           color="primary"
         >

@@ -1,3 +1,7 @@
+.color-primary-dark-blue {
+  color: var(--color-primary-dark-blue);
+}
+
 .lucide {
   display: block;
   height: 1em;
@@ -99,6 +103,7 @@ pr-icon {
   justify-content: center;
   align-items: center;
   padding: 1.5%;
+  @apply color-primary-dark-blue;
 }
 
 .icon-nested-blue {

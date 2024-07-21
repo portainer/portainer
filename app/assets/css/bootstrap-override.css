@@ -76,8 +76,8 @@
 }
 
 .switch input[type='checkbox']:disabled:is(:checked) + .slider {
-  @apply th-dark:!bg-blue-8 th-dark:!opacity-60;
-  @apply th-highcontrast:!bg-blue-8 th-highcontrast:!opacity-60;
+  /* @apply th-dark: !bg-blue-8 th-dark: !opacity-60;
+  @apply th-highcontrast: !bg-blue-8 th-highcontrast: !opacity-60; */
 }
 
 .switch-values {
@@ -111,7 +111,7 @@
 }
 
 input:checked + .slider:hover {
-  background-color: var(--ui-blue-9);
+  background-color: var(--color-primary-dark-blue);
   @apply th-dark:bg-blue-10;
   @apply th-highcontrast:bg-blue-10;
 }
@@ -129,7 +129,7 @@ input:checked + .slider:hover {
 }
 
 input:checked + .slider {
-  background-color: var(--ui-blue-8);
+  background-color: var(--color-primary-dark-blue);
   @apply th-dark:bg-blue-9;
   @apply th-highcontrast:bg-blue-9;
 }
@@ -201,11 +201,18 @@ input:checked + .slider:before {
 }
 
 /* Widget */
+.bg-primary-dark-blue {
+  background-color: var(--grey-8);
+}
+
+.color-primary-dark-blue {
+  color: var(--color-primary-dark-blue);
+}
 
 .widget .widget-icon {
   @apply mr-1 !p-2 text-lg;
-  @apply bg-blue-3 text-blue-8;
   @apply th-dark:bg-gray-9 th-dark:text-blue-3;
+  @apply bg-blue-3 color-primary-dark-blue;
 
   border-radius: 50%;
   display: inline-flex;
@@ -245,9 +252,11 @@ input:checked + .slider:before {
 .toast-success .toast-progress {
   background-color: var(--ui-success-7);
 }
+
 .toast-warning .toast-progress {
   background-color: var(--ui-warning-6);
 }
+
 .toast-error .toast-progress {
   background-color: var(--ui-error-8);
 }

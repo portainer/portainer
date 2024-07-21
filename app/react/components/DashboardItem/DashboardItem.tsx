@@ -63,7 +63,7 @@ export function DashboardItem({
         <div
           className={clsx(
             'icon-badge mr-4 !p-2 text-2xl',
-            'bg-blue-3 text-blue-8',
+            'bg-blue-3',
             'th-dark:bg-blue-3 th-dark:text-blue-8',
             'th-highcontrast:bg-blue-3 th-highcontrast:text-blue-8'
           )}

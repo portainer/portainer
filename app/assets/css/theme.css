@@ -101,7 +101,11 @@
   --bg-main-color: var(--white-color);
   --bg-body-color: var(--grey-9);
   --bg-checkbox-border-color: var(--grey-49);
-  --bg-sidebar-color: var(--ui-blue-10);
+  --bg-sidebar-color: #162951;
+  --color-primary-dark-blue: #162951;
+  --color-primary-blue: #194299;
+  --color-primary-yellow: #e4aa24;
+  --color-primary-yellow-light: #ffd063;
   --bg-sidebar-nav-color: var(--ui-blue-11);
   --bg-widget-color: var(--white-color);
   --bg-widget-header-color: var(--grey-10);
@@ -109,7 +113,7 @@
   --bg-header-color: var(--white-color);
   --bg-hover-table-color: var(--grey-14);
   --bg-input-group-addon-color: var(--ui-gray-3);
-  --bg-btn-default-color: var(--ui-blue-10);
+  --bg-btn-default-color: var(--ui-primary-dark-blue-web);
   --bg-blocklist-hover-color: var(--ui-blue-2);
   --bg-table-color: var(--white-color);
   --bg-md-checkbox-color: var(--grey-12);
@@ -424,6 +428,10 @@
   --bg-button-group: var(--white-color);
   --border-button-group: var(--ui-gray-5);
   --text-button-group: var(--ui-gray-9);
+  --color-primary-dark-blue: var(--grey-2);
+  --color-primary-blue: var(--grey-3);
+  --color-primary-yellow: var(--grey-2);
+  --color-primary-yellow-light: var(--grey-2);
 }
 
 /* High Contrast Theme */
@@ -588,4 +596,9 @@
   --bg-button-group: var(--white-color);
   --border-button-group: var(--ui-gray-5);
   --text-button-group: var(--ui-gray-9);
+  --ui-primary-dark-blue-web: #162951;
+  --color-primary-dark-blue: var(--grey-2);
+  --color-primary-blue: var(--grey-3);
+  --color-primary-yellow: var(--grey-2);
+  --color-primary-yellow-light: var(--grey-2);
 }

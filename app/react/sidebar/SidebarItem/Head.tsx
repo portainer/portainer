@@ -42,7 +42,7 @@ export function Head({
       onClick={anchorProps.onClick}
       className={clsx(
         anchorProps.className,
-        'text-inherit no-underline hover:text-inherit hover:no-underline focus:text-inherit focus:no-underline',
+        'no-underline hover:text-yellow-6 active:text-yellow-6  hover:no-underline focus:text-yellow-6 focus:no-underline',
         'flex h-8 w-full flex-1 items-center space-x-4 rounded-md text-sm',
         'transition-colors duration-200 hover:bg-blue-9 be:hover:bg-gray-9 th-dark:hover:bg-gray-true-9',
         {

@@ -20,7 +20,7 @@ export type PathOptions = {
 export function useSidebarSrefActive(
   to: string,
   // default values are the classes used in the sidebar for an active item
-  activeClassName: string = 'bg-blue-5/25 be:bg-gray-5/25 th-dark:bg-gray-true-5/25',
+  activeClassName: string = 'text-yellow-6 bg-blue-5/25 be:bg-gray-5/25 th-dark:bg-gray-true-5/25',
   params: Partial<Record<string, string>> = {},
   options: TransitionOptions = {},
   pathOptions: PathOptions = {

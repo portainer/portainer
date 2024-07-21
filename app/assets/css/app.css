@@ -8,6 +8,7 @@
   font-weight: 100 900;
   font-style: normal;
 }
+
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   select {
     font-family: Inter, Arial, Helvetica, sans-serif;
@@ -62,11 +63,13 @@ body,
   border-style: solid;
   border-width: 0 0 0 1em;
 }
+
 .messages {
   max-height: 50px;
   overflow-x: hidden;
   overflow-y: scroll;
 }
+
 .containerNameInput {
   width: 85%;
   border: none;
@@ -383,39 +386,49 @@ input[type='checkbox'] {
     margin-top: 5px;
   }
 }
+
 @media (min-width: 768px) {
   .pull-sm-left {
     float: left !important;
   }
+
   .pull-sm-right {
     float: right !important;
   }
+
   .pull-sm-none {
     float: none !important;
   }
 }
+
 @media (min-width: 992px) {
   .pull-md-left {
     float: left !important;
   }
+
   .pull-md-right {
     float: right !important;
   }
+
   .pull-md-none {
     float: none !important;
   }
 }
+
 @media (min-width: 1200px) {
   .pull-lg-left {
     float: left !important;
   }
+
   .pull-lg-right {
     float: right !important;
   }
+
   .pull-lg-none {
     float: none !important;
   }
 }
+
 .pull-none {
   float: none !important;
 }
@@ -607,6 +620,7 @@ input[type='checkbox'] {
 #toast-container > div {
   opacity: 0.9;
 }
+
 /*!toaster override*/
 
 .monospaced {
@@ -618,6 +632,7 @@ input[type='checkbox'] {
 .progress-bar {
   color: var(--text-progress-bar-color);
 }
+
 /* !uib-progressbar override */
 
 .loading-view-area {
@@ -631,9 +646,11 @@ input[type='checkbox'] {
   height: 22px;
   padding: 2px 5px;
   font-size: 12px;
-  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  line-height: 1.5;
+  /* If Placeholder of the input is moved up, rem/modify this. */
   border-radius: 3px;
 }
+
 /* !bootstrap extend */
 
 /* spinkit override */
@@ -649,6 +666,7 @@ input[type='checkbox'] {
 .sk-fold-cube:before {
   background-color: var(--blue-2);
 }
+
 /* !spinkit override */
 
 /* uib-typeahead override */
@@ -656,6 +674,7 @@ input[type='checkbox'] {
   max-height: 300px;
   overflow-y: auto;
 }
+
 /* !uib-typeahead override */
 
 .no-margin {

@@ -104,7 +104,7 @@ function ItemAnchor({
       onClick={onClick}
       className={clsx(
         className,
-        'text-inherit no-underline hover:text-inherit hover:no-underline focus:text-inherit focus:no-underline',
+        'text-inherit no-underline hover:text-yellow-6 hover:no-underline focus:text-yellow-6 focus:no-underline',
         'flex h-8 w-full flex-1 items-center space-x-4 rounded-md text-sm',
         'transition-colors duration-200 hover:bg-blue-5/20 be:hover:bg-gray-5/20 th-dark:hover:bg-gray-true-5/20',
         {

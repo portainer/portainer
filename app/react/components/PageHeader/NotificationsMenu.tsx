@@ -49,7 +49,7 @@ export function NotificationsMenu() {
           className={clsx(
             headerStyles.menuIcon,
             'icon-badge mr-1 !p-2 text-lg',
-            'text-gray-8',
+            '',
             'th-dark:text-gray-warm-7'
           )}
         >

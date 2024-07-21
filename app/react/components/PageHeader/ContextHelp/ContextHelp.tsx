@@ -20,7 +20,7 @@ export function ContextHelp() {
           headerStyles.menuIcon,
           'menu-icon',
           'icon-badge mr-1 !p-2 text-lg',
-          'text-gray-8',
+          '',
           'th-dark:text-gray-warm-7'
         )}
         title="Help"
