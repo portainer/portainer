@@ -145,6 +145,7 @@ code {
 .table > tfoot > tr.active > th {
   background-color: var(--bg-table-selected-color);
 }
+
 .table-hover > tbody > tr > td.active:hover,
 .table-hover > tbody > tr > th.active:hover,
 .table-hover > tbody > tr.active:hover > td,
@@ -398,4 +399,8 @@ input:-webkit-autofill {
 
 .tippy-content {
   padding: 0;
+}
+
+a {
+  color: var(--color-primary-dark-blue);
 }

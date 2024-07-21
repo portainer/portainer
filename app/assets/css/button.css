@@ -94,6 +94,10 @@ fieldset[disabled] .btn {
   @apply th-highcontrast:hover:border-gray-6 th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:text-gray-warm-4;
 }
 
+.color-primary-dark-blue {
+  color: var(--color-primary-dark-blue);
+}
+
 .btn.btn-light:active,
 .btn.btn-light.active,
 .open > .dropdown-toggle.btn-light {
@@ -101,7 +105,7 @@ fieldset[disabled] .btn {
 }
 
 .btn.btn-link {
-  @apply text-blue-8 hover:text-blue-9 disabled:text-gray-5;
+  @apply color-primary-dark-blue hover:text-blue-9 disabled:text-gray-5;
   @apply th-dark:text-blue-8 th-dark:hover:text-blue-7;
   @apply th-highcontrast:text-blue-8 th-highcontrast:hover:text-blue-7;
 }
