@@ -2,7 +2,7 @@ import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import clsx from 'clsx';
 
 import smallLogo from '@/assets/ico/favicon-32x32.png';
-import fullLogo from '@/assets/images/NextZEN-ngang2.png';
+import fullLogo from '@/assets/images/appmanager-ngang-cam-v2.png';
 
 import { Link } from '@@/Link';
 

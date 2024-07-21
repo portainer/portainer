@@ -35,7 +35,7 @@ export function EnvironmentInfo() {
   const isEdgeAgent = isEdgeEnvironment(environment.Type);
 
   const isEnvUrlVisible = !isEdgeAgent;
-
+  // const nameTitleFake = 'App Manager'
   return (
     <Widget>
       <Widget.Title icon={GaugeIcon} title="Environment info" />

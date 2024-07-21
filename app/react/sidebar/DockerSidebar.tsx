@@ -5,7 +5,6 @@ import {
   List,
   Lock,
   Shuffle,
-  Trello,
   Clipboard,
   Edit,
   Network,
@@ -15,14 +14,15 @@ import {
   type Environment,
   type EnvironmentId,
 } from '@/react/portainer/environments/types';
-import { Authorized, useIsEnvironmentAdmin } from '@/react/hooks/useUser';
+// import { Authorized, useIsEnvironmentAdmin } from '@/react/hooks/useUser';
+import { useIsEnvironmentAdmin } from '@/react/hooks/useUser';
 import { useInfo } from '@/react/docker/proxy/queries/useInfo';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
 
 import { SidebarItem } from './SidebarItem';
 import { DashboardLink } from './items/DashboardLink';
 import { VolumesLink } from './items/VolumesLink';
-import { SidebarParent } from './SidebarItem/SidebarParent';
+// import { SidebarParent } from './SidebarItem/SidebarParent';
 
 interface Props {
   environmentId: EnvironmentId;
@@ -46,26 +46,26 @@ export function DockerSidebar({ environmentId, environment }: Props) {
 
   const isSwarmManager = envInfoQuery.data;
 
-  const setupSubMenuProps = isSwarmManager
-    ? {
-        label: 'Swarm',
-        icon: Trello,
-        to: 'docker.swarm',
-        dataCy: 'portainerSidebar-swarm',
-      }
-    : {
-        label: 'Host',
-        icon: Trello,
-        to: 'docker.host',
-        dataCy: 'portainerSidebar-host',
-      };
+  // const setupSubMenuProps = isSwarmManager
+  //   ? {
+  //     label: 'Swarm',
+  //     icon: Trello,
+  //     to: 'docker.swarm',
+  //     dataCy: 'portainerSidebar-swarm',
+  //   }
+  //   : {
+  //     label: 'Host',
+  //     icon: Trello,
+  //     to: 'docker.host',
+  //     dataCy: 'portainerSidebar-host',
+  //   };
 
-  const featSubMenuTo = isSwarmManager
-    ? 'docker.swarm.featuresConfiguration'
-    : 'docker.host.featuresConfiguration';
-  const registrySubMenuTo = isSwarmManager
-    ? 'docker.swarm.registries'
-    : 'docker.host.registries';
+  // const featSubMenuTo = isSwarmManager
+  //   ? 'docker.swarm.featuresConfiguration'
+  //   : 'docker.host.featuresConfiguration';
+  // const registrySubMenuTo = isSwarmManager
+  //   ? 'docker.swarm.registries'
+  //   : 'docker.host.registries';
 
   return (
     <>
@@ -74,7 +74,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         platformPath="docker"
         data-cy="dockerSidebar-dashboard"
       />
-      <SidebarParent
+      {/* <SidebarParent
         icon={Edit}
         label="Templates"
         to="docker.templates"
@@ -97,8 +97,16 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           isSubMenu
           data-cy="dockerSidebar-customTemplates"
         />
-      </SidebarParent>
-
+      </SidebarParent> */}
+      <SidebarItem
+        icon={Edit}
+        label="Application"
+        to="docker.templates"
+        ignorePaths={['docker.templates.custom']}
+        params={{ endpointId: environmentId }}
+        isSubMenu
+        data-cy="portainerSidebar-appTemplates"
+      />
       {areStacksVisible && (
         <SidebarItem
           to="docker.stacks"
@@ -178,7 +186,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           data-cy="dockerSidebar-events"
         />
       )}
-
+      {/* 
       <SidebarParent
         label={setupSubMenuProps.label}
         icon={setupSubMenuProps.icon}
@@ -217,7 +225,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           data-cy="portainerSidebar-docker-registries"
         />
-      </SidebarParent>
+      </SidebarParent> */}
     </>
   );
 }

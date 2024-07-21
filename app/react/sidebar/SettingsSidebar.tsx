@@ -1,4 +1,5 @@
-import { Users, Settings, Radio, Bell } from 'lucide-react';
+// import { Users, Settings, Radio, Bell } from 'lucide-react';
+import { Users, Settings, Bell } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 // import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -95,12 +96,12 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             <EdgeUpdatesSidebarItem />
           </SidebarParent> */}
 
-          <SidebarItem
+          {/* <SidebarItem
             label="Registries"
             to="portainer.registries"
             icon={Radio}
             data-cy="portainerSidebar-registries"
-          />
+          /> */}
 
           {/* {isBE && (
             <SidebarItem

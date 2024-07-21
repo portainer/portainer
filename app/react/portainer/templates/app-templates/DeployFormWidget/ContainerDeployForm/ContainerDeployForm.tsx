@@ -49,6 +49,8 @@ export function ContainerDeployForm({
 
   const initialValues: FormValues = {
     name: template.Name || '',
+    title: template.Title,
+    idApp: template.Id,
     envVars:
       Object.fromEntries(template.Env?.map((env) => [env.name, env.value])) ||
       {},
@@ -59,7 +61,7 @@ export function ContainerDeployForm({
     hostname: '',
     hosts: [],
     labels: [],
-    network: '',
+    network: 'bridge',
     ports: template.Ports.map((p) => ({ ...p, hostPort: p.hostPort || '' })),
     volumes: template.Volumes.map((v) => ({
       containerPath: v.container,
@@ -68,7 +70,6 @@ export function ContainerDeployForm({
       name: v.type === 'bind' ? v.bind || '' : 'auto',
     })),
   };
-
   return (
     <Formik
       initialValues={initialValues}
@@ -81,10 +82,10 @@ export function ContainerDeployForm({
           <FormSection title="Configuration">
             <NameField
               value={values.name}
+              placeholder={values.name}
               onChange={(v) => setFieldValue('name', v)}
               error={errors.name}
             />
-
             <FormControl label="Network" errors={errors?.network}>
               <NetworkSelector
                 value={values.network}

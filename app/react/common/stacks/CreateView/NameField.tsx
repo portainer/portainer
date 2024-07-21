@@ -2,7 +2,7 @@ import { FormikErrors } from 'formik';
 import { SchemaOf, string } from 'yup';
 import { useMemo } from 'react';
 
-import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
+// import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -52,10 +52,7 @@ export function useNameValidation(
               (s) => s.EndpointId !== environmentId || s.Name !== value
             ) ?? true
         )
-        .matches(
-          new RegExp(STACK_NAME_VALIDATION_REGEX),
-          "This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123')."
-        ),
+        .matches(/./, 'nhập tùy ý'),
     [environmentId, stacksQuery.data]
   );
 }

@@ -7,7 +7,7 @@ import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 // this value is taken from https://github.com/portainer/portainer/blob/develop/api/portainer.go#L1628
 const DEFAULT_URL =
-  'https://raw.githubusercontent.com/portainer/templates/v3/templates.json';
+  'https://raw.githubusercontent.com/minhtribtc/NextZen/main/appsv3.json';
 
 export function TemplatesUrlSection() {
   const [{ name }, { error }] = useField<string>('templatesUrl');

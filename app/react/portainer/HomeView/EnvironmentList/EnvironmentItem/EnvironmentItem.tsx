@@ -52,7 +52,7 @@ export function EnvironmentItem({
 
   const tags = useEnvironmentTagNames(environment.TagIds);
   const dashboardRoute = getDashboardRoute(environment);
-
+  const nameTitleFake = 'App Manager';
   return (
     <div className="relative">
       <BlocklistItem
@@ -70,7 +70,7 @@ export function EnvironmentItem({
         </div>
         <div className="ml-3 mr-auto flex flex-col items-start justify-center gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="font-bold">{environment.Name}</span>
+            <span className="font-bold">{nameTitleFake}</span>
             {isEdge ? (
               <EdgeIndicator environment={environment} showLastCheckInDate />
             ) : (

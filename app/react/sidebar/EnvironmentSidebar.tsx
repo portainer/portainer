@@ -125,7 +125,7 @@ function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
 
   const EnvironmentIcon = getPlatformIcon(environment.Type);
-
+  const nameTitleFake = 'App Manager';
   if (!isOpen) {
     return (
       <div className="-ml-3 flex w-8 justify-center" title={environment.Name}>
@@ -138,7 +138,7 @@ function Title({ environment, onClear }: TitleProps) {
     <div className="flex items-center">
       <EnvironmentIcon className="mr-3 text-2xl" />
       <span className="overflow-hidden text-ellipsis whitespace-nowrap text-white">
-        {environment.Name}
+        {nameTitleFake}
       </span>
 
       <button

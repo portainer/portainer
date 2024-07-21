@@ -6,6 +6,7 @@ import { LabelsTabValues } from '@/react/docker/containers/CreateView/LabelsTab'
 import { EnvVarsValue } from '../EnvVarsFieldset';
 
 export interface FormValues {
+  idApp: number;
   name: string;
   network: string;
   accessControl: AccessControlFormData;
@@ -15,4 +16,5 @@ export interface FormValues {
   labels: LabelsTabValues;
   hostname: string;
   envVars: EnvVarsValue;
+  title: string;
 }

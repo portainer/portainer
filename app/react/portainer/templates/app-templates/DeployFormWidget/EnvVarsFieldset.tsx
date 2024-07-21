@@ -58,6 +58,7 @@ function Item({
       required={!option.preset}
       errors={errors}
       inputId={inputId}
+      tooltip={option.description}
     >
       {option.select ? (
         <Select
@@ -73,6 +74,7 @@ function Item({
         />
       ) : (
         <Input
+          placeholder={option.description}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={option.preset}
