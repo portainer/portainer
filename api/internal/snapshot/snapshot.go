@@ -64,7 +64,7 @@ func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService po
 		}
 
 		for _, e := range endpoints {
-			if !endpointutils.IsEdgeEndpoint(&e) || e.Edge.AsyncMode {
+			if !endpointutils.IsEdgeEndpoint(&e) || e.Edge.AsyncMode || !e.UserTrusted {
 				continue
 			}
 
