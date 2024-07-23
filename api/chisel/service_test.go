@@ -15,9 +15,10 @@ import (
 
 func TestPingAgentPanic(t *testing.T) {
 	endpoint := &portainer.Endpoint{
-		ID:     1,
-		EdgeID: "test-edge-id",
-		Type:   portainer.EdgeAgentOnDockerEnvironment,
+		ID:          1,
+		EdgeID:      "test-edge-id",
+		Type:        portainer.EdgeAgentOnDockerEnvironment,
+		UserTrusted: true,
 	}
 
 	_, store := datastore.MustNewTestStore(t, true, true)
