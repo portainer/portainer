@@ -40,7 +40,7 @@ func (s *Service) Open(endpoint *portainer.Endpoint) error {
 		return ErrAsyncEnv
 	}
 
-	if endpoint.ID == 0 || endpoint.EdgeID == "" {
+	if endpoint.ID == 0 || endpoint.EdgeID == "" || !endpoint.UserTrusted {
 		return ErrInvalidEnv
 	}
 
