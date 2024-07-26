@@ -70,7 +70,8 @@ func (d *stackDeployer) DeployRemoteComposeStack(
 		endpoint,
 		OperationDeploy,
 		unpackerCmdBuilderOptions{
-			registries: registries,
+			forceRecreate: forceRecreate,
+			registries:    registries,
 		},
 	)
 }
@@ -119,10 +120,10 @@ func (d *stackDeployer) DeployRemoteSwarmStack(
 	defer d.swarmStackManager.Logout(endpoint)
 
 	return d.remoteStack(stack, endpoint, OperationSwarmDeploy, unpackerCmdBuilderOptions{
-
-		pullImage:  pullImage,
-		prune:      prune,
-		registries: registries,
+		pullImage:     pullImage,
+		prune:         prune,
+		forceRecreate: stack.AutoUpdate != nil && stack.AutoUpdate.ForceUpdate,
+		registries:    registries,
 	})
 }
 
