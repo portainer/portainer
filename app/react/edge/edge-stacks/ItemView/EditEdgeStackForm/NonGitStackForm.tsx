@@ -186,6 +186,7 @@ function InnerForm({
     setFieldValue,
     isValid,
     errors,
+    setValues,
     setFieldError,
     initialValues,
   } = useFormikContext<FormValues>();
@@ -327,10 +328,14 @@ function InnerForm({
 
           <StaggerFieldset
             values={values.staggerConfig}
-            onChange={(value) =>
-              Object.entries(value).forEach(([key, value]) =>
-                setFieldValue(`staggerConfig.${key}`, value)
-              )
+            onChange={(newStaggerValues) =>
+              setValues((values) => ({
+                ...values,
+                staggerConfig: {
+                  ...values.staggerConfig,
+                  ...newStaggerValues,
+                },
+              }))
             }
             errors={errors.staggerConfig}
           />
