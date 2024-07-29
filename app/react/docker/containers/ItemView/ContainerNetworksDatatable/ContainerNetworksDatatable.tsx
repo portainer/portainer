@@ -6,6 +6,7 @@ import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { ContainerListViewModel } from '../../types';
 
@@ -60,10 +61,12 @@ export function ContainerNetworksDatatable({
           selectedNetworks={networks.map((n) => n.id)}
         />
       }
-      extendTableOptions={withMeta({
-        table: 'container-networks',
-        containerId: container.Id,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'container-networks',
+          containerId: container.Id,
+        })
+      )}
       data-cy="container-networks-datatable"
     />
   );

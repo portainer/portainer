@@ -7,6 +7,7 @@ import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { EdgeJob, JobResult, LogsStatus } from '../../types';
 import { useJobResults } from '../../queries/jobResults/useJobResults';
@@ -68,10 +69,12 @@ export function ResultsDatatable({ jobId }: { jobId: EdgeJob['Id'] }) {
       title="Results"
       titleIcon={List}
       settingsManager={tableState}
-      extendTableOptions={withMeta({
-        table: 'edge-job-results',
-        jobId,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'edge-job-results',
+          jobId,
+        })
+      )}
       data-cy="edge-job-results-datatable"
     />
   );
