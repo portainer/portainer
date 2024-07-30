@@ -38,6 +38,7 @@
         "TenantID": ""
       },
       "ComposeSyntaxMaxVersion": "",
+      "ContainerEngine": "",
       "Edge": {
         "AsyncMode": false,
         "CommandInterval": 0,
