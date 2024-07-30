@@ -2100,3 +2100,8 @@ const (
 	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
 	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
 )
+
+const (
+	ContainerEngineDocker = "docker"
+	ContainerEnginePodman = "podman"
+)
