@@ -373,12 +373,13 @@ func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, pay
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{
-		ID:      portainer.EndpointID(endpointID),
-		Name:    payload.Name,
-		URL:     portainerHost,
-		Type:    portainer.EdgeAgentOnDockerEnvironment,
-		GroupID: portainer.EndpointGroupID(payload.GroupID),
-		Gpus:    payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             portainerHost,
+		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -430,13 +431,14 @@ func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, pay
 
 	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
-		Name:      payload.Name,
-		URL:       payload.URL,
-		Type:      endpointType,
-		GroupID:   portainer.EndpointGroupID(payload.GroupID),
-		PublicURL: payload.PublicURL,
-		Gpus:      payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             payload.URL,
+		Type:            endpointType,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:       payload.PublicURL,
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -492,13 +494,14 @@ func (handler *Handler) createKubernetesEndpoint(tx dataservices.DataStoreTx, pa
 func (handler *Handler) createTLSSecuredEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload, endpointType portainer.EndpointType, agentVersion string) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
-		Name:      payload.Name,
-		URL:       payload.URL,
-		Type:      endpointType,
-		GroupID:   portainer.EndpointGroupID(payload.GroupID),
-		PublicURL: payload.PublicURL,
-		Gpus:      payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             payload.URL,
+		Type:            endpointType,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:       payload.PublicURL,
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.TLS,
 			TLSSkipVerify: payload.TLSSkipVerify,
