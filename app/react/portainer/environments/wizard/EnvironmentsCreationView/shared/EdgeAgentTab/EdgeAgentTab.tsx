@@ -1,7 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { useReducer, useState } from 'react';
 
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { CommandTab } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { OS, EdgeInfo } from '@/react/edge/components/EdgeScriptForm/types';
@@ -15,9 +18,15 @@ interface Props {
   onCreate: (environment: Environment) => void;
   commands: CommandTab[] | Partial<Record<OS, CommandTab[]>>;
   asyncMode?: boolean;
+  containerEngine?: ContainerEngine;
 }
 
-export function EdgeAgentTab({ onCreate, commands, asyncMode = false }: Props) {
+export function EdgeAgentTab({
+  onCreate,
+  commands,
+  asyncMode = false,
+  containerEngine = 'docker',
+}: Props) {
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
@@ -28,6 +37,7 @@ export function EdgeAgentTab({ onCreate, commands, asyncMode = false }: Props) {
         readonly={!!edgeInfo}
         key={formKey}
         asyncMode={asyncMode}
+        containerEngine={containerEngine}
       />
 
       {edgeInfo && (

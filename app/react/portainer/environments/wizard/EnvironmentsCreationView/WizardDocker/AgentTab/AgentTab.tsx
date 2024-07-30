@@ -15,7 +15,7 @@ export function AgentTab({ onCreate, isDockerStandalone }: Props) {
       <DeploymentScripts isDockerStandalone={isDockerStandalone} />
 
       <div className="mt-5">
-        <AgentForm onCreate={onCreate} />
+        <AgentForm onCreate={onCreate} containerEngine="docker" />
       </div>
     </>
   );

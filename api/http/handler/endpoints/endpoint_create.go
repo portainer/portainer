@@ -40,6 +40,7 @@ type endpointCreatePayload struct {
 	AzureAuthenticationKey string
 	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
+	ContainerEngine        string
 }
 
 type endpointCreationEnum int
@@ -65,6 +66,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		return errors.New("invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
+	payload.ContainerEngine, _ = request.RetrieveMultiPartFormValue(r, "ContainerEngine", true)
 
 	groupID, _ := request.RetrieveNumericMultiPartFormValue(r, "GroupID", true)
 	if groupID == 0 {
@@ -416,7 +418,11 @@ func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, pay
 	endpointType := portainer.DockerEnvironment
 
 	if payload.URL == "" {
-		payload.URL = "unix:///var/run/docker.sock"
+		if payload.ContainerEngine == "podman" {
+			payload.URL = "unix:///var/run/podman/podman.sock"
+		} else {
+			payload.URL = "unix:///var/run/docker.sock"
+		}
 		if runtime.GOOS == "windows" {
 			payload.URL = "npipe:////./pipe/docker_engine"
 		}

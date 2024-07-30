@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, Network, Plug2 } from 'lucide-react';
+import { Zap, Plug2 } from 'lucide-react';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
@@ -15,12 +15,10 @@ import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
 
 import { AgentTab } from './AgentTab';
-import { APITab } from './APITab';
 import { SocketTab } from './SocketTab';
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
-  isDockerStandalone?: boolean;
 }
 
 const options: BoxSelectorOption<
@@ -32,13 +30,6 @@ const options: BoxSelectorOption<
     label: 'Agent',
     description: '',
     value: 'agent',
-  },
-  {
-    id: 'api',
-    icon: <BadgeIcon icon={Network} size="3xl" />,
-    label: 'API',
-    description: '',
-    value: 'api',
   },
   {
     id: 'socket',
@@ -63,9 +54,9 @@ const options: BoxSelectorOption<
   },
 ]);
 
-const containerEngine = 'docker';
+const containerEngine = 'podman';
 
-export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
+export function WizardPodman({ onCreate }: Props) {
   const [creationType, setCreationType] = useState(options[0].value);
 
   const tab = getTab(creationType);
@@ -78,7 +69,6 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
         value={creationType}
         radioName="creation-type"
       />
-
       {tab}
     </div>
   );
@@ -95,36 +85,24 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
       case 'agent':
         return (
           <AgentTab
-            onCreate={(environment) => onCreate(environment, 'dockerAgent')}
-            isDockerStandalone={isDockerStandalone}
-          />
-        );
-      case 'api':
-        return (
-          <APITab
-            onCreate={(environment) => onCreate(environment, 'dockerApi')}
+            onCreate={(environment) => onCreate(environment, 'podmanAgent')}
           />
         );
       case 'socket':
         return (
           <SocketTab
-            onCreate={(environment) => onCreate(environment, 'localEndpoint')}
+            onCreate={(environment) =>
+              onCreate(environment, 'podmanLocalEnvironment')
+            }
           />
         );
       case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
             onCreate={(environment) =>
-              onCreate(environment, 'dockerEdgeAgentStandard')
+              onCreate(environment, 'podmanEdgeAgentStandard')
             }
-            commands={{
-              linux: isDockerStandalone
-                ? [commandsTabs.standaloneLinux]
-                : [commandsTabs.swarmLinux],
-              win: isDockerStandalone
-                ? [commandsTabs.standaloneWindow]
-                : [commandsTabs.swarmWindows],
-            }}
+            commands={[commandsTabs.podmanLinux]}
             containerEngine={containerEngine}
           />
         );
@@ -133,16 +111,9 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
           <EdgeAgentTab
             asyncMode
             onCreate={(environment) =>
-              onCreate(environment, 'dockerEdgeAgentAsync')
+              onCreate(environment, 'podmanEdgeAgentAsync')
             }
-            commands={{
-              linux: isDockerStandalone
-                ? [commandsTabs.standaloneLinux]
-                : [commandsTabs.swarmLinux],
-              win: isDockerStandalone
-                ? [commandsTabs.standaloneWindow]
-                : [commandsTabs.swarmWindows],
-            }}
+            commands={[commandsTabs.podmanLinux]}
             containerEngine={containerEngine}
           />
         );

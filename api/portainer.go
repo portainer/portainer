@@ -1621,7 +1621,12 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{}
+const (
+	FeaturePodman = "podman"
+)
+
+// List of supported features
+var SupportedFeatureFlags = []featureflags.Feature{FeaturePodman}
 
 const (
 	_ AuthenticationMethod = iota
@@ -1707,7 +1712,7 @@ const (
 
 const (
 	_ EndpointType = iota
-	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint)
+	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint) via the Docker API or Socket
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Docker environment(endpoint)
 	AgentOnDockerEnvironment

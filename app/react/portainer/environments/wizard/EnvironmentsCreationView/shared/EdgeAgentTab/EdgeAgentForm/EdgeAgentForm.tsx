@@ -1,7 +1,10 @@
 import { Formik, Form } from 'formik';
 import { Plug2 } from 'lucide-react';
 
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { useCreateEdgeAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { Settings } from '@/react/portainer/settings/types';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
@@ -26,9 +29,15 @@ interface Props {
   onCreate(environment: Environment): void;
   readonly: boolean;
   asyncMode: boolean;
+  containerEngine: ContainerEngine;
 }
 
-export function EdgeAgentForm({ onCreate, readonly, asyncMode }: Props) {
+export function EdgeAgentForm({
+  onCreate,
+  readonly,
+  asyncMode,
+  containerEngine,
+}: Props) {
   const settingsQuery = useSettings();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
@@ -100,6 +109,7 @@ export function EdgeAgentForm({ onCreate, readonly, asyncMode }: Props) {
           ...values.edge,
           asyncMode,
         },
+        containerEngine,
       },
       {
         onSuccess(environment) {

@@ -35,6 +35,11 @@ export const commandsTabs: Record<string, CommandTab> = {
     label: 'Docker Standalone',
     command: buildLinuxStandaloneCommand,
   },
+  podmanLinux: {
+    id: 'podman',
+    label: 'Podman',
+    command: buildLinuxPodmanCommand,
+  },
   swarmWindows: {
     id: 'swarm',
     label: 'Docker Swarm',
@@ -77,6 +82,43 @@ docker run -d \\
   -v /:/host \\
   -v portainer_agent_data:/data \\
   --restart always \\
+  ${env} \\
+  --name portainer_edge_agent \\
+  portainer/agent:${agentVersion}
+  `;
+}
+
+function buildLinuxPodmanCommand(
+  agentVersion: string,
+  edgeKey: string,
+  properties: ScriptFormValues,
+  useAsyncMode: boolean,
+  edgeId?: string,
+  agentSecret?: string
+) {
+  const { allowSelfSignedCertificates, edgeIdGenerator, envVars } = properties;
+
+  const env = buildDockerEnvVars(envVars, [
+    ...buildDefaultDockerEnvVars(
+      edgeKey,
+      allowSelfSignedCertificates,
+      !edgeIdGenerator ? edgeId : undefined,
+      agentSecret,
+      useAsyncMode
+    ),
+    ...metaEnvVars(properties),
+  ]);
+
+  return `${
+    edgeIdGenerator ? `PORTAINER_EDGE_ID=$(${edgeIdGenerator}) \n\n` : ''
+  }\
+podman run -d \\
+  -v /run/podman/podman.sock:/var/run/docker.sock:Z \\
+  -v /var/lib/containers/storage/volumes:/var/lib/docker/volumes \\
+  -v /:/host \\
+  -v portainer_agent_data:/data \\
+  --restart always \\
+  --privileged \\
   ${env} \\
   --name portainer_edge_agent \\
   portainer/agent:${agentVersion}
