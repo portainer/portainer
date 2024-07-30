@@ -4,6 +4,7 @@ import filesize from 'filesize';
 import { Cloud } from 'lucide-react';
 
 import Kube from '@/assets/ico/kube.svg?c';
+import PodmanIcon from '@/assets/ico/vendor/podman-icon.svg?c';
 import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
 import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
 import { EnvironmentType } from '@/react/portainer/environments/types';
@@ -105,7 +106,7 @@ export function endpointTypeName(type) {
   return '';
 }
 
-export function environmentTypeIcon(type) {
+export function environmentTypeIcon(type, containerEngine) {
   switch (type) {
     case EnvironmentType.Azure:
       return MicrosoftIcon;
@@ -117,6 +118,9 @@ export function environmentTypeIcon(type) {
       return Kube;
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.Docker:
+      if (containerEngine === 'podman') {
+        return PodmanIcon;
+      }
       return DockerIcon;
     default:
       throw new Error(`type ${type}-${EnvironmentType[type]} is not supported`);

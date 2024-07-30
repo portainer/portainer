@@ -53,7 +53,10 @@ export function WizardEndpointsList({ environmentIds }: Props) {
           <div className={styles.wizardListWrapper} key={environment.Id}>
             <div className={styles.wizardListImage}>
               <Icon
-                icon={environmentTypeIcon(environment.Type)}
+                icon={environmentTypeIcon(
+                  environment.Type,
+                  environment.ContainerEngine
+                )}
                 className="mr-1"
               />
             </div>
