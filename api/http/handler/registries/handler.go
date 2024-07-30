@@ -3,6 +3,7 @@ package registries
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -83,29 +84,60 @@ func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Re
 	return hasSameUrl && hasSameCredentials && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
 }
 
-func (handler *Handler) userHasRegistryAccess(r *http.Request) (hasAccess bool, isAdmin bool, err error) {
+// this function validates that
+//
+// 1. user has the appropriate authorizations to perform the request
+//
+// 2. user has a direct or indirect access to the registry
+func (handler *Handler) userHasRegistryAccess(r *http.Request, registry *portainer.Registry) (hasAccess bool, isAdmin bool, err error) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return false, false, err
-	}
+	// user, err := security.RetrieveUserFromRequest(r, handler.DataStore)
+	// if err != nil {
+	// 	return false, false, err
+	// }
 
+	// Portainer admins always have access to everything
 	if securityContext.IsAdmin {
 		return true, true, nil
 	}
 
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	// mandatory query param that should become a path param
+	endpointIdStr, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return false, false, err
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpointId := portainer.EndpointID(endpointIdStr)
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointId)
 	if err != nil {
 		return false, false, err
 	}
 
-	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
+	// validate that the request is allowed for the user (READ/WRITE authorization on request path)
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); errors.Is(err, security.ErrAuthorizationRequired) {
+		return false, false, nil
+	} else if err != nil {
 		return false, false, err
 	}
 
-	return true, false, nil
+	// standard users need to be granted accesses explicitly
+	if _, ok := registry.RegistryAccesses[endpointId].UserAccessPolicies[securityContext.UserID]; ok {
+		return true, false, nil
+	}
+
+	// or granted access indirectly via their team
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(securityContext.UserID)
+	if err != nil {
+		return false, false, nil
+	}
+	for _, ms := range memberships {
+		if _, ok := registry.RegistryAccesses[endpointId].TeamAccessPolicies[ms.TeamID]; ok {
+			return true, false, nil
+		}
+	}
+
+	// when user has no access via their role, direct grant or indirect grant
+	// then they don't have access to the registry
+	return false, false, nil
 }
