@@ -16,12 +16,13 @@ export const type = columnHelper.accessor('Type', {
   cell: Cell,
 });
 
-function Cell({ getValue }: CellContext<Environment, EnvironmentType>) {
+function Cell({ getValue, row }: CellContext<Environment, EnvironmentType>) {
   const type = getValue();
+  const containerEngine = row.original.ContainerEngine;
 
   return (
     <span className="flex items-center gap-1">
-      <Icon icon={environmentTypeIcon(type)} />
+      <Icon icon={environmentTypeIcon(type, containerEngine)} />
       {getPlatformTypeName(type)}
     </span>
   );

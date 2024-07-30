@@ -127,6 +127,7 @@ export type Environment = {
   Agent: { Version: string };
   Id: EnvironmentId;
   Type: EnvironmentType;
+  ContainerEngine?: ContainerEngine;
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
   DeploymentOptions: DeploymentOptions | null;

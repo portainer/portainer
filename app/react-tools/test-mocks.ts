@@ -69,6 +69,7 @@ export function createMockEnvironment(): Environment {
     TagIds: [],
     GroupId: 1,
     Type: 1,
+    ContainerEngine: 'docker',
     Name: 'environment',
     Status: 1,
     URL: 'url',
