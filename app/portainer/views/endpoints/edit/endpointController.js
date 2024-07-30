@@ -296,8 +296,16 @@ function EndpointController(
   async function initView() {
     return $async(async () => {
       try {
-        const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
-
+        const [endpoint, groups, settings, publicSettings] = await Promise.all([
+          EndpointService.endpoint($transition$.params().id),
+          GroupService.groups(),
+          SettingsService.settings(),
+          SettingsService.publicSettings(),
+        ]);
+        // Feature flag check to conditionally show podman
+        if (publicSettings.Features['podman']) {
+          $scope.state.edgeScriptCommands.linux.push(commandsTabs.podmanLinux);
+        }
         if (isDockerAPIEnvironment(endpoint)) {
           $scope.state.showTLSConfig = true;
         }

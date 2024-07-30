@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Wand2 } from 'lucide-react';
 
 import { useAnalytics } from '@/react/hooks/useAnalytics';
+import { useFeatureFlag } from '@/react/portainer/feature-flags/useFeatureFlag';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
@@ -13,14 +14,20 @@ import { FormSection } from '@@/form-components/FormSection';
 import { EnvironmentSelector } from './EnvironmentSelector';
 import {
   EnvironmentOptionValue,
-  existingEnvironmentTypes,
+  getExistingEnvironmentTypes,
   newEnvironmentTypes,
+  getEnvironmentTypes,
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
+  const { data: isPodmanEnabled } = useFeatureFlag('podman');
+  const existingEnvironmentTypes = getExistingEnvironmentTypes(
+    !!isPodmanEnabled
+  );
+  const environmentTypes = getEnvironmentTypes(!!isPodmanEnabled);
 
   return (
     <>
@@ -65,6 +72,7 @@ export function EnvironmentTypeSelectView() {
                 disabled={types.length === 0}
                 data-cy="start-wizard-button"
                 onClick={() => startWizard()}
+                className="!ml-0"
               >
                 Start Wizard
               </Button>
@@ -79,11 +87,6 @@ export function EnvironmentTypeSelectView() {
     if (types.length === 0) {
       return;
     }
-
-    const environmentTypes = [
-      ...existingEnvironmentTypes,
-      ...newEnvironmentTypes,
-    ];
 
     const steps = _.compact(
       types.map((id) => environmentTypes.find((eType) => eType.id === id))

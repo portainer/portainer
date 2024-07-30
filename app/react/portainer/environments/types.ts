@@ -4,6 +4,9 @@ import { DockerSnapshot } from '@/react/docker/snapshots/types';
 
 export type EnvironmentId = number;
 
+/**
+ * matches portainer.EndpointType in app/portainer.go
+ */
 export enum EnvironmentType {
   // Docker represents an environment(endpoint) connected to a Docker environment(endpoint)
   Docker = 1,
@@ -167,6 +170,8 @@ export enum EnvironmentCreationTypes {
   LocalKubernetesEnvironment,
   KubeConfigEnvironment,
 }
+
+export type ContainerEngine = 'docker' | 'podman';
 
 export enum PlatformType {
   Docker,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, Network, Plug2 } from 'lucide-react';
+import { Zap, Plug2 } from 'lucide-react';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
@@ -10,18 +10,15 @@ import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
-import { Alert } from '@@/Alert';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
 
 import { AgentTab } from './AgentTab';
-import { APITab } from './APITab';
 import { SocketTab } from './SocketTab';
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
-  isDockerStandalone?: boolean;
 }
 
 const options: BoxSelectorOption<
@@ -33,13 +30,6 @@ const options: BoxSelectorOption<
     label: 'Agent',
     description: '',
     value: 'agent',
-  },
-  {
-    id: 'api',
-    icon: <BadgeIcon icon={Network} size="3xl" />,
-    label: 'API',
-    description: '',
-    value: 'api',
   },
   {
     id: 'socket',
@@ -64,33 +54,21 @@ const options: BoxSelectorOption<
   },
 ]);
 
-const containerEngine = 'docker';
+const containerEngine = 'podman';
 
-export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
+export function WizardPodman({ onCreate }: Props) {
   const [creationType, setCreationType] = useState(options[0].value);
 
   const tab = getTab(creationType);
 
   return (
     <div className="form-horizontal">
-      {!isDockerStandalone && (
-        <Alert color="warn" className="col-sm-12 mb-2">
-          <div>
-            Only do this <b>once</b> for your environment, regardless of how
-            many nodes are in the cluster. You do <b>not</b> need to add each
-            node as an individual environment in Portainer. Adding just one node
-            (we recommend the manager node) will allow Portainer to manage the
-            entire cluster.
-          </div>
-        </Alert>
-      )}
       <BoxSelector
         onChange={(v) => setCreationType(v)}
         options={options}
         value={creationType}
         radioName="creation-type"
       />
-
       {tab}
     </div>
   );
@@ -107,36 +85,24 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
       case 'agent':
         return (
           <AgentTab
-            onCreate={(environment) => onCreate(environment, 'dockerAgent')}
-            isDockerStandalone={isDockerStandalone}
-          />
-        );
-      case 'api':
-        return (
-          <APITab
-            onCreate={(environment) => onCreate(environment, 'dockerApi')}
+            onCreate={(environment) => onCreate(environment, 'podmanAgent')}
           />
         );
       case 'socket':
         return (
           <SocketTab
-            onCreate={(environment) => onCreate(environment, 'localEndpoint')}
+            onCreate={(environment) =>
+              onCreate(environment, 'podmanLocalEnvironment')
+            }
           />
         );
       case 'edgeAgentStandard':
         return (
           <EdgeAgentTab
             onCreate={(environment) =>
-              onCreate(environment, 'dockerEdgeAgentStandard')
+              onCreate(environment, 'podmanEdgeAgentStandard')
             }
-            commands={{
-              linux: isDockerStandalone
-                ? [commandsTabs.standaloneLinux]
-                : [commandsTabs.swarmLinux],
-              win: isDockerStandalone
-                ? [commandsTabs.standaloneWindow]
-                : [commandsTabs.swarmWindows],
-            }}
+            commands={[commandsTabs.podmanLinux]}
             containerEngine={containerEngine}
           />
         );
@@ -145,16 +111,9 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
           <EdgeAgentTab
             asyncMode
             onCreate={(environment) =>
-              onCreate(environment, 'dockerEdgeAgentAsync')
+              onCreate(environment, 'podmanEdgeAgentAsync')
             }
-            commands={{
-              linux: isDockerStandalone
-                ? [commandsTabs.standaloneLinux]
-                : [commandsTabs.swarmLinux],
-              win: isDockerStandalone
-                ? [commandsTabs.standaloneWindow]
-                : [commandsTabs.swarmWindows],
-            }}
+            commands={[commandsTabs.podmanLinux]}
             containerEngine={containerEngine}
           />
         );

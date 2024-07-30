@@ -4,7 +4,10 @@ import { Plug2 } from 'lucide-react';
 
 import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -18,6 +21,7 @@ import { useValidation } from './AgentForm.validation';
 interface Props {
   onCreate(environment: Environment): void;
   envDefaultPort?: string;
+  containerEngine?: ContainerEngine;
 }
 
 const initialValues: CreateAgentEnvironmentValues = {
@@ -29,7 +33,11 @@ const initialValues: CreateAgentEnvironmentValues = {
   },
 };
 
-export function AgentForm({ onCreate, envDefaultPort }: Props) {
+export function AgentForm({
+  onCreate,
+  envDefaultPort,
+  containerEngine = 'docker',
+}: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   const mutation = useCreateAgentEnvironmentMutation();
@@ -70,12 +78,15 @@ export function AgentForm({ onCreate, envDefaultPort }: Props) {
   );
 
   function handleSubmit(values: CreateAgentEnvironmentValues) {
-    mutation.mutate(values, {
-      onSuccess(environment) {
-        notifySuccess('Environment created', environment.Name);
-        clearForm();
-        onCreate(environment);
-      },
-    });
+    mutation.mutate(
+      { ...values, containerEngine },
+      {
+        onSuccess(environment) {
+          notifySuccess('Environment created', environment.Name);
+          clearForm();
+          onCreate(environment);
+        },
+      }
+    );
   }
 }
