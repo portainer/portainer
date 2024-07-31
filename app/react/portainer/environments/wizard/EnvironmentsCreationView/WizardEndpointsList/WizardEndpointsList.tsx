@@ -1,15 +1,11 @@
 import { Plug2 } from 'lucide-react';
 
-import {
-  environmentTypeIcon,
-  endpointTypeName,
-  stripProtocol,
-} from '@/portainer/filters/filters';
-import { EnvironmentId } from '@/react/portainer/environments/types';
-import {
+import { endpointTypeName, stripProtocol } from '@/portainer/filters/filters';
+import { getEnvironmentTypeIcon ,
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
 } from '@/react/portainer/environments/utils';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
@@ -53,7 +49,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
           <div className={styles.wizardListWrapper} key={environment.Id}>
             <div className={styles.wizardListImage}>
               <Icon
-                icon={environmentTypeIcon(
+                icon={getEnvironmentTypeIcon(
                   environment.Type,
                   environment.ContainerEngine
                 )}

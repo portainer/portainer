@@ -1,4 +1,4 @@
-import { environmentTypeIcon } from '@/portainer/filters/filters';
+import { getEnvironmentTypeIcon } from '@/react/portainer/environments/utils';
 import dockerEdge from '@/assets/images/edge_endpoint.png';
 import kube from '@/assets/images/kubernetes_endpoint.png';
 import kubeEdge from '@/assets/images/kubernetes_edge_endpoint.png';
@@ -41,7 +41,7 @@ export function EnvironmentIcon({ type, containerEngine }: Props) {
     default:
       return (
         <Icon
-          icon={environmentTypeIcon(type, containerEngine)}
+          icon={getEnvironmentTypeIcon(type, containerEngine)}
           className="blue-icon !h-16 !w-16"
         />
       );
