@@ -130,11 +130,13 @@ func GetNonAdminNamespaces(userID int, endpoint *portainer.Endpoint, clientFacto
 	}
 
 	nonAdminNamespaces := []string{}
+	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+		nonAdminNamespaces = append(nonAdminNamespaces, defaultNamespace)
+	}
+
 	for namespace, accessPolicy := range accessPolicies {
 		if hasUserAccessToNamespace(userID, nil, accessPolicy) {
-			if !(endpoint.Kubernetes.Configuration.RestrictDefaultNamespace && namespace == "default") {
-				nonAdminNamespaces = append(nonAdminNamespaces, namespace)
-			}
+			nonAdminNamespaces = append(nonAdminNamespaces, namespace)
 		}
 	}
 

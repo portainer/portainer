@@ -9,7 +9,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
-	"github.com/portainer/portainer/api/http/rbacutils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -166,10 +165,15 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			Str("user", user.Username).
 			Msg("Creating a Kubernetes client")
 
-		isKubeAdmin, nonAdminNamespaces, err := rbacutils.IsAdmin(user, endpoint, handler.DataStore, handler.KubernetesClientFactory)
-		if err != nil {
-			httperror.InternalServerError("an error occurred during the kubeClientMiddleware operation, unable to check if user is an admin and retrieve non-admin namespaces. Error: ", err)
-			return
+		isKubeAdmin := true
+		nonAdminNamespaces := []string{}
+		if user.Role != portainer.AdministratorRole {
+			nonAdminNamespaces, err = cli.GetNonAdminNamespaces(int(user.ID), endpoint, handler.KubernetesClientFactory)
+			if err != nil {
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: ", err)
+				return
+			}
+			isKubeAdmin = false
 		}
 
 		bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)

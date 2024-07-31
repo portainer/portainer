@@ -17,33 +17,13 @@ func IsAdmin(user *portainer.User, endpoint *portainer.Endpoint, dataStore datas
 		return false, nil, fmt.Errorf("an error occurred during the IsAdmin operation, user is nil. Unable to check if user is an admin")
 	}
 
-	if len(endpoint.UserAccessPolicies) > 0 {
-		_, ok := endpoint.UserAccessPolicies[user.ID]
-		if ok {
-			nonAdminNamespaces, err := cli.GetNonAdminNamespaces(int(user.ID), endpoint, clientFactory)
-			if err != nil {
-				return false, nil, fmt.Errorf("an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: %v", err)
-			}
-			return false, nonAdminNamespaces, nil
-		}
-	}
-
-	if len(endpoint.TeamAccessPolicies) > 0 {
-		teamMemberships, err := dataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	// use constants
+	if user.Role != 1 {
+		nonAdminNamespaces, err := cli.GetNonAdminNamespaces(int(user.ID), endpoint, clientFactory)
 		if err != nil {
-			return false, nil, fmt.Errorf("an error occurred during the IsAdmin operation, unable to retrieve user team memberships to fetch allowed namespace access. Error: %v", err)
+			return false, nil, fmt.Errorf("an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: %v", err)
 		}
-
-		for _, teamMembership := range teamMemberships {
-			_, ok := endpoint.TeamAccessPolicies[teamMembership.TeamID]
-			if ok {
-				nonAdminNamespaces, err := cli.GetNonAdminNamespaces(int(user.ID), endpoint, clientFactory)
-				if err != nil {
-					return false, nil, fmt.Errorf("an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: %v", err)
-				}
-				return false, nonAdminNamespaces, nil
-			}
-		}
+		return false, nonAdminNamespaces, nil
 	}
 
 	return true, nil, nil
