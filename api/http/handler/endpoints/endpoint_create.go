@@ -68,11 +68,11 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
 
 	payload.ContainerEngine, err = request.RetrieveMultiPartFormValue(r, "ContainerEngine", true)
+	if err != nil || (payload.ContainerEngine != "" && payload.ContainerEngine != portainer.ContainerEngineDocker && payload.ContainerEngine != portainer.ContainerEnginePodman) {
+		return errors.New("invalid container engine value. Value must be one of: 'docker' or 'podman'")
+	}
 	if payload.ContainerEngine == "" {
 		payload.ContainerEngine = portainer.ContainerEngineDocker
-	}
-	if err != nil || (payload.ContainerEngine != portainer.ContainerEngineDocker && payload.ContainerEngine != portainer.ContainerEnginePodman) {
-		return errors.New("invalid container engine value. Value must be one of: 'docker' or 'podman'")
 	}
 
 	groupID, _ := request.RetrieveNumericMultiPartFormValue(r, "GroupID", true)
