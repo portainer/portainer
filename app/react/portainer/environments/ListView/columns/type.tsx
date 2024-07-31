@@ -1,11 +1,13 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { environmentTypeIcon } from '@/portainer/filters/filters';
+import {
+  getEnvironmentTypeIcon,
+  getPlatformTypeName,
+} from '@/react/portainer/environments/utils';
 import {
   Environment,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
-import { getPlatformTypeName } from '@/react/portainer/environments/utils';
 
 import { Icon } from '@@/Icon';
 
@@ -22,7 +24,7 @@ function Cell({ getValue, row }: CellContext<Environment, EnvironmentType>) {
 
   return (
     <span className="flex items-center gap-1">
-      <Icon icon={environmentTypeIcon(type, containerEngine)} />
+      <Icon icon={getEnvironmentTypeIcon(type, containerEngine)} />
       {getPlatformTypeName(type)}
     </span>
   );
