@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { NamespaceViewModel } from '../types';
+import { PortainerNamespace } from '../../types';
 
-export const helper = createColumnHelper<NamespaceViewModel>();
+export const helper = createColumnHelper<PortainerNamespace>();

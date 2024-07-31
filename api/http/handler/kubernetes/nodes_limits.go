@@ -31,7 +31,7 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
@@ -50,7 +50,7 @@ func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r 
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Failed to lookup KubeClient", err)
 	}

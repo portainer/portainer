@@ -67,7 +67,7 @@ func (handler *Handler) deleteKubernetesSecrets(registry *portainer.Registry) {
 				continue
 			}
 
-			cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+			cli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 			if err != nil {
 				// Skip environments that can't get a kubeclient from
 				log.Warn().Err(err).Msgf("Unable to get kubernetes client for environment %d", endpointId)

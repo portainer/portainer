@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -9,13 +9,14 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/http/rbacutils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gorilla/mux"
 )
@@ -49,7 +50,6 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	// endpoints
 	endpointRouter := kubeRouter.PathPrefix("/{id}").Subrouter()
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
-	endpointRouter.Use(kubeOnlyMiddleware)
 	endpointRouter.Use(h.kubeClientMiddleware)
 
 	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.getKubernetesDashboard)).Methods(http.MethodGet)
@@ -67,6 +67,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
+	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
 
@@ -88,55 +89,36 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	return h
 }
 
-func kubeOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
-		endpoint, err := middlewares.FetchEndpoint(request)
-		if err != nil {
-			httperror.InternalServerError(
-				"Unable to find an environment on request context",
-				err,
-			)
-			return
-		}
-
-		if !endpointutils.IsKubernetesEndpoint(endpoint) {
-			errMessage := "environment is not a Kubernetes environment"
-			httperror.BadRequest(
-				errMessage,
-				errors.New(errMessage),
-			)
-			return
-		}
-
-		rw.Header().Set(portainer.PortainerCacheHeader, "true")
-		next.ServeHTTP(rw, request)
-	})
-}
-
 // getProxyKubeClient gets a kubeclient for the user.  It's generally what you want as it retrieves the kubeclient
 // from the Authorization token of the currently logged in user.  The kubeclient that is not from the proxy is actually using
 // admin permissions.  If you're unsure which one to use, use this.
 func (h *Handler) getProxyKubeClient(r *http.Request) (*cli.KubeClient, *httperror.HandlerError) {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return nil, httperror.BadRequest("Invalid environment identifier route variable", err)
+		return nil, httperror.BadRequest(fmt.Sprintf("an error occurred during the getProxyKubeClient operation, the environment identifier route variable is invalid for /api/kubernetes/%d. Error: ", endpointID), err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
+		return nil, httperror.Forbidden(fmt.Sprintf("an error occurred during the getProxyKubeClient operation, permission denied to access the environment /api/kubernetes/%d. Error: ", endpointID), err)
 	}
 
 	cli, ok := h.KubernetesClientFactory.GetProxyKubeClient(strconv.Itoa(endpointID), tokenData.Token)
 	if !ok {
-		return nil, httperror.InternalServerError("Failed to lookup KubeClient", nil)
+		return nil, httperror.InternalServerError("an error occurred during the getProxyKubeClient operation,failed to get proxy KubeClient", nil)
 	}
 
 	return cli, nil
 }
 
+// kubeClientMiddleware is a middleware that will create a kubeclient for the user if it doesn't exist
+// and store it in the factory for future use.
+// if there is a kubeclient against this auth token already, the existing one will be reused.
+// otherwise, generate a new one
 func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(portainer.PortainerCacheHeader, "true")
+
 		if handler.KubernetesClientFactory == nil {
 			next.ServeHTTP(w, r)
 			return
@@ -144,13 +126,13 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 
 		endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 		if err != nil {
-			httperror.WriteError(w, http.StatusBadRequest, "Invalid environment identifier route variable", err)
+			httperror.WriteError(w, http.StatusBadRequest, fmt.Sprintf("an error occurred during the kubeClientMiddleware operation, the environment identifier route variable is invalid for /api/kubernetes/%d. Error: ", endpointID), err)
 			return
 		}
 
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Permission denied to access environment", err)
+			httperror.WriteError(w, http.StatusForbidden, "an error occurred during the kubeClientMiddleware operation, permission denied to access the environment. Error: ", err)
 		}
 
 		// Check if we have a kubeclient against this auth token already, otherwise generate a new one
@@ -163,16 +145,30 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 		if err != nil {
 			if handler.DataStore.IsErrObjectNotFound(err) {
-				httperror.WriteError(
-					w,
-					http.StatusNotFound,
-					"Unable to find an environment with the specified identifier inside the database",
-					err,
-				)
+				httperror.WriteError(w, http.StatusNotFound,
+					"an error occurred during the kubeClientMiddleware operation, unable to find an environment with the specified environment identifier inside the database. Error: ", err)
 				return
 			}
 
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to read the environment from the database", err)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, error reading from the Portainer database. Error: ", err)
+			return
+		}
+
+		user, err := security.RetrieveUserFromRequest(r, handler.DataStore)
+		if err != nil {
+			httperror.InternalServerError("an error occurred during the kubeClientMiddleware operation, unable to retrieve the user from request. Error: ", err)
+			return
+		}
+		log.
+			Debug().
+			Str("context", "kubeClientMiddleware").
+			Str("endpoint", endpoint.Name).
+			Str("user", user.Username).
+			Msg("Creating a Kubernetes client")
+
+		isKubeAdmin, nonAdminNamespaces, err := rbacutils.IsAdmin(user, endpoint, handler.DataStore, handler.KubernetesClientFactory)
+		if err != nil {
+			httperror.InternalServerError("an error occurred during the kubeClientMiddleware operation, unable to check if user is an admin and retrieve non-admin namespaces. Error: ", err)
 			return
 		}
 
@@ -208,7 +204,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			)
 			return
 		}
-		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml))
+		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml), isKubeAdmin, nonAdminNamespaces)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Failed to create client from kubeconfig", err)
 			return

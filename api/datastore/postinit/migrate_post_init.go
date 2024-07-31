@@ -90,7 +90,7 @@ func (migrator *PostInitMigrator) MigrateEnvironment(environment *portainer.Endp
 	switch {
 	case endpointutils.IsKubernetesEndpoint(environment):
 		// get the kubeclient for the environment, and skip all kube migrations if there's an error
-		kubeclient, err := migrator.kubeFactory.GetKubeClient(environment)
+		kubeclient, err := migrator.kubeFactory.GetPrivilegedKubeClient(environment)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error creating kubeclient for environment: %d", environment.ID)
 			return err

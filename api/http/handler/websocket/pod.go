@@ -102,7 +102,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return nil
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
@@ -165,7 +165,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 		return "", false, err
 	}
 
-	kubecli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	kubecli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return "", false, err
 	}

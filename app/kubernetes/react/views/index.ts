@@ -13,12 +13,17 @@ import { ConfigmapsAndSecretsView } from '@/react/kubernetes/configs/ListView/Co
 import { CreateNamespaceView } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceView';
 import { ApplicationDetailsView } from '@/react/kubernetes/applications/DetailsView/ApplicationDetailsView';
 import { ConfigureView } from '@/react/kubernetes/cluster/ConfigureView';
+import { NamespacesView } from '@/react/kubernetes/namespaces/ListView/NamespacesView';
 
 export const viewsModule = angular
   .module('portainer.kubernetes.react.views', [])
   .component(
     'kubernetesCreateNamespaceView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(CreateNamespaceView))), [])
+  )
+  .component(
+    'kubernetesNamespacesView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(NamespacesView))), [])
   )
   .component(
     'kubernetesServicesView',

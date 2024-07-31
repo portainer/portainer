@@ -21,7 +21,7 @@ export function useColumns() {
   return useMemo(
     () =>
       _.compact([
-        helper.accessor('Namespace.Name', {
+        helper.accessor('Name', {
           header: 'Name',
           id: 'Name',
           cell: ({ getValue, row: { original: item } }) => {
@@ -38,7 +38,7 @@ export function useColumns() {
                 >
                   {name}
                 </Link>
-                {item.Namespace.IsSystem && (
+                {item.IsSystem && (
                   <span className="ml-2">
                     <SystemBadge />
                   </span>
@@ -47,14 +47,18 @@ export function useColumns() {
             );
           },
         }),
-        helper.accessor('Namespace.Status', {
+        helper.accessor('Status', {
           header: 'Status',
           cell({ getValue }) {
             const status = getValue();
-            return <StatusBadge color={getColor(status)}>{status}</StatusBadge>;
+            return (
+              <StatusBadge color={getColor(status.phase)}>
+                {status.phase}
+              </StatusBadge>
+            );
 
-            function getColor(status: string) {
-              switch (status.toLowerCase()) {
+            function getColor(status?: string) {
+              switch (status?.toLowerCase()) {
                 case 'active':
                   return 'success';
                 case 'terminating':
@@ -65,7 +69,8 @@ export function useColumns() {
             }
           },
         }),
-        helper.accessor('Quota', {
+        helper.accessor('ResourceQuota', {
+          header: 'Quota',
           cell({ getValue }) {
             const quota = getValue();
 
@@ -76,15 +81,13 @@ export function useColumns() {
             return <Badge type="warn">Enabled</Badge>;
           },
         }),
-        helper.accessor('Namespace.CreationDate', {
+        helper.accessor('CreationDate', {
           header: 'Created',
           cell({ row: { original: item } }) {
             return (
               <>
-                {isoDate(item.Namespace.CreationDate)}{' '}
-                {item.Namespace.ResourcePoolOwner
-                  ? ` by ${item.Namespace.ResourcePoolOwner}`
-                  : ''}
+                {isoDate(item.CreationDate)}{' '}
+                {item.NamespaceOwner ? ` by ${item.NamespaceOwner}` : ''}
               </>
             );
           },

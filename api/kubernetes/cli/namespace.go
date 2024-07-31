@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -17,6 +18,8 @@ import (
 
 const (
 	systemNamespaceLabel = "io.portainer.kubernetes.namespace.system"
+	namespaceOwnerLabel  = "io.portainer.kubernetes.resourcepool.owner"
+	namespaceNameLabel   = "io.portainer.kubernetes.resourcepool.name"
 )
 
 func defaultSystemNamespaces() map[string]struct{} {
@@ -30,17 +33,38 @@ func defaultSystemNamespaces() map[string]struct{} {
 
 // GetNamespaces gets the namespaces in the current k8s environment(endpoint).
 func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, error) {
+	if kcl.isKubeAdmin {
+		return kcl.fetchNamespacesForAdmin()
+	}
+	return kcl.fetchNamespacesForNonAdmin()
+}
+
+// fetchNamespacesForAdmin gets the namespaces in the current k8s environment(endpoint) for the admin user.
+// The kube client must have cluster scope read access to do this.
+func (kcl *KubeClient) fetchNamespacesForAdmin() (map[string]portainer.K8sNamespaceInfo, error) {
 	namespaces, err := kcl.cli.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list namespaces for the admin user: %w", err)
 	}
 
 	results := make(map[string]portainer.K8sNamespaceInfo)
+	for _, namespace := range namespaces.Items {
+		results[namespace.Name] = parseNamespace(&namespace)
+	}
+	return results, nil
+}
 
-	for _, ns := range namespaces.Items {
-		results[ns.Name] = portainer.K8sNamespaceInfo{
-			IsSystem:  isSystemNamespace(ns),
-			IsDefault: ns.Name == defaultNamespace,
+// fetchNamespacesForNonAdmin gets the namespaces in the current k8s environment(endpoint) for the non-admin user.
+func (kcl *KubeClient) fetchNamespacesForNonAdmin() (map[string]portainer.K8sNamespaceInfo, error) {
+	results := make(map[string]portainer.K8sNamespaceInfo)
+	log.Debug().Msgf("Fetching namespaces for non-admin user: %v", kcl.nonAdminNamespaces)
+	if len(kcl.nonAdminNamespaces) > 0 {
+		for _, ns := range kcl.nonAdminNamespaces {
+			namespace, err := kcl.GetNamespace(ns)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get namespace %s for the non-admin user: %w", ns, err)
+			}
+			results[ns] = namespace
 		}
 	}
 
@@ -54,19 +78,27 @@ func (kcl *KubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, er
 		return portainer.K8sNamespaceInfo{}, err
 	}
 
-	result := portainer.K8sNamespaceInfo{
-		IsSystem:  isSystemNamespace(*namespace),
-		IsDefault: namespace.Name == defaultNamespace,
-	}
+	return parseNamespace(namespace), nil
+}
 
-	return result, nil
+// parseNamespace converts a k8s namespace object to a portainer namespace object.
+func parseNamespace(namespace *v1.Namespace) portainer.K8sNamespaceInfo {
+	return portainer.K8sNamespaceInfo{
+		Id:             string(namespace.UID),
+		Name:           namespace.Name,
+		Status:         namespace.Status,
+		CreationDate:   namespace.CreationTimestamp.Format(time.RFC3339),
+		NamespaceOwner: namespace.Labels[namespaceOwnerLabel],
+		IsSystem:       isSystemNamespace(*namespace),
+		IsDefault:      namespace.Name == defaultNamespace,
+	}
 }
 
 // CreateNamespace creates a new ingress in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) error {
 	portainerLabels := map[string]string{
-		"io.portainer.kubernetes.resourcepool.name":  stackutils.SanitizeLabel(info.Name),
-		"io.portainer.kubernetes.resourcepool.owner": stackutils.SanitizeLabel(info.Owner),
+		namespaceNameLabel:  stackutils.SanitizeLabel(info.Name),
+		namespaceOwnerLabel: stackutils.SanitizeLabel(info.Owner),
 	}
 
 	var ns v1.Namespace

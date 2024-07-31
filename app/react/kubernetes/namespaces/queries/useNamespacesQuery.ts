@@ -5,33 +5,22 @@ import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { Namespaces } from '../types';
-import { getSelfSubjectAccessReview } from '../getSelfSubjectAccessReview';
+
+import { queryKeys } from './queryKeys';
 
 export function useNamespacesQuery(
   environmentId: EnvironmentId,
-  options?: { autoRefreshRate?: number }
+  options?: { autoRefreshRate?: number; withResourceQuota?: boolean }
 ) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'namespaces'],
+    queryKeys.list(environmentId, {
+      withResourceQuota: !!options?.withResourceQuota,
+    }),
     async () => {
-      const namespaces = await getNamespaces(environmentId);
-      const namespaceNames = Object.keys(namespaces);
-      // use selfsubjectaccess reviews to avoid forbidden requests
-      const allNamespaceAccessReviews = await Promise.all(
-        namespaceNames.map((namespaceName) =>
-          getSelfSubjectAccessReview(environmentId, namespaceName)
-        )
+      return await getNamespaces(
+        environmentId,
+        options?.withResourceQuota
       );
-      const allowedNamespacesNames = allNamespaceAccessReviews
-        .filter((accessReview) => accessReview.status.allowed)
-        .map((accessReview) => accessReview.spec.resourceAttributes.namespace);
-      const allowedNamespaces = namespaceNames.reduce((acc, namespaceName) => {
-        if (allowedNamespacesNames.includes(namespaceName)) {
-          acc[namespaceName] = namespaces[namespaceName];
-        }
-        return acc;
-      }, {} as Namespaces);
-      return allowedNamespaces;
     },
     {
       ...withError('Unable to get namespaces.'),
@@ -43,10 +32,15 @@ export function useNamespacesQuery(
 }
 
 // getNamespaces is used to retrieve namespaces using the Portainer backend with caching
-async function getNamespaces(environmentId: EnvironmentId) {
+export async function getNamespaces(
+  environmentId: EnvironmentId,
+  withResourceQuota?: boolean
+) {
+  const params = withResourceQuota ? { withResourceQuota } : {};
   try {
     const { data: namespaces } = await axios.get<Namespaces>(
-      `kubernetes/${environmentId}/namespaces`
+      `kubernetes/${environmentId}/namespaces`,
+      { params }
     );
     return namespaces;
   } catch (e) {

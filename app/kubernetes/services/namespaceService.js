@@ -3,8 +3,7 @@ import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
-import $allSettled from 'Portainer/services/allSettled';
-import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
+import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery.ts';
 
 class KubernetesNamespaceService {
   /* @ngInject */
@@ -68,17 +67,16 @@ class KubernetesNamespaceService {
     try {
       // get the list of all namespaces (RBAC allows users to see the list of namespaces)
       const data = await this.KubernetesNamespaces().get().$promise;
-      // get the status of each namespace with accessReviews (to avoid failed forbidden responses, which aren't cached)
-      const accessReviews = await Promise.all(data.items.map((namespace) => getSelfSubjectAccessReview(this.$state.params.endpointId, namespace.metadata.name)));
-      const allowedNamespaceNames = accessReviews.filter((ar) => ar.status.allowed).map((ar) => ar.spec.resourceAttributes.namespace);
-      const promises = allowedNamespaceNames.map((name) => this.KubernetesNamespaces().status({ id: name }).$promise);
-      const namespaces = await $allSettled(promises);
-      // only return namespaces if the user has access to namespaces
-      const allNamespaces = namespaces.fulfilled.map((item) => {
-        return KubernetesNamespaceConverter.apiToNamespace(item);
-      });
-      updateNamespaces(allNamespaces);
-      return allNamespaces;
+      // get the list of all namespaces with isAccessAllowed flags
+      const namespacesWithAccess = await getNamespaces(this.$state.params.endpointId);
+      const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
+      const namespaces = data.items.filter(
+        (item) => (!KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces)
+      );
+      // parse the namespaces
+      const visibleNamespaces = namespaces.map((item) => KubernetesNamespaceConverter.apiToNamespace(item));
+      updateNamespaces(visibleNamespaces);
+      return visibleNamespaces;
     } catch (err) {
       throw new PortainerError('Unable to retrieve namespaces', err);
     }
