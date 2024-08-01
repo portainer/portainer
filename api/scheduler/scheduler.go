@@ -84,6 +84,7 @@ func (s *Scheduler) StopJob(jobID string) error {
 	s.mu.Lock()
 	if cancel, ok := s.activeJobs[entryID]; ok {
 		cancel()
+		delete(s.activeJobs, entryID)
 	}
 	s.mu.Unlock()
 
