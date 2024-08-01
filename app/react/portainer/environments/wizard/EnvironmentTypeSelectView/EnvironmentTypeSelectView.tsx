@@ -5,6 +5,7 @@ import { Wand2 } from 'lucide-react';
 
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { useFeatureFlag } from '@/react/portainer/feature-flags/useFeatureFlag';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
@@ -23,7 +24,7 @@ export function EnvironmentTypeSelectView() {
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
-  const { data: isPodmanEnabled } = useFeatureFlag('podman');
+  const { data: isPodmanEnabled } = useFeatureFlag(FeatureId.PODMAN);
   const existingEnvironmentTypes = getExistingEnvironmentTypes(
     !!isPodmanEnabled
   );

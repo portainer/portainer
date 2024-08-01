@@ -373,7 +373,7 @@ type (
 		Name string `json:"Name" example:"my-environment"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
 		Type EndpointType `json:"Type" example:"1"`
-		// ContainerEngine represents the container engine type. 'docker' or 'podman' are valid values.
+		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environmentes, otherwise '' for kubernetes environments.
 		ContainerEngine string `json:"ContainerEngine" example:"docker"`
 		// URL or IP address of the Docker host associated to this environment(endpoint)
 		URL string `json:"URL" example:"docker.mydomain.tld:2375"`

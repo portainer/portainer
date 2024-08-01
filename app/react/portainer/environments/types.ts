@@ -178,4 +178,5 @@ export enum PlatformType {
   Docker,
   Kubernetes,
   Azure,
+  Podman,
 }

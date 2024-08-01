@@ -6,6 +6,7 @@ import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmDestructive } from '@@/modals/confirm';
 import { isEdgeEnvironment, isDockerAPIEnvironment } from '@/react/portainer/environments/utils';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { confirmDisassociate } from '@/react/portainer/environments/ItemView/ConfirmDisassociateModel';
@@ -303,7 +304,7 @@ function EndpointController(
           SettingsService.publicSettings(),
         ]);
         // Feature flag check to conditionally show podman
-        if (publicSettings.Features['podman']) {
+        if (publicSettings.Features[FeatureId.PODMAN]) {
           $scope.state.edgeScriptCommands.linux.push(commandsTabs.podmanLinux);
         }
         if (isDockerAPIEnvironment(endpoint)) {

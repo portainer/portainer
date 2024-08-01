@@ -12,7 +12,10 @@ import {
   PlatformType,
 } from '../types';
 
-export function getPlatformType(envType: EnvironmentType) {
+export function getPlatformType(
+  envType: EnvironmentType,
+  containerEngine?: ContainerEngine
+) {
   switch (envType) {
     case EnvironmentType.KubernetesLocal:
     case EnvironmentType.AgentOnKubernetes:
@@ -21,6 +24,9 @@ export function getPlatformType(envType: EnvironmentType) {
     case EnvironmentType.Docker:
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.EdgeAgentOnDocker:
+      if (containerEngine === 'podman') {
+        return PlatformType.Podman;
+      }
       return PlatformType.Docker;
     case EnvironmentType.Azure:
       return PlatformType.Azure;
@@ -37,8 +43,11 @@ export function isKubernetesEnvironment(envType: EnvironmentType) {
   return getPlatformType(envType) === PlatformType.Kubernetes;
 }
 
-export function getPlatformTypeName(envType: EnvironmentType): string {
-  return PlatformType[getPlatformType(envType)];
+export function getPlatformTypeName(
+  envType: EnvironmentType,
+  containerEngine?: ContainerEngine
+): string {
+  return PlatformType[getPlatformType(envType, containerEngine)];
 }
 
 export function isAgentEnvironment(envType: EnvironmentType) {

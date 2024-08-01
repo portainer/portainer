@@ -85,6 +85,7 @@ function Content({ environment, onClear }: ContentProps) {
     } = {
       [PlatformType.Azure]: AzureSidebar,
       [PlatformType.Docker]: DockerSidebar,
+      [PlatformType.Podman]: DockerSidebar, // same as docker for now, until pod management is added
       [PlatformType.Kubernetes]: KubernetesSidebar,
     };
 

@@ -4,28 +4,38 @@ import {
   getEnvironmentTypeIcon,
   getPlatformTypeName,
 } from '@/react/portainer/environments/utils';
-import {
-  Environment,
-  EnvironmentType,
-} from '@/react/portainer/environments/types';
 
 import { Icon } from '@@/Icon';
 
+import { EnvironmentListItem } from '../types';
+import { EnvironmentType, ContainerEngine } from '../../types';
+
 import { columnHelper } from './helper';
 
-export const type = columnHelper.accessor('Type', {
-  header: 'Type',
-  cell: Cell,
-});
+type TypeCellContext = {
+  type: EnvironmentType;
+  containerEngine?: ContainerEngine;
+};
 
-function Cell({ getValue, row }: CellContext<Environment, EnvironmentType>) {
-  const type = getValue();
-  const containerEngine = row.original.ContainerEngine;
+export const type = columnHelper.accessor(
+  (rowItem): TypeCellContext => ({
+    type: rowItem.Type,
+    containerEngine: rowItem.ContainerEngine,
+  }),
+  {
+    header: 'Type',
+    cell: Cell,
+    id: 'Type',
+  }
+);
+
+function Cell({ getValue }: CellContext<EnvironmentListItem, TypeCellContext>) {
+  const { type, containerEngine } = getValue();
 
   return (
     <span className="flex items-center gap-1">
       <Icon icon={getEnvironmentTypeIcon(type, containerEngine)} />
-      {getPlatformTypeName(type)}
+      {getPlatformTypeName(type, containerEngine)}
     </span>
   );
 }

@@ -280,13 +280,27 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
     return value.toString().toLowerCase().includes(filterValueLower);
   }
 
+  if (typeof value === 'object') {
+    return Object.values(value).some((item) => filterPrimitive(item));
+  }
+
   if (Array.isArray(value)) {
-    return value.some((item) =>
-      item.toString().toLowerCase().includes(filterValueLower)
-    );
+    return value.some((item) => filterPrimitive(item));
   }
 
   return false;
+
+  // only filter primitive values within objects and arrays, to avoid searching nested objects
+  function filterPrimitive(value: unknown): boolean {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return value.toString().toLowerCase().includes(filterValueLower);
+    }
+    return false;
+  }
 }
 
 function getColumnCanGlobalFilter<D>(column: Column<D, unknown>): boolean {
