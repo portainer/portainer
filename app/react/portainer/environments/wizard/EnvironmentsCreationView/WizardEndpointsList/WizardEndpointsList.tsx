@@ -1,7 +1,8 @@
 import { Plug2 } from 'lucide-react';
 
 import { endpointTypeName, stripProtocol } from '@/portainer/filters/filters';
-import { getEnvironmentTypeIcon ,
+import {
+  getEnvironmentTypeIcon,
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
 } from '@/react/portainer/environments/utils';

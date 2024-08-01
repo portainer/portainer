@@ -265,6 +265,12 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
         EnvironmentType.AgentOnDocker,
         EnvironmentType.EdgeAgentOnDocker,
       ],
+      // for podman keep the env type as docker (the containerEngine distinguishes podman from docker)
+      [PlatformType.Podman]: [
+        EnvironmentType.Docker,
+        EnvironmentType.AgentOnDocker,
+        EnvironmentType.EdgeAgentOnDocker,
+      ],
       [PlatformType.Azure]: [EnvironmentType.Azure],
       [PlatformType.Kubernetes]: [
         EnvironmentType.KubernetesLocal,

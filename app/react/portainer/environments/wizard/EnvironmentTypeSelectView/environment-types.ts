@@ -1,3 +1,5 @@
+import { compact } from 'lodash';
+
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Podman from '@/assets/ico/vendor/podman.svg?c';
@@ -25,7 +27,7 @@ export interface EnvironmentOption
 export function getExistingEnvironmentTypes(
   isPodmanEnabled: boolean
 ): EnvironmentOption[] {
-  const options = [
+  const options: (EnvironmentOption | false)[] = [
     {
       id: 'dockerStandalone',
       value: 'dockerStandalone',
@@ -66,10 +68,8 @@ export function getExistingEnvironmentTypes(
       iconType: 'logo',
       icon: Azure,
     },
-  ]
-    //  removes the falsy values from the array (e.g. when isPodmanEnabled is false)
-    .filter(Boolean) as EnvironmentOption[];
-  return options;
+  ];
+  return compact(options);
 }
 
 export const newEnvironmentTypes: EnvironmentOption[] = [

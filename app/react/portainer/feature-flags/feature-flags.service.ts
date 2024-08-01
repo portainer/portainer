@@ -47,6 +47,7 @@ export async function init(edition: Edition) {
     [FeatureId.K8S_ANNOTATIONS]: Edition.BE,
     [FeatureId.CA_FILE]: Edition.BE,
     [FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS]: Edition.BE,
+    [FeatureId.PODMAN]: Edition.CE,
   };
 
   state.currentEdition = currentEdition;

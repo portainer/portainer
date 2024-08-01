@@ -224,7 +224,7 @@ async function createEnvironment(
   };
 
   if (options) {
-    const { tls, azure, meta, containerEngine = 'docker' } = options;
+    const { tls, azure, meta, containerEngine } = options;
     const { groupId, tagIds = [] } = meta || {};
 
     payload = {

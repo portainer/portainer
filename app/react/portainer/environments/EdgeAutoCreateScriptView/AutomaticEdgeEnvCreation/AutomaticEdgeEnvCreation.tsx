@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Laptop } from 'lucide-react';
+import { compact } from 'lodash';
 
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
@@ -8,6 +9,8 @@ import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { useSettings } from '@/react/portainer/settings/queries';
 import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
 import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
+import { FeatureId } from '@/react/portainer/feature-flags/enums';
+import { useFeatureFlag } from '@/react/portainer/feature-flags/useFeatureFlag';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
@@ -17,16 +20,6 @@ import { CopyButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-
-const commands = {
-  linux: [
-    commandsTabs.k8sLinux,
-    commandsTabs.swarmLinux,
-    commandsTabs.standaloneLinux,
-    commandsTabs.podmanLinux,
-  ],
-  win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
-};
 
 const asyncModeOptions = [
   {
@@ -140,6 +133,17 @@ function EdgeKeyInfo({
   tunnelUrl?: string;
   asyncMode: boolean;
 }) {
+  const { data: isPodmanEnabled } = useFeatureFlag(FeatureId.PODMAN);
+  const commands = {
+    linux: compact([
+      commandsTabs.k8sLinux,
+      commandsTabs.swarmLinux,
+      commandsTabs.standaloneLinux,
+      isPodmanEnabled && commandsTabs.podmanLinux,
+    ]),
+    win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+  };
+
   if (isLoading || !edgeKey) {
     return <div>Generating key for {url} ... </div>;
   }
