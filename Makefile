@@ -82,6 +82,8 @@ dev-client: ## Run the client in development mode
 dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
 
+dev-server-podman: build-server ## Run the server in development mode
+	@./dev/run_container_podman.sh
 
 ##@ Format
 .PHONY: format format-client format-server

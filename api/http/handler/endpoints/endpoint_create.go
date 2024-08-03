@@ -425,7 +425,7 @@ func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, pay
 
 	if payload.URL == "" {
 		if payload.ContainerEngine == portainer.ContainerEnginePodman {
-			payload.URL = "unix:///var/podman/podman.sock"
+			payload.URL = "unix:///run/podman/podman.sock"
 		} else {
 			payload.URL = "unix:///var/run/docker.sock"
 		}
