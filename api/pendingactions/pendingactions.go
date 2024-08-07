@@ -97,7 +97,6 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 
 	if len(pendingActions) > 0 {
 		log.Debug().Msgf("Found %d pending actions", len(pendingActions))
-		log.Debug().Msgf("PendingActions %+v", pendingActions)
 	}
 
 	for i, endpointPendingAction := range pendingActions {
