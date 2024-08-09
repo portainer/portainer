@@ -60,7 +60,7 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: 'install dependencies'
-        run: make test-deps PLATFORM=${{ matrix.config.platform }} ARCH=${{ matrix.config.arch }}
+        run: make test-deps PLATFORM=linux ARCH=amd64
 
       - name: 'update $PATH'
         run: echo "$(pwd)/dist" >> $GITHUB_PATH
