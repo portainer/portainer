@@ -24,7 +24,7 @@ on:
 
 jobs:
   test-client:
-    runs-on: tia-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
     steps:
@@ -45,7 +45,7 @@ jobs:
           - { platform: linux, arch: arm64 }
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
-    runs-on: tia-runner-set
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
     steps:
