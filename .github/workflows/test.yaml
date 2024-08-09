@@ -28,15 +28,22 @@ jobs:
     if: github.event.pull_request.draft == false
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: 'checkout the current branch'
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: 'set up node.js'
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
+
       - run: yarn --frozen-lockfile
 
       - name: Run tests
         run: make test-client ARGS="--maxWorkers=2 --minWorkers=1"
+
   test-server:
     strategy:
       matrix:
@@ -49,15 +56,21 @@ jobs:
     if: github.event.pull_request.draft == false
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - name: 'checkout the current branch'
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: 'set up golang'
+        uses: actions/setup-go@v5.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Install docker-compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install docker-compose
+      - name: 'install dependencies'
+        run: make test-deps PLATFORM=linux ARCH=amd64
 
-      - name: Run tests
+      - name: 'update $PATH'
+        run: echo "$(pwd)/dist" >> $GITHUB_PATH
+
+      - name: 'run tests'
         run: make test-server
