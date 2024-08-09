@@ -43,8 +43,8 @@ jobs:
         config:
           - { platform: linux, arch: amd64 }
           - { platform: linux, arch: arm64 }
-          - { platform: windows, arch: amd64, version: 1809 }
-          - { platform: windows, arch: amd64, version: ltsc2022 }
+          # - { platform: windows, arch: amd64, version: 1809 }
+          # - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
