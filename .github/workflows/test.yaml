@@ -56,9 +56,19 @@ jobs:
 
       - name: Install docker-compose
         run: |
-          # sudo apt-get update
-          # sudo apt-get install docker-compose
-          alias docker-compose='docker compose'
+          sudo tee "/usr/local/bin/docker-compose" > /dev/null <<EOF
+          #!/bin/bash
+
+          # Check if the user has provided any arguments
+          if [ "$#" -eq 0 ]; then
+              echo "Usage: docker-compose [OPTIONS] COMMAND [ARGS...]"
+              exit 1
+          fi
+
+          # Forward the arguments to 'docker compose'
+          docker compose "$@"
+          EOF
+          sudo chmod +x /usr/local/bin/docker-compose
 
       - name: Run tests
         run: make test-server
