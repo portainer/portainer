@@ -12,6 +12,7 @@ import { columnHelper } from './helper';
 export const name = columnHelper.accessor('Name', {
   header: 'Name',
   cell: NameCell,
+  id: 'name',
 });
 
 function NameCell({
