@@ -3,17 +3,20 @@ package registries
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/pendingactions"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/gorilla/mux"
+
+	"github.com/pkg/errors"
 )
 
 func hideFields(registry *portainer.Registry, hideAccesses bool) {
@@ -91,10 +94,14 @@ func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Re
 // 2. user has a direct or indirect access to the registry
 func (handler *Handler) userHasRegistryAccess(r *http.Request, registry *portainer.Registry) (hasAccess bool, isAdmin bool, err error) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	// user, err := security.RetrieveUserFromRequest(r, handler.DataStore)
-	// if err != nil {
-	// 	return false, false, err
-	// }
+	if err != nil {
+		return false, false, err
+	}
+
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
+	if err != nil {
+		return false, false, err
+	}
 
 	// Portainer admins always have access to everything
 	if securityContext.IsAdmin {
@@ -121,20 +128,44 @@ func (handler *Handler) userHasRegistryAccess(r *http.Request, registry *portain
 		return false, false, err
 	}
 
-	// standard users need to be granted accesses explicitly
-	if _, ok := registry.RegistryAccesses[endpointId].UserAccessPolicies[securityContext.UserID]; ok {
-		return true, false, nil
-	}
-
-	// or granted access indirectly via their team
-	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(securityContext.UserID)
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
 	if err != nil {
 		return false, false, nil
 	}
-	for _, ms := range memberships {
-		if _, ok := registry.RegistryAccesses[endpointId].TeamAccessPolicies[ms.TeamID]; ok {
-			return true, false, nil
+
+	// validate access for kubernetes namespaces (leverage registry.RegistryAccesses[endpointId].Namespaces)
+	if endpointutils.IsKubernetesEndpoint(endpoint) {
+		kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+		if err != nil {
+			return false, false, errors.Wrap(err, "unable to retrieve kubernetes client to validate registry access")
 		}
+		accessPolicies, err := kcl.GetNamespaceAccessPolicies()
+		if err != nil {
+			return false, false, errors.Wrap(err, "unable to retrieve environment's namespaces policies to validate registry access")
+		}
+
+		authorizedNamespaces := registry.RegistryAccesses[endpointId].Namespaces
+
+		for _, namespace := range authorizedNamespaces {
+			// when the default namespace is authorized to use a registry, all users have the ability to use it
+			// unless the default namespace is restricted: in this case continue to search for other potential accesses authorizations
+			if namespace == kubernetes.DefaultNamespace && !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+				return true, false, nil
+			}
+
+			namespacePolicy := accessPolicies[namespace]
+			if security.AuthorizedAccess(user.ID, memberships, namespacePolicy.UserAccessPolicies, namespacePolicy.TeamAccessPolicies) {
+				return true, false, nil
+			}
+		}
+		return false, false, nil
+	}
+
+	// validate access for docker environments
+	// leverage registry.RegistryAccesses[endpointId].UserAccessPolicies (direct access)
+	// and registry.RegistryAccesses[endpointId].TeamAccessPolicies (indirect access via his teams)
+	if security.AuthorizedRegistryAccess(registry, user, memberships, endpoint.ID) {
+		return true, false, nil
 	}
 
 	// when user has no access via their role, direct grant or indirect grant
