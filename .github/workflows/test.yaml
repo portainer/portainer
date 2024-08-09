@@ -56,8 +56,9 @@ jobs:
 
       - name: Install docker-compose
         run: |
-          sudo apt-get update
-          sudo apt-get install docker-compose
+          # sudo apt-get update
+          # sudo apt-get install docker-compose
+          alias docker-compose='docker compose'
 
       - name: Run tests
         run: make test-server
