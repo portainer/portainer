@@ -5,6 +5,7 @@ env:
   NODE_VERSION: 18.x
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - master
