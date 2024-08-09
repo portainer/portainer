@@ -64,6 +64,10 @@ clean: ## Remove all build and download artifacts
 .PHONY: test test-client test-server
 test: test-server test-client ## Run all tests
 
+test-deps: init-dist
+	dockerComposeVersion=$(shell jq -r '.dockerCompose' < "./binary-version.json")
+	./build/download_docker_compose_binary.sh $(PLATFORM) $(ARCH) $(dockerComposeVersion)
+
 test-client: ## Run client tests
 	yarn test $(ARGS)
 
