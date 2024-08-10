@@ -20,6 +20,7 @@ angular
   .module('portainer.app', [
     'portainer.oauth',
     'portainer.rbac',
+    'portainer.registrymanagement',
     componentsModule,
     settingsModule,
     featureFlagModule,
@@ -352,47 +353,6 @@ angular
         },
       };
 
-      var registries = {
-        name: 'portainer.registries',
-        url: '/registries',
-        views: {
-          'content@': {
-            templateUrl: './views/registries/registries.html',
-            controller: 'RegistriesController',
-          },
-        },
-        data: {
-          docs: '/admin/registries',
-          access: AccessHeaders.Admin,
-        },
-      };
-
-      var registry = {
-        name: 'portainer.registries.registry',
-        url: '/:id',
-        views: {
-          'content@': {
-            component: 'editRegistry',
-          },
-        },
-        data: {
-          docs: '/admin/registries/edit',
-        },
-      };
-
-      const registryCreation = {
-        name: 'portainer.registries.new',
-        url: '/new',
-        views: {
-          'content@': {
-            component: 'createRegistry',
-          },
-        },
-        data: {
-          docs: '/admin/registries/add',
-        },
-      };
-
       var settings = {
         name: 'portainer.settings',
         url: '/settings',
@@ -497,9 +457,6 @@ angular
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
-      $stateRegistryProvider.register(registries);
-      $stateRegistryProvider.register(registry);
-      $stateRegistryProvider.register(registryCreation);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
       $stateRegistryProvider.register(settingsEdgeCompute);
