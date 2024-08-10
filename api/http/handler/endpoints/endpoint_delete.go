@@ -144,19 +144,19 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	}
 
 	if err := tx.Snapshot().Delete(endpointID); err != nil {
-		log.Warn().Err(err).Msgf("Unable to remove the snapshot from the database")
+		log.Warn().Err(err).Msg("Unable to remove the snapshot from the database")
 	}
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 
 	if len(endpoint.UserAccessPolicies) > 0 || len(endpoint.TeamAccessPolicies) > 0 {
 		if err := handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx); err != nil {
-			log.Warn().Err(err).Msgf("Unable to update user authorizations")
+			log.Warn().Err(err).Msg("Unable to update user authorizations")
 		}
 	}
 
 	if err := tx.EndpointRelation().DeleteEndpointRelation(endpoint.ID); err != nil {
-		log.Warn().Err(err).Msgf("Unable to remove environment relation from the database")
+		log.Warn().Err(err).Msg("Unable to remove environment relation from the database")
 	}
 
 	for _, tagID := range endpoint.TagIDs {
@@ -168,9 +168,9 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 		}
 
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			log.Warn().Err(err).Msgf("Unable to find tag inside the database")
+			log.Warn().Err(err).Msg("Unable to find tag inside the database")
 		} else if err != nil {
-			log.Warn().Err(err).Msgf("Unable to delete tag relation from the database")
+			log.Warn().Err(err).Msg("Unable to delete tag relation from the database")
 		}
 	}
 
@@ -185,38 +185,38 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 		})
 
 		if err := tx.EdgeGroup().Update(edgeGroup.ID, &edgeGroup); err != nil {
-			log.Warn().Err(err).Msgf("Unable to update edge group")
+			log.Warn().Err(err).Msg("Unable to update edge group")
 		}
 	}
 
 	edgeStacks, err := tx.EdgeStack().EdgeStacks()
 	if err != nil {
-		log.Warn().Err(err).Msgf("Unable to retrieve edge stacks from the database")
+		log.Warn().Err(err).Msg("Unable to retrieve edge stacks from the database")
 	}
 
 	for idx := range edgeStacks {
 		edgeStack := &edgeStacks[idx]
 		if _, ok := edgeStack.Status[endpoint.ID]; ok {
 			delete(edgeStack.Status, endpoint.ID)
-			err = tx.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
-			if err != nil {
-				log.Warn().Err(err).Msgf("Unable to update edge stack")
+
+			if err := tx.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack); err != nil {
+				log.Warn().Err(err).Msg("Unable to update edge stack")
 			}
 		}
 	}
 
 	registries, err := tx.Registry().ReadAll()
 	if err != nil {
-		log.Warn().Err(err).Msgf("Unable to retrieve registries from the database")
+		log.Warn().Err(err).Msg("Unable to retrieve registries from the database")
 	}
 
 	for idx := range registries {
 		registry := &registries[idx]
 		if _, ok := registry.RegistryAccesses[endpoint.ID]; ok {
 			delete(registry.RegistryAccesses, endpoint.ID)
-			err = tx.Registry().Update(registry.ID, registry)
-			if err != nil {
-				log.Warn().Err(err).Msgf("Unable to update registry accesses")
+
+			if err := tx.Registry().Update(registry.ID, registry); err != nil {
+				log.Warn().Err(err).Msg("Unable to update registry accesses")
 			}
 		}
 	}
@@ -224,7 +224,7 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 	if endpointutils.IsEdgeEndpoint(endpoint) {
 		edgeJobs, err := handler.DataStore.EdgeJob().ReadAll()
 		if err != nil {
-			log.Warn().Err(err).Msgf("Unable to retrieve edge jobs from the database")
+			log.Warn().Err(err).Msg("Unable to retrieve edge jobs from the database")
 		}
 
 		for idx := range edgeJobs {
@@ -232,9 +232,8 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 			if _, ok := edgeJob.Endpoints[endpoint.ID]; ok {
 				delete(edgeJob.Endpoints, endpoint.ID)
 
-				err = tx.EdgeJob().Update(edgeJob.ID, edgeJob)
-				if err != nil {
-					log.Warn().Err(err).Msgf("Unable to update edge job")
+				if err := tx.EdgeJob().Update(edgeJob.ID, edgeJob); err != nil {
+					log.Warn().Err(err).Msg("Unable to update edge job")
 				}
 			}
 		}
@@ -242,7 +241,7 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 
 	// delete the pending actions
 	if err := tx.PendingActions().DeleteByEndpointID(endpoint.ID); err != nil {
-		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msgf("Unable to delete pending actions")
+		log.Warn().Err(err).Int("endpointId", int(endpoint.ID)).Msg("Unable to delete pending actions")
 	}
 
 	if err := tx.Endpoint().DeleteEndpoint(endpointID); err != nil {
