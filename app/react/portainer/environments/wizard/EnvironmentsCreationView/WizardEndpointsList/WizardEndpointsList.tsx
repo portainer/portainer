@@ -1,4 +1,5 @@
 import { Plug2 } from 'lucide-react';
+import clsx from 'clsx';
 
 import { endpointTypeName, stripProtocol } from '@/portainer/filters/filters';
 import {
@@ -6,7 +7,11 @@ import {
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
 } from '@/react/portainer/environments/utils';
-import { EnvironmentId } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  EnvironmentId,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
 import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
@@ -48,7 +53,12 @@ export function WizardEndpointsList({ environmentIds }: Props) {
       <WidgetBody>
         {environments.map((environment) => (
           <div className={styles.wizardListWrapper} key={environment.Id}>
-            <div className={styles.wizardListImage}>
+            <div
+              className={clsx(
+                styles.wizardListImage,
+                getIconClass(environment.Type, environment.ContainerEngine)
+              )}
+            >
               <Icon
                 icon={getEnvironmentTypeIcon(
                   environment.Type,
@@ -74,4 +84,24 @@ export function WizardEndpointsList({ environmentIds }: Props) {
       </WidgetBody>
     </Widget>
   );
+
+  // a color similar to text-blue-8 was used for all icons. This didn't look right for podman, so change it to text-white for only podman
+  function getIconClass(
+    type: EnvironmentType,
+    containerEngine?: ContainerEngine
+  ) {
+    switch (type) {
+      case EnvironmentType.AgentOnDocker:
+      case EnvironmentType.Docker:
+        return containerEngine === 'podman' ? 'text-white' : 'text-blue-8';
+      case EnvironmentType.Azure:
+      case EnvironmentType.EdgeAgentOnDocker:
+      case EnvironmentType.KubernetesLocal:
+      case EnvironmentType.AgentOnKubernetes:
+      case EnvironmentType.EdgeAgentOnKubernetes:
+        return 'blue-8';
+      default:
+        return 'blue-8';
+    }
+  }
 }

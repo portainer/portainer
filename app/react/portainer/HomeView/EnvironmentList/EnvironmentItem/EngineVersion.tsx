@@ -5,13 +5,20 @@ import {
   KubernetesSnapshot,
 } from '@/react/portainer/environments/types';
 import { getPlatformType } from '@/react/portainer/environments/utils';
+import { getDockerEnvironmentType } from '@/react/portainer/environments/utils/getDockerEnvironmentType';
 
 export function EngineVersion({ environment }: { environment: Environment }) {
   const platform = getPlatformType(environment.Type);
+  const isPodman = environment.ContainerEngine === 'podman';
 
   switch (platform) {
     case PlatformType.Docker:
-      return <DockerEngineVersion snapshot={environment.Snapshots[0]} />;
+      return (
+        <DockerEngineVersion
+          snapshot={environment.Snapshots[0]}
+          isPodman={isPodman}
+        />
+      );
     case PlatformType.Kubernetes:
       return (
         <KubernetesEngineVersion
@@ -23,14 +30,21 @@ export function EngineVersion({ environment }: { environment: Environment }) {
   }
 }
 
-function DockerEngineVersion({ snapshot }: { snapshot?: DockerSnapshot }) {
+function DockerEngineVersion({
+  snapshot,
+  isPodman,
+}: {
+  snapshot?: DockerSnapshot;
+  isPodman: boolean;
+}) {
   if (!snapshot) {
     return null;
   }
+  const type = getDockerEnvironmentType(snapshot.Swarm, isPodman);
 
   return (
     <span className="small text-muted vertical-center">
-      {snapshot.Swarm ? 'Swarm' : 'Standalone'} {snapshot.DockerVersion}
+      {type} {snapshot.DockerVersion}
     </span>
   );
 }
