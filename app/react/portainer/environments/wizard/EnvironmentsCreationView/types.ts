@@ -12,7 +12,7 @@ export interface AnalyticsState {
   kubernetesEdgeAgentAsync: number;
   kaasAgent: number;
   aciApi: number;
-  localEndpoint: number;
+  localEndpoint: number; // docker socket
 }
 
 export type AnalyticsStateKey = keyof AnalyticsState;

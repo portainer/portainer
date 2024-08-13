@@ -113,7 +113,7 @@ function buildLinuxPodmanCommand(
     edgeIdGenerator ? `PORTAINER_EDGE_ID=$(${edgeIdGenerator}) \n\n` : ''
   }\
 podman run -d \\
-  -v /run/podman/podman.sock:/var/run/docker.sock:Z \\
+  -v /run/podman/podman.sock:/var/run/docker.sock \\
   -v /var/lib/containers/storage/volumes:/var/lib/docker/volumes \\
   -v /:/host \\
   -v portainer_agent_data:/data \\
