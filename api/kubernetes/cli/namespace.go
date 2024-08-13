@@ -3,15 +3,20 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	portaineree "github.com/portainer/portainer/api"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -33,7 +38,7 @@ func defaultSystemNamespaces() map[string]struct{} {
 
 // GetNamespaces gets the namespaces in the current k8s environment(endpoint).
 func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, error) {
-	if kcl.isKubeAdmin {
+	if kcl.IsKubeAdmin {
 		return kcl.fetchNamespacesForAdmin()
 	}
 	return kcl.fetchNamespacesForNonAdmin()
@@ -44,7 +49,7 @@ func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, e
 func (kcl *KubeClient) fetchNamespacesForAdmin() (map[string]portainer.K8sNamespaceInfo, error) {
 	namespaces, err := kcl.cli.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list namespaces for the admin user: %w", err)
+		return nil, fmt.Errorf("an error occurred during the fetchNamespacesForAdmin operation, unable to list namespaces for the admin user: %w", err)
 	}
 
 	results := make(map[string]portainer.K8sNamespaceInfo)
@@ -56,15 +61,26 @@ func (kcl *KubeClient) fetchNamespacesForAdmin() (map[string]portainer.K8sNamesp
 
 // fetchNamespacesForNonAdmin gets the namespaces in the current k8s environment(endpoint) for the non-admin user.
 func (kcl *KubeClient) fetchNamespacesForNonAdmin() (map[string]portainer.K8sNamespaceInfo, error) {
+	log.Debug().Msgf("Fetching namespaces for non-admin user: %v", kcl.NonAdminNamespaces)
 	results := make(map[string]portainer.K8sNamespaceInfo)
-	log.Debug().Msgf("Fetching namespaces for non-admin user: %v", kcl.nonAdminNamespaces)
-	if len(kcl.nonAdminNamespaces) > 0 {
-		for _, ns := range kcl.nonAdminNamespaces {
-			namespace, err := kcl.GetNamespace(ns)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get namespace %s for the non-admin user: %w", ns, err)
-			}
-			results[ns] = namespace
+
+	if len(kcl.NonAdminNamespaces) == 0 {
+		return results, nil
+	}
+
+	namespaces, err := kcl.cli.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred during the fetchNamespacesForNonAdmin operation, unable to list namespaces for the non-admin user: %w", err)
+	}
+
+	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
+	for _, ns := range kcl.NonAdminNamespaces {
+		nonAdminNamespaceSet[ns] = struct{}{}
+	}
+
+	for _, namespace := range namespaces.Items {
+		if _, exists := nonAdminNamespaceSet[namespace.Name]; exists {
+			results[namespace.Name] = parseNamespace(&namespace)
 		}
 	}
 
@@ -236,4 +252,29 @@ func (kcl *KubeClient) DeleteNamespace(namespace string) error {
 		}
 	}
 	return fmt.Errorf("namespace %s not found", namespace)
+}
+
+// CombineNamespacesWithResourceQuotas combines namespaces with resource quotas where matching is based on "portainer-rq-"+namespace.Name
+func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string]portaineree.K8sNamespaceInfo, w http.ResponseWriter) *httperror.HandlerError {
+	resourceQuotas, err := kcl.GetResourceQuotas("")
+	if err != nil {
+		return httperror.InternalServerError("an error occurred during the CombineNamespacesWithResourceQuotas operation, unable to retrieve resource quotas from the Kubernetes for an admin user. Error: ", err)
+	}
+
+	if len(*resourceQuotas) > 0 {
+		return response.JSON(w, kcl.UpdateNamespacesWithResourceQuotas(namespaces, *resourceQuotas))
+	}
+
+	return response.JSON(w, namespaces)
+}
+
+// CombineNamespaceWithResourceQuota combines a namespace with a resource quota prefixed with "portainer-rq-"+namespace.Name
+func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portaineree.K8sNamespaceInfo, w http.ResponseWriter) *httperror.HandlerError {
+	resourceQuota, err := kcl.GetPortainerResourceQuota(namespace.Name)
+	if err != nil && !k8serrors.IsNotFound(err) {
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CombineNamespaceWithResourceQuota operation, unable to retrieve the resource quota associated with the namespace: %s for a non-admin user. Error: ", namespace.Name), err)
+	}
+	namespace.ResourceQuota = resourceQuota
+
+	return response.JSON(w, namespace)
 }

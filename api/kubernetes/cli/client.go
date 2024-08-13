@@ -44,8 +44,8 @@ type (
 		cli                kubernetes.Interface
 		instanceID         string
 		mu                 sync.Mutex
-		isKubeAdmin        bool
-		nonAdminNamespaces []string
+		IsKubeAdmin        bool
+		NonAdminNamespaces []string
 	}
 )
 
@@ -127,7 +127,7 @@ func (factory *ClientFactory) SetProxyKubeClient(endpointID, userID string, cli 
 
 // CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
 // Kubernetes config.
-func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte, isKubeAdmin bool, nonAdminNamespaces []string) (*KubeClient, error) {
+func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte, IsKubeAdmin bool, NonAdminNamespaces []string) (*KubeClient, error) {
 	config, err := clientcmd.NewClientConfigFromBytes(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a client config from kubeconfig: %w", err)
@@ -149,8 +149,8 @@ func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, k
 	return &KubeClient{
 		cli:                cli,
 		instanceID:         factory.instanceID,
-		isKubeAdmin:        isKubeAdmin,
-		nonAdminNamespaces: nonAdminNamespaces,
+		IsKubeAdmin:        IsKubeAdmin,
+		NonAdminNamespaces: NonAdminNamespaces,
 	}, nil
 }
 
@@ -161,9 +161,8 @@ func (factory *ClientFactory) createCachedPrivilegedKubeClient(endpoint *portain
 	}
 
 	return &KubeClient{
-		cli:         cli,
-		instanceID:  factory.instanceID,
-		isKubeAdmin: true,
+		cli:        cli,
+		instanceID: factory.instanceID,
 	}, nil
 }
 

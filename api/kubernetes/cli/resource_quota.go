@@ -13,7 +13,7 @@ import (
 // GetResourceQuotas gets all resource quotas in the current k8s environment(endpoint).
 // The kube client must have cluster scope read access to do this.
 func (kcl *KubeClient) GetResourceQuotas(namespace string) (*[]corev1.ResourceQuota, error) {
-	if kcl.isKubeAdmin {
+	if kcl.IsKubeAdmin {
 		return kcl.fetchResourceQuotasForAdmin()
 	}
 	return kcl.fetchResourceQuotasForNonAdmin()
@@ -34,7 +34,7 @@ func (kcl *KubeClient) fetchResourceQuotasForAdmin() (*[]corev1.ResourceQuota, e
 // the role of the user must have read access to the resource quotas in the defined namespaces.
 func (kcl *KubeClient) fetchResourceQuotasForNonAdmin() (*[]corev1.ResourceQuota, error) {
 	resourceQuotas := []corev1.ResourceQuota{}
-	for _, namespace := range kcl.nonAdminNamespaces {
+	for _, namespace := range kcl.NonAdminNamespaces {
 		resourceQuota, err := kcl.GetResourceQuota(namespace, "portainer-rq-"+namespace)
 		if err != nil && !k8serrors.IsNotFound(err) {
 			return nil, fmt.Errorf("an error occured, failed to get a resource quota %s of the namespace %s for the non-admin user: %w", resourceQuota.Name, namespace, err)
