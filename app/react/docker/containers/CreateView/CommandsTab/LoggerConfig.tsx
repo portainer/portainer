@@ -2,8 +2,9 @@ import { FormikErrors } from 'formik';
 import { array, object, SchemaOf, string } from 'yup';
 import _ from 'lodash';
 
-import { useLoggingPlugins } from '@/react/docker/proxy/queries/useServicePlugins';
+import { useLoggingPlugins } from '@/react/docker/proxy/queries/usePlugins';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
@@ -31,7 +32,9 @@ export function LoggerConfig({
 }) {
   const envId = useEnvironmentId();
 
-  const pluginsQuery = useLoggingPlugins(envId, apiVersion < 1.25);
+  const isPodman = useIsPodman();
+  const isSystem = apiVersion < 1.25;
+  const pluginsQuery = useLoggingPlugins(envId, isSystem, isPodman);
 
   if (!pluginsQuery.data) {
     return null;

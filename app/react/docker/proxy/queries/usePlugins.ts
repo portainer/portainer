@@ -99,21 +99,22 @@ export function aggregateData(
 
 export function useLoggingPlugins(
   environmentId: EnvironmentId,
-  systemOnly: boolean
+  systemOnly: boolean,
+  isPodman?: boolean
 ) {
-  return useServicePlugins(environmentId, systemOnly, 'Log');
-}
+  const systemPluginsQuery = useInfo(environmentId, {
+    select: (info) => info.Plugins,
+  });
+  const enabled = !systemOnly && isPodman === false;
+  const pluginsQuery = usePlugins(environmentId, { enabled });
 
-export function useVolumePlugins(
-  environmentId: EnvironmentId,
-  systemOnly: boolean
-) {
-  return useServicePlugins(environmentId, systemOnly, 'Volume');
-}
-
-export function useNetworkPlugins(
-  environmentId: EnvironmentId,
-  systemOnly: boolean
-) {
-  return useServicePlugins(environmentId, systemOnly, 'Network');
+  return {
+    data: aggregateData(
+      systemPluginsQuery.data,
+      pluginsQuery.data,
+      systemOnly,
+      'Log'
+    ),
+    isLoading: systemPluginsQuery.isLoading || pluginsQuery.isLoading,
+  };
 }
