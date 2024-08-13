@@ -4,7 +4,6 @@ export interface AnalyticsState {
   dockerEdgeAgentStandard: number;
   dockerEdgeAgentAsync: number;
   podmanAgent: number;
-  podmanApi: number;
   podmanEdgeAgentStandard: number;
   podmanEdgeAgentAsync: number;
   podmanLocalEnvironment: number; // podman socket
