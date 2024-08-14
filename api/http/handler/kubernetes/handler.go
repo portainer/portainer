@@ -69,7 +69,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.isRBACEnabled)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
-	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
+	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
