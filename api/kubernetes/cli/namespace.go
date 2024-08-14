@@ -63,11 +63,7 @@ func (kcl *KubeClient) fetchNamespacesForNonAdmin() (map[string]portainer.K8sNam
 		return nil, fmt.Errorf("an error occurred during the fetchNamespacesForNonAdmin operation, unable to list namespaces for the non-admin user: %w", err)
 	}
 
-	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
-	for _, ns := range kcl.NonAdminNamespaces {
-		nonAdminNamespaceSet[ns] = struct{}{}
-	}
-
+	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
 	results := make(map[string]portainer.K8sNamespaceInfo)
 	for _, namespace := range namespaces {
 		if _, exists := nonAdminNamespaceSet[namespace.Name]; exists {
@@ -285,4 +281,13 @@ func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portaineree.K
 	namespace.ResourceQuota = resourceQuota
 
 	return response.JSON(w, namespace)
+}
+
+func (kcl *KubeClient) BuildNonAdminNamespacesMap() map[string]struct{} {
+	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
+	for _, namespace := range kcl.NonAdminNamespaces {
+		nonAdminNamespaceSet[namespace] = struct{}{}
+	}
+
+	return nonAdminNamespaceSet
 }
