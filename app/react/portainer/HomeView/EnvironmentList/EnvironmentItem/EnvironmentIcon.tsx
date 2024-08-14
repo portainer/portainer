@@ -1,7 +1,8 @@
 import { getEnvironmentTypeIcon } from '@/react/portainer/environments/utils';
-import dockerEdge from '@/assets/images/edge_endpoint.png';
+import dockerEdge from '@/assets/ico/docker-edge-environment.svg';
+import podmanEdge from '@/assets/ico/podman-edge-environment.svg';
 import kube from '@/assets/images/kubernetes_endpoint.png';
-import kubeEdge from '@/assets/images/kubernetes_edge_endpoint.png';
+import kubeEdge from '@/assets/ico/kubernetes-edge-environment.svg';
 import {
   ContainerEngine,
   EnvironmentType,
@@ -21,21 +22,21 @@ export function EnvironmentIcon({ type, containerEngine }: Props) {
   switch (type) {
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.Docker:
-      if (containerEngine === 'docker') {
+      if (containerEngine === 'podman') {
         return (
           <img
-            src={docker}
+            src={podman}
             width="60"
-            alt="docker environment"
+            alt="podman environment"
             aria-hidden="true"
           />
         );
       }
       return (
         <img
-          src={podman}
+          src={docker}
           width="60"
-          alt="podman environment"
+          alt="docker environment"
           aria-hidden="true"
         />
       );
@@ -49,6 +50,15 @@ export function EnvironmentIcon({ type, containerEngine }: Props) {
         />
       );
     case EnvironmentType.EdgeAgentOnDocker:
+      if (containerEngine === 'podman') {
+        return (
+          <img
+            src={podmanEdge}
+            alt="podman edge environment"
+            aria-hidden="true"
+          />
+        );
+      }
       return (
         <img
           src={dockerEdge}
