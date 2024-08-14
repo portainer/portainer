@@ -34,10 +34,9 @@ func (kcl *KubeClient) fetchServicesForAdmin(namespace string) ([]models.K8sServ
 // it returns a list of K8sServiceInfo objects.
 func (kcl *KubeClient) fetchServicesForNonAdmin(namespace string) ([]models.K8sServiceInfo, error) {
 	log.Debug().Msgf("Fetching services for non-admin user: %v", kcl.NonAdminNamespaces)
-	results := make([]models.K8sServiceInfo, 0)
 
 	if len(kcl.NonAdminNamespaces) == 0 {
-		return results, nil
+		return nil, nil
 	}
 
 	services, err := kcl.fetchServices(namespace)
@@ -45,11 +44,8 @@ func (kcl *KubeClient) fetchServicesForNonAdmin(namespace string) ([]models.K8sS
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
-	for _, ns := range kcl.NonAdminNamespaces {
-		nonAdminNamespaceSet[ns] = struct{}{}
-	}
-
+	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	results := make([]models.K8sServiceInfo, 0)
 	for _, service := range services {
 		if _, ok := nonAdminNamespaceSet[service.Namespace]; ok {
 			results = append(results, service)
