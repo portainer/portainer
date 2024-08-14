@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -26,36 +27,10 @@ import (
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces [get]
-func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+func (handler *Handler) GetKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	namespaces, err := handler.getKubernetesNamespaces(w, r)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
-	}
-
-	cli, httpErr := handler.getProxyKubeClient(r)
-	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
-	}
-
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return httperror.NotFound("Unable to find an environment on request context", err)
-	}
-
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
-	if err != nil {
-		return httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
-	}
-	pcli.IsKubeAdmin = cli.IsKubeAdmin
-	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
-
-	namespaces, err := pcli.GetNamespaces()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve namespaces", err)
-	}
-
-	if withResourceQuota {
-		return pcli.CombineNamespacesWithResourceQuotas(namespaces, w)
+		return err
 	}
 
 	return response.JSON(w, namespaces)
@@ -76,29 +51,47 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/count [get]
 func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, err := middlewares.FetchEndpoint(r)
+	namespaces, err := handler.getKubernetesNamespaces(w, r)
 	if err != nil {
-		return httperror.NotFound("Unable to find an environment on request context", err)
+		return err
+	}
+
+	return response.JSON(w, len(namespaces))
+}
+
+func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+	}
+
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		return nil, httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
 	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
+		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
 	}
 	pcli.IsKubeAdmin = cli.IsKubeAdmin
 	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
 
 	namespaces, err := pcli.GetNamespaces()
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to retrieve namespaces from the Kubernetes cluster to count the total. Error: ", err)
+		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes cluster. Error: ", err)
 	}
 
-	return response.JSON(w, len(namespaces))
+	if withResourceQuota {
+		return pcli.CombineNamespacesWithResourceQuotas(namespaces, w)
+	}
+
+	return namespaces, nil
 }
 
 // @id GetKubernetesNamespace
