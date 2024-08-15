@@ -5,8 +5,8 @@ import { ContainerListViewModel } from '../../types';
 
 import { CONTAINER_MODE, Values } from './types';
 
-export function getDefaultViewModel(isWindows: boolean) {
-  const networkMode = isWindows ? 'nat' : 'bridge';
+export function getDefaultViewModel(isWindows: boolean, isPodman?: boolean) {
+  const networkMode = getDefaultNetworkMode(isWindows, isPodman);
   return {
     networkMode,
     hostname: '',
@@ -19,6 +19,12 @@ export function getDefaultViewModel(isWindows: boolean) {
     hostsFileEntries: [],
     container: '',
   };
+}
+
+function getDefaultNetworkMode(isWindows: boolean, isPodman?: boolean) {
+  if (isWindows) return 'nat';
+  if (isPodman) return 'podman';
+  return 'bridge';
 }
 
 export function toViewModel(
