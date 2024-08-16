@@ -3,6 +3,7 @@ package security
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -406,29 +407,40 @@ func extractBearerToken(r *http.Request) (string, bool) {
 	return token, true
 }
 
-// AddAuthCookie adds the jwt token to the response cookie.
-func AddAuthCookie(w http.ResponseWriter, token string, expirationTime time.Time) {
-	http.SetCookie(w, &http.Cookie{
+func getAuthCookie(value string, expirationTime time.Time) http.Cookie {
+	// Docker Desktop extension requires SameSite=None and Secure=true for Set-Cookie, because the docker desktop frontend is served at file://
+	_, isDockerDesktopMode := os.LookupEnv("DOCKER_EXTENSION")
+	if isDockerDesktopMode {
+		return http.Cookie{
+			Name:     portainer.AuthCookieKey,
+			Value:    value,
+			Path:     "/",
+			Expires:  expirationTime,
+			HttpOnly: true,
+			SameSite: http.SameSiteNoneMode,
+			Secure:   true,
+		}
+	}
+	return http.Cookie{
 		Name:     portainer.AuthCookieKey,
-		Value:    token,
+		Value:    value,
 		Path:     "/",
 		Expires:  expirationTime,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-	})
+	}
+}
+
+// AddAuthCookie adds the jwt token to the response cookie.
+func AddAuthCookie(w http.ResponseWriter, token string, expirationTime time.Time) {
+	authCookie := getAuthCookie(token, expirationTime)
+	http.SetCookie(w, &authCookie)
 }
 
 // RemoveAuthCookie removes the jwt token from the response cookie.
 func RemoveAuthCookie(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     portainer.AuthCookieKey,
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
-		MaxAge:   -1,
-		SameSite: http.SameSiteStrictMode,
-	})
+	authCookie := getAuthCookie("", time.Unix(0, 0))
+	http.SetCookie(w, &authCookie)
 }
 
 // extractKeyFromCookie extracts the jwt token from the cookie.
@@ -528,7 +540,12 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 // - public routes
 // - kubectl - a bearer token is needed, and no csrf token can be sent
 // - api token
+// - docker desktop extension
 func ShouldSkipCSRFCheck(r *http.Request) (bool, error) {
+	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+		return true, nil
+	}
+
 	cookie, _ := r.Cookie(portainer.AuthCookieKey)
 	hasCookie := cookie != nil && cookie.Value != ""
 
