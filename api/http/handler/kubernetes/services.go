@@ -54,6 +54,11 @@ func (handler *Handler) getKubernetesClusterServicesCount(w http.ResponseWriter,
 }
 
 func (handler *Handler) getKubernetesClusterServices(r *http.Request) ([]models.K8sServiceInfo, *httperror.HandlerError) {
+	withApplications, err := request.RetrieveBooleanQueryParameter(r, "withApplications", false)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetKubernetesEnvironmentServices operation, unable to retrieve withApplications query parameter. Error: ", err)
+	}
+
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
 		return nil, httperror.NotFound("an error occurred during the GetKubernetesEnvironmentServices operation, unable to fetch endpoint. Error: ", err)
@@ -74,11 +79,6 @@ func (handler *Handler) getKubernetesClusterServices(r *http.Request) ([]models.
 	services, err := pcli.GetServices("")
 	if err != nil {
 		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesEnvironmentServices operation, unable to retrieve services from the Kubernetes for a cluster level user. Error: ", err)
-	}
-
-	withApplications, err := request.RetrieveBooleanQueryParameter(r, "withApplications", false)
-	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetKubernetesEnvironmentServices operation, unable to retrieve withApplications query parameter. Error: ", err)
 	}
 
 	if withApplications {

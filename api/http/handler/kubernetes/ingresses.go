@@ -480,6 +480,89 @@ PayloadLoop:
 	return response.Empty(w)
 }
 
+// @id GetKubernetesClusterIngresses
+// @summary Get kubernetes ingresses at the cluster level
+// @description Get kubernetes ingresses at the cluster level for the provided environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param body body []models.K8sIngressInfo true "Ingress details"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/ingresses [get]
+func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	ingresses, err := handler.getKubernetesClusterIngresses(r)
+	if err != nil {
+		return err
+	}
+
+	return response.JSON(w, ingresses)
+}
+
+// @id getKubernetesClusterIngressesCount
+// @summary Get the number of kubernetes ingresses within the given environment
+// @description Get the number of kubernetes ingresses within the given environment
+// @description **Access policy**: Authenticated users only.
+// @tags kubernetes
+// @security ApiKeyAuth || jwt
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @success 200 int "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/ingresses/count [get]
+func (handler *Handler) getKubernetesClusterIngressesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	ingresses, err := handler.getKubernetesClusterIngresses(r)
+	if err != nil {
+		return err
+	}
+
+	return response.JSON(w, len(ingresses))
+}
+
+func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models.K8sIngressInfo, *httperror.HandlerError) {
+	withServices, err := request.RetrieveBooleanQueryParameter(r, "withServices", false)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetKubernetesEnvironmentServices operation, unable to retrieve withApplications query parameter. Error: ", err)
+	}
+
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		return nil, httperror.NotFound("an error occurred during the GetKubernetesClusterIngresses operation, unable to fetch endpoint. Error: ", err)
+	}
+
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
+	if err != nil {
+		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to get privileged kube client for combining services with applications. Error: ", err)
+	}
+	pcli.IsKubeAdmin = cli.IsKubeAdmin
+	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
+
+	ingresses, err := pcli.GetIngresses("")
+	if err != nil {
+		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve ingresses from the Kubernetes for a cluster level user. Error: ", err)
+	}
+
+	if withServices {
+		services, err := pcli.GetServices("")
+		if err != nil {
+			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve services from the Kubernetes for a cluster level user to look up ingresses used by services. Error: ", err)
+		}
+	}
+
+	return ingresses, nil
+}
+
 // @id getKubernetesIngresses
 // @summary Get kubernetes ingresses by namespace
 // @description Get kubernetes ingresses by namespace for the provided environment
