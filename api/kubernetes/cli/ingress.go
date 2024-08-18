@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
@@ -71,6 +72,16 @@ func parseIngressClass(ingressClasses netv1.IngressClass) models.K8sIngressContr
 	}
 
 	return ingressContoller
+}
+
+// GetIngress gets an ingress in a given namespace in a k8s endpoint.
+func (kcl *KubeClient) GetIngress(namespace, ingressName string) (models.K8sIngressInfo, error) {
+	ingress, err := kcl.cli.NetworkingV1().Ingresses(namespace).Get(context.Background(), ingressName, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sIngressInfo{}, err
+	}
+
+	return parseIngress(*ingress), nil
 }
 
 // GetIngresses gets all the ingresses for a given namespace in a k8s endpoint.
@@ -300,8 +311,40 @@ func (kcl *KubeClient) UpdateIngress(namespace string, info models.K8sIngressInf
 	return nil
 }
 
+// CombineIngressWithService combines an ingress with a service that is being used by the ingress.
+// this is required to display the service that is being used by the ingress in the UI edit view.
+func (kcl *KubeClient) CombineIngressWithService(ingress models.K8sIngressInfo) (models.K8sIngressInfo, error) {
+	services, err := kcl.GetServices(ingress.Namespace)
+	if err != nil {
+		return models.K8sIngressInfo{}, fmt.Errorf("an error occurred during the CombineIngressWithService operation, unable to retrieve services from the Kubernetes for a namespace level user. Error: %w", err)
+	}
+
+	serviceMap := kcl.buildServicesMap(services)
+	for pathIndex, path := range ingress.Paths {
+		if _, ok := serviceMap[path.ServiceName]; ok {
+			ingress.Paths[pathIndex].HasService = true
+		}
+	}
+
+	return ingress, nil
+}
+
 // CombineIngressesWithServices combines a list of ingresses with a list of services that are being used by the ingresses.
-// This is required to display the services that are being used by the ingresses in the UI.
-func (kcl *KubeClient) CombineIngressesWithServices(ingresses []models.K8sIngressInfo, services []models.K8sServiceInfo) []models.K8sIngressInfo {
-	return result
+// this is required to display the services that are being used by the ingresses in the UI list view.
+func (kcl *KubeClient) CombineIngressesWithServices(ingresses []models.K8sIngressInfo) ([]models.K8sIngressInfo, error) {
+	services, err := kcl.GetServices("")
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred during the CombineIngressesWithServices operation, unable to retrieve services from the Kubernetes for a cluster level user. Error: %w", err)
+	}
+
+	serviceMap := kcl.buildServicesMap(services)
+	for ingressIndex, ingress := range ingresses {
+		for pathIndex, path := range ingress.Paths {
+			if _, ok := serviceMap[path.ServiceName]; ok {
+				(ingresses)[ingressIndex].Paths[pathIndex].HasService = true
+			}
+		}
+	}
+
+	return ingresses, nil
 }

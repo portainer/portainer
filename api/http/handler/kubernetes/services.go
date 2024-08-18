@@ -125,11 +125,6 @@ func (handler *Handler) getKubernetesServices(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("an error occurred during the GetKubernetesServices operation, unable to retrieve services from the Kubernetes for a namespace level user. Error: ", err)
 	}
 
-	_, err = request.RetrieveBooleanQueryParameter(r, "withApplications", true)
-	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesServices operation, unable to retrieve withApplications query parameter. Error: ", err)
-	}
-
 	return response.JSON(w, services)
 }
 

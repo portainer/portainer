@@ -224,3 +224,13 @@ func containsServiceWithSelector(services []models.K8sServiceInfo) bool {
 	}
 	return false
 }
+
+// buildServicesMap builds a map of service names from a list of K8sServiceInfo objects
+// it returns a map of service names for lookups
+func (kcl *KubeClient) buildServicesMap(services []models.K8sServiceInfo) map[string]struct{} {
+	serviceMap := make(map[string]struct{})
+	for _, service := range services {
+		serviceMap[service.Name] = struct{}{}
+	}
+	return serviceMap
+}

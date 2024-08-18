@@ -491,6 +491,7 @@ PayloadLoop:
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param body body []models.K8sIngressInfo true "Ingress details"
+// @param withServices query boolean false "Lookup services associated with each ingress"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -554,10 +555,12 @@ func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models
 	}
 
 	if withServices {
-		services, err := pcli.GetServices("")
+		ingressesWithServices, err := pcli.CombineIngressesWithServices(ingresses)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve services from the Kubernetes for a cluster level user to look up ingresses used by services. Error: ", err)
+			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to combine ingresses with services. Error: ", err)
 		}
+
+		return ingressesWithServices, nil
 	}
 
 	return ingresses, nil
@@ -596,6 +599,46 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 	}
 
 	return response.JSON(w, ingresses)
+}
+
+// @id getKubernetesIngress
+// @summary Get a kubernetes ingress by namespace
+// @description Get a kubernetes ingress by namespace for the provided environment
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment (Endpoint) identifier"
+// @param namespace path string true "Namespace name"
+// @param ingress path string true "Ingress name"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace}/ingresses/{ingress} [get]
+func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
+	if err != nil {
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
+	}
+
+	ingress, err := request.RetrieveRouteVariableValue(r, "ingress")
+	if err != nil {
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from request. Error: ", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	ingressInfo, err := cli.GetIngress(namespace, ingress)
+	if err != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from the Kubernetes for a namespace level user. Error: ", err)
+	}
+
+	return response.JSON(w, ingressInfo)
 }
 
 // @id createKubernetesIngress
