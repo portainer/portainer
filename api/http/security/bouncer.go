@@ -540,12 +540,7 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 // - public routes
 // - kubectl - a bearer token is needed, and no csrf token can be sent
 // - api token
-// - docker desktop extension
 func ShouldSkipCSRFCheck(r *http.Request) (bool, error) {
-	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
-		return true, nil
-	}
-
 	cookie, _ := r.Cookie(portainer.AuthCookieKey)
 	hasCookie := cookie != nil && cookie.Value != ""
 
