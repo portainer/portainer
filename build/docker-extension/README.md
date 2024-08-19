@@ -20,7 +20,7 @@ Next you must install the CLI plugin to enable extension development. Please fol
 
 ### Build from local changes
 
-1. Run `make dev-extension` to install the project dependencies and start in development mode.
+1. Run `make dev-extension` to install the project dependencies and start in development mode (note that this doesn't do live updates for frontend changes).
 2. Make your code changes
 3. Re-run `make dev-extension` to rebuild and re-install with your latest changes
 
