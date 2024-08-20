@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,8 +67,8 @@ func (kcl *KubeClient) GetResourceQuota(namespace, resourceQuota string) (*corev
 
 // UpdateNamespacesWithResourceQuotas updates the namespaces with the resource quotas.
 // The resource quotas are matched with the namespaces by name.
-func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portaineree.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) map[string]portaineree.K8sNamespaceInfo {
-	namespacesWithQuota := map[string]portaineree.K8sNamespaceInfo{}
+func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) map[string]portainer.K8sNamespaceInfo {
+	namespacesWithQuota := map[string]portainer.K8sNamespaceInfo{}
 
 	for _, namespace := range namespaces {
 		namespace.ResourceQuota = kcl.GetResourceQuotaFromNamespace(namespace, resourceQuotas)
@@ -79,7 +79,7 @@ func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]
 }
 
 // GetResourceQuotaFromNamespace gets the resource quota in a specific namespace where the resource quota's name is prefixed with "portainer-rq-".
-func (kcl *KubeClient) GetResourceQuotaFromNamespace(namespace portaineree.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) *corev1.ResourceQuota {
+func (kcl *KubeClient) GetResourceQuotaFromNamespace(namespace portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) *corev1.ResourceQuota {
 	for _, resourceQuota := range resourceQuotas {
 		if resourceQuota.ObjectMeta.Namespace == namespace.Name && resourceQuota.ObjectMeta.Name == "portainer-rq-"+namespace.Name {
 			return &resourceQuota
