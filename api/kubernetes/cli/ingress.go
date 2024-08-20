@@ -110,7 +110,7 @@ func (kcl *KubeClient) fetchIngressesForNonAdmin(namespace string) ([]models.K8s
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sIngressInfo, 0)
 	for _, ingress := range ingresses {
 		if _, ok := nonAdminNamespaceSet[ingress.Namespace]; ok {

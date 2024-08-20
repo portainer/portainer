@@ -44,7 +44,7 @@ func (kcl *KubeClient) fetchServicesForNonAdmin(namespace string) ([]models.K8sS
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sServiceInfo, 0)
 	for _, service := range services {
 		if _, ok := nonAdminNamespaceSet[service.Namespace]; ok {

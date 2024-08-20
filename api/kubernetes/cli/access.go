@@ -125,7 +125,7 @@ func (kcl *KubeClient) GetNonAdminNamespaces(userID int, isRestrictDefaultNamesp
 	}
 
 	nonAdminNamespaces := []string{}
-	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+	if !isRestrictDefaultNamespace {
 		nonAdminNamespaces = append(nonAdminNamespaces, defaultNamespace)
 	}
 
