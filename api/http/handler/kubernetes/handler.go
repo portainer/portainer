@@ -168,9 +168,15 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		isKubeAdmin := true
 		nonAdminNamespaces := []string{}
 		if user.Role != portainer.AdministratorRole {
-			nonAdminNamespaces, err = cli.GetNonAdminNamespaces(int(user.ID), endpoint, handler.KubernetesClientFactory)
+			pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 			if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: ", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to get privileged kube client to grab all namespaces. Error: ", err)
+				return
+			}
+
+			nonAdminNamespaces, err = pcli.GetNonAdminNamespaces(int(user.ID), endpoint.Kubernetes.Configuration.RestrictDefaultNamespace)
+			if err != nil {
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to retrieve non-admin namespaces. Error: ", err)
 				return
 			}
 			isKubeAdmin = false
