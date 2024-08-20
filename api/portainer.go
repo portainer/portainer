@@ -592,8 +592,14 @@ type (
 	JobType int
 
 	K8sNamespaceInfo struct {
-		IsSystem  bool `json:"IsSystem"`
-		IsDefault bool `json:"IsDefault"`
+		Id             string             `json:"Id"`
+		Name           string             `json:"Name"`
+		Status         v1.NamespaceStatus `json:"Status"`
+		CreationDate   string             `json:"CreationDate"`
+		NamespaceOwner string             `json:"NamespaceOwner"`
+		IsSystem       bool               `json:"IsSystem"`
+		IsDefault      bool               `json:"IsDefault"`
+		ResourceQuota  *v1.ResourceQuota  `json:"ResourceQuota"`
 	}
 
 	K8sNodeLimits struct {

@@ -80,7 +80,7 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 	} else {
 		// For Kubernetes endpoints, we need to check if the endpoint is up by
 		// creating a kube client and performing a simple operation
-		client, err := service.kubeFactory.GetKubeClient(endpoint)
+		client, err := service.kubeFactory.GetPrivilegedKubeClient(endpoint)
 		if err != nil {
 			log.Debug().Msgf("failed to create Kubernetes client for environment %d: %v", environmentID, err)
 			return

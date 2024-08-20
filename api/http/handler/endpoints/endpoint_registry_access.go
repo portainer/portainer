@@ -134,7 +134,7 @@ func (handler *Handler) updateKubeAccess(endpoint *portainer.Endpoint, registry 
 	namespacesToRemove := setDifference(oldNamespacesSet, newNamespacesSet)
 	namespacesToAdd := setDifference(newNamespacesSet, oldNamespacesSet)
 
-	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

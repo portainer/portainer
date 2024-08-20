@@ -91,7 +91,7 @@ func InitialIngressClassDetection(endpoint *portainer.Endpoint, endpointService 
 		}
 	}()
 
-	cli, err := factory.GetKubeClient(endpoint)
+	cli, err := factory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for ingress class detection")
 
@@ -128,7 +128,7 @@ func InitialMetricsDetection(endpoint *portainer.Endpoint, endpointService datas
 		}
 	}()
 
-	cli, err := factory.GetKubeClient(endpoint)
+	cli, err := factory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create kubernetes client for initial metrics detection")
 
@@ -156,7 +156,7 @@ func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.En
 		}
 	}()
 
-	cli, err := factory.GetKubeClient(endpoint)
+	cli, err := factory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to create Kubernetes client for initial storage detection")
 

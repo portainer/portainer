@@ -193,7 +193,7 @@ func syncConfig(registry *portainer.Registry) *portainer.RegistryManagementConfi
 }
 
 func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *portainer.Registry, endpointAccess portainer.RegistryAccessPolicies) error {
-	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

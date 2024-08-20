@@ -44,7 +44,7 @@ func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheMan
 }
 
 func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
-	kubeCLI, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
+	kubeCLI, err := deployer.kubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return "", err
 	}

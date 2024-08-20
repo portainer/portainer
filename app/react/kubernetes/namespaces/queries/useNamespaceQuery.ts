@@ -4,15 +4,15 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { notifyError } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { DefaultOrSystemNamespace } from '../types';
+import { PortainerNamespace } from '../types';
 
-export function useNamespaceQuery<T = DefaultOrSystemNamespace>(
+export function useNamespaceQuery<T = PortainerNamespace>(
   environmentId: EnvironmentId,
   namespace: string,
   {
     select,
   }: {
-    select?(namespace: DefaultOrSystemNamespace): T;
+    select?(namespace: PortainerNamespace): T;
   } = {}
 ) {
   return useQuery(
@@ -33,7 +33,7 @@ export async function getNamespace(
   namespace: string
 ) {
   try {
-    const { data: ns } = await axios.get<DefaultOrSystemNamespace>(
+    const { data: ns } = await axios.get<PortainerNamespace>(
       `kubernetes/${environmentId}/namespaces/${namespace}`
     );
     return ns;

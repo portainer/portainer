@@ -7,7 +7,7 @@ import (
 )
 
 func (transport *baseTransport) refreshRegistry(request *http.Request, namespace string) (err error) {
-	cli, err := transport.k8sClientFactory.GetKubeClient(transport.endpoint)
+	cli, err := transport.k8sClientFactory.GetPrivilegedKubeClient(transport.endpoint)
 	if err != nil {
 		return
 	}
