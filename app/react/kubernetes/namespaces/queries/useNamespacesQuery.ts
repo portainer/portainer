@@ -34,9 +34,9 @@ export function useNamespacesQuery(
 // getNamespaces is used to retrieve namespaces using the Portainer backend with caching
 export async function getNamespaces(
   environmentId: EnvironmentId,
-  withResourceQuota: boolean = false
+  withResourceQuota?: boolean
 ) {
-  const params = { withResourceQuota };
+  const params = withResourceQuota ? { withResourceQuota } : {};
   try {
     const { data: namespaces } = await axios.get<Namespaces>(
       `kubernetes/${environmentId}/namespaces`,

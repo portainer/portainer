@@ -37,17 +37,13 @@ func defaultSystemNamespaces() map[string]struct{} {
 }
 
 // GetNamespaces gets the namespaces in the current k8s environment(endpoint).
+// if the user is an admin, all namespaces in the current k8s environment(endpoint) are fetched using the fetchNamespaces function.
+// otherwise, namespaces the non-admin user has access to will be used to filter the namespaces based on the allowed namespaces.
 func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchNamespacesForAdmin()
+		return kcl.fetchNamespaces()
 	}
 	return kcl.fetchNamespacesForNonAdmin()
-}
-
-// fetchNamespacesForAdmin gets the namespaces in the current k8s environment(endpoint) for the admin user.
-// The kube client must have cluster scope read access to do this.
-func (kcl *KubeClient) fetchNamespacesForAdmin() (map[string]portainer.K8sNamespaceInfo, error) {
-	return kcl.fetchNamespaces()
 }
 
 // fetchNamespacesForNonAdmin gets the namespaces in the current k8s environment(endpoint) for the non-admin user.
@@ -63,7 +59,7 @@ func (kcl *KubeClient) fetchNamespacesForNonAdmin() (map[string]portainer.K8sNam
 		return nil, fmt.Errorf("an error occurred during the fetchNamespacesForNonAdmin operation, unable to list namespaces for the non-admin user: %w", err)
 	}
 
-	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make(map[string]portainer.K8sNamespaceInfo)
 	for _, namespace := range namespaces {
 		if _, exists := nonAdminNamespaceSet[namespace.Name]; exists {
@@ -259,7 +255,7 @@ func (kcl *KubeClient) DeleteNamespace(namespace string) error {
 }
 
 // CombineNamespacesWithResourceQuotas combines namespaces with resource quotas where matching is based on "portainer-rq-"+namespace.Name
-func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string]portaineree.K8sNamespaceInfo, w http.ResponseWriter) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
+func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, w http.ResponseWriter) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
 	resourceQuotas, err := kcl.GetResourceQuotas("")
 	if err != nil {
 		return nil, httperror.InternalServerError("an error occurred during the CombineNamespacesWithResourceQuotas operation, unable to retrieve resource quotas from the Kubernetes for an admin user. Error: ", err)
@@ -273,7 +269,7 @@ func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string
 }
 
 // CombineNamespaceWithResourceQuota combines a namespace with a resource quota prefixed with "portainer-rq-"+namespace.Name
-func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portaineree.K8sNamespaceInfo, w http.ResponseWriter) *httperror.HandlerError {
+func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portainer.K8sNamespaceInfo, w http.ResponseWriter) *httperror.HandlerError {
 	resourceQuota, err := kcl.GetPortainerResourceQuota(namespace.Name)
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CombineNamespaceWithResourceQuota operation, unable to retrieve the resource quota associated with the namespace: %s for a non-admin user. Error: ", namespace.Name), err)
@@ -283,11 +279,23 @@ func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portaineree.K
 	return response.JSON(w, namespace)
 }
 
-func (kcl *KubeClient) BuildNonAdminNamespacesMap() map[string]struct{} {
+// buildNonAdminNamespacesMap builds a map of non-admin namespaces.
+// the map is used to filter the namespaces based on the allowed namespaces.
+func (kcl *KubeClient) buildNonAdminNamespacesMap() map[string]struct{} {
 	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
 	for _, namespace := range kcl.NonAdminNamespaces {
 		nonAdminNamespaceSet[namespace] = struct{}{}
 	}
 
 	return nonAdminNamespaceSet
+}
+
+// ConvertNamespaceMapToSlice converts the namespace map to a slice of namespaces.
+// this is used to for the API response.
+func (kcl *KubeClient) ConvertNamespaceMapToSlice(namespaces map[string]portainer.K8sNamespaceInfo) []portainer.K8sNamespaceInfo {
+	namespaceSlice := make([]portainer.K8sNamespaceInfo, 0, len(namespaces))
+	for _, namespace := range namespaces {
+		namespaceSlice = append(namespaceSlice, namespace)
+	}
+	return namespaceSlice
 }
