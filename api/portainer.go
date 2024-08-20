@@ -1623,9 +1623,6 @@ const (
 // List of supported features
 var SupportedFeatureFlags = []featureflags.Feature{}
 
-// IsDockerDesktopExtension is a flag to determine if the Portainer instance is running as a Docker Desktop extension
-var IsDockerDesktopExtension = false
-
 const (
 	_ AuthenticationMethod = iota
 	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -17,8 +16,9 @@ import (
 func WithProtect(handler http.Handler) (http.Handler, error) {
 	// IsDockerDesktopExtension is used to check if we should skip csrf checks in the request bouncer (ShouldSkipCSRFCheck)
 	// DOCKER_EXTENSION is set to '1' in build/docker-extension/docker-compose.yml
+	isDockerDesktopExtension := false
 	if val, ok := os.LookupEnv("DOCKER_EXTENSION"); ok && val == "1" {
-		portainer.IsDockerDesktopExtension = true
+		isDockerDesktopExtension = true
 	}
 
 	handler = withSendCSRFToken(handler)
@@ -34,7 +34,7 @@ func WithProtect(handler http.Handler) (http.Handler, error) {
 		gorillacsrf.Secure(false),
 	)(handler)
 
-	return withSkipCSRF(handler), nil
+	return withSkipCSRF(handler, isDockerDesktopExtension), nil
 }
 
 func withSendCSRFToken(handler http.Handler) http.Handler {
@@ -53,9 +53,9 @@ func withSendCSRFToken(handler http.Handler) http.Handler {
 	})
 }
 
-func withSkipCSRF(handler http.Handler) http.Handler {
+func withSkipCSRF(handler http.Handler, isDockerDesktopExtension bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		skip, err := security.ShouldSkipCSRFCheck(r)
+		skip, err := security.ShouldSkipCSRFCheck(r, isDockerDesktopExtension)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, err.Error(), err)
 
