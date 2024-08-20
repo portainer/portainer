@@ -3,7 +3,6 @@ package security
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -531,7 +530,7 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 // - api token
 // - docker desktop extension
 func ShouldSkipCSRFCheck(r *http.Request) (bool, error) {
-	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+	if portainer.IsDockerDesktopExtension {
 		return true, nil
 	}
 

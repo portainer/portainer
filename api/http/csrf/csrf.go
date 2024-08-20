@@ -4,7 +4,9 @@ import (
 	"crypto/rand"
 	"fmt"
 	"net/http"
+	"os"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -13,6 +15,12 @@ import (
 )
 
 func WithProtect(handler http.Handler) (http.Handler, error) {
+	// IsDockerDesktopExtension is used to check if we should skip csrf checks in the request bouncer (ShouldSkipCSRFCheck)
+	// DOCKER_EXTENSION is set to '1' in build/docker-extension/docker-compose.yml
+	if val, ok := os.LookupEnv("DOCKER_EXTENSION"); ok && val == "1" {
+		portainer.IsDockerDesktopExtension = true
+	}
+
 	handler = withSendCSRFToken(handler)
 
 	token := make([]byte, 32)
