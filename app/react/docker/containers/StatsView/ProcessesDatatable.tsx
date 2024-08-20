@@ -31,7 +31,8 @@ export function ProcessesDatatable() {
   const topQuery = useContainerTop(
     environmentId,
     containerId,
-    parseContainerProcesses
+    (containerProcesses: ContainerProcesses) =>
+      parseContainerProcesses(containerProcesses)
   );
   const tableState = useTableState(store, tableKey);
 
@@ -54,10 +55,17 @@ function parseContainerProcesses(
   containerProcesses: ContainerProcesses
 ): ProcessesDatatableProps {
   const { Processes: processes, Titles: titles } = containerProcesses;
-  const rows = processes?.map((row, index) => ({
-    id: index,
-    ...Object.fromEntries(titles.map((header, index) => [header, row[index]])),
-  }));
+  const rows = processes?.map((row, index) => {
+    // docker has the row data as an array of many strings
+    // podman has the row data as an array with a single string separated by one or many spaces
+    const processArray = row.length === 1 ? row[0].split(/\s+/) : row;
+    return {
+      id: index,
+      ...Object.fromEntries(
+        titles.map((header, index) => [header, processArray[index]])
+      ),
+    };
+  });
 
   const columns = titles
     ? titles.map(

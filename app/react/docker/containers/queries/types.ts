@@ -9,6 +9,6 @@ export interface Filters {
 }
 
 export type ContainerProcesses = {
-  Processes: Array<string>;
+  Processes: Array<Array<string>>;
   Titles: Array<string>;
 };
