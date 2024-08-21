@@ -17,7 +17,7 @@ require (
 	github.com/coreos/go-semver v0.3.0
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/docker/cli v26.0.1+incompatible
-	github.com/docker/docker v26.0.1+incompatible
+	github.com/docker/docker v26.1.5+incompatible
 	github.com/fvbommel/sortorder v1.0.2
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
 	github.com/go-git/go-git/v5 v5.11.0
