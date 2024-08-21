@@ -60,7 +60,7 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 }
 
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
 	}
@@ -116,7 +116,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 		return httperror.BadRequest("an error occurred during the getKubernetesNamespace operation, invalid namespace parameter namespace. Error: ", err)
 	}
 
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
 		return httperror.BadRequest(fmt.Sprintf("an error occurred during the getKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespace), err)
 	}

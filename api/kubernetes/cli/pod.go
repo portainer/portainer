@@ -9,6 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -109,4 +111,32 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, 
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
+}
+
+// isReplicaSetOwner checks if the pod's owner reference is a ReplicaSet
+func isReplicaSetOwner(pod corev1.Pod) bool {
+	return len(pod.OwnerReferences) > 0 && pod.OwnerReferences[0].Kind == "ReplicaSet"
+}
+
+// updateOwnerReferenceToDeployment updates the pod's owner reference to the Deployment if applicable
+func updateOwnerReferenceToDeployment(pod *corev1.Pod, replicaSets []appsv1.ReplicaSet) {
+	for _, replicaSet := range replicaSets {
+		if pod.OwnerReferences[0].Name == replicaSet.Name {
+			if len(replicaSet.OwnerReferences) > 0 && replicaSet.OwnerReferences[0].Kind == "Deployment" {
+				pod.OwnerReferences[0].Kind = "Deployment"
+				pod.OwnerReferences[0].Name = replicaSet.OwnerReferences[0].Name
+			}
+			break
+		}
+	}
+}
+
+// containsReplicaSetOwnerReference checks if the pod list contains a pod with a ReplicaSet owner reference
+func containsReplicaSetOwnerReference(pods *corev1.PodList) bool {
+	for _, pod := range pods.Items {
+		if len(pod.OwnerReferences) > 0 && pod.OwnerReferences[0].Kind == "ReplicaSet" {
+			return true
+		}
+	}
+	return false
 }

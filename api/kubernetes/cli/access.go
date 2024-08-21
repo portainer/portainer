@@ -118,19 +118,14 @@ func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]p
 }
 
 // GetNonAdminNamespaces retrieves namespaces for a non-admin user, excluding the default namespace if restricted.
-func GetNonAdminNamespaces(userID int, endpoint *portainer.Endpoint, clientFactory *ClientFactory) ([]string, error) {
-	kcl, err := clientFactory.GetPrivilegedKubeClient(endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("an error occurred during the getNonAdminNamespaces operation, unable to get privileged kube client: %w", err)
-	}
-
+func (kcl *KubeClient) GetNonAdminNamespaces(userID int, isRestrictDefaultNamespace bool) ([]string, error) {
 	accessPolicies, err := kcl.GetNamespaceAccessPolicies()
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred during the getNonAdminNamespaces operation, unable to get namespace access policies via portainer-config. check if portainer-config configMap exists in the Kubernetes cluster: %w", err)
 	}
 
 	nonAdminNamespaces := []string{}
-	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+	if !isRestrictDefaultNamespace {
 		nonAdminNamespaces = append(nonAdminNamespaces, defaultNamespace)
 	}
 

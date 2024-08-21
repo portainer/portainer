@@ -69,6 +69,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes", httperror.LoggerHandler(h.GetKubernetesVolumes)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes/count", httperror.LoggerHandler(h.getKubernetesVolumesCount)).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
@@ -84,6 +86,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.createKubernetesService)).Methods(http.MethodPost)
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.updateKubernetesService)).Methods(http.MethodPut)
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.getKubernetesServices)).Methods(http.MethodGet)
+	namespaceRouter.Handle("/volumes/{volume}", httperror.LoggerHandler(h.getKubernetesVolume)).Methods(http.MethodGet)
 
 	return h
 }
@@ -168,9 +171,15 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		isKubeAdmin := true
 		nonAdminNamespaces := []string{}
 		if user.Role != portainer.AdministratorRole {
-			nonAdminNamespaces, err = cli.GetNonAdminNamespaces(int(user.ID), endpoint, handler.KubernetesClientFactory)
+			pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 			if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the IsAdmin operation, unable to retrieve non-admin namespaces. Error: ", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to get privileged kube client to grab all namespaces. Error: ", err)
+				return
+			}
+
+			nonAdminNamespaces, err = pcli.GetNonAdminNamespaces(int(user.ID), endpoint.Kubernetes.Configuration.RestrictDefaultNamespace)
+			if err != nil {
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to retrieve non-admin namespaces. Error: ", err)
 				return
 			}
 			isKubeAdmin = false
