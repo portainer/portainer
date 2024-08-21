@@ -51,6 +51,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	endpointRouter.Use(h.kubeClientMiddleware)
 
+	endpointRouter.Handle("/configmaps", httperror.LoggerHandler(h.GetKubernetesConfigMaps)).Methods(http.MethodGet)
+	endpointRouter.Handle("/configmaps/count", httperror.LoggerHandler(h.getKubernetesConfigMapsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.getKubernetesDashboard)).Methods(http.MethodGet)
 	endpointRouter.Handle("/nodes_limits", httperror.LoggerHandler(h.getKubernetesNodesLimits)).Methods(http.MethodGet)
 	endpointRouter.Handle("/max_resource_limits", httperror.LoggerHandler(h.getKubernetesMaxResourceLimits)).Methods(http.MethodGet)
@@ -77,7 +79,6 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	namespaceRouter.Handle("/system", bouncer.RestrictedAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllersByNamespace)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllersByNamespace)).Methods(http.MethodPut)
-	namespaceRouter.Handle("/configuration", httperror.LoggerHandler(h.getKubernetesConfigMapsAndSecrets)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.createKubernetesIngress)).Methods(http.MethodPost)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.updateKubernetesIngress)).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresses", httperror.LoggerHandler(h.getKubernetesIngresses)).Methods(http.MethodGet)

@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -151,4 +153,54 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 	}
 
 	return models.K8sApplication{}, nil
+}
+
+// GetApplicationsFromConfigMap gets a list of applications that use a specific ConfigMap
+// by checking all pods in the same namespace as the ConfigMap
+func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConfigMap, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]string, error) {
+	results := []string{}
+	for _, pod := range pods {
+		if pod.Namespace == configMap.Namespace {
+			if isPodUsingConfigMap(&pod, configMap.Name) {
+				application, err := kcl.ConvertPodToApplication(pod, replicaSets)
+				if err != nil {
+					return nil, err
+				}
+				results = append(results, application.Name)
+			}
+		}
+	}
+
+	return results, nil
+}
+
+// ConvertPodToApplication converts a pod to an application, updating owner references if necessary
+func (kcl *KubeClient) ConvertPodToApplication(pod corev1.Pod, replicaSets []appsv1.ReplicaSet) (models.K8sApplication, error) {
+	if len(pod.OwnerReferences) == 0 {
+		return createPodApplication(pod), nil
+	}
+
+	if isReplicaSetOwner(pod) {
+		updateOwnerReferenceToDeployment(&pod, replicaSets)
+	}
+
+	return createApplicationFromOwnerReference(pod), nil
+}
+
+// createPodApplication creates a K8sApplication from a pod without owner references
+func createPodApplication(pod corev1.Pod) models.K8sApplication {
+	return models.K8sApplication{
+		Name:      pod.Name,
+		Namespace: pod.Namespace,
+		Kind:      "Pod",
+	}
+}
+
+// createApplicationFromOwnerReference creates a K8sApplication from the pod's owner reference
+func createApplicationFromOwnerReference(pod corev1.Pod) models.K8sApplication {
+	return models.K8sApplication{
+		Name:      pod.OwnerReferences[0].Name,
+		Namespace: pod.Namespace,
+		Kind:      pod.OwnerReferences[0].Kind,
+	}
 }

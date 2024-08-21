@@ -1486,7 +1486,8 @@ type (
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		GetNamespace(string) (K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
-		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		GetConfigMaps(namespace string) ([]models.K8sConfigMap, error)
+		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
 		GetApplications(namespace, kind string) ([]models.K8sApplication, error)
 		GetApplication(namespace, kind, name string) (models.K8sApplication, error)
