@@ -403,6 +403,7 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 			name:                     "Should return true (skip) when cookie is present and docker desktop extension is true",
 			cookieValue:              "test-cookie",
 			isDockerDesktopExtension: true,
+			expectedResult:           true,
 		},
 		{
 			name:                     "Should return true (skip) when cookie is not present",
