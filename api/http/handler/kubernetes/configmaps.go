@@ -10,6 +10,51 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
+// @id getKubernetesConfigMap
+// @summary Get ConfigMap
+// @description Get a ConfigMap by name for a given namespace
+// @description **Access policy**: authenticated
+// @tags kubernetes
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment identifier"
+// @param namespace path string true "Namespace name"
+// @param configmap path string true "ConfigMap name"
+// @success 200 {object} K8sConfigMap "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap} [get]
+func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
+	if err != nil {
+		return httperror.BadRequest("an error occurred during the GetKubernetesConfigMap operation, unable to retrieve namespace identifier route variable. Error: ", err)
+	}
+
+	configMapName, err := request.RetrieveRouteVariableValue(r, "configmap")
+	if err != nil {
+		return httperror.BadRequest("an error occurred during the GetKubernetesConfigMap operation, unable to retrieve configMap identifier route variable. Error: ", err)
+	}
+
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	configMap, err := cli.GetConfigMap(namespace, configMapName)
+	if err != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
+	}
+
+	configMapWithApplications, err := cli.CombineConfigMapWithApplications(configMap)
+	if err != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesConfigMap operation, unable to combine configMap with applications. Error: ", err)
+	}
+
+	return response.JSON(w, configMapWithApplications)
+}
+
 // @id GetKubernetesConfigMaps
 // @summary Get ConfigMaps
 // @description Get all ConfigMaps for a given namespace

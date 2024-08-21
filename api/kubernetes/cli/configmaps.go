@@ -62,6 +62,15 @@ func (kcl *KubeClient) fetchConfigMaps(namespace string) ([]models.K8sConfigMap,
 	return results, nil
 }
 
+func (kcl *KubeClient) GetConfigMap(namespace, configMapName string) (models.K8sConfigMap, error) {
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(namespace).Get(context.Background(), configMapName, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(configMap), nil
+}
+
 // parseConfigMap parses a k8s ConfigMap object into a K8sConfigMap struct.
 func parseConfigMap(configMap *corev1.ConfigMap) models.K8sConfigMap {
 	return models.K8sConfigMap{
@@ -104,4 +113,36 @@ func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8s
 	}
 
 	return updatedConfigMaps, nil
+}
+
+// CombineConfigMapWithApplications combines the config map with the applications that use it.
+// the function fetches all the pods in the cluster and checks if the config map is used by any of the pods.
+// it needs to check if the pods are owned by a replica set to determine if the pod is part of a deployment.
+func (kcl *KubeClient) CombineConfigMapWithApplications(configMap models.K8sConfigMap) (models.K8sConfigMap, error) {
+	pods, err := kcl.cli.CoreV1().Pods(configMap.Namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get pods. Error: %w", err)
+	}
+
+	containsReplicaSetOwner := false
+	for _, pod := range pods.Items {
+		containsReplicaSetOwner = isReplicaSetOwner(pod)
+		break
+	}
+
+	if containsReplicaSetOwner {
+		replicaSets, err := kcl.cli.AppsV1().ReplicaSets(configMap.Namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get replica sets. Error: %w", err)
+		}
+
+		applications, err := kcl.GetApplicationNamesFromConfigMap(configMap, pods.Items, replicaSets.Items)
+		if err != nil {
+			return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get applications from config map. Error: %w", err)
+		}
+
+		configMap.Applications = applications
+	}
+
+	return configMap, nil
 }

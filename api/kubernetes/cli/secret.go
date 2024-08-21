@@ -3,12 +3,12 @@ package cli
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -49,7 +49,7 @@ func (kcl *KubeClient) getSecretsForNonAdmin(namespace string) ([]models.K8sSecr
 }
 
 // getSecrets gets all the Secrets for a given namespace in a k8s endpoint.
-// the result is a list of config maps parsed into a K8sSecret struct.
+// the result is a list of secrets parsed into a K8sSecret struct.
 func (kcl *KubeClient) getSecrets(namespace string) ([]models.K8sSecret, error) {
 	secrets, err := kcl.cli.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
@@ -64,12 +64,23 @@ func (kcl *KubeClient) getSecrets(namespace string) ([]models.K8sSecret, error) 
 	return results, nil
 }
 
+// GetSecret gets a Secret by name for a given namespace.
+// the result is a secret parsed into a K8sSecret struct.
+func (kcl *KubeClient) GetSecret(namespace string, secretName string) (models.K8sSecret, error) {
+	secret, err := kcl.cli.CoreV1().Secrets(namespace).Get(context.Background(), secretName, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sSecret{}, err
+	}
+
+	return parseSecret(secret), nil
+}
+
 // parseSecret parses a k8s Secret object into a K8sSecret struct.
 func parseSecret(secret *corev1.Secret) models.K8sSecret {
 	secretData := secret.Data
 	secretDataMap := make(map[string]string, len(secretData))
-	for k, v := range secretData {
-		secretDataMap[k] = string(v)
+	for key, value := range secretData {
+		secretDataMap[key] = string(value)
 	}
 
 	return models.K8sSecret{
@@ -85,10 +96,72 @@ func parseSecret(secret *corev1.Secret) models.K8sSecret {
 	}
 }
 
+// CombineSecretsWithApplications combines the secrets with the applications that use them.
+// the function fetches all the pods and replica sets in the cluster and checks if the secret is used by any of the pods.
+// if the secret is used by a pod, the application that uses the pod is added to the secret.
+// otherwise, the secret is returned as is.
+func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret) ([]models.K8sSecret, error) {
+	updatedSecrets := make([]models.K8sSecret, len(secrets))
+
+	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets()
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
+	}
+
+	for index, secret := range secrets {
+		updatedSecret := secret
+
+		applications, err := kcl.GetApplicationNamesFromSecret(secret, pods, replicaSets)
+		if err != nil {
+			return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to get applications from secret. Error: %w", err)
+		}
+
+		if len(applications) > 0 {
+			updatedSecret.Applications = applications
+		}
+
+		updatedSecrets[index] = updatedSecret
+	}
+
+	return updatedSecrets, nil
+}
+
+// CombineSecretWithApplications combines the secret with the applications that use it.
+// the function fetches all the pods in the cluster and checks if the secret is used by any of the pods.
+// it needs to check if the pods are owned by a replica set to determine if the pod is part of a deployment.
+func (kcl *KubeClient) CombineSecretWithApplications(secret models.K8sSecret) (models.K8sSecret, error) {
+	pods, err := kcl.cli.CoreV1().Pods(secret.Namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get pods. Error: %w", err)
+	}
+
+	containsReplicaSetOwner := false
+	for _, pod := range pods.Items {
+		containsReplicaSetOwner = isReplicaSetOwner(pod)
+		break
+	}
+
+	if containsReplicaSetOwner {
+		replicaSets, err := kcl.cli.AppsV1().ReplicaSets(secret.Namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get replica sets. Error: %w", err)
+		}
+
+		applications, err := kcl.GetApplicationNamesFromSecret(secret, pods.Items, replicaSets.Items)
+		if err != nil {
+			return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get applications from secret. Error: %w", err)
+		}
+
+		secret.Applications = applications
+	}
+
+	return secret, nil
+}
+
 func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) error {
 	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName, kcl.instanceID)
 
-	serviceAccountSecret := &v1.Secret{
+	serviceAccountSecret := &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: serviceAccountSecretName,

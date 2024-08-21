@@ -192,3 +192,22 @@ func isPodUsingConfigMap(pod *corev1.Pod, configMapName string) bool {
 
 	return false
 }
+
+// isPodUsingSecret checks if a pod is using a specific Secret
+func isPodUsingSecret(pod *corev1.Pod, secretName string) bool {
+	for _, volume := range pod.Spec.Volumes {
+		if volume.Secret != nil && volume.Secret.SecretName == secretName {
+			return true
+		}
+	}
+
+	for _, container := range pod.Spec.Containers {
+		for _, env := range container.Env {
+			if env.ValueFrom != nil && env.ValueFrom.SecretKeyRef != nil && env.ValueFrom.SecretKeyRef.Name == secretName {
+				return true
+			}
+		}
+	}
+
+	return false
+}
