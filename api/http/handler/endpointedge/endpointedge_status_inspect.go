@@ -264,7 +264,7 @@ func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statu
 	rr := httptest.NewRecorder()
 
 	if err := response.JSON(rr, statusResponse); err != nil {
-		return nil
+		return err
 	}
 
 	h := fnv.New32a()
