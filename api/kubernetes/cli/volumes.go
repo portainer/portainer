@@ -69,7 +69,7 @@ func (kcl *KubeClient) fetchVolumesForNonAdmin(namespace string) ([]models.K8sVo
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sVolumeInfo, 0)
 	for _, volume := range volumes {
 		if _, ok := nonAdminNamespaceSet[volume.PersistentVolumeClaim.Namespace]; ok {
