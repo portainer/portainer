@@ -137,7 +137,8 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
     network: networkTabUtils.toViewModel(
       fromContainer,
       networksQuery.data,
-      runningContainersQuery.data
+      runningContainersQuery.data,
+      isPodman
     ),
     labels: labelsTabUtils.toViewModel(fromContainer),
     restartPolicy: restartPolicyTabUtils.toViewModel(fromContainer),

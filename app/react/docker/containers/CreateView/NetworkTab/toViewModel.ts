@@ -30,7 +30,8 @@ function getDefaultNetworkMode(isWindows: boolean, isPodman?: boolean) {
 export function toViewModel(
   config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<ContainerListViewModel> = []
+  runningContainers: Array<ContainerListViewModel> = [],
+  isPodman?: boolean
 ): Values {
   const dns = config.HostConfig?.Dns;
   const [primaryDns = '', secondaryDns = ''] = dns || [];
@@ -40,7 +41,8 @@ export function toViewModel(
   const [networkMode, container = ''] = getNetworkMode(
     config,
     networks,
-    runningContainers
+    runningContainers,
+    isPodman
   );
 
   const networkSettings = config.NetworkSettings?.Networks?.[networkMode];
@@ -70,7 +72,8 @@ export function toViewModel(
 function getNetworkMode(
   config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<ContainerListViewModel> = []
+  runningContainers: Array<ContainerListViewModel> = [],
+  isPodman?: boolean
 ) {
   let networkMode = config.HostConfig?.NetworkMode || '';
   if (!networkMode) {
@@ -91,6 +94,9 @@ function getNetworkMode(
   const networkNames = networks.map((n) => n.Name);
 
   if (networkNames.includes(networkMode)) {
+    if (isPodman && networkMode === 'bridge') {
+      return ['podman'] as const;
+    }
     return [networkMode] as const;
   }
 
@@ -98,6 +104,9 @@ function getNetworkMode(
     networkNames.includes('bridge') &&
     (!networkMode || networkMode === 'default' || networkMode === 'bridge')
   ) {
+    if (isPodman) {
+      return ['podman'] as const;
+    }
     return ['bridge'] as const;
   }
 
