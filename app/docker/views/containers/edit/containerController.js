@@ -6,6 +6,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { confirmContainerRecreation } from '@/react/docker/containers/ItemView/ConfirmRecreationModal';
 import { commitContainer } from '@/react/docker/proxy/queries/useCommitContainerMutation';
+import { semverCompare } from '@/react/common/semver-utils';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -123,7 +124,14 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowHostNamespaceForRegularUsers ||
             !allowPrivilegedModeForRegularUsers;
 
-          $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          const apiVersion = endpoint.Snapshots[0] ? endpoint.Snapshots[0].DockerSnapshotRaw.Version.ApiVersion : '1.24';
+          const isApiVersion1_44OrGreater = semverCompare(apiVersion, '1.44') >= 0;
+          // isCreateContainerSupported is true if the API version is 1.44 or greater, or if the container does not have a MacAddress
+          // see https://github.com/moby/moby/blob/f9522e5e96c3ab5a6b8a643d15a92700ca864da6/client/container_create.go#L44
+          // podman 5.1.1 currently shows an api version of 1.41 and has container networks with mac addresses, so hide the recreate button in this case
+          const isCreateContainerSupported = isApiVersion1_44OrGreater || !container.NetworkSettings.MacAddress;
+          $scope.displayDuplicateEditButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          $scope.displayRecreateButton = $scope.displayDuplicateEditButton && isCreateContainerSupported;
           $scope.displayCreateWebhookButton = $scope.displayRecreateButton;
         })
         .catch(function error(err) {
