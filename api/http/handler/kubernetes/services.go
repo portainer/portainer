@@ -82,7 +82,7 @@ func (handler *Handler) getKubernetesClusterServices(r *http.Request) ([]models.
 	}
 
 	if withApplications {
-		servicesWithApplications, err := pcli.CombineServicesWithApplications(&services)
+		servicesWithApplications, err := pcli.CombineServicesWithApplications(services)
 		if err != nil {
 			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesEnvironmentServices operation, unable to combine services with applications. Error: ", err)
 		}

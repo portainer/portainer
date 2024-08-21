@@ -158,13 +158,13 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 
 // GetApplicationFromServiceSelector gets applications based on service selectors
 // it matches the service selector with the pod labels
-func (kcl *KubeClient) GetApplicationFromServiceSelector(pods *corev1.PodList, service models.K8sServiceInfo, replicaSets []appsv1.ReplicaSet) (models.K8sApplication, error) {
+func (kcl *KubeClient) GetApplicationFromServiceSelector(pods []corev1.Pod, service models.K8sServiceInfo, replicaSets []appsv1.ReplicaSet) (models.K8sApplication, error) {
 	servicesSelector := labels.SelectorFromSet(service.Selector)
 	if servicesSelector.Empty() {
 		return models.K8sApplication{}, nil
 	}
 
-	for _, pod := range pods.Items {
+	for _, pod := range pods {
 		if servicesSelector.Matches(labels.Set(pod.Labels)) {
 			return kcl.ConvertPodToApplication(pod, replicaSets)
 		}

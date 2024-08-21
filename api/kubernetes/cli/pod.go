@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -11,11 +12,11 @@ import (
 	"github.com/rs/zerolog/log"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (kcl *KubeClient) GetPods(namespace string) ([]v1.Pod, error) {
+func (kcl *KubeClient) GetPods(namespace string) ([]corev1.Pod, error) {
 	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -63,7 +64,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 
 	podPrefix := userShellPodPrefix(serviceAccountName)
 
-	podSpec := &v1.Pod{
+	podSpec := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: podPrefix,
 			Namespace:    portainerNamespace,
@@ -71,20 +72,20 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 				"kubernetes.io/pod.type": "kubectl-shell",
 			},
 		},
-		Spec: v1.PodSpec{
+		Spec: corev1.PodSpec{
 			TerminationGracePeriodSeconds: new(int64),
 			ServiceAccountName:            serviceAccountName,
-			Containers: []v1.Container{
+			Containers: []corev1.Container{
 				{
 					Name:    "kubectl-shell-container",
 					Image:   shellPodImage,
 					Command: []string{"sleep"},
 					// Specify sleep time to prevent zombie pods in case portainer process is terminated
 					Args:            []string{maxPodKeepAliveSecondsStr},
-					ImagePullPolicy: v1.PullIfNotPresent,
+					ImagePullPolicy: corev1.PullIfNotPresent,
 				},
 			},
-			RestartPolicy: v1.RestartPolicyNever,
+			RestartPolicy: corev1.RestartPolicyNever,
 		},
 	}
 
@@ -97,7 +98,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	timeoutCtx, cancelFunc := context.WithTimeout(ctx, 20*time.Second)
 	defer cancelFunc()
 
-	if err := kcl.waitForPodStatus(timeoutCtx, v1.PodRunning, shellPod); err != nil {
+	if err := kcl.waitForPodStatus(timeoutCtx, corev1.PodRunning, shellPod); err != nil {
 		kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
 
 		return nil, errors.Wrap(err, "aborting pod creation; error waiting for shell pod ready status")
@@ -128,7 +129,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 
 // waitForPodStatus will wait until duration d (from now) for a pod to reach defined phase/status.
 // The pod status will be polled at specified delay until the pod reaches ready state.
-func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, pod *v1.Pod) error {
+func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase corev1.PodPhase, pod *corev1.Pod) error {
 	log.Debug().Str("pod", pod.Name).Msg("waiting for pod ready")
 
 	for {
@@ -148,4 +149,27 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, 
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
+}
+
+// fetchAllPodsAndReplicaSets fetches all pods and replica sets across the cluster, i.e. all namespaces
+func (kcl *KubeClient) fetchAllPodsAndReplicaSets() ([]corev1.Pod, []appsv1.ReplicaSet, error) {
+	pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, nil, nil
+		}
+		return nil, nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to list pods across the cluster. Error: %w", err)
+	}
+
+	hasReplicaSetOwnerReference := containsReplicaSetOwnerReference(pods)
+	replicaSetItems := make([]appsv1.ReplicaSet, 0)
+	if hasReplicaSetOwnerReference {
+		replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			return nil, nil, fmt.Errorf("an error occurred during the GetApplicationsFromServiceSelectors operation, unable to list replica sets across the cluster. Error: %w", err)
+		}
+		replicaSetItems = replicaSets.Items
+	}
+
+	return pods.Items, replicaSetItems, nil
 }

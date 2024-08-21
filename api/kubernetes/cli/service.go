@@ -7,9 +7,7 @@ import (
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/rs/zerolog/log"
 
-	appsv1 "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -74,7 +72,7 @@ func (kcl *KubeClient) fetchServices(namespace string) ([]models.K8sServiceInfo,
 // parseService converts a k8s native service object to a Portainer K8sServiceInfo object.
 // service ports, ingress status, labels, annotations, cluster IPs, and external IPs are parsed.
 // it returns a K8sServiceInfo object.
-func parseService(service v1.Service) models.K8sServiceInfo {
+func parseService(service corev1.Service) models.K8sServiceInfo {
 	servicePorts := make([]models.K8sServicePort, 0)
 	for _, port := range service.Spec.Ports {
 		servicePorts = append(servicePorts, models.K8sServicePort{
@@ -115,10 +113,10 @@ func parseService(service v1.Service) models.K8sServiceInfo {
 // convertToK8sService converts a K8sServiceInfo object back to a k8s native service object.
 // this is required for create and update operations.
 // it returns a v1.Service object.
-func (kcl *KubeClient) convertToK8sService(info models.K8sServiceInfo) v1.Service {
-	service := v1.Service{}
+func (kcl *KubeClient) convertToK8sService(info models.K8sServiceInfo) corev1.Service {
+	service := corev1.Service{}
 	service.Name = info.Name
-	service.Spec.Type = v1.ServiceType(info.Type)
+	service.Spec.Type = corev1.ServiceType(info.Type)
 	service.Namespace = info.Namespace
 	service.Annotations = info.Annotations
 	service.Labels = info.Labels
@@ -126,11 +124,11 @@ func (kcl *KubeClient) convertToK8sService(info models.K8sServiceInfo) v1.Servic
 	service.Spec.Selector = info.Selector
 
 	for _, p := range info.Ports {
-		port := v1.ServicePort{}
+		port := corev1.ServicePort{}
 		port.Name = p.Name
 		port.NodePort = int32(p.NodePort)
 		port.Port = int32(p.Port)
-		port.Protocol = v1.Protocol(p.Protocol)
+		port.Protocol = corev1.Protocol(p.Protocol)
 		port.TargetPort = intstr.FromString(p.TargetPort)
 		service.Spec.Ports = append(service.Spec.Ports, port)
 	}
@@ -138,7 +136,7 @@ func (kcl *KubeClient) convertToK8sService(info models.K8sServiceInfo) v1.Servic
 	for _, i := range info.IngressStatus {
 		service.Status.LoadBalancer.Ingress = append(
 			service.Status.LoadBalancer.Ingress,
-			v1.LoadBalancerIngress{IP: i.IP, Hostname: i.Host},
+			corev1.LoadBalancerIngress{IP: i.IP, Hostname: i.Host},
 		)
 	}
 
@@ -176,42 +174,36 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 
 // CombineServicesWithApplications retrieves applications based on service selectors in a given namespace
 // for all services, it lists pods based on the service selector and converts the pod to an application
+// if replicasets are found, it updates the owner reference to deployment
 // it then combines the service with the application
 // finally, it returns a list of K8sServiceInfo objects
-func (kcl *KubeClient) CombineServicesWithApplications(services *[]models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
-	hasSelectors := containsServiceWithSelector(*services)
+func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
+	updatedServices := make([]models.K8sServiceInfo, len(services))
+
+	hasSelectors := containsServiceWithSelector(services)
 	if hasSelectors {
-		pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+		pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets()
 		if err != nil {
-			if k8serrors.IsNotFound(err) {
-				return *services, nil
-			}
-			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to list pods across the cluster. Error: %w", err)
+			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}
 
-		hasReplicaSetOwnerReference := containsReplicaSetOwnerReference(pods)
-		replicaSetItems := make([]appsv1.ReplicaSet, 0)
-		if hasReplicaSetOwnerReference {
-			replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
-			if err != nil {
-				return nil, fmt.Errorf("an error occurred during the GetApplicationsFromServiceSelectors operation, unable to list replica sets across the cluster. Error: %w", err)
-			}
-			replicaSetItems = replicaSets.Items
-		}
+		for index, service := range services {
+			updatedService := service
 
-		for index, service := range *services {
-			application, err := kcl.GetApplicationFromServiceSelector(pods, service, replicaSetItems)
+			application, err := kcl.GetApplicationFromServiceSelector(pods, service, replicaSets)
 			if err != nil {
-				return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to get application from service. Error: %w", err)
+				return services, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to get application from service. Error: %w", err)
 			}
 
 			if application.Name != "" {
-				(*services)[index].Applications = append((*services)[index].Applications, application)
+				updatedService.Applications = append(updatedService.Applications, application)
 			}
+
+			updatedServices[index] = updatedService
 		}
 	}
 
-	return *services, nil
+	return updatedServices, nil
 }
 
 // containsServiceWithSelector checks if a list of services contains a service with a selector
