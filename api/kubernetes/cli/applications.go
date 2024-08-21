@@ -159,7 +159,7 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 // GetApplicationsFromConfigMap gets a list of applications that use a specific ConfigMap
 // by checking all pods in the same namespace as the ConfigMap
 func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConfigMap, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]string, error) {
-	results := []string{}
+	applications := []string{}
 	for _, pod := range pods {
 		if pod.Namespace == configMap.Namespace {
 			if isPodUsingConfigMap(&pod, configMap.Name) {
@@ -167,12 +167,29 @@ func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConf
 				if err != nil {
 					return nil, err
 				}
-				results = append(results, application.Name)
+				applications = append(applications, application.Name)
 			}
 		}
 	}
 
-	return results, nil
+	return applications, nil
+}
+
+func (kcl *KubeClient) GetApplicationNamesFromSecret(secret models.K8sSecret, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]string, error) {
+	applications := []string{}
+	for _, pod := range pods {
+		if pod.Namespace == secret.Namespace {
+			if isPodUsingSecret(&pod, secret.Name) {
+				application, err := kcl.ConvertPodToApplication(pod, replicaSets)
+				if err != nil {
+					return nil, err
+				}
+				applications = append(applications, application.Name)
+			}
+		}
+	}
+
+	return applications, nil
 }
 
 // ConvertPodToApplication converts a pod to an application, updating owner references if necessary
