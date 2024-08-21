@@ -4,25 +4,20 @@ import (
 	"context"
 	"fmt"
 
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // GetResourceQuotas gets all resource quotas in the current k8s environment(endpoint).
-// The kube client must have cluster scope read access to do this.
+// if the user is an admin, all resource quotas in all namespaces are fetched.
+// otherwise, namespaces the non-admin user has access to will be used to filter the resource quotas.
 func (kcl *KubeClient) GetResourceQuotas(namespace string) (*[]corev1.ResourceQuota, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchResourceQuotasForAdmin(namespace)
+		return kcl.fetchResourceQuotas(namespace)
 	}
 	return kcl.fetchResourceQuotasForNonAdmin(namespace)
-}
-
-// fetchResourceQuotasForAdmin gets the resource quotas in the current k8s environment(endpoint) for an admin user.
-// The kube client must have cluster scope read access to do this.
-func (kcl *KubeClient) fetchResourceQuotasForAdmin(namespace string) (*[]corev1.ResourceQuota, error) {
-	return kcl.fetchResourceQuotas(namespace)
 }
 
 // fetchResourceQuotasForNonAdmin gets the resource quotas in the current k8s environment(endpoint) for a non-admin user.
@@ -39,7 +34,7 @@ func (kcl *KubeClient) fetchResourceQuotasForNonAdmin(namespace string) (*[]core
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := kcl.BuildNonAdminNamespacesMap()
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := []corev1.ResourceQuota{}
 	for _, resourceQuota := range *resourceQuotas {
 		if _, exists := nonAdminNamespaceSet[resourceQuota.Namespace]; exists {
@@ -59,8 +54,8 @@ func (kcl *KubeClient) fetchResourceQuotas(namespace string) (*[]corev1.Resource
 	return &resourceQuotas.Items, nil
 }
 
-// GetPortainerResourceQuota gets the resource quota for the portainer namespace.
-// The resource quota is prefixed with "portainer-rq-".
+// GetPortainerResourceQuota gets the resource quota prefixed with "portainer-rq-" in a specific namespace.
+// this is to fetch a specific resource quota created by Portainer.
 func (kcl *KubeClient) GetPortainerResourceQuota(namespace string) (*corev1.ResourceQuota, error) {
 	return kcl.cli.CoreV1().ResourceQuotas(namespace).Get(context.TODO(), "portainer-rq-"+namespace, metav1.GetOptions{})
 }
@@ -72,8 +67,8 @@ func (kcl *KubeClient) GetResourceQuota(namespace, resourceQuota string) (*corev
 
 // UpdateNamespacesWithResourceQuotas updates the namespaces with the resource quotas.
 // The resource quotas are matched with the namespaces by name.
-func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portaineree.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) map[string]portaineree.K8sNamespaceInfo {
-	namespacesWithQuota := map[string]portaineree.K8sNamespaceInfo{}
+func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) map[string]portainer.K8sNamespaceInfo {
+	namespacesWithQuota := map[string]portainer.K8sNamespaceInfo{}
 
 	for _, namespace := range namespaces {
 		namespace.ResourceQuota = kcl.GetResourceQuotaFromNamespace(namespace, resourceQuotas)
@@ -83,9 +78,8 @@ func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]
 	return namespacesWithQuota
 }
 
-// GetResourceQuotaFromNamespace updates the namespace.ResourceQuota field with the resource quota information.
-// The resource quota is matched with the namespace and prefixed with "portainer-rq-".
-func (kcl *KubeClient) GetResourceQuotaFromNamespace(namespace portaineree.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) *corev1.ResourceQuota {
+// GetResourceQuotaFromNamespace gets the resource quota in a specific namespace where the resource quota's name is prefixed with "portainer-rq-".
+func (kcl *KubeClient) GetResourceQuotaFromNamespace(namespace portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) *corev1.ResourceQuota {
 	for _, resourceQuota := range resourceQuotas {
 		if resourceQuota.ObjectMeta.Namespace == namespace.Name && resourceQuota.ObjectMeta.Name == "portainer-rq-"+namespace.Name {
 			return &resourceQuota
