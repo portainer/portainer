@@ -38,23 +38,8 @@ func (kcl *KubeClient) fetchClusterRoleBindings() ([]models.K8sClusterRoleBindin
 func parseClusterRoleBinding(clusterRoleBinding rbacv1.ClusterRoleBinding) models.K8sClusterRoleBinding {
 	return models.K8sClusterRoleBinding{
 		Name:         clusterRoleBinding.Name,
-		RoleName:     clusterRoleBinding.RoleRef.Name,
-		RoleKind:     clusterRoleBinding.RoleRef.Kind,
-		Subjects:     fetchSubjectsFromClusterRoleBinding(clusterRoleBinding),
+		RoleRef:      clusterRoleBinding.RoleRef,
+		Subjects:     clusterRoleBinding.Subjects,
 		CreationDate: clusterRoleBinding.CreationTimestamp.Time,
 	}
-}
-
-// fetchSubjectsFromClusterRoleBinding returns a list of K8sClusterRoleBindingSubject objects from a rbacv1.ClusterRoleBinding object.
-func fetchSubjectsFromClusterRoleBinding(clusterRoleBinding rbacv1.ClusterRoleBinding) []models.K8sClusterRoleBindingSubject {
-	subjects := make([]models.K8sClusterRoleBindingSubject, 0)
-	for _, subject := range clusterRoleBinding.Subjects {
-		subjects = append(subjects, models.K8sClusterRoleBindingSubject{
-			Kind:      subject.Kind,
-			Name:      subject.Name,
-			Namespace: subject.Namespace,
-		})
-	}
-
-	return subjects
 }

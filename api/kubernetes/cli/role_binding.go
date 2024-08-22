@@ -58,23 +58,8 @@ func parseRoleBinding(roleBinding rbacv1.RoleBinding) models.K8sRoleBinding {
 	return models.K8sRoleBinding{
 		Name:         roleBinding.Name,
 		Namespace:    roleBinding.Namespace,
-		RoleName:     roleBinding.RoleRef.Name,
-		RoleKind:     roleBinding.RoleRef.Kind,
-		Subjects:     fetchSubjectsFromRoleBinding(roleBinding),
+		RoleRef:      roleBinding.RoleRef,
+		Subjects:     roleBinding.Subjects,
 		CreationDate: roleBinding.CreationTimestamp.Time,
 	}
-}
-
-// fetchSubjectsFromRoleBinding returns a list of K8sRoleBindingSubject objects from a rbacv1.RoleBinding object.
-func fetchSubjectsFromRoleBinding(clusterRoleBinding rbacv1.RoleBinding) []models.K8sRoleBindingSubject {
-	subjects := make([]models.K8sRoleBindingSubject, 0)
-	for _, subject := range clusterRoleBinding.Subjects {
-		subjects = append(subjects, models.K8sRoleBindingSubject{
-			Kind:      subject.Kind,
-			Name:      subject.Name,
-			Namespace: subject.Namespace,
-		})
-	}
-
-	return subjects
 }
