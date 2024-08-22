@@ -65,7 +65,7 @@ func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Re
 // @accept json
 // @produce json
 // @param id path int true "Environment identifier"
-// @param isUsed query bool false "When set to true, associate the ConfigMaps with the applications that use them"
+// @param isUsed query bool true "When set to true, associate the ConfigMaps with the applications that use them"
 // @success 200 {array} []K8sConfigMap "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -103,7 +103,7 @@ func (handler *Handler) getKubernetesConfigMapsCount(w http.ResponseWriter, r *h
 }
 
 func (handler *Handler) getKubernetesConfigMaps(r *http.Request) ([]models.K8sConfigMap, *httperror.HandlerError) {
-	isUsed, err := request.RetrieveBooleanQueryParameter(r, "isUsed", false)
+	isUsed, err := request.RetrieveBooleanQueryParameter(r, "isUsed", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the GetKubernetesConfigMaps operation, unable to retrieve isUsed query parameter. Error: ", err)
 	}
@@ -125,7 +125,7 @@ func (handler *Handler) getKubernetesConfigMaps(r *http.Request) ([]models.K8sCo
 	pcli.IsKubeAdmin = cli.IsKubeAdmin
 	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
 
-	configMaps, err := cli.GetConfigMaps("")
+	configMaps, err := pcli.GetConfigMaps("")
 	if err != nil {
 		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesConfigMaps operation, unable to get configMaps. Error: ", err)
 	}

@@ -1,19 +1,20 @@
 import { useMemo } from 'react';
 import { Lock } from 'lucide-react';
-import { Pod, Secret } from 'kubernetes-types/core/v1';
-import { CronJob, Job } from 'kubernetes-types/batch/v1';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import {
-  DefaultDatatableSettings,
-  TableSettings as KubeTableSettings,
-} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+  Authorized,
+  useAuthorizations,
+  useCurrentUser,
+} from '@/react/hooks/useUser';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { useEnvironment } from '@/react/portainer/environments/queries';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 import { usePods } from '@/react/kubernetes/applications/usePods';
 import { useJobs } from '@/react/kubernetes/applications/useJobs';
@@ -21,44 +22,37 @@ import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
+import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
-import {
-  type FilteredColumnsTableSettings,
-  filteredColumnsSettings,
-} from '@@/datatables/types';
-import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
-import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
-import {
-  useSecretsForCluster,
-  useMutationDeleteSecrets,
-} from '../../secret.service';
-import { IndexOptional } from '../../types';
+import { useSecretsForCluster } from '../../queries/useSecretsForCluster';
+import { useDeleteSecrets } from '../../queries/useDeleteSecrets';
+import { IndexOptional, Configuration } from '../../types';
+import { CronJob, Job, K8sPod } from '../../../applications/types';
 
 import { getIsSecretInUse } from './utils';
 import { SecretRowData } from './types';
 import { columns } from './columns';
 
 const storageKey = 'k8sSecretsDatatable';
-
-interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+const settingsStore = createStore(storageKey);
 
 export function SecretsDatatable() {
-  const tableState = useKubeStore<TableSettings>(
-    storageKey,
-    undefined,
-    (set) => ({
-      ...filteredColumnsSettings(set),
-    })
-  );
   const environmentId = useEnvironmentId();
+  const tableState = useTableState(settingsStore, storageKey);
   const { authorized: canWrite } = useAuthorizations(['K8sSecretsW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
+
+  const isAddSecretHidden = useIsDeploymentOptionHidden('form');
+  const { user } = useCurrentUser();
+  const restrictSecretsQuery = useEnvironment(
+    environmentId,
+    (env) => env?.Kubernetes.Configuration.RestrictSecrets
+  );
+  const isSecretsRestricted = !!restrictSecretsQuery.data;
 
   const { data: namespaces, ...namespacesQuery } = useNamespacesQuery(
     environmentId,
@@ -66,31 +60,26 @@ export function SecretsDatatable() {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const namespaceNames = Object.keys(namespaces || {});
+
+  const withSystem = canAccessSystemResources && tableState.showSystemResources;
+
   const { data: secrets, ...secretsQuery } = useSecretsForCluster(
     environmentId,
-    namespaceNames,
+    {
+      withSystem,
+    },
     {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
     }
   );
-  const podsQuery = usePods(environmentId, namespaceNames);
-  const jobsQuery = useJobs(environmentId, namespaceNames);
-  const cronJobsQuery = useCronJobs(environmentId, namespaceNames);
+  const podsQuery = usePods(environmentId, { params: { withSystem } });
+  const jobsQuery = useJobs(environmentId, { withSystem });
+  const cronJobsQuery = useCronJobs(environmentId, { withSystem });
   const isInUseLoading =
     podsQuery.isLoading || jobsQuery.isLoading || cronJobsQuery.isLoading;
 
-  const filteredSecrets = useMemo(
-    () =>
-      secrets?.filter(
-        (secret) =>
-          (canAccessSystemResources && tableState.showSystemResources) ||
-          !namespaces?.[secret.metadata?.namespace ?? '']?.IsSystem
-      ) || [],
-    [secrets, tableState, canAccessSystemResources, namespaces]
-  );
   const secretRowData = useSecretRowData(
-    filteredSecrets,
+    secrets ?? [],
     podsQuery.data ?? [],
     jobsQuery.data ?? [],
     cronJobsQuery.data ?? [],
@@ -98,21 +87,27 @@ export function SecretsDatatable() {
     namespaces
   );
 
+  const isEnvironmentAdminQuery = useAuthorizations('K8sClusterW');
+
   return (
     <Datatable<IndexOptional<SecretRowData>>
-      dataset={secretRowData}
+      dataset={secretRowData || []}
       columns={columns}
       settingsManager={tableState}
       isLoading={secretsQuery.isLoading || namespacesQuery.isLoading}
+      emptyContentLabel="No secrets found"
       title="Secrets"
       titleIcon={Lock}
-      getRowId={(row) => row.metadata?.uid ?? ''}
+      getRowId={(row) => row.UID ?? ''}
       isRowSelectable={(row) =>
-        !namespaces?.[row.original.metadata?.namespace ?? '']?.IsSystem
+        !namespaces?.[row.original.Namespace ?? ''].IsSystem
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
-        <TableActions selectedItems={selectedRows} />
+        <TableActions
+          selectedItems={selectedRows}
+          isAddSecretHidden={isAddSecretHidden}
+        />
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
@@ -125,9 +120,6 @@ export function SecretsDatatable() {
         />
       }
       data-cy="k8s-secrets-datatable"
-      extendTableOptions={mergeOptions(
-        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
-      )}
     />
   );
 }
@@ -135,8 +127,8 @@ export function SecretsDatatable() {
 // useSecretRowData appends the `inUse` property to the secret data (for the unused badge in the name column)
 // and wraps with useMemo to prevent unnecessary calculations
 function useSecretRowData(
-  secrets: Secret[],
-  pods: Pod[],
+  secrets: Configuration[],
+  pods: K8sPod[],
   jobs: Job[],
   cronJobs: CronJob[],
   isInUseLoading: boolean,
@@ -144,27 +136,36 @@ function useSecretRowData(
 ): SecretRowData[] {
   return useMemo(
     () =>
-      secrets.map((secret) => ({
-        ...secret,
-        inUse:
-          // if the apps are loading, set inUse to true to hide the 'unused' badge
-          isInUseLoading || getIsSecretInUse(secret, pods, jobs, cronJobs),
-        isSystem: namespaces
-          ? namespaces?.[secret.metadata?.namespace ?? '']?.IsSystem
-          : false,
-      })),
+      secrets?.map(
+        (secret) =>
+          ({
+            ...secret,
+            inUse:
+              // if the apps are loading, set inUse to true to hide the 'unused' badge
+              isInUseLoading || getIsSecretInUse(secret, pods, jobs, cronJobs),
+            isSystem: namespaces
+              ? namespaces?.[secret.Namespace ?? '']?.IsSystem
+              : false,
+          }) ?? []
+      ),
     [secrets, isInUseLoading, pods, jobs, cronJobs, namespaces]
   );
 }
 
-function TableActions({ selectedItems }: { selectedItems: SecretRowData[] }) {
+function TableActions({
+  selectedItems,
+  isAddSecretHidden,
+}: {
+  selectedItems: SecretRowData[];
+  isAddSecretHidden: boolean;
+}) {
   const environmentId = useEnvironmentId();
-  const deleteSecretMutation = useMutationDeleteSecrets(environmentId);
+  const deleteSecretMutation = useDeleteSecrets(environmentId);
 
   async function handleRemoveClick(secrets: SecretRowData[]) {
     const secretsToDelete = secrets.map((secret) => ({
-      namespace: secret.metadata?.namespace ?? '',
-      name: secret.metadata?.name ?? '',
+      namespace: secret.Namespace ?? '',
+      name: secret.Name ?? '',
     }));
 
     await deleteSecretMutation.mutateAsync(secretsToDelete);
@@ -181,13 +182,17 @@ function TableActions({ selectedItems }: { selectedItems: SecretRowData[] }) {
           'secret'
         )}?`}
       />
-      <AddButton
-        to="kubernetes.secrets.new"
-        data-cy="k8sSecret-addSecretWithFormButton"
-        color="secondary"
-      >
-        Add with form
-      </AddButton>
+
+      {!isAddSecretHidden && (
+        <AddButton
+          to="kubernetes.secrets.new"
+          data-cy="k8sSecret-addSecretWithFormButton"
+          color="secondary"
+        >
+          Add with form
+        </AddButton>
+      )}
+
       <CreateFromManifestButton
         params={{
           tab: 'secrets',

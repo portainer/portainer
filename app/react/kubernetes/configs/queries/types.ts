@@ -1,0 +1,1 @@
+export type ConfigMapQueryParams = { withData?: boolean; withSystem?: boolean };
