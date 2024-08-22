@@ -2,6 +2,7 @@ package endpointedge
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -78,8 +79,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
-	cachedResp := handler.respondFromCache(w, r, portainer.EndpointID(endpointID))
-	if cachedResp {
+	if cachedResp := handler.respondFromCache(w, r, portainer.EndpointID(endpointID)); cachedResp {
 		return nil
 	}
 
@@ -96,24 +96,21 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	firstConn := endpoint.LastCheckInDate == 0
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	handler.DataStore.Endpoint().UpdateHeartbeat(endpoint.ID)
 
-	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	var statusResponse *endpointEdgeStatusInspectResponse
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID), firstConn)
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -125,15 +122,29 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	return cacheResponse(w, endpoint.ID, *statusResponse)
 }
 
+func (handler *Handler) parseHeaders(r *http.Request, endpoint *portainer.Endpoint) error {
+	endpoint.EdgeID = cmp.Or(endpoint.EdgeID, r.Header.Get(portainer.PortainerAgentEdgeIDHeader))
+
+	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
+	if agentPlatformErr != nil {
+		return httperror.BadRequest("agent platform header is not valid", agentPlatformErr)
+	}
+	endpoint.Type = agentPlatform
+
+	version := r.Header.Get(portainer.PortainerAgentHeader)
+	endpoint.Agent.Version = version
+
+	return nil
+}
+
 func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID, firstConn bool) (*endpointEdgeStatusInspectResponse, error) {
 	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return nil, err
 	}
 
-	if endpoint.EdgeID == "" {
-		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
-		endpoint.EdgeID = edgeIdentifier
+	if err := handler.parseHeaders(r, endpoint); err != nil {
+		return nil, err
 	}
 
 	// Take an initial snapshot
@@ -143,19 +154,9 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		}
 	}
 
-	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
-	if agentPlatformErr != nil {
-		return nil, httperror.BadRequest("agent platform header is not valid", err)
-	}
-	endpoint.Type = agentPlatform
-
-	version := r.Header.Get(portainer.PortainerAgentHeader)
-	endpoint.Agent.Version = version
-
 	endpoint.LastCheckInDate = time.Now().Unix()
 
-	err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
+	if err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
 		return nil, httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
@@ -262,9 +263,8 @@ func (handler *Handler) buildEdgeStacks(tx dataservices.DataStoreTx, endpointID 
 func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statusResponse endpointEdgeStatusInspectResponse) *httperror.HandlerError {
 	rr := httptest.NewRecorder()
 
-	httpErr := response.JSON(rr, statusResponse)
-	if httpErr != nil {
-		return httpErr
+	if err := response.JSON(rr, statusResponse); err != nil {
+		return err
 	}
 
 	h := fnv.New32a()
