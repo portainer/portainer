@@ -9,7 +9,7 @@ type (
 		RoleName     string                  `json:"roleName"`
 		RoleKind     string                  `json:"roleKind"`
 		Subjects     []K8sRoleBindingSubject `json:"subjects"`
-		CreationDate time.Time               `json:"CreationDate"`
+		CreationDate time.Time               `json:"creationDate"`
 	}
 
 	K8sRoleBindingSubject struct {

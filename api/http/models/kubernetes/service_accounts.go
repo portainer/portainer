@@ -5,5 +5,5 @@ import "time"
 type K8sServiceAccount struct {
 	Name         string    `json:"name"`
 	Namespace    string    `json:"namespace"`
-	CreationDate time.Time `json:"CreationDate"`
+	CreationDate time.Time `json:"creationDate"`
 }
