@@ -152,3 +152,34 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 
 	return models.K8sApplication{}, nil
 }
+
+// GetClusterApplicationsResource returns the total resource requests and limits for all applications in a namespace
+// for a cluster level resource, set the namespace to ""
+func (kcl *KubeClient) GetApplicationsResource(namespace string) (models.K8sApplicationResource, error) {
+	resource := models.K8sApplicationResource{}
+	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return resource, err
+	}
+
+	for _, pod := range pods.Items {
+		for _, container := range pod.Spec.Containers {
+			resource.CPURequest += container.Resources.Requests.Cpu().MilliValue()
+			resource.CPULimit += container.Resources.Limits.Cpu().MilliValue()
+			resource.MemoryRequest += container.Resources.Requests.Memory().Value()
+			resource.MemoryLimit += container.Resources.Limits.Memory().Value()
+		}
+	}
+
+	return convertApplicationResourceUnits(resource), nil
+}
+
+// convertApplicationResourceUnits converts the resource units from milli to core and bytes to mega bytes
+func convertApplicationResourceUnits(resource models.K8sApplicationResource) models.K8sApplicationResource {
+	return models.K8sApplicationResource{
+		CPURequest:    resource.CPURequest / 1000,
+		CPULimit:      resource.CPULimit / 1000,
+		MemoryRequest: resource.MemoryRequest / 1024 / 1024,
+		MemoryLimit:   resource.MemoryLimit / 1024 / 1024,
+	}
+}

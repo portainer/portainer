@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
-import { getMetricsForAllNodes } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForAllNodes, getTotalResourcesForAllApplications } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesClusterController {
   /* @ngInject */
@@ -68,21 +68,12 @@ class KubernetesClusterController {
   async getApplicationsAsync() {
     try {
       this.state.applicationsLoading = true;
-      this.applications = await this.KubernetesApplicationService.get();
-      const nodeNames = _.map(this.nodes, (node) => node.Name);
-      this.resourceReservation = _.reduce(
-        this.applications,
-        (acc, app) => {
-          app.Pods = _.filter(app.Pods, (pod) => nodeNames.includes(pod.Node));
-          const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
-          acc.CPU += resourceReservation.CPU;
-          acc.Memory += resourceReservation.Memory;
-          return acc;
-        },
-        new KubernetesResourceReservation()
-      );
-      this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
-
+      
+      const applicationsResources = await getTotalResourcesForAllApplications(this.endpoint.Id);
+      this.resourceReservation = new KubernetesResourceReservation();
+      this.resourceReservation.CPU = applicationsResources.cpuRequest;
+      this.resourceReservation.Memory = applicationsResources.memoryRequest;
+      
       if (this.hasResourceUsageAccess()) {
         await this.getResourceUsage(this.endpoint.Id);
       }
@@ -134,7 +125,7 @@ class KubernetesClusterController {
     await this.getNodes();
     if (this.isAdmin) {
       await this.getEndpoints();
-      await this.getApplications();
+      await this.getApplicationsAsync();
     }
 
     this.state.viewReady = true;

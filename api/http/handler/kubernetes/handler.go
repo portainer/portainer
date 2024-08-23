@@ -54,6 +54,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.getKubernetesDashboard)).Methods(http.MethodGet)
 	endpointRouter.Handle("/nodes_limits", httperror.LoggerHandler(h.getKubernetesNodesLimits)).Methods(http.MethodGet)
 	endpointRouter.Handle("/max_resource_limits", httperror.LoggerHandler(h.getKubernetesMaxResourceLimits)).Methods(http.MethodGet)
+	endpointRouter.Handle("/metrics/applications_resources", httperror.LoggerHandler(h.getApplicationsResources)).Methods(http.MethodGet)
 	endpointRouter.Handle("/metrics/nodes", httperror.LoggerHandler(h.getKubernetesMetricsForAllNodes)).Methods(http.MethodGet)
 	endpointRouter.Handle("/metrics/nodes/{name}", httperror.LoggerHandler(h.getKubernetesMetricsForNode)).Methods(http.MethodGet)
 	endpointRouter.Handle("/metrics/pods/namespace/{namespace}", httperror.LoggerHandler(h.getKubernetesMetricsForAllPods)).Methods(http.MethodGet)

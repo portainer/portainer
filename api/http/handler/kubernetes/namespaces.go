@@ -22,7 +22,7 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
-// @param withResourceQuota query boolean false "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
+// @param withResourceQuota query boolean true "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
 // @success 200 {object} map[string]portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -60,7 +60,7 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 }
 
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
 	}
@@ -105,7 +105,7 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"
 // @param namespace path string true "The namespace name to get details for"
-// @param withResourceQuota query boolean false "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
+// @param withResourceQuota query boolean true "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
 // @success 200 {object} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -116,7 +116,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 		return httperror.BadRequest("an error occurred during the getKubernetesNamespace operation, invalid namespace parameter namespace. Error: ", err)
 	}
 
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", false)
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
 		return httperror.BadRequest(fmt.Sprintf("an error occurred during the getKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespace), err)
 	}

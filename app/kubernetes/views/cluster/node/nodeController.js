@@ -9,7 +9,7 @@ import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubern
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { confirmUpdateNode } from '@/react/kubernetes/cluster/NodeView/ConfirmUpdateNode';
-import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForNode } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesNodeController {
   /* @ngInject */

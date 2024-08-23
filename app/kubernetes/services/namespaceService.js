@@ -7,11 +7,12 @@ import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespac
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaces, LocalStorage, $state) {
+  constructor($async, KubernetesNamespaces, Authentication, LocalStorage, $state) {
     this.$async = $async;
     this.$state = $state;
     this.KubernetesNamespaces = KubernetesNamespaces;
     this.LocalStorage = LocalStorage;
+    this.Authentication = Authentication;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -65,19 +66,15 @@ class KubernetesNamespaceService {
 
   async getAllAsync() {
     try {
-      // get the list of all namespaces (RBAC allows users to see the list of namespaces)
-      const data = await this.KubernetesNamespaces().get().$promise;
-      // get the list of all namespaces with isAccessAllowed flags
-      const namespacesWithAccess = await getNamespaces(this.$state.params.endpointId);
+      const data = await getNamespaces(this.$state.params.endpointId);
       const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
-      const namespaces = data.items.filter(
-        (item) => (!KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces)
+      const namespaces = Object.values(data).filter(
+        (item) => (!item.IsSystem || hasK8sAccessSystemNamespaces)
       );
-      // parse the namespaces
-      const visibleNamespaces = namespaces.map((item) => KubernetesNamespaceConverter.apiToNamespace(item));
-      updateNamespaces(visibleNamespaces);
-      return visibleNamespaces;
+      updateNamespaces(namespaces);  
+      return namespaces;
     } catch (err) {
+      console.error('Error retrieving namespaces:', err);
       throw new PortainerError('Unable to retrieve namespaces', err);
     }
   }
