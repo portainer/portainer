@@ -86,7 +86,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm !ml-0" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
             </div>
           </div>
         </form>
@@ -103,7 +103,7 @@
         <table class="table">
           <tbody>
             <tr>
-              <td>ID</td>
+              <td class="min-w-[80px]">ID</td>
               <td>
                 {{ image.Id }}
                 <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)">
@@ -145,7 +145,7 @@
               <td>
                 <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in image.Labels">
-                    <td>{{ k }}</td>
+                    <td class="min-w-[80px]">{{ k }}</td>
                     <td>{{ v }}</td>
                   </tr>
                 </table>

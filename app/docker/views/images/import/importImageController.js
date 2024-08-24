@@ -3,13 +3,14 @@ import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 angular.module('portainer.docker').controller('ImportImageController', [
   '$scope',
   '$state',
+  '$async',
   'ImageService',
   'Notifications',
   'HttpRequestHelper',
   'Authentication',
   'ImageHelper',
   'endpoint',
-  function ($scope, $state, ImageService, Notifications, HttpRequestHelper, Authentication, ImageHelper, endpoint) {
+  function ($scope, $state, $async, ImageService, Notifications, HttpRequestHelper, Authentication, ImageHelper, endpoint) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -32,16 +33,20 @@ angular.module('portainer.docker').controller('ImportImageController', [
     async function tagImage(id) {
       const registryModel = $scope.formValues.RegistryModel;
       if (registryModel.Image) {
-        const image = ImageHelper.createImageConfigForContainer(registryModel);
+        const { repo, tag } = ImageHelper.createImageConfigForContainer(registryModel);
         try {
-          await ImageService.tagImage(id, image.fromImage);
+          await ImageService.tagImage(id, repo, tag);
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to tag image');
         }
       }
     }
 
-    $scope.uploadImage = async function () {
+    $scope.uploadImage = function () {
+      return $async(uploadImageAsync);
+    };
+
+    async function uploadImageAsync() {
       $scope.state.actionInProgress = true;
 
       var nodeName = $scope.formValues.NodeName;
@@ -52,7 +57,8 @@ angular.module('portainer.docker').controller('ImportImageController', [
         if (data.error) {
           Notifications.error('Failure', data.error, 'Unable to upload image');
         } else if (data.stream) {
-          var regex = /Loaded.*?: (.*?)\n$/g;
+          // docker has /n at the end of the stream, podman doesn't
+          var regex = /Loaded.*?: (.*?)(?:\n|$)/g;
           var imageIds = regex.exec(data.stream);
           if (imageIds && imageIds.length == 2) {
             await tagImage(imageIds[1]);
@@ -67,6 +73,6 @@ angular.module('portainer.docker').controller('ImportImageController', [
       } finally {
         $scope.state.actionInProgress = false;
       }
-    };
+    }
   },
 ]);

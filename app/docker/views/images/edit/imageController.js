@@ -70,9 +70,9 @@ angular.module('portainer.docker').controller('ImageController', [
     $scope.tagImage = function () {
       const registryModel = $scope.formValues.RegistryModel;
 
-      const image = ImageHelper.createImageConfigForContainer(registryModel);
+      const { repo, tag } = ImageHelper.createImageConfigForContainer(registryModel);
 
-      ImageService.tagImage($transition$.params().id, image.fromImage)
+      ImageService.tagImage($transition$.params().id, repo, tag)
         .then(function success() {
           Notifications.success('Success', 'Image successfully tagged');
           $state.go('docker.images.image', { id: $transition$.params().id }, { reload: true });

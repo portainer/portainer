@@ -16,10 +16,21 @@ function ImageHelperFactory() {
   /**
    *
    * @param {PorImageRegistryModel} registry
+   * @returns {ImageConfig}
+   * @typedef ImageConfig = {
+   *  fromImage: string; // full image URI (including tag)
+   *  repo: string; // image URI without tag
+   *  tag: string;  // image tag
+   * }
    */
   function createImageConfigForContainer(imageModel) {
+    const fromImage = buildImageFullURIFromModel(imageModel);
+    const repo = fromImage.split(':')[0];
+    const tag = fromImage.split(':')[1] || 'latest';
     return {
       fromImage: buildImageFullURIFromModel(imageModel),
+      repo,
+      tag,
     };
   }
 
