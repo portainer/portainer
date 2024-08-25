@@ -25,8 +25,14 @@ function ImageHelperFactory() {
    */
   function createImageConfigForContainer(imageModel) {
     const fromImage = buildImageFullURIFromModel(imageModel);
-    const repo = fromImage.split(':')[0];
-    const tag = fromImage.split(':')[1] || 'latest';
+    // possible fromImage values:
+    // - registry/image-repo:tag
+    // - image-repo:tag
+    // - registry:port/image-repo:tag
+    // buildImageFullURIFromModel always gives a tag (defaulting to 'latest'), so the tag is always present after the last ':'
+    const parts = fromImage.split(':');
+    const tag = parts.pop() || 'latest';
+    const repo = parts.join(':');
     return {
       fromImage: buildImageFullURIFromModel(imageModel),
       repo,
