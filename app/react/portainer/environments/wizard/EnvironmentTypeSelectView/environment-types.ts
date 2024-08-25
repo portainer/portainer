@@ -1,5 +1,3 @@
-import { compact } from 'lodash';
-
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Podman from '@/assets/ico/vendor/podman.svg?c';
@@ -24,10 +22,8 @@ export interface EnvironmentOption
   id: EnvironmentOptionValue;
   value: EnvironmentOptionValue;
 }
-export function getExistingEnvironmentTypes(
-  isPodmanEnabled: boolean
-): EnvironmentOption[] {
-  const options: (EnvironmentOption | false)[] = [
+export function getExistingEnvironmentTypes(): EnvironmentOption[] {
+  const options: EnvironmentOption[] = [
     {
       id: 'dockerStandalone',
       value: 'dockerStandalone',
@@ -44,7 +40,7 @@ export function getExistingEnvironmentTypes(
       iconType: 'logo',
       description: 'Connect to Docker Swarm via URL/IP, API or Socket',
     },
-    isPodmanEnabled && {
+    {
       id: 'podman',
       value: 'podman',
       label: 'Podman',
@@ -69,7 +65,7 @@ export function getExistingEnvironmentTypes(
       icon: Azure,
     },
   ];
-  return compact(options);
+  return options;
 }
 
 export const newEnvironmentTypes: EnvironmentOption[] = [
@@ -96,11 +92,8 @@ export const newEnvironmentTypes: EnvironmentOption[] = [
   },
 ];
 
-export function getEnvironmentTypes(isPodmanEnabled: boolean) {
-  return [
-    ...getExistingEnvironmentTypes(isPodmanEnabled),
-    ...newEnvironmentTypes,
-  ];
+export function getEnvironmentTypes() {
+  return [...getExistingEnvironmentTypes(), ...newEnvironmentTypes];
 }
 
 export const formTitles: Record<EnvironmentOptionValue, string> = {

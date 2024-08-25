@@ -1,6 +1,6 @@
 import { usePublicSettings } from '../settings/queries';
 
-export type FeatureFlag = 'podman';
+export enum FeatureFlag {}
 
 export function useFeatureFlag(
   flag: FeatureFlag,

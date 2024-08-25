@@ -1623,12 +1623,7 @@ const (
 )
 
 // List of supported features
-const (
-	FeaturePodman = "podman"
-)
-
-// List of supported features
-var SupportedFeatureFlags = []featureflags.Feature{FeaturePodman}
+var SupportedFeatureFlags = []featureflags.Feature{}
 
 const (
 	_ AuthenticationMethod = iota

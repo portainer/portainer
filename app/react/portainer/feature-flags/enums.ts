@@ -42,5 +42,4 @@ export enum FeatureId {
   K8S_ANNOTATIONS = 'k8s-annotations',
   CA_FILE = 'ca-file',
   K8S_REQUIRE_NOTE_ON_APPLICATIONS = 'k8s-note-on-applications',
-  PODMAN = 'podman',
 }
