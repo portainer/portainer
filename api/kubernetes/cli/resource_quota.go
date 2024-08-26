@@ -67,15 +67,19 @@ func (kcl *KubeClient) GetResourceQuota(namespace, resourceQuota string) (*corev
 
 // UpdateNamespacesWithResourceQuotas updates the namespaces with the resource quotas.
 // The resource quotas are matched with the namespaces by name.
-func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) map[string]portainer.K8sNamespaceInfo {
+func (kcl *KubeClient) UpdateNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, resourceQuotas []corev1.ResourceQuota) []portainer.K8sNamespaceInfo {
 	namespacesWithQuota := map[string]portainer.K8sNamespaceInfo{}
 
 	for _, namespace := range namespaces {
-		namespace.ResourceQuota = kcl.GetResourceQuotaFromNamespace(namespace, resourceQuotas)
+		resourceQuota := kcl.GetResourceQuotaFromNamespace(namespace, resourceQuotas)
+		if resourceQuota != nil {
+			namespace.ResourceQuota = resourceQuota
+		}
+
 		namespacesWithQuota[namespace.Name] = namespace
 	}
 
-	return namespacesWithQuota
+	return kcl.ConvertNamespaceMapToSlice(namespacesWithQuota)
 }
 
 // GetResourceQuotaFromNamespace gets the resource quota in a specific namespace where the resource quota's name is prefixed with "portainer-rq-".
