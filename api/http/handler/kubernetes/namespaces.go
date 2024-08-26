@@ -20,7 +20,7 @@ import (
 // @produce json
 // @param id path int true "Environment identifier"
 // @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. It is set to false by default"
-// @success 200 {object} map[string]portaineree.K8sNamespaceInfo "Success"
+// @success 200 {object} map[string]portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve the list of namespaces."
@@ -85,7 +85,7 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 // @param id path int true "Environment identifier"
 // @param namespace path string true "The namespace name to get details for"
 // @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. It is set to false by default"
-// @success 200 {object} portaineree.K8sNamespaceInfo "Success"
+// @success 200 {object} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve specified namespace information."
