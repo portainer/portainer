@@ -10,67 +10,56 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // @id getKubernetesIngressControllers
 // @summary Get a list of ingress controllers
 // @description Get a list of ingress controllers for the given environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param allowedOnly query boolean false "Only return allowed ingress controllers"
 // @success 200 {object} models.K8sIngressControllers "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve ingress controllers"
 // @router /kubernetes/{id}/ingresscontrollers [get]
 func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve environment identifier from request. Error: ", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
-	} else if err != nil {
-		return httperror.InternalServerError(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
+	if err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.NotFound("an error occurred during the GetKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
 	}
 
 	allowedOnly, err := request.RetrieveBooleanQueryParameter(r, "allowedOnly", true)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid allowedOnly boolean query parameter",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve allowedOnly query parameter. Error: ", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to create Kubernetes client",
-			err,
-		)
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to get privileged kube client. Error: ", err)
 	}
 
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch ingressclasses",
-			err,
-		)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the GetKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
@@ -82,16 +71,17 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		})
 	}
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	var updatedClasses []portainer.KubernetesIngressClassConfig
+	updatedClasses := []portainer.KubernetesIngressClassConfig{}
 	for i := range controllers {
 		controllers[i].Availability = true
 		if controllers[i].ClassName != "none" {
 			controllers[i].New = true
 		}
 
-		var updatedClass portainer.KubernetesIngressClassConfig
-		updatedClass.Name = controllers[i].ClassName
-		updatedClass.Type = controllers[i].Type
+		updatedClass := portainer.KubernetesIngressClassConfig{
+			Name: controllers[i].ClassName,
+			Type: controllers[i].Type,
+		}
 
 		// Check if the controller is already known.
 		for _, existingClass := range existingClasses {
@@ -112,16 +102,13 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		endpoint,
 	)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to store found IngressClasses inside the database",
-			err,
-		)
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to store found IngressClasses inside the database. Error: ", err)
 	}
 
 	// If the allowedOnly query parameter was set. We need to prune out
 	// disallowed controllers from the response.
 	if allowedOnly {
-		var allowedControllers models.K8sIngressControllers
+		allowedControllers := models.K8sIngressControllers{}
 		for _, controller := range controllers {
 			if controller.Availability {
 				allowedControllers = append(allowedControllers, controller)
@@ -135,46 +122,36 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 // @id getKubernetesIngressControllersByNamespace
 // @summary Get a list ingress controllers by namespace
 // @description Get a list of ingress controllers for the given environment in the provided namespace
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace"
 // @success 200 {object} models.K8sIngressControllers "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve ingress controllers by a namespace"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [get]
 func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve environment identifier from request. Error: ", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
-	} else if err != nil {
-		return httperror.InternalServerError(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
+	if err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.NotFound("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid namespace identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -184,10 +161,11 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 
 	currentControllers, err := cli.GetIngressControllers()
 	if err != nil {
-		return httperror.InternalServerError(
-			"Failed to fetch ingressclasses",
-			err,
-		)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
 	}
 	// Add none controller if "AllowNone" is set for endpoint.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
@@ -197,21 +175,24 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 			Type:      "custom",
 		})
 	}
+
 	kubernetesConfig := endpoint.Kubernetes.Configuration
 	existingClasses := kubernetesConfig.IngressClasses
 	ingressAvailabilityPerNamespace := kubernetesConfig.IngressAvailabilityPerNamespace
-	var updatedClasses []portainer.KubernetesIngressClassConfig
-	var controllers models.K8sIngressControllers
+	updatedClasses := []portainer.KubernetesIngressClassConfig{}
+	controllers := models.K8sIngressControllers{}
+
 	for i := range currentControllers {
-		var globallyblocked bool
+		globallyblocked := false
 		currentControllers[i].Availability = true
 		if currentControllers[i].ClassName != "none" {
 			currentControllers[i].New = true
 		}
 
-		var updatedClass portainer.KubernetesIngressClassConfig
-		updatedClass.Name = currentControllers[i].ClassName
-		updatedClass.Type = currentControllers[i].Type
+		updatedClass := portainer.KubernetesIngressClassConfig{
+			Name: currentControllers[i].ClassName,
+			Type: currentControllers[i].Type,
+		}
 
 		// Check if the controller is blocked globally or in the current
 		// namespace.
@@ -243,15 +224,9 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	// Update the database to match the list of found controllers.
 	// This includes pruning out controllers which no longer exist.
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.DataStore.Endpoint().UpdateEndpoint(
-		portainer.EndpointID(endpointID),
-		endpoint,
-	)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(portainer.EndpointID(endpointID), endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to store found IngressClasses inside the database",
-			err,
-		)
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to store found IngressClasses inside the database. Error: ", err)
 	}
 	return response.JSON(w, controllers)
 }
@@ -259,65 +234,56 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 // @id updateKubernetesIngressControllers
 // @summary Update (block/unblock) ingress controllers
 // @description Update (block/unblock) ingress controllers
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param body body []models.K8sIngressControllers true "Ingress controllers"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to update ingress controllers"
 // @router /kubernetes/{id}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid environment identifier route variable",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve environment identifier from request. Error: ", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
-	} else if err != nil {
-		return httperror.InternalServerError(
-			"Unable to find an environment with the specified identifier inside the database",
-			err,
-		)
+	if err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
 	}
 
-	var payload models.K8sIngressControllers
+	payload := models.K8sIngressControllers{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest(
-			"Invalid request payload",
-			err,
-		)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllers operation, unable to decode and validate the request payload. Error: ", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to create Kubernetes client",
-			err,
-		)
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to get privileged kube client. Error: ", err)
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to get ingress controllers",
-			err,
-		)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the UpdateKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
@@ -329,14 +295,15 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		})
 	}
 
-	var updatedClasses []portainer.KubernetesIngressClassConfig
+	updatedClasses := []portainer.KubernetesIngressClassConfig{}
 	for i := range controllers {
 		controllers[i].Availability = true
 		controllers[i].New = true
 
-		var updatedClass portainer.KubernetesIngressClassConfig
-		updatedClass.Name = controllers[i].ClassName
-		updatedClass.Type = controllers[i].Type
+		updatedClass := portainer.KubernetesIngressClassConfig{
+			Name: controllers[i].ClassName,
+			Type: controllers[i].Type,
+		}
 
 		// Check if the controller is already known.
 		for _, existingClass := range existingClasses {
@@ -366,59 +333,58 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		endpoint,
 	)
 	if err != nil {
-		return httperror.InternalServerError(
-			"Unable to update the BlockedIngressClasses inside the database",
-			err,
-		)
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to store found IngressClasses inside the database. Error: ", err)
 	}
+
 	return response.Empty(w)
 }
 
 // @id updateKubernetesIngressControllersByNamespace
 // @summary Update (block/unblock) ingress controllers by namespace
 // @description Update (block/unblock) ingress controllers by namespace for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body []models.K8sIngressControllers true "Ingress controllers"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to update ingress controllers by namespace"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.NotFound("Unable to find an environment on request context", err)
+		return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to fetch endpoint. Error: ", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
-	var payload models.K8sIngressControllers
+	payload := models.K8sIngressControllers{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to decode and validate the request payload. Error: ", err)
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	var updatedClasses []portainer.KubernetesIngressClassConfig
+	updatedClasses := []portainer.KubernetesIngressClassConfig{}
 PayloadLoop:
 	for _, p := range payload {
 		for _, existingClass := range existingClasses {
 			if p.ClassName != existingClass.Name {
 				continue
 			}
-			var updatedClass portainer.KubernetesIngressClassConfig
-			updatedClass.Name = existingClass.Name
-			updatedClass.Type = existingClass.Type
-			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+			updatedClass := portainer.KubernetesIngressClassConfig{
+				Name:            existingClass.Name,
+				Type:            existingClass.Type,
+				GloballyBlocked: existingClass.GloballyBlocked,
+			}
 
 			// Handle "allow"
 			if p.Availability {
@@ -445,10 +411,7 @@ PayloadLoop:
 					continue PayloadLoop
 				}
 			}
-			updatedClass.BlockedNamespaces = append(
-				updatedClass.BlockedNamespaces,
-				namespace,
-			)
+			updatedClass.BlockedNamespaces = append(updatedClass.BlockedNamespaces, namespace)
 			updatedClasses = append(updatedClasses, updatedClass)
 		}
 	}
@@ -458,7 +421,7 @@ PayloadLoop:
 	// part of updatedClasses, but we MUST include it or we would remove the
 	// global block.
 	for _, existingClass := range existingClasses {
-		var found bool
+		found := false
 
 		for _, updatedClass := range updatedClasses {
 			if existingClass.Name == updatedClass.Name {
@@ -474,7 +437,15 @@ PayloadLoop:
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return httperror.InternalServerError("Unable to update the BlockedIngressClasses inside the database", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to store BlockedIngressClasses inside the database. Error: ", err)
 	}
 
 	return response.Empty(w)
@@ -483,18 +454,18 @@ PayloadLoop:
 // @id GetKubernetesClusterIngresses
 // @summary Get kubernetes ingresses at the cluster level
 // @description Get kubernetes ingresses at the cluster level for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param body body []models.K8sIngressInfo true "Ingress details"
 // @param withServices query boolean false "Lookup services associated with each ingress"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve ingresses"
 // @router /kubernetes/{id}/ingresses [get]
 func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	ingresses, err := handler.getKubernetesClusterIngresses(r)
@@ -512,10 +483,11 @@ func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @success 200 int "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve ingresses count"
 // @router /kubernetes/{id}/ingresses/count [get]
 func (handler *Handler) getKubernetesClusterIngressesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	ingresses, err := handler.getKubernetesClusterIngresses(r)
@@ -529,33 +501,29 @@ func (handler *Handler) getKubernetesClusterIngressesCount(w http.ResponseWriter
 func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models.K8sIngressInfo, *httperror.HandlerError) {
 	withServices, err := request.RetrieveBooleanQueryParameter(r, "withServices", false)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetKubernetesEnvironmentServices operation, unable to retrieve withApplications query parameter. Error: ", err)
+		return nil, httperror.BadRequest("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve withApplications query parameter. Error: ", err)
 	}
 
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return nil, httperror.NotFound("an error occurred during the GetKubernetesClusterIngresses operation, unable to fetch endpoint. Error: ", err)
-	}
-
-	cli, httpErr := handler.getProxyKubeClient(r)
+	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httpErr
+		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
+	ingresses, err := cli.GetIngresses("")
 	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to get privileged kube client for combining services with applications. Error: ", err)
-	}
-	pcli.IsKubeAdmin = cli.IsKubeAdmin
-	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
+		if k8serrors.IsUnauthorized(err) {
+			return nil, httperror.Unauthorized("an error occurred during the GetKubernetesClusterIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
 
-	ingresses, err := pcli.GetIngresses("")
-	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, httperror.NotFound("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve ingresses from the Kubernetes for a cluster level user. Error: ", err)
+		}
+
 		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve ingresses from the Kubernetes for a cluster level user. Error: ", err)
 	}
 
 	if withServices {
-		ingressesWithServices, err := pcli.CombineIngressesWithServices(ingresses)
+		ingressesWithServices, err := cli.CombineIngressesWithServices(ingresses)
 		if err != nil {
 			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to combine ingresses with services. Error: ", err)
 		}
@@ -569,23 +537,23 @@ func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models
 // @id getKubernetesIngresses
 // @summary Get kubernetes ingresses by namespace
 // @description Get kubernetes ingresses by namespace for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body []models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve ingresses"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresses [get]
 func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+		return httperror.BadRequest("an error occurred during the GetKubernetesIngresses operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -595,7 +563,15 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 
 	ingresses, err := cli.GetIngresses(namespace)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve ingresses", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the GetKubernetesIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the GetKubernetesIngresses operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetKubernetesIngresses operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
 	}
 
 	return response.JSON(w, ingresses)
@@ -604,18 +580,18 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 // @id getKubernetesIngress
 // @summary Get a kubernetes ingress by namespace
 // @description Get a kubernetes ingress by namespace for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param ingress path string true "Ingress name"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve an ingress"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresses/{ingress} [get]
 func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
@@ -623,7 +599,7 @@ func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
-	ingress, err := request.RetrieveRouteVariableValue(r, "ingress")
+	ingressName, err := request.RetrieveRouteVariableValue(r, "ingress")
 	if err != nil {
 		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from request. Error: ", err)
 	}
@@ -633,40 +609,48 @@ func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Requ
 		return handlerErr
 	}
 
-	ingressInfo, err := cli.GetIngress(namespace, ingress)
+	ingress, err := cli.GetIngress(namespace, ingressName)
 	if err != nil {
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the GetKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from the Kubernetes for a namespace level user. Error: ", err)
+		}
+
 		return httperror.InternalServerError("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from the Kubernetes for a namespace level user. Error: ", err)
 	}
 
-	return response.JSON(w, ingressInfo)
+	return response.JSON(w, ingress)
 }
 
 // @id createKubernetesIngress
 // @summary Create a kubernetes ingress by namespace
 // @description Create a kubernetes ingress by namespace for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to create an ingress"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresses [post]
 func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+		return httperror.BadRequest("an error occurred during the CreateKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
-	var payload models.K8sIngressInfo
+	payload := models.K8sIngressInfo{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the CreateKubernetesIngress operation, unable to decode and validate the request payload. Error: ", err)
 	}
 
 	owner := "admin"
@@ -682,7 +666,15 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 
 	err = cli.CreateIngress(namespace, payload, owner)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve the ingress", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the CreateKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsAlreadyExists(err) {
+			return httperror.Conflict("an error occurred during the CreateKubernetesIngress operation, ingress already exists. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the CreateKubernetesIngress operation, unable to create an ingress. Error: ", err)
 	}
 
 	return response.Empty(w)
@@ -691,17 +683,17 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 // @id deleteKubernetesIngresses
 // @summary Delete kubernetes ingresses
 // @description Delete kubernetes ingresses for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param body body models.K8sIngressDeleteRequests true "Ingress details"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to delete ingresses"
 // @router /kubernetes/{id}/ingresses/delete [post]
 func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -709,15 +701,23 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 		return handlerErr
 	}
 
-	var payload models.K8sIngressDeleteRequests
+	payload := models.K8sIngressDeleteRequests{}
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the DeleteKubernetesIngresses operation, unable to decode and validate the request payload. Error: ", err)
 	}
 
 	err = cli.DeleteIngresses(payload)
 	if err != nil {
-		return httperror.InternalServerError("Unable to delete ingresses", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the DeleteKubernetesIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the DeleteKubernetesIngresses operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the DeleteKubernetesIngresses operation, unable to delete ingresses. Error: ", err)
 	}
 
 	return response.Empty(w)
@@ -726,29 +726,29 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 // @id updateKubernetesIngress
 // @summary Update kubernetes ingress rule
 // @description Update kubernetes ingress rule for the provided environment
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body models.K8sIngressInfo true "Ingress details"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to update ingress in a namespace"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresses [put]
 func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
 	}
 
-	var payload models.K8sIngressInfo
+	payload := models.K8sIngressInfo{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngress operation, unable to decode and validate the request payload. Error: ", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -758,7 +758,15 @@ func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.R
 
 	err = cli.UpdateIngress(namespace, payload)
 	if err != nil {
-		return httperror.InternalServerError("Unable to update the ingress", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the UpdateKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound("an error occurred during the UpdateKubernetesIngress operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngress operation, unable to update ingress in a namespace. Error: ", err)
 	}
 
 	return response.Empty(w)

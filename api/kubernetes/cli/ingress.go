@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/rs/zerolog/log"
 	netv1 "k8s.io/api/networking/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -87,14 +88,9 @@ func (kcl *KubeClient) GetIngress(namespace, ingressName string) (models.K8sIngr
 // GetIngresses gets all the ingresses for a given namespace in a k8s endpoint.
 func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchIngressesForAdmin(namespace)
+		return kcl.fetchIngresses(namespace)
 	}
 	return kcl.fetchIngressesForNonAdmin(namespace)
-}
-
-// fetchIngressesForAdmin gets all the ingress classes in a k8s endpoint.
-func (kcl *KubeClient) fetchIngressesForAdmin(namespace string) ([]models.K8sIngressInfo, error) {
-	return kcl.fetchIngresses(namespace)
 }
 
 // fetchIngressesForNonAdmin gets all the ingresses for non-admin users in a k8s endpoint.
@@ -334,6 +330,10 @@ func (kcl *KubeClient) CombineIngressWithService(ingress models.K8sIngressInfo) 
 func (kcl *KubeClient) CombineIngressesWithServices(ingresses []models.K8sIngressInfo) ([]models.K8sIngressInfo, error) {
 	services, err := kcl.GetServices("")
 	if err != nil {
+		if k8serrors.IsUnauthorized(err) {
+			return nil, fmt.Errorf("an error occurred during the CombineIngressesWithServices operation, unauthorized access to the Kubernetes API. Error: %w", err)
+		}
+
 		return nil, fmt.Errorf("an error occurred during the CombineIngressesWithServices operation, unable to retrieve services from the Kubernetes for a cluster level user. Error: %w", err)
 	}
 

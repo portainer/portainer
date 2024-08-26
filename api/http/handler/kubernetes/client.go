@@ -19,7 +19,7 @@ func (handler *Handler) prepareKubeClient(r *http.Request) (*cli.KubeClient, *ht
 
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return nil, httperror.NotFound("Unable to find an environment on request context", err)
+		return nil, httperror.NotFound("an error occurred during the getKubernetesNamespaces operation, unable to find the Kubernetes endpoint associated to the request. Error: ", err)
 	}
 
 	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
