@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -75,41 +73,6 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 	}
 
 	return response.JSON(w, len(namespaces))
-}
-
-func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
-	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
-	}
-
-	cli, httpErr := handler.getProxyKubeClient(r)
-	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
-	}
-
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return nil, httperror.NotFound("Unable to find an environment on request context", err)
-	}
-
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
-	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
-	}
-	pcli.IsKubeAdmin = cli.IsKubeAdmin
-	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
-
-	namespaces, err := pcli.GetNamespaces()
-	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes cluster. Error: ", err)
-	}
-
-	if withResourceQuota {
-		return pcli.CombineNamespacesWithResourceQuotas(namespaces, w)
-	}
-
-	return namespaces, nil
 }
 
 // @id GetKubernetesNamespace
