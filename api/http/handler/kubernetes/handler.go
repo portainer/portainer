@@ -69,7 +69,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.isRBACEnabled)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
-	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.GetKubernetesNamespaces)).Methods(http.MethodGet)
+	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
@@ -130,13 +130,13 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 
 		endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 		if err != nil {
-			httperror.WriteError(w, http.StatusBadRequest, fmt.Sprintf("an error occurred during the kubeClientMiddleware operation, the environment identifier route variable is invalid for /api/kubernetes/%d. Error: ", endpointID), err)
+			httperror.WriteError(w, http.StatusBadRequest, fmt.Sprintf("an error occurred during the KubeClientMiddleware operation, the environment identifier route variable is invalid for /api/kubernetes/%d. Error: ", endpointID), err)
 			return
 		}
 
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "an error occurred during the kubeClientMiddleware operation, permission denied to access the environment. Error: ", err)
+			httperror.WriteError(w, http.StatusForbidden, "an error occurred during the KubeClientMiddleware operation, permission denied to access the environment. Error: ", err)
 		}
 
 		// Check if we have a kubeclient against this auth token already, otherwise generate a new one
@@ -150,22 +150,22 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		if err != nil {
 			if handler.DataStore.IsErrObjectNotFound(err) {
 				httperror.WriteError(w, http.StatusNotFound,
-					"an error occurred during the kubeClientMiddleware operation, unable to find an environment with the specified environment identifier inside the database. Error: ", err)
+					"an error occurred during the KubeClientMiddleware operation, unable to find an environment with the specified environment identifier inside the database. Error: ", err)
 				return
 			}
 
-			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, error reading from the Portainer database. Error: ", err)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, error reading from the Portainer database. Error: ", err)
 			return
 		}
 
 		user, err := security.RetrieveUserFromRequest(r, handler.DataStore)
 		if err != nil {
-			httperror.InternalServerError("an error occurred during the kubeClientMiddleware operation, unable to retrieve the user from request. Error: ", err)
+			httperror.InternalServerError("an error occurred during the KubeClientMiddleware operation, unable to retrieve the user from request. Error: ", err)
 			return
 		}
 		log.
 			Debug().
-			Str("context", "kubeClientMiddleware").
+			Str("context", "KubeClientMiddleware").
 			Str("endpoint", endpoint.Name).
 			Str("user", user.Username).
 			Msg("Creating a Kubernetes client")
@@ -175,13 +175,13 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		if user.Role != portainer.AdministratorRole {
 			pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 			if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to get privileged kube client to grab all namespaces. Error: ", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to get privileged kube client to grab all namespaces. Error: ", err)
 				return
 			}
 
 			nonAdminNamespaces, err = pcli.GetNonAdminNamespaces(int(user.ID), endpoint.Kubernetes.Configuration.RestrictDefaultNamespace)
 			if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the kubeClientMiddleware operation, unable to retrieve non-admin namespaces. Error: ", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to retrieve non-admin namespaces. Error: ", err)
 				return
 			}
 			isKubeAdmin = false
@@ -189,20 +189,20 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 
 		bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
 		if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create JWT token", err)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to generate token for kubeconfig. Error: ", err)
 			return
 		}
 
 		config := handler.buildConfig(r, tokenData, bearerToken, []portainer.Endpoint{*endpoint}, true)
 		if len(config.Clusters) == 0 {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable build cluster kubeconfig", nil)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to build kubeconfig. Error: ", nil)
 			return
 		}
 
 		// Manually setting serverURL to localhost to route the request to proxy server
 		serverURL, err := url.Parse(config.Clusters[0].Cluster.Server)
 		if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable parse cluster's kubeconfig server URL", nil)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to parse server URL for building kubeconfig. Error: ", err)
 			return
 		}
 		serverURL.Scheme = "https"
@@ -211,17 +211,12 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 
 		yaml, err := cli.GenerateYAML(config)
 		if err != nil {
-			httperror.WriteError(
-				w,
-				http.StatusInternalServerError,
-				"Unable to generate yaml from endpoint kubeconfig",
-				err,
-			)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to generate kubeconfig YAML. Error: ", err)
 			return
 		}
 		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml), isKubeAdmin, nonAdminNamespaces)
 		if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Failed to create client from kubeconfig", err)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to create kubernetes client from kubeconfig. Error: ", err)
 			return
 		}
 
