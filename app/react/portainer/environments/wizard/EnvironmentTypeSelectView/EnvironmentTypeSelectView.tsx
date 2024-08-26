@@ -13,17 +13,15 @@ import { FormSection } from '@@/form-components/FormSection';
 import { EnvironmentSelector } from './EnvironmentSelector';
 import {
   EnvironmentOptionValue,
-  getExistingEnvironmentTypes,
+  existingEnvironmentTypes,
   newEnvironmentTypes,
-  getEnvironmentTypes,
+  environmentTypes,
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
-  const existingEnvironmentTypes = getExistingEnvironmentTypes();
-  const environmentTypes = getEnvironmentTypes();
 
   return (
     <>

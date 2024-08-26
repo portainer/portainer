@@ -20,7 +20,7 @@ import { Icon } from '@@/Icon';
 
 import {
   EnvironmentOptionValue,
-  getEnvironmentTypes,
+  environmentTypes,
   formTitles,
   EnvironmentOption,
 } from '../EnvironmentTypeSelectView/environment-types';
@@ -51,7 +51,6 @@ export function EnvironmentCreationView() {
   const envTypes = useParamEnvironmentTypes();
   const { trackEvent } = useAnalytics();
   const router = useRouter();
-  const environmentTypes = getEnvironmentTypes();
   const steps = _.compact(
     envTypes.map((id) => environmentTypes.find((eType) => eType.id === id))
   );
