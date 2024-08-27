@@ -155,10 +155,10 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 	return models.K8sApplication{}, nil
 }
 
-// GetApplicationsFromConfigMap gets a list of applications that use a specific ConfigMap
+// GetApplicationConfigurationOwnersFromConfigMap gets a list of applications that use a specific ConfigMap
 // by checking all pods in the same namespace as the ConfigMap
-func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConfigMap, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]string, error) {
-	applications := []string{}
+func (kcl *KubeClient) GetApplicationConfigurationOwnersFromConfigMap(configMap models.K8sConfigMap, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]models.K8sConfigurationOwners, error) {
+	configurationOwners := []models.K8sConfigurationOwners{}
 	for _, pod := range pods {
 		if pod.Namespace == configMap.Namespace {
 			if isPodUsingConfigMap(&pod, configMap.Name) {
@@ -166,16 +166,21 @@ func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConf
 				if err != nil {
 					return nil, err
 				}
-				applications = append(applications, application.Name)
+
+				configurationOwners = append(configurationOwners, models.K8sConfigurationOwners{
+					ConfigurationOwner:   application.Name,
+					K8sConfigurationKind: application.Kind,
+					ConfigurationOwnerId: application.UID,
+				})
 			}
 		}
 	}
 
-	return applications, nil
+	return configurationOwners, nil
 }
 
-func (kcl *KubeClient) GetApplicationNamesFromSecret(secret models.K8sSecret, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]string, error) {
-	applications := []string{}
+func (kcl *KubeClient) GetApplicationConfigurationOwnersFromSecret(secret models.K8sSecret, pods []corev1.Pod, replicaSets []appsv1.ReplicaSet) ([]models.K8sConfigurationOwners, error) {
+	configurationOwners := []models.K8sConfigurationOwners{}
 	for _, pod := range pods {
 		if pod.Namespace == secret.Namespace {
 			if isPodUsingSecret(&pod, secret.Name) {
@@ -183,12 +188,17 @@ func (kcl *KubeClient) GetApplicationNamesFromSecret(secret models.K8sSecret, po
 				if err != nil {
 					return nil, err
 				}
-				applications = append(applications, application.Name)
+
+				configurationOwners = append(configurationOwners, models.K8sConfigurationOwners{
+					ConfigurationOwner:   application.Name,
+					K8sConfigurationKind: application.Kind,
+					ConfigurationOwnerId: application.UID,
+				})
 			}
 		}
 	}
 
-	return applications, nil
+	return configurationOwners, nil
 }
 
 // ConvertPodToApplication converts a pod to an application, updating owner references if necessary
@@ -210,6 +220,7 @@ func createPodApplication(pod corev1.Pod) models.K8sApplication {
 		Name:      pod.Name,
 		Namespace: pod.Namespace,
 		Kind:      "Pod",
+		UID:       string(pod.UID),
 	}
 }
 
@@ -219,5 +230,6 @@ func createApplicationFromOwnerReference(pod corev1.Pod) models.K8sApplication {
 		Name:      pod.OwnerReferences[0].Name,
 		Namespace: pod.Namespace,
 		Kind:      pod.OwnerReferences[0].Kind,
+		UID:       string(pod.OwnerReferences[0].UID),
 	}
 }

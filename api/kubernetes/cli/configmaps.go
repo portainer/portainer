@@ -56,7 +56,7 @@ func (kcl *KubeClient) fetchConfigMaps(namespace string) ([]models.K8sConfigMap,
 
 	results := []models.K8sConfigMap{}
 	for _, configMap := range configMaps.Items {
-		results = append(results, parseConfigMap(&configMap))
+		results = append(results, parseConfigMap(&configMap, false))
 	}
 
 	return results, nil
@@ -68,21 +68,28 @@ func (kcl *KubeClient) GetConfigMap(namespace, configMapName string) (models.K8s
 		return models.K8sConfigMap{}, err
 	}
 
-	return parseConfigMap(configMap), nil
+	return parseConfigMap(configMap, true), nil
 }
 
 // parseConfigMap parses a k8s ConfigMap object into a K8sConfigMap struct.
-func parseConfigMap(configMap *corev1.ConfigMap) models.K8sConfigMap {
-	return models.K8sConfigMap{
+// for get operation, withData will be set to true.
+// otherwise, only metadata will be parsed.
+func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfigMap {
+	result := models.K8sConfigMap{
 		K8sConfiguration: models.K8sConfiguration{
 			UID:          string(configMap.UID),
 			Name:         configMap.Name,
 			Namespace:    configMap.Namespace,
 			CreationDate: configMap.CreationTimestamp.Time.UTC().Format(time.RFC3339),
 			Annotations:  configMap.Annotations,
-			Data:         configMap.Data,
 		},
 	}
+
+	if withData {
+		result.Data = configMap.Data
+	}
+
+	return result
 }
 
 // CombineConfigMapsWithApplications combines the config maps with the applications that use them.
@@ -100,13 +107,13 @@ func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8s
 	for index, configMap := range configMaps {
 		updatedConfigMap := configMap
 
-		applications, err := kcl.GetApplicationNamesFromConfigMap(configMap, pods, replicaSets)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromConfigMap(configMap, pods, replicaSets)
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineConfigMapsWithApplications operation, unable to get applications from config map. Error: %w", err)
 		}
 
-		if len(applications) > 0 {
-			updatedConfigMap.Applications = applications
+		if len(applicationConfigurationOwners) > 0 {
+			configMap.ConfigurationOwners = applicationConfigurationOwners
 		}
 
 		updatedConfigMaps[index] = updatedConfigMap
@@ -136,12 +143,14 @@ func (kcl *KubeClient) CombineConfigMapWithApplications(configMap models.K8sConf
 			return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get replica sets. Error: %w", err)
 		}
 
-		applications, err := kcl.GetApplicationNamesFromConfigMap(configMap, pods.Items, replicaSets.Items)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromConfigMap(configMap, pods.Items, replicaSets.Items)
 		if err != nil {
 			return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get applications from config map. Error: %w", err)
 		}
 
-		configMap.Applications = applications
+		if len(applicationConfigurationOwners) > 0 {
+			configMap.ConfigurationOwners = applicationConfigurationOwners
+		}
 	}
 
 	return configMap, nil

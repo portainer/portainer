@@ -58,7 +58,7 @@ func (kcl *KubeClient) getSecrets(namespace string) ([]models.K8sSecret, error) 
 
 	results := []models.K8sSecret{}
 	for _, secret := range secrets.Items {
-		results = append(results, parseSecret(&secret))
+		results = append(results, parseSecret(&secret, false))
 	}
 
 	return results, nil
@@ -72,28 +72,35 @@ func (kcl *KubeClient) GetSecret(namespace string, secretName string) (models.K8
 		return models.K8sSecret{}, err
 	}
 
-	return parseSecret(secret), nil
+	return parseSecret(secret, true), nil
 }
 
 // parseSecret parses a k8s Secret object into a K8sSecret struct.
-func parseSecret(secret *corev1.Secret) models.K8sSecret {
-	secretData := secret.Data
-	secretDataMap := make(map[string]string, len(secretData))
-	for key, value := range secretData {
-		secretDataMap[key] = string(value)
-	}
-
-	return models.K8sSecret{
+// for get operation, withData will be set to true.
+// otherwise, only metadata will be parsed.
+func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
+	result := models.K8sSecret{
 		K8sConfiguration: models.K8sConfiguration{
 			UID:          string(secret.UID),
 			Name:         secret.Name,
 			Namespace:    secret.Namespace,
 			CreationDate: secret.CreationTimestamp.Time.UTC().Format(time.RFC3339),
 			Annotations:  secret.Annotations,
-			Data:         secretDataMap,
 		},
 		SecretType: string(secret.Type),
 	}
+
+	if withData {
+		secretData := secret.Data
+		secretDataMap := make(map[string]string, len(secretData))
+		for key, value := range secretData {
+			secretDataMap[key] = string(value)
+		}
+
+		result.Data = secretDataMap
+	}
+
+	return result
 }
 
 // CombineSecretsWithApplications combines the secrets with the applications that use them.
@@ -111,13 +118,13 @@ func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret
 	for index, secret := range secrets {
 		updatedSecret := secret
 
-		applications, err := kcl.GetApplicationNamesFromSecret(secret, pods, replicaSets)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, pods, replicaSets)
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to get applications from secret. Error: %w", err)
 		}
 
-		if len(applications) > 0 {
-			updatedSecret.Applications = applications
+		if len(applicationConfigurationOwners) > 0 {
+			updatedSecret.ConfigurationOwners = applicationConfigurationOwners
 		}
 
 		updatedSecrets[index] = updatedSecret
@@ -147,12 +154,14 @@ func (kcl *KubeClient) CombineSecretWithApplications(secret models.K8sSecret) (m
 			return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get replica sets. Error: %w", err)
 		}
 
-		applications, err := kcl.GetApplicationNamesFromSecret(secret, pods.Items, replicaSets.Items)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, pods.Items, replicaSets.Items)
 		if err != nil {
 			return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get applications from secret. Error: %w", err)
 		}
 
-		secret.Applications = applications
+		if len(applicationConfigurationOwners) > 0 {
+			secret.ConfigurationOwners = applicationConfigurationOwners
+		}
 	}
 
 	return secret, nil
