@@ -1,4 +1,4 @@
-export function getDockerEnvironmentType(isSwarm: boolean, isPodman: boolean) {
+export function getDockerEnvironmentType(isSwarm: boolean, isPodman?: boolean) {
   if (isPodman) {
     return 'Podman';
   }

@@ -1,4 +1,5 @@
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
+import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
 import {
   Environment,
   PlatformType,
@@ -9,7 +10,7 @@ import { getDockerEnvironmentType } from '@/react/portainer/environments/utils/g
 
 export function EngineVersion({ environment }: { environment: Environment }) {
   const platform = getPlatformType(environment.Type);
-  const isPodman = environment.ContainerEngine === 'podman';
+  const isPodman = useIsPodman(environment.Id);
 
   switch (platform) {
     case PlatformType.Docker:
@@ -35,7 +36,7 @@ function DockerEngineVersion({
   isPodman,
 }: {
   snapshot?: DockerSnapshot;
-  isPodman: boolean;
+  isPodman?: boolean;
 }) {
   if (!snapshot) {
     return null;
