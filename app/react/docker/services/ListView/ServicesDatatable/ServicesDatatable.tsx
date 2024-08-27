@@ -42,6 +42,8 @@ const store = createPersistedStore<TableSettingsType>(
   })
 );
 
+let foundGlobalFilter = false;
+
 export function ServicesDatatable({
   titleIcon = Shuffle,
   dataset,
@@ -76,7 +78,7 @@ export function ServicesDatatable({
           <td colSpan={Number.MAX_SAFE_INTEGER}>
             <TasksDatatable
               dataset={item.Tasks as Array<DecoratedTask>}
-              search={tableState.search}
+              search={foundGlobalFilter ? '' : tableState.search}
             />
           </td>
         </tr>
@@ -118,12 +120,15 @@ function filter(
   columnId: string,
   filterValue: null | { search: string }
 ) {
+  foundGlobalFilter = defaultGlobalFilterFn(row, columnId, filterValue);
   return (
-    defaultGlobalFilterFn(row, columnId, filterValue) ||
-    row.original.Tasks.some((task) =>
-      Object.values(task).some(
-        (value) => value && value.toString().includes(filterValue?.search || '')
-      )
-    )
+    foundGlobalFilter ||
+    (!foundGlobalFilter &&
+      row.original.Tasks.some((task) =>
+        Object.values(task).some(
+          (value) =>
+            value && value.toString().includes(filterValue?.search || '')
+        )
+      ))
   );
 }
