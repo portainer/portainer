@@ -129,7 +129,8 @@ angular.module('portainer.docker').controller('ContainerController', [
           // isCreateContainerSupported is true if the API version is 1.44 or greater, or if the container does not have a MacAddress
           // see https://github.com/moby/moby/blob/f9522e5e96c3ab5a6b8a643d15a92700ca864da6/client/container_create.go#L44
           // podman 5.1.1 currently shows an api version of 1.41 and has container networks with mac addresses, so hide the recreate button in this case
-          const isCreateContainerSupported = isApiVersion1_44OrGreater || !container.NetworkSettings.MacAddress;
+          const hasMacAddress = container.NetworkSettings.Networks ? Object.values(container.NetworkSettings.Networks).some((network) => network.MacAddress) : false;
+          const isCreateContainerSupported = isApiVersion1_44OrGreater || !hasMacAddress;
           $scope.displayDuplicateEditButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
           $scope.displayRecreateButton = $scope.displayDuplicateEditButton && isCreateContainerSupported;
           $scope.displayCreateWebhookButton = $scope.displayRecreateButton;

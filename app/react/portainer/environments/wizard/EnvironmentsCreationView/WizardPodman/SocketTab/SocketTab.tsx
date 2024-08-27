@@ -12,7 +12,7 @@ interface Props {
 export function SocketTab({ onCreate }: Props) {
   return (
     <>
-      <TextTip color="orange" className="mb-2">
+      <TextTip color="orange" className="mb-2" inline={false}>
         Connecting to Podman via socket is only supported for Linux
         environments. Please use the Agent or Edge Agent options if you&apos;re
         running Podman on Windows or Mac.
