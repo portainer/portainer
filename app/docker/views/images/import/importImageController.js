@@ -1,4 +1,5 @@
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { fullURIIntoRepoAndTag } from '@/react/docker/images/utils';
 
 angular.module('portainer.docker').controller('ImportImageController', [
   '$scope',
@@ -33,7 +34,8 @@ angular.module('portainer.docker').controller('ImportImageController', [
     async function tagImage(id) {
       const registryModel = $scope.formValues.RegistryModel;
       if (registryModel.Image) {
-        const { repo, tag } = ImageHelper.createImageConfigForContainer(registryModel);
+        const image = ImageHelper.createImageConfigForContainer(registryModel);
+        const { repo, tag } = fullURIIntoRepoAndTag(image.fromImage);
         try {
           await ImageService.tagImage(id, repo, tag);
         } catch (err) {
