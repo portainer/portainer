@@ -4,7 +4,6 @@ export interface AnalyticsState {
   dockerEdgeAgentStandard: number;
   dockerEdgeAgentAsync: number;
   podmanAgent: number;
-  podmanApi: number;
   podmanEdgeAgentStandard: number;
   podmanEdgeAgentAsync: number;
   podmanLocalEnvironment: number; // podman socket
@@ -13,7 +12,7 @@ export interface AnalyticsState {
   kubernetesEdgeAgentAsync: number;
   kaasAgent: number;
   aciApi: number;
-  localEndpoint: number;
+  localEndpoint: number; // docker socket
 }
 
 export type AnalyticsStateKey = keyof AnalyticsState;
