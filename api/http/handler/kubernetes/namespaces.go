@@ -97,7 +97,6 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 	}
 
 	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
 		return httperror.BadRequest(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespaceName), err)
 	}
