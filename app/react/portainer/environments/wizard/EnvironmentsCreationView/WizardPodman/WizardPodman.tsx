@@ -10,6 +10,7 @@ import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -69,6 +70,11 @@ export function WizardPodman({ onCreate }: Props) {
         value={creationType}
         radioName="creation-type"
       />
+      <TextTip color="orange" className="mb-2">
+        Currently, Portainer only supports Podman environments running in
+        rootful mode. Rootless mode may work, but isn&apos;t officially
+        supported yet.
+      </TextTip>
       {tab}
     </div>
   );

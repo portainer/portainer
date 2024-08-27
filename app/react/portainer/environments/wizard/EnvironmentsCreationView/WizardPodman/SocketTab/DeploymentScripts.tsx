@@ -4,13 +4,13 @@ import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
 import { NavContainer } from '@@/NavTabs/NavContainer';
+import { TextTip } from '@@/Tip/TextTip';
 
 const deployments = [
   {
     id: 'linux',
     label: 'Linux',
-    command: `sudo systemctl start podman.socket
-sudo systemctl enable podman.socket`,
+    command: `sudo systemctl enable --now podman.socket`,
   },
 ];
 
@@ -41,10 +41,10 @@ interface DeployCodeProps {
 function DeployCode({ code }: DeployCodeProps) {
   return (
     <>
-      <span className="text-muted small">
+      <TextTip color="blue" className="mb-1">
         To use the socket, ensure that you have started the Podman rootful
         socket:
-      </span>
+      </TextTip>
 
       <Code>{code}</Code>
       <div className="mt-2">
