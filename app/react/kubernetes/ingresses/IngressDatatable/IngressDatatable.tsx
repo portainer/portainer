@@ -17,7 +17,7 @@ import { DeleteButton } from '@@/buttons/DeleteButton';
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '../../namespaces/types';
+import { Namespaces, PortainerNamespace } from '../../namespaces/types';
 import { CreateFromManifestButton } from '../../components/CreateFromManifestButton';
 
 import { columns } from './columns';
@@ -39,12 +39,19 @@ export function IngressDatatable() {
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespaces, ...namespacesQuery } =
-    useNamespacesQuery(environmentId);
+  const { data: namespacesArray, ...namespacesQuery } = useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     withServices: true,
   });
+
+  const namespaces: Record<string, PortainerNamespace> = {};
+  if (Array.isArray(namespacesArray)) {
+    for (let i = 0; i < namespacesArray.length; i++) {
+      const namespace = namespacesArray[i];
+      namespaces[namespace.Name] = namespace;
+    }
+  }
 
   const filteredIngresses = useMemo(
     () =>

@@ -4,7 +4,7 @@ import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
 
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { Namespaces, PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
@@ -30,8 +30,7 @@ const settingsStore = createStore(storageKey);
 export function ServicesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } =
-    useNamespacesQuery(environmentId);
+  const { data: namespacesArray, ...namespacesQuery } = useNamespacesQuery(environmentId);
   const { data: services, ...servicesQuery } = useClusterServices(
     environmentId,
     {
@@ -39,6 +38,14 @@ export function ServicesDatatable() {
       withApplications: true,
     }
   );
+
+  const namespaces: Record<string, PortainerNamespace> = {};
+  if (Array.isArray(namespacesArray)) {
+    for (let i = 0; i < namespacesArray.length; i++) {
+      const namespace = namespacesArray[i];
+      namespaces[namespace.Name] = namespace;
+    }
+  }
 
   const { authorized: canWrite } = useAuthorizations(['K8sServiceW']);
   const readOnly = !canWrite;
@@ -50,6 +57,8 @@ export function ServicesDatatable() {
       (canAccessSystemResources && tableState.showSystemResources) ||
       !namespaces?.[service.Namespace].IsSystem
   );
+  
+  console.log('filteredServices', filteredServices);
 
   const servicesWithIsSystem = useServicesRowData(
     filteredServices || [],

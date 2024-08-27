@@ -16,15 +16,9 @@ import (
 // It returns a list of K8sServiceInfo objects.
 func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchServicesForAdmin(namespace)
+		return kcl.fetchServices(namespace)
 	}
 	return kcl.fetchServicesForNonAdmin(namespace)
-}
-
-// fetchServicesForAdmin gets all the services for either at the cluster level or a given namespace in a k8s endpoint.
-// it returns a list of K8sServiceInfo objects.
-func (kcl *KubeClient) fetchServicesForAdmin(namespace string) ([]models.K8sServiceInfo, error) {
-	return kcl.fetchServices(namespace)
 }
 
 // fetchServicesForNonAdmin gets all the services for either at the cluster level or a given namespace in a k8s endpoint.
