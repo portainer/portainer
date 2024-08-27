@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -13,18 +12,17 @@ import (
 // @id getKubernetesSecret
 // @summary Get Secret
 // @description Get a Secret by name for a given namespace
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @param namespace path string true "Namespace name"
-// @param secret path string true "Secret name"
-// @success 200 {object} K8sSecret "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @param namespace path string true "The namespace name where the secret is located"
+// @param secret path string true "The secret name to get details for"
+// @success 200 {object} models.K8sSecret "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve a secret by name belong in a namespace."
 // @router /kubernetes/{id}/namespaces/{namespace}/secrets/{secret} [get]
 func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
@@ -58,20 +56,19 @@ func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Reque
 // @id GetKubernetesSecrets
 // @summary Get Secrets
 // @description Get all Secrets for a given namespace
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
 // @param isUsed query bool true "When set to true, associate the Secrets with the applications that use them"
-// @success 200 {array} []K8sSecret "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @success 200 {array} models.[]K8sSecret "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve all secrets from the cluster."
 // @router /kubernetes/{id}/secrets [get]
-func (handler *Handler) GetKubernetesSecrets(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	secrets, err := handler.getKubernetesSecrets(r)
+func (handler *Handler) GetAllKubernetesSecrets(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	secrets, err := handler.getAllKubernetesSecrets(r)
 	if err != nil {
 		return err
 	}
@@ -79,22 +76,21 @@ func (handler *Handler) GetKubernetesSecrets(w http.ResponseWriter, r *http.Requ
 	return response.JSON(w, secrets)
 }
 
-// @id getKubernetesSecretsCount
+// @id getAllKubernetesSecretsCount
 // @summary Get Secrets count
 // @description Get the count of Secrets for a given namespace
-// @description **Access policy**: authenticated
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @success 200 {object} map[string]int "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @success 200 {integer} integer "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve the count of all secrets from the cluster."
 // @router /kubernetes/{id}/secrets/count [get]
-func (handler *Handler) getKubernetesSecretsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	secrets, err := handler.getKubernetesSecrets(r)
+func (handler *Handler) getAllKubernetesSecretsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	secrets, err := handler.getAllKubernetesSecrets(r)
 	if err != nil {
 		return err
 	}
@@ -102,38 +98,26 @@ func (handler *Handler) getKubernetesSecretsCount(w http.ResponseWriter, r *http
 	return response.JSON(w, len(secrets))
 }
 
-func (handler *Handler) getKubernetesSecrets(r *http.Request) ([]models.K8sSecret, *httperror.HandlerError) {
+func (handler *Handler) getAllKubernetesSecrets(r *http.Request) ([]models.K8sSecret, *httperror.HandlerError) {
 	isUsed, err := request.RetrieveBooleanQueryParameter(r, "isUsed", true)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the getKubernetesSecrets operation, unable to retrieve isUsed query parameter. Error: ", err)
+		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesSecrets operation, unable to retrieve isUsed query parameter. Error: ", err)
 	}
 
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return nil, httperror.NotFound("an error occurred during the getKubernetesSecrets operation, unable to fetch endpoint. Error: ", err)
-	}
-
-	cli, httpErr := handler.getProxyKubeClient(r)
+	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httpErr
+		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to prepare kube client. Error: ", httpErr)
 	}
 
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
+	secrets, err := cli.GetSecrets("")
 	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesSecrets operation, unable to get privileged kube client for combining services with applications. Error: ", err)
-	}
-	pcli.IsKubeAdmin = cli.IsKubeAdmin
-	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
-
-	secrets, err := pcli.GetSecrets("")
-	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesSecrets operation, unable to get secrets. Error: ", err)
+		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to get secrets. Error: ", err)
 	}
 
 	if isUsed {
-		secretsWithApplications, err := pcli.CombineSecretsWithApplications(secrets)
+		secretsWithApplications, err := cli.CombineSecretsWithApplications(secrets)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the getKubernetesSecrets operation, unable to combine secrets with applications. Error: ", err)
+			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to combine secrets with applications. Error: ", err)
 		}
 
 		return secretsWithApplications, nil
