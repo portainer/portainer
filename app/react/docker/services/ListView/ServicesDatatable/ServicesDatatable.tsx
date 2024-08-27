@@ -42,7 +42,7 @@ const store = createPersistedStore<TableSettingsType>(
   })
 );
 
-let foundGlobalFilter = false;
+const parentFilteredStatus: Map<string, boolean> = new Map();
 
 export function ServicesDatatable({
   titleIcon = Shuffle,
@@ -78,7 +78,9 @@ export function ServicesDatatable({
           <td colSpan={Number.MAX_SAFE_INTEGER}>
             <TasksDatatable
               dataset={item.Tasks as Array<DecoratedTask>}
-              search={foundGlobalFilter ? '' : tableState.search}
+              search={
+                parentFilteredStatus.get(item.Id) ? '' : tableState.search
+              }
             />
           </td>
         </tr>
@@ -120,15 +122,16 @@ function filter(
   columnId: string,
   filterValue: null | { search: string }
 ) {
-  foundGlobalFilter = defaultGlobalFilterFn(row, columnId, filterValue);
+  parentFilteredStatus.set(
+    row.id,
+    defaultGlobalFilterFn(row, columnId, filterValue)
+  );
   return (
-    foundGlobalFilter ||
-    (!foundGlobalFilter &&
-      row.original.Tasks.some((task) =>
-        Object.values(task).some(
-          (value) =>
-            value && value.toString().includes(filterValue?.search || '')
-        )
-      ))
+    parentFilteredStatus.get(row.id) ||
+    row.original.Tasks.some((task) =>
+      Object.values(task).some(
+        (value) => value && value.toString().includes(filterValue?.search || '')
+      )
+    )
   );
 }
