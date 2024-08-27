@@ -47,6 +47,8 @@ import { useNetworksForSelector } from '../components/NetworkSelector';
 import { useContainers } from '../queries/useContainers';
 import { useContainer } from '../queries/useContainer';
 
+import { getDefaultNetworkMode } from './NetworkTab/toViewModel';
+
 export interface Values extends BaseFormValues {
   commands: CommandsTabValues;
   volumes: VolumesTabValues;
@@ -118,7 +120,11 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
   const extraNetworks = Object.entries(
     fromContainer.NetworkSettings?.Networks || {}
   )
-    .filter(([n]) => n !== network.networkMode)
+    .filter(
+      ([n]) =>
+        n !== network.networkMode &&
+        n !== getDefaultNetworkMode(isWindows, isPodman)
+    )
     .map(([networkName, network]) => ({
       networkName,
       aliases: (network.Aliases || []).filter(

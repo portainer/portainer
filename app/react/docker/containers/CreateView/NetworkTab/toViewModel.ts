@@ -21,7 +21,7 @@ export function getDefaultViewModel(isWindows: boolean, isPodman?: boolean) {
   };
 }
 
-function getDefaultNetworkMode(isWindows: boolean, isPodman?: boolean) {
+export function getDefaultNetworkMode(isWindows: boolean, isPodman?: boolean) {
   if (isWindows) return 'nat';
   if (isPodman) return 'podman';
   return 'bridge';
