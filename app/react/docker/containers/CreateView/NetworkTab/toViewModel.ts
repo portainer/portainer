@@ -69,7 +69,7 @@ export function toViewModel(
   };
 }
 
-function getNetworkMode(
+export function getNetworkMode(
   config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
   runningContainers: Array<ContainerListViewModel> = [],
