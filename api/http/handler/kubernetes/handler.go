@@ -69,8 +69,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
-	endpointRouter.Handle("/volumes", httperror.LoggerHandler(h.GetKubernetesVolumes)).Methods(http.MethodGet)
-	endpointRouter.Handle("/volumes/count", httperror.LoggerHandler(h.getKubernetesVolumesCount)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes", httperror.LoggerHandler(h.GetAllKubernetesVolumes)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes/count", httperror.LoggerHandler(h.getAllKubernetesVolumesCount)).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
