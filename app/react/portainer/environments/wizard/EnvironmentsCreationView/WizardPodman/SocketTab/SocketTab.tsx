@@ -14,8 +14,8 @@ export function SocketTab({ onCreate }: Props) {
     <>
       <TextTip color="orange" className="mb-2">
         Connecting to Podman via socket is only supported for Linux
-        environments. Please try using the agent option if you&apos;re running
-        Podman on Windows or Mac.
+        environments. Please use the Agent or Edge Agent options if you&apos;re
+        running Podman on Windows or Mac.
       </TextTip>
       <DeploymentScripts />
 
