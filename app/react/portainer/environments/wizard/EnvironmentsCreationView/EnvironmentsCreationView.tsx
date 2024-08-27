@@ -226,7 +226,6 @@ function useAnalyticsState() {
     dockerEdgeAgentAsync: 0,
     dockerEdgeAgentStandard: 0,
     podmanAgent: 0,
-    podmanApi: 0,
     podmanEdgeAgentAsync: 0,
     podmanEdgeAgentStandard: 0,
     podmanLocalEnvironment: 0,
