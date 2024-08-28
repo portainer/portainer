@@ -381,8 +381,7 @@ angular
         url: '/users',
         views: {
           'content@': {
-            templateUrl: './views/users/users.html',
-            controller: 'UsersController',
+            component: 'usersListView',
           },
         },
         data: {

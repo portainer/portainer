@@ -1,5 +1,4 @@
 import { Formik, Field, Form } from 'formik';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useReducer } from 'react';
 import { Plus } from 'lucide-react';
 
@@ -14,8 +13,8 @@ import { UsersSelector } from '@@/UsersSelector';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { createTeam } from '../../teams.service';
 import { Team } from '../../types';
+import { useAddTeamMutation } from '../../queries/useAddTeamMutation';
 
 import { FormValues } from './types';
 import { validationSchema } from './CreateTeamForm.validation';
@@ -145,23 +144,4 @@ export function CreateTeamForm({ users, teams }: Props) {
       },
     });
   }
-}
-
-export function useAddTeamMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    (values: FormValues) => createTeam(values.name, values.leaders),
-    {
-      meta: {
-        error: {
-          title: 'Failure',
-          message: 'Failed to create team',
-        },
-      },
-      onSuccess() {
-        return queryClient.invalidateQueries(['teams']);
-      },
-    }
-  );
 }
