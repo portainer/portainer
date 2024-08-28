@@ -88,7 +88,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 	if err != nil {
 		if dataservices.IsErrObjectNotFound(err) {
 			// skip error because agent tries to report on deleted stack
-			log.Warn().
+			log.Debug().
 				Err(err).
 				Int("stackID", int(stackID)).
 				Int("status", int(*payload.Status)).
