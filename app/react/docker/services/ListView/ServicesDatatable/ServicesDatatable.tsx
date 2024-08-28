@@ -1,5 +1,6 @@
 import { Shuffle } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
+import { useRef } from 'react';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
@@ -42,8 +43,6 @@ const store = createPersistedStore<TableSettingsType>(
   })
 );
 
-const parentFilteredStatus: Map<string, boolean> = new Map();
-
 export function ServicesDatatable({
   titleIcon = Shuffle,
   dataset,
@@ -57,6 +56,8 @@ export function ServicesDatatable({
   isStackColumnVisible?: boolean;
   onRefresh?(): void;
 }) {
+  // useRef so that updating the parent filter doesn't cause a re-render
+  const parentFilteredStatusRef = useRef<Map<string, boolean>>(new Map());
   const environmentId = useEnvironmentId();
   const apiVersion = useApiVersion(environmentId);
   const tableState = useTableState(store, tableKey);
@@ -79,7 +80,9 @@ export function ServicesDatatable({
             <TasksDatatable
               dataset={item.Tasks as Array<DecoratedTask>}
               search={
-                parentFilteredStatus.get(item.Id) ? '' : tableState.search
+                parentFilteredStatusRef.current.get(item.Id)
+                  ? ''
+                  : tableState.search
               }
             />
           </td>
@@ -115,23 +118,24 @@ export function ServicesDatatable({
       data-cy="services-datatable"
     />
   );
-}
 
-function filter(
-  row: Row<ServiceViewModel>,
-  columnId: string,
-  filterValue: null | { search: string }
-) {
-  parentFilteredStatus.set(
-    row.id,
-    defaultGlobalFilterFn(row, columnId, filterValue)
-  );
-  return (
-    parentFilteredStatus.get(row.id) ||
-    row.original.Tasks.some((task) =>
-      Object.values(task).some(
-        (value) => value && value.toString().includes(filterValue?.search || '')
+  function filter(
+    row: Row<ServiceViewModel>,
+    columnId: string,
+    filterValue: null | { search: string }
+  ) {
+    parentFilteredStatusRef.current = parentFilteredStatusRef.current.set(
+      row.id,
+      defaultGlobalFilterFn(row, columnId, filterValue)
+    );
+    return (
+      parentFilteredStatusRef.current.get(row.id) ||
+      row.original.Tasks.some((task) =>
+        Object.values(task).some(
+          (value) =>
+            value && value.toString().includes(filterValue?.search || '')
+        )
       )
-    )
-  );
+    );
+  }
 }
