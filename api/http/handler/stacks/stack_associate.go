@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -94,8 +95,8 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	}
 	if !canManage {
-		errMsg := "Stack management is disabled for non-admin users"
-		return httperror.Forbidden(errMsg, fmt.Errorf(errMsg))
+		errMsg := "stack management is disabled for non-admin users"
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	stack.EndpointID = portainer.EndpointID(endpointID)
