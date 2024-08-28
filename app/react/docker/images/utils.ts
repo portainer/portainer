@@ -6,8 +6,14 @@ import {
   RegistryTypes,
 } from '@/react/portainer/registries/types/registry';
 
-import { DockerImage, ImageModel } from './types';
+import { DockerImage } from './types';
 import { DockerImageResponse } from './types/response';
+
+type ImageModel = {
+  UseRegistry: boolean;
+  Registry?: Registry;
+  Image: string;
+};
 
 export function parseViewModel(response: DockerImageResponse): DockerImage {
   return {
