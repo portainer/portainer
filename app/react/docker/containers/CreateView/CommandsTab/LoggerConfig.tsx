@@ -31,8 +31,7 @@ export function LoggerConfig({
   errors?: FormikErrors<LogConfig>;
 }) {
   const envId = useEnvironmentId();
-
-  const isPodman = useIsPodman();
+  const isPodman = useIsPodman(envId);
   const isSystem = apiVersion < 1.25;
   const pluginsQuery = useLoggingPlugins(envId, isSystem, isPodman);
 

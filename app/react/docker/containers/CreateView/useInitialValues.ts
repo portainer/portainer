@@ -83,7 +83,7 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
   const registriesQuery = useEnvironmentRegistries(environmentId, {
     enabled: !!from,
   });
-  const isPodman = useIsPodman();
+  const isPodman = useIsPodman(environmentId);
 
   if (!networksQuery.data) {
     return null;

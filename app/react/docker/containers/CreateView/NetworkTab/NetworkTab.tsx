@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik';
 
 import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -21,7 +22,8 @@ export function NetworkTab({
   setFieldValue: (field: string, value: unknown) => void;
   errors?: FormikErrors<Values>;
 }) {
-  const isPodman = useIsPodman();
+  const envId = useEnvironmentId();
+  const isPodman = useIsPodman(envId);
   const additionalOptions = getAdditionalOptions(isPodman);
   return (
     <div className="mt-3">

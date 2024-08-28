@@ -20,7 +20,8 @@ export function NetworkSelector({
   onChange: (value: string) => void;
   hiddenNetworks?: string[];
 }) {
-  const isPodman = useIsPodman();
+  const envId = useEnvironmentId();
+  const isPodman = useIsPodman(envId);
   const networksQuery = useNetworksForSelector({
     select(networks) {
       return networks.map((n) => {
