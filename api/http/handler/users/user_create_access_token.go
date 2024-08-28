@@ -21,7 +21,7 @@ type userAccessTokenCreatePayload struct {
 }
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Description) {
+	if len(payload.Description) == 0 {
 		return errors.New("invalid description: cannot be empty")
 	}
 	if govalidator.HasWhitespaceOnly(payload.Description) {
@@ -100,7 +100,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 
 	if internalAuth {
 		// Internal auth requires the password field and must not be empty
-		if govalidator.IsNull(payload.Password) {
+		if len(payload.Password) == 0 {
 			return httperror.BadRequest("Invalid request payload", errors.New("invalid password: cannot be empty"))
 		}
 

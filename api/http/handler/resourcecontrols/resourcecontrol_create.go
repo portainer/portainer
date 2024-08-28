@@ -8,8 +8,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type resourceControlCreatePayload struct {
@@ -33,7 +31,7 @@ type resourceControlCreatePayload struct {
 var errResourceControlAlreadyExists = errors.New("A resource control is already applied on this resource") //http/resourceControl
 
 func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.ResourceID) {
+	if len(payload.ResourceID) == 0 {
 		return errors.New("invalid payload: invalid resource identifier")
 	}
 

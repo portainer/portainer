@@ -8,8 +8,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type teamCreatePayload struct {
@@ -20,7 +18,7 @@ type teamCreatePayload struct {
 }
 
 func (payload *teamCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("Invalid team name")
 	}
 	return nil

@@ -11,8 +11,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type userUpdatePasswordPayload struct {
@@ -23,10 +21,10 @@ type userUpdatePasswordPayload struct {
 }
 
 func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Password) {
+	if len(payload.Password) == 0 {
 		return errors.New("Invalid current password")
 	}
-	if govalidator.IsNull(payload.NewPassword) {
+	if len(payload.NewPassword) == 0 {
 		return errors.New("Invalid new password")
 	}
 	return nil

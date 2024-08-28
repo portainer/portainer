@@ -11,8 +11,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type registryCreatePayload struct {
@@ -46,19 +44,19 @@ type registryCreatePayload struct {
 }
 
 func (payload *registryCreatePayload) Validate(_ *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("Invalid registry name")
 	}
-	if govalidator.IsNull(payload.URL) {
+	if len(payload.URL) == 0 {
 		return errors.New("Invalid registry URL")
 	}
 
 	if payload.Authentication {
-		if govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password) {
+		if len(payload.Username) == 0 || len(payload.Password) == 0 {
 			return errors.New("Invalid credentials. Username and password must be specified when authentication is enabled")
 		}
 		if payload.Type == portainer.EcrRegistry {
-			if govalidator.IsNull(payload.Ecr.Region) {
+			if len(payload.Ecr.Region) == 0 {
 				return errors.New("invalid credentials: access key ID, secret access key and region must be specified when authentication is enabled")
 			}
 		}

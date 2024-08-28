@@ -10,7 +10,6 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 )
 
@@ -33,11 +32,11 @@ type edgeStackFromStringPayload struct {
 }
 
 func (payload *edgeStackFromStringPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid stack name")
 	}
 
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid stack file content")
 	}
 

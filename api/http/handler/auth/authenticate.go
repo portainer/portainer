@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -30,11 +29,11 @@ type authenticateResponse struct {
 }
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Username) {
+	if len(payload.Username) == 0 {
 		return errors.New("Invalid username")
 	}
 
-	if govalidator.IsNull(payload.Password) {
+	if len(payload.Password) == 0 {
 		return errors.New("Invalid password")
 	}
 

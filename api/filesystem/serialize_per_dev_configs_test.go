@@ -1,9 +1,10 @@
 package filesystem
 
 import (
+	"testing"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMultiFilterDirForPerDevConfigs(t *testing.T) {
