@@ -10,8 +10,6 @@ import {
   EnvironmentId,
 } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
-import { useFeatureFlag } from '@/react/portainer/feature-flags/useFeatureFlag';
-import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
 import { Stepper } from '@@/Stepper';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
@@ -22,7 +20,7 @@ import { Icon } from '@@/Icon';
 
 import {
   EnvironmentOptionValue,
-  getEnvironmentTypes,
+  environmentTypes,
   formTitles,
   EnvironmentOption,
 } from '../EnvironmentTypeSelectView/environment-types';
@@ -53,12 +51,6 @@ export function EnvironmentCreationView() {
   const envTypes = useParamEnvironmentTypes();
   const { trackEvent } = useAnalytics();
   const router = useRouter();
-  const isPodmanEnabledQuery = useFeatureFlag(FeatureId.PODMAN);
-  // for the stepper, assume isPodmanEnabled is true when loading. This avoids a bug where the stepper doesn't contain the current podman step on the initial render, and renders nothing.
-  const isPodmanEnabled = isPodmanEnabledQuery.isLoading
-    ? true
-    : !!isPodmanEnabledQuery.data;
-  const environmentTypes = getEnvironmentTypes(isPodmanEnabled);
   const steps = _.compact(
     envTypes.map((id) => environmentTypes.find((eType) => eType.id === id))
   );

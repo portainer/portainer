@@ -14,13 +14,14 @@ import { buildDockerProxyUrl } from '../buildDockerProxyUrl';
 export async function tagImage(
   environmentId: EnvironmentId,
   id: ImageId | ImageName,
-  repo: string
+  repo: string,
+  tag?: string
 ) {
   try {
     const { data } = await axios.post(
       buildDockerProxyUrl(environmentId, 'images', id, 'tag'),
       {},
-      { params: { repo } }
+      { params: { repo, tag } }
     );
     return data;
   } catch (e) {

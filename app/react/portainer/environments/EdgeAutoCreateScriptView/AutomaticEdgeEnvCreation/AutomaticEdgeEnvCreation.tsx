@@ -9,8 +9,6 @@ import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { useSettings } from '@/react/portainer/settings/queries';
 import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
 import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
-import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { useFeatureFlag } from '@/react/portainer/feature-flags/useFeatureFlag';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
@@ -133,13 +131,12 @@ function EdgeKeyInfo({
   tunnelUrl?: string;
   asyncMode: boolean;
 }) {
-  const { data: isPodmanEnabled } = useFeatureFlag(FeatureId.PODMAN);
   const commands = {
     linux: compact([
       commandsTabs.k8sLinux,
       commandsTabs.swarmLinux,
       commandsTabs.standaloneLinux,
-      isPodmanEnabled && commandsTabs.podmanLinux,
+      commandsTabs.podmanLinux,
     ]),
     win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
   };

@@ -1,5 +1,3 @@
-import { compact } from 'lodash';
-
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Podman from '@/assets/ico/vendor/podman.svg?c';
@@ -24,53 +22,48 @@ export interface EnvironmentOption
   id: EnvironmentOptionValue;
   value: EnvironmentOptionValue;
 }
-export function getExistingEnvironmentTypes(
-  isPodmanEnabled: boolean
-): EnvironmentOption[] {
-  const options: (EnvironmentOption | false)[] = [
-    {
-      id: 'dockerStandalone',
-      value: 'dockerStandalone',
-      label: 'Docker Standalone',
-      icon: Docker,
-      iconType: 'logo',
-      description: 'Connect to Docker Standalone via URL/IP, API or Socket',
-    },
-    {
-      id: 'dockerSwarm',
-      value: 'dockerSwarm',
-      label: 'Docker Swarm',
-      icon: Docker,
-      iconType: 'logo',
-      description: 'Connect to Docker Swarm via URL/IP, API or Socket',
-    },
-    isPodmanEnabled && {
-      id: 'podman',
-      value: 'podman',
-      label: 'Podman',
-      icon: Podman,
-      iconType: 'logo',
-      description: 'Connect to Podman via URL/IP, API or Socket',
-    },
-    {
-      id: 'kubernetes',
-      value: 'kubernetes',
-      label: 'Kubernetes',
-      icon: Kubernetes,
-      iconType: 'logo',
-      description: 'Connect to a Kubernetes environment via URL/IP',
-    },
-    {
-      id: 'aci',
-      value: 'aci',
-      label: 'ACI',
-      description: 'Connect to ACI environment via API',
-      iconType: 'logo',
-      icon: Azure,
-    },
-  ];
-  return compact(options);
-}
+export const existingEnvironmentTypes: EnvironmentOption[] = [
+  {
+    id: 'dockerStandalone',
+    value: 'dockerStandalone',
+    label: 'Docker Standalone',
+    icon: Docker,
+    iconType: 'logo',
+    description: 'Connect to Docker Standalone via URL/IP, API or Socket',
+  },
+  {
+    id: 'dockerSwarm',
+    value: 'dockerSwarm',
+    label: 'Docker Swarm',
+    icon: Docker,
+    iconType: 'logo',
+    description: 'Connect to Docker Swarm via URL/IP, API or Socket',
+  },
+  {
+    id: 'podman',
+    value: 'podman',
+    label: 'Podman',
+    icon: Podman,
+    iconType: 'logo',
+    description: 'Connect to Podman via URL/IP, API or Socket',
+  },
+  {
+    id: 'kubernetes',
+    value: 'kubernetes',
+    label: 'Kubernetes',
+    icon: Kubernetes,
+    iconType: 'logo',
+    description: 'Connect to a Kubernetes environment via URL/IP',
+  },
+  {
+    id: 'aci',
+    value: 'aci',
+    label: 'ACI',
+    description: 'Connect to ACI environment via API',
+    iconType: 'logo',
+    icon: Azure,
+  },
+];
 
 export const newEnvironmentTypes: EnvironmentOption[] = [
   {
@@ -96,12 +89,10 @@ export const newEnvironmentTypes: EnvironmentOption[] = [
   },
 ];
 
-export function getEnvironmentTypes(isPodmanEnabled: boolean) {
-  return [
-    ...getExistingEnvironmentTypes(isPodmanEnabled),
-    ...newEnvironmentTypes,
-  ];
-}
+export const environmentTypes: EnvironmentOption[] = [
+  ...existingEnvironmentTypes,
+  ...newEnvironmentTypes,
+];
 
 export const formTitles: Record<EnvironmentOptionValue, string> = {
   dockerStandalone: 'Connect to your Docker Standalone environment',

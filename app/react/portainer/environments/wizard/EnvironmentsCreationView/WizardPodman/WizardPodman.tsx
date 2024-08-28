@@ -70,7 +70,7 @@ export function WizardPodman({ onCreate }: Props) {
         value={creationType}
         radioName="creation-type"
       />
-      <TextTip color="orange" className="mb-2">
+      <TextTip color="orange" className="mb-2" inline={false}>
         Currently, Portainer only supports Podman environments running in
         rootful mode. Rootless mode may work, but isn&apos;t officially
         supported yet.
