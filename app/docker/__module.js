@@ -188,8 +188,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/events',
       views: {
         'content@': {
-          templateUrl: './views/events/events.html',
-          controller: 'EventsController',
+          component: 'eventsListView',
         },
       },
       data: {
