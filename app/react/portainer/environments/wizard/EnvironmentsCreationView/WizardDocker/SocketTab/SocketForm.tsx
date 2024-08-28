@@ -11,7 +11,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { NameField } from '../../shared/NameField';
+import { NameField } from '../../../../common/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './SocketForm.validation';

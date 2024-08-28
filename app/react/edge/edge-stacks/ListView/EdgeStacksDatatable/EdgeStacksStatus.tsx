@@ -26,8 +26,8 @@ export function EdgeStackStatus({ edgeStack }: { edgeStack: EdgeStack }) {
     return null;
   }
 
-  const hasOldVersion = environmentsQuery.environments.some((env) =>
-    isVersionSmaller(env.Agent.Version, '2.19.0')
+  const hasOldVersion = environmentsQuery.environments.some(
+    (env) => !env.Agent.Version || isVersionSmaller(env.Agent.Version, '2.19.0')
   );
 
   const { icon, label, mode, spin, tooltip } = getStatus(

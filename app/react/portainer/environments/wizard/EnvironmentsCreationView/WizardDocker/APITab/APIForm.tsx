@@ -14,7 +14,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-import { NameField } from '../../shared/NameField';
+import { NameField } from '../../../../common/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './APIForm.validation';

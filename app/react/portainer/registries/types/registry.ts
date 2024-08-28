@@ -1,5 +1,5 @@
 import { TeamId } from '@/react/portainer/users/teams/types';
-import { UserId } from '@/portainer/users/types';
+import { UserId } from '@/portainer/users/types/user-id';
 
 import { TLSConfiguration } from '../../settings/types';
 
@@ -20,12 +20,12 @@ export enum RegistryTypes {
 }
 
 export type RoleId = number;
-interface AccessPolicy {
+export interface AccessPolicy {
   RoleId: RoleId;
 }
 
-type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
-type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
+export type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
+export type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
 
 export interface RegistryAccess {
   UserAccessPolicies: UserAccessPolicies;

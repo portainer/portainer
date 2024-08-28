@@ -7,6 +7,8 @@ import {
 } from 'react-select/dist/declarations/src/types';
 import { OptionProps } from 'react-select/dist/declarations/src/components/Option';
 
+import { Pair } from '@/react/portainer/settings/types';
+
 import { Select } from '@@/form-components/ReactSelect';
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -20,15 +22,10 @@ interface GpuOption {
   description?: string;
 }
 
-interface GPU {
-  value: string;
-  name: string;
-}
-
 export interface Props {
   values: Values;
   onChange(values: Values): void;
-  gpus: GPU[];
+  gpus: Pair[];
   usedGpus: string[];
   usedAllGpus: boolean;
   enableGpuManagement?: boolean;
@@ -77,13 +74,15 @@ export function GpuFieldset({
   enableGpuManagement,
 }: Props) {
   const options = useMemo(() => {
-    const options = (gpus || []).map((gpu) => ({
-      value: gpu.value,
-      label:
-        usedGpus.includes(gpu.value) || usedAllGpus
-          ? `${gpu.name} (in use)`
-          : gpu.name,
-    }));
+    const options = (gpus || [])
+      .filter((gpu): gpu is { value: string; name: string } => !!gpu.value)
+      .map((gpu) => ({
+        value: gpu.value,
+        label:
+          usedGpus.includes(gpu.value) || usedAllGpus
+            ? `${gpu.name} (in use)`
+            : gpu.name,
+      }));
 
     options.unshift({
       value: 'all',

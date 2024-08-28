@@ -111,6 +111,7 @@ export function createMockEnvironment(): Environment {
     Gpus: [],
     Agent: { Version: '1.0.0' },
     EnableImageNotification: false,
+    CloudProvider: undefined,
     ChangeWindow: {
       Enabled: false,
       EndTime: '',
@@ -120,5 +121,18 @@ export function createMockEnvironment(): Environment {
       detail: '',
       summary: '',
     },
-  };
+    PublicURL: '',
+    ComposeSyntaxMaxVersion: '1',
+    TLSConfig: {
+      TLS: false,
+      TLSSkipVerify: false,
+    },
+    UserAccessPolicies: {},
+    TeamAccessPolicies: {},
+    LastCheckInDate: 0,
+    EdgeCheckinInterval: 0,
+    Heartbeat: true,
+    QueryDate: 0,
+    LocalTimeZone: '',
+  } satisfies Environment;
 }

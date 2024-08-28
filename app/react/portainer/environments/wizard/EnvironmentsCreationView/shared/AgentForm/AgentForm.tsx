@@ -9,7 +9,7 @@ import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/env
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 
-import { NameField } from '../NameField';
+import { NameField } from '../../../../common/NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
 
 import { EnvironmentUrlField } from './EnvironmentUrlField';

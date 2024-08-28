@@ -195,8 +195,7 @@ angular
         },
         views: {
           'content@': {
-            templateUrl: './views/endpoints/edit/endpoint.html',
-            controller: 'EndpointController',
+            component: 'environmentsItemView',
           },
         },
       };

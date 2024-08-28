@@ -167,14 +167,6 @@ export async function endpointsByGroup(
   });
 }
 
-export async function disassociateEndpoint(id: EnvironmentId) {
-  try {
-    await axios.delete(buildUrl(id, 'association'));
-  } catch (e) {
-    throw parseAxiosError(e as Error);
-  }
-}
-
 export async function deleteEndpoint(id: EnvironmentId) {
   try {
     await axios.delete(buildUrl(id));
