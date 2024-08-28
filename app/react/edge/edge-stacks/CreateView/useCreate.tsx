@@ -4,6 +4,8 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
+import { notifySuccess } from '@/portainer/services/notifications';
+import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 
 import {
   BasePayload,
@@ -49,6 +51,7 @@ export function useCreate({
 
     mutation.mutate(getPayload(method, values), {
       onSuccess: () => {
+        notifySuccess('Success', 'Edge stack created');
         router.stateService.go('^');
       },
     });
@@ -87,6 +90,10 @@ export function useCreate({
               ...getBasePayload(values),
               git: values.git,
               relativePathSettings: values.relativePath,
+              autoUpdate: transformAutoUpdateViewModel(
+                values.git.AutoUpdate,
+                webhookId
+              ),
             },
           };
         default:

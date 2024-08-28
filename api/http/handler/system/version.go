@@ -95,8 +95,7 @@ func GetLatestVersion() string {
 		TagName string `json:"tag_name"`
 	}
 
-	err = json.Unmarshal(motd, &data)
-	if err != nil {
+	if err := json.Unmarshal(motd, &data); err != nil {
 		log.Debug().Err(err).Msg("couldn't parse latest Portainer version")
 
 		return ""

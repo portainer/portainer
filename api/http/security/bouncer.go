@@ -11,9 +11,9 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
-	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -275,7 +275,7 @@ func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
 }
 
 // mwAuthenticateFirst authenticates a request an auth token.
-// A result of a first succeded token lookup would be used for the authentication.
+// A result of a first succeeded token lookup would be used for the authentication.
 func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var token *portainer.TokenData
@@ -376,7 +376,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
 		// update the last used time of the key
 		apiKey.LastUsed = now
-		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+		_ = bouncer.apiKeyService.UpdateAPIKey(&apiKey)
 	}
 
 	return tokenData, nil
@@ -528,7 +528,12 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 // - public routes
 // - kubectl - a bearer token is needed, and no csrf token can be sent
 // - api token
-func ShouldSkipCSRFCheck(r *http.Request) (bool, error) {
+// - docker desktop extension
+func ShouldSkipCSRFCheck(r *http.Request, isDockerDesktopExtension bool) (bool, error) {
+	if isDockerDesktopExtension {
+		return true, nil
+	}
+
 	cookie, _ := r.Cookie(portainer.AuthCookieKey)
 	hasCookie := cookie != nil && cookie.Value != ""
 

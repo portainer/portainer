@@ -1,6 +1,7 @@
 package users
 
 import (
+	"cmp"
 	"errors"
 	"net/http"
 	"time"
@@ -78,8 +79,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	var payload userUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -99,11 +99,9 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 			return httperror.Forbidden("Permission denied. Unable to update username", httperrors.ErrResourceAccessDenied)
 		}
 
-		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
-		if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
+		if sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username); err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.InternalServerError("Unable to retrieve users from the database", err)
-		}
-		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
+		} else if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
 			return httperror.Conflict("Another user with the same username already exists", errUserAlreadyExists)
 		}
 
@@ -121,8 +119,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	if payload.NewPassword != "" {
 		// Non-admins need to supply the previous password
 		if tokenData.Role != portainer.AdministratorRole {
-			err := handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
-			if err != nil {
+			if err := handler.CryptoService.CompareHashAndData(user.Password, payload.Password); err != nil {
 				return httperror.Forbidden("Current password doesn't match. Password left unchanged", errors.New("Current password does not match the password provided. Please try again"))
 			}
 		}
@@ -139,22 +136,17 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if payload.Theme != nil {
-		if payload.Theme.Color != nil {
-			user.ThemeSettings.Color = *payload.Theme.Color
-		}
+		user.ThemeSettings.Color = *cmp.Or(payload.Theme.Color, &user.ThemeSettings.Color)
 	}
 
-	if payload.UseCache != nil {
-		user.UseCache = *payload.UseCache
-	}
+	user.UseCache = *cmp.Or(payload.UseCache, &user.UseCache)
 
 	if payload.Role != 0 {
 		user.Role = portainer.UserRole(payload.Role)
 		user.TokenIssueAt = time.Now().Unix()
 	}
 
-	err = handler.DataStore.User().Update(user.ID, user)
-	if err != nil {
+	if err := handler.DataStore.User().Update(user.ID, user); err != nil {
 		return httperror.InternalServerError("Unable to persist user changes inside the database", err)
 	}
 

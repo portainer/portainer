@@ -5,7 +5,7 @@ package request
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -33,23 +33,24 @@ func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) (
 	}
 	defer file.Close()
 
-	fileContent, err := ioutil.ReadAll(file)
+	fileContent, err := io.ReadAll(file)
 	if err != nil {
 		return nil, "", err
 	}
+
 	return fileContent, headers.Filename, nil
 }
 
 // RetrieveMultiPartFormJSONValue decodes the value of some form data as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the form data value is not found.
-func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target interface{}, optional bool) error {
+func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target any, optional bool) error {
 	value, err := RetrieveMultiPartFormValue(request, name, optional)
 	if err != nil {
 		return err
-	}
-	if value == "" {
+	} else if value == "" {
 		return nil
 	}
+
 	return json.Unmarshal([]byte(value), target)
 }
 
@@ -60,6 +61,7 @@ func RetrieveMultiPartFormValue(request *http.Request, name string, optional boo
 	if value == "" && !optional {
 		return "", errors.New(ErrMissingFormDataValue)
 	}
+
 	return value, nil
 }
 
@@ -70,6 +72,7 @@ func RetrieveNumericMultiPartFormValue(request *http.Request, name string, optio
 	if err != nil {
 		return 0, err
 	}
+
 	return strconv.Atoi(value)
 }
 
@@ -80,6 +83,7 @@ func RetrieveBooleanMultiPartFormValue(request *http.Request, name string, optio
 	if err != nil {
 		return false, err
 	}
+
 	return value == "true", nil
 }
 
@@ -89,10 +93,12 @@ func RetrieveRouteVariableValue(request *http.Request, name string) (string, err
 	if routeVariables == nil {
 		return "", errors.New(ErrInvalidRequestURL)
 	}
+
 	routeVar := routeVariables[name]
 	if routeVar == "" {
 		return "", errors.New(ErrInvalidRequestURL)
 	}
+
 	return routeVar, nil
 }
 
@@ -102,6 +108,7 @@ func RetrieveNumericRouteVariableValue(request *http.Request, name string) (int,
 	if err != nil {
 		return 0, err
 	}
+
 	return strconv.Atoi(routeVar)
 }
 
@@ -112,6 +119,7 @@ func RetrieveQueryParameter(request *http.Request, name string, optional bool) (
 	if queryParameter == "" && !optional {
 		return "", errors.New(ErrMissingQueryParameter)
 	}
+
 	return queryParameter, nil
 }
 
@@ -121,10 +129,10 @@ func RetrieveNumericQueryParameter(request *http.Request, name string, optional 
 	queryParameter, err := RetrieveQueryParameter(request, name, optional)
 	if err != nil {
 		return 0, err
-	}
-	if queryParameter == "" && optional {
+	} else if queryParameter == "" && optional {
 		return 0, nil
 	}
+
 	return strconv.Atoi(queryParameter)
 }
 
@@ -135,18 +143,19 @@ func RetrieveBooleanQueryParameter(request *http.Request, name string, optional 
 	if err != nil {
 		return false, err
 	}
+
 	return queryParameter == "true", nil
 }
 
 // RetrieveJSONQueryParameter decodes the value of a query parameter as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the query parameter is not found.
-func RetrieveJSONQueryParameter(request *http.Request, name string, target interface{}, optional bool) error {
+func RetrieveJSONQueryParameter(request *http.Request, name string, target any, optional bool) error {
 	queryParameter, err := RetrieveQueryParameter(request, name, optional)
 	if err != nil {
 		return err
-	}
-	if queryParameter == "" {
+	} else if queryParameter == "" {
 		return nil
 	}
+
 	return json.Unmarshal([]byte(queryParameter), target)
 }

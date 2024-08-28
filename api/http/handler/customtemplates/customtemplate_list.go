@@ -4,14 +4,15 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -70,7 +71,7 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 	customTemplates = filterByType(customTemplates, templateTypes)
 
 	if edge != nil {
-		customTemplates = slices.Filter(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
+		customTemplates = slicesx.Filter(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
 			return customTemplate.EdgeTemplate == *edge
 		})
 	}

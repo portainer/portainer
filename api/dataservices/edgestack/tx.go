@@ -24,7 +24,7 @@ func (service ServiceTx) EdgeStacks() ([]portainer.EdgeStack, error) {
 	err := service.tx.GetAll(
 		BucketName,
 		&portainer.EdgeStack{},
-		func(obj interface{}) (interface{}, error) {
+		func(obj any) (any, error) {
 			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")

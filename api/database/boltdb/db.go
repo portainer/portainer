@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -73,7 +74,6 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 // NeedsEncryptionMigration returns true if database encryption is enabled and
 // we have an un-encrypted DB that requires migration to an encrypted DB
 func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
-
 	// Cases:  Note, we need to check both portainer.db and portainer.edb
 	// to determine if it's a new store.   We only need to differentiate between cases 2,3 and 5
 
@@ -121,11 +121,11 @@ func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-
 	log.Info().Str("filename", connection.GetDatabaseFileName()).Msg("loading PortainerDB")
 
 	// Now we open the db
 	databasePath := connection.GetDatabaseFilePath()
+
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{
 		Timeout:         1 * time.Second,
 		InitialMmapSize: connection.InitialMmapSize,
@@ -178,6 +178,7 @@ func (connection *DbConnection) ViewTx(fn func(portainer.Transaction) error) err
 func (connection *DbConnection) BackupTo(w io.Writer) error {
 	return connection.View(func(tx *bolt.Tx) error {
 		_, err := tx.WriteTo(w)
+
 		return err
 	})
 }
@@ -192,6 +193,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 	if err != nil {
 		return err
 	}
+
 	return os.WriteFile(filename, b, 0600)
 }
 
@@ -201,6 +203,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 func (connection *DbConnection) ConvertToKey(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
+
 	return b
 }
 
@@ -212,7 +215,7 @@ func keyToString(b []byte) string {
 
 	v := binary.BigEndian.Uint64(b)
 	if v <= math.MaxInt32 {
-		return fmt.Sprintf("%d", v)
+		return strconv.FormatUint(v, 10)
 	}
 
 	return string(b)
@@ -226,7 +229,7 @@ func (connection *DbConnection) SetServiceName(bucketName string) error {
 }
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a database.
-func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) GetObject(bucketName string, key []byte, object any) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(bucketName, key, object)
 	})
@@ -241,7 +244,7 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 }
 
 // UpdateObject is a generic function used to update an object inside a database.
-func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.UpdateObject(bucketName, key, object)
 	})
@@ -282,7 +285,7 @@ func (connection *DbConnection) DeleteObject(bucketName string, key []byte) erro
 
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
-func (connection *DbConnection) DeleteAllObjects(bucketName string, obj interface{}, matching func(o interface{}) (id int, ok bool)) error {
+func (connection *DbConnection) DeleteAllObjects(bucketName string, obj any, matching func(o any) (id int, ok bool)) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.DeleteAllObjects(bucketName, obj, matching)
 	})
@@ -301,71 +304,64 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 }
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
-func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
+func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, any)) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObject(bucketName, fn)
 	})
 }
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
-func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObjectWithId(bucketName, id, obj)
 	})
 }
 
 // CreateObjectWithStringId creates a new object in the bucket, using the specified id
-func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj any) error {
 	return connection.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.CreateObjectWithStringId(bucketName, id, obj)
 	})
 }
 
-func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAll(bucketName string, obj any, appendFn func(o any) (any, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAll(bucketName, obj, append)
+		return tx.GetAll(bucketName, obj, appendFn)
 	})
 }
 
-// TODO: decide which Unmarshal to use, and use one...
-func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj any, appendFn func(o any) (any, error)) error {
 	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAllWithJsoniter(bucketName, obj, append)
-	})
-}
-
-func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
-	return connection.ViewTx(func(tx portainer.Transaction) error {
-		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, append)
+		return tx.GetAllWithKeyPrefix(bucketName, keyPrefix, obj, appendFn)
 	})
 }
 
 // BackupMetadata will return a copy of the boltdb sequence numbers for all buckets.
-func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error) {
-	buckets := map[string]interface{}{}
+func (connection *DbConnection) BackupMetadata() (map[string]any, error) {
+	buckets := map[string]any{}
 
 	err := connection.View(func(tx *bolt.Tx) error {
-		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
 			seqId := bucket.Sequence()
 			buckets[bucketName] = int(seqId)
+
 			return nil
 		})
-
-		return err
 	})
 
 	return buckets, err
 }
 
 // RestoreMetadata will restore the boltdb sequence numbers for all buckets.
-func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error {
+func (connection *DbConnection) RestoreMetadata(s map[string]any) error {
 	var err error
 
 	for bucketName, v := range s {
 		id, ok := v.(float64) // JSON ints are unmarshalled to interface as float64. See: https://pkg.go.dev/encoding/json#Decoder.Decode
 		if !ok {
 			log.Error().Str("bucket", bucketName).Msg("failed to restore metadata to bucket, skipped")
+
 			continue
 		}
 

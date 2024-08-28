@@ -13,7 +13,6 @@ export function ClusterVisualizerLink() {
           icon={TrelloIcon}
           props={{
             to: 'docker.swarm.visualizer',
-            'data-cy': 'cluster-visualizer',
           }}
           data-cy="cluster-visualizer"
         >

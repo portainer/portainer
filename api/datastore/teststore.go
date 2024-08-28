@@ -52,27 +52,24 @@ func NewTestStore(t testing.TB, init, secure bool) (bool, *Store, func(), error)
 	}
 
 	if init {
-		err = store.Init()
-		if err != nil {
+		if err := store.Init(); err != nil {
 			return newStore, nil, nil, err
 		}
 	}
 
 	if newStore {
-		// from MigrateData
+		// From MigrateData
 		v := models.Version{
 			SchemaVersion: portainer.APIVersion,
 			Edition:       int(portainer.PortainerCE),
 		}
-		err = store.VersionService.UpdateVersion(&v)
-		if err != nil {
+		if err := store.VersionService.UpdateVersion(&v); err != nil {
 			return newStore, nil, nil, err
 		}
 	}
 
 	teardown := func() {
-		err := store.Close()
-		if err != nil {
+		if err := store.Close(); err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
 	}

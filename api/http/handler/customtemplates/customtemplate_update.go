@@ -67,18 +67,23 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
 		return errors.New("Invalid custom template title")
 	}
+
 	if govalidator.IsNull(payload.FileContent) && govalidator.IsNull(payload.RepositoryURL) {
 		return errors.New("Either file content or git repository url need to be provided")
 	}
+
 	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
+
 	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
+
 	if govalidator.IsNull(payload.Description) {
 		return errors.New("Invalid custom template description")
 	}
+
 	if !isValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
@@ -86,12 +91,12 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
+
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	err := validateVariablesDefinitions(payload.Variables)
-	if err != nil {
+	if err := validateVariablesDefinitions(payload.Variables); err != nil {
 		return err
 	}
 
@@ -122,8 +127,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	var payload customTemplateUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -219,8 +223,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		customTemplate.ProjectPath = projectPath
 	}
 
-	err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)
-	if err != nil {
+	if err := handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate); err != nil {
 		return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 	}
 

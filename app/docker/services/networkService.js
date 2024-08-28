@@ -1,91 +1,55 @@
+import { createNetwork } from '@/react/docker/networks/queries/useCreateNetworkMutation';
+import { getNetwork } from '@/react/docker/networks/queries/useNetwork';
+import { getNetworks } from '@/react/docker/networks/queries/useNetworks';
+import { deleteNetwork } from '@/react/docker/networks/queries/useDeleteNetworkMutation';
+import { connectContainer } from '@/react/docker/networks/queries/useConnectContainerMutation';
+
 import { NetworkViewModel } from '../models/network';
 
-angular.module('portainer.docker').factory('NetworkService', [
-  '$q',
-  'Network',
-  function NetworkServiceFactory($q, Network) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('NetworkService', NetworkServiceFactory);
 
-    service.create = function (networkConfiguration) {
-      var deferred = $q.defer();
+/* @ngInject */
+function NetworkServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      Network.create(networkConfiguration)
-        .$promise.then(function success(data) {
-          deferred.resolve(data);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create network', err: err });
-        });
-      return deferred.promise;
-    };
+  return {
+    create: useAxios(injectEnvironmentId(createNetwork)), // create network
+    network: useAxios(injectEnvironmentId(networkAngularJS)), // service edit
+    networks: useAxios(injectEnvironmentId(networksAngularJS)), // macvlan form + container edit + dashboard + service create + service edit + custom templates list + templates list
+    remove: useAxios(injectEnvironmentId(deleteNetwork)), // networks list
+    connectContainer: useAxios(injectEnvironmentId(connectContainerAngularJS)), // container edit
+  };
 
-    service.network = function (id) {
-      var deferred = $q.defer();
+  /**
+   * @param {EnvironmentId} environmentId filled by AngularToReact
+   * @param {NetworkId} networkId
+   * @param {string?} nodeName
+   * @returns NetworkViewModel
+   */
+  async function networkAngularJS(environmentId, networkId, nodeName) {
+    const data = await getNetwork(environmentId, networkId, { nodeName });
+    return new NetworkViewModel(data);
+  }
 
-      Network.get({ id: id })
-        .$promise.then(function success(data) {
-          var network = new NetworkViewModel(data);
-          deferred.resolve(network);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve network details', err: err });
-        });
+  /**
+   * @param {EnvironmentId} environmentId filled by AngularToReact
+   * @param {boolean?} localNetworks
+   * @param {boolean?} swarmNetworks
+   * @param {boolean?} swarmAttachableNetworks
+   * @param {*} filters
+   * @returns NetworkViewModel[]
+   */
+  async function networksAngularJS(environmentId, local, swarm, swarmAttachable, filters) {
+    const data = await getNetworks(environmentId, { local, swarm, swarmAttachable, filters });
+    return data.map((n) => new NetworkViewModel(n));
+  }
 
-      return deferred.promise;
-    };
-
-    service.networks = function (localNetworks, swarmNetworks, swarmAttachableNetworks, filters) {
-      var deferred = $q.defer();
-
-      Network.query({ filters: filters })
-        .$promise.then(function success(data) {
-          var networks = data;
-          var filteredNetworks = networks
-            .filter(function (network) {
-              if (localNetworks && network.Scope === 'local') {
-                return network;
-              }
-              if (swarmNetworks && network.Scope === 'swarm') {
-                return network;
-              }
-              if (swarmAttachableNetworks && network.Scope === 'swarm' && network.Attachable === true) {
-                return network;
-              }
-            })
-            .map(function (item) {
-              return new NetworkViewModel(item);
-            });
-
-          deferred.resolve(filteredNetworks);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve networks', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.remove = function (id) {
-      return Network.remove({ id: id }).$promise;
-    };
-
-    service.disconnectContainer = function (networkId, containerId, force) {
-      return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
-    };
-
-    service.connectContainer = function (networkId, containerId, aliases) {
-      var payload = {
-        Container: containerId,
-      };
-      if (aliases) {
-        payload.EndpointConfig = {
-          Aliases: aliases,
-        };
-      }
-      return Network.connect({ id: networkId }, payload).$promise;
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId filled by AngularToReact
+   * @param {NetworkId} networkId
+   * @param {ContainerId} containerId
+   */
+  async function connectContainerAngularJS(environmentId, networkId, containerId) {
+    return connectContainer({ environmentId, containerId, networkId });
+  }
+}

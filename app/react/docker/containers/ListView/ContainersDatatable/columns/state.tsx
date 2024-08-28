@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { CellContext } from '@tanstack/react-table';
 
 import {
-  type DockerContainer,
+  type ContainerListViewModel,
   ContainerStatus,
 } from '@/react/docker/containers/types';
 
@@ -25,7 +25,7 @@ export const state = columnHelper.accessor('Status', {
 function StatusCell({
   getValue,
   row: { original: container },
-}: CellContext<DockerContainer, ContainerStatus>) {
+}: CellContext<ContainerListViewModel, ContainerStatus>) {
   const status = getValue();
 
   const hasHealthCheck = [

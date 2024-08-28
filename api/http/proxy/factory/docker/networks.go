@@ -78,7 +78,7 @@ func (transport *Transport) networkInspectOperation(response *http.Response, exe
 
 // findSystemNetworkResourceControl will check if the network object is a system network
 // and will return a system resource control if that's the case.
-func findSystemNetworkResourceControl(networkObject map[string]interface{}) *portainer.ResourceControl {
+func findSystemNetworkResourceControl(networkObject map[string]any) *portainer.ResourceControl {
 	if networkObject[networkObjectName] == nil {
 		return nil
 	}
@@ -98,6 +98,6 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 // API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-func selectorNetworkLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorNetworkLabels(responseObject map[string]any) map[string]any {
 	return utils.GetJSONObject(responseObject, "Labels")
 }

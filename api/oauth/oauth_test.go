@@ -16,8 +16,7 @@ func Test_getOAuthToken(t *testing.T) {
 
 	t.Run("getOAuthToken fails upon invalid code", func(t *testing.T) {
 		code := ""
-		_, err := getOAuthToken(code, config)
-		if err == nil {
+		if _, err := getOAuthToken(code, config); err == nil {
 			t.Errorf("getOAuthToken should fail upon providing invalid code; code=%v", code)
 		}
 	})
@@ -35,7 +34,7 @@ func Test_getOAuthToken(t *testing.T) {
 func Test_getIdToken(t *testing.T) {
 	verifiedToken := `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2NTM1NDA3MjksImV4cCI6MTY4NTA3NjcyOSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiam9obi5kb2VAZXhhbXBsZS5jb20iLCJHaXZlbk5hbWUiOiJKb2huIiwiU3VybmFtZSI6IkRvZSIsIkdyb3VwcyI6WyJGaXJzdCIsIlNlY29uZCJdfQ.GeU8XCV4Y4p5Vm-i63Aj7UP5zpb_0Zxb7-DjM2_z-s8`
 	nonVerifiedToken := `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2NTM1NDA3MjksImV4cCI6MTY4NTA3NjcyOSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoiam9obi5kb2VAZXhhbXBsZS5jb20iLCJHaXZlbk5hbWUiOiJKb2huIiwiU3VybmFtZSI6IkRvZSIsIkdyb3VwcyI6WyJGaXJzdCIsIlNlY29uZCJdfQ.`
-	claims := map[string]interface{}{
+	claims := map[string]any{
 		"iss":       "Online JWT Builder",
 		"iat":       float64(1653540729),
 		"exp":       float64(1685076729),
@@ -43,13 +42,13 @@ func Test_getIdToken(t *testing.T) {
 		"sub":       "john.doe@example.com",
 		"GivenName": "John",
 		"Surname":   "Doe",
-		"Groups":    []interface{}{"First", "Second"},
+		"Groups":    []any{"First", "Second"},
 	}
 
 	tests := []struct {
 		testName       string
 		idToken        string
-		expectedResult map[string]interface{}
+		expectedResult map[string]any
 		expectedError  error
 	}{
 		{
@@ -67,7 +66,7 @@ func Test_getIdToken(t *testing.T) {
 		{
 			testName:       "should return empty map if token does not exist",
 			idToken:        "",
-			expectedResult: make(map[string]interface{}),
+			expectedResult: make(map[string]any),
 			expectedError:  nil,
 		},
 	}
@@ -76,7 +75,7 @@ func Test_getIdToken(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			token := &oauth2.Token{}
 			if tc.idToken != "" {
-				token = token.WithExtra(map[string]interface{}{"id_token": tc.idToken})
+				token = token.WithExtra(map[string]any{"id_token": tc.idToken})
 			}
 
 			result, err := getIdToken(token)
@@ -91,22 +90,19 @@ func Test_getResource(t *testing.T) {
 	defer srv.Close()
 
 	t.Run("should fail upon missing Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource("", config)
-		if err == nil {
+		if _, err := getResource("", config); err == nil {
 			t.Errorf("getResource should fail if access token is not provided in auth bearer header")
 		}
 	})
 
 	t.Run("should fail upon providing incorrect Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource("incorrect-token", config)
-		if err == nil {
+		if _, err := getResource("incorrect-token", config); err == nil {
 			t.Errorf("getResource should fail if incorrect access token provided in auth bearer header")
 		}
 	})
 
 	t.Run("should succeed upon providing correct Authorization Bearer header", func(t *testing.T) {
-		_, err := getResource(oauthtest.AccessToken, config)
-		if err != nil {
+		if _, err := getResource(oauthtest.AccessToken, config); err != nil {
 			t.Errorf("getResource should succeed if correct access token provided in auth bearer header")
 		}
 	})
@@ -120,8 +116,7 @@ func Test_Authenticate(t *testing.T) {
 		srv, config := oauthtest.RunOAuthServer(code, &portainer.OAuthSettings{})
 		defer srv.Close()
 
-		_, err := authService.Authenticate(code, config)
-		if err == nil {
+		if _, err := authService.Authenticate(code, config); err == nil {
 			t.Error("Authenticate should fail to extract username from resource if incorrect UserIdentifier provided")
 		}
 	})

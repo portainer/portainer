@@ -61,7 +61,7 @@ func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings
 }
 
 // mergeSecondIntoFirst merges the overlap map into the base overwriting any existing values.
-func mergeSecondIntoFirst(base map[string]interface{}, overlap map[string]interface{}) map[string]interface{} {
+func mergeSecondIntoFirst(base map[string]any, overlap map[string]any) map[string]any {
 	for k, v := range overlap {
 		base[k] = v
 	}
@@ -87,8 +87,8 @@ func getOAuthToken(code string, configuration *portainer.OAuthSettings) (*oauth2
 // getIdToken retrieves parsed id_token from the OAuth token response.
 // This is necessary for OAuth providers like Azure
 // that do not provide information about user groups on the user resource endpoint.
-func getIdToken(token *oauth2.Token) (map[string]interface{}, error) {
-	tokenData := make(map[string]interface{})
+func getIdToken(token *oauth2.Token) (map[string]any, error) {
+	tokenData := make(map[string]any)
 
 	idToken := token.Extra("id_token")
 	if idToken == nil {
@@ -113,7 +113,7 @@ func getIdToken(token *oauth2.Token) (map[string]interface{}, error) {
 	return tokenData, nil
 }
 
-func getResource(token string, configuration *portainer.OAuthSettings) (map[string]interface{}, error) {
+func getResource(token string, configuration *portainer.OAuthSettings) (map[string]any, error) {
 	req, err := http.NewRequest("GET", configuration.ResourceURI, nil)
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func getResource(token string, configuration *portainer.OAuthSettings) (map[stri
 			return nil, err
 		}
 
-		datamap := make(map[string]interface{})
+		datamap := make(map[string]any)
 		for k, v := range values {
 			if len(v) == 0 {
 				datamap[k] = ""
@@ -162,7 +162,7 @@ func getResource(token string, configuration *portainer.OAuthSettings) (map[stri
 		return datamap, nil
 	}
 
-	var datamap map[string]interface{}
+	var datamap map[string]any
 	if err = json.Unmarshal(body, &datamap); err != nil {
 		return nil, err
 	}

@@ -5,17 +5,16 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
 	"github.com/segmentio/encoding/json"
 )
 
-var errEncryptedStringTooShort = fmt.Errorf("encrypted string too short")
+var errEncryptedStringTooShort = errors.New("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error) {
+func (connection *DbConnection) MarshalObject(object any) ([]byte, error) {
 	buf := &bytes.Buffer{}
 
 	// Special case for the VERSION bucket. Here we're not using json
@@ -39,7 +38,7 @@ func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error
 }
 
 // UnmarshalObject decodes an object from binary data
-func (connection *DbConnection) UnmarshalObject(data []byte, object interface{}) error {
+func (connection *DbConnection) UnmarshalObject(data []byte, object any) error {
 	var err error
 	if connection.getEncryptionKey() != nil {
 		data, err = decrypt(data, connection.getEncryptionKey())
@@ -47,8 +46,8 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 			return errors.Wrap(err, "Failed decrypting object")
 		}
 	}
-	e := json.Unmarshal(data, object)
-	if e != nil {
+
+	if e := json.Unmarshal(data, object); e != nil {
 		// Special case for the VERSION bucket. Here we're not using json
 		// So we need to return it as a string
 		s, ok := object.(*string)
@@ -58,6 +57,7 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 
 		*s = string(data)
 	}
+
 	return err
 }
 
@@ -70,22 +70,20 @@ func encrypt(plaintext []byte, passphrase []byte) (encrypted []byte, err error) 
 	if err != nil {
 		return encrypted, err
 	}
+
 	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return encrypted, err
 	}
-	ciphertextByte := gcm.Seal(
-		nonce,
-		nonce,
-		plaintext,
-		nil)
-	return ciphertextByte, nil
+
+	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
 func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err error) {
 	if string(encrypted) == "false" {
 		return []byte("false"), nil
 	}
+
 	block, err := aes.NewCipher(passphrase)
 	if err != nil {
 		return encrypted, errors.Wrap(err, "Error creating cypher block")
@@ -102,11 +100,8 @@ func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err err
 	}
 
 	nonce, ciphertextByteClean := encrypted[:nonceSize], encrypted[nonceSize:]
-	plaintextByte, err = gcm.Open(
-		nil,
-		nonce,
-		ciphertextByteClean,
-		nil)
+
+	plaintextByte, err = gcm.Open(nil, nonce, ciphertextByteClean, nil)
 	if err != nil {
 		return encrypted, errors.Wrap(err, "Error decrypting text")
 	}

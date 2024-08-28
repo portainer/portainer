@@ -16,13 +16,18 @@ export function useRenderTemplate(
   templateValues: DockerFormValues['templateValues'],
   setValues: (values: SetStateAction<DockerFormValues>) => void
 ) {
-  const templateQuery = useCustomTemplate(templateValues.templateId);
+  const templateQuery = useCustomTemplate(templateValues.templateId, {
+    enabled: templateValues.type === 'custom',
+  });
 
   const template = templateQuery.data;
 
   const templateFileQuery = useCustomTemplateFile(
     templateValues.templateId,
-    !!template?.GitConfig
+    !!template?.GitConfig,
+    {
+      enabled: templateValues.type === 'custom',
+    }
   );
   const [renderedFile, setRenderedFile] = useState<string>('');
 

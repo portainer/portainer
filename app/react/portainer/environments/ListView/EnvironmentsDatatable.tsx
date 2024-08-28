@@ -15,7 +15,6 @@ import { EnvironmentStatus } from '../types';
 
 import { columns } from './columns';
 import { EnvironmentListItem } from './types';
-import { ImportFdoDeviceButton } from './ImportFdoDeviceButton';
 
 const tableKey = 'environments';
 const settingsStore = createPersistedStore(tableKey, 'Name');
@@ -82,8 +81,6 @@ export function EnvironmentsDatatable({
           >
             Remove
           </Button>
-
-          <ImportFdoDeviceButton />
 
           {isBE && (
             <AddButton

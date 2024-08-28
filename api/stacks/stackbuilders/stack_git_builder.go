@@ -23,7 +23,7 @@ type GitMethodStackBuildProcess interface {
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) GitMethodStackBuildProcess
 	// Save the stack information to database and return the stack object
 	SaveStack() (*portainer.Stack, *httperror.HandlerError)
-	// Get reponse from http request. Use if it is needed
+	// Get response from HTTP request. Use if it is needed
 	GetResponse() string
 	// Set git repository configuration
 	SetGitRepository(payload *StackPayload) GitMethodStackBuildProcess
@@ -45,11 +45,11 @@ func (b *GitMethodStackBuilder) SetGeneralInfo(payload *StackPayload, endpoint *
 	b.stack.Status = portainer.StackStatusActive
 	b.stack.CreationDate = time.Now().Unix()
 	b.stack.AutoUpdate = payload.AutoUpdate
+
 	return b
 }
 
 func (b *GitMethodStackBuilder) SetUniqueInfo(payload *StackPayload) GitMethodStackBuildProcess {
-
 	return b
 }
 
@@ -74,6 +74,7 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 	if payload.ComposeFile == "" {
 		repoConfig.ConfigFilePath = filesystem.ComposeFileDefaultName
 	}
+
 	// If a manifest file is specified (for kube git apps), then use it instead of the default compose file name
 	if payload.ManifestFile != "" {
 		repoConfig.ConfigFilePath = payload.ManifestFile
@@ -97,6 +98,7 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 	// Update the latest commit id
 	repoConfig.ConfigHash = commitHash
 	b.stack.GitConfig = &repoConfig
+
 	return b
 }
 
@@ -134,6 +136,7 @@ func (b *GitMethodStackBuilder) SetAutoUpdate(payload *StackPayload) GitMethodSt
 
 		b.stack.AutoUpdate.JobID = jobID
 	}
+
 	return b
 }
 

@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"cmp"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -9,10 +10,12 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/pendingactions/handlers"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -80,8 +83,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	var payload endpointUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -96,17 +98,13 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Name != nil {
 		name := *payload.Name
-		isUnique, err := handler.isNameUnique(name, endpoint.ID)
-		if err != nil {
+		if isUnique, err := handler.isNameUnique(name, endpoint.ID); err != nil {
 			return httperror.InternalServerError("Unable to check if name is unique", err)
-		}
-
-		if !isUnique {
+		} else if !isUnique {
 			return httperror.Conflict("Name is not unique", nil)
 		}
 
 		endpoint.Name = name
-
 	}
 
 	if payload.URL != nil && *payload.URL != endpoint.URL {
@@ -114,17 +112,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		updateEndpointProxy = true
 	}
 
-	if payload.PublicURL != nil {
-		endpoint.PublicURL = *payload.PublicURL
-	}
-
 	if payload.Gpus != nil {
 		endpoint.Gpus = payload.Gpus
 	}
 
-	if payload.EdgeCheckinInterval != nil {
-		endpoint.EdgeCheckinInterval = *payload.EdgeCheckinInterval
-	}
+	endpoint.PublicURL = *cmp.Or(payload.PublicURL, &endpoint.PublicURL)
+	endpoint.EdgeCheckinInterval = *cmp.Or(payload.EdgeCheckinInterval, &endpoint.EdgeCheckinInterval)
 
 	updateRelations := false
 
@@ -136,8 +129,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.TagIDs != nil {
-		err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-
+		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			tagsChanged, err := updateEnvironmentTags(tx, payload.TagIDs, endpoint.TagIDs, endpoint.ID)
 			if err != nil {
 				return err
@@ -147,10 +139,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			updateRelations = updateRelations || tagsChanged
 
 			return nil
-		})
-
-		if err != nil {
-			httperror.InternalServerError("Unable to update environment tags", err)
+		}); err != nil {
+			return httperror.InternalServerError("Unable to update environment tags", err)
 		}
 	}
 
@@ -191,17 +181,18 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		if payload.AzureApplicationID != nil {
 			credentials.ApplicationID = *payload.AzureApplicationID
 		}
+
 		if payload.AzureTenantID != nil {
 			credentials.TenantID = *payload.AzureTenantID
 		}
+
 		if payload.AzureAuthenticationKey != nil {
 			credentials.AuthenticationKey = *payload.AzureAuthenticationKey
 		}
 
 		httpClient := client.NewHTTPClient()
-		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
-		if authErr != nil {
-			return httperror.InternalServerError("Unable to authenticate against Azure", authErr)
+		if _, err := httpClient.ExecuteAzureAuthenticationRequest(&credentials); err != nil {
+			return httperror.InternalServerError("Unable to authenticate against Azure", err)
 		}
 		endpoint.AzureCredentials = credentials
 	}
@@ -236,20 +227,19 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 					handler.FileService.DeleteTLSFile(folder, portainer.TLSFileKey)
 				}
 			}
-
 		} else {
 			endpoint.TLSConfig.TLS = false
 			endpoint.TLSConfig.TLSSkipVerify = false
 			endpoint.TLSConfig.TLSCACertPath = ""
 			endpoint.TLSConfig.TLSCertPath = ""
 			endpoint.TLSConfig.TLSKeyPath = ""
-			err = handler.FileService.DeleteTLSFiles(folder)
-			if err != nil {
+
+			if err := handler.FileService.DeleteTLSFiles(folder); err != nil {
 				return httperror.InternalServerError("Unable to remove TLS files from disk", err)
 			}
 		}
 
-		if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		if !endpointutils.IsLocalEndpoint(endpoint) && endpointutils.IsKubernetesEndpoint(endpoint) {
 			endpoint.TLSConfig.TLS = true
 			endpoint.TLSConfig.TLSSkipVerify = true
 		}
@@ -257,39 +247,32 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if updateEndpointProxy {
 		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
-		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
-		if err != nil {
+
+		if _, err := handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint); err != nil {
 			return httperror.InternalServerError("Unable to register HTTP proxy for the environment", err)
 		}
 	}
 
-	if updateAuthorizations {
-		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil)
-			if err != nil {
-				handler.PendingActionsService.Create(handlers.NewCleanNAPWithOverridePolicies(endpoint.ID, nil))
-				log.Warn().Err(err).Msgf("Unable to clean NAP with override policies for endpoint (%d). Will try to update when endpoint is online.", endpoint.ID)
-			}
+	if updateAuthorizations && endpointutils.IsKubernetesEndpoint(endpoint) {
+		if err := handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil); err != nil {
+			handler.PendingActionsService.Create(handlers.NewCleanNAPWithOverridePolicies(endpoint.ID, nil))
+			log.Warn().Err(err).Msgf("Unable to clean NAP with override policies for endpoint (%d). Will try to update when endpoint is online.", endpoint.ID)
 		}
 	}
 
-	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
+	if err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
 		return httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
 	if updateRelations {
-		err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			return handler.updateEdgeRelations(tx, endpoint)
-		})
-
-		if err != nil {
+		}); err != nil {
 			return httperror.InternalServerError("Unable to update environment relations", err)
 		}
 	}
 
-	err = handler.SnapshotService.FillSnapshotData(endpoint)
-	if err != nil {
+	if err := handler.SnapshotService.FillSnapshotData(endpoint); err != nil {
 		return httperror.InternalServerError("Unable to add snapshot data", err)
 	}
 
@@ -297,7 +280,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 }
 
 func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {
-
 	// If we change anything in the tls config then we need to reload the proxy
 	if payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS {
 		return true
@@ -315,8 +297,5 @@ func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpoin
 		return true
 	}
 
-	if payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify {
-		return true
-	}
-	return false
+	return payload.TLSSkipClientVerify != nil && !*payload.TLSSkipClientVerify
 }

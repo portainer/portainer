@@ -122,7 +122,7 @@ func (handler *Handler) updateRegistryAccess(tx dataservices.DataStoreTx, r *htt
 		registryAccess.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
-	registry.RegistryAccesses[portainer.EndpointID(endpointID)] = registryAccess
+	registry.RegistryAccesses[endpointID] = registryAccess
 
 	return tx.Registry().Update(registry.ID, registry)
 }

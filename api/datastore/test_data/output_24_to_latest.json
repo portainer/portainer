@@ -583,7 +583,6 @@
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
     "Edge": {
-      "AsyncMode": false,
       "CommandInterval": 0,
       "PingInterval": 0,
       "SnapshotInterval": 0
@@ -644,17 +643,10 @@
       "Scopes": "",
       "UserIdentifier": ""
     },
-    "ShowKomposeBuildOption": false,
     "SnapshotInterval": "5m",
     "TemplatesURL": "",
     "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
-    "fdoConfiguration": {
-      "enabled": false,
-      "ownerPassword": "",
-      "ownerURL": "",
-      "ownerUsername": ""
-    },
     "openAMTConfiguration": {
       "certFileContent": "",
       "certFileName": "",
@@ -810,7 +802,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 2,
-      "IsComposeFormat": false,
       "Name": "alpine",
       "Namespace": "",
       "Option": null,
@@ -833,7 +824,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 5,
-      "IsComposeFormat": false,
       "Name": "redis",
       "Namespace": "",
       "Option": null,
@@ -856,7 +846,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 6,
-      "IsComposeFormat": false,
       "Name": "nginx",
       "Namespace": "",
       "Option": null,

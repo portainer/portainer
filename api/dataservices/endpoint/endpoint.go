@@ -6,6 +6,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/rs/zerolog/log"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -157,6 +159,7 @@ func (service *Service) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.
 					return true
 				}
 			}
+
 			return false
 		}),
 	)
@@ -166,11 +169,13 @@ func (service *Service) EndpointsByTeamID(teamID portainer.TeamID) ([]portainer.
 func (service *Service) GetNextIdentifier() int {
 	var identifier int
 
-	service.connection.UpdateTx(func(tx portainer.Transaction) error {
+	if err := service.connection.UpdateTx(func(tx portainer.Transaction) error {
 		identifier = service.Tx(tx).GetNextIdentifier()
 
 		return nil
-	})
+	}); err != nil {
+		log.Error().Err(err).Str("bucket", BucketName).Msg("could not get the next identifier")
+	}
 
 	return identifier
 }

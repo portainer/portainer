@@ -7,9 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 )
 
-const (
-	taskServiceObjectIdentifier = "ServiceID"
-)
+const taskServiceObjectIdentifier = "ServiceID"
 
 // taskListOperation extracts the response as a JSON array, loop through the tasks array
 // and filter the containers based on resource controls before rewriting the response.
@@ -38,7 +36,7 @@ func (transport *Transport) taskListOperation(response *http.Response, executor 
 // selectorServiceLabels retrieve the labels object associated to the task object.
 // Labels are available under the "Spec.ContainerSpec.Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
-func selectorTaskLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorTaskLabels(responseObject map[string]any) map[string]any {
 	taskSpecObject := utils.GetJSONObject(responseObject, "Spec")
 	if taskSpecObject != nil {
 		containerSpecObject := utils.GetJSONObject(taskSpecObject, "ContainerSpec")
@@ -46,5 +44,6 @@ func selectorTaskLabels(responseObject map[string]interface{}) map[string]interf
 			return utils.GetJSONObject(containerSpecObject, "Labels")
 		}
 	}
+
 	return nil
 }

@@ -9,10 +9,10 @@ import (
 )
 
 type StackBuilderDirector struct {
-	builder interface{}
+	builder any
 }
 
-func NewStackBuilderDirector(b interface{}) *StackBuilderDirector {
+func NewStackBuilderDirector(b any) *StackBuilderDirector {
 	return &StackBuilderDirector{
 		builder: b,
 	}

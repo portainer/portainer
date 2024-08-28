@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -81,7 +80,7 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 }
 
 func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	endpointURL := fmt.Sprintf("https://%s", endpoint.URL)
+	endpointURL := "https://" + endpoint.URL
 	remoteURL, err := url.Parse(endpointURL)
 	if err != nil {
 		return nil, err

@@ -4,7 +4,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useState } from 'react';
 import { FormikHelpers } from 'formik/dist/types';
 
-import { invalidateContainer } from '@/react/docker/containers/queries/container';
+import { invalidateContainer } from '@/react/docker/containers/queries/useContainer';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { mutationOptions, withError } from '@/react-tools/react-query';
 import { useSystemLimits } from '@/react/docker/proxy/queries/useInfo';

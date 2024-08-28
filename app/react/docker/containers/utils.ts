@@ -5,12 +5,17 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useIsStandAlone } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 
-import { DockerContainer, ContainerStatus } from './types';
+import { ContainerListViewModel, ContainerStatus } from './types';
 import { DockerContainerResponse } from './types/response';
 
+/**
+ * Transform an item of the raw docker container list reponse to a container list view model
+ * @param response Raw docker container list reponse item
+ * @returns ContainerListViewModel
+ */
 export function toListViewModel(
   response: DockerContainerResponse
-): DockerContainer {
+): ContainerListViewModel {
   const resourceControl =
     response.Portainer?.ResourceControl &&
     new ResourceControlViewModel(response?.Portainer?.ResourceControl);

@@ -99,7 +99,7 @@ func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 	return &models.Version{
 		SchemaVersion: dbVersionToSemanticVersion(dbVersion),
 		Edition:       edition,
-		InstanceID:    string(instanceId),
+		InstanceID:    instanceId,
 	}, nil
 }
 
@@ -111,5 +111,6 @@ func (store *Store) finishMigrateLegacyVersion(versionToWrite *models.Version) e
 	store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyEditionKey))
 	store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
+
 	return err
 }

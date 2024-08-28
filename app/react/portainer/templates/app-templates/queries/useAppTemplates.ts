@@ -31,7 +31,7 @@ export function useAppTemplates<T = Array<TemplateViewModel>>({
 
 export function useAppTemplate(
   id: AppTemplate['id'] | undefined,
-  { enabled = true }: { enabled?: boolean } = {}
+  { enabled }: { enabled?: boolean } = {}
 ) {
   const templateListQuery = useAppTemplates({ enabled: !!id && enabled });
 
@@ -39,7 +39,7 @@ export function useAppTemplate(
 
   return {
     data: template,
-    isLoading: templateListQuery.isLoading,
+    isLoading: templateListQuery.isInitialLoading,
     error: templateListQuery.error,
   };
 }

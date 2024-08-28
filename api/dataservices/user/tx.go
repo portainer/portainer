@@ -53,7 +53,7 @@ func (service ServiceTx) UsersByRole(role portainer.UserRole) ([]portainer.User,
 func (service ServiceTx) Create(user *portainer.User) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			user.ID = portainer.UserID(id)
 			user.Username = strings.ToLower(user.Username)
 

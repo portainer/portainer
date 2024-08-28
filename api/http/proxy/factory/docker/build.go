@@ -19,12 +19,19 @@ type postDockerfileRequest struct {
 	Content string
 }
 
+var ErrUploadedFilesNotFound = errors.New("uploaded files not found to build image")
+
 // buildOperation inspects the "Content-Type" header to determine if it needs to alter the request.
+//
 // If the value of the header is empty, it means that a Dockerfile is posted via upload, the function
 // will extract the file content from the request body, tar it, and rewrite the body.
+// !! THIS IS ONLY TRUE WHEN THE UPLOADED DOCKERFILE FILE HAS NO EXTENSION (the generated file.type in the frontend will be empty)
+// If the Dockerfile is named like Dockerfile.yaml or has an internal type, a non-empty Content-Type header will be generated
+//
 // If the value of the header contains "application/json", it means that the content of a Dockerfile is posted
 // in the request payload as JSON, the function will create a new file called Dockerfile inside a tar archive and
 // rewrite the body of the request.
+//
 // In any other case, it will leave the request unaltered.
 func buildOperation(request *http.Request) error {
 	contentTypeHeader := request.Header.Get("Content-Type")
@@ -64,13 +71,12 @@ func buildOperation(request *http.Request) error {
 		}
 
 	case "multipart/form-data":
-		err := request.ParseMultipartForm(32 * OneMegabyte) // limit parser memory to 32MB
-		if err != nil {
+		if err := request.ParseMultipartForm(32 * OneMegabyte); err != nil {
 			return err
 		}
 
 		if request.MultipartForm == nil || request.MultipartForm.File == nil {
-			return errors.New("uploaded files not found to build image")
+			return ErrUploadedFilesNotFound
 		}
 
 		tfb := archive.NewTarFileInBuffer()

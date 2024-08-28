@@ -6,10 +6,10 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/portainer/portainer/api/internal/securecookie"
 	"github.com/rs/zerolog/log"
 )
 
@@ -51,7 +51,7 @@ func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*
 		return nil, err
 	}
 
-	secret := securecookie.GenerateRandomKey(32)
+	secret := apikey.GenerateRandomKey(32)
 	if secret == nil {
 		return nil, errSecretGeneration
 	}
@@ -69,6 +69,7 @@ func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*
 		userSessionTimeout,
 		dataStore,
 	}
+
 	return service, nil
 }
 
@@ -80,16 +81,18 @@ func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 
 	kubeSecret := settings.OAuthSettings.KubeSecretKey
 	if kubeSecret == nil {
-		kubeSecret = securecookie.GenerateRandomKey(32)
+		kubeSecret = apikey.GenerateRandomKey(32)
 		if kubeSecret == nil {
 			return nil, errSecretGeneration
 		}
+
 		settings.OAuthSettings.KubeSecretKey = kubeSecret
-		err = dataStore.Settings().UpdateSettings(settings)
-		if err != nil {
+
+		if err := dataStore.Settings().UpdateSettings(settings); err != nil {
 			return nil, err
 		}
 	}
+
 	return kubeSecret, nil
 }
 
@@ -108,7 +111,7 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.T
 func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
 	scope := parseScope(token)
 	secret := service.secrets[scope]
-	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			return nil, msg

@@ -227,10 +227,10 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 	}
 
 	if config["HttpHeaders"] == nil {
-		config["HttpHeaders"] = make(map[string]interface{})
+		config["HttpHeaders"] = make(map[string]any)
 	}
 
-	headersObject := config["HttpHeaders"].(map[string]interface{})
+	headersObject := config["HttpHeaders"].(map[string]any)
 	headersObject["X-PortainerAgent-ManagerOperation"] = "1"
 	headersObject["X-PortainerAgent-Signature"] = signature
 	headersObject["X-PortainerAgent-PublicKey"] = manager.signatureService.EncodedPublicKey()
@@ -238,12 +238,12 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 	return manager.fileService.WriteJSONToFile(configFilePath, config)
 }
 
-func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
-	var config map[string]interface{}
+func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]any, error) {
+	var config map[string]any
 
 	raw, err := manager.fileService.GetFileContent(path, "")
 	if err != nil {
-		return make(map[string]interface{}), nil
+		return make(map[string]any), nil
 	}
 
 	err = json.Unmarshal(raw, &config)

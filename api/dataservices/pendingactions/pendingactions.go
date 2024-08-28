@@ -64,7 +64,7 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 }
 
 func (s ServiceTx) Create(config *portainer.PendingAction) error {
-	return s.Tx.CreateObject(BucketName, func(id uint64) (int, interface{}) {
+	return s.Tx.CreateObject(BucketName, func(id uint64) (int, any) {
 		config.ID = portainer.PendingActionID(id)
 		config.CreatedAt = time.Now().Unix()
 

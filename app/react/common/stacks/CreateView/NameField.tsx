@@ -14,10 +14,12 @@ export function NameField({
   onChange,
   value,
   errors,
+  placeholder,
 }: {
   onChange(value: string): void;
   value: string;
   errors?: FormikErrors<string>;
+  placeholder?: string;
 }) {
   return (
     <FormControl inputId="name-input" label="Name" errors={errors} required>
@@ -25,6 +27,7 @@ export function NameField({
         id="name-input"
         onChange={(e) => onChange(e.target.value)}
         value={value}
+        placeholder={placeholder}
         required
         data-cy="stack-name-input"
       />

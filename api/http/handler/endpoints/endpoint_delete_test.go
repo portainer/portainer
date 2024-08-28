@@ -27,27 +27,25 @@ func TestEndpointDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	var endpointIDs []portainer.EndpointID
 
-	for i := 0; i < endpointsCount; i++ {
+	for i := range endpointsCount {
 		endpointID := portainer.EndpointID(i) + 1
 
-		err := store.Endpoint().Create(&portainer.Endpoint{
+		if err := store.Endpoint().Create(&portainer.Endpoint{
 			ID:   endpointID,
 			Name: "env-" + strconv.Itoa(int(endpointID)),
 			Type: portainer.EdgeAgentOnDockerEnvironment,
-		})
-		if err != nil {
+		}); err != nil {
 			t.Fatal("could not create endpoint:", err)
 		}
 
 		endpointIDs = append(endpointIDs, endpointID)
 	}
 
-	err := store.EdgeGroup().Create(&portainer.EdgeGroup{
+	if err := store.EdgeGroup().Create(&portainer.EdgeGroup{
 		ID:        1,
 		Name:      "edgegroup-1",
 		Endpoints: endpointIDs,
-	})
-	if err != nil {
+	}); err != nil {
 		t.Fatal("could not create edge group:", err)
 	}
 

@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -28,19 +28,13 @@ type KubeAppLabels struct {
 	Kind      string
 }
 
-// convert string to valid kubernetes label by replacing invalid characters with periods
-func sanitizeLabel(value string) string {
-	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
-	return re.ReplaceAllString(value, ".")
-}
-
 // ToMap converts KubeAppLabels to a map[string]string
 func (kal *KubeAppLabels) ToMap() map[string]string {
 	return map[string]string{
 		labelPortainerAppStackID: strconv.Itoa(kal.StackID),
-		labelPortainerAppStack:   kal.StackName,
-		labelPortainerAppName:    kal.StackName,
-		labelPortainerAppOwner:   sanitizeLabel(kal.Owner),
+		labelPortainerAppStack:   stackutils.SanitizeLabel(kal.StackName),
+		labelPortainerAppName:    stackutils.SanitizeLabel(kal.StackName),
+		labelPortainerAppOwner:   stackutils.SanitizeLabel(kal.Owner),
 		labelPortainerAppKind:    kal.Kind,
 	}
 }
@@ -49,7 +43,7 @@ func (kal *KubeAppLabels) ToMap() map[string]string {
 func GetHelmAppLabels(name, owner string) map[string]string {
 	return map[string]string{
 		labelPortainerAppName:  name,
-		labelPortainerAppOwner: sanitizeLabel(owner),
+		labelPortainerAppOwner: stackutils.SanitizeLabel(owner),
 	}
 }
 
@@ -61,7 +55,7 @@ func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, err
 		return manifestYaml, nil
 	}
 
-	postProcessYaml := func(yamlDoc interface{}) error {
+	postProcessYaml := func(yamlDoc any) error {
 		addResourceLabels(yamlDoc, appLabels)
 		return nil
 	}
@@ -77,12 +71,12 @@ func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, err
 // ExtractDocuments extracts all the documents from a yaml file
 // Optionally post-process each document with a function, which can modify the document in place.
 // Pass in nil for postProcessYaml to skip post-processing.
-func ExtractDocuments(manifestYaml []byte, postProcessYaml func(interface{}) error) ([][]byte, error) {
+func ExtractDocuments(manifestYaml []byte, postProcessYaml func(any) error) ([][]byte, error) {
 	docs := make([][]byte, 0)
 	yamlDecoder := yaml.NewDecoder(bytes.NewReader(manifestYaml))
 
 	for {
-		m := make(map[string]interface{})
+		m := make(map[string]any)
 		err := yamlDecoder.Decode(&m)
 
 		// if decoded document is empty
@@ -119,7 +113,7 @@ func ExtractDocuments(manifestYaml []byte, postProcessYaml func(interface{}) err
 // It returns an empty string if namespace is not found in the resource
 func GetNamespace(manifestYaml []byte) (string, error) {
 	yamlDecoder := yaml.NewDecoder(bytes.NewReader(manifestYaml))
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	err := yamlDecoder.Decode(&m)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to unmarshal yaml manifest when obtaining namespace")
@@ -131,12 +125,12 @@ func GetNamespace(manifestYaml []byte) (string, error) {
 	}
 
 	if _, ok := m["metadata"]; ok {
-		var namespace interface{}
+		var namespace any
 		var ok bool
 		if strings.EqualFold(kind, "namespace") {
-			namespace, ok = m["metadata"].(map[string]interface{})["name"]
+			namespace, ok = m["metadata"].(map[string]any)["name"]
 		} else {
-			namespace, ok = m["metadata"].(map[string]interface{})["namespace"]
+			namespace, ok = m["metadata"].(map[string]any)["namespace"]
 		}
 
 		if ok {
@@ -149,8 +143,8 @@ func GetNamespace(manifestYaml []byte) (string, error) {
 	return "", nil
 }
 
-func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
-	m, ok := yamlDoc.(map[string]interface{})
+func addResourceLabels(yamlDoc any, appLabels map[string]string) {
+	m, ok := yamlDoc.(map[string]any)
 	if !ok {
 		return
 	}
@@ -163,9 +157,9 @@ func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
 
 	for _, v := range m {
 		switch v := v.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			addResourceLabels(v, appLabels)
-		case []interface{}:
+		case []any:
 			for _, item := range v {
 				addResourceLabels(item, appLabels)
 			}
@@ -173,15 +167,15 @@ func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
 	}
 }
 
-func addLabels(obj map[string]interface{}, appLabels map[string]string) {
-	metadata := make(map[string]interface{})
+func addLabels(obj map[string]any, appLabels map[string]string) {
+	metadata := make(map[string]any)
 	if m, ok := obj["metadata"]; ok {
-		metadata = m.(map[string]interface{})
+		metadata = m.(map[string]any)
 	}
 
 	labels := make(map[string]string)
 	if l, ok := metadata["labels"]; ok {
-		for k, v := range l.(map[string]interface{}) {
+		for k, v := range l.(map[string]any) {
 			labels[k] = fmt.Sprintf("%v", v)
 		}
 	}

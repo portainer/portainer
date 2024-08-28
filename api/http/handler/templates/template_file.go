@@ -71,8 +71,7 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 
 	defer handler.cleanUp(projectPath)
 
-	err = handler.GitService.CloneRepository(projectPath, template.Repository.URL, "", "", "", false)
-	if err != nil {
+	if err := handler.GitService.CloneRepository(projectPath, template.Repository.URL, "", "", "", false); err != nil {
 		return httperror.InternalServerError("Unable to clone git repository", err)
 	}
 
@@ -82,12 +81,10 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	return response.JSON(w, fileResponse{FileContent: string(fileContent)})
-
 }
 
 func (handler *Handler) cleanUp(projectPath string) {
-	err := handler.FileService.RemoveDirectory(projectPath)
-	if err != nil {
+	if err := handler.FileService.RemoveDirectory(projectPath); err != nil {
 		log.Debug().Err(err).Msg("HTTP error: unable to cleanup stack creation")
 	}
 }

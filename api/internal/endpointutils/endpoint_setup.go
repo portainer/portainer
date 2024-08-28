@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,10 +24,9 @@ import (
 // will save the signature from the first request after the admin user is created, ensuring that
 // it matches in the event of a backup restoration.
 func InitEndpoint(shutdownCtx context.Context, adminCreationDone <-chan struct{}, flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) {
-
 	select {
 	case <-shutdownCtx.Done():
-		log.Debug().Msg("shutdown endpoint initalization")
+		log.Debug().Msg("shutdown endpoint initialization")
 
 	case <-adminCreationDone:
 		// Wait for the admin user to be created before initializing the primary endpoint
@@ -35,8 +35,7 @@ func InitEndpoint(shutdownCtx context.Context, adminCreationDone <-chan struct{}
 		// 2. Using the API with the /api/users/admin/init endpoint
 		log.Debug().Msg("init primary endpoint")
 
-		err := initEndpoint(flags, dataStore, snapshotService)
-		if err != nil {
+		if err := initEndpoint(flags, dataStore, snapshotService); err != nil {
 			log.Fatal().Err(err).Msg("failed initializing environment")
 		}
 	}
@@ -61,6 +60,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, s
 	if *flags.TLS || *flags.TLSSkipVerify {
 		return createTLSSecuredEndpoint(flags, dataStore, snapshotService)
 	}
+
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
@@ -123,8 +123,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.
 		}
 	}
 
-	err := snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
+	if err := snapshotService.SnapshotEndpoint(endpoint); err != nil {
 		log.Error().
 			Str("endpoint", endpoint.Name).
 			Str("URL", endpoint.URL).
@@ -137,8 +136,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.
 
 func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
 	if strings.HasPrefix(endpointURL, "tcp://") {
-		_, err := client.ExecutePingOperation(endpointURL, nil)
-		if err != nil {
+		if _, err := client.ExecutePingOperation(endpointURL, nil); err != nil {
 			return err
 		}
 	}
@@ -172,8 +170,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStor
 		},
 	}
 
-	err := snapshotService.SnapshotEndpoint(endpoint)
-	if err != nil {
+	if err := snapshotService.SnapshotEndpoint(endpoint); err != nil {
 		log.Error().
 			Str("endpoint", endpoint.Name).
 			Str("URL", endpoint.URL).Err(err).

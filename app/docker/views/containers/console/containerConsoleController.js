@@ -9,28 +9,12 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'ContainerService',
   'ImageService',
   'Notifications',
-  'ContainerHelper',
   'ExecService',
   'HttpRequestHelper',
-  'LocalStorage',
   'CONSOLE_COMMANDS_LABEL_PREFIX',
   'SidebarService',
   'endpoint',
-  function (
-    $scope,
-    $state,
-    $transition$,
-    ContainerService,
-    ImageService,
-    Notifications,
-    ContainerHelper,
-    ExecService,
-    HttpRequestHelper,
-    LocalStorage,
-    CONSOLE_COMMANDS_LABEL_PREFIX,
-    SidebarService,
-    endpoint
-  ) {
+  function ($scope, $state, $transition$, ContainerService, ImageService, Notifications, ExecService, HttpRequestHelper, CONSOLE_COMMANDS_LABEL_PREFIX, SidebarService, endpoint) {
     var socket, term;
 
     let states = Object.freeze({
@@ -97,7 +81,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       $scope.state = states.connecting;
       var command = $scope.formValues.isCustomCommand ? $scope.formValues.customCommand : $scope.formValues.command;
       var execConfig = {
-        id: $transition$.params().id,
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true,
@@ -106,7 +89,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         Cmd: commandStringToArray(command),
       };
 
-      ContainerService.createExec(endpoint.Id, execConfig)
+      ContainerService.createExec(endpoint.Id, $transition$.params().id, execConfig)
         .then(function success(data) {
           const params = {
             endpointId: $state.params.endpointId,

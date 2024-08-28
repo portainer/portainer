@@ -2,14 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { genericHandler } from '@/docker/rest/response/handlers';
 
 import { ContainerId } from '../types';
-import { urlBuilder } from '../containers.service';
-import { addNodeHeader } from '../../proxy/addNodeHeader';
+import { withAgentTargetHeader } from '../../proxy/queries/utils';
+import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
 
 import { queryKeys } from './query-keys';
-import { ContainerJSON } from './container';
+import { ContainerDetailsJSON } from './useContainer';
 
 export function useContainerInspect(
   environmentId: EnvironmentId,
@@ -28,12 +27,12 @@ export async function inspectContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const { data } = await axios.get<ContainerJSON>(
-      urlBuilder(environmentId, id, 'json'),
-      { transformResponse: genericHandler, headers: addNodeHeader(nodeName) }
+    const { data } = await axios.get<ContainerDetailsJSON>(
+      buildDockerProxyUrl(environmentId, 'containers', id, 'json'),
+      { headers: { ...withAgentTargetHeader(nodeName) } }
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e, 'Failed starting container');
+    throw parseAxiosError(e, 'Failed inspecting container');
   }
 }

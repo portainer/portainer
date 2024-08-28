@@ -1,5 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Clock } from 'lucide-react';
+import { EventMessage } from 'docker-types/generated/1.41';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 
@@ -7,26 +8,22 @@ import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 
-type DockerEvent = {
-  Time: number;
-  Type: string;
-  Details: string;
-};
+import { createEventDetails } from './model';
 
-const columnHelper = createColumnHelper<DockerEvent>();
+const columnHelper = createColumnHelper<EventMessage>();
 
 export const columns = [
-  columnHelper.accessor('Time', {
+  columnHelper.accessor('time', {
     header: 'Date',
     cell: ({ getValue }) => {
       const value = getValue();
       return isoDateFromTimestamp(value);
     },
   }),
-  columnHelper.accessor('Type', {
+  columnHelper.accessor((c) => c.Type, {
     header: 'Type',
   }),
-  columnHelper.accessor('Details', {
+  columnHelper.accessor((c) => createEventDetails(c), {
     header: 'Details',
   }),
 ];
@@ -37,12 +34,17 @@ const settingsStore = createPersistedStore(tableKey, {
   desc: true,
 });
 
-export function EventsDatatable({ dataset }: { dataset: Array<DockerEvent> }) {
+export function EventsDatatable({
+  dataset,
+}: {
+  dataset?: Array<EventMessage>;
+}) {
   const tableState = useTableState(settingsStore, tableKey);
 
   return (
     <Datatable
       dataset={dataset ?? []}
+      isLoading={!dataset}
       columns={columns}
       settingsManager={tableState}
       title="Events"

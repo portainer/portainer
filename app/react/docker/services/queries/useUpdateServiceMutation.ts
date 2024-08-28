@@ -1,36 +1,33 @@
-import {
-  TaskSpec,
-  ServiceSpec,
-  ServiceUpdateResponse,
-} from 'docker-types/generated/1.41';
+import { ServiceUpdateResponse } from 'docker-types/generated/1.41';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { mutationOptions, withError } from '@/react-tools/react-query';
+import {
+  mutationOptions,
+  withError,
+  withInvalidate,
+} from '@/react-tools/react-query';
 
-import { encodeRegistryCredentials } from '../../images/queries/encodeRegistryCredentials';
-import { urlBuilder } from '../axios/urlBuilder';
+import { ServiceUpdateConfig } from '../types';
+import { withRegistryAuthHeader } from '../../proxy/queries/utils';
 
+import { buildUrl } from './build-url';
 import { queryKeys } from './query-keys';
 
-export function useUpdateServiceMutation() {
+export function useUpdateServiceMutation(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
 
   return useMutation(
     updateService,
     mutationOptions(
-      {
-        onSuccess(data, { environmentId }) {
-          return queryClient.invalidateQueries(queryKeys.list(environmentId));
-        },
-      },
+      withInvalidate(queryClient, [queryKeys.list(environmentId)]),
       withError('Unable to update service')
     )
   );
 }
 
-async function updateService({
+export async function updateService({
   environmentId,
   serviceId,
   config,
@@ -47,34 +44,21 @@ async function updateService({
 }) {
   try {
     const { data } = await axios.post<ServiceUpdateResponse>(
-      urlBuilder(environmentId, serviceId, 'update'),
+      buildUrl(environmentId, serviceId, 'update'),
       config,
       {
         params: {
           rollback,
           version,
         },
-        ...(registryId
-          ? {
-              headers: {
-                'X-Registry-Id': encodeRegistryCredentials(registryId),
-              },
-            }
-          : {}),
+        headers: {
+          version: '1.29', // https://github.com/orgs/portainer/discussions/9407#discussioncomment-6559219
+          ...withRegistryAuthHeader(registryId),
+        },
       }
     );
     return data;
   } catch (e) {
     throw parseAxiosError(e, 'Unable to update service');
   }
-}
-
-export interface ServiceUpdateConfig {
-  Name: string;
-  Labels: Record<string, string>;
-  TaskTemplate: TaskSpec;
-  Mode: ServiceSpec['Mode'];
-  UpdateConfig: ServiceSpec['UpdateConfig'];
-  Networks: ServiceSpec['Networks'];
-  EndpointSpec: ServiceSpec['EndpointSpec'];
 }

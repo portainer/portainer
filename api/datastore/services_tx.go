@@ -44,7 +44,6 @@ func (tx *StoreTx) EndpointRelation() dataservices.EndpointRelationService {
 	return tx.store.EndpointRelationService.Tx(tx.tx)
 }
 
-func (tx *StoreTx) FDOProfile() dataservices.FDOProfileService                 { return nil }
 func (tx *StoreTx) HelmUserRepository() dataservices.HelmUserRepositoryService { return nil }
 
 func (tx *StoreTx) Registry() dataservices.RegistryService {

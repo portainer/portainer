@@ -57,7 +57,6 @@ export function BrowseButton({
           props={{
             to: 'portainer.registries.registry.repositories',
             params: { id: registry.Id, endpointId: environmentId },
-            'data-cy': `browse-registry-link-${registry.Name}`,
           }}
           disabled={isLimited}
           icon={Search}

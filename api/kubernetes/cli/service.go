@@ -4,6 +4,7 @@ import (
 	"context"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -67,9 +68,7 @@ func (kcl *KubeClient) GetServices(namespace string, lookupApplications bool) ([
 	return result, nil
 }
 
-// CreateService creates a new service in a given namespace in a k8s endpoint.
-func (kcl *KubeClient) CreateService(namespace string, info models.K8sServiceInfo) error {
-	ServiceClient := kcl.cli.CoreV1().Services(namespace)
+func (kcl *KubeClient) fillService(info models.K8sServiceInfo) v1.Service {
 	var service v1.Service
 
 	service.Name = info.Name
@@ -93,16 +92,21 @@ func (kcl *KubeClient) CreateService(namespace string, info models.K8sServiceInf
 
 	// Set ingresses.
 	for _, i := range info.IngressStatus {
-		var ing v1.LoadBalancerIngress
-		ing.IP = i.IP
-		ing.Hostname = i.Host
 		service.Status.LoadBalancer.Ingress = append(
 			service.Status.LoadBalancer.Ingress,
-			ing,
+			v1.LoadBalancerIngress{IP: i.IP, Hostname: i.Host},
 		)
 	}
 
-	_, err := ServiceClient.Create(context.Background(), &service, metav1.CreateOptions{})
+	return service
+}
+
+// CreateService creates a new service in a given namespace in a k8s endpoint.
+func (kcl *KubeClient) CreateService(namespace string, info models.K8sServiceInfo) error {
+	serviceClient := kcl.cli.CoreV1().Services(namespace)
+	service := kcl.fillService(info)
+
+	_, err := serviceClient.Create(context.Background(), &service, metav1.CreateOptions{})
 	return err
 }
 
@@ -120,45 +124,16 @@ func (kcl *KubeClient) DeleteServices(reqs models.K8sServiceDeleteRequests) erro
 			)
 		}
 	}
+
 	return err
 }
 
 // UpdateService updates service in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInfo) error {
-	ServiceClient := kcl.cli.CoreV1().Services(namespace)
-	var service v1.Service
+	serviceClient := kcl.cli.CoreV1().Services(namespace)
+	service := kcl.fillService(info)
 
-	service.Name = info.Name
-	service.Spec.Type = v1.ServiceType(info.Type)
-	service.Namespace = info.Namespace
-	service.Annotations = info.Annotations
-	service.Labels = info.Labels
-	service.Spec.AllocateLoadBalancerNodePorts = info.AllocateLoadBalancerNodePorts
-	service.Spec.Selector = info.Selector
-
-	// Set ports.
-	for _, p := range info.Ports {
-		var port v1.ServicePort
-		port.Name = p.Name
-		port.NodePort = int32(p.NodePort)
-		port.Port = int32(p.Port)
-		port.Protocol = v1.Protocol(p.Protocol)
-		port.TargetPort = intstr.FromString(p.TargetPort)
-		service.Spec.Ports = append(service.Spec.Ports, port)
-	}
-
-	// Set ingresses.
-	for _, i := range info.IngressStatus {
-		var ing v1.LoadBalancerIngress
-		ing.IP = i.IP
-		ing.Hostname = i.Host
-		service.Status.LoadBalancer.Ingress = append(
-			service.Status.LoadBalancer.Ingress,
-			ing,
-		)
-	}
-
-	_, err := ServiceClient.Update(context.Background(), &service, metav1.UpdateOptions{})
+	_, err := serviceClient.Update(context.Background(), &service, metav1.UpdateOptions{})
 	return err
 }
 
@@ -210,5 +185,4 @@ func makeApplication(meta metav1.Object) []models.K8sApplication {
 			Name: ownerReference.Name,
 		},
 	}
-
 }

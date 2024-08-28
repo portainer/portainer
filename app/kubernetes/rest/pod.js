@@ -1,5 +1,4 @@
 import { rawResponse } from 'Kubernetes/rest/response/transform';
-import { logsHandler } from 'Docker/rest/response/handlers';
 
 angular.module('portainer.kubernetes').factory('KubernetesPods', [
   '$resource',
@@ -48,3 +47,11 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
     };
   },
 ]);
+
+// The Docker API returns the logs as a single string.
+// This handler wraps the data in a JSON object under the "logs" property.
+function logsHandler(data) {
+  return {
+    logs: data,
+  };
+}

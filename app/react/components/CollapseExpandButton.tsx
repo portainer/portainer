@@ -22,7 +22,7 @@ export function CollapseExpandButton({
       aria-label={isExpanded ? 'Collapse' : 'Expand'}
       aria-expanded={isExpanded}
       type="button"
-      className="flex-none border-none bg-transparent flex items-center p-0 px-3 group"
+      className="flex-none border-none bg-transparent flex items-center p-0 !ml-0 group"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     >

@@ -42,7 +42,7 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) Create(role *portainer.Role) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			role.ID = portainer.RoleID(id)
 			return int(role.ID), role
 		},

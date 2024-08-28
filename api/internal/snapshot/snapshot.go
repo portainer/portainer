@@ -57,28 +57,30 @@ func NewService(
 // NewBackgroundSnapshotter queues snapshots of existing edge environments that
 // do not have one already
 func NewBackgroundSnapshotter(dataStore dataservices.DataStore, tunnelService portainer.ReverseTunnelService) {
-	err := dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+	if err := dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		endpoints, err := tx.Endpoint().Endpoints()
 		if err != nil {
 			return err
 		}
 
 		for _, e := range endpoints {
-			if !endpointutils.IsEdgeEndpoint(&e) {
+			if !endpointutils.IsEdgeEndpoint(&e) || e.Edge.AsyncMode || !e.UserTrusted {
 				continue
 			}
 
 			s, err := tx.Snapshot().Read(e.ID)
 			if dataservices.IsErrObjectNotFound(err) ||
 				(err == nil && s.Docker == nil && s.Kubernetes == nil) {
-				tunnelService.Open(&e)
+				if err := tunnelService.Open(&e); err != nil {
+					log.Error().Err(err).Msg("could not open the tunnel")
+				}
 			}
 		}
 
 		return nil
-	})
-	if err != nil {
+	}); err != nil {
 		log.Error().Err(err).Msg("background snapshotter failure")
+
 		return
 	}
 }
@@ -138,6 +140,7 @@ func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 	if endpoint.Type == portainer.AgentOnDockerEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
 		var err error
 		var tlsConfig *tls.Config
+
 		if endpoint.TLSConfig.TLS {
 			tlsConfig, err = crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 			if err != nil {
@@ -243,6 +246,7 @@ func (service *Service) startSnapshotLoop() {
 		case <-service.shutdownCtx.Done():
 			log.Debug().Msg("shutting down snapshotting")
 			ticker.Stop()
+
 			return
 		case interval := <-service.snapshotIntervalCh:
 			ticker.Reset(interval)
@@ -265,6 +269,7 @@ func (service *Service) snapshotEndpoints() error {
 
 		service.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			updateEndpointStatus(tx, &endpoint, snapshotError, service.pendingActionsService)
+
 			return nil
 		})
 	}
@@ -284,6 +289,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 	}
 
 	latestEndpointReference.Status = portainer.EndpointStatusUp
+
 	if snapshotError != nil {
 		log.Debug().
 			Str("endpoint", endpoint.Name).
@@ -295,8 +301,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 
 	latestEndpointReference.Agent.Version = endpoint.Agent.Version
 
-	err = tx.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
-	if err != nil {
+	if err := tx.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference); err != nil {
 		log.Debug().
 			Str("endpoint", endpoint.Name).
 			Str("URL", endpoint.URL).Err(err).
@@ -323,5 +328,6 @@ func FetchDockerID(snapshot portainer.DockerSnapshot) (string, error) {
 	}
 
 	clusterInfo := swarmInfo.Cluster
+
 	return clusterInfo.ID, nil
 }

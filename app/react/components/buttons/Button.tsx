@@ -41,7 +41,7 @@ export interface Props<TasProps = unknown>
   as?: ComponentType<TasProps> | string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   mRef?: React.ForwardedRef<HTMLButtonElement>;
-  props?: TasProps;
+  props?: Omit<TasProps, keyof Props>;
 }
 
 export const ButtonWithRef = forwardRef<HTMLButtonElement, Omit<Props, 'mRef'>>(

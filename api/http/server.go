@@ -32,7 +32,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
-	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
@@ -60,6 +59,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/internal/upgrade"
 	k8s "github.com/portainer/portainer/api/kubernetes"
@@ -238,8 +238,6 @@ func (server *Server) Start() error {
 	openAMTHandler.DataStore = server.DataStore
 	openAMTHandler.DockerClientFactory = server.DockerClientFactory
 
-	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore, server.FileService)
-
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
@@ -315,7 +313,6 @@ func (server *Server) Start() error {
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		OpenAMTHandler:         openAMTHandler,
-		FDOHandler:             fdoHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
@@ -376,9 +373,7 @@ func (server *Server) Start() error {
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
-
-	// Temporarily disable for EE-6905 until we have a solution for the snapshotter
-	// go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
+	go snapshot.NewBackgroundSnapshotter(server.DataStore, server.ReverseTunnelService)
 
 	return httpsServer.ListenAndServeTLS("", "")
 }

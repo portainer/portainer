@@ -37,7 +37,6 @@ function Cell({
       props={{
         to: 'kubernetes.resourcePools.resourcePool.access',
         params: { id: item.Namespace.Name },
-        'data-cy': `manage-access-link-${item.Namespace.Name}`,
       }}
       icon={Users}
       data-cy={`manage-access-button-${item.Namespace.Name}`}

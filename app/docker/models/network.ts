@@ -2,7 +2,20 @@ import { IPAM, Network, NetworkContainer } from 'docker-types/generated/1.41';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { IResource } from '@/react/docker/components/datatable/createOwnershipColumn';
-import { PortainerMetadata } from '@/react/docker/types';
+import { PortainerResponse } from '@/react/docker/types';
+
+// TODO later: aggregate NetworkViewModel and DockerNetwork types
+//
+// type MacvlanNetwork = {
+//   ConfigFrom?: { Network: string };
+//   ConfigOnly?: boolean;
+// };
+//
+// type NetworkViewModel = Network & {
+//   StackName?: string;
+//   NodeName?: string;
+//   ResourceControl?: ResourceControlViewModel;
+// } & MacvlanNetwork;
 
 export class NetworkViewModel implements IResource {
   Id: string;
@@ -38,8 +51,7 @@ export class NetworkViewModel implements IResource {
   ResourceControl?: ResourceControlViewModel;
 
   constructor(
-    data: Network & {
-      Portainer?: PortainerMetadata;
+    data: PortainerResponse<Network> & {
       ConfigFrom?: { Network: string };
       ConfigOnly?: boolean;
     }

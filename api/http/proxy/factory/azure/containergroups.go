@@ -28,7 +28,7 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 		return nil, err
 	}
 
-	value, ok := responseObject["value"].([]interface{})
+	value, ok := responseObject["value"].([]any)
 	if ok {
 		context, err := transport.createAzureRequestContext(request)
 		if err != nil {

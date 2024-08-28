@@ -137,29 +137,6 @@ func (deployer *KubernetesDeployer) command(operation string, userID portainer.U
 	return string(output), nil
 }
 
-// ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
-func (deployer *KubernetesDeployer) ConvertCompose(data []byte) ([]byte, error) {
-	command := path.Join(deployer.binaryPath, "kompose")
-	if runtime.GOOS == "windows" {
-		command = path.Join(deployer.binaryPath, "kompose.exe")
-	}
-
-	args := make([]string, 0)
-	args = append(args, "convert", "-f", "-", "--stdout")
-
-	var stderr bytes.Buffer
-	cmd := exec.Command(command, args...)
-	cmd.Stderr = &stderr
-	cmd.Stdin = bytes.NewReader(data)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return nil, errors.New(stderr.String())
-	}
-
-	return output, nil
-}
-
 func (deployer *KubernetesDeployer) getAgentURL(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
 	proxy, err := deployer.proxyManager.CreateAgentProxyServer(endpoint)
 	if err != nil {

@@ -8,12 +8,12 @@ import (
 	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/logoutcontext"
+	"github.com/portainer/portainer/api/logoutcontext"
 
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
-	"github.com/portainer/portainer/api/crypto"
 	"github.com/rs/zerolog/log"
 )
 

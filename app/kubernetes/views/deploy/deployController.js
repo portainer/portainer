@@ -12,6 +12,7 @@ import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/p
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
 import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
+import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -57,6 +58,7 @@ class KubernetesDeployController {
       templateLoadFailed: false,
       isEditorReadOnly: false,
       selectedHelmChart: '',
+      stackNameError: '',
     };
 
     this.currentUser = {
@@ -117,7 +119,16 @@ class KubernetesDeployController {
   }
 
   setStackName(name) {
-    this.formValues.StackName = name;
+    return this.$async(async () => {
+      if (KUBE_STACK_NAME_VALIDATION_REGEX.test(name) || name === '') {
+        this.state.stackNameError = '';
+      } else {
+        this.state.stackNameError =
+          "Stack must consist of alphanumeric characters, '-', '_' or '.', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').";
+      }
+
+      this.formValues.StackName = name;
+    });
   }
 
   renderTemplate() {
@@ -197,9 +208,9 @@ class KubernetesDeployController {
     const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
     const isURLFormInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.URL && _.isEmpty(this.formValues.ManifestURL);
     const isCustomTemplateInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.CUSTOM_TEMPLATE && _.isEmpty(this.formValues.EditorContent);
-
     const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
-    return isWebEditorInvalid || isURLFormInvalid || isCustomTemplateInvalid || this.state.actionInProgress || isNamespaceInvalid;
+    const isStackNameInvalid = this.state.stackNameError !== '';
+    return isWebEditorInvalid || isURLFormInvalid || isCustomTemplateInvalid || this.state.actionInProgress || isNamespaceInvalid || isStackNameInvalid;
   }
 
   onChangeFormValues(newValues) {

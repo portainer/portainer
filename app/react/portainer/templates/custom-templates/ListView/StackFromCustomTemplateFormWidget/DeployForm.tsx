@@ -63,7 +63,7 @@ export function DeployForm({
   const isGit = !!template.GitConfig;
 
   const initialValues: FormValues = {
-    name: template.Title || '',
+    name: '',
     variables: getVariablesFieldDefaultValues(template.Variables),
     accessControl: parseAccessControlFormData(
       isEdgeAdminQuery.isAdmin,
@@ -86,6 +86,7 @@ export function DeployForm({
               value={values.name}
               onChange={(v) => setFieldValue('name', v)}
               errors={errors.name}
+              placeholder="e.g. mystack"
             />
           </FormSection>
 
@@ -158,7 +159,6 @@ export function DeployForm({
               as={Link}
               props={{
                 to: '.',
-                'data-cy': 'cancel-stack-creation',
                 params: { template: null },
               }}
               color="default"

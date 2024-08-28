@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Network } from 'lucide-react';
 import { EndpointSettings, NetworkSettings } from 'docker-types/generated/1.41';
 
@@ -5,11 +6,12 @@ import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
-import { DockerContainer } from '../../types';
+import { ContainerListViewModel } from '../../types';
 
 import { TableNetwork } from './types';
-import { columns } from './columns';
+import { buildColumns } from './columns';
 import { ConnectNetworkForm } from './ConnectNetworkForm';
 
 const storageKey = 'container-networks';
@@ -21,10 +23,11 @@ export function ContainerNetworksDatatable({
   nodeName,
 }: {
   dataset: NetworkSettings['Networks'];
-  container: DockerContainer;
+  container: ContainerListViewModel;
   nodeName?: string;
 }) {
   const tableState = useTableState(store, storageKey);
+  const columns = useMemo(() => buildColumns({ nodeName }), [nodeName]);
 
   const networks: Array<TableNetwork> = Object.entries(dataset || {})
     .filter(isNetworkDefined)
@@ -58,10 +61,12 @@ export function ContainerNetworksDatatable({
           selectedNetworks={networks.map((n) => n.id)}
         />
       }
-      extendTableOptions={withMeta({
-        table: 'container-networks',
-        containerId: container.Id,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'container-networks',
+          containerId: container.Id,
+        })
+      )}
       data-cy="container-networks-datatable"
     />
   );

@@ -6,7 +6,7 @@ import (
 
 	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
-	"github.com/portainer/portainer/api/internal/set"
+	"github.com/portainer/portainer/api/set"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"

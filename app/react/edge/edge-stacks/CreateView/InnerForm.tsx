@@ -124,7 +124,15 @@ export function InnerForm({
       <StaggerFieldset
         isEdit={false}
         values={values.staggerConfig}
-        onChange={(value) => setFieldValue('staggerConfig', value)}
+        onChange={(newStaggerValues) =>
+          setValues((values) => ({
+            ...values,
+            staggerConfig: {
+              ...values.staggerConfig,
+              ...newStaggerValues,
+            },
+          }))
+        }
       />
 
       <FormActions

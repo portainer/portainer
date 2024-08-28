@@ -31,13 +31,13 @@ import {
   renameContainer,
   startContainer,
   stopContainer,
-  urlBuilder,
 } from '../containers.service';
 import { PortainerResponse } from '../../types';
-import { connectContainer } from '../../networks/queries/useConnectContainer';
-import { DockerContainer } from '../types';
+import { connectContainer } from '../../networks/queries/useConnectContainerMutation';
+import { ContainerListViewModel } from '../types';
 import { queryKeys } from '../queries/query-keys';
-import { addNodeHeader } from '../../proxy/addNodeHeader';
+import { withAgentTargetHeader } from '../../proxy/queries/utils';
+import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
 
 import { CreateContainerRequest } from './types';
 import { Values } from './useInitialValues';
@@ -75,7 +75,7 @@ interface CreateOptions {
 }
 
 interface ReplaceOptions extends CreateOptions {
-  oldContainer: DockerContainer;
+  oldContainer: ContainerListViewModel;
   extraNetworks: Array<ExtraNetwork>;
 }
 
@@ -172,7 +172,7 @@ async function replace({
 async function renameAndCreate(
   environmentId: EnvironmentId,
   name: string,
-  oldContainer: DockerContainer,
+  oldContainer: ContainerListViewModel,
   config: CreateContainerRequest,
   nodeName?: string
 ) {
@@ -234,7 +234,7 @@ async function applyContainerSettings(
 async function createAndStart(
   environmentId: EnvironmentId,
   config: CreateContainerRequest,
-  name: string,
+  name?: string,
   nodeName?: string
 ) {
   let containerId = '';
@@ -290,12 +290,10 @@ async function createContainer(
   { nodeName }: { nodeName?: string } = {}
 ) {
   try {
-    const headers = addNodeHeader(nodeName);
-
     const { data } = await axios.post<
       PortainerResponse<{ Id: string; Warnings: Array<string> }>
-    >(urlBuilder(environmentId, undefined, 'create'), config, {
-      headers,
+    >(buildDockerProxyUrl(environmentId, 'containers', 'create'), config, {
+      headers: { ...withAgentTargetHeader(nodeName) },
       params: { name },
     });
 
@@ -349,7 +347,7 @@ function connectToExtraNetworks(
 
 function stopContainerIfNeeded(
   environmentId: EnvironmentId,
-  container: DockerContainer,
+  container: ContainerListViewModel,
   nodeName?: string
 ) {
   if (container.State !== 'running' || !container.Id) {

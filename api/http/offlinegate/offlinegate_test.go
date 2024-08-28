@@ -71,6 +71,7 @@ func Test_waitingMiddleware_executesImmediately_whenNotLocked(t *testing.T) {
 
 	timeout := 2 * time.Second
 	start := time.Now()
+
 	o.WaitingMiddleware(timeout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		elapsed := time.Since(start)
 		if elapsed >= timeout {
@@ -81,7 +82,7 @@ func Test_waitingMiddleware_executesImmediately_whenNotLocked(t *testing.T) {
 
 	body, _ := io.ReadAll(response.Body)
 	if string(body) != "success" {
-		t.Error("Didn't receive expected result from the hanlder")
+		t.Error("Didn't receive expected result from the handler")
 	}
 }
 
@@ -105,6 +106,7 @@ func Test_waitingMiddleware_waitsForTheLockToBeReleased(t *testing.T) {
 
 	timeout := 10 * time.Second
 	start := time.Now()
+
 	o.WaitingMiddleware(timeout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		elapsed := time.Since(start)
 		if elapsed >= timeout {
@@ -115,7 +117,7 @@ func Test_waitingMiddleware_waitsForTheLockToBeReleased(t *testing.T) {
 
 	body, _ := io.ReadAll(response.Body)
 	if string(body) != "success" {
-		t.Error("Didn't receive expected result from the hanlder")
+		t.Error("Didn't receive expected result from the handler")
 	}
 }
 

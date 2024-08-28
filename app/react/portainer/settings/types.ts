@@ -1,12 +1,5 @@
 import { TeamId } from '@/react/portainer/users/teams/types';
 
-export interface FDOConfiguration {
-  enabled: boolean;
-  ownerURL: string;
-  ownerUsername: string;
-  ownerPassword: string;
-}
-
 export interface TLSConfiguration {
   TLS: boolean;
   TLSSkipVerify: boolean;
@@ -119,7 +112,6 @@ export interface Settings {
   LDAPSettings: LDAPSettings;
   OAuthSettings: OAuthSettings;
   openAMTConfiguration: OpenAMTConfiguration;
-  fdoConfiguration: FDOConfiguration;
   FeatureFlagSettings: { [key: Feature]: boolean };
   SnapshotInterval: string;
   TemplatesURL: string;
@@ -201,8 +193,6 @@ export interface PublicSettingsResponse {
   KubeconfigExpiry: string;
   /** Whether team sync is enabled */
   TeamSync: boolean;
-  /** Whether FDO is enabled */
-  IsFDOEnabled: boolean;
   /** Whether AMT is enabled */
   IsAMTEnabled: boolean;
   /** Whether to hide default registry (only on BE) */

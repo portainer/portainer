@@ -18,8 +18,7 @@ func TestTagDeleteEdgeGroupsConcurrently(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, true, false)
 
 	user := &portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
-	err := store.User().Create(user)
-	if err != nil {
+	if err := store.User().Create(user); err != nil {
 		t.Fatal("could not create admin user:", err)
 	}
 
@@ -30,32 +29,31 @@ func TestTagDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	var tagIDs []portainer.TagID
 
-	for i := 0; i < tagsCount; i++ {
+	for i := range tagsCount {
 		tagID := portainer.TagID(i) + 1
 
-		err = store.Tag().Create(&portainer.Tag{
+		if err := store.Tag().Create(&portainer.Tag{
 			ID:   tagID,
 			Name: "tag-" + strconv.Itoa(int(tagID)),
-		})
-		if err != nil {
+		}); err != nil {
 			t.Fatal("could not create tag:", err)
 		}
 
 		tagIDs = append(tagIDs, tagID)
 	}
 
-	err = store.EdgeGroup().Create(&portainer.EdgeGroup{
+	if err := store.EdgeGroup().Create(&portainer.EdgeGroup{
 		ID:     1,
 		Name:   "edgegroup-1",
 		TagIDs: tagIDs,
-	})
-	if err != nil {
+	}); err != nil {
 		t.Fatal("could not create edge group:", err)
 	}
 
 	// Remove the tags concurrently
 
 	var wg sync.WaitGroup
+
 	wg.Add(len(tagIDs))
 
 	for _, tagID := range tagIDs {

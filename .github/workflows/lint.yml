@@ -18,7 +18,7 @@ on:
       - ready_for_review
 
 env:
-  GO_VERSION: 1.21.9
+  GO_VERSION: 1.22.5
   NODE_VERSION: 18.x
 
 jobs:
@@ -51,5 +51,5 @@ jobs:
       - name: GolangCI-Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.55.2
+          version: v1.59.1
           args: --timeout=10m -c .golangci.yaml

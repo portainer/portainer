@@ -3,15 +3,16 @@ package endpoints
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/pkg/errors"
 )
 
 // @id endpointRegistriesList
@@ -34,12 +35,10 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	}
 
 	var registries []portainer.Registry
-	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		registries, err = handler.listRegistries(tx, r, portainer.EndpointID(endpointID))
 		return err
-	})
-
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -62,7 +61,7 @@ func (handler *Handler) listRegistries(tx dataservices.DataStoreTx, r *http.Requ
 		return nil, httperror.InternalServerError("Unable to retrieve user from the database", err)
 	}
 
-	endpoint, err := tx.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
 	if tx.IsErrObjectNotFound(err) {
 		return nil, httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -104,11 +103,9 @@ func (handler *Handler) filterKubernetesEndpointRegistries(r *http.Request, regi
 	}
 
 	if namespaceParam != "" {
-		authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin)
-		if err != nil {
+		if authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin); err != nil {
 			return nil, httperror.NotFound("Unable to check for namespace authorization", err)
-		}
-		if !authorized {
+		} else if !authorized {
 			return nil, httperror.Forbidden("User is not authorized to use namespace", errors.New("user is not authorized to use namespace"))
 		}
 
@@ -127,7 +124,7 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 		return true, nil
 	}
 
-	if namespace == "default" {
+	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace && namespace == kubernetes.DefaultNamespace {
 		return true, nil
 	}
 

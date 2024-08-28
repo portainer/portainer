@@ -4,7 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { queryKeys } from '../queries/utils';
-import { buildDockerUrl } from '../queries/utils/root';
+import { buildDockerUrl } from '../queries/utils/buildDockerUrl';
 
 interface DashboardResponse {
   containers: {
@@ -29,7 +29,7 @@ export function useDashboard(envId: EnvironmentId) {
     queryFn: async () => {
       try {
         const res = await axios.get<DashboardResponse>(
-          `${buildDockerUrl(envId)}/dashboard`
+          buildDockerUrl(envId, 'dashboard')
         );
         return res.data;
       } catch (error) {

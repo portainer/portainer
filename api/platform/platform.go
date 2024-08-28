@@ -4,19 +4,19 @@ import (
 	"context"
 	"os"
 
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
-	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/rs/zerolog/log"
 )
 
 const (
 	PodmanMode            = "PODMAN"
 	KubernetesServiceHost = "KUBERNETES_SERVICE_HOST"
-	NomadJobName          = "NOMAD_JOB_NAME"
 )
 
-// ContainerPlatform represent the platform on which the container is running (Docker, Kubernetes, Nomad)
+// ContainerPlatform represent the platform on which the container is running (Docker, Kubernetes)
 type ContainerPlatform string
 
 const (
@@ -28,8 +28,6 @@ const (
 	PlatformKubernetes = ContainerPlatform("Kubernetes")
 	// PlatformPodman represent the Podman platform (Standalone)
 	PlatformPodman = ContainerPlatform("Podman")
-	// PlatformNomad represent the Nomad platform (Standalone)
-	PlatformNomad = ContainerPlatform("Nomad")
 )
 
 // DetermineContainerPlatform will check for the existence of the PODMAN_MODE
@@ -47,11 +45,6 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 		return PlatformKubernetes, nil
 	}
 
-	nomadJobName := os.Getenv(NomadJobName)
-	if nomadJobName != "" {
-		return PlatformNomad, nil
-	}
-
 	if !isRunningInContainer() {
 		return "", nil
 	}
@@ -65,9 +58,8 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 	info, err := dockerCli.Info(context.Background())
 	if err != nil {
 		if client.IsErrConnectionFailed(err) {
-			log.Warn().
-				Err(err).
-				Msg("failed to retrieve docker info")
+			log.Warn().Err(err).Msg("failed to retrieve docker info")
+
 			return "", nil
 		}
 
@@ -85,5 +77,6 @@ func DetermineContainerPlatform() (ContainerPlatform, error) {
 // this code is taken from https://github.com/moby/libnetwork/blob/master/drivers/bridge/setup_bridgenetfiltering.go
 func isRunningInContainer() bool {
 	_, err := os.Stat("/.dockerenv")
+
 	return !os.IsNotExist(err)
 }

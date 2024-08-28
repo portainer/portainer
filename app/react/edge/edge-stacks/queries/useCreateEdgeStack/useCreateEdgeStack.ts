@@ -4,6 +4,7 @@ import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import {
+  AutoUpdateResponse,
   GitFormModel,
   RelativePathModel,
 } from '@/react/portainer/gitops/types';
@@ -70,6 +71,7 @@ export type CreateEdgeStackPayload =
       payload: BasePayload & {
         git: GitFormModel;
         relativePathSettings?: RelativePathModel;
+        autoUpdate: AutoUpdateResponse | null;
       };
     };
 
@@ -115,6 +117,7 @@ async function createStackAndGitCredential(
   payload: BasePayload & {
     git: GitFormModel;
     relativePathSettings?: RelativePathModel;
+    autoUpdate: AutoUpdateResponse | null;
   }
 ) {
   const newGitModel = await saveGitCredentialsIfNeeded(userId, payload.git);
@@ -144,6 +147,6 @@ async function createStackAndGitCredential(
       payload.relativePathSettings?.PerDeviceConfigsMatchType,
     perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
     tlsSkipVerify: newGitModel.TLSSkipVerify,
-    autoUpdate: newGitModel.AutoUpdate,
+    autoUpdate: payload.autoUpdate,
   });
 }

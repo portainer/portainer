@@ -20,7 +20,7 @@ func (tx *DbTransaction) SetServiceName(bucketName string) error {
 	return err
 }
 
-func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interface{}) error {
+func (tx *DbTransaction) GetObject(bucketName string, key []byte, object any) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	value := bucket.Get(key)
@@ -31,7 +31,7 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object interfa
 	return tx.conn.UnmarshalObject(value, object)
 }
 
-func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object interface{}) error {
+func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object any) error {
 	data, err := tx.conn.MarshalObject(object)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func (tx *DbTransaction) DeleteObject(bucketName string, key []byte) error {
 	return bucket.Delete(key)
 }
 
-func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, matchingFn func(o interface{}) (id int, ok bool)) error {
+func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj any, matchingFn func(o any) (id int, ok bool)) error {
 	var ids []int
 
 	bucket := tx.tx.Bucket([]byte(bucketName))
@@ -74,16 +74,18 @@ func (tx *DbTransaction) DeleteAllObjects(bucketName string, obj interface{}, ma
 
 func (tx *DbTransaction) GetNextIdentifier(bucketName string) int {
 	bucket := tx.tx.Bucket([]byte(bucketName))
+
 	id, err := bucket.NextSequence()
 	if err != nil {
-		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifer")
+		log.Error().Err(err).Str("bucket", bucketName).Msg("failed to get the next identifier")
+
 		return 0
 	}
 
 	return int(id)
 }
 
-func (tx *DbTransaction) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
+func (tx *DbTransaction) CreateObject(bucketName string, fn func(uint64) (int, any)) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	seqId, _ := bucket.NextSequence()
@@ -97,7 +99,7 @@ func (tx *DbTransaction) CreateObject(bucketName string, fn func(uint64) (int, i
 	return bucket.Put(tx.conn.ConvertToKey(id), data)
 }
 
-func (tx *DbTransaction) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
+func (tx *DbTransaction) CreateObjectWithId(bucketName string, id int, obj any) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 	data, err := tx.conn.MarshalObject(obj)
 	if err != nil {
@@ -107,7 +109,7 @@ func (tx *DbTransaction) CreateObjectWithId(bucketName string, id int, obj inter
 	return bucket.Put(tx.conn.ConvertToKey(id), data)
 }
 
-func (tx *DbTransaction) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
+func (tx *DbTransaction) CreateObjectWithStringId(bucketName string, id []byte, obj any) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 	data, err := tx.conn.MarshalObject(obj)
 	if err != nil {
@@ -117,7 +119,7 @@ func (tx *DbTransaction) CreateObjectWithStringId(bucketName string, id []byte, 
 	return bucket.Put(id, data)
 }
 
-func (tx *DbTransaction) GetAll(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
+func (tx *DbTransaction) GetAll(bucketName string, obj any, appendFn func(o any) (any, error)) error {
 	bucket := tx.tx.Bucket([]byte(bucketName))
 
 	return bucket.ForEach(func(k []byte, v []byte) error {
@@ -130,20 +132,7 @@ func (tx *DbTransaction) GetAll(bucketName string, obj interface{}, appendFn fun
 	})
 }
 
-func (tx *DbTransaction) GetAllWithJsoniter(bucketName string, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
-	bucket := tx.tx.Bucket([]byte(bucketName))
-
-	return bucket.ForEach(func(k []byte, v []byte) error {
-		err := tx.conn.UnmarshalObject(v, obj)
-		if err == nil {
-			obj, err = appendFn(obj)
-		}
-
-		return err
-	})
-}
-
-func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, appendFn func(o interface{}) (interface{}, error)) error {
+func (tx *DbTransaction) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj any, appendFn func(o any) (any, error)) error {
 	cursor := tx.tx.Bucket([]byte(bucketName)).Cursor()
 
 	for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {

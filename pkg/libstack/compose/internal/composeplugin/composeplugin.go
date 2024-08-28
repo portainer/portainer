@@ -57,7 +57,7 @@ func (wrapper *PluginWrapper) Deploy(ctx context.Context, filePaths []string, op
 
 // Down stop and remove containers
 func (wrapper *PluginWrapper) Remove(ctx context.Context, projectName string, filePaths []string, options libstack.Options) error {
-	output, err := wrapper.command(newDownCommand(projectName, filePaths), options)
+	output, err := wrapper.command(newDownCommand(projectName), options)
 	if len(output) != 0 {
 		if err != nil {
 			return err
@@ -217,8 +217,8 @@ func newUpCommand(filePaths []string, options upOptions) composeCommand {
 	return newCommand(args, filePaths)
 }
 
-func newDownCommand(projectName string, filePaths []string) composeCommand {
-	cmd := newCommand([]string{"down", "--remove-orphans"}, filePaths)
+func newDownCommand(projectName string) composeCommand {
+	cmd := newCommand([]string{"down", "--remove-orphans"}, nil)
 	cmd.WithProjectName(projectName)
 
 	return cmd

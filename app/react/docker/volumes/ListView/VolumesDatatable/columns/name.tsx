@@ -15,7 +15,7 @@ import { getTableMeta } from '../tableMeta';
 
 import { columnHelper } from './helper';
 
-export const name = columnHelper.accessor('Id', {
+export const name = columnHelper.accessor('Name', {
   id: 'name',
   header: 'Name',
   cell: Cell,
@@ -103,7 +103,6 @@ function Cell({
                 id: item.Id,
                 nodeName: item.NodeName,
               },
-              'data-cy': `volume-browse-link-${name}`,
             }}
             data-cy={`volume-browse-button-${name}`}
           >

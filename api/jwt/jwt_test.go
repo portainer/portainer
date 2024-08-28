@@ -25,7 +25,7 @@ func TestGenerateSignedToken(t *testing.T) {
 	generatedToken, err := svc.generateSignedToken(token, expiresAt, defaultScope)
 	assert.NoError(t, err, "failed to generate a signed token")
 
-	parsedToken, err := jwt.ParseWithClaims(generatedToken, &claims{}, func(token *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.ParseWithClaims(generatedToken, &claims{}, func(token *jwt.Token) (any, error) {
 		return svc.secrets[defaultScope], nil
 	})
 	assert.NoError(t, err, "failed to parse generated token")

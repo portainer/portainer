@@ -1,14 +1,15 @@
 package apikey
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/internal/securecookie"
 
 	"github.com/pkg/errors"
 )
@@ -20,30 +21,45 @@ var ErrInvalidAPIKey = errors.New("Invalid API key")
 type apiKeyService struct {
 	apiKeyRepository dataservices.APIKeyRepository
 	userRepository   dataservices.UserService
-	cache            *apiKeyCache
+	cache            *ApiKeyCache[portainer.User]
+}
+
+// GenerateRandomKey generates a random key of specified length
+// source: https://github.com/gorilla/securecookie/blob/master/securecookie.go#L515
+func GenerateRandomKey(length int) []byte {
+	k := make([]byte, length)
+	if _, err := io.ReadFull(rand.Reader, k); err != nil {
+		return nil
+	}
+
+	return k
+}
+
+func compareUser(u portainer.User, id portainer.UserID) bool {
+	return u.ID == id
 }
 
 func NewAPIKeyService(apiKeyRepository dataservices.APIKeyRepository, userRepository dataservices.UserService) *apiKeyService {
 	return &apiKeyService{
 		apiKeyRepository: apiKeyRepository,
 		userRepository:   userRepository,
-		cache:            NewAPIKeyCache(defaultAPIKeyCacheSize),
+		cache:            NewAPIKeyCache(DefaultAPIKeyCacheSize, compareUser),
 	}
 }
 
 // HashRaw computes a hash digest of provided raw API key.
 func (a *apiKeyService) HashRaw(rawKey string) string {
 	hashDigest := sha256.Sum256([]byte(rawKey))
+
 	return base64.StdEncoding.EncodeToString(hashDigest[:])
 }
 
 // GenerateApiKey generates a raw API key for a user (for one-time display).
 // The generated API key is stored in the cache and database.
 func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error) {
-	randKey := securecookie.GenerateRandomKey(32)
+	randKey := GenerateRandomKey(32)
 	encodedRawAPIKey := base64.StdEncoding.EncodeToString(randKey)
 	prefixedAPIKey := portainerAPIKeyPrefix + encodedRawAPIKey
-
 	hashDigest := a.HashRaw(prefixedAPIKey)
 
 	apiKey := &portainer.APIKey{
@@ -54,8 +70,7 @@ func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) 
 		Digest:      hashDigest,
 	}
 
-	err := a.apiKeyRepository.Create(apiKey)
-	if err != nil {
+	if err := a.apiKeyRepository.Create(apiKey); err != nil {
 		return "", nil, errors.Wrap(err, "Unable to create API key")
 	}
 
@@ -78,7 +93,6 @@ func (a *apiKeyService) GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey,
 // GetDigestUserAndKey returns the user and api-key associated to a specified hash digest.
 // A cache lookup is performed first; if the user/api-key is not found in the cache, respective database lookups are performed.
 func (a *apiKeyService) GetDigestUserAndKey(digest string) (portainer.User, portainer.APIKey, error) {
-	// get api key from cache if possible
 	cachedUser, cachedKey, ok := a.cache.Get(digest)
 	if ok {
 		return cachedUser, cachedKey, nil
@@ -106,20 +120,21 @@ func (a *apiKeyService) UpdateAPIKey(apiKey *portainer.APIKey) error {
 	if err != nil {
 		return errors.Wrap(err, "Unable to retrieve API key")
 	}
+
 	a.cache.Set(apiKey.Digest, user, *apiKey)
+
 	return a.apiKeyRepository.Update(apiKey.ID, apiKey)
 }
 
 // DeleteAPIKey deletes an API key and removes the digest/api-key entry from the cache.
 func (a *apiKeyService) DeleteAPIKey(apiKeyID portainer.APIKeyID) error {
-	// get api-key digest to remove from cache
 	apiKey, err := a.apiKeyRepository.Read(apiKeyID)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("Unable to retrieve API key: %d", apiKeyID))
 	}
 
-	// delete the user/api-key from cache
 	a.cache.Delete(apiKey.Digest)
+
 	return a.apiKeyRepository.Delete(apiKeyID)
 }
 

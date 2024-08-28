@@ -15,7 +15,7 @@ func migrationError(err error, context string) error {
 	return errors.Wrap(err, "failed in "+context)
 }
 
-func GetFunctionName(i interface{}) string {
+func GetFunctionName(i any) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
@@ -39,20 +39,19 @@ func (m *Migrator) Migrate() error {
 		latestMigrations := m.LatestMigrations()
 		if latestMigrations.Version.Equal(schemaVersion) &&
 			version.MigratorCount != len(latestMigrations.MigrationFuncs) {
-			err := runMigrations(latestMigrations.MigrationFuncs)
-			if err != nil {
+			if err := runMigrations(latestMigrations.MigrationFuncs); err != nil {
 				return err
 			}
+
 			newMigratorCount = len(latestMigrations.MigrationFuncs)
 		}
 	} else {
 		// regular path when major/minor/patch versions differ
 		for _, migration := range m.migrations {
 			if schemaVersion.LessThan(migration.Version) {
-
 				log.Info().Msgf("migrating data to %s", migration.Version.String())
-				err := runMigrations(migration.MigrationFuncs)
-				if err != nil {
+
+				if err := runMigrations(migration.MigrationFuncs); err != nil {
 					return err
 				}
 			}
@@ -63,16 +62,14 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	err = m.Always()
-	if err != nil {
+	if err := m.Always(); err != nil {
 		return migrationError(err, "Always migrations returned error")
 	}
 
 	version.SchemaVersion = portainer.APIVersion
 	version.MigratorCount = newMigratorCount
 
-	err = m.versionService.UpdateVersion(version)
-	if err != nil {
+	if err := m.versionService.UpdateVersion(version); err != nil {
 		return migrationError(err, "StoreDBVersion")
 	}
 
@@ -99,6 +96,7 @@ func (m *Migrator) NeedsMigration() bool {
 	// In this particular instance we should log a fatal error
 	if m.CurrentDBEdition() != portainer.PortainerCE {
 		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
+
 		return false
 	}
 
