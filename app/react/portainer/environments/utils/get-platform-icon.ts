@@ -1,5 +1,6 @@
 import { getPlatformType } from '@/react/portainer/environments/utils';
 import {
+  ContainerEngine,
   EnvironmentType,
   PlatformType,
 } from '@/react/portainer/environments/types';
@@ -18,8 +19,11 @@ const icons: {
   [PlatformType.Azure]: Azure,
 };
 
-export function getPlatformIcon(type: EnvironmentType) {
-  const platform = getPlatformType(type);
+export function getPlatformIcon(
+  type: EnvironmentType,
+  containerEngine?: ContainerEngine
+) {
+  const platform = getPlatformType(type, containerEngine);
 
   return icons[platform];
 }
