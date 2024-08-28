@@ -36,9 +36,9 @@ function Cell({
 
   return ports
     .filter((port) => port.PublishedPort)
-    .map((port, index) => (
+    .map((port) => (
       <PublishedPortLink
-        key={index}
+        key={port.PublishedPort}
         hostPort={port.PublishedPort}
         containerPort={port.TargetPort}
         hostURL={environmentQuery.data.PublicURL}
