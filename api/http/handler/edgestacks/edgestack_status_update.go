@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,7 +30,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 		return errors.New("invalid EnvironmentID")
 	}
 
-	if *payload.Status == portainer.EdgeStackStatusError && govalidator.IsNull(payload.Error) {
+	if *payload.Status == portainer.EdgeStackStatusError && len(payload.Error) == 0 {
 		return errors.New("error message is mandatory when status is error")
 	}
 

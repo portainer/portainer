@@ -8,7 +8,7 @@ import (
 )
 
 func ValidateRepoConfig(repoConfig *gittypes.RepoConfig) error {
-	if govalidator.IsNull(repoConfig.URL) || !govalidator.IsURL(repoConfig.URL) {
+	if len(repoConfig.URL) == 0 || !govalidator.IsURL(repoConfig.URL) {
 		return httperrors.NewInvalidPayloadError("Invalid repository URL. Must correspond to a valid URL format")
 	}
 
@@ -17,7 +17,7 @@ func ValidateRepoConfig(repoConfig *gittypes.RepoConfig) error {
 }
 
 func ValidateRepoAuthentication(auth *gittypes.GitAuthentication) error {
-	if auth != nil && govalidator.IsNull(auth.Password) && auth.GitCredentialID == 0 {
+	if auth != nil && len(auth.Password) == 0 && auth.GitCredentialID == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid repository credentials. Password or GitCredentialID must be specified when authentication is enabled")
 	}
 

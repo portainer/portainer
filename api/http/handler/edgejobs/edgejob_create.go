@@ -49,7 +49,7 @@ type edgeJobCreateFromFileContentPayload struct {
 }
 
 func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("invalid Edge job name")
 	}
 
@@ -57,7 +57,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 		return errors.New("invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
-	if govalidator.IsNull(payload.CronExpression) {
+	if len(payload.CronExpression) == 0 {
 		return errors.New("invalid cron expression")
 	}
 
@@ -65,7 +65,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 		return errors.New("no environments or groups have been provided")
 	}
 
-	if govalidator.IsNull(payload.FileContent) {
+	if len(payload.FileContent) == 0 {
 		return errors.New("invalid script file content")
 	}
 
