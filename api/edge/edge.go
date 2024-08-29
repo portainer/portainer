@@ -51,6 +51,9 @@ type (
 		// Used only for EE
 		// EnvVars is a list of environment variables to inject into the stack
 		EnvVars []portainer.Pair
+		// ForceRedeploy is a flag indicating if the agent should force the redeploy of the stack.
+		// Used only for EE
+		ForceRedeploy bool
 
 		// Used only for EE async edge agent
 		// ReadyRePullImage is a flag to indicate whether the auto update is trigger to re-pull image
