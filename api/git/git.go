@@ -143,6 +143,7 @@ func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, e
 		ReferenceName:   plumbing.ReferenceName(opt.referenceName),
 		Auth:            getAuth(opt.username, opt.password),
 		InsecureSkipTLS: opt.tlsSkipVerify,
+		Tags:            git.NoTags,
 	}
 
 	repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
@@ -166,7 +167,10 @@ func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, e
 	}
 
 	var allPaths []string
+
 	w := object.NewTreeWalker(tree, true, nil)
+	defer w.Close()
+
 	for {
 		name, entry, err := w.Next()
 		if err != nil {
