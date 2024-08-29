@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	gittypes "github.com/portainer/portainer/api/git/types"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -14,7 +16,6 @@ import (
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
-	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 type gitClient struct {
