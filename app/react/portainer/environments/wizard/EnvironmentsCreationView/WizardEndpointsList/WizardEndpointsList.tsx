@@ -7,11 +7,7 @@ import {
   isEdgeEnvironment,
   isUnassociatedEdgeEnvironment,
 } from '@/react/portainer/environments/utils';
-import {
-  ContainerEngine,
-  EnvironmentId,
-  EnvironmentType,
-} from '@/react/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
@@ -56,7 +52,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
             <div
               className={clsx(
                 styles.wizardListImage,
-                getIconClass(environment.Type, environment.ContainerEngine)
+                'text-blue-8 th-dark:text-blue-7 th-highcontrast:text-white text-5xl'
               )}
             >
               <Icon
@@ -84,22 +80,4 @@ export function WizardEndpointsList({ environmentIds }: Props) {
       </WidgetBody>
     </Widget>
   );
-
-  // a color similar to text-blue-8 was used for all icons. This didn't look right for podman, so change it to text-white for only podman
-  function getIconClass(
-    type: EnvironmentType,
-    containerEngine?: ContainerEngine
-  ) {
-    switch (type) {
-      case EnvironmentType.Docker:
-      case EnvironmentType.AgentOnDocker:
-      case EnvironmentType.EdgeAgentOnDocker:
-        if (containerEngine === 'podman') {
-          return 'text-white';
-        }
-        return 'text-blue-8';
-      default:
-        return 'text-blue-8';
-    }
-  }
 }
