@@ -91,6 +91,29 @@ func Test_latestCommitID(t *testing.T) {
 	assert.Equal(t, "68dcaa7bd452494043c64252ab90db0f98ecf8d2", id)
 }
 
+func Test_ListRefs(t *testing.T) {
+	service := Service{git: NewGitClient(true)}
+
+	repositoryURL := setup(t)
+
+	fs, err := service.ListRefs(repositoryURL, "", "", false, false)
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"refs/heads/main"}, fs)
+}
+
+func Test_ListFiles(t *testing.T) {
+	service := Service{git: NewGitClient(true)}
+
+	repositoryURL := setup(t)
+	referenceName := "refs/heads/main"
+
+	fs, err := service.ListFiles(repositoryURL, referenceName, "", "", false, false, []string{".yml"}, false)
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"docker-compose.yml"}, fs)
+}
+
 func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
