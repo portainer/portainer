@@ -90,9 +90,16 @@ export function WizardEndpointsList({ environmentIds }: Props) {
     type: EnvironmentType,
     containerEngine?: ContainerEngine
   ) {
-    if (type === EnvironmentType.Docker && containerEngine === 'podman') {
-      return 'text-white';
+    switch (type) {
+      case EnvironmentType.Docker:
+      case EnvironmentType.AgentOnDocker:
+      case EnvironmentType.EdgeAgentOnDocker:
+        if (containerEngine === 'podman') {
+          return 'text-white';
+        }
+        return 'text-blue-8';
+      default:
+        return 'text-blue-8';
     }
-    return 'text-blue-8';
   }
 }

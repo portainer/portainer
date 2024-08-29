@@ -141,12 +141,10 @@ export async function createRemoteEnvironment({
   name,
   url,
   options = {},
-  containerEngine,
 }: CreateRemoteEnvironment) {
   return createEnvironment(name, creationType, {
     ...options,
     url: `tcp://${url}`,
-    containerEngine,
   });
 }
 
