@@ -22,7 +22,6 @@ on:
 env:
   DOCKER_HUB_REPO: portainerci/portainer-ce
   EXTENSION_HUB_REPO: portainerci/portainer-docker-extension
-  GO_VERSION: 1.22.5
   NODE_VERSION: 18.x
 
 jobs:
@@ -47,7 +46,7 @@ jobs:
       - name: '[preparation] set up golang'
         uses: actions/setup-go@v5.0.0
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version-file: go.mod
       - name: '[preparation] set up node.js'
         uses: actions/setup-node@v4.0.1
         with:
