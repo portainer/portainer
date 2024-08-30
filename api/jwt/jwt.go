@@ -108,9 +108,10 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.T
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
+func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, string, time.Time, error) {
 	scope := parseScope(token)
 	secret := service.secrets[scope]
+
 	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -118,28 +119,27 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		}
 		return secret, nil
 	})
-
-	if err == nil && parsedToken != nil {
-		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
-
-			user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
-			if err != nil {
-				return nil, errInvalidJWTToken
-			}
-			if user.TokenIssueAt > cl.RegisteredClaims.IssuedAt.Unix() {
-				return nil, errInvalidJWTToken
-			}
-
-			return &portainer.TokenData{
-				ID:                  portainer.UserID(cl.UserID),
-				Username:            cl.Username,
-				Role:                portainer.UserRole(cl.Role),
-				Token:               token,
-				ForceChangePassword: cl.ForceChangePassword,
-			}, nil
-		}
+	if err != nil || parsedToken == nil {
+		return nil, "", time.Time{}, errInvalidJWTToken
 	}
-	return nil, errInvalidJWTToken
+
+	cl, ok := parsedToken.Claims.(*claims)
+	if !ok || !parsedToken.Valid {
+		return nil, "", time.Time{}, errInvalidJWTToken
+	}
+
+	user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
+	if err != nil || user.TokenIssueAt > cl.RegisteredClaims.IssuedAt.Unix() {
+		return nil, "", time.Time{}, errInvalidJWTToken
+	}
+
+	return &portainer.TokenData{
+		ID:                  portainer.UserID(cl.UserID),
+		Username:            cl.Username,
+		Role:                portainer.UserRole(cl.Role),
+		Token:               token,
+		ForceChangePassword: cl.ForceChangePassword,
+	}, cl.ID, cl.ExpiresAt.Time, nil
 }
 
 // parse a JWT token, fallback to defaultScope if no scope is present in the JWT
