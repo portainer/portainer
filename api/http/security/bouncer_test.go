@@ -41,7 +41,6 @@ func tokenLookupEmpty(r *http.Request) (*portainer.TokenData, error) {
 }
 
 func Test_mwAuthenticateFirst(t *testing.T) {
-
 	_, store := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -156,7 +155,6 @@ func Test_extractKeyFromCookie(t *testing.T) {
 }
 
 func Test_extractBearerToken(t *testing.T) {
-
 	tt := []struct {
 		name               string
 		requestHeader      string
@@ -386,7 +384,6 @@ func Test_apiKeyLookup(t *testing.T) {
 }
 
 func Test_ShouldSkipCSRFCheck(t *testing.T) {
-
 	tt := []struct {
 		name                     string
 		cookieValue              string

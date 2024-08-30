@@ -4,16 +4,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
-	i "github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/api/internal/testhelpers"
+
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateSignedToken(t *testing.T) {
-	dataStore := i.NewDatastore(i.WithSettingsService(&portainer.Settings{}))
+	dataStore := testhelpers.NewDatastore(testhelpers.WithSettingsService(&portainer.Settings{}))
 	svc, err := NewService("24h", dataStore)
 	assert.NoError(t, err, "failed to create a copy of service")
 
@@ -42,7 +43,7 @@ func TestGenerateSignedToken(t *testing.T) {
 }
 
 func TestGenerateSignedToken_InvalidScope(t *testing.T) {
-	dataStore := i.NewDatastore(i.WithSettingsService(&portainer.Settings{}))
+	dataStore := testhelpers.NewDatastore(testhelpers.WithSettingsService(&portainer.Settings{}))
 	svc, err := NewService("24h", dataStore)
 	assert.NoError(t, err, "failed to create a copy of service")
 

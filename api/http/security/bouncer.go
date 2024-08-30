@@ -31,9 +31,9 @@ type (
 
 		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
-		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
 		JWTAuthLookup(*http.Request) (*portainer.TokenData, error)
+		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		RevokeJWT(string)
 	}
 
@@ -92,6 +92,7 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, true)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -104,6 +105,7 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, false)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -117,6 +119,7 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	h = bouncer.mwIsTeamLeader(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -128,6 +131,7 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -209,6 +213,7 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 		bouncer.JWTAuthLookup,
 	}, h)
 	h = mwSecureHeaders(h)
+
 	return h
 }
 
@@ -296,23 +301,27 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			resultToken, err := lookup(r)
 			if err != nil {
 				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", httperrors.ErrUnauthorized)
+
 				return
 			}
 
 			if resultToken != nil {
 				token = resultToken
+
 				break
 			}
 		}
 
 		if token == nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "A valid authorization token is missing", httperrors.ErrUnauthorized)
+
 			return
 		}
 
 		user, _ := bouncer.dataStore.User().Read(token.ID)
 		if user == nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "An authorization token is invalid", httperrors.ErrUnauthorized)
+
 			return
 		}
 
@@ -437,6 +446,7 @@ func extractBearerToken(r *http.Request) (string, bool) {
 	if token != "" {
 		query.Del("token")
 		r.URL.RawQuery = query.Encode()
+
 		return token, true
 	}
 
@@ -550,11 +560,13 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 		settings, err := bouncer.dataStore.Settings().Settings()
 		if err != nil {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Unable to retrieve settings", err)
+
 			return
 		}
 
 		if !settings.EnableEdgeComputeFeatures {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Edge compute features are disabled", errors.New("Edge compute features are disabled"))
+
 			return
 		}
 

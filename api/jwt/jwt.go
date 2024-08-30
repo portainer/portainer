@@ -13,7 +13,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const year = time.Hour * 24 * 365
+const (
+	year = time.Hour * 24 * 365
+
+	keyLen = 32
+
+	defaultScope    = scope("default")
+	kubeConfigScope = scope("kubeconfig")
+)
 
 // scope represents JWT scopes that are supported in JWT claims.
 type scope string
@@ -35,13 +42,8 @@ type claims struct {
 }
 
 var (
-	errSecretGeneration = errors.New("Unable to generate secret key")
-	errInvalidJWTToken  = errors.New("Invalid JWT token")
-)
-
-const (
-	defaultScope    = scope("default")
-	kubeConfigScope = scope("kubeconfig")
+	errSecretGeneration = errors.New("unable to generate secret key")
+	errInvalidJWTToken  = errors.New("invalid JWT token")
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
@@ -51,7 +53,7 @@ func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*
 		return nil, err
 	}
 
-	secret := apikey.GenerateRandomKey(32)
+	secret := apikey.GenerateRandomKey(keyLen)
 	if secret == nil {
 		return nil, errSecretGeneration
 	}
@@ -61,16 +63,14 @@ func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*
 		return nil, err
 	}
 
-	service := &Service{
+	return &Service{
 		map[scope][]byte{
 			defaultScope:    secret,
 			kubeConfigScope: kubeSecret,
 		},
 		userSessionTimeout,
 		dataStore,
-	}
-
-	return service, nil
+	}, nil
 }
 
 func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
@@ -80,17 +80,19 @@ func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 	}
 
 	kubeSecret := settings.OAuthSettings.KubeSecretKey
+	if kubeSecret != nil {
+		return kubeSecret, nil
+	}
+
+	kubeSecret = apikey.GenerateRandomKey(keyLen)
 	if kubeSecret == nil {
-		kubeSecret = apikey.GenerateRandomKey(32)
-		if kubeSecret == nil {
-			return nil, errSecretGeneration
-		}
+		return nil, errSecretGeneration
+	}
 
-		settings.OAuthSettings.KubeSecretKey = kubeSecret
+	settings.OAuthSettings.KubeSecretKey = kubeSecret
 
-		if err := dataStore.Settings().UpdateSettings(settings); err != nil {
-			return nil, err
-		}
+	if err := dataStore.Settings().UpdateSettings(settings); err != nil {
+		return nil, err
 	}
 
 	return kubeSecret, nil
@@ -104,6 +106,7 @@ func (service *Service) defaultExpireAt() time.Time {
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.Time, error) {
 	expiryTime := service.defaultExpireAt()
 	token, err := service.generateSignedToken(data, expiryTime, defaultScope)
+
 	return token, expiryTime, err
 }
 
@@ -114,9 +117,9 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			msg := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			return nil, msg
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
 		return secret, nil
 	})
 	if err != nil || parsedToken == nil {
@@ -145,12 +148,12 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 // parse a JWT token, fallback to defaultScope if no scope is present in the JWT
 func parseScope(token string) scope {
 	unverifiedToken, _, _ := new(jwt.Parser).ParseUnverified(token, &claims{})
-	if unverifiedToken != nil {
-		if cl, ok := unverifiedToken.Claims.(*claims); ok {
-			if cl.Scope == kubeConfigScope {
-				return kubeConfigScope
-			}
-		}
+	if unverifiedToken == nil {
+		return defaultScope
+	}
+
+	if cl, ok := unverifiedToken.Claims.(*claims); ok && cl.Scope == kubeConfigScope {
+		return kubeConfigScope
 	}
 
 	return defaultScope
@@ -173,9 +176,8 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	}
 
 	if settings.IsDockerDesktopExtension {
-		// Set expiration to 99 years for docker desktop extension.
 		log.Info().Msg("detected docker desktop extension mode")
-		expiresAt = time.Now().Add(year * 99)
+		expiresAt = time.Now().Add(99 * year)
 	}
 
 	cl := claims{
@@ -196,10 +198,6 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cl)
-	signedToken, err := token.SignedString(secret)
-	if err != nil {
-		return "", err
-	}
 
-	return signedToken, nil
+	return token.SignedString(secret)
 }
