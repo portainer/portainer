@@ -1458,7 +1458,7 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, time.Time, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
+		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 

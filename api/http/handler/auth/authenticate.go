@@ -154,7 +154,6 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	security.AddAuthCookie(w, token, expirationTime)
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
-
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
@@ -179,20 +178,18 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 	}
 
 	for _, team := range teams {
-		if teamExists(team.Name, userGroups) {
-			if teamMembershipExists(team.ID, userMemberships) {
-				continue
-			}
+		if !teamExists(team.Name, userGroups) || teamMembershipExists(team.ID, userMemberships) {
+			continue
+		}
 
-			membership := &portainer.TeamMembership{
-				UserID: user.ID,
-				TeamID: team.ID,
-				Role:   portainer.TeamMember,
-			}
+		membership := &portainer.TeamMembership{
+			UserID: user.ID,
+			TeamID: team.ID,
+			Role:   portainer.TeamMember,
+		}
 
-			if err := handler.DataStore.TeamMembership().Create(membership); err != nil {
-				return err
-			}
+		if err := handler.DataStore.TeamMembership().Create(membership); err != nil {
+			return err
 		}
 	}
 

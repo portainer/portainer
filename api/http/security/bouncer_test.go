@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
@@ -14,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // testHandler200 is a simple handler which returns HTTP status 200 OK
@@ -39,7 +41,6 @@ func tokenLookupEmpty(r *http.Request) (*portainer.TokenData, error) {
 }
 
 func Test_mwAuthenticateFirst(t *testing.T) {
-
 	_, store := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -154,7 +155,6 @@ func Test_extractKeyFromCookie(t *testing.T) {
 }
 
 func Test_extractBearerToken(t *testing.T) {
-
 	tt := []struct {
 		name               string
 		requestHeader      string
@@ -384,7 +384,6 @@ func Test_apiKeyLookup(t *testing.T) {
 }
 
 func Test_ShouldSkipCSRFCheck(t *testing.T) {
-
 	tt := []struct {
 		name                     string
 		cookieValue              string
@@ -458,4 +457,61 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestJWTRevocation(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	jwtService, err := jwt.NewService("1h", store)
+	require.NoError(t, err)
+
+	err = store.User().Create(&portainer.User{ID: 1})
+	require.NoError(t, err)
+
+	jwtService.SetUserSessionDuration(time.Second)
+
+	token, _, err := jwtService.GenerateToken(&portainer.TokenData{ID: 1})
+	require.NoError(t, err)
+
+	apiKeyService := apikey.NewAPIKeyService(nil, nil)
+
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
+
+	r, err := http.NewRequest(http.MethodGet, "url", nil)
+	require.NoError(t, err)
+
+	r.Header.Add(jwtTokenHeader, "Bearer "+token)
+
+	r.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: token})
+
+	_, err = bouncer.JWTAuthLookup(r)
+	require.NoError(t, err)
+
+	_, err = bouncer.CookieAuthLookup(r)
+	require.NoError(t, err)
+
+	bouncer.RevokeJWT(token)
+
+	revokeLen := func() (l int) {
+		bouncer.revokedJWT.Range(func(key, value any) bool {
+			l++
+
+			return true
+		})
+
+		return l
+	}
+	require.Equal(t, 1, revokeLen())
+
+	_, err = bouncer.JWTAuthLookup(r)
+	require.Error(t, err)
+
+	_, err = bouncer.CookieAuthLookup(r)
+	require.Error(t, err)
+
+	time.Sleep(time.Second)
+
+	bouncer.cleanUpExpiredJWTPass()
+
+	require.Equal(t, 0, revokeLen())
 }
