@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -15,6 +16,9 @@ import (
 
 	"github.com/pkg/errors"
 )
+
+const apiKeyHeader = "X-API-KEY"
+const jwtTokenHeader = "Authorization"
 
 type (
 	BouncerService interface {
@@ -30,6 +34,7 @@ type (
 		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
 		JWTAuthLookup(*http.Request) (*portainer.TokenData, error)
+		RevokeJWT(string)
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses
@@ -37,6 +42,7 @@ type (
 		dataStore     dataservices.DataStore
 		jwtService    portainer.JWTService
 		apiKeyService apikey.APIKeyService
+		revokedJWT    sync.Map
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -52,16 +58,22 @@ type (
 	tokenLookup func(*http.Request) (*portainer.TokenData, error)
 )
 
-const apiKeyHeader = "X-API-KEY"
-const jwtTokenHeader = "Authorization"
+var (
+	ErrInvalidKey = errors.New("Invalid API key")
+	ErrRevokedJWT = errors.New("the JWT has been revoked")
+)
 
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
-	return &RequestBouncer{
+	b := &RequestBouncer{
 		dataStore:     dataStore,
 		jwtService:    jwtService,
 		apiKeyService: apiKeyService,
 	}
+
+	go b.cleanUpExpiredJWT()
+
+	return b
 }
 
 // PublicAccess defines a security check for public API endpoints.
@@ -317,9 +329,13 @@ func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.Tok
 		return nil, nil
 	}
 
-	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	tokenData, jti, _, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if _, ok := bouncer.revokedJWT.Load(jti); ok {
+		return nil, ErrRevokedJWT
 	}
 
 	return tokenData, nil
@@ -333,15 +349,44 @@ func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenD
 		return nil, nil
 	}
 
-	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	tokenData, jti, _, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if _, ok := bouncer.revokedJWT.Load(jti); ok {
+		return nil, ErrRevokedJWT
 	}
 
 	return tokenData, nil
 }
 
-var ErrInvalidKey = errors.New("Invalid API key")
+func (bouncer *RequestBouncer) RevokeJWT(token string) {
+	_, jti, exp, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	if err != nil {
+		return
+	}
+
+	bouncer.revokedJWT.Store(jti, exp)
+}
+
+func (bouncer *RequestBouncer) cleanUpExpiredJWTPass() {
+	bouncer.revokedJWT.Range(func(key, value any) bool {
+		if time.Now().After(value.(time.Time)) {
+			bouncer.revokedJWT.Delete(key)
+		}
+
+		return true
+	})
+}
+
+func (bouncer *RequestBouncer) cleanUpExpiredJWT() {
+	ticker := time.NewTicker(time.Hour)
+
+	for range ticker.C {
+		bouncer.cleanUpExpiredJWTPass()
+	}
+}
 
 // apiKeyLookup looks up an verifies an api-key by:
 // - computing the digest of the raw api-key

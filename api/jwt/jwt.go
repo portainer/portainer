@@ -103,7 +103,7 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.T
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
+func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, string, time.Time, error) {
 	scope := parseScope(token)
 	secret := service.secrets[scope]
 	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -119,10 +119,10 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 			user, err := service.dataStore.User().Read(portainer.UserID(cl.UserID))
 			if err != nil {
-				return nil, errInvalidJWTToken
+				return nil, "", time.Time{}, errInvalidJWTToken
 			}
 			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
-				return nil, errInvalidJWTToken
+				return nil, "", time.Time{}, errInvalidJWTToken
 			}
 
 			return &portainer.TokenData{
@@ -131,10 +131,11 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 				Role:                portainer.UserRole(cl.Role),
 				Token:               token,
 				ForceChangePassword: cl.ForceChangePassword,
-			}, nil
+			}, cl.Id, time.Unix(cl.ExpiresAt, 0), nil
 		}
 	}
-	return nil, errInvalidJWTToken
+
+	return nil, "", time.Time{}, errInvalidJWTToken
 }
 
 // parse a JWT token, fallback to defaultScope if no scope is present in the JWT
