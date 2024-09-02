@@ -241,8 +241,8 @@ github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8Hm
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/jpillora/ansi v1.0.3 h1:nn4Jzti0EmRfDxm7JtEs5LzCbNwd5sv+0aE+LdS9/ZQ=
 github.com/jpillora/ansi v1.0.3/go.mod h1:D2tT+6uzJvN1nBVQILYWkIdq7zG+b5gcFN5WI/VyjMY=
-github.com/jpillora/chisel v1.9.0 h1:pGZuxCZZ3W56Y2wX5bcXUvtB3r6wdaXRruJLAev8xzk=
-github.com/jpillora/chisel v1.9.0/go.mod h1:qvgGfFR9ZhiDoYJM4IM1omX1HLbQSkZag8miP9u4SsQ=
+github.com/jpillora/chisel v1.10.0 h1:qdA2YWr8FZoB/srgsuv+ALsm6Lk8NYef+zCfO0qUdVk=
+github.com/jpillora/chisel v1.10.0/go.mod h1:JwsnHmvXKfHGuu9kym97zq/9TMLBlTsS+Qpw4+/xE1U=
 github.com/jpillora/requestlog v1.0.0 h1:bg++eJ74T7DYL3DlIpiwknrtfdUA9oP/M4fL+PpqnyA=
 github.com/jpillora/requestlog v1.0.0/go.mod h1:HTWQb7QfDc2jtHnWe2XEIEeJB7gJPnVdpNn52HXPvy8=
 github.com/jpillora/sizestr v1.0.0 h1:4tr0FLxs1Mtq3TnsLDV+GYUWG7Q26a6s+tV5Zfw2ygw=
