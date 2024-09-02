@@ -7,9 +7,10 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/portainer/portainer/api/internal/securecookie"
+
+	"github.com/gofrs/uuid"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog/log"
 )
 
@@ -174,6 +175,11 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
 	}
 
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return "", fmt.Errorf("unable to generate the JWT ID: %w", err)
+	}
+
 	cl := claims{
 		UserID:              int(data.ID),
 		Username:            data.Username,
@@ -181,6 +187,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		Scope:               scope,
 		ForceChangePassword: data.ForceChangePassword,
 		StandardClaims: jwt.StandardClaims{
+			Id:        uuid.String(),
 			ExpiresAt: expiresAt,
 			IssuedAt:  time.Now().Unix(),
 		},
