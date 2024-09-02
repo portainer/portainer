@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 
+	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -145,7 +146,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	}, cl.ID, cl.ExpiresAt.Time, nil
 }
 
-// parse a JWT token, fallback to defaultScope if no scope is present in the JWT
+// Parse a JWT token, fallback to defaultScope if no scope is present in the JWT
 func parseScope(token string) scope {
 	unverifiedToken, _, _ := new(jwt.Parser).ParseUnverified(token, &claims{})
 	if unverifiedToken == nil {
@@ -180,6 +181,11 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		expiresAt = time.Now().Add(99 * year)
 	}
 
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return "", fmt.Errorf("unable to generate the JWT ID: %w", err)
+	}
+
 	cl := claims{
 		UserID:              int(data.ID),
 		Username:            data.Username,
@@ -187,6 +193,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		Scope:               scope,
 		ForceChangePassword: data.ForceChangePassword,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        uuid.String(),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
