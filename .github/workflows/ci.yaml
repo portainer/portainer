@@ -33,7 +33,6 @@ jobs:
           - { platform: linux, arch: arm64, version: "" }
           - { platform: linux, arch: arm, version: "" }
           - { platform: linux, arch: ppc64le, version: "" }
-          - { platform: linux, arch: s390x, version: "" }
           - { platform: windows, arch: amd64, version: 1809 }
           - { platform: windows, arch: amd64, version: ltsc2022 }
     runs-on: ubuntu-latest
@@ -151,25 +150,17 @@ jobs:
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-ppc64le" \
-            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-s390x" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-windows1809-amd64" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-windowsltsc2022-amd64"
           
           docker buildx imagetools create -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64-alpine" \
             "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
-            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine" \
+            "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-ppc64le-alpine"
             
           if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
             docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" \
               "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-ppc64le" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-s390x"
-            
-            docker buildx imagetools create -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-amd64-alpine" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64-alpine" \
-              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm-alpine"
+              "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-linux-arm64"
           fi
