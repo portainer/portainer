@@ -14,6 +14,7 @@ type Deployer interface {
 	Pull(ctx context.Context, filePaths []string, options Options) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
 	WaitForStatus(ctx context.Context, name string, status Status) <-chan WaitResult
+	Config(ctx context.Context, filePaths []string, options Options) ([]byte, error)
 }
 
 type Status string
