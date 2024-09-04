@@ -48,6 +48,8 @@ type Options struct {
 	// By default, it is an empty string, which means it corresponds to the path of the compose file itself.
 	// This is particularly helpful when mounting a relative path.
 	ProjectDir string
+	// ConfigOptions is a list of options to pass to the docker-compose config command
+	ConfigOptions []string
 }
 
 type DeployOptions struct {
