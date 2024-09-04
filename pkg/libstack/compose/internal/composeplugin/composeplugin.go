@@ -94,7 +94,7 @@ func (wrapper *PluginWrapper) Pull(ctx context.Context, filePaths []string, opti
 
 // Validate stack file
 func (wrapper *PluginWrapper) Validate(ctx context.Context, filePaths []string, options libstack.Options) error {
-	output, err := wrapper.command(newValidateCommand(filePaths), options)
+	output, err := wrapper.Config(ctx, filePaths, options)
 	if len(output) != 0 {
 		if err != nil {
 			return err
@@ -108,6 +108,10 @@ func (wrapper *PluginWrapper) Validate(ctx context.Context, filePaths []string, 
 	}
 
 	return err
+}
+
+func (wrapper *PluginWrapper) Config(ctx context.Context, filePaths []string, options libstack.Options) ([]byte, error) {
+	return wrapper.command(newValidateCommand(filePaths), options)
 }
 
 // Command execute a docker-compose command
