@@ -31,7 +31,7 @@ func TestConcurrentTeamCreation(t *testing.T) {
 
 	n := 100
 
-	for range n {
+	for i := 0; i < n; i++ {
 		errGroup.Go(func() error {
 			req, err := http.NewRequest(http.MethodPost, "/teams", bytes.NewReader(m))
 			if err != nil {
