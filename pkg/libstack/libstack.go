@@ -14,6 +14,7 @@ type Deployer interface {
 	Pull(ctx context.Context, filePaths []string, options Options) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
 	WaitForStatus(ctx context.Context, name string, status Status) <-chan WaitResult
+	Config(ctx context.Context, filePaths []string, options Options) ([]byte, error)
 }
 
 type Status string
@@ -47,6 +48,8 @@ type Options struct {
 	// By default, it is an empty string, which means it corresponds to the path of the compose file itself.
 	// This is particularly helpful when mounting a relative path.
 	ProjectDir string
+	// ConfigOptions is a list of options to pass to the docker-compose config command
+	ConfigOptions []string
 }
 
 type DeployOptions struct {

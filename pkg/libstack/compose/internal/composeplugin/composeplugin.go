@@ -110,6 +110,11 @@ func (wrapper *PluginWrapper) Validate(ctx context.Context, filePaths []string, 
 	return err
 }
 
+func (wrapper *PluginWrapper) Config(ctx context.Context, filePaths []string, options libstack.Options) ([]byte, error) {
+	configArgs := append([]string{"config"}, options.ConfigOptions...)
+	return wrapper.command(newCommand(configArgs, filePaths), options)
+}
+
 // Command execute a docker-compose command
 func (wrapper *PluginWrapper) command(command composeCommand, options libstack.Options) ([]byte, error) {
 	program := utils.ProgramPath(wrapper.binaryPath, "docker-compose")
