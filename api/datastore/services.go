@@ -402,7 +402,6 @@ type storeExport struct {
 }
 
 func (store *Store) Export(filename string) (err error) {
-
 	backup := storeExport{}
 
 	if c, err := store.CustomTemplate().ReadAll(); err != nil {
@@ -606,6 +605,7 @@ func (store *Store) Export(filename string) (err error) {
 	if err != nil {
 		return err
 	}
+
 	return os.WriteFile(filename, b, 0600)
 }
 

@@ -80,7 +80,10 @@ func (tx *StoreTx) TeamMembership() dataservices.TeamMembershipService {
 	return tx.store.TeamMembershipService.Tx(tx.tx)
 }
 
-func (tx *StoreTx) Team() dataservices.TeamService                 { return nil }
+func (tx *StoreTx) Team() dataservices.TeamService {
+	return tx.store.TeamService.Tx(tx.tx)
+}
+
 func (tx *StoreTx) TunnelServer() dataservices.TunnelServerService { return nil }
 
 func (tx *StoreTx) User() dataservices.UserService {
