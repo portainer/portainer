@@ -15,9 +15,9 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type mockPasswordStrenghtChecker struct{}
+type mockPasswordStrengthChecker struct{}
 
-func (m *mockPasswordStrenghtChecker) Check(string) bool {
+func (m *mockPasswordStrengthChecker) Check(string) bool {
 	return true
 }
 
@@ -25,7 +25,7 @@ func TestConcurrentUserCreation(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, true, false)
 
 	h := &Handler{
-		passwordStrengthChecker: &mockPasswordStrenghtChecker{},
+		passwordStrengthChecker: &mockPasswordStrengthChecker{},
 		CryptoService:           &crypto.Service{},
 		DataStore:               store,
 	}
