@@ -31,6 +31,12 @@ View [this](https://www.portainer.io/products) table to see all of the Portainer
 - [Portainer CE for Docker / Docker Swarm](https://www.portainer.io/solutions/docker)
 - [Portainer CE for Kubernetes](https://www.portainer.io/solutions/kubernetes-ui)
 
+## One-click Deployment
+
+You can deploy Portainer on Elestio using one-click-deployment.
+
+[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/portainer)
+
 ## Getting help
 
 Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
