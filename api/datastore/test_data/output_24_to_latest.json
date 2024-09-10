@@ -601,7 +601,7 @@
       "RequiredPasswordLength": 12
     },
     "KubeconfigExpiry": "0",
-    "KubectlShellImage": "portainer/kubectl-shell",
+    "KubectlShellImage": "portainer/kubectl-shell:2.22.0",
     "LDAPSettings": {
       "AnonymousMode": true,
       "AutoCreateUsers": true,

@@ -1611,7 +1611,7 @@ const (
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
-	DefaultKubectlShellImage = "portainer/kubectl-shell"
+	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
