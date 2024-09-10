@@ -101,14 +101,14 @@ jobs:
         run: |
           if [ "${{ matrix.config.platform }}" == "windows" ]; then
             mv dist/portainer dist/portainer.exe
-            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} --build-arg OSVERSION=${{ matrix.config.version }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+            docker buildx build --output=type=registry --attest type=sbom,generator=docker/scout-sbom-indexer:latest --attest type=provenance,mode=max --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} --build-arg OSVERSION=${{ matrix.config.version }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
           else 
-            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
-            docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
+            docker buildx build --output=type=registry --attest type=sbom,generator=docker/scout-sbom-indexer:latest --attest type=provenance,mode=max --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+            docker buildx build --output=type=registry --attest type=sbom,generator=docker/scout-sbom-indexer:latest --attest type=provenance,mode=max --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${DOCKER_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             
             if [[ "${GITHUB_REF_NAME}" =~ ^release/.*$ ]]; then
-              docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
-              docker buildx build --output=type=registry --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
+              docker buildx build --output=type=registry --attest type=sbom,generator=docker/scout-sbom-indexer:latest --attest type=provenance,mode=max --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}" -f build/${{ matrix.config.platform }}/Dockerfile .
+              docker buildx build --output=type=registry --attest type=sbom,generator=docker/scout-sbom-indexer:latest --attest type=provenance,mode=max --platform ${{ matrix.config.platform }}/${{ matrix.config.arch }} -t "${EXTENSION_HUB_REPO}:${CONTAINER_IMAGE_TAG}-alpine" -f build/${{ matrix.config.platform }}/alpine.Dockerfile .
             fi
           fi
         env:
