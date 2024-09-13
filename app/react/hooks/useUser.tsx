@@ -101,7 +101,7 @@ export function useAuthorizations(
   forceEnvironmentId?: EnvironmentId,
   adminOnlyCE = false
 ) {
-  const { user } = useCurrentUser();
+  const { user, isPureAdmin } = useCurrentUser();
   const {
     params: { endpointId },
   } = useCurrentStateAndParams();
@@ -110,6 +110,10 @@ export function useAuthorizations(
 
   if (!user) {
     return { authorized: false, isLoading: false };
+  }
+
+  if (isBE && isPureAdmin) {
+    return { authorized: true, isLoading: false };
   }
 
   if (envQuery.isLoading || isAdminQuery.isLoading) {
