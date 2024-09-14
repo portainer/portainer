@@ -6,8 +6,6 @@ import {
   withError,
   withInvalidate,
 } from '@/react-tools/react-query';
-import { getServices } from '@/react/kubernetes/networks/services/service';
-import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import {
   getIngresses,
@@ -55,72 +53,23 @@ export function useIngress(
 
 export function useIngresses(
   environmentId: EnvironmentId,
-  namespaces?: string[],
-  options?: { autoRefreshRate?: number }
+  options?: {
+    autoRefreshRate?: number;
+    enabled?: boolean;
+    withServices?: boolean;
+  }
 ) {
+  const withServices = options?.withServices ?? false;
+
   return useQuery(
-    [
-      'environments',
-      environmentId,
-      'kubernetes',
-      'namespace',
-      namespaces,
-      'ingress',
-    ],
-    async () => {
-      if (!namespaces?.length) {
-        return [];
-      }
-      const settledIngressesPromise = await Promise.allSettled(
-        namespaces.map((namespace) => getIngresses(environmentId, namespace))
-      );
-      const ingresses = settledIngressesPromise
-        .filter(isFulfilled)
-        ?.map((i) => i.value);
-      // flatten the array and remove empty ingresses
-      const filteredIngresses = ingresses.flat().filter((ing) => ing);
-
-      // get all services in only the namespaces that the ingresses are in to find missing services
-      const uniqueNamespacesWithIngress = [
-        ...new Set(filteredIngresses.map((ing) => ing?.Namespace)),
-      ];
-      const settledServicesPromise = await Promise.allSettled(
-        uniqueNamespacesWithIngress.map((ns) => getServices(environmentId, ns))
-      );
-      const services = settledServicesPromise
-        .filter(isFulfilled)
-        ?.map((s) => s.value)
-        .flat();
-
-      // check if each ingress path service has a service that still exists
-      const updatedFilteredIngresses: Ingress[] = filteredIngresses.map(
-        (ing) => {
-          const servicesInNamespace = services?.filter(
-            (service) => service?.Namespace === ing?.Namespace
-          );
-          const serviceNamesInNamespace = servicesInNamespace?.map(
-            (service) => service.Name
-          );
-
-          const updatedPaths =
-            ing.Paths?.map((path) => {
-              const hasService = serviceNamesInNamespace?.includes(
-                path.ServiceName
-              );
-              return { ...path, HasService: hasService };
-            }) || null;
-
-          return { ...ing, Paths: updatedPaths };
-        }
-      );
-      return updatedFilteredIngresses;
-    },
+    ['environments', environmentId, 'kubernetes', 'ingress', withServices],
+    async () => getIngresses(environmentId, options?.withServices),
     {
-      enabled: !!namespaces?.length,
       ...withError('Unable to get ingresses'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
+      enabled: options?.enabled,
     }
   );
 }

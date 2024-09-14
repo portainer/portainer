@@ -20,11 +20,14 @@ export async function getIngress(
 
 export async function getIngresses(
   environmentId: EnvironmentId,
-  namespace: string
+  withServices?: boolean
 ) {
   try {
-    const { data: ingresses } = await axios.get<Ingress[]>(
-      buildUrl(environmentId, namespace)
+    const params = withServices ? { withServices: true } : {};
+
+    const { data: ingresses } = await axios.get(
+      `kubernetes/${environmentId}/ingresses`,
+      { params }
     );
     return ingresses;
   } catch (e) {
