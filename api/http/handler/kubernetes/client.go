@@ -14,17 +14,17 @@ import (
 func (handler *Handler) prepareKubeClient(r *http.Request) (*cli.KubeClient, *httperror.HandlerError) {
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		return nil, httperror.InternalServerError("an error occurred during the prepareKubeClient operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return nil, httperror.NotFound("an error occurred during the getKubernetesNamespaces operation, unable to find the Kubernetes endpoint associated to the request. Error: ", err)
+		return nil, httperror.NotFound("an error occurred during the prepareKubeClient operation, unable to find the Kubernetes endpoint associated to the request. Error: ", err)
 	}
 
 	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
+		return nil, httperror.InternalServerError("an error occurred during the prepareKubeClient operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
 	}
 	pcli.IsKubeAdmin = cli.IsKubeAdmin
 	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
