@@ -130,9 +130,15 @@ func (kcl *KubeClient) fetchIngresses(namespace string) ([]models.K8sIngressInfo
 	}
 
 	results := []models.K8sIngressInfo{}
+	if len(ingresses.Items) == 0 {
+		return results, nil
+	}
+
 	for _, ingress := range ingresses.Items {
 		result := parseIngress(ingress)
-		result.Type = findUsedIngressFromIngressClasses(ingressClasses, *ingress.Spec.IngressClassName).Name
+		if ingress.Spec.IngressClassName != nil {
+			result.Type = findUsedIngressFromIngressClasses(ingressClasses, *ingress.Spec.IngressClassName).Name
+		}
 		results = append(results, result)
 	}
 
@@ -141,6 +147,11 @@ func (kcl *KubeClient) fetchIngresses(namespace string) ([]models.K8sIngressInfo
 
 // parseIngress converts a k8s native ingress object to a Portainer K8sIngressInfo object.
 func parseIngress(ingress netv1.Ingress) models.K8sIngressInfo {
+	ingressClassName := ""
+	if ingress.Spec.IngressClassName != nil {
+		ingressClassName = *ingress.Spec.IngressClassName
+	}
+
 	result := models.K8sIngressInfo{
 		Name:         ingress.Name,
 		Namespace:    ingress.Namespace,
@@ -148,7 +159,7 @@ func parseIngress(ingress netv1.Ingress) models.K8sIngressInfo {
 		Annotations:  ingress.Annotations,
 		Labels:       ingress.Labels,
 		CreationDate: ingress.CreationTimestamp.Time,
-		ClassName:    *ingress.Spec.IngressClassName,
+		ClassName:    ingressClassName,
 	}
 
 	for _, tls := range ingress.Spec.TLS {
