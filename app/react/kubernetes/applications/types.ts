@@ -8,8 +8,9 @@ import {
   ReplicaSet,
   ControllerRevision,
 } from 'kubernetes-types/apps/v1';
-import { Pod, PodList } from 'kubernetes-types/core/v1';
+import { Container, Pod, PodList, Volume } from 'kubernetes-types/core/v1';
 import { RawExtension } from 'kubernetes-types/runtime';
+import { OwnerReference } from 'kubernetes-types/meta/v1';
 
 import { EnvVarValues } from '@@/form-components/EnvironmentVariablesFieldset';
 
@@ -90,3 +91,30 @@ export type KubernetesStack = {
   >;
   Highlighted: boolean;
 };
+
+export interface ConfigmapRef {
+  name: string;
+}
+
+export interface ValueFrom {
+  configMapRef?: ConfigmapRef;
+  secretRef?: ConfigmapRef;
+}
+
+export interface Job {
+  name?: string;
+  namespace: string;
+  creationDate?: Date;
+  uid?: string;
+  containers: Container[];
+}
+
+export interface K8sPod extends Job {
+  ownerReferences: OwnerReference[];
+  volumes?: Volume[];
+  nodeName?: string;
+}
+
+export interface CronJob extends Job {
+  schedule: string;
+}

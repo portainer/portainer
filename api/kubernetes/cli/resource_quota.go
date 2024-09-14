@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,7 +31,7 @@ func (kcl *KubeClient) fetchResourceQuotasForNonAdmin(namespace string) (*[]core
 	}
 
 	resourceQuotas, err := kcl.fetchResourceQuotas(namespace)
-	if err != nil {
+	if err != nil && !k8serrors.IsNotFound(err) {
 		return nil, err
 	}
 
@@ -54,8 +55,8 @@ func (kcl *KubeClient) fetchResourceQuotas(namespace string) (*[]corev1.Resource
 	return &resourceQuotas.Items, nil
 }
 
-// GetPortainerResourceQuota gets the resource quota prefixed with "portainer-rq-" in a specific namespace.
-// this is to fetch a specific resource quota created by Portainer.
+// GetPortainerResourceQuota gets the resource quota for the portainer namespace.
+// The resource quota is prefixed with "portainer-rq-".
 func (kcl *KubeClient) GetPortainerResourceQuota(namespace string) (*corev1.ResourceQuota, error) {
 	return kcl.cli.CoreV1().ResourceQuotas(namespace).Get(context.TODO(), "portainer-rq-"+namespace, metav1.GetOptions{})
 }

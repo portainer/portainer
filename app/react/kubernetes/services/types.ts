@@ -12,9 +12,9 @@ type IngressStatus = {
 };
 
 type Application = {
-  UID: string;
-  Name: string;
-  Type: string;
+  uid: string;
+  name: string;
+  kind: string;
 };
 
 export type ServiceType =
@@ -36,10 +36,10 @@ export type Service = {
   IngressStatus?: Array<IngressStatus>;
   ExternalName?: string;
   ExternalIPs?: Array<string>;
-  CreationTimestamp: string;
+  CreationDate: string;
   Applications?: Application[];
 
-  IsSystem?: boolean;
+  IsSystem: boolean;
 };
 
 export type NodeMetrics = {
