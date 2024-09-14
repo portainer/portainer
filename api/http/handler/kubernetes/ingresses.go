@@ -13,7 +13,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-// @id getKubernetesIngressControllers
+// @id getAllKubernetesIngressControllers
 // @summary Get a list of ingress controllers
 // @description Get a list of ingress controllers for the given environment
 // @description **Access policy**: Authenticated user.
@@ -28,7 +28,7 @@ import (
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve ingress controllers"
 // @router /kubernetes/{id}/ingresscontrollers [get]
-func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve environment identifier from request. Error: ", err)
@@ -451,7 +451,7 @@ PayloadLoop:
 	return response.Empty(w)
 }
 
-// @id GetKubernetesClusterIngresses
+// @id GetAllKubernetesClusterIngresses
 // @summary Get kubernetes ingresses at the cluster level
 // @description Get kubernetes ingresses at the cluster level for the provided environment
 // @description **Access policy**: Authenticated user.
@@ -467,7 +467,7 @@ PayloadLoop:
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve ingresses"
 // @router /kubernetes/{id}/ingresses [get]
-func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) GetAllKubernetesClusterIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	ingresses, err := handler.getKubernetesClusterIngresses(r)
 	if err != nil {
 		return err
@@ -476,7 +476,7 @@ func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *
 	return response.JSON(w, ingresses)
 }
 
-// @id getKubernetesClusterIngressesCount
+// @id getAllKubernetesClusterIngressesCount
 // @summary Get the number of kubernetes ingresses within the given environment
 // @description Get the number of kubernetes ingresses within the given environment
 // @description **Access policy**: Authenticated users only.
@@ -489,7 +489,7 @@ func (handler *Handler) GetKubernetesClusterIngresses(w http.ResponseWriter, r *
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve ingresses count"
 // @router /kubernetes/{id}/ingresses/count [get]
-func (handler *Handler) getKubernetesClusterIngressesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) getAllKubernetesClusterIngressesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	ingresses, err := handler.getKubernetesClusterIngresses(r)
 	if err != nil {
 		return err
