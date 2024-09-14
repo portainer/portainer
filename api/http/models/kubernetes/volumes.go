@@ -26,6 +26,7 @@ type (
 	}
 
 	K8sPersistentVolumeClaim struct {
+		ID                 string                              `json:"id"`
 		Name               string                              `json:"name"`
 		Namespace          string                              `json:"namespace"`
 		Storage            int64                               `json:"storage"`
@@ -33,7 +34,7 @@ type (
 		AccessModes        []corev1.PersistentVolumeAccessMode `json:"accessModes,omitempty"`
 		VolumeName         string                              `json:"volumeName"`
 		ResourcesRequests  *corev1.ResourceList                `json:"resourcesRequests"`
-		StorageClassName   *string                             `json:"storageClassName"`
+		StorageClass       *string                             `json:"storageClass"`
 		VolumeMode         *corev1.PersistentVolumeMode        `json:"volumeMode"`
 		OwningApplications []K8sApplication                    `json:"owningApplications,omitempty"`
 		Phase              corev1.PersistentVolumeClaimPhase   `json:"phase"`

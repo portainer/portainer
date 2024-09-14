@@ -19,7 +19,7 @@ import (
 // It returns a list of K8sVolumeInfo.
 func (kcl *KubeClient) GetVolumes(namespace string) ([]models.K8sVolumeInfo, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchVolumesForAdmin(namespace)
+		return kcl.fetchVolumes(namespace)
 	}
 	return kcl.fetchVolumesForNonAdmin(namespace)
 }
@@ -45,13 +45,6 @@ func (kcl *KubeClient) GetVolume(namespace, volumeName string) (*models.K8sVolum
 
 	volume := parseVolume(persistentVolumeClaim, persistentVolumesMap, storageClassesMap)
 	return &volume, nil
-}
-
-// fetchVolumesForAdmin fetches all the volumes in the cluster.
-// This function is called when the user is an admin.
-// It fetches all the persistent volume claims, persistent volumes and storage classes in the cluster.
-func (kcl *KubeClient) fetchVolumesForAdmin(namespace string) ([]models.K8sVolumeInfo, error) {
-	return kcl.fetchVolumes(namespace)
 }
 
 // fetchVolumesForNonAdmin fetches the volumes in the namespaces the user has access to.
@@ -118,8 +111,8 @@ func parseVolume(persistentVolumeClaim *corev1.PersistentVolumeClaim, persistent
 		}
 	}
 
-	if volumeClaim.StorageClassName != nil {
-		storageClass, ok := storageClassesMap[*volumeClaim.StorageClassName]
+	if volumeClaim.StorageClass != nil {
+		storageClass, ok := storageClassesMap[*volumeClaim.StorageClass]
 		if ok {
 			volume.StorageClass = storageClass
 		}
@@ -135,6 +128,7 @@ func parseVolume(persistentVolumeClaim *corev1.PersistentVolumeClaim, persistent
 func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8sPersistentVolumeClaim {
 	storage := volume.Spec.Resources.Requests[corev1.ResourceStorage]
 	return models.K8sPersistentVolumeClaim{
+		ID:                 string(volume.UID),
 		Name:               volume.Name,
 		Namespace:          volume.Namespace,
 		CreationDate:       volume.CreationTimestamp.Time,
@@ -142,7 +136,7 @@ func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8s
 		AccessModes:        volume.Spec.AccessModes,
 		VolumeName:         volume.Spec.VolumeName,
 		ResourcesRequests:  &volume.Spec.Resources.Requests,
-		StorageClassName:   volume.Spec.StorageClassName,
+		StorageClass:       volume.Spec.StorageClassName,
 		VolumeMode:         volume.Spec.VolumeMode,
 		OwningApplications: nil,
 		Phase:              volume.Status.Phase,
