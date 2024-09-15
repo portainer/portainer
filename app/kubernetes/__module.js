@@ -582,6 +582,51 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const moreResources = {
+      name: 'kubernetes.moreResources',
+      url: '/moreResources',
+      abstract: true,
+    };
+
+    const serviceAccounts = {
+      name: 'kubernetes.moreResources.serviceAccounts',
+      url: '/serviceAccounts',
+      views: {
+        'content@': {
+          component: 'serviceAccountsView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/service-accounts',
+      },
+    };
+
+    const clusterRoles = {
+      name: 'kubernetes.moreResources.clusterRoles',
+      url: '/clusterRoles?tab',
+      views: {
+        'content@': {
+          component: 'clusterRolesView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/cluster-roles',
+      },
+    };
+
+    const roles = {
+      name: 'kubernetes.moreResources.roles',
+      url: '/roles?tab',
+      views: {
+        'content@': {
+          component: 'k8sRolesView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/namespace-roles',
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(applications);
@@ -621,5 +666,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(ingresses);
     $stateRegistryProvider.register(ingressesCreate);
     $stateRegistryProvider.register(ingressesEdit);
+
+    $stateRegistryProvider.register(moreResources);
+    $stateRegistryProvider.register(serviceAccounts);
+    $stateRegistryProvider.register(clusterRoles);
+    $stateRegistryProvider.register(roles);
   },
 ]);

@@ -51,6 +51,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	endpointRouter.Use(h.kubeClientMiddleware)
 
+	endpointRouter.Handle("/cluster_roles", httperror.LoggerHandler(h.getAllKubernetesClusterRoles)).Methods(http.MethodGet)
+	endpointRouter.Handle("/cluster_role_bindings", httperror.LoggerHandler(h.getAllKubernetesClusterRoleBindings)).Methods(http.MethodGet)
 	endpointRouter.Handle("/configmaps", httperror.LoggerHandler(h.GetAllKubernetesConfigMaps)).Methods(http.MethodGet)
 	endpointRouter.Handle("/configmaps/count", httperror.LoggerHandler(h.getAllKubernetesConfigMapsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.getKubernetesDashboard)).Methods(http.MethodGet)
@@ -71,6 +73,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/secrets/count", httperror.LoggerHandler(h.getAllKubernetesSecretsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/services/delete", httperror.LoggerHandler(h.deleteKubernetesServices)).Methods(http.MethodPost)
 	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.isRBACEnabled)).Methods(http.MethodGet)
+	endpointRouter.Handle("/roles", httperror.LoggerHandler(h.getAllKubernetesRoles)).Methods(http.MethodGet)
+	endpointRouter.Handle("/role_bindings", httperror.LoggerHandler(h.getAllKubernetesRoleBindings)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.updateKubernetesNamespace)).Methods(http.MethodPut)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.getKubernetesNamespaces)).Methods(http.MethodGet)
