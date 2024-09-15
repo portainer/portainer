@@ -18,9 +18,9 @@ func Test_GetServiceAccount(t *testing.T) {
 			instanceID: "test",
 		}
 		tokenData := &portainer.TokenData{ID: 1}
-		_, err := k.GetServiceAccount(tokenData)
+		_, err := k.GetPortainerUserServiceAccount(tokenData)
 		if err == nil {
-			t.Error("GetServiceAccount should fail with service account not found")
+			t.Error("GetPortainerUserServiceAccount should fail with service account not found")
 		}
 	})
 
@@ -46,9 +46,9 @@ func Test_GetServiceAccount(t *testing.T) {
 		}
 		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
-		sa, err := k.GetServiceAccount(tokenData)
+		sa, err := k.GetPortainerUserServiceAccount(tokenData)
 		if err != nil {
-			t.Errorf("GetServiceAccount should succeed; err=%s", err)
+			t.Errorf("GetPortainerUserServiceAccount should succeed; err=%s", err)
 		}
 
 		want := "portainer-sa-clusteradmin"
@@ -79,14 +79,14 @@ func Test_GetServiceAccount(t *testing.T) {
 		}
 		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
-		sa, err := k.GetServiceAccount(tokenData)
+		sa, err := k.GetPortainerUserServiceAccount(tokenData)
 		if err != nil {
-			t.Errorf("GetServiceAccount should succeed; err=%s", err)
+			t.Errorf("GetPortainerUserServiceAccount should succeed; err=%s", err)
 		}
 
 		want := "portainer-sa-user-test-1"
 		if sa.Name != want {
-			t.Errorf("GetServiceAccount should succeed and return correct sa name; got=%s want=%s", sa.Name, want)
+			t.Errorf("GetPortainerUserServiceAccount should succeed and return correct sa name; got=%s want=%s", sa.Name, want)
 		}
 	})
 
