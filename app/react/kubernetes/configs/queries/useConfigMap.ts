@@ -9,14 +9,17 @@ import { Configuration } from '../types';
 import { configMapQueryKeys } from './query-keys';
 import { ConfigMapQueryParams } from './types';
 
-export function useConfigMapsForCluster(
+export function useConfigMap(
   environmentId: EnvironmentId,
+  namespace: string,
+  configMap: string,
   options?: { autoRefreshRate?: number } & ConfigMapQueryParams
 ) {
-  const { autoRefreshRate, ...params } = options ?? {};
+  console.log(environmentId, namespace, configMap, options);
+
   return useQuery(
-    configMapQueryKeys.configMapsForCluster(environmentId, params),
-    () => getConfigMapsForCluster(environmentId, { ...params, isUsed: params?.isUsed }),
+    configMapQueryKeys.configMap(environmentId, namespace, configMap),
+    () => getConfigMap(environmentId, namespace, configMap, { withData: true }),
     {
       ...withError('Unable to retrieve ConfigMaps for cluster'),
       refetchInterval() {
@@ -26,14 +29,16 @@ export function useConfigMapsForCluster(
   );
 }
 
-// get all configmaps for a cluster
-async function getConfigMapsForCluster(
+// get a configmap
+async function getConfigMap(
   environmentId: EnvironmentId,
-  params?: { withData?: boolean; isUsed?: boolean }
+  namespace: string,
+  configMap: string,
+  params?: { withData?: boolean; }
 ) {
   try {
     const { data } = await axios.get<Configuration[]>(
-      `/kubernetes/${environmentId}/configmaps`,
+      `/kubernetes/${environmentId}/${namespace}/configmaps/${configMap}`,
       { params }
     );
     return data;

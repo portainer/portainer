@@ -17,6 +17,7 @@ type (
 		CreationDate        string                   `json:"CreationDate"`
 		Annotations         map[string]string        `json:"Annotations"`
 		Data                map[string]string        `json:"Data"`
+		IsUsed              bool                     `json:"IsUsed"`
 		ConfigurationOwners []K8sConfigurationOwners `json:"ConfigurationOwners"`
 	}
 

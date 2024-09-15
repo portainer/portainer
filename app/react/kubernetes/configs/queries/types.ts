@@ -1,1 +1,2 @@
-export type ConfigMapQueryParams = { withData?: boolean; withSystem?: boolean };
+export type ConfigMapQueryParams = { isUsed?: boolean; };
+export type SecretQueryParams = { isUsed?: boolean; };

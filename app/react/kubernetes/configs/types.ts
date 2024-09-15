@@ -8,9 +8,9 @@ export interface Configuration {
   ConfigurationOwner: string; // username
   ConfigurationOwnerId: string; // user id
 
-  // Used: boolean;
+  IsUsed: boolean;
   Data?: Record<string, string>;
-  // Yaml: string;
+  Yaml: string;
 
   SecretType?: string;
   IsRegistrySecret?: boolean;

@@ -7,6 +7,7 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { useConfigMap } from '@/react/kubernetes/configs/queries/useConfigMap';
 
 import { pluralize } from '@/portainer/helpers/strings';
 
@@ -139,13 +140,18 @@ class KubernetesConfigMapController {
 
   async getConfigurationAsync() {
     try {
-      this.state.configurationLoading = true;
+      this.state.configurationLoading = true
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
+      const environmentId = this.$transition$.params().enviromentId;
+      
       try {
-        const configMap = await this.KubernetesConfigMapService.get(namespace, name);
-        this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap);
-        this.formValues.Data = configMap.Data;
+        // const configMap = await this.KubernetesConfigMapService.get(namespace, name);
+        // this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap);
+        // this.formValues.Data = configMap.Data;
+        console.log('useConfigMap', environmentId, namespace, name);
+        this.configuration = await useConfigMap(environmentId, namespace, name);
+        this.formValues.Data = this.configuration.Data;
       } catch (err) {
         if (err.status === 403) {
           this.$state.go('kubernetes.configurations', { tab: 'configmaps' });
@@ -153,7 +159,7 @@ class KubernetesConfigMapController {
         }
       }
 
-      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
+      this.formValues.ResourcePool = this.configuration.Namespace;
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
@@ -266,13 +272,9 @@ class KubernetesConfigMapController {
 
       this.formValues = new KubernetesConfigurationFormValues();
 
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
-
       const configuration = await this.getConfiguration();
       if (configuration) {
-        await this.getApplications(this.configuration.Namespace);
         await this.getEvents(this.configuration.Namespace);
-        await this.getConfigurations();
       }
 
       this.tagUsedDataKeys();

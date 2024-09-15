@@ -113,7 +113,8 @@ func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8s
 		}
 
 		if len(applicationConfigurationOwners) > 0 {
-			configMap.ConfigurationOwners = applicationConfigurationOwners
+			updatedConfigMap.ConfigurationOwners = applicationConfigurationOwners
+			updatedConfigMap.IsUsed = true
 		}
 
 		updatedConfigMaps[index] = updatedConfigMap
