@@ -111,7 +111,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 	if !canManage {
 		errMsg := "stack deletion is disabled for non-admin users"
-		return httperror.Forbidden(errMsg, fmt.Errorf(errMsg))
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	// stop scheduler updates of the stack before removal
@@ -338,7 +338,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		}
 		if !canManage {
 			errMsg := "stack deletion is disabled for non-admin users"
-			return httperror.Forbidden(errMsg, fmt.Errorf(errMsg))
+			return httperror.Forbidden(errMsg, errors.New(errMsg))
 		}
 
 		stacksToDelete = append(stacksToDelete, stack)
