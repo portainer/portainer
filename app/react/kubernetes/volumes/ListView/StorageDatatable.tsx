@@ -31,6 +31,9 @@ const columns = [
   }),
   helper.accessor('size', {
     header: 'Usage',
+    cell: ({ row: { original: item } }) => {
+      return `${item.size}GiB`;      
+    }
   }),
 ];
 
