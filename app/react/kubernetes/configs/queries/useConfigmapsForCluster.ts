@@ -16,7 +16,11 @@ export function useConfigMapsForCluster(
   const { autoRefreshRate, ...params } = options ?? {};
   return useQuery(
     configMapQueryKeys.configMapsForCluster(environmentId, params),
-    () => getConfigMapsForCluster(environmentId, { ...params, isUsed: params?.isUsed }),
+    () =>
+      getConfigMapsForCluster(environmentId, {
+        ...params,
+        isUsed: params?.isUsed,
+      }),
     {
       ...withError('Unable to retrieve ConfigMaps for cluster'),
       refetchInterval() {

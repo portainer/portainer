@@ -15,8 +15,6 @@ export function useConfigMap(
   configMap: string,
   options?: { autoRefreshRate?: number } & ConfigMapQueryParams
 ) {
-  console.log(environmentId, namespace, configMap, options);
-
   return useQuery(
     configMapQueryKeys.configMap(environmentId, namespace, configMap),
     () => getConfigMap(environmentId, namespace, configMap, { withData: true }),
@@ -34,7 +32,7 @@ async function getConfigMap(
   environmentId: EnvironmentId,
   namespace: string,
   configMap: string,
-  params?: { withData?: boolean; }
+  params?: { withData?: boolean }
 ) {
   try {
     const { data } = await axios.get<Configuration[]>(

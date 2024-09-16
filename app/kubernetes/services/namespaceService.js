@@ -70,9 +70,7 @@ class KubernetesNamespaceService {
       // get the list of all namespaces with isAccessAllowed flags
       const namespacesWithAccess = await getNamespaces(this.$state.params.endpointId);
       const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
-      const namespaces = data.items.filter(
-        (item) => (!KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces)
-      );
+      const namespaces = data.items.filter((item) => !KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces);
       // parse the namespaces
       const visibleNamespaces = namespaces.map((item) => KubernetesNamespaceConverter.apiToNamespace(item));
       updateNamespaces(visibleNamespaces);

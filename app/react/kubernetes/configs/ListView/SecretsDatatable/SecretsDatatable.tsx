@@ -2,19 +2,14 @@ import { useMemo } from 'react';
 import { Lock } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import {
-  Authorized,
-  useAuthorizations,
-  useCurrentUser,
-} from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
-import { useEnvironment } from '@/react/portainer/environments/queries';
+import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -26,7 +21,6 @@ import { useSecretsForCluster } from '../../queries/useSecretsForCluster';
 import { useDeleteSecrets } from '../../queries/useDeleteSecrets';
 import { IndexOptional, Configuration } from '../../types';
 
-import { getIsSecretInUse } from './utils';
 import { SecretRowData } from './types';
 import { columns } from './columns';
 
@@ -34,32 +28,33 @@ const storageKey = 'k8sSecretsDatatable';
 const settingsStore = createStore(storageKey);
 
 export function SecretsDatatable() {
-  const environmentId = useEnvironmentId();
   const tableState = useTableState(settingsStore, storageKey);
   const { authorized: canWrite } = useAuthorizations(['K8sSecretsW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-
   const isAddSecretHidden = useIsDeploymentOptionHidden('form');
+
+  const environmentId = useEnvironmentId();
   const namespacesQuery = useNamespacesQuery(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
-
-  const withSystem = canAccessSystemResources && tableState.showSystemResources;
-
   const secretsQuery = useSecretsForCluster(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
-    isUsed: true
+    isUsed: true,
   });
 
+  const secrets = Object.values(secretsQuery.data ?? []);
+
+  const filteredSecrets = tableState.showSystemResources
+    ? secrets
+    : secrets.filter((item) => !isSystem(item));
+
   const secretRowData = useSecretRowData(
-    secretsQuery.data ?? [],
+    filteredSecrets ?? [],
     namespacesQuery.data
   );
-
-  const isEnvironmentAdminQuery = useAuthorizations('K8sClusterW');
 
   return (
     <Datatable<IndexOptional<SecretRowData>>
@@ -71,8 +66,8 @@ export function SecretsDatatable() {
       title="Secrets"
       titleIcon={Lock}
       getRowId={(row) => row.UID ?? ''}
-      isRowSelectable={(row) =>
-        !namespacesQuery.data?.[row.original.Namespace ?? '']?.IsSystem
+      isRowSelectable={({ original: item }) =>
+        canAccessSystemResources && !isSystem(item)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -94,13 +89,22 @@ export function SecretsDatatable() {
       data-cy="k8s-secrets-datatable"
     />
   );
+
+  function isSystem(configMap: Configuration): boolean {
+    return (
+      namespacesQuery.data?.some(
+        (namespace) =>
+          namespace.Name === configMap.Namespace && namespace.IsSystem
+      ) ?? false
+    );
+  }
 }
 
 // useSecretRowData appends the `inUse` property to the secret data (for the unused badge in the name column)
 // and wraps with useMemo to prevent unnecessary calculations
 function useSecretRowData(
   secrets: Configuration[],
-  namespaces?: Namespaces
+  namespaces?: PortainerNamespace[]
 ): SecretRowData[] {
   return useMemo(
     () =>
@@ -108,10 +112,11 @@ function useSecretRowData(
         (secret) =>
           ({
             ...secret,
-            inUse:
-              secret.IsUsed,
+            inUse: secret.IsUsed,
             isSystem: namespaces
-              ? namespaces?.[secret.Namespace ?? '']?.IsSystem
+              ? namespaces.find(
+                  (namespace) => namespace.Name === secret.Namespace
+                )?.IsSystem ?? false
               : false,
           }) ?? []
       ),

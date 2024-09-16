@@ -3,10 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { SecretQueryParams } from './types';
 
 import { Configuration } from '../types';
 
+import { SecretQueryParams } from './types';
 import { secretQueryKeys } from './query-keys';
 
 export function useSecretsForCluster(
@@ -16,7 +16,11 @@ export function useSecretsForCluster(
   const { autoRefreshRate, ...params } = options ?? {};
   return useQuery(
     secretQueryKeys.secretsForCluster(environmentId, params),
-    () => getSecretsForCluster(environmentId, { ...params, isUsed: params?.isUsed }),
+    () =>
+      getSecretsForCluster(environmentId, {
+        ...params,
+        isUsed: params?.isUsed,
+      }),
     {
       ...withError('Unable to retrieve secrets for cluster'),
       refetchInterval() {
@@ -36,7 +40,10 @@ async function getSecretsForCluster(
 
 // get all secrets for a cluster
 async function getSecrets(
-environmentId: EnvironmentId, withSystem?: boolean, params?: { withData?: boolean; isUsed?: boolean; } | undefined) {
+  environmentId: EnvironmentId,
+  withSystem?: boolean,
+  params?: { withData?: boolean; isUsed?: boolean } | undefined
+) {
   try {
     const { data } = await axios.get<Configuration[]>(
       `/kubernetes/${environmentId}/secrets`,

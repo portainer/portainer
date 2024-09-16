@@ -9,7 +9,7 @@ import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemR
 import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -20,6 +20,7 @@ import { DeleteButton } from '@@/buttons/DeleteButton';
 import { IndexOptional, Configuration } from '../../types';
 import { useDeleteConfigMaps } from '../../queries/useDeleteConfigMaps';
 import { useConfigMapsForCluster } from '../../queries/useConfigmapsForCluster';
+
 import { ConfigMapRowData } from './types';
 import { columns } from './columns';
 
@@ -35,18 +36,22 @@ export function ConfigMapsDatatable() {
   );
 
   const environmentId = useEnvironmentId();
-  const withSystem = canAccessSystemResources && tableState.showSystemResources;
-
   const namespacesQuery = useNamespacesQuery(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
   const configMapsQuery = useConfigMapsForCluster(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
-    isUsed: true
+    isUsed: true,
   });
 
+  const configMaps = Object.values(configMapsQuery.data ?? []);
+
+  const filteredConfigMaps = tableState.showSystemResources
+    ? configMaps
+    : configMaps.filter((item) => !isSystem(item));
+
   const configMapRowData = useConfigMapRowData(
-    configMapsQuery.data ?? [],
+    filteredConfigMaps,
     namespacesQuery.data
   );
 
@@ -60,8 +65,8 @@ export function ConfigMapsDatatable() {
       title="ConfigMaps"
       titleIcon={FileCode}
       getRowId={(row) => row.UID ?? ''}
-      isRowSelectable={(row) =>
-        !namespacesQuery.data?.[row.original.Namespace ?? '']?.IsSystem
+      isRowSelectable={({ original: item }) =>
+        canAccessSystemResources && !isSystem(item)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -80,20 +85,30 @@ export function ConfigMapsDatatable() {
       data-cy="k8s-configmaps-datatable"
     />
   );
+
+  function isSystem(configMap: Configuration): boolean {
+    return (
+      namespacesQuery.data?.some(
+        (namespace) =>
+          namespace.Name === configMap.Namespace && namespace.IsSystem
+      ) ?? false
+    );
+  }
 }
 
 function useConfigMapRowData(
   configMaps: Configuration[],
-  namespaces?: Namespaces,
+  namespaces?: PortainerNamespace[]
 ): ConfigMapRowData[] {
   return useMemo(
     () =>
       configMaps?.map((configMap) => ({
         ...configMap,
-        inUse:
-          configMap.IsUsed,
+        inUse: configMap.IsUsed,
         isSystem: namespaces
-          ? namespaces?.[configMap.Namespace ?? '']?.IsSystem
+          ? namespaces.find(
+              (namespace) => namespace.Name === configMap.Namespace
+            )?.IsSystem ?? false
           : false,
       })) || [],
     [configMaps, namespaces]

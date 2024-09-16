@@ -140,11 +140,11 @@ class KubernetesConfigMapController {
 
   async getConfigurationAsync() {
     try {
-      this.state.configurationLoading = true
+      this.state.configurationLoading = true;
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
       const environmentId = this.$transition$.params().enviromentId;
-      
+
       try {
         // const configMap = await this.KubernetesConfigMapService.get(namespace, name);
         // this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap);
