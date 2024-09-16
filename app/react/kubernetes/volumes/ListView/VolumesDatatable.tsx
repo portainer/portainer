@@ -18,16 +18,15 @@ import {
 } from '../../datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
+import { useAllVolumesQuery } from '../useVolumesQuery';
 
 import { VolumeViewModel } from './types';
 import { columns } from './columns';
 
 export function VolumesDatatable({
-  dataset,
   onRemove,
   onRefresh,
 }: {
-  dataset: Array<VolumeViewModel>;
   onRemove(items: Array<VolumeViewModel>): void;
   onRefresh(): void;
 }) {
@@ -47,15 +46,19 @@ export function VolumesDatatable({
   const envId = useEnvironmentId();
   const namespaceListQuery = useNamespacesQuery(envId);
 
-  const filteredDataset = tableState.showSystemResources
-    ? dataset
-    : dataset.filter((item) => !isSystem(item));
+  const volumesQuery = useAllVolumesQuery(envId);
+  const volumes = Object.values(volumesQuery.data ?? []);
+
+  const filteredVolumes = tableState.showSystemResources
+    ? volumes
+    : volumes.filter((item) => !isSystem(item));
 
   return (
     <Datatable
       noWidget
       data-cy="k8s-volumes-datatable"
-      dataset={filteredDataset}
+      isLoading={volumesQuery.isLoading}
+      dataset={filteredVolumes}
       columns={columns}
       settingsManager={tableState}
       title="Volumes"
@@ -89,7 +92,10 @@ export function VolumesDatatable({
   );
 
   function isSystem(item: VolumeViewModel) {
-    return !!namespaceListQuery.data?.[item.ResourcePool.Namespace.Name]
-      .IsSystem;
+    return namespaceListQuery.data?.some(
+      (namespace) =>
+        namespace.Name === item.ResourcePool.Namespace.Name &&
+        namespace.IsSystem
+    );
   }
 }

@@ -11,7 +11,7 @@ export interface VolumeViewModel {
       Name: string;
     };
     Storage?: unknown;
-    CreationDate: number;
+    CreationDate?: Date;
     ApplicationOwner?: string;
   };
   ResourcePool: {
@@ -22,6 +22,6 @@ export interface VolumeViewModel {
 }
 
 export type StorageClassViewModel = StorageClass & {
-  size: 0;
+  size: number;
   Volumes: Array<Volume>;
 };

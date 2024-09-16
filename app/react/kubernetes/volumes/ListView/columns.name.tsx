@@ -23,10 +23,12 @@ export function NameCell({
 }: CellContext<VolumeViewModel, string>) {
   const envId = useEnvironmentId();
   const namespaceListQuery = useNamespacesQuery(envId);
-  const isSystem =
-    namespaceListQuery.data?.[item.ResourcePool.Namespace.Name].IsSystem;
+  const isSystem = namespaceListQuery.data?.some(
+    (namespace) =>
+      namespace.Name === item.ResourcePool.Namespace.Name && namespace.IsSystem
+  );
   return (
-    <>
+    <div className="flex gap-x-1">
       <Link
         to="kubernetes.volumes.volume"
         params={{
@@ -45,6 +47,6 @@ export function NameCell({
           {!KubernetesVolumeHelper.isUsed(item) && <UnusedBadge />}
         </>
       )}
-    </>
+    </div>
   );
 }

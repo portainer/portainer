@@ -1,6 +1,8 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { HardDrive } from 'lucide-react';
 
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+
 import { TableSettingsMenu } from '@@/datatables';
 import {
   BasicTableSettings,
@@ -13,6 +15,8 @@ import { useRepeater } from '@@/datatables/useRepeater';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
+
+import { useAllStoragesQuery } from '../useVolumesQuery';
 
 import { StorageClassViewModel } from './types';
 
@@ -30,13 +34,7 @@ const columns = [
   }),
 ];
 
-export function StorageDatatable({
-  dataset,
-  onRefresh,
-}: {
-  dataset: Array<StorageClassViewModel>;
-  onRefresh: () => void;
-}) {
+export function StorageDatatable({ onRefresh }: { onRefresh: () => void }) {
   const tableState = useTableStateWithStorage<TableSettings>(
     'kubernetes.volumes.storages',
     'Name',
@@ -47,11 +45,15 @@ export function StorageDatatable({
 
   useRepeater(tableState.autoRefreshRate, onRefresh);
 
+  const envId = useEnvironmentId();
+  const storagesQuery = useAllStoragesQuery(envId);
+  const storages = Object.values(storagesQuery.data ?? []);
+
   return (
     <ExpandableDatatable
       noWidget
       disableSelect
-      dataset={dataset}
+      dataset={storages}
       columns={columns}
       title="Storage"
       titleIcon={HardDrive}

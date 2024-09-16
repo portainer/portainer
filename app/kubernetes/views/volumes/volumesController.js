@@ -93,8 +93,6 @@ class KubernetesVolumesController {
       isAdmin: this.Authentication.isAdmin(),
     };
 
-    await this.getVolumes();
-
     this.state.viewReady = true;
   }
 
