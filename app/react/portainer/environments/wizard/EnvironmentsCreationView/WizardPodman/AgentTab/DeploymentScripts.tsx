@@ -76,7 +76,8 @@ function linuxPodmanCommandRootful(agentVersion: string, agentSecret: string) {
   const secret =
     agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
 
-  return `sudo podman volume create portainer\n
+  return `sudo systemctl enable --now podman.socket\n
+sudo podman volume create portainer\n
 sudo podman run -d \\
 -p 9001:9001 ${secret}\\
 --name portainer_agent \\
@@ -94,7 +95,7 @@ function windowsMacPodmanCommandRootful(
   agentSecret: string
 ) {
   const secret =
-    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
+    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret}`;
 
   return `podman machine stop
 podman machine set --rootful
