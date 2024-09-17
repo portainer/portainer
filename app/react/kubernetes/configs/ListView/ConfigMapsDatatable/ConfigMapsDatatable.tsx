@@ -5,7 +5,10 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
+import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
@@ -14,6 +17,7 @@ import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFr
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
+import { useTableState } from '@@/datatables/useTableState';
 import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
@@ -26,8 +30,10 @@ import { columns } from './columns';
 
 const storageKey = 'k8sConfigMapsDatatable';
 const settingsStore = createStore(storageKey);
+const settingsStore = createStore(storageKey);
 
 export function ConfigMapsDatatable() {
+  const tableState = useTableState(settingsStore, storageKey);
   const tableState = useTableState(settingsStore, storageKey);
   const { authorized: canWrite } = useAuthorizations(['K8sConfigMapsW']);
   const readOnly = !canWrite;
@@ -61,6 +67,7 @@ export function ConfigMapsDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={configMapsQuery.isLoading || namespacesQuery.isLoading}
+      emptyContentLabel="No ConfigMaps found"
       emptyContentLabel="No ConfigMaps found"
       title="ConfigMaps"
       titleIcon={FileCode}
@@ -103,6 +110,7 @@ function useConfigMapRowData(
   return useMemo(
     () =>
       configMaps?.map((configMap) => ({
+      configMaps?.map((configMap) => ({
         ...configMap,
         inUse: configMap.IsUsed,
         isSystem: namespaces
@@ -121,7 +129,9 @@ function TableActions({
   selectedItems: ConfigMapRowData[];
 }) {
   const isAddConfigMapHidden = useIsDeploymentOptionHidden('form');
+  const isAddConfigMapHidden = useIsDeploymentOptionHidden('form');
   const environmentId = useEnvironmentId();
+  const deleteConfigMapMutation = useDeleteConfigMaps(environmentId);
   const deleteConfigMapMutation = useDeleteConfigMaps(environmentId);
 
   return (
@@ -136,6 +146,15 @@ function TableActions({
         data-cy="k8sConfig-removeConfigButton"
       />
 
+      {!isAddConfigMapHidden && (
+        <AddButton
+          to="kubernetes.configmaps.new"
+          data-cy="k8sConfig-addConfigWithFormButton"
+          color="secondary"
+        >
+          Add with form
+        </AddButton>
+      )}
       {!isAddConfigMapHidden && (
         <AddButton
           to="kubernetes.configmaps.new"

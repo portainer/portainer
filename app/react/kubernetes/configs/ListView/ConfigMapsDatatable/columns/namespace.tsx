@@ -13,6 +13,11 @@ export const namespace = columnHelper.accessor((row) => row.Namespace, {
   id: 'namespace',
   cell: ({ getValue }) => {
     const namespace = getValue();
+export const namespace = columnHelper.accessor((row) => row.Namespace, {
+  header: 'Namespace',
+  id: 'namespace',
+  cell: ({ getValue }) => {
+    const namespace = getValue();
 
     return (
       <Link
