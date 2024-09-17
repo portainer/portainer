@@ -4,7 +4,6 @@ import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesNamespaceService {
   /* @ngInject */
