@@ -59,13 +59,13 @@ function convertToVolumeViewModels(
   volumes: K8sVolumeInfo[]
 ): VolumeViewModel[] {
   return volumes.map((volume) => ({
-    Applications: volume.persistentVolumeClaim.owningApplications?.map((app) => {
-      return {
+    Applications: volume.persistentVolumeClaim.owningApplications?.map(
+      (app) => ({
         Name: app.Name,
         Namespace: app.Namespace,
         Kind: app.Kind,
-      };
-    }) as VolumeViewModel['Applications'],
+      })
+    ) as VolumeViewModel['Applications'],
     PersistentVolumeClaim: {
       Name: volume.persistentVolumeClaim.name,
       storageClass: {

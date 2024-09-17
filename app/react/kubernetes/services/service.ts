@@ -88,7 +88,7 @@ export async function getServices(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`,
       {
         params: {
-          withApplications: withApplications,
+          withApplications,
         },
       }
     );

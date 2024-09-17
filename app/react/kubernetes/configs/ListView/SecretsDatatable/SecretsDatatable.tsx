@@ -56,8 +56,6 @@ export function SecretsDatatable() {
     namespacesQuery.data
   );
 
-  const isEnvironmentAdminQuery = useAuthorizations('K8sClusterW');
-
   return (
     <Datatable<IndexOptional<SecretRowData>>
       dataset={secretRowData || []}

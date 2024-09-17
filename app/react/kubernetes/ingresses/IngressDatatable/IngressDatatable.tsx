@@ -39,7 +39,8 @@ export function IngressDatatable() {
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespacesArray, ...namespacesQuery } = useNamespacesQuery(environmentId);
+  const { data: namespacesArray, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     withServices: true,

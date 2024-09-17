@@ -1,4 +1,12 @@
-import { Box, Edit, Layers, LayoutList, Lock, Network, Server } from 'lucide-react';
+import {
+  Box,
+  Edit,
+  Layers,
+  LayoutList,
+  Lock,
+  Network,
+  Server,
+} from 'lucide-react';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Authorized } from '@/react/hooks/useUser';
