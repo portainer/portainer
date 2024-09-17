@@ -36,7 +36,7 @@ async function getConfigMap(
 ) {
   try {
     const { data } = await axios.get<Configuration[]>(
-      `/kubernetes/${environmentId}/${namespace}/configmaps/${configMap}`,
+      `/kubernetes/${environmentId}/namespaces/${namespace}/configmaps/${configMap}`,
       { params }
     );
     return data;
