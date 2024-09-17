@@ -381,7 +381,9 @@ func (bouncer *RequestBouncer) RevokeJWT(token string) {
 
 func (bouncer *RequestBouncer) cleanUpExpiredJWTPass() {
 	bouncer.revokedJWT.Range(func(key, value any) bool {
-		if time.Now().After(value.(time.Time)) {
+		if t := value.(time.Time); t.IsZero() {
+			return true
+		} else if time.Now().After(t) {
 			bouncer.revokedJWT.Delete(key)
 		}
 
