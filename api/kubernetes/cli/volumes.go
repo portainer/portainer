@@ -246,7 +246,7 @@ func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8s
 		for _, pod := range pods.Items {
 			if pod.Spec.Volumes != nil {
 				for _, podVolume := range pod.Spec.Volumes {
-					if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name {
+					if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
 						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems)
 						if err != nil {
 							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)

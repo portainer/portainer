@@ -47,11 +47,11 @@ interface K8sStorageClass {
 }
 
 interface K8sApplication {
-  uid?: string;
-  name: string;
-  namespace?: string;
-  kind?: string;
-  labels?: { [key: string]: string };
+  Uid?: string;
+  Name: string;
+  Namespace?: string;
+  Kind?: string;
+  Labels?: { [key: string]: string };
 }
 
 export type Volumes = Record<string, K8sVolumeInfo>;

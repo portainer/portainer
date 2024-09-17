@@ -59,11 +59,13 @@ function convertToVolumeViewModels(
   volumes: K8sVolumeInfo[]
 ): VolumeViewModel[] {
   return volumes.map((volume) => ({
-    Applications: volume.persistentVolumeClaim.owningApplications
-      ? volume.persistentVolumeClaim.owningApplications.map((app) => ({
-          Name: app.name,
-        }))
-      : [],
+    Applications: volume.persistentVolumeClaim.owningApplications?.map((app) => {
+      return {
+        Name: app.Name,
+        Namespace: app.Namespace,
+        Kind: app.Kind,
+      };
+    }) as VolumeViewModel['Applications'],
     PersistentVolumeClaim: {
       Name: volume.persistentVolumeClaim.name,
       storageClass: {
@@ -74,7 +76,7 @@ function convertToVolumeViewModels(
       )}GiB`, // Convert KB to GB
       CreationDate: volume.persistentVolumeClaim.creationDate,
       ApplicationOwner:
-        volume.persistentVolumeClaim.owningApplications?.[0]?.name,
+        volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
     },
     ResourcePool: {
       Namespace: {
@@ -136,7 +138,7 @@ function convertToVolumeModel(volumes: K8sVolumeInfo[]): Volume[] {
       Storage: volume.persistentVolumeClaim.storage,
       CreationDate: volume.persistentVolumeClaim.creationDate,
       ApplicationOwner:
-        volume.persistentVolumeClaim.owningApplications?.[0]?.name,
+        volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
       AccessModes: volume.persistentVolumeClaim.accessModes,
       ApplicationName: '',
     } as unknown as Volume['PersistentVolumeClaim'],
