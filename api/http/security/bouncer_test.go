@@ -473,6 +473,17 @@ func TestJWTRevocation(t *testing.T) {
 	token, _, err := jwtService.GenerateToken(&portainer.TokenData{ID: 1})
 	require.NoError(t, err)
 
+	settings, err := store.Settings().Settings()
+	require.NoError(t, err)
+
+	settings.KubeconfigExpiry = "0"
+
+	err = store.Settings().UpdateSettings(settings)
+	require.NoError(t, err)
+
+	kubeToken, err := jwtService.GenerateTokenForKubeconfig(&portainer.TokenData{ID: 1})
+	require.NoError(t, err)
+
 	apiKeyService := apikey.NewAPIKeyService(nil, nil)
 
 	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
@@ -491,6 +502,7 @@ func TestJWTRevocation(t *testing.T) {
 	require.NoError(t, err)
 
 	bouncer.RevokeJWT(token)
+	bouncer.RevokeJWT(kubeToken)
 
 	revokeLen := func() (l int) {
 		bouncer.revokedJWT.Range(func(key, value any) bool {
@@ -501,7 +513,7 @@ func TestJWTRevocation(t *testing.T) {
 
 		return l
 	}
-	require.Equal(t, 1, revokeLen())
+	require.Equal(t, 2, revokeLen())
 
 	_, err = bouncer.JWTAuthLookup(r)
 	require.Error(t, err)
@@ -513,5 +525,5 @@ func TestJWTRevocation(t *testing.T) {
 
 	bouncer.cleanUpExpiredJWTPass()
 
-	require.Equal(t, 0, revokeLen())
+	require.Equal(t, 1, revokeLen())
 }
