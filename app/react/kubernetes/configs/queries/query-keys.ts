@@ -1,8 +1,21 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { ConfigMapQueryParams } from './types';
+import { ConfigMapQueryParams, SecretQueryParams } from './types';
 
 export const configMapQueryKeys = {
+  configMap: (
+    environmentId: EnvironmentId,
+    namespace: string,
+    configMap: string
+  ) => [
+    'environments',
+    environmentId,
+    'kubernetes',
+    'configmaps',
+    'namespaces',
+    namespace,
+    configMap,
+  ],
   configMaps: (environmentId: EnvironmentId, namespace?: string) => [
     'environments',
     environmentId,
@@ -29,8 +42,11 @@ export const secretQueryKeys = {
     'namespaces',
     namespace,
   ],
-  secretsForCluster: (environmentId: EnvironmentId, withSystem?: boolean) =>
-    withSystem
-      ? ['environments', environmentId, 'kubernetes', 'secrets', withSystem]
+  secretsForCluster: (
+    environmentId: EnvironmentId,
+    params?: SecretQueryParams
+  ) =>
+    params
+      ? ['environments', environmentId, 'kubernetes', 'secrets', params]
       : ['environments', environmentId, 'kubernetes', 'secrets'],
 };

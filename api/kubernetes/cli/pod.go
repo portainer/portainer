@@ -173,3 +173,41 @@ func (kcl *KubeClient) fetchAllPodsAndReplicaSets() ([]corev1.Pod, []appsv1.Repl
 
 	return pods.Items, replicaSetItems, nil
 }
+
+// isPodUsingConfigMap checks if a pod is using a specific ConfigMap
+func isPodUsingConfigMap(pod *corev1.Pod, configMapName string) bool {
+	for _, volume := range pod.Spec.Volumes {
+		if volume.ConfigMap != nil && volume.ConfigMap.Name == configMapName {
+			return true
+		}
+	}
+
+	for _, container := range pod.Spec.Containers {
+		for _, env := range container.Env {
+			if env.ValueFrom != nil && env.ValueFrom.ConfigMapKeyRef != nil && env.ValueFrom.ConfigMapKeyRef.Name == configMapName {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// isPodUsingSecret checks if a pod is using a specific Secret
+func isPodUsingSecret(pod *corev1.Pod, secretName string) bool {
+	for _, volume := range pod.Spec.Volumes {
+		if volume.Secret != nil && volume.Secret.SecretName == secretName {
+			return true
+		}
+	}
+
+	for _, container := range pod.Spec.Containers {
+		for _, env := range container.Env {
+			if env.ValueFrom != nil && env.ValueFrom.SecretKeyRef != nil && env.ValueFrom.SecretKeyRef.Name == secretName {
+				return true
+			}
+		}
+	}
+
+	return false
+}

@@ -13,7 +13,6 @@ export const namespace = columnHelper.accessor((row) => row.Namespace, {
   id: 'namespace',
   cell: ({ getValue }) => {
     const namespace = getValue();
-
     return (
       <Link
         to="kubernetes.resourcePools.resourcePool"

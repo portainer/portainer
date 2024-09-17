@@ -1,6 +1,6 @@
-import { Secret } from 'kubernetes-types/core/v1';
+import { Configuration } from '../../types';
 
-export interface SecretRowData extends Secret {
+export interface SecretRowData extends Configuration {
   inUse: boolean;
   isSystem: boolean;
 }

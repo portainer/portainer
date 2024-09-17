@@ -6,23 +6,23 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Configuration } from '../types';
 
-import { configMapQueryKeys } from './query-keys';
-import { ConfigMapQueryParams } from './types';
+import { SecretQueryParams } from './types';
+import { secretQueryKeys } from './query-keys';
 
-export function useConfigMapsForCluster(
+export function useSecretsForCluster(
   environmentId: EnvironmentId,
-  options?: { autoRefreshRate?: number } & ConfigMapQueryParams
+  options?: { autoRefreshRate?: number } & SecretQueryParams
 ) {
   const { autoRefreshRate, ...params } = options ?? {};
   return useQuery(
-    configMapQueryKeys.configMapsForCluster(environmentId, params),
+    secretQueryKeys.secretsForCluster(environmentId, params),
     () =>
-      getConfigMapsForCluster(environmentId, {
+      getSecretsForCluster(environmentId, {
         ...params,
         isUsed: params?.isUsed,
       }),
     {
-      ...withError('Unable to retrieve ConfigMaps for cluster'),
+      ...withError('Unable to retrieve secrets for cluster'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
@@ -30,20 +30,27 @@ export function useConfigMapsForCluster(
   );
 }
 
-// get all configmaps for a cluster
-async function getConfigMapsForCluster(
+async function getSecretsForCluster(
   environmentId: EnvironmentId,
   params?: { withData?: boolean; isUsed?: boolean }
 ) {
+  const secrets = await getSecrets(environmentId, undefined, params);
+  return secrets;
+}
+
+// get all secrets for a cluster
+async function getSecrets(
+  environmentId: EnvironmentId,
+  withSystem?: boolean,
+  params?: { withData?: boolean; isUsed?: boolean } | undefined
+) {
   try {
     const { data } = await axios.get<Configuration[]>(
-      `/kubernetes/${environmentId}/configmaps`,
+      `/kubernetes/${environmentId}/secrets`,
       { params }
     );
     return data;
   } catch (e) {
-    // use parseAxiosError instead of parseKubernetesAxiosError
-    // because this is an internal portainer api endpoint, not through the kube proxy
-    throw parseAxiosError(e, 'Unable to retrieve ConfigMaps');
+    throw parseAxiosError(e, 'Unable to retrieve secrets');
   }
 }

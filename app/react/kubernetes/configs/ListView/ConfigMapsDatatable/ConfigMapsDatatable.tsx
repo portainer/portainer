@@ -9,11 +9,8 @@ import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemR
 import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
-import { useJobs } from '@/react/kubernetes/applications/useJobs';
-import { usePods } from '@/react/kubernetes/applications/usePods';
-import { useCronJobs } from '@/react/kubernetes/applications/useCronJobs';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
@@ -21,11 +18,9 @@ import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { IndexOptional, Configuration } from '../../types';
-import { CronJob, Job, K8sPod } from '../../../applications/types';
 import { useDeleteConfigMaps } from '../../queries/useDeleteConfigMaps';
 import { useConfigMapsForCluster } from '../../queries/useConfigmapsForCluster';
 
-import { getIsConfigMapInUse } from './utils';
 import { ConfigMapRowData } from './types';
 import { columns } from './columns';
 
@@ -41,40 +36,22 @@ export function ConfigMapsDatatable() {
   );
 
   const environmentId = useEnvironmentId();
-  const withSystem = canAccessSystemResources && tableState.showSystemResources;
-
   const namespacesQuery = useNamespacesQuery(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
   const configMapsQuery = useConfigMapsForCluster(environmentId, {
-    withSystem,
     autoRefreshRate: tableState.autoRefreshRate * 1000,
+    isUsed: true,
   });
-  const jobsQuery = useJobs(environmentId, {
-    withSystem,
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
-  });
-  const cronJobsQuery = useCronJobs(environmentId, {
-    withSystem,
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
-  });
-  const podsQuery = usePods(environmentId, {
-    params: {
-      withSystem,
-    },
-    queryOptions: {
-      refetchInterval: tableState.autoRefreshRate * 1000,
-    },
-  });
-  const isInUseLoading =
-    jobsQuery.isLoading || cronJobsQuery.isLoading || podsQuery.isLoading;
+
+  const configMaps = Object.values(configMapsQuery.data ?? []);
+
+  const filteredConfigMaps = tableState.showSystemResources
+    ? configMaps
+    : configMaps.filter((item) => !isSystem(item));
 
   const configMapRowData = useConfigMapRowData(
-    configMapsQuery.data ?? [],
-    podsQuery.data ?? [],
-    jobsQuery.data ?? [],
-    cronJobsQuery.data ?? [],
-    isInUseLoading,
+    filteredConfigMaps,
     namespacesQuery.data
   );
 
@@ -88,8 +65,8 @@ export function ConfigMapsDatatable() {
       title="ConfigMaps"
       titleIcon={FileCode}
       getRowId={(row) => row.UID ?? ''}
-      isRowSelectable={(row) =>
-        !namespacesQuery.data?.[row.original.Namespace ?? '']?.IsSystem
+      isRowSelectable={({ original: item }) =>
+        canAccessSystemResources && !isSystem(item)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -108,31 +85,33 @@ export function ConfigMapsDatatable() {
       data-cy="k8s-configmaps-datatable"
     />
   );
+
+  function isSystem(configMap: Configuration): boolean {
+    return (
+      namespacesQuery.data?.some(
+        (namespace) =>
+          namespace.Name === configMap.Namespace && namespace.IsSystem
+      ) ?? false
+    );
+  }
 }
 
-// useConfigMapRowData appends the `inUse` property to the ConfigMap data (for the unused badge in the name column)
-// and wraps with useMemo to prevent unnecessary calculations
 function useConfigMapRowData(
   configMaps: Configuration[],
-  pods: K8sPod[],
-  jobs: Job[],
-  cronJobs: CronJob[],
-  isInUseLoading: boolean,
-  namespaces?: Namespaces
+  namespaces?: PortainerNamespace[]
 ): ConfigMapRowData[] {
   return useMemo(
     () =>
       configMaps?.map((configMap) => ({
         ...configMap,
-        inUse:
-          // if the apps are loading, set inUse to true to hide the 'unused' badge
-          isInUseLoading ||
-          getIsConfigMapInUse(configMap, pods, jobs, cronJobs),
+        inUse: configMap.IsUsed,
         isSystem: namespaces
-          ? namespaces?.[configMap.Namespace ?? '']?.IsSystem
+          ? namespaces.find(
+              (namespace) => namespace.Name === configMap.Namespace
+            )?.IsSystem ?? false
           : false,
       })) || [],
-    [configMaps, isInUseLoading, pods, jobs, cronJobs, namespaces]
+    [configMaps, namespaces]
   );
 }
 
@@ -157,6 +136,15 @@ function TableActions({
         data-cy="k8sConfig-removeConfigButton"
       />
 
+      {!isAddConfigMapHidden && (
+        <AddButton
+          to="kubernetes.configmaps.new"
+          data-cy="k8sConfig-addConfigWithFormButton"
+          color="secondary"
+        >
+          Add with form
+        </AddButton>
+      )}
       {!isAddConfigMapHidden && (
         <AddButton
           to="kubernetes.configmaps.new"

@@ -4,7 +4,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { Namespaces } from '../types';
+import { PortainerNamespace } from '../types';
 
 import { queryKeys } from './queryKeys';
 
@@ -16,12 +16,7 @@ export function useNamespacesQuery(
     queryKeys.list(environmentId, {
       withResourceQuota: !!options?.withResourceQuota,
     }),
-    async () => {
-      return await getNamespaces(
-        environmentId,
-        options?.withResourceQuota
-      );
-    },
+    async () => getNamespaces(environmentId, options?.withResourceQuota),
     {
       ...withError('Unable to get namespaces.'),
       refetchInterval() {
@@ -38,7 +33,7 @@ export async function getNamespaces(
 ) {
   const params = withResourceQuota ? { withResourceQuota } : {};
   try {
-    const { data: namespaces } = await axios.get<Namespaces>(
+    const { data: namespaces } = await axios.get<PortainerNamespace[]>(
       `kubernetes/${environmentId}/namespaces`,
       { params }
     );
