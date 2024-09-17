@@ -2,8 +2,8 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
-// import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery.ts';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesNamespaceService {
@@ -69,7 +69,6 @@ class KubernetesNamespaceService {
       // get the list of all namespaces (RBAC allows users to see the list of namespaces)
       const data = await this.KubernetesNamespaces().get().$promise;
       // get the list of all namespaces with isAccessAllowed flags
-      // const namespacesWithAccess = await getNamespaces(this.$state.params.endpointId);
       const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
       const namespaces = data.items.filter((item) => !KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces);
       // parse the namespaces

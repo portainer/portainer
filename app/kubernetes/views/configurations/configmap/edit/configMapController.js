@@ -7,7 +7,6 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-
 import { pluralize } from '@/portainer/helpers/strings';
 
 import { confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
@@ -142,6 +141,7 @@ class KubernetesConfigMapController {
       this.state.configurationLoading = true;
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
+
       try {
         const configMap = await this.KubernetesConfigMapService.get(namespace, name);
         this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap);
@@ -153,7 +153,7 @@ class KubernetesConfigMapController {
         }
       }
 
-      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
+      this.formValues.ResourcePool = this.configuration.Namespace;
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
@@ -266,13 +266,9 @@ class KubernetesConfigMapController {
 
       this.formValues = new KubernetesConfigurationFormValues();
 
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
-
       const configuration = await this.getConfiguration();
       if (configuration) {
-        await this.getApplications(this.configuration.Namespace);
         await this.getEvents(this.configuration.Namespace);
-        await this.getConfigurations();
       }
 
       this.tagUsedDataKeys();

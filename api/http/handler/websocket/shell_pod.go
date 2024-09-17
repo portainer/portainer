@@ -47,7 +47,7 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
-	serviceAccount, err := cli.GetServiceAccount(tokenData)
+	serviceAccount, err := cli.GetPortainerUserServiceAccount(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to find serviceaccount associated with user", err)
 	}

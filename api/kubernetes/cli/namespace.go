@@ -248,6 +248,7 @@ func (kcl *KubeClient) DeleteNamespace(namespaceName string) (*corev1.Namespace,
 	return namespace, fmt.Errorf("namespace %s not found", namespace)
 }
 
+// CombineNamespacesWithResourceQuotas combines namespaces with resource quotas where matching is based on "portainer-rq-"+namespace.Name
 func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string]portainer.K8sNamespaceInfo, w http.ResponseWriter) *httperror.HandlerError {
 	resourceQuotas, err := kcl.GetResourceQuotas("")
 	if err != nil && !k8serrors.IsNotFound(err) {
