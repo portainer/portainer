@@ -46,13 +46,16 @@ export function IngressDatatable() {
     withServices: true,
   });
 
-  const namespaces: Record<string, PortainerNamespace> = {};
-  if (Array.isArray(namespacesArray)) {
-    for (let i = 0; i < namespacesArray.length; i++) {
-      const namespace = namespacesArray[i];
-      namespaces[namespace.Name] = namespace;
+  const namespaces = useMemo(() => {
+    const ns: Record<string, PortainerNamespace> = {};
+    if (Array.isArray(namespacesArray)) {
+      for (let i = 0; i < namespacesArray.length; i++) {
+        const namespace = namespacesArray[i];
+        ns[namespace.Name] = namespace;
+      }
     }
-  }
+    return ns;
+  }, [namespacesArray]);
 
   const filteredIngresses = useMemo(
     () =>
