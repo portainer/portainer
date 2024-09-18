@@ -2,8 +2,8 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { updateNamespaces } from 'Kubernetes/store/namespace';
-import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery.ts';
 
 class KubernetesNamespaceService {
   /* @ngInject */
@@ -66,13 +66,15 @@ class KubernetesNamespaceService {
 
   async getAllAsync() {
     try {
-      const data = await getNamespaces(this.$state.params.endpointId);
+      // get the list of all namespaces (RBAC allows users to see the list of namespaces)
+      const data = await this.KubernetesNamespaces().get().$promise;
+      // get the list of all namespaces with isAccessAllowed flags
       const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
-      const namespaces = Object.values(data).filter(
-        (item) => (!item.IsSystem || hasK8sAccessSystemNamespaces)
-      );
-      updateNamespaces(namespaces);  
-      return namespaces;
+      const namespaces = data.items.filter((item) => !KubernetesNamespaceHelper.isSystemNamespace(item.metadata.name) || hasK8sAccessSystemNamespaces);
+      // parse the namespaces
+      const visibleNamespaces = namespaces.map((item) => KubernetesNamespaceConverter.apiToNamespace(item));
+      updateNamespaces(visibleNamespaces);
+      return visibleNamespaces;
     } catch (err) {
       console.error('Error retrieving namespaces:', err);
       throw new PortainerError('Unable to retrieve namespaces', err);

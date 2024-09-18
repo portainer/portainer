@@ -4,247 +4,237 @@ import (
 	"fmt"
 	"net/http"
 
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // @id GetKubernetesNamespaces
 // @summary Get a list of kubernetes namespaces within the given Portainer environment
-// @description Get a list of all kubernetes namespaces within the given environment (Endpoint). The Endpoint ID must be a valid Portainer environment identifier.
-// @description **Access policy**: authenticated
+// @description Get a list of all kubernetes namespaces within the given environment based on the user role and permissions.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
-// @param withResourceQuota query boolean true "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
+// @param id path int true "Environment identifier"
+// @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. It is set to false by default"
 // @success 200 {object} map[string]portainer.K8sNamespaceInfo "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve the list of namespaces."
 // @router /kubernetes/{id}/namespaces [get]
-func (handler *Handler) GetKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	namespaces, err := handler.getKubernetesNamespaces(w, r)
+func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
-		return err
+		return httperror.BadRequest("an error occurred during the GetKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
 	}
 
-	return response.JSON(w, namespaces)
+	cli, httpErr := handler.prepareKubeClient(r)
+	if httpErr != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespaces operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+	}
+
+	namespaces, err := cli.GetNamespaces()
+	if err != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes for the user. Error: ", err)
+	}
+
+	if withResourceQuota {
+		return cli.CombineNamespacesWithResourceQuotas(namespaces, w)
+	}
+
+	return response.JSON(w, cli.ConvertNamespaceMapToSlice(namespaces))
 }
 
 // @id GetKubernetesNamespacesCount
 // @summary Get the total number of kubernetes namespaces within the given Portainer environment.
-// @description Get the total number of kubernetes namespaces within the given environment (Endpoint), including the system namespaces. The total count depends on the user's role and permissions. The Endpoint ID must be a valid Portainer environment identifier.
-// @description **Access policy**: authenticated
+// @description Get the total number of kubernetes namespaces within the given environment, including the system namespaces. The total count depends on the user's role and permissions.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to compute the namespace count."
 // @router /kubernetes/{id}/namespaces/count [get]
 func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	namespaces, err := handler.getKubernetesNamespaces(w, r)
+	cli, httpErr := handler.prepareKubeClient(r)
+	if httpErr != nil {
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+	}
+
+	namespaces, err := cli.GetNamespaces()
 	if err != nil {
-		return err
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespacesCount operation, unable to retrieve namespaces from the Kubernetes cluster to count the total. Error: ", err)
 	}
 
 	return response.JSON(w, len(namespaces))
 }
 
-func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) (map[string]portainer.K8sNamespaceInfo, *httperror.HandlerError) {
-	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
-	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the getKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
-	}
-
-	cli, httpErr := handler.getProxyKubeClient(r)
-	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
-	}
-
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return nil, httperror.NotFound("Unable to find an environment on request context", err)
-	}
-
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
-	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to get a privileged Kubernetes client for the user. Error: ", err)
-	}
-	pcli.IsKubeAdmin = cli.IsKubeAdmin
-	pcli.NonAdminNamespaces = cli.NonAdminNamespaces
-
-	namespaces, err := pcli.GetNamespaces()
-	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the getKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes cluster. Error: ", err)
-	}
-
-	if withResourceQuota {
-		return pcli.CombineNamespacesWithResourceQuotas(namespaces, w)
-	}
-
-	return namespaces, nil
-}
-
 // @id GetKubernetesNamespace
 // @summary Get kubernetes namespace details
-// @description Get kubernetes namespace details for the provided namespace within the given environment
-// @description **Access policy**: authenticated
+// @description Get kubernetes namespace details for the provided namespace within the given environment.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "The namespace name to get details for"
-// @param withResourceQuota query boolean true "When set to True, include the resource quota information as part of the Namespace information. It is set to false by default"
+// @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. It is set to false by default"
 // @success 200 {object} portainer.K8sNamespaceInfo "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to retrieve specified namespace information."
 // @router /kubernetes/{id}/namespaces/{namespace} [get]
 func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
+	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the getKubernetesNamespace operation, invalid namespace parameter namespace. Error: ", err)
+		return httperror.BadRequest("an error occurred during the GetKubernetesNamespace operation, invalid namespace parameter namespace. Error: ", err)
 	}
 
 	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
-		return httperror.BadRequest(fmt.Sprintf("an error occurred during the getKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespace), err)
+		return httperror.BadRequest(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespaceName), err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the getKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespace), httpErr)
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
 	}
 
-	namespaceInfo, err := cli.GetNamespace(namespace)
+	namespaceInfo, err := cli.GetNamespace(namespaceName)
 	if err != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the getKubernetesNamespace operation, unable to get the namespace: %s. Error: ", namespace), err)
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespaceName), err)
+		}
+
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation, unauthorized to access the namespace: %s. Error: ", namespaceName), err)
+		}
+
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation, unable to get the namespace: %s. Error: ", namespaceName), err)
 	}
 
-	// if withResourceQuota is set to true, grab a resource quota associated to the namespace
 	if withResourceQuota {
 		return cli.CombineNamespaceWithResourceQuota(namespaceInfo, w)
+	}
+
+	return response.JSON(w, namespaceInfo)
+}
+
+// @id CreateKubernetesNamespace
+// @summary Create a kubernetes namespace
+// @description Create a kubernetes namespace within the given environment.
+// @description **Access policy**: Authenticated user.
+// @tags kubernetes
+// @security ApiKeyAuth || jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment identifier"
+// @param body body models.K8sNamespaceDetails true "Namespace configuration details"
+// @success 200 {string} string "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to create the namespace."
+// @router /kubernetes/{id}/namespaces [post]
+func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	payload := models.K8sNamespaceDetails{}
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("an error occurred during the CreateKubernetesNamespace operation, invalid request payload. Error: ", err)
+	}
+
+	namespaceName := payload.Name
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
+	}
+
+	namespace, err := cli.CreateNamespace(payload)
+	if err != nil {
+		if k8serrors.IsAlreadyExists(err) {
+			return httperror.Conflict(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, the namespace %s already exists. Error: ", namespaceName), err)
+		}
+
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: %s", namespaceName), err)
 	}
 
 	return response.JSON(w, namespace)
 }
 
-// @id createKubernetesNamespace
-// @summary Create a kubernetes namespace
-// @description Create a kubernetes namespace within the given environment
-// @description **Access policy**: authenticated
+// @id DeleteKubernetesNamespace
+// @summary Delete a kubernetes namespace
+// @description Delete a kubernetes namespace within the given environment.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
-// @produce json
-// @param id path int true "Environment (Endpoint) identifier"
-// @param body body models.K8sNamespaceDetails true "Namespace configuration details"
-// @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
-// @router /kubernetes/{id}/namespaces [post]
-func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload models.K8sNamespaceDetails
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
-	}
-
-	cli, handlerErr := handler.getProxyKubeClient(r)
-	if handlerErr != nil {
-		return handlerErr
-	}
-
-	err = cli.CreateNamespace(payload)
-	if err != nil {
-		return httperror.InternalServerError("Unable to create namespace", err)
-	}
-
-	return nil
-}
-
-// @id deleteKubernetesNamespace
-// @summary Delete kubernetes namespace
-// @description Delete a kubernetes namespace within the given environment
-// @description **Access policy**: authenticated
-// @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
-// @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @security ApiKeyAuth || jwt
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to delete the namespace."
 // @router /kubernetes/{id}/namespaces/{namespace} [delete]
 func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload models.K8sNamespaceDetails
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the DeleteKubernetesNamespace operation, invalid namespace identifier route variable. Error: ", err)
 	}
 
-	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
+	}
+
+	namespace, err := cli.DeleteNamespace(namespaceName)
 	if err != nil {
-		return httperror.BadRequest("Invalid namespace identifier route variable", err)
+		if k8serrors.IsNotFound(err) {
+			return httperror.NotFound(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespace), err)
+		}
+
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to delete the Kubernetes namespace. Error: ", namespace), err)
 	}
 
-	cli, handlerErr := handler.getProxyKubeClient(r)
-	if handlerErr != nil {
-		return handlerErr
-	}
-
-	err = cli.DeleteNamespace(namespace)
-	if err != nil {
-		return httperror.InternalServerError("Unable to delete namespace", err)
-	}
-
-	return nil
+	return response.JSON(w, namespace)
 }
 
-// @id updateKubernetesNamespace
-// @summary Updates a kubernetes namespace
-// @description Update a kubernetes namespace within the given environment
-// @description **Access policy**: authenticated
+// @id UpdateKubernetesNamespace
+// @summary Update a kubernetes namespace
+// @description Update a kubernetes namespace within the given environment.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace"
 // @param body body models.K8sNamespaceDetails true "Namespace details"
 // @success 200 {string} string "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to update the namespace."
 // @router /kubernetes/{id}/namespaces/{namespace} [put]
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload models.K8sNamespaceDetails
+	payload := models.K8sNamespaceDetails{}
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("an error occurred during the UpdateKubernetesNamespace operation, invalid request payload. Error: ", err)
 	}
 
-	cli, handlerErr := handler.getProxyKubeClient(r)
-	if handlerErr != nil {
-		return handlerErr
+	namespaceName := payload.Name
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the UpdateKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
 	}
 
-	err = cli.UpdateNamespace(payload)
+	namespace, err := cli.UpdateNamespace(payload)
 	if err != nil {
-		return httperror.InternalServerError("Unable to update namespace", err)
+		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the UpdateKubernetesNamespace operation for the namespace %s, unable to update the Kubernetes namespace. Error: ", namespaceName), err)
 	}
-	return nil
+
+	return response.JSON(w, namespace)
 }

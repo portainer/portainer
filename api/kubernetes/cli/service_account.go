@@ -4,23 +4,76 @@ import (
 	"context"
 
 	portainer "github.com/portainer/portainer/api"
-	v1 "k8s.io/api/core/v1"
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetServiceAccount returns the portainer ServiceAccountName associated to the specified user.
-func (kcl *KubeClient) GetServiceAccount(tokenData *portainer.TokenData) (*v1.ServiceAccount, error) {
-	var portainerServiceAccountName string
+// GetServiceAccounts gets all the service accounts for either at the cluster level or a given namespace in a k8s endpoint.
+// It returns a list of K8sServiceAccount objects.
+func (kcl *KubeClient) GetServiceAccounts(namespace string) ([]models.K8sServiceAccount, error) {
+	if kcl.IsKubeAdmin {
+		return kcl.fetchServiceAccounts(namespace)
+	}
+
+	return kcl.fetchServiceAccountsForNonAdmin(namespace)
+}
+
+// fetchServiceAccountsForNonAdmin gets all the service accounts for either at the cluster level or a given namespace in a k8s endpoint.
+// the namespace will be coming from NonAdminNamespaces as non-admin users are restricted to certain namespaces.
+// it returns a list of K8sServiceAccount objects.
+func (kcl *KubeClient) fetchServiceAccountsForNonAdmin(namespace string) ([]models.K8sServiceAccount, error) {
+	serviceAccounts, err := kcl.fetchServiceAccounts(namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
+	results := make([]models.K8sServiceAccount, 0)
+	for _, serviceAccount := range serviceAccounts {
+		if _, ok := nonAdminNamespaceSet[serviceAccount.Namespace]; ok {
+			results = append(results, serviceAccount)
+		}
+	}
+
+	return results, nil
+}
+
+// fetchServiceAccounts returns a list of all ServiceAccounts in the specified namespace.
+func (kcl *KubeClient) fetchServiceAccounts(namespace string) ([]models.K8sServiceAccount, error) {
+	serviceAccounts, err := kcl.cli.CoreV1().ServiceAccounts(namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]models.K8sServiceAccount, 0)
+	for _, serviceAccount := range serviceAccounts.Items {
+		results = append(results, parseServiceAccount(serviceAccount))
+	}
+
+	return results, nil
+}
+
+// parseServiceAccount converts a corev1.ServiceAccount object to a models.K8sServiceAccount object.
+func parseServiceAccount(serviceAccount corev1.ServiceAccount) models.K8sServiceAccount {
+	return models.K8sServiceAccount{
+		Name:         serviceAccount.Name,
+		Namespace:    serviceAccount.Namespace,
+		CreationDate: serviceAccount.CreationTimestamp.Time,
+	}
+}
+
+// GetPortainerUserServiceAccount returns the portainer ServiceAccountName associated to the specified user.
+func (kcl *KubeClient) GetPortainerUserServiceAccount(tokenData *portainer.TokenData) (*corev1.ServiceAccount, error) {
+	portainerUserServiceAccountName := UserServiceAccountName(int(tokenData.ID), kcl.instanceID)
 	if tokenData.Role == portainer.AdministratorRole {
-		portainerServiceAccountName = portainerClusterAdminServiceAccountName
-	} else {
-		portainerServiceAccountName = UserServiceAccountName(int(tokenData.ID), kcl.instanceID)
+		portainerUserServiceAccountName = portainerClusterAdminServiceAccountName
 	}
 
 	// verify name exists as service account resource within portainer namespace
-	serviceAccount, err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Get(context.TODO(), portainerServiceAccountName, metav1.GetOptions{})
+	serviceAccount, err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Get(context.TODO(), portainerUserServiceAccountName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +122,7 @@ func (kcl *KubeClient) ensureRequiredResourcesExist() error {
 }
 
 func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName string) error {
-	serviceAccount := &v1.ServiceAccount{
+	serviceAccount := &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: serviceAccountName,
 		},

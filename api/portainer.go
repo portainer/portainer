@@ -14,7 +14,7 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 
 	"golang.org/x/oauth2"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
 )
 
@@ -592,14 +592,14 @@ type (
 	JobType int
 
 	K8sNamespaceInfo struct {
-		Id             string             `json:"Id"`
-		Name           string             `json:"Name"`
-		Status         v1.NamespaceStatus `json:"Status"`
-		CreationDate   string             `json:"CreationDate"`
-		NamespaceOwner string             `json:"NamespaceOwner"`
-		IsSystem       bool               `json:"IsSystem"`
-		IsDefault      bool               `json:"IsDefault"`
-		ResourceQuota  *v1.ResourceQuota  `json:"ResourceQuota"`
+		Id             string                 `json:"Id"`
+		Name           string                 `json:"Name"`
+		Status         corev1.NamespaceStatus `json:"Status"`
+		CreationDate   string                 `json:"CreationDate"`
+		NamespaceOwner string                 `json:"NamespaceOwner"`
+		IsSystem       bool                   `json:"IsSystem"`
+		IsDefault      bool                   `json:"IsDefault"`
+		ResourceQuota  *corev1.ResourceQuota  `json:"ResourceQuota"`
 	}
 
 	K8sNodeLimits struct {
@@ -1474,19 +1474,20 @@ type (
 
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		IsRBACEnabled() (bool, error)
-		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
+		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
-		CreateNamespace(info models.K8sNamespaceDetails) error
-		UpdateNamespace(info models.K8sNamespaceDetails) error
+		CreateNamespace(info models.K8sNamespaceDetails) (*corev1.Namespace, error)
+		UpdateNamespace(info models.K8sNamespaceDetails) (*corev1.Namespace, error)
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		GetNamespace(string) (K8sNamespaceInfo, error)
-		DeleteNamespace(namespace string) error
-		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		DeleteNamespace(namespace string) (*corev1.Namespace, error)
+		GetConfigMaps(namespace string) ([]models.K8sConfigMap, error)
+		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
 		GetApplications(namespace, kind string) ([]models.K8sApplication, error)
 		GetApplication(namespace, kind, name string) (models.K8sApplication, error)
@@ -1498,7 +1499,7 @@ type (
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
 		CreateService(namespace string, service models.K8sServiceInfo) error
 		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
+		GetServices(namespace string) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
