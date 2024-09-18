@@ -399,7 +399,6 @@ class KubernetesNodeController {
 
     await this.getNodes();
     await this.getEvents();
-    await this.getApplications();
     await this.getEndpoints();
 
     this.availableEffects = _.values(KubernetesNodeTaintEffects);
@@ -407,6 +406,7 @@ class KubernetesNodeController {
     this.formValues.Labels = KubernetesNodeHelper.computeUsedLabels(this.applications, this.formValues.Labels);
     this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
 
+    this.state.applicationsLoading = false;
     this.state.viewReady = true;
   }
 

@@ -52,11 +52,19 @@ export function useColumns() {
         }),
         helper.accessor('CPU', {
           header: 'CPU reservation',
-          cell: ({ getValue }) => _.round(getValue(), 2),
+          cell: ({ row: { original: item } }) => (
+            <>
+              {_.round(item.Resource?.cpuRequest || 0, 2)}
+            </>
+          ),
         }),
         helper.accessor('Memory', {
           header: 'Memory reservation',
-          cell: ({ getValue }) => humanize(getValue()),
+          cell: ({ row: { original: item } }) => (
+            <>
+              {humanize(item.Resource?.memoryRequest || 0)}
+            </>
+          ),
         }),
       ]),
     [hideStacksQuery.data]

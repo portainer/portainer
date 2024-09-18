@@ -51,6 +51,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	endpointRouter.Use(h.kubeClientMiddleware)
 
+	endpointRouter.Handle("/applications", httperror.LoggerHandler(h.GetAllKubernetesApplications)).Methods(http.MethodGet)
+	endpointRouter.Handle("/applications/count", httperror.LoggerHandler(h.getAllKubernetesApplicationsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/configmaps", httperror.LoggerHandler(h.GetAllKubernetesConfigMaps)).Methods(http.MethodGet)
 	endpointRouter.Handle("/configmaps/count", httperror.LoggerHandler(h.getAllKubernetesConfigMapsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/cluster_roles", httperror.LoggerHandler(h.getAllKubernetesClusterRoles)).Methods(http.MethodGet)

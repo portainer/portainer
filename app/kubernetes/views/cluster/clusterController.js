@@ -71,8 +71,8 @@ class KubernetesClusterController {
       
       const applicationsResources = await getTotalResourcesForAllApplications(this.endpoint.Id);
       this.resourceReservation = new KubernetesResourceReservation();
-      this.resourceReservation.CPU = applicationsResources.cpuRequest;
-      this.resourceReservation.Memory = applicationsResources.memoryRequest;
+      this.resourceReservation.CPU = applicationsResources.CpuRequest;
+      this.resourceReservation.Memory = applicationsResources.MemoryRequest;
       
       if (this.hasResourceUsageAccess()) {
         await this.getResourceUsage(this.endpoint.Id);

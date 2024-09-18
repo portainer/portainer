@@ -28,6 +28,8 @@ export class Application {
 
   ResourcePool: string;
 
+  Namespace: string;
+
   Image: string;
 
   CreationDate: 0;
@@ -41,10 +43,12 @@ export class Application {
     annotations?: Record<string, string>;
   };
 
-  Limits: {
-    Cpu?: number;
-    Memory?: number;
-  };
+  Resource: {
+    cpuLimit?: number;
+    cpuRequest?: number;
+    memoryLimit?: number;
+    memoryRequest?: number;
+  } | undefined;
 
   ServiceType?: ServiceType;
 
@@ -101,12 +105,13 @@ export class Application {
     this.ApplicationOwner = '';
     this.ApplicationName = '';
     this.ResourcePool = '';
+    this.Namespace = '';
     this.Image = '';
     this.CreationDate = 0;
     this.Pods = [];
     this.Containers = [];
     this.Metadata = {};
-    this.Limits = {};
+    this.Resource = {};
     this.ServiceId = '';
     this.ServiceName = '';
     this.HeadlessServiceName = undefined;
