@@ -56,9 +56,9 @@ export function KubeConfigTeaserForm() {
                 </li>
               </ul>
               <p>
-                Note: Officially supported cloud providers are Civo, Linode,
-                DigitalOcean and Microsoft Azure (others are not guaranteed to
-                work at present)
+                Note: Officially supported cloud providers are Civo, Akamai
+                Connected Cloud, DigitalOcean and Microsoft Azure (others are
+                not guaranteed to work at present)
               </p>
             </div>
           </div>
