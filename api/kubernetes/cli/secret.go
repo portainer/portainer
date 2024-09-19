@@ -110,7 +110,7 @@ func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret) ([]models.K8sSecret, error) {
 	updatedSecrets := make([]models.K8sSecret, len(secrets))
 
-	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(nil)
+	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 	}

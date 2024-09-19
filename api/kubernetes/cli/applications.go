@@ -160,7 +160,7 @@ func (kcl *KubeClient) GetApplication(namespace, kind, name string) (models.K8sA
 // GetApplicationsByNode gets a list of kubernetes workloads (or applications) by node name
 func (kcl *KubeClient) GetApplicationsByNode(nodeName string) ([]models.K8sApplication, error) {
 	applications := []models.K8sApplication{}
-	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(&metav1.ListOptions{FieldSelector: fmt.Sprintf("spec.nodeName=%s", nodeName)})
+	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(metav1.ListOptions{FieldSelector: fmt.Sprintf("spec.nodeName=%s", nodeName)})
 	if err != nil {
 		return nil, err
 	}
