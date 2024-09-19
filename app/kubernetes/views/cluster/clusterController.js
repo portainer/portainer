@@ -124,8 +124,7 @@ class KubernetesClusterController {
 
     await this.getNodes();
     if (this.isAdmin) {
-      await this.getEndpoints();
-      await this.getApplicationsAsync();
+      await Promise.allSettled([this.getEndpoints(), this.getApplicationsAsync()]);
     }
 
     this.state.viewReady = true;

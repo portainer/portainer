@@ -43,12 +43,12 @@ export class Application {
     annotations?: Record<string, string>;
   };
 
-  Resource: {
+  Resource?: {
     cpuLimit?: number;
     cpuRequest?: number;
     memoryLimit?: number;
     memoryRequest?: number;
-  } | undefined;
+  };
 
   ServiceType?: ServiceType;
 

@@ -12,7 +12,6 @@ export const clusterManagementModule = angular
   .component(
     'kubernetesNodeApplicationsDatatable',
     r2a(withUIRouter(withCurrentUser(NodeApplicationsDatatable)), [
-      'dataset',
       'isLoading',
       'onRefresh',
     ])
