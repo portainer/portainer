@@ -41,7 +41,6 @@ export function AppIngressPathsForm({
   const environmentId = useEnvironmentId();
   const ingressesQuery = useIngresses(
     environmentId,
-    namespace ? [namespace] : undefined
   );
   const { data: ingresses } = ingressesQuery;
   const { data: ingressControllers, ...ingressControllersQuery } =
@@ -54,11 +53,11 @@ export function AppIngressPathsForm({
         ?.filter((ic) => ic.Availability)
         .map((ic) => ic.ClassName) || [];
     const allowedIngresses =
-      ingresses?.filter((ing) => {
+      ingresses?.filter((ing: { ClassName: string; }) => {
         const className = ing.ClassName || 'none';
         return allowedIngressClasses.includes(className);
       }) || [];
-    return allowedIngresses.flatMap((ing) =>
+    return allowedIngresses.flatMap((ing: { Hosts: any[]; Name: any; }) =>
       ing.Hosts?.length
         ? ing.Hosts.map((host) => ({
             label: `${host} (${ing.Name})`,

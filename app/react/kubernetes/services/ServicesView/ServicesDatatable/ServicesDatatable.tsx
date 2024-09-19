@@ -4,7 +4,10 @@ import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
 
-import { Namespaces, PortainerNamespace } from '@/react/kubernetes/namespaces/types';
+import {
+  Namespaces,
+  PortainerNamespace,
+} from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
@@ -30,7 +33,8 @@ const settingsStore = createStore(storageKey);
 export function ServicesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespacesArray, ...namespacesQuery } = useNamespacesQuery(environmentId);
+  const { data: namespacesArray, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const { data: services, ...servicesQuery } = useClusterServices(
     environmentId,
     {
@@ -57,8 +61,6 @@ export function ServicesDatatable() {
       (canAccessSystemResources && tableState.showSystemResources) ||
       !namespaces?.[service.Namespace].IsSystem
   );
-  
-  console.log('filteredServices', filteredServices);
 
   const servicesWithIsSystem = useServicesRowData(
     filteredServices || [],

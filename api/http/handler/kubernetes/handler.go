@@ -74,6 +74,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/secrets/count", httperror.LoggerHandler(h.getAllKubernetesSecretsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresses", httperror.LoggerHandler(h.GetAllKubernetesClusterIngresses)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresses/count", httperror.LoggerHandler(h.getAllKubernetesClusterIngressesCount)).Methods(http.MethodGet)
+	endpointRouter.Handle("/service_accounts", httperror.LoggerHandler(h.getAllKubernetesServiceAccounts)).Methods(http.MethodGet)
 	endpointRouter.Handle("/services", httperror.LoggerHandler(h.GetAllKubernetesServices)).Methods(http.MethodGet)
 	endpointRouter.Handle("/services/count", httperror.LoggerHandler(h.getAllKubernetesServicesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/secrets", httperror.LoggerHandler(h.GetAllKubernetesSecrets)).Methods(http.MethodGet)

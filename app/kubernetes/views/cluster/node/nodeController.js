@@ -40,7 +40,6 @@ class KubernetesNodeController {
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.updateNodeAsync = this.updateNodeAsync.bind(this);
     this.drainNodeAsync = this.drainNodeAsync.bind(this);
@@ -338,43 +337,6 @@ class KubernetesNodeController {
     this.selectTab(2);
   }
 
-  async getApplicationsAsync() {
-    try {
-      this.state.applicationsLoading = true;
-      this.applications = await this.KubernetesApplicationService.get();
-
-      this.resourceReservation = new KubernetesResourceReservation();
-      this.applications = _.map(this.applications, (app) => {
-        app.Pods = _.filter(app.Pods, (pod) => pod.Node === this.node.Name);
-        return app;
-      });
-      this.applications = _.filter(this.applications, (app) => app.Pods.length !== 0);
-      this.applications = _.map(this.applications, (app) => {
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
-        app.CPU = resourceReservation.CPU;
-        app.Memory = resourceReservation.Memory;
-        this.resourceReservation.CPU += resourceReservation.CPU;
-        this.resourceReservation.Memory += resourceReservation.Memory;
-        return app;
-      });
-      this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
-      this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
-      this.state.isContainPortainer = _.find(this.applications, { ApplicationName: 'portainer' });
-
-      if (this.hasResourceUsageAccess()) {
-        await this.getNodeUsage();
-      }
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve applications');
-    } finally {
-      this.state.applicationsLoading = false;
-    }
-  }
-
-  getApplications() {
-    return this.$async(this.getApplicationsAsync);
-  }
-
   async onInit() {
     this.availabilities = KubernetesNodeAvailabilities;
 
@@ -406,7 +368,6 @@ class KubernetesNodeController {
     this.formValues.Labels = KubernetesNodeHelper.computeUsedLabels(this.applications, this.formValues.Labels);
     this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
 
-    this.state.applicationsLoading = false;
     this.state.viewReady = true;
   }
 

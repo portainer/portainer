@@ -11,10 +11,7 @@ export const clusterManagementModule = angular
   .module('portainer.kubernetes.react.components.clusterManagement', [])
   .component(
     'kubernetesNodeApplicationsDatatable',
-    r2a(withUIRouter(withCurrentUser(NodeApplicationsDatatable)), [
-      'isLoading',
-      'onRefresh',
-    ])
+    r2a(withUIRouter(withCurrentUser(NodeApplicationsDatatable)), [])
   )
   .component(
     'resourceEventsDatatable',

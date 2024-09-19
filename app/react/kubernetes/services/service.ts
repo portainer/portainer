@@ -6,8 +6,6 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   Service,
-  NodeMetrics,
-  NodeMetric,
 } from '@/react/kubernetes/services/types';
 
 import { parseKubernetesAxiosError } from '../axiosError';
@@ -88,7 +86,7 @@ export async function getServices(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`,
       {
         params: {
-          withApplications: withApplications,
+          withApplications,
         },
       }
     );

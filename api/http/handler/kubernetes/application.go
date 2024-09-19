@@ -7,11 +7,12 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // @id GetApplicationsResources
-// @summary Get the total CPU and memory requests and limits of all applications within a namespace
-// @description Get the total CPU and memory requests and limits of all applications within a namespace
+// @summary Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces
+// @description Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -28,12 +29,20 @@ import (
 func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the getApplicationsResources operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		return httperror.InternalServerError("an error occurred during the GetApplicationsResources operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	applicationsResources, err := cli.GetApplicationsResource("")
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the getApplicationsResources operation, unable to calculate the total resource requests and limits for all applications in the namespace. Error: ", err)
+		if k8serrors.IsUnauthorized(err) {
+			return httperror.Unauthorized("an error occurred during the GetApplicationsResources operation, unable to get the total resource requests and limits for all applications in the namespace. Error: ", err)
+		}
+
+		if k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the GetApplicationsResources operation, unable to get the total resource requests and limits for all applications in the namespace. Error: ", err)
+		}
+
+		return httperror.InternalServerError("an error occurred during the GetApplicationsResources operation, unable to calculate the total resource requests and limits for all applications in the namespace. Error: ", err)
 	}
 
 	return response.JSON(w, applicationsResources)
@@ -102,7 +111,11 @@ func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.
 	if nodeName != "" {
 		applications, err = cli.GetApplicationsByNode(nodeName)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the getAllKubernetesApplications operation, unable to get the list of applications. Error: ", err)
+			if k8serrors.IsUnauthorized(err) {
+				return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
+			}
+
+			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
 		}
 	}
 

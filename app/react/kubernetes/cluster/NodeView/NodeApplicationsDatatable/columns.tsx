@@ -54,11 +54,9 @@ export function useColumns() {
           header: 'CPU reservation',
           cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
         }),
-        helper.accessor('Memory', {
+        helper.accessor((row) => row.Resource?.memoryRequest, {
           header: 'Memory reservation',
-          cell: ({ row: { original: item } }) => (
-            <>{humanize(item.Resource?.memoryRequest || 0)}</>
-          ),
+          cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
         }),
       ]),
     [hideStacksQuery.data]

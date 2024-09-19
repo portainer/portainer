@@ -1,6 +1,10 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { NodeMetrics, NodeMetric, ApplicationResource} from '@/react/kubernetes/metrics/types';
+import {
+  NodeMetrics,
+  NodeMetric,
+  ApplicationResource,
+} from '@/react/kubernetes/metrics/types';
 
 export async function getMetricsForAllNodes(environmentId: EnvironmentId) {
   try {

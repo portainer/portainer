@@ -12,11 +12,7 @@ export const namespacesModule = angular
   .module('portainer.kubernetes.react.components.namespaces', [])
   .component(
     'kubernetesNamespacesDatatable',
-    r2a(withUIRouter(withCurrentUser(NamespacesDatatable)), [
-      'dataset',
-      'onRemove',
-      'onRefresh',
-    ])
+    r2a(withUIRouter(withCurrentUser(NamespacesDatatable)), [])
   )
   .component(
     'kubernetesNamespaceApplicationsDatatable',

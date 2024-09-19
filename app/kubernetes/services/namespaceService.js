@@ -76,7 +76,6 @@ class KubernetesNamespaceService {
       updateNamespaces(visibleNamespaces);
       return visibleNamespaces;
     } catch (err) {
-      console.error('Error retrieving namespaces:', err);
       throw new PortainerError('Unable to retrieve namespaces', err);
     }
   }

@@ -39,19 +39,23 @@ export function IngressDatatable() {
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespacesArray, ...namespacesQuery } = useNamespacesQuery(environmentId);
+  const { data: namespacesArray, ...namespacesQuery } =
+    useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     withServices: true,
   });
 
-  const namespaces: Record<string, PortainerNamespace> = {};
-  if (Array.isArray(namespacesArray)) {
-    for (let i = 0; i < namespacesArray.length; i++) {
-      const namespace = namespacesArray[i];
-      namespaces[namespace.Name] = namespace;
+  const namespaces = useMemo(() => {
+    const ns: Record<string, PortainerNamespace> = {};
+    if (Array.isArray(namespacesArray)) {
+      for (let i = 0; i < namespacesArray.length; i++) {
+        const namespace = namespacesArray[i];
+        ns[namespace.Name] = namespace;
+      }
     }
-  }
+    return ns;
+  }, [namespacesArray]);
 
   const filteredIngresses = useMemo(
     () =>

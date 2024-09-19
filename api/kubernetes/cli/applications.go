@@ -165,7 +165,17 @@ func (kcl *KubeClient) GetApplicationsByNode(nodeName string) ([]models.K8sAppli
 		return nil, err
 	}
 
+	processedOwners := make(map[string]struct{})
+
 	for _, pod := range pods {
+		if len(pod.OwnerReferences) > 0 {
+			ownerUID := string(pod.OwnerReferences[0].UID)
+			if _, exists := processedOwners[ownerUID]; exists {
+				continue
+			}
+			processedOwners[ownerUID] = struct{}{}
+		}
+
 		application, err := kcl.ConvertPodToApplication(pod, replicaSets, true)
 		if err != nil {
 			return nil, err

@@ -28,8 +28,6 @@ export class Application {
 
   ResourcePool: string;
 
-  Namespace: string;
-
   Image: string;
 
   CreationDate: 0;
@@ -105,7 +103,6 @@ export class Application {
     this.ApplicationOwner = '';
     this.ApplicationName = '';
     this.ResourcePool = '';
-    this.Namespace = '';
     this.Image = '';
     this.CreationDate = 0;
     this.Pods = [];
