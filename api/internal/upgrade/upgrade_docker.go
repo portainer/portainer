@@ -36,10 +36,12 @@ func (service *service) upgradeDocker(environment *portainer.Endpoint, licenseKe
 		return err
 	}
 
+	updaterImage := getUpdaterImage()
+
 	composeFile, err := mustache.RenderFile(templateName, map[string]string{
 		"image":           image,
 		"skip_pull_image": skipPullImageEnv,
-		"updater_image":   os.Getenv(updaterImageEnvVar),
+		"updater_image":   updaterImage,
 		"license":         licenseKey,
 		"envType":         envType,
 	})
@@ -114,4 +116,12 @@ func (service *service) checkImageForDocker(ctx context.Context, environment *po
 
 		return nil
 	}
+}
+
+func getUpdaterImage() string {
+	updaterImage := os.Getenv(updaterImageEnvVar)
+	if updaterImage == "" {
+		updaterImage = "portainer/portainer-updater:" + portainer.APIVersion
+	}
+	return updaterImage
 }
