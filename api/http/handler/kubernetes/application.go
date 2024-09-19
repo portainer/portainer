@@ -66,7 +66,7 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 }
 
 // @id getAllKubernetesApplicationsCount
-// @summary Get Secrets count
+// @summary Get Applications count
 // @description Get the count of Applications across all namespaces in the cluster. If nodeName is provided, it will return the count of applications running on that node.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
@@ -76,15 +76,15 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 // @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
-// @failure 500 "Server error occurred while attempting to retrieve the count of all secrets from the cluster."
+// @failure 500 "Server error occurred while attempting to retrieve the count of all applications from the cluster."
 // @router /kubernetes/{id}/applications/count [get]
 func (handler *Handler) getAllKubernetesApplicationsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	secrets, err := handler.getAllKubernetesApplications(r)
+	applications, err := handler.getAllKubernetesApplications(r)
 	if err != nil {
 		return err
 	}
 
-	return response.JSON(w, len(secrets))
+	return response.JSON(w, len(applications))
 }
 
 func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.K8sApplication, *httperror.HandlerError) {
