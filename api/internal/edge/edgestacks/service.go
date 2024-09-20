@@ -101,12 +101,12 @@ func (service *Service) PersistEdgeStack(
 	stack.EntryPoint = composePath
 	stack.NumDeployments = len(relatedEndpointIds)
 
-	if err := service.updateEndpointRelations(tx, stack.ID, relatedEndpointIds); err != nil {
-		return nil, fmt.Errorf("unable to update endpoint relations: %w", err)
-	}
-
 	if err := tx.EdgeStack().Create(stack.ID, stack); err != nil {
 		return nil, err
+	}
+
+	if err := service.updateEndpointRelations(tx, stack.ID, relatedEndpointIds); err != nil {
+		return nil, fmt.Errorf("unable to update endpoint relations: %w", err)
 	}
 
 	return stack, nil
