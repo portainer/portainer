@@ -10,13 +10,8 @@ import { NavContainer } from '@@/NavTabs/NavContainer';
 const deploymentPodman = [
   {
     id: 'all',
-    label: 'Linux',
+    label: 'RHEL / CentOS Linux',
     command: linuxPodmanCommandRootful,
-  },
-  {
-    id: 'mac',
-    label: 'Windows / Mac',
-    command: windowsMacPodmanCommandRootful,
   },
 ];
 
@@ -78,29 +73,6 @@ function linuxPodmanCommandRootful(agentVersion: string, agentSecret: string) {
 
   return `sudo systemctl enable --now podman.socket\n
 sudo podman volume create portainer\n
-sudo podman run -d \\
--p 9001:9001 ${secret}\\
---name portainer_agent \\
---restart=always \\
---privileged \\
--v /run/podman/podman.sock:/var/run/docker.sock \\
--v /var/lib/containers/storage/volumes:/var/lib/docker/volumes \\
--v /:/host \\
-portainer/agent:${agentVersion}
-`;
-}
-
-function windowsMacPodmanCommandRootful(
-  agentVersion: string,
-  agentSecret: string
-) {
-  const secret =
-    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret}`;
-
-  return `podman machine stop
-podman machine set --rootful
-podman machine start \n
-sudo podman volume create portainer
 sudo podman run -d \\
 -p 9001:9001 ${secret}\\
 --name portainer_agent \\
