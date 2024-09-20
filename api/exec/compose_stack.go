@@ -38,7 +38,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
-func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, forceRecreate bool) error {
+func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, options portainer.ComposeUpOptions) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch environment proxy")
@@ -61,7 +61,39 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 			Host:        url,
 			ProjectName: stack.Name,
 		},
-		ForceRecreate: forceRecreate,
+		ForceRecreate:        options.ForceRecreate,
+		AbortOnContainerExit: options.AbortOnContainerExit,
+	})
+	return errors.Wrap(err, "failed to deploy a stack")
+}
+
+// Run runs a one-off command on a service. Wraps `docker-compose run` command
+func (manager *ComposeStackManager) Run(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, serviceName string, options portainer.ComposeRunOptions) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	if err != nil {
+		return errors.Wrap(err, "failed to fetch environment proxy")
+	}
+
+	if proxy != nil {
+		defer proxy.Close()
+	}
+
+	envFilePath, err := createEnvFile(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to create env file")
+	}
+
+	filePaths := stackutils.GetStackFilePaths(stack, true)
+	err = manager.deployer.Run(ctx, filePaths, serviceName, libstack.RunOptions{
+		Options: libstack.Options{
+			WorkingDir:  stack.ProjectPath,
+			EnvFilePath: envFilePath,
+			Host:        url,
+			ProjectName: stack.Name,
+		},
+		Remove:   options.Remove,
+		Args:     options.Args,
+		Detached: options.Detached,
 	})
 	return errors.Wrap(err, "failed to deploy a stack")
 }

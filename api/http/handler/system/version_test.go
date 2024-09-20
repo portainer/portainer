@@ -39,7 +39,7 @@ func Test_getSystemVersion(t *testing.T) {
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService)
 
-	h := NewHandler(requestBouncer, &portainer.Status{}, store, nil)
+	h := NewHandler(requestBouncer, &portainer.Status{}, store, nil, nil)
 
 	// generate standard and admin user tokens
 	jwt, _, _ := jwtService.GenerateToken(&portainer.TokenData{ID: adminUser.ID, Username: adminUser.Username, Role: adminUser.Role})

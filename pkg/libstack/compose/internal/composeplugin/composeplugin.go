@@ -158,11 +158,12 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 
 	cmd.Env = append(cmd.Env, options.Env...)
 
+	executedCommand := cmd.String()
+
 	log.Debug().
-		Str("command", program).
-		Strs("args", args).
+		Str("command", executedCommand).
 		Interface("env", cmd.Env).
-		Msg("run command")
+		Msg("execute command")
 
 	cmd.Stderr = &stderr
 

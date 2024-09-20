@@ -3,11 +3,13 @@ package upgrade
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/kubernetes/cli"
-	"github.com/portainer/portainer/api/platform"
-	"github.com/portainer/portainer/pkg/libstack"
+	"github.com/portainer/portainer/api/dataservices"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
+	plf "github.com/portainer/portainer/api/platform"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -26,48 +28,54 @@ const (
 )
 
 type Service interface {
-	Upgrade(environment *portainer.Endpoint, licenseKey string) error
+	Upgrade(platform plf.ContainerPlatform, environment *portainer.Endpoint, licenseKey string) error
 }
 
 type service struct {
-	composeDeployer         libstack.Deployer
-	kubernetesClientFactory *cli.ClientFactory
+	kubernetesClientFactory   *kubecli.ClientFactory
+	dockerClientFactory       *dockerclient.ClientFactory
+	dockerComposeStackManager portainer.ComposeStackManager
+	fileService               portainer.FileService
 
 	isUpdating bool
-	platform   platform.ContainerPlatform
 
 	assetsPath string
 }
 
 func NewService(
 	assetsPath string,
-	composeDeployer libstack.Deployer,
-	kubernetesClientFactory *cli.ClientFactory,
+	kubernetesClientFactory *kubecli.ClientFactory,
+	dockerClientFactory *dockerclient.ClientFactory,
+	dockerComposeStackManager portainer.ComposeStackManager,
+	dataStore dataservices.DataStore,
+	fileService portainer.FileService,
+	stackDeployer deployments.StackDeployer,
 ) (Service, error) {
-	platform, err := platform.DetermineContainerPlatform()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to determine container platform")
-	}
 
 	return &service{
-		assetsPath:              assetsPath,
-		composeDeployer:         composeDeployer,
-		kubernetesClientFactory: kubernetesClientFactory,
-		platform:                platform,
+		assetsPath:                assetsPath,
+		kubernetesClientFactory:   kubernetesClientFactory,
+		dockerClientFactory:       dockerClientFactory,
+		dockerComposeStackManager: dockerComposeStackManager,
+		fileService:               fileService,
 	}, nil
 }
 
-func (service *service) Upgrade(environment *portainer.Endpoint, licenseKey string) error {
+func (service *service) Upgrade(platform plf.ContainerPlatform, environment *portainer.Endpoint, licenseKey string) error {
 	service.isUpdating = true
+	log.Debug().
+		Str("platform", string(platform)).
+		Msg("Starting upgrade process")
 
-	switch service.platform {
-	case platform.PlatformDockerStandalone:
-		return service.upgradeDocker(licenseKey, portainer.APIVersion, "standalone")
-	case platform.PlatformDockerSwarm:
-		return service.upgradeDocker(licenseKey, portainer.APIVersion, "swarm")
-	case platform.PlatformKubernetes:
+	switch platform {
+	case plf.PlatformDockerStandalone:
+		return service.upgradeDocker(environment, licenseKey, portainer.APIVersion, "standalone")
+	case plf.PlatformDockerSwarm:
+		return service.upgradeDocker(environment, licenseKey, portainer.APIVersion, "swarm")
+	case plf.PlatformKubernetes:
 		return service.upgradeKubernetes(environment, licenseKey, portainer.APIVersion)
 	}
 
-	return fmt.Errorf("unsupported platform %s", service.platform)
+	service.isUpdating = false
+	return fmt.Errorf("unsupported platform %s", platform)
 }
