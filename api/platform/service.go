@@ -76,12 +76,17 @@ func guessLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoin
 
 	endpoints, err := dataStore.Endpoint().Endpoints()
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to retrieve endpoints: %w", err)
+		return nil, "", fmt.Errorf("failed to retrieve environments: %w", err)
+	}
+
+	// skip guessing when there is no endpoints registered in DB
+	if len(endpoints) == 0 {
+		return nil, "", nil
 	}
 
 	endpointTypes, ok := platformToEndpointType[platform]
 	if !ok {
-		return nil, "", errors.New("failed to determine endpoint type")
+		return nil, "", errors.New("failed to determine environment type")
 	}
 
 	for _, endpoint := range endpoints {
@@ -97,7 +102,7 @@ func guessLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoin
 		}
 	}
 
-	return nil, "", errors.New("failed to find local endpoint")
+	return nil, "", errors.New("failed to find local environment")
 }
 
 func checkDockerEnvTypeForUpgrade(environment *portainer.Endpoint) ContainerPlatform {
