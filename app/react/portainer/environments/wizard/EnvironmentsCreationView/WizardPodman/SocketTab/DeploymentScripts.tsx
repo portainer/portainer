@@ -9,7 +9,7 @@ import { TextTip } from '@@/Tip/TextTip';
 const deployments = [
   {
     id: 'linux',
-    label: 'Linux',
+    label: 'Linux (CentOS / RHEL)',
     command: `sudo systemctl enable --now podman.socket`,
   },
 ];

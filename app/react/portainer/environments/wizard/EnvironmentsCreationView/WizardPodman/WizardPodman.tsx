@@ -73,11 +73,11 @@ export function WizardPodman({ onCreate }: Props) {
       <TextTip color="orange" className="mb-2" inline={false}>
         Currently,{' '}
         <b>
-          Portainer only supports Podman running in rootful mode or RHEL and
+          Portainer only supports Podman running in rootful mode on RHEL and
           CentOS Linux environments.
         </b>{' '}
-        Rootless mode and other Linux distros may work, but isn&apos;t
-        officially supported yet.
+        Rootless mode and other Linux distros may work, but aren&apos;t
+        officially supported.
       </TextTip>
       {tab}
     </div>
