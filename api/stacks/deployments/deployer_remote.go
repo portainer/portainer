@@ -184,7 +184,9 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	if err != nil {
 		return errors.Wrap(err, "unable to get agent info")
 	}
-	targetSocketBind := getTargetSocketBind(info.OSType)
+	// ensure the targetSocketBindHost is changed to podman for podman environments
+	targetSocketBindHost := getTargetSocketBindHost(info.OSType, endpoint.ContainerEngine)
+	targetSocketBindContainer := getTargetSocketBindContainer(info.OSType)
 
 	composeDestination := filesystem.JoinPaths(stack.ProjectPath, composePathPrefix)
 
@@ -206,7 +208,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	}, &container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", composeDestination, composeDestination),
-			fmt.Sprintf("%s:%s", targetSocketBind, targetSocketBind),
+			fmt.Sprintf("%s:%s", targetSocketBindHost, targetSocketBindContainer),
 		},
 	}, nil, nil, fmt.Sprintf("portainer-unpacker-%d-%s-%d", stack.ID, stack.Name, rand.Intn(100)))
 
@@ -327,7 +329,19 @@ func getUnpackerImage() string {
 	return image
 }
 
-func getTargetSocketBind(osType string) string {
+func getTargetSocketBindHost(osType string, containerEngine string) string {
+	targetSocketBind := "//./pipe/docker_engine"
+	if strings.EqualFold(osType, "linux") {
+		if containerEngine == portainer.ContainerEnginePodman {
+			targetSocketBind = "/run/podman/podman.sock"
+		} else {
+			targetSocketBind = "/var/run/docker.sock"
+		}
+	}
+	return targetSocketBind
+}
+
+func getTargetSocketBindContainer(osType string) string {
 	targetSocketBind := "//./pipe/docker_engine"
 	if strings.EqualFold(osType, "linux") {
 		targetSocketBind = "/var/run/docker.sock"
