@@ -1,7 +1,10 @@
+import { useRouter } from '@uirouter/react';
+
 import { useParamState } from '@/react/hooks/useParamState';
 
 export function useTemplateParams() {
-  const [id, setTemplateId] = useParamState('templateId', (param) => {
+  const router = useRouter();
+  const [id] = useParamState('templateId', (param) => {
     if (!param) {
       return undefined;
     }
@@ -14,7 +17,7 @@ export function useTemplateParams() {
     return templateId;
   });
 
-  const [type, setTemplateType] = useParamState('templateType', (param) => {
+  const [type] = useParamState('templateType', (param) => {
     if (param === 'app' || param === 'custom') {
       return param;
     }
@@ -31,7 +34,10 @@ export function useTemplateParams() {
     id: number | undefined;
     type: 'app' | 'custom' | undefined;
   }) {
-    setTemplateId(id);
-    setTemplateType(type);
+    router.stateService.go(
+      '.',
+      { templateId: id, templateType: type },
+      { reload: false }
+    );
   }
 }
