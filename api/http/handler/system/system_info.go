@@ -42,11 +42,12 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 		if endpointutils.IsEdgeEndpoint(&environment) {
 			edgeAgents++
 		}
+
 	}
 
-	platform, err := handler.platformService.GetPlatform()
+	platform, err := plf.DetermineContainerPlatform()
 	if err != nil {
-		return httperror.InternalServerError("Failed to get platform", err)
+		return httperror.InternalServerError("Unable to determine container platform", err)
 	}
 
 	return response.JSON(w, &systemInfoResponse{

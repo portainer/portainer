@@ -19,11 +19,8 @@ func (manager *composeStackManager) ComposeSyntaxMaxVersion() string {
 func (manager *composeStackManager) NormalizeStackName(name string) string {
 	return name
 }
-func (manager *composeStackManager) Run(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, serviceName string, options portainer.ComposeRunOptions) error {
-	return nil
-}
 
-func (manager *composeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, options portainer.ComposeUpOptions) error {
+func (manager *composeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, forceRecreate bool) error {
 	return nil
 }
 

@@ -45,7 +45,6 @@ import (
 	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/pendingactions/actions"
 	"github.com/portainer/portainer/api/pendingactions/handlers"
-	"github.com/portainer/portainer/api/platform"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/featureflags"
@@ -533,20 +532,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Msg("failed to fetch SSL settings from DB")
 	}
 
-	platformService, err := platform.NewService(dataStore)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed initializing platform service")
-	}
-
-	upgradeService, err := upgrade.NewService(
-		*flags.Assets,
-		kubernetesClientFactory,
-		dockerClientFactory,
-		composeStackManager,
-		dataStore,
-		fileService,
-		stackDeployer,
-	)
+	upgradeService, err := upgrade.NewService(*flags.Assets, composeDeployer, kubernetesClientFactory)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing upgrade service")
 	}
@@ -603,7 +589,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		UpgradeService:              upgradeService,
 		AdminCreationDone:           adminCreationDone,
 		PendingActionsService:       pendingActionsService,
-		PlatformService:             platformService,
 	}
 }
 

@@ -161,7 +161,7 @@ func (handler *Handler) startStack(
 			return handler.StackDeployer.StartRemoteComposeStack(stack, endpoint, filteredRegistries)
 		}
 
-		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{})
+		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, false)
 	case portainer.DockerSwarmStack:
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 

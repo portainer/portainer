@@ -1,7 +1,14 @@
 package platform
 
 import (
+	"context"
 	"os"
+
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+
+	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -13,8 +20,6 @@ const (
 type ContainerPlatform string
 
 const (
-	// PlatformDocker represent the Docker platform (Unknown)
-	PlatformDocker = ContainerPlatform("Docker")
 	// PlatformDockerStandalone represent the Docker platform (Standalone)
 	PlatformDockerStandalone = ContainerPlatform("Docker Standalone")
 	// PlatformDockerSwarm represent the Docker platform (Swarm)
@@ -29,22 +34,43 @@ const (
 // or KUBERNETES_SERVICE_HOST environment variable to determine if
 // the container is running on Podman or inside the Kubernetes platform.
 // Defaults to Docker otherwise.
-func DetermineContainerPlatform() ContainerPlatform {
+func DetermineContainerPlatform() (ContainerPlatform, error) {
 	podmanModeEnvVar := os.Getenv(PodmanMode)
 	if podmanModeEnvVar == "1" {
-		return PlatformPodman
+		return PlatformPodman, nil
 	}
 
 	serviceHostKubernetesEnvVar := os.Getenv(KubernetesServiceHost)
 	if serviceHostKubernetesEnvVar != "" {
-		return PlatformKubernetes
+		return PlatformKubernetes, nil
 	}
 
 	if !isRunningInContainer() {
-		return ""
+		return "", nil
 	}
 
-	return PlatformDocker
+	dockerCli, err := dockerclient.CreateSimpleClient()
+	if err != nil {
+		return "", errors.WithMessage(err, "failed to create docker client")
+	}
+	defer dockerCli.Close()
+
+	info, err := dockerCli.Info(context.Background())
+	if err != nil {
+		if client.IsErrConnectionFailed(err) {
+			log.Warn().Err(err).Msg("failed to retrieve docker info")
+
+			return "", nil
+		}
+
+		return "", errors.WithMessage(err, "failed to retrieve docker info")
+	}
+
+	if info.Swarm.NodeID == "" {
+		return PlatformDockerStandalone, nil
+	}
+
+	return PlatformDockerSwarm, nil
 }
 
 // isRunningInContainer returns true if the process is running inside a container

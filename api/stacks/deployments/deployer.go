@@ -69,9 +69,7 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 		}
 	}
 
-	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
-		ForceRecreate: forceRecreate,
-	})
+	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRecreate)
 	if err != nil {
 		d.composeStackManager.Down(context.TODO(), stack, endpoint)
 	}

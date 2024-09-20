@@ -65,7 +65,6 @@ import (
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/pendingactions"
-	"github.com/portainer/portainer/api/platform"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/pkg/libhelm"
@@ -112,7 +111,6 @@ type Server struct {
 	UpgradeService              upgrade.Service
 	AdminCreationDone           chan struct{}
 	PendingActionsService       *pendingactions.PendingActionsService
-	PlatformService             platform.Service
 }
 
 // Start starts the HTTP server
@@ -267,7 +265,6 @@ func (server *Server) Start() error {
 	var systemHandler = system.NewHandler(requestBouncer,
 		server.Status,
 		server.DataStore,
-		server.PlatformService,
 		server.UpgradeService)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
