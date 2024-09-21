@@ -152,8 +152,8 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase corev1.PodPha
 }
 
 // fetchAllPodsAndReplicaSets fetches all pods and replica sets across the cluster, i.e. all namespaces
-func (kcl *KubeClient) fetchAllPodsAndReplicaSets() ([]corev1.Pod, []appsv1.ReplicaSet, error) {
-	pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+func (kcl *KubeClient) fetchAllPodsAndReplicaSets(podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, error) {
+	pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), podListOptions)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, nil, nil

@@ -7,11 +7,12 @@ import { updateNamespaces } from 'Kubernetes/store/namespace';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaces, LocalStorage, $state) {
+  constructor($async, KubernetesNamespaces, Authentication, LocalStorage, $state) {
     this.$async = $async;
     this.$state = $state;
     this.KubernetesNamespaces = KubernetesNamespaces;
     this.LocalStorage = LocalStorage;
+    this.Authentication = Authentication;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);

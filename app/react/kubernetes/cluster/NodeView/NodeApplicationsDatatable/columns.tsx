@@ -50,13 +50,13 @@ export function useColumns() {
             </>
           ),
         }),
-        helper.accessor('CPU', {
+        helper.accessor((row) => row.Resource?.cpuRequest, {
           header: 'CPU reservation',
-          cell: ({ getValue }) => _.round(getValue(), 2),
+          cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
         }),
-        helper.accessor('Memory', {
+        helper.accessor((row) => row.Resource?.memoryRequest, {
           header: 'Memory reservation',
-          cell: ({ getValue }) => humanize(getValue()),
+          cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
         }),
       ]),
     [hideStacksQuery.data]

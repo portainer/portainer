@@ -267,11 +267,5 @@
     </div>
   </div>
 
-  <kubernetes-node-applications-datatable
-    ng-if="ctrl.applications && ctrl.applications.length > 0"
-    dataset="ctrl.applications"
-    on-refresh="(ctrl.getApplications)"
-    is-loading="ctrl.state.applicationsLoading"
-  >
-  </kubernetes-node-applications-datatable>
+  <kubernetes-node-applications-datatable></kubernetes-node-applications-datatable>
 </div>

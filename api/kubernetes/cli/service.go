@@ -176,7 +176,7 @@ func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServ
 
 	hasSelectors := containsServiceWithSelector(services)
 	if hasSelectors {
-		pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets()
+		pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(metav1.ListOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}

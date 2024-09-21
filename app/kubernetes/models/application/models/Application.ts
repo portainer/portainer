@@ -41,9 +41,11 @@ export class Application {
     annotations?: Record<string, string>;
   };
 
-  Limits: {
-    Cpu?: number;
-    Memory?: number;
+  Resource?: {
+    cpuLimit?: number;
+    cpuRequest?: number;
+    memoryLimit?: number;
+    memoryRequest?: number;
   };
 
   ServiceType?: ServiceType;
@@ -106,7 +108,7 @@ export class Application {
     this.Pods = [];
     this.Containers = [];
     this.Metadata = {};
-    this.Limits = {};
+    this.Resource = {};
     this.ServiceId = '';
     this.ServiceName = '';
     this.HeadlessServiceName = undefined;
