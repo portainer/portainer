@@ -165,13 +165,13 @@ export function createAgentEnvironment({
     name,
     url: environmentUrl,
     creationType: EnvironmentCreationTypes.AgentEnvironment,
-    containerEngine,
     options: {
       meta,
       tls: {
         skipVerify: true,
         skipClientVerify: true,
       },
+      containerEngine,
     },
   });
 }
