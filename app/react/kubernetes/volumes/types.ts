@@ -29,13 +29,13 @@ interface K8sPersistentVolumeClaim {
   name: string;
   namespace: string;
   storage: number;
-  creationDate: Date;
+  creationDate: string;
   accessModes?: PersistentVolumeClaimSpec['accessModes'];
   volumeName: string;
   resourcesRequests?: PersistentVolumeClaimSpec['resources'];
   storageClass?: string;
   volumeMode?: PersistentVolumeClaimSpec['volumeMode'];
-  owningApplications?: K8sApplication[];
+  owningApplications?: K8sVolOwningApplication[];
   phase: PersistentVolumeClaimStatus['phase'];
 }
 
@@ -46,7 +46,7 @@ interface K8sStorageClass {
   allowVolumeExpansion?: boolean;
 }
 
-interface K8sApplication {
+export interface K8sVolOwningApplication {
   Uid?: string;
   Name: string;
   Namespace?: string;

@@ -11,7 +11,6 @@ import {
 } from '@@/datatables/types';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useRepeater } from '@@/datatables/useRepeater';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
@@ -35,7 +34,7 @@ const columns = [
   }),
 ];
 
-export function StorageDatatable({ onRefresh }: { onRefresh: () => void }) {
+export function StorageDatatable() {
   const tableState = useTableStateWithStorage<TableSettings>(
     'kubernetes.volumes.storages',
     'Name',
@@ -44,11 +43,11 @@ export function StorageDatatable({ onRefresh }: { onRefresh: () => void }) {
     })
   );
 
-  useRepeater(tableState.autoRefreshRate, onRefresh);
-
   const envId = useEnvironmentId();
-  const storagesQuery = useAllStoragesQuery(envId);
-  const storages = Object.values(storagesQuery.data ?? []);
+  const storagesQuery = useAllStoragesQuery(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+  });
+  const storages = storagesQuery.data ?? [];
 
   return (
     <ExpandableDatatable
@@ -59,6 +58,7 @@ export function StorageDatatable({ onRefresh }: { onRefresh: () => void }) {
       title="Storage"
       titleIcon={HardDrive}
       settingsManager={tableState}
+      isLoading={storagesQuery.isLoading}
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh

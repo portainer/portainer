@@ -8,7 +8,6 @@ import { refreshableSettings } from '@@/datatables/types';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
-import { useRepeater } from '@@/datatables/useRepeater';
 
 import { systemResourcesSettings } from '../../datatables/SystemResourcesSettings';
 import { CreateFromManifestButton } from '../../components/CreateFromManifestButton';
@@ -19,16 +18,15 @@ import {
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 import { useAllVolumesQuery } from '../useVolumesQuery';
+import { PortainerNamespace } from '../../namespaces/types';
 
 import { VolumeViewModel } from './types';
 import { columns } from './columns';
 
 export function VolumesDatatable({
   onRemove,
-  onRefresh,
 }: {
   onRemove(items: Array<VolumeViewModel>): void;
-  onRefresh(): void;
 }) {
   const tableState = useTableStateWithStorage<TableSettings>(
     'kube-volumes',
@@ -41,23 +39,23 @@ export function VolumesDatatable({
 
   const hasWriteAuth = useAuthorizations('K8sVolumesW', undefined, true);
 
-  useRepeater(tableState.autoRefreshRate, onRefresh);
-
   const envId = useEnvironmentId();
   const namespaceListQuery = useNamespacesQuery(envId);
-
-  const volumesQuery = useAllVolumesQuery(envId);
-  const volumes = Object.values(volumesQuery.data ?? []);
+  const namespaces = namespaceListQuery.data ?? [];
+  const volumesQuery = useAllVolumesQuery(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+  });
+  const volumes = volumesQuery.data ?? [];
 
   const filteredVolumes = tableState.showSystemResources
     ? volumes
-    : volumes.filter((item) => !isSystem(item));
+    : volumes.filter((volume) => !isSystem(volume, namespaces));
 
   return (
     <Datatable
       noWidget
       data-cy="k8s-volumes-datatable"
-      isLoading={volumesQuery.isLoading}
+      isLoading={volumesQuery.isLoading || namespaceListQuery.isLoading}
       dataset={filteredVolumes}
       columns={columns}
       settingsManager={tableState}
@@ -65,7 +63,7 @@ export function VolumesDatatable({
       titleIcon={Database}
       isRowSelectable={({ original: item }) =>
         hasWriteAuth &&
-        !(isSystem(item) && !KubernetesVolumeHelper.isUsed(item))
+        !(isSystem(item, namespaces) && !KubernetesVolumeHelper.isUsed(item))
       }
       renderTableActions={(selectedItems) => (
         <>
@@ -90,12 +88,15 @@ export function VolumesDatatable({
       }
     />
   );
+}
 
-  function isSystem(item: VolumeViewModel) {
-    return namespaceListQuery.data?.some(
-      (namespace) =>
-        namespace.Name === item.ResourcePool.Namespace.Name &&
-        namespace.IsSystem
-    );
-  }
+function isSystem(
+  volume: VolumeViewModel,
+  namespaces: PortainerNamespace[]
+): boolean {
+  return namespaces.some(
+    (namespace) =>
+      namespace.Name === volume.ResourcePool.Namespace.Name &&
+      namespace.IsSystem
+  );
 }

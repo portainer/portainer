@@ -24,10 +24,7 @@ func (kcl *KubeClient) GetVolumes(namespace string) ([]models.K8sVolumeInfo, err
 	return kcl.fetchVolumesForNonAdmin(namespace)
 }
 
-// GetVolume gets the volume with the given name in the current k8s environment(endpoint).
-// If the user is an admin, it fetches all the volumes in the cluster.
-// If the user is not an admin, it fetches the volumes in the namespaces the user has access to.
-// It returns the volume with the given name.
+// GetVolume gets the volume with the given name and namespace.
 func (kcl *KubeClient) GetVolume(namespace, volumeName string) (*models.K8sVolumeInfo, error) {
 	persistentVolumeClaim, err := kcl.cli.CoreV1().PersistentVolumeClaims(namespace).Get(context.TODO(), volumeName, metav1.GetOptions{})
 	if err != nil {
@@ -123,8 +120,6 @@ func parseVolume(persistentVolumeClaim *corev1.PersistentVolumeClaim, persistent
 }
 
 // parsePersistentVolumeClaim parses the given persistent volume claim and returns a K8sPersistentVolumeClaim.
-// This function is called by fetchVolumes.
-// It returns a K8sPersistentVolumeClaim.
 func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8sPersistentVolumeClaim {
 	storage := volume.Spec.Resources.Requests[corev1.ResourceStorage]
 	return models.K8sPersistentVolumeClaim{
@@ -144,8 +139,6 @@ func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8s
 }
 
 // parsePersistentVolume parses the given persistent volume and returns a K8sPersistentVolume.
-// This function is called by buildPersistentVolumesMap.
-// It returns a K8sPersistentVolume.
 func parsePersistentVolume(volume *corev1.PersistentVolume) models.K8sPersistentVolume {
 	return models.K8sPersistentVolume{
 		Name:                          volume.Name,
@@ -161,8 +154,6 @@ func parsePersistentVolume(volume *corev1.PersistentVolume) models.K8sPersistent
 }
 
 // buildPersistentVolumesMap builds a map of persistent volumes.
-// This function is called by fetchVolumes.
-// It returns a map of persistent volumes.
 func (kcl *KubeClient) buildPersistentVolumesMap(persistentVolumes *corev1.PersistentVolumeList) map[string]models.K8sPersistentVolume {
 	persistentVolumesMap := make(map[string]models.K8sPersistentVolume)
 	for _, persistentVolume := range persistentVolumes.Items {
@@ -173,8 +164,6 @@ func (kcl *KubeClient) buildPersistentVolumesMap(persistentVolumes *corev1.Persi
 }
 
 // parseStorageClass parses the given storage class and returns a K8sStorageClass.
-// This function is called by buildStorageClassesMap.
-// It returns a K8sStorageClass.
 func parseStorageClass(storageClass *storagev1.StorageClass) models.K8sStorageClass {
 	return models.K8sStorageClass{
 		Name:                 storageClass.Name,
@@ -185,8 +174,6 @@ func parseStorageClass(storageClass *storagev1.StorageClass) models.K8sStorageCl
 }
 
 // buildStorageClassesMap builds a map of storage classes.
-// This function is called by fetchVolumes.
-// It returns a map of storage classes.
 func (kcl *KubeClient) buildStorageClassesMap(storageClasses *storagev1.StorageClassList) map[string]models.K8sStorageClass {
 	storageClassesMap := make(map[string]models.K8sStorageClass)
 	for _, storageClass := range storageClasses.Items {
@@ -198,7 +185,6 @@ func (kcl *KubeClient) buildStorageClassesMap(storageClasses *storagev1.StorageC
 
 // fetchPersistentVolumesAndStorageClassesMap fetches all the persistent volumes and storage classes in the cluster.
 // It returns a map of persistent volumes and a map of storage classes.
-// This function is called by fetchVolumes.
 func (kcl *KubeClient) fetchPersistentVolumesAndStorageClassesMap() (map[string]models.K8sPersistentVolume, map[string]models.K8sStorageClass, error) {
 	persistentVolumes, err := kcl.cli.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -216,13 +202,13 @@ func (kcl *KubeClient) fetchPersistentVolumesAndStorageClassesMap() (map[string]
 }
 
 // CombineVolumesWithApplications combines the volumes with the applications that use them.
-// It returns a list of K8sVolumeInfo.
 func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolumeInfo) (*[]models.K8sVolumeInfo, error) {
 	pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return volumes, nil
 		}
+		log.Error().Err(err).Msg("Failed to list pods across the cluster")
 		return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to list pods across the cluster. Error: %w", err)
 	}
 
@@ -231,6 +217,7 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 	if hasReplicaSetOwnerReference {
 		replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
 		if err != nil {
+			log.Error().Err(err).Msg("Failed to list replica sets across the cluster")
 			return nil, fmt.Errorf("an error occurred during the GetApplicationsFromServiceSelectors operation, unable to list replica sets across the cluster. Error: %w", err)
 		}
 		replicaSetItems = replicaSets.Items
@@ -240,22 +227,32 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 }
 
 // updateVolumesWithOwningApplications updates the volumes with the applications that use them.
-// This function is called by CombineVolumesWithApplications.
 func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8sVolumeInfo, pods *corev1.PodList, replicaSetItems []appsv1.ReplicaSet) (*[]models.K8sVolumeInfo, error) {
 	for i, volume := range *volumes {
-		for _, pod := range pods.Items {
-			if pod.Spec.Volumes != nil {
-				for _, podVolume := range pod.Spec.Volumes {
-					if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
-						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems)
-						if err != nil {
-							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)
-						}
-						(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, application)
+			for _, pod := range pods.Items {
+					if pod.Spec.Volumes != nil {
+							for _, podVolume := range pod.Spec.Volumes {
+									if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
+											application, err := kcl.ConvertPodToApplication(pod, replicaSetItems)
+											if err != nil {
+													log.Error().Err(err).Msg("Failed to convert pod to application")
+													return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)
+											}
+											// Check if the application already exists in the OwningApplications slice
+											exists := false
+											for _, existingApp := range (*volumes)[i].PersistentVolumeClaim.OwningApplications {
+													if existingApp.Name == application.Name && existingApp.Namespace == application.Namespace {
+															exists = true
+															break
+													}
+											}
+											if !exists {
+													(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, application)
+											}
+									}
+							}
 					}
-				}
 			}
-		}
 	}
 	return volumes, nil
 }

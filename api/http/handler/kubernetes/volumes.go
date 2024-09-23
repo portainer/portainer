@@ -1,10 +1,10 @@
 package kubernetes
 
 import (
-	"fmt"
 	"net/http"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/rs/zerolog/log"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -74,30 +74,36 @@ func (handler *Handler) getAllKubernetesVolumesCount(w http.ResponseWriter, r *h
 func (handler *Handler) getKubernetesVolume(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesVolume operation, unable to retrieve namespace identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesVolume").Msg("Unable to retrieve namespace identifier")
+		return httperror.BadRequest("Invalid namespace identifier", err)
 	}
 
 	volumeName, err := request.RetrieveRouteVariableValue(r, "volume")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesVolume operation, unable to retrieve volume name route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesVolume").Msg("Unable to retrieve volume name")
+		return httperror.BadRequest("Invalid volume name", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesVolume operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetKubernetesVolume").Msg("Unable to get Kubernetes client")
+		return httperror.InternalServerError("Failed to prepare Kubernetes client", httpErr)
 	}
 
 	volume, err := cli.GetVolume(namespace, volumeName)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized(fmt.Sprintf("an error occurred during the GetKubernetesVolume operation, unauthorized to access volume: %s in namespace: %s. Error: ", volumeName, namespace), err)
+			log.Error().Err(err).Str("context", "GetKubernetesVolume").Str("namespace", namespace).Str("volume", volumeName).Msg("Unauthorized access")
+			return httperror.Unauthorized("Unauthorized access to volume", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound(fmt.Sprintf("an error occurred during the GetKubernetesVolume operation, unable to find volume: %s in namespace: %s. Error: ", volumeName, namespace), err)
+			log.Error().Err(err).Str("context", "GetKubernetesVolume").Str("namespace", namespace).Str("volume", volumeName).Msg("Volume not found")
+			return httperror.NotFound("Volume not found", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesVolume operation, unable to retrieve volume from the Kubernetes cluster. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesVolume").Str("namespace", namespace).Str("volume", volumeName).Msg("Failed to retrieve volume")
+		return httperror.InternalServerError("Failed to retrieve volume", err)
 	}
 
 	return response.JSON(w, volume)
@@ -106,27 +112,32 @@ func (handler *Handler) getKubernetesVolume(w http.ResponseWriter, r *http.Reque
 func (handler *Handler) getKubernetesVolumes(r *http.Request) ([]models.K8sVolumeInfo, *httperror.HandlerError) {
 	withApplications, err := request.RetrieveBooleanQueryParameter(r, "withApplications", true)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetKubernetesVolumes operation, unable to parse query parameter. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesVolumes").Bool("withApplications", withApplications).Msg("Unable to parse query parameter")
+		return nil, httperror.BadRequest("Invalid 'withApplications' parameter", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesVolumes operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetKubernetesVolumes").Msg("Unable to get Kubernetes client")
+		return nil, httperror.InternalServerError("Failed to prepare Kubernetes client", httpErr)
 	}
 
 	volumes, err := cli.GetVolumes("")
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) {
-			return nil, httperror.Unauthorized("an error occurred during the GetKubernetesVolumes operation, unauthorized to access volumes in the Kubernetes cluster. Error: ", err)
+			log.Error().Err(err).Str("context", "GetKubernetesVolumes").Msg("Unauthorized access")
+			return nil, httperror.Unauthorized("Unauthorized access to volumes", err)
 		}
 
-		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesVolumes operation, unable to retrieve volumes from the Kubernetes cluster. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesVolumes").Msg("Failed to retrieve volumes")
+		return nil, httperror.InternalServerError("Failed to retrieve volumes", err)
 	}
 
 	if withApplications {
 		volumesWithApplications, err := cli.CombineVolumesWithApplications(&volumes)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesVolumes operation, unable to combine volumes with applications. Error: ", err)
+			log.Error().Err(err).Str("context", "GetKubernetesVolumes").Msg("Failed to combine volumes with applications")
+			return nil, httperror.InternalServerError("Failed to combine volumes with applications", err)
 		}
 
 		return *volumesWithApplications, nil

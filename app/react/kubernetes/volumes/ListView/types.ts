@@ -1,17 +1,17 @@
 import { StorageClass } from '@/kubernetes/models/storage-class/StorageClass';
 import { Volume } from '@/kubernetes/models/volume/Volume';
 
+import { K8sVolOwningApplication } from '../types';
+
 export interface VolumeViewModel {
-  Applications: Array<{
-    Name: string;
-  }>;
+  Applications: K8sVolOwningApplication[];
   PersistentVolumeClaim: {
     Name: string;
     storageClass: {
       Name: string;
     };
     Storage?: unknown;
-    CreationDate?: Date;
+    CreationDate?: string;
     ApplicationOwner?: string;
   };
   ResourcePool: {

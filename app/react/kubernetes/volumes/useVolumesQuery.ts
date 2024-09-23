@@ -11,22 +11,36 @@ import { K8sVolumeInfo } from './types';
 import { VolumeViewModel, StorageClassViewModel } from './ListView/types';
 
 // useQuery to get a list of all volumes from an array of namespaces
-export function useAllVolumesQuery(environmentId: EnvironmentId) {
+export function useAllVolumesQuery(
+  environmentId: EnvironmentId,
+  queryOptions?: {
+    refetchInterval?: number;
+  }
+) {
   return useQuery(
     ['environments', environmentId, 'kubernetes', 'volumes'],
-    () => getAllVolumes(environmentId, false, true),
+    () => getAllVolumes(environmentId, { withApplications: true }),
     {
+      refetchInterval: queryOptions?.refetchInterval,
+      select: convertToVolumeViewModels,
       ...withError('Unable to retrieve volumes'),
     }
   );
 }
 
 // useQuery to get a list of all volumes from an array of namespaces
-export function useAllStoragesQuery(environmentId: EnvironmentId) {
+export function useAllStoragesQuery(
+  environmentId: EnvironmentId,
+  queryOptions?: {
+    refetchInterval?: number;
+  }
+) {
   return useQuery(
     ['environments', environmentId, 'kubernetes', 'storages'],
-    () => getAllVolumes(environmentId, true, false),
+    () => getAllVolumes(environmentId),
     {
+      refetchInterval: queryOptions?.refetchInterval,
+      select: convertToStorageClassViewModels,
       ...withError('Unable to retrieve volumes'),
     }
   );
@@ -35,21 +49,14 @@ export function useAllStoragesQuery(environmentId: EnvironmentId) {
 // get all volumes from a namespace
 export async function getAllVolumes(
   environmentId: EnvironmentId,
-  isStorage: boolean,
-  withApplications: boolean
+  params?: { withApplications: boolean }
 ) {
   try {
-    const params = withApplications ? { withApplications } : {};
     const { data } = await axios.get<K8sVolumeInfo[]>(
       `/kubernetes/${environmentId}/volumes`,
       { params }
     );
-
-    if (isStorage) {
-      return convertToStorageClassViewModels(data);
-    }
-
-    return convertToVolumeViewModels(data);
+    return data;
   } catch (e) {
     throw parseKubernetesAxiosError(e, 'Unable to retrieve volumes');
   }
@@ -58,32 +65,34 @@ export async function getAllVolumes(
 function convertToVolumeViewModels(
   volumes: K8sVolumeInfo[]
 ): VolumeViewModel[] {
-  return volumes.map((volume) => ({
-    Applications: volume.persistentVolumeClaim.owningApplications?.map(
-      (app) => ({
+  return volumes.map((volume) => {
+    const owningApplications =
+      volume.persistentVolumeClaim.owningApplications ?? [];
+    return {
+      Applications: owningApplications.map((app) => ({
         Name: app.Name,
         Namespace: app.Namespace,
         Kind: app.Kind,
-      })
-    ) as VolumeViewModel['Applications'],
-    PersistentVolumeClaim: {
-      Name: volume.persistentVolumeClaim.name,
-      storageClass: {
-        Name: volume.persistentVolumeClaim.storageClass || '',
+      })),
+      PersistentVolumeClaim: {
+        Name: volume.persistentVolumeClaim.name,
+        storageClass: {
+          Name: volume.persistentVolumeClaim.storageClass || '',
+        },
+        Storage: `${(volume.persistentVolumeClaim.storage / 1024 ** 3).toFixed(
+          0
+        )}GiB`, // Convert KB to GB
+        CreationDate: volume.persistentVolumeClaim.creationDate,
+        ApplicationOwner:
+          volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
       },
-      Storage: `${(volume.persistentVolumeClaim.storage / 1073741824).toFixed(
-        0
-      )}GiB`, // Convert KB to GB
-      CreationDate: volume.persistentVolumeClaim.creationDate,
-      ApplicationOwner:
-        volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
-    },
-    ResourcePool: {
-      Namespace: {
-        Name: volume.persistentVolumeClaim.namespace,
+      ResourcePool: {
+        Namespace: {
+          Name: volume.persistentVolumeClaim.namespace,
+        },
       },
-    },
-  }));
+    };
+  });
 }
 
 function convertToStorageClassViewModels(
@@ -94,14 +103,16 @@ function convertToStorageClassViewModels(
 
   volumes.forEach((volume) => {
     const storageClassName = volume.storageClass.name || 'none';
-    const storageClassViewModel = storageClassMap.get(storageClassName) || {
+    const defaultStorageClass = {
       Name: storageClassName,
-      Provisioner: volume.storageClass.provisioner || '',
-      ReclaimPolicy: volume.storageClass.reclaimPolicy || '',
+      Provisioner: volume.storageClass.provisioner,
+      ReclaimPolicy: volume.storageClass.reclaimPolicy ?? '',
       AllowVolumeExpansion: volume.storageClass.allowVolumeExpansion || false,
       size: 0,
       Volumes: [],
     };
+    const storageClassViewModel =
+      storageClassMap.get(storageClassName) ?? defaultStorageClass;
 
     storageClassViewModel.size += volume.persistentVolumeClaim.storage || 0;
     storageClassViewModel.Volumes.push(
@@ -117,7 +128,7 @@ function convertToStorageClassViewModels(
   storageClassMap.forEach((value, key) => {
     storageClassMap.set(key, {
       ...value,
-      size: value.size / 1073741824,
+      size: value.size / 1024 ** 3,
     });
   });
 
@@ -126,7 +137,6 @@ function convertToStorageClassViewModels(
 
 function convertToVolumeModel(volumes: K8sVolumeInfo[]): Volume[] {
   return volumes.map((volume) => ({
-    ResourcePool: {} as Volume['ResourcePool'],
     PersistentVolumeClaim: {
       Id: volume.persistentVolumeClaim.id,
       Name: volume.persistentVolumeClaim.name,
@@ -134,14 +144,19 @@ function convertToVolumeModel(volumes: K8sVolumeInfo[]): Volume[] {
       Namespace: volume.persistentVolumeClaim.namespace,
       storageClass: {
         Name: volume.persistentVolumeClaim.storageClass || '',
+        Provisioner: volume.storageClass.provisioner,
+        ReclaimPolicy: volume.storageClass.reclaimPolicy ?? '',
+        AllowVolumeExpansion: volume.storageClass.allowVolumeExpansion || false,
       },
       Storage: volume.persistentVolumeClaim.storage,
       CreationDate: volume.persistentVolumeClaim.creationDate,
       ApplicationOwner:
-        volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
-      AccessModes: volume.persistentVolumeClaim.accessModes,
+        volume.persistentVolumeClaim.owningApplications?.[0]?.Name ?? '',
+      AccessModes: volume.persistentVolumeClaim.accessModes ?? [],
       ApplicationName: '',
-    } as unknown as Volume['PersistentVolumeClaim'],
-    Applications: [] as Volume['Applications'],
+      MountPath: '',
+      Yaml: '',
+    },
+    Applications: [],
   }));
 }
