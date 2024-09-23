@@ -10,16 +10,9 @@ export const volumesModule = angular
   .module('portainer.kubernetes.react.components.volumes', [])
   .component(
     'kubernetesVolumesDatatable',
-    r2a(withUIRouter(withCurrentUser(VolumesDatatable)), [
-      'dataset',
-      'onRemove',
-      'onRefresh',
-    ])
+    r2a(withUIRouter(withCurrentUser(VolumesDatatable)), ['onRemove'])
   )
   .component(
     'kubernetesVolumesStoragesDatatable',
-    r2a(withUIRouter(withCurrentUser(StorageDatatable)), [
-      'dataset',
-      'onRefresh',
-    ])
+    r2a(withUIRouter(withCurrentUser(StorageDatatable)), [])
   ).name;
