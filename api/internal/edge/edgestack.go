@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/slicesx"
 )
 
 var ErrEdgeGroupNotFound = errors.New("edge group was not found")
@@ -32,7 +33,7 @@ func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints [
 		edgeStackEndpoints = append(edgeStackEndpoints, EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)...)
 	}
 
-	return edgeStackEndpoints, nil
+	return slicesx.Unique(edgeStackEndpoints), nil
 }
 
 type EndpointRelationsConfig struct {

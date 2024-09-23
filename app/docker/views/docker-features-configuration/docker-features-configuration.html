@@ -154,9 +154,12 @@
           <!-- other -->
           <div class="col-sm-12 form-section-title"> Other </div>
           <div class="form-group">
-            <div class="col-sm-12">
-              <gpus-insights></gpus-insights>
+            <div class="col-sm-12" ng-if="!$ctrl.isDockerStandaloneEnv">
+              <text-tip children="'Showing GPU in the UI is currently only available with Docker Standalone and is limited to NVIDIA graphics cards.'" color="'blue'" />
             </div>
+          </div>
+
+          <div class="form-group">
             <div class="col-sm-12">
               <por-switch-field
                 label="'Show GPU in the UI'"
@@ -168,11 +171,20 @@
                 disabled="!$ctrl.isDockerStandaloneEnv"
               ></por-switch-field>
             </div>
-            <div class="col-sm-12">
-              <div class="pl-4">
-                <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+
+            <div ng-if="$ctrl.state.enableGPUManagement">
+              <div class="col-sm-12">
+                <text-tip children="'GPU support is currently limited to NVIDIA graphics cards only.'" color="'blue'" />
+              </div>
+              <div class="col-sm-12">
+                <div class="pl-4">
+                  <gpus-list ng-if="$ctrl.state.enableGPUManagement" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="form-group">
             <div class="col-sm-12">
               <por-switch-field
                 label="'Show image up to date indicators for Stacks, Services and Containers'"

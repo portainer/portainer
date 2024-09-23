@@ -5,7 +5,7 @@ import { PortainerSelect } from '@@/form-components/PortainerSelect';
 interface Props {
   name?: string;
   value: TeamId[] | readonly TeamId[];
-  onChange(value: readonly TeamId[]): void;
+  onChange(value: TeamId[]): void;
   teams: Team[];
   dataCy: string;
   inputId?: string;

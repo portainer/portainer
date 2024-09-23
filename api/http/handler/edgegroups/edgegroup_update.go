@@ -12,8 +12,6 @@ import (
 	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type edgeGroupUpdatePayload struct {
@@ -25,7 +23,7 @@ type edgeGroupUpdatePayload struct {
 }
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("invalid Edge group name")
 	}
 

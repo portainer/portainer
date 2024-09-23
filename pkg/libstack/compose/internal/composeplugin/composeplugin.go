@@ -57,7 +57,7 @@ func (wrapper *PluginWrapper) Deploy(ctx context.Context, filePaths []string, op
 
 // Down stop and remove containers
 func (wrapper *PluginWrapper) Remove(ctx context.Context, projectName string, filePaths []string, options libstack.Options) error {
-	output, err := wrapper.command(newDownCommand(projectName, filePaths), options)
+	output, err := wrapper.command(newDownCommand(projectName), options)
 	if len(output) != 0 {
 		if err != nil {
 			return err
@@ -110,6 +110,11 @@ func (wrapper *PluginWrapper) Validate(ctx context.Context, filePaths []string, 
 	return err
 }
 
+func (wrapper *PluginWrapper) Config(ctx context.Context, filePaths []string, options libstack.Options) ([]byte, error) {
+	configArgs := append([]string{"config"}, options.ConfigOptions...)
+	return wrapper.command(newCommand(configArgs, filePaths), options)
+}
+
 // Command execute a docker-compose command
 func (wrapper *PluginWrapper) command(command composeCommand, options libstack.Options) ([]byte, error) {
 	program := utils.ProgramPath(wrapper.binaryPath, "docker-compose")
@@ -153,11 +158,12 @@ func (wrapper *PluginWrapper) command(command composeCommand, options libstack.O
 
 	cmd.Env = append(cmd.Env, options.Env...)
 
+	executedCommand := cmd.String()
+
 	log.Debug().
-		Str("command", program).
-		Strs("args", args).
+		Str("command", executedCommand).
 		Interface("env", cmd.Env).
-		Msg("run command")
+		Msg("execute command")
 
 	cmd.Stderr = &stderr
 
@@ -217,8 +223,8 @@ func newUpCommand(filePaths []string, options upOptions) composeCommand {
 	return newCommand(args, filePaths)
 }
 
-func newDownCommand(projectName string, filePaths []string) composeCommand {
-	cmd := newCommand([]string{"down", "--remove-orphans"}, filePaths)
+func newDownCommand(projectName string) composeCommand {
+	cmd := newCommand([]string{"down", "--remove-orphans"}, nil)
 	cmd.WithProjectName(projectName)
 
 	return cmd

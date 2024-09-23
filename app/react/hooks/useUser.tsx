@@ -112,7 +112,7 @@ export function useAuthorizations(
     return { authorized: false, isLoading: false };
   }
 
-  if (envQuery.isLoading || isAdminQuery.isLoading) {
+  if (envQuery.isInitialLoading || isAdminQuery.isLoading) {
     return { authorized: false, isLoading: true };
   }
 

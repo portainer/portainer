@@ -12,8 +12,10 @@ type Deployer interface {
 	// if projectName is supplied filePaths will be ignored
 	Remove(ctx context.Context, projectName string, filePaths []string, options Options) error
 	Pull(ctx context.Context, filePaths []string, options Options) error
+	Run(ctx context.Context, filePaths []string, serviceName string, options RunOptions) error
 	Validate(ctx context.Context, filePaths []string, options Options) error
 	WaitForStatus(ctx context.Context, name string, status Status) <-chan WaitResult
+	Config(ctx context.Context, filePaths []string, options Options) ([]byte, error)
 }
 
 type Status string
@@ -47,6 +49,8 @@ type Options struct {
 	// By default, it is an empty string, which means it corresponds to the path of the compose file itself.
 	// This is particularly helpful when mounting a relative path.
 	ProjectDir string
+	// ConfigOptions is a list of options to pass to the docker-compose config command
+	ConfigOptions []string
 }
 
 type DeployOptions struct {
@@ -57,4 +61,14 @@ type DeployOptions struct {
 	//
 	// When this is set, docker compose will output its logs to stdout
 	AbortOnContainerExit bool ``
+}
+
+type RunOptions struct {
+	Options
+	// Automatically remove the container when it exits
+	Remove bool
+	// A list of arguments to pass to the container
+	Args []string
+	// Run the container in detached mode
+	Detached bool
 }

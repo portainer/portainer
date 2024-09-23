@@ -5,6 +5,7 @@ import { Datatable } from '@@/datatables';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { Tag } from './types';
 import { useColumns } from './columns/useColumns';
@@ -45,13 +46,15 @@ export function TagsDatatable({
         )
       }
       getRowId={(tag) => tag.Name}
-      extendTableOptions={withMeta({
-        onUpdate: async () => {
-          await onRetag(updatesState.updates);
-          updatesState.clear();
-        },
-        table: 'registry-repository-tags',
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          onUpdate: async () => {
+            await onRetag(updatesState.updates);
+            updatesState.clear();
+          },
+          table: 'registry-repository-tags',
+        })
+      )}
       data-cy="registry-tags-datatable"
     />
   );

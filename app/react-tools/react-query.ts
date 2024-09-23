@@ -9,6 +9,10 @@ import {
 
 import { notifyError } from '@/portainer/services/notifications';
 
+/**
+ * @deprecated use withGlobalError
+ * `onError` and other callbacks are not supported on react-query v5
+ */
 export function withError(fallbackMessage?: string, title = 'Failure') {
   return {
     onError(error: unknown) {
@@ -29,7 +33,7 @@ type OptionalReadonly<T> = T | Readonly<T>;
 
 export function withInvalidate(
   queryClient: QueryClient,
-  queryKeysToInvalidate: Array<OptionalReadonly<Array<string | number>>>,
+  queryKeysToInvalidate: Array<OptionalReadonly<Array<unknown>>>,
   // skipRefresh will set the mutation state to success without waiting for the invalidated queries to refresh
   // see the following for info: https://tkdodo.eu/blog/mastering-mutations-in-react-query#awaited-promises
   { skipRefresh }: { skipRefresh?: boolean } = {}
@@ -37,9 +41,7 @@ export function withInvalidate(
   return {
     onSuccess() {
       const promise = Promise.all(
-        queryKeysToInvalidate.map((keys) =>
-          queryClient.invalidateQueries(keys, { refetchType: 'none' })
-        )
+        queryKeysToInvalidate.map((keys) => queryClient.invalidateQueries(keys))
       );
       return skipRefresh
         ? undefined // don't wait for queries to refresh before setting state to success

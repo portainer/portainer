@@ -5,13 +5,14 @@ import { ColumnDef } from '@tanstack/react-table';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
-import { deleteTeam } from '@/react/portainer/users/teams/teams.service';
 
 import { Datatable } from '@@/datatables';
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
+
+import { deleteTeam } from '../../queries/useDeleteTeamMutation';
 
 const storageKey = 'teams';
 

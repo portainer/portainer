@@ -5,7 +5,9 @@ import { IResource } from '@/react/docker/components/datatable/createOwnershipCo
 import { PortainerResponse } from '@/react/docker/types';
 
 export class VolumeViewModel implements IResource {
-  Id: Volume['Name'];
+  Id: string;
+
+  Name: Volume['Name'];
 
   CreatedAt?: Volume['CreatedAt'];
 
@@ -28,7 +30,7 @@ export class VolumeViewModel implements IResource {
   ResourceControl?: ResourceControlViewModel;
 
   constructor(data: PortainerResponse<Volume> & { ResourceID?: string }) {
-    this.Id = data.Name;
+    this.Name = data.Name;
     this.CreatedAt = data.CreatedAt;
     this.Driver = data.Driver;
     this.Options = data.Options;
@@ -51,6 +53,11 @@ export class VolumeViewModel implements IResource {
       if (data.Portainer.Agent && data.Portainer.Agent.NodeName) {
         this.NodeName = data.Portainer.Agent.NodeName;
       }
+    }
+
+    this.Id = data.Name;
+    if (this.NodeName) {
+      this.Id = `${data.Name}-${this.NodeName}`;
     }
   }
 }

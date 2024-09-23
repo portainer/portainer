@@ -30,7 +30,7 @@ build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
 build-image: build-all ## Build the Portainer image locally
-	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
+	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
 
 build-storybook: ## Build and serve the storybook files
 	yarn storybook:build
@@ -63,6 +63,9 @@ clean: ## Remove all build and download artifacts
 ##@ Testing
 .PHONY: test test-client test-server
 test: test-server test-client ## Run all tests
+
+test-deps: init-dist
+	./build/download_docker_compose_binary.sh $(PLATFORM) $(ARCH) $(shell jq -r '.dockerCompose' < "./binary-version.json")
 
 test-client: ## Run client tests
 	yarn test $(ARGS)

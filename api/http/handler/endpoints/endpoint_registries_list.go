@@ -3,15 +3,16 @@ package endpoints
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/pkg/errors"
 )
 
 // @id endpointRegistriesList
@@ -123,7 +124,7 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 		return true, nil
 	}
 
-	if namespace == "default" {
+	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace && namespace == kubernetes.DefaultNamespace {
 		return true, nil
 	}
 

@@ -1363,11 +1363,31 @@ type (
 		ValidateFlags(flags *CLIFlags) error
 	}
 
+	ComposeUpOptions struct {
+		// ForceRecreate forces to recreate containers
+		ForceRecreate bool
+		// AbortOnContainerExit will stop the deployment if a container exits.
+		// This is useful when running a onetime task.
+		//
+		// When this is set, docker compose will output its logs to stdout
+		AbortOnContainerExit bool
+	}
+
+	ComposeRunOptions struct {
+		// Remove will remove the container after it has stopped
+		Remove bool
+		// Args are the arguments to pass to the container
+		Args []string
+		// Detached will run the container in the background
+		Detached bool
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
+		Run(ctx context.Context, stack *Stack, endpoint *Endpoint, serviceName string, options ComposeRunOptions) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeUpOptions) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
@@ -1464,7 +1484,7 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, time.Time, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
+		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
@@ -1618,7 +1638,7 @@ const (
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
-	DefaultKubectlShellImage = "portainer/kubectl-shell"
+	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token

@@ -28,5 +28,7 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 
 	security.RemoveAuthCookie(w)
 
+	handler.bouncer.RevokeJWT(tokenData.Token)
+
 	return response.Empty(w)
 }

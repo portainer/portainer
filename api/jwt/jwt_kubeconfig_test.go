@@ -3,14 +3,20 @@ package jwt
 import (
 	"testing"
 
-	"github.com/golang-jwt/jwt/v4"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	i "github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/api/datastore"
+
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestService_GenerateTokenForKubeconfig(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, false)
+
+	err := store.User().Create(&portainer.User{ID: 1})
+	assert.NoError(t, err)
+
 	type fields struct {
 		userSessionTimeout string
 		dataStore          dataservices.DataStore
@@ -20,13 +26,17 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 		data *portainer.TokenData
 	}
 
-	mySettings := &portainer.Settings{
-		KubeconfigExpiry: "0",
-	}
+	settings, err := store.Settings().Settings()
+	assert.NoError(t, err)
+
+	settings.KubeconfigExpiry = "0"
+
+	err = store.Settings().UpdateSettings(settings)
+	assert.NoError(t, err)
 
 	myFields := fields{
 		userSessionTimeout: "24h",
-		dataStore:          i.NewDatastore(i.WithSettingsService(mySettings)),
+		dataStore:          store,
 	}
 
 	myTokenData := &portainer.TokenData{
@@ -65,6 +75,9 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 				t.Errorf("GenerateTokenForKubeconfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
+			_, _, _, err = service.ParseAndVerifyToken(got)
+			assert.NoError(t, err)
 
 			parsedToken, err := jwt.ParseWithClaims(got, &claims{}, func(token *jwt.Token) (any, error) {
 				return service.secrets[kubeConfigScope], nil

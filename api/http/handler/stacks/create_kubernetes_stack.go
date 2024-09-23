@@ -88,7 +88,7 @@ func createStackPayloadFromK8sUrlPayload(name, namespace, manifestUrl string, co
 }
 
 func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return errors.New("Invalid stack file content")
 	}
 
@@ -96,15 +96,15 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 }
 
 func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
 
-	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+	if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
 		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 
-	if govalidator.IsNull(payload.ManifestFile) {
+	if len(payload.ManifestFile) == 0 {
 		return errors.New("Invalid manifest file in repository")
 	}
 
@@ -112,7 +112,7 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 }
 
 func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.ManifestURL) || !govalidator.IsURL(payload.ManifestURL) {
+	if len(payload.ManifestURL) == 0 || !govalidator.IsURL(payload.ManifestURL) {
 		return errors.New("Invalid manifest URL")
 	}
 

@@ -8,6 +8,7 @@ import { BasicTableSettings } from '@@/datatables/types';
 import { Button } from '@@/buttons';
 import { TableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { FileData } from './types';
 import { columns } from './columns';
@@ -86,15 +87,17 @@ export function FilesTable({
           Dir: false,
         },
       }}
-      extendTableOptions={withMeta({
-        table: 'files',
-        isEdit,
-        setIsEdit,
-        onRename,
-        onBrowse,
-        onDownload,
-        onDelete,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'files',
+          isEdit,
+          setIsEdit,
+          onRename,
+          onBrowse,
+          onDownload,
+          onDelete,
+        })
+      )}
       disableSelect
       data-cy="files-datatable"
       renderTableActions={() => {

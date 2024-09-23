@@ -64,11 +64,11 @@ type customTemplateUpdatePayload struct {
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Title) {
+	if len(payload.Title) == 0 {
 		return errors.New("Invalid custom template title")
 	}
 
-	if govalidator.IsNull(payload.FileContent) && govalidator.IsNull(payload.RepositoryURL) {
+	if len(payload.FileContent) == 0 && len(payload.RepositoryURL) == 0 {
 		return errors.New("Either file content or git repository url need to be provided")
 	}
 
@@ -80,7 +80,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid custom template type")
 	}
 
-	if govalidator.IsNull(payload.Description) {
+	if len(payload.Description) == 0 {
 		return errors.New("Invalid custom template description")
 	}
 
@@ -88,11 +88,11 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+	if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 
-	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
+	if len(payload.ComposeFilePathInRepository) == 0 {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 

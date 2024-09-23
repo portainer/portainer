@@ -11,7 +11,8 @@
     <meta name="robots" content="noindex" />
     <base id="base" />
     <script>
-      if (window.origin == 'file://') {
+      // http://localhost:49000 is a docker extension specific url (see /build/docker-extension/docker-compose.yml)
+      if (window.origin == 'http://localhost:49000') {
         // we are loading the app from a local file as in docker extension
         document.getElementById('base').href = 'http://localhost:49000/';
 
