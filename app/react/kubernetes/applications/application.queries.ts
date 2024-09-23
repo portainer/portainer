@@ -21,8 +21,17 @@ import { applicationIsKind, matchLabelsToLabelSelectorValue } from './utils';
 import { getNamespacePods } from './usePods';
 
 const queryKeys = {
-  applicationsForCluster: (environmentId: EnvironmentId) =>
-    ['environments', environmentId, 'kubernetes', 'applications'] as const,
+  applicationsForCluster: (
+    environmentId: EnvironmentId,
+    params?: GetAppsParams
+  ) =>
+    [
+      'environments',
+      environmentId,
+      'kubernetes',
+      'applications',
+      params,
+    ] as const,
   application: (
     environmentId: EnvironmentId,
     namespace: string,
@@ -261,7 +270,8 @@ export function useApplicationHorizontalPodAutoscaler(
     },
     {
       ...withError(
-        `Unable to get horizontal pod autoscaler${app ? ` for ${app.metadata?.name}` : ''
+        `Unable to get horizontal pod autoscaler${
+          app ? ` for ${app.metadata?.name}` : ''
         }`
       ),
       enabled: !!app,
@@ -321,8 +331,8 @@ export function usePatchApplicationMutation(
       appKind: AppKind;
       patch: ApplicationPatch;
       contentType?:
-      | 'application/json-patch+json'
-      | 'application/strategic-merge-patch+json';
+        | 'application/json-patch+json'
+        | 'application/strategic-merge-patch+json';
     }) =>
       patchApplication(
         environmentId,
@@ -382,17 +392,27 @@ export function useRedeployApplicationMutation(
   );
 }
 
+type GetAppsParams = {
+  namespace?: string;
+  nodeName?: string;
+  withDependencies?: boolean;
+};
+
+type GetAppsQueryOptions = {
+  refetchInterval?: number;
+} & GetAppsParams;
+
 // useQuery to get a list of all applications from an array of namespaces
 export function useAllApplicationsQuery(
   environmentId: EnvironmentId,
-  namespace: string,
-  nodeName: string,
-  withDependencies: boolean = false
+  queryOptions?: GetAppsQueryOptions
 ) {
+  const { refetchInterval, ...params } = queryOptions ?? {};
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'applications'],
-    () => getAllApplications(environmentId, namespace, nodeName, withDependencies),
+    queryKeys.applicationsForCluster(environmentId, params),
+    () => getAllApplications(environmentId, params),
     {
+      refetchInterval,
       ...withError('Unable to retrieve applications'),
     }
   );
@@ -401,21 +421,15 @@ export function useAllApplicationsQuery(
 // get all applications from a namespace
 export async function getAllApplications(
   environmentId: EnvironmentId,
-  namespace: string,
-  nodeName: string,
-  withDependencies: boolean = false
+  params?: GetAppsParams
 ) {
   try {
-    const params = nodeName
-      ? { nodeName, namespace, withDependencies }
-      : { namespace, withDependencies };
     const { data } = await axios.get<K8sApplication[]>(
       `/kubernetes/${environmentId}/applications`,
       { params }
     );
-
     return data;
   } catch (e) {
-    throw parseAxiosError(e, `Unable to retrieve applications from either across the cluster, namespace ${namespace}, or the node ${nodeName}`);
+    throw parseAxiosError(e, 'Unable to retrieve applications');
   }
 }

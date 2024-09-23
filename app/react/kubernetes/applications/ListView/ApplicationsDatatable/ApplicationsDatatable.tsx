@@ -64,7 +64,11 @@ export function ApplicationsDatatable({
     setShowSystemResources(showSystem || false);
   }, [showSystem, setShowSystemResources]);
 
-  const applicationsQuery = useAllApplicationsQuery(envId, namespace, "", true);
+  const applicationsQuery = useAllApplicationsQuery(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+    namespace,
+    withDependencies: true,
+  });
   const applications = applicationsQuery.data ?? [];
   const filteredApplications = showSystem
     ? applications
@@ -147,9 +151,7 @@ export function ApplicationsDatatable({
 
   function isSystem(item: Application) {
     return namespaceListQuery.data?.some(
-      (namespace) =>
-        namespace.Name === item.ResourcePool &&
-        namespace.IsSystem
+      (namespace) => namespace.Name === item.ResourcePool && namespace.IsSystem
     );
   }
 }
