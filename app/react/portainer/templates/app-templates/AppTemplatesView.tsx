@@ -22,7 +22,7 @@ export function AppTemplatesView() {
     'template',
     (param) => (param ? parseInt(param, 10) : 0)
   );
-  const templatesQuery = useAppTemplates();
+  const templatesQuery = useAppTemplates({ environmentId: envId });
   const selectedTemplate = selectedTemplateId
     ? templatesQuery.data?.find(
         (template) => template.Id === selectedTemplateId
