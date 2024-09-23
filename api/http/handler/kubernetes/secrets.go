@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesSecret
@@ -29,27 +30,32 @@ import (
 func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesSecret operation, unable to retrieve namespace identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Msg("Unable to retrieve namespace identifier route variable")
+		return httperror.BadRequest("unable to retrieve namespace identifier route variable. Error: ", err)
 	}
 
 	secretName, err := request.RetrieveRouteVariableValue(r, "secret")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesSecret operation, unable to retrieve secret identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Msg("Unable to retrieve secret identifier route variable")
+		return httperror.BadRequest("unable to retrieve secret identifier route variable. Error: ", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httpErr
+		log.Error().Err(httpErr).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	secret, err := cli.GetSecret(namespace, secretName)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesSecret operation, unable to get secret. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Str("secret", secretName).Msg("Unable to get secret")
+		return httperror.InternalServerError("unable to get secret. Error: ", err)
 	}
 
 	secretWithApplication, err := cli.CombineSecretWithApplications(secret)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesSecret operation, unable to combine secret with applications. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Str("secret", secretName).Msg("Unable to combine secret with associated applications")
+		return httperror.InternalServerError("unable to combine secret with associated applications. Error: ", err)
 	}
 
 	return response.JSON(w, secretWithApplication)
@@ -107,23 +113,27 @@ func (handler *Handler) getAllKubernetesSecretsCount(w http.ResponseWriter, r *h
 func (handler *Handler) getAllKubernetesSecrets(r *http.Request) ([]models.K8sSecret, *httperror.HandlerError) {
 	isUsed, err := request.RetrieveBooleanQueryParameter(r, "isUsed", true)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesSecrets operation, unable to retrieve isUsed query parameter. Error: ", err)
+		log.Error().Err(err).Str("context", "GetAllKubernetesSecrets").Msg("Unable to retrieve isUsed query parameter")
+		return nil, httperror.BadRequest("unable to retrieve isUsed query parameter. Error: ", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to prepare kube client. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetAllKubernetesSecrets").Msg("Unable to prepare kube client")
+		return nil, httperror.InternalServerError("unable to prepare kube client. Error: ", httpErr)
 	}
 
 	secrets, err := cli.GetSecrets("")
 	if err != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to get secrets. Error: ", err)
+		log.Error().Err(err).Str("context", "GetAllKubernetesSecrets").Msg("Unable to get secrets")
+		return nil, httperror.InternalServerError("unable to get secrets. Error: ", err)
 	}
 
 	if isUsed {
 		secretsWithApplications, err := cli.CombineSecretsWithApplications(secrets)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to combine secrets with applications. Error: ", err)
+			log.Error().Err(err).Str("context", "GetAllKubernetesSecrets").Msg("Unable to combine secrets with associated applications")
+			return nil, httperror.InternalServerError("unable to combine secrets with associated applications. Error: ", err)
 		}
 
 		return secretsWithApplications, nil

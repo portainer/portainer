@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesServiceAccounts
@@ -25,12 +26,14 @@ import (
 func (handler *Handler) getAllKubernetesServiceAccounts(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesSecrets operation, unable to prepare kube client. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetAllKubernetesServiceAccounts").Msg("Unable to prepare kube client")
+		return httperror.InternalServerError("unable to prepare kube client. Error: ", httpErr)
 	}
 
 	serviceAccounts, err := cli.GetServiceAccounts("")
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesServiceAccounts operation, unable to fetch service accounts. Error: ", err)
+		log.Error().Err(err).Str("context", "GetAllKubernetesServiceAccounts").Msg("Unable to fetch service accounts across all namespaces")
+		return httperror.InternalServerError("unable to fetch service accounts. Error: ", err)
 	}
 
 	return response.JSON(w, serviceAccounts)

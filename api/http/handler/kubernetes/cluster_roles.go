@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetAllKubernetesClusterRoles
@@ -25,16 +26,19 @@ import (
 func (handler *Handler) getAllKubernetesClusterRoles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httpErr
+		log.Error().Err(httpErr.Err).Str("context", "getAllKubernetesClusterRoles").Msg("user is not authorized to fetch cluster roles from the Kubernetes cluster.")
+		return httperror.Forbidden("User is not authorized to fetch cluster roles from the Kubernetes cluster.", httpErr)
 	}
 
 	if !cli.IsKubeAdmin {
-		return httperror.Forbidden("an error occurred during the GetAllKubernetesClusterRoles operation, user is not authorized to fetch cluster roles from the Kubernetes cluster.", nil)
+		log.Error().Str("context", "getAllKubernetesClusterRoles").Msg("user is not authorized to fetch cluster roles from the Kubernetes cluster.")
+		return httperror.Forbidden("User is not authorized to fetch cluster roles from the Kubernetes cluster.", nil)
 	}
 
 	clusterroles, err := cli.GetClusterRoles()
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesClusterRoles operation, unable to fetch clusterroles. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesClusterRoles").Msg("Unable to fetch clusterroles.")
+		return httperror.InternalServerError("Unable to fetch clusterroles.", err)
 	}
 
 	return response.JSON(w, clusterroles)

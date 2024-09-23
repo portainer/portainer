@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -30,35 +31,42 @@ import (
 func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesConfigMap operation, unable to retrieve namespace identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Msg("Unable to retrieve namespace identifier route variable")
+		return httperror.BadRequest("Unable to retrieve namespace identifier route variable", err)
 	}
 
 	configMapName, err := request.RetrieveRouteVariableValue(r, "configmap")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesConfigMap operation, unable to retrieve configMap identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Msg("Unable to retrieve configMap identifier route variable")
+		return httperror.BadRequest("Unable to retrieve configMap identifier route variable", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httpErr
+		log.Error().Err(httpErr).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Str("configMap", configMapName).Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
 	}
 
 	configMap, err := cli.GetConfigMap(namespace, configMapName)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Str("configMap", configMapName).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Str("configMap", configMapName).Msg("Unable to retrieve configMap")
+			return httperror.NotFound("Unable to retrieve configMap", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Str("configMap", configMapName).Msg("Unable to retrieve configMap")
+		return httperror.InternalServerError("Unable to retrieve configMap", err)
 	}
 
 	configMapWithApplications, err := cli.CombineConfigMapWithApplications(configMap)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesConfigMap operation, unable to combine configMap with applications. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesConfigMap").Str("namespace", namespace).Str("configMap", configMapName).Msg("Unable to combine configMap with applications")
+		return httperror.InternalServerError("Unable to combine configMap with applications", err)
 	}
 
 	return response.JSON(w, configMapWithApplications)
@@ -116,27 +124,32 @@ func (handler *Handler) getAllKubernetesConfigMapsCount(w http.ResponseWriter, r
 func (handler *Handler) getAllKubernetesConfigMaps(r *http.Request) ([]models.K8sConfigMap, *httperror.HandlerError) {
 	isUsed, err := request.RetrieveBooleanQueryParameter(r, "isUsed", true)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesConfigMaps operation, unable to retrieve isUsed query parameter. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesConfigMaps").Msg("Unable to retrieve isUsed query parameter")
+		return nil, httperror.BadRequest("Unable to retrieve isUsed query parameter", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesConfigMaps operation, unable to prepare kube client. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "getAllKubernetesConfigMaps").Msg("Unable to prepare kube client")
+		return nil, httperror.InternalServerError("Unable to prepare kube client", httpErr)
 	}
 
 	configMaps, err := cli.GetConfigMaps("")
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return nil, httperror.Forbidden("an error occurred during the GetAllKubernetesConfigMaps operation, unable to get configMap. Error: ", err)
+			log.Error().Err(err).Str("context", "getAllKubernetesConfigMaps").Msg("Unauthorized access to the Kubernetes API")
+			return nil, httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
-		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesConfigMaps operation, unable to get configMaps. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesConfigMaps").Msg("Unable to get configMaps")
+		return nil, httperror.InternalServerError("Unable to get configMaps", err)
 	}
 
 	if isUsed {
 		configMapsWithApplications, err := cli.CombineConfigMapsWithApplications(configMaps)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesConfigMaps operation, unable to combine configMaps with applications. Error: ", err)
+			log.Error().Err(err).Str("context", "getAllKubernetesConfigMaps").Msg("Unable to combine configMaps with associated applications")
+			return nil, httperror.InternalServerError("Unable to combine configMaps with associated applications", err)
 		}
 
 		return configMapsWithApplications, nil

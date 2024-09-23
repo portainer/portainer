@@ -45,15 +45,15 @@ type registryCreatePayload struct {
 
 func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 	if len(payload.Name) == 0 {
-		return errors.New("Invalid registry name")
+		return errors.New("invalid registry name")
 	}
 	if len(payload.URL) == 0 {
-		return errors.New("Invalid registry URL")
+		return errors.New("invalid registry URL")
 	}
 
 	if payload.Authentication {
 		if len(payload.Username) == 0 || len(payload.Password) == 0 {
-			return errors.New("Invalid credentials. Username and password must be specified when authentication is enabled")
+			return errors.New("invalid credentials. Username and password must be specified when authentication is enabled")
 		}
 		if payload.Type == portainer.EcrRegistry {
 			if len(payload.Ecr.Region) == 0 {
@@ -127,10 +127,10 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 	for _, r := range registries {
 		if r.Name == registry.Name {
-			return httperror.Conflict("Another registry with the same name already exists", errors.New("A registry is already defined with this name"))
+			return httperror.Conflict("Another registry with the same name already exists", errors.New("a registry is already defined with this name"))
 		}
 		if handler.registriesHaveSameURLAndCredentials(&r, registry) {
-			return httperror.Conflict("Another registry with the same URL and credentials already exists", errors.New("A registry is already defined for this URL and credentials"))
+			return httperror.Conflict("Another registry with the same URL and credentials already exists", errors.New("a registry is already defined for this URL and credentials"))
 		}
 	}
 

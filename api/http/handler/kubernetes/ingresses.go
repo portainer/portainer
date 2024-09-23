@@ -10,6 +10,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -32,35 +33,42 @@ import (
 func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve environment identifier from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Invalid environment identifier route variable")
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.NotFound("an error occurred during the GetKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+			log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
+			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	allowedOnly, err := request.RetrieveBooleanQueryParameter(r, "allowedOnly", true)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve allowedOnly query parameter. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to retrieve allowedOnly query parameter")
+		return httperror.BadRequest("Unable to retrieve allowedOnly query parameter", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to get privileged kube client. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to get privileged kube client")
+		return httperror.InternalServerError("Unable to get privileged kube client", err)
 	}
 
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the GetKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to retrieve ingress controllers from the Kubernetes")
+		return httperror.InternalServerError("Unable to retrieve ingress controllers from the Kubernetes", err)
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
@@ -103,7 +111,8 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 		endpoint,
 	)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllers operation, unable to store found IngressClasses inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to store found IngressClasses inside the database")
+		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
 	}
 
 	// If the allowedOnly query parameter was set. We need to prune out
@@ -139,21 +148,25 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve environment identifier from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve environment identifier from request")
+		return httperror.BadRequest("Unable to retrieve environment identifier from request", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.NotFound("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to find an environment with the specified identifier inside the database")
+			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to find an environment with the specified identifier inside the database")
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -164,10 +177,12 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	currentControllers, err := cli.GetIngressControllers()
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unable to retrieve ingress controllers from the Kubernetes")
+		return httperror.InternalServerError("Unable to retrieve ingress controllers from the Kubernetes", err)
 	}
 	// Add none controller if "AllowNone" is set for endpoint.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
@@ -228,7 +243,8 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = handler.DataStore.Endpoint().UpdateEndpoint(portainer.EndpointID(endpointID), endpoint)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngressControllersByNamespace operation, unable to store found IngressClasses inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to store found IngressClasses inside the database")
+		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
 	}
 	return response.JSON(w, controllers)
 }
@@ -253,41 +269,49 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve environment identifier from request. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to retrieve environment identifier from request")
+		return httperror.BadRequest("Unable to retrieve environment identifier from request", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+			log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
+			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to find an environment with the specified identifier inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	payload := models.K8sIngressControllers{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllers operation, unable to decode and validate the request payload. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to get privileged kube client. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to get privileged kube client")
+		return httperror.InternalServerError("Unable to get privileged kube client", err)
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the UpdateKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+			log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to retrieve ingress controllers from the Kubernetes")
+			return httperror.NotFound("Unable to retrieve ingress controllers from the Kubernetes", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to retrieve ingress controllers from the Kubernetes. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to retrieve ingress controllers from the Kubernetes")
+		return httperror.InternalServerError("Unable to retrieve ingress controllers from the Kubernetes", err)
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
@@ -337,7 +361,8 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		endpoint,
 	)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllers operation, unable to store found IngressClasses inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to store found IngressClasses inside the database")
+		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
 	}
 
 	return response.Empty(w)
@@ -364,18 +389,21 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return httperror.NotFound("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to fetch endpoint. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Msg("Unable to fetch endpoint")
+		return httperror.NotFound("Unable to fetch endpoint", err)
 	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	payload := models.K8sIngressControllers{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to decode and validate the request payload. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
@@ -443,7 +471,8 @@ PayloadLoop:
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngressControllersByNamespace operation, unable to store BlockedIngressClasses inside the database. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unable to store BlockedIngressClasses inside the database")
+		return httperror.InternalServerError("Unable to store BlockedIngressClasses inside the database", err)
 	}
 
 	return response.Empty(w)
@@ -501,31 +530,37 @@ func (handler *Handler) getAllKubernetesClusterIngressesCount(w http.ResponseWri
 func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models.K8sIngressInfo, *httperror.HandlerError) {
 	withServices, err := request.RetrieveBooleanQueryParameter(r, "withServices", true)
 	if err != nil {
-		return nil, httperror.BadRequest("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve withApplications query parameter. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesClusterIngresses").Msg("Unable to retrieve withApplications query parameter")
+		return nil, httperror.BadRequest("Unable to retrieve withApplications query parameter", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "getKubernetesClusterIngresses").Msg("Unable to get a Kubernetes client for the user")
+		return nil, httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
 	}
 
 	ingresses, err := cli.GetIngresses("")
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return nil, httperror.Forbidden("an error occurred during the GetKubernetesClusterIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesClusterIngresses").Msg("Unauthorized access to the Kubernetes API")
+			return nil, httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return nil, httperror.NotFound("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve ingresses from the Kubernetes for a cluster level user. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesClusterIngresses").Msg("Unable to retrieve ingresses from the Kubernetes for a cluster level user")
+			return nil, httperror.NotFound("Unable to retrieve ingresses from the Kubernetes for a cluster level user", err)
 		}
 
-		return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve ingresses from the Kubernetes for a cluster level user. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesClusterIngresses").Msg("Unable to retrieve ingresses from the Kubernetes for a cluster level user")
+		return nil, httperror.InternalServerError("Unable to retrieve ingresses from the Kubernetes for a cluster level user", err)
 	}
 
 	if withServices {
 		ingressesWithServices, err := cli.CombineIngressesWithServices(ingresses)
 		if err != nil {
-			return nil, httperror.InternalServerError("an error occurred during the GetKubernetesClusterIngresses operation, unable to combine ingresses with services. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesClusterIngresses").Msg("Unable to combine ingresses with services")
+			return nil, httperror.InternalServerError("Unable to combine ingresses with services", err)
 		}
 
 		return ingressesWithServices, nil
@@ -553,7 +588,8 @@ func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models
 func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngresses operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngresses").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -564,10 +600,12 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 	ingresses, err := cli.GetIngresses(namespace)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the GetKubernetesIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesIngresses").Str("namespace", namespace).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngresses operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngresses").Str("namespace", namespace).Msg("Unable to retrieve ingresses from the Kubernetes for a namespace level user")
+		return httperror.InternalServerError("Unable to retrieve ingresses from the Kubernetes for a namespace level user", err)
 	}
 
 	return response.JSON(w, ingresses)
@@ -593,12 +631,14 @@ func (handler *Handler) getKubernetesIngresses(w http.ResponseWriter, r *http.Re
 func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngress").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	ingressName, err := request.RetrieveRouteVariableValue(r, "ingress")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from request. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngress").Msg("Unable to retrieve ingress from request")
+		return httperror.BadRequest("Unable to retrieve ingress from request", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -609,14 +649,17 @@ func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Requ
 	ingress, err := cli.GetIngress(namespace, ingressName)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the GetKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesIngress").Str("namespace", namespace).Str("ingress", ingressName).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from the Kubernetes for a namespace level user. Error: ", err)
+			log.Error().Err(err).Str("context", "getKubernetesIngress").Str("namespace", namespace).Str("ingress", ingressName).Msg("Unable to retrieve ingress from the Kubernetes for a namespace level user")
+			return httperror.NotFound("Unable to retrieve ingress from the Kubernetes for a namespace level user", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the GetKubernetesIngress operation, unable to retrieve ingress from the Kubernetes for a namespace level user. Error: ", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngress").Str("namespace", namespace).Str("ingress", ingressName).Msg("Unable to retrieve ingress from the Kubernetes for a namespace level user")
+		return httperror.InternalServerError("Unable to retrieve ingress from the Kubernetes for a namespace level user", err)
 	}
 
 	return response.JSON(w, ingress)
@@ -644,13 +687,15 @@ func (handler *Handler) getKubernetesIngress(w http.ResponseWriter, r *http.Requ
 func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the CreateKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "createKubernetesIngress").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	payload := models.K8sIngressInfo{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the CreateKubernetesIngress operation, unable to decode and validate the request payload. Error: ", err)
+		log.Error().Err(err).Str("context", "createKubernetesIngress").Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
 	owner := "admin"
@@ -667,14 +712,17 @@ func (handler *Handler) createKubernetesIngress(w http.ResponseWriter, r *http.R
 	err = cli.CreateIngress(namespace, payload, owner)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the CreateKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "createKubernetesIngress").Str("namespace", namespace).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsAlreadyExists(err) {
-			return httperror.Conflict("an error occurred during the CreateKubernetesIngress operation, ingress already exists. Error: ", err)
+			log.Error().Err(err).Str("context", "createKubernetesIngress").Str("namespace", namespace).Msg("Ingress already exists")
+			return httperror.Conflict("Ingress already exists", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the CreateKubernetesIngress operation, unable to create an ingress. Error: ", err)
+		log.Error().Err(err).Str("context", "createKubernetesIngress").Str("namespace", namespace).Msg("Unable to create an ingress")
+		return httperror.InternalServerError("Unable to create an ingress", err)
 	}
 
 	return response.Empty(w)
@@ -706,20 +754,24 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 	payload := models.K8sIngressDeleteRequests{}
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the DeleteKubernetesIngresses operation, unable to decode and validate the request payload. Error: ", err)
+		log.Error().Err(err).Str("context", "deleteKubernetesIngresses").Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
 	err = cli.DeleteIngresses(payload)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the DeleteKubernetesIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "deleteKubernetesIngresses").Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound("an error occurred during the DeleteKubernetesIngresses operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+			log.Error().Err(err).Str("context", "deleteKubernetesIngresses").Msg("Unable to retrieve ingresses from the Kubernetes for a namespace level user")
+			return httperror.NotFound("Unable to retrieve ingresses from the Kubernetes for a namespace level user", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the DeleteKubernetesIngresses operation, unable to delete ingresses. Error: ", err)
+		log.Error().Err(err).Str("context", "deleteKubernetesIngresses").Msg("Unable to delete ingresses")
+		return httperror.InternalServerError("Unable to delete ingresses", err)
 	}
 
 	return response.Empty(w)
@@ -746,13 +798,15 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngress operation, unable to retrieve namespace from request. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngress").Msg("Unable to retrieve namespace from request")
+		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	payload := models.K8sIngressInfo{}
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return httperror.BadRequest("an error occurred during the UpdateKubernetesIngress operation, unable to decode and validate the request payload. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngress").Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
 	cli, handlerErr := handler.getProxyKubeClient(r)
@@ -763,14 +817,17 @@ func (handler *Handler) updateKubernetesIngress(w http.ResponseWriter, r *http.R
 	err = cli.UpdateIngress(namespace, payload)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
-			return httperror.Forbidden("an error occurred during the UpdateKubernetesIngress operation, unauthorized access to the Kubernetes API. Error: ", err)
+			log.Error().Err(err).Str("context", "updateKubernetesIngress").Str("namespace", namespace).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("Unauthorized access to the Kubernetes API", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
-			return httperror.NotFound("an error occurred during the UpdateKubernetesIngress operation, unable to retrieve ingresses from the Kubernetes for a namespace level user. Error: ", err)
+			log.Error().Err(err).Str("context", "updateKubernetesIngress").Str("namespace", namespace).Msg("Unable to retrieve ingresses from the K	ubernetes for a namespace level user")
+			return httperror.NotFound("Unable to retrieve ingresses from the Kubernetes for a namespace level user", err)
 		}
 
-		return httperror.InternalServerError("an error occurred during the UpdateKubernetesIngress operation, unable to update ingress in a namespace. Error: ", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngress").Str("namespace", namespace).Msg("Unable to update ingress in a namespace")
+		return httperror.InternalServerError("Unable to update ingress in a namespace", err)
 	}
 
 	return response.Empty(w)

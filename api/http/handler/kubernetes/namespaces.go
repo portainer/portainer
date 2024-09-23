@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -30,17 +31,20 @@ import (
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNamespaces").Msg("Invalid query parameter withResourceQuota")
 		return httperror.BadRequest("an error occurred during the GetKubernetesNamespaces operation, invalid query parameter withResourceQuota. Error: ", err)
 	}
 
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
+		log.Error().Err(httpErr).Str("context", "GetKubernetesNamespaces").Msg("Unable to get a Kubernetes client for the user")
 		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespaces operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	namespaces, err := cli.GetNamespaces()
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes for the user. Error: ", err)
+		log.Error().Err(err).Str("context", "GetKubernetesNamespaces").Msg("Unable to retrieve namespaces from the Kubernetes cluster")
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespaces operation, unable to retrieve namespaces from the Kubernetes cluster. Error: ", err)
 	}
 
 	if withResourceQuota {
@@ -68,11 +72,13 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
+		log.Error().Err(httpErr).Str("context", "GetKubernetesNamespacesCount").Msg("Unable to get a Kubernetes client for the user")
 		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespacesCount operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	namespaces, err := cli.GetNamespaces()
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNamespacesCount").Msg("Unable to retrieve namespaces from the Kubernetes cluster to count the total")
 		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespacesCount operation, unable to retrieve namespaces from the Kubernetes cluster to count the total. Error: ", err)
 	}
 
@@ -99,29 +105,35 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNamespace").Msg("Invalid namespace parameter namespace")
 		return httperror.BadRequest("an error occurred during the GetKubernetesNamespace operation, invalid namespace parameter namespace. Error: ", err)
 	}
 
 	withResourceQuota, err := request.RetrieveBooleanQueryParameter(r, "withResourceQuota", true)
 	if err != nil {
-		return httperror.BadRequest(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", namespaceName), err)
+		log.Error().Err(err).Str("context", "GetKubernetesNamespace").Msg("Invalid query parameter withResourceQuota")
+		return httperror.BadRequest("an error occurred during the GetKubernetesNamespace operation for the namespace %s, invalid query parameter withResourceQuota. Error: ", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
+		log.Error().Err(httpErr).Str("context", "GetKubernetesNamespace").Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("an error occurred during the GetKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	namespaceInfo, err := cli.GetNamespace(namespaceName)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesNamespace").Msg("Unable to find the namespace")
 			return httperror.NotFound(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespaceName), err)
 		}
 
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesNamespace").Msg("Unauthorized to access the namespace")
 			return httperror.Forbidden(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation, unauthorized to access the namespace: %s. Error: ", namespaceName), err)
 		}
 
+		log.Error().Err(err).Str("context", "GetKubernetesNamespace").Msg("Unable to get the namespace")
 		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the GetKubernetesNamespace operation, unable to get the namespace: %s. Error: ", namespaceName), err)
 	}
 
@@ -153,21 +165,25 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 	payload := models.K8sNamespaceDetails{}
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
+		log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Msg("Invalid request payload")
 		return httperror.BadRequest("an error occurred during the CreateKubernetesNamespace operation, invalid request payload. Error: ", err)
 	}
 
 	namespaceName := payload.Name
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
+		log.Error().Err(httpErr).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("an error occurred during the CreateKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	namespace, err := cli.CreateNamespace(payload)
 	if err != nil {
 		if k8serrors.IsAlreadyExists(err) {
+			log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("The namespace already exists")
 			return httperror.Conflict(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, the namespace %s already exists. Error: ", namespaceName), err)
 		}
 
+		log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to create the namespace")
 		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: %s", namespaceName), err)
 	}
 
@@ -190,20 +206,24 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
+		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Invalid namespace identifier route variable")
 		return httperror.BadRequest("an error occurred during the DeleteKubernetesNamespace operation, invalid namespace identifier route variable. Error: ", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", namespaceName), httpErr)
+		log.Error().Err(httpErr).Str("context", "DeleteKubernetesNamespace").Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
 	namespace, err := cli.DeleteNamespace(namespaceName)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
+			log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Unable to find the namespace")
 			return httperror.NotFound(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespace), err)
 		}
 
+		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Unable to delete the namespace")
 		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to delete the Kubernetes namespace. Error: ", namespace), err)
 	}
 

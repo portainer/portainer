@@ -229,30 +229,30 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 // updateVolumesWithOwningApplications updates the volumes with the applications that use them.
 func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8sVolumeInfo, pods *corev1.PodList, replicaSetItems []appsv1.ReplicaSet) (*[]models.K8sVolumeInfo, error) {
 	for i, volume := range *volumes {
-			for _, pod := range pods.Items {
-					if pod.Spec.Volumes != nil {
-							for _, podVolume := range pod.Spec.Volumes {
-									if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
-											application, err := kcl.ConvertPodToApplication(pod, replicaSetItems)
-											if err != nil {
-													log.Error().Err(err).Msg("Failed to convert pod to application")
-													return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)
-											}
-											// Check if the application already exists in the OwningApplications slice
-											exists := false
-											for _, existingApp := range (*volumes)[i].PersistentVolumeClaim.OwningApplications {
-													if existingApp.Name == application.Name && existingApp.Namespace == application.Namespace {
-															exists = true
-															break
-													}
-											}
-											if !exists {
-													(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, application)
-											}
-									}
+		for _, pod := range pods.Items {
+			if pod.Spec.Volumes != nil {
+				for _, podVolume := range pod.Spec.Volumes {
+					if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
+						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems, []appsv1.Deployment{}, []appsv1.StatefulSet{}, []appsv1.DaemonSet{}, []corev1.Service{}, false)
+						if err != nil {
+							log.Error().Err(err).Msg("Failed to convert pod to application")
+							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)
+						}
+						// Check if the application already exists in the OwningApplications slice
+						exists := false
+						for _, existingApp := range (*volumes)[i].PersistentVolumeClaim.OwningApplications {
+							if existingApp.Name == application.Name && existingApp.Namespace == application.Namespace {
+								exists = true
+								break
 							}
+						}
+						if !exists {
+							(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, *application)
+						}
 					}
+				}
 			}
+		}
 	}
 	return volumes, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesRBACStatus
@@ -24,11 +25,13 @@ import (
 func (handler *Handler) getKubernetesRBACStatus(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, handlerErr := handler.getProxyKubeClient(r)
 	if handlerErr != nil {
-		return handlerErr
+		log.Error().Err(handlerErr).Str("context", "GetKubernetesRBACStatus").Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("Unable to get a Kubernetes client for the user. Error: ", handlerErr)
 	}
 
 	isRBACEnabled, err := cli.IsRBACEnabled()
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesRBACStatus").Msg("Failed to check RBAC status")
 		return httperror.InternalServerError("Failed to check RBAC status", err)
 	}
 

@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/http/middlewares"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesNodesLimits
@@ -26,16 +27,19 @@ import (
 func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNodesLimits").Msg("Unable to find an environment on request context")
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNodesLimits").Msg("Unable to create Kubernetes client")
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
 	nodesLimits, err := cli.GetNodesLimits()
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesNodesLimits").Msg("Unable to retrieve nodes limits")
 		return httperror.InternalServerError("Unable to retrieve nodes limits", err)
 	}
 
@@ -60,12 +64,14 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesMaxResourceLimits").Msg("Unable to find an environment on request context")
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		return httperror.InternalServerError("Failed to lookup KubeClient", err)
+		log.Error().Err(err).Str("context", "GetKubernetesMaxResourceLimits").Msg("Unable to create Kubernetes client")
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
 	overCommit := endpoint.Kubernetes.Configuration.EnableResourceOverCommit
@@ -74,6 +80,7 @@ func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r 
 	// name is set to "" so all namespaces resources are considered when calculating max resource limits
 	resourceLimit, err := cli.GetMaxResourceLimits("", overCommit, overCommitPercent)
 	if err != nil {
+		log.Error().Err(err).Str("context", "GetKubernetesMaxResourceLimits").Msg("Unable to retrieve max resource limit")
 		return httperror.InternalServerError("Unable to retrieve max resource limit", err)
 	}
 

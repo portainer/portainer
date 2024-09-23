@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesRoleBindings
@@ -25,12 +26,14 @@ import (
 func (handler *Handler) getAllKubernetesRoleBindings(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesRoleBindings operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetAllKubernetesRoleBindings").Msg("Unable to prepare kube client")
+		return httperror.InternalServerError("unable to prepare kube client. Error: ", httpErr)
 	}
 
 	rolebindings, err := cli.GetRoleBindings("")
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesRoleBindings operation, unable to fetch rolebindings. Error: ", err)
+		log.Error().Err(err).Str("context", "GetAllKubernetesRoleBindings").Msg("Unable to fetch rolebindings")
+		return httperror.InternalServerError("unable to fetch rolebindings. Error: ", err)
 	}
 
 	return response.JSON(w, rolebindings)

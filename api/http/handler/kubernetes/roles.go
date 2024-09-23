@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id GetKubernetesRoles
@@ -25,12 +26,14 @@ import (
 func (handler *Handler) getAllKubernetesRoles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesRoles operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
+		log.Error().Err(httpErr).Str("context", "GetAllKubernetesRoles").Msg("Unable to prepare kube client")
+		return httperror.InternalServerError("unable to prepare kube client. Error: ", httpErr)
 	}
 
 	roles, err := cli.GetRoles("")
 	if err != nil {
-		return httperror.InternalServerError("an error occurred during the GetAllKubernetesRoles operation, unable to fetch roles. Error: ", err)
+		log.Error().Err(err).Str("context", "GetAllKubernetesRoles").Msg("Unable to fetch roles across all namespaces")
+		return httperror.InternalServerError("unable to fetch roles across all namespaces. Error: ", err)
 	}
 
 	return response.JSON(w, roles)

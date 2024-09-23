@@ -135,7 +135,7 @@ func (handler *Handler) userHasRegistryAccess(r *http.Request, registry *portain
 
 	// validate access for kubernetes namespaces (leverage registry.RegistryAccesses[endpointId].Namespaces)
 	if endpointutils.IsKubernetesEndpoint(endpoint) {
-		kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+		kcl, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 		if err != nil {
 			return false, false, errors.Wrap(err, "unable to retrieve kubernetes client to validate registry access")
 		}

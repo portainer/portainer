@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
@@ -35,20 +36,24 @@ import (
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
+		log.Error().Err(err).Str("context", "getKubernetesConfig").Msg("Permission denied to access environment")
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
 	if err != nil {
+		log.Error().Err(err).Str("context", "getKubernetesConfig").Msg("Unable to generate JWT token")
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
 
 	endpoints, handlerErr := handler.filterUserKubeEndpoints(r)
 	if handlerErr != nil {
+		log.Error().Err(handlerErr).Str("context", "getKubernetesConfig").Msg("Unable to filter user kube endpoints")
 		return handlerErr
 	}
 
 	if len(endpoints) == 0 {
+		log.Error().Str("context", "getKubernetesConfig").Msg("Empty endpoints list")
 		return httperror.BadRequest("empty endpoints list", errors.New("empty endpoints list"))
 	}
 
@@ -65,16 +70,19 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	_ = request.RetrieveJSONQueryParameter(r, "excludeIds", &excludeEndpointIDs, true)
 
 	if len(endpointIDs) > 0 && len(excludeEndpointIDs) > 0 {
+		log.Error().Str("context", "filterUserKubeEndpoints").Msg("Can't provide both 'ids' and 'excludeIds' parameters")
 		return nil, httperror.BadRequest("Can't provide both 'ids' and 'excludeIds' parameters", errors.New("invalid parameters"))
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
+		log.Error().Err(err).Str("context", "filterUserKubeEndpoints").Msg("Unable to retrieve info from request context")
 		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
+		log.Error().Err(err).Str("context", "filterUserKubeEndpoints").Msg("Unable to retrieve environment groups from the database")
 		return nil, httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}
 
@@ -83,6 +91,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 		for _, endpointID := range endpointIDs {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
+				log.Error().Err(err).Str("context", "filterUserKubeEndpoints").Msg("Unable to retrieve environment from the database")
 				return nil, httperror.InternalServerError("Unable to retrieve environment from the database", err)
 			}
 			if !endpointutils.IsKubernetesEndpoint(endpoint) {
@@ -99,6 +108,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	var kubeEndpoints []portainer.Endpoint
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
+		log.Error().Err(err).Str("context", "filterUserKubeEndpoints").Msg("Unable to retrieve environments from the database")
 		return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
 
@@ -195,6 +205,7 @@ func writeFileContent(w http.ResponseWriter, r *http.Request, endpoints []portai
 	if r.Header.Get("Accept") == "text/yaml" {
 		yaml, err := kcli.GenerateYAML(config)
 		if err != nil {
+			log.Error().Err(err).Str("context", "writeFileContent").Msg("Failed to generate Kubeconfig")
 			return httperror.InternalServerError("Failed to generate Kubeconfig", err)
 		}
 
