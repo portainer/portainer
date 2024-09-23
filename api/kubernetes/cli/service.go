@@ -176,7 +176,7 @@ func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServ
 
 	hasSelectors := containsServiceWithSelector(services)
 	if hasSelectors {
-		pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(metav1.ListOptions{})
+		pods, replicaSets, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}
@@ -189,8 +189,8 @@ func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServ
 				return services, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to get application from service. Error: %w", err)
 			}
 
-			if application.Name != "" {
-				updatedService.Applications = append(updatedService.Applications, application)
+			if application != nil {
+				updatedService.Applications = append(updatedService.Applications, *application)
 			}
 
 			updatedServices[index] = updatedService

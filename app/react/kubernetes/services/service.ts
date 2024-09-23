@@ -4,9 +4,7 @@ import { ServiceList } from 'kubernetes-types/core/v1';
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import {
-  Service,
-} from '@/react/kubernetes/services/types';
+import { Service } from '@/react/kubernetes/services/types';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 

@@ -93,6 +93,16 @@ func (handler *Handler) getAllKubernetesApplicationsCount(w http.ResponseWriter,
 }
 
 func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.K8sApplication, *httperror.HandlerError) {
+	namespace, err := request.RetrieveQueryParameter(r, "namespace", true)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the namespace query parameter. Error: ", err)
+	}
+
+	withDependencies, err := request.RetrieveBooleanQueryParameter(r, "withDependencies", true)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the withDependencies query parameter. Error: ", err)
+	}
+
 	nodeName, err := request.RetrieveQueryParameter(r, "nodeName", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the nodeName query parameter. Error: ", err)
@@ -113,6 +123,8 @@ func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.
 
 			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
 		}
+
+		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
 	}
 
 	return applications, nil

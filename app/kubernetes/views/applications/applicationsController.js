@@ -205,7 +205,7 @@ class KubernetesApplicationsController {
       this.state.namespaceName = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
     }
 
-    await this.getApplications();
+    // await this.getApplications();
 
     this.state.viewReady = true;
   }

@@ -499,7 +499,7 @@ func (handler *Handler) getAllKubernetesClusterIngressesCount(w http.ResponseWri
 }
 
 func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models.K8sIngressInfo, *httperror.HandlerError) {
-	withServices, err := request.RetrieveBooleanQueryParameter(r, "withServices", false)
+	withServices, err := request.RetrieveBooleanQueryParameter(r, "withServices", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the GetKubernetesClusterIngresses operation, unable to retrieve withApplications query parameter. Error: ", err)
 	}

@@ -151,12 +151,16 @@ func getApplicationsCount(ctx context.Context, kcl *KubeClient, namespace string
 	}
 
 	// + (naked pods)
-	nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
-	if err != nil {
-		return 0, err
-	}
+	// TODO: Implement fetching of naked pods
+	// This is to be reworked as part of the dashboard refactor
 
-	return count + int64(len(nakedPods)), nil
+	// nakedPods, err := kcl.GetApplications(namespace, "nakedpods")
+	// if err != nil {
+	// 	return 0, err
+	// }
+	// For now, we're not including naked pods in the count
+
+	return count, nil
 }
 
 // Get the total count of services for the given namespace
