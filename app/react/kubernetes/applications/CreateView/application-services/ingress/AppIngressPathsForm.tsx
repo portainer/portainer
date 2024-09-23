@@ -39,9 +39,7 @@ export function AppIngressPathsForm({
   isEditMode,
 }: Props) {
   const environmentId = useEnvironmentId();
-  const ingressesQuery = useIngresses(
-    environmentId,
-  );
+  const ingressesQuery = useIngresses(environmentId);
   const { data: ingresses } = ingressesQuery;
   const { data: ingressControllers, ...ingressControllersQuery } =
     useIngressControllers(environmentId, namespace);
@@ -53,11 +51,11 @@ export function AppIngressPathsForm({
         ?.filter((ic) => ic.Availability)
         .map((ic) => ic.ClassName) || [];
     const allowedIngresses =
-      ingresses?.filter((ing: { ClassName: string; }) => {
+      ingresses?.filter((ing: { ClassName: string }) => {
         const className = ing.ClassName || 'none';
         return allowedIngressClasses.includes(className);
       }) || [];
-    return allowedIngresses.flatMap((ing: { Hosts: any[]; Name: any; }) =>
+    return allowedIngresses.flatMap((ing: { Hosts: any[]; Name: any }) =>
       ing.Hosts?.length
         ? ing.Hosts.map((host) => ({
             label: `${host} (${ing.Name})`,

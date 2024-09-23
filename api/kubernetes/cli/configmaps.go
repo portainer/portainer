@@ -99,7 +99,7 @@ func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfig
 func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8sConfigMap) ([]models.K8sConfigMap, error) {
 	updatedConfigMaps := make([]models.K8sConfigMap, len(configMaps))
 
-	pods, replicaSets, err := kcl.fetchAllPodsAndReplicaSets(metav1.ListOptions{})
+	pods, replicaSets, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred during the CombineConfigMapsWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 	}

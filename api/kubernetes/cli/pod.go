@@ -43,6 +43,26 @@ func updateOwnerReferenceToDeployment(pod *corev1.Pod, replicaSets []appsv1.Repl
 	}
 }
 
+// containsStatefulSetOwnerReference checks if the pod list contains a pod with a StatefulSet owner reference
+func containsStatefulSetOwnerReference(pods *corev1.PodList) bool {
+	for _, pod := range pods.Items {
+		if len(pod.OwnerReferences) > 0 && pod.OwnerReferences[0].Kind == "StatefulSet" {
+			return true
+		}
+	}
+	return false
+}
+
+// containsDaemonSetOwnerReference checks if the pod list contains a pod with a DaemonSet owner reference
+func containsDaemonSetOwnerReference(pods *corev1.PodList) bool {
+	for _, pod := range pods.Items {
+		if len(pod.OwnerReferences) > 0 && pod.OwnerReferences[0].Kind == "DaemonSet" {
+			return true
+		}
+	}
+	return false
+}
+
 // containsReplicaSetOwnerReference checks if the pod list contains a pod with a ReplicaSet owner reference
 func containsReplicaSetOwnerReference(pods *corev1.PodList) bool {
 	for _, pod := range pods.Items {
@@ -152,26 +172,64 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase corev1.PodPha
 }
 
 // fetchAllPodsAndReplicaSets fetches all pods and replica sets across the cluster, i.e. all namespaces
-func (kcl *KubeClient) fetchAllPodsAndReplicaSets(podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, error) {
-	pods, err := kcl.cli.CoreV1().Pods("").List(context.Background(), podListOptions)
+func (kcl *KubeClient) fetchAllPodsAndReplicaSets(namespace string, podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, error) {
+	return kcl.fetchResourcesWithOwnerReferences(namespace, podListOptions, false, false)
+}
+
+// fetchAllApplicationsListResources fetches all pods, replica sets, stateful sets, and daemon sets across the cluster, i.e. all namespaces
+// this is required for the applications list view
+func (kcl *KubeClient) fetchAllApplicationsListResources(namespace string, podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, error) {
+	return kcl.fetchResourcesWithOwnerReferences(namespace, podListOptions, true, true)
+}
+
+// fetchResourcesWithOwnerReferences fetches pods and other resources based on owner references
+func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podListOptions metav1.ListOptions, includeStatefulSets, includeDaemonSets bool) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, error) {
+	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), podListOptions)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			return nil, nil, nil
+			return nil, nil, nil, nil, nil, nil, nil
 		}
-		return nil, nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to list pods across the cluster. Error: %w", err)
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list pods across the cluster: %w", err)
 	}
 
-	hasReplicaSetOwnerReference := containsReplicaSetOwnerReference(pods)
-	replicaSetItems := make([]appsv1.ReplicaSet, 0)
-	if hasReplicaSetOwnerReference {
-		replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			return nil, nil, fmt.Errorf("an error occurred during the GetApplicationsFromServiceSelectors operation, unable to list replica sets across the cluster. Error: %w", err)
+	// if replicaSet owner reference exists, fetch the replica sets
+	// this also means that the deployments will be fetched because deployments own replica sets
+	replicaSets := &appsv1.ReplicaSetList{}
+	deployments := &appsv1.DeploymentList{}
+	if containsReplicaSetOwnerReference(pods) {
+		replicaSets, err = kcl.cli.AppsV1().ReplicaSets(namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil && !k8serrors.IsNotFound(err) {
+			return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list replica sets across the cluster: %w", err)
 		}
-		replicaSetItems = replicaSets.Items
+
+		deployments, err = kcl.cli.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil && !k8serrors.IsNotFound(err) {
+			return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list deployments across the cluster: %w", err)
+		}
 	}
 
-	return pods.Items, replicaSetItems, nil
+	statefulSets := &appsv1.StatefulSetList{}
+	if includeStatefulSets && containsStatefulSetOwnerReference(pods) {
+		statefulSets, err = kcl.cli.AppsV1().StatefulSets(namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil && !k8serrors.IsNotFound(err) {
+			return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list stateful sets across the cluster: %w", err)
+		}
+	}
+
+	daemonSets := &appsv1.DaemonSetList{}
+	if includeDaemonSets && containsDaemonSetOwnerReference(pods) {
+		daemonSets, err = kcl.cli.AppsV1().DaemonSets(namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil && !k8serrors.IsNotFound(err) {
+			return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list daemon sets across the cluster: %w", err)
+		}
+	}
+
+	services, err := kcl.cli.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil && !k8serrors.IsNotFound(err) {
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list services across the cluster: %w", err)
+	}
+
+	return pods.Items, replicaSets.Items, deployments.Items, statefulSets.Items, daemonSets.Items, services.Items, nil
 }
 
 // isPodUsingConfigMap checks if a pod is using a specific ConfigMap

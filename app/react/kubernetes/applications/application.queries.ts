@@ -3,6 +3,7 @@ import { Pod } from 'kubernetes-types/core/v1';
 
 import { queryClient, withError } from '@/react-tools/react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { getNamespaceServices } from '../services/service';
 
@@ -13,6 +14,7 @@ import {
   getApplicationRevisionList,
 } from './application.service';
 import type { AppKind, Application, ApplicationPatch } from './types';
+import { Application as K8sApplication } from './ListView/ApplicationsDatatable/types';
 import { deletePod } from './pod.service';
 import { getNamespaceHorizontalPodAutoscalers } from './autoscaling.service';
 import { applicationIsKind, matchLabelsToLabelSelectorValue } from './utils';
@@ -259,8 +261,7 @@ export function useApplicationHorizontalPodAutoscaler(
     },
     {
       ...withError(
-        `Unable to get horizontal pod autoscaler${
-          app ? ` for ${app.metadata?.name}` : ''
+        `Unable to get horizontal pod autoscaler${app ? ` for ${app.metadata?.name}` : ''
         }`
       ),
       enabled: !!app,
@@ -320,8 +321,8 @@ export function usePatchApplicationMutation(
       appKind: AppKind;
       patch: ApplicationPatch;
       contentType?:
-        | 'application/json-patch+json'
-        | 'application/strategic-merge-patch+json';
+      | 'application/json-patch+json'
+      | 'application/strategic-merge-patch+json';
     }) =>
       patchApplication(
         environmentId,
@@ -379,4 +380,42 @@ export function useRedeployApplicationMutation(
       ...withError('Unable to redeploy application'),
     }
   );
+}
+
+// useQuery to get a list of all applications from an array of namespaces
+export function useAllApplicationsQuery(
+  environmentId: EnvironmentId,
+  namespace: string,
+  nodeName: string,
+  withDependencies: boolean = false
+) {
+  return useQuery(
+    ['environments', environmentId, 'kubernetes', 'applications'],
+    () => getAllApplications(environmentId, namespace, nodeName, withDependencies),
+    {
+      ...withError('Unable to retrieve applications'),
+    }
+  );
+}
+
+// get all applications from a namespace
+export async function getAllApplications(
+  environmentId: EnvironmentId,
+  namespace: string,
+  nodeName: string,
+  withDependencies: boolean = false
+) {
+  try {
+    const params = nodeName
+      ? { nodeName, namespace, withDependencies }
+      : { namespace, withDependencies };
+    const { data } = await axios.get<K8sApplication[]>(
+      `/kubernetes/${environmentId}/applications`,
+      { params }
+    );
+
+    return data;
+  } catch (e) {
+    throw parseAxiosError(e, `Unable to retrieve applications from either across the cluster, namespace ${namespace}, or the node ${nodeName}`);
+  }
 }

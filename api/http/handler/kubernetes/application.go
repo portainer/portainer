@@ -49,15 +49,17 @@ func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.
 }
 
 // @id GetAllKubernetesApplications
-// @summary Get a list of applications by node name
-// @description Get a list of applications by node name
+// @summary Get a list of applications across all namespaces in the cluster. If the nodeName is provided, it will return the applications running on that node.
+// @description Get a list of applications across all namespaces in the cluster. If the nodeName is provided, it will return the applications running on that node.
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
+// @param namespace query string true "Namespace name"
 // @param nodeName query string true "Node name"
+// @param withDependencies query boolean false "Include dependencies in the response"
 // @success 200 {array} models.K8sApplication "Success"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
@@ -76,7 +78,7 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 
 // @id getAllKubernetesApplicationsCount
 // @summary Get Applications count
-// @description Get the count of Applications across all namespaces in the cluster. If nodeName is provided, it will return the count of applications running on that node.
+// @description Get the count of Applications across all namespaces in the cluster. If the nodeName is provided, it will return the count of applications running on that node.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -97,6 +99,16 @@ func (handler *Handler) getAllKubernetesApplicationsCount(w http.ResponseWriter,
 }
 
 func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.K8sApplication, *httperror.HandlerError) {
+	namespace, err := request.RetrieveQueryParameter(r, "namespace", true)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the namespace query parameter. Error: ", err)
+	}
+
+	withDependencies, err := request.RetrieveBooleanQueryParameter(r, "withDependencies", true)
+	if err != nil {
+		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the withDependencies query parameter. Error: ", err)
+	}
+
 	nodeName, err := request.RetrieveQueryParameter(r, "nodeName", true)
 	if err != nil {
 		return nil, httperror.BadRequest("an error occurred during the GetAllKubernetesApplications operation, unable to parse the nodeName query parameter. Error: ", err)
@@ -107,16 +119,13 @@ func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.
 		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
-	applications := []models.K8sApplication{}
-	if nodeName != "" {
-		applications, err = cli.GetApplicationsByNode(nodeName)
-		if err != nil {
-			if k8serrors.IsUnauthorized(err) {
-				return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
-			}
-
-			return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
+	applications, err := cli.GetApplications(namespace, nodeName, withDependencies)
+	if err != nil {
+		if k8serrors.IsUnauthorized(err) {
+			return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
 		}
+
+		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to get the list of applications. Error: ", err)
 	}
 
 	return applications, nil
