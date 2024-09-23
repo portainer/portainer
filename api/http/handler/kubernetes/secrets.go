@@ -9,9 +9,9 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-// @id getKubernetesSecret
-// @summary Get Secret
-// @description Get a Secret by name for a given namespace
+// @id GetKubernetesSecret
+// @summary Get a Secret
+// @description Get a Secret by name for a given namespace.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -21,7 +21,9 @@ import (
 // @param secret path string true "The secret name to get details for"
 // @success 200 {object} models.K8sSecret "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve a secret by name belong in a namespace."
 // @router /kubernetes/{id}/namespaces/{namespace}/secrets/{secret} [get]
 func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -54,17 +56,19 @@ func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Reque
 }
 
 // @id GetKubernetesSecrets
-// @summary Get Secrets
-// @description Get all Secrets for a given namespace
+// @summary Get a list of Secrets
+// @description Get a list of Secrets for a given namespace. If isUsed is set to true, information about the applications that use the secrets is also returned.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
 // @param isUsed query bool true "When set to true, associate the Secrets with the applications that use them"
-// @success 200 {array} models.[]K8sSecret "Success"
+// @success 200 {array} models.K8sSecret "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve all secrets from the cluster."
 // @router /kubernetes/{id}/secrets [get]
 func (handler *Handler) GetAllKubernetesSecrets(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -76,9 +80,9 @@ func (handler *Handler) GetAllKubernetesSecrets(w http.ResponseWriter, r *http.R
 	return response.JSON(w, secrets)
 }
 
-// @id getAllKubernetesSecretsCount
+// @id GetKubernetesSecretsCount
 // @summary Get Secrets count
-// @description Get the count of Secrets for a given namespace
+// @description Get the count of Secrets across all namespaces that the user has access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -86,7 +90,9 @@ func (handler *Handler) GetAllKubernetesSecrets(w http.ResponseWriter, r *http.R
 // @param id path int true "Environment identifier"
 // @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve the count of all secrets from the cluster."
 // @router /kubernetes/{id}/secrets/count [get]
 func (handler *Handler) getAllKubernetesSecretsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

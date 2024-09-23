@@ -10,19 +10,20 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-// @id GetAllKubernetesServices
-// @summary Get a list of kubernetes services within the given environment
-// @description Get a list of kubernetes services within the given environment
+// @id GetKubernetesServices
+// @summary Get a list of services
+// @description Get a list of services that the user has access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
-// @accept json
 // @produce json
 // @param id path int true "Environment identifier"
 // @param withApplications query boolean false "Lookup applications associated with each service"
 // @success 200 {array} models.K8sServiceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve all services."
 // @router /kubernetes/{id}/services [get]
 func (handler *Handler) GetAllKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -34,18 +35,19 @@ func (handler *Handler) GetAllKubernetesServices(w http.ResponseWriter, r *http.
 	return response.JSON(w, services)
 }
 
-// @id getAllKubernetesServicesCount
-// @summary Get the number of kubernetes services within the given environment
-// @description Get the number of kubernetes services within the given environment
+// @id GetAllKubernetesServicesCount
+// @summary Get services count
+// @description Get the count of services that the user has access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
-// @accept json
 // @produce json
 // @param id path int true "Environment identifier"
-// @success 200 {object} models.K8sServicesCount "Success"
+// @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve the total count of all services."
 // @router /kubernetes/{id}/services/count [get]
 func (handler *Handler) getAllKubernetesServicesCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -70,8 +72,8 @@ func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sS
 
 	services, err := cli.GetServices("")
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return nil, httperror.Forbidden("an error occurred during the GetAllKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to retrieve services from the Kubernetes for a cluster level user. Error: ", err)
@@ -89,20 +91,20 @@ func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sS
 	return services, nil
 }
 
-// @id getKubernetesServicesByNamespace
-// @summary Get a list of kubernetes services for a given namespace
-// @description Get a list of kubernetes services for a given namespace
+// @id GetKubernetesServicesByNamespace
+// @summary Get a list of services for a given namespace
+// @description Get a list of services for a given namespace.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
-// @accept json
 // @produce json
 // @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
-// @param withApplications query boolean false "Lookup applications associated with each service"
 // @success 200 {array} models.K8sServiceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve all services for a namespace."
 // @router /kubernetes/{id}/namespaces/{namespace}/services [get]
 func (handler *Handler) getKubernetesServicesByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -118,8 +120,8 @@ func (handler *Handler) getKubernetesServicesByNamespace(w http.ResponseWriter, 
 
 	services, err := cli.GetServices(namespace)
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the GetKubernetesServicesByNamespace operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the GetKubernetesServicesByNamespace operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		return httperror.InternalServerError("an error occurred during the GetKubernetesServicesByNamespace operation, unable to retrieve services from the Kubernetes for a namespace level user. Error: ", err)
@@ -128,9 +130,9 @@ func (handler *Handler) getKubernetesServicesByNamespace(w http.ResponseWriter, 
 	return response.JSON(w, services)
 }
 
-// @id createKubernetesService
-// @summary Create a kubernetes service
-// @description Create a kubernetes service within a given namespace
+// @id CreateKubernetesService
+// @summary Create a service
+// @description Create a service within a given namespace
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -139,9 +141,11 @@ func (handler *Handler) getKubernetesServicesByNamespace(w http.ResponseWriter, 
 // @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body models.K8sServiceInfo true "Service definition"
-// @success 200  "Success"
+// @success 204 "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to create a service."
 // @router /kubernetes/{id}/namespaces/{namespace}/services [post]
 func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -163,8 +167,8 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 
 	err = cli.CreateService(namespace, payload)
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the CreateKubernetesService operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the CreateKubernetesService operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		if k8serrors.IsAlreadyExists(err) {
@@ -174,12 +178,12 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 		return httperror.InternalServerError("an error occurred during the CreateKubernetesService operation, unable to create a service. Error: ", err)
 	}
 
-	return nil
+	return response.Empty(w)
 }
 
-// @id deleteKubernetesServices
-// @summary Delete kubernetes services
-// @description Delete the provided list of kubernetes services
+// @id DeleteKubernetesServices
+// @summary Delete services
+// @description Delete the provided list of services.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -187,9 +191,11 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 // @produce json
 // @param id path int true "Environment identifier"
 // @param body body models.K8sServiceDeleteRequests true "A map where the key is the namespace and the value is an array of services to delete"
-// @success 200  "Success"
+// @success 204 "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier or unable to find a specific service."
 // @failure 500 "Server error occurred while attempting to delete services."
 // @router /kubernetes/{id}/services/delete [post]
 func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -206,8 +212,8 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 
 	err = cli.DeleteServices(payload)
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the DeleteKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the DeleteKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
@@ -217,12 +223,12 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 		return httperror.InternalServerError("an error occurred during the DeleteKubernetesServices operation, unable to delete services. Error: ", err)
 	}
 
-	return nil
+	return response.Empty(w)
 }
 
-// @id updateKubernetesService
-// @summary Update a kubernetes service
-// @description Update a kubernetes service within a given namespace
+// @id UpdateKubernetesService
+// @summary Update a service
+// @description Update a service within a given namespace.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -231,9 +237,11 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 // @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace name"
 // @param body body models.K8sServiceInfo true "Service definition"
-// @success 200  "Success"
+// @success 204 "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier or unable to find the service to update."
 // @failure 500 "Server error occurred while attempting to update a service."
 // @router /kubernetes/{id}/namespaces/{namespace}/services [put]
 func (handler *Handler) updateKubernetesService(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -255,8 +263,8 @@ func (handler *Handler) updateKubernetesService(w http.ResponseWriter, r *http.R
 
 	err = cli.UpdateService(namespace, payload)
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the UpdateKubernetesService operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the UpdateKubernetesService operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		if k8serrors.IsNotFound(err) {

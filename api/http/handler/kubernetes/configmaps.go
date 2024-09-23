@@ -10,9 +10,9 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
-// @id getKubernetesConfigMap
-// @summary Get ConfigMap
-// @description Get a ConfigMap by name for a given namespace
+// @id GetKubernetesConfigMap
+// @summary Get a ConfigMap
+// @description Get a ConfigMap by name for a given namespace.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -22,8 +22,10 @@ import (
 // @param configmap path string true "The configmap name to get details for"
 // @success 200 {object} models.K8sConfigMap "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
-// @failure 500 "Server error occurred while attempting to retrieve a configmap by name belong in a namespace."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier or a configmap with the specified name in the given namespace."
+// @failure 500 "Server error occurred while attempting to retrieve a configmap by name within the specified namespace."
 // @router /kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap} [get]
 func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
@@ -43,8 +45,8 @@ func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Re
 
 	configMap, err := cli.GetConfigMap(namespace, configMapName)
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the GetKubernetesConfigMap operation, unable to get configMap. Error: ", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
@@ -63,17 +65,19 @@ func (handler *Handler) getKubernetesConfigMap(w http.ResponseWriter, r *http.Re
 }
 
 // @id GetAllKubernetesConfigMaps
-// @summary Get ConfigMaps
-// @description Get all ConfigMaps for a given namespace
+// @summary Get a list of ConfigMaps
+// @description Get a list of ConfigMaps across all namespaces in the cluster. For non-admin users, it will only return ConfigMaps based on the namespaces that they have access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @param isUsed query bool true "When set to true, associate the ConfigMaps with the applications that use them"
-// @success 200 {array} models.[]K8sConfigMap "Success"
+// @param isUsed query bool true "Set to true to include information about applications that use the ConfigMaps in the response"
+// @success 200 {array} models.K8sConfigMap "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve all configmaps from the cluster."
 // @router /kubernetes/{id}/configmaps [get]
 func (handler *Handler) GetAllKubernetesConfigMaps(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -85,9 +89,9 @@ func (handler *Handler) GetAllKubernetesConfigMaps(w http.ResponseWriter, r *htt
 	return response.JSON(w, configMaps)
 }
 
-// @id getAllKubernetesConfigMapsCount
+// @id GetAllKubernetesConfigMapsCount
 // @summary Get ConfigMaps count
-// @description Get the count of ConfigMaps for a given namespace
+// @description Get the count of ConfigMaps across all namespaces in the cluster. For non-admin users, it will only return the count of ConfigMaps based on the namespaces that they have access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -95,7 +99,9 @@ func (handler *Handler) GetAllKubernetesConfigMaps(w http.ResponseWriter, r *htt
 // @param id path int true "Environment identifier"
 // @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve the count of all configmaps from the cluster."
 // @router /kubernetes/{id}/configmaps/count [get]
 func (handler *Handler) getAllKubernetesConfigMapsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -120,8 +126,8 @@ func (handler *Handler) getAllKubernetesConfigMaps(r *http.Request) ([]models.K8
 
 	configMaps, err := cli.GetConfigMaps("")
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesConfigMaps operation, unable to get configMap. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return nil, httperror.Forbidden("an error occurred during the GetAllKubernetesConfigMaps operation, unable to get configMap. Error: ", err)
 		}
 
 		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesConfigMaps operation, unable to get configMaps. Error: ", err)

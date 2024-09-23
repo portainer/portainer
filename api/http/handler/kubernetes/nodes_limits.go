@@ -10,20 +10,18 @@ import (
 
 // @id GetKubernetesNodesLimits
 // @summary Get CPU and memory limits of all nodes within k8s cluster
-// @description Get CPU and memory limits of all nodes within k8s cluster
-// @description **Access policy**: authenticated
+// @description Get CPU and memory limits of all nodes within k8s cluster.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
 // @success 200 {object} portainer.K8sNodesLimits "Success"
 // @failure 400 "Invalid request"
-// @failure 401 "Unauthorized"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to retrieve nodes limits."
 // @router /kubernetes/{id}/nodes_limits [get]
 func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
@@ -44,6 +42,21 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 	return response.JSON(w, nodesLimits)
 }
 
+// @id GetKubernetesMaxResourceLimits
+// @summary Get max CPU and memory limits of all nodes within k8s cluster
+// @description Get max CPU and memory limits (unused resources) of all nodes within k8s cluster.
+// @description **Access policy**: Authenticated user.
+// @tags kubernetes
+// @security ApiKeyAuth || jwt
+// @produce json
+// @param id path int true "Environment(Endpoint) identifier"
+// @success 200 {object} portainer.K8sNodesLimits "Success"
+// @failure 400 "Invalid request"
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to retrieve nodes limits."
+// @router /kubernetes/{id}/max_resource_limits [get]
 func (handler *Handler) getKubernetesMaxResourceLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {

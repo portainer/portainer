@@ -17,22 +17,20 @@ import (
 )
 
 // @id GetKubernetesConfig
-// @summary Generate a kubeconfig file enabling client communication with k8s api server
-// @description Generate a kubeconfig file enabling client communication with k8s api server
-// @description **Access policy**: authenticated
+// @summary Generate a kubeconfig file
+// @description Generate a kubeconfig file that allows a client to communicate with the Kubernetes API server
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
-// @produce json
+// @security ApiKeyAuth || jwt
+// @produce application/json, application/yaml
 // @param ids query []int false "will include only these environments(endpoints)"
 // @param excludeIds query []int false "will exclude these environments(endpoints)"
-// @success 200 "Success"
-// @failure 400 "Invalid request"
-// @failure 401 "Unauthorized"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
-// @failure 500 "Server error"
+// @success 200 {object} interface{} "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to generate the kubeconfig file."
 // @router /kubernetes/config [get]
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
