@@ -14,7 +14,7 @@
                 Volumes
               </uib-tab-heading>
 
-              <kubernetes-volumes-datatable dataset="ctrl.volumes" on-remove="(ctrl.removeAction)" on-refresh="(ctrl.getVolumes)"> </kubernetes-volumes-datatable>
+              <kubernetes-volumes-datatable on-remove="(ctrl.removeAction)"> </kubernetes-volumes-datatable>
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading class="vertical-center">
@@ -22,7 +22,7 @@
                 Storage
               </uib-tab-heading>
 
-              <kubernetes-volumes-storages-datatable dataset="ctrl.storages" on-refresh="(ctrl.getVolumes)"> </kubernetes-volumes-storages-datatable>
+              <kubernetes-volumes-storages-datatable> </kubernetes-volumes-storages-datatable>
             </uib-tab>
           </uib-tabset>
         </rd-widget-body>

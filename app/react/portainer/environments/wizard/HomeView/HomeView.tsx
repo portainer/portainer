@@ -47,8 +47,12 @@ export function HomeView() {
                       We could not connect your local environment to Portainer.
                       <br />
                       Please ensure your environment is correctly exposed. For
-                      help with installation visit
-                      <a href="https://documentation.portainer.io/quickstart/">
+                      help with installation visit{' '}
+                      <a
+                        href="https://documentation.portainer.io/quickstart/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         https://documentation.portainer.io/quickstart
                       </a>
                     </p>

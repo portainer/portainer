@@ -117,7 +117,7 @@ angular.module('portainer.docker').controller('ImagesController', [
       $scope.state.exportInProgress = true;
       ImageService.downloadImages(images)
         .then(function success(data) {
-          var downloadData = new Blob([data.file], { type: 'application/x-tar' });
+          var downloadData = new Blob([data], { type: 'application/x-tar' });
           FileSaver.saveAs(downloadData, 'images.tar');
           Notifications.success('Success', 'Image(s) successfully downloaded');
         })

@@ -7,8 +7,8 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-// @id getAllKubernetesClusterRoles
-// @summary Get a list of kubernetes cluster roles within the given environment at the cluster level.
+// @id GetAllKubernetesClusterRoles
+// @summary Get a list of kubernetes cluster roles
 // @description Get a list of kubernetes cluster roles within the given environment at the cluster level.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
@@ -17,7 +17,9 @@ import (
 // @param id path int true "Environment identifier"
 // @success 200 {array} models.K8sClusterRole "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve the list of cluster roles."
 // @router /kubernetes/{id}/clusterroles [get]
 func (handler *Handler) getAllKubernetesClusterRoles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -27,7 +29,7 @@ func (handler *Handler) getAllKubernetesClusterRoles(w http.ResponseWriter, r *h
 	}
 
 	if !cli.IsKubeAdmin {
-		return httperror.Unauthorized("an error occurred during the GetAllKubernetesClusterRoles operation, user is not authorized to fetch cluster roles from the Kubernetes cluster.", nil)
+		return httperror.Forbidden("an error occurred during the GetAllKubernetesClusterRoles operation, user is not authorized to fetch cluster roles from the Kubernetes cluster.", nil)
 	}
 
 	clusterroles, err := cli.GetClusterRoles()

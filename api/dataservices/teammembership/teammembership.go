@@ -85,7 +85,7 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj any) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
@@ -106,7 +106,7 @@ func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) er
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj any) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
@@ -126,7 +126,7 @@ func (service *Service) DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.T
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj any) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)

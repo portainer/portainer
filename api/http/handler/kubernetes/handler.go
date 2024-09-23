@@ -70,8 +70,6 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getAllKubernetesIngressControllers)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllers)).Methods(http.MethodPut)
 	endpointRouter.Handle("/ingresses/delete", httperror.LoggerHandler(h.deleteKubernetesIngresses)).Methods(http.MethodPost)
-	endpointRouter.Handle("/secrets", httperror.LoggerHandler(h.GetAllKubernetesSecrets)).Methods(http.MethodGet)
-	endpointRouter.Handle("/secrets/count", httperror.LoggerHandler(h.getAllKubernetesSecretsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresses", httperror.LoggerHandler(h.GetAllKubernetesClusterIngresses)).Methods(http.MethodGet)
 	endpointRouter.Handle("/ingresses/count", httperror.LoggerHandler(h.getAllKubernetesClusterIngressesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/service_accounts", httperror.LoggerHandler(h.getAllKubernetesServiceAccounts)).Methods(http.MethodGet)
@@ -80,7 +78,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/secrets", httperror.LoggerHandler(h.GetAllKubernetesSecrets)).Methods(http.MethodGet)
 	endpointRouter.Handle("/secrets/count", httperror.LoggerHandler(h.getAllKubernetesSecretsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/services/delete", httperror.LoggerHandler(h.deleteKubernetesServices)).Methods(http.MethodPost)
-	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.isRBACEnabled)).Methods(http.MethodGet)
+	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.getKubernetesRBACStatus)).Methods(http.MethodGet)
 	endpointRouter.Handle("/roles", httperror.LoggerHandler(h.getAllKubernetesRoles)).Methods(http.MethodGet)
 	endpointRouter.Handle("/role_bindings", httperror.LoggerHandler(h.getAllKubernetesRoleBindings)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespaces", httperror.LoggerHandler(h.createKubernetesNamespace)).Methods(http.MethodPost)
@@ -89,6 +87,8 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/namespaces/count", httperror.LoggerHandler(h.getKubernetesNamespacesCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/namespace/{namespace}", httperror.LoggerHandler(h.deleteKubernetesNamespace)).Methods(http.MethodDelete)
 	endpointRouter.Handle("/namespaces/{namespace}", httperror.LoggerHandler(h.getKubernetesNamespace)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes", httperror.LoggerHandler(h.GetAllKubernetesVolumes)).Methods(http.MethodGet)
+	endpointRouter.Handle("/volumes/count", httperror.LoggerHandler(h.getAllKubernetesVolumesCount)).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
@@ -106,6 +106,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.createKubernetesService)).Methods(http.MethodPost)
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.updateKubernetesService)).Methods(http.MethodPut)
 	namespaceRouter.Handle("/services", httperror.LoggerHandler(h.getKubernetesServicesByNamespace)).Methods(http.MethodGet)
+	namespaceRouter.Handle("/volumes/{volume}", httperror.LoggerHandler(h.getKubernetesVolume)).Methods(http.MethodGet)
 
 	return h
 }

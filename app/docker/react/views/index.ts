@@ -5,6 +5,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DashboardView } from '@/react/docker/DashboardView/DashboardView';
+import { ListView } from '@/react/docker/events/ListView';
 
 import { containersModule } from './containers';
 
@@ -14,6 +15,7 @@ export const viewsModule = angular
     'dockerDashboardView',
     r2a(withUIRouter(withCurrentUser(DashboardView)), [])
   )
+  .component('eventsListView', r2a(withUIRouter(withCurrentUser(ListView)), []))
   .component(
     'networkDetailsView',
     r2a(withUIRouter(withCurrentUser(NetworksItemView)), [])

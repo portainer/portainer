@@ -24,7 +24,7 @@ export function usePVCsQuery(
       return pvcs.flat();
     },
     {
-      ...withError('Unable to retrieve perrsistent volume claims'),
+      ...withError('Unable to retrieve persistent volume claims'),
       enabled: !!namespaces,
     }
   );
@@ -36,6 +36,7 @@ export async function getPVCs(environmentId: EnvironmentId, namespace: string) {
     const { data } = await axios.get<PersistentVolumeClaimList>(
       `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/persistentvolumeclaims`
     );
+
     return data.items;
   } catch (e) {
     throw parseKubernetesAxiosError(

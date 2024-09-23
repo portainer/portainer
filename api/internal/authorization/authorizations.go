@@ -430,6 +430,155 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 	}
 }
 
+// RemoveTeamAccessPolicies will remove all existing access policies associated to the specified team
+func (service *Service) RemoveTeamAccessPolicies(tx dataservices.DataStoreTx, teamID portainer.TeamID) error {
+	endpoints, err := tx.Endpoint().Endpoints()
+	if err != nil {
+		return err
+	}
+	for _, endpoint := range endpoints {
+		for policyTeamID := range endpoint.TeamAccessPolicies {
+			if policyTeamID == teamID {
+				delete(endpoint.TeamAccessPolicies, policyTeamID)
+
+				err := tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	endpointGroups, err := tx.EndpointGroup().ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, endpointGroup := range endpointGroups {
+		for policyTeamID := range endpointGroup.TeamAccessPolicies {
+			if policyTeamID == teamID {
+				delete(endpointGroup.TeamAccessPolicies, policyTeamID)
+
+				err := tx.EndpointGroup().Update(endpointGroup.ID, &endpointGroup)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	registries, err := tx.Registry().ReadAll()
+	if err != nil {
+		return err
+	}
+
+	// iterate over all environments for all registries
+	// and evict all direct accesses to the registries the team had
+	// we could have built a range of the teams's environments accesses while removing them above
+	// but ranging over all environments (registryAccessPolicy is indexed by environmentId)
+	// makes sure we cleanup all resources in case an access was not removed when a team was removed from an env
+	for _, registry := range registries {
+		updateRegistry := false
+		for _, registryAccessPolicy := range registry.RegistryAccesses {
+			if _, ok := registryAccessPolicy.TeamAccessPolicies[teamID]; ok {
+				delete(registryAccessPolicy.TeamAccessPolicies, teamID)
+				updateRegistry = true
+			}
+		}
+		if updateRegistry {
+			if err := tx.Registry().Update(registry.ID, &registry); err != nil {
+				return err
+			}
+		}
+	}
+
+	return service.UpdateUsersAuthorizationsTx(tx)
+}
+
+// RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
+func (service *Service) RemoveUserAccessPolicies(tx dataservices.DataStoreTx, userID portainer.UserID) error {
+	endpoints, err := tx.Endpoint().Endpoints()
+	if err != nil {
+		return err
+	}
+
+	for _, endpoint := range endpoints {
+		for policyUserID := range endpoint.UserAccessPolicies {
+			if policyUserID == userID {
+				delete(endpoint.UserAccessPolicies, policyUserID)
+
+				err := tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	endpointGroups, err := tx.EndpointGroup().ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, endpointGroup := range endpointGroups {
+		for policyUserID := range endpointGroup.UserAccessPolicies {
+			if policyUserID == userID {
+				delete(endpointGroup.UserAccessPolicies, policyUserID)
+
+				err := tx.EndpointGroup().Update(endpointGroup.ID, &endpointGroup)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	registries, err := tx.Registry().ReadAll()
+	if err != nil {
+		return err
+	}
+
+	// iterate over all environments for all registries
+	// and evict all direct accesses to the registries the user had
+	// we could have built a range of the user's environments accesses while removing them above
+	// but ranging over all environments (registryAccessPolicy is indexed by environmentId)
+	// makes sure we cleanup all resources in case an access was not removed when a user was removed from an env
+	for _, registry := range registries {
+		updateRegistry := false
+		for _, registryAccessPolicy := range registry.RegistryAccesses {
+			if _, ok := registryAccessPolicy.UserAccessPolicies[userID]; ok {
+				delete(registryAccessPolicy.UserAccessPolicies, userID)
+				updateRegistry = true
+			}
+		}
+		if updateRegistry {
+			if err := tx.Registry().Update(registry.ID, &registry); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateUserAuthorizations will update the authorizations for the provided userid
+func (service *Service) UpdateUserAuthorizations(tx dataservices.DataStoreTx, userID portainer.UserID) error {
+	err := service.updateUserAuthorizations(tx, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
 func (service *Service) UpdateUsersAuthorizations() error {
 	return service.UpdateUsersAuthorizationsTx(service.dataStore)

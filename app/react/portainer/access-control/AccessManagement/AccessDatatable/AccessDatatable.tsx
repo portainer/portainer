@@ -14,6 +14,7 @@ import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { useColumns } from './columns/useColumns';
 import { Access } from './types';
@@ -55,10 +56,12 @@ export function AccessDatatable({
       isLoading={!dataset}
       columns={columns}
       settingsManager={tableState}
-      extendTableOptions={withMeta({
-        table: 'access-table',
-        roles: rolesState,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'access-table',
+          roles: rolesState,
+        })
+      )}
       isRowSelectable={({ original: item }) => !inheritFrom || !item.Inherited}
       renderTableActions={(selectedItems) => (
         <>

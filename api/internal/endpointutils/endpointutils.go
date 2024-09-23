@@ -234,7 +234,7 @@ func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portaine
 		{endpoint.Edge.SnapshotInterval, settings.Edge.SnapshotInterval},
 	}
 
-	for i := range len(intervals) {
+	for i := range intervals {
 		effectiveInterval := intervals[i][0]
 		if effectiveInterval <= 0 {
 			effectiveInterval = intervals[i][1]

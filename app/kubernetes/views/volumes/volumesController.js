@@ -1,23 +1,4 @@
-import _ from 'lodash-es';
-import filesizeParser from 'filesize-parser';
 import angular from 'angular';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
-
-function buildStorages(storages, volumes) {
-  _.forEach(storages, (s) => {
-    const filteredVolumes = _.filter(volumes, ['PersistentVolumeClaim.storageClass.Name', s.Name, 'PersistentVolumeClaim.storageClass.Provisioner', s.Provisioner]);
-    s.Volumes = filteredVolumes;
-    s.size = computeSize(filteredVolumes);
-  });
-  return storages;
-}
-
-function computeSize(volumes) {
-  const size = _.sumBy(volumes, (v) => filesizeParser(v.PersistentVolumeClaim.Storage, { base: 10 }));
-  const format = KubernetesResourceQuotaHelper.formatBytes(size);
-  return `${format.size}${format.sizeUnit}`;
-}
 
 class KubernetesVolumesController {
   /* @ngInject */
@@ -32,7 +13,6 @@ class KubernetesVolumesController {
     this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
-    this.getVolumes = this.getVolumes.bind(this);
     this.getVolumesAsync = this.getVolumesAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
   }
@@ -62,29 +42,6 @@ class KubernetesVolumesController {
     });
   }
 
-  async getVolumesAsync() {
-    const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
-    try {
-      const [volumes, applications, storages] = await Promise.all([
-        this.KubernetesVolumeService.get(undefined, storageClasses),
-        this.KubernetesApplicationService.get(),
-        this.KubernetesStorageService.get(this.endpoint.Id),
-      ]);
-
-      this.volumes = _.map(volumes, (volume) => {
-        volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
-        return volume;
-      });
-      this.storages = buildStorages(storages, volumes);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retreive namespaces');
-    }
-  }
-
-  getVolumes() {
-    return this.$async(this.getVolumesAsync);
-  }
-
   async onInit() {
     this.state = {
       viewReady: false,
@@ -92,8 +49,6 @@ class KubernetesVolumesController {
       activeTab: this.LocalStorage.getActiveTab('volumes'),
       isAdmin: this.Authentication.isAdmin(),
     };
-
-    await this.getVolumes();
 
     this.state.viewReady = true;
   }

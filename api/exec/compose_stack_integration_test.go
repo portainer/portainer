@@ -60,7 +60,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err = w.Up(ctx, stack, endpoint, false)
+	err = w.Up(ctx, stack, endpoint, portainer.ComposeUpOptions{})
 	if err != nil {
 		t.Fatalf("Error calling docker-compose up: %s", err)
 	}

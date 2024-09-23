@@ -152,7 +152,7 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusForbidden {
-		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d without Edge identifier", http.StatusForbidden, rec.Code))
+		t.Fatalf("expected a %d response, found: %d without Edge identifier", http.StatusForbidden, rec.Code)
 	}
 }
 
@@ -177,7 +177,7 @@ func TestWithEndpoints(t *testing.T) {
 		handler.ServeHTTP(rec, req)
 
 		if rec.Code != test.expectedStatusCode {
-			t.Fatalf(fmt.Sprintf("expected a %d response, found: %d for endpoint ID: %d", test.expectedStatusCode, rec.Code, test.endpoint.ID))
+			t.Fatalf("expected a %d response, found: %d for endpoint ID: %d", test.expectedStatusCode, rec.Code, test.endpoint.ID)
 		}
 	}
 }
@@ -217,7 +217,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
+		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
 	}
 
 	updatedEndpoint, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
@@ -260,7 +260,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d with empty edge ID", http.StatusOK, rec.Code))
+		t.Fatalf("expected a %d response, found: %d with empty edge ID", http.StatusOK, rec.Code)
 	}
 
 	updatedEndpoint, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
@@ -326,7 +326,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
+		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
 	}
 
 	var data endpointEdgeStatusInspectResponse
@@ -390,7 +390,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
+		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
 	}
 
 	var data endpointEdgeStatusInspectResponse

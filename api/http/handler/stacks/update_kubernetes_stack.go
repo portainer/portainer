@@ -16,7 +16,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -37,7 +36,7 @@ type kubernetesGitStackUpdatePayload struct {
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return errors.New("Invalid stack file content")
 	}
 

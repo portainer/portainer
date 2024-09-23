@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { ReactNode } from 'react';
 import { AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -12,6 +12,7 @@ export interface Props {
   className?: string;
   childrenWrapperClassName?: string;
   inline?: boolean;
+  children: ReactNode;
 }
 
 export function TextTip({
@@ -20,8 +21,8 @@ export function TextTip({
   inline = true,
   className,
   children,
-  childrenWrapperClassName = 'text-muted',
-}: PropsWithChildren<Props>) {
+  childrenWrapperClassName,
+}: Props) {
   return (
     <div
       className={clsx(
@@ -32,7 +33,6 @@ export function TextTip({
       role="status"
     >
       <Icon icon={icon} mode={getMode(color)} className="!mt-0.5 flex-none" />
-
       <span className={childrenWrapperClassName}>{children}</span>
     </div>
   );

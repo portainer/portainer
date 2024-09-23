@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { ComponentProps, PropsWithChildren } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -12,6 +12,7 @@ interface Props extends AutomationTestingProps {
   isLoading: boolean;
   isValid: boolean;
   errors?: unknown;
+  submitIcon?: ComponentProps<typeof LoadingButton>['icon'];
 }
 
 export function FormActions({
@@ -21,6 +22,7 @@ export function FormActions({
   children,
   isValid,
   errors,
+  submitIcon,
   'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
   return (
@@ -34,6 +36,7 @@ export function FormActions({
               isLoading={isLoading}
               disabled={!isValid}
               data-cy={dataCy}
+              icon={submitIcon}
             >
               {submitLabel}
             </LoadingButton>

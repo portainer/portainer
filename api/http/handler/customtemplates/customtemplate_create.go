@@ -108,13 +108,13 @@ type customTemplateFromFileContentPayload struct {
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Title) {
+	if len(payload.Title) == 0 {
 		return errors.New("Invalid custom template title")
 	}
-	if govalidator.IsNull(payload.Description) {
+	if len(payload.Description) == 0 {
 		return errors.New("Invalid custom template description")
 	}
-	if govalidator.IsNull(payload.FileContent) {
+	if len(payload.FileContent) == 0 {
 		return errors.New("Invalid file content")
 	}
 	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
@@ -132,7 +132,7 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 }
 
 func isValidNote(note string) bool {
-	if govalidator.IsNull(note) {
+	if len(note) == 0 {
 		return true
 	}
 	match, _ := regexp.MatchString("<img", note)
@@ -226,19 +226,19 @@ type customTemplateFromGitRepositoryPayload struct {
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Title) {
+	if len(payload.Title) == 0 {
 		return errors.New("Invalid custom template title")
 	}
-	if govalidator.IsNull(payload.Description) {
+	if len(payload.Description) == 0 {
 		return errors.New("Invalid custom template description")
 	}
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+	if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
-	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
+	if len(payload.ComposeFilePathInRepository) == 0 {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 

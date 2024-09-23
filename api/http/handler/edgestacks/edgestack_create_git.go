@@ -46,15 +46,15 @@ type edgeStackFromGitRepositoryPayload struct {
 }
 
 func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid stack name")
 	}
 
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 || !govalidator.IsURL(payload.RepositoryURL) {
 		return httperrors.NewInvalidPayloadError("Invalid repository URL. Must correspond to a valid URL format")
 	}
 
-	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+	if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 
@@ -62,7 +62,7 @@ func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) erro
 		return httperrors.NewInvalidPayloadError("Invalid deployment type")
 	}
 
-	if govalidator.IsNull(payload.FilePathInRepository) {
+	if len(payload.FilePathInRepository) == 0 {
 		switch payload.DeploymentType {
 		case portainer.EdgeStackDeploymentCompose:
 			payload.FilePathInRepository = filesystem.ComposeFileDefaultName

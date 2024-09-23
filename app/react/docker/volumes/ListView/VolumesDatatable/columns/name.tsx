@@ -15,7 +15,7 @@ import { getTableMeta } from '../tableMeta';
 
 import { columnHelper } from './helper';
 
-export const name = columnHelper.accessor('Id', {
+export const name = columnHelper.accessor('Name', {
   id: 'name',
   header: 'Name',
   cell: Cell,

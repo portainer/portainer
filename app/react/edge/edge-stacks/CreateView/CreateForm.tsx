@@ -92,7 +92,7 @@ function getTemplateValues(
   type: 'custom' | 'app' | undefined,
   template: TemplateViewModel | CustomTemplate | undefined
 ): TemplateValues {
-  if (!type) {
+  if (!type || !template) {
     return getInitialTemplateValues();
   }
 

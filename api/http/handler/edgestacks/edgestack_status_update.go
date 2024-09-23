@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,7 +30,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 		return errors.New("invalid EnvironmentID")
 	}
 
-	if *payload.Status == portainer.EdgeStackStatusError && govalidator.IsNull(payload.Error) {
+	if *payload.Status == portainer.EdgeStackStatusError && len(payload.Error) == 0 {
 		return errors.New("error message is mandatory when status is error")
 	}
 
@@ -88,7 +87,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 	if err != nil {
 		if dataservices.IsErrObjectNotFound(err) {
 			// skip error because agent tries to report on deleted stack
-			log.Warn().
+			log.Debug().
 				Err(err).
 				Int("stackID", int(stackID)).
 				Int("status", int(*payload.Status)).

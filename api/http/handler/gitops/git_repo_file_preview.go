@@ -29,15 +29,15 @@ type repositoryFilePreviewPayload struct {
 }
 
 func (payload *repositoryFilePreviewPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Repository) || !govalidator.IsURL(payload.Repository) {
+	if len(payload.Repository) == 0 || !govalidator.IsURL(payload.Repository) {
 		return errors.New("invalid repository URL. Must correspond to a valid URL format")
 	}
 
-	if govalidator.IsNull(payload.Reference) {
+	if len(payload.Reference) == 0 {
 		payload.Reference = "refs/heads/main"
 	}
 
-	if govalidator.IsNull(payload.TargetFile) {
+	if len(payload.TargetFile) == 0 {
 		return errors.New("invalid target filename")
 	}
 

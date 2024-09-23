@@ -6,7 +6,7 @@ import { PersistentVolumeClaim } from './PersistentVolumeClaim';
 type VolumeResourcePool = ReturnType<typeof KubernetesResourcePool>;
 
 export class Volume {
-  ResourcePool: VolumeResourcePool = {} as VolumeResourcePool;
+  ResourcePool?: VolumeResourcePool = {} as VolumeResourcePool;
 
   PersistentVolumeClaim: PersistentVolumeClaim = {} as PersistentVolumeClaim;
 

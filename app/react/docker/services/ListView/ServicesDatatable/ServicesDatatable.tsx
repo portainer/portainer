@@ -1,5 +1,6 @@
 import { Shuffle } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
+import { useRef } from 'react';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
@@ -55,6 +56,8 @@ export function ServicesDatatable({
   isStackColumnVisible?: boolean;
   onRefresh?(): void;
 }) {
+  // useRef so that updating the parent filter doesn't cause a re-render
+  const parentFilteredStatusRef = useRef<Map<string, boolean>>(new Map());
   const environmentId = useEnvironmentId();
   const apiVersion = useApiVersion(environmentId);
   const tableState = useTableState(store, tableKey);
@@ -76,7 +79,11 @@ export function ServicesDatatable({
           <td colSpan={Number.MAX_SAFE_INTEGER}>
             <TasksDatatable
               dataset={item.Tasks as Array<DecoratedTask>}
-              search={tableState.search}
+              search={
+                parentFilteredStatusRef.current.get(item.Id)
+                  ? ''
+                  : tableState.search
+              }
             />
           </td>
         </tr>
@@ -111,19 +118,24 @@ export function ServicesDatatable({
       data-cy="services-datatable"
     />
   );
-}
 
-function filter(
-  row: Row<ServiceViewModel>,
-  columnId: string,
-  filterValue: null | { search: string }
-) {
-  return (
-    defaultGlobalFilterFn(row, columnId, filterValue) ||
-    row.original.Tasks.some((task) =>
-      Object.values(task).some(
-        (value) => value && value.toString().includes(filterValue?.search || '')
+  function filter(
+    row: Row<ServiceViewModel>,
+    columnId: string,
+    filterValue: null | { search: string }
+  ) {
+    parentFilteredStatusRef.current = parentFilteredStatusRef.current.set(
+      row.id,
+      defaultGlobalFilterFn(row, columnId, filterValue)
+    );
+    return (
+      parentFilteredStatusRef.current.get(row.id) ||
+      row.original.Tasks.some((task) =>
+        Object.values(task).some(
+          (value) =>
+            value && value.toString().includes(filterValue?.search || '')
+        )
       )
-    )
-  );
+    );
+  }
 }

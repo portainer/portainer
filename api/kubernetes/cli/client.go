@@ -33,10 +33,8 @@ type (
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
-		endpointClients      map[string]*KubeClient
 		endpointProxyClients *cache.Cache
 		AddrHTTPS            string
-		mu                   sync.Mutex
 	}
 
 	// KubeClient represent a service used to execute Kubernetes operations

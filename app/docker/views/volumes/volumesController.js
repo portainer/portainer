@@ -13,9 +13,9 @@ angular.module('portainer.docker').controller('VolumesController', [
   function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, Authentication, endpoint) {
     $scope.removeAction = async function (selectedItems) {
       async function doRemove(volume) {
-        return VolumeService.remove(volume.Id, volume.NodeName)
+        return VolumeService.remove(volume.Name, volume.NodeName)
           .then(function success() {
-            Notifications.success('Volume successfully removed', volume.Id);
+            Notifications.success('Volume successfully removed', volume.Name);
             var index = $scope.volumes.indexOf(volume);
             $scope.volumes.splice(index, 1);
           })
