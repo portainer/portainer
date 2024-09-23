@@ -11,19 +11,17 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// @id getKubernetesMetricsForAllNodes
+// @id GetKubernetesMetricsForAllNodes
 // @summary Get a list of nodes with their live metrics
-// @description Get a list of nodes with their live metrics
-// @description **Access policy**: authenticated
+// @description Get a list of metrics associated with all nodes of a cluster.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @success 200 {object} v1beta1.NodeMetricsList "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 500 "Server error occurred while attempting to retrieve the list of nodes with their live metrics."
 // @router /kubernetes/{id}/metrics/nodes [get]
 func (handler *Handler) getKubernetesMetricsForAllNodes(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
@@ -44,20 +42,19 @@ func (handler *Handler) getKubernetesMetricsForAllNodes(w http.ResponseWriter, r
 	return response.JSON(w, metrics)
 }
 
-// @id getKubernetesMetricsForNode
+// @id GetKubernetesMetricsForNode
 // @summary Get live metrics for a node
-// @description Get live metrics for a node
-// @description **Access policy**: authenticated
+// @description Get live metrics for the specified node.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param name path string true "Node identifier"
 // @success 200 {object} v1beta1.NodeMetrics "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 500 "Server error occurred while attempting to retrieve the live metrics for the specified node."
 // @router /kubernetes/{id}/metrics/nodes/{name} [get]
 func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
@@ -87,20 +84,19 @@ func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *ht
 	return response.JSON(w, metrics)
 }
 
-// @id getKubernetesMetricsForAllPods
+// @id GetKubernetesMetricsForAllPods
 // @summary Get a list of pods with their live metrics
-// @description Get a list of pods with their live metrics
-// @description **Access policy**: authenticated
+// @description Get a list of pods with their live metrics for the specified namespace.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace"
 // @success 200 {object} v1beta1.PodMetricsList "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 500 "Server error occurred while attempting to retrieve the list of pods with their live metrics."
 // @router /kubernetes/{id}/metrics/pods/{namespace} [get]
 func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
@@ -126,21 +122,20 @@ func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r 
 	return response.JSON(w, metrics)
 }
 
-// @id getKubernetesMetricsForPod
+// @id GetKubernetesMetricsForPod
 // @summary Get live metrics for a pod
-// @description Get live metrics for a pod
-// @description **Access policy**: authenticated
+// @description Get live metrics for the specified pod.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
-// @accept json
+// @security ApiKeyAuth || jwt
 // @produce json
-// @param id path int true "Environment (Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace"
 // @param name path string true "Pod identifier"
 // @success 200 {object} v1beta1.PodMetrics "Success"
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 500 "Server error occurred while attempting to retrieve the live metrics for the specified pod."
 // @router /kubernetes/{id}/metrics/pods/{namespace}/{name} [get]
 func (handler *Handler) getKubernetesMetricsForPod(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
