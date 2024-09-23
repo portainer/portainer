@@ -18,10 +18,10 @@ export function CreateView() {
   return (
     <div>
       <PageHeader
-        title="Create Custom template"
+        title="Create Custom Template"
         breadcrumbs={[
           { label: 'Custom Templates', link: '^' },
-          'Create Custom template',
+          'Create Custom Template',
         ]}
       />
 
