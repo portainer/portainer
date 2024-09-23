@@ -7,9 +7,9 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-// @id getAllKubernetesServiceAccounts
-// @summary Get a list of kubernetes service accounts within the given environment at the cluster level or a given namespace.
-// @description Get a list of kubernetes service accounts within the given environment at the cluster level or a given namespace.
+// @id GetKubernetesServiceAccounts
+// @summary Get a list of kubernetes service accounts
+// @description Get a list of kubernetes service accounts that the user has access to.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -17,8 +17,10 @@ import (
 // @param id path int true "Environment identifier"
 // @success 200 {array} models.K8sServiceAccount "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
-// @failure 500 "Server error occurred while attempting to retrieve the list of namespaces."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to retrieve the list of service accounts."
 // @router /kubernetes/{id}/serviceaccounts [get]
 func (handler *Handler) getAllKubernetesServiceAccounts(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli, httpErr := handler.prepareKubeClient(r)

@@ -45,7 +45,7 @@ func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.
 
 // @id GetAllKubernetesApplications
 // @summary Get a list of applications
-// @description Get a list of applications. If nodeName is provided, it will return the list of applications running on that node.
+// @description Get a list of applications that the user has access to. If nodeName is provided, it will return the list of applications running on that node.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
@@ -70,7 +70,7 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 
 // @id GetAllKubernetesApplicationsCount
 // @summary Get Applications count
-// @description Get the count of Applications across all namespaces in the cluster. If nodeName is provided, it will return the count of applications running on that node.
+// @description Get the count of Applications that the user has access to. If nodeName is provided, it will return the count of applications running on that node.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
