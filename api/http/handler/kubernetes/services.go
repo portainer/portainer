@@ -72,8 +72,8 @@ func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sS
 
 	services, err := cli.GetServices("")
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return nil, httperror.Unauthorized("an error occurred during the GetAllKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return nil, httperror.Forbidden("an error occurred during the GetAllKubernetesServices operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		return nil, httperror.InternalServerError("an error occurred during the GetAllKubernetesServices operation, unable to retrieve services from the Kubernetes for a cluster level user. Error: ", err)

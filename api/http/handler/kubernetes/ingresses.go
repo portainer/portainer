@@ -247,7 +247,7 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
-// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 404 "Unable to find an environment with the specified identifier or unable to find the ingress controllers to update."
 // @failure 500 "Server error occurred while attempting to update ingress controllers."
 // @router /kubernetes/{id}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -279,8 +279,8 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return httperror.Unauthorized("an error occurred during the UpdateKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return httperror.Forbidden("an error occurred during the UpdateKubernetesIngressControllers operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
@@ -511,8 +511,8 @@ func (handler *Handler) getKubernetesClusterIngresses(r *http.Request) ([]models
 
 	ingresses, err := cli.GetIngresses("")
 	if err != nil {
-		if k8serrors.IsUnauthorized(err) {
-			return nil, httperror.Unauthorized("an error occurred during the GetKubernetesClusterIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			return nil, httperror.Forbidden("an error occurred during the GetKubernetesClusterIngresses operation, unauthorized access to the Kubernetes API. Error: ", err)
 		}
 
 		if k8serrors.IsNotFound(err) {
