@@ -136,7 +136,6 @@ function EdgeKeyInfo({
       commandsTabs.k8sLinux,
       commandsTabs.swarmLinux,
       commandsTabs.standaloneLinux,
-      commandsTabs.podmanLinux,
     ]),
     win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
   };
