@@ -1,7 +1,7 @@
 import { compact } from 'lodash';
 import { useQuery } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -20,7 +20,7 @@ export function useGetClusterRoleBindingsQuery(
       return compact(cluerRoleBindings);
     },
     {
-      ...withError('Unable to get cluster role bindings'),
+      ...withGlobalError('Unable to get cluster role bindings'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },

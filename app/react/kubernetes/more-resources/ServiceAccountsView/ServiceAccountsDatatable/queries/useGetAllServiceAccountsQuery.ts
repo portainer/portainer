@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -11,7 +11,7 @@ import { queryKeys } from './query-keys';
 export function useGetAllServiceAccountsQuery(
   environmentId: EnvironmentId,
   options?: {
-    autoRefreshRate?: number;
+    refetchInterval?: number;
     enabled?: boolean;
   }
 ) {
@@ -19,11 +19,8 @@ export function useGetAllServiceAccountsQuery(
     queryKeys.list(environmentId),
     async () => getAllServiceAccounts(environmentId),
     {
-      ...withError('Unable to get service accounts'),
-      refetchInterval() {
-        return options?.autoRefreshRate ?? false;
-      },
-      enabled: options?.enabled,
+      ...withGlobalError('Unable to get service accounts'),
+      ...options,
     }
   );
 }

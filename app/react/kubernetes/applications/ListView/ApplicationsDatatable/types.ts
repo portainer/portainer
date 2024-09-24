@@ -39,6 +39,12 @@ export interface Application {
     }>;
     Port: number;
   }>;
+  Resource?: {
+    cpuLimit?: number;
+    cpuRequest?: number;
+    memoryLimit?: number;
+    memoryRequest?: number;
+  };
 }
 
 export enum ConfigKind {

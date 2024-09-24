@@ -3,7 +3,7 @@ import { ConfigMap, ConfigMapList } from 'kubernetes-types/core/v1';
 
 import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 
 import { parseKubernetesAxiosError } from '../../axiosError';
 
@@ -15,7 +15,9 @@ export function useConfigMaps(environmentId: EnvironmentId, namespace: string) {
     configMapQueryKeys.configMaps(environmentId, namespace),
     () => (namespace ? getConfigMaps(environmentId, namespace) : []),
     {
-      ...withError(`Unable to get ConfigMaps in namespace '${namespace}'`),
+      ...withGlobalError(
+        `Unable to get ConfigMaps in namespace '${namespace}'`
+      ),
       enabled: !!namespace,
     }
   );

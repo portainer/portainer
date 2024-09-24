@@ -254,6 +254,7 @@ class KubernetesSecretController {
 
       const configuration = await this.getConfiguration();
       if (configuration) {
+        await this.getApplications(this.configuration.Namespace);
         await this.getEvents(this.configuration.Namespace);
       }
 

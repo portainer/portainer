@@ -51,19 +51,18 @@ export function AppIngressPathsForm({
         ?.filter((ic) => ic.Availability)
         .map((ic) => ic.ClassName) || [];
     const allowedIngresses =
-      ingresses?.filter((ing: { ClassName: string }) => {
+      ingresses?.filter((ing) => {
         const className = ing.ClassName || 'none';
         return allowedIngressClasses.includes(className);
       }) || [];
-    return allowedIngresses.flatMap(
-      (ing: { Hosts: unknown[]; Name: unknown }) =>
-        ing.Hosts?.length
-          ? ing.Hosts.map((host) => ({
-              label: `${host} (${ing.Name})`,
-              value: host,
-              ingressName: ing.Name,
-            }))
-          : []
+    return allowedIngresses.flatMap((ing) =>
+      ing.Hosts?.length
+        ? ing.Hosts.map((host) => ({
+            label: `${host} (${ing.Name})`,
+            value: host,
+            ingressName: ing.Name,
+          }))
+        : []
     );
   }, [ingressControllers, ingresses]);
 

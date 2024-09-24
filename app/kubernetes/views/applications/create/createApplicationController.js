@@ -918,7 +918,7 @@ class KubernetesCreateApplicationController {
   async checkIngressesToUpdate() {
     let ingressesToUpdate = [];
     let servicePortsToUpdate = [];
-    const fullIngresses = await getIngresses(this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name);
+    const fullIngresses = await getIngresses(this.endpoint.Id);
     this.formValues.Services.forEach((updatedService) => {
       const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === updatedService.Name);
       const numberOfPortsInOldService = this.oldFormValues.Services[oldServiceIndex] && this.oldFormValues.Services[oldServiceIndex].Ports.length;

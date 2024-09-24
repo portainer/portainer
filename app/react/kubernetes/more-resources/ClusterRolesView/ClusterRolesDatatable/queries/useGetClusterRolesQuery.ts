@@ -1,7 +1,7 @@
 import { compact } from 'lodash';
 import { useQuery } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -20,10 +20,8 @@ export function useGetClusterRolesQuery(
       return compact(clusterRoles);
     },
     {
-      ...withError('Unable to get cluster roles'),
-      refetchInterval() {
-        return options?.autoRefreshRate ?? false;
-      },
+      ...withGlobalError('Unable to get cluster roles'),
+      ...options,
     }
   );
 }

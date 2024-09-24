@@ -1,7 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
+
+import { queryKeys } from './queryKeys';
 
 type DeleteNamespaceError = {
   namespaceName: string;
@@ -16,12 +18,13 @@ type DeleteNamespacesResponse = {
 
 // useDeleteNamespaces is a react query mutation that removes a list of namespaces,
 export function useDeleteNamespaces(environmentId: number) {
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation(
     ({ namespaceNames }: { namespaceNames: string[] }) =>
       deleteNamespaces(environmentId, namespaceNames),
     {
-      ...withError('Unable to delete namespaces'),
+      ...withInvalidate(queryClient, [queryKeys.list(environmentId)]),
+      ...withGlobalError('Unable to delete namespaces'),
       // onSuccess handled by the caller
     }
   );

@@ -6,6 +6,8 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { PortainerNamespace } from '../types';
 
+import { queryKeys } from './queryKeys';
+
 export function useNamespaceQuery<T = PortainerNamespace>(
   environmentId: EnvironmentId,
   namespace: string,
@@ -16,7 +18,7 @@ export function useNamespaceQuery<T = PortainerNamespace>(
   } = {}
 ) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'namespaces', namespace],
+    queryKeys.namespace(environmentId, namespace),
     () => getNamespace(environmentId, namespace),
     {
       onError: (err) => {
@@ -38,6 +40,6 @@ export async function getNamespace(
     );
     return ns;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve namespace');
+    throw parseAxiosError(e, 'Unable to retrieve namespace');
   }
 }

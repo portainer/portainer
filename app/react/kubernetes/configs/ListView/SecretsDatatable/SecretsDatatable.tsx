@@ -44,8 +44,7 @@ export function SecretsDatatable() {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     isUsed: true,
   });
-
-  const secrets = Object.values(secretsQuery.data ?? []);
+  const secrets = secretsQuery.data ?? [];
 
   const filteredSecrets = tableState.showSystemResources
     ? secrets

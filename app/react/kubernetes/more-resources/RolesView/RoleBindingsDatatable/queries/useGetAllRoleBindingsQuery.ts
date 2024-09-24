@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -16,7 +16,7 @@ export function useGetAllRoleBindingsQuery(
     queryKeys.list(environmentId),
     async () => getAllRoleBindings(environmentId),
     {
-      ...withError('Unable to get role bindings'),
+      ...withGlobalError('Unable to get role bindings'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },

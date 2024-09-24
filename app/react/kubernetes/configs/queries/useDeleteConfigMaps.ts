@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { queryClient, withError } from '@/react-tools/react-query';
+import { queryClient, withGlobalError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
@@ -34,7 +34,7 @@ export function useDeleteConfigMaps(environmentId: EnvironmentId) {
       return { failedConfigMaps, successfulConfigMaps };
     },
     {
-      ...withError('Unable to remove ConfigMaps'),
+      ...withGlobalError('Unable to remove ConfigMaps'),
       onSuccess: ({ failedConfigMaps, successfulConfigMaps }) => {
         // Promise.allSettled can also resolve with errors, so check for errors here
         // show an error message for each configmap that failed to delete

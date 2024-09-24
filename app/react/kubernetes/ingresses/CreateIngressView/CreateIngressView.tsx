@@ -291,8 +291,7 @@ export function CreateIngressView() {
     ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
-        (ing: Ingress) =>
-          ing.Name === params.name && ing.Namespace === params.namespace
+        (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
         const type = ingressControllers?.find(

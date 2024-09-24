@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
   mutationOptions,
-  withError,
+  withGlobalError,
   withInvalidate,
 } from '@/react-tools/react-query';
 
@@ -17,13 +17,23 @@ import {
 } from './service';
 import { DeleteIngressesRequest, Ingress } from './types';
 
-const ingressKeys = {
-  all: ['environments', 'kubernetes', 'namespace', 'ingress'] as const,
-  namespace: (
+const queryKeys = {
+  base: ['environments', 'kubernetes', 'ingress'] as const,
+  clusterIngresses: (environmentId: EnvironmentId) =>
+    [...queryKeys.base, String(environmentId)] as const,
+  namespaceIngresses: (
     environmentId: EnvironmentId,
     namespace: string,
     ingress: string
-  ) => [...ingressKeys.all, String(environmentId), namespace, ingress] as const,
+  ) => [...queryKeys.base, String(environmentId), namespace, ingress] as const,
+  ingress: (environmentId: EnvironmentId, namespace: string, name: string) =>
+    [...queryKeys.base, String(environmentId), namespace, name] as const,
+  ingressControllers: (environmentId: EnvironmentId, namespace: string) => [
+    ...queryKeys.base,
+    String(environmentId),
+    namespace,
+    'ingresscontrollers',
+  ],
 };
 
 export function useIngress(
@@ -32,21 +42,13 @@ export function useIngress(
   name: string
 ) {
   return useQuery(
-    [
-      'environments',
-      environmentId,
-      'kubernetes',
-      'namespace',
-      namespace,
-      'ingress',
-      name,
-    ],
+    queryKeys.ingress(environmentId, namespace, name),
     async () => {
       const ing = await getIngress(environmentId, namespace, name);
       return ing;
     },
     {
-      ...withError('Unable to get ingress'),
+      ...withGlobalError('Unable to get ingress'),
     }
   );
 }
@@ -59,17 +61,15 @@ export function useIngresses(
     withServices?: boolean;
   }
 ) {
-  const withServices = options?.withServices ?? false;
+  const { enabled, autoRefreshRate, ...params } = options ?? {};
 
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'ingress', withServices],
-    async () => getIngresses(environmentId, options?.withServices),
+    ['environments', environmentId, 'kubernetes', 'ingress', params],
+    async () => getIngresses(environmentId, params),
     {
-      ...withError('Unable to get ingresses'),
-      refetchInterval() {
-        return options?.autoRefreshRate ?? false;
-      },
-      enabled: options?.enabled,
+      ...withGlobalError('Unable to get ingresses'),
+      refetchInterval: autoRefreshRate,
+      enabled,
     }
   );
 }
@@ -85,8 +85,8 @@ export function useCreateIngress() {
       ingress: Ingress;
     }) => createIngress(environmentId, ingress),
     mutationOptions(
-      withError('Unable to create ingress controller'),
-      withInvalidate(queryClient, [ingressKeys.all])
+      withGlobalError('Unable to create ingress controller'),
+      withInvalidate(queryClient, [queryKeys.base])
     )
   );
 }
@@ -102,8 +102,8 @@ export function useUpdateIngress() {
       ingress: Ingress;
     }) => updateIngress(environmentId, ingress),
     mutationOptions(
-      withError('Unable to update ingress controller'),
-      withInvalidate(queryClient, [ingressKeys.all])
+      withGlobalError('Unable to update ingress controller'),
+      withInvalidate(queryClient, [queryKeys.base])
     )
   );
 }
@@ -119,8 +119,8 @@ export function useDeleteIngresses() {
       data: DeleteIngressesRequest;
     }) => deleteIngresses(environmentId, data),
     mutationOptions(
-      withError('Unable to update ingress controller'),
-      withInvalidate(queryClient, [ingressKeys.all])
+      withGlobalError('Unable to update ingress controller'),
+      withInvalidate(queryClient, [queryKeys.base])
     )
   );
 }
@@ -134,21 +134,14 @@ export function useIngressControllers(
   allowedOnly?: boolean
 ) {
   return useQuery(
-    [
-      'environments',
-      environmentId,
-      'kubernetes',
-      'namespace',
-      namespace,
-      'ingresscontrollers',
-    ],
+    queryKeys.ingressControllers(environmentId, namespace ?? ''),
     async () =>
       namespace
         ? getIngressControllers(environmentId, namespace, allowedOnly)
         : [],
     {
       enabled: !!namespace,
-      ...withError('Unable to get ingress controllers'),
+      ...withGlobalError('Unable to get ingress controllers'),
     }
   );
 }

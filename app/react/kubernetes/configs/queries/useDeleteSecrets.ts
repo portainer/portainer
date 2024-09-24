@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { queryClient, withError } from '@/react-tools/react-query';
+import { queryClient, withGlobalError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import {
@@ -34,7 +34,7 @@ export function useDeleteSecrets(environmentId: EnvironmentId) {
       return { failedSecrets, successfulSecrets };
     },
     {
-      ...withError('Unable to remove secrets'),
+      ...withGlobalError('Unable to remove secrets'),
       onSuccess: ({ failedSecrets, successfulSecrets }) => {
         // show an error message for each secret that failed to delete
         failedSecrets.forEach(({ name, reason }) => {

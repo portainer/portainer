@@ -39,37 +39,35 @@ export function IngressDatatable() {
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespacesArray, ...namespacesQuery } =
-    useNamespacesQuery(environmentId);
+  const namespacesQuery = useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     withServices: true,
   });
 
-  const namespaces = useMemo(() => {
-    const ns: Record<string, PortainerNamespace> = {};
-    if (Array.isArray(namespacesArray)) {
-      for (let i = 0; i < namespacesArray.length; i++) {
-        const namespace = namespacesArray[i];
-        ns[namespace.Name] = namespace;
-      }
-    }
-    return ns;
-  }, [namespacesArray]);
+  const namespacesMap = useMemo(() => {
+    const namespacesMap = namespacesQuery.data?.reduce<
+      Record<string, PortainerNamespace>
+    >((acc, namespace) => {
+      acc[namespace.Name] = namespace;
+      return acc;
+    }, {});
+    return namespacesMap ?? {};
+  }, [namespacesQuery.data]);
 
   const filteredIngresses = useMemo(
     () =>
       ingresses?.filter(
-        (ingress: Ingress) =>
+        (ingress) =>
           (canAccessSystemResources && tableState.showSystemResources) ||
-          !namespaces?.[ingress.Namespace].IsSystem
+          !namespacesMap?.[ingress.Namespace].IsSystem
       ) || [],
-    [ingresses, tableState, canAccessSystemResources, namespaces]
+    [ingresses, tableState, canAccessSystemResources, namespacesMap]
   );
 
   const ingressesWithIsSystem = useIngressesRowData(
     filteredIngresses || [],
-    namespaces
+    namespacesMap
   );
 
   const isAddIngressHidden = useIsDeploymentOptionHidden('form');
@@ -88,7 +86,9 @@ export function IngressDatatable() {
       title="Ingresses"
       titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
-      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
+      isRowSelectable={(row) =>
+        !namespacesMap?.[row.original.Namespace].IsSystem
+      }
       renderTableActions={tableActions}
       renderTableSettings={() => (
         <TableSettingsMenu>

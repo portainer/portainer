@@ -3,7 +3,7 @@ export interface Configuration {
   Name: string;
   Type: number;
   Namespace: string;
-  CreationDate?: Date;
+  CreationDate?: string;
 
   ConfigurationOwner: string; // username
   ConfigurationOwnerId: string; // user id

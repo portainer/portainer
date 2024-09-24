@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -19,7 +19,7 @@ export function useConfigMap(
     configMapQueryKeys.configMap(environmentId, namespace, configMap),
     () => getConfigMap(environmentId, namespace, configMap, { withData: true }),
     {
-      ...withError('Unable to retrieve ConfigMaps for cluster'),
+      ...withGlobalError('Unable to retrieve ConfigMaps for cluster'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },

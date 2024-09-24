@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Secret, SecretList } from 'kubernetes-types/core/v1';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -15,7 +15,7 @@ export function useSecrets(environmentId: EnvironmentId, namespace?: string) {
     secretQueryKeys.secrets(environmentId, namespace),
     () => (namespace ? getSecrets(environmentId, namespace) : []),
     {
-      ...withError(`Unable to get secrets in namespace '${namespace}'`),
+      ...withGlobalError(`Unable to get secrets in namespace '${namespace}'`),
       enabled: !!namespace,
     }
   );

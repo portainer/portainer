@@ -104,7 +104,7 @@ export interface ValueFrom {
 export interface Job {
   name?: string;
   namespace: string;
-  creationDate?: Date;
+  creationDate?: string;
   uid?: string;
   containers: Container[];
 }

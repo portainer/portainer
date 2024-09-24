@@ -35,7 +35,7 @@ export function ServiceAccountsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const namespacesQuery = useNamespacesQuery(environmentId);
   const serviceAccountsQuery = useGetAllServiceAccountsQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRate * 1000,
     enabled: namespacesQuery.isSuccess,
   });
 

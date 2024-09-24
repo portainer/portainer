@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -11,7 +11,7 @@ export function useDeleteServiceAccountsMutation(environmentId: EnvironmentId) {
   return useMutation(deleteServices, {
     onSuccess: () =>
       queryClient.invalidateQueries(queryKeys.list(environmentId)),
-    ...withError('Unable to delete service accounts'),
+    ...withGlobalError('Unable to delete service accounts'),
   });
 }
 
@@ -28,6 +28,6 @@ export async function deleteServices({
       data
     );
   } catch (e) {
-    throw parseAxiosError(e as Error, `Unable to delete service accounts`);
+    throw parseAxiosError(e, `Unable to delete service accounts`);
   }
 }

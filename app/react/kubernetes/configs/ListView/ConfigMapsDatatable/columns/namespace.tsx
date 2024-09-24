@@ -8,7 +8,7 @@ import { ConfigMapRowData } from '../types';
 
 import { columnHelper } from './helper';
 
-export const namespace = columnHelper.accessor((row) => row.Namespace, {
+export const namespace = columnHelper.accessor('Namespace', {
   header: 'Namespace',
   id: 'namespace',
   cell: ({ getValue }) => {

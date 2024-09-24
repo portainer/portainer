@@ -20,12 +20,10 @@ export async function getIngress(
 
 export async function getIngresses(
   environmentId: EnvironmentId,
-  withServices?: boolean
+  params?: { withServices?: boolean }
 ) {
   try {
-    const params = withServices ? { withServices: true } : {};
-
-    const { data: ingresses } = await axios.get(
+    const { data: ingresses } = await axios.get<Ingress[]>(
       `kubernetes/${environmentId}/ingresses`,
       { params }
     );

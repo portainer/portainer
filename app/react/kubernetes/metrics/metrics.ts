@@ -9,15 +9,11 @@ import {
 export async function getMetricsForAllNodes(environmentId: EnvironmentId) {
   try {
     const { data: nodes } = await axios.get<NodeMetrics>(
-      `kubernetes/${environmentId}/metrics/nodes`,
-      {}
+      `kubernetes/${environmentId}/metrics/nodes`
     );
     return nodes;
   } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve metrics for all nodes'
-    );
+    throw parseAxiosError(e, 'Unable to retrieve metrics for all nodes');
   }
 }
 
@@ -27,12 +23,11 @@ export async function getMetricsForNode(
 ) {
   try {
     const { data: node } = await axios.get<NodeMetric>(
-      `kubernetes/${environmentId}/metrics/nodes/${nodeName}`,
-      {}
+      `kubernetes/${environmentId}/metrics/nodes/${nodeName}`
     );
     return node;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for node');
+    throw parseAxiosError(e, 'Unable to retrieve metrics for node');
   }
 }
 
@@ -42,15 +37,11 @@ export async function getMetricsForAllPods(
 ) {
   try {
     const { data: pods } = await axios.get(
-      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}`,
-      {}
+      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}`
     );
     return pods;
   } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve metrics for all pods'
-    );
+    throw parseAxiosError(e, 'Unable to retrieve metrics for all pods');
   }
 }
 
@@ -61,12 +52,11 @@ export async function getMetricsForPod(
 ) {
   try {
     const { data: pod } = await axios.get(
-      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}/${podName}`,
-      {}
+      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}/${podName}`
     );
     return pod;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for pod');
+    throw parseAxiosError(e, 'Unable to retrieve metrics for pod');
   }
 }
 
@@ -75,14 +65,12 @@ export async function getTotalResourcesForAllApplications(
 ) {
   try {
     const { data: resources } = await axios.get<ApplicationResource>(
-      `kubernetes/${environmentId}/metrics/applications_resources`,
-      {}
+      `kubernetes/${environmentId}/metrics/applications_resources`
     );
-
     return resources;
   } catch (e) {
     throw parseAxiosError(
-      e as Error,
+      e,
       'Unable to retrieve total resources for all applications'
     );
   }

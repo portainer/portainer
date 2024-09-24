@@ -1,8 +1,5 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
@@ -36,8 +33,6 @@ class KubernetesApplicationsController {
     this.KubernetesNamespaceService = KubernetesNamespaceService;
 
     this.onInit = this.onInit.bind(this);
-    this.getApplications = this.getApplications.bind(this);
-    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
     this.removeStacksAction = this.removeStacksAction.bind(this);
@@ -137,40 +132,13 @@ class KubernetesApplicationsController {
       this.state.namespaceName = namespaceName;
       // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
       this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
-      return this.getApplicationsAsync();
     });
-  }
-
-  async getApplicationsAsync() {
-    try {
-      this.state.isAppsLoading = true;
-      const [applications, configurations] = await Promise.all([
-        this.KubernetesApplicationService.get(this.state.namespaceName),
-        this.KubernetesConfigurationService.get(this.state.namespaceName),
-      ]);
-      const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
-      const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
-
-      this.state.applications = [...helmApplications, ...nonHelmApplications];
-      this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
-      this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
-
-      this.$scope.$apply();
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve applications');
-    } finally {
-      this.state.isAppsLoading = false;
-    }
   }
 
   setSystemResources(flag) {
     return this.$scope.$applyAsync(() => {
       this.state.isSystemResources = flag;
     });
-  }
-
-  getApplications() {
-    return this.$async(this.getApplicationsAsync);
   }
 
   async onInit() {
@@ -204,8 +172,6 @@ class KubernetesApplicationsController {
       // otherwise, set the preferred namespaceName if it exists, otherwise set the first namespaceName
       this.state.namespaceName = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
     }
-
-    // await this.getApplications();
 
     this.state.viewReady = true;
   }

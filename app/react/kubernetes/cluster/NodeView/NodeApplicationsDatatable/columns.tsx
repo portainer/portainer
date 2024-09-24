@@ -41,14 +41,15 @@ export function useColumns() {
         }),
         helper.accessor('Image', {
           header: 'Image',
-          cell: ({ row: { original: item } }) => (
-            <>
-              {truncate(item.Image, 64)}
-              {item.Containers?.length > 1 && (
-                <>+ {item.Containers.length - 1}</>
-              )}
-            </>
-          ),
+          cell: ({ row: { original: item } }) => {
+            const containersLength = item.Containers?.length || 0;
+            return (
+              <>
+                {truncate(item.Image, 64)}
+                {containersLength > 1 && <>+ {containersLength - 1}</>}
+              </>
+            );
+          },
         }),
         helper.accessor((row) => row.Resource?.cpuRequest, {
           header: 'CPU reservation',

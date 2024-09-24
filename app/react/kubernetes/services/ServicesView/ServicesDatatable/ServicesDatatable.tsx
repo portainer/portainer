@@ -100,7 +100,7 @@ export function ServicesDatatable() {
   );
 }
 
-// useServicesRowData appends the `isSyetem` property to the service data
+// useServicesRowData appends the `isSystem` property to the service data
 function useServicesRowData(
   services: Service[],
   namespaces?: Namespaces

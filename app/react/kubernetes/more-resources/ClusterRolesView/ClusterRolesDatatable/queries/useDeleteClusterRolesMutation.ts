@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -11,7 +11,7 @@ export function useDeleteClusterRolesMutation(environmentId: EnvironmentId) {
   return useMutation(deleteClusterRoles, {
     onSuccess: () =>
       queryClient.invalidateQueries(queryKeys.list(environmentId)),
-    ...withError('Unable to delete cluster roles'),
+    ...withGlobalError('Unable to delete cluster roles'),
   });
 }
 

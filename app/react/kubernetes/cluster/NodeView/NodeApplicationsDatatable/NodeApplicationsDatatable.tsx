@@ -2,6 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import LaptopCode from '@/assets/ico/laptop-code.svg?c';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useAllApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
@@ -11,8 +12,6 @@ import {
   refreshableSettings,
   RefreshableTableSettings,
 } from '@@/datatables/types';
-
-import { useAllNodeApplicationsQuery } from '../useNodeApplicationsQuery';
 
 import { useColumns } from './columns';
 
@@ -31,8 +30,8 @@ export function NodeApplicationsDatatable() {
   const {
     params: { nodeName },
   } = useCurrentStateAndParams();
-
-  const applicationsQuery = useAllNodeApplicationsQuery(envId, nodeName, {
+  const applicationsQuery = useAllApplicationsQuery(envId, {
+    nodeName,
     refetchInterval: tableState.autoRefreshRate * 1000,
   });
   const applications = applicationsQuery.data ?? [];

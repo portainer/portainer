@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { NodeApplication } from './types';
+import { Application } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/types';
 
-export const helper = createColumnHelper<NodeApplication>();
+export const helper = createColumnHelper<Application>();

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { PortainerNamespace } from '../types';
@@ -18,7 +18,7 @@ export function useNamespacesQuery(
     }),
     async () => getNamespaces(environmentId, options?.withResourceQuota),
     {
-      ...withError('Unable to get namespaces.'),
+      ...withGlobalError('Unable to get namespaces.'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
@@ -39,6 +39,6 @@ export async function getNamespaces(
     );
     return namespaces;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve namespaces');
+    throw parseAxiosError(e, 'Unable to retrieve namespaces');
   }
 }
