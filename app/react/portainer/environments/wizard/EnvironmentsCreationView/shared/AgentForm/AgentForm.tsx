@@ -17,6 +17,7 @@ import { useValidation } from './AgentForm.validation';
 
 interface Props {
   onCreate(environment: Environment): void;
+  envDefaultPort?: string;
 }
 
 const initialValues: CreateAgentEnvironmentValues = {
@@ -28,7 +29,7 @@ const initialValues: CreateAgentEnvironmentValues = {
   },
 };
 
-export function AgentForm({ onCreate }: Props) {
+export function AgentForm({ onCreate, envDefaultPort }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   const mutation = useCreateAgentEnvironmentMutation();
@@ -45,7 +46,7 @@ export function AgentForm({ onCreate }: Props) {
       {({ isValid, dirty }) => (
         <Form>
           <NameField />
-          <EnvironmentUrlField />
+          <EnvironmentUrlField placeholderPort={envDefaultPort} />
 
           <MoreSettingsSection />
 
