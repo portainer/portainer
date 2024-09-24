@@ -5,7 +5,7 @@ PORTAINER_DATA=${PORTAINER_DATA:-/tmp/portainer}
 PORTAINER_PROJECT=${PORTAINER_PROJECT:-$(pwd)}
 PORTAINER_FLAGS=${PORTAINER_FLAGS:-}
 
-podman rm -f portainer
+sudo podman rm -f portainer
 
 # rootful podman (sudo required)
 sudo podman run -d \

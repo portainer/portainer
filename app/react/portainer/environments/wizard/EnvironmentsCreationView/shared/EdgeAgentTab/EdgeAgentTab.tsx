@@ -25,7 +25,7 @@ export function EdgeAgentTab({
   onCreate,
   commands,
   asyncMode = false,
-  containerEngine = 'docker',
+  containerEngine = ContainerEngine.Docker,
 }: Props) {
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);

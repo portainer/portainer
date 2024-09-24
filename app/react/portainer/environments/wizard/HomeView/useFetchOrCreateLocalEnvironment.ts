@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 import {
+  ContainerEngine,
   Environment,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
@@ -65,8 +66,16 @@ async function createLocalEnvironment() {
   const name = 'local';
   const attempts = [
     () => createLocalKubernetesEnvironment({ name }),
-    () => createLocalDockerEnvironment({ name, containerEngine: 'podman' }),
-    () => createLocalDockerEnvironment({ name, containerEngine: 'docker' }),
+    () =>
+      createLocalDockerEnvironment({
+        name,
+        containerEngine: ContainerEngine.Podman,
+      }),
+    () =>
+      createLocalDockerEnvironment({
+        name,
+        containerEngine: ContainerEngine.Docker,
+      }),
   ];
 
   for (let i = 0; i < attempts.length; i++) {

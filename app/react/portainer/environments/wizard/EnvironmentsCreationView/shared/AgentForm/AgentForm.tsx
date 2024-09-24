@@ -36,7 +36,7 @@ const initialValues: CreateAgentEnvironmentValues = {
 export function AgentForm({
   onCreate,
   envDefaultPort,
-  containerEngine = 'docker',
+  containerEngine = ContainerEngine.Docker,
 }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 

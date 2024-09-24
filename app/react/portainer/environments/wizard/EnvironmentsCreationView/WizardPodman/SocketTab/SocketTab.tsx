@@ -1,4 +1,7 @@
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -20,7 +23,10 @@ export function SocketTab({ onCreate }: Props) {
       <DeploymentScripts />
 
       <div className="mt-5">
-        <SocketForm onCreate={onCreate} containerEngine="podman" />
+        <SocketForm
+          onCreate={onCreate}
+          containerEngine={ContainerEngine.Podman}
+        />
       </div>
     </>
   );

@@ -172,7 +172,10 @@ export enum EnvironmentCreationTypes {
   KubeConfigEnvironment,
 }
 
-export type ContainerEngine = 'docker' | 'podman';
+export enum ContainerEngine {
+  Docker = 'docker',
+  Podman = 'podman',
+}
 
 export enum PlatformType {
   Docker,

@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Laptop } from 'lucide-react';
-import { compact } from 'lodash';
 
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
@@ -18,6 +17,15 @@ import { CopyButton } from '@@/buttons';
 import { Link } from '@@/Link';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+
+const commands = {
+  linux: [
+    commandsTabs.k8sLinux,
+    commandsTabs.swarmLinux,
+    commandsTabs.standaloneLinux,
+  ],
+  win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+};
 
 const asyncModeOptions = [
   {
@@ -131,15 +139,6 @@ function EdgeKeyInfo({
   tunnelUrl?: string;
   asyncMode: boolean;
 }) {
-  const commands = {
-    linux: compact([
-      commandsTabs.k8sLinux,
-      commandsTabs.swarmLinux,
-      commandsTabs.standaloneLinux,
-    ]),
-    win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
-  };
-
   if (isLoading || !edgeKey) {
     return <div>Generating key for {url} ... </div>;
   }

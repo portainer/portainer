@@ -102,19 +102,27 @@ export function useLoggingPlugins(
   systemOnly: boolean,
   isPodman?: boolean
 ) {
-  const systemPluginsQuery = useInfo(environmentId, {
-    select: (info) => info.Plugins,
-  });
-  const enabled = !systemOnly && isPodman === false;
-  const pluginsQuery = usePlugins(environmentId, { enabled });
+  //  systemOnly false + podman false|undefined -> both
+  //  systemOnly true + podman false|undefined -> system
+  //  systemOnly false + podman true -> system
+  //  systemOnly true + podman true -> system
+  return useServicePlugins(
+    environmentId,
+    systemOnly || isPodman === true,
+    'Log'
+  );
+}
 
-  return {
-    data: aggregateData(
-      systemPluginsQuery.data,
-      pluginsQuery.data,
-      systemOnly,
-      'Log'
-    ),
-    isLoading: systemPluginsQuery.isLoading || pluginsQuery.isLoading,
-  };
+export function useVolumePlugins(
+  environmentId: EnvironmentId,
+  systemOnly: boolean
+) {
+  return useServicePlugins(environmentId, systemOnly, 'Volume');
+}
+
+export function useNetworkPlugins(
+  environmentId: EnvironmentId,
+  systemOnly: boolean
+) {
+  return useServicePlugins(environmentId, systemOnly, 'Network');
 }

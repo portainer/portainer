@@ -1,6 +1,7 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
 import { StackType } from '@/react/common/stacks/types';
+import { ContainerEngine } from '@/react/portainer/environments/types';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -12,7 +13,9 @@ import { CreateForm } from './CreateForm';
 export function CreateView() {
   const viewType = useViewType();
   const environmentId = useEnvironmentId(false);
-  const isSwarm = useIsSwarm(environmentId, { enabled: viewType === 'docker' });
+  const isSwarm = useIsSwarm(environmentId, {
+    enabled: viewType === ContainerEngine.Docker,
+  });
   const defaultType = getDefaultType(viewType, isSwarm);
 
   return (

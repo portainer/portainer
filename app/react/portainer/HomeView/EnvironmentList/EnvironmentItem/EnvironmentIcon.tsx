@@ -22,7 +22,7 @@ export function EnvironmentIcon({ type, containerEngine }: Props) {
   switch (type) {
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.Docker:
-      if (containerEngine === 'podman') {
+      if (containerEngine === ContainerEngine.Podman) {
         return (
           <img
             src={podman}
@@ -50,7 +50,7 @@ export function EnvironmentIcon({ type, containerEngine }: Props) {
         />
       );
     case EnvironmentType.EdgeAgentOnDocker:
-      if (containerEngine === 'podman') {
+      if (containerEngine === ContainerEngine.Podman) {
         return (
           <img
             src={podmanEdge}

@@ -24,7 +24,7 @@ export function getPlatformType(
     case EnvironmentType.Docker:
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.EdgeAgentOnDocker:
-      if (containerEngine === 'podman') {
+      if (containerEngine === ContainerEngine.Podman) {
         return PlatformType.Podman;
       }
       return PlatformType.Docker;
@@ -141,7 +141,7 @@ export function getEnvironmentTypeIcon(
       return Kube;
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.Docker:
-      if (containerEngine === 'podman') {
+      if (containerEngine === ContainerEngine.Podman) {
         return PodmanIcon;
       }
       return DockerIcon;

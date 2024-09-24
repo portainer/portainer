@@ -9,7 +9,7 @@ import { EdgeAsyncIntervalsValues } from '@/react/edge/components/EdgeAsyncInter
 
 import {
   type Environment,
-  type ContainerEngine,
+  ContainerEngine,
   EnvironmentCreationTypes,
 } from '../types';
 
@@ -158,7 +158,7 @@ export interface CreateAgentEnvironmentValues {
 export function createAgentEnvironment({
   name,
   environmentUrl,
-  containerEngine = 'docker',
+  containerEngine = ContainerEngine.Docker,
   meta = { tagIds: [] },
 }: CreateAgentEnvironmentValues) {
   return createRemoteEnvironment({

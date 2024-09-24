@@ -1,4 +1,4 @@
-import { EnvironmentId } from '../types';
+import { ContainerEngine, EnvironmentId } from '../types';
 
 import { useEnvironment } from './useEnvironment';
 
@@ -9,7 +9,7 @@ import { useEnvironment } from './useEnvironment';
 export function useIsPodman(envId: EnvironmentId) {
   const { data: isPodman } = useEnvironment(
     envId,
-    (env) => env.ContainerEngine === 'podman'
+    (env) => env.ContainerEngine === ContainerEngine.Podman
   );
   return isPodman;
 }
