@@ -10,7 +10,7 @@ import { NavContainer } from '@@/NavTabs/NavContainer';
 const deploymentPodman = [
   {
     id: 'all',
-    label: 'Linux (CentOS / RHEL)',
+    label: 'Linux (CentOS)',
     command: linuxPodmanCommandRootful,
   },
 ];

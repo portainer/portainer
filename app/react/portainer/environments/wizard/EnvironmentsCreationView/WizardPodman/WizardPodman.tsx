@@ -74,13 +74,9 @@ export function WizardPodman({ onCreate }: Props) {
         radioName="creation-type"
       />
       <TextTip color="orange" className="mb-2" inline={false}>
-        Currently,{' '}
-        <b>
-          Portainer only supports Podman running in rootful mode on RHEL and
-          CentOS Linux environments.
-        </b>{' '}
-        Rootless mode and other Linux distros may work, but aren&apos;t
-        officially supported.
+        Currently, Portainer only supports <b>Podman 5</b> running in rootful
+        (privileged) mode on <b>CentOS 9</b> Linux environments. Rootless mode
+        and other Linux distros may work, but aren&apos;t officially supported.
       </TextTip>
       {tab}
     </div>

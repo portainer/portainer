@@ -9,7 +9,7 @@ import { TextTip } from '@@/Tip/TextTip';
 const deployments = [
   {
     id: 'linux',
-    label: 'Linux (CentOS / RHEL)',
+    label: 'Linux (CentOS)',
     command: `sudo systemctl enable --now podman.socket`,
   },
 ];
@@ -39,22 +39,24 @@ interface DeployCodeProps {
 }
 
 function DeployCode({ code }: DeployCodeProps) {
+  const bindMountCode = `-v "/run/podman/podman.sock:/var/run/docker.sock"`;
   return (
     <>
       <TextTip color="blue" className="mb-1">
-        <p className="mb-0">
-          When using the socket, ensure that you have started the Portainer
-          container with the following Podman flag:
-        </p>
-        <code className="mb-2">
-          {`-v "/run/podman/podman.sock:/var/run/docker.sock"`}
-        </code>
-        <p>
-          To use the socket, ensure that you have started the Podman rootful
-          socket:
-        </p>
+        When using the socket, ensure that you have started the Portainer
+        container with the following Podman flag:
       </TextTip>
+      <Code>{bindMountCode}</Code>
+      <div className="mt-2 mb-4">
+        <CopyButton copyText={bindMountCode} data-cy="copy-deployment-command">
+          Copy command
+        </CopyButton>
+      </div>
 
+      <TextTip color="blue" className="mb-1">
+        To use the socket, ensure that you have started the Podman rootful
+        socket:
+      </TextTip>
       <Code>{code}</Code>
       <div className="mt-2">
         <CopyButton copyText={code} data-cy="copy-deployment-command">
