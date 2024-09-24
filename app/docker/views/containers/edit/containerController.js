@@ -6,6 +6,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { confirmContainerRecreation } from '@/react/docker/containers/ItemView/ConfirmRecreationModal';
 import { commitContainer } from '@/react/docker/proxy/queries/useCommitContainerMutation';
+import { ContainerEngine } from '@/react/portainer/environments/types';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -123,7 +124,11 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowHostNamespaceForRegularUsers ||
             !allowPrivilegedModeForRegularUsers;
 
-          $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          // displayRecreateButton should false for podman because recreating podman containers give and error: cannot set memory swappiness with cgroupv2
+          // https://github.com/containrrr/watchtower/issues/1060#issuecomment-2319076222
+          const isPodman = endpoint.ContainerEngine === ContainerEngine.Podman;
+          $scope.displayDuplicateEditButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers) && !isPodman;
           $scope.displayCreateWebhookButton = $scope.displayRecreateButton;
         })
         .catch(function error(err) {

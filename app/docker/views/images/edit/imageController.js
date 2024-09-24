@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { confirmImageExport } from '@/react/docker/images/common/ConfirmExportModal';
 import { confirmDelete } from '@@/modals/confirm';
+import { fullURIIntoRepoAndTag } from '@/react/docker/images/utils';
 
 angular.module('portainer.docker').controller('ImageController', [
   '$async',
@@ -71,8 +72,9 @@ angular.module('portainer.docker').controller('ImageController', [
       const registryModel = $scope.formValues.RegistryModel;
 
       const image = ImageHelper.createImageConfigForContainer(registryModel);
+      const { repo, tag } = fullURIIntoRepoAndTag(image.fromImage);
 
-      ImageService.tagImage($transition$.params().id, image.fromImage)
+      ImageService.tagImage($transition$.params().id, repo, tag)
         .then(function success() {
           Notifications.success('Success', 'Image successfully tagged');
           $state.go('docker.images.image', { id: $transition$.params().id }, { reload: true });

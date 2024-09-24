@@ -7,3 +7,8 @@ export interface Filters {
   network?: NetworkId[];
   status?: ContainerStatus[];
 }
+
+export type ContainerProcesses = {
+  Processes: Array<Array<string>>;
+  Titles: Array<string>;
+};

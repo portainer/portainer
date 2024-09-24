@@ -3,7 +3,7 @@ import { EnvironmentGroupId } from '@/react/portainer/environments/environment-g
 
 import { EdgeGroup } from '../../edge-groups/types';
 
-export type Platform = 'standalone' | 'swarm' | 'k8s';
+export type Platform = 'standalone' | 'swarm' | 'podman' | 'k8s';
 export type OS = 'win' | 'linux';
 
 export interface ScriptFormValues {

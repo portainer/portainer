@@ -99,9 +99,18 @@ export function aggregateData(
 
 export function useLoggingPlugins(
   environmentId: EnvironmentId,
-  systemOnly: boolean
+  systemOnly: boolean,
+  isPodman?: boolean
 ) {
-  return useServicePlugins(environmentId, systemOnly, 'Log');
+  //  systemOnly false + podman false|undefined -> both
+  //  systemOnly true + podman false|undefined -> system
+  //  systemOnly false + podman true -> system
+  //  systemOnly true + podman true -> system
+  return useServicePlugins(
+    environmentId,
+    systemOnly || isPodman === true,
+    'Log'
+  );
 }
 
 export function useVolumePlugins(

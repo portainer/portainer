@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Zap, Network, Plug2 } from 'lucide-react';
 import _ from 'lodash';
 
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
@@ -63,6 +66,8 @@ const options: BoxSelectorOption<
     value: 'edgeAgentAsync',
   },
 ]);
+
+const containerEngine = ContainerEngine.Docker;
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
   const [creationType, setCreationType] = useState(options[0].value);
@@ -135,6 +140,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
                 ? [commandsTabs.standaloneWindow]
                 : [commandsTabs.swarmWindows],
             }}
+            containerEngine={containerEngine}
           />
         );
       case 'edgeAgentAsync':
@@ -152,6 +158,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
                 ? [commandsTabs.standaloneWindow]
                 : [commandsTabs.swarmWindows],
             }}
+            containerEngine={containerEngine}
           />
         );
       default:

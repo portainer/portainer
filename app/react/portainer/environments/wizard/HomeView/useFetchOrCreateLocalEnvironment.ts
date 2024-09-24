@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries/useEnvironmentList';
 import {
+  ContainerEngine,
   Environment,
   EnvironmentType,
 } from '@/react/portainer/environments/types';
@@ -62,11 +63,30 @@ function getStatus(
 }
 
 async function createLocalEnvironment() {
-  try {
-    return await createLocalKubernetesEnvironment({ name: 'local' });
-  } catch (err) {
-    return await createLocalDockerEnvironment({ name: 'local' });
+  const name = 'local';
+  const attempts = [
+    () => createLocalKubernetesEnvironment({ name }),
+    () =>
+      createLocalDockerEnvironment({
+        name,
+        containerEngine: ContainerEngine.Podman,
+      }),
+    () =>
+      createLocalDockerEnvironment({
+        name,
+        containerEngine: ContainerEngine.Docker,
+      }),
+  ];
+
+  for (let i = 0; i < attempts.length; i++) {
+    try {
+      return await attempts[i]();
+    } catch (err) {
+      // Continue to next attempt
+    }
   }
+
+  throw new Error('Failed to create local environment with any method');
 }
 
 function useFetchLocalEnvironment() {

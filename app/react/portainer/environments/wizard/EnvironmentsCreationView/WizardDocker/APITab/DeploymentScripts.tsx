@@ -4,6 +4,7 @@ import { CopyButton } from '@@/buttons/CopyButton';
 import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
 import { NavContainer } from '@@/NavTabs/NavContainer';
+import { TextTip } from '@@/Tip/TextTip';
 
 const deployments = [
   {
@@ -45,10 +46,10 @@ interface DeployCodeProps {
 function DeployCode({ code }: DeployCodeProps) {
   return (
     <>
-      <span className="text-muted small">
+      <TextTip color="blue" className="mb-1">
         When using the socket, ensure that you have started the Portainer
         container with the following Docker flag:
-      </span>
+      </TextTip>
 
       <Code>{code}</Code>
       <div className="mt-2">

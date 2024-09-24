@@ -73,11 +73,11 @@ function Cell({
   });
 
   return (
-    <>
+    <div className="flex gap-1">
       <a href={linkProps.href} onClick={linkProps.onClick} title={name}>
         {truncate(name, 40)}
       </a>
       {!image.used && <UnusedBadge />}
-    </>
+    </div>
   );
 }
