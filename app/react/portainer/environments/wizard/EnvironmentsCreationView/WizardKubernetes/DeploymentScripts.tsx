@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Info } from 'lucide-react';
 
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
@@ -11,7 +10,7 @@ import { NavTabs } from '@@/NavTabs';
 import { Icon } from '@@/Icon';
 import { NavContainer } from '@@/NavTabs/NavContainer';
 
-const deployments = [
+export const deployments = [
   {
     id: 'k8sLoadBalancer',
     label: 'Kubernetes via load balancer',
@@ -26,9 +25,13 @@ const deployments = [
   },
 ];
 
-export function DeploymentScripts() {
-  const [deployType, setDeployType] = useState(deployments[0].id);
-
+export function DeploymentScripts({
+  deployType,
+  setDeployType,
+}: {
+  deployType: string;
+  setDeployType: (id: string) => void;
+}) {
   const agentDetailsQuery = useAgentDetails();
 
   if (!agentDetailsQuery) {
