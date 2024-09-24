@@ -21,7 +21,7 @@ import (
 // @produce json
 // @param id path int true "Environment identifier"
 // @param withApplications query boolean false "When set to True, include the applications that are using the volumes. It is set to false by default"
-// @success 200 {object} map[string]portainer.K8sVolumeInfo "Success"
+// @success 200 {object} map[string]kubernetes.K8sVolumeInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to retrieve kubernetes volumes."
@@ -67,7 +67,7 @@ func (handler *Handler) getAllKubernetesVolumesCount(w http.ResponseWriter, r *h
 // @param id path int true "Environment identifier"
 // @param namespace path string true "Namespace identifier"
 // @param volume path string true "Volume name"
-// @success 200 {object} portainer.K8sVolumeInfo "Success"
+// @success 200 {object} kubernetes.K8sVolumeInfo "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/volumes/{namespace}/{volume} [get]

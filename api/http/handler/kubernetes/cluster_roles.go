@@ -16,7 +16,7 @@ import (
 // @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @success 200 {array} models.K8sClusterRole "Success"
+// @success 200 {array} kubernetes.K8sClusterRole "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
