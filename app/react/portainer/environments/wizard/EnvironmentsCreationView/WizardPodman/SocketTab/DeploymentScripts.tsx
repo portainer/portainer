@@ -47,7 +47,7 @@ function DeployCode({ code }: DeployCodeProps) {
           container with the following Podman flag:
         </p>
         <code className="mb-2">
-          {`-v "/run/podman/podman.sock:/run/podman/podman.sock"`}
+          {`-v "/run/podman/podman.sock:/var/run/docker.sock"`}
         </code>
         <p>
           To use the socket, ensure that you have started the Podman rootful

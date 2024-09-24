@@ -424,11 +424,7 @@ func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, pay
 	endpointType := portainer.DockerEnvironment
 
 	if payload.URL == "" {
-		if payload.ContainerEngine == portainer.ContainerEnginePodman {
-			payload.URL = "unix:///run/podman/podman.sock"
-		} else {
-			payload.URL = "unix:///var/run/docker.sock"
-		}
+		payload.URL = "unix:///var/run/docker.sock"
 		if runtime.GOOS == "windows" {
 			payload.URL = "npipe:////./pipe/docker_engine"
 		}

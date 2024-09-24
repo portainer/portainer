@@ -14,7 +14,7 @@ sudo podman run -d \
   -p 9443:9443 \
   -v "$PORTAINER_PROJECT/dist:/app" \
   -v "$PORTAINER_DATA:/data" \
-  -v /run/podman/podman.sock:/run/podman/podman.sock \
+  -v /run/podman/podman.sock:/var/run/docker.sock \
   -v /tmp:/tmp \
   --privileged \
   --name portainer \
