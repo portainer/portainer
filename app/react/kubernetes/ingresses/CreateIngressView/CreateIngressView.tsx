@@ -1,16 +1,14 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useSecrets } from '@/react/kubernetes/configs/queries/useSecrets';
+import { useSecrets } from '@/react/kubernetes/configs/secret.service';
 import { useNamespaceServices } from '@/react/kubernetes/networks/services/queries';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
-import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { Annotation } from '@/react/kubernetes/annotations/types';
-import KubernetesAnnotationsUtils from '@/kubernetes/converters/annotations';
 import { prepareAnnotations } from '@/react/kubernetes/utils';
 
 import { Link } from '@@/Link';
@@ -18,6 +16,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
+import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 import { Ingress, IngressController } from '../types';
 import {
   useCreateIngress,
@@ -25,7 +24,6 @@ import {
   useUpdateIngress,
   useIngressControllers,
 } from '../queries';
-import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 
 import {
   Rule,
@@ -79,8 +77,6 @@ export function CreateIngressView() {
 
   const createIngressMutation = useCreateIngress();
   const updateIngressMutation = useUpdateIngress();
-
-  const hideForm = useIsDeploymentOptionHidden('form');
 
   const [ingressNames, ingresses, ruleCounterByNamespace, hostWithTLS] =
     useMemo((): [
@@ -365,7 +361,7 @@ export function CreateIngressView() {
       groupedServiceOptions: GroupedServiceOptions,
       existingIngressClass?: IngressController
     ) => {
-      let errors: IngressErrors = {};
+      const errors: Record<string, ReactNode> = {};
       const rule = { ...ingressRule };
 
       // User cannot edit the namespace and the ingress name
@@ -412,16 +408,45 @@ export function CreateIngressView() {
         }
       }
 
-      const annotationErrors = KubernetesAnnotationsUtils.validateAnnotations(
-        rule.Annotations
-      )
-        ? {
-            annotations: KubernetesAnnotationsUtils.validateAnnotations(
-              rule.Annotations
-            ),
+      const duplicatedAnnotations: string[] = [];
+      const re = /^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$/;
+      rule.Annotations?.forEach((a, i) => {
+        if (!a.Key) {
+          errors[`annotations.key[${i}]`] = 'Key is required.';
+        } else if (duplicatedAnnotations.includes(a.Key)) {
+          errors[`annotations.key[${i}]`] =
+            'Key is a duplicate of an existing one.';
+        } else {
+          const key = a.Key.split('/');
+          if (key.length > 2) {
+            errors[`annotations.key[${i}]`] =
+              'Two segments are allowed, separated by a slash (/): a prefix (optional) and a name.';
+          } else if (key.length === 2) {
+            if (key[0].length > 253) {
+              errors[`annotations.key[${i}]`] =
+                "Prefix (before the slash) can't exceed 253 characters.";
+            } else if (key[1].length > 63) {
+              errors[`annotations.key[${i}]`] =
+                "Name (after the slash) can't exceed 63 characters.";
+            } else if (!re.test(key[1])) {
+              errors[`annotations.key[${i}]`] =
+                'Start and end with alphanumeric characters only, limiting characters in between to dashes, underscores, and alphanumerics.';
+            }
+          } else if (key.length === 1) {
+            if (key[0].length > 63) {
+              errors[`annotations.key[${i}]`] =
+                "Name (the segment after a slash (/), or only segment if no slash) can't exceed 63 characters.";
+            } else if (!re.test(key[0])) {
+              errors[`annotations.key[${i}]`] =
+                'Start and end with alphanumeric characters only, limiting characters in between to dashes, underscores, and alphanumerics.';
+            }
           }
-        : {};
-      errors = { ...errors, ...annotationErrors };
+        }
+        if (!a.Value) {
+          errors[`annotations.value[${i}]`] = 'Value is required.';
+        }
+        duplicatedAnnotations.push(a.Key);
+      });
 
       const duplicatedHosts: string[] = [];
       // Check if the paths are duplicates
@@ -539,14 +564,14 @@ export function CreateIngressView() {
   return (
     <>
       <PageHeader
-        title={getIngressTitle(isEdit, hideForm)}
+        title={isEdit ? 'Edit ingress' : 'Create ingress'}
         breadcrumbs={[
           {
             link: 'kubernetes.ingresses',
             label: 'Ingresses',
           },
           {
-            label: getIngressTitle(isEdit, hideForm),
+            label: isEdit ? 'Edit ingress' : 'Create ingress',
           },
         ]}
         reload
@@ -571,18 +596,19 @@ export function CreateIngressView() {
             addNewIngressRoute={addNewIngressRoute}
             removeIngressHost={removeIngressHost}
             removeIngressRoute={removeIngressRoute}
+            addNewAnnotation={addNewAnnotation}
+            removeAnnotation={removeAnnotation}
             reloadTLSCerts={reloadTLSCerts}
+            handleAnnotationChange={handleAnnotationChange}
             namespace={namespace}
             handleNamespaceChange={handleNamespaceChange}
             namespacesOptions={namespaceOptions}
             isNamespaceOptionsLoading={namespacesQuery.isLoading}
             // wait for ingress results too to set a name that's not taken with handleNamespaceChange()
             isIngressNamesLoading={ingressesResults.isLoading}
-            hideForm={hideForm}
-            handleUpdateAnnotations={handleUpdateAnnotations}
           />
         </div>
-        {namespace && !hideForm && (
+        {namespace && (
           <div className="col-sm-12">
             <Button
               onClick={() => handleCreateIngressRules()}
@@ -596,14 +622,6 @@ export function CreateIngressView() {
       </div>
     </>
   );
-
-  function handleUpdateAnnotations(annotations: Annotation[]) {
-    setIngressRule((prevRules) => {
-      const rule = { ...prevRules };
-      rule.Annotations = annotations;
-      return rule;
-    });
-  }
 
   function handleNamespaceChange(ns: string) {
     setNamespace(ns);
@@ -655,6 +673,25 @@ export function CreateIngressView() {
 
       rule.Hosts[hostIndex] = h;
       return rule;
+    });
+  }
+
+  function handleAnnotationChange(
+    index: number,
+    key: 'Key' | 'Value',
+    val: string
+  ) {
+    setIngressRule((prevRules) => {
+      const rules = { ...prevRules };
+
+      rules.Annotations = rules.Annotations || [];
+      rules.Annotations[index] = rules.Annotations[index] || {
+        Key: '',
+        Value: '',
+      };
+      rules.Annotations[index][key] = val;
+
+      return rules;
     });
   }
 
@@ -720,6 +757,45 @@ export function CreateIngressView() {
     setIngressRule(rule);
   }
 
+  function addNewAnnotation(type?: 'rewrite' | 'regex' | 'ingressClass') {
+    const rule = { ...ingressRule };
+
+    const annotation: Annotation = {
+      Key: '',
+      Value: '',
+      ID: uuidv4(),
+    };
+    switch (type) {
+      case 'rewrite':
+        annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
+        annotation.Value = '/$1';
+        break;
+      case 'regex':
+        annotation.Key = 'nginx.ingress.kubernetes.io/use-regex';
+        annotation.Value = 'true';
+        break;
+      case 'ingressClass':
+        annotation.Key = 'kubernetes.io/ingress.class';
+        annotation.Value = '';
+        break;
+      default:
+        break;
+    }
+    rule.Annotations = rule.Annotations || [];
+    rule.Annotations?.push(annotation);
+    setIngressRule(rule);
+  }
+
+  function removeAnnotation(index: number) {
+    const rule = { ...ingressRule };
+
+    if (index > -1) {
+      rule.Annotations?.splice(index, 1);
+    }
+
+    setIngressRule(rule);
+  }
+
   function removeIngressRoute(hostIndex: number, pathIndex: number) {
     const rule = { ...ingressRule, Hosts: [...ingressRule.Hosts] };
     if (hostIndex > -1 && pathIndex > -1) {
@@ -779,14 +855,4 @@ export function CreateIngressView() {
       );
     }
   }
-}
-
-function getIngressTitle(isEdit: boolean, hideForm: boolean) {
-  if (!isEdit) {
-    return 'Create ingress';
-  }
-  if (hideForm) {
-    return 'Ingress details';
-  }
-  return 'Edit ingress';
 }

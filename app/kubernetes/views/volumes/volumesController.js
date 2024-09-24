@@ -13,7 +13,7 @@ class KubernetesVolumesController {
     this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
-    this.getVolumesAsync = this.getVolumesAsync.bind(this);
+    // this.getVolumesAsync = this.getVolumesAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
   }
 

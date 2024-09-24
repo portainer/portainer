@@ -39,7 +39,6 @@ function Cell({
         params: {
           id: namespace.Name,
         },
-        'data-cy': `manage-access-link-${namespace.Name}`,
       }}
       icon={Users}
       data-cy={`manage-access-button-${namespace.Name}`}

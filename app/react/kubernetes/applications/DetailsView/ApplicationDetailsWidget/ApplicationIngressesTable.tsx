@@ -19,7 +19,9 @@ export function ApplicationIngressesTable({
   namespace,
   appServices,
 }: Props) {
-  const namespaceIngresses = useIngresses(environmentId, [namespace]);
+  const namespaceIngresses = useIngresses(environmentId, {
+    withServices: true,
+  });
   // getIngressPathsForAppServices could be expensive, so memoize it
   const ingressPathsForAppServices = useMemo(
     () => getIngressPathsForAppServices(namespaceIngresses.data, appServices),

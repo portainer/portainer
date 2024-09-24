@@ -55,14 +55,15 @@ export function AppIngressPathsForm({
         const className = ing.ClassName || 'none';
         return allowedIngressClasses.includes(className);
       }) || [];
-    return allowedIngresses.flatMap((ing: { Hosts: any[]; Name: any }) =>
-      ing.Hosts?.length
-        ? ing.Hosts.map((host) => ({
-            label: `${host} (${ing.Name})`,
-            value: host,
-            ingressName: ing.Name,
-          }))
-        : []
+    return allowedIngresses.flatMap(
+      (ing: { Hosts: unknown[]; Name: unknown }) =>
+        ing.Hosts?.length
+          ? ing.Hosts.map((host) => ({
+              label: `${host} (${ing.Name})`,
+              value: host,
+              ingressName: ing.Name,
+            }))
+          : []
     );
   }, [ingressControllers, ingresses]);
 

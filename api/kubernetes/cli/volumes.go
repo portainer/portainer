@@ -246,7 +246,7 @@ func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8s
 								break
 							}
 						}
-						if !exists {
+						if !exists && application != nil {
 							(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, *application)
 						}
 					}

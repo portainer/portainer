@@ -12,6 +12,8 @@ describe('getIsConfigMapInUse', () => {
       Type: 1,
       ConfigurationOwner: '',
       ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
     const pods: K8sPod[] = [];
     const jobs: Job[] = [];
@@ -28,6 +30,8 @@ describe('getIsConfigMapInUse', () => {
       Type: 1,
       ConfigurationOwner: '',
       ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
     const pods: K8sPod[] = [
       {
@@ -55,6 +59,8 @@ describe('getIsConfigMapInUse', () => {
       Type: 1,
       ConfigurationOwner: '',
       ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
     const pods: K8sPod[] = [];
     const jobs: Job[] = [
@@ -81,6 +87,8 @@ describe('getIsConfigMapInUse', () => {
       Type: 1,
       ConfigurationOwner: '',
       ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
     const pods: K8sPod[] = [];
     const jobs: Job[] = [];

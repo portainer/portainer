@@ -21,7 +21,7 @@ import {
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
 import { isDefaultNamespace } from '../isDefaultNamespace';
 import { useNamespacesQuery } from '../queries/useNamespacesQuery';
-import { Namespaces, PortainerNamespace } from '../types';
+import { PortainerNamespace } from '../types';
 import { useDeleteNamespaces } from '../queries/useDeleteNamespaces';
 import { queryKeys } from '../queries/queryKeys';
 
@@ -95,7 +95,7 @@ function TableActions({
   namespaces: namespacesQueryData,
 }: {
   selectedItems: PortainerNamespace[];
-  namespaces?: Namespaces;
+  namespaces?: PortainerNamespace[];
 }) {
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId();
@@ -176,7 +176,7 @@ function TableActions({
             () =>
               deletedNamespaces.reduce(
                 (acc, ns) => {
-                  delete acc[ns];
+                  delete acc[ns as keyof typeof acc];
                   return acc;
                 },
                 { ...namespacesQueryData }
