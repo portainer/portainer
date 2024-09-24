@@ -1,1 +1,1 @@
-export { EnvironmentTypeSelectView } from './EndpointTypeView';
+export { EnvironmentTypeSelectView } from './EnvironmentTypeSelectView';

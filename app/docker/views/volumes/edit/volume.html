@@ -11,6 +11,15 @@
               <td>ID</td>
               <td>
                 {{ volume.Id }}
+                <button
+                  ng-if="showBrowseAction"
+                  class="btn btn-xs btn-primary"
+                  ui-sref="docker.volumes.volume.browse({ id: volume.Id, nodeName: volume.NodeName })"
+                  authorization="DockerAgentBrowseList"
+                >
+                  <pr-icon icon="'search'" class="leading-none"></pr-icon>
+                  Browse
+                </button>
                 <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"
                   ><pr-icon icon="'trash-2'" class="leading-none"></pr-icon> Remove this volume</button
                 >

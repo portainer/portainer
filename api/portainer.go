@@ -373,6 +373,8 @@ type (
 		Name string `json:"Name" example:"my-environment"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
 		Type EndpointType `json:"Type" example:"1"`
+		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environmentes, otherwise '' for kubernetes environments.
+		ContainerEngine string `json:"ContainerEngine" example:"docker"`
 		// URL or IP address of the Docker host associated to this environment(endpoint)
 		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
 		// Environment(Endpoint) group identifier
@@ -1727,7 +1729,7 @@ const (
 
 const (
 	_ EndpointType = iota
-	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint)
+	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint) via the Docker API or Socket
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Docker environment(endpoint)
 	AgentOnDockerEnvironment
@@ -2112,4 +2114,9 @@ type PerDevConfigsFilterType string
 const (
 	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
 	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
+)
+
+const (
+	ContainerEngineDocker = "docker"
+	ContainerEnginePodman = "podman"
 )

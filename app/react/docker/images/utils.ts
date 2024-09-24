@@ -9,6 +9,12 @@ import {
 import { DockerImage } from './types';
 import { DockerImageResponse } from './types/response';
 
+type ImageModel = {
+  UseRegistry: boolean;
+  Registry?: Registry;
+  Image: string;
+};
+
 export function parseViewModel(response: DockerImageResponse): DockerImage {
   return {
     ...response,
@@ -40,11 +46,7 @@ export function imageContainsURL(image: string) {
   return false;
 }
 
-export function buildImageFullURIFromModel(imageModel: {
-  UseRegistry: boolean;
-  Registry?: Registry;
-  Image: string;
-}) {
+export function buildImageFullURIFromModel(imageModel: ImageModel) {
   const registry = imageModel.UseRegistry ? imageModel.Registry : undefined;
   return buildImageFullURI(imageModel.Image, registry);
 }
@@ -106,4 +108,25 @@ function buildImageFullURIWithRegistry(image: string, registry: Registry) {
     const url = registry.URL ? `${registry.URL}/` : '';
     return url + image;
   }
+}
+
+/**
+ * Splits a full URI into repository and tag.
+ *
+ * @param fullURI - The full URI to be split.
+ * @returns An object containing the repository and tag.
+ */
+export function fullURIIntoRepoAndTag(fullURI: string) {
+  // possible fullURI values (all should contain a tag):
+  // - registry/image-repo:tag
+  // - image-repo:tag
+  // - registry:port/image-repo:tag
+  // buildImageFullURIFromModel always gives a tag (defaulting to 'latest'), so the tag is always present after the last ':'
+  const parts = fullURI.split(':');
+  const tag = parts.pop() || 'latest';
+  const repo = parts.join(':');
+  return {
+    repo,
+    tag,
+  };
 }

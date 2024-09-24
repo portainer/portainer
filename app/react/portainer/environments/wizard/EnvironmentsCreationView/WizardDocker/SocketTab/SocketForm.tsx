@@ -4,7 +4,10 @@ import { Plug2 } from 'lucide-react';
 
 import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -19,9 +22,10 @@ import { FormValues } from './types';
 
 interface Props {
   onCreate(environment: Environment): void;
+  containerEngine: ContainerEngine;
 }
 
-export function SocketForm({ onCreate }: Props) {
+export function SocketForm({ onCreate, containerEngine }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     name: '',
@@ -74,6 +78,7 @@ export function SocketForm({ onCreate }: Props) {
         name: values.name,
         socketPath: values.overridePath ? values.socketPath : '',
         meta: values.meta,
+        containerEngine,
       },
       {
         onSuccess(environment) {

@@ -5,7 +5,7 @@ import { Select } from '@@/form-components/Input';
 
 const typeOptions = [
   { label: 'Swarm', value: StackType.DockerSwarm },
-  { label: 'Standalone', value: StackType.DockerCompose },
+  { label: 'Standalone / Podman', value: StackType.DockerCompose },
 ];
 
 export function TemplateTypeSelector({

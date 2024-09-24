@@ -1,5 +1,6 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
+import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
 import {
   BaseFormValues,
   baseFormUtils,
@@ -46,6 +47,8 @@ import { useNetworksForSelector } from '../components/NetworkSelector';
 import { useContainers } from '../queries/useContainers';
 import { useContainer } from '../queries/useContainer';
 
+import { getDefaultNetworkMode } from './NetworkTab/toViewModel';
+
 export interface Values extends BaseFormValues {
   commands: CommandsTabValues;
   volumes: VolumesTabValues;
@@ -80,6 +83,7 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
   const registriesQuery = useEnvironmentRegistries(environmentId, {
     enabled: !!from,
   });
+  const isPodman = useIsPodman(environmentId);
 
   if (!networksQuery.data) {
     return null;
@@ -87,7 +91,13 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
 
   if (!from) {
     return {
-      initialValues: defaultValues(isPureAdmin, user.Id, nodeName, isWindows),
+      initialValues: defaultValues(
+        isPureAdmin,
+        user.Id,
+        nodeName,
+        isWindows,
+        isPodman
+      ),
     };
   }
 
@@ -110,7 +120,11 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
   const extraNetworks = Object.entries(
     fromContainer.NetworkSettings?.Networks || {}
   )
-    .filter(([n]) => n !== network.networkMode)
+    .filter(
+      ([n]) =>
+        n !== network.networkMode &&
+        n !== getDefaultNetworkMode(isWindows, isPodman)
+    )
     .map(([networkName, network]) => ({
       networkName,
       aliases: (network.Aliases || []).filter(
@@ -129,7 +143,8 @@ export function useInitialValues(submitting: boolean, isWindows: boolean) {
     network: networkTabUtils.toViewModel(
       fromContainer,
       networksQuery.data,
-      runningContainersQuery.data
+      runningContainersQuery.data,
+      isPodman
     ),
     labels: labelsTabUtils.toViewModel(fromContainer),
     restartPolicy: restartPolicyTabUtils.toViewModel(fromContainer),
@@ -153,12 +168,13 @@ function defaultValues(
   isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string,
-  isWindows: boolean
+  isWindows: boolean,
+  isPodman?: boolean
 ): Values {
   return {
     commands: commandsTabUtils.getDefaultViewModel(),
     volumes: volumesTabUtils.getDefaultViewModel(),
-    network: networkTabUtils.getDefaultViewModel(isWindows), // windows containers should default to the nat network, not the bridge
+    network: networkTabUtils.getDefaultViewModel(isWindows, isPodman), // windows containers should default to the nat network, not the bridge
     labels: labelsTabUtils.getDefaultViewModel(),
     restartPolicy: restartPolicyTabUtils.getDefaultViewModel(),
     resources: resourcesTabUtils.getDefaultViewModel(),

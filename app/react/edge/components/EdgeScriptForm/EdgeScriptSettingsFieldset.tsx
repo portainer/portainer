@@ -57,6 +57,7 @@ export function EdgeScriptSettingsFieldset({
               type="text"
               value={values.edgeIdGenerator}
               name="edgeIdGenerator"
+              placeholder="e.g. uuidgen"
               id="edge-id-generator-input"
               onChange={(e) => setFieldValue(e.target.name, e.target.value)}
               data-cy="edge-id-generator-input"
@@ -81,7 +82,7 @@ export function EdgeScriptSettingsFieldset({
         <Field
           name="envVars"
           as={Input}
-          placeholder="foo=bar,myvar"
+          placeholder="e.g. foo=bar"
           id="env-variables-input"
         />
       </FormControl>

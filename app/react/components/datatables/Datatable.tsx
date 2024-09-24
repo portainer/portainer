@@ -272,6 +272,21 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
 
   const filterValueLower = filterValue.search.toLowerCase();
 
+  if (typeof value === 'object') {
+    return Object.values(value).some((item) =>
+      filterPrimitive(item, filterValueLower)
+    );
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => filterPrimitive(item, filterValueLower));
+  }
+
+  return filterPrimitive(value, filterValueLower);
+}
+
+// only filter primitive values within objects and arrays, to avoid searching nested objects
+function filterPrimitive(value: unknown, filterValueLower: string) {
   if (
     typeof value === 'string' ||
     typeof value === 'number' ||
@@ -279,13 +294,6 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
   ) {
     return value.toString().toLowerCase().includes(filterValueLower);
   }
-
-  if (Array.isArray(value)) {
-    return value.some((item) =>
-      item.toString().toLowerCase().includes(filterValueLower)
-    );
-  }
-
   return false;
 }
 
