@@ -12,7 +12,7 @@ type (
 		Type                          string
 		Namespace                     string
 		Annotations                   map[string]string
-		CreationTimestamp             string
+		CreationDate                  string
 		Labels                        map[string]string
 		AllocateLoadBalancerNodePorts *bool `json:",omitempty"`
 		Ports                         []K8sServicePort

@@ -90,18 +90,14 @@ class KubernetesConfigMapController {
   async updateConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
-      if (
-        this.formValues.Kind !== this.configuration.Kind ||
-        this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace ||
-        this.formValues.Name !== this.configuration.Name
-      ) {
+      if (this.formValues.Kind !== this.configuration.Kind || this.formValues.ResourcePool !== this.configuration.Namespace || this.formValues.Name !== this.configuration.Name) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
         this.Notifications.success('Success', `ConfigMap successfully updated`);
         this.$state.go(
           'kubernetes.configurations.configmap',
           {
-            namespace: this.formValues.ResourcePool.Namespace.Name,
+            namespace: this.formValues.ResourcePool,
             name: this.formValues.Name,
           },
           { reload: true }

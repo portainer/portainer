@@ -115,7 +115,7 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMap();
     res.Id = formValues.Id;
     res.Name = formValues.Name;
-    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Namespace = formValues.ResourcePool;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     res.Data = formValues.Data;
     return res;

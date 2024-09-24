@@ -91,7 +91,7 @@ func parseService(service corev1.Service) models.K8sServiceInfo {
 		UID:                           string(service.GetUID()),
 		Type:                          string(service.Spec.Type),
 		Namespace:                     service.Namespace,
-		CreationTimestamp:             service.GetCreationTimestamp().String(),
+		CreationDate:                  service.GetCreationTimestamp().String(),
 		AllocateLoadBalancerNodePorts: service.Spec.AllocateLoadBalancerNodePorts,
 		Ports:                         servicePorts,
 		IngressStatus:                 ingressStatus,

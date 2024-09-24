@@ -145,15 +145,6 @@ function TableActions({
           Add with form
         </AddButton>
       )}
-      {!isAddConfigMapHidden && (
-        <AddButton
-          to="kubernetes.configmaps.new"
-          data-cy="k8sConfig-addConfigWithFormButton"
-          color="secondary"
-        >
-          Add with form
-        </AddButton>
-      )}
 
       <CreateFromManifestButton
         params={{

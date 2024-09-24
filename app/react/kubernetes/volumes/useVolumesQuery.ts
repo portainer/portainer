@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { humanize } from '@/portainer/filters/filters';
 import { withError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
 import { Volume } from '@/kubernetes/models/volume/Volume';
@@ -79,9 +80,7 @@ function convertToVolumeViewModels(
         storageClass: {
           Name: volume.persistentVolumeClaim.storageClass || '',
         },
-        Storage: `${(volume.persistentVolumeClaim.storage / 1024 ** 3).toFixed(
-          0
-        )}GiB`, // Convert KB to GB
+        Storage: humanize(volume.persistentVolumeClaim.storage),
         CreationDate: volume.persistentVolumeClaim.creationDate,
         ApplicationOwner:
           volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
@@ -103,6 +102,7 @@ function convertToStorageClassViewModels(
 
   volumes.forEach((volume) => {
     const storageClassName = volume.storageClass.name || 'none';
+
     const defaultStorageClass = {
       Name: storageClassName,
       Provisioner: volume.storageClass.provisioner,
@@ -111,6 +111,7 @@ function convertToStorageClassViewModels(
       size: 0,
       Volumes: [],
     };
+
     const storageClassViewModel =
       storageClassMap.get(storageClassName) ?? defaultStorageClass;
 
@@ -124,11 +125,10 @@ function convertToStorageClassViewModels(
     storageClassMap.set(storageClassName, storageClassViewModel);
   });
 
-  // Convert size from KB to GB without reassigning the parameter
   storageClassMap.forEach((value, key) => {
     storageClassMap.set(key, {
       ...value,
-      size: value.size / 1024 ** 3,
+      size: value.size,
     });
   });
 

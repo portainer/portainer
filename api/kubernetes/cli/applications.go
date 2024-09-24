@@ -15,12 +15,12 @@ import (
 // GetAllKubernetesApplications gets a list of kubernetes workloads (or applications) across all namespaces in the cluster
 // if the user is an admin, all namespaces in the current k8s environment(endpoint) are fetched using the fetchApplications function.
 // otherwise, namespaces the non-admin user has access to will be used to filter the applications based on the allowed namespaces.
-func (kcl *KubeClient) GetApplications(namespace, nodename string, withDependencies bool) ([]models.K8sApplication, error) {
+func (kcl *KubeClient) GetApplications(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchApplications(namespace, nodename, withDependencies)
+		return kcl.fetchApplications(namespace, nodeName, withDependencies)
 	}
 
-	return kcl.fetchApplicationsForNonAdmin(namespace, nodename, withDependencies)
+	return kcl.fetchApplicationsForNonAdmin(namespace, nodeName, withDependencies)
 }
 
 // fetchApplications fetches the applications in the namespaces the user has access to.

@@ -2,6 +2,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { HardDrive } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { humanize } from '@/portainer/filters/filters';
 
 import { TableSettingsMenu } from '@@/datatables';
 import {
@@ -30,7 +31,7 @@ const columns = [
   }),
   helper.accessor('size', {
     header: 'Usage',
-    cell: ({ row: { original: item } }) => `${item.size}GiB`,
+    cell: ({ row: { original: item } }) => <>{humanize(item.size)}</>,
   }),
 ];
 

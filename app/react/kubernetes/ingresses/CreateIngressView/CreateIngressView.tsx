@@ -120,10 +120,10 @@ export function CreateIngressView() {
   const namespaceOptions = useMemo(
     () =>
       Object.entries(namespaces || {})
-        .filter(([, nsValue]) => !nsValue.IsSystem)
-        .map(([nsKey]) => ({
-          label: nsKey,
-          value: nsKey,
+        .filter(([, ns]) => !ns.IsSystem)
+        .map(([, ns]) => ({
+          label: ns.Name,
+          value: ns.Name,
         })),
     [namespaces]
   );
