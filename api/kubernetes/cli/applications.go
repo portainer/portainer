@@ -215,6 +215,7 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 
 	application := models.K8sApplication{
 		Services: []corev1.Service{},
+		Metadata: &models.Metadata{},
 	}
 
 	switch kind {
@@ -236,6 +237,9 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 				application.TotalPodsCount = int(deployment.Status.Replicas)
 				application.RunningPodsCount = int(deployment.Status.ReadyReplicas)
 				application.DeploymentType = "Replicated"
+				application.Metadata = &models.Metadata{
+					Labels: deployment.Labels,
+				}
 
 				break
 			}
@@ -259,6 +263,9 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 				application.TotalPodsCount = int(statefulSet.Status.Replicas)
 				application.RunningPodsCount = int(statefulSet.Status.ReadyReplicas)
 				application.DeploymentType = "Replicated"
+				application.Metadata = &models.Metadata{
+					Labels: statefulSet.Labels,
+				}
 
 				break
 			}
@@ -282,6 +289,9 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 				application.TotalPodsCount = int(daemonSet.Status.DesiredNumberScheduled)
 				application.RunningPodsCount = int(daemonSet.Status.NumberReady)
 				application.DeploymentType = "Global"
+				application.Metadata = &models.Metadata{
+					Labels: daemonSet.Labels,
+				}
 
 				break
 			}
@@ -308,6 +318,9 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 		application.TotalPodsCount = 1
 		application.RunningPodsCount = runningPodsCount
 		application.DeploymentType = string(pod.Status.Phase)
+		application.Metadata = &models.Metadata{
+			Labels: pod.Labels,
+		}
 	}
 
 	if application.ID != "" && application.Name != "" && len(services) > 0 {

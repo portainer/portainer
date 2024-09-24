@@ -1,6 +1,7 @@
 package kubernetes
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -197,14 +198,13 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
 // @param id path int true "Environment identifier"
-// @param namespace path string true "Namespace"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to delete the namespace."
-// @router /kubernetes/{id}/namespaces/{namespace} [delete]
+// @router /kubernetes/{id}/namespaces [delete]
 func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")
+	namespaceNames, err := request.GetPayload[deleteKubernetesNamespacePayload](r)
 	if err != nil {
 		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Invalid namespace identifier route variable")
 		return httperror.BadRequest("an error occurred during the DeleteKubernetesNamespace operation, invalid namespace identifier route variable. Error: ", err)
@@ -216,18 +216,30 @@ func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http
 		return httperror.InternalServerError("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to get a Kubernetes client for the user. Error: ", httpErr)
 	}
 
-	namespace, err := cli.DeleteNamespace(namespaceName)
-	if err != nil {
-		if k8serrors.IsNotFound(err) {
-			log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Unable to find the namespace")
-			return httperror.NotFound(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespace), err)
-		}
+	for _, namespaceName := range *namespaceNames {
+		_, err := cli.DeleteNamespace(namespaceName)
+		if err != nil {
+			if k8serrors.IsNotFound(err) {
+				log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to find the namespace")
+				return httperror.NotFound(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespaceName), err)
+			}
 
-		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Unable to delete the namespace")
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to delete the Kubernetes namespace. Error: ", namespace), err)
+			log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to delete the namespace")
+			return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to delete the Kubernetes namespace. Error: ", namespaceName), err)
+		}
 	}
 
-	return response.JSON(w, namespace)
+	return response.JSON(w, namespaceNames)
+}
+
+type deleteKubernetesNamespacePayload []string
+
+func (payload deleteKubernetesNamespacePayload) Validate(r *http.Request) error {
+	if len(payload) == 0 {
+		return errors.New("namespace names are required")
+	}
+
+	return nil
 }
 
 // @id UpdateKubernetesNamespace

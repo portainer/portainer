@@ -18,7 +18,6 @@ type DeleteNamespacesResponse = {
 
 // useDeleteNamespaces is a react query mutation that removes a list of namespaces,
 export function useDeleteNamespaces(environmentId: number) {
-  const queryClient = useQueryClient();
   return useMutation(
     ({ namespaceNames }: { namespaceNames: string[] }) =>
       deleteNamespaces(environmentId, namespaceNames),
