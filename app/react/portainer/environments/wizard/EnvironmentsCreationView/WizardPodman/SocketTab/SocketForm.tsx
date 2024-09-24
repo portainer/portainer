@@ -110,13 +110,13 @@ function OverrideSocketFieldset() {
       {values.overridePath && (
         <FormControl
           label="Socket Path"
-          tooltip="Path to the Docker socket. Remember to bind-mount the socket, see the important notice above for more information."
+          tooltip="Path to the Podman socket. Remember to bind-mount the socket, see the important notice above for more information."
           errors={errors.socketPath}
         >
           <Field
             name="socketPath"
             as={Input}
-            placeholder="e.g. /var/run/docker.sock (on Linux) or //./pipe/docker_engine (on Windows)"
+            placeholder="e.g. /run/podman/podman.sock (on Linux)"
           />
         </FormControl>
       )}

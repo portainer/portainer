@@ -42,8 +42,17 @@ function DeployCode({ code }: DeployCodeProps) {
   return (
     <>
       <TextTip color="blue" className="mb-1">
-        To use the socket, ensure that you have started the Podman rootful
-        socket:
+        <p className="mb-0">
+          When using the socket, ensure that you have started the Portainer
+          container with the following Podman flag:
+        </p>
+        <code className="mb-2">
+          {`-v "/run/podman/podman.sock:/run/podman/podman.sock"`}
+        </code>
+        <p>
+          To use the socket, ensure that you have started the Podman rootful
+          socket:
+        </p>
       </TextTip>
 
       <Code>{code}</Code>

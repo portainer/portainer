@@ -25,7 +25,7 @@ export function CopyButton({
   fadeDelay = 1000,
   displayText = 'copied',
   className,
-  color,
+  color = 'default',
   indicatorPosition = 'right',
   children,
   'data-cy': dataCy,
@@ -52,7 +52,7 @@ export function CopyButton({
     <div className={styles.container}>
       {indicatorPosition === 'left' && copiedIndicator()}
       <Button
-        className={className}
+        className={clsx(className, '!ml-0')}
         color={color}
         size="small"
         onClick={handleCopy}

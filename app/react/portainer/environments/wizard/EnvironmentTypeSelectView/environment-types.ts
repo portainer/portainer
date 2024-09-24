@@ -45,7 +45,7 @@ export const existingEnvironmentTypes: EnvironmentOption[] = [
     label: 'Podman',
     icon: Podman,
     iconType: 'logo',
-    description: 'Connect to Podman via URL/IP, API or Socket',
+    description: 'Connect to Podman via URL/IP or Socket',
   },
   {
     id: 'kubernetes',
