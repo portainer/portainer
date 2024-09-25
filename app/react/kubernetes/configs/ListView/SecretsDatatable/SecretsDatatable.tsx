@@ -11,6 +11,7 @@ import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
@@ -48,7 +49,9 @@ export function SecretsDatatable() {
 
   const filteredSecrets = tableState.showSystemResources
     ? secrets
-    : secrets.filter((item) => !isSystem(item));
+    : secrets.filter(
+        (secret) => !isSystemNamespace(secret.Namespace, namespacesQuery.data)
+      );
 
   const secretRowData = useSecretRowData(
     filteredSecrets ?? [],
@@ -65,8 +68,9 @@ export function SecretsDatatable() {
       title="Secrets"
       titleIcon={Lock}
       getRowId={(row) => row.UID ?? ''}
-      isRowSelectable={({ original: item }) =>
-        canAccessSystemResources && !isSystem(item)
+      isRowSelectable={({ original: secret }) =>
+        canAccessSystemResources &&
+        !isSystemNamespace(secret.Namespace, namespacesQuery.data)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -88,15 +92,6 @@ export function SecretsDatatable() {
       data-cy="k8s-secrets-datatable"
     />
   );
-
-  function isSystem(configMap: Configuration): boolean {
-    return (
-      namespacesQuery.data?.some(
-        (namespace) =>
-          namespace.Name === configMap.Namespace && namespace.IsSystem
-      ) ?? false
-    );
-  }
 }
 
 // useSecretRowData appends the `inUse` property to the secret data (for the unused badge in the name column)

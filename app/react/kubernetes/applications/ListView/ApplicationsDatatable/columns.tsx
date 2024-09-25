@@ -1,5 +1,12 @@
-import { isoDate, truncate } from '@/portainer/filters/filters';
+import { CellContext } from '@tanstack/react-table';
 
+import { isoDate, truncate } from '@/portainer/filters/filters';
+import { useIsSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+
+import { Link } from '@@/Link';
+import { SystemBadge } from '@@/Badge/SystemBadge';
+
+import { Application } from './types';
 import { helper } from './columns.helper';
 
 export const stackName = helper.accessor('StackName', {
@@ -9,8 +16,25 @@ export const stackName = helper.accessor('StackName', {
 
 export const namespace = helper.accessor('ResourcePool', {
   header: 'Namespace',
-  cell: ({ getValue }) => getValue() || '-',
+  cell: NamespaceCell,
 });
+
+function NamespaceCell({ row, getValue }: CellContext<Application, string>) {
+  const value = getValue();
+  const isSystem = useIsSystemNamespace(value);
+  return (
+    <div className="flex gap-2">
+      <Link
+        to="kubernetes.resourcePools.resourcePool"
+        params={{ id: value }}
+        data-cy={`app-namespace-link-${row.original.Name}`}
+      >
+        {value}
+      </Link>
+      {isSystem && <SystemBadge />}
+    </div>
+  );
+}
 
 export const image = helper.accessor('Image', {
   header: 'Image',

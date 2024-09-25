@@ -18,7 +18,7 @@ import {
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
 import { useAllVolumesQuery } from '../useVolumesQuery';
-import { PortainerNamespace } from '../../namespaces/types';
+import { isSystemNamespace } from '../../namespaces/queries/useIsSystemNamespace';
 
 import { VolumeViewModel } from './types';
 import { columns } from './columns';
@@ -49,7 +49,10 @@ export function VolumesDatatable({
 
   const filteredVolumes = tableState.showSystemResources
     ? volumes
-    : volumes.filter((volume) => !isSystem(volume, namespaces));
+    : volumes.filter(
+        (volume) =>
+          !isSystemNamespace(volume.ResourcePool.Namespace.Name, namespaces)
+      );
 
   return (
     <Datatable
@@ -61,9 +64,12 @@ export function VolumesDatatable({
       settingsManager={tableState}
       title="Volumes"
       titleIcon={Database}
-      isRowSelectable={({ original: item }) =>
+      isRowSelectable={({ original: volume }) =>
         hasWriteAuth &&
-        !(isSystem(item, namespaces) && !KubernetesVolumeHelper.isUsed(item))
+        !(
+          isSystemNamespace(volume.ResourcePool.Namespace.Name, namespaces) &&
+          !KubernetesVolumeHelper.isUsed(volume)
+        )
       }
       renderTableActions={(selectedItems) => (
         <>
@@ -87,16 +93,5 @@ export function VolumesDatatable({
         />
       }
     />
-  );
-}
-
-function isSystem(
-  volume: VolumeViewModel,
-  namespaces: PortainerNamespace[]
-): boolean {
-  return namespaces.some(
-    (namespace) =>
-      namespace.Name === volume.ResourcePool.Namespace.Name &&
-      namespace.IsSystem
   );
 }

@@ -1,5 +1,7 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
+import { PortainerNamespace } from '../types';
+
 import { useNamespaceQuery } from './useNamespaceQuery';
 
 export function useIsSystemNamespace(namespace: string) {
@@ -9,4 +11,13 @@ export function useIsSystemNamespace(namespace: string) {
   });
 
   return !!query.data;
+}
+
+export function isSystemNamespace(
+  namespaceName: string,
+  namespaces?: PortainerNamespace[]
+) {
+  return namespaces?.some(
+    (namespace) => namespace.Name === namespaceName && namespace.IsSystem
+  );
 }

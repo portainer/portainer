@@ -6,15 +6,9 @@ import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
 import { Link } from '@@/Link';
 import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
-import { KubernetesStack } from '../../types';
+import { Stack } from './types';
 
-export function SubRows({
-  stack,
-  span,
-}: {
-  stack: KubernetesStack;
-  span: number;
-}) {
+export function SubRows({ stack, span }: { stack: Stack; span: number }) {
   return (
     <>
       {stack.Applications.map((app) => (

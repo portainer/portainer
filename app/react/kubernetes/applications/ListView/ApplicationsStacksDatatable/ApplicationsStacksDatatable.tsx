@@ -4,16 +4,19 @@ import { useEffect } from 'react';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { KubernetesStack } from '../../types';
+import { useAllApplicationsQuery } from '../../application.queries';
+import { Application } from '../ApplicationsDatatable/types';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
-import { Namespace } from './types';
+import { Namespace, Stack } from './types';
 import { StacksSettingsMenu } from './StacksSettingsMenu';
 import { NamespaceFilter } from './NamespaceFilter';
 import { TableActions } from './TableActions';
@@ -23,25 +26,19 @@ const storageKey = 'kubernetes.applications.stacks';
 const settingsStore = createStore(storageKey);
 
 interface Props {
-  dataset: Array<KubernetesStack>;
-  onRemove(selectedItems: Array<KubernetesStack>): void;
-  onRefresh(): Promise<void>;
+  onRemove(selectedItems: Array<Stack>): void;
   namespace?: string;
   namespaces: Array<Namespace>;
   onNamespaceChange(namespace: string): void;
-  isLoading?: boolean;
   showSystem?: boolean;
   setSystemResources(showSystem: boolean): void;
 }
 
 export function ApplicationsStacksDatatable({
-  dataset,
   onRemove,
-  onRefresh,
   namespace = '',
   namespaces,
   onNamespaceChange,
-  isLoading,
   showSystem,
   setSystemResources,
 }: Props) {
@@ -53,8 +50,24 @@ export function ApplicationsStacksDatatable({
     setShowSystemResources(showSystem || false);
   }, [showSystem, setShowSystemResources]);
 
+  const envId = useEnvironmentId();
+  const applicationsQuery = useAllApplicationsQuery(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+    namespace,
+    withDependencies: true,
+  });
+  const namespaceListQuery = useNamespacesQuery(envId);
+  const applications = applicationsQuery.data ?? [];
+  const filteredApplications = showSystem
+    ? applications
+    : applications.filter(
+        (item) =>
+          !isSystemNamespace(item.ResourcePool, namespaceListQuery.data ?? [])
+      );
+
   const { authorized } = useAuthorizations('K8sApplicationsW');
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+
+  const dataset = parseStacksFromApplications(filteredApplications);
 
   return (
     <ExpandableDatatable
@@ -62,7 +75,7 @@ export function ApplicationsStacksDatatable({
       title="Stacks"
       titleIcon={List}
       dataset={dataset}
-      isLoading={isLoading}
+      isLoading={applicationsQuery.isLoading || namespaceListQuery.isLoading}
       columns={columns}
       settingsManager={tableState}
       disableSelect={!authorized}
@@ -99,4 +112,37 @@ export function ApplicationsStacksDatatable({
       data-cy="applications-stacks-datatable"
     />
   );
+}
+
+function parseStacksFromApplications(applications: Application[]) {
+  const res = applications.reduce<Stack[]>((stacks, app) => {
+    const updatedStacks = stacks.map((stack) => {
+      if (
+        stack.Name === app.StackName &&
+        stack.ResourcePool === app.ResourcePool
+      ) {
+        return {
+          ...stack,
+          Applications: [...stack.Applications, app],
+        };
+      }
+      return stack;
+    });
+
+    const stackExists = updatedStacks.some(
+      (stack) =>
+        stack.Name === app.StackName && stack.ResourcePool === app.ResourcePool
+    );
+
+    if (!stackExists && app.StackName) {
+      updatedStacks.push({
+        Name: app.StackName,
+        ResourcePool: app.ResourcePool,
+        Applications: [app],
+        Highlighted: false,
+      });
+    }
+    return updatedStacks;
+  }, []);
+  return res;
 }

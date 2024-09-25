@@ -9,6 +9,7 @@ import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNam
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useAuthorizations } from '@/react/hooks/useUser';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { TableSettingsMenu } from '@@/datatables';
 import { useRepeater } from '@@/datatables/useRepeater';
@@ -72,7 +73,10 @@ export function ApplicationsDatatable({
   const applications = applicationsQuery.data ?? [];
   const filteredApplications = showSystem
     ? applications
-    : applications.filter((item) => !isSystem(item));
+    : applications.filter(
+        (application) =>
+          !isSystemNamespace(application.ResourcePool, namespaceListQuery.data)
+      );
 
   const columns = useColumns(hideStacks);
 
@@ -87,7 +91,9 @@ export function ApplicationsDatatable({
       titleIcon={BoxIcon}
       isLoading={applicationsQuery.isLoading}
       disableSelect={!hasWriteAuthQuery.authorized}
-      isRowSelectable={(row) => !isSystem(row.original)}
+      isRowSelectable={(row) =>
+        !isSystemNamespace(row.original.ResourcePool, namespaceListQuery.data)
+      }
       getRowCanExpand={(row) => isExpandable(row.original)}
       renderSubRow={(row) => (
         <SubRow
@@ -148,12 +154,6 @@ export function ApplicationsDatatable({
       }
     />
   );
-
-  function isSystem(item: Application) {
-    return namespaceListQuery.data?.some(
-      (namespace) => namespace.Name === item.ResourcePool && namespace.IsSystem
-    );
-  }
 }
 
 function isExpandable(item: Application) {

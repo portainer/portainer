@@ -213,13 +213,10 @@ export const ngModule = angular
   .component(
     'kubernetesApplicationsStacksDatatable',
     r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
-      'dataset',
-      'onRefresh',
       'onRemove',
       'namespace',
       'namespaces',
       'onNamespaceChange',
-      'isLoading',
       'showSystem',
       'setSystemResources',
     ])

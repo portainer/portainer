@@ -11,6 +11,7 @@ import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
@@ -48,7 +49,10 @@ export function ConfigMapsDatatable() {
 
   const filteredConfigMaps = tableState.showSystemResources
     ? configMaps
-    : configMaps.filter((item) => !isSystem(item));
+    : configMaps.filter(
+        (configmap) =>
+          !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
+      );
 
   const configMapRowData = useConfigMapRowData(
     filteredConfigMaps,
@@ -65,8 +69,9 @@ export function ConfigMapsDatatable() {
       title="ConfigMaps"
       titleIcon={FileCode}
       getRowId={(row) => row.UID ?? ''}
-      isRowSelectable={({ original: item }) =>
-        canAccessSystemResources && !isSystem(item)
+      isRowSelectable={({ original: configmap }) =>
+        canAccessSystemResources &&
+        !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -85,15 +90,6 @@ export function ConfigMapsDatatable() {
       data-cy="k8s-configmaps-datatable"
     />
   );
-
-  function isSystem(configMap: Configuration): boolean {
-    return (
-      namespacesQuery.data?.some(
-        (namespace) =>
-          namespace.Name === configMap.Namespace && namespace.IsSystem
-      ) ?? false
-    );
-  }
 }
 
 function useConfigMapRowData(
