@@ -22,9 +22,12 @@ func (kcl *KubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error {
 		return errors.WithMessage(err, "failed to fetch access policies")
 	}
 
-	delete(policies, ns)
+	if policies != nil {
+		delete(policies, ns)
+		return kcl.UpdateNamespaceAccessPolicies(policies)
+	}
 
-	return kcl.UpdateNamespaceAccessPolicies(policies)
+	return nil
 }
 
 // GetNamespaceAccessPolicies gets the namespace access policies
@@ -32,6 +35,9 @@ func (kcl *KubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error {
 func (kcl *KubeClient) GetNamespaceAccessPolicies() (map[string]portainer.K8sNamespaceAccessPolicy, error) {
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(context.TODO(), portainerConfigMapName, metav1.GetOptions{})
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
