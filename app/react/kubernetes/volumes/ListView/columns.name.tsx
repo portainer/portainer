@@ -15,6 +15,7 @@ import { helper } from './columns.helper';
 
 export const name = helper.accessor('PersistentVolumeClaim.Name', {
   header: 'Name',
+  id: 'Name',
   cell: NameCell,
 });
 

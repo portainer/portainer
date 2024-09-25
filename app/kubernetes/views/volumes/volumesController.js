@@ -28,8 +28,6 @@ class KubernetesVolumesController {
         try {
           await this.KubernetesVolumeService.delete(volume);
           this.Notifications.success('Volume successfully removed', volume.PersistentVolumeClaim.Name);
-          const index = this.volumes.indexOf(volume);
-          this.volumes.splice(index, 1);
         } catch (err) {
           this.Notifications.error('Failure', err, 'Unable to remove volume');
         } finally {

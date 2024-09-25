@@ -76,6 +76,7 @@ function convertToVolumeViewModels(
         Kind: app.Kind,
       })),
       PersistentVolumeClaim: {
+        Namespace: volume.persistentVolumeClaim.namespace,
         Name: volume.persistentVolumeClaim.name,
         storageClass: {
           Name: volume.persistentVolumeClaim.storageClass || '',
