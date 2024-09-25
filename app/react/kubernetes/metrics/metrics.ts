@@ -25,6 +25,7 @@ export async function getMetricsForNode(
     const { data: node } = await axios.get<NodeMetric>(
       `kubernetes/${environmentId}/metrics/nodes/${nodeName}`
     );
+
     return node;
   } catch (e) {
     throw parseAxiosError(e, 'Unable to retrieve metrics for node');
@@ -61,11 +62,17 @@ export async function getMetricsForPod(
 }
 
 export async function getTotalResourcesForAllApplications(
-  environmentId: EnvironmentId
+  environmentId: EnvironmentId,
+  nodeName?: string
 ) {
   try {
     const { data: resources } = await axios.get<ApplicationResource>(
-      `kubernetes/${environmentId}/metrics/applications_resources`
+      `kubernetes/${environmentId}/metrics/applications_resources`,
+      {
+        params: {
+          node: nodeName,
+        },
+      }
     );
     return resources;
   } catch (e) {

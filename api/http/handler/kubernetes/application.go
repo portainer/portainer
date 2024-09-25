@@ -20,6 +20,7 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
+// @param node query string true "Node name"
 // @success 200 {object} models.K8sApplicationResource "Success"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
@@ -28,13 +29,19 @@ import (
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/metrics/applications_resources [get]
 func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	node, err := request.RetrieveQueryParameter(r, "node", true)
+	if err != nil {
+		log.Error().Err(err).Str("context", "getApplicationsResources").Msg("Unable to parse the namespace query parameter")
+		return httperror.BadRequest("Unable to parse the node query parameter", err)
+	}
+
 	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
 		log.Error().Err(httpErr).Str("context", "getApplicationsResources").Msg("Unable to get a Kubernetes client for the user")
 		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
 	}
 
-	applicationsResources, err := cli.GetApplicationsResource("")
+	applicationsResources, err := cli.GetApplicationsResource("", node)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) {
 			log.Error().Err(err).Str("context", "getApplicationsResources").Msg("Unable to get the total resource requests and limits for all applications in the namespace")

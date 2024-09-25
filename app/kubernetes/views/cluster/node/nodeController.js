@@ -9,7 +9,7 @@ import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubern
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { confirmUpdateNode } from '@/react/kubernetes/cluster/NodeView/ConfirmUpdateNode';
-import { getMetricsForNode } from '@/react/kubernetes/metrics/metrics.ts';
+import { getMetricsForNode, getTotalResourcesForAllApplications } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -299,6 +299,8 @@ class KubernetesNodeController {
     try {
       const nodeName = this.$transition$.params().nodeName;
       const node = await getMetricsForNode(this.$state.params.endpointId, nodeName);
+      node.CPU = node.usage.cpu;
+      node.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);
       this.resourceUsage = new KubernetesResourceReservation();
       this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);
       this.resourceUsage.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);
@@ -367,6 +369,11 @@ class KubernetesNodeController {
     this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
     this.formValues.Labels = KubernetesNodeHelper.computeUsedLabels(this.applications, this.formValues.Labels);
     this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
+
+    this.resourceReservation = await getTotalResourcesForAllApplications(this.$state.params.endpointId, this.node.Name);
+    this.resourceReservation.CpuRequest = Math.round(this.resourceReservation.CpuRequest / 1000);
+    this.resourceReservation.MemoryRequest = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.MemoryRequest);
+    this.node.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
 
     this.state.viewReady = true;
   }

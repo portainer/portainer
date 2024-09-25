@@ -119,9 +119,14 @@ func (kcl *KubeClient) convertPodsToApplications(pods []corev1.Pod, replicaSets 
 
 // GetClusterApplicationsResource returns the total resource requests and limits for all applications in a namespace
 // for a cluster level resource, set the namespace to ""
-func (kcl *KubeClient) GetApplicationsResource(namespace string) (models.K8sApplicationResource, error) {
+func (kcl *KubeClient) GetApplicationsResource(namespace, node string) (models.K8sApplicationResource, error) {
 	resource := models.K8sApplicationResource{}
-	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
+	podListOptions := metav1.ListOptions{}
+	if node != "" {
+		podListOptions.FieldSelector = fmt.Sprintf("spec.nodeName=%s", node)
+	}
+
+	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), podListOptions)
 	if err != nil {
 		return resource, err
 	}
@@ -135,7 +140,7 @@ func (kcl *KubeClient) GetApplicationsResource(namespace string) (models.K8sAppl
 		}
 	}
 
-	return convertApplicationResourceUnits(resource), nil
+	return resource, nil
 }
 
 // convertApplicationResourceUnits converts the resource units from milli to core and bytes to mega bytes
