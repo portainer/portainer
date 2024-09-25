@@ -12,7 +12,6 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useAllApplicationsQuery } from '../../application.queries';
-import { Application } from '../ApplicationsDatatable/types';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -20,6 +19,7 @@ import { Namespace, Stack } from './types';
 import { StacksSettingsMenu } from './StacksSettingsMenu';
 import { NamespaceFilter } from './NamespaceFilter';
 import { TableActions } from './TableActions';
+import { getStacksFromApplications } from './getStacksFromApplications';
 
 const storageKey = 'kubernetes.applications.stacks';
 
@@ -67,7 +67,7 @@ export function ApplicationsStacksDatatable({
 
   const { authorized } = useAuthorizations('K8sApplicationsW');
 
-  const dataset = parseStacksFromApplications(filteredApplications);
+  const dataset = getStacksFromApplications(filteredApplications);
 
   return (
     <ExpandableDatatable
@@ -112,37 +112,4 @@ export function ApplicationsStacksDatatable({
       data-cy="applications-stacks-datatable"
     />
   );
-}
-
-function parseStacksFromApplications(applications: Application[]) {
-  const res = applications.reduce<Stack[]>((stacks, app) => {
-    const updatedStacks = stacks.map((stack) => {
-      if (
-        stack.Name === app.StackName &&
-        stack.ResourcePool === app.ResourcePool
-      ) {
-        return {
-          ...stack,
-          Applications: [...stack.Applications, app],
-        };
-      }
-      return stack;
-    });
-
-    const stackExists = updatedStacks.some(
-      (stack) =>
-        stack.Name === app.StackName && stack.ResourcePool === app.ResourcePool
-    );
-
-    if (!stackExists && app.StackName) {
-      updatedStacks.push({
-        Name: app.StackName,
-        ResourcePool: app.ResourcePool,
-        Applications: [app],
-        Highlighted: false,
-      });
-    }
-    return updatedStacks;
-  }, []);
-  return res;
 }
