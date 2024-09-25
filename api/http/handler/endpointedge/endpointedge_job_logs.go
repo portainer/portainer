@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/internal/edge/utils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -39,32 +40,30 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Unable to find an environment on request context", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "jobID")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge job identifier route variable", err)
+		return httperror.BadRequest("Invalid edge job identifier route variable", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	var payload logsPayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return httperror.BadRequest("Invalid request payload", utils.NewEdgeError(endpoint.Name, err))
 	}
 
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.getEdgeJobLobs(tx, endpoint.ID, portainer.EdgeJobID(edgeJobID), payload)
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
+			httpErr.Err = utils.NewEdgeError(endpoint.Name, httpErr.Err)
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unexpected error", err)
+		return httperror.InternalServerError("Unexpected error", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	return response.JSON(w, nil)

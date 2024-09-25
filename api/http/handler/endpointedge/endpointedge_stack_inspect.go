@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/edge"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/internal/edge/utils"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -33,27 +34,26 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		return httperror.BadRequest("Unable to find an environment on request context", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "stackId")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge stack identifier route variable", err)
+		return httperror.BadRequest("Invalid edge stack identifier route variable", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", err)
+		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", utils.NewEdgeError(endpoint.Name, err))
 	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
+		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {
 		if fileName == "" {
-			return httperror.BadRequest("Docker is not supported by this stack", errors.New("Docker is not supported by this stack"))
+			return httperror.BadRequest("Docker is not supported by this stack", utils.NewEdgeError(endpoint.Name, errors.New("Docker is not supported by this stack")))
 		}
 	}
 
@@ -66,18 +66,18 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		fileName = edgeStack.ManifestPath
 
 		if fileName == "" {
-			return httperror.BadRequest("Kubernetes is not supported by this stack", errors.New("Kubernetes is not supported by this stack"))
+			return httperror.BadRequest("Kubernetes is not supported by this stack", utils.NewEdgeError(endpoint.Name, errors.New("Kubernetes is not supported by this stack")))
 		}
 	}
 
 	dirEntries, err := filesystem.LoadDir(edgeStack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to load repository", err)
+		return httperror.InternalServerError("Unable to load repository", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	fileContent, err := filesystem.FilterDirForCompatibility(dirEntries, fileName, endpoint.Agent.Version)
 	if err != nil {
-		return httperror.InternalServerError("File not found", err)
+		return httperror.InternalServerError("File not found", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	dirEntries = filesystem.FilterDirForEntryFile(dirEntries, fileName)

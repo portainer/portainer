@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/portainer/portainer/api/internal/edge/utils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -85,25 +86,25 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	if _, ok := handler.DataStore.Endpoint().Heartbeat(portainer.EndpointID(endpointID)); !ok {
 		// EE-5190
-		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(strconv.Itoa(endpointID), errors.New("the device has not been trusted yet")))
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		// EE-5190
-		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(strconv.Itoa(endpointID), errors.New("the device has not been trusted yet")))
 	}
 
 	firstConn := endpoint.LastCheckInDate == 0
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	handler.DataStore.Endpoint().UpdateHeartbeat(endpoint.ID)
 
 	if err := handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	var statusResponse *endpointEdgeStatusInspectResponse
@@ -113,10 +114,11 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
+			httpErr.Err = utils.NewEdgeError(endpoint.Name, httpErr.Err)
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unexpected error", err)
+		return httperror.InternalServerError("Unexpected error", utils.NewEdgeError(endpoint.Name, err))
 	}
 
 	return cacheResponse(w, endpoint.ID, *statusResponse)
