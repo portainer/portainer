@@ -90,7 +90,7 @@ class KubernetesSecretController {
       this.state.actionInProgress = true;
       if (
         this.formValues.Kind !== this.configuration.Kind ||
-        this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace ||
+        this.formValues.ResourcePool !== this.configuration.Namespace ||
         this.formValues.Name !== this.configuration.Name
       ) {
         await this.KubernetesConfigurationService.create(this.formValues);
@@ -99,7 +99,7 @@ class KubernetesSecretController {
         this.$state.go(
           'kubernetes.secrets.secret',
           {
-            namespace: this.formValues.ResourcePool.Namespace.Name,
+            namespace: this.formValues.ResourcePool,
             name: this.formValues.Name,
           },
           { reload: true }

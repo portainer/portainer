@@ -20,7 +20,7 @@ import { useAllStoragesQuery } from '../useVolumesQuery';
 
 import { StorageClassViewModel } from './types';
 
-interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
+interface TableSettings extends BasicTableSettings, RefreshableTableSettings { }
 
 const helper = createColumnHelper<StorageClassViewModel>();
 
@@ -93,7 +93,7 @@ function SubRow({ item }: { item: StorageClassViewModel }) {
               {vol.PersistentVolumeClaim.Name}
             </Link>
           </td>
-          <td>{vol.PersistentVolumeClaim.Storage}</td>
+          <td>{humanize(vol.PersistentVolumeClaim.Storage)}</td>
         </tr>
       ))}
     </>

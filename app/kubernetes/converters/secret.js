@@ -100,7 +100,7 @@ class KubernetesSecretConverter {
   static configurationFormValuesToSecret(formValues) {
     const res = new KubernetesApplicationSecret();
     res.Name = formValues.Name;
-    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Namespace = formValues.ResourcePool;
     res.Type = formValues.Type;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     res.Data = formValues.Data;
