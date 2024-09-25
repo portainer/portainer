@@ -6,6 +6,7 @@ import { AutomationTestingProps } from '@/types';
 import { confirmDelete } from '@@/modals/confirm';
 
 import { Button } from './Button';
+import { LoadingButton } from './LoadingButton';
 
 type ConfirmOrClick =
   | {
@@ -24,6 +25,8 @@ export function DeleteButton({
   disabled,
   size,
   children,
+  isLoading,
+  loadingText = 'Removing',
   'data-cy': dataCy,
   ...props
 }: PropsWithChildren<
@@ -31,10 +34,28 @@ export function DeleteButton({
     ConfirmOrClick & {
       size?: ComponentProps<typeof Button>['size'];
       disabled?: boolean;
+      isLoading?: boolean;
+      loadingText?: string;
     }
 >) {
+  if (isLoading === undefined) {
+    return (
+      <Button
+        size={size}
+        color="dangerlight"
+        disabled={disabled || isLoading}
+        onClick={() => handleClick()}
+        icon={Trash2}
+        className="!m-0"
+        data-cy={dataCy}
+      >
+        {children || 'Remove'}
+      </Button>
+    );
+  }
+
   return (
-    <Button
+    <LoadingButton
       size={size}
       color="dangerlight"
       disabled={disabled}
@@ -42,9 +63,11 @@ export function DeleteButton({
       icon={Trash2}
       className="!m-0"
       data-cy={dataCy}
+      isLoading={isLoading}
+      loadingText={loadingText}
     >
       {children || 'Remove'}
-    </Button>
+    </LoadingButton>
   );
 
   async function handleClick() {

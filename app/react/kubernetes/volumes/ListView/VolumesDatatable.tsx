@@ -17,17 +17,13 @@ import {
 } from '../../datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '../../datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
-import { useAllVolumesQuery } from '../useVolumesQuery';
+import { useAllVolumesQuery } from '../queries/useVolumesQuery';
 import { isSystemNamespace } from '../../namespaces/queries/useIsSystemNamespace';
+import { useDeleteVolumes } from '../queries/useDeleteVolumes';
 
-import { VolumeViewModel } from './types';
 import { columns } from './columns';
 
-export function VolumesDatatable({
-  onRemove,
-}: {
-  onRemove(items: Array<VolumeViewModel>): void;
-}) {
+export function VolumesDatatable() {
   const tableState = useTableStateWithStorage<TableSettings>(
     'kube-volumes',
     'Name',
@@ -40,6 +36,7 @@ export function VolumesDatatable({
   const hasWriteAuth = useAuthorizations('K8sVolumesW', undefined, true);
 
   const envId = useEnvironmentId();
+  const deleteVolumesMutation = useDeleteVolumes(envId);
   const namespaceListQuery = useNamespacesQuery(envId);
   const namespaces = namespaceListQuery.data ?? [];
   const volumesQuery = useAllVolumesQuery(envId, {
@@ -56,7 +53,6 @@ export function VolumesDatatable({
 
   return (
     <Datatable
-      noWidget
       data-cy="k8s-volumes-datatable"
       isLoading={volumesQuery.isLoading || namespaceListQuery.isLoading}
       dataset={filteredVolumes}
@@ -75,8 +71,9 @@ export function VolumesDatatable({
         <>
           <DeleteButton
             confirmMessage="Do you want to remove the selected volume(s)?"
-            onConfirmed={() => onRemove(selectedItems)}
+            onConfirmed={() => deleteVolumesMutation.mutate(selectedItems)}
             disabled={selectedItems.length === 0}
+            isLoading={deleteVolumesMutation.isLoading}
             data-cy="k8s-volumes-delete-button"
           />
           <CreateFromManifestButton data-cy="k8s-volumes-deploy-button" />

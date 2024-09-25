@@ -2,16 +2,17 @@ import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { humanize } from '@/portainer/filters/filters';
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios from '@/portainer/services/axios';
 import { Volume } from '@/kubernetes/models/volume/Volume';
 
-import { parseKubernetesAxiosError } from '../axiosError';
+import { parseKubernetesAxiosError } from '../../axiosError';
+import { K8sVolumeInfo } from '../types';
+import { VolumeViewModel, StorageClassViewModel } from '../ListView/types';
 
-import { K8sVolumeInfo } from './types';
-import { VolumeViewModel, StorageClassViewModel } from './ListView/types';
+import { queryKeys } from './query-keys';
 
-// useQuery to get a list of all volumes from an array of namespaces
+// useQuery to get a list of all volumes in a cluster
 export function useAllVolumesQuery(
   environmentId: EnvironmentId,
   queryOptions?: {
@@ -19,17 +20,17 @@ export function useAllVolumesQuery(
   }
 ) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'volumes'],
+    queryKeys.volumes(environmentId),
     () => getAllVolumes(environmentId, { withApplications: true }),
     {
       refetchInterval: queryOptions?.refetchInterval,
       select: convertToVolumeViewModels,
-      ...withError('Unable to retrieve volumes'),
+      ...withGlobalError('Unable to retrieve volumes'),
     }
   );
 }
 
-// useQuery to get a list of all volumes from an array of namespaces
+// useQuery to get a list of all volumes in a cluster
 export function useAllStoragesQuery(
   environmentId: EnvironmentId,
   queryOptions?: {
@@ -37,12 +38,12 @@ export function useAllStoragesQuery(
   }
 ) {
   return useQuery(
-    ['environments', environmentId, 'kubernetes', 'storages'],
+    queryKeys.storages(environmentId),
     () => getAllVolumes(environmentId),
     {
       refetchInterval: queryOptions?.refetchInterval,
       select: convertToStorageClassViewModels,
-      ...withError('Unable to retrieve volumes'),
+      ...withGlobalError('Unable to retrieve volumes'),
     }
   );
 }

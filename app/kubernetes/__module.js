@@ -511,7 +511,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const volumes = {
       name: 'kubernetes.volumes',
-      url: '/volumes',
+      url: '/volumes?tab',
       views: {
         'content@': {
           component: 'kubernetesVolumesView',

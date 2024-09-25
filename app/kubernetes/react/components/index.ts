@@ -62,7 +62,6 @@ import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/comp
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
 import { applicationsModule } from './applications';
-import { volumesModule } from './volumes';
 import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
 import { registriesModule } from './registries';
@@ -70,7 +69,6 @@ import { registriesModule } from './registries';
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
     applicationsModule,
-    volumesModule,
     namespacesModule,
     clusterManagementModule,
     registriesModule,

@@ -16,11 +16,11 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
 
-import { useAllStoragesQuery } from '../useVolumesQuery';
+import { useAllStoragesQuery } from '../queries/useVolumesQuery';
 
 import { StorageClassViewModel } from './types';
 
-interface TableSettings extends BasicTableSettings, RefreshableTableSettings { }
+interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
 
 const helper = createColumnHelper<StorageClassViewModel>();
 
@@ -52,7 +52,6 @@ export function StorageDatatable() {
 
   return (
     <ExpandableDatatable
-      noWidget
       disableSelect
       dataset={storages}
       columns={columns}

@@ -17,6 +17,7 @@ import { NamespacesView } from '@/react/kubernetes/namespaces/ListView/Namespace
 import { ServiceAccountsView } from '@/react/kubernetes/more-resources/ServiceAccountsView/ServiceAccountsView';
 import { ClusterRolesView } from '@/react/kubernetes/more-resources/ClusterRolesView';
 import { RolesView } from '@/react/kubernetes/more-resources/RolesView';
+import { VolumesView } from '@/react/kubernetes/volumes/ListView/VolumesView';
 
 export const viewsModule = angular
   .module('portainer.kubernetes.react.views', [])
@@ -31,6 +32,10 @@ export const viewsModule = angular
   .component(
     'kubernetesServicesView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ServicesView))), [])
+  )
+  .component(
+    'kubernetesVolumesView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(VolumesView))), [])
   )
   .component(
     'kubernetesIngressesView',
