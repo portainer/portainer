@@ -23,11 +23,11 @@ func (e *EdgeError) Error() string {
 
 	if e.endpoint != "" {
 		if _, err := strconv.Atoi(e.endpoint); err == nil {
-			errMsg += ", environment ID: " + e.endpoint
+			errMsg += ". Environment ID: " + e.endpoint
 			return errMsg
 		}
 
-		errMsg += ", environment: " + e.endpoint
+		errMsg += ". Environment: " + e.endpoint
 	}
 	return errMsg
 }
