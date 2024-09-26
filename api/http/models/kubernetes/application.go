@@ -31,6 +31,7 @@ type K8sApplication struct {
 	StackID               string                 `json:"StackId,omitempty"`
 	ServiceID             string                 `json:"ServiceId,omitempty"`
 	ServiceName           string                 `json:"ServiceName,omitempty"`
+	ServiceType           string                 `json:"ServiceType,omitempty"`
 	Kind                  string                 `json:"Kind,omitempty"`
 	MatchLabels           map[string]string      `json:"MatchLabels,omitempty"`
 	Labels                map[string]string      `json:"Labels,omitempty"`
