@@ -84,7 +84,7 @@ func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string, 
 	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sApplication, 0)
 	for _, application := range applications {
-		if _, ok := nonAdminNamespaceSet[application.Namespace]; ok {
+		if _, ok := nonAdminNamespaceSet[application.ResourcePool]; ok {
 			results = append(results, application)
 		}
 	}
