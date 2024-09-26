@@ -374,7 +374,14 @@ func (kcl *KubeClient) GetApplicationFromServiceSelector(pods []corev1.Pod, serv
 
 	for _, pod := range pods {
 		if servicesSelector.Matches(labels.Set(pod.Labels)) {
-			return kcl.ConvertPodToApplication(pod, replicaSets, nil, nil, nil, nil, false)
+			if isReplicaSetOwner(pod) {
+				updateOwnerReferenceToDeployment(&pod, replicaSets)
+			}
+
+			return &models.K8sApplication{
+				Name: pod.OwnerReferences[0].Name,
+				Kind: pod.OwnerReferences[0].Kind,
+			}, nil
 		}
 	}
 

@@ -218,7 +218,7 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 		replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to list replica sets across the cluster")
-			return nil, fmt.Errorf("an error occurred during the GetApplicationsFromServiceSelectors operation, unable to list replica sets across the cluster. Error: %w", err)
+			return nil, fmt.Errorf("an error occurred during the CombineVolumesWithApplications operation, unable to list replica sets across the cluster. Error: %w", err)
 		}
 		replicaSetItems = replicaSets.Items
 	}

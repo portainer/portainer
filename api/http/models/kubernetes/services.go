@@ -14,7 +14,7 @@ type (
 		Annotations                   map[string]string
 		CreationDate                  string
 		Labels                        map[string]string
-		AllocateLoadBalancerNodePorts *bool `json:",omitempty"`
+		AllocateLoadBalancerNodePorts *bool
 		Ports                         []K8sServicePort
 		Selector                      map[string]string
 		IngressStatus                 []K8sServiceIngress `json:",omitempty"`

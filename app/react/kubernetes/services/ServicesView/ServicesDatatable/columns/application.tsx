@@ -9,7 +9,7 @@ import { Service } from '../../../types';
 import { columnHelper } from './helper';
 
 export const application = columnHelper.accessor(
-  (row) => (row.Applications ? row.Applications[0].name : ''),
+  (row) => (row.Applications ? row.Applications[0].Name : ''),
   {
     header: 'Application',
     id: 'application',

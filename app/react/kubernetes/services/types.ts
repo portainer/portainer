@@ -12,9 +12,9 @@ type IngressStatus = {
 };
 
 type Application = {
-  uid: string;
-  name: string;
-  kind: string;
+  Uid: string;
+  Name: string;
+  Kind: string;
 };
 
 export type ServiceType =
