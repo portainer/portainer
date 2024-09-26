@@ -51,12 +51,20 @@ export function useColumns() {
             );
           },
         }),
-        helper.accessor((row) => row.Resource?.cpuRequest, {
+        helper.accessor((row) => row.Resource?.CpuRequest, {
           header: 'CPU reservation',
           cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
         }),
-        helper.accessor((row) => row.Resource?.memoryRequest, {
+        helper.accessor((row) => row.Resource?.CpuLimit, {
+          header: 'CPU Limit',
+          cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
+        }),
+        helper.accessor((row) => row.Resource?.MemoryRequest, {
           header: 'Memory reservation',
+          cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
+        }),
+        helper.accessor((row) => row.Resource?.MemoryLimit, {
+          header: 'Memory Limit',
           cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
         }),
       ]),

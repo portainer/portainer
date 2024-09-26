@@ -40,10 +40,10 @@ export interface Application {
     Port: number;
   }>;
   Resource?: {
-    cpuLimit?: number;
-    cpuRequest?: number;
-    memoryLimit?: number;
-    memoryRequest?: number;
+    CpuLimit?: number;
+    CpuRequest?: number;
+    MemoryLimit?: number;
+    MemoryRequest?: number;
   };
 }
 
