@@ -27,15 +27,17 @@ func (kcl *KubeClient) GetApplications(namespace, nodeName string, withDependenc
 // This function is called when the user is an admin.
 func (kcl *KubeClient) fetchApplications(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
 	podListOptions := metav1.ListOptions{}
-	if nodeName != "" || !withDependencies {
+	if nodeName != "" {
 		podListOptions.FieldSelector = fmt.Sprintf("spec.nodeName=%s", nodeName)
-		// todo: statefulsets and daemonsets are to be included in the list in the future
-		pods, replicaSets, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets(namespace, podListOptions)
+	}
+	if !withDependencies {
+		// TODO: make sure not to fetch services in fetchAllApplicationsListResources from this call
+		pods, replicaSets, deployments, statefulSets, daemonSets, _, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
 		if err != nil {
 			return nil, err
 		}
 
-		return kcl.convertPodsToApplications(pods, replicaSets, nil, nil, nil, nil)
+		return kcl.convertPodsToApplications(pods, replicaSets, deployments, statefulSets, daemonSets, nil)
 	}
 
 	pods, replicaSets, deployments, statefulSets, daemonSets, services, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)

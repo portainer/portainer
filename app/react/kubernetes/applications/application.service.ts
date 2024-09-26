@@ -1,7 +1,4 @@
 import {
-  DaemonSetList,
-  StatefulSetList,
-  DeploymentList,
   Deployment,
   DaemonSet,
   StatefulSet,
@@ -16,56 +13,9 @@ import { isFulfilled } from '@/portainer/helpers/promise-utils';
 import { parseKubernetesAxiosError } from '../axiosError';
 
 import { getPod, patchPod } from './pod.service';
-import { filterRevisionsByOwnerUid, getNakedPods } from './utils';
-import {
-  AppKind,
-  Application,
-  ApplicationList,
-  ApplicationPatch,
-} from './types';
+import { filterRevisionsByOwnerUid } from './utils';
+import { AppKind, Application, ApplicationPatch } from './types';
 import { appRevisionAnnotation } from './constants';
-import { getNamespacePods } from './usePods';
-
-// This file contains services for Kubernetes apps/v1 resources (Deployments, DaemonSets, StatefulSets)
-
-export async function getApplicationsForCluster(
-  environmentId: EnvironmentId,
-  namespaceNames?: string[]
-) {
-  if (!namespaceNames) {
-    return [];
-  }
-  const applications = await Promise.all(
-    namespaceNames.map((namespace) =>
-      getApplicationsForNamespace(environmentId, namespace)
-    )
-  );
-  return applications.flat();
-}
-
-// get a list of all Deployments, DaemonSets, StatefulSets and naked pods (https://portainer.atlassian.net/browse/CE-2) in one namespace
-async function getApplicationsForNamespace(
-  environmentId: EnvironmentId,
-  namespace: string
-) {
-  const [deployments, daemonSets, statefulSets, pods] = await Promise.all([
-    getApplicationsByKind<DeploymentList>(
-      environmentId,
-      namespace,
-      'Deployment'
-    ),
-    getApplicationsByKind<DaemonSetList>(environmentId, namespace, 'DaemonSet'),
-    getApplicationsByKind<StatefulSetList>(
-      environmentId,
-      namespace,
-      'StatefulSet'
-    ),
-    getNamespacePods(environmentId, namespace),
-  ]);
-  // find all pods which are 'naked' (not owned by a deployment, daemonset or statefulset)
-  const nakedPods = getNakedPods(pods, deployments, daemonSets, statefulSets);
-  return [...deployments, ...daemonSets, ...statefulSets, ...nakedPods];
-}
 
 // if not known, get the type of an application (Deployment, DaemonSet, StatefulSet or naked pod) by name
 export async function getApplication<
@@ -232,29 +182,6 @@ async function getApplicationByKind<
     return data;
   } catch (e) {
     throw parseKubernetesAxiosError(e, 'Unable to retrieve application');
-  }
-}
-
-async function getApplicationsByKind<T extends ApplicationList>(
-  environmentId: EnvironmentId,
-  namespace: string,
-  appKind: 'Deployment' | 'DaemonSet' | 'StatefulSet'
-) {
-  try {
-    const { data } = await axios.get<T>(
-      buildUrl(environmentId, namespace, `${appKind}s`)
-    );
-    const items = (data.items || []).map((app) => ({
-      ...app,
-      kind: appKind,
-      apiVersion: data.apiVersion,
-    }));
-    return items as T['items'];
-  } catch (e) {
-    throw parseKubernetesAxiosError(
-      e,
-      `Unable to retrieve ${appKind}s in namespace '${namespace}'`
-    );
   }
 }
 

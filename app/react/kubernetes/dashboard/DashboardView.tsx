@@ -33,7 +33,7 @@ export function DashboardView() {
         <DashboardGrid>
           <DashboardItem
             value={dashboard?.namespacesCount}
-            isLoading={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
             isRefetching={dashboardQuery.isRefetching}
             icon={Layers}
             to="kubernetes.resourcePools"
@@ -42,8 +42,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.applicationsCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Box}
             to="kubernetes.applications"
             type="Application"
@@ -51,8 +51,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.servicesCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Shuffle}
             to="kubernetes.services"
             type="Service"
@@ -60,8 +60,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.ingressesCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Route}
             to="kubernetes.ingresses"
             type="Ingress"
@@ -70,8 +70,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.configMapsCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={FileCode}
             to="kubernetes.configurations"
             params={{ tab: 'configmaps' }}
@@ -80,8 +80,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.secretsCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Lock}
             to="kubernetes.configurations"
             params={{ tab: 'secrets' }}
@@ -90,8 +90,8 @@ export function DashboardView() {
           />
           <DashboardItem
             value={dashboard?.volumesCount}
-            isLoading={dashboardQuery.isLoading}
-            isRefetching={dashboardQuery.isLoading}
+            isLoading={dashboardQuery.isInitialLoading}
+            isRefetching={dashboardQuery.isRefetching}
             icon={Database}
             to="kubernetes.volumes"
             type="Volume"

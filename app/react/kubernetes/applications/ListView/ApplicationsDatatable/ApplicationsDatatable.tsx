@@ -19,7 +19,7 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
 import { Namespace } from '../ApplicationsStacksDatatable/types';
-import { useAllApplicationsQuery } from '../../application.queries';
+import { useApplications } from '../../application.queries';
 
 import { Application, ConfigKind } from './types';
 import { useColumns } from './useColumns';
@@ -65,7 +65,7 @@ export function ApplicationsDatatable({
     setShowSystemResources(showSystem || false);
   }, [showSystem, setShowSystemResources]);
 
-  const applicationsQuery = useAllApplicationsQuery(envId, {
+  const applicationsQuery = useApplications(envId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
     namespace,
     withDependencies: true,

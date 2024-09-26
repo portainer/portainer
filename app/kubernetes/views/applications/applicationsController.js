@@ -3,6 +3,8 @@ import _ from 'lodash-es';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
+import { getStacksFromApplications } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable/getStacksFromApplications';
+import { getApplications } from '@/react/kubernetes/applications/application.queries.ts';
 
 class KubernetesApplicationsController {
   /* @ngInject */
@@ -13,6 +15,7 @@ class KubernetesApplicationsController {
     Authentication,
     Notifications,
     KubernetesApplicationService,
+    EndpointService,
     HelmService,
     KubernetesConfigurationService,
     LocalStorage,
@@ -84,22 +87,17 @@ class KubernetesApplicationsController {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);
-
           if (application.Metadata.labels && application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
-            // Update applications in stack
-            const stack = this.state.stacks.find((x) => x.Name === application.StackName);
-            const index = stack.Applications.indexOf(application);
-            stack.Applications.splice(index, 1);
-
             // remove stack if no app left in the stack
+            const appsInNamespace = await getApplications(this.endpoint.Id, { namespace: application.ResourcePool, withDependencies: false });
+            const stacksInNamespace = getStacksFromApplications(appsInNamespace);
+            const stack = stacksInNamespace.find((x) => x.Name === application.StackName);
             if (stack.Applications.length === 0 && application.StackId) {
               await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
             }
           }
         }
         this.Notifications.success('Application successfully removed', application.Name);
-        const index = this.state.applications.indexOf(application);
-        this.state.applications.splice(index, 1);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove application');
       } finally {

@@ -11,7 +11,7 @@ import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNam
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useAllApplicationsQuery } from '../../application.queries';
+import { useApplications } from '../../application.queries';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -51,7 +51,7 @@ export function ApplicationsStacksDatatable({
   }, [showSystem, setShowSystemResources]);
 
   const envId = useEnvironmentId();
-  const applicationsQuery = useAllApplicationsQuery(envId, {
+  const applicationsQuery = useApplications(envId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
     namespace,
     withDependencies: true,
@@ -67,14 +67,14 @@ export function ApplicationsStacksDatatable({
 
   const { authorized } = useAuthorizations('K8sApplicationsW');
 
-  const dataset = getStacksFromApplications(filteredApplications);
+  const stacks = getStacksFromApplications(filteredApplications);
 
   return (
     <ExpandableDatatable
       getRowCanExpand={(row) => row.original.Applications.length > 0}
       title="Stacks"
       titleIcon={List}
-      dataset={dataset}
+      dataset={stacks}
       isLoading={applicationsQuery.isLoading || namespaceListQuery.isLoading}
       columns={columns}
       settingsManager={tableState}
