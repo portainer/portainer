@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Trash2, UserCheck } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 
@@ -10,6 +9,7 @@ import { createStore } from '@/react/kubernetes/datatables/default-kube-datatabl
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -39,17 +39,15 @@ export function RolesDatatable() {
     { to: 'kubernetes.dashboard' }
   );
 
-  const filteredRoles = useMemo(
-    () =>
-      rolesQuery.data?.filter(
-        (role) => tableState.showSystemResources || !role.isSystem
-      ) || [],
-    [rolesQuery.data, tableState.showSystemResources]
-  );
+  const filteredRoles = tableState.showSystemResources
+    ? rolesQuery.data
+    : rolesQuery.data?.filter(
+        (role) => !isSystemNamespace(role.namespace, namespacesQuery.data)
+      );
 
   return (
     <Datatable
-      dataset={filteredRoles}
+      dataset={filteredRoles || []}
       columns={columns}
       settingsManager={tableState}
       isLoading={rolesQuery.isLoading}

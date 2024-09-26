@@ -1,6 +1,5 @@
 import { User } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
-import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized } from '@/react/hooks/useUser';
@@ -10,6 +9,7 @@ import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNam
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
@@ -41,13 +41,11 @@ export function ServiceAccountsDatatable() {
 
   const columns = useColumns();
 
-  const filteredServiceAccounts = useMemo(
-    () =>
-      serviceAccountsQuery.data?.filter(
-        (sa) => tableState.showSystemResources || !sa.isSystem
-      ),
-    [serviceAccountsQuery.data, tableState.showSystemResources]
-  );
+  const filteredServiceAccounts = tableState.showSystemResources
+    ? serviceAccountsQuery.data
+    : serviceAccountsQuery.data?.filter(
+        (sa) => !isSystemNamespace(sa.namespace, namespacesQuery.data)
+      );
 
   return (
     <Datatable

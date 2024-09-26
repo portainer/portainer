@@ -2,7 +2,6 @@ import { Trash2, Link as LinkIcon } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import { Row } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
@@ -11,6 +10,7 @@ import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemR
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
@@ -35,13 +35,12 @@ export function RoleBindingsDatatable() {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
     enabled: namespacesQuery.isSuccess,
   });
-  const filteredRoleBindings = useMemo(
-    () =>
-      roleBindingsQuery.data?.filter(
-        (rb) => tableState.showSystemResources || !rb.isSystem
-      ),
-    [roleBindingsQuery.data, tableState.showSystemResources]
-  );
+
+  const filteredRoleBindings = tableState.showSystemResources
+    ? roleBindingsQuery.data
+    : roleBindingsQuery.data?.filter(
+        (rb) => !isSystemNamespace(rb.namespace, namespacesQuery.data)
+      );
 
   const { authorized: isAuthorisedToAddEdit } = useAuthorizations([
     'K8sRoleBindingsW',
