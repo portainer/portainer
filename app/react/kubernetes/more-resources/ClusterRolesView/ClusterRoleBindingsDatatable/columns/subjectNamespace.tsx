@@ -1,6 +1,8 @@
 import { Link } from '@@/Link';
 import { filterHOC } from '@@/datatables/Filter';
 
+import { filterFn, filterNamespaceOptionsTransformer } from '../../utils';
+
 import { columnHelper } from './helper';
 
 export const subjectNamespace = columnHelper.accessor(
@@ -30,7 +32,11 @@ export const subjectNamespace = columnHelper.accessor(
     enableColumnFilter: true,
     // use a custom filter, to remove empty namespace values
     meta: {
-      filter: filterHOC('Filter by subject namespace'),
+      filter: filterHOC(
+        'Filter by subject namespace',
+        filterNamespaceOptionsTransformer
+      ),
     },
+    filterFn,
   }
 );

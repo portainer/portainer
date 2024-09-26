@@ -1,7 +1,10 @@
 import { Link } from '@@/Link';
 import { filterHOC } from '@@/datatables/Filter';
 
-import { filterFn } from '../../../ClusterRolesView/utils';
+import {
+  filterFn,
+  filterNamespaceOptionsTransformer,
+} from '../../../ClusterRolesView/utils';
 
 import { columnHelper } from './helper';
 
@@ -32,7 +35,10 @@ export const subjectNamespace = columnHelper.accessor(
     enableColumnFilter: true,
     // use a custom filter, to remove empty namespace values
     meta: {
-      filter: filterHOC('Filter by subject namespace'),
+      filter: filterHOC(
+        'Filter by subject namespace',
+        filterNamespaceOptionsTransformer
+      ),
     },
     filterFn,
   }
