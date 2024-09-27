@@ -234,12 +234,12 @@ func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) err
 
 func validateContainerEngineCompatibility(endpoint *portainer.Endpoint, dockerSnapshot *portainer.DockerSnapshot) error {
 	if endpoint.ContainerEngine == portainer.ContainerEngineDocker && dockerSnapshot.IsPodman {
-		err := errors.New("podman is not supported for Docker environments. Please select the Podman option instead.")
+		err := errors.New("the Docker environment option doesn't support Podman environments. Please select the Podman option instead.")
 		log.Error().Err(err).Str("endpoint", endpoint.Name).Msg(err.Error())
 		return err
 	}
 	if endpoint.ContainerEngine == portainer.ContainerEnginePodman && !dockerSnapshot.IsPodman {
-		err := errors.New("docker is not supported for Podman environments. Please select the Docker option instead.")
+		err := errors.New("the Podman environment option doesn't support Docker environments. Please select the Docker option instead.")
 		log.Error().Err(err).Str("endpoint", endpoint.Name).Msg(err.Error())
 		return err
 	}
