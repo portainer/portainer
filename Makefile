@@ -30,7 +30,7 @@ build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
 build-image: build-all ## Build the Portainer image locally
-	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
+	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
 
 build-storybook: ## Build and serve the storybook files
 	yarn storybook:build
@@ -85,6 +85,8 @@ dev-client: ## Run the client in development mode
 dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
 
+dev-server-podman: build-server ## Run the server in development mode
+	@./dev/run_container_podman.sh
 
 ##@ Format
 .PHONY: format format-client format-server

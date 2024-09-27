@@ -40,6 +40,7 @@ type endpointCreatePayload struct {
 	AzureAuthenticationKey string
 	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
+	ContainerEngine        string
 }
 
 type endpointCreationEnum int
@@ -65,6 +66,11 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		return errors.New("invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
+
+	payload.ContainerEngine, err = request.RetrieveMultiPartFormValue(r, "ContainerEngine", true)
+	if err != nil || (payload.ContainerEngine != "" && payload.ContainerEngine != portainer.ContainerEngineDocker && payload.ContainerEngine != portainer.ContainerEnginePodman) {
+		return errors.New("invalid container engine value. Value must be one of: 'docker' or 'podman'")
+	}
 
 	groupID, _ := request.RetrieveNumericMultiPartFormValue(r, "GroupID", true)
 	if groupID == 0 {
@@ -186,6 +192,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param Name formData string true "Name that will be used to identify this environment(endpoint) (example: my-environment)"
 // @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment)" Enum(1,2,3,4,5)
+// @param ContainerEngine formData string false "Container engine used by the environment(endpoint). Value must be one of: 'docker' or 'podman'"
 // @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine). Cannot be empty if EndpointCreationType is set to 4 (Edge agent environment)"
 // @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
 // @param GroupID formData int false "Environment(Endpoint) group identifier. If not specified will default to 1 (unassigned)."
@@ -371,12 +378,13 @@ func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, pay
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{
-		ID:      portainer.EndpointID(endpointID),
-		Name:    payload.Name,
-		URL:     portainerHost,
-		Type:    portainer.EdgeAgentOnDockerEnvironment,
-		GroupID: portainer.EndpointGroupID(payload.GroupID),
-		Gpus:    payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             portainerHost,
+		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -424,13 +432,14 @@ func (handler *Handler) createUnsecuredEndpoint(tx dataservices.DataStoreTx, pay
 
 	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
-		Name:      payload.Name,
-		URL:       payload.URL,
-		Type:      endpointType,
-		GroupID:   portainer.EndpointGroupID(payload.GroupID),
-		PublicURL: payload.PublicURL,
-		Gpus:      payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             payload.URL,
+		Type:            endpointType,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:       payload.PublicURL,
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -486,13 +495,14 @@ func (handler *Handler) createKubernetesEndpoint(tx dataservices.DataStoreTx, pa
 func (handler *Handler) createTLSSecuredEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload, endpointType portainer.EndpointType, agentVersion string) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := tx.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:        portainer.EndpointID(endpointID),
-		Name:      payload.Name,
-		URL:       payload.URL,
-		Type:      endpointType,
-		GroupID:   portainer.EndpointGroupID(payload.GroupID),
-		PublicURL: payload.PublicURL,
-		Gpus:      payload.Gpus,
+		ID:              portainer.EndpointID(endpointID),
+		Name:            payload.Name,
+		URL:             payload.URL,
+		Type:            endpointType,
+		ContainerEngine: payload.ContainerEngine,
+		GroupID:         portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:       payload.PublicURL,
+		Gpus:            payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.TLS,
 			TLSSkipVerify: payload.TLSSkipVerify,

@@ -43,11 +43,12 @@
             Remove</button
           >
         </div>
-        <div class="btn-group" role="group" aria-label="..." ng-if="displayRecreateButton" authorization="DockerContainerCreate">
+        <div class="btn-group" role="group" aria-label="..." ng-if="displayRecreateButton || displayDuplicateEditButton" authorization="DockerContainerCreate">
           <button
             type="button"
             class="btn btn-light btn-sm"
             ng-disabled="state.recreateContainerInProgress || container.IsPortainer"
+            ng-if="displayRecreateButton"
             ng-click="recreate()"
             button-spinner="state.recreateContainerInProgress"
           >
@@ -57,7 +58,13 @@
             >
             <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
           </button>
-          <a class="btn btn-light btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })" ng-disabled="container.IsPortainer">
+          <a
+            class="btn btn-light btn-sm"
+            type="button"
+            ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })"
+            ng-disabled="container.IsPortainer"
+            ng-if="displayDuplicateEditButton"
+          >
             <pr-icon icon="'copy'"></pr-icon>
             Duplicate/Edit</a
           >
@@ -218,7 +225,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="!state.pullImageValidity || !config.RegistryModel.Image || config.commitInProgress"
                 ng-click="commit()"
               >

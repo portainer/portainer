@@ -1,5 +1,6 @@
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
+import Podman from '@/assets/ico/vendor/podman.svg?c';
 import Kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
 import KaaS from '@/assets/ico/vendor/kaas-icon.svg?c';
@@ -10,6 +11,7 @@ import { BoxSelectorOption } from '@@/BoxSelector';
 export type EnvironmentOptionValue =
   | 'dockerStandalone'
   | 'dockerSwarm'
+  | 'podman'
   | 'kubernetes'
   | 'aci'
   | 'kaas'
@@ -20,7 +22,6 @@ export interface EnvironmentOption
   id: EnvironmentOptionValue;
   value: EnvironmentOptionValue;
 }
-
 export const existingEnvironmentTypes: EnvironmentOption[] = [
   {
     id: 'dockerStandalone',
@@ -37,6 +38,14 @@ export const existingEnvironmentTypes: EnvironmentOption[] = [
     icon: Docker,
     iconType: 'logo',
     description: 'Connect to Docker Swarm via URL/IP, API or Socket',
+  },
+  {
+    id: 'podman',
+    value: 'podman',
+    label: 'Podman',
+    icon: Podman,
+    iconType: 'logo',
+    description: 'Connect to Podman via URL/IP or Socket',
   },
   {
     id: 'kubernetes',
@@ -80,7 +89,7 @@ export const newEnvironmentTypes: EnvironmentOption[] = [
   },
 ];
 
-export const environmentTypes = [
+export const environmentTypes: EnvironmentOption[] = [
   ...existingEnvironmentTypes,
   ...newEnvironmentTypes,
 ];
@@ -88,6 +97,7 @@ export const environmentTypes = [
 export const formTitles: Record<EnvironmentOptionValue, string> = {
   dockerStandalone: 'Connect to your Docker Standalone environment',
   dockerSwarm: 'Connect to your Docker Swarm environment',
+  podman: 'Connect to your Podman environment',
   kubernetes: 'Connect to your Kubernetes environment',
   aci: 'Connect to your ACI environment',
   kaas: 'Provision a KaaS environment',

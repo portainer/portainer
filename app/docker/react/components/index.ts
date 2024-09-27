@@ -118,7 +118,7 @@ const ngModule = angular
   )
   .component(
     'dockerContainerProcessesDatatable',
-    r2a(ProcessesDatatable, ['dataset', 'headers'])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ProcessesDatatable))), [])
   )
   .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
   .component(

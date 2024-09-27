@@ -7,7 +7,11 @@ import { type EnvironmentGroupId } from '@/react/portainer/environments/environm
 import { type TagId } from '@/portainer/tags/types';
 import { EdgeAsyncIntervalsValues } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 
-import { type Environment, EnvironmentCreationTypes } from '../types';
+import {
+  type Environment,
+  ContainerEngine,
+  EnvironmentCreationTypes,
+} from '../types';
 
 import { buildUrl } from './utils';
 
@@ -21,6 +25,7 @@ interface CreateLocalDockerEnvironment {
   socketPath?: string;
   publicUrl?: string;
   meta?: EnvironmentMetadata;
+  containerEngine?: ContainerEngine;
 }
 
 export async function createLocalDockerEnvironment({
@@ -28,6 +33,7 @@ export async function createLocalDockerEnvironment({
   socketPath = '',
   publicUrl = '',
   meta = { tagIds: [] },
+  containerEngine,
 }: CreateLocalDockerEnvironment) {
   const url = prefixPath(socketPath);
 
@@ -38,6 +44,7 @@ export async function createLocalDockerEnvironment({
       url,
       publicUrl,
       meta,
+      containerEngine,
     }
   );
 
@@ -115,6 +122,7 @@ export interface EnvironmentOptions {
   pollFrequency?: number;
   edge?: EdgeSettings;
   tunnelServerAddr?: string;
+  containerEngine?: ContainerEngine;
 }
 
 interface CreateRemoteEnvironment {
@@ -125,6 +133,7 @@ interface CreateRemoteEnvironment {
   >;
   url: string;
   options?: Omit<EnvironmentOptions, 'url'>;
+  containerEngine?: ContainerEngine;
 }
 
 export async function createRemoteEnvironment({
@@ -143,11 +152,13 @@ export interface CreateAgentEnvironmentValues {
   name: string;
   environmentUrl: string;
   meta: EnvironmentMetadata;
+  containerEngine?: ContainerEngine;
 }
 
 export function createAgentEnvironment({
   name,
   environmentUrl,
+  containerEngine = ContainerEngine.Docker,
   meta = { tagIds: [] },
 }: CreateAgentEnvironmentValues) {
   return createRemoteEnvironment({
@@ -160,6 +171,7 @@ export function createAgentEnvironment({
         skipVerify: true,
         skipClientVerify: true,
       },
+      containerEngine,
     },
   });
 }
@@ -171,6 +183,7 @@ interface CreateEdgeAgentEnvironment {
   meta?: EnvironmentMetadata;
   pollFrequency: number;
   edge: EdgeSettings;
+  containerEngine: ContainerEngine;
 }
 
 export function createEdgeAgentEnvironment({
@@ -179,6 +192,7 @@ export function createEdgeAgentEnvironment({
   meta = { tagIds: [] },
   pollFrequency,
   edge,
+  containerEngine,
 }: CreateEdgeAgentEnvironment) {
   return createEnvironment(
     name,
@@ -192,6 +206,7 @@ export function createEdgeAgentEnvironment({
       pollFrequency,
       edge,
       meta,
+      containerEngine,
     }
   );
 }
@@ -207,7 +222,8 @@ async function createEnvironment(
   };
 
   if (options) {
-    const { groupId, tagIds = [] } = options.meta || {};
+    const { tls, azure, meta, containerEngine } = options;
+    const { groupId, tagIds = [] } = meta || {};
 
     payload = {
       ...payload,
@@ -216,9 +232,8 @@ async function createEnvironment(
       GroupID: groupId,
       TagIds: arrayToJson(tagIds),
       EdgeCheckinInterval: options.pollFrequency,
+      ContainerEngine: containerEngine,
     };
-
-    const { tls, azure } = options;
 
     if (tls) {
       payload = {

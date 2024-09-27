@@ -137,6 +137,10 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		return nil, "", time.Time{}, errInvalidJWTToken
 	}
 
+	if cl.ExpiresAt == nil {
+		cl.ExpiresAt = &jwt.NumericDate{}
+	}
+
 	return &portainer.TokenData{
 		ID:                  portainer.UserID(cl.UserID),
 		Username:            cl.Username,

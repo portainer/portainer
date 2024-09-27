@@ -43,7 +43,13 @@ export function useValidation(): SchemaOf<FormValues> {
 
 function passwordValidation(minLength: number | undefined = 12) {
   return object({
-    password: string().required('Password is required').min(minLength, ''),
+    password: string()
+      .required('Password is required')
+      .min(
+        minLength,
+        ({ value, min }) =>
+          `The password must be at least ${min} characters long. (${value.length}/${min})`
+      ),
     confirmPassword: string().oneOf(
       [ref('password'), null],
       'Passwords must match'

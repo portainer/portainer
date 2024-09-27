@@ -47,6 +47,14 @@ export class ContainerStatsViewModel {
       this.NumProcs = data.num_procs || 0;
       this.isWindows = true;
     }
+    // Podman has memory limit and usage but not stats
+    else if (
+      data?.memory_stats?.usage !== undefined &&
+      data?.memory_stats?.stats === undefined
+    ) {
+      this.MemoryUsage = data.memory_stats.usage || 0;
+      this.MemoryCache = 0;
+    }
     // Linux
     else if (
       data?.memory_stats?.stats === undefined ||

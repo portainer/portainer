@@ -9,8 +9,6 @@ import { notifySuccess } from '@/portainer/services/notifications';
 
 import { Widget } from '@@/Widget';
 import { FormActions } from '@@/form-components/FormActions';
-import { PasswordCheckHint } from '@@/PasswordCheckHint';
-import { FormControl } from '@@/form-components/FormControl';
 
 import { useTeams } from '../../teams/queries';
 import { useCreateUserMutation } from '../../queries/useCreateUserMutation';
@@ -80,10 +78,6 @@ export function NewUserForm() {
                       <PasswordField />
 
                       <ConfirmPasswordField />
-
-                      <FormControl label="">
-                        <PasswordCheckHint passwordValid={!errors.password} />
-                      </FormControl>
                     </>
                   )}
 

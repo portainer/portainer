@@ -1,5 +1,8 @@
 import { FormikErrors } from 'formik';
 
+import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
@@ -19,12 +22,15 @@ export function NetworkTab({
   setFieldValue: (field: string, value: unknown) => void;
   errors?: FormikErrors<Values>;
 }) {
+  const envId = useEnvironmentId();
+  const isPodman = useIsPodman(envId);
+  const additionalOptions = getAdditionalOptions(isPodman);
   return (
     <div className="mt-3">
       <FormControl label="Network" errors={errors?.networkMode}>
         <NetworkSelector
           value={values.networkMode}
-          additionalOptions={[{ label: 'Container', value: CONTAINER_MODE }]}
+          additionalOptions={additionalOptions}
           onChange={(networkMode) => setFieldValue('networkMode', networkMode)}
         />
       </FormControl>
@@ -104,4 +110,11 @@ export function NetworkTab({
       />
     </div>
   );
+}
+
+function getAdditionalOptions(isPodman?: boolean) {
+  if (isPodman) {
+    return [];
+  }
+  return [{ label: 'Container', value: CONTAINER_MODE }];
 }

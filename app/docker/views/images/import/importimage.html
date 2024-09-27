@@ -12,7 +12,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12 vertical-center">
-              <button type="button" class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
+              <button type="button" class="btn btn-sm btn-primary !ml-0" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
               <span class="ml-1">
                 {{ formValues.UploadFile.name }}
                 <pr-icon icon="'x'" mode="'danger'" ng-if="!formValues.UploadFile"></pr-icon>
@@ -27,7 +27,7 @@
             <!-- !node-selection -->
           </div>
           <div class="row" authorization="DockerImageCreate">
-            <div class="col-lg-12 col-md-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-xs-12 p-0">
               <rd-widget>
                 <rd-widget-header icon="tag" title-text="Tag the image"></rd-widget-header>
                 <rd-widget-body>
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress || !formValues.UploadFile"
                 ng-click="uploadImage()"
                 button-spinner="state.actionInProgress"

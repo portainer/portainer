@@ -17,7 +17,7 @@ import { resizeTTY } from '@/react/docker/containers/queries/useContainerResizeT
 import { updateContainer } from '@/react/docker/containers/queries/useUpdateContainer';
 import { createExec } from '@/react/docker/containers/queries/useCreateExecMutation';
 import { containerStats } from '@/react/docker/containers/queries/useContainerStats';
-import { containerTop } from '@/react/docker/containers/queries/useContainerTop';
+import { getContainerTop } from '@/react/docker/containers/queries/useContainerTop';
 
 import { ContainerDetailsViewModel } from '../models/containerDetails';
 import { ContainerStatsViewModel } from '../models/containerStats';
@@ -45,7 +45,7 @@ function ContainerServiceFactory(AngularToReact) {
     updateRestartPolicy: useAxios(updateRestartPolicyAngularJS), // container edit
     createExec: useAxios(createExec), // container console
     containerStats: useAxios(containerStatsAngularJS), // container stats
-    containerTop: useAxios(containerTop), // container stats
+    containerTop: useAxios(getContainerTop), // container stats
     inspect: useAxios(getContainer), // container inspect
     logs: useAxios(containerLogsAngularJS), // container logs
   };

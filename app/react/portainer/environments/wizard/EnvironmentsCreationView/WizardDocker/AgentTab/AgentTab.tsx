@@ -1,4 +1,7 @@
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 
 import { AgentForm } from '../../shared/AgentForm/AgentForm';
 
@@ -15,7 +18,10 @@ export function AgentTab({ onCreate, isDockerStandalone }: Props) {
       <DeploymentScripts isDockerStandalone={isDockerStandalone} />
 
       <div className="mt-5">
-        <AgentForm onCreate={onCreate} />
+        <AgentForm
+          onCreate={onCreate}
+          containerEngine={ContainerEngine.Docker}
+        />
       </div>
     </>
   );

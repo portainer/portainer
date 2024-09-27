@@ -2,6 +2,8 @@ import { CellContext } from '@tanstack/react-table';
 
 import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
+import { Badge } from '@@/Badge';
+
 import { columnHelper } from './helper';
 
 export const tags = columnHelper.accessor((item) => item.tags?.join(','), {
@@ -16,12 +18,12 @@ function Cell({
   const repoTags = item.tags;
 
   return (
-    <>
+    <div className="flex flex-wrap gap-1">
       {repoTags?.map((tag, idx) => (
-        <span key={idx} className="label label-primary image-tag" title={tag}>
+        <Badge key={idx} type="info">
           {tag}
-        </span>
+        </Badge>
       ))}
-    </>
+    </div>
   );
 }

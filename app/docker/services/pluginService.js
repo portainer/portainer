@@ -1,6 +1,6 @@
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 import { getInfo } from '@/react/docker/proxy/queries/useInfo';
-import { aggregateData, getPlugins } from '@/react/docker/proxy/queries/useServicePlugins';
+import { aggregateData, getPlugins } from '@/react/docker/proxy/queries/usePlugins';
 
 angular.module('portainer.docker').factory('PluginService', PluginServiceFactory);
 

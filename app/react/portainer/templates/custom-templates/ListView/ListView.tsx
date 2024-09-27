@@ -1,5 +1,6 @@
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useParamState } from '@/react/hooks/useParamState';
+import { ContainerEngine } from '@/react/portainer/environments/types';
 
 import { PageHeader } from '@@/PageHeader';
 import { confirmDelete } from '@@/modals/confirm';
@@ -28,7 +29,7 @@ export function ListView() {
     <>
       <PageHeader title="Custom Templates" breadcrumbs="Custom Templates" />
 
-      {viewType === 'docker' && !!selectedTemplateId && (
+      {viewType === ContainerEngine.Docker && !!selectedTemplateId && (
         <StackFromCustomTemplateFormWidget templateId={selectedTemplateId} />
       )}
 

@@ -26,7 +26,7 @@ import google from '@/assets/ico/vendor/google.svg?c';
 import googlecloud from '@/assets/ico/vendor/googlecloud.svg?c';
 import kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
 import helm from '@/assets/ico/vendor/helm.svg?c';
-import linode from '@/assets/ico/vendor/linode.svg?c';
+import akamai from '@/assets/ico/vendor/akamai.svg?c';
 import microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import microsofticon from '@/assets/ico/vendor/microsoft-icon.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
@@ -60,7 +60,7 @@ export const SvgIcons = {
   googlecloud,
   kubernetes,
   helm,
-  linode,
+  akamai,
   microsoft,
   microsofticon,
   openldap,

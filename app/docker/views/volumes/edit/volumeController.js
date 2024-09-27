@@ -9,10 +9,12 @@ angular.module('portainer.docker').controller('VolumeController', [
   'ContainerService',
   'Notifications',
   'HttpRequestHelper',
+  'Authentication',
   'endpoint',
-  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, endpoint) {
+  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, Authentication, endpoint) {
     $scope.resourceType = ResourceControlType.Volume;
     $scope.endpoint = endpoint;
+    $scope.showBrowseAction = false;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
@@ -41,6 +43,7 @@ angular.module('portainer.docker').controller('VolumeController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+      $scope.showBrowseAction = $scope.applicationState.endpoint.mode.agentProxy && (Authentication.isAdmin() || endpoint.SecuritySettings.allowVolumeBrowserForRegularUsers);
 
       VolumeService.volume($transition$.params().id)
         .then(function success(data) {

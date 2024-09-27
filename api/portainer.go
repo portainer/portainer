@@ -373,6 +373,8 @@ type (
 		Name string `json:"Name" example:"my-environment"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
 		Type EndpointType `json:"Type" example:"1"`
+		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environmentes, otherwise '' for kubernetes environments.
+		ContainerEngine string `json:"ContainerEngine" example:"docker"`
 		// URL or IP address of the Docker host associated to this environment(endpoint)
 		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
 		// Environment(Endpoint) group identifier
@@ -1357,11 +1359,31 @@ type (
 		ValidateFlags(flags *CLIFlags) error
 	}
 
+	ComposeUpOptions struct {
+		// ForceRecreate forces to recreate containers
+		ForceRecreate bool
+		// AbortOnContainerExit will stop the deployment if a container exits.
+		// This is useful when running a onetime task.
+		//
+		// When this is set, docker compose will output its logs to stdout
+		AbortOnContainerExit bool
+	}
+
+	ComposeRunOptions struct {
+		// Remove will remove the container after it has stopped
+		Remove bool
+		// Args are the arguments to pass to the container
+		Args []string
+		// Detached will run the container in the background
+		Detached bool
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
+		Run(ctx context.Context, stack *Stack, endpoint *Endpoint, serviceName string, options ComposeRunOptions) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeUpOptions) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
@@ -1611,7 +1633,7 @@ const (
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
-	DefaultKubectlShellImage = "portainer/kubectl-shell"
+	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
@@ -1707,7 +1729,7 @@ const (
 
 const (
 	_ EndpointType = iota
-	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint)
+	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint) via the Docker API or Socket
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Docker environment(endpoint)
 	AgentOnDockerEnvironment
@@ -2092,4 +2114,9 @@ type PerDevConfigsFilterType string
 const (
 	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
 	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
+)
+
+const (
+	ContainerEngineDocker = "docker"
+	ContainerEnginePodman = "podman"
 )

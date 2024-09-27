@@ -85,6 +85,7 @@ function Content({ environment, onClear }: ContentProps) {
     } = {
       [PlatformType.Azure]: AzureSidebar,
       [PlatformType.Docker]: DockerSidebar,
+      [PlatformType.Podman]: DockerSidebar, // same as docker for now, until pod management is added
       [PlatformType.Kubernetes]: KubernetesSidebar,
     };
 
@@ -124,7 +125,10 @@ interface TitleProps {
 function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
 
-  const EnvironmentIcon = getPlatformIcon(environment.Type);
+  const EnvironmentIcon = getPlatformIcon(
+    environment.Type,
+    environment.ContainerEngine
+  );
 
   if (!isOpen) {
     return (

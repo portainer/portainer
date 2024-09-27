@@ -15,6 +15,7 @@ import {
   EnvironmentOptionValue,
   existingEnvironmentTypes,
   newEnvironmentTypes,
+  environmentTypes,
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
@@ -65,6 +66,7 @@ export function EnvironmentTypeSelectView() {
                 disabled={types.length === 0}
                 data-cy="start-wizard-button"
                 onClick={() => startWizard()}
+                className="!ml-0"
               >
                 Start Wizard
               </Button>
@@ -79,11 +81,6 @@ export function EnvironmentTypeSelectView() {
     if (types.length === 0) {
       return;
     }
-
-    const environmentTypes = [
-      ...existingEnvironmentTypes,
-      ...newEnvironmentTypes,
-    ];
 
     const steps = _.compact(
       types.map((id) => environmentTypes.find((eType) => eType.id === id))

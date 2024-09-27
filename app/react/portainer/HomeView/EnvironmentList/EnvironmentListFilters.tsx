@@ -171,6 +171,13 @@ function getConnectionTypeOptions(platformTypes: PlatformType[]) {
       ConnectionType.EdgeAgentStandard,
       ConnectionType.EdgeAgentAsync,
     ],
+    [PlatformType.Podman]: [
+      // api includes a socket connection, so keep this for podman
+      ConnectionType.API,
+      ConnectionType.Agent,
+      ConnectionType.EdgeAgentStandard,
+      ConnectionType.EdgeAgentAsync,
+    ],
     [PlatformType.Azure]: [ConnectionType.API],
     [PlatformType.Kubernetes]: [
       ConnectionType.Agent,
