@@ -109,49 +109,49 @@ func TestContains(t *testing.T) {
 	cases := []struct {
 		name     string
 		setA     tagSet
-		setB     tagSet
+		setB     []portainer.TagID
 		expected bool
 	}{
 		{
 			name:     "setA contains setB",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
-			setB:     Set([]portainer.TagID{1, 2}),
+			setB:     []portainer.TagID{1, 2},
 			expected: true,
 		},
 		{
 			name:     "setA equals to setB",
 			setA:     Set([]portainer.TagID{1, 2}),
-			setB:     Set([]portainer.TagID{1, 2}),
+			setB:     []portainer.TagID{1, 2},
 			expected: true,
 		},
 		{
 			name:     "setA contains parts of setB",
 			setA:     Set([]portainer.TagID{1, 2}),
-			setB:     Set([]portainer.TagID{1, 2, 3}),
+			setB:     []portainer.TagID{1, 2, 3},
 			expected: false,
 		},
 		{
 			name:     "setA does not contain setB",
 			setA:     Set([]portainer.TagID{1, 2}),
-			setB:     Set([]portainer.TagID{3, 4}),
+			setB:     []portainer.TagID{3, 4},
 			expected: false,
 		},
 		{
 			name:     "setA is empty and setB is not empty",
 			setA:     Set([]portainer.TagID{}),
-			setB:     Set([]portainer.TagID{1, 2}),
+			setB:     []portainer.TagID{1, 2},
 			expected: false,
 		},
 		{
 			name:     "setA is not empty and setB is empty",
 			setA:     Set([]portainer.TagID{1, 2}),
-			setB:     Set([]portainer.TagID{}),
+			setB:     []portainer.TagID{},
 			expected: false,
 		},
 		{
 			name:     "setA is empty and setB is empty",
 			setA:     Set([]portainer.TagID{}),
-			setB:     Set([]portainer.TagID{}),
+			setB:     []portainer.TagID{},
 			expected: false,
 		},
 	}
