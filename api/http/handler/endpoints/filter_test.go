@@ -155,7 +155,7 @@ func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
 	endpointIDs := []portainer.EndpointID{}
 
 	endpoints := []portainer.Endpoint{}
-	for i := range n {
+	for i := 0; i < n; i++ {
 		endpoints = append(endpoints, portainer.Endpoint{
 			ID:      portainer.EndpointID(i + 1),
 			Name:    "endpoint-" + strconv.Itoa(i+1),
@@ -170,7 +170,7 @@ func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
 	endpointGroups := []portainer.EndpointGroup{}
 
 	edgeGroups := []portainer.EdgeGroup{}
-	for i := range 1000 {
+	for i := 0; i < 1000; i++ {
 		edgeGroups = append(edgeGroups, portainer.EdgeGroup{
 			ID:           portainer.EdgeGroupID(i + 1),
 			Name:         "edge-group-" + strconv.Itoa(i+1),
@@ -182,7 +182,7 @@ func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
 	}
 
 	tagsMap := map[portainer.TagID]string{}
-	for i := range 10 {
+	for i := 0; i < 10; i++ {
 		tagsMap[portainer.TagID(i+1)] = "tag-" + strconv.Itoa(i+1)
 	}
 
@@ -190,7 +190,7 @@ func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
 
 	b.ResetTimer()
 
-	for range b.N {
+	for i := 0; i < b.N; i++ {
 		e := filterEndpointsBySearchCriteria(endpoints, endpointGroups, edgeGroups, tagsMap, searchString)
 		if len(e) != n {
 			b.FailNow()
