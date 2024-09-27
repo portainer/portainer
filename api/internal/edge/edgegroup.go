@@ -86,11 +86,9 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 		endpointTags = tag.Union(endpointTags, tag.Set(endpointGroup.TagIDs))
 	}
 
-	edgeGroupTags := tag.Set(edgeGroup.TagIDs)
-
 	if edgeGroup.PartialMatch {
-		return tag.PartialMatch(edgeGroupTags, endpointTags)
+		return tag.PartialMatch(edgeGroup.TagIDs, endpointTags)
 	}
 
-	return tag.FullMatch(edgeGroupTags, endpointTags)
+	return tag.FullMatch(edgeGroup.TagIDs, endpointTags)
 }

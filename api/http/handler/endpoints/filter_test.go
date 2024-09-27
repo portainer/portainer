@@ -149,7 +149,7 @@ func Test_Filter_excludeIDs(t *testing.T) {
 	runTests(tests, t, handler, environments)
 }
 
-func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
+func BenchmarkFilterEndpointsBySearchCriteria_PartialMatch(b *testing.B) {
 	n := 10000
 
 	endpointIDs := []portainer.EndpointID{}
@@ -178,6 +178,54 @@ func BenchmarkFilterEndpointsBySearchCriteria(b *testing.B) {
 			Dynamic:      true,
 			TagIDs:       []portainer.TagID{1, 2, 3},
 			PartialMatch: true,
+		})
+	}
+
+	tagsMap := map[portainer.TagID]string{}
+	for i := 0; i < 10; i++ {
+		tagsMap[portainer.TagID(i+1)] = "tag-" + strconv.Itoa(i+1)
+	}
+
+	searchString := "edge-group"
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		e := filterEndpointsBySearchCriteria(endpoints, endpointGroups, edgeGroups, tagsMap, searchString)
+		if len(e) != n {
+			b.FailNow()
+		}
+	}
+}
+
+func BenchmarkFilterEndpointsBySearchCriteria_FullMatch(b *testing.B) {
+	n := 10000
+
+	endpointIDs := []portainer.EndpointID{}
+
+	endpoints := []portainer.Endpoint{}
+	for i := 0; i < n; i++ {
+		endpoints = append(endpoints, portainer.Endpoint{
+			ID:      portainer.EndpointID(i + 1),
+			Name:    "endpoint-" + strconv.Itoa(i+1),
+			GroupID: 1,
+			TagIDs:  []portainer.TagID{1, 2, 3},
+			Type:    portainer.EdgeAgentOnDockerEnvironment,
+		})
+
+		endpointIDs = append(endpointIDs, portainer.EndpointID(i+1))
+	}
+
+	endpointGroups := []portainer.EndpointGroup{}
+
+	edgeGroups := []portainer.EdgeGroup{}
+	for i := 0; i < 1000; i++ {
+		edgeGroups = append(edgeGroups, portainer.EdgeGroup{
+			ID:        portainer.EdgeGroupID(i + 1),
+			Name:      "edge-group-" + strconv.Itoa(i+1),
+			Endpoints: append([]portainer.EndpointID{}, endpointIDs...),
+			Dynamic:   true,
+			TagIDs:    []portainer.TagID{1},
 		})
 	}
 

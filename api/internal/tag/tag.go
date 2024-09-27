@@ -16,24 +16,18 @@ func Set(tagIDs []portainer.TagID) tagSet {
 	return set
 }
 
-// IntersectionCount returns the element count of the intersection of the
-// provided sets
-func IntersectionCount(sets ...tagSet) int {
-	count := 0
-
-	if len(sets) == 0 {
-		return 0
+// IntersectionCount returns the element count of the intersection of the sets
+func IntersectionCount(setA, setB tagSet) int {
+	if len(setA) > len(setB) {
+		setA, setB = setB, setA
 	}
 
-outerLoop:
-	for tag := range sets[0] {
-		for _, set := range sets {
-			if _, ok := set[tag]; !ok {
-				continue outerLoop
-			}
-		}
+	count := 0
 
-		count++
+	for tag := range setA {
+		if _, ok := setB[tag]; ok {
+			count++
+		}
 	}
 
 	return count
@@ -53,12 +47,12 @@ func Union(sets ...tagSet) tagSet {
 }
 
 // Contains return true if setA contains setB
-func Contains(setA tagSet, setB tagSet) bool {
+func Contains(setA tagSet, setB []portainer.TagID) bool {
 	if len(setA) == 0 || len(setB) == 0 {
 		return false
 	}
 
-	for tag := range setB {
+	for _, tag := range setB {
 		if _, ok := setA[tag]; !ok {
 			return false
 		}
