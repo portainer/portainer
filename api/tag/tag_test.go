@@ -7,49 +7,49 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-func TestIntersection(t *testing.T) {
+func TestIntersectionCount(t *testing.T) {
 	cases := []struct {
 		name     string
 		setA     tagSet
 		setB     tagSet
-		expected tagSet
+		expected int
 	}{
 		{
 			name:     "positive numbers set intersection",
 			setA:     Set([]portainer.TagID{1, 2, 3, 4, 5}),
 			setB:     Set([]portainer.TagID{4, 5, 6, 7}),
-			expected: Set([]portainer.TagID{4, 5}),
+			expected: 2,
 		},
 		{
 			name:     "empty setA intersection",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
 			setB:     Set([]portainer.TagID{}),
-			expected: Set([]portainer.TagID{}),
+			expected: 0,
 		},
 		{
 			name:     "empty setB intersection",
 			setA:     Set([]portainer.TagID{}),
 			setB:     Set([]portainer.TagID{1, 2, 3}),
-			expected: Set([]portainer.TagID{}),
+			expected: 0,
 		},
 		{
 			name:     "no common elements sets intersection",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
 			setB:     Set([]portainer.TagID{4, 5, 6}),
-			expected: Set([]portainer.TagID{}),
+			expected: 0,
 		},
 		{
 			name:     "equal sets intersection",
 			setA:     Set([]portainer.TagID{1, 2, 3}),
 			setB:     Set([]portainer.TagID{1, 2, 3}),
-			expected: Set([]portainer.TagID{1, 2, 3}),
+			expected: 3,
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := Intersection(tc.setA, tc.setB)
-			if !reflect.DeepEqual(result, tc.expected) {
+			result := IntersectionCount(tc.setA, tc.setB)
+			if result != tc.expected {
 				t.Errorf("Expected %v, got %v", tc.expected, result)
 			}
 		})
