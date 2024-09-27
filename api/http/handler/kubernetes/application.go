@@ -12,21 +12,20 @@ import (
 )
 
 // @id GetApplicationsResources
-// @summary Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces
-// @description Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces
-// @description **Access policy**: authenticated
+// @summary Get the total resource requests and limits of all applications
+// @description Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
-// @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
 // @param node query string true "Node name"
 // @success 200 {object} models.K8sApplicationResource "Success"
-// @failure 400 "Invalid request"
-// @failure 401 "Unauthorized"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to retrieve the total resource requests and limits for all applications from the cluster."
 // @router /kubernetes/{id}/metrics/applications_resources [get]
 func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	node, err := request.RetrieveQueryParameter(r, "node", true)
@@ -66,18 +65,17 @@ func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.
 // @description **Access policy**: authenticated
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
-// @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
 // @param namespace query string true "Namespace name"
 // @param nodeName query string true "Node name"
 // @param withDependencies query boolean false "Include dependencies in the response"
 // @success 200 {array} models.K8sApplication "Success"
-// @failure 400 "Invalid request"
-// @failure 401 "Unauthorized"
-// @failure 403 "Permission denied"
-// @failure 404 "Environment(Endpoint) not found"
-// @failure 500 "Server error"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
+// @failure 500 "Server error occurred while attempting to retrieve the list of applications from the cluster."
 // @router /kubernetes/{id}/applications [get]
 func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	applications, err := handler.getAllKubernetesApplications(r)
@@ -88,7 +86,7 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 	return response.JSON(w, applications)
 }
 
-// @id getAllKubernetesApplicationsCount
+// @id GetAllKubernetesApplicationsCount
 // @summary Get Applications count
 // @description Get the count of Applications across all namespaces in the cluster. If the nodeName is provided, it will return the count of applications running on that node.
 // @description **Access policy**: Authenticated user.
@@ -98,7 +96,9 @@ func (handler *Handler) GetAllKubernetesApplications(w http.ResponseWriter, r *h
 // @param id path int true "Environment identifier"
 // @success 200 {integer} integer "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
-// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier."
 // @failure 500 "Server error occurred while attempting to retrieve the count of all applications from the cluster."
 // @router /kubernetes/{id}/applications/count [get]
 func (handler *Handler) getAllKubernetesApplicationsCount(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
