@@ -7,5 +7,5 @@ func FullMatch(edgeGroupTags tagSet, environmentTags tagSet) bool {
 
 // PartialMatch returns true if environment tags matches at least one edge group tag
 func PartialMatch(edgeGroupTags tagSet, environmentTags tagSet) bool {
-	return len(Intersection(edgeGroupTags, environmentTags)) != 0
+	return IntersectionCount(edgeGroupTags, environmentTags) != 0
 }

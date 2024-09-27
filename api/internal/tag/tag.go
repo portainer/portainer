@@ -1,50 +1,54 @@
 package tag
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+)
 
-type tagSet map[portainer.TagID]bool
+type tagSet map[portainer.TagID]struct{}
 
 // Set converts an array of ids to a set
 func Set(tagIDs []portainer.TagID) tagSet {
-	set := map[portainer.TagID]bool{}
+	set := map[portainer.TagID]struct{}{}
 	for _, tagID := range tagIDs {
-		set[tagID] = true
+		set[tagID] = struct{}{}
 	}
+
 	return set
 }
 
-// Intersection returns a set intersection of the provided sets
-func Intersection(sets ...tagSet) tagSet {
-	intersection := tagSet{}
+// IntersectionCount returns the element count of the intersection of the
+// provided sets
+func IntersectionCount(sets ...tagSet) int {
+	count := 0
+
 	if len(sets) == 0 {
-		return intersection
+		return 0
 	}
-	setA := sets[0]
-	for tag := range setA {
-		inAll := true
-		for _, setB := range sets {
-			if !setB[tag] {
-				inAll = false
-				break
+
+outerLoop:
+	for tag := range sets[0] {
+		for _, set := range sets {
+			if _, ok := set[tag]; !ok {
+				continue outerLoop
 			}
 		}
 
-		if inAll {
-			intersection[tag] = true
-		}
+		count++
 	}
 
-	return intersection
+	return count
 }
 
 // Union returns a set union of provided sets
 func Union(sets ...tagSet) tagSet {
 	union := tagSet{}
+
 	for _, set := range sets {
 		for tag := range set {
-			union[tag] = true
+			union[tag] = struct{}{}
 		}
 	}
+
 	return union
 }
 
@@ -55,10 +59,11 @@ func Contains(setA tagSet, setB tagSet) bool {
 	}
 
 	for tag := range setB {
-		if !setA[tag] {
+		if _, ok := setA[tag]; !ok {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -67,8 +72,8 @@ func Difference(setA tagSet, setB tagSet) tagSet {
 	set := tagSet{}
 
 	for tag := range setA {
-		if !setB[tag] {
-			set[tag] = true
+		if _, ok := setB[tag]; !ok {
+			set[tag] = struct{}{}
 		}
 	}
 
