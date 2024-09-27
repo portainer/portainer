@@ -214,6 +214,7 @@ type (
 		NodeCount               int               `json:"NodeCount"`
 		GpuUseAll               bool              `json:"GpuUseAll"`
 		GpuUseList              []string          `json:"GpuUseList"`
+		IsPodman                bool              `json:"IsPodman"`
 	}
 
 	// DockerContainerSnapshot is an extent of Docker's Container struct

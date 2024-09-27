@@ -267,6 +267,17 @@ func snapshotVersion(snapshot *portainer.DockerSnapshot, cli *client.Client) err
 	}
 
 	snapshot.SnapshotRaw.Version = version
-
+	snapshot.IsPodman = isPodman(version)
 	return nil
+}
+
+// isPodman checks if the version is for Podman by checking if any of the components contain "podman".
+// If it's podman, a component name should be "Podman Engine"
+func isPodman(version types.Version) bool {
+	for _, component := range version.Components {
+		if strings.Contains(strings.ToLower(component.Name), "podman") {
+			return true
+		}
+	}
+	return false
 }
