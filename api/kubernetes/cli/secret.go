@@ -13,6 +13,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	labelPortainerKubeConfigOwner   = "io.portainer.kubernetes.configuration.owner"
+	labelPortainerKubeConfigOwnerId = "io.portainer.kubernetes.configuration.owner.id"
+)
+
 // GetSecrets gets all the Secrets for a given namespace in a k8s endpoint.
 // if the user is an admin, all secrets in the current k8s environment(endpoint) are fetched using the getSecrets function.
 // otherwise, namespaces the non-admin user has access to will be used to filter the secrets based on the allowed namespaces.
@@ -81,12 +86,14 @@ func (kcl *KubeClient) GetSecret(namespace string, secretName string) (models.K8
 func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 	result := models.K8sSecret{
 		K8sConfiguration: models.K8sConfiguration{
-			UID:          string(secret.UID),
-			Name:         secret.Name,
-			Namespace:    secret.Namespace,
-			CreationDate: secret.CreationTimestamp.Time.UTC().Format(time.RFC3339),
-			Annotations:  secret.Annotations,
-			Labels:       secret.Labels,
+			UID:                  string(secret.UID),
+			Name:                 secret.Name,
+			Namespace:            secret.Namespace,
+			CreationDate:         secret.CreationTimestamp.Time.UTC().Format(time.RFC3339),
+			Annotations:          secret.Annotations,
+			Labels:               secret.Labels,
+			ConfigurationOwner:   secret.Labels[labelPortainerKubeConfigOwner],
+			ConfigurationOwnerId: secret.Labels[labelPortainerKubeConfigOwnerId],
 		},
 		SecretType: string(secret.Type),
 	}
@@ -125,7 +132,7 @@ func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret
 		}
 
 		if len(applicationConfigurationOwners) > 0 {
-			updatedSecret.ConfigurationOwners = applicationConfigurationOwners
+			updatedSecret.ConfigurationOwnerResources = applicationConfigurationOwners
 		}
 
 		updatedSecrets[index] = updatedSecret
@@ -161,7 +168,7 @@ func (kcl *KubeClient) CombineSecretWithApplications(secret models.K8sSecret) (m
 		}
 
 		if len(applicationConfigurationOwners) > 0 {
-			secret.ConfigurationOwners = applicationConfigurationOwners
+			secret.ConfigurationOwnerResources = applicationConfigurationOwners
 		}
 	}
 

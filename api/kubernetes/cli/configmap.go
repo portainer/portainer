@@ -77,12 +77,14 @@ func (kcl *KubeClient) GetConfigMap(namespace, configMapName string) (models.K8s
 func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfigMap {
 	result := models.K8sConfigMap{
 		K8sConfiguration: models.K8sConfiguration{
-			UID:          string(configMap.UID),
-			Name:         configMap.Name,
-			Namespace:    configMap.Namespace,
-			CreationDate: configMap.CreationTimestamp.Time.UTC().Format(time.RFC3339),
-			Annotations:  configMap.Annotations,
-			Labels:       configMap.Labels,
+			UID:                  string(configMap.UID),
+			Name:                 configMap.Name,
+			Namespace:            configMap.Namespace,
+			CreationDate:         configMap.CreationTimestamp.Time.UTC().Format(time.RFC3339),
+			Annotations:          configMap.Annotations,
+			Labels:               configMap.Labels,
+			ConfigurationOwner:   configMap.Labels[labelPortainerKubeConfigOwner],
+			ConfigurationOwnerId: configMap.Labels[labelPortainerKubeConfigOwnerId],
 		},
 	}
 
@@ -114,7 +116,7 @@ func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8s
 		}
 
 		if len(applicationConfigurationOwners) > 0 {
-			updatedConfigMap.ConfigurationOwners = applicationConfigurationOwners
+			updatedConfigMap.ConfigurationOwnerResources = applicationConfigurationOwners
 			updatedConfigMap.IsUsed = true
 		}
 
@@ -151,7 +153,7 @@ func (kcl *KubeClient) CombineConfigMapWithApplications(configMap models.K8sConf
 		}
 
 		if len(applicationConfigurationOwners) > 0 {
-			configMap.ConfigurationOwners = applicationConfigurationOwners
+			configMap.ConfigurationOwnerResources = applicationConfigurationOwners
 		}
 	}
 

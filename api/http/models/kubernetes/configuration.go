@@ -11,20 +11,22 @@ type (
 	}
 
 	K8sConfiguration struct {
-		UID                 string                   `json:"UID"`
-		Name                string                   `json:"Name"`
-		Namespace           string                   `json:"Namespace"`
-		CreationDate        string                   `json:"CreationDate"`
-		Annotations         map[string]string        `json:"Annotations"`
-		Data                map[string]string        `json:"Data"`
-		IsUsed              bool                     `json:"IsUsed"`
-		ConfigurationOwners []K8sConfigurationOwners `json:"ConfigurationOwners"`
-		Labels              map[string]string        `json:"Labels"`
+		UID                         string                          `json:"UID"`
+		Name                        string                          `json:"Name"`
+		Namespace                   string                          `json:"Namespace"`
+		CreationDate                string                          `json:"CreationDate"`
+		Annotations                 map[string]string               `json:"Annotations"`
+		Data                        map[string]string               `json:"Data"`
+		IsUsed                      bool                            `json:"IsUsed"`
+		Labels                      map[string]string               `json:"Labels"`
+		ConfigurationOwnerResources []K8sConfigurationOwnerResource `json:"ConfigurationOwners"`
+		ConfigurationOwner          string                          `json:"ConfigurationOwner"`
+		ConfigurationOwnerId        string                          `json:"ConfigurationOwnerId"`
 	}
 
-	K8sConfigurationOwners struct {
-		ConfigurationOwner   string `json:"ConfigurationOwner"`
-		K8sConfigurationKind string `json:"K8sConfigurationKind"`
-		ConfigurationOwnerId string `json:"ConfigurationOwnerId"`
+	K8sConfigurationOwnerResource struct {
+		Id           string `json:"Id"`
+		Name         string `json:"Name"`
+		ResourceKind string `json:"ResourceKind"`
 	}
 )
