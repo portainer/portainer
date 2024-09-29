@@ -769,6 +769,7 @@
         "GpuUseList": null,
         "HealthyContainerCount": 0,
         "ImageCount": 9,
+        "IsPodman": false,
         "NodeCount": 0,
         "RunningContainerCount": 5,
         "ServiceCount": 0,
