@@ -86,6 +86,7 @@ func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 			Namespace:    secret.Namespace,
 			CreationDate: secret.CreationTimestamp.Time.UTC().Format(time.RFC3339),
 			Annotations:  secret.Annotations,
+			Labels:       secret.Labels,
 		},
 		SecretType: string(secret.Type),
 	}

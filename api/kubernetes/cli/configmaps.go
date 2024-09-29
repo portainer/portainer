@@ -82,6 +82,7 @@ func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfig
 			Namespace:    configMap.Namespace,
 			CreationDate: configMap.CreationTimestamp.Time.UTC().Format(time.RFC3339),
 			Annotations:  configMap.Annotations,
+			Labels:       configMap.Labels,
 		},
 	}
 
