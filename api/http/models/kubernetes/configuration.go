@@ -19,6 +19,7 @@ type (
 		Data                map[string]string        `json:"Data"`
 		IsUsed              bool                     `json:"IsUsed"`
 		ConfigurationOwners []K8sConfigurationOwners `json:"ConfigurationOwners"`
+		Labels              map[string]string        `json:"Labels"`
 	}
 
 	K8sConfigurationOwners struct {
