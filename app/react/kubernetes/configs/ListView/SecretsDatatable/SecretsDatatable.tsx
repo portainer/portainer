@@ -43,18 +43,17 @@ export function SecretsDatatable() {
   });
   const secretsQuery = useSecretsForCluster(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
+    select: (secrets) =>
+      secrets.filter(
+        (secret) =>
+          (canAccessSystemResources && tableState.showSystemResources) ||
+          !isSystemNamespace(secret.Namespace, namespacesQuery.data)
+      ),
     isUsed: true,
   });
-  const secrets = secretsQuery.data ?? [];
-
-  const filteredSecrets = tableState.showSystemResources
-    ? secrets
-    : secrets.filter(
-        (secret) => !isSystemNamespace(secret.Namespace, namespacesQuery.data)
-      );
 
   const secretRowData = useSecretRowData(
-    filteredSecrets ?? [],
+    secretsQuery.data ?? [],
     namespacesQuery.data
   );
 
@@ -69,7 +68,6 @@ export function SecretsDatatable() {
       titleIcon={Lock}
       getRowId={(row) => row.UID ?? ''}
       isRowSelectable={({ original: secret }) =>
-        canAccessSystemResources &&
         !isSystemNamespace(secret.Namespace, namespacesQuery.data)
       }
       disableSelect={readOnly}

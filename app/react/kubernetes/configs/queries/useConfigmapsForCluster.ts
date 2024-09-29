@@ -9,11 +9,14 @@ import { Configuration } from '../types';
 import { configMapQueryKeys } from './query-keys';
 import { ConfigMapQueryParams } from './types';
 
-export function useConfigMapsForCluster(
+export function useConfigMapsForCluster<TData = Configuration[]>(
   environmentId: EnvironmentId,
-  options?: { autoRefreshRate?: number } & ConfigMapQueryParams
+  options?: {
+    autoRefreshRate?: number;
+    select?: (data: Configuration[]) => TData;
+  } & ConfigMapQueryParams
 ) {
-  const { autoRefreshRate, ...params } = options ?? {};
+  const { autoRefreshRate, select, ...params } = options ?? {};
   return useQuery(
     configMapQueryKeys.configMapsForCluster(environmentId, params),
     () =>
@@ -26,6 +29,7 @@ export function useConfigMapsForCluster(
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
+      select,
     }
   );
 }

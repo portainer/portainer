@@ -9,11 +9,14 @@ import { Configuration } from '../types';
 import { SecretQueryParams } from './types';
 import { secretQueryKeys } from './query-keys';
 
-export function useSecretsForCluster(
+export function useSecretsForCluster<TData = Configuration[]>(
   environmentId: EnvironmentId,
-  options?: { autoRefreshRate?: number } & SecretQueryParams
+  options?: {
+    autoRefreshRate?: number;
+    select?: (data: Configuration[]) => TData;
+  } & SecretQueryParams
 ) {
-  const { autoRefreshRate, ...params } = options ?? {};
+  const { autoRefreshRate, select, ...params } = options ?? {};
   return useQuery(
     secretQueryKeys.secretsForCluster(environmentId, params),
     () =>
@@ -26,6 +29,7 @@ export function useSecretsForCluster(
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
+      select,
     }
   );
 }

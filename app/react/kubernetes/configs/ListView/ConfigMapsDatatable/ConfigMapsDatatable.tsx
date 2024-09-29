@@ -42,20 +42,17 @@ export function ConfigMapsDatatable() {
   });
   const configMapsQuery = useConfigMapsForCluster(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
+    select: (configMaps) =>
+      configMaps.filter(
+        (configmap) =>
+          tableState.showSystemResources ||
+          !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
+      ),
     isUsed: true,
   });
 
-  const configMaps = Object.values(configMapsQuery.data ?? []);
-
-  const filteredConfigMaps = tableState.showSystemResources
-    ? configMaps
-    : configMaps.filter(
-        (configmap) =>
-          !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
-      );
-
   const configMapRowData = useConfigMapRowData(
-    filteredConfigMaps,
+    configMapsQuery.data ?? [],
     namespacesQuery.data
   );
 
