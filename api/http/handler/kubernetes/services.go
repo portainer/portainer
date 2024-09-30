@@ -84,7 +84,7 @@ func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sS
 		return nil, httperror.InternalServerError("unable to retrieve services from the Kubernetes for a cluster level user. Error: ", err)
 	}
 
-	if withApplications {
+	if withApplications && len(services) > 0 {
 		servicesWithApplications, err := cli.CombineServicesWithApplications(services)
 		if err != nil {
 			log.Error().Err(err).Str("context", "GetAllKubernetesServices").Msg("Unable to combine services with applications")

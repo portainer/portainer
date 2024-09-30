@@ -172,10 +172,8 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 // it then combines the service with the application
 // finally, it returns a list of K8sServiceInfo objects
 func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
-	updatedServices := make([]models.K8sServiceInfo, len(services))
-
-	hasSelectors := containsServiceWithSelector(services)
-	if hasSelectors {
+	if containsServiceWithSelector(services) {
+		updatedServices := make([]models.K8sServiceInfo, len(services))
 		pods, replicaSets, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
@@ -195,9 +193,11 @@ func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServ
 
 			updatedServices[index] = updatedService
 		}
+
+		return updatedServices, nil
 	}
 
-	return updatedServices, nil
+	return services, nil
 }
 
 // containsServiceWithSelector checks if a list of services contains a service with a selector
