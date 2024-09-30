@@ -56,7 +56,7 @@ export function ApplicationsDatatable({
   const hasWriteAuthQuery = useAuthorizations(
     'K8sApplicationsW',
     undefined,
-    true
+    false
   );
 
   const { setShowSystemResources } = tableState;
