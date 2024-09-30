@@ -219,12 +219,30 @@ func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) err
 		return err
 	}
 
+	if err := validateContainerEngineCompatibility(endpoint, dockerSnapshot); err != nil {
+		return err
+	}
+
 	if dockerSnapshot != nil {
 		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Docker: dockerSnapshot}
 
 		return service.dataStore.Snapshot().Create(snapshot)
 	}
 
+	return nil
+}
+
+func validateContainerEngineCompatibility(endpoint *portainer.Endpoint, dockerSnapshot *portainer.DockerSnapshot) error {
+	if endpoint.ContainerEngine == portainer.ContainerEngineDocker && dockerSnapshot.IsPodman {
+		err := errors.New("the Docker environment option doesn't support Podman environments. Please select the Podman option instead.")
+		log.Error().Err(err).Str("endpoint", endpoint.Name).Msg(err.Error())
+		return err
+	}
+	if endpoint.ContainerEngine == portainer.ContainerEnginePodman && !dockerSnapshot.IsPodman {
+		err := errors.New("the Podman environment option doesn't support Docker environments. Please select the Docker option instead.")
+		log.Error().Err(err).Str("endpoint", endpoint.Name).Msg(err.Error())
+		return err
+	}
 	return nil
 }
 
