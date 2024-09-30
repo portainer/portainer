@@ -1,5 +1,4 @@
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
-import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
 
 import { updateAxiosAdapter } from '@/portainer/services/axios';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
@@ -96,13 +95,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           }
 
           try {
-            const status = await checkEndpointStatus(
-              endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
-                ? KubernetesHealthService.ping(endpoint.Id)
-                : // use selfsubject access review to check if we can connect to the kubernetes environment
-                  // because it gets a fast response, and is accessible to all users
-                  getSelfSubjectAccessReview(endpoint.Id, 'default')
-            );
+            const status = await checkEndpointStatus(endpoint);
 
             if (endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
               await updateEndpointStatus(endpoint, status);
@@ -131,9 +124,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             return false;
           }
 
-          async function checkEndpointStatus(promise) {
+          async function checkEndpointStatus(endpoint) {
             try {
-              await promise;
+              await KubernetesHealthService.ping(endpoint.Id);
               return EnvironmentStatus.Up;
             } catch (e) {
               return EnvironmentStatus.Down;
