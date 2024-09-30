@@ -45,7 +45,7 @@ export function ConfigMapsDatatable() {
     select: (configMaps) =>
       configMaps.filter(
         (configmap) =>
-          tableState.showSystemResources ||
+          (canAccessSystemResources && tableState.showSystemResources) ||
           !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
       ),
     isUsed: true,
