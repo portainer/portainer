@@ -30,7 +30,7 @@ export type Service = {
   Annotations?: Record<string, string>;
   Labels?: Record<string, string>;
   Type: ServiceType;
-  Ports: Array<ServicePort>;
+  Ports?: Array<ServicePort>;
   Selector?: Record<string, string>;
   ClusterIPs?: Array<string>;
   IngressStatus?: Array<IngressStatus>;
