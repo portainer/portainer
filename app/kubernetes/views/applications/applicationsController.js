@@ -5,7 +5,7 @@ import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
 import { getStacksFromApplications } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable/getStacksFromApplications';
 import { getApplications } from '@/react/kubernetes/applications/application.queries.ts';
-
+import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 class KubernetesApplicationsController {
   /* @ngInject */
   constructor(
@@ -156,12 +156,12 @@ class KubernetesApplicationsController {
     this.deploymentOptions = await getDeploymentOptions();
 
     this.user = this.Authentication.getUserDetails();
-    this.state.namespaces = await this.KubernetesNamespaceService.get();
+    this.state.namespaces = await getNamespaces(this.endpoint.Id);
 
     const savedNamespace = this.LocalStorage.getNamespaceFilter(this.endpoint.Id, this.user.ID); // could be null if not found, and '' if all namepsaces is selected
     const preferredNamespace = savedNamespace === null ? 'default' : savedNamespace;
 
-    this.state.namespaces = this.state.namespaces.filter((n) => n.Status === 'Active');
+    this.state.namespaces = this.state.namespaces.filter((n) => n.Status.phase === 'Active');
     this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
     // set all namespaces ('') if there are no namespaces, or if all namespaces is selected
     if (!this.state.namespaces.length || preferredNamespace === '') {
