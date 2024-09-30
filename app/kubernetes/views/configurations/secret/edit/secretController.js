@@ -88,11 +88,7 @@ class KubernetesSecretController {
   async updateConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
-      if (
-        this.formValues.Kind !== this.configuration.Kind ||
-        this.formValues.ResourcePool !== this.configuration.Namespace ||
-        this.formValues.Name !== this.configuration.Name
-      ) {
+      if (this.formValues.Kind !== this.configuration.Kind || this.formValues.ResourcePool !== this.configuration.Namespace || this.formValues.Name !== this.configuration.Name) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
         this.Notifications.success('Success', `Secret successfully updated`);
