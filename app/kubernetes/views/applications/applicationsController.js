@@ -86,7 +86,6 @@ class KubernetesApplicationsController {
         if (application.ApplicationType === KubernetesApplicationTypes.Helm) {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
-          await this.KubernetesApplicationService.delete(application);
           if (application.Metadata.labels && application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
             // remove stack if no app left in the stack
             const appsInNamespace = await getApplications(this.endpoint.Id, { namespace: application.ResourcePool, withDependencies: false });
@@ -96,6 +95,7 @@ class KubernetesApplicationsController {
               await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
             }
           }
+          await this.KubernetesApplicationService.delete(application);
         }
         this.Notifications.success('Application successfully removed', application.Name);
       } catch (err) {
