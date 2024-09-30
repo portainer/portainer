@@ -45,7 +45,7 @@ class KubernetesCreateSecretController {
   async onResourcePoolSelectionChangeAsync() {
     try {
       this.onChangeName();
-      this.availableServiceAccounts = await getServiceAccounts(this.environmentId, this.formValues.ResourcePool.Namespace.Name);
+      this.availableServiceAccounts = await getServiceAccounts(this.environmentId, this.formValues.ResourcePool.Name);
       this.formValues.ServiceAccountName = this.availableServiceAccounts.length > 0 ? this.availableServiceAccounts[0].metadata.name : '';
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load service accounts');
