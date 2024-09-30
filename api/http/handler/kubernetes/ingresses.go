@@ -163,6 +163,12 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
+	if err != nil {
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to create Kubernetes client")
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
+	}
+
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
 		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace from request")
