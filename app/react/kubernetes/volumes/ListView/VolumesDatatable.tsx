@@ -60,6 +60,7 @@ export function VolumesDatatable() {
       settingsManager={tableState}
       title="Volumes"
       titleIcon={Database}
+      getRowId={(row) => row.PersistentVolumeClaim.Name}
       isRowSelectable={({ original: volume }) =>
         hasWriteAuth &&
         !(
