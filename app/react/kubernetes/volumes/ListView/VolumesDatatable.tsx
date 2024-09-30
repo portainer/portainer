@@ -1,6 +1,6 @@
 import { Database } from 'lucide-react';
 
-import { useAuthorizations } from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -33,7 +33,11 @@ export function VolumesDatatable() {
     })
   );
 
-  const hasWriteAuth = useAuthorizations('K8sVolumesW', undefined, true);
+  const { authorized: hasWriteAuth } = useAuthorizations(
+    'K8sVolumesW',
+    undefined,
+    true
+  );
 
   const envId = useEnvironmentId();
   const deleteVolumesMutation = useDeleteVolumes(envId);
@@ -61,15 +65,13 @@ export function VolumesDatatable() {
       title="Volumes"
       titleIcon={Database}
       getRowId={(row) => row.PersistentVolumeClaim.Name}
+      disableSelect={!hasWriteAuth}
       isRowSelectable={({ original: volume }) =>
-        hasWriteAuth &&
-        !(
-          isSystemNamespace(volume.ResourcePool.Namespace.Name, namespaces) &&
-          !KubernetesVolumeHelper.isUsed(volume)
-        )
+        !isSystemNamespace(volume.ResourcePool.Namespace.Name, namespaces) &&
+        !KubernetesVolumeHelper.isUsed(volume)
       }
       renderTableActions={(selectedItems) => (
-        <>
+        <Authorized authorizations="K8sVolumesW">
           <DeleteButton
             confirmMessage="Do you want to remove the selected volume(s)?"
             onConfirmed={() => deleteVolumesMutation.mutate(selectedItems)}
@@ -78,7 +80,7 @@ export function VolumesDatatable() {
             data-cy="k8s-volumes-delete-button"
           />
           <CreateFromManifestButton data-cy="k8s-volumes-deploy-button" />
-        </>
+        </Authorized>
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
