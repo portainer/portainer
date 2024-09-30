@@ -61,7 +61,7 @@ func (handler *Handler) getAllKubernetesServicesCount(w http.ResponseWriter, r *
 }
 
 func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sServiceInfo, *httperror.HandlerError) {
-	withApplications, err := request.RetrieveBooleanQueryParameter(r, "withApplications", false)
+	withApplications, err := request.RetrieveBooleanQueryParameter(r, "withApplications", true)
 	if err != nil {
 		log.Error().Err(err).Str("context", "GetAllKubernetesServices").Msg("Unable to retrieve withApplications identifier")
 		return nil, httperror.BadRequest("unable to retrieve withApplications query parameter. Error: ", err)
