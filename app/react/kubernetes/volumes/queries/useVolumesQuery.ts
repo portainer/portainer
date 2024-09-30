@@ -100,40 +100,36 @@ function convertToStorageClassViewModels(
   volumes: K8sVolumeInfo[]
 ): StorageClassViewModel[] {
   const volumesModels = convertToVolumeModel(volumes);
-  const storageClassMap = new Map<string, StorageClassViewModel>();
 
-  volumes.forEach((volume) => {
-    const storageClassName = volume.storageClass.name || 'none';
-
-    const defaultStorageClass = {
-      Name: storageClassName,
-      Provisioner: volume.storageClass.provisioner,
-      ReclaimPolicy: volume.storageClass.reclaimPolicy ?? '',
-      AllowVolumeExpansion: volume.storageClass.allowVolumeExpansion || false,
+  // Use reduce to create a new Map
+  const storageClassMap = volumesModels.reduce((acc, volume) => {
+    const pvcStorageClass = volume.PersistentVolumeClaim.storageClass;
+    const storageClassName = pvcStorageClass?.Name || 'none';
+    const defaultStorageClass: StorageClassViewModel = {
+      Name: pvcStorageClass?.Name || 'none',
+      Provisioner: pvcStorageClass?.Provisioner ?? '',
+      ReclaimPolicy: pvcStorageClass?.ReclaimPolicy ?? '',
+      AllowVolumeExpansion: pvcStorageClass?.AllowVolumeExpansion || false,
       size: 0,
       Volumes: [],
     };
 
-    const storageClassViewModel =
-      storageClassMap.get(storageClassName) ?? defaultStorageClass;
+    const existingStorageClass =
+      acc.get(storageClassName) ?? defaultStorageClass;
 
-    storageClassViewModel.size += volume.persistentVolumeClaim.storage || 0;
-    storageClassViewModel.Volumes.push(
-      ...volumesModels.filter(
-        (v) => v.PersistentVolumeClaim.storageClass?.Name === storageClassName
-      )
-    );
+    // Create a new StorageClassViewModel with updated values
+    const updatedStorageClass = {
+      ...existingStorageClass,
+      size:
+        existingStorageClass.size + (volume.PersistentVolumeClaim.Storage || 0),
+      Volumes: [...existingStorageClass.Volumes, volume],
+    };
 
-    storageClassMap.set(storageClassName, storageClassViewModel);
-  });
+    // Return a new Map with the updated StorageClassViewModel
+    return new Map(acc).set(storageClassName, updatedStorageClass);
+  }, new Map<string, StorageClassViewModel>());
 
-  storageClassMap.forEach((value, key) => {
-    storageClassMap.set(key, {
-      ...value,
-      size: value.size,
-    });
-  });
-
+  // Convert the Map values to an array
   return Array.from(storageClassMap.values());
 }
 
