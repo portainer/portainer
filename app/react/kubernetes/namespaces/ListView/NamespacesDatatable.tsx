@@ -65,10 +65,9 @@ export function NamespacesDatatable() {
       title="Namespaces"
       titleIcon={Layers}
       getRowId={(item) => item.Id}
+      disableSelect={!hasWriteAuthQuery.authorized}
       isRowSelectable={({ original: item }) =>
-        hasWriteAuthQuery.authorized &&
-        !item.IsSystem &&
-        !isDefaultNamespace(item.Name)
+        !item.IsSystem && !isDefaultNamespace(item.Name)
       }
       renderTableActions={(selectedItems) => (
         <TableActions
