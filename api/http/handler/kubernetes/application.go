@@ -34,10 +34,10 @@ func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.
 		return httperror.BadRequest("Unable to parse the node query parameter", err)
 	}
 
-	cli, httpErr := handler.getProxyKubeClient(r)
+	cli, httpErr := handler.prepareKubeClient(r)
 	if httpErr != nil {
-		log.Error().Err(httpErr).Str("context", "getApplicationsResources").Msg("Unable to get a Kubernetes client for the user")
-		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
+		log.Error().Err(httpErr).Str("context", "getApplicationsResources").Msg("Unable to prepare kube client")
+		return httperror.InternalServerError("Unable to prepare kube client", httpErr)
 	}
 
 	applicationsResources, err := cli.GetApplicationsResource("", node)
