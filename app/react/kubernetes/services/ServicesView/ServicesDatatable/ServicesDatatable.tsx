@@ -59,7 +59,7 @@ export function ServicesDatatable() {
   const filteredServices = services?.filter(
     (service) =>
       (canAccessSystemResources && tableState.showSystemResources) ||
-      !namespaces?.[service.Namespace].IsSystem
+      !namespaces?.[service.Namespace]?.IsSystem
   );
 
   const servicesWithIsSystem = useServicesRowData(
@@ -77,7 +77,7 @@ export function ServicesDatatable() {
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
-      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace]?.IsSystem}
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
@@ -109,7 +109,9 @@ function useServicesRowData(
     () =>
       services.map((service) => ({
         ...service,
-        IsSystem: namespaces ? namespaces?.[service.Namespace].IsSystem : false,
+        IsSystem: namespaces
+          ? namespaces?.[service.Namespace]?.IsSystem
+          : false,
       })),
     [services, namespaces]
   );
