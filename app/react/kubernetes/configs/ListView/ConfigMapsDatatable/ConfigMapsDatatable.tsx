@@ -67,7 +67,6 @@ export function ConfigMapsDatatable() {
       titleIcon={FileCode}
       getRowId={(row) => row.UID ?? ''}
       isRowSelectable={({ original: configmap }) =>
-        canAccessSystemResources &&
         !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
       }
       disableSelect={readOnly}
