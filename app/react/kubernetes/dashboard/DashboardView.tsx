@@ -9,7 +9,6 @@ import { DashboardItem } from '@@/DashboardItem/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
 
 import { EnvironmentInfo } from './EnvironmentInfo';
-// import { useGetDashboardQuery } from './queries/getDashboardQuery';
 import { useGetApplicationsCountQuery } from './queries/getApplicationsCountQuery';
 import { useGetConfigMapsCountQuery } from './queries/getConfigMapsCountQuery';
 import { useGetIngressesCountQuery } from './queries/getIngressesCountQuery';
