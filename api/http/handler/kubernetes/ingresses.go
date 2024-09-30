@@ -175,11 +175,6 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
-	cli, handlerErr := handler.getProxyKubeClient(r)
-	if handlerErr != nil {
-		return handlerErr
-	}
-
 	currentControllers, err := cli.GetIngressControllers()
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
