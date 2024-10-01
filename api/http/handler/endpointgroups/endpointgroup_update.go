@@ -98,8 +98,8 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		payloadTagSet := tag.Set(payload.TagIDs)
 		endpointGroupTagSet := tag.Set((endpointGroup.TagIDs))
 		union := tag.Union(payloadTagSet, endpointGroupTagSet)
-		intersection := tag.Intersection(payloadTagSet, endpointGroupTagSet)
-		tagsChanged = len(union) > len(intersection)
+		intersection := tag.IntersectionCount(payloadTagSet, endpointGroupTagSet)
+		tagsChanged = len(union) > intersection
 
 		if tagsChanged {
 			removeTags := tag.Difference(endpointGroupTagSet, payloadTagSet)

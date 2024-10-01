@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"strconv"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -146,6 +147,103 @@ func Test_Filter_excludeIDs(t *testing.T) {
 	}
 
 	runTests(tests, t, handler, environments)
+}
+
+func BenchmarkFilterEndpointsBySearchCriteria_PartialMatch(b *testing.B) {
+	n := 10000
+
+	endpointIDs := []portainer.EndpointID{}
+
+	endpoints := []portainer.Endpoint{}
+	for i := range n {
+		endpoints = append(endpoints, portainer.Endpoint{
+			ID:      portainer.EndpointID(i + 1),
+			Name:    "endpoint-" + strconv.Itoa(i+1),
+			GroupID: 1,
+			TagIDs:  []portainer.TagID{1},
+			Type:    portainer.EdgeAgentOnDockerEnvironment,
+		})
+
+		endpointIDs = append(endpointIDs, portainer.EndpointID(i+1))
+	}
+
+	endpointGroups := []portainer.EndpointGroup{}
+
+	edgeGroups := []portainer.EdgeGroup{}
+	for i := range 1000 {
+		edgeGroups = append(edgeGroups, portainer.EdgeGroup{
+			ID:           portainer.EdgeGroupID(i + 1),
+			Name:         "edge-group-" + strconv.Itoa(i+1),
+			Endpoints:    append([]portainer.EndpointID{}, endpointIDs...),
+			Dynamic:      true,
+			TagIDs:       []portainer.TagID{1, 2, 3},
+			PartialMatch: true,
+		})
+	}
+
+	tagsMap := map[portainer.TagID]string{}
+	for i := range 10 {
+		tagsMap[portainer.TagID(i+1)] = "tag-" + strconv.Itoa(i+1)
+	}
+
+	searchString := "edge-group"
+
+	b.ResetTimer()
+
+	for range b.N {
+		e := filterEndpointsBySearchCriteria(endpoints, endpointGroups, edgeGroups, tagsMap, searchString)
+		if len(e) != n {
+			b.FailNow()
+		}
+	}
+}
+
+func BenchmarkFilterEndpointsBySearchCriteria_FullMatch(b *testing.B) {
+	n := 10000
+
+	endpointIDs := []portainer.EndpointID{}
+
+	endpoints := []portainer.Endpoint{}
+	for i := range n {
+		endpoints = append(endpoints, portainer.Endpoint{
+			ID:      portainer.EndpointID(i + 1),
+			Name:    "endpoint-" + strconv.Itoa(i+1),
+			GroupID: 1,
+			TagIDs:  []portainer.TagID{1, 2, 3},
+			Type:    portainer.EdgeAgentOnDockerEnvironment,
+		})
+
+		endpointIDs = append(endpointIDs, portainer.EndpointID(i+1))
+	}
+
+	endpointGroups := []portainer.EndpointGroup{}
+
+	edgeGroups := []portainer.EdgeGroup{}
+	for i := range 1000 {
+		edgeGroups = append(edgeGroups, portainer.EdgeGroup{
+			ID:        portainer.EdgeGroupID(i + 1),
+			Name:      "edge-group-" + strconv.Itoa(i+1),
+			Endpoints: append([]portainer.EndpointID{}, endpointIDs...),
+			Dynamic:   true,
+			TagIDs:    []portainer.TagID{1},
+		})
+	}
+
+	tagsMap := map[portainer.TagID]string{}
+	for i := range 10 {
+		tagsMap[portainer.TagID(i+1)] = "tag-" + strconv.Itoa(i+1)
+	}
+
+	searchString := "edge-group"
+
+	b.ResetTimer()
+
+	for range b.N {
+		e := filterEndpointsBySearchCriteria(endpoints, endpointGroups, edgeGroups, tagsMap, searchString)
+		if len(e) != n {
+			b.FailNow()
+		}
+	}
 }
 
 func runTests(tests []filterTest, t *testing.T, handler *Handler, endpoints []portainer.Endpoint) {
