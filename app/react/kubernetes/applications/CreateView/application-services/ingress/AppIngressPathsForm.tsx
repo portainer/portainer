@@ -39,10 +39,7 @@ export function AppIngressPathsForm({
   isEditMode,
 }: Props) {
   const environmentId = useEnvironmentId();
-  const ingressesQuery = useIngresses(
-    environmentId,
-    namespace ? [namespace] : undefined
-  );
+  const ingressesQuery = useIngresses(environmentId);
   const { data: ingresses } = ingressesQuery;
   const { data: ingressControllers, ...ingressControllersQuery } =
     useIngressControllers(environmentId, namespace);

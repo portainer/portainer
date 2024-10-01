@@ -1,16 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { compact } from 'lodash';
 import { ServiceList } from 'kubernetes-types/core/v1';
 
-import { withError } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { isFulfilled } from '@/portainer/helpers/promise-utils';
-import {
-  Service,
-  NodeMetrics,
-  NodeMetric,
-} from '@/react/kubernetes/services/types';
+import { Service } from '@/react/kubernetes/services/types';
 
 import { parseKubernetesAxiosError } from '../axiosError';
 
@@ -19,32 +13,28 @@ export const queryKeys = {
     ['environments', environmentId, 'kubernetes', 'services'] as const,
 };
 
-export function useServicesForCluster(
+/**
+ * Custom hook to fetch cluster services for a specific environment.
+ *
+ * @param environmentId - The ID of the environment.
+ * @param options - Additional options for fetching services.
+ * @param options.autoRefreshRate - The auto refresh rate for refetching services.
+ * @param options.withApplications - Whether to lookup applications for the services.
+ *
+ * @returns The result of the query.
+ */
+export function useClusterServices(
   environmentId: EnvironmentId,
-  namespaceNames?: string[],
-  options?: { autoRefreshRate?: number; lookupApplications?: boolean }
+  options?: { autoRefreshRate?: number; withApplications?: boolean }
 ) {
   return useQuery(
     queryKeys.clusterServices(environmentId),
-    async () => {
-      if (!namespaceNames?.length) {
-        return [];
-      }
-      const settledServicesPromise = await Promise.allSettled(
-        namespaceNames.map((namespace) =>
-          getServices(environmentId, namespace, options?.lookupApplications)
-        )
-      );
-      return compact(
-        settledServicesPromise.filter(isFulfilled).flatMap((i) => i.value)
-      );
-    },
+    async () => getClusterServices(environmentId, options?.withApplications),
     {
-      ...withError('Unable to get services.'),
+      ...withGlobalError('Unable to get services.'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
-      enabled: !!namespaceNames?.length,
     }
   );
 }
@@ -68,7 +58,7 @@ export function useServicesQuery<T extends Service | string = Service>(
       return services;
     },
     {
-      ...withError('Unable to retrieve services.'),
+      ...withGlobalError('Unable to retrieve services.'),
       enabled: !!serviceNames?.length,
     }
   );
@@ -79,7 +69,7 @@ export function useMutationDeleteServices(environmentId: EnvironmentId) {
   return useMutation(deleteServices, {
     onSuccess: () =>
       queryClient.invalidateQueries(queryKeys.clusterServices(environmentId)),
-    ...withError('Unable to delete service(s)'),
+    ...withGlobalError('Unable to delete service(s)'),
   });
 }
 
@@ -87,14 +77,33 @@ export function useMutationDeleteServices(environmentId: EnvironmentId) {
 export async function getServices(
   environmentId: EnvironmentId,
   namespace: string,
-  lookupApplications?: boolean
+  withApplications?: boolean
 ) {
   try {
     const { data: services } = await axios.get<Array<Service>>(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`,
       {
         params: {
-          lookupapplications: lookupApplications,
+          withApplications,
+        },
+      }
+    );
+    return services;
+  } catch (e) {
+    throw parseAxiosError(e, 'Unable to retrieve services');
+  }
+}
+
+export async function getClusterServices(
+  environmentId: EnvironmentId,
+  withApplications?: boolean
+) {
+  try {
+    const { data: services } = await axios.get<Array<Service>>(
+      `kubernetes/${environmentId}/services`,
+      {
+        params: {
+          withApplications,
         },
       }
     );
@@ -158,70 +167,6 @@ export async function deleteServices({
       data
     );
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to delete service(s)');
-  }
-}
-
-export async function getMetricsForAllNodes(environmentId: EnvironmentId) {
-  try {
-    const { data: nodes } = await axios.get<NodeMetrics>(
-      `kubernetes/${environmentId}/metrics/nodes`,
-      {}
-    );
-    return nodes;
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve metrics for all nodes'
-    );
-  }
-}
-
-export async function getMetricsForNode(
-  environmentId: EnvironmentId,
-  nodeName: string
-) {
-  try {
-    const { data: node } = await axios.get<NodeMetric>(
-      `kubernetes/${environmentId}/metrics/nodes/${nodeName}`,
-      {}
-    );
-    return node;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for node');
-  }
-}
-
-export async function getMetricsForAllPods(
-  environmentId: EnvironmentId,
-  namespace: string
-) {
-  try {
-    const { data: pods } = await axios.get(
-      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}`,
-      {}
-    );
-    return pods;
-  } catch (e) {
-    throw parseAxiosError(
-      e as Error,
-      'Unable to retrieve metrics for all pods'
-    );
-  }
-}
-
-export async function getMetricsForPod(
-  environmentId: EnvironmentId,
-  namespace: string,
-  podName: string
-) {
-  try {
-    const { data: pod } = await axios.get(
-      `kubernetes/${environmentId}/metrics/pods/namespace/${namespace}/${podName}`,
-      {}
-    );
-    return pod;
-  } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve metrics for pod');
+    throw parseAxiosError(e, 'Unable to delete service(s)');
   }
 }

@@ -128,7 +128,7 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 		return true, nil
 	}
 
-	kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	kcl, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return false, errors.Wrap(err, "unable to retrieve kubernetes client")
 	}
@@ -187,7 +187,7 @@ func (handler *Handler) filterKubernetesRegistriesByUserRole(r *http.Request, re
 }
 
 func (handler *Handler) userNamespaces(endpoint *portainer.Endpoint, user *portainer.User) ([]string, error) {
-	kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	kcl, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}

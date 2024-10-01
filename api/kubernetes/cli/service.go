@@ -2,99 +2,135 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/rs/zerolog/log"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// GetServices gets all the services for a given namespace in a k8s endpoint.
-func (kcl *KubeClient) GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error) {
-	client := kcl.cli.CoreV1().Services(namespace)
+// GetServices gets all the services for either at the cluster level or a given namespace in a k8s endpoint.
+// It returns a list of K8sServiceInfo objects.
+func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, error) {
+	if kcl.IsKubeAdmin {
+		return kcl.fetchServices(namespace)
+	}
+	return kcl.fetchServicesForNonAdmin(namespace)
+}
 
-	services, err := client.List(context.Background(), metav1.ListOptions{})
+// fetchServicesForNonAdmin gets all the services for either at the cluster level or a given namespace in a k8s endpoint.
+// the namespace will be coming from NonAdminNamespaces as non-admin users are restricted to certain namespaces.
+// it returns a list of K8sServiceInfo objects.
+func (kcl *KubeClient) fetchServicesForNonAdmin(namespace string) ([]models.K8sServiceInfo, error) {
+	log.Debug().Msgf("Fetching services for non-admin user: %v", kcl.NonAdminNamespaces)
+
+	if len(kcl.NonAdminNamespaces) == 0 {
+		return nil, nil
+	}
+
+	services, err := kcl.fetchServices(namespace)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []models.K8sServiceInfo
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
+	results := make([]models.K8sServiceInfo, 0)
+	for _, service := range services {
+		if _, ok := nonAdminNamespaceSet[service.Namespace]; ok {
+			results = append(results, service)
+		}
+	}
 
+	return results, nil
+}
+
+// fetchServices gets the services in a given namespace in a k8s endpoint.
+// It returns a list of K8sServiceInfo objects.
+func (kcl *KubeClient) fetchServices(namespace string) ([]models.K8sServiceInfo, error) {
+	services, err := kcl.cli.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]models.K8sServiceInfo, 0)
 	for _, service := range services.Items {
-		servicePorts := make([]models.K8sServicePort, 0)
-		for _, port := range service.Spec.Ports {
-			servicePorts = append(servicePorts, models.K8sServicePort{
-				Name:       port.Name,
-				NodePort:   int(port.NodePort),
-				Port:       int(port.Port),
-				Protocol:   string(port.Protocol),
-				TargetPort: port.TargetPort.String(),
-			})
-		}
+		results = append(results, parseService(service))
+	}
 
-		ingressStatus := make([]models.K8sServiceIngress, 0)
-		for _, status := range service.Status.LoadBalancer.Ingress {
-			ingressStatus = append(ingressStatus, models.K8sServiceIngress{
-				IP:   status.IP,
-				Host: status.Hostname,
-			})
-		}
+	return results, nil
+}
 
-		var applications []models.K8sApplication
-		if lookupApplications {
-			applications, _ = kcl.getOwningApplication(namespace, service.Spec.Selector)
-		}
-
-		result = append(result, models.K8sServiceInfo{
-			Name:                          service.Name,
-			UID:                           string(service.GetUID()),
-			Type:                          string(service.Spec.Type),
-			Namespace:                     service.Namespace,
-			CreationTimestamp:             service.GetCreationTimestamp().String(),
-			AllocateLoadBalancerNodePorts: service.Spec.AllocateLoadBalancerNodePorts,
-			Ports:                         servicePorts,
-			IngressStatus:                 ingressStatus,
-			Labels:                        service.GetLabels(),
-			Annotations:                   service.GetAnnotations(),
-			ClusterIPs:                    service.Spec.ClusterIPs,
-			ExternalName:                  service.Spec.ExternalName,
-			ExternalIPs:                   service.Spec.ExternalIPs,
-			Applications:                  applications,
+// parseService converts a k8s native service object to a Portainer K8sServiceInfo object.
+// service ports, ingress status, labels, annotations, cluster IPs, and external IPs are parsed.
+// it returns a K8sServiceInfo object.
+func parseService(service corev1.Service) models.K8sServiceInfo {
+	servicePorts := make([]models.K8sServicePort, 0)
+	for _, port := range service.Spec.Ports {
+		servicePorts = append(servicePorts, models.K8sServicePort{
+			Name:       port.Name,
+			NodePort:   int(port.NodePort),
+			Port:       int(port.Port),
+			Protocol:   string(port.Protocol),
+			TargetPort: port.TargetPort.String(),
 		})
 	}
 
-	return result, nil
+	ingressStatus := make([]models.K8sServiceIngress, 0)
+	for _, status := range service.Status.LoadBalancer.Ingress {
+		ingressStatus = append(ingressStatus, models.K8sServiceIngress{
+			IP:   status.IP,
+			Host: status.Hostname,
+		})
+	}
+
+	return models.K8sServiceInfo{
+		Name:                          service.Name,
+		UID:                           string(service.GetUID()),
+		Type:                          string(service.Spec.Type),
+		Namespace:                     service.Namespace,
+		CreationDate:                  service.GetCreationTimestamp().String(),
+		AllocateLoadBalancerNodePorts: service.Spec.AllocateLoadBalancerNodePorts,
+		Ports:                         servicePorts,
+		IngressStatus:                 ingressStatus,
+		Labels:                        service.GetLabels(),
+		Annotations:                   service.GetAnnotations(),
+		ClusterIPs:                    service.Spec.ClusterIPs,
+		ExternalName:                  service.Spec.ExternalName,
+		ExternalIPs:                   service.Spec.ExternalIPs,
+		Selector:                      service.Spec.Selector,
+	}
 }
 
-func (kcl *KubeClient) fillService(info models.K8sServiceInfo) v1.Service {
-	var service v1.Service
-
+// convertToK8sService converts a K8sServiceInfo object back to a k8s native service object.
+// this is required for create and update operations.
+// it returns a v1.Service object.
+func (kcl *KubeClient) convertToK8sService(info models.K8sServiceInfo) corev1.Service {
+	service := corev1.Service{}
 	service.Name = info.Name
-	service.Spec.Type = v1.ServiceType(info.Type)
+	service.Spec.Type = corev1.ServiceType(info.Type)
 	service.Namespace = info.Namespace
 	service.Annotations = info.Annotations
 	service.Labels = info.Labels
 	service.Spec.AllocateLoadBalancerNodePorts = info.AllocateLoadBalancerNodePorts
 	service.Spec.Selector = info.Selector
 
-	// Set ports.
 	for _, p := range info.Ports {
-		var port v1.ServicePort
+		port := corev1.ServicePort{}
 		port.Name = p.Name
 		port.NodePort = int32(p.NodePort)
 		port.Port = int32(p.Port)
-		port.Protocol = v1.Protocol(p.Protocol)
+		port.Protocol = corev1.Protocol(p.Protocol)
 		port.TargetPort = intstr.FromString(p.TargetPort)
 		service.Spec.Ports = append(service.Spec.Ports, port)
 	}
 
-	// Set ingresses.
 	for _, i := range info.IngressStatus {
 		service.Status.LoadBalancer.Ingress = append(
 			service.Status.LoadBalancer.Ingress,
-			v1.LoadBalancerIngress{IP: i.IP, Hostname: i.Host},
+			corev1.LoadBalancerIngress{IP: i.IP, Hostname: i.Host},
 		)
 	}
 
@@ -103,86 +139,84 @@ func (kcl *KubeClient) fillService(info models.K8sServiceInfo) v1.Service {
 
 // CreateService creates a new service in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) CreateService(namespace string, info models.K8sServiceInfo) error {
-	serviceClient := kcl.cli.CoreV1().Services(namespace)
-	service := kcl.fillService(info)
-
-	_, err := serviceClient.Create(context.Background(), &service, metav1.CreateOptions{})
+	service := kcl.convertToK8sService(info)
+	_, err := kcl.cli.CoreV1().Services(namespace).Create(context.Background(), &service, metav1.CreateOptions{})
 	return err
 }
 
 // DeleteServices processes a K8sServiceDeleteRequest by deleting each service
 // in its given namespace.
 func (kcl *KubeClient) DeleteServices(reqs models.K8sServiceDeleteRequests) error {
-	var err error
 	for namespace := range reqs {
 		for _, service := range reqs[namespace] {
-			serviceClient := kcl.cli.CoreV1().Services(namespace)
-			err = serviceClient.Delete(
-				context.Background(),
-				service,
-				metav1.DeleteOptions{},
-			)
+			err := kcl.cli.CoreV1().Services(namespace).Delete(context.Background(), service, metav1.DeleteOptions{})
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return err
+	return nil
 }
 
 // UpdateService updates service in a given namespace in a k8s endpoint.
 func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInfo) error {
-	serviceClient := kcl.cli.CoreV1().Services(namespace)
-	service := kcl.fillService(info)
-
-	_, err := serviceClient.Update(context.Background(), &service, metav1.UpdateOptions{})
+	service := kcl.convertToK8sService(info)
+	_, err := kcl.cli.CoreV1().Services(namespace).Update(context.Background(), &service, metav1.UpdateOptions{})
 	return err
 }
 
-// getOwningApplication gets the application that owns the given service selector.
-func (kcl *KubeClient) getOwningApplication(namespace string, selector map[string]string) ([]models.K8sApplication, error) {
-	if len(selector) == 0 {
-		return nil, nil
-	}
-
-	selectorLabels := labels.SelectorFromSet(selector).String()
-
-	// look for replicasets first, limit 1 (we only support one owner)
-	replicasets, err := kcl.cli.AppsV1().ReplicaSets(namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: selectorLabels, Limit: 1})
-	if err != nil {
-		return nil, err
-	}
-
-	var meta metav1.Object
-	if replicasets != nil && len(replicasets.Items) > 0 {
-		meta = replicasets.Items[0].GetObjectMeta()
-	} else {
-		// otherwise look for matching pods, limit 1 (we only support one owner)
-		pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: selectorLabels, Limit: 1})
+// CombineServicesWithApplications retrieves applications based on service selectors in a given namespace
+// for all services, it lists pods based on the service selector and converts the pod to an application
+// if replicasets are found, it updates the owner reference to deployment
+// it then combines the service with the application
+// finally, it returns a list of K8sServiceInfo objects
+func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
+	if containsServiceWithSelector(services) {
+		updatedServices := make([]models.K8sServiceInfo, len(services))
+		pods, replicaSets, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}
 
-		if pods == nil || len(pods.Items) == 0 {
-			return nil, nil
+		for index, service := range services {
+			updatedService := service
+
+			application, err := kcl.GetApplicationFromServiceSelector(pods, service, replicaSets)
+			if err != nil {
+				return services, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to get application from service. Error: %w", err)
+			}
+
+			if application != nil {
+				updatedService.Applications = append(updatedService.Applications, *application)
+			}
+
+			updatedServices[index] = updatedService
 		}
 
-		meta = pods.Items[0].GetObjectMeta()
+		return updatedServices, nil
 	}
 
-	return makeApplication(meta), nil
+	return services, nil
 }
 
-func makeApplication(meta metav1.Object) []models.K8sApplication {
-	ownerReferences := meta.GetOwnerReferences()
-	if len(ownerReferences) == 0 {
-		return nil
+// containsServiceWithSelector checks if a list of services contains a service with a selector
+// it returns true if any service has a selector, otherwise false
+func containsServiceWithSelector(services []models.K8sServiceInfo) bool {
+	for _, service := range services {
+		if len(service.Selector) > 0 {
+			return true
+		}
 	}
+	return false
+}
 
-	// Currently, we only support one owner reference
-	ownerReference := ownerReferences[0]
-	return []models.K8sApplication{
-		{
-			// Only the name is used right now, but we can add more fields in the future
-			Name: ownerReference.Name,
-		},
+// buildServicesMap builds a map of service names from a list of K8sServiceInfo objects
+// it returns a map of service names for lookups
+func (kcl *KubeClient) buildServicesMap(services []models.K8sServiceInfo) map[string]struct{} {
+	serviceMap := make(map[string]struct{})
+	for _, service := range services {
+		serviceMap[service.Name] = struct{}{}
 	}
+	return serviceMap
 }

@@ -1,27 +1,27 @@
-import { ConfigMap, Pod, PodSpec } from 'kubernetes-types/core/v1';
-import { CronJob, Job } from 'kubernetes-types/batch/v1';
+import { PodSpec } from 'kubernetes-types/core/v1';
+
+import { Configuration } from '../../types';
+import { Job, CronJob, K8sPod } from '../../../applications/types';
 
 /**
  * getIsConfigMapInUse returns true if the configmap is referenced by any pod, job, or cronjob in the same namespace
  */
 export function getIsConfigMapInUse(
-  configMap: ConfigMap,
-  pods: Pod[],
+  configMap: Configuration,
+  pods: K8sPod[],
   jobs: Job[],
   cronJobs: CronJob[]
 ) {
   // get all podspecs from pods, jobs and cronjobs that are in the same namespace
-  const podsInNamespace = pods
-    .filter((pod) => pod.metadata?.namespace === configMap.metadata?.namespace)
-    .map((pod) => pod.spec);
-  const jobsInNamespace = jobs
-    .filter((job) => job.metadata?.namespace === configMap.metadata?.namespace)
-    .map((job) => job.spec?.template.spec);
-  const cronJobsInNamespace = cronJobs
-    .filter(
-      (cronJob) => cronJob.metadata?.namespace === configMap.metadata?.namespace
-    )
-    .map((cronJob) => cronJob.spec?.jobTemplate.spec?.template.spec);
+  const podsInNamespace = pods.filter(
+    (pod) => pod.namespace === configMap.Namespace
+  );
+  const jobsInNamespace = jobs.filter(
+    (job) => job.namespace === configMap.Namespace
+  );
+  const cronJobsInNamespace = cronJobs.filter(
+    (cronJob) => cronJob.namespace === configMap.Namespace
+  );
   const allPodSpecs = [
     ...podsInNamespace,
     ...jobsInNamespace,
@@ -30,10 +30,10 @@ export function getIsConfigMapInUse(
 
   // check if the configmap is referenced by any pod, job or cronjob in the namespace
   const isReferenced = allPodSpecs.some((podSpec) => {
-    if (!podSpec || !configMap.metadata?.name) {
+    if (!podSpec || !configMap.Namespace) {
       return false;
     }
-    return doesPodSpecReferenceConfigMap(podSpec, configMap.metadata?.name);
+    return doesPodSpecReferenceConfigMap(podSpec, configMap.Name);
   });
 
   return isReferenced;

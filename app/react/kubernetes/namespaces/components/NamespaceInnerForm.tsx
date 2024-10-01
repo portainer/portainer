@@ -83,10 +83,10 @@ export function NamespaceInnerForm({
             onChange={(classes) => setFieldValue('ingressClasses', classes)}
             values={values.ingressClasses}
             description="Enable the ingress controllers that users can select when publishing applications in this namespace."
+            noIngressControllerLabel="No ingress controllers available in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster."
             view="namespace"
             isLoading={ingressClassesQuery.isLoading}
             initialValues={initialValues.ingressClasses}
-            noIngressControllerLabel="No ingress controllers available in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster."
           />
         </FormSection>
       )}

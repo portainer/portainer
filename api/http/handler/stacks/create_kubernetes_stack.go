@@ -163,7 +163,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	// Refresh ECR registry secret if needed
 	// RefreshEcrSecret method checks if the namespace has any ECR registry
 	// otherwise return nil
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
 		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace)
 	}

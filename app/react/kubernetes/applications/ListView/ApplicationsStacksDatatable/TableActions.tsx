@@ -2,14 +2,14 @@ import { Authorized } from '@/react/hooks/useUser';
 
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { KubernetesStack } from '../../types';
+import { Stack } from './types';
 
 export function TableActions({
   selectedItems,
   onRemove,
 }: {
-  selectedItems: Array<KubernetesStack>;
-  onRemove: (selectedItems: Array<KubernetesStack>) => void;
+  selectedItems: Array<Stack>;
+  onRemove: (selectedItems: Array<Stack>) => void;
 }) {
   return (
     <Authorized authorizations="K8sApplicationsW">

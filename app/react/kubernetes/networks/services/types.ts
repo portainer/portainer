@@ -26,7 +26,7 @@ export interface Service {
   Namespace: string;
   UID: string;
   AllocateLoadBalancerNodePorts?: boolean;
-  Ports: Port[];
+  Ports?: Port[];
   Selector?: Document;
   Type: string;
   Status?: Status;

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
-import { Column } from '@tanstack/react-table';
+import { Column, Row } from '@tanstack/react-table';
 import { Check, Filter } from 'lucide-react';
 
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
@@ -73,7 +73,15 @@ export function MultipleSelectionFilter({
   }
 }
 
-export function filterHOC<TData extends DefaultType>(menuTitle: string) {
+export type FilterOptionsTransformer<TData extends DefaultType> = (
+  rows: Row<TData>[],
+  id: string
+) => string[];
+
+export function filterHOC<TData extends DefaultType>(
+  menuTitle: string,
+  filterOptionsTransformer: FilterOptionsTransformer<TData> = defaultFilterOptionsTransformer
+) {
   return function Filter({
     column: { getFilterValue, setFilterValue, getFacetedRowModel, id },
   }: {
@@ -81,15 +89,10 @@ export function filterHOC<TData extends DefaultType>(menuTitle: string) {
   }) {
     const { flatRows } = getFacetedRowModel();
 
-    const options = useMemo(() => {
-      const options = new Set<string>();
-      flatRows.forEach(({ getValue }) => {
-        const value = getValue<string>(id);
-
-        options.add(value);
-      });
-      return Array.from(options);
-    }, [flatRows, id]);
+    const options = useMemo(
+      () => filterOptionsTransformer(flatRows, id),
+      [flatRows, id]
+    );
 
     const value = getFilterValue();
 
@@ -105,4 +108,16 @@ export function filterHOC<TData extends DefaultType>(menuTitle: string) {
       />
     );
   };
+}
+
+function defaultFilterOptionsTransformer<TData extends DefaultType>(
+  rows: Row<TData>[],
+  id: string
+) {
+  const options = new Set<string>();
+  rows.forEach(({ getValue }) => {
+    const value = getValue<string>(id);
+    options.add(value);
+  });
+  return Array.from(options);
 }

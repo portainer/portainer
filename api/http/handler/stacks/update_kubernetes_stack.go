@@ -124,7 +124,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	// Refresh ECR registry secret if needed
 	// RefreshEcrSecret method checks if the namespace has any ECR registry
 	// otherwise return nil
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
 		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace)
 	}

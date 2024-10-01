@@ -77,7 +77,7 @@ class KubernetesConfigMapConverter {
   static createPayload(data) {
     const res = new KubernetesConfigMapCreatePayload();
     res.metadata.name = data.Name;
-    res.metadata.namespace = data.Namespace;
+    res.metadata.namespace = data.Namespace.Namespace.Name;
     const configurationOwner = _.truncate(data.ConfigurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
 
@@ -115,7 +115,7 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMap();
     res.Id = formValues.Id;
     res.Name = formValues.Name;
-    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Namespace = formValues.ResourcePool;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     res.Data = formValues.Data;
     return res;

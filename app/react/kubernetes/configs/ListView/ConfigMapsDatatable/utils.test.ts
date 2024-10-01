@@ -1,14 +1,21 @@
-import { ConfigMap, Pod } from 'kubernetes-types/core/v1';
-import { CronJob, Job } from 'kubernetes-types/batch/v1';
+import { CronJob, Job, K8sPod } from '../../../applications/types';
+import { Configuration } from '../../types';
 
 import { getIsConfigMapInUse } from './utils';
 
 describe('getIsConfigMapInUse', () => {
   it('should return false when no resources reference the configMap', () => {
-    const configMap: ConfigMap = {
-      metadata: { name: 'my-configmap', namespace: 'default' },
+    const configMap: Configuration = {
+      Name: 'my-configmap',
+      Namespace: 'default',
+      UID: '',
+      Type: 1,
+      ConfigurationOwner: '',
+      ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
-    const pods: Pod[] = [];
+    const pods: K8sPod[] = [];
     const jobs: Job[] = [];
     const cronJobs: CronJob[] = [];
 
@@ -16,20 +23,26 @@ describe('getIsConfigMapInUse', () => {
   });
 
   it('should return true when a pod references the configMap', () => {
-    const configMap: ConfigMap = {
-      metadata: { name: 'my-configmap', namespace: 'default' },
+    const configMap: Configuration = {
+      Name: 'my-configmap',
+      Namespace: 'default',
+      UID: '',
+      Type: 1,
+      ConfigurationOwner: '',
+      ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
-    const pods: Pod[] = [
+    const pods: K8sPod[] = [
       {
-        metadata: { namespace: 'default' },
-        spec: {
-          containers: [
-            {
-              name: 'container1',
-              envFrom: [{ configMapRef: { name: 'my-configmap' } }],
-            },
-          ],
-        },
+        namespace: 'default',
+        containers: [
+          {
+            name: 'container1',
+            envFrom: [{ configMapRef: { name: 'my-configmap' } }],
+          },
+        ],
+        ownerReferences: [],
       },
     ];
     const jobs: Job[] = [];
@@ -39,25 +52,26 @@ describe('getIsConfigMapInUse', () => {
   });
 
   it('should return true when a job references the configMap', () => {
-    const configMap: ConfigMap = {
-      metadata: { name: 'my-configmap', namespace: 'default' },
+    const configMap: Configuration = {
+      Name: 'my-configmap',
+      Namespace: 'default',
+      UID: '',
+      Type: 1,
+      ConfigurationOwner: '',
+      ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
-    const pods: Pod[] = [];
+    const pods: K8sPod[] = [];
     const jobs: Job[] = [
       {
-        metadata: { namespace: 'default' },
-        spec: {
-          template: {
-            spec: {
-              containers: [
-                {
-                  name: 'container1',
-                  envFrom: [{ configMapRef: { name: 'my-configmap' } }],
-                },
-              ],
-            },
+        namespace: 'default',
+        containers: [
+          {
+            name: 'container1',
+            envFrom: [{ configMapRef: { name: 'my-configmap' } }],
           },
-        },
+        ],
       },
     ];
     const cronJobs: CronJob[] = [];
@@ -66,31 +80,28 @@ describe('getIsConfigMapInUse', () => {
   });
 
   it('should return true when a cronJob references the configMap', () => {
-    const configMap: ConfigMap = {
-      metadata: { name: 'my-configmap', namespace: 'default' },
+    const configMap: Configuration = {
+      Name: 'my-configmap',
+      Namespace: 'default',
+      UID: '',
+      Type: 1,
+      ConfigurationOwner: '',
+      ConfigurationOwnerId: '',
+      IsUsed: false,
+      Yaml: '',
     };
-    const pods: Pod[] = [];
+    const pods: K8sPod[] = [];
     const jobs: Job[] = [];
     const cronJobs: CronJob[] = [
       {
-        metadata: { namespace: 'default' },
-        spec: {
-          schedule: '0 0 * * *',
-          jobTemplate: {
-            spec: {
-              template: {
-                spec: {
-                  containers: [
-                    {
-                      name: 'container1',
-                      envFrom: [{ configMapRef: { name: 'my-configmap' } }],
-                    },
-                  ],
-                },
-              },
-            },
+        namespace: 'default',
+        schedule: '0 0 * * *',
+        containers: [
+          {
+            name: 'container1',
+            envFrom: [{ configMapRef: { name: 'my-configmap' } }],
           },
-        },
+        ],
       },
     ];
 

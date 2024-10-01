@@ -1,6 +1,6 @@
-import { ConfigMap } from 'kubernetes-types/core/v1';
+import { Configuration } from '../../types';
 
-export interface ConfigMapRowData extends ConfigMap {
+export interface ConfigMapRowData extends Configuration {
   inUse: boolean;
   isSystem: boolean;
 }

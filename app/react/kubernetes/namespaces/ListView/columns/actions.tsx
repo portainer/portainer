@@ -7,8 +7,8 @@ import { Environment } from '@/react/portainer/environments/types';
 import { Link } from '@@/Link';
 import { Button } from '@@/buttons';
 
-import { NamespaceViewModel } from '../types';
 import { isDefaultNamespace } from '../../isDefaultNamespace';
+import { PortainerNamespace } from '../../types';
 
 import { helper } from './helper';
 
@@ -18,15 +18,15 @@ export const actions = helper.display({
 });
 
 function Cell({
-  row: { original: item },
-}: CellContext<NamespaceViewModel, unknown>) {
+  row: { original: namespace },
+}: CellContext<PortainerNamespace, unknown>) {
   const environmentQuery = useCurrentEnvironment();
 
   if (!environmentQuery.data) {
     return null;
   }
 
-  if (!canManageAccess(item, environmentQuery.data)) {
+  if (!canManageAccess(namespace, environmentQuery.data)) {
     return '-';
   }
 
@@ -36,22 +36,24 @@ function Cell({
       color="link"
       props={{
         to: 'kubernetes.resourcePools.resourcePool.access',
-        params: { id: item.Namespace.Name },
+        params: {
+          id: namespace.Name,
+        },
       }}
       icon={Users}
-      data-cy={`manage-access-button-${item.Namespace.Name}`}
+      data-cy={`manage-access-button-${namespace.Name}`}
     >
       Manage access
     </Button>
   );
 
-  function canManageAccess(item: NamespaceViewModel, environment: Environment) {
-    const name = item.Namespace.Name;
-    const isSystem = item.Namespace.IsSystem;
-
+  function canManageAccess(
+    { Name, IsSystem }: PortainerNamespace,
+    environment: Environment
+  ) {
     return (
-      !isSystem &&
-      (!isDefaultNamespace(name) ||
+      !IsSystem &&
+      (!isDefaultNamespace(Name) ||
         environment.Kubernetes.Configuration.RestrictDefaultNamespace)
     );
   }

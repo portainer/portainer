@@ -76,12 +76,12 @@
                 <div style="padding: 8px">
                   <kubernetes-resource-reservation
                     ng-if="ctrl.resourceReservation"
-                    cpu-reservation="ctrl.resourceReservation.CPU"
+                    cpu-reservation="ctrl.resourceReservation.CpuRequest"
                     cpu-usage="ctrl.resourceUsage.CPU"
                     cpu-limit="ctrl.node.CPU"
-                    memory-reservation="ctrl.resourceReservation.Memory"
+                    memory-reservation="ctrl.resourceReservation.MemoryRequest"
                     memory-usage="ctrl.resourceUsage.Memory"
-                    memory-limit="ctrl.memoryLimit"
+                    memory-limit="ctrl.node.Memory"
                     description="Resource reservation represents the total amount of resource assigned to all the applications running on this node."
                     display-usage="ctrl.hasResourceUsageAccess()"
                   >
@@ -267,11 +267,5 @@
     </div>
   </div>
 
-  <kubernetes-node-applications-datatable
-    ng-if="ctrl.applications && ctrl.applications.length > 0"
-    dataset="ctrl.applications"
-    on-refresh="(ctrl.getApplications)"
-    is-loading="ctrl.state.applicationsLoading"
-  >
-  </kubernetes-node-applications-datatable>
+  <kubernetes-node-applications-datatable></kubernetes-node-applications-datatable>
 </div>

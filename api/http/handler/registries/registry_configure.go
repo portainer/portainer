@@ -41,7 +41,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	if useAuthentication {
 		username, err := request.RetrieveMultiPartFormValue(r, "Username", false)
 		if err != nil {
-			return errors.New("Invalid username")
+			return errors.New("invalid username")
 		}
 		payload.Username = username
 
@@ -61,19 +61,19 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	if useTLS && !skipTLSVerify {
 		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 		if err != nil {
-			return errors.New("Invalid certificate file. Ensure that the file is uploaded correctly")
+			return errors.New("invalid certificate file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSCertFile = cert
 
 		key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 		if err != nil {
-			return errors.New("Invalid key file. Ensure that the file is uploaded correctly")
+			return errors.New("invalid key file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSKeyFile = key
 
 		ca, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 		if err != nil {
-			return errors.New("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+			return errors.New("invalid CA certificate file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSCACertFile = ca
 	}

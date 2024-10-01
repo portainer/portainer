@@ -1,76 +1,65 @@
+import { useMemo } from 'react';
 import { Shuffle } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import clsx from 'clsx';
 import { Row } from '@tanstack/react-table';
-import { useMemo } from 'react';
 
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import {
+  Namespaces,
+  PortainerNamespace,
+} from '@/react/kubernetes/namespaces/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
-import {
-  DefaultDatatableSettings,
-  TableSettings as KubeTableSettings,
-} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
+import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
-import {
-  type FilteredColumnsTableSettings,
-  filteredColumnsSettings,
-} from '@@/datatables/types';
-import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
-import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
-import {
-  useMutationDeleteServices,
-  useServicesForCluster,
-} from '../../service';
+import { useMutationDeleteServices, useClusterServices } from '../../service';
 import { Service } from '../../types';
 
 import { columns } from './columns';
+import { createStore } from './datatable-store';
 
 const storageKey = 'k8sServicesDatatable';
-interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+const settingsStore = createStore(storageKey);
 
 export function ServicesDatatable() {
-  const tableState = useKubeStore<TableSettings>(
-    storageKey,
-    undefined,
-    (set) => ({
-      ...filteredColumnsSettings(set),
-    })
-  );
+  const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } =
+  const { data: namespacesArray, ...namespacesQuery } =
     useNamespacesQuery(environmentId);
-  const namespaceNames = (namespaces && Object.keys(namespaces)) || [];
-  const { data: services, ...servicesQuery } = useServicesForCluster(
+  const { data: services, ...servicesQuery } = useClusterServices(
     environmentId,
-    namespaceNames,
     {
       autoRefreshRate: tableState.autoRefreshRate * 1000,
-      lookupApplications: true,
+      withApplications: true,
     }
   );
+
+  const namespaces: Record<string, PortainerNamespace> = {};
+  if (Array.isArray(namespacesArray)) {
+    for (let i = 0; i < namespacesArray.length; i++) {
+      const namespace = namespacesArray[i];
+      namespaces[namespace.Name] = namespace;
+    }
+  }
 
   const { authorized: canWrite } = useAuthorizations(['K8sServiceW']);
   const readOnly = !canWrite;
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-
   const filteredServices = services?.filter(
     (service) =>
       (canAccessSystemResources && tableState.showSystemResources) ||
-      !namespaces?.[service.Namespace].IsSystem
+      !namespaces?.[service.Namespace]?.IsSystem
   );
 
   const servicesWithIsSystem = useServicesRowData(
@@ -84,10 +73,11 @@ export function ServicesDatatable() {
       columns={columns}
       settingsManager={tableState}
       isLoading={servicesQuery.isLoading || namespacesQuery.isLoading}
+      emptyContentLabel="No services found"
       title="Services"
       titleIcon={Shuffle}
       getRowId={(row) => row.UID}
-      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
+      isRowSelectable={(row) => !namespaces?.[row.original.Namespace]?.IsSystem}
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
@@ -106,9 +96,6 @@ export function ServicesDatatable() {
       }
       renderRow={servicesRenderRow}
       data-cy="k8s-services-datatable"
-      extendTableOptions={mergeOptions(
-        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
-      )}
     />
   );
 }
@@ -122,7 +109,9 @@ function useServicesRowData(
     () =>
       services.map((service) => ({
         ...service,
-        IsSystem: namespaces ? namespaces?.[service.Namespace].IsSystem : false,
+        IsSystem: namespaces
+          ? namespaces?.[service.Namespace]?.IsSystem
+          : false,
       })),
     [services, namespaces]
   );

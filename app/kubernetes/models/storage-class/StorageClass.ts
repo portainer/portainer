@@ -3,5 +3,7 @@ export class StorageClass {
 
   Provisioner: string = '';
 
+  ReclaimPolicy: string = '';
+
   AllowVolumeExpansion: boolean = false;
 }

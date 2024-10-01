@@ -9,6 +9,7 @@ import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNam
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useAuthorizations } from '@/react/hooks/useUser';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { TableSettingsMenu } from '@@/datatables';
 import { useRepeater } from '@@/datatables/useRepeater';
@@ -18,6 +19,7 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
 import { Namespace } from '../ApplicationsStacksDatatable/types';
+import { useApplications } from '../../application.queries';
 
 import { Application, ConfigKind } from './types';
 import { useColumns } from './useColumns';
@@ -26,9 +28,7 @@ import { SubRow } from './SubRow';
 import { HelmInsightsBox } from './HelmInsightsBox';
 
 export function ApplicationsDatatable({
-  dataset,
   onRefresh,
-  isLoading,
   onRemove,
   namespace = '',
   namespaces,
@@ -37,9 +37,7 @@ export function ApplicationsDatatable({
   onShowSystemChange,
   hideStacks,
 }: {
-  dataset: Array<Application>;
   onRefresh: () => void;
-  isLoading: boolean;
   onRemove: (selectedItems: Application[]) => void;
   namespace?: string;
   namespaces: Array<Namespace>;
@@ -50,7 +48,7 @@ export function ApplicationsDatatable({
 }) {
   const envId = useEnvironmentId();
   const envQuery = useCurrentEnvironment();
-  const namespaceMetaListQuery = useNamespacesQuery(envId);
+  const namespaceListQuery = useNamespacesQuery(envId);
 
   const tableState = useKubeStore('kubernetes.applications', 'Name');
   useRepeater(tableState.autoRefreshRate, onRefresh);
@@ -58,7 +56,7 @@ export function ApplicationsDatatable({
   const hasWriteAuthQuery = useAuthorizations(
     'K8sApplicationsW',
     undefined,
-    true
+    false
   );
 
   const { setShowSystemResources } = tableState;
@@ -67,27 +65,34 @@ export function ApplicationsDatatable({
     setShowSystemResources(showSystem || false);
   }, [showSystem, setShowSystemResources]);
 
-  const columns = useColumns(hideStacks);
+  const applicationsQuery = useApplications(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+    namespace,
+    withDependencies: true,
+  });
+  const applications = applicationsQuery.data ?? [];
+  const filteredApplications = showSystem
+    ? applications
+    : applications.filter(
+        (application) =>
+          !isSystemNamespace(application.ResourcePool, namespaceListQuery.data)
+      );
 
-  const filteredDataset = !showSystem
-    ? dataset.filter(
-        (item) => !namespaceMetaListQuery.data?.[item.ResourcePool]?.IsSystem
-      )
-    : dataset;
+  const columns = useColumns(hideStacks);
 
   return (
     <ExpandableDatatable
       data-cy="k8sApp-appTable"
       noWidget
-      dataset={filteredDataset}
+      dataset={filteredApplications ?? []}
       settingsManager={tableState}
       columns={columns}
       title="Applications"
       titleIcon={BoxIcon}
-      isLoading={isLoading}
+      isLoading={applicationsQuery.isLoading}
       disableSelect={!hasWriteAuthQuery.authorized}
       isRowSelectable={(row) =>
-        !namespaceMetaListQuery.data?.[row.original.ResourcePool]?.IsSystem
+        !isSystemNamespace(row.original.ResourcePool, namespaceListQuery.data)
       }
       getRowCanExpand={(row) => isExpandable(row.original)}
       renderSubRow={(row) => (

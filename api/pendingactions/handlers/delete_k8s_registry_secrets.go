@@ -57,7 +57,7 @@ func (h *HandlerDeleteK8sRegistrySecrets) Execute(pa portainer.PendingAction, en
 		return err
 	}
 
-	kubeClient, err := h.kubeFactory.GetKubeClient(endpoint)
+	kubeClient, err := h.kubeFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

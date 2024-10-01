@@ -73,8 +73,18 @@ func Test_ToggleSystemState(t *testing.T) {
 	t.Run("for regular namespace if isSystem is true and doesn't have a label, should set the label to true", func(t *testing.T) {
 		nsName := "namespace"
 
+		config := &core.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      portainerConfigMapName,
+				Namespace: portainerNamespace,
+			},
+			Data: map[string]string{
+				"NamespaceAccessPolicies": `{"ns1":{"UserAccessPolicies":{"2":{"RoleId":0}}}, "ns2":{"UserAccessPolicies":{"2":{"RoleId":0}}}}`,
+			},
+		}
+
 		kcl := &KubeClient{
-			cli:        kfake.NewSimpleClientset(&core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: nsName}}),
+			cli:        kfake.NewSimpleClientset(&core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: nsName}}, config),
 			instanceID: "instance",
 		}
 

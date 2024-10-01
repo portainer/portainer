@@ -15,7 +15,7 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { updateIngressControllerClassMap, getIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/useIngressControllerClassMap';
 import { confirmUpdate } from '@@/modals/confirm';
 import { confirmUpdateNamespace } from '@/react/kubernetes/namespaces/ItemView/ConfirmUpdateNamespace';
-import { getMetricsForAllPods } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForAllPods } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */

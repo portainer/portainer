@@ -1,18 +1,20 @@
 export interface Configuration {
-  Id: string;
+  UID: string;
   Name: string;
   Type: number;
   Namespace: string;
-  CreationDate: Date;
+  CreationDate?: string;
 
-  ConfigurationOwner: string;
+  ConfigurationOwner: string; // username
+  ConfigurationOwnerId: string; // user id
 
-  Used: boolean;
-  Data: Document;
+  IsUsed: boolean;
+  Data?: Record<string, string>;
   Yaml: string;
 
   SecretType?: string;
   IsRegistrySecret?: boolean;
+  IsSecret?: boolean;
 }
 
 // Workaround for the TS error `Type 'ConfigMap' does not satisfy the constraint 'Record<string, unknown>'` for the datatable

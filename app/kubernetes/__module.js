@@ -1,5 +1,4 @@
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
-import { getSelfSubjectAccessReview } from '@/react/kubernetes/namespaces/getSelfSubjectAccessReview';
 
 import { updateAxiosAdapter } from '@/portainer/services/axios';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
@@ -96,13 +95,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
           }
 
           try {
-            const status = await checkEndpointStatus(
-              endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
-                ? KubernetesHealthService.ping(endpoint.Id)
-                : // use selfsubject access review to check if we can connect to the kubernetes environment
-                  // because it gets a fast response, and is accessible to all users
-                  getSelfSubjectAccessReview(endpoint.Id, 'default')
-            );
+            const status = await checkEndpointStatus(endpoint);
 
             if (endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
               await updateEndpointStatus(endpoint, status);
@@ -131,9 +124,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             return false;
           }
 
-          async function checkEndpointStatus(promise) {
+          async function checkEndpointStatus(endpoint) {
             try {
-              await promise;
+              await KubernetesHealthService.ping(endpoint.Id);
               return EnvironmentStatus.Up;
             } catch (e) {
               return EnvironmentStatus.Down;
@@ -459,10 +452,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const resourcePools = {
       name: 'kubernetes.resourcePools',
-      url: '/pools',
+      url: '/namespaces',
       views: {
         'content@': {
-          component: 'kubernetesResourcePoolsView',
+          component: 'kubernetesNamespacesView',
         },
       },
       data: {
@@ -511,7 +504,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const volumes = {
       name: 'kubernetes.volumes',
-      url: '/volumes',
+      url: '/volumes?tab',
       views: {
         'content@': {
           component: 'kubernetesVolumesView',
@@ -582,6 +575,51 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const moreResources = {
+      name: 'kubernetes.moreResources',
+      url: '/moreResources',
+      abstract: true,
+    };
+
+    const serviceAccounts = {
+      name: 'kubernetes.moreResources.serviceAccounts',
+      url: '/serviceAccounts',
+      views: {
+        'content@': {
+          component: 'serviceAccountsView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/service-accounts',
+      },
+    };
+
+    const clusterRoles = {
+      name: 'kubernetes.moreResources.clusterRoles',
+      url: '/clusterRoles?tab',
+      views: {
+        'content@': {
+          component: 'clusterRolesView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/cluster-roles',
+      },
+    };
+
+    const roles = {
+      name: 'kubernetes.moreResources.roles',
+      url: '/roles?tab',
+      views: {
+        'content@': {
+          component: 'k8sRolesView',
+        },
+      },
+      data: {
+        docs: '/user/kubernetes/more-resources/namespace-roles',
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(applications);
@@ -621,5 +659,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(ingresses);
     $stateRegistryProvider.register(ingressesCreate);
     $stateRegistryProvider.register(ingressesEdit);
+
+    $stateRegistryProvider.register(moreResources);
+    $stateRegistryProvider.register(serviceAccounts);
+    $stateRegistryProvider.register(clusterRoles);
+    $stateRegistryProvider.register(roles);
   },
 ]);

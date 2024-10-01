@@ -4,27 +4,20 @@ import { useMemo } from 'react';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import Route from '@/assets/ico/route.svg?c';
-import {
-  DefaultDatatableSettings,
-  TableSettings as KubeTableSettings,
-} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
-import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { AddButton } from '@@/buttons';
+import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
-import {
-  type FilteredColumnsTableSettings,
-  filteredColumnsSettings,
-} from '@@/datatables/types';
-import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
-import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 
 import { DeleteIngressesRequest, Ingress } from '../types';
 import { useDeleteIngresses, useIngresses } from '../queries';
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '../../namespaces/types';
+import { Namespaces, PortainerNamespace } from '../../namespaces/types';
 import { CreateFromManifestButton } from '../../components/CreateFromManifestButton';
 
 import { columns } from './columns';
@@ -37,47 +30,47 @@ interface SelectedIngress {
 }
 const storageKey = 'ingressClassesNameSpace';
 
-interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+const settingsStore = createStore(storageKey, 'name');
 
 export function IngressDatatable() {
-  const tableState = useKubeStore<TableSettings>(
-    storageKey,
-    undefined,
-    (set) => ({
-      ...filteredColumnsSettings(set),
-    })
-  );
+  const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
 
   const { authorized: canAccessSystemResources } = useAuthorizations(
     'K8sAccessSystemNamespaces'
   );
-  const { data: namespaces, ...namespacesQuery } =
-    useNamespacesQuery(environmentId);
-  const { data: ingresses, ...ingressesQuery } = useIngresses(
-    environmentId,
-    Object.keys(namespaces || {}),
-    {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
-    }
-  );
+  const namespacesQuery = useNamespacesQuery(environmentId);
+  const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    withServices: true,
+  });
+
+  const namespacesMap = useMemo(() => {
+    const namespacesMap = namespacesQuery.data?.reduce<
+      Record<string, PortainerNamespace>
+    >((acc, namespace) => {
+      acc[namespace.Name] = namespace;
+      return acc;
+    }, {});
+    return namespacesMap ?? {};
+  }, [namespacesQuery.data]);
 
   const filteredIngresses = useMemo(
     () =>
       ingresses?.filter(
         (ingress) =>
           (canAccessSystemResources && tableState.showSystemResources) ||
-          !namespaces?.[ingress.Namespace].IsSystem
+          !namespacesMap?.[ingress.Namespace].IsSystem
       ) || [],
-    [ingresses, tableState, canAccessSystemResources, namespaces]
+    [ingresses, tableState, canAccessSystemResources, namespacesMap]
   );
 
   const ingressesWithIsSystem = useIngressesRowData(
     filteredIngresses || [],
-    namespaces
+    namespacesMap
   );
+
+  const isAddIngressHidden = useIsDeploymentOptionHidden('form');
 
   const deleteIngressesMutation = useDeleteIngresses();
 
@@ -89,10 +82,13 @@ export function IngressDatatable() {
       dataset={ingressesWithIsSystem}
       columns={columns}
       isLoading={ingressesQuery.isLoading || namespacesQuery.isLoading}
+      emptyContentLabel="No supported ingresses found"
       title="Ingresses"
       titleIcon={Route}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
-      isRowSelectable={(row) => !namespaces?.[row.original.Namespace].IsSystem}
+      isRowSelectable={(row) =>
+        !namespacesMap?.[row.original.Namespace].IsSystem
+      }
       renderTableActions={tableActions}
       renderTableSettings={() => (
         <TableSettingsMenu>
@@ -106,9 +102,6 @@ export function IngressDatatable() {
       }
       disableSelect={useCheckboxes()}
       data-cy="k8s-ingresses-datatable"
-      extendTableOptions={mergeOptions(
-        withColumnFilters(tableState.columnFilters, tableState.setColumnFilters)
-      )}
     />
   );
 
@@ -137,9 +130,15 @@ export function IngressDatatable() {
           data-cy="remove-ingresses-button"
         />
 
-        <AddButton to=".create" color="secondary" data-cy="add-ingress-button">
-          Add with form
-        </AddButton>
+        {!isAddIngressHidden && (
+          <AddButton
+            to=".create"
+            color="secondary"
+            data-cy="add-ingress-button"
+          >
+            Add with form
+          </AddButton>
+        )}
 
         <CreateFromManifestButton data-cy="k8s-ingress-deploy-button" />
       </Authorized>

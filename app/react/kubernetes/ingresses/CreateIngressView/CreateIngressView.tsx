@@ -71,10 +71,7 @@ export function CreateIngressView() {
 
   const { data: allServices } = useNamespaceServices(environmentId, namespace);
   const secretsResults = useSecrets(environmentId, namespace);
-  const ingressesResults = useIngresses(
-    environmentId,
-    namespaces ? Object.keys(namespaces || {}) : []
-  );
+  const ingressesResults = useIngresses(environmentId);
   const { data: ingressControllers, ...ingressControllersQuery } =
     useIngressControllers(environmentId, namespace);
 
@@ -90,7 +87,7 @@ export function CreateIngressView() {
     ] => {
       const ruleCounterByNamespace: Record<string, number> = {};
       const hostWithTLS: Record<string, string> = {};
-      ingressesResults.data?.forEach((ingress) => {
+      ingressesResults.data?.forEach((ingress: Ingress) => {
         ingress.TLS?.forEach((tls) => {
           tls.Hosts.forEach((host) => {
             hostWithTLS[host] = tls.SecretName;
@@ -98,7 +95,7 @@ export function CreateIngressView() {
         });
       });
       const ingressNames: string[] = [];
-      ingressesResults.data?.forEach((ing) => {
+      ingressesResults.data?.forEach((ing: Ingress) => {
         ruleCounterByNamespace[ing.Namespace] =
           ruleCounterByNamespace[ing.Namespace] || 0;
         const n = ing.Name.match(/^(.*)-(\d+)$/);
@@ -123,10 +120,10 @@ export function CreateIngressView() {
   const namespaceOptions = useMemo(
     () =>
       Object.entries(namespaces || {})
-        .filter(([, nsValue]) => !nsValue.IsSystem)
-        .map(([nsKey]) => ({
-          label: nsKey,
-          value: nsKey,
+        .filter(([, ns]) => !ns.IsSystem)
+        .map(([, ns]) => ({
+          label: ns.Name,
+          value: ns.Name,
         })),
     [namespaces]
   );
@@ -170,10 +167,10 @@ export function CreateIngressView() {
         ? Object.fromEntries(
             allServices?.map((service) => [
               service.Name,
-              service.Ports.map((port) => ({
+              service.Ports?.map((port) => ({
                 label: String(port.Port),
                 value: String(port.Port),
-              })),
+              })) ?? [],
             ])
           )
         : {},

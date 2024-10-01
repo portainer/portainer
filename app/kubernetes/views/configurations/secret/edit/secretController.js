@@ -88,18 +88,14 @@ class KubernetesSecretController {
   async updateConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
-      if (
-        this.formValues.Kind !== this.configuration.Kind ||
-        this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace ||
-        this.formValues.Name !== this.configuration.Name
-      ) {
+      if (this.formValues.Kind !== this.configuration.Kind || this.formValues.ResourcePool !== this.configuration.Namespace || this.formValues.Name !== this.configuration.Name) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
         this.Notifications.success('Success', `Secret successfully updated`);
         this.$state.go(
           'kubernetes.secrets.secret',
           {
-            namespace: this.formValues.ResourcePool.Namespace.Name,
+            namespace: this.formValues.ResourcePool,
             name: this.formValues.Name,
           },
           { reload: true }
@@ -149,7 +145,7 @@ class KubernetesSecretController {
           throw new Error('Not authorized to edit secret');
         }
       }
-      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
+      this.formValues.ResourcePool = this.configuration.Namespace;
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
@@ -252,7 +248,6 @@ class KubernetesSecretController {
 
       this.formValues = new KubernetesConfigurationFormValues();
 
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
       const configuration = await this.getConfiguration();
       if (configuration) {
         await this.getApplications(this.configuration.Namespace);

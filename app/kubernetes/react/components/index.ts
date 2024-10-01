@@ -62,7 +62,6 @@ import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/comp
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
 import { applicationsModule } from './applications';
-import { volumesModule } from './volumes';
 import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
 import { registriesModule } from './registries';
@@ -70,7 +69,6 @@ import { registriesModule } from './registries';
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
     applicationsModule,
-    volumesModule,
     namespacesModule,
     clusterManagementModule,
     registriesModule,
@@ -213,13 +211,10 @@ export const ngModule = angular
   .component(
     'kubernetesApplicationsStacksDatatable',
     r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
-      'dataset',
-      'onRefresh',
       'onRemove',
       'namespace',
       'namespaces',
       'onNamespaceChange',
-      'isLoading',
       'showSystem',
       'setSystemResources',
     ])

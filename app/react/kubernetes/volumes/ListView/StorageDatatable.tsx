@@ -1,6 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { HardDrive } from 'lucide-react';
 
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { humanize } from '@/portainer/filters/filters';
+
 import { TableSettingsMenu } from '@@/datatables';
 import {
   BasicTableSettings,
@@ -9,10 +12,11 @@ import {
 } from '@@/datatables/types';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useRepeater } from '@@/datatables/useRepeater';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
+
+import { useAllStoragesQuery } from '../queries/useVolumesQuery';
 
 import { StorageClassViewModel } from './types';
 
@@ -27,16 +31,11 @@ const columns = [
   }),
   helper.accessor('size', {
     header: 'Usage',
+    cell: ({ row: { original: item } }) => <>{humanize(item.size)}</>,
   }),
 ];
 
-export function StorageDatatable({
-  dataset,
-  onRefresh,
-}: {
-  dataset: Array<StorageClassViewModel>;
-  onRefresh: () => void;
-}) {
+export function StorageDatatable() {
   const tableState = useTableStateWithStorage<TableSettings>(
     'kubernetes.volumes.storages',
     'Name',
@@ -45,17 +44,21 @@ export function StorageDatatable({
     })
   );
 
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  const envId = useEnvironmentId();
+  const storagesQuery = useAllStoragesQuery(envId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+  });
+  const storages = storagesQuery.data ?? [];
 
   return (
     <ExpandableDatatable
-      noWidget
       disableSelect
-      dataset={dataset}
+      dataset={storages}
       columns={columns}
       title="Storage"
       titleIcon={HardDrive}
       settingsManager={tableState}
+      isLoading={storagesQuery.isLoading}
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
@@ -89,7 +92,7 @@ function SubRow({ item }: { item: StorageClassViewModel }) {
               {vol.PersistentVolumeClaim.Name}
             </Link>
           </td>
-          <td>{vol.PersistentVolumeClaim.Storage}</td>
+          <td>{humanize(vol.PersistentVolumeClaim.Storage)}</td>
         </tr>
       ))}
     </>

@@ -11,7 +11,7 @@ func (service *Service) CleanNAPWithOverridePolicies(
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) error {
-	kubecli, err := service.K8sClientFactory.GetKubeClient(endpoint)
+	kubecli, err := service.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

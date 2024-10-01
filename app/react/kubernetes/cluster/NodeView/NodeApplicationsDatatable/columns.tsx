@@ -41,22 +41,31 @@ export function useColumns() {
         }),
         helper.accessor('Image', {
           header: 'Image',
-          cell: ({ row: { original: item } }) => (
-            <>
-              {truncate(item.Image, 64)}
-              {item.Containers?.length > 1 && (
-                <>+ {item.Containers.length - 1}</>
-              )}
-            </>
-          ),
+          cell: ({ row: { original: item } }) => {
+            const containersLength = item.Containers?.length || 0;
+            return (
+              <>
+                {truncate(item.Image, 64)}
+                {containersLength > 1 && <>+ {containersLength - 1}</>}
+              </>
+            );
+          },
         }),
-        helper.accessor('CPU', {
+        helper.accessor((row) => row.Resource?.CpuRequest, {
           header: 'CPU reservation',
-          cell: ({ getValue }) => _.round(getValue(), 2),
+          cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
         }),
-        helper.accessor('Memory', {
+        helper.accessor((row) => row.Resource?.CpuLimit, {
+          header: 'CPU Limit',
+          cell: ({ getValue }) => <>{_.round(getValue() || 0, 2)}</>,
+        }),
+        helper.accessor((row) => row.Resource?.MemoryRequest, {
           header: 'Memory reservation',
-          cell: ({ getValue }) => humanize(getValue()),
+          cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
+        }),
+        helper.accessor((row) => row.Resource?.MemoryLimit, {
+          header: 'Memory Limit',
+          cell: ({ getValue }) => <>{humanize(getValue() || 0)}</>,
         }),
       ]),
     [hideStacksQuery.data]

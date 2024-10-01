@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
 
@@ -21,24 +22,27 @@ func (kcl *KubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error {
 		return errors.WithMessage(err, "failed to fetch access policies")
 	}
 
-	delete(policies, ns)
+	if policies != nil {
+		delete(policies, ns)
+		return kcl.UpdateNamespaceAccessPolicies(policies)
+	}
 
-	return kcl.UpdateNamespaceAccessPolicies(policies)
+	return nil
 }
 
 // GetNamespaceAccessPolicies gets the namespace access policies
 // from config maps in the portainer namespace
 func (kcl *KubeClient) GetNamespaceAccessPolicies() (map[string]portainer.K8sNamespaceAccessPolicy, error) {
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(context.TODO(), portainerConfigMapName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		return nil, nil
-	} else if err != nil {
+	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
 	accessData := configMap.Data[portainerConfigMapAccessPoliciesKey]
-
-	var policies map[string]portainer.K8sNamespaceAccessPolicy
+	policies := map[string]portainer.K8sNamespaceAccessPolicy{}
 	err = json.Unmarshal([]byte(accessData), &policies)
 	if err != nil {
 		return nil, err
@@ -109,10 +113,6 @@ func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]p
 	}
 
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(context.TODO(), portainerConfigMapName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		return nil
-	}
-
 	if err != nil {
 		return err
 	}
@@ -121,4 +121,21 @@ func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]p
 	_, err = kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Update(context.TODO(), configMap, metav1.UpdateOptions{})
 
 	return err
+}
+
+// GetNonAdminNamespaces retrieves namespaces for a non-admin user, excluding the default namespace if restricted.
+func (kcl *KubeClient) GetNonAdminNamespaces(userID int) ([]string, error) {
+	accessPolicies, err := kcl.GetNamespaceAccessPolicies()
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred during the getNonAdminNamespaces operation, unable to get namespace access policies via portainer-config. check if portainer-config configMap exists in the Kubernetes cluster: %w", err)
+	}
+
+	nonAdminNamespaces := []string{defaultNamespace}
+	for namespace, accessPolicy := range accessPolicies {
+		if hasUserAccessToNamespace(userID, nil, accessPolicy) {
+			nonAdminNamespaces = append(nonAdminNamespaces, namespace)
+		}
+	}
+
+	return nonAdminNamespaces, nil
 }

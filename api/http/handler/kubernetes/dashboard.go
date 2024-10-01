@@ -9,11 +9,10 @@ import (
 
 // @id GetKubernetesDashboard
 // @summary Get the dashboard summary data
-// @description Get the dashboard summary data which is simply a count of a range of different commonly used kubernetes resources
-// @description **Access policy**: authenticated
+// @description Get the dashboard summary data which is simply a count of a range of different commonly used kubernetes resources.
+// @description **Access policy**: Authenticated user.
 // @tags kubernetes
-// @security ApiKeyAuth
-// @security jwt
+// @security ApiKeyAuth || jwt
 // @accept json
 // @produce json
 // @param id path int true "Environment (Endpoint) identifier"

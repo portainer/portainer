@@ -47,7 +47,7 @@ func (handler *Handler) updateUserServiceAccounts(membership *portainer.TeamMemb
 		restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
 		// update kubernenets service accounts if the team is associated with a kubernetes environment
 		if endpointutils.IsKubernetesEndpoint(&endpoint) {
-			kubecli, err := handler.K8sClientFactory.GetKubeClient(&endpoint)
+			kubecli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(&endpoint)
 			if err != nil {
 				log.Error().Err(err).Msgf("failed getting kube client for environment %d", endpoint.ID)
 				continue

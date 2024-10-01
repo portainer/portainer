@@ -1,27 +1,27 @@
-import { Secret, Pod, PodSpec } from 'kubernetes-types/core/v1';
-import { CronJob, Job } from 'kubernetes-types/batch/v1';
+import { PodSpec } from 'kubernetes-types/core/v1';
+
+import { Configuration } from '../../types';
+import { Job, CronJob, K8sPod } from '../../../applications/types';
 
 /**
  * getIsSecretInUse returns true if the secret is referenced by any pod, job, or cronjob in the same namespace
  */
 export function getIsSecretInUse(
-  secret: Secret,
-  pods: Pod[],
+  secret: Configuration,
+  pods: K8sPod[],
   jobs: Job[],
   cronJobs: CronJob[]
 ) {
   // get all podspecs from pods, jobs and cronjobs that are in the same namespace
-  const podsInNamespace = pods
-    .filter((pod) => pod.metadata?.namespace === secret.metadata?.namespace)
-    .map((pod) => pod.spec);
-  const jobsInNamespace = jobs
-    .filter((job) => job.metadata?.namespace === secret.metadata?.namespace)
-    .map((job) => job.spec?.template.spec);
-  const cronJobsInNamespace = cronJobs
-    .filter(
-      (cronJob) => cronJob.metadata?.namespace === secret.metadata?.namespace
-    )
-    .map((cronJob) => cronJob.spec?.jobTemplate.spec?.template.spec);
+  const podsInNamespace = pods.filter(
+    (pod) => pod.namespace === secret.Namespace
+  );
+  const jobsInNamespace = jobs.filter(
+    (job) => job.namespace === secret.Namespace
+  );
+  const cronJobsInNamespace = cronJobs.filter(
+    (cronJob) => cronJob.namespace === secret.Namespace
+  );
   const allPodSpecs = [
     ...podsInNamespace,
     ...jobsInNamespace,
@@ -30,10 +30,10 @@ export function getIsSecretInUse(
 
   // check if the secret is referenced by any pod, job or cronjob in the namespace
   const isReferenced = allPodSpecs.some((podSpec) => {
-    if (!podSpec || !secret.metadata?.name) {
+    if (!podSpec || !secret.Name) {
       return false;
     }
-    return doesPodSpecReferenceSecret(podSpec, secret.metadata?.name);
+    return doesPodSpecReferenceSecret(podSpec, secret.Name);
   });
 
   return isReferenced;

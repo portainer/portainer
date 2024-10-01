@@ -1,12 +1,11 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
-
+import { getStacksFromApplications } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable/getStacksFromApplications';
+import { getApplications } from '@/react/kubernetes/applications/application.queries.ts';
+import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 class KubernetesApplicationsController {
   /* @ngInject */
   constructor(
@@ -16,6 +15,7 @@ class KubernetesApplicationsController {
     Authentication,
     Notifications,
     KubernetesApplicationService,
+    EndpointService,
     HelmService,
     KubernetesConfigurationService,
     LocalStorage,
@@ -36,8 +36,6 @@ class KubernetesApplicationsController {
     this.KubernetesNamespaceService = KubernetesNamespaceService;
 
     this.onInit = this.onInit.bind(this);
-    this.getApplications = this.getApplications.bind(this);
-    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
     this.removeStacksAction = this.removeStacksAction.bind(this);
@@ -88,23 +86,18 @@ class KubernetesApplicationsController {
         if (application.ApplicationType === KubernetesApplicationTypes.Helm) {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
-          await this.KubernetesApplicationService.delete(application);
-
           if (application.Metadata.labels && application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
-            // Update applications in stack
-            const stack = this.state.stacks.find((x) => x.Name === application.StackName);
-            const index = stack.Applications.indexOf(application);
-            stack.Applications.splice(index, 1);
-
             // remove stack if no app left in the stack
+            const appsInNamespace = await getApplications(this.endpoint.Id, { namespace: application.ResourcePool, withDependencies: false });
+            const stacksInNamespace = getStacksFromApplications(appsInNamespace);
+            const stack = stacksInNamespace.find((x) => x.Name === application.StackName);
             if (stack.Applications.length === 0 && application.StackId) {
               await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
             }
           }
+          await this.KubernetesApplicationService.delete(application);
         }
         this.Notifications.success('Application successfully removed', application.Name);
-        const index = this.state.applications.indexOf(application);
-        this.state.applications.splice(index, 1);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove application');
       } finally {
@@ -137,40 +130,13 @@ class KubernetesApplicationsController {
       this.state.namespaceName = namespaceName;
       // save the selected namespaceName in local storage with the key 'kubernetes_namespace_filter_${environmentId}_${userID}'
       this.LocalStorage.storeNamespaceFilter(this.endpoint.Id, this.user.ID, namespaceName);
-      return this.getApplicationsAsync();
     });
-  }
-
-  async getApplicationsAsync() {
-    try {
-      this.state.isAppsLoading = true;
-      const [applications, configurations] = await Promise.all([
-        this.KubernetesApplicationService.get(this.state.namespaceName),
-        this.KubernetesConfigurationService.get(this.state.namespaceName),
-      ]);
-      const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
-      const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
-
-      this.state.applications = [...helmApplications, ...nonHelmApplications];
-      this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
-      this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
-
-      this.$scope.$apply();
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve applications');
-    } finally {
-      this.state.isAppsLoading = false;
-    }
   }
 
   setSystemResources(flag) {
     return this.$scope.$applyAsync(() => {
       this.state.isSystemResources = flag;
     });
-  }
-
-  getApplications() {
-    return this.$async(this.getApplicationsAsync);
   }
 
   async onInit() {
@@ -190,12 +156,12 @@ class KubernetesApplicationsController {
     this.deploymentOptions = await getDeploymentOptions();
 
     this.user = this.Authentication.getUserDetails();
-    this.state.namespaces = await this.KubernetesNamespaceService.get();
+    this.state.namespaces = await getNamespaces(this.endpoint.Id);
 
     const savedNamespace = this.LocalStorage.getNamespaceFilter(this.endpoint.Id, this.user.ID); // could be null if not found, and '' if all namepsaces is selected
     const preferredNamespace = savedNamespace === null ? 'default' : savedNamespace;
 
-    this.state.namespaces = this.state.namespaces.filter((n) => n.Status === 'Active');
+    this.state.namespaces = this.state.namespaces.filter((n) => n.Status.phase === 'Active');
     this.state.namespaces = _.sortBy(this.state.namespaces, 'Name');
     // set all namespaces ('') if there are no namespaces, or if all namespaces is selected
     if (!this.state.namespaces.length || preferredNamespace === '') {
@@ -204,8 +170,6 @@ class KubernetesApplicationsController {
       // otherwise, set the preferred namespaceName if it exists, otherwise set the first namespaceName
       this.state.namespaceName = this.state.namespaces.find((n) => n.Name === preferredNamespace) ? preferredNamespace : this.state.namespaces[0].Name;
     }
-
-    await this.getApplications();
 
     this.state.viewReady = true;
   }
