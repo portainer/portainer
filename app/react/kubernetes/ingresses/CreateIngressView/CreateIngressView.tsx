@@ -167,10 +167,10 @@ export function CreateIngressView() {
         ? Object.fromEntries(
             allServices?.map((service) => [
               service.Name,
-              service.Ports.map((port) => ({
+              service.Ports?.map((port) => ({
                 label: String(port.Port),
                 value: String(port.Port),
-              })),
+              })) ?? [],
             ])
           )
         : {},
