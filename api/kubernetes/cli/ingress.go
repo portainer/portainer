@@ -223,6 +223,11 @@ func (kcl *KubeClient) CreateIngress(namespace string, info models.K8sIngressInf
 // convertToK8sIngress converts a Portainer K8sIngressInfo object to a k8s native Ingress object.
 // this is required for create and update operations.
 func (kcl *KubeClient) convertToK8sIngress(info models.K8sIngressInfo, owner string) netv1.Ingress {
+	ingressSpec := netv1.IngressSpec{}
+	if info.ClassName != "" {
+		ingressSpec.IngressClassName = &info.ClassName
+	}
+
 	result := netv1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        info.Name,
@@ -230,9 +235,7 @@ func (kcl *KubeClient) convertToK8sIngress(info models.K8sIngressInfo, owner str
 			Annotations: info.Annotations,
 		},
 
-		Spec: netv1.IngressSpec{
-			IngressClassName: &info.ClassName,
-		},
+		Spec: ingressSpec,
 	}
 
 	labels := make(map[string]string)
