@@ -197,7 +197,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			nonAdminNamespaces, err = pcli.GetNonAdminNamespaces(int(user.ID))
+			nonAdminNamespaces, err = pcli.GetNonAdminNamespaces(int(user.ID), endpoint.Kubernetes.Configuration.RestrictDefaultNamespace)
 			if err != nil {
 				httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to retrieve non-admin namespaces. Error: ", err)
 				return
