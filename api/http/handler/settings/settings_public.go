@@ -49,6 +49,7 @@ type publicSettingsResponse struct {
 	}
 
 	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
+	NewProperty              string
 }
 
 // @id SettingsPublic
@@ -82,6 +83,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  featureflags.FeatureFlags(),
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
+		NewProperty:               portainer.NewProperty,
 	}
 
 	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
