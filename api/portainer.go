@@ -1600,6 +1600,8 @@ type (
 )
 
 const (
+	// NewProperty simulates a new property
+	NewProperty = "newprop"
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.21.2"
 	// Edition is what this edition of Portainer is called
