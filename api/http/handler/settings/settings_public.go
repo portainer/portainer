@@ -53,6 +53,7 @@ type publicSettingsResponse struct {
 	}
 
 	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
+	NewProperty              string
 }
 
 // @id SettingsPublic
@@ -87,6 +88,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		Features:                  featureflags.FeatureFlags(),
 		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
+		NewProperty:               portainer.NewProperty,
 	}
 
 	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
