@@ -108,3 +108,9 @@ func (kcl *KubeClient) upsertPortainerK8sClusterRoles() error {
 
 	return nil
 }
+
+func getPortainerDefaultK8sRoleNames() []string {
+	return []string{
+		string(portainerUserCRName),
+	}
+}

@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -39,5 +40,33 @@ func parseClusterRole(clusterRole rbacv1.ClusterRole) models.K8sClusterRole {
 	return models.K8sClusterRole{
 		Name:         clusterRole.Name,
 		CreationDate: clusterRole.CreationTimestamp.Time,
+		Uid:          string(clusterRole.UID),
+		IsSystem:     isSystemClusterRole(&clusterRole),
 	}
+}
+
+func isSystemClusterRole(role *rbacv1.ClusterRole) bool {
+	if role.Namespace == "kube-system" || role.Namespace == "kube-public" ||
+		role.Namespace == "kube-node-lease" || role.Namespace == "portainer" {
+		return true
+	}
+
+	if strings.HasPrefix(role.Name, "system:") {
+		return true
+	}
+
+	if role.Labels != nil {
+		if role.Labels["kubernetes.io/bootstrapping"] == "rbac-defaults" {
+			return true
+		}
+	}
+
+	roles := getPortainerDefaultK8sRoleNames()
+	for i := range roles {
+		if role.Name == roles[i] {
+			return true
+		}
+	}
+
+	return false
 }
