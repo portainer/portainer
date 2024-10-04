@@ -58,6 +58,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/cluster_roles", httperror.LoggerHandler(h.getAllKubernetesClusterRoles)).Methods(http.MethodGet)
 	endpointRouter.Handle("/cluster_roles/delete", httperror.LoggerHandler(h.deleteClusterRoles)).Methods(http.MethodPost)
 	endpointRouter.Handle("/cluster_role_bindings", httperror.LoggerHandler(h.getAllKubernetesClusterRoleBindings)).Methods(http.MethodGet)
+	endpointRouter.Handle("/cluster_role_bindings/delete", httperror.LoggerHandler(h.deleteClusterRoleBindings)).Methods(http.MethodPost)
 	endpointRouter.Handle("/configmaps", httperror.LoggerHandler(h.GetAllKubernetesConfigMaps)).Methods(http.MethodGet)
 	endpointRouter.Handle("/configmaps/count", httperror.LoggerHandler(h.getAllKubernetesConfigMapsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.getKubernetesDashboard)).Methods(http.MethodGet)

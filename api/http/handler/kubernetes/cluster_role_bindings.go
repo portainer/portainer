@@ -3,7 +3,9 @@ package kubernetes
 import (
 	"net/http"
 
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 )
@@ -16,7 +18,7 @@ import (
 // @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @success 200 {array} kubernetes.K8sClusterRoleBinding "Success"
+// @success 200 {array} models.K8sClusterRoleBinding "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
@@ -42,4 +44,37 @@ func (handler *Handler) getAllKubernetesClusterRoleBindings(w http.ResponseWrite
 	}
 
 	return response.JSON(w, clusterrolebindings)
+}
+
+// @id DeleteClusterRoleBindings
+// @summary Delete the provided cluster role bindings
+// @description Delete the provided cluster role bindings for the given Kubernetes environment
+// @description **Access policy**: administrator
+// @tags rbac_enabled
+// @security ApiKeyAuth
+// @security jwt
+// @produce text/plain
+// @param id path int true "Environment(Endpoint) identifier"
+// @param payload body models.K8sClusterRoleBindingDeleteRequests true "Cluster role bindings to delete"
+// @success 200 "Success"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/cluster_role_bindings/delete [POST]
+func (handler *Handler) deleteClusterRoleBindings(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload models.K8sClusterRoleBindingDeleteRequests
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	cli, handlerErr := handler.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	err = cli.DeleteClusterRoleBindings(payload)
+	if err != nil {
+		return httperror.InternalServerError("Failed to delete cluster role bindings", err)
+	}
+
+	return nil
 }
