@@ -1,56 +1,76 @@
 import { Trash2, UserCheck } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { LoadingButton } from '@@/buttons';
-import { useTableState } from '@@/datatables/useTableState';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
 
-import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
+import { useAllRoleBindings } from '../RoleBindingsDatatable/queries/useAllRoleBindings';
+import { RoleBinding } from '../RoleBindingsDatatable/types';
 
 import { columns } from './columns';
-import { Role } from './types';
-import { useGetAllRolesQuery } from './queries/useGetAllRolesQuery';
-import { useDeleteRolesMutation } from './queries/useDeleteRolesMutation';
+import { Role, RoleRowData } from './types';
+import { useAllRoles } from './queries/useAllRoles';
+import { useDeleteRoles } from './queries/useDeleteRoles';
 
 const storageKey = 'roles';
-const settingsStore = createStore(storageKey);
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function RolesDatatable() {
-  const environmentId = useEnvironmentId();
-  const tableState = useTableState(settingsStore, storageKey);
-  const namespacesQuery = useNamespacesQuery(environmentId);
-  const rolesQuery = useGetAllRolesQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
-    enabled: namespacesQuery.isSuccess,
-  });
   useUnauthorizedRedirect(
     { authorizations: ['K8sRolesW'] },
     { to: 'kubernetes.dashboard' }
   );
 
-  const filteredRoles = tableState.showSystemResources
-    ? rolesQuery.data
-    : rolesQuery.data?.filter(
-        (role) => !isSystemNamespace(role.namespace, namespacesQuery.data)
-      );
+  const environmentId = useEnvironmentId();
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
+  const rolesQuery = useAllRoles(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
+  const roleBindingsQuery = useAllRoleBindings(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
+  const roleRowData = useRoleRowData(rolesQuery.data, roleBindingsQuery.data);
+
+  const filteredRoles = useMemo(
+    () =>
+      tableState.showSystemResources
+        ? roleRowData
+        : roleRowData.filter((role) => !role.isSystem),
+    [roleRowData, tableState.showSystemResources]
+  );
 
   return (
     <Datatable
       dataset={filteredRoles || []}
       columns={columns}
       settingsManager={tableState}
-      isLoading={rolesQuery.isLoading}
+      isLoading={rolesQuery.isLoading || roleBindingsQuery.isLoading}
       emptyContentLabel="No roles found"
       title="Roles"
       titleIcon={UserCheck}
@@ -85,7 +105,7 @@ type TableActionsProps = {
 
 function TableActions({ selectedItems }: TableActionsProps) {
   const environmentId = useEnvironmentId();
-  const deleteRolesMutation = useDeleteRolesMutation(environmentId);
+  const deleteRolesMutation = useDeleteRoles(environmentId);
   const router = useRouter();
 
   return (
@@ -154,4 +174,27 @@ function TableActions({ selectedItems }: TableActionsProps) {
     );
     return roles;
   }
+}
+
+// Mark roles that are used by a role binding
+
+// Mark roles that are used by a role binding
+function useRoleRowData(
+  roles?: Role[],
+  roleBindings?: RoleBinding[]
+): RoleRowData[] {
+  const roleRowData = useMemo(
+    () =>
+      roles?.map((role) => {
+        const isUsed = roleBindings?.some(
+          (roleBinding) =>
+            roleBinding.roleRef.name === role.name &&
+            roleBinding.namespace === role.namespace
+        );
+        return { ...role, isUnused: !isUsed };
+      }),
+    [roles, roleBindings]
+  );
+
+  return roleRowData ?? [];
 }

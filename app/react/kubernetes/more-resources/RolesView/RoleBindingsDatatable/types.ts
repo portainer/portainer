@@ -15,12 +15,8 @@ export type RoleBinding = {
   name: string;
   uid: string;
   namespace: string;
-  resourceVersion: string;
-  creationDate: string;
-  annotations: Record<string, string> | null;
-
   roleRef: RoleRef;
   subjects: RoleSubject[] | null;
-
+  creationDate: string;
   isSystem: boolean;
 };

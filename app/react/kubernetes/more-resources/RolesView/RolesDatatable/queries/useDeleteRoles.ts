@@ -6,15 +6,15 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { queryKeys } from './query-keys';
 
-export function useDeleteRoleBindingsMutation(environmentId: EnvironmentId) {
+export function useDeleteRoles(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
-  return useMutation(deleteRoleBindings, {
+  return useMutation(deleteRole, {
     ...withInvalidate(queryClient, [queryKeys.list(environmentId)]),
-    ...withGlobalError('Unable to delete role bindings'),
+    ...withGlobalError('Unable to delete roles'),
   });
 }
 
-export async function deleteRoleBindings({
+export async function deleteRole({
   environmentId,
   data,
 }: {
@@ -22,11 +22,8 @@ export async function deleteRoleBindings({
   data: Record<string, string[]>;
 }) {
   try {
-    return await axios.post(
-      `kubernetes/${environmentId}/role_bindings/delete`,
-      data
-    );
+    return await axios.post(`kubernetes/${environmentId}/roles/delete`, data);
   } catch (e) {
-    throw parseAxiosError(e, `Unable to delete role bindings`);
+    throw parseAxiosError(e, `Unable to delete roles`);
   }
 }

@@ -3,7 +3,7 @@ import { Row } from '@tanstack/react-table';
 import { filterHOC } from '@@/datatables/Filter';
 import { Link } from '@@/Link';
 
-import { Role } from '../types';
+import { RoleRowData } from '../types';
 
 import { columnHelper } from './helper';
 
@@ -26,7 +26,7 @@ export const namespace = columnHelper.accessor((row) => row.namespace, {
     filter: filterHOC('Filter by namespace'),
   },
   enableColumnFilter: true,
-  filterFn: (row: Row<Role>, _columnId: string, filterValue: string[]) =>
+  filterFn: (row: Row<RoleRowData>, _columnId: string, filterValue: string[]) =>
     filterValue.length === 0 ||
     filterValue.includes(row.original.namespace ?? ''),
 });

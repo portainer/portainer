@@ -8,7 +8,7 @@ import { RoleBinding } from '../types';
 
 import { queryKeys } from './query-keys';
 
-export function useGetAllRoleBindingsQuery(
+export function useAllRoleBindings(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number; enabled?: boolean }
 ) {

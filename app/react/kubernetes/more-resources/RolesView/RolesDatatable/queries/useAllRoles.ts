@@ -11,7 +11,7 @@ const queryKeys = {
     ['environments', environmentId, 'kubernetes', 'roles'] as const,
 };
 
-export function useGetAllRolesQuery(
+export function useAllRoles(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number; enabled?: boolean }
 ) {

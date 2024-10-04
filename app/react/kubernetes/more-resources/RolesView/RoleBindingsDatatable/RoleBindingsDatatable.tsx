@@ -2,45 +2,56 @@ import { Trash2, Link as LinkIcon } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
 import { Row } from '@tanstack/react-table';
 import clsx from 'clsx';
+import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
-import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { confirmDelete } from '@@/modals/confirm';
 import { Datatable, Table, TableSettingsMenu } from '@@/datatables';
 import { LoadingButton } from '@@/buttons';
-import { useTableState } from '@@/datatables/useTableState';
-
-import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
 
 import { RoleBinding } from './types';
 import { columns } from './columns';
-import { useGetAllRoleBindingsQuery } from './queries/useGetAllRoleBindingsQuery';
-import { useDeleteRoleBindingsMutation } from './queries/useDeleteRoleBindingsMutation';
+import { useAllRoleBindings } from './queries/useAllRoleBindings';
+import { useDeleteRoleBindings } from './queries/useDeleteRoleBindings';
 
 const storageKey = 'roleBindings';
-const settingsStore = createStore(storageKey);
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function RoleBindingsDatatable() {
   const environmentId = useEnvironmentId();
-  const tableState = useTableState(settingsStore, storageKey);
-  const namespacesQuery = useNamespacesQuery(environmentId);
-  const roleBindingsQuery = useGetAllRoleBindingsQuery(environmentId, {
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
+  const roleBindingsQuery = useAllRoleBindings(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
-    enabled: namespacesQuery.isSuccess,
   });
-
-  const filteredRoleBindings = tableState.showSystemResources
-    ? roleBindingsQuery.data
-    : roleBindingsQuery.data?.filter(
-        (rb) => !isSystemNamespace(rb.namespace, namespacesQuery.data)
-      );
+  const filteredRoleBindings = useMemo(
+    () =>
+      tableState.showSystemResources
+        ? roleBindingsQuery.data
+        : roleBindingsQuery.data?.filter((rb) => !rb.isSystem),
+    [roleBindingsQuery.data, tableState.showSystemResources]
+  );
 
   const { authorized: isAuthorisedToAddEdit } = useAuthorizations([
     'K8sRoleBindingsW',
@@ -100,8 +111,7 @@ type TableActionsProps = {
 
 function TableActions({ selectedItems }: TableActionsProps) {
   const environmentId = useEnvironmentId();
-  const deleteRoleBindingsMutation =
-    useDeleteRoleBindingsMutation(environmentId);
+  const deleteRoleBindingsMutation = useDeleteRoleBindings(environmentId);
   const router = useRouter();
 
   async function handleRemoveClick(roles: SelectedRole[]) {

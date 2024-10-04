@@ -8,12 +8,10 @@ export type Role = {
   name: string;
   uid: string;
   namespace: string;
-  resourceVersion: string;
   creationDate: string;
-  annotations?: Record<string, string>;
-
-  rules: Rule[];
-
   isSystem: boolean;
+};
+
+export type RoleRowData = Role & {
   isUnused: boolean;
 };
