@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
+import { createOwnershipColumn } from '@/react/docker/components/datatables/createOwnershipColumn';
 import { isoDate, truncateLeftRight } from '@/portainer/filters/filters';
 
 import { DecoratedVolume } from '../../types';

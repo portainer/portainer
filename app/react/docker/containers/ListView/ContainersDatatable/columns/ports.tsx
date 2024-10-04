@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { CellContext } from '@tanstack/react-table';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
 import { PublishedPortLink } from '@/react/docker/components/ImageStatus/PublishedPortLink';
+import type { ContainerListViewModel } from '@/react/docker/containers/types';
 
 import { useRowContext } from '../RowContext';
 
@@ -20,7 +20,7 @@ export const ports = columnHelper.accessor(
   }
 );
 
-function Cell({ row }: CellContext<DockerContainer, string>) {
+function Cell({ row }: CellContext<ContainerListViewModel, string>) {
   const ports = row.original.Ports;
 
   const { environment } = useRowContext();

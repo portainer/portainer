@@ -2,8 +2,9 @@ import { CellContext } from '@tanstack/react-table';
 import { useRouter } from '@uirouter/react';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { useDisconnectContainer } from '@/react/docker/networks/queries';
+import { useDisconnectContainer } from '@/react/docker/networks/queries/useDisconnectContainerMutation';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { LoadingButton } from '@@/buttons';
 
@@ -17,19 +18,25 @@ export function buildActions({ nodeName }: { nodeName?: string } = {}) {
   });
 
   function Cell({
-    row,
+    row: {
+      original: { id: networkId },
+    },
     table: {
       options: { meta },
     },
   }: CellContext<TableNetwork, unknown>) {
     const router = useRouter();
     const environmentId = useEnvironmentId();
-    const disconnectMutation = useDisconnectContainer();
+    const disconnectMutation = useDisconnectContainer({
+      environmentId,
+      networkId,
+    });
 
     return (
       <Authorized authorizations="DockerNetworkDisconnect">
         <LoadingButton
           color="dangerlight"
+          data-cy="disconnect-network-button"
           isLoading={disconnectMutation.isLoading}
           loadingText="Leaving network..."
           type="button"
@@ -47,13 +54,12 @@ export function buildActions({ nodeName }: { nodeName?: string } = {}) {
 
       disconnectMutation.mutate(
         {
-          environmentId,
-          networkId: row.original.id,
           containerId: meta.containerId,
           nodeName,
         },
         {
           onSuccess() {
+            notifySuccess('Container successfully disconnected', networkId);
             router.stateService.reload();
           },
         }

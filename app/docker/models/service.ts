@@ -9,15 +9,13 @@ import {
 } from 'docker-types/generated/1.41';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
-import { PortainerMetadata } from '@/react/docker/types';
-import { WithRequiredProperty } from '@/types';
+import { PortainerResponse } from '@/react/docker/types';
 
 import { TaskViewModel } from './task';
 
-type ContainerSpec = WithRequiredProperty<
-  TaskSpec,
-  'ContainerSpec'
->['ContainerSpec'];
+type ContainerSpec = Required<TaskSpec>['ContainerSpec'];
+
+export type ServiceId = string;
 
 export class ServiceViewModel {
   Model: Service;
@@ -140,7 +138,7 @@ export class ServiceViewModel {
 
   ResourceControl?: ResourceControlViewModel;
 
-  constructor(data: Service & { Portainer?: PortainerMetadata }) {
+  constructor(data: PortainerResponse<Service>) {
     this.Model = data;
     this.Id = data.ID || '';
     this.Tasks = [];

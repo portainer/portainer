@@ -9,7 +9,7 @@ import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 import { pluralize } from '@/portainer/helpers/strings';
-import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
+import { ownershipIcon } from '@/react/docker/components/datatables/createOwnershipColumn';
 
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';

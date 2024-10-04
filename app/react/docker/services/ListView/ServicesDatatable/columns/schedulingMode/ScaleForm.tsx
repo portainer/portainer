@@ -18,7 +18,7 @@ export function ScaleForm({
   service: ServiceViewModel;
 }) {
   const environmentId = useEnvironmentId();
-  const mutation = useUpdateServiceMutation();
+  const mutation = useUpdateServiceMutation(environmentId);
   const router = useRouter();
   return (
     <Formik

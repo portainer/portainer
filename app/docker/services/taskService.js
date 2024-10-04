@@ -1,69 +1,57 @@
-import { formatLogs } from '../helpers/logHelper';
+import { getTask } from '@/react/docker/tasks/queries/useTask';
+import { getTasks } from '@/react/docker/proxy/queries/tasks/useTasks';
+import { getTaskLogs } from '@/react/docker/tasks/queries/useTaskLogs';
+
 import { TaskViewModel } from '../models/task';
+import { formatLogs } from '../helpers/logHelper';
 
-angular.module('portainer.docker').factory('TaskService', [
-  '$q',
-  'Task',
-  function TaskServiceFactory($q, Task) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('TaskService', TaskServiceFactory);
 
-    service.task = function (id) {
-      var deferred = $q.defer();
+/* @ngInject */
+function TaskServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      Task.get({ id: id })
-        .$promise.then(function success(data) {
-          var task = new TaskViewModel(data);
-          deferred.resolve(task);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve task details', err: err });
-        });
+  return {
+    task: useAxios(injectEnvironmentId(taskAngularJS)), // task edit
+    tasks: useAxios(injectEnvironmentId(tasksAngularJS)), // services list + service edit + swarm visualizer + stack edit
+    logs: useAxios(injectEnvironmentId(taskLogsAngularJS)), // task logs
+  };
 
-      return deferred.promise;
-    };
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {TaskId} id
+   */
+  async function taskAngularJS(environmentId, id) {
+    const data = await getTask(environmentId, id);
+    return new TaskViewModel(data);
+  }
 
-    service.tasks = function (filters) {
-      var deferred = $q.defer();
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {*} filters
+   */
+  async function tasksAngularJS(environmentId, filters) {
+    const data = await getTasks(environmentId, filters);
+    return data.map((t) => new TaskViewModel(t));
+  }
 
-      Task.query({ filters: filters ? filters : {} })
-        .$promise.then(function success(data) {
-          var tasks = data.map(function (item) {
-            return new TaskViewModel(item);
-          });
-          deferred.resolve(tasks);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve tasks', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.logs = function (id, stdout, stderr, timestamps, since, tail) {
-      var deferred = $q.defer();
-
-      var parameters = {
-        id: id,
-        stdout: stdout || 0,
-        stderr: stderr || 0,
-        timestamps: timestamps || 0,
-        since: since || 0,
-        tail: tail || 'all',
-      };
-
-      Task.logs(parameters)
-        .$promise.then(function success(data) {
-          var logs = formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
-          deferred.resolve(logs);
-        })
-        .catch(function error(err) {
-          deferred.reject(err);
-        });
-
-      return deferred.promise;
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {TaskId} id
+   * @param {boolean?} stdout
+   * @param {boolean?} stderr
+   * @param {boolean?} timestamps
+   * @param {number?} since
+   * @param {number?} tail
+   */
+  async function taskLogsAngularJS(environmentId, id, stdout = false, stderr = false, timestamps = false, since = 0, tail = 'all') {
+    const data = await getTaskLogs(environmentId, id, {
+      since,
+      stderr,
+      stdout,
+      tail,
+      timestamps,
+    });
+    return formatLogs(data, { stripHeaders: true, withTimestamps: !!timestamps });
+  }
+}

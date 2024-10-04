@@ -19,7 +19,7 @@ import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
 import { HelpLink } from '@@/HelpLink';
 
-import { useContainers } from '../queries/containers';
+import { useContainers } from '../queries/useContainers';
 import { useSystemLimits, useIsWindows } from '../../proxy/queries/useInfo';
 
 import { useCreateOrReplaceMutation } from './useCreateMutation';
@@ -149,7 +149,21 @@ function CreateForm() {
     const config = toRequest(values, registry, hideCapabilities);
 
     return mutation.mutate(
-      { config, environment, values, registry, oldContainer, extraNetworks },
+      {
+        config,
+        environment,
+        values: {
+          accessControl: values.accessControl,
+          imageName: values.image.image,
+          name: values.name,
+          alwaysPull: values.alwaysPull,
+          enableWebhook: values.enableWebhook,
+          nodeName: values.nodeName,
+        },
+        registry,
+        oldContainer,
+        extraNetworks,
+      },
       {
         onSuccess() {
           sendAnalytics(values, registry);

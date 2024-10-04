@@ -1,6 +1,5 @@
-import { PortainerMetadata } from '@/react/docker/types';
-
-import { ContainerId } from '../containers/types';
+import { PortainerResponse } from '@/react/docker/types';
+import { ContainerId } from '@/react/docker/containers/types';
 
 export type IPConfig = {
   Subnet: string;
@@ -32,7 +31,7 @@ export type NetworkResponseContainers = Record<
   NetworkResponseContainer
 >;
 
-export interface DockerNetwork {
+export interface DockerNetwork extends PortainerResponse<unknown> {
   Name: string;
   Id: NetworkId;
   Driver: string;
@@ -44,7 +43,6 @@ export interface DockerNetwork {
     Driver: string;
     Options: IpamOptions;
   };
-  Portainer?: PortainerMetadata;
   Options: NetworkOptions;
   Containers: NetworkResponseContainers;
 }

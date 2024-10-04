@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { Team } from '@/react/portainer/users/teams/types';
-import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
+import { ownershipIcon } from '@/react/docker/components/datatables/createOwnershipColumn';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BadgeIcon } from '@@/BadgeIcon';

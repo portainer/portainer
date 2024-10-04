@@ -3,13 +3,13 @@ import { ResourceControlOwnership } from '@/react/portainer/access-control/types
 import { UserId } from '@/portainer/users/types';
 import { getDefaultImageConfig } from '@/react/portainer/registries/utils/getImageConfig';
 
-import { ContainerResponse } from '../../queries/container';
+import { ContainerDetailsResponse } from '../../queries/useContainer';
 
 import { toViewModel as toPortsMappingViewModel } from './PortsMappingField.viewModel';
 import { Values } from './BaseForm';
 
 export function toViewModel(
-  config: ContainerResponse,
+  config: ContainerDetailsResponse,
   isPureAdmin: boolean,
   currentUserId: UserId,
   nodeName: string,

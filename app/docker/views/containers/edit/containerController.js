@@ -5,6 +5,7 @@ import { confirmContainerDeletion } from '@/react/docker/containers/common/confi
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { confirmContainerRecreation } from '@/react/docker/containers/ItemView/ConfirmRecreationModal';
+import { commitContainer } from '@/react/docker/proxy/queries/useCommitContainerMutation';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -13,14 +14,13 @@ angular.module('portainer.docker').controller('ContainerController', [
   '$transition$',
   '$filter',
   '$async',
-  'Commit',
   'ContainerService',
   'ImageHelper',
   'Notifications',
   'HttpRequestHelper',
   'Authentication',
   'endpoint',
-  function ($q, $scope, $state, $transition$, $filter, $async, Commit, ContainerService, ImageHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
+  function ($q, $scope, $state, $transition$, $filter, $async, ContainerService, ImageHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
     $scope.resourceType = ResourceControlType.Container;
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
@@ -204,7 +204,7 @@ angular.module('portainer.docker').controller('ContainerController', [
       const registryModel = $scope.config.RegistryModel;
       const imageConfig = ImageHelper.createImageConfigForContainer(registryModel);
       try {
-        await Commit.commitContainer({ environmentId: endpoint.Id }, { id: $transition$.params().id, repo: imageConfig.fromImage }).$promise;
+        await commitContainer(endpoint.Id, { container: $transition$.params().id, repo: imageConfig.fromImage });
         Notifications.success('Image created', $transition$.params().id);
         $state.reload();
       } catch (err) {

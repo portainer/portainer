@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { StackType } from '@/react/common/stacks/types';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
-import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
+import { createOwnershipColumn } from '@/react/docker/components/datatables/createOwnershipColumn';
 
 import { DecoratedStack } from '../types';
 
