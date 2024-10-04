@@ -78,6 +78,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Handle("/secrets", httperror.LoggerHandler(h.GetAllKubernetesSecrets)).Methods(http.MethodGet)
 	endpointRouter.Handle("/secrets/count", httperror.LoggerHandler(h.getAllKubernetesSecretsCount)).Methods(http.MethodGet)
 	endpointRouter.Handle("/services/delete", httperror.LoggerHandler(h.deleteKubernetesServices)).Methods(http.MethodPost)
+	endpointRouter.Handle("/service_accounts/delete", httperror.LoggerHandler(h.deleteKubernetesServiceAccounts)).Methods(http.MethodPost)
 	endpointRouter.Handle("/rbac_enabled", httperror.LoggerHandler(h.getKubernetesRBACStatus)).Methods(http.MethodGet)
 	endpointRouter.Handle("/roles", httperror.LoggerHandler(h.getAllKubernetesRoles)).Methods(http.MethodGet)
 	endpointRouter.Handle("/role_bindings", httperror.LoggerHandler(h.getAllKubernetesRoleBindings)).Methods(http.MethodGet)

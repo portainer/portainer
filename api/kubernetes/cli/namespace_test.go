@@ -65,7 +65,7 @@ func Test_ToggleSystemState(t *testing.T) {
 				ns, err := kcl.cli.CoreV1().Namespaces().Get(context.Background(), nsName, metav1.GetOptions{})
 				assert.NoError(t, err)
 
-				assert.Equal(t, test.isSystem, isSystemNamespace(*ns))
+				assert.Equal(t, test.isSystem, isSystemNamespace(ns))
 			})
 		}
 	})

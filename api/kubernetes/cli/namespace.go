@@ -94,7 +94,7 @@ func parseNamespace(namespace *corev1.Namespace) portainer.K8sNamespaceInfo {
 		Status:         namespace.Status,
 		CreationDate:   namespace.CreationTimestamp.Format(time.RFC3339),
 		NamespaceOwner: namespace.Labels[namespaceOwnerLabel],
-		IsSystem:       isSystemNamespace(*namespace),
+		IsSystem:       isSystemNamespace(namespace),
 		IsDefault:      namespace.Name == defaultNamespace,
 	}
 }
@@ -171,7 +171,7 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) (*corev1
 	return namespace, nil
 }
 
-func isSystemNamespace(namespace corev1.Namespace) bool {
+func isSystemNamespace(namespace *corev1.Namespace) bool {
 	systemLabelValue, hasSystemLabel := namespace.Labels[systemNamespaceLabel]
 	if hasSystemLabel {
 		return systemLabelValue == "true"
@@ -182,6 +182,15 @@ func isSystemNamespace(namespace corev1.Namespace) bool {
 	_, isSystem := systemNamespaces[namespace.Name]
 
 	return isSystem
+}
+
+func (kcl *KubeClient) isSystemNamespace(namespace string) bool {
+	ns, err := kcl.cli.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
+	if err != nil {
+		return false
+	}
+
+	return isSystemNamespace(ns)
 }
 
 // ToggleSystemState will set a namespace as a system namespace, or remove this state
@@ -199,7 +208,7 @@ func (kcl *KubeClient) ToggleSystemState(namespaceName string, isSystem bool) er
 		return errors.Wrap(err, "failed fetching namespace object")
 	}
 
-	if isSystemNamespace(*namespace) == isSystem {
+	if isSystemNamespace(namespace) == isSystem {
 		return nil
 	}
 
