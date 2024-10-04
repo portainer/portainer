@@ -18,6 +18,60 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestHasNewerVersion(t *testing.T) {
+	// Test cases
+	tests := []struct {
+		name           string
+		currentVersion string
+		latestVersion  string
+		expected       bool
+	}{
+		{
+			name:           "current version is less than latest version",
+			currentVersion: "2.22.0",
+			latestVersion:  "v2.22.1",
+			expected:       true,
+		},
+		{
+			name:           "current version is equal to latest version",
+			currentVersion: "2.22.0",
+			latestVersion:  "v2.22.0",
+			expected:       false,
+		},
+		{
+			name:           "current version is greater than latest version",
+			currentVersion: "v2.22.2",
+			latestVersion:  "v2.22.1",
+			expected:       false,
+		},
+		{
+			name:           "invalid current version",
+			currentVersion: "invalid",
+			latestVersion:  "v2.22.0",
+			expected:       false,
+		},
+		{
+			name:           "invalid latest version",
+			currentVersion: "2.22.0",
+			latestVersion:  "invalid",
+			expected:       false,
+		},
+		{
+			name:           "both versions are invalid",
+			currentVersion: "invalid",
+			latestVersion:  "invalid",
+			expected:       false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := HasNewerVersion(tt.currentVersion, tt.latestVersion)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
 func Test_getSystemVersion(t *testing.T) {
 	is := assert.New(t)
 

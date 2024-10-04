@@ -11,7 +11,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/coreos/go-semver/semver"
+	"github.com/Masterminds/semver/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
@@ -119,7 +119,7 @@ func HasNewerVersion(currentVersion, latestVersion string) bool {
 		return false
 	}
 
-	return currentVersionSemver.LessThan(*latestVersionSemver)
+	return currentVersionSemver.LessThan(latestVersionSemver)
 }
 
 // @id Version
