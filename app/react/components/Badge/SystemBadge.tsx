@@ -1,5 +1,5 @@
 import { Badge } from '@@/Badge';
 
 export function SystemBadge() {
-  return <Badge type="success">system</Badge>;
+  return <Badge type="success">System</Badge>;
 }
