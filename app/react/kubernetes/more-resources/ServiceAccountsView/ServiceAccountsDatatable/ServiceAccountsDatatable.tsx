@@ -1,29 +1,38 @@
 import { User } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useMemo } from 'react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import {
+  DefaultDatatableSettings,
+  TableSettings as KubeTableSettings,
+} from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
+import {
+  type FilteredColumnsTableSettings,
+  filteredColumnsSettings,
+} from '@@/datatables/types';
 
 import { ServiceAccount } from '../types';
-import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
 
-import { useColumns } from './columns';
+import { getColumns } from './columns';
 import { useDeleteServiceAccountsMutation } from './queries/useDeleteServiceAccountsMutation';
 import { useGetAllServiceAccountsQuery } from './queries/useGetAllServiceAccountsQuery';
 
 const storageKey = 'serviceAccounts';
-const settingsStore = createStore(storageKey);
+interface TableSettings
+  extends KubeTableSettings,
+    FilteredColumnsTableSettings {}
 
 export function ServiceAccountsDatatable() {
   useUnauthorizedRedirect(
@@ -32,20 +41,30 @@ export function ServiceAccountsDatatable() {
   );
 
   const environmentId = useEnvironmentId();
-  const tableState = useTableState(settingsStore, storageKey);
+  const tableState = useKubeStore<TableSettings>(
+    storageKey,
+    undefined,
+    (set) => ({
+      ...filteredColumnsSettings(set),
+    })
+  );
   const namespacesQuery = useNamespacesQuery(environmentId);
+  const namespaces = namespacesQuery.data;
   const serviceAccountsQuery = useGetAllServiceAccountsQuery(environmentId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
     enabled: namespacesQuery.isSuccess,
   });
 
-  const columns = useColumns();
-
-  const filteredServiceAccounts = tableState.showSystemResources
-    ? serviceAccountsQuery.data
-    : serviceAccountsQuery.data?.filter(
-        (sa) => !isSystemNamespace(sa.namespace, namespacesQuery.data)
-      );
+  const columns = getColumns(namespaces);
+  const filteredServiceAccounts = useMemo(
+    () =>
+      tableState.showSystemResources
+        ? serviceAccountsQuery.data
+        : serviceAccountsQuery.data?.filter(
+            (sa) => !isSystemNamespace(sa.namespace, namespaces)
+          ),
+    [namespaces, serviceAccountsQuery.data, tableState.showSystemResources]
+  );
 
   return (
     <Datatable
@@ -56,8 +75,10 @@ export function ServiceAccountsDatatable() {
       emptyContentLabel="No service accounts found"
       title="Service Accounts"
       titleIcon={User}
-      getRowId={(row) => row.uid}
-      isRowSelectable={(row) => !row.original.isSystem}
+      getRowId={(row) => `${row.namespace}-${row.name}`}
+      isRowSelectable={(row) =>
+        !isSystemNamespace(row.original.namespace, namespaces)
+      }
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}
