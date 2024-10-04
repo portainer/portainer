@@ -9,7 +9,7 @@ import { ClusterRole } from '../types';
 
 import { queryKeys } from './query-keys';
 
-export function useGetClusterRolesQuery(
+export function useClusterRoles(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number }
 ) {

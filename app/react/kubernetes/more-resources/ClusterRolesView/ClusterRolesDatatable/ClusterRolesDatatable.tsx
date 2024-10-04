@@ -18,8 +18,8 @@ import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSe
 
 import { ClusterRole } from './types';
 import { columns } from './columns';
-import { useGetClusterRolesQuery } from './queries/useGetClusterRolesQuery';
-import { useDeleteClusterRolesMutation } from './queries/useDeleteClusterRolesMutation';
+import { useClusterRoles } from './queries/useClusterRoles';
+import { useDeleteClusterRoles } from './queries/useDeleteClusterRoles';
 
 const storageKey = 'clusterRoles';
 const settingsStore = createStore(storageKey);
@@ -27,7 +27,7 @@ const settingsStore = createStore(storageKey);
 export function ClusterRolesDatatable() {
   const environmentId = useEnvironmentId();
   const tableState = useTableState(settingsStore, storageKey);
-  const clusterRolesQuery = useGetClusterRolesQuery(environmentId, {
+  const clusterRolesQuery = useClusterRoles(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
 
@@ -82,8 +82,7 @@ type TableActionsProps = {
 
 function TableActions({ selectedItems }: TableActionsProps) {
   const environmentId = useEnvironmentId();
-  const deleteClusterRolesMutation =
-    useDeleteClusterRolesMutation(environmentId);
+  const deleteClusterRolesMutation = useDeleteClusterRoles(environmentId);
   const router = useRouter();
 
   async function handleRemoveClick(roles: SelectedRole[]) {
