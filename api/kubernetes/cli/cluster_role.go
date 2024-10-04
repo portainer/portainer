@@ -6,8 +6,11 @@ import (
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/portainer/portainer/api/internal/errorlist"
+	"github.com/rs/zerolog/log"
 	rbacv1 "k8s.io/api/rbac/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // GetClusterRoles gets all the clusterRoles for at the cluster level in a k8s endpoint.
@@ -22,7 +25,7 @@ func (kcl *KubeClient) GetClusterRoles() ([]models.K8sClusterRole, error) {
 
 // fetchClusterRoles returns a list of all Roles in the specified namespace.
 func (kcl *KubeClient) fetchClusterRoles() ([]models.K8sClusterRole, error) {
-	clusterRoles, err := kcl.cli.RbacV1().ClusterRoles().List(context.TODO(), metav1.ListOptions{})
+	clusterRoles, err := kcl.cli.RbacV1().ClusterRoles().List(context.TODO(), meta.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +43,37 @@ func parseClusterRole(clusterRole rbacv1.ClusterRole) models.K8sClusterRole {
 	return models.K8sClusterRole{
 		Name:         clusterRole.Name,
 		CreationDate: clusterRole.CreationTimestamp.Time,
-		Uid:          string(clusterRole.UID),
+		UID:          clusterRole.UID,
 		IsSystem:     isSystemClusterRole(&clusterRole),
 	}
+}
+
+func (kcl *KubeClient) DeleteClusterRoles(req models.K8sClusterRoleDeleteRequests) error {
+	var errors []error
+	for _, name := range req {
+		client := kcl.cli.RbacV1().ClusterRoles()
+
+		clusterRole, err := client.Get(context.Background(), name, meta.GetOptions{})
+		if err != nil {
+			if k8serrors.IsNotFound(err) {
+				continue
+			}
+			// this is a more serious error to do with the client so we return right away
+			return err
+		}
+
+		if isSystemClusterRole(clusterRole) {
+			log.Warn().Str("role_name", name).Msg("ignoring delete of 'system' cluster role, not allowed")
+		}
+
+		err = client.Delete(context.Background(), name, meta.DeleteOptions{})
+		if err != nil {
+			log.Err(err).Str("role_name", name).Msg("unable to delete the cluster role")
+			errors = append(errors, err)
+		}
+	}
+
+	return errorlist.Combine(errors)
 }
 
 func isSystemClusterRole(role *rbacv1.ClusterRole) bool {
