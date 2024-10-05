@@ -53,18 +53,20 @@ func (kcl *KubeClient) fetchServiceAccounts(namespace string) ([]models.K8sServi
 
 	results := make([]models.K8sServiceAccount, 0)
 	for _, serviceAccount := range serviceAccounts.Items {
-		results = append(results, parseServiceAccount(serviceAccount))
+		results = append(results, kcl.parseServiceAccount(serviceAccount))
 	}
 
 	return results, nil
 }
 
 // parseServiceAccount converts a corev1.ServiceAccount object to a models.K8sServiceAccount object.
-func parseServiceAccount(serviceAccount corev1.ServiceAccount) models.K8sServiceAccount {
+func (kcl *KubeClient) parseServiceAccount(serviceAccount corev1.ServiceAccount) models.K8sServiceAccount {
 	return models.K8sServiceAccount{
 		Name:         serviceAccount.Name,
+		UID:          serviceAccount.UID,
 		Namespace:    serviceAccount.Namespace,
 		CreationDate: serviceAccount.CreationTimestamp.Time,
+		IsSystem:     kcl.isSystemServiceAccount(serviceAccount.Namespace),
 	}
 }
 
@@ -84,6 +86,10 @@ func (kcl *KubeClient) GetPortainerUserServiceAccount(tokenData *portainer.Token
 	return serviceAccount, nil
 }
 
+func (kcl *KubeClient) isSystemServiceAccount(namespace string) bool {
+	return kcl.isSystemNamespace(namespace)
+}
+
 // DeleteServices processes a K8sServiceDeleteRequest by deleting each service
 // in its given namespace.
 func (kcl *KubeClient) DeleteServiceAccounts(reqs kubernetes.K8sServiceAccountDeleteRequests) error {
@@ -101,7 +107,7 @@ func (kcl *KubeClient) DeleteServiceAccounts(reqs kubernetes.K8sServiceAccountDe
 				return err
 			}
 
-			if kcl.isSystemNamespace(sa.Namespace) {
+			if kcl.isSystemServiceAccount(sa.Namespace) {
 				return fmt.Errorf("cannot delete system service account %q", namespace+"/"+serviceName)
 			}
 

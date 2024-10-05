@@ -6,13 +6,11 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import {
   DefaultDatatableSettings,
   TableSettings as KubeTableSettings,
 } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
-import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -24,7 +22,7 @@ import {
 
 import { ServiceAccount } from '../types';
 
-import { getColumns } from './columns';
+import { columns } from './columns';
 import { useDeleteServiceAccountsMutation } from './queries/useDeleteServiceAccountsMutation';
 import { useGetAllServiceAccountsQuery } from './queries/useGetAllServiceAccountsQuery';
 
@@ -42,22 +40,15 @@ export function ServiceAccountsDatatable() {
       ...filteredColumnsSettings(set),
     })
   );
-  const namespacesQuery = useNamespacesQuery(environmentId);
-  const namespaces = namespacesQuery.data;
   const serviceAccountsQuery = useGetAllServiceAccountsQuery(environmentId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
-    enabled: namespacesQuery.isSuccess,
   });
-
-  const columns = getColumns(namespaces);
   const filteredServiceAccounts = useMemo(
     () =>
       tableState.showSystemResources
         ? serviceAccountsQuery.data
-        : serviceAccountsQuery.data?.filter(
-            (sa) => !isSystemNamespace(sa.namespace, namespaces)
-          ),
-    [namespaces, serviceAccountsQuery.data, tableState.showSystemResources]
+        : serviceAccountsQuery.data?.filter((sa) => !sa.isSystem),
+    [serviceAccountsQuery.data, tableState.showSystemResources]
   );
 
   return (
@@ -69,10 +60,8 @@ export function ServiceAccountsDatatable() {
       emptyContentLabel="No service accounts found"
       title="Service Accounts"
       titleIcon={User}
-      getRowId={(row) => `${row.namespace}-${row.name}`}
-      isRowSelectable={(row) =>
-        !isSystemNamespace(row.original.namespace, namespaces)
-      }
+      getRowId={(row) => row.uid}
+      isRowSelectable={(row) => !row.original.isSystem}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} />
       )}

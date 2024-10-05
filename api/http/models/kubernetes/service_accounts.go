@@ -4,13 +4,17 @@ import (
 	"errors"
 	"net/http"
 	"time"
+
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
 	K8sServiceAccount struct {
 		Name         string    `json:"name"`
+		UID          types.UID `json:"uid"`
 		Namespace    string    `json:"namespace"`
 		CreationDate time.Time `json:"creationDate"`
+		IsSystem     bool      `json:"isSystem"`
 	}
 
 	// K8sServiceAcountDeleteRequests is a mapping of namespace names to a slice of service account names.
