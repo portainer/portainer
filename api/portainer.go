@@ -1498,6 +1498,8 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		IsRBACEnabled() (bool, error)
 		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
+		GetServiceAccounts(namespace string) ([]models.K8sServiceAccount, error)
+		DeleteServiceAccounts(reqs models.K8sServiceAccountDeleteRequests) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
@@ -1531,6 +1533,16 @@ type (
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
+
+		GetClusterRoles() ([]models.K8sClusterRole, error)
+		DeleteClusterRoles(models.K8sClusterRoleDeleteRequests) error
+		GetClusterRoleBindings() ([]models.K8sClusterRoleBinding, error)
+		DeleteClusterRoleBindings(models.K8sClusterRoleBindingDeleteRequests) error
+
+		GetRoles(namespace string) ([]models.K8sRole, error)
+		DeleteRoles(models.K8sRoleDeleteRequests) error
+		GetRoleBindings(namespace string) ([]models.K8sRoleBinding, error)
+		DeleteRoleBindings(models.K8sRoleBindingDeleteRequests) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)

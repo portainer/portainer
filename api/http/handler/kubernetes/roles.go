@@ -3,7 +3,9 @@ package kubernetes
 import (
 	"net/http"
 
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 )
@@ -37,4 +39,37 @@ func (handler *Handler) getAllKubernetesRoles(w http.ResponseWriter, r *http.Req
 	}
 
 	return response.JSON(w, roles)
+}
+
+// @id DeleteRoles
+// @summary Delete the provided roles
+// @description Delete the provided roles for the given Kubernetes environment
+// @description **Access policy**: administrator
+// @tags rbac_enabled
+// @security ApiKeyAuth
+// @security jwt
+// @produce text/plain
+// @param id path int true "Environment(Endpoint) identifier"
+// @param payload body kubernetes.K8sRoleDeleteRequests true "Roles to delete "
+// @success 200 "Success"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/roles/delete [POST]
+func (h *Handler) deleteRoles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload models.K8sRoleDeleteRequests
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	cli, handlerErr := h.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	err = cli.DeleteRoles(payload)
+	if err != nil {
+		return httperror.InternalServerError("Failed to delete roles", err)
+	}
+
+	return nil
 }

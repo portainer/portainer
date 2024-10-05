@@ -55,7 +55,7 @@ func (handler *Handler) getAllKubernetesClusterRoles(w http.ResponseWriter, r *h
 // @security jwt
 // @produce text/plain
 // @param id path int true "Environment(Endpoint) identifier"
-// @param payload body models.K8sClusterRoleDeleteRequests true "Cluster roles to delete"
+// @param payload body kubernetes.K8sClusterRoleDeleteRequests true "Cluster roles to delete"
 // @success 200 "Success"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/cluster_roles/delete [POST]

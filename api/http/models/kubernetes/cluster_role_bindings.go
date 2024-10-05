@@ -13,6 +13,7 @@ type (
 	K8sClusterRoleBinding struct {
 		Name         string           `json:"name"`
 		UID          types.UID        `json:"uid"`
+		Namespace    string           `json:"namespace"`
 		RoleRef      rbacv1.RoleRef   `json:"roleRef"`
 		Subjects     []rbacv1.Subject `json:"subjects"`
 		CreationDate time.Time        `json:"creationDate"`

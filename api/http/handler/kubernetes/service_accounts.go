@@ -50,7 +50,7 @@ func (handler *Handler) getAllKubernetesServiceAccounts(w http.ResponseWriter, r
 // @security jwt
 // @produce text/plain
 // @param id path int true "Environment(Endpoint) identifier"
-// @param payload body models.K8sServiceAccountDeleteRequests true "Service accounts to delete "
+// @param payload body kubernetes.K8sServiceAccountDeleteRequests true "Service accounts to delete "
 // @success 200 "Success"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/service_accounts/delete [POST]

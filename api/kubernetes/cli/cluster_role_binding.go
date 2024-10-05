@@ -43,6 +43,7 @@ func parseClusterRoleBinding(clusterRoleBinding rbacv1.ClusterRoleBinding) model
 	return models.K8sClusterRoleBinding{
 		Name:         clusterRoleBinding.Name,
 		UID:          clusterRoleBinding.UID,
+		Namespace:    clusterRoleBinding.Namespace,
 		RoleRef:      clusterRoleBinding.RoleRef,
 		Subjects:     clusterRoleBinding.Subjects,
 		CreationDate: clusterRoleBinding.CreationTimestamp.Time,

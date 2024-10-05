@@ -3,7 +3,9 @@ package kubernetes
 import (
 	"net/http"
 
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 )
@@ -37,4 +39,36 @@ func (handler *Handler) getAllKubernetesRoleBindings(w http.ResponseWriter, r *h
 	}
 
 	return response.JSON(w, rolebindings)
+}
+
+// @id DeleteRoleBindings
+// @summary Delete the provided role bindings
+// @description Delete the provided role bindings for the given Kubernetes environment
+// @description **Access policy**: administrator
+// @tags rbac_enabled
+// @security ApiKeyAuth
+// @security jwt
+// @produce text/plain
+// @param id path int true "Environment(Endpoint) identifier"
+// @param payload body models.K8sRoleDeleteRequests true "Role bindings to delete"
+// @success 200 "Success"
+// @failure 500 "Server error"
+// @router /kubernetes/{id}/role_bindings/delete [POST]
+func (h *Handler) deleteRoleBindings(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload models.K8sRoleBindingDeleteRequests
+
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	cli, handlerErr := h.getProxyKubeClient(r)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	if err := cli.DeleteRoleBindings(payload); err != nil {
+		return httperror.InternalServerError("Failed to delete role bindings", err)
+	}
+
+	return nil
 }
