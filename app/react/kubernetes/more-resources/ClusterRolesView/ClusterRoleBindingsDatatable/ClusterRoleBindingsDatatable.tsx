@@ -20,8 +20,8 @@ import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSe
 
 import { ClusterRoleBinding } from './types';
 import { columns } from './columns';
-import { useGetClusterRoleBindingsQuery } from './queries/useGetClusterRoleBindingsQuery';
-import { useDeleteClusterRoleBindingsMutation } from './queries/useDeleteClusterRoleBindingsMutation';
+import { useClusterRoleBindings } from './queries/useClusterRoleBindings';
+import { useDeleteClusterRoleBindings } from './queries/useDeleteClusterRoleBindings';
 
 const storageKey = 'clusterRoleBindings';
 const settingsStore = createStore(storageKey);
@@ -29,12 +29,9 @@ const settingsStore = createStore(storageKey);
 export function ClusterRoleBindingsDatatable() {
   const environmentId = useEnvironmentId();
   const tableState = useTableState(settingsStore, storageKey);
-  const clusterRoleBindingsQuery = useGetClusterRoleBindingsQuery(
-    environmentId,
-    {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
-    }
-  );
+  const clusterRoleBindingsQuery = useClusterRoleBindings(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
 
   const filteredClusterRoleBindings = useMemo(
     () =>
@@ -102,7 +99,7 @@ type TableActionsProps = {
 function TableActions({ selectedItems }: TableActionsProps) {
   const environmentId = useEnvironmentId();
   const deleteClusterRoleBindingsMutation =
-    useDeleteClusterRoleBindingsMutation(environmentId);
+    useDeleteClusterRoleBindings(environmentId);
   const router = useRouter();
 
   async function handleRemoveClick(roles: SelectedRole[]) {

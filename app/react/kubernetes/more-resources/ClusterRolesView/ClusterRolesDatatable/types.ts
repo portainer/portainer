@@ -5,6 +5,10 @@ export type ClusterRole = {
   isSystem: boolean;
 };
 
+export type ClusterRoleRowData = ClusterRole & {
+  isUnused: boolean;
+};
+
 export type DeleteRequestPayload = {
   clusterRoles: string[];
 };

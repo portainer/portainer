@@ -25,7 +25,7 @@ import {
 
 import { RoleBinding } from './types';
 import { columns } from './columns';
-import { useAllRoleBindings } from './queries/useAllRoleBindings';
+import { useRoleBindings } from './queries/useRoleBindings';
 import { useDeleteRoleBindings } from './queries/useDeleteRoleBindings';
 
 const storageKey = 'roleBindings';
@@ -42,7 +42,7 @@ export function RoleBindingsDatatable() {
       ...filteredColumnsSettings(set),
     })
   );
-  const roleBindingsQuery = useAllRoleBindings(environmentId, {
+  const roleBindingsQuery = useRoleBindings(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
   const filteredRoleBindings = useMemo(

@@ -15,8 +15,12 @@ import { LoadingButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { DefaultDatatableSettings } from '../../../datatables/DefaultDatatableSettings';
+import { useClusterRoleBindings } from '../ClusterRoleBindingsDatatable/queries/useClusterRoleBindings';
+import { useRoleBindings } from '../../RolesView/RoleBindingsDatatable/queries/useRoleBindings';
+import { ClusterRoleBinding } from '../ClusterRoleBindingsDatatable/types';
+import { RoleBinding } from '../../RolesView/RoleBindingsDatatable/types';
 
-import { ClusterRole } from './types';
+import { ClusterRole, ClusterRoleRowData } from './types';
 import { columns } from './columns';
 import { useClusterRoles } from './queries/useClusterRoles';
 import { useDeleteClusterRoles } from './queries/useDeleteClusterRoles';
@@ -27,26 +31,41 @@ const settingsStore = createStore(storageKey);
 export function ClusterRolesDatatable() {
   const environmentId = useEnvironmentId();
   const tableState = useTableState(settingsStore, storageKey);
+
   const clusterRolesQuery = useClusterRoles(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
+  const clusterRoleBindingsQuery = useClusterRoleBindings(environmentId);
+  const roleBindingsQuery = useRoleBindings(environmentId);
+
+  const clusterRolesWithUnusedFlag = useClusterRolesWithUnusedFlag(
+    clusterRolesQuery.data,
+    clusterRoleBindingsQuery.data,
+    roleBindingsQuery.data
+  );
+
+  const filteredClusterRoles = useMemo(
+    () =>
+      clusterRolesWithUnusedFlag.filter(
+        (cr) => tableState.showSystemResources || !cr.isSystem
+      ),
+    [clusterRolesWithUnusedFlag, tableState.showSystemResources]
+  );
+
+  const isLoading =
+    clusterRolesQuery.isLoading ||
+    clusterRoleBindingsQuery.isLoading ||
+    roleBindingsQuery.isLoading;
 
   const { authorized: isAuthorizedToAddEdit } = useAuthorizations([
     'K8sClusterRolesW',
   ]);
-  const filteredClusterRoles = useMemo(
-    () =>
-      clusterRolesQuery.data?.filter(
-        (cr) => tableState.showSystemResources || !cr.isSystem
-      ),
-    [clusterRolesQuery.data, tableState.showSystemResources]
-  );
 
   return (
     <Datatable
       dataset={filteredClusterRoles || []}
       columns={columns}
-      isLoading={clusterRolesQuery.isLoading}
+      isLoading={isLoading}
       settingsManager={tableState}
       emptyContentLabel="No supported cluster roles found"
       title="Cluster Roles"
@@ -148,4 +167,39 @@ function TableActions({ selectedItems }: TableActionsProps) {
       />
     </Authorized>
   );
+}
+
+// Updated custom hook
+function useClusterRolesWithUnusedFlag(
+  clusterRoles?: ClusterRole[],
+  clusterRoleBindings?: ClusterRoleBinding[],
+  roleBindings?: RoleBinding[]
+): ClusterRoleRowData[] {
+  return useMemo(() => {
+    if (!clusterRoles || !clusterRoleBindings || !roleBindings) {
+      return [];
+    }
+
+    const usedRoleNames = new Set<string>();
+
+    // Check ClusterRoleBindings
+    clusterRoleBindings.forEach((binding) => {
+      if (binding.roleRef.kind === 'ClusterRole') {
+        usedRoleNames.add(binding.roleRef.name);
+      }
+    });
+
+    // Check RoleBindings
+    roleBindings.forEach((binding) => {
+      if (binding.roleRef.kind === 'ClusterRole') {
+        usedRoleNames.add(binding.roleRef.name);
+      }
+    });
+
+    // Mark cluster roles as unused if they're not in the usedRoleNames set
+    return clusterRoles.map((clusterRole) => ({
+      ...clusterRole,
+      isUnused: !usedRoleNames.has(clusterRole.name) && !clusterRole.isSystem,
+    }));
+  }, [clusterRoles, clusterRoleBindings, roleBindings]);
 }

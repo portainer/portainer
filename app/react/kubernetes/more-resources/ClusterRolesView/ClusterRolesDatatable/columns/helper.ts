@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { ClusterRole } from '../types';
+import { ClusterRoleRowData } from '../types';
 
-export const columnHelper = createColumnHelper<ClusterRole>();
+export const columnHelper = createColumnHelper<ClusterRoleRowData>();

@@ -12,7 +12,6 @@ import {
   TableSettings as KubeTableSettings,
 } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
-import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 
@@ -35,11 +34,6 @@ interface TableSettings
     FilteredColumnsTableSettings {}
 
 export function ServiceAccountsDatatable() {
-  useUnauthorizedRedirect(
-    { authorizations: ['K8sServiceAccountsW'] },
-    { to: 'kubernetes.dashboard' }
-  );
-
   const environmentId = useEnvironmentId();
   const tableState = useKubeStore<TableSettings>(
     storageKey,

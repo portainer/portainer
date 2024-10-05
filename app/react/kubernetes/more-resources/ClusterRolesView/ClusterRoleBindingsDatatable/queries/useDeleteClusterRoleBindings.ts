@@ -6,9 +6,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { queryKeys } from './query-keys';
 
-export function useDeleteClusterRoleBindingsMutation(
-  environmentId: EnvironmentId
-) {
+export function useDeleteClusterRoleBindings(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation(deleteClusterRoleBindings, {
     ...withInvalidate(queryClient, [queryKeys.list(environmentId)]),

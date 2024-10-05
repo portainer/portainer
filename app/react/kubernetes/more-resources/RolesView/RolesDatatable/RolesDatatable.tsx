@@ -7,7 +7,6 @@ import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
 import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
-import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 import {
   DefaultDatatableSettings,
   TableSettings as KubeTableSettings,
@@ -22,12 +21,12 @@ import {
   filteredColumnsSettings,
 } from '@@/datatables/types';
 
-import { useAllRoleBindings } from '../RoleBindingsDatatable/queries/useAllRoleBindings';
+import { useRoleBindings } from '../RoleBindingsDatatable/queries/useRoleBindings';
 import { RoleBinding } from '../RoleBindingsDatatable/types';
 
 import { columns } from './columns';
 import { Role, RoleRowData } from './types';
-import { useAllRoles } from './queries/useAllRoles';
+import { useRoles } from './queries/useRoles';
 import { useDeleteRoles } from './queries/useDeleteRoles';
 
 const storageKey = 'roles';
@@ -36,11 +35,6 @@ interface TableSettings
     FilteredColumnsTableSettings {}
 
 export function RolesDatatable() {
-  useUnauthorizedRedirect(
-    { authorizations: ['K8sRolesW'] },
-    { to: 'kubernetes.dashboard' }
-  );
-
   const environmentId = useEnvironmentId();
   const tableState = useKubeStore<TableSettings>(
     storageKey,
@@ -49,10 +43,10 @@ export function RolesDatatable() {
       ...filteredColumnsSettings(set),
     })
   );
-  const rolesQuery = useAllRoles(environmentId, {
+  const rolesQuery = useRoles(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
-  const roleBindingsQuery = useAllRoleBindings(environmentId, {
+  const roleBindingsQuery = useRoleBindings(environmentId, {
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
   const roleRowData = useRoleRowData(rolesQuery.data, roleBindingsQuery.data);

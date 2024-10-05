@@ -9,7 +9,7 @@ import { ClusterRoleBinding } from '../types';
 
 import { queryKeys } from './query-keys';
 
-export function useGetClusterRoleBindingsQuery(
+export function useClusterRoleBindings(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number }
 ) {

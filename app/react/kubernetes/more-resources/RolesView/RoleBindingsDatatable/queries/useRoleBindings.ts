@@ -4,22 +4,19 @@ import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { Role } from '../types';
+import { RoleBinding } from '../types';
 
-const queryKeys = {
-  list: (environmentId: EnvironmentId) =>
-    ['environments', environmentId, 'kubernetes', 'roles'] as const,
-};
+import { queryKeys } from './query-keys';
 
-export function useAllRoles(
+export function useRoleBindings(
   environmentId: EnvironmentId,
   options?: { autoRefreshRate?: number; enabled?: boolean }
 ) {
   return useQuery(
     queryKeys.list(environmentId),
-    async () => getAllRoles(environmentId),
+    async () => getAllRoleBindings(environmentId),
     {
-      ...withGlobalError('Unable to get roles'),
+      ...withGlobalError('Unable to get role bindings'),
       refetchInterval() {
         return options?.autoRefreshRate ?? false;
       },
@@ -28,14 +25,14 @@ export function useAllRoles(
   );
 }
 
-async function getAllRoles(environmentId: EnvironmentId) {
+async function getAllRoleBindings(environmentId: EnvironmentId) {
   try {
-    const { data: roles } = await axios.get<Role[]>(
-      `kubernetes/${environmentId}/roles`
+    const { data: roleBinding } = await axios.get<RoleBinding[]>(
+      `kubernetes/${environmentId}/role_bindings`
     );
 
-    return roles;
+    return roleBinding;
   } catch (e) {
-    throw parseAxiosError(e, 'Unable to get roles');
+    throw parseAxiosError(e, 'Unable to get role bindings');
   }
 }
