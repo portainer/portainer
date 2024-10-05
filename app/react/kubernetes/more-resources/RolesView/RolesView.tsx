@@ -11,7 +11,7 @@ import { RoleBindingsDatatable } from './RoleBindingsDatatable';
 
 export function RolesView() {
   useUnauthorizedRedirect(
-    { authorizations: ['K8sRoleBindingsW', 'K8sRolesW'] },
+    { authorizations: ['K8sRoleBindingsW', 'K8sRolesW'], adminOnlyCE: true },
     { to: 'kubernetes.dashboard' }
   );
 

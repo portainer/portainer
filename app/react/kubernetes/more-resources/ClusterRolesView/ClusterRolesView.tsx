@@ -11,7 +11,10 @@ import { ClusterRoleBindingsDatatable } from './ClusterRoleBindingsDatatable/Clu
 
 export function ClusterRolesView() {
   useUnauthorizedRedirect(
-    { authorizations: ['K8sClusterRoleBindingsW', 'K8sClusterRolesW'] },
+    {
+      authorizations: ['K8sClusterRoleBindingsW', 'K8sClusterRolesW'],
+      adminOnlyCE: true,
+    },
     { to: 'kubernetes.dashboard' }
   );
 
