@@ -29,6 +29,7 @@ import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confi
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
 import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
+import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -1022,16 +1023,14 @@ class KubernetesCreateApplicationController {
 
         this.deploymentOptions = await getGlobalDeploymentOptions();
 
-        const [resourcePools, nodes, nodesLimits] = await Promise.all([
-          this.KubernetesResourcePoolService.get(),
-          this.KubernetesNodeService.get(),
-          this.KubernetesNodesLimitsService.get(),
-        ]);
+        const [namespaces, nodes, nodesLimits] = await Promise.all([getNamespaces(this.endpoint.Id), this.KubernetesNodeService.get(), this.KubernetesNodesLimitsService.get()]);
         this.nodesLimits = nodesLimits;
+        // transform the namespaces to resource pools to conform to legacy code  ( this.KubernetesResourcePoolService.get() )
+        const resourcePools = namespaces.map((namespace) => ({ Namespace: namespace }));
 
         const nonSystemNamespaces = _.filter(
           resourcePools,
-          (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && resourcePool.Namespace.Status === 'Active'
+          (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Name) && resourcePool.Namespace.Status.phase === 'Active'
         );
 
         this.allNamespaces = resourcePools.map(({ Namespace }) => Namespace.Name);
