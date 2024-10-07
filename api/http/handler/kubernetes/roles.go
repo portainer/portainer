@@ -55,8 +55,8 @@ func (handler *Handler) getAllKubernetesRoles(w http.ResponseWriter, r *http.Req
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
-// @failure 404 "Unable to find an environment with the specified identifier or unable to find a specific service."
-// @failure 500 "Server error occurred while attempting to delete services."
+// @failure 404 "Unable to find an environment with the specified identifier or unable to find a specific role."
+// @failure 500 "Server error occurred while attempting to delete roles."
 // @router /kubernetes/{id}/roles/delete [POST]
 func (h *Handler) deleteRoles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload models.K8sRoleDeleteRequests
