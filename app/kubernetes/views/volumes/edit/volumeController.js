@@ -6,6 +6,7 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { confirmRedeploy } from '@/react/kubernetes/volumes/ItemView/ConfirmRedeployModal';
+import { isVolumeUsed, isVolumeExternal } from '@/react/kubernetes/volumes/utils';
 
 class KubernetesVolumeController {
   /* @ngInject */
@@ -49,7 +50,7 @@ class KubernetesVolumeController {
   }
 
   isExternalVolume() {
-    return KubernetesVolumeHelper.isExternalVolume(this.volume);
+    return isVolumeExternal(this.volume);
   }
 
   isSystemNamespace() {
@@ -57,7 +58,7 @@ class KubernetesVolumeController {
   }
 
   isUsed() {
-    return KubernetesVolumeHelper.isUsed(this.volume);
+    return isVolumeUsed(this.volume);
   }
 
   onChangeSize() {
@@ -102,7 +103,7 @@ class KubernetesVolumeController {
   }
 
   updateVolume() {
-    if (KubernetesVolumeHelper.isUsed(this.volume)) {
+    if (isVolumeUsed(this.volume)) {
       confirmRedeploy().then((redeploy) => {
         return this.$async(this.updateVolumeAsync, redeploy);
       });

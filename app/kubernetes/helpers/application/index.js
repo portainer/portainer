@@ -21,7 +21,7 @@ import {
   KubernetesApplicationVolumePersistentPayload,
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import { generatedApplicationConfigVolumeName } from '@/react/kubernetes/volumes/utils';
 import { HelmApplication } from 'Kubernetes/models/application/models';
 import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
@@ -239,7 +239,7 @@ class KubernetesApplicationHelper {
         const volKeys = _.filter(config.overridenKeys, (item) => item.type === 'FILESYSTEM');
         const groupedVolKeys = _.groupBy(volKeys, 'path');
         _.forEach(groupedVolKeys, (items, path) => {
-          const volumeName = KubernetesVolumeHelper.generatedApplicationConfigVolumeName(app.Name);
+          const volumeName = generatedApplicationConfigVolumeName(app.Name);
           const configurationName = config.selectedConfiguration.metadata.name;
           const itemsMap = _.map(items, (item) => {
             const entry = new KubernetesApplicationVolumeEntryPayload();

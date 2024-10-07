@@ -1,7 +1,6 @@
 import { Database } from 'lucide-react';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
-import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { refreshableSettings } from '@@/datatables/types';
@@ -20,6 +19,7 @@ import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery'
 import { useAllVolumesQuery } from '../queries/useVolumesQuery';
 import { isSystemNamespace } from '../../namespaces/queries/useIsSystemNamespace';
 import { useDeleteVolumes } from '../queries/useDeleteVolumes';
+import { isVolumeUsed } from '../utils';
 
 import { columns } from './columns';
 
@@ -68,7 +68,7 @@ export function VolumesDatatable() {
       disableSelect={!hasWriteAuth}
       isRowSelectable={({ original: volume }) =>
         !isSystemNamespace(volume.ResourcePool.Namespace.Name, namespaces) &&
-        !KubernetesVolumeHelper.isUsed(volume)
+        !isVolumeUsed(volume)
       }
       renderTableActions={(selectedItems) => (
         <Authorized authorizations="K8sVolumesW">
