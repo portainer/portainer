@@ -1,14 +1,13 @@
 package endpointedge
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
-	"github.com/portainer/portainer/api/internal/edge/utils"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -35,25 +34,25 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	}
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "stackId")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge stack identifier route variable", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.BadRequest("Invalid edge stack identifier route variable", fmt.Errorf("invalid Edge stack route variable: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("unable to find the Edge stack from database: %w. Environment name: %s", err, endpoint.Name))
 	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("failed to find the Edge stack from database: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {
 		if fileName == "" {
-			return httperror.BadRequest("Docker is not supported by this stack", utils.NewEdgeError(endpoint.Name, errors.New("Docker is not supported by this stack")))
+			return httperror.BadRequest("Docker is not supported by this stack", fmt.Errorf("no filename is provided for the Docker endpoint. Environment name: %s", endpoint.Name))
 		}
 	}
 
@@ -66,18 +65,18 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		fileName = edgeStack.ManifestPath
 
 		if fileName == "" {
-			return httperror.BadRequest("Kubernetes is not supported by this stack", utils.NewEdgeError(endpoint.Name, errors.New("Kubernetes is not supported by this stack")))
+			return httperror.BadRequest("Kubernetes is not supported by this stack", fmt.Errorf("no filename is provided for the Kubernetes endpoint. Environment name: %s", endpoint.Name))
 		}
 	}
 
 	dirEntries, err := filesystem.LoadDir(edgeStack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to load repository", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.InternalServerError("Unable to load repository", fmt.Errorf("failed to load project directory: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	fileContent, err := filesystem.FilterDirForCompatibility(dirEntries, fileName, endpoint.Agent.Version)
 	if err != nil {
-		return httperror.InternalServerError("File not found", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.InternalServerError("File not found", fmt.Errorf("unable to find file: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	dirEntries = filesystem.FilterDirForEntryFile(dirEntries, fileName)

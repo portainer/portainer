@@ -2,13 +2,13 @@ package endpointedge
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
-	"github.com/portainer/portainer/api/internal/edge/utils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -41,17 +41,17 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "jobID")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge job identifier route variable", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.BadRequest("Invalid edge job identifier route variable", fmt.Errorf("invalid Edge job route variable: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	var payload logsPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.BadRequest("Invalid request payload", fmt.Errorf("invalid Edge job request payload: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
@@ -59,11 +59,11 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
-			httpErr.Err = utils.NewEdgeError(endpoint.Name, httpErr.Err)
+			httpErr.Err = fmt.Errorf("edge polling error: %w. Environment name: %s", httpErr.Err, endpoint.Name)
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unexpected error", utils.NewEdgeError(endpoint.Name, err))
+		return httperror.InternalServerError("Unexpected error", fmt.Errorf("edge polling error: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	return response.JSON(w, nil)
