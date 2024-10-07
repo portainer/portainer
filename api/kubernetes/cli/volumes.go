@@ -214,6 +214,7 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 
 	hasReplicaSetOwnerReference := containsReplicaSetOwnerReference(pods)
 	replicaSetItems := make([]appsv1.ReplicaSet, 0)
+	deploymentItems := make([]appsv1.Deployment, 0)
 	if hasReplicaSetOwnerReference {
 		replicaSets, err := kcl.cli.AppsV1().ReplicaSets("").List(context.Background(), metav1.ListOptions{})
 		if err != nil {
@@ -221,19 +222,48 @@ func (kcl *KubeClient) CombineVolumesWithApplications(volumes *[]models.K8sVolum
 			return nil, fmt.Errorf("an error occurred during the CombineVolumesWithApplications operation, unable to list replica sets across the cluster. Error: %w", err)
 		}
 		replicaSetItems = replicaSets.Items
+
+		deployments, err := kcl.cli.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to list deployments across the cluster")
+			return nil, fmt.Errorf("an error occurred during the CombineVolumesWithApplications operation, unable to list deployments across the cluster. Error: %w", err)
+		}
+		deploymentItems = deployments.Items
 	}
 
-	return kcl.updateVolumesWithOwningApplications(volumes, pods, replicaSetItems)
+	hasStatefulSetOwnerReference := containsStatefulSetOwnerReference(pods)
+	statefulSetItems := make([]appsv1.StatefulSet, 0)
+	if hasStatefulSetOwnerReference {
+		statefulSets, err := kcl.cli.AppsV1().StatefulSets("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to list stateful sets across the cluster")
+			return nil, fmt.Errorf("an error occurred during the CombineVolumesWithApplications operation, unable to list stateful sets across the cluster. Error: %w", err)
+		}
+		statefulSetItems = statefulSets.Items
+	}
+
+	hasDaemonSetOwnerReference := containsDaemonSetOwnerReference(pods)
+	daemonSetItems := make([]appsv1.DaemonSet, 0)
+	if hasDaemonSetOwnerReference {
+		daemonSets, err := kcl.cli.AppsV1().DaemonSets("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to list daemon sets across the cluster")
+			return nil, fmt.Errorf("an error occurred during the CombineVolumesWithApplications operation, unable to list daemon sets across the cluster. Error: %w", err)
+		}
+		daemonSetItems = daemonSets.Items
+	}
+
+	return kcl.updateVolumesWithOwningApplications(volumes, pods, deploymentItems, replicaSetItems, statefulSetItems, daemonSetItems)
 }
 
 // updateVolumesWithOwningApplications updates the volumes with the applications that use them.
-func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8sVolumeInfo, pods *corev1.PodList, replicaSetItems []appsv1.ReplicaSet) (*[]models.K8sVolumeInfo, error) {
+func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8sVolumeInfo, pods *corev1.PodList, deploymentItems []appsv1.Deployment, replicaSetItems []appsv1.ReplicaSet, statefulSetItems []appsv1.StatefulSet, daemonSetItems []appsv1.DaemonSet) (*[]models.K8sVolumeInfo, error) {
 	for i, volume := range *volumes {
 		for _, pod := range pods.Items {
 			if pod.Spec.Volumes != nil {
 				for _, podVolume := range pod.Spec.Volumes {
-					if podVolume.PersistentVolumeClaim != nil && podVolume.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
-						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems, []appsv1.Deployment{}, []appsv1.StatefulSet{}, []appsv1.DaemonSet{}, []corev1.Service{}, false)
+					if podVolume.VolumeSource.PersistentVolumeClaim != nil && podVolume.VolumeSource.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
+						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems, deploymentItems, statefulSetItems, daemonSetItems, []corev1.Service{}, false)
 						if err != nil {
 							log.Error().Err(err).Msg("Failed to convert pod to application")
 							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)

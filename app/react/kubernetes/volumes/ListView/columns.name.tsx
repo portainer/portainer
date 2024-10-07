@@ -1,6 +1,5 @@
 import { CellContext } from '@tanstack/react-table';
 
-import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { Link } from '@@/Link';
@@ -9,6 +8,7 @@ import { ExternalBadge } from '@@/Badge/ExternalBadge';
 import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
+import { isVolumeExternal, isVolumeUsed } from '../utils';
 
 import { VolumeViewModel } from './types';
 import { helper } from './columns.helper';
@@ -44,8 +44,8 @@ export function NameCell({
         <SystemBadge />
       ) : (
         <>
-          {KubernetesVolumeHelper.isExternalVolume(item) && <ExternalBadge />}
-          {!KubernetesVolumeHelper.isUsed(item) && <UnusedBadge />}
+          {isVolumeExternal(item) && <ExternalBadge />}
+          {!isVolumeUsed(item) && <UnusedBadge />}
         </>
       )}
     </div>

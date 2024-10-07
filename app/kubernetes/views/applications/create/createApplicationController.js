@@ -29,6 +29,7 @@ import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confi
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
 import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
+import { isVolumeUsed } from '@/react/kubernetes/volumes/utils';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -785,7 +786,7 @@ class KubernetesCreateApplicationController {
         });
         this.volumes = volumes;
         const filteredVolumes = _.filter(this.volumes, (volume) => {
-          const isUnused = !KubernetesVolumeHelper.isUsed(volume);
+          const isUnused = !isVolumeUsed(volume);
           const isRWX = volume.PersistentVolumeClaim.storageClass && _.includes(volume.PersistentVolumeClaim.storageClass.AccessModes, 'RWX');
           return isUnused || isRWX;
         });
