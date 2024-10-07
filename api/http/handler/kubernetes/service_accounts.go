@@ -51,8 +51,12 @@ func (handler *Handler) getAllKubernetesServiceAccounts(w http.ResponseWriter, r
 // @produce text/plain
 // @param id path int true "Environment(Endpoint) identifier"
 // @param payload body kubernetes.K8sServiceAccountDeleteRequests true "Service accounts to delete "
-// @success 200 "Success"
-// @failure 500 "Server error"
+// @success 204 "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 404 "Unable to find an environment with the specified identifier or unable to find a specific service."
+// @failure 500 "Server error occurred while attempting to delete services."
 // @router /kubernetes/{id}/service_accounts/delete [POST]
 func (handler *Handler) deleteKubernetesServiceAccounts(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload models.K8sServiceAccountDeleteRequests
@@ -71,5 +75,5 @@ func (handler *Handler) deleteKubernetesServiceAccounts(w http.ResponseWriter, r
 		return httperror.InternalServerError("Unable to delete service accounts", err)
 	}
 
-	return nil
+	return response.Empty(w)
 }
