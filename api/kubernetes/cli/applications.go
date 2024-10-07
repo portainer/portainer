@@ -135,8 +135,8 @@ func (kcl *KubeClient) GetApplicationsResource(namespace, node string) (models.K
 
 	for _, pod := range pods.Items {
 		for _, container := range pod.Spec.Containers {
-			resource.CPURequest += container.Resources.Requests.Cpu().MilliValue()
-			resource.CPULimit += container.Resources.Limits.Cpu().MilliValue()
+			resource.CPURequest += float64(container.Resources.Requests.Cpu().MilliValue())
+			resource.CPULimit += float64(container.Resources.Limits.Cpu().MilliValue())
 			resource.MemoryRequest += container.Resources.Requests.Memory().Value()
 			resource.MemoryLimit += container.Resources.Limits.Memory().Value()
 		}
@@ -356,8 +356,8 @@ func updateApplicationWithService(application models.K8sApplication, services []
 func calculateResourceUsage(pod corev1.Pod) models.K8sApplicationResource {
 	resource := models.K8sApplicationResource{}
 	for _, container := range pod.Spec.Containers {
-		resource.CPURequest += container.Resources.Requests.Cpu().MilliValue()
-		resource.CPULimit += container.Resources.Limits.Cpu().MilliValue()
+		resource.CPURequest += float64(container.Resources.Requests.Cpu().MilliValue())
+		resource.CPULimit += float64(container.Resources.Limits.Cpu().MilliValue())
 		resource.MemoryRequest += container.Resources.Requests.Memory().Value()
 		resource.MemoryLimit += container.Resources.Limits.Memory().Value()
 	}
