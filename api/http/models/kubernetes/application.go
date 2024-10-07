@@ -70,8 +70,8 @@ type TLSInfo struct {
 
 // Existing types
 type K8sApplicationResource struct {
-	CPURequest    int64 `json:"CpuRequest"`
-	CPULimit      int64 `json:"CpuLimit"`
-	MemoryRequest int64 `json:"MemoryRequest"`
-	MemoryLimit   int64 `json:"MemoryLimit"`
+	CPURequest    float64 `json:"CpuRequest"`
+	CPULimit      float64 `json:"CpuLimit"`
+	MemoryRequest int64   `json:"MemoryRequest"`
+	MemoryLimit   int64   `json:"MemoryLimit"`
 }
