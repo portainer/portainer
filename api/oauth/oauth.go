@@ -31,19 +31,19 @@ func NewService() *Service {
 func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings) (string, error) {
 	token, err := getOAuthToken(code, configuration)
 	if err != nil {
-		log.Debug().Err(err).Msg("failed retrieving oauth token")
+		log.Error().Err(err).Msg("failed retrieving oauth token")
 
 		return "", err
 	}
 
 	idToken, err := getIdToken(token)
 	if err != nil {
-		log.Debug().Err(err).Msg("failed parsing id_token")
+		log.Error().Err(err).Msg("failed parsing id_token")
 	}
 
 	resource, err := getResource(token.AccessToken, configuration)
 	if err != nil {
-		log.Debug().Err(err).Msg("failed retrieving resource")
+		log.Error().Err(err).Msg("failed retrieving resource")
 
 		return "", err
 	}
@@ -52,7 +52,7 @@ func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings
 
 	username, err := getUsername(resource, configuration)
 	if err != nil {
-		log.Debug().Err(err).Msg("failed retrieving username")
+		log.Error().Err(err).Msg("failed retrieving username")
 
 		return "", err
 	}
