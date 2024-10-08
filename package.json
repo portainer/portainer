@@ -27,7 +27,7 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o ./dist/storybook",
     "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js",
-    "prepare": "husky install"
+    "prepare": "cd ../.. && husky install package/server-ce/.husky"
   },
   "engines": {
     "node": ">= 16"
