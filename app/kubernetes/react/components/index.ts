@@ -215,8 +215,6 @@ export const ngModule = angular
       'namespace',
       'namespaces',
       'onNamespaceChange',
-      'showSystem',
-      'setSystemResources',
     ])
   )
   .component(

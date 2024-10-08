@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { BoxIcon } from 'lucide-react';
 
 import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
@@ -33,8 +32,6 @@ export function ApplicationsDatatable({
   namespace = '',
   namespaces,
   onNamespaceChange,
-  showSystem,
-  onShowSystemChange,
   hideStacks,
 }: {
   onRefresh: () => void;
@@ -42,8 +39,6 @@ export function ApplicationsDatatable({
   namespace?: string;
   namespaces: Array<Namespace>;
   onNamespaceChange(namespace: string): void;
-  showSystem?: boolean;
-  onShowSystemChange(showSystem: boolean): void;
   hideStacks: boolean;
 }) {
   const envId = useEnvironmentId();
@@ -58,20 +53,13 @@ export function ApplicationsDatatable({
     undefined,
     false
   );
-
-  const { setShowSystemResources } = tableState;
-
-  useEffect(() => {
-    setShowSystemResources(showSystem || false);
-  }, [showSystem, setShowSystemResources]);
-
   const applicationsQuery = useApplications(envId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
     namespace,
     withDependencies: true,
   });
   const applications = applicationsQuery.data ?? [];
-  const filteredApplications = showSystem
+  const filteredApplications = tableState.showSystemResources
     ? applications
     : applications.filter(
         (application) =>
@@ -124,10 +112,7 @@ export function ApplicationsDatatable({
       }
       renderTableSettings={() => (
         <TableSettingsMenu>
-          <DefaultDatatableSettings
-            settings={tableState}
-            onShowSystemChange={onShowSystemChange}
-          />
+          <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
       description={

@@ -42,7 +42,6 @@ class KubernetesApplicationsController {
     this.removeStacksActionAsync = this.removeStacksActionAsync.bind(this);
     this.onPublishingModeClick = this.onPublishingModeClick.bind(this);
     this.onChangeNamespaceDropdown = this.onChangeNamespaceDropdown.bind(this);
-    this.setSystemResources = this.setSystemResources.bind(this);
   }
 
   selectTab(index) {
@@ -133,12 +132,6 @@ class KubernetesApplicationsController {
     });
   }
 
-  setSystemResources(flag) {
-    return this.$scope.$applyAsync(() => {
-      this.state.isSystemResources = flag;
-    });
-  }
-
   async onInit() {
     this.state = {
       activeTab: this.LocalStorage.getActiveTab('applications'),
@@ -150,7 +143,6 @@ class KubernetesApplicationsController {
       ports: [],
       namespaces: [],
       namespaceName: '',
-      isSystemResources: undefined,
     };
 
     this.deploymentOptions = await getDeploymentOptions();
