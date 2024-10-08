@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -63,7 +64,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 
 	var payload updateStatusPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return httperror.BadRequest("Invalid request payload", fmt.Errorf("edge polling error: %w. Environment ID: %d", err, payload.EndpointID))
 	}
 
 	var stack *portainer.EdgeStack
@@ -95,16 +96,16 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 			return nil, nil
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("unable to retrieve Edge stack from the database: %w. Environment ID: %d", err, payload.EndpointID)
 	}
 
 	endpoint, err := tx.Endpoint().Endpoint(payload.EndpointID)
 	if err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
+		return nil, handler.handlerDBErr(fmt.Errorf("unable to find the environment from the database: %w. Environment ID: %d", err, payload.EndpointID), "unable to find the environment")
 	}
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
+		return nil, httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	status := *payload.Status
@@ -123,7 +124,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 	updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
 
 	if err := tx.EdgeStack().UpdateEdgeStack(stackID, stack); err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
+		return nil, handler.handlerDBErr(fmt.Errorf("unable to update Edge stack to the database: %w. Environment name: %s", err, endpoint.Name), "unable to update Edge stack")
 	}
 
 	return stack, nil
