@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { StackType } from '@/react/common/stacks/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
-import { IResource } from '../../components/datatable/createOwnershipColumn';
+import { IResource } from '../../components/datatables/createOwnershipColumn';
 
 export class ExternalStackViewModel implements IResource {
   Id: string;

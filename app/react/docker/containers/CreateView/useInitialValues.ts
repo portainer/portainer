@@ -43,8 +43,8 @@ import { useEnvironmentRegistries } from '@/react/portainer/environments/queries
 import { EnvVarValues } from '@@/form-components/EnvironmentVariablesFieldset';
 
 import { useNetworksForSelector } from '../components/NetworkSelector';
-import { useContainers } from '../queries/containers';
-import { useContainer } from '../queries/container';
+import { useContainers } from '../queries/useContainers';
+import { useContainer } from '../queries/useContainer';
 
 export interface Values extends BaseFormValues {
   commands: CommandsTabValues;

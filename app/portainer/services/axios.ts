@@ -21,6 +21,8 @@ import {
   portainerAgentManagerOperation,
   portainerAgentTargetHeader,
 } from './http-request.helper';
+import { dockerMaxAPIVersionInterceptor } from './dockerMaxApiVersionInterceptor';
+import { MAX_DOCKER_API_VERSION } from './dockerMaxApiVersion';
 
 const portainerCacheHeader = 'X-Portainer-Cache';
 
@@ -48,7 +50,10 @@ function headerInterpreter(
   return 'not enough headers';
 }
 
-const axios = Axios.create({ baseURL: 'api' });
+const axios = Axios.create({
+  baseURL: 'api',
+  maxDockerAPIVersion: MAX_DOCKER_API_VERSION,
+});
 axios.interceptors.request.use((req) => {
   dispatchCacheRefreshEventIfNeeded(req);
   return req;
@@ -118,13 +123,14 @@ export function agentInterceptor(config: InternalAxiosRequestConfig) {
   return newConfig;
 }
 
+axios.interceptors.request.use(dockerMaxAPIVersionInterceptor);
 axios.interceptors.request.use(agentInterceptor);
 
 axios.interceptors.response.use(undefined, (error) => {
   if (
     error.response?.status === 401 &&
-    !error.config.url.includes('/v2/') &&
-    !error.config.url.includes('/api/v4/') &&
+    !error.config.url.includes('/v2/') && // docker proxy through agent
+    !error.config.url.includes('/api/v4/') && // gitlab proxy
     isTransitionRequiresAuthentication()
   ) {
     // eslint-disable-next-line no-console
@@ -188,12 +194,28 @@ export function defaultErrorParser(axiosError: AxiosError<unknown>) {
     const error = new Error(message);
     return { error, details };
   }
+  if (isArrayResponse(axiosError.response?.data)) {
+    const message = axiosError.response?.data[0].message || '';
+    const details = axiosError.response?.data[0].details || message;
+    const error = new Error(message);
+    return { error, details };
+  }
 
   const details = axiosError.response?.data
     ? axiosError.response?.data.toString()
     : '';
   const error = new Error('Axios error');
   return { error, details };
+}
+
+// handle jsonObjectsToArrayHandler transformation
+function isArrayResponse(data: unknown): data is DefaultAxiosErrorType[] {
+  return (
+    !!data &&
+    Array.isArray(data) &&
+    'message' in data[0] &&
+    typeof data[0].message === 'string'
+  );
 }
 
 export function isDefaultResponse(
@@ -248,4 +270,19 @@ export function json2formData(json: Record<string, unknown>) {
   });
 
   return formData;
+}
+
+/**
+ * The Docker API often returns a list of JSON object.
+ * This handler wrap the JSON objects in an array.
+ * @param data Raw docker API response (stream of objects in a single string)
+ * @returns An array of parsed objects
+ */
+export function jsonObjectsToArrayHandler(data: string): unknown[] {
+  // catching empty data helps the function not to fail and prevents unwanted error message to user.
+  if (!data) {
+    return [];
+  }
+  const str = `[${data.replace(/\n/g, ' ').replace(/\}\s*\{/g, '}, {')}]`;
+  return JSON.parse(str);
 }

@@ -1,6 +1,6 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
-import { useContainer } from '@/react/docker/containers/queries/container';
+import { useContainer } from '@/react/docker/containers/queries/useContainer';
 
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';

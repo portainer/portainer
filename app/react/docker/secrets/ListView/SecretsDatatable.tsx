@@ -19,7 +19,7 @@ import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { useRepeater } from '@@/datatables/useRepeater';
 
-import { createOwnershipColumn } from '../../components/datatable/createOwnershipColumn';
+import { createOwnershipColumn } from '../../components/datatables/createOwnershipColumn';
 
 const columnHelper = createColumnHelper<SecretViewModel>();
 

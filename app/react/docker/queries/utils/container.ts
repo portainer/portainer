@@ -1,4 +1,4 @@
-import { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -18,13 +18,13 @@ export const queryKeys = {
   ) => [...queryKeys.containers(environmentId), params] as const,
   container: (
     environmentId: EnvironmentId,
-    containerId: DockerContainer['Id']
+    containerId: ContainerListViewModel['Id']
   ) => [...queryKeys.containers(environmentId), containerId] as const,
 };
 
 export function buildDockerSnapshotContainersUrl(
   environmentId: EnvironmentId,
-  containerId?: DockerContainer['Id']
+  containerId?: ContainerListViewModel['Id']
 ) {
   let url = `${buildDockerSnapshotUrl(environmentId)}/containers`;
 

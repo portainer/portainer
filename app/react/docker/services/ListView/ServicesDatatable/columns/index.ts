@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { isoDate } from '@/portainer/filters/filters';
-import { createOwnershipColumn } from '@/react/docker/components/datatable/createOwnershipColumn';
+import { createOwnershipColumn } from '@/react/docker/components/datatables/createOwnershipColumn';
 
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { buildExpandColumn } from '@@/datatables/expand-column';

@@ -4,7 +4,7 @@ interface AgentMetadata {
   NodeName: string;
 }
 
-export interface PortainerMetadata {
+interface PortainerMetadata {
   ResourceControl?: ResourceControlResponse;
   Agent?: AgentMetadata;
 }

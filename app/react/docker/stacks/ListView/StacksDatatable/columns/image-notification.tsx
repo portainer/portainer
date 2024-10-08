@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { ImageUpToDateTooltip } from '@/react/docker/components/datatable/TableColumnHeaderImageUpToDate';
+import { ImageUpToDateTooltip } from '@/react/docker/components/datatables/TableColumnHeaderImageUpToDate';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isRegularStack } from '@/react/docker/stacks/view-models/utils';
 

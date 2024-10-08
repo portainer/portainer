@@ -1,6 +1,6 @@
 import { Box } from 'lucide-react';
 
-import { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { Environment } from '@/react/portainer/environments/types';
 import { createStore } from '@/react/docker/containers/ListView/ContainersDatatable/datatable-store';
 import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatable/columns';
@@ -20,7 +20,7 @@ import {
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useContainers } from '../../../docker/containers/queries/containers';
+import { useContainers } from '../../../docker/containers/queries/useContainers';
 import { RowProvider } from '../../../docker/containers/ListView/ContainersDatatable/RowContext';
 
 const storageKey = 'stack-containers';
@@ -70,7 +70,7 @@ export function StackContainersDatatable({ environment, stackName }: Props) {
           initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
           renderTableSettings={(tableInstance) => (
             <>
-              <ColumnVisibilityMenu<DockerContainer>
+              <ColumnVisibilityMenu<ContainerListViewModel>
                 table={tableInstance}
                 onChange={(hiddenColumns) => {
                   tableState.setHiddenColumns(hiddenColumns);

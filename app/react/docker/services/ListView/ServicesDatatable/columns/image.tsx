@@ -5,7 +5,7 @@ import { ImageStatus } from '@/react/docker/components/ImageStatus';
 import { hideShaSum } from '@/docker/filters/utils';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { ResourceType } from '@/react/docker/components/ImageStatus/types';
-import { ImageUpToDateTooltip } from '@/react/docker/components/datatable/TableColumnHeaderImageUpToDate';
+import { ImageUpToDateTooltip } from '@/react/docker/components/datatables/TableColumnHeaderImageUpToDate';
 
 import { columnHelper } from './helper';
 
