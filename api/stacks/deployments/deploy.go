@@ -1,6 +1,7 @@
 package deployments
 
 import (
+	"cmp"
 	"crypto/tls"
 	"fmt"
 	"strconv"
@@ -43,21 +44,19 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	// Webhook
 	if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != "" {
-		return redeployWhenChanged(stack, deployer, datastore, gitService)
+		return redeployWhenChanged(stack, deployer, datastore, gitService, true)
 	}
 
 	// Polling
 	_, err, _ = singleflightGroup.Do(strconv.Itoa(int(stackID)), func() (any, error) {
-		return nil, redeployWhenChanged(stack, deployer, datastore, gitService)
+		return nil, redeployWhenChanged(stack, deployer, datastore, gitService, false)
 	})
 
 	return err
 }
 
-func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
-	stackID := stack.ID
-
-	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
+func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, webhook bool) error {
+	log.Debug().Int("stack_id", int(stack.ID)).Msg("redeploying stack")
 
 	if stack.GitConfig == nil {
 		return nil // do nothing if it isn't a git-based stack
@@ -76,17 +75,14 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
 	}
 
-	author := stack.UpdatedBy
-	if author == "" {
-		author = stack.CreatedBy
-	}
+	author := cmp.Or(stack.UpdatedBy, stack.CreatedBy)
 
 	user, err := datastore.User().UserByUsername(author)
 	if err != nil {
 		log.Warn().
-			Int("stack_id", int(stackID)).
-			Str("author", author).
+			Int("stack_id", int(stack.ID)).
 			Str("stack", stack.Name).
+			Str("author", author).
 			Int("endpoint_id", int(stack.EndpointID)).
 			Msg("cannot auto update a stack, stack author user is missing")
 
@@ -97,9 +93,36 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 		return nil
 	}
 
+	if webhook {
+		go func() {
+			if err := redeployWhenChangedSecondStage(stack, deployer, datastore, gitService, user, endpoint); err != nil {
+				log.Error().Err(err).
+					Int("stack_id", int(stack.ID)).
+					Str("stack", stack.Name).
+					Str("author", author).
+					Int("endpoint_id", int(stack.EndpointID)).
+					Msg("webhook failed to redeploy a stack")
+			}
+		}()
+
+		return nil
+	}
+
+	return redeployWhenChangedSecondStage(stack, deployer, datastore, gitService, user, endpoint)
+}
+
+func redeployWhenChangedSecondStage(
+	stack *portainer.Stack,
+	deployer StackDeployer,
+	datastore dataservices.DataStore,
+	gitService portainer.GitService,
+	user *portainer.User,
+	endpoint *portainer.Endpoint,
+) error {
 	var gitCommitChangedOrForceUpdate bool
+
 	if !stack.FromAppTemplate {
-		updated, newHash, err := update.UpdateGitObject(gitService, fmt.Sprintf("stack:%d", stackID), stack.GitConfig, false, false, stack.ProjectPath)
+		updated, newHash, err := update.UpdateGitObject(gitService, fmt.Sprintf("stack:%d", stack.ID), stack.GitConfig, false, false, stack.ProjectPath)
 		if err != nil {
 			return err
 		}
@@ -124,7 +147,6 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-
 		if stackutils.IsRelativePathStack(stack) {
 			err = deployer.DeployRemoteComposeStack(stack, endpoint, registries, true, false)
 		} else {
@@ -132,7 +154,7 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 		}
 
 		if err != nil {
-			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
+			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stack.ID)
 		}
 	case portainer.DockerSwarmStack:
 		if stackutils.IsRelativePathStack(stack) {
@@ -141,16 +163,13 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 			err = deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
 		}
 		if err != nil {
-			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
+			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stack.ID)
 		}
 	case portainer.KubernetesStack:
-		log.Debug().
-			Int("stack_id", int(stackID)).
-			Msg("deploying a kube app")
+		log.Debug().Int("stack_id", int(stack.ID)).Msg("deploying a kube app")
 
-		err := deployer.DeployKubernetesStack(stack, endpoint, user)
-		if err != nil {
-			return errors.WithMessagef(err, "failed to deploy a kubernetes app stack %v", stackID)
+		if err := deployer.DeployKubernetesStack(stack, endpoint, user); err != nil {
+			return errors.WithMessagef(err, "failed to deploy a kubernetes app stack %v", stack.ID)
 		}
 	default:
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)
