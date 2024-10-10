@@ -24,8 +24,7 @@ func setup(t *testing.T) string {
 		t.Fatal(errors.Wrap(err, "failed to open an archive"))
 	}
 
-	err = archive.ExtractTarGz(file, dir)
-	if err != nil {
+	if err := archive.ExtractTarGz(file, dir); err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to extract file from the archive to a folder %s", dir))
 	}
 

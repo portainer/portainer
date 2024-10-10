@@ -34,6 +34,7 @@ func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) e
 		Depth:           opt.depth,
 		InsecureSkipTLS: opt.tlsSkipVerify,
 		Auth:            getAuth(opt.username, opt.password),
+		Tags:            git.NoTags,
 	}
 
 	if opt.referenceName != "" {
