@@ -123,7 +123,7 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", configuration.MPSToken))
+	req.Header.Set("Authorization", "Bearer "+configuration.MPSToken)
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {

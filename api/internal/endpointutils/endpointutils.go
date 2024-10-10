@@ -1,7 +1,7 @@
 package endpointutils
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 
@@ -171,7 +171,7 @@ func storageDetect(endpoint *portainer.Endpoint, endpointService dataservices.En
 	} else if len(storage) == 0 {
 		log.Info().Err(err).Msg("zero storage classes found: they may be still building, retrying in 30 seconds")
 
-		return fmt.Errorf("zero storage classes found: they may be still building, retrying in 30 seconds")
+		return errors.New("zero storage classes found: they may be still building, retrying in 30 seconds")
 	}
 
 	endpoint.Kubernetes.Configuration.StorageClasses = storage

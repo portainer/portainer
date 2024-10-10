@@ -31,8 +31,7 @@ const (
 
 // AesEncrypt reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
-	err := aesEncryptGCM(input, output, passphrase)
-	if err != nil {
+	if err := aesEncryptGCM(input, output, passphrase); err != nil {
 		return fmt.Errorf("error encrypting file: %w", err)
 	}
 
@@ -142,7 +141,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 	}
 
 	if string(header) != aesGcmHeader {
-		return nil, fmt.Errorf("invalid header")
+		return nil, errors.New("invalid header")
 	}
 
 	// Read salt
@@ -194,8 +193,7 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 			return nil, err
 		}
 
-		_, err = buf.Write(plaintext)
-		if err != nil {
+		if _, err := buf.Write(plaintext); err != nil {
 			return nil, err
 		}
 

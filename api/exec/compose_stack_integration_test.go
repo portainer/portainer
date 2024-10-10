@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -60,8 +59,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err = w.Up(ctx, stack, endpoint, portainer.ComposeUpOptions{})
-	if err != nil {
+	if err := w.Up(ctx, stack, endpoint, portainer.ComposeUpOptions{}); err != nil {
 		t.Fatalf("Error calling docker-compose up: %s", err)
 	}
 
@@ -69,8 +67,7 @@ func Test_UpAndDown(t *testing.T) {
 		t.Fatal("container should exist")
 	}
 
-	err = w.Down(ctx, stack, endpoint)
-	if err != nil {
+	if err := w.Down(ctx, stack, endpoint); err != nil {
 		t.Fatalf("Error calling docker-compose down: %s", err)
 	}
 
@@ -80,7 +77,7 @@ func Test_UpAndDown(t *testing.T) {
 }
 
 func containerExists(containerName string) bool {
-	cmd := exec.Command("docker", "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
+	cmd := exec.Command("docker", "ps", "-a", "-f", "name="+containerName)
 
 	out, err := cmd.Output()
 	if err != nil {

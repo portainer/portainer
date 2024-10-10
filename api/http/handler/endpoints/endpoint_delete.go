@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
@@ -33,7 +32,7 @@ type endpointDeleteBatchPartialResponse struct {
 
 func (payload *endpointDeleteBatchPayload) Validate(r *http.Request) error {
 	if payload == nil || len(payload.Endpoints) == 0 {
-		return fmt.Errorf("invalid request payload. You must provide a list of environments to delete")
+		return errors.New("invalid request payload. You must provide a list of environments to delete")
 	}
 
 	return nil

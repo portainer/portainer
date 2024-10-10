@@ -1,7 +1,7 @@
 package azure
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
@@ -41,7 +41,7 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 
 		utils.RewriteResponse(response, responseObject, http.StatusOK)
 	} else {
-		return nil, fmt.Errorf("The container groups response has no value property")
+		return nil, errors.New("The container groups response has no value property")
 	}
 
 	return response, nil

@@ -48,7 +48,7 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 // if no ResourceControl was found.
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
-	stop := fmt.Errorf("ok")
+	stop := errors.New("ok")
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},

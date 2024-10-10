@@ -19,7 +19,7 @@ type ServiceTx struct {
 // if no ResourceControl was found.
 func (service ServiceTx) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
-	stop := fmt.Errorf("ok")
+	stop := errors.New("ok")
 	err := service.Tx.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},

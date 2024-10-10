@@ -116,7 +116,7 @@ func shouldIncludeFile(dirEntry DirEntry, deviceName, configPath string) bool {
 	filterEqual := filepath.Join(configPath, deviceName)
 
 	// example: A/B/C/<deviceName>/
-	filterPrefix := fmt.Sprintf("%s.", filterEqual)
+	filterPrefix := filterEqual + "."
 
 	// include file entries: A/B/C/<deviceName> or A/B/C/<deviceName>.*
 	return dirEntry.Name == filterEqual || strings.HasPrefix(dirEntry.Name, filterPrefix)

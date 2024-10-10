@@ -133,7 +133,7 @@ func (handler *Handler) storeManifestFromGitRepository(tx dataservices.DataStore
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	}
 	if hasWrongType {
-		return "", "", "", fmt.Errorf("edge stack with config do not match the environment type")
+		return "", "", "", errors.New("edge stack with config do not match the environment type")
 	}
 
 	projectPath = handler.FileService.GetEdgeStackProjectPath(stackFolder)

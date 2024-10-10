@@ -1,7 +1,6 @@
 package customtemplates
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"sync"
@@ -80,8 +79,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 	if customTemplate.GitConfig.ConfigHash != commitHash {
 		customTemplate.GitConfig.ConfigHash = commitHash
 
-		err = handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate)
-		if err != nil {
+		if err := handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate); err != nil {
 			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 		}
 	}
@@ -100,9 +98,8 @@ func backupCustomTemplate(projectPath string) (string, error) {
 		return "", err
 	}
 
-	backupPath := fmt.Sprintf("%s-backup", projectPath)
-	err = os.Rename(projectPath, backupPath)
-	if err != nil {
+	backupPath := projectPath + "-backup"
+	if err := os.Rename(projectPath, backupPath); err != nil {
 		return "", err
 	}
 
@@ -110,8 +107,7 @@ func backupCustomTemplate(projectPath string) (string, error) {
 }
 
 func rollbackCustomTemplate(backupPath, projectPath string) error {
-	err := os.RemoveAll(projectPath)
-	if err != nil {
+	if err := os.RemoveAll(projectPath); err != nil {
 		return err
 	}
 

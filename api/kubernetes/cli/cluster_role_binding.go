@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -16,7 +16,7 @@ func (kcl *KubeClient) GetClusterRoleBindings() ([]models.K8sClusterRoleBinding,
 		return kcl.fetchClusterRoleBindings()
 	}
 
-	return []models.K8sClusterRoleBinding{}, fmt.Errorf("non-admin users are not allowed to access cluster role bindings")
+	return []models.K8sClusterRoleBinding{}, errors.New("non-admin users are not allowed to access cluster role bindings")
 }
 
 // fetchClusterRoleBindings returns a list of all cluster roles in the cluster.

@@ -120,7 +120,7 @@ func (transport *baseTransport) prepareRoundTrip(request *http.Request) (string,
 		return "", err
 	}
 
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	request.Header.Set("Authorization", "Bearer "+token)
 
 	return token, nil
 }

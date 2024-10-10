@@ -273,7 +273,7 @@ func (factory *ClientFactory) buildEdgeConfig(endpoint *portainer.Endpoint) (*re
 func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endpoint) (*metricsv.Clientset, error) {
 	config, err := factory.CreateConfig(endpoint)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create metrics KubeConfig")
+		return nil, errors.New("failed to create metrics KubeConfig")
 	}
 	return metricsv.NewForConfig(config)
 }

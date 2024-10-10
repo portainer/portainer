@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/rs/zerolog/log"
@@ -28,7 +27,7 @@ func (kcl *KubeClient) GetApplications(namespace, nodeName string, withDependenc
 func (kcl *KubeClient) fetchApplications(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
 	podListOptions := metav1.ListOptions{}
 	if nodeName != "" {
-		podListOptions.FieldSelector = fmt.Sprintf("spec.nodeName=%s", nodeName)
+		podListOptions.FieldSelector = "spec.nodeName=" + nodeName
 	}
 	if !withDependencies {
 		// TODO: make sure not to fetch services in fetchAllApplicationsListResources from this call
@@ -59,7 +58,7 @@ func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string, 
 
 	podListOptions := metav1.ListOptions{}
 	if nodeName != "" {
-		podListOptions.FieldSelector = fmt.Sprintf("spec.nodeName=%s", nodeName)
+		podListOptions.FieldSelector = "spec.nodeName=" + nodeName
 	}
 
 	if !withDependencies {
@@ -125,7 +124,7 @@ func (kcl *KubeClient) GetApplicationsResource(namespace, node string) (models.K
 	resource := models.K8sApplicationResource{}
 	podListOptions := metav1.ListOptions{}
 	if node != "" {
-		podListOptions.FieldSelector = fmt.Sprintf("spec.nodeName=%s", node)
+		podListOptions.FieldSelector = "spec.nodeName=" + node
 	}
 
 	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), podListOptions)

@@ -3,7 +3,7 @@ package ecr
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 )
@@ -15,7 +15,7 @@ func (s *Service) GetEncodedAuthorizationToken() (token *string, expiry *time.Ti
 	}
 
 	if len(getAuthorizationTokenOutput.AuthorizationData) == 0 {
-		err = fmt.Errorf("AuthorizationData is empty")
+		err = errors.New("AuthorizationData is empty")
 		return
 	}
 
@@ -50,7 +50,7 @@ func (s *Service) ParseAuthorizationToken(token string) (username string, passwo
 
 	splitToken := strings.Split(token, ":")
 	if len(splitToken) < 2 {
-		err = fmt.Errorf("invalid ECR authorization token")
+		err = errors.New("invalid ECR authorization token")
 		return
 	}
 

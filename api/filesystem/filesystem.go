@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -357,7 +358,7 @@ func (service *Service) RollbackStackFile(stackIdentifier, fileName string) erro
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -381,12 +382,12 @@ func (service *Service) RollbackStackFile(stackIdentifier, fileName string) erro
 func (service *Service) RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error {
 	versionStr := ""
 	if version != 0 {
-		versionStr = fmt.Sprintf("v%d", version)
+		versionStr = "v" + strconv.Itoa(version)
 	}
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -671,7 +672,7 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 // createBackupFileInStore makes a copy in the file store.
 func (service *Service) createBackupFileInStore(filePath string) error {
 	path := service.wrapFileStore(filePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	return service.Copy(path, backupPath, true)
 }
@@ -679,7 +680,7 @@ func (service *Service) createBackupFileInStore(filePath string) error {
 // removeBackupFileInStore removes the copy in the file store.
 func (service *Service) removeBackupFileInStore(filePath string) error {
 	path := service.wrapFileStore(filePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -799,7 +800,7 @@ func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID strin
 		return err
 	}
 
-	filePath := JoinPaths(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
+	filePath := JoinPaths(edgeJobStorePath, "logs_"+taskID)
 	r := bytes.NewReader(data)
 	return service.createFileInStore(filePath, r)
 }
@@ -990,7 +991,7 @@ func MoveDirectory(originalPath, newPath string, overwriteTargetPath bool) error
 
 	if alreadyExists {
 		if !overwriteTargetPath {
-			return fmt.Errorf("Target path already exists")
+			return errors.New("Target path already exists")
 		}
 
 		if err = os.RemoveAll(newPath); err != nil {

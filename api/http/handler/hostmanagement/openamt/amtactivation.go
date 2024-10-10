@@ -2,7 +2,6 @@ package openamt
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -37,7 +36,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if !endpointutils.IsAgentEndpoint(endpoint) {
-		errMsg := fmt.Sprintf("%s is not an agent environment", endpoint.Name)
+		errMsg := endpoint.Name + " is not an agent environment"
 		return httperror.BadRequest(errMsg, errors.New(errMsg))
 	}
 
@@ -46,8 +45,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
-	err = handler.activateDevice(endpoint, *settings)
-	if err != nil {
+	if err := handler.activateDevice(endpoint, *settings); err != nil {
 		return httperror.InternalServerError("Unable to activate device", err)
 	}
 
@@ -63,8 +61,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	endpoint.AMTDeviceGUID = hostInfo.UUID
-	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
+	if err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
 		return httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 

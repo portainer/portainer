@@ -2,7 +2,6 @@ package edgejobs
 
 import (
 	"errors"
-	"fmt"
 	"maps"
 	"net/http"
 	"strconv"
@@ -300,5 +299,5 @@ func deprecatedEdgeJobCreateUrlParser(w http.ResponseWriter, r *http.Request) (s
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	return fmt.Sprintf("/edge_jobs/create/%s", method), nil
+	return "/edge_jobs/create/" + method, nil
 }

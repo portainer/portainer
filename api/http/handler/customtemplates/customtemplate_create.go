@@ -2,7 +2,6 @@ package customtemplates
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -52,15 +51,13 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	err = handler.DataStore.CustomTemplate().Create(customTemplate)
-	if err != nil {
+	if err := handler.DataStore.CustomTemplate().Create(customTemplate); err != nil {
 		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
 	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, tokenData.ID)
 
-	err = handler.DataStore.ResourceControl().Create(resourceControl)
-	if err != nil {
+	if err := handler.DataStore.ResourceControl().Create(resourceControl); err != nil {
 		return httperror.InternalServerError("Unable to persist resource control inside the database", err)
 	}
 
@@ -155,8 +152,7 @@ func isValidNote(note string) bool {
 // @router /custom_templates/create/string [post]
 func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromFileContentPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return nil, err
 	}
 
@@ -272,8 +268,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 // @router /custom_templates/create/repository [post]
 func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (*portainer.CustomTemplate, error) {
 	var payload customTemplateFromGitRepositoryPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return nil, err
 	}
 
@@ -423,12 +418,10 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 
 	varsString, _ := request.RetrieveMultiPartFormValue(r, "Variables", true)
 	if varsString != "" {
-		err = json.Unmarshal([]byte(varsString), &payload.Variables)
-		if err != nil {
+		if err := json.Unmarshal([]byte(varsString), &payload.Variables); err != nil {
 			return errors.New("Invalid variables. Ensure that the variables are valid JSON")
 		}
-		err = validateVariablesDefinitions(payload.Variables)
-		if err != nil {
+		if err := validateVariablesDefinitions(payload.Variables); err != nil {
 			return err
 		}
 	}
@@ -462,8 +455,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 // @router /custom_templates/create/file [post]
 func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*portainer.CustomTemplate, error) {
 	payload := &customTemplateFromFileUploadPayload{}
-	err := payload.Validate(r)
-	if err != nil {
+	if err := payload.Validate(r); err != nil {
 		return nil, err
 	}
 
@@ -513,6 +505,5 @@ func deprecatedCustomTemplateCreateUrlParser(w http.ResponseWriter, r *http.Requ
 		return "", httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
-	url := fmt.Sprintf("/custom_templates/create/%s", method)
-	return url, nil
+	return "/custom_templates/create/" + method, nil
 }
