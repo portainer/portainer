@@ -22,13 +22,11 @@ type K8sResourceQuota struct {
 
 func (r *K8sNamespaceDetails) Validate(request *http.Request) error {
 	if r.ResourceQuota != nil && r.ResourceQuota.Enabled {
-		_, err := resource.ParseQuantity(r.ResourceQuota.Memory)
-		if err != nil {
+		if _, err := resource.ParseQuantity(r.ResourceQuota.Memory); err != nil {
 			return fmt.Errorf("error parsing memory quota value: %w", err)
 		}
 
-		_, err = resource.ParseQuantity(r.ResourceQuota.CPU)
-		if err != nil {
+		if _, err := resource.ParseQuantity(r.ResourceQuota.CPU); err != nil {
 			return fmt.Errorf("error parsing cpu quota value: %w", err)
 		}
 	}

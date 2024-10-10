@@ -185,7 +185,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 		}
 
 		log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to create the namespace")
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: %s", namespaceName), err)
+		return httperror.InternalServerError("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: "+namespaceName, err)
 	}
 
 	return response.JSON(w, namespace)
@@ -217,15 +217,14 @@ func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http
 	}
 
 	for _, namespaceName := range *namespaceNames {
-		_, err := cli.DeleteNamespace(namespaceName)
-		if err != nil {
+		if _, err := cli.DeleteNamespace(namespaceName); err != nil {
 			if k8serrors.IsNotFound(err) {
 				log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to find the namespace")
-				return httperror.NotFound(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to find the namespace. Error: ", namespaceName), err)
+				return httperror.NotFound("an error occurred during the DeleteKubernetesNamespace operation for the namespace "+namespaceName+", unable to find the namespace. Error: ", err)
 			}
 
 			log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to delete the namespace")
-			return httperror.InternalServerError(fmt.Sprintf("an error occurred during the DeleteKubernetesNamespace operation for the namespace %s, unable to delete the Kubernetes namespace. Error: ", namespaceName), err)
+			return httperror.InternalServerError("an error occurred during the DeleteKubernetesNamespace operation for the namespace "+namespaceName+", unable to delete the Kubernetes namespace. Error: ", err)
 		}
 	}
 
@@ -262,8 +261,7 @@ func (payload deleteKubernetesNamespacePayload) Validate(r *http.Request) error 
 // @router /kubernetes/{id}/namespaces/{namespace} [put]
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := models.K8sNamespaceDetails{}
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("an error occurred during the UpdateKubernetesNamespace operation, invalid request payload. Error: ", err)
 	}
 

@@ -124,7 +124,7 @@ func (wrapper *PluginWrapper) WaitForStatus(ctx context.Context, name string, st
 		for {
 			select {
 			case <-ctx.Done():
-				waitResult.ErrorMsg = fmt.Sprintf("failed to wait for status: %s", ctx.Err().Error())
+				waitResult.ErrorMsg = "failed to wait for status: " + ctx.Err().Error()
 				waitResultCh <- waitResult
 			default:
 			}

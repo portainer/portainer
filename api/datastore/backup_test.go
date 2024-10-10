@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -33,7 +32,7 @@ func TestStoreCreation(t *testing.T) {
 func TestBackup(t *testing.T) {
 	_, store := MustNewTestStore(t, true, true)
 	backupFileName := store.backupFilename()
-	t.Run(fmt.Sprintf("Backup should create %s", backupFileName), func(t *testing.T) {
+	t.Run("Backup should create "+backupFileName, func(t *testing.T) {
 		v := models.Version{
 			Edition:       int(portainer.PortainerCE),
 			SchemaVersion: portainer.APIVersion,

@@ -92,7 +92,7 @@ func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolde
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	}
 	if hasWrongType {
-		return "", "", "", fmt.Errorf("edge stack with config do not match the environment type")
+		return "", "", "", errors.New("edge stack with config do not match the environment type")
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentCompose {
@@ -107,7 +107,6 @@ func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolde
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentKubernetes {
-
 		manifestPath = filesystem.ManifestFileDefaultName
 
 		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, manifestPath, fileContent)

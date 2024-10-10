@@ -2,7 +2,6 @@ package azure
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -40,7 +39,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 		Method: http.MethodGet,
 		URL:    request.URL,
 		Header: http.Header{
-			"Authorization": []string{fmt.Sprintf("Bearer %s", tokenData.Token)},
+			"Authorization": []string{"Bearer " + tokenData.Token},
 		},
 	}
 

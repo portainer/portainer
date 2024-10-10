@@ -94,7 +94,7 @@ func encrypt(path string, passphrase string) (string, error) {
 	}
 	defer in.Close()
 
-	outFileName := fmt.Sprintf("%s.encrypted", path)
+	outFileName := path + ".encrypted"
 	out, err := os.Create(outFileName)
 	if err != nil {
 		return "", err

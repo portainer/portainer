@@ -1,12 +1,11 @@
 package git
 
 import (
-	"fmt"
-
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,32 +24,28 @@ type CloneOptions struct {
 }
 
 func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) (clean func(), err error) {
-	backupProjectPath := fmt.Sprintf("%s-old", options.ProjectPath)
+	backupProjectPath := options.ProjectPath + "-old"
 	cleanUp := false
 	cleanFn := func() {
 		if !cleanUp {
 			return
 		}
 
-		err = fileService.RemoveDirectory(backupProjectPath)
-		if err != nil {
+		if err := fileService.RemoveDirectory(backupProjectPath); err != nil {
 			log.Warn().Err(err).Msg("unable to remove git repository directory")
 		}
 	}
 
-	err = filesystem.MoveDirectory(options.ProjectPath, backupProjectPath, true)
-	if err != nil {
+	if err := filesystem.MoveDirectory(options.ProjectPath, backupProjectPath, true); err != nil {
 		return cleanFn, errors.WithMessage(err, "Unable to move git repository directory")
 	}
 
 	cleanUp = true
 
-	err = gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password, options.TLSSkipVerify)
-	if err != nil {
+	if err := gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password, options.TLSSkipVerify); err != nil {
 		cleanUp = false
-		restoreError := filesystem.MoveDirectory(backupProjectPath, options.ProjectPath, false)
-		if restoreError != nil {
-			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
+		if err := filesystem.MoveDirectory(backupProjectPath, options.ProjectPath, false); err != nil {
+			log.Warn().Err(err).Msg("failed restoring backup folder")
 		}
 
 		if errors.Is(err, gittypes.ErrAuthenticationFailure) {

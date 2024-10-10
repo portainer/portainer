@@ -21,8 +21,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
+	if err := connection.SetServiceName(BucketName); err != nil {
 		return nil, err
 	}
 
@@ -62,7 +61,7 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 // Note: there is a 1-to-1 mapping of api-key and digest
 func (service *Service) GetAPIKeyByDigest(digest string) (*portainer.APIKey, error) {
 	var k *portainer.APIKey
-	stop := fmt.Errorf("ok")
+	stop := errors.New("ok")
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.APIKey{},

@@ -1,7 +1,6 @@
 package images
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/containers/image/v5/docker"
@@ -10,7 +9,7 @@ import (
 
 func ParseReference(imageStr string) (types.ImageReference, error) {
 	if !strings.HasPrefix(imageStr, "//") {
-		imageStr = fmt.Sprintf("//%s", imageStr)
+		imageStr = "//" + imageStr
 	}
 	return docker.ParseReference(imageStr)
 }

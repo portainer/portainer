@@ -142,23 +142,23 @@ func (i *Image) hubLink() (string, error) {
 			prefix = "_"
 			path = strings.Replace(i.Path, "library/", "", 1)
 		}
-		return fmt.Sprintf("https://hub.docker.com/%s/%s", prefix, path), nil
+		return "https://hub.docker.com/" + prefix + "/" + path, nil
 	case "docker.bintray.io", "jfrog-docker-reg2.bintray.io":
-		return fmt.Sprintf("https://bintray.com/jfrog/reg2/%s", strings.ReplaceAll(i.Path, "/", "%3A")), nil
+		return "https://bintray.com/jfrog/reg2/" + strings.ReplaceAll(i.Path, "/", "%3A"), nil
 	case "docker.pkg.github.com":
-		return fmt.Sprintf("https://github.com/%s/packages", filepath.ToSlash(filepath.Dir(i.Path))), nil
+		return "https://github.com/" + filepath.ToSlash(filepath.Dir(i.Path)) + "/packages", nil
 	case "gcr.io":
-		return fmt.Sprintf("https://%s/%s", i.Domain, i.Path), nil
+		return "https://" + i.Domain + "/" + i.Path, nil
 	case "ghcr.io":
 		ref := strings.Split(i.Path, "/")
 		ghUser, ghPackage := ref[0], ref[1]
-		return fmt.Sprintf("https://github.com/users/%s/packages/container/package/%s", ghUser, ghPackage), nil
+		return "https://github.com/users/" + ghUser + "/packages/container/package/" + ghPackage, nil
 	case "quay.io":
-		return fmt.Sprintf("https://quay.io/repository/%s", i.Path), nil
+		return "https://quay.io/repository/" + i.Path, nil
 	case "registry.access.redhat.com":
-		return fmt.Sprintf("https://access.redhat.com/containers/#/registry.access.redhat.com/%s", i.Path), nil
+		return "https://access.redhat.com/containers/#/registry.access.redhat.com/" + i.Path, nil
 	case "registry.gitlab.com":
-		return fmt.Sprintf("https://gitlab.com/%s/container_registry", i.Path), nil
+		return "https://gitlab.com/" + i.Path + "/container_registry", nil
 	default:
 		return "", nil
 	}

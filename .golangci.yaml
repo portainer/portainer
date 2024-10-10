@@ -9,6 +9,9 @@ linters:
     - gosimple
     - govet
     - errorlint
+    - copyloopvar
+    - intrange
+    - perfsprint
 
 linters-settings:
   depguard:

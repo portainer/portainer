@@ -1,7 +1,6 @@
 package edgestacks
 
 import (
-	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -78,5 +77,5 @@ func deprecatedEdgeStackCreateUrlParser(w http.ResponseWriter, r *http.Request) 
 		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
-	return fmt.Sprintf("/edge_stacks/create/%s", method), nil
+	return "/edge_stacks/create/" + method, nil
 }

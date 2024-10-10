@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -69,8 +69,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
@@ -87,15 +86,13 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	r.Header.Del("Origin")
 
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
-		err := handler.proxyAgentWebsocketRequest(w, r, params)
-		if err != nil {
+		if err := handler.proxyAgentWebsocketRequest(w, r, params); err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
 		}
 
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
-		if err != nil {
+		if err := handler.proxyEdgeAgentWebsocketRequest(w, r, params); err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
 		}
 
@@ -187,7 +184,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 	}
 
 	if token == "" {
-		return "", false, fmt.Errorf("can not get a valid user service account token")
+		return "", false, errors.New("can not get a valid user service account token")
 	}
 
 	return token, false, nil

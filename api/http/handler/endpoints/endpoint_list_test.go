@@ -202,7 +202,7 @@ func setupEndpointListHandler(t *testing.T, endpoints []portainer.Endpoint) *Han
 }
 
 func buildEndpointListRequest(query string) *http.Request {
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/endpoints?%s", query), nil)
+	req := httptest.NewRequest(http.MethodGet, "/endpoints?"+query, nil)
 
 	ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 	req = req.WithContext(ctx)

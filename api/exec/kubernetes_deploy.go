@@ -71,7 +71,7 @@ func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *
 	}
 
 	if token == "" {
-		return "", fmt.Errorf("can not get a valid user service account token")
+		return "", errors.New("can not get a valid user service account token")
 	}
 
 	return token, nil

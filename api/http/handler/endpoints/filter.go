@@ -557,7 +557,7 @@ func filter(endpoints []portainer.Endpoint, predicate func(endpoint portainer.En
 }
 
 func getArrayQueryParameter(r *http.Request, parameter string) []string {
-	list, exists := r.Form[fmt.Sprintf("%s[]", parameter)]
+	list, exists := r.Form[parameter+"[]"]
 	if !exists {
 		list = []string{}
 	}
@@ -576,7 +576,6 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 		number, err := strconv.Atoi(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Unable to parse parameter %s", parameter)
-
 		}
 
 		result = append(result, T(number))

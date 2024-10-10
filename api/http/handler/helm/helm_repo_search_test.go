@@ -1,7 +1,6 @@
 package helm
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +25,7 @@ func Test_helmRepoSearch(t *testing.T) {
 	for _, repo := range repos {
 		t.Run(repo, func(t *testing.T) {
 			repoUrlEncoded := url.QueryEscape(repo)
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/templates/helm?repo=%s", repoUrlEncoded), nil)
+			req := httptest.NewRequest(http.MethodGet, "/templates/helm?repo="+repoUrlEncoded, nil)
 			rr := httptest.NewRecorder()
 			h.ServeHTTP(rr, req)
 
@@ -41,7 +40,7 @@ func Test_helmRepoSearch(t *testing.T) {
 	t.Run("fails on invalid URL", func(t *testing.T) {
 		repo := "abc.com"
 		repoUrlEncoded := url.QueryEscape(repo)
-		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/templates/helm?repo=%s", repoUrlEncoded), nil)
+		req := httptest.NewRequest(http.MethodGet, "/templates/helm?repo="+repoUrlEncoded, nil)
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
 

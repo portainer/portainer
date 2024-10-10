@@ -1,7 +1,6 @@
 package backup
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,8 +36,7 @@ func (p *backupPayload) Validate(r *http.Request) error {
 // @router /backup [post]
 func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload backupPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -48,7 +46,7 @@ func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.Hand
 	}
 	defer os.RemoveAll(filepath.Dir(archivePath))
 
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("portainer-backup_%s", filepath.Base(archivePath))))
+	w.Header().Set("Content-Disposition", "attachment; filename=portainer-backup_"+filepath.Base(archivePath))
 	http.ServeFile(w, r, archivePath)
 
 	return nil

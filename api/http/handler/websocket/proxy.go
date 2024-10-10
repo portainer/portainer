@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -34,7 +33,7 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	endpointURL := params.endpoint.URL
 	if params.endpoint.Type == portainer.AgentOnKubernetesEnvironment {
-		endpointURL = fmt.Sprintf("http://%s", params.endpoint.URL)
+		endpointURL = "http://" + params.endpoint.URL
 	}
 
 	agentURL, err := url.Parse(endpointURL)

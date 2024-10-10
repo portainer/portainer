@@ -4,7 +4,6 @@ package binary
 // The functionality does not rely on the implementation of `HelmPackageManager`
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -72,7 +71,7 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 
 	url, err := url.ParseRequestURI(searchRepoOpts.Repo)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("invalid helm chart URL: %s", searchRepoOpts.Repo))
+		return nil, errors.Wrap(err, "invalid helm chart URL: "+searchRepoOpts.Repo)
 	}
 
 	url.Path = path.Join(url.Path, "index.yaml")

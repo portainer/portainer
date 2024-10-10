@@ -137,7 +137,7 @@ func getDockerHubLimits(httpClient *client.HTTPClient, token string) (*dockerhub
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Add("Authorization", "Bearer "+token)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {

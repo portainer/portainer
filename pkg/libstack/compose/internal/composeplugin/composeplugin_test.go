@@ -2,7 +2,6 @@ package composeplugin
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -134,7 +133,7 @@ func createFile(dir, fileName, content string) (string, error) {
 }
 
 func containerExists(containerName string) bool {
-	cmd := exec.Command("docker", "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
+	cmd := exec.Command("docker", "ps", "-a", "-f", "name="+containerName)
 
 	out, err := cmd.Output()
 	if err != nil {

@@ -172,13 +172,12 @@ func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoin
 }
 
 func buildClusterName(endpointName string) string {
-	return fmt.Sprintf("portainer-cluster-%s", endpointName)
+	return "portainer-cluster-" + endpointName
 }
 
 func buildContext(serviceAccountName string, endpoint portainer.Endpoint) clientV1.NamedContext {
-	contextName := fmt.Sprintf("portainer-ctx-%s", endpoint.Name)
 	return clientV1.NamedContext{
-		Name: contextName,
+		Name: "portainer-ctx-" + endpoint.Name,
 		Context: clientV1.Context{
 			AuthInfo: serviceAccountName,
 			Cluster:  buildClusterName(endpoint.Name),

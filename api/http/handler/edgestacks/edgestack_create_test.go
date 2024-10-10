@@ -207,7 +207,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 			r := bytes.NewBuffer(jsonPayload)
 
 			// Create EdgeStack
-			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("/edge_stacks/create/%s", tc.Method), r)
+			req, err := http.NewRequest(http.MethodPost, "/edge_stacks/create/"+tc.Method, r)
 			if err != nil {
 				t.Fatal("request error:", err)
 			}

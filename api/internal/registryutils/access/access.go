@@ -1,7 +1,7 @@
 package access
 
 import (
-	"fmt"
+	"errors"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -52,7 +52,7 @@ func GetAccessibleRegistry(
 	}
 
 	if !hasPermission {
-		err = fmt.Errorf("user does not has permission to get the registry")
+		err = errors.New("user does not has permission to get the registry")
 		return nil, err
 	}
 
