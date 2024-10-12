@@ -36,7 +36,7 @@ export function VolumesDatatable() {
   const { authorized: hasWriteAuth } = useAuthorizations(
     'K8sVolumesW',
     undefined,
-    true
+    false
   );
 
   const envId = useEnvironmentId();
