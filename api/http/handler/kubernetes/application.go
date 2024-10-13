@@ -13,7 +13,7 @@ import (
 
 // @id GetApplicationsResources
 // @summary Get the total resource requests and limits of all applications
-// @description Get the total CPU (cores) and memory requests (MB) and limits of all applications across all namespaces.
+// @description Get the total CPU (cores) and memory (bytes) requests and limits of all applications across all namespaces.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt

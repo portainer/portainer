@@ -133,25 +133,14 @@ func (kcl *KubeClient) GetApplicationsResource(namespace, node string) (models.K
 	}
 
 	for _, pod := range pods.Items {
-		for _, container := range pod.Spec.Containers {
-			resource.CPURequest += float64(container.Resources.Requests.Cpu().MilliValue())
-			resource.CPULimit += float64(container.Resources.Limits.Cpu().MilliValue())
-			resource.MemoryRequest += container.Resources.Requests.Memory().Value()
-			resource.MemoryLimit += container.Resources.Limits.Memory().Value()
-		}
+		podResources := calculateResourceUsage(pod)
+		resource.CPURequest += podResources.CPURequest
+		resource.CPULimit += podResources.CPULimit
+		resource.MemoryRequest += podResources.MemoryRequest
+		resource.MemoryLimit += podResources.MemoryLimit
 	}
 
 	return resource, nil
-}
-
-// convertApplicationResourceUnits converts the resource units from milli to core and bytes to mega bytes
-func convertApplicationResourceUnits(resource models.K8sApplicationResource) models.K8sApplicationResource {
-	return models.K8sApplicationResource{
-		CPURequest:    resource.CPURequest / 1000,
-		CPULimit:      resource.CPULimit / 1000,
-		MemoryRequest: resource.MemoryRequest / 1024 / 1024,
-		MemoryLimit:   resource.MemoryLimit / 1024 / 1024,
-	}
 }
 
 // GetApplicationsFromConfigMap gets a list of applications that use a specific ConfigMap
@@ -351,16 +340,18 @@ func updateApplicationWithService(application models.K8sApplication, services []
 	return application
 }
 
-// calculateResourceUsage calculates the resource usage for a pod
+// calculateResourceUsage calculates the resource usage for a pod in CPU cores and Bytes
 func calculateResourceUsage(pod corev1.Pod) models.K8sApplicationResource {
 	resource := models.K8sApplicationResource{}
 	for _, container := range pod.Spec.Containers {
-		resource.CPURequest += float64(container.Resources.Requests.Cpu().MilliValue())
-		resource.CPULimit += float64(container.Resources.Limits.Cpu().MilliValue())
+		// CPU cores as a decimal
+		resource.CPURequest += float64(container.Resources.Requests.Cpu().MilliValue()) / 1000
+		resource.CPULimit += float64(container.Resources.Limits.Cpu().MilliValue()) / 1000
+		// Bytes
 		resource.MemoryRequest += container.Resources.Requests.Memory().Value()
 		resource.MemoryLimit += container.Resources.Limits.Memory().Value()
 	}
-	return convertApplicationResourceUnits(resource)
+	return resource
 }
 
 // GetApplicationFromServiceSelector gets applications based on service selectors
