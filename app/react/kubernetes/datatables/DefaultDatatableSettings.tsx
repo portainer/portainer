@@ -16,10 +16,8 @@ export interface TableSettings
 
 export function DefaultDatatableSettings({
   settings,
-  onShowSystemChange,
 }: {
   settings: TableSettings;
-  onShowSystemChange?(showSystem: boolean): void;
 }) {
   return (
     <>
@@ -27,7 +25,6 @@ export function DefaultDatatableSettings({
         value={settings.showSystemResources}
         onChange={(value) => {
           settings.setShowSystemResources(value);
-          onShowSystemChange?.(value);
         }}
       />
 

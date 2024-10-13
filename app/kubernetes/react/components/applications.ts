@@ -15,8 +15,6 @@ export const applicationsModule = angular
       'namespaces',
       'onNamespaceChange',
       'onRefresh',
-      'showSystem',
-      'onShowSystemChange',
       'onRemove',
       'hideStacks',
     ])
