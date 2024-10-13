@@ -37,6 +37,7 @@ interface K8sPersistentVolumeClaim {
   volumeMode?: PersistentVolumeClaimSpec['volumeMode'];
   owningApplications?: K8sVolOwningApplication[];
   phase: PersistentVolumeClaimStatus['phase'];
+  labels?: { [key: string]: string };
 }
 
 interface K8sStorageClass {

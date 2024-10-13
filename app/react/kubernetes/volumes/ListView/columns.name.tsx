@@ -8,7 +8,7 @@ import { ExternalBadge } from '@@/Badge/ExternalBadge';
 import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { useNamespacesQuery } from '../../namespaces/queries/useNamespacesQuery';
-import { isVolumeExternal, isVolumeUsed } from '../utils';
+import { isVolumeUsed } from '../utils';
 
 import { VolumeViewModel } from './types';
 import { helper } from './columns.helper';
@@ -44,7 +44,7 @@ export function NameCell({
         <SystemBadge />
       ) : (
         <>
-          {isVolumeExternal(item) && <ExternalBadge />}
+          {item.PersistentVolumeClaim.IsExternal && <ExternalBadge />}
           {!isVolumeUsed(item) && <UnusedBadge />}
         </>
       )}

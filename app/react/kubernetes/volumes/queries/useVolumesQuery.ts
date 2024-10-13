@@ -9,6 +9,7 @@ import { Volume } from '@/kubernetes/models/volume/Volume';
 import { parseKubernetesAxiosError } from '../../axiosError';
 import { K8sVolumeInfo } from '../types';
 import { VolumeViewModel, StorageClassViewModel } from '../ListView/types';
+import { appOwnerLabel } from '../../applications/constants';
 
 import { queryKeys } from './query-keys';
 
@@ -86,6 +87,7 @@ function convertToVolumeViewModels(
         CreationDate: volume.persistentVolumeClaim.creationDate,
         ApplicationOwner:
           volume.persistentVolumeClaim.owningApplications?.[0]?.Name,
+        IsExternal: !volume.persistentVolumeClaim.labels?.[appOwnerLabel],
       },
       ResourcePool: {
         Namespace: {

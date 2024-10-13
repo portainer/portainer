@@ -135,6 +135,7 @@ func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8s
 		VolumeMode:         volume.Spec.VolumeMode,
 		OwningApplications: nil,
 		Phase:              volume.Status.Phase,
+		Labels:             volume.Labels,
 	}
 }
 

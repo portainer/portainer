@@ -38,6 +38,7 @@ type (
 		VolumeMode         *corev1.PersistentVolumeMode        `json:"volumeMode"`
 		OwningApplications []K8sApplication                    `json:"owningApplications,omitempty"`
 		Phase              corev1.PersistentVolumeClaimPhase   `json:"phase"`
+		Labels             map[string]string
 	}
 
 	K8sStorageClass struct {

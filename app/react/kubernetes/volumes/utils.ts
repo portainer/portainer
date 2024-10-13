@@ -6,10 +6,6 @@ export function isVolumeUsed(volume: VolumeViewModel) {
   return volume.Applications.length !== 0;
 }
 
-export function isVolumeExternal(volume: VolumeViewModel) {
-  return !volume.PersistentVolumeClaim.ApplicationOwner;
-}
-
 export function generatedApplicationConfigVolumeName(applicationName: string) {
   return `config-${applicationName}-${uuidv4()}`;
 }

@@ -13,6 +13,7 @@ export interface VolumeViewModel {
     Storage?: unknown;
     CreationDate?: string;
     ApplicationOwner?: string;
+    IsExternal?: boolean;
   };
   ResourcePool: {
     Namespace: {

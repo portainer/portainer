@@ -6,7 +6,7 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { confirmRedeploy } from '@/react/kubernetes/volumes/ItemView/ConfirmRedeployModal';
-import { isVolumeUsed, isVolumeExternal } from '@/react/kubernetes/volumes/utils';
+import { isVolumeUsed } from '@/react/kubernetes/volumes/utils';
 
 class KubernetesVolumeController {
   /* @ngInject */
@@ -50,7 +50,7 @@ class KubernetesVolumeController {
   }
 
   isExternalVolume() {
-    return isVolumeExternal(this.volume);
+    return !this.volume.PersistentVolumeClaim.ApplicationOwner;
   }
 
   isSystemNamespace() {
