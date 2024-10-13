@@ -8,7 +8,7 @@ import {
 
 import styles from './columns.status.module.css';
 import { helper } from './columns.helper';
-import { Application } from './types';
+import { ApplicationRowData } from './types';
 
 export const status = helper.accessor('Status', {
   header: 'Status',
@@ -16,7 +16,9 @@ export const status = helper.accessor('Status', {
   enableSorting: false,
 });
 
-function Cell({ row: { original: item } }: CellContext<Application, string>) {
+function Cell({
+  row: { original: item },
+}: CellContext<ApplicationRowData, string>) {
   if (
     item.ApplicationType === KubernetesApplicationTypes.Pod &&
     item.Pods &&

@@ -31,9 +31,7 @@ import {
   KubernetesPodNodeAffinityPayload,
   KubernetesPreferredSchedulingTermPayload,
 } from 'Kubernetes/pod/payloads/affinities';
-
-export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
-export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
+import { PodKubernetesInstanceLabel, PodManagedByLabel } from '@/react/kubernetes/applications/constants';
 
 class KubernetesApplicationHelper {
   /* #region  UTILITY FUNCTIONS */

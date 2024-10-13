@@ -7,14 +7,16 @@ import { SystemBadge } from '@@/Badge/SystemBadge';
 import { ExternalBadge } from '@@/Badge/ExternalBadge';
 
 import { helper } from './columns.helper';
-import { Application } from './types';
+import { ApplicationRowData } from './types';
 
 export const name = helper.accessor('Name', {
   header: 'Name',
   cell: Cell,
 });
 
-function Cell({ row: { original: item } }: CellContext<Application, string>) {
+function Cell({
+  row: { original: item },
+}: CellContext<ApplicationRowData, string>) {
   const isSystem = useIsSystemNamespace(item.ResourcePool);
 
   return (

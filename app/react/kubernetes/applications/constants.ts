@@ -8,6 +8,8 @@ export const appNoteAnnotation = 'io.portainer.kubernetes.application.note';
 export const appDeployMethodLabel = 'io.portainer.kubernetes.application.kind';
 export const defaultDeploymentUniqueLabel = 'pod-template-hash';
 export const appNameLabel = 'io.portainer.kubernetes.application.name';
+export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
+export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
 
 export const appRevisionAnnotation = 'deployment.kubernetes.io/revision';
 

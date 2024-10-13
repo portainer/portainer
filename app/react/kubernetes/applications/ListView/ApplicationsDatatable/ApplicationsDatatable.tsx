@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BoxIcon } from 'lucide-react';
+import { groupBy, partition } from 'lodash';
 
 import { useKubeStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
@@ -10,6 +11,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { KubernetesApplicationTypes } from '@/kubernetes/models/application/models/appConstants';
 
 import { TableSettingsMenu } from '@@/datatables';
 import { useRepeater } from '@@/datatables/useRepeater';
@@ -20,8 +22,9 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
 import { Namespace } from '../ApplicationsStacksDatatable/types';
 import { useApplications } from '../../application.queries';
+import { PodKubernetesInstanceLabel, PodManagedByLabel } from '../../constants';
 
-import { Application, ConfigKind } from './types';
+import { Application, ApplicationRowData, ConfigKind } from './types';
 import { useColumns } from './useColumns';
 import { getPublishedUrls } from './PublishedPorts';
 import { SubRow } from './SubRow';
@@ -70,7 +73,7 @@ export function ApplicationsDatatable({
     namespace,
     withDependencies: true,
   });
-  const applications = applicationsQuery.data ?? [];
+  const applications = useApplicationsRowData(applicationsQuery.data);
   const filteredApplications = showSystem
     ? applications
     : applications.filter(
@@ -156,7 +159,74 @@ export function ApplicationsDatatable({
   );
 }
 
-function isExpandable(item: Application) {
+function useApplicationsRowData(
+  applications?: Application[]
+): ApplicationRowData[] {
+  return useMemo(() => separateHelmApps(applications ?? []), [applications]);
+}
+
+function separateHelmApps(applications: Application[]): ApplicationRowData[] {
+  const [helmApps, nonHelmApps] = partition(
+    applications,
+    (app) =>
+      app.Metadata?.labels &&
+      app.Metadata.labels[PodKubernetesInstanceLabel] &&
+      app.Metadata.labels[PodManagedByLabel] === 'Helm'
+  );
+
+  const groupedHelmApps: Record<string, Application[]> = groupBy(
+    helmApps,
+    (app) => app.Metadata?.labels[PodKubernetesInstanceLabel] ?? ''
+  );
+
+  // build the helm apps row data from the grouped helm apps
+  const helmAppsRowData = Object.entries(groupedHelmApps).reduce<
+    ApplicationRowData[]
+  >((helmApps, [appName, apps]) => {
+    const helmApp = buildHelmAppRowData(appName, apps);
+    return [...helmApps, helmApp];
+  }, []);
+
+  return [...helmAppsRowData, ...nonHelmApps];
+}
+
+function buildHelmAppRowData(
+  appName: string,
+  apps: Application[]
+): ApplicationRowData {
+  const id = `${apps[0].ResourcePool}-${appName
+    .toLowerCase()
+    .replaceAll(' ', '-')}`;
+  const { earliestCreationDate, runningPods, totalPods } = apps.reduce(
+    (acc, app) => ({
+      earliestCreationDate:
+        new Date(app.CreationDate) < new Date(acc.earliestCreationDate)
+          ? app.CreationDate
+          : acc.earliestCreationDate,
+      runningPods: acc.runningPods + app.RunningPodsCount,
+      totalPods: acc.totalPods + app.TotalPodsCount,
+    }),
+    {
+      earliestCreationDate: apps[0].CreationDate,
+      runningPods: 0,
+      totalPods: 0,
+    }
+  );
+  const helmApp: ApplicationRowData = {
+    ...apps[0],
+    Name: appName,
+    Id: id,
+    KubernetesApplications: apps,
+    ApplicationType: KubernetesApplicationTypes.Helm,
+    Status: runningPods < totalPods ? 'Not ready' : 'Ready',
+    CreationDate: earliestCreationDate,
+    RunningPodsCount: runningPods,
+    TotalPodsCount: totalPods,
+  };
+  return helmApp;
+}
+
+function isExpandable(item: ApplicationRowData) {
   return (
     !!item.KubernetesApplications ||
     !!getPublishedUrls(item).length ||
