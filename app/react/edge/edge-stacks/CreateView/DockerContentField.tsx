@@ -16,7 +16,7 @@ export function DockerContentField({
       id="stack-creation-editor"
       value={value}
       onChange={onChange}
-      yaml
+      type="yaml"
       placeholder="Define or paste the content of your docker compose file here"
       error={error}
       readonly={readonly}

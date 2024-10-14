@@ -100,7 +100,7 @@ export function InnerForm({
           id="custom-template-creation-editor"
           value={values.FileContent}
           onChange={handleChangeFileContent}
-          yaml
+          type="yaml"
           placeholder={texts.editor.placeholder}
           error={errors.FileContent}
         >

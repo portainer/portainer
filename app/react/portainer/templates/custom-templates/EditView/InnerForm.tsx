@@ -92,7 +92,7 @@ export function InnerForm({
         id="edit-custom-template-editor"
         value={gitFileContent || values.FileContent}
         onChange={handleChangeFileContent}
-        yaml
+        type="yaml"
         placeholder={
           gitFileContent
             ? 'Preview of the file from git repository'

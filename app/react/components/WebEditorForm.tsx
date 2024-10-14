@@ -1,8 +1,13 @@
-import { PropsWithChildren, useEffect, useMemo } from 'react';
+import {
+  ComponentProps,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useMemo,
+} from 'react';
 import { useTransitionHook } from '@uirouter/react';
 
 import { BROWSER_OS_PLATFORM } from '@/react/constants';
-import { AutomationTestingProps } from '@/types';
 
 import { CodeEditor } from '@@/CodeEditor';
 import { Tooltip } from '@@/Tip/Tooltip';
@@ -52,39 +57,21 @@ export const editorConfig = {
   win: otherEditorConfig,
 } as const;
 
-interface Props extends AutomationTestingProps {
-  value: string;
-  onChange: (value: string) => void;
+type CodeEditorProps = ComponentProps<typeof CodeEditor>;
 
-  id: string;
-  placeholder?: string;
-  yaml?: boolean;
-  shell?: boolean;
-  readonly?: boolean;
-  titleContent?: React.ReactNode;
+interface Props extends CodeEditorProps {
+  titleContent?: ReactNode;
   hideTitle?: boolean;
   error?: string;
-  versions?: number[];
-  onVersionChange?: (version: number) => void;
-  height?: string;
 }
 
 export function WebEditorForm({
   id,
-  onChange,
-  placeholder,
-  value,
   titleContent = '',
   hideTitle,
-  readonly,
-  yaml,
-  shell,
   children,
   error,
-  versions,
-  onVersionChange,
-  height,
-  'data-cy': dataCy,
+  ...props
 }: PropsWithChildren<Props>) {
   return (
     <div>
@@ -107,16 +94,8 @@ export function WebEditorForm({
           <div className="col-sm-12 col-lg-12">
             <CodeEditor
               id={id}
-              placeholder={placeholder}
-              readonly={readonly}
-              yaml={yaml}
-              shell={shell}
-              value={value}
-              onChange={onChange}
-              versions={versions}
-              onVersionChange={(v) => onVersionChange && onVersionChange(v)}
-              height={height}
-              data-cy={dataCy}
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...props}
             />
           </div>
         </div>

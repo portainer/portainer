@@ -83,7 +83,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
         onChange={(value) => setFieldValue('fileContent', value)}
         value={values.fileContent}
         placeholder="Define or paste the content of your script file here"
-        shell
+        type="shell"
         error={errors.fileContent}
       />
 

@@ -119,7 +119,7 @@ export function DeployForm({
                 }
                 setFieldValue('fileContent', value);
               }}
-              yaml
+              type="yaml"
               error={errors.fileContent}
               placeholder="Define or paste the content of your docker compose file here"
               readonly={isGit}

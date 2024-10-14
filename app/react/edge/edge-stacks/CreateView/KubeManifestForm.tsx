@@ -72,7 +72,7 @@ export function KubeManifestForm({
           id="stack-creation-editor"
           value={values.fileContent}
           onChange={(value) => handleChange({ fileContent: value })}
-          yaml
+          type="yaml"
           placeholder="Define or paste the content of your manifest file here"
           error={errors?.fileContent}
           data-cy="stack-creation-editor"

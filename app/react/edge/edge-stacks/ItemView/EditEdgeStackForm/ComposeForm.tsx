@@ -60,7 +60,7 @@ export function ComposeForm({
       <WebEditorForm
         data-cy="compose-editor"
         value={values.content}
-        yaml
+        type="yaml"
         id="compose-editor"
         placeholder="Define or paste the content of your docker compose file here"
         onChange={(value) => handleContentChange(DeploymentType.Compose, value)}
