@@ -170,7 +170,7 @@ func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Reque
 		Credentials:     tunnel.Credentials,
 	}
 
-	schedules, handlerErr := handler.buildSchedules(endpoint.ID)
+	schedules, handlerErr := handler.buildSchedules(tx, endpoint.ID)
 	if handlerErr != nil {
 		return nil, handlerErr
 	}
@@ -208,9 +208,33 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 	}
 }
 
-func (handler *Handler) buildSchedules(endpointID portainer.EndpointID) ([]edgeJobResponse, *httperror.HandlerError) {
+func (handler *Handler) buildSchedules(tx dataservices.DataStoreTx, endpointID portainer.EndpointID) ([]edgeJobResponse, *httperror.HandlerError) {
 	schedules := []edgeJobResponse{}
-	for _, job := range handler.ReverseTunnelService.EdgeJobs(endpointID) {
+
+	edgeJobs, err := tx.EdgeJob().ReadAll()
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve Edge Jobs", err)
+	}
+
+	for _, job := range edgeJobs {
+		_, endpointHasJob := job.Endpoints[endpointID]
+		if !endpointHasJob {
+			for _, edgeGroupID := range job.EdgeGroups {
+				member, _, err := edge.EndpointInEdgeGroup(tx, endpointID, edgeGroupID)
+				if err != nil {
+					return nil, httperror.InternalServerError("Unable to retrieve relations", err)
+				} else if member {
+					endpointHasJob = true
+
+					break
+				}
+			}
+		}
+
+		if !endpointHasJob {
+			continue
+		}
+
 		var collectLogs bool
 		if _, ok := job.GroupLogsCollection[endpointID]; ok {
 			collectLogs = job.GroupLogsCollection[endpointID].CollectLogs

@@ -1,8 +1,12 @@
 package edge
 
 import (
+	"slices"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/rs/zerolog/log"
 )
 
 // EndpointRelatedEdgeStacks returns a list of Edge stacks related to this Environment(Endpoint)
@@ -38,4 +42,34 @@ func EffectiveCheckinInterval(tx dataservices.DataStoreTx, endpoint *portainer.E
 	}
 
 	return portainer.DefaultEdgeAgentCheckinIntervalInSeconds
+}
+
+// EndpointInEdgeGroup returns true and the edge group name if the endpoint is in the edge group
+func EndpointInEdgeGroup(
+	tx dataservices.DataStoreTx,
+	endpointID portainer.EndpointID,
+	edgeGroupID portainer.EdgeGroupID,
+) (bool, string, error) {
+	endpointIDs, err := GetEndpointsFromEdgeGroups(
+		[]portainer.EdgeGroupID{edgeGroupID}, tx,
+	)
+	if err != nil {
+		return false, "", err
+	}
+
+	if slices.Contains(endpointIDs, endpointID) {
+		edgeGroup, err := tx.EdgeGroup().Read(edgeGroupID)
+		if err != nil {
+			log.Warn().
+				Err(err).
+				Int("edgeGroupID", int(edgeGroupID)).
+				Msg("Unable to retrieve edge group")
+
+			return false, "", err
+		}
+
+		return true, edgeGroup.Name, nil
+	}
+
+	return false, "", nil
 }

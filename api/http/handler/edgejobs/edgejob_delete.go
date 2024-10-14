@@ -9,9 +9,11 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,10 +35,9 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid Edge job identifier route variable", err)
 	}
 
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEdgeJob(tx, portainer.EdgeJobID(edgeJobID))
-	})
-	if err != nil {
+	}); err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
 			return handlerError
@@ -57,12 +58,9 @@ func (handler *Handler) deleteEdgeJob(tx dataservices.DataStoreTx, edgeJobID por
 	}
 
 	edgeJobFolder := handler.FileService.GetEdgeJobFolder(strconv.Itoa(int(edgeJobID)))
-	err = handler.FileService.RemoveDirectory(edgeJobFolder)
-	if err != nil {
+	if err := handler.FileService.RemoveDirectory(edgeJobFolder); err != nil {
 		log.Warn().Err(err).Msg("Unable to remove the files associated to the Edge job on the filesystem")
 	}
-
-	handler.ReverseTunnelService.RemoveEdgeJob(edgeJob.ID)
 
 	var endpointsMap map[portainer.EndpointID]portainer.EdgeJobEndpointMeta
 	if len(edgeJob.EdgeGroups) > 0 {
@@ -78,11 +76,10 @@ func (handler *Handler) deleteEdgeJob(tx dataservices.DataStoreTx, edgeJobID por
 	}
 
 	for endpointID := range endpointsMap {
-		handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpointID, edgeJob.ID)
+		cache.Del(endpointID)
 	}
 
-	err = tx.EdgeJob().Delete(edgeJob.ID)
-	if err != nil {
+	if err := tx.EdgeJob().Delete(edgeJob.ID); err != nil {
 		return httperror.InternalServerError("Unable to remove the Edge job from the database", err)
 	}
 

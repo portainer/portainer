@@ -1568,10 +1568,6 @@ type (
 		TunnelAddr(endpoint *Endpoint) (string, error)
 		UpdateLastActivity(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		EdgeJobs(endpointId EndpointID) []EdgeJob
-		AddEdgeJob(endpoint *Endpoint, edgeJob *EdgeJob)
-		RemoveEdgeJob(edgeJobID EdgeJobID)
-		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
 	}
 
 	// Server defines the interface to serve the API

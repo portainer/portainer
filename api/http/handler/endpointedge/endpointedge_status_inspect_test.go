@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 
@@ -36,7 +37,7 @@ var endpointTestCases = []endpointTestCase{
 	{
 		portainer.Endpoint{
 			ID:     -1,
-			Name:   "endpoint-id--1",
+			Name:   "endpoint-id-1",
 			Type:   portainer.EdgeAgentOnDockerEnvironment,
 			URL:    "https://portainer.io:9443",
 			EdgeID: "edge-id",
@@ -342,28 +343,48 @@ func TestEdgeStackStatus(t *testing.T) {
 func TestEdgeJobsResponse(t *testing.T) {
 	handler := mustSetupHandler(t)
 
-	endpointID := portainer.EndpointID(77)
-	endpoint := portainer.Endpoint{
-		ID:              endpointID,
-		Name:            "test-endpoint-77",
-		Type:            portainer.EdgeAgentOnDockerEnvironment,
-		URL:             "https://portainer.io:9443",
-		EdgeID:          "edge-id",
-		LastCheckInDate: time.Now().Unix(),
+	localCreateEndpoint := func(endpointID portainer.EndpointID, tagIDs []portainer.TagID) *portainer.Endpoint {
+		endpoint := portainer.Endpoint{
+			ID:              endpointID,
+			Name:            "test-endpoint-" + strconv.Itoa(int(endpointID)),
+			Type:            portainer.EdgeAgentOnDockerEnvironment,
+			URL:             "https://portainer.io:9443",
+			EdgeID:          "edge-id-" + strconv.Itoa(int(endpointID)),
+			TagIDs:          tagIDs,
+			LastCheckInDate: time.Now().Unix(),
+			UserTrusted:     true,
+		}
+		err := createEndpoint(handler, endpoint,
+			portainer.EndpointRelation{EndpointID: endpointID})
+		require.NoError(t, err)
+
+		return &endpoint
 	}
 
-	endpointRelation := portainer.EndpointRelation{
-		EndpointID: endpoint.ID,
-	}
+	dynamicGroupTags := []portainer.TagID{1, 2, 3}
 
-	if err := createEndpoint(handler, endpoint, endpointRelation); err != nil {
-		t.Fatal(err)
+	endpoint := localCreateEndpoint(77, nil)
+	endpointFromStaticEdgeGroup := localCreateEndpoint(78, nil)
+	endpointFromDynamicEdgeGroup := localCreateEndpoint(79, dynamicGroupTags)
+	unrelatedEndpoint := localCreateEndpoint(80, nil)
+
+	staticEdgeGroup := portainer.EdgeGroup{
+		ID:        1,
+		Endpoints: []portainer.EndpointID{endpointFromStaticEdgeGroup.ID},
 	}
+	err := handler.DataStore.EdgeGroup().Create(&staticEdgeGroup)
+	require.NoError(t, err)
+
+	dynamicEdgeGroup := portainer.EdgeGroup{
+		ID:      2,
+		Dynamic: true,
+		TagIDs:  dynamicGroupTags,
+	}
+	err = handler.DataStore.EdgeGroup().Create(&dynamicEdgeGroup)
+	require.NoError(t, err)
 
 	path, err := handler.FileService.StoreEdgeJobFileFromBytes("test-script", []byte("pwd"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	edgeJobID := portainer.EdgeJobID(35)
 	edgeJob := portainer.EdgeJob{
@@ -374,32 +395,42 @@ func TestEdgeJobsResponse(t *testing.T) {
 		ScriptPath:     path,
 		Recurring:      true,
 		Version:        57,
+		Endpoints: map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{
+			endpoint.ID: {},
+		},
+		EdgeGroups: []portainer.EdgeGroupID{staticEdgeGroup.ID, dynamicEdgeGroup.ID},
 	}
 
-	handler.ReverseTunnelService.AddEdgeJob(&endpoint, &edgeJob)
+	err = handler.DataStore.EdgeJob().Create(&edgeJob)
+	require.NoError(t, err)
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
-	if err != nil {
-		t.Fatal("request error:", err)
+	f := func(endpoint *portainer.Endpoint, scheduleLen int) {
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/endpoints/%d/edge/status", endpoint.ID), nil)
+		require.NoError(t, err)
+
+		req.Header.Set(portainer.PortainerAgentEdgeIDHeader, endpoint.EdgeID)
+		req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
+
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusOK, rec.Code)
+
+		var data endpointEdgeStatusInspectResponse
+		err = json.NewDecoder(rec.Body).Decode(&data)
+		require.NoError(t, err)
+
+		require.Len(t, data.Schedules, scheduleLen)
+
+		if scheduleLen > 0 {
+			require.Equal(t, edgeJob.ID, data.Schedules[0].ID)
+			require.Equal(t, edgeJob.CronExpression, data.Schedules[0].CronExpression)
+			require.Equal(t, edgeJob.Version, data.Schedules[0].Version)
+		}
 	}
 
-	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
-	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
-
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusOK {
-		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
-	}
-
-	var data endpointEdgeStatusInspectResponse
-	if err := json.NewDecoder(rec.Body).Decode(&data); err != nil {
-		t.Fatal("error decoding response:", err)
-	}
-
-	assert.Len(t, data.Schedules, 1)
-	assert.Equal(t, edgeJob.ID, data.Schedules[0].ID)
-	assert.Equal(t, edgeJob.CronExpression, data.Schedules[0].CronExpression)
-	assert.Equal(t, edgeJob.Version, data.Schedules[0].Version)
+	f(endpoint, 1)
+	f(endpointFromStaticEdgeGroup, 1)
+	f(endpointFromDynamicEdgeGroup, 1)
+	f(unrelatedEndpoint, 0)
 }

@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -84,8 +85,7 @@ func (handler *Handler) getEdgeJobLobs(tx dataservices.DataStoreTx, endpointID p
 		return httperror.InternalServerError("Unable to find an edge job with the specified identifier inside the database", err)
 	}
 
-	err = handler.FileService.StoreEdgeJobTaskLogFileFromBytes(strconv.Itoa(int(edgeJobID)), strconv.Itoa(int(endpointID)), []byte(payload.FileContent))
-	if err != nil {
+	if err := handler.FileService.StoreEdgeJobTaskLogFileFromBytes(strconv.Itoa(int(edgeJobID)), strconv.Itoa(int(endpoint.ID)), []byte(payload.FileContent)); err != nil {
 		return httperror.InternalServerError("Unable to save task log to the filesystem", err)
 	}
 
@@ -96,13 +96,11 @@ func (handler *Handler) getEdgeJobLobs(tx dataservices.DataStoreTx, endpointID p
 		edgeJob.Endpoints[endpoint.ID] = meta
 	}
 
-	err = tx.EdgeJob().Update(edgeJob.ID, edgeJob)
-
-	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
-
-	if err != nil {
+	if err := tx.EdgeJob().Update(edgeJob.ID, edgeJob); err != nil {
 		return httperror.InternalServerError("Unable to persist edge job changes to the database", err)
 	}
+
+	cache.Del(endpointID)
 
 	return nil
 }

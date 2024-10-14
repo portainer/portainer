@@ -31,7 +31,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/snapshot"
@@ -465,10 +464,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed initializing helm package manager")
-	}
-
-	if err := edge.LoadEdgeJobs(dataStore, reverseTunnelService); err != nil {
-		log.Fatal().Err(err).Msg("failed loading edge jobs from database")
 	}
 
 	applicationStatus := initStatus(instanceID)

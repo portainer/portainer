@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -53,7 +54,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
 			mutationFn(edgeJob, endpointID, endpointsFromGroups)
 
@@ -61,8 +62,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		}
 
 		return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
-	})
-	if err != nil {
+	}); err != nil {
 		var handlerError *httperror.HandlerError
 		if errors.As(err, &handlerError) {
 			return handlerError
@@ -82,8 +82,7 @@ func (handler *Handler) clearEdgeJobTaskLogs(tx dataservices.DataStoreTx, edgeJo
 		return httperror.InternalServerError("Unable to find an Edge job with the specified identifier inside the database", err)
 	}
 
-	err = handler.FileService.ClearEdgeJobTaskLogs(strconv.Itoa(int(edgeJobID)), strconv.Itoa(int(endpointID)))
-	if err != nil {
+	if err := handler.FileService.ClearEdgeJobTaskLogs(strconv.Itoa(int(edgeJobID)), strconv.Itoa(int(endpointID))); err != nil {
 		return httperror.InternalServerError("Unable to clear log file from disk", err)
 	}
 
@@ -92,17 +91,11 @@ func (handler *Handler) clearEdgeJobTaskLogs(tx dataservices.DataStoreTx, edgeJo
 		return httperror.InternalServerError("Unable to get Endpoints from EdgeGroups", err)
 	}
 
-	err = updateEdgeJob(edgeJob, endpointID, endpointsFromGroups)
-	if err != nil {
+	if err := updateEdgeJob(edgeJob, endpointID, endpointsFromGroups); err != nil {
 		return httperror.InternalServerError("Unable to persist Edge job changes in the database", err)
 	}
 
-	endpoint, err := tx.Endpoint().Endpoint(endpointID)
-	if err != nil {
-		return httperror.NotFound("Unable to retrieve environment from the database", err)
-	}
-
-	handler.ReverseTunnelService.AddEdgeJob(endpoint, edgeJob)
+	cache.Del(endpointID)
 
 	return nil
 }
