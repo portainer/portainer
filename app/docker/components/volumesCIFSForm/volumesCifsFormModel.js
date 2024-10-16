@@ -1,6 +1,7 @@
 export function VolumesCIFSFormData() {
   this.useCIFS = false;
   this.serverAddress = '';
+  this.serverPort = 445;
   this.share = '';
   this.version = 'CIFS v2.0 (Used by Windows Vista / Server 2008)';
   this.versions = [
