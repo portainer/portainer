@@ -2,6 +2,7 @@ FROM alpine:latest as production
 
 LABEL org.opencontainers.image.title="Portainer" \
     org.opencontainers.image.description="Docker container management made simple, with the world’s most popular GUI-based container management platform." \
+    org.opencontainers.image.source="https://github.com/portainer/portainer" \
     org.opencontainers.image.vendor="Portainer.io" \
     com.docker.desktop.extension.api.version=">= 0.2.2" \
     com.docker.desktop.extension.icon="https://portainer-io-assets.sfo2.cdn.digitaloceanspaces.com/logos/portainer.png" \
