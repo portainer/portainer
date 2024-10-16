@@ -57,7 +57,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
             id: attachId,
           };
 
-          const base = window.location.origin.startsWith('http') ? `${window.location.origin}${baseHref()}` : baseHref();
+          const base = window.location.origin.startsWith('http') && !window.ddExtension ? `${window.location.origin}${baseHref()}` : baseHref();
           var url =
             base +
             'api/websocket/attach?' +
@@ -96,7 +96,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
             id: data.Id,
           };
 
-          const base = window.location.origin.startsWith('http') ? `${window.location.origin}${baseHref()}` : baseHref();
+          const base = window.location.origin.startsWith('http') && !window.ddExtension ? `${window.location.origin}${baseHref()}` : baseHref();
           var url =
             base +
             'api/websocket/exec?' +
