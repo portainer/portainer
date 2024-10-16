@@ -133,7 +133,7 @@ func (kcl *KubeClient) GetApplicationsResource(namespace, node string) (models.K
 	}
 
 	for _, pod := range pods.Items {
-		podResources := calculateResourceUsage(pod)
+		podResources := calculatePodResourceUsage(pod)
 		resource.CPURequest += podResources.CPURequest
 		resource.CPULimit += podResources.CPULimit
 		resource.MemoryRequest += podResources.MemoryRequest
@@ -191,7 +191,12 @@ func (kcl *KubeClient) ConvertPodToApplication(pod corev1.Pod, replicaSets []app
 	}
 
 	if withResource {
-		application.Resource = calculateResourceUsage(pod)
+		podResources := calculatePodResourceUsage(pod)
+		// multiply by the number of requested pods in the application (not the running count)
+		application.Resource.CPURequest = podResources.CPURequest * float64(application.TotalPodsCount)
+		application.Resource.CPULimit = podResources.CPULimit * float64(application.TotalPodsCount)
+		application.Resource.MemoryRequest = podResources.MemoryRequest * int64(application.TotalPodsCount)
+		application.Resource.MemoryLimit = podResources.MemoryLimit * int64(application.TotalPodsCount)
 	}
 
 	return &application, nil
@@ -340,8 +345,8 @@ func updateApplicationWithService(application models.K8sApplication, services []
 	return application
 }
 
-// calculateResourceUsage calculates the resource usage for a pod in CPU cores and Bytes
-func calculateResourceUsage(pod corev1.Pod) models.K8sApplicationResource {
+// calculatePodResourceUsage calculates the resource usage for a pod in CPU cores and Bytes
+func calculatePodResourceUsage(pod corev1.Pod) models.K8sApplicationResource {
 	resource := models.K8sApplicationResource{}
 	for _, container := range pod.Spec.Containers {
 		// CPU cores as a decimal
