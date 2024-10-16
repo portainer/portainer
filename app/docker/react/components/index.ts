@@ -13,7 +13,6 @@ import { InsightsBox } from '@/react/components/InsightsBox';
 import { BetaAlert } from '@/react/portainer/environments/update-schedules/common/BetaAlert';
 import { ImagesDatatable } from '@/react/docker/images/ListView/ImagesDatatable/ImagesDatatable';
 import { EventsDatatable } from '@/react/docker/events/EventsDatatables';
-import { ConfigsDatatable } from '@/react/docker/configs/ListView/ConfigsDatatable';
 import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowser';
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
@@ -79,14 +78,7 @@ const ngModule = angular
       'onRemove',
     ])
   )
-  .component(
-    'dockerConfigsDatatable',
-    r2a(withUIRouter(withCurrentUser(ConfigsDatatable)), [
-      'dataset',
-      'onRemoveClick',
-      'onRefresh',
-    ])
-  )
+
   .component(
     'agentHostBrowserReact',
     r2a(withUIRouter(withCurrentUser(AgentHostBrowser)), [

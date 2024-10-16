@@ -75,9 +75,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/configs',
       views: {
         'content@': {
-          templateUrl: './views/configs/configs.html',
-          controller: 'ConfigsController',
-          controllerAs: 'ctrl',
+          component: 'configsListView',
         },
       },
       data: {

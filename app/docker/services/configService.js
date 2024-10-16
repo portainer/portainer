@@ -3,7 +3,7 @@ import { getConfigs } from '@/react/docker/configs/queries/useConfigs';
 
 import { deleteConfig } from '@/react/docker/configs/queries/useDeleteConfigMutation';
 import { createConfig } from '@/react/docker/configs/queries/useCreateConfigMutation';
-import { ConfigViewModel } from '../models/config';
+import { ConfigViewModel } from '../../react/docker/configs/model';
 
 angular.module('portainer.docker').factory('ConfigService', ConfigServiceFactory);
 
