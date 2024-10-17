@@ -102,7 +102,8 @@ func guessLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoin
 		}
 	}
 
-	return nil, "", errors.New("failed to find local environment")
+	// no local environment found
+	return nil, "", nil
 }
 
 func checkDockerEnvTypeForUpgrade(environment *portainer.Endpoint) ContainerPlatform {
