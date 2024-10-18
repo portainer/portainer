@@ -1,10 +1,15 @@
 {
+  "api_key": null,
+  "customtemplates": null,
   "dockerhub": [
     {
       "Authentication": false,
       "Username": ""
     }
   ],
+  "edge_stack": null,
+  "edgegroups": null,
+  "edgejobs": null,
   "endpoint_groups": [
     {
       "AuthorizedTeams": null,
@@ -103,6 +108,9 @@
       "UserAccessPolicies": {}
     }
   ],
+  "extension": null,
+  "helm_user_repository": null,
+  "pending_actions": null,
   "registries": [
     {
       "Authentication": true,
@@ -860,6 +868,8 @@
       "UpdatedBy": ""
     }
   ],
+  "tags": null,
+  "team_membership": null,
   "teams": [
     {
       "Id": 1,
@@ -933,5 +943,6 @@
   ],
   "version": {
     "VERSION": "{\"SchemaVersion\":\"2.23.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
-  }
+  },
+  "webhooks": null
 }

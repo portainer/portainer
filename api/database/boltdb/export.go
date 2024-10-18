@@ -49,8 +49,8 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 		backup["__metadata"] = meta
 	}
 
-	err = connection.View(func(tx *bolt.Tx) error {
-		err = tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+	if err := connection.View(func(tx *bolt.Tx) error {
+		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
 			var list []any
 			version := make(map[string]string)
@@ -84,27 +84,22 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 				return nil
 			}
 
-			if len(list) > 0 {
-				if bucketName == "ssl" ||
-					bucketName == "settings" ||
-					bucketName == "tunnel_server" {
-					backup[bucketName] = nil
-					if len(list) > 0 {
-						backup[bucketName] = list[0]
-					}
-					return nil
+			if bucketName == "ssl" ||
+				bucketName == "settings" ||
+				bucketName == "tunnel_server" {
+				backup[bucketName] = nil
+				if len(list) > 0 {
+					backup[bucketName] = list[0]
 				}
-				backup[bucketName] = list
+
 				return nil
 			}
 
+			backup[bucketName] = list
+
 			return nil
 		})
-
-		return err
-	})
-
-	if err != nil {
+	}); err != nil {
 		return []byte("{}"), err
 	}
 
