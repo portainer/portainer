@@ -131,7 +131,7 @@ function ErrorCell({ getValue }: CellContext<EdgeStackEnvironment, string>) {
       </div>
       <div
         className={clsx('overflow-hidden whitespace-normal', {
-          'h-[1.5em]': isExpanded,
+          'h-[1.5em]': !isExpanded,
         })}
       >
         {value}
