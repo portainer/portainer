@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -105,6 +106,7 @@ func getIdToken(token *oauth2.Token) (map[string]any, error) {
 	}
 
 	if claims, ok := t.Claims.(jwt.MapClaims); ok {
+		log.Debug().Str("obj", fmt.Sprintf("%#v", claims)).Msg("JSON Web Token (parsed)")
 		for k, v := range claims {
 			tokenData[k] = v
 		}
