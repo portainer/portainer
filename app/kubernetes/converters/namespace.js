@@ -7,6 +7,7 @@ import {
   KubernetesPortainerNamespaceSystemLabel,
 } from 'Kubernetes/models/resource-pool/models';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 export default class KubernetesNamespaceConverter {
   static apiToNamespace(data, yaml) {
@@ -35,7 +36,7 @@ export default class KubernetesNamespaceConverter {
     res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = namespace.ResourcePoolName;
 
     if (namespace.ResourcePoolOwner) {
-      const resourcePoolOwner = _.truncate(namespace.ResourcePoolOwner, { length: 63, omission: '' });
+      const resourcePoolOwner = KubernetesCommonHelper.ownerToLabel(namespace.ResourcePoolOwner);
       res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = resourcePoolOwner;
     }
     return res;
