@@ -174,7 +174,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         let commandBuffer = '';
 
         $scope.state = states.connected;
-        term = new Terminal();
+        term = new Terminal({
+          fontSize: 14,
+        });
 
         if (isLinuxTerm) {
           // linux terminals support xterm
