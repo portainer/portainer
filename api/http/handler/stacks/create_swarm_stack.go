@@ -97,7 +97,60 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(swarmStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return handler.decorateStackResponse(w, stack, userID)
+}
+
+// @id StackCreateDockerSwarmString
+// @summary Save a new swarm stack from a text
+// @description Save a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body swarmStackFromFileContentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/string [post]
+func (handler *Handler) saveSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	var payload swarmStackFromFileContentPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
+
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
+	if err != nil {
+		return httperror.InternalServerError("Unable to check for name collision", err)
+	}
+	if !isUnique {
+		return stackExistsError(payload.Name)
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	stackPayload := createStackPayloadFromSwarmFileContentPayload(payload.Name, payload.SwarmID, payload.StackFileContent, payload.Env, payload.FromAppTemplate)
+
+	swarmStackBuilder := stackbuilders.CreateSwarmStackFileContentBuilder(securityContext,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer)
+
+	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(swarmStackBuilder)
+	stack, httpErr := stackBuilderDirector.Save(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -246,7 +299,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(swarmStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -347,7 +400,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(swarmStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}

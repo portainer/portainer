@@ -179,6 +179,25 @@
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
+              <button
+                      type="button"
+                      class="btn btn-primary btn-sm !ml-0"
+                      ng-show="state.Method === 'editor'"
+                      ng-disabled="state.actionInProgress
+              || !createStackForm.$valid
+              || ((state.Method === 'editor') && (!formValues.StackFileContent || state.editorYamlValidationError))
+              || !formValues.Name"
+                      ng-click="saveStack()"
+                      button-spinner="state.actionInProgress"
+                      analytics-on
+                      analytics-category="docker"
+                      analytics-event="docker-stack-save"
+                      analytics-properties="buildAnalyticsProperties()"
+              >
+                <span ng-hide="state.actionInProgress">Save the stack</span>
+                <span ng-show="state.actionInProgress">Saving in progress...</span>
+              </button>
+
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
             </div>
           </div>
