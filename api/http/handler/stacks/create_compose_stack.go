@@ -132,7 +132,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 // @id StackSaveDockerStandaloneString
 // @summary Save a new compose stack from a text
-// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description Save a new stack into a Docker environment specified via the environment identifier.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
