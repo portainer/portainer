@@ -74,6 +74,72 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	return httperror.BadRequest("Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter))
 }
 
+func (handler *Handler) stackSave(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	stackType, err := request.RetrieveRouteVariableValue(r, "type")
+	if err != nil {
+		return httperror.BadRequest("Invalid path parameter: type", err)
+	}
+
+	method, err := request.RetrieveRouteVariableValue(r, "method")
+	if err != nil {
+		return httperror.BadRequest("Invalid path parameter: method", err)
+	}
+
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
+	}
+
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
+	}
+	if !canManage {
+		errMsg := "Stack creation is disabled for non-admin users"
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return httperror.Forbidden("Permission denied to access environment", err)
+	}
+
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
+	}
+
+	switch stackType {
+	case "swarm":
+		return handler.saveSwarmStack(w, r, method, endpoint, tokenData.ID)
+	case "standalone":
+		return handler.saveComposeStack(w, r, method, endpoint, tokenData.ID)
+	}
+
+	return httperror.BadRequest("Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter))
+}
+
+func (handler *Handler) saveComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	switch method {
+	case "string":
+		return handler.saveComposeStackFromFileContent(w, r, endpoint, userID)
+	}
+
+	return httperror.BadRequest("Invalid value for query parameter: method. Value must be: string", errors.New(request.ErrInvalidQueryParameter))
+}
+
 func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
@@ -98,6 +164,15 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	}
 
 	return httperror.BadRequest("Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter))
+}
+
+func (handler *Handler) saveSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	switch method {
+	case "string":
+		return handler.createSwarmStackFromFileContent(w, r, endpoint, userID)
+	}
+
+	return httperror.BadRequest("Invalid value for query parameter: method. Value must be: string", errors.New(request.ErrInvalidQueryParameter))
 }
 
 func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
