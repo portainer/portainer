@@ -327,7 +327,14 @@ angular.module('portainer.app').factory('StackService', [
       };
       return Stack.create({ endpointId: endpointId }, { method: 'string', type: 'standalone', ...payload }).$promise;
     };
-
+    service.saveComposeStackFromFileContent = function (name, stackFileContent, env, endpointId) {
+      var payload = {
+        Name: name,
+        StackFileContent: stackFileContent,
+        Env: env,
+      };
+      return Stack.save({ endpointId: endpointId }, { method: 'string', type: 'standalone', ...payload }).$promise;
+    };
     service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var deferred = $q.defer();
 
@@ -347,6 +354,28 @@ angular.module('portainer.app').factory('StackService', [
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to create the stack', err: err });
         });
+
+      return deferred.promise;
+    };
+    service.saveSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
+      var deferred = $q.defer();
+
+      SwarmService.swarm(endpointId)
+          .then(function success(swarm) {
+            var payload = {
+              Name: name,
+              SwarmID: swarm.ID,
+              StackFileContent: stackFileContent,
+              Env: env,
+            };
+            return Stack.save({ endpointId: endpointId }, { method: 'string', type: 'swarm', ...payload }).$promise;
+          })
+          .then(function success(data) {
+            deferred.resolve(data);
+          })
+          .catch(function error(err) {
+            deferred.reject({ msg: 'Unable to save the stack', err: err });
+          });
 
       return deferred.promise;
     };
