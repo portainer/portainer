@@ -104,34 +104,9 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 // @failure 500 "Server error"
 // @router /stacks/create/standalone/string [post]
 func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
-	var payload composeStackFromFileContentPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
-	}
-
-	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
-
-	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-
-	if !isUnique {
-		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
-		if err != nil {
-			return stackExistsError(payload.Name)
-		}
-		for _, stack := range stacks {
-			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
-				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
-				if err != nil {
-					return httperror.BadRequest("Invalid request payload", err)
-				}
-			} else {
-				return stackExistsError(payload.Name)
-			}
-		}
+	payload, handlerError := handler.getValidatedPayload(w, r, endpoint, userID)
+	if handlerError != nil {
+		return handlerError
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -153,6 +128,39 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	}
 
 	return handler.decorateStackResponse(w, stack, userID)
+}
+
+func (handler *Handler) getValidatedPayload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) (*composeStackFromFileContentPayload, *httperror.HandlerError) {
+	var payload composeStackFromFileContentPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return nil, httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
+
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to check for name collision", err)
+	}
+
+	if !isUnique {
+		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
+		if err != nil {
+			return nil, stackExistsError(payload.Name)
+		}
+		for _, stack := range stacks {
+			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
+				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
+				if err != nil {
+					return nil, httperror.BadRequest("Invalid request payload", err)
+				}
+			} else {
+				return nil, stackExistsError(payload.Name)
+			}
+		}
+	}
+	return &payload, nil
 }
 
 type composeStackFromGitRepositoryPayload struct {
