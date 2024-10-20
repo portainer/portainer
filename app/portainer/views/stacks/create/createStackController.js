@@ -219,7 +219,7 @@ angular
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
 
-        if (method === 'editor' || method === 'template') {
+        if (method === 'editor') {
           var stackFileContent = $scope.formValues.StackFileContent;
           return StackService.saveComposeStackFromFileContent(name, stackFileContent, env, endpointId);
         }
@@ -231,7 +231,7 @@ angular
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
 
-        if (method === 'template' || method === 'editor') {
+        if (method === 'editor') {
           var stackFileContent = $scope.formValues.StackFileContent;
           return StackService.saveSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
         }
