@@ -18,6 +18,18 @@ func NewStackBuilderDirector(b any) *StackBuilderDirector {
 	}
 }
 
+func (d *StackBuilderDirector) Save(payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
+	switch builder := d.builder.(type) {
+	case FileContentMethodStackBuildProcess:
+		return builder.SetGeneralInfo(payload, endpoint).
+			SetUniqueInfo(payload).
+			SetFileContent(payload).
+			SaveStack()
+	default:
+		return nil, httperror.BadRequest("Invalid value for query parameter. Value must be: string", errors.New(request.ErrInvalidQueryParameter))
+	}
+}
+
 func (d *StackBuilderDirector) SaveAndDeploy(payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
 
 	switch builder := d.builder.(type) {
