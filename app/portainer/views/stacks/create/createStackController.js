@@ -215,6 +215,29 @@ angular
         }
       }
 
+      function saveComposeStack(name, method) {
+        var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+        const endpointId = +$state.params.endpointId;
+
+        if (method === 'editor' || method === 'template') {
+          var stackFileContent = $scope.formValues.StackFileContent;
+          return StackService.saveComposeStackFromFileContent(name, stackFileContent, env, endpointId);
+        }
+
+        throw new Error("Saving is only supported in the editor");
+      }
+
+      function saveSwarmStack(name, method) {
+        var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+        const endpointId = +$state.params.endpointId;
+
+        if (method === 'template' || method === 'editor') {
+          var stackFileContent = $scope.formValues.StackFileContent;
+          return StackService.saveSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
+        }
+
+        throw new Error("Saving is only supported in the editor");
+      }
       $scope.handleEnvVarChange = handleEnvVarChange;
       function handleEnvVarChange(value) {
         $scope.formValues.Env = value;
@@ -263,6 +286,51 @@ angular
           .finally(function final() {
             $scope.state.actionInProgress = false;
           });
+      };
+
+      $scope.saveStack = function () {
+        var name = $scope.formValues.Name;
+        var method = $scope.state.Method;
+
+        var accessControlData = $scope.formValues.AccessControlData;
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = Authentication.isAdmin();
+
+        if (method === 'editor' && $scope.formValues.StackFileContent === '') {
+          $scope.state.formValidationError = 'Stack file content must not be empty';
+          return;
+        }
+
+        if (!validateForm(accessControlData, isAdmin)) {
+          return;
+        }
+
+        var type = $scope.state.StackType;
+        var action = saveSwarmStack;
+        if (type === 2) {
+          action = saveComposeStack;
+        }
+        $scope.state.actionInProgress = true;
+        action(name, method)
+            .then(function success(data) {
+              if (data.data) {
+                data = data.data;
+              }
+              const userId = userDetails.ID;
+              const resourceControl = data.ResourceControl;
+              return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
+            })
+            .then(function success() {
+              Notifications.success('Success', 'Stack successfully saved');
+              $scope.state.isEditorDirty = false;
+              $state.go('docker.stacks');
+            })
+            .catch(function error(err) {
+              Notifications.error('Saving error', err, 'Unable to save stack');
+            })
+            .finally(function final() {
+              $scope.state.actionInProgress = false;
+            });
       };
 
       $scope.onChangeFileContent = onChangeFileContent;
