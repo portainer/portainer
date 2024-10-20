@@ -18,7 +18,7 @@ func NewStackBuilderDirector(b any) *StackBuilderDirector {
 	}
 }
 
-func (d *StackBuilderDirector) Build(payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
+func (d *StackBuilderDirector) SaveAndDeploy(payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
 
 	switch builder := d.builder.(type) {
 	case GitMethodStackBuildProcess:
