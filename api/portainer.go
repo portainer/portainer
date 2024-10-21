@@ -1653,11 +1653,15 @@ const (
 
 // List of supported features
 const (
-	FeatureFdo = "fdo"
+	FeatureFdo  = "fdo"
+	FeatureHSTS = "hsts"
+	FeatureCSP  = "csp"
 )
 
 var SupportedFeatureFlags = []featureflags.Feature{
 	FeatureFdo,
+	FeatureHSTS,
+	FeatureCSP,
 }
 
 const (

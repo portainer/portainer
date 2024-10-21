@@ -11,10 +11,11 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
-	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 const apiKeyHeader = "X-API-KEY"
@@ -43,6 +44,8 @@ type (
 		jwtService    portainer.JWTService
 		apiKeyService apikey.APIKeyService
 		revokedJWT    sync.Map
+		hsts          bool
+		csp           bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -69,6 +72,8 @@ func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JW
 		dataStore:     dataStore,
 		jwtService:    jwtService,
 		apiKeyService: apiKeyService,
+		hsts:          featureflags.IsEnabled("hsts"),
+		csp:           featureflags.IsEnabled("csp"),
 	}
 
 	go b.cleanUpExpiredJWT()
@@ -79,7 +84,7 @@ func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JW
 // PublicAccess defines a security check for public API endpoints.
 // No authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
-	return mwSecureHeaders(h)
+	return MWSecureHeaders(h, bouncer.hsts, bouncer.csp)
 }
 
 // AdminAccess defines a security check for API endpoints that require an authorization check.
@@ -208,7 +213,8 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 		bouncer.CookieAuthLookup,
 		bouncer.JWTAuthLookup,
 	}, h)
-	h = mwSecureHeaders(h)
+	h = MWSecureHeaders(h, bouncer.hsts, bouncer.csp)
+
 	return h
 }
 
@@ -506,10 +512,17 @@ func extractAPIKey(r *http.Request) (string, bool) {
 	return "", false
 }
 
-// mwSecureHeaders provides secure headers middleware for handlers.
-func mwSecureHeaders(next http.Handler) http.Handler {
+// MWSecureHeaders provides secure headers middleware for handlers.
+func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		if hsts {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000") // 365 days
+		}
+
+		if csp {
+			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud")
+		}
+
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})

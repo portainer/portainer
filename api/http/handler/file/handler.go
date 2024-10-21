@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/pkg/featureflags"
+
 	"github.com/gorilla/handlers"
 )
 
@@ -16,8 +19,10 @@ type Handler struct {
 // NewHandler creates a handler to serve static files.
 func NewHandler(assetPublicPath string, wasInstanceDisabled func() bool) *Handler {
 	h := &Handler{
-		Handler: handlers.CompressHandler(
-			http.FileServer(http.Dir(assetPublicPath)),
+		Handler: security.MWSecureHeaders(
+			handlers.CompressHandler(http.FileServer(http.Dir(assetPublicPath))),
+			featureflags.IsEnabled("hsts"),
+			featureflags.IsEnabled("csp"),
 		),
 		wasInstanceDisabled: wasInstanceDisabled,
 	}
@@ -53,7 +58,5 @@ func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	}
 
-	w.Header().Add("X-XSS-Protection", "1; mode=block")
-	w.Header().Add("X-Content-Type-Options", "nosniff")
 	handler.Handler.ServeHTTP(w, r)
 }
