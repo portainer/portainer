@@ -941,6 +941,6 @@
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.21.3\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.21.4\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }
