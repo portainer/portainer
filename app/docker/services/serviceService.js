@@ -56,11 +56,12 @@ function ServiceServiceFactory(AngularToReact) {
    * @param {string?} rollback
    */
   async function updateServiceAngularJS(environmentId, service, config, rollback) {
+    const data = await getServiceAngularJS(environmentId, service.Id);
     return updateService({
       environmentId,
       config,
       serviceId: service.Id,
-      version: service.Version,
+      version: data.Version,
       registryId: config.registryId,
       rollback,
     });
