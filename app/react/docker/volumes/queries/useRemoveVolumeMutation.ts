@@ -9,7 +9,7 @@ import { withAgentTargetHeader } from '../../proxy/queries/utils';
 export async function removeVolume(
   environmentId: EnvironmentId,
   name: Volume['Name'],
-  { nodeName }: { nodeName: string }
+  { nodeName }: { nodeName?: string } = {}
 ) {
   try {
     await axios.delete(buildDockerProxyUrl(environmentId, 'volumes', name), {

@@ -9,3 +9,16 @@ export function AccessControlFormData() {
   this.AuthorizedUsers = [];
   this.AuthorizedTeams = [];
 }
+
+/**
+ * Transform AngularJS UAC FormData model to React UAC FormData model
+ * @param {AccessControlFormData} uac AngularJS format (see above)
+ * @returns {AccessControlFormData} React format (see at @/react/portainer/access-control/types)
+ */
+export function toReactAccessControlFormData({ Ownership, AuthorizedTeams, AuthorizedUsers }) {
+  return {
+    ownership: Ownership, // type: ResourceControlOwnership;
+    authorizedUsers: AuthorizedUsers, // type: UserId[];
+    authorizedTeams: AuthorizedTeams, // type: TeamId[];
+  };
+}
