@@ -5,12 +5,12 @@ import { createOwnershipColumn } from '@/react/docker/components/datatable/creat
 
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 
-import { DockerConfig } from '../../types';
+import { ConfigViewModel } from '../../model';
 
-const columnHelper = createColumnHelper<DockerConfig>();
+const columnHelper = createColumnHelper<ConfigViewModel>();
 
 export const columns = [
-  buildNameColumn<DockerConfig>(
+  buildNameColumn<ConfigViewModel>(
     'Name',
     'docker.configs.config',
     'docker-configs-name'
@@ -22,5 +22,5 @@ export const columns = [
       return <time dateTime={date}>{isoDate(date)}</time>;
     },
   }),
-  createOwnershipColumn<DockerConfig>(),
+  createOwnershipColumn<ConfigViewModel>(),
 ];
