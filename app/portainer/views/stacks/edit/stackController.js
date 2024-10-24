@@ -236,7 +236,8 @@ angular.module('portainer.app').controller('StackController', [
     $scope.deployStack = function () {
       const stack = $scope.stack;
       const isSwarmStack = stack.Type === 1;
-      confirmStackUpdate('Do you want to force an update of the stack?', isSwarmStack).then(function (result) {
+      // not selected. default
+      confirmStackUpdate('Do you want to force an update of the stack?', false).then(function (result) {
         if (!result) {
           return;
         }
