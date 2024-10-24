@@ -25,8 +25,13 @@ const (
 )
 
 func isAzureUrl(s string) bool {
-	return strings.Contains(s, azureDevOpsHost) ||
+	condition := strings.Contains(s, azureDevOpsHost) ||
 		strings.Contains(s, visualStudioHostSuffix)
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
+	if azureDevOpsServerURLOK {
+		return condition || strings.Contains(s, azureDevOpsServerURL)
+	}
+	return condition
 }
 
 type azureOptions struct {
@@ -54,6 +59,12 @@ type azureClient struct {
 }
 
 func NewAzureClient() *azureClient {
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
+	if azureDevOpsServerURLOK {
+		return &azureClient{
+			baseUrl: azureDevOpsServerURL,
+		}
+	}
 	return &azureClient{
 		baseUrl: "https://dev.azure.com",
 	}
@@ -241,9 +252,25 @@ func parseHttpUrl(rawUrl string) (*azureOptions, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HTTP url")
 	}
-
+	azureDevOpsServerURL, azureDevOpsServerURLOK := os.LookupEnv("AZURE_DEVOPS_SERVER_URL")
+	var azureDevOpsServerParsedURL *url.URL
+	if azureDevOpsServerURLOK {
+		azureDevOpsServerParsedURL, err = url.Parse(azureDevOpsServerURL)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse Azure DevOps Server url")
+		}
+	}
 	opt := azureOptions{}
 	switch {
+	case azureDevOpsServerURLOK && azureDevOpsServerParsedURL != nil && u.Host == azureDevOpsServerParsedURL.Host:
+		path := strings.Split(strings.ReplaceAll(u.Path, azureDevOpsServerParsedURL.Path, ""), "/")
+		if len(path) != 5 {
+			expectedUrl := azureDevOpsServerURL + "/{Collection}/{Project}/_git/{Repository}"
+			return nil, errors.Errorf("want url %s, got %s", expectedUrl, u)
+		}
+		opt.organisation = path[1] //In case of AzureDevops Server Organisation is replaced with Collection but their logic is the same
+		opt.project = path[2]
+		opt.repository = path[4]
 	case u.Host == azureDevOpsHost:
 		path := strings.Split(u.Path, "/")
 		if len(path) != 5 {
