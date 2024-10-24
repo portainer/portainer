@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: jq is not installed. Please install jq before building Portainer. Get it here: https://jqlang.github.io/jq/download/' >&2
+  exit 1
+fi
 
 PLATFORM=${1:-"linux"}
 ARCH=${2:-"amd64"}
