@@ -104,34 +104,9 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 // @failure 500 "Server error"
 // @router /stacks/create/standalone/string [post]
 func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
-	var payload composeStackFromFileContentPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
-	}
-
-	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
-
-	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
-	if err != nil {
-		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-
-	if !isUnique {
-		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
-		if err != nil {
-			return stackExistsError(payload.Name)
-		}
-		for _, stack := range stacks {
-			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
-				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
-				if err != nil {
-					return httperror.BadRequest("Invalid request payload", err)
-				}
-			} else {
-				return stackExistsError(payload.Name)
-			}
-		}
+	payload, handlerError := handler.getValidatedPayload(w, r, endpoint, userID)
+	if handlerError != nil {
+		return handlerError
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -147,12 +122,87 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
 
 	return handler.decorateStackResponse(w, stack, userID)
+}
+
+// @id StackSaveDockerStandaloneString
+// @summary Save a new compose stack from a text
+// @description Save a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body composeStackFromFileContentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/standalone/string [post]
+func (handler *Handler) saveComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	payload, handlerError := handler.getValidatedPayload(w, r, endpoint, userID)
+	if handlerError != nil {
+		return handlerError
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	stackPayload := createStackPayloadFromComposeFileContentPayload(payload.Name, payload.StackFileContent, payload.Env, payload.FromAppTemplate)
+
+	composeStackBuilder := stackbuilders.CreateComposeStackFileContentBuilder(securityContext,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer)
+
+	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
+	stack, httpErr := stackBuilderDirector.Save(&stackPayload, endpoint)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return handler.decorateStackResponse(w, stack, userID)
+}
+
+func (handler *Handler) getValidatedPayload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) (*composeStackFromFileContentPayload, *httperror.HandlerError) {
+	var payload composeStackFromFileContentPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return nil, httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
+
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to check for name collision", err)
+	}
+
+	if !isUnique {
+		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
+		if err != nil {
+			return nil, stackExistsError(payload.Name)
+		}
+		for _, stack := range stacks {
+			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
+				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
+				if err != nil {
+					return nil, httperror.BadRequest("Invalid request payload", err)
+				}
+			} else {
+				return nil, stackExistsError(payload.Name)
+			}
+		}
+	}
+	return &payload, nil
 }
 
 type composeStackFromGitRepositoryPayload struct {
@@ -305,7 +355,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -410,7 +460,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	stack, httpErr := stackBuilderDirector.SaveAndDeploy(&stackPayload, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
