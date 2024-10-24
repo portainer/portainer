@@ -77,7 +77,7 @@ The feature request process is similar to the bug report process but has an extr
 
 ## Build and run Portainer locally
 
-Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
+Ensure you have Docker, Node.js, yarn, Golang, and the command-line utility jq installed in the correct versions.
 
 Install dependencies:
 
