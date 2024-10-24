@@ -86,7 +86,12 @@ func redeployWhenChanged(stack *portainer.Stack, deployer StackDeployer, datasto
 			Int("endpoint_id", int(stack.EndpointID)).
 			Msg("cannot auto update a stack, stack author user is missing")
 
-		return &StackAuthorMissingErr{int(stack.ID), author}
+		// If the stack creator is deleted, the stack should still remain capable of
+		// updating automatically.
+		if !datastore.IsErrObjectNotFound(err) {
+			// only return error when it's not ErrObjectNotFound
+			return &StackAuthorMissingErr{int(stack.ID), author}
+		}
 	}
 
 	if !isEnvironmentOnline(endpoint) {
