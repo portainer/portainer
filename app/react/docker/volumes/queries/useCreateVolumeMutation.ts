@@ -16,7 +16,7 @@ export type VolumeConfiguration = {
 export async function createVolume(
   environmentId: EnvironmentId,
   volumeConfiguration: VolumeConfiguration,
-  { nodeName }: { nodeName: string }
+  { nodeName }: { nodeName?: string } = {}
 ) {
   try {
     const { data } = await axios.post<Volume>(

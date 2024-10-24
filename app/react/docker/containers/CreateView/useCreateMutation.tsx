@@ -118,6 +118,8 @@ async function create({
     containerResponse.Portainer?.ResourceControl,
     registry
   );
+
+  return containerResponse;
 }
 
 async function replace({
@@ -163,6 +165,8 @@ async function replace({
   await removeContainer(environment.Id, oldContainer.Id, {
     nodeName: oldContainer.NodeName,
   });
+
+  return containerResponse;
 }
 
 /**

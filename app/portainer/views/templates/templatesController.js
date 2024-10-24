@@ -114,10 +114,10 @@ angular.module('portainer.app').controller('TemplatesController', [
             generatedVolumeIds.push(volumeId);
           });
           TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-          return ImageService.pullImage(template.RegistryModel, true);
+          return ImageService.pullImage(template.RegistryModel);
         })
         .then(function success() {
-          return ContainerService.createAndStartContainer(endpoint, templateConfiguration);
+          return ContainerService.createAndStartContainer(endpoint, templateConfiguration, accessControlData);
         })
         .then(function success(data) {
           const resourceControl = data.Portainer.ResourceControl;

@@ -19,6 +19,7 @@ import { createExec } from '@/react/docker/containers/queries/useCreateExecMutat
 import { containerStats } from '@/react/docker/containers/queries/useContainerStats';
 import { containerTop } from '@/react/docker/containers/queries/useContainerTop';
 import { createOrReplace } from '@/react/docker/containers/CreateView/useCreateMutation';
+import { toReactAccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 
 import { ContainerDetailsViewModel } from '../models/containerDetails';
 import { ContainerStatsViewModel } from '../models/containerStats';
@@ -91,11 +92,17 @@ function ContainerServiceFactory(AngularToReact) {
   /**
    * @param {Environment} environment
    * @param {*} configuration
+   * @param {AccessControlFormData} accessControlFormData
    */
-  async function createAndStartContainer(environment, configuration) {
+  async function createAndStartContainer(environment, configuration, accessControlFormData) {
     return createOrReplace({
       config: configuration,
       environment,
+      values: {
+        name: configuration.name,
+        imageName: configuration.Image,
+        accessControl: toReactAccessControlFormData(accessControlFormData),
+      },
     });
   }
 
