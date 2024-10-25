@@ -12,7 +12,7 @@ import { Link } from '@@/Link';
 
 import { Application } from '../../types';
 import { applicationIsKind } from '../../utils';
-import { useApplicationPods } from '../../application.queries';
+import { useApplicationPods } from '../../queries/useApplicationPods';
 
 type Props = {
   environmentId: EnvironmentId;

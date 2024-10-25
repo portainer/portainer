@@ -1,52 +1,44 @@
 import { List } from 'lucide-react';
+import { useRouter } from '@uirouter/react';
 
-import { useAuthorizations } from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { useTableState } from '@@/datatables/useTableState';
 import { TableSettingsMenu } from '@@/datatables';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { useApplications } from '../../application.queries';
+import { useApplications } from '../../queries/useApplications';
+import { ApplicationsTableSettings } from '../useKubeAppsTableStore';
+import { useDeleteApplicationsMutation } from '../../queries/useDeleteApplicationsMutation';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
-import { Namespace, Stack } from './types';
 import { NamespaceFilter } from './NamespaceFilter';
-import { TableActions } from './TableActions';
 import { getStacksFromApplications } from './getStacksFromApplications';
-
-const storageKey = 'kubernetes.applications.stacks';
-
-const settingsStore = createStore(storageKey);
-
-interface Props {
-  onRemove(selectedItems: Array<Stack>): void;
-  namespace?: string;
-  namespaces: Array<Namespace>;
-  onNamespaceChange(namespace: string): void;
-}
+import { Stack } from './types';
 
 export function ApplicationsStacksDatatable({
-  onRemove,
-  namespace = '',
-  namespaces,
-  onNamespaceChange,
-}: Props) {
-  const tableState = useTableState(settingsStore, storageKey);
-
-  const envId = useEnvironmentId();
-  const applicationsQuery = useApplications(envId, {
+  tableState,
+}: {
+  tableState: ApplicationsTableSettings & {
+    setSearch: (value: string) => void;
+    search: string;
+  };
+}) {
+  const router = useRouter();
+  const environmentId = useEnvironmentId();
+  const namespaceListQuery = useNamespacesQuery(environmentId);
+  const { authorized: hasWriteAuth } = useAuthorizations('K8sApplicationsW');
+  const applicationsQuery = useApplications(environmentId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
-    namespace,
+    namespace: tableState.namespace,
     withDependencies: true,
   });
-  const namespaceListQuery = useNamespacesQuery(envId);
   const applications = applicationsQuery.data ?? [];
   const filteredApplications = tableState.showSystemResources
     ? applications
@@ -54,10 +46,12 @@ export function ApplicationsStacksDatatable({
         (item) =>
           !isSystemNamespace(item.ResourcePool, namespaceListQuery.data ?? [])
       );
-
-  const { authorized } = useAuthorizations('K8sApplicationsW');
-
   const stacks = getStacksFromApplications(filteredApplications);
+  const removeApplicationsMutation = useDeleteApplicationsMutation({
+    environmentId,
+    stacks,
+    reportStacks: true,
+  });
 
   return (
     <ExpandableDatatable
@@ -68,18 +62,17 @@ export function ApplicationsStacksDatatable({
       isLoading={applicationsQuery.isLoading || namespaceListQuery.isLoading}
       columns={columns}
       settingsManager={tableState}
-      disableSelect={!authorized}
+      disableSelect={!hasWriteAuth}
       renderSubRow={(row) => (
         <SubRows stack={row.original} span={row.getVisibleCells().length} />
       )}
-      noWidget
       description={
         <div className="w-full">
           <div className="float-right mr-2 min-w-[140px]">
             <NamespaceFilter
-              namespaces={namespaces}
-              value={namespace}
-              onChange={onNamespaceChange}
+              namespaces={namespaceListQuery.data ?? []}
+              value={tableState.namespace}
+              onChange={tableState.setNamespace}
               showSystem={tableState.showSystemResources}
             />
           </div>
@@ -92,7 +85,14 @@ export function ApplicationsStacksDatatable({
         </div>
       }
       renderTableActions={(selectedItems) => (
-        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
+        <Authorized authorizations="K8sApplicationsW">
+          <DeleteButton
+            confirmMessage="Are you sure that you want to remove the selected stack(s) ? This will remove all the applications associated to the stack(s)."
+            disabled={selectedItems.length === 0}
+            onConfirmed={() => handleRemoveStacks(selectedItems)}
+            data-cy="k8sApp-removeStackButton"
+          />
+        </Authorized>
       )}
       renderTableSettings={() => (
         <TableSettingsMenu>
@@ -103,4 +103,13 @@ export function ApplicationsStacksDatatable({
       data-cy="applications-stacks-datatable"
     />
   );
+
+  function handleRemoveStacks(selectedItems: Stack[]) {
+    const applications = selectedItems.flatMap((stack) => stack.Applications);
+    removeApplicationsMutation.mutate(applications, {
+      onSuccess: () => {
+        router.stateService.reload();
+      },
+    });
+  }
 }

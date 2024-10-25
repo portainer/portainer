@@ -11,7 +11,8 @@ import { useEnvironment } from '@/react/portainer/environments/queries';
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useApplication, useApplicationPods } from '../../application.queries';
+import { useApplication } from '../../queries/useApplication';
+import { useApplicationPods } from '../../queries/useApplicationPods';
 
 import { ContainerRowData } from './types';
 import { getColumns } from './columns';

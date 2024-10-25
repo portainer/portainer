@@ -11,6 +11,7 @@ import { ServicesView } from '@/react/kubernetes/services/ServicesView';
 import { ConsoleView } from '@/react/kubernetes/applications/ConsoleView';
 import { ConfigmapsAndSecretsView } from '@/react/kubernetes/configs/ListView/ConfigmapsAndSecretsView';
 import { CreateNamespaceView } from '@/react/kubernetes/namespaces/CreateView/CreateNamespaceView';
+import { ApplicationsView } from '@/react/kubernetes/applications/ListView/ApplicationsView';
 import { ApplicationDetailsView } from '@/react/kubernetes/applications/DetailsView/ApplicationDetailsView';
 import { ConfigureView } from '@/react/kubernetes/cluster/ConfigureView';
 import { NamespacesView } from '@/react/kubernetes/namespaces/ListView/NamespacesView';
@@ -54,6 +55,10 @@ export const viewsModule = angular
       withUIRouter(withReactQuery(withCurrentUser(ConfigmapsAndSecretsView))),
       []
     )
+  )
+  .component(
+    'kubernetesApplicationsView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ApplicationsView))), [])
   )
   .component(
     'applicationDetailsView',

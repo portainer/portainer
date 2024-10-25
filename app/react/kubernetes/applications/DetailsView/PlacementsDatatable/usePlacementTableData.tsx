@@ -14,8 +14,9 @@ import {
 } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useApplication, useApplicationPods } from '../../application.queries';
 import { Affinity, Label, NodePlacementRowData } from '../types';
+import { useApplication } from '../../queries/useApplication';
+import { useApplicationPods } from '../../queries/useApplicationPods';
 
 interface TableSettings extends BasicTableSettings, RefreshableTableSettings {}
 

@@ -15,16 +15,14 @@ import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 import { Tooltip } from '@@/Tip/Tooltip';
 
 import {
-  useApplicationRevisionList,
-  usePatchApplicationMutation,
-} from '../../application.queries';
-import {
   applicationIsKind,
   getRollbackPatchPayload,
   matchLabelsToLabelSelectorValue,
 } from '../../utils';
 import { Application } from '../../types';
 import { appDeployMethodLabel } from '../../constants';
+import { useApplicationRevisionList } from '../../queries/useApplicationRevisionList';
+import { usePatchApplicationMutation } from '../../queries/usePatchApplicationMutation';
 
 type Props = {
   environmentId: EnvironmentId;

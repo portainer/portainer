@@ -1,13 +1,16 @@
 import { Filter } from 'lucide-react';
 import { useEffect } from 'react';
 
+import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
+
 import { Icon } from '@@/Icon';
 import { Select } from '@@/form-components/Input';
 import { InputGroup } from '@@/form-components/InputGroup';
 
-import { Namespace } from './types';
-
-function transformNamespaces(namespaces: Namespace[], showSystem?: boolean) {
+function transformNamespaces(
+  namespaces: PortainerNamespace[],
+  showSystem?: boolean
+) {
   const transformedNamespaces = namespaces.map(({ Name, IsSystem }) => ({
     label: IsSystem ? `${Name} - system` : Name,
     value: Name,
@@ -26,7 +29,7 @@ export function NamespaceFilter({
   onChange,
   showSystem,
 }: {
-  namespaces: Namespace[];
+  namespaces: PortainerNamespace[];
   value: string;
   onChange: (value: string) => void;
   showSystem?: boolean;

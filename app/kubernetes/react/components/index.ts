@@ -23,7 +23,6 @@ import { ApplicationSummarySection } from '@/react/kubernetes/applications/compo
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
-import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
 import { StackNameLabelInsight } from '@/react/kubernetes/DeployView/StackName/StackNameLabelInsight';
@@ -61,14 +60,12 @@ import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
-import { applicationsModule } from './applications';
 import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
 import { registriesModule } from './registries';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
-    applicationsModule,
     namespacesModule,
     clusterManagementModule,
     registriesModule,
@@ -207,15 +204,6 @@ export const ngModule = angular
       withUIRouter(withReactQuery(withCurrentUser(ApplicationSummarySection))),
       ['formValues', 'oldFormValues']
     )
-  )
-  .component(
-    'kubernetesApplicationsStacksDatatable',
-    r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
-      'onRemove',
-      'namespace',
-      'namespaces',
-      'onNamespaceChange',
-    ])
   )
   .component(
     'kubernetesIntegratedApplicationsDatatable',

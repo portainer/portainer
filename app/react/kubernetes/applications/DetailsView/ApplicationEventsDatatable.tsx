@@ -6,14 +6,12 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { useTableState } from '@@/datatables/useTableState';
 
-import {
-  useApplication,
-  useApplicationPods,
-  useApplicationServices,
-} from '../application.queries';
 import { EventsDatatable } from '../../components/EventsDatatable';
 import { useEvents } from '../../queries/useEvents';
 import { AppKind } from '../types';
+import { useApplication } from '../queries/useApplication';
+import { useApplicationServices } from '../queries/useApplicationServices';
+import { useApplicationPods } from '../queries/useApplicationPods';
 
 const storageKey = 'k8sAppEventsDatatable';
 const settingsStore = createStore(storageKey, { id: 'Date', desc: true });

@@ -2,7 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import LaptopCode from '@/assets/ico/laptop-code.svg?c';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useApplications } from '@/react/kubernetes/applications/application.queries';
+import { useApplications } from '@/react/kubernetes/applications/queries/useApplications';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';

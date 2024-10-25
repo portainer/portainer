@@ -34,12 +34,10 @@ import {
   getTotalPods,
   isExternalApplication,
 } from '../utils';
-import {
-  useApplication,
-  usePatchApplicationMutation,
-} from '../application.queries';
 import { Application, ApplicationPatch } from '../types';
 import { useNamespaceQuery } from '../../namespaces/queries/useNamespaceQuery';
+import { useApplication } from '../queries/useApplication';
+import { usePatchApplicationMutation } from '../queries/usePatchApplicationMutation';
 
 export function ApplicationSummaryWidget() {
   const stateAndParams = useCurrentStateAndParams();

@@ -11,12 +11,10 @@ import { AddButton, Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 
-import {
-  useApplication,
-  useApplicationServices,
-} from '../../application.queries';
 import { applicationIsKind, isExternalApplication } from '../../utils';
 import { appStackIdLabel } from '../../constants';
+import { useApplication } from '../../queries/useApplication';
+import { useApplicationServices } from '../../queries/useApplicationServices';
 
 import { RestartApplicationButton } from './RestartApplicationButton';
 import { RedeployApplicationButton } from './RedeployApplicationButton';
