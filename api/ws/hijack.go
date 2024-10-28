@@ -1,4 +1,4 @@
-package websocket
+package ws
 
 import (
 	"bufio"
@@ -16,18 +16,13 @@ import (
 
 const (
 	// Time allowed to write a message to the peer
-	writeWait = 10 * time.Second
+	WriteWait = 10 * time.Second
 
 	// Send pings to peer with this period
-	pingPeriod = 50 * time.Second
+	PingPeriod = 50 * time.Second
 )
 
-func hijackRequest(
-	websocketConn *websocket.Conn,
-	conn net.Conn,
-	request *http.Request,
-	token string,
-) error {
+func HijackRequest(websocketConn *websocket.Conn, conn net.Conn, request *http.Request) error {
 	resp, err := sendHTTPRequest(conn, request)
 	if err != nil {
 		return err
@@ -39,17 +34,21 @@ func hijackRequest(
 		return fmt.Errorf("unexpected response status code: %d", resp.StatusCode)
 	}
 
+	var mu sync.Mutex
+
 	errorChan := make(chan error, 1)
-	go readWebSocketToTCP(websocketConn, conn, errorChan)
-	go writeTCPToWebSocket(websocketConn, conn, errorChan)
+	go StreamFromWebsocketToWriter(websocketConn, conn, errorChan)
+	go WriteReaderToWebSocket(websocketConn, &mu, conn, errorChan)
 
 	err = <-errorChan
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
-		log.Debug().Msgf("Unexpected close error: %v\n", err)
+		log.Debug().Err(err).Msg("unexpected close error")
+
 		return err
 	}
 
-	log.Debug().Msgf("session ended")
+	log.Info().Msg("session ended")
+
 	return nil
 }
 
@@ -69,60 +68,40 @@ func sendHTTPRequest(conn net.Conn, req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func readWebSocketToTCP(websocketConn *websocket.Conn, tcpConn net.Conn, errorChan chan error) {
-	for {
-		messageType, p, err := websocketConn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				log.Debug().Msgf("Unexpected close error: %v\n", err)
-			}
-			errorChan <- err
-			return
-		}
-
-		if messageType == websocket.TextMessage || messageType == websocket.BinaryMessage {
-			_, err := tcpConn.Write(p)
-			if err != nil {
-				log.Debug().Msgf("Error writing to TCP connection: %v\n", err)
-				errorChan <- err
-				return
-			}
-		}
-	}
-}
-
-func writeTCPToWebSocket(websocketConn *websocket.Conn, tcpConn net.Conn, errorChan chan error) {
-	var mu sync.Mutex
-	out := make([]byte, readerBufferSize)
+func WriteReaderToWebSocket(websocketConn *websocket.Conn, mu *sync.Mutex, reader io.Reader, errorChan chan error) {
+	out := make([]byte, ReaderBufferSize)
 	input := make(chan string)
-	pingTicker := time.NewTicker(pingPeriod)
+	pingTicker := time.NewTicker(PingPeriod)
 	defer pingTicker.Stop()
 	defer websocketConn.Close()
 
-	websocketConn.SetReadLimit(2048)
+	mu.Lock()
+	websocketConn.SetReadLimit(ReaderBufferSize)
 	websocketConn.SetPongHandler(func(string) error {
 		return nil
 	})
 
 	websocketConn.SetPingHandler(func(data string) error {
-		websocketConn.SetWriteDeadline(time.Now().Add(writeWait))
+		websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+
 		return websocketConn.WriteMessage(websocket.PongMessage, []byte(data))
 	})
-
-	reader := bufio.NewReader(tcpConn)
+	mu.Unlock()
 
 	go func() {
 		for {
 			n, err := reader.Read(out)
 			if err != nil {
 				errorChan <- err
+
 				if !errors.Is(err, io.EOF) {
-					log.Debug().Msgf("error reading from server: %v", err)
+					log.Debug().Err(err).Msg("error reading from server")
 				}
+
 				return
 			}
 
-			processedOutput := validString(string(out[:n]))
+			processedOutput := ValidString(string(out[:n]))
 			input <- processedOutput
 		}
 	}()
@@ -130,34 +109,37 @@ func writeTCPToWebSocket(websocketConn *websocket.Conn, tcpConn net.Conn, errorC
 	for {
 		select {
 		case msg := <-input:
-			err := wswrite(websocketConn, &mu, msg)
-			if err != nil {
-				log.Debug().Msgf("error writing to websocket: %v", err)
+			if err := wsWrite(websocketConn, mu, msg); err != nil {
+				log.Debug().Err(err).Msg("error writing to websocket")
 				errorChan <- err
+
 				return
 			}
 		case <-pingTicker.C:
-			if err := wsping(websocketConn, &mu); err != nil {
-				log.Debug().Msgf("error writing to websocket during pong response: %v", err)
+			if err := wsPing(websocketConn, mu); err != nil {
+				log.Debug().Err(err).Msg("error writing to websocket during pong response")
 				errorChan <- err
+
 				return
 			}
 		}
 	}
 }
 
-func wswrite(websocketConn *websocket.Conn, mu *sync.Mutex, msg string) error {
+func wsWrite(websocketConn *websocket.Conn, mu *sync.Mutex, msg string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	websocketConn.SetWriteDeadline(time.Now().Add(writeWait))
+	websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+
 	return websocketConn.WriteMessage(websocket.TextMessage, []byte(msg))
 }
 
-func wsping(websocketConn *websocket.Conn, mu *sync.Mutex) error {
+func wsPing(websocketConn *websocket.Conn, mu *sync.Mutex) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	websocketConn.SetWriteDeadline(time.Now().Add(writeWait))
+	websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+
 	return websocketConn.WriteMessage(websocket.PingMessage, nil)
 }

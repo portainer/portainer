@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -136,8 +137,8 @@ func (handler *Handler) hijackPodExecStartOperation(
 
 	// errorChan is used to propagate errors from the go routines to the caller.
 	errorChan := make(chan error, 1)
-	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
-	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
+	go ws.StreamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
+	go ws.StreamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
 	// StartExecProcess is a blocking operation which streams IO to/from pod;
 	// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before

@@ -5,10 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/rs/zerolog/log"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -76,14 +74,6 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		log.Warn().
-			Err(err).
-			Msg("unable to retrieve user details from authentication token")
-		return err
-	}
-
 	r.Header.Del("Origin")
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
@@ -98,14 +88,13 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 	}
 	defer websocketConn.Close()
 
-	return hijackAttachStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
+	return hijackAttachStartOperation(websocketConn, params.endpoint, params.ID)
 }
 
 func hijackAttachStartOperation(
 	websocketConn *websocket.Conn,
 	endpoint *portainer.Endpoint,
 	attachID string,
-	token string,
 ) error {
 	conn, err := initDial(endpoint)
 	if err != nil {
@@ -127,7 +116,7 @@ func hijackAttachStartOperation(
 		return err
 	}
 
-	return hijackRequest(websocketConn, conn, attachStartRequest, token)
+	return ws.HijackRequest(websocketConn, conn, attachStartRequest)
 }
 
 func createAttachStartRequest(attachID string) (*http.Request, error) {
