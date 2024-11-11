@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 
-	"github.com/Masterminds/semver"
+	"github.com/Masterminds/semver/v3"
 	"github.com/rs/zerolog/log"
 )
 

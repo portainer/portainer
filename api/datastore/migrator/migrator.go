@@ -3,7 +3,7 @@ package migrator
 import (
 	"errors"
 
-	"github.com/Masterminds/semver"
+	"github.com/Masterminds/semver/v3"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
