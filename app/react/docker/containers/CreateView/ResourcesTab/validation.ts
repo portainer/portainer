@@ -6,6 +6,7 @@ import { resourcesValidation } from './ResourcesFieldset';
 import { Values } from './ResourcesTab';
 import { runtimeValidation } from './RuntimeSection';
 import { sysctlsValidation } from './SysctlsField';
+import { securityOptValidation } from './SecurityOptField';
 
 export function validation({
   maxMemory,
@@ -18,6 +19,7 @@ export function validation({
     runtime: runtimeValidation(),
     devices: devicesValidation(),
     sysctls: sysctlsValidation(),
+    securityOpt: securityOptValidation(),
     sharedMemorySize: number().min(0).default(0),
     gpu: gpuFieldsetUtils.validation(),
     resources: resourcesValidation({ maxMemory, maxCpu }),

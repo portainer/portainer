@@ -19,6 +19,7 @@ export function toViewModel(config: ContainerDetailsJSON): Values {
         value,
       })
     ),
+    securityOpt: config.HostConfig?.SecurityOpt || [],
     gpu: gpuFieldsetUtils.toViewModel(config.HostConfig?.DeviceRequests || []),
     sharedMemorySize: toViewModelMemory(config.HostConfig?.ShmSize),
     resources: {
@@ -38,6 +39,7 @@ export function getDefaultViewModel(): Values {
     },
     devices: [],
     sysctls: [],
+    securityOpt: [],
     sharedMemorySize: 64,
     gpu: gpuFieldsetUtils.getDefaultViewModel(),
     resources: {

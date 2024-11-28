@@ -56,6 +56,10 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 			return errors.New("sysctl setting disabled for non administrator users")
 		}
 
+		if !securitySettings.AllowSecurityOptForRegularUsers && service.SecurityOpt != nil && len(service.SecurityOpt) > 0 {
+			return errors.New("security-opt setting disabled for non administrator users")
+		}
+
 		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
 			return errors.New("container capabilities disabled for non administrator users")
 		}

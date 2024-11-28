@@ -91,6 +91,7 @@
         "allowPrivilegedModeForRegularUsers": true,
         "allowStackManagementForRegularUsers": true,
         "allowSysctlSettingForRegularUsers": false,
+        "allowSecurityOptForRegularUsers": false,
         "allowVolumeBrowserForRegularUsers": false,
         "enableHostManagementFeatures": false
       },
