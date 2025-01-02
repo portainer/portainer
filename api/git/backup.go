@@ -26,25 +26,19 @@ type CloneOptions struct {
 	TLSSkipVerify bool `example:"false"`
 }
 
-func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) (clean func(), err error) {
+func CloneWithBackup(gitService portainer.GitService, fileService portainer.FileService, options CloneOptions) error {
 	backupProjectPath := fmt.Sprintf("%s-old-%s", options.ProjectPath, time.Now().Unix())
-	cleanUp := false
 	cleanFn := func() {
-		if !cleanUp {
-			return
-		}
-
 		if err := fileService.RemoveDirectory(backupProjectPath); err != nil {
 			log.Warn().Err(err).Msg("unable to remove git repository directory")
 		}
 	}
-	defer cleanFn()
 
 	if err := filesystem.MoveDirectory(options.ProjectPath, backupProjectPath, true); err != nil {
 		return cleanFn, errors.WithMessage(err, "Unable to move git repository directory")
 	}
 
-	cleanUp = true
+	defer cleanFn()
 
 	if err := gitService.CloneRepository(options.ProjectPath, options.URL, options.ReferenceName, options.Username, options.Password, options.TLSSkipVerify); err != nil {
 		cleanUp = false
