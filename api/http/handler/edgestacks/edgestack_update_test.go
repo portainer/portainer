@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/stretchr/testify/require"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -24,8 +25,7 @@ func TestUpdateAndInspect(t *testing.T) {
 	endpointID := portainer.EndpointID(6)
 	newEndpoint := createEndpointWithId(t, handler.DataStore, endpointID)
 
-	err := handler.DataStore.Endpoint().Create(&newEndpoint)
-	if err != nil {
+	if err := handler.DataStore.Endpoint().Create(&newEndpoint); err != nil {
 		t.Fatal(err)
 	}
 
@@ -36,8 +36,7 @@ func TestUpdateAndInspect(t *testing.T) {
 		},
 	}
 
-	err = handler.DataStore.EndpointRelation().Create(&endpointRelation)
-	if err != nil {
+	if err := handler.DataStore.EndpointRelation().Create(&endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 
@@ -50,8 +49,7 @@ func TestUpdateAndInspect(t *testing.T) {
 		PartialMatch: false,
 	}
 
-	err = handler.DataStore.EdgeGroup().Create(&newEdgeGroup)
-	if err != nil {
+	if err := handler.DataStore.EdgeGroup().Create(&newEdgeGroup); err != nil {
 		t.Fatal(err)
 	}
 
@@ -96,8 +94,7 @@ func TestUpdateAndInspect(t *testing.T) {
 	}
 
 	updatedStack := portainer.EdgeStack{}
-	err = json.NewDecoder(rec.Body).Decode(&updatedStack)
-	if err != nil {
+	if err := json.NewDecoder(rec.Body).Decode(&updatedStack); err != nil {
 		t.Fatal("error decoding response:", err)
 	}
 
@@ -120,7 +117,6 @@ func TestUpdateWithInvalidEdgeGroups(t *testing.T) {
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
 
-	//newEndpoint := createEndpoint(t, handler.DataStore)
 	newEdgeGroup := portainer.EdgeGroup{
 		ID:           2,
 		Name:         "EdgeGroup 2",
@@ -130,7 +126,8 @@ func TestUpdateWithInvalidEdgeGroups(t *testing.T) {
 		PartialMatch: false,
 	}
 
-	handler.DataStore.EdgeGroup().Create(&newEdgeGroup)
+	err := handler.DataStore.EdgeGroup().Create(&newEdgeGroup)
+	require.NoError(t, err)
 
 	cases := []struct {
 		Name               string

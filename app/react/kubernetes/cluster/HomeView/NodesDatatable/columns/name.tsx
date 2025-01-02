@@ -12,6 +12,7 @@ import { columnHelper } from './helper';
 export const name = columnHelper.accessor('Name', {
   header: 'Name',
   cell: NameCell,
+  id: 'name',
 });
 
 function NameCell({
@@ -25,7 +26,11 @@ function NameCell({
         childrenUnauthorized={nodeName}
         adminOnlyCE
       >
-        <Link to="kubernetes.cluster.node" params={{ nodeName }}>
+        <Link
+          to="kubernetes.cluster.node"
+          params={{ nodeName }}
+          data-cy={`node-name-link-${nodeName}`}
+        >
           {nodeName}
         </Link>
       </Authorized>

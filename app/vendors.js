@@ -6,7 +6,6 @@ import 'angular-messages';
 import 'angular-resource';
 import 'angular-utils-pagination';
 import 'angular-local-storage';
-import 'angular-json-tree';
 import 'angular-loading-bar';
 import 'angular-clipboard';
 import 'angular-file-saver';

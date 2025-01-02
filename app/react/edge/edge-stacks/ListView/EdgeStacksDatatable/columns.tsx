@@ -17,7 +17,12 @@ import { DeploymentCounter } from './DeploymentCounter';
 const columnHelper = createColumnHelper<DecoratedEdgeStack>();
 
 export const columns = _.compact([
-  buildNameColumn<DecoratedEdgeStack>('Name', 'edge.stacks.edit', 'stackId'),
+  buildNameColumn<DecoratedEdgeStack>(
+    'Name',
+    'edge.stacks.edit',
+    'edge-stacks-name',
+    'stackId'
+  ),
   columnHelper.accessor(
     (item) => item.aggregatedStatus[StatusType.Acknowledged] || 0,
     {
@@ -99,9 +104,10 @@ export const columns = _.compact([
                 to="edge.stacks.edit"
                 params={{
                   stackId: row.original.Id,
-                  tab: 1,
+                  tab: 'environments',
                   status: StatusType.Error,
                 }}
+                data-cy={`edge-stacks-error-${row.original.Id}`}
               >
                 ({count}/{row.original.NumDeployments})
               </Link>

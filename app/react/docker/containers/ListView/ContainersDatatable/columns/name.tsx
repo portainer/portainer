@@ -2,7 +2,7 @@ import { CellContext } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
+import type { ContainerListViewModel } from '@/react/docker/containers/types';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
 
@@ -19,7 +19,7 @@ export const name = columnHelper.accessor((row) => row.Names[0], {
 export function NameCell({
   getValue,
   row: { original: container },
-}: CellContext<DockerContainer, string>) {
+}: CellContext<ContainerListViewModel, string>) {
   const name = getValue();
 
   const linkProps = useSref('.container', {

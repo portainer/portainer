@@ -40,6 +40,7 @@ export function ApplicationSettingsForm() {
           </TextTip>
           <SwitchField
             label="Enable front-end data caching for Kubernetes environments"
+            data-cy="account-applicationSettingsUseCacheSwitch"
             checked={values.useCache}
             onChange={(value) => setFieldValue('useCache', value)}
             labelClass="col-lg-2 col-sm-3" // match the label width of the other fields in the page

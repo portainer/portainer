@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { withGlobalError } from '@/react-tools/react-query';
@@ -12,13 +12,17 @@ type CustomTemplateFileContent = {
   FileContent: string;
 };
 
-export function useCustomTemplateFile(id?: CustomTemplate['Id'], git = false) {
+export function useCustomTemplateFile(
+  id?: CustomTemplate['Id'],
+  git = false,
+  { enabled }: { enabled?: boolean } = {}
+) {
   return useQuery(
-    id ? queryKeys.file(id, { git }) : [],
+    queryKeys.file(id!, { git }),
     () => getCustomTemplateFile({ id: id!, git }),
     {
       ...withGlobalError('Failed to get custom template file'),
-      enabled: !!id,
+      enabled: !!id && enabled,
       // there's nothing to do with a new file content, so we're disabling refetch
       refetchOnReconnect: false,
       refetchOnWindowFocus: false,

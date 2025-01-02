@@ -118,7 +118,7 @@ export class KubernetesIngressConverter {
     const res = new KubernetesIngress();
     res.Name = formValues.IngressClass.Name;
     res.Namespace = formValues.Namespace;
-    const pairs = _.map(formValues.Annotations, (a) => [a.Key, a.Value]);
+    const pairs = _.map(formValues.Annotations, (a) => [a.key, a.value]);
     res.Annotations = _.fromPairs(pairs);
     res.Annotations[PortainerIngressClassTypes] = formValues.IngressClass.Name;
     res.IngressClassName = formValues.IngressClass.Name;
@@ -149,8 +149,8 @@ export class KubernetesIngressConverter {
         const annotations = _.map(_.toPairs(ingress.Annotations), ([key, value]) => {
           if (key !== PortainerIngressClassTypes) {
             const annotation = new KubernetesResourcePoolIngressClassAnnotationFormValue();
-            annotation.Key = key;
-            annotation.Value = value;
+            annotation.key = key;
+            annotation.value = value;
             return annotation;
           }
         });

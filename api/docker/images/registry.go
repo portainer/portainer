@@ -1,6 +1,7 @@
 package images
 
 import (
+	"cmp"
 	"strings"
 	"time"
 
@@ -41,8 +42,7 @@ func (c *RegistryClient) RegistryAuth(image Image) (string, string, error) {
 }
 
 func (c *RegistryClient) CertainRegistryAuth(registry *portainer.Registry) (string, string, error) {
-	err := registryutils.EnsureRegTokenValid(c.dataStore, registry)
-	if err != nil {
+	if err := registryutils.EnsureRegTokenValid(c.dataStore, registry); err != nil {
 		return "", "", err
 	}
 
@@ -72,8 +72,7 @@ func (c *RegistryClient) EncodedRegistryAuth(image Image) (string, error) {
 }
 
 func (c *RegistryClient) EncodedCertainRegistryAuth(registry *portainer.Registry) (string, error) {
-	err := registryutils.EnsureRegTokenValid(c.dataStore, registry)
-	if err != nil {
+	if err := registryutils.EnsureRegTokenValid(c.dataStore, registry); err != nil {
 		return "", err
 	}
 
@@ -92,38 +91,32 @@ func findBestMatchRegistry(repository string, registries []portainer.Registry) (
 	}
 
 	var match1, match2, match3 *portainer.Registry
-	for i := 0; i < len(registries); i++ {
-		registry := registries[i]
-		if registry.Type == portainer.DockerHubRegistry {
 
-			// try to match repository examples:
-			//   <USERNAME>/nginx:latest
-			//   docker.io/<USERNAME>/nginx:latest
-			if strings.HasPrefix(repository, registry.Username+"/") || strings.HasPrefix(repository, registry.URL+"/"+registry.Username+"/") {
-				match1 = &registry
-			}
-
-			// try to match repository examples:
-			//   portainer/portainer-ee:latest
-			//   <NON-USERNAME>/portainer-ee:latest
-			if match3 == nil {
-				match3 = &registry
-			}
-		}
-
+	for _, registry := range registries {
 		if strings.Contains(repository, registry.URL) {
 			match2 = &registry
 		}
+
+		if registry.Type != portainer.DockerHubRegistry {
+			continue
+		}
+
+		// try to match repository examples:
+		//   <USERNAME>/nginx:latest
+		//   docker.io/<USERNAME>/nginx:latest
+		if strings.HasPrefix(repository, registry.Username+"/") || strings.HasPrefix(repository, registry.URL+"/"+registry.Username+"/") {
+			match1 = &registry
+		}
+
+		// try to match repository examples:
+		//   portainer/portainer-ee:latest
+		//   <NON-USERNAME>/portainer-ee:latest
+		if match3 == nil {
+			match3 = &registry
+		}
 	}
 
-	match := match1
-	if match == nil {
-		match = match2
-	}
-	if match == nil {
-		match = match3
-	}
-
+	match := cmp.Or(match1, match2, match3)
 	if match == nil {
 		return nil, errors.New("no registries matched")
 	}

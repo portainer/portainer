@@ -27,7 +27,6 @@ interface Props {
   initialIngressControllers: IngressControllerClassMap[] | undefined;
   allowNoneIngressClass: boolean;
   isLoading: boolean;
-  noIngressControllerLabel: string;
   view: string;
 }
 
@@ -40,7 +39,6 @@ export function IngressClassDatatableAngular({
   ingressControllers,
   allowNoneIngressClass,
   isLoading,
-  noIngressControllerLabel,
   view,
 }: Props) {
   const tableState = useTableState(settingsStore, storageKey);
@@ -99,12 +97,12 @@ export function IngressClassDatatableAngular({
         dataset={ingControllerFormValues || []}
         columns={columns}
         isLoading={isLoading}
-        emptyContentLabel={noIngressControllerLabel}
         title="Ingress Controllers"
         titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
         description={renderIngressClassDescription()}
+        data-cy="k8s-ingress-classes-datatable"
       />
     </div>
   );
@@ -127,6 +125,7 @@ export function IngressClassDatatableAngular({
                 false
               )
             }
+            data-cy="k8s-disallow-selected-ingress-controllers-button"
           >
             Disallow selected
           </Button>
@@ -144,6 +143,7 @@ export function IngressClassDatatableAngular({
                 true
               )
             }
+            data-cy="k8s-allow-selected-ingress-controllers-button"
           >
             Allow selected
           </Button>

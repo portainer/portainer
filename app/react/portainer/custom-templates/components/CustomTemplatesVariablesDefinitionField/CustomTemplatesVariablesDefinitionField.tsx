@@ -50,6 +50,7 @@ export function CustomTemplatesVariablesDefinitionField({
       errors={errors}
       textTip="List should map the mustache variables in the template file, if default value is empty, the variable will be required."
       isAddButtonHidden={isVariablesNamesFromParent}
+      data-cy="custom-templates-variables-field"
     />
   );
 }
@@ -58,7 +59,13 @@ interface DefinitionItemProps extends ItemProps<VariableDefinition> {
   isNameReadonly?: boolean;
 }
 
-function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
+function Item({
+  item,
+  onChange,
+  error,
+  isNameReadonly,
+  index,
+}: DefinitionItemProps) {
   const errorObj = typeof error === 'object' ? error : {};
 
   return (
@@ -70,6 +77,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           onChange={handleChange}
           placeholder="Name (e.g var_name)"
           readOnly={isNameReadonly}
+          data-cy={`custom-templates-item-name-field_${index}`}
         />
         {errorObj?.name && <FormError>{errorObj.name}</FormError>}
       </div>
@@ -79,6 +87,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           onChange={handleChange}
           placeholder="Label"
           name="label"
+          data-cy={`custom-templates-item-label-field_${index}`}
         />
         {errorObj?.label && <FormError>{errorObj.label}</FormError>}
       </div>
@@ -88,6 +97,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           value={item.description}
           onChange={handleChange}
           placeholder="Description"
+          data-cy={`custom-templates-item-description-field_${index}`}
         />
         {errorObj?.description && <FormError>{errorObj.description}</FormError>}
       </div>
@@ -97,6 +107,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           onChange={handleChange}
           placeholder="Default Value"
           name="defaultValue"
+          data-cy={`custom-templates-item-default-value-field_${index}`}
         />
         {errorObj?.defaultValue && (
           <FormError>{errorObj.defaultValue}</FormError>

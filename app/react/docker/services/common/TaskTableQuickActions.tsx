@@ -28,6 +28,7 @@ export function TaskTableQuickActions({
             to="docker.tasks.task.logs"
             params={{ id: taskId }}
             title="Logs"
+            data-cy="docker-task-logs-link"
           >
             <Icon icon={FileText} className="space-right" />
           </Link>
@@ -36,7 +37,12 @@ export function TaskTableQuickActions({
 
       {state.showQuickActionInspect && (
         <Authorized authorizations="DockerTaskInspect">
-          <Link to="docker.tasks.task" params={{ id: taskId }} title="Inspect">
+          <Link
+            to="docker.tasks.task"
+            params={{ id: taskId }}
+            title="Inspect"
+            data-cy="docker-task-inspect-link"
+          >
             <Icon icon={Info} className="space-right" />
           </Link>
         </Authorized>

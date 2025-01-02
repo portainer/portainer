@@ -81,7 +81,7 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 		t.Fatalf("expected EdgeStackStatusType %d, found %d", *payload.Status, lastStatus.Type)
 	}
 
-	if endpointStatus.EndpointID != portainer.EndpointID(payload.EndpointID) {
+	if endpointStatus.EndpointID != payload.EndpointID {
 		t.Fatalf("expected EndpointID %d, found %d", payload.EndpointID, endpointStatus.EndpointID)
 	}
 

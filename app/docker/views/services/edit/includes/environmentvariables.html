@@ -11,9 +11,7 @@
       <p>There are no environment variables for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.EnvironmentVariables.length > 0">
-      <div class="form-group">
-        <environment-variables-fieldset values="service.EnvironmentVariables" on-change="(onChangeEnvVars)"></environment-variables-fieldset>
-      </div>
+      <environment-variables-fieldset values="service.EnvironmentVariables" on-change="(onChangeEnvVars)"></environment-variables-fieldset>
     </rd-widget-body>
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
@@ -27,7 +25,7 @@
             Apply changes
           </button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
+            <pr-icon icon="'chevron-down'"></pr-icon>
           </button>
           <ul class="dropdown-menu">
             <li><a ng-click="cancelChanges(service, ['EnvironmentVariables'])">Reset changes</a></li>

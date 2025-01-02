@@ -120,7 +120,7 @@ func (transport *baseTransport) prepareRoundTrip(request *http.Request) (string,
 		return "", err
 	}
 
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	request.Header.Set("Authorization", "Bearer "+token)
 
 	return token, nil
 }
@@ -142,7 +142,7 @@ func (transport *baseTransport) getRoundTripToken(request *http.Request, tokenMa
 	} else {
 		token, err = tokenManager.GetUserServiceAccountToken(int(tokenData.ID), transport.endpoint.ID)
 		if err != nil {
-			log.Debug().
+			log.Error().
 				Err(err).
 				Msg("failed retrieving service account token")
 

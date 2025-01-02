@@ -53,7 +53,7 @@ function EndpointController(
     showAMTInfo: false,
     showTLSConfig: false,
     edgeScriptCommands: {
-      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux]),
+      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, commandsTabs.podmanLinux]),
       win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
     },
   };
@@ -297,7 +297,6 @@ function EndpointController(
     return $async(async () => {
       try {
         const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
-
         if (isDockerAPIEnvironment(endpoint)) {
           $scope.state.showTLSConfig = true;
         }

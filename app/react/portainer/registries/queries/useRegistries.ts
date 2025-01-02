@@ -1,4 +1,4 @@
-import { QueryKey, useQuery } from 'react-query';
+import { QueryKey, useQuery } from '@tanstack/react-query';
 
 import { withError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

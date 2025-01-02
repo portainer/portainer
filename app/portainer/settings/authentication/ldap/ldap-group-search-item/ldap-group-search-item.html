@@ -22,9 +22,7 @@
 
   <div class="form-group">
     <label class="col-sm-4 col-md-2 control-label text-left"> Group Base DN </label>
-    <div class="col-sm-8 col-md-10">
-      {{ $ctrl.config.GroupBaseDN }}
-    </div>
+    <div class="col-sm-8 col-md-10"> {{ $ctrl.config.GroupBaseDN }} </div>
   </div>
 
   <div class="form-group">
@@ -39,7 +37,14 @@
       <div class="w-full px-5 pt-3">
         <div class="form-group no-margin-last-child" ng-repeat="entry in $ctrl.groups">
           <div class="col-sm-4">
-            <select class="form-control" ng-model="entry.type" ng-change="$ctrl.onGroupsChange()" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1">
+            <select
+              class="form-control"
+              data-cy="ldap-group-search-item-select"
+              ng-model="entry.type"
+              ng-change="$ctrl.onGroupsChange()"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            >
               <option value="ou">OU Name</option>
               <option value="cn">Folder Name</option>
             </select>
@@ -71,8 +76,6 @@
 
   <div class="form-group no-margin-last-child">
     <label class="col-sm-4 col-md-2 control-label text-left"> Group Filter </label>
-    <div class="col-sm-8 col-md-10">
-      {{ $ctrl.config.GroupFilter }}
-    </div>
+    <div class="col-sm-8 col-md-10"> {{ $ctrl.config.GroupFilter }} </div>
   </div>
 </div>

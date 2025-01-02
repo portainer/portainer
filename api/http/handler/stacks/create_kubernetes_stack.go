@@ -34,7 +34,6 @@ func createStackPayloadFromK8sFileContentPayload(name, namespace, fileContent st
 		StackName:        name,
 		Namespace:        namespace,
 		StackFileContent: fileContent,
-		ComposeFormat:    composeFormat,
 		FromAppTemplate:  fromAppTemplate,
 	}
 }
@@ -67,7 +66,6 @@ func createStackPayloadFromK8sGitPayload(name, repoUrl, repoReference, repoUsern
 			TLSSkipVerify:  repoSkipSSLVerify,
 		},
 		Namespace:       namespace,
-		ComposeFormat:   composeFormat,
 		ManifestFile:    manifest,
 		AdditionalFiles: additionalFiles,
 		AutoUpdate:      autoUpdate,
@@ -83,15 +81,14 @@ type kubernetesManifestURLDeploymentPayload struct {
 
 func createStackPayloadFromK8sUrlPayload(name, namespace, manifestUrl string, composeFormat bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
-		StackName:     name,
-		Namespace:     namespace,
-		ManifestURL:   manifestUrl,
-		ComposeFormat: composeFormat,
+		StackName:   name,
+		Namespace:   namespace,
+		ManifestURL: manifestUrl,
 	}
 }
 
 func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return errors.New("Invalid stack file content")
 	}
 
@@ -99,25 +96,26 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 }
 
 func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+
+	if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
 		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
-	if govalidator.IsNull(payload.ManifestFile) {
+
+	if len(payload.ManifestFile) == 0 {
 		return errors.New("Invalid manifest file in repository")
 	}
-	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
-		return err
-	}
-	return nil
+
+	return update.ValidateAutoUpdateSettings(payload.AutoUpdate)
 }
 
 func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.ManifestURL) || !govalidator.IsURL(payload.ManifestURL) {
+	if len(payload.ManifestURL) == 0 || !govalidator.IsURL(payload.ManifestURL) {
 		return errors.New("Invalid manifest URL")
 	}
+
 	return nil
 }
 
@@ -165,15 +163,14 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	// Refresh ECR registry secret if needed
 	// RefreshEcrSecret method checks if the namespace has any ECR registry
 	// otherwise return nil
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
 		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace)
 	}
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil {
-		return httpErr
+	if _, err := stackBuilderDirector.Build(&stackPayload, endpoint); err != nil {
+		return err
 	}
 
 	resp := &createKubernetesStackResponse{
@@ -195,6 +192,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
 // @router /stacks/create/kubernetes/repository [post]
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
@@ -212,13 +210,11 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 
-	//make sure the webhook ID is unique
+	// Make sure the webhook ID is unique
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
-		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
-		if err != nil {
+		if isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook); err != nil {
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
-		}
-		if !isUnique {
+		} else if !isUnique {
 			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
 		}
 	}
@@ -246,16 +242,13 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		user)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil {
-		return httpErr
+	if _, err := stackBuilderDirector.Build(&stackPayload, endpoint); err != nil {
+		return err
 	}
 
-	resp := &createKubernetesStackResponse{
+	return response.JSON(w, &createKubernetesStackResponse{
 		Output: k8sStackBuilder.GetResponse(),
-	}
-
-	return response.JSON(w, resp)
+	})
 }
 
 // @id StackCreateKubernetesUrl
@@ -295,16 +288,13 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		user)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil {
-		return httpErr
+	if _, err := stackBuilderDirector.Build(&stackPayload, endpoint); err != nil {
+		return err
 	}
 
-	resp := &createKubernetesStackResponse{
+	return response.JSON(w, &createKubernetesStackResponse{
 		Output: k8sStackBuilder.GetResponse(),
-	}
-
-	return response.JSON(w, resp)
+	})
 }
 
 func (handler *Handler) deployKubernetesStack(userID portainer.UserID, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
@@ -319,8 +309,7 @@ func (handler *Handler) deployKubernetesStack(userID portainer.UserID, endpoint 
 		return "", errors.Wrap(err, "failed to create temp kub deployment files")
 	}
 
-	err = k8sDeploymentConfig.Deploy()
-	if err != nil {
+	if err := k8sDeploymentConfig.Deploy(); err != nil {
 		return "", err
 	}
 

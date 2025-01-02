@@ -12,20 +12,21 @@ export function StatusBadge({
 }: PropsWithChildren<
   {
     className?: string;
-    color?: 'success' | 'danger' | 'warning' | 'default';
+    color?: 'success' | 'danger' | 'warning' | 'info' | 'default';
     icon?: IconProps['icon'];
   } & AriaAttributes
 >) {
   return (
     <span
       className={clsx(
-        'flex items-center gap-1 rounded',
+        'inline-flex items-center gap-1 rounded',
         'w-fit px-1.5 py-0.5',
         'text-sm font-medium text-white',
         {
-          ' bg-success-7  th-dark:bg-success-9': color === 'success',
-          ' bg-warning-7  th-dark:bg-warning-9': color === 'warning',
-          ' bg-error-7  th-dark:bg-error-9': color === 'danger',
+          'bg-success-7 th-dark:bg-success-9': color === 'success',
+          'bg-warning-7 th-dark:bg-warning-9': color === 'warning',
+          'bg-error-7 th-dark:bg-error-9': color === 'danger',
+          'bg-blue-9': color === 'info',
         },
         className
       )}

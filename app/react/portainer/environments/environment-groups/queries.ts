@@ -1,8 +1,10 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
-import { error as notifyError } from '@/portainer/services/notifications';
+import { withGlobalError } from '@/react-tools/react-query';
 
-import { EnvironmentGroup, EnvironmentGroupId } from './types';
+import { EnvironmentGroupId } from '../types';
+
+import { EnvironmentGroup } from './types';
 import { getGroup, getGroups } from './environment-groups.service';
 import { queryKeys } from './queries/query-keys';
 
@@ -17,16 +19,22 @@ export function useGroups<T = EnvironmentGroup[]>({
 }
 
 export function useGroup<T = EnvironmentGroup>(
-  groupId: EnvironmentGroupId,
-  select?: (group: EnvironmentGroup) => T
+  groupId?: EnvironmentGroupId,
+  select?: (group: EnvironmentGroup | null) => T
 ) {
-  const { data } = useQuery(queryKeys.group(groupId), () => getGroup(groupId), {
-    staleTime: 50,
-    select,
-    onError(error) {
-      notifyError('Failed loading group', error as Error);
+  return useQuery(
+    queryKeys.group(groupId),
+    () => {
+      if (groupId === undefined) {
+        return null;
+      }
+      return getGroup(groupId);
     },
-  });
-
-  return data;
+    {
+      staleTime: 50,
+      select,
+      enabled: groupId !== undefined,
+      ...withGlobalError('Failed loading group'),
+    }
+  );
 }

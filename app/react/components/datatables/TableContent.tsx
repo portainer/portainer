@@ -13,7 +13,7 @@ interface Props<T extends DefaultType = DefaultType> {
 export function TableContent<T extends DefaultType = DefaultType>({
   isLoading = false,
   rows,
-  emptyContent = 'No items available',
+  emptyContent = 'No items available.',
   renderRow,
 }: Props<T>) {
   if (isLoading) {

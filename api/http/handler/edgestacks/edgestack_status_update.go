@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,7 +31,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 		return errors.New("invalid EnvironmentID")
 	}
 
-	if *payload.Status == portainer.EdgeStackStatusError && govalidator.IsNull(payload.Error) {
+	if *payload.Status == portainer.EdgeStackStatusError && len(payload.Error) == 0 {
 		return errors.New("error message is mandatory when status is error")
 	}
 
@@ -63,17 +63,15 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	var payload updateStatusPayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return httperror.BadRequest("Invalid request payload", fmt.Errorf("edge polling error: %w. Environment ID: %d", err, payload.EndpointID))
 	}
 
 	var stack *portainer.EdgeStack
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		stack, err = handler.updateEdgeStackStatus(tx, r, portainer.EdgeStackID(stackID), payload)
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -90,7 +88,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 	if err != nil {
 		if dataservices.IsErrObjectNotFound(err) {
 			// skip error because agent tries to report on deleted stack
-			log.Warn().
+			log.Debug().
 				Err(err).
 				Int("stackID", int(stackID)).
 				Int("status", int(*payload.Status)).
@@ -98,17 +96,16 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 			return nil, nil
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("unable to retrieve Edge stack from the database: %w. Environment ID: %d", err, payload.EndpointID)
 	}
 
 	endpoint, err := tx.Endpoint().Endpoint(payload.EndpointID)
 	if err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
+		return nil, handler.handlerDBErr(fmt.Errorf("unable to find the environment from the database: %w. Environment ID: %d", err, payload.EndpointID), "unable to find the environment")
 	}
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
+		return nil, httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	status := *payload.Status
@@ -126,9 +123,8 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 
 	updateEnvStatus(payload.EndpointID, stack, deploymentStatus)
 
-	err = tx.EdgeStack().UpdateEdgeStack(stackID, stack)
-	if err != nil {
-		return nil, handler.handlerDBErr(err, "Unable to persist the stack changes inside the database")
+	if err := tx.EdgeStack().UpdateEdgeStack(stackID, stack); err != nil {
+		return nil, handler.handlerDBErr(fmt.Errorf("unable to update Edge stack to the database: %w. Environment name: %s", err, endpoint.Name), "unable to update Edge stack")
 	}
 
 	return stack, nil
@@ -137,6 +133,7 @@ func (handler *Handler) updateEdgeStackStatus(tx dataservices.DataStoreTx, r *ht
 func updateEnvStatus(environmentId portainer.EndpointID, stack *portainer.EdgeStack, deploymentStatus portainer.EdgeStackDeploymentStatus) {
 	if deploymentStatus.Type == portainer.EdgeStackStatusRemoved {
 		delete(stack.Status, environmentId)
+
 		return
 	}
 

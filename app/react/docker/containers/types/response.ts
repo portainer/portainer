@@ -1,14 +1,11 @@
-import {
-  EndpointSettings,
-  MountPoint,
-  Port,
-} from 'docker-types/generated/1.41';
+import { ContainerSummary } from 'docker-types/generated/1.41';
 
-import { PortainerMetadata } from '@/react/docker/types';
+import { PortainerResponse } from '@/react/docker/types';
+import { WithRequiredProperties } from '@/types';
 
-export interface SummaryNetworkSettings {
-  Networks: { [key: string]: EndpointSettings | undefined };
-}
+export type SummaryNetworkSettings = NonNullable<
+  ContainerSummary['NetworkSettings']
+>;
 
 export interface Health {
   Status: 'healthy' | 'unhealthy' | 'starting';
@@ -16,24 +13,23 @@ export interface Health {
   Log: Array<{ Output: string }>;
 }
 
-export interface DockerContainerResponse {
-  Id: string;
-  Names: string[];
-  Image: string;
-  ImageID: string;
-  Command: string;
-  Created: number;
-  Ports: Port[];
-  SizeRw?: number;
-  SizeRootFs?: number;
-  Labels: { [key: string]: string };
-  State: string;
-  Status: string;
-  HostConfig: {
-    NetworkMode?: string;
-  };
-  NetworkSettings?: SummaryNetworkSettings;
-  Mounts: MountPoint[];
-  Portainer: PortainerMetadata;
-  IsPortainer: boolean;
-}
+/**
+ * Raw container list response item
+ */
+export type DockerContainerResponse = PortainerResponse<
+  WithRequiredProperties<
+    ContainerSummary,
+    | 'Id'
+    | 'Names'
+    | 'Image'
+    | 'ImageID'
+    | 'Command'
+    | 'Created'
+    | 'Ports'
+    | 'Labels'
+    | 'State'
+    | 'Status'
+    | 'HostConfig'
+    | 'Mounts'
+  >
+>;

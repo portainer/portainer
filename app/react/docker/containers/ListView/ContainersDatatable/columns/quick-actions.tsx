@@ -2,7 +2,7 @@ import { CellContext } from '@tanstack/react-table';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
-import { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
 
@@ -18,7 +18,7 @@ export const quickActions = columnHelper.display({
 
 function QuickActionsCell({
   row: { original: container },
-}: CellContext<DockerContainer, unknown>) {
+}: CellContext<ContainerListViewModel, unknown>) {
   const settings = useTableSettings<TableSettings>();
 
   const { hiddenQuickActions = [] } = settings;

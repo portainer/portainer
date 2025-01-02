@@ -1,11 +1,10 @@
 import angular from 'angular';
 
 import { AccessHeaders } from '@/portainer/authorization-guard';
-import edgeStackModule from './views/edge-stacks';
 import { reactModule } from './react';
 
 angular
-  .module('portainer.edge', [edgeStackModule, reactModule])
+  .module('portainer.edge', [reactModule])
 
   .config(function config($stateRegistryProvider) {
     const edge = {
@@ -36,7 +35,7 @@ angular
       url: '/new',
       views: {
         'content@': {
-          component: 'createEdgeGroupView',
+          component: 'edgeGroupsCreateView',
         },
       },
     };
@@ -46,7 +45,7 @@ angular
       url: '/:groupId',
       views: {
         'content@': {
-          component: 'editEdgeGroupView',
+          component: 'edgeGroupsItemView',
         },
       },
     };
@@ -69,11 +68,15 @@ angular
       url: '/new?templateId&templateType',
       views: {
         'content@': {
-          component: 'createEdgeStackView',
+          component: 'edgeStacksCreateView',
         },
       },
       data: {
         docs: '/user/edge/stacks/add',
+      },
+      params: {
+        templateId: { dynamic: true },
+        templateType: { dynamic: true },
       },
     };
 
@@ -82,7 +85,7 @@ angular
       url: '/:stackId?tab&status',
       views: {
         'content@': {
-          component: 'editEdgeStackView',
+          component: 'edgeStacksItemView',
         },
       },
       params: {
@@ -107,14 +110,11 @@ angular
 
     const edgeJob = {
       name: 'edge.jobs.job',
-      url: '/:id',
+      url: '/:id?tab',
       views: {
         'content@': {
-          component: 'edgeJobView',
+          component: 'edgeJobsItemView',
         },
-      },
-      params: {
-        tab: 0,
       },
     };
 
@@ -123,7 +123,7 @@ angular
       url: '/new',
       views: {
         'content@': {
-          component: 'createEdgeJobView',
+          component: 'edgeJobsCreateView',
         },
       },
     };
@@ -154,7 +154,7 @@ angular
       url: '/templates?template',
       views: {
         'content@': {
-          component: 'edgeAppTemplatesView',
+          component: 'appTemplatesView',
         },
       },
       data: {
@@ -167,7 +167,7 @@ angular
       url: '/custom',
       views: {
         'content@': {
-          component: 'edgeCustomTemplatesView',
+          component: 'customTemplatesView',
         },
       },
       data: {

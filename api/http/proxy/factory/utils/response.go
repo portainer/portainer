@@ -12,13 +12,13 @@ import (
 )
 
 // GetResponseAsJSONObject returns the response content as a generic JSON object
-func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, error) {
+func GetResponseAsJSONObject(response *http.Response) (map[string]any, error) {
 	responseData, err := getResponseBody(response)
 	if err != nil {
 		return nil, err
 	}
 
-	responseObject, ok := responseData.(map[string]interface{})
+	responseObject, ok := responseData.(map[string]any)
 	if !ok {
 		return nil, nil
 	}
@@ -26,7 +26,7 @@ func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, e
 }
 
 // GetResponseAsJSONArray returns the response content as an array of generic JSON object
-func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
+func GetResponseAsJSONArray(response *http.Response) ([]any, error) {
 	responseData, err := getResponseBody(response)
 	if err != nil {
 		return nil, err
@@ -36,9 +36,9 @@ func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 	}
 
 	switch responseObject := responseData.(type) {
-	case []interface{}:
+	case []any:
 		return responseObject, nil
-	case map[string]interface{}:
+	case map[string]any:
 		if responseObject["message"] != nil {
 			return nil, errors.New(responseObject["message"].(string))
 		}
@@ -76,7 +76,7 @@ func RewriteAccessDeniedResponse(response *http.Response) error {
 
 // RewriteResponse will replace the existing response body and status code with the one specified
 // in parameters
-func RewriteResponse(response *http.Response, newResponseData interface{}, statusCode int) error {
+func RewriteResponse(response *http.Response, newResponseData any, statusCode int) error {
 	data, err := marshal(getContentType(response), newResponseData)
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func RewriteResponse(response *http.Response, newResponseData interface{}, statu
 	return nil
 }
 
-func getResponseBody(response *http.Response) (interface{}, error) {
+func getResponseBody(response *http.Response) (any, error) {
 	isGzip := response.Header.Get("Content-Encoding") == "gzip"
 	if isGzip {
 		response.Header.Del("Content-Encoding")

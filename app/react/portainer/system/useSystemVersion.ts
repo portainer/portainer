@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
@@ -13,6 +13,7 @@ export interface VersionResponse {
   // The latest version available
   LatestVersion: string;
   ServerVersion: string;
+  VersionSupport: 'STS' | 'LTS';
   DatabaseVersion: string;
   Build: {
     BuildNumber: string;
@@ -22,6 +23,14 @@ export interface VersionResponse {
     WebpackVersion: string;
     GoVersion: string;
     GitCommit: string;
+  };
+  Dependencies: {
+    DockerVersion: string;
+    HelmVersion: string;
+    KubectlVersion: string;
+    ComposeVersion: string;
+  };
+  Runtime: {
     Env?: string[];
   };
 }
@@ -36,5 +45,9 @@ export async function getSystemVersion() {
 }
 
 export function useSystemVersion() {
-  return useQuery(queryKey, () => getSystemVersion());
+  return useQuery(queryKey, () => getSystemVersion(), {
+    // 24 hour stale time to reduce the number of requests to avoid github api rate limits
+    // a hard refresh of the browser will still trigger a new request
+    staleTime: 24 * 60 * 60 * 1000,
+  });
 }

@@ -1,11 +1,8 @@
-import { useQuery } from 'react-query';
-import { RetryValue } from 'react-query/types/core/retryer';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { UserId } from '@/portainer/users/types';
 
 import { isBE } from '../feature-flags/feature-flags.service';
-import { EnvironmentId } from '../environments/types';
 
 import { buildUrl } from './build-url';
 import { queryKeys } from './query-keys';
@@ -16,11 +13,6 @@ export interface StatusResponse {
   Edition: string;
   Version: string;
   InstanceID: string;
-  DemoEnvironment: {
-    Enabled: boolean;
-    Users: Array<UserId>;
-    Environments: Array<EnvironmentId>;
-  };
 }
 
 export async function getSystemStatus() {
@@ -43,7 +35,7 @@ export function useSystemStatus<T = StatusResponse>({
 }: {
   select?: (status: StatusResponse) => T;
   enabled?: boolean;
-  retry?: RetryValue<unknown>;
+  retry?: UseQueryOptions['retry'];
   onSuccess?: (data: T) => void;
 } = {}) {
   return useQuery(queryKey, () => getSystemStatus(), {
@@ -52,11 +44,5 @@ export function useSystemStatus<T = StatusResponse>({
     retry,
     retryDelay: 1000,
     onSuccess,
-  });
-}
-
-export function useIsDemo() {
-  return useSystemStatus({
-    select: (status) => status.DemoEnvironment.Enabled,
   });
 }

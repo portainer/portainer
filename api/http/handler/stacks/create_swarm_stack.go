@@ -30,13 +30,13 @@ type swarmStackFromFileContentPayload struct {
 }
 
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("Invalid stack name")
 	}
-	if govalidator.IsNull(payload.SwarmID) {
+	if len(payload.SwarmID) == 0 {
 		return errors.New("Invalid Swarm ID")
 	}
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return errors.New("Invalid stack file content")
 	}
 	return nil
@@ -77,7 +77,6 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
-
 	if err != nil {
 		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
@@ -137,16 +136,16 @@ type swarmStackFromGitRepositoryPayload struct {
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("Invalid stack name")
 	}
-	if govalidator.IsNull(payload.SwarmID) {
+	if len(payload.SwarmID) == 0 {
 		return errors.New("Invalid Swarm ID")
 	}
-	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+	if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
 		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
@@ -188,6 +187,7 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 // @param body body swarmStackFromGitRepositoryPayload true "stack config"
 // @success 200 {object} portainer.Stack
 // @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
 // @router /stacks/create/swarm/repository [post]
 func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {

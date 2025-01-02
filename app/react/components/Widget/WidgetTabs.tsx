@@ -1,4 +1,4 @@
-import { RawParams } from '@uirouter/react';
+import { RawParams, useCurrentStateAndParams } from '@uirouter/react';
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
@@ -7,7 +7,7 @@ import { Link } from '@@/Link';
 
 export interface Tab {
   name: ReactNode;
-  icon: ReactNode;
+  icon?: ReactNode;
   widget: ReactNode;
   selectedTabParam: string;
 }
@@ -46,8 +46,9 @@ export function WidgetTabs({ currentTabIndex, tabs }: Props) {
                     currentTabIndex !== index,
                 }
               )}
+              data-cy={`tab-${index}`}
             >
-              <Icon icon={icon} />
+              {icon && <Icon icon={icon} />}
               {name}
             </Link>
           ))}
@@ -66,5 +67,15 @@ export function findSelectedTabIndex(
   const currentTabIndex = tabs.findIndex(
     (tab) => tab.selectedTabParam === selectedTabParam
   );
-  return currentTabIndex || 0;
+  if (currentTabIndex === -1) {
+    return 0;
+  }
+  return currentTabIndex;
+}
+
+export function useCurrentTabIndex(tabs: Tab[]) {
+  const prarms = useCurrentStateAndParams();
+  const currentTabIndex = findSelectedTabIndex(prarms, tabs);
+
+  return [currentTabIndex];
 }

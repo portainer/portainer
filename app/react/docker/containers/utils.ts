@@ -2,15 +2,20 @@ import _ from 'lodash';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { EnvironmentId } from '@/react/portainer/environments/types';
-import { useInfo } from '@/react/docker/proxy/queries/useInfo';
+import { useIsStandAlone } from '@/react/docker/proxy/queries/useInfo';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 
-import { DockerContainer, ContainerStatus } from './types';
+import { ContainerListViewModel, ContainerStatus } from './types';
 import { DockerContainerResponse } from './types/response';
 
+/**
+ * Transform an item of the raw docker container list reponse to a container list view model
+ * @param response Raw docker container list reponse item
+ * @returns ContainerListViewModel
+ */
 export function toListViewModel(
   response: DockerContainerResponse
-): DockerContainer {
+): ContainerListViewModel {
   const resourceControl =
     response.Portainer?.ResourceControl &&
     new ResourceControlViewModel(response?.Portainer?.ResourceControl);
@@ -95,14 +100,11 @@ function createStatus(statusText = ''): ContainerStatus {
   return ContainerStatus.Running;
 }
 
-export function useShowGPUsColumn(environmentID: EnvironmentId) {
-  const isDockerStandaloneQuery = useInfo(
-    environmentID,
-    (info) => !(!!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable) // is not a swarm environment, therefore docker standalone
-  );
+export function useShowGPUsColumn(environmentId: EnvironmentId) {
+  const isDockerStandalone = useIsStandAlone(environmentId);
   const enableGPUManagementQuery = useEnvironment(
-    environmentID,
+    environmentId,
     (env) => env?.EnableGPUManagement
   );
-  return isDockerStandaloneQuery.data && enableGPUManagementQuery.data;
+  return isDockerStandalone && enableGPUManagementQuery.data;
 }

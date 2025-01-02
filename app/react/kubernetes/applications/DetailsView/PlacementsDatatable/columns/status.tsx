@@ -11,11 +11,13 @@ export const status = columnHelper.accessor('acceptsApplication', {
   cell: ({ getValue }) => {
     const acceptsApplication = getValue();
     return (
-      <Icon
-        icon={acceptsApplication ? Check : X}
-        mode={acceptsApplication ? 'success' : 'danger'}
-        size="sm"
-      />
+      <div className="flex items-center h-full">
+        <Icon
+          icon={acceptsApplication ? Check : X}
+          mode={acceptsApplication ? 'success' : 'danger'}
+          size="sm"
+        />
+      </div>
     );
   },
   meta: {

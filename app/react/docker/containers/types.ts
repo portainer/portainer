@@ -24,6 +24,9 @@ export interface Port {
 
 export type ContainerId = string;
 
+/**
+ * Computed fields from Container List Raw data
+ */
 type DecoratedDockerContainer = {
   NodeName: string;
   ResourceControl?: ResourceControlViewModel;
@@ -32,9 +35,23 @@ type DecoratedDockerContainer = {
   Status: ContainerStatus;
   Ports: Port[];
   StatusText: string;
-  Image: string;
   Gpus: string;
 };
 
-export type DockerContainer = DecoratedDockerContainer &
+/**
+ * Docker Container list ViewModel
+ *
+ * Alias AngularJS ContainerViewModel
+ *
+ * Raw details is ContainerDetailsJSON
+ */
+export type ContainerListViewModel = DecoratedDockerContainer &
   Omit<DockerContainerResponse, keyof DecoratedDockerContainer>;
+
+export type ContainerLogsParams = {
+  stdout?: boolean;
+  stderr?: boolean;
+  timestamps?: boolean;
+  since?: number;
+  tail?: number;
+};

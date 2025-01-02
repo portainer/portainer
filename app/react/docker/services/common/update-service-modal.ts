@@ -7,6 +7,7 @@ export async function confirmServiceForceUpdate(message: string) {
     message,
     confirmButton: buildConfirmButton('Update'),
     modalType: ModalType.Warn,
+    'data-cy': 'confirm-service-force-update',
   });
 
   return result ? { pullLatest: result.value } : undefined;

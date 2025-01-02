@@ -38,11 +38,13 @@ func (b *SwarmStackFileUploadBuilder) SetUniqueInfo(payload *StackPayload) FileU
 	if b.hasError() {
 		return b
 	}
+
 	b.stack.Name = payload.Name
 	b.stack.Type = portainer.DockerSwarmStack
 	b.stack.SwarmID = payload.SwarmID
 	b.stack.EntryPoint = filesystem.ComposeFileDefaultName
 	b.stack.Env = payload.Env
+
 	return b
 }
 

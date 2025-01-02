@@ -43,5 +43,5 @@ func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Re
 		return httperror.InternalServerError("Unable to retrieve log file from disk", err)
 	}
 
-	return response.JSON(w, &fileResponse{FileContent: string(logFileContent)})
+	return response.JSON(w, &fileResponse{FileContent: logFileContent})
 }

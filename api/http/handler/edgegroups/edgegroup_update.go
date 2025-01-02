@@ -8,12 +8,11 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/edge/cache"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type edgeGroupUpdatePayload struct {
@@ -25,7 +24,7 @@ type edgeGroupUpdatePayload struct {
 }
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return errors.New("invalid Edge group name")
 	}
 
@@ -57,8 +56,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var payload edgeGroupUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -107,13 +105,12 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			edgeGroup.PartialMatch = *payload.PartialMatch
 		}
 
-		err = tx.EdgeGroup().Update(edgeGroup.ID, edgeGroup)
-		if err != nil {
+		if err := tx.EdgeGroup().Update(edgeGroup.ID, edgeGroup); err != nil {
 			return httperror.InternalServerError("Unable to persist Edge group changes inside the database", err)
 		}
 
 		newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
-		endpointsToUpdate := unique.Unique(append(newRelatedEndpoints, oldRelatedEndpoints...))
+		endpointsToUpdate := slicesx.Unique(append(newRelatedEndpoints, oldRelatedEndpoints...))
 
 		edgeJobs, err := tx.EdgeJob().ReadAll()
 		if err != nil {
@@ -138,8 +135,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 				return httperror.InternalServerError("Unable to get Environment from database", err)
 			}
 
-			err = handler.updateEndpointStacks(tx, endpoint, edgeGroups, edgeStacks)
-			if err != nil {
+			if err := handler.updateEndpointStacks(tx, endpoint, edgeGroups, edgeStacks); err != nil {
 				return httperror.InternalServerError("Unable to persist Environment relation changes inside the database", err)
 			}
 
@@ -158,8 +154,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 				continue
 			}
 
-			err = handler.updateEndpointEdgeJobs(edgeGroup.ID, endpoint, edgeJobs, operation)
-			if err != nil {
+			if err := handler.updateEndpointEdgeJobs(edgeGroup.ID, endpoint, edgeJobs, operation); err != nil {
 				return httperror.InternalServerError("Unable to persist Environment Edge Jobs changes inside the database", err)
 			}
 		}
@@ -200,10 +195,8 @@ func (handler *Handler) updateEndpointEdgeJobs(edgeGroupID portainer.EdgeGroupID
 		}
 
 		switch operation {
-		case "add":
-			handler.ReverseTunnelService.AddEdgeJob(endpoint, &edgeJob)
-		case "remove":
-			handler.ReverseTunnelService.RemoveEdgeJobFromEndpoint(endpoint.ID, edgeJob.ID)
+		case "add", "remove":
+			cache.Del(endpoint.ID)
 		}
 	}
 

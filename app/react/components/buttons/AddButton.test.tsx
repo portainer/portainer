@@ -28,7 +28,11 @@ function renderDefault({
     ],
     route: 'root',
   });
-  return render(<Wrapped to="">{label}</Wrapped>);
+  return render(
+    <Wrapped to="" data-cy="wrapped">
+      {label}
+    </Wrapped>
+  );
 }
 
 test('should display a AddButton component', async () => {

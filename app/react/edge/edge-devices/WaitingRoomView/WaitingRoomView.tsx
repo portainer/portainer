@@ -22,13 +22,23 @@ function WaitingRoomView() {
         reload
       />
 
-      <InformationPanel>
-        <TextTip color="blue">
-          Only environments generated from the AEEC script will appear here,
-          manually added environments and edge devices will bypass the waiting
-          room.
-        </TextTip>
-      </InformationPanel>
+      <div className="row">
+        <div className="col-sm-12">
+          <InformationPanel>
+            <TextTip color="blue">
+              Only environments generated from the{' '}
+              <Link
+                to="portainer.endpoints.edgeAutoCreateScript"
+                data-cy="waitingRoom-edgeAutoCreateScriptLink"
+              >
+                auto onboarding
+              </Link>{' '}
+              script will appear here, manually added environments and edge
+              devices will bypass the waiting room.
+            </TextTip>
+          </InformationPanel>
+        </div>
+      </div>
 
       {licenseOverused && (
         <div className="row">
@@ -36,8 +46,13 @@ function WaitingRoomView() {
             <Alert color="warn">
               Associating all nodes in waiting room will exceed the node limit
               of your current license. Go to{' '}
-              <Link to="portainer.licenses">Licenses</Link> page to view the
-              current usage.
+              <Link
+                to="portainer.licenses"
+                data-cy="waitingRoom-portainerLicensesLink"
+              >
+                Licenses
+              </Link>{' '}
+              page to view the current usage.
             </Alert>
           </div>
         </div>

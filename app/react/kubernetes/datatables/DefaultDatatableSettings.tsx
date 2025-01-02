@@ -23,7 +23,9 @@ export function DefaultDatatableSettings({
     <>
       <SystemResourcesSettings
         value={settings.showSystemResources}
-        onChange={(value) => settings.setShowSystemResources(value)}
+        onChange={(value) => {
+          settings.setShowSystemResources(value);
+        }}
       />
 
       <TableSettingsMenuAutoRefresh

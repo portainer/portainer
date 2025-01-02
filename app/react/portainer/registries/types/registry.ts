@@ -1,7 +1,8 @@
-import { TeamId } from '@/react/portainer/users/teams/types';
-import { UserId } from '@/portainer/users/types';
-
 import { TLSConfiguration } from '../../settings/types';
+import {
+  TeamAccessPolicies,
+  UserAccessPolicies,
+} from '../../environments/types';
 
 export type Catalog = {
   repositories: string[];
@@ -19,17 +20,9 @@ export enum RegistryTypes {
   GITHUB,
 }
 
-export type RoleId = number;
-interface AccessPolicy {
-  RoleId: RoleId;
-}
-
-type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
-type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
-
 export interface RegistryAccess {
-  UserAccessPolicies: UserAccessPolicies;
-  TeamAccessPolicies: TeamAccessPolicies;
+  UserAccessPolicies: UserAccessPolicies | null;
+  TeamAccessPolicies: TeamAccessPolicies | null;
   Namespaces: string[];
 }
 
@@ -44,7 +37,7 @@ export interface Gitlab {
 }
 
 export interface Quay {
-  UseOrganisation: boolean;
+  UseOrganisation?: boolean;
   OrganisationName: string;
 }
 
@@ -78,7 +71,7 @@ export interface Registry {
   Authentication: boolean;
   Username: string;
   Password?: string;
-  RegistryAccesses: RegistryAccesses;
+  RegistryAccesses: RegistryAccesses | null;
   Gitlab: Gitlab;
   Quay: Quay;
   Github: Github;

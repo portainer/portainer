@@ -18,4 +18,7 @@ export const queryKeys = {
 
   gpus: (environmentId: EnvironmentId, id: string) =>
     [...queryKeys.container(environmentId, id), 'gpus'] as const,
+
+  top: (environmentId: EnvironmentId, id: string) =>
+    [...queryKeys.container(environmentId, id), 'top'] as const,
 };

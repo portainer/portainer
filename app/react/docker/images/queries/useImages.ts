@@ -1,9 +1,10 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
-import { buildUrl } from './build-url';
+import { buildDockerUrl } from '../../queries/utils/buildDockerUrl';
+
 import { queryKeys } from './queryKeys';
 
 export interface ImagesListResponse {
@@ -20,6 +21,11 @@ export interface ImagesListResponse {
   used: boolean;
 }
 
+/**
+ * Used in ImagesDatatable
+ *
+ * Query /api/docker/{envId}/images
+ */
 export function useImages<T = Array<ImagesListResponse>>(
   environmentId: EnvironmentId,
   withUsage = false,
@@ -46,11 +52,11 @@ async function getImages(
 ) {
   try {
     const { data } = await axios.get<Array<ImagesListResponse>>(
-      buildUrl(environmentId),
+      buildDockerUrl(environmentId, 'images'),
       { params: { withUsage } }
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err as Error, 'Unable to retrieve images');
+    throw parseAxiosError(err, 'Unable to retrieve images');
   }
 }

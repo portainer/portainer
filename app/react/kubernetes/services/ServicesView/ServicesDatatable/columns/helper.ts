@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Service } from '../../../types';
+import { ServiceRowData } from '../types';
 
-export const columnHelper = createColumnHelper<Service>();
+export const columnHelper = createColumnHelper<ServiceRowData>();

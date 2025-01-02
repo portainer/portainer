@@ -44,5 +44,19 @@ export function validation(
         otherwise: (schema) => schema.required('No rollback options available'),
       }),
     registryId: number().default(0),
+    agentImage: string()
+      .default('')
+      .when('registryId', {
+        is: 0,
+        then: (schema) => schema.optional(),
+        otherwise: (schema) => schema.required('Agent image is required'),
+      }),
+    updaterImage: string()
+      .default('')
+      .when('registryId', {
+        is: 0,
+        then: (schema) => schema.optional(),
+        otherwise: (schema) => schema.required('Updater image is required'),
+      }),
   });
 }

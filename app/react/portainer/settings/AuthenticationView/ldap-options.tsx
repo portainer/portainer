@@ -3,7 +3,7 @@ import { Edit } from 'lucide-react';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';
 
-const SERVER_TYPES = {
+export const SERVER_TYPES = {
   CUSTOM: 0,
   OPEN_LDAP: 1,
   AD: 2,

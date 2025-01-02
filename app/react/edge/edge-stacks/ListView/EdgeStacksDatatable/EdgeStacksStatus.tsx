@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {
   AlertTriangle,
   CheckCircle,
-  type Icon as IconType,
+  type LucideIcon,
   Loader2,
   XCircle,
   MinusCircle,
@@ -51,7 +51,7 @@ function getStatus(
   hasOldVersion: boolean
 ): {
   label: string;
-  icon?: IconType;
+  icon?: LucideIcon;
   spin?: boolean;
   mode?: IconMode;
   tooltip?: string;
@@ -81,6 +81,16 @@ function getStatus(
       label: 'Failed',
       icon: XCircle,
       mode: 'danger',
+    };
+  }
+
+  const allCompleted = envStatus.every((s) => s.Type === StatusType.Completed);
+
+  if (allCompleted) {
+    return {
+      label: 'Completed',
+      icon: CheckCircle,
+      mode: 'success',
     };
   }
 

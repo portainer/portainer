@@ -37,6 +37,7 @@ export function BackupFileForm() {
             <div className="col-sm-12">
               <LoadingButton
                 loadingText="Downloading settings..."
+                data-cy="settings-downloadBackupLocalButton"
                 isLoading={isSubmitting}
                 disabled={!isValid}
                 className="!ml-0"

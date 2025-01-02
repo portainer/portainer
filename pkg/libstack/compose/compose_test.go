@@ -2,7 +2,6 @@ package compose_test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -22,7 +21,7 @@ func checkPrerequisites(t *testing.T) {
 func Test_UpAndDown(t *testing.T) {
 	checkPrerequisites(t)
 
-	deployer, _ := compose.NewComposeDeployer("", "")
+	deployer := compose.NewComposeDeployer()
 
 	const composeFileContent = `
     version: "3.9"
@@ -70,7 +69,7 @@ func Test_UpAndDown(t *testing.T) {
 		t.Fatal("container should exist")
 	}
 
-	err = deployer.Remove(ctx, projectName, []string{filePathOriginal, filePathOverride}, libstack.Options{})
+	err = deployer.Remove(ctx, projectName, []string{filePathOriginal, filePathOverride}, libstack.RemoveOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,19 +81,16 @@ func Test_UpAndDown(t *testing.T) {
 
 func createFile(dir, fileName, content string) (string, error) {
 	filePath := filepath.Join(dir, fileName)
-	f, err := os.Create(filePath)
-	if err != nil {
+
+	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
 		return "", err
 	}
-
-	f.WriteString(content)
-	f.Close()
 
 	return filePath, nil
 }
 
 func containerExists(containerName string) bool {
-	cmd := exec.Command("docker", "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
+	cmd := exec.Command("docker", "ps", "-a", "-f", "name="+containerName)
 
 	out, err := cmd.Output()
 	if err != nil {

@@ -1,8 +1,6 @@
 package migrator
 
 import (
-	portainer "github.com/portainer/portainer/api"
-
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,7 +18,7 @@ func (m *Migrator) migrateSettingsToDB33() error {
 	}
 
 	log.Info().Msg("setting default kubectl shell image")
-	settings.KubectlShellImage = portainer.DefaultKubectlShellImage
+	settings.KubectlShellImage = *m.flags.KubectlShellImage
 
 	return m.settingsService.UpdateSettings(settings)
 }

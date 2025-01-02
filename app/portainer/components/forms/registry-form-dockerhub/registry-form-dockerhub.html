@@ -13,7 +13,16 @@
   <div class="form-group">
     <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="dockerhub-prod-us" required />
+      <input
+        type="text"
+        class="form-control"
+        id="registry_name"
+        name="registry_name"
+        ng-model="$ctrl.model.Name"
+        placeholder="dockerhub-prod-us"
+        required
+        data-cy="component-registryName"
+      />
       <div class="help-block" ng-show="$ctrl.registryFormDockerhub.registry_name.$invalid">
         <div class="small text-warning">
           <div ng-messages="$ctrl.registryFormDockerhub.registry_name.$error">
@@ -35,7 +44,7 @@
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">DockerHub username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required data-cy="component-registryUsername" />
       <div class="help-block" ng-show="$ctrl.registryFormDockerhub.registry_username.$invalid">
         <div class="small text-warning">
           <div ng-messages="$ctrl.registryFormDockerhub.registry_username.$error">

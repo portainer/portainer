@@ -205,7 +205,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             data-cy="portainerSidebar-edgeCompute"
           />
 
-          <SidebarItem.Wrapper label="Help / About">
+          <SidebarItem.Wrapper label="Get Help">
             <a
               href={
                 process.env.PORTAINER_EDITION === 'CE'
@@ -216,7 +216,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               rel="noreferrer"
               className="hover:!underline focus:no-underline text-sm flex h-8 w-full items-center rounded px-3 transition-colors duration-200 hover:bg-blue-5/20 be:hover:bg-gray-5/20 th-dark:hover:bg-gray-true-5/20"
             >
-              Help / About
+              Get Help
             </a>
           </SidebarItem.Wrapper>
         </SidebarParent>

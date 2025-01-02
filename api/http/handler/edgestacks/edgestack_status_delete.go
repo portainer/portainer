@@ -61,7 +61,7 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 }
 
 func (handler *Handler) deleteEdgeStackStatus(tx dataservices.DataStoreTx, stackID portainer.EdgeStackID, endpoint *portainer.Endpoint) (*portainer.EdgeStack, error) {
-	stack, err := tx.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	stack, err := tx.EdgeStack().EdgeStack(stackID)
 	if err != nil {
 		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}

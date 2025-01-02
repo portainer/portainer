@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -36,8 +37,6 @@ const (
 	ManifestFileDefaultName = "k8s-deployment.yml"
 	// EdgeStackStorePath represents the subfolder where edge stack files are stored in the file store folder.
 	EdgeStackStorePath = "edge_stacks"
-	// FDOProfileStorePath represents the subfolder where FDO profiles files are stored in the file store folder.
-	FDOProfileStorePath = "fdo_profiles"
 	// PrivateKeyFile represents the name on disk of the file containing the private key.
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
@@ -359,7 +358,7 @@ func (service *Service) RollbackStackFile(stackIdentifier, fileName string) erro
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -383,12 +382,12 @@ func (service *Service) RollbackStackFile(stackIdentifier, fileName string) erro
 func (service *Service) RollbackStackFileByVersion(stackIdentifier string, version int, fileName string) error {
 	versionStr := ""
 	if version != 0 {
-		versionStr = fmt.Sprintf("v%d", version)
+		versionStr = "v" + strconv.Itoa(version)
 	}
 	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier, versionStr)
 	composeFilePath := JoinPaths(stackStorePath, fileName)
 	path := service.wrapFileStore(composeFilePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -601,7 +600,7 @@ func (service *Service) Rename(oldPath, newPath string) error {
 }
 
 // WriteJSONToFile writes JSON to the specified file.
-func (service *Service) WriteJSONToFile(path string, content interface{}) error {
+func (service *Service) WriteJSONToFile(path string, content any) error {
 	jsonContent, err := json.Marshal(content)
 	if err != nil {
 		return err
@@ -673,7 +672,7 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 // createBackupFileInStore makes a copy in the file store.
 func (service *Service) createBackupFileInStore(filePath string) error {
 	path := service.wrapFileStore(filePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	return service.Copy(path, backupPath, true)
 }
@@ -681,7 +680,7 @@ func (service *Service) createBackupFileInStore(filePath string) error {
 // removeBackupFileInStore removes the copy in the file store.
 func (service *Service) removeBackupFileInStore(filePath string) error {
 	path := service.wrapFileStore(filePath)
-	backupPath := fmt.Sprintf("%s.bak", path)
+	backupPath := path + ".bak"
 
 	exists, err := service.FileExists(backupPath)
 	if err != nil {
@@ -801,7 +800,7 @@ func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID strin
 		return err
 	}
 
-	filePath := JoinPaths(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
+	filePath := JoinPaths(edgeJobStorePath, "logs_"+taskID)
 	r := bytes.NewReader(data)
 	return service.createFileInStore(filePath, r)
 }
@@ -934,7 +933,7 @@ func FileExists(filePath string) (bool, error) {
 func (service *Service) SafeMoveDirectory(originalPath, newPath string) error {
 	// 1. Backup the source directory to a different folder
 	backupDir := fmt.Sprintf("%s-%s", filepath.Dir(originalPath), "backup")
-	err := MoveDirectory(originalPath, backupDir)
+	err := MoveDirectory(originalPath, backupDir, false)
 	if err != nil {
 		return fmt.Errorf("failed to backup source directory: %w", err)
 	}
@@ -973,14 +972,14 @@ func restoreBackup(src, backupDir string) error {
 		return fmt.Errorf("failed to delete destination directory: %w", err)
 	}
 
-	err = MoveDirectory(backupDir, src)
+	err = MoveDirectory(backupDir, src, false)
 	if err != nil {
 		return fmt.Errorf("failed to restore backup directory: %w", err)
 	}
 	return nil
 }
 
-func MoveDirectory(originalPath, newPath string) error {
+func MoveDirectory(originalPath, newPath string, overwriteTargetPath bool) error {
 	if _, err := os.Stat(originalPath); err != nil {
 		return err
 	}
@@ -991,27 +990,16 @@ func MoveDirectory(originalPath, newPath string) error {
 	}
 
 	if alreadyExists {
-		return errors.New("Target path already exists")
+		if !overwriteTargetPath {
+			return errors.New("Target path already exists")
+		}
+
+		if err = os.RemoveAll(newPath); err != nil {
+			return fmt.Errorf("failed to overwrite path %s: %s", newPath, err.Error())
+		}
 	}
 
 	return os.Rename(originalPath, newPath)
-}
-
-// StoreFDOProfileFileFromBytes creates a subfolder in the FDOProfileStorePath and stores a new file from bytes.
-// It returns the path to the folder where the file is stored.
-func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error) {
-	err := service.createDirectoryInStore(FDOProfileStorePath)
-	if err != nil {
-		return "", err
-	}
-
-	filePath := JoinPaths(FDOProfileStorePath, fdoProfileIdentifier)
-	err = service.createFileInStore(filePath, bytes.NewReader(data))
-	if err != nil {
-		return "", err
-	}
-
-	return service.wrapFileStore(filePath), nil
 }
 
 func CreateFile(path string, r io.Reader) error {

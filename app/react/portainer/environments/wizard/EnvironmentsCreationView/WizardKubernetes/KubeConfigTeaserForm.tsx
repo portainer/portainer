@@ -7,7 +7,7 @@ import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp';
 
 const initialValues = {
   kubeConfig: '',
@@ -20,7 +20,7 @@ const initialValues = {
 
 export function KubeConfigTeaserForm() {
   const kubeConfigImportDocUrl = useDocsUrl(
-    'admin/environments/add/kubernetes/import'
+    '/admin/environments/add/kubernetes/import'
   );
 
   return (
@@ -56,9 +56,9 @@ export function KubeConfigTeaserForm() {
                 </li>
               </ul>
               <p>
-                Note: Officially supported cloud providers are Civo, Linode,
-                DigitalOcean and Microsoft Azure (others are not guaranteed to
-                work at present)
+                Note: Officially supported cloud providers are Civo, Akamai
+                Connected Cloud, DigitalOcean and Microsoft Azure (others are
+                not guaranteed to work at present)
               </p>
             </div>
           </div>
@@ -78,13 +78,16 @@ export function KubeConfigTeaserForm() {
             required
             inputId="kubeconfig_file"
           >
-            <Button disabled>Select a file</Button>
+            <Button disabled data-cy="kubeconfig-file-upload">
+              Select a file
+            </Button>
           </FormControl>
 
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
                 className="wizard-connect-button !ml-0"
+                data-cy="kubeconfig-connect-environment-button"
                 loadingText="Connecting environment..."
                 isLoading={false}
                 disabled

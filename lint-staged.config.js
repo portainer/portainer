@@ -1,6 +1,6 @@
 module.exports = {
-  '*.(js|ts){,x}': 'eslint --cache --fix',
+  '*.(js|ts){,x}': 'yarn lint',
   '*.(ts){,x}': () => 'tsc --noEmit',
-  '*.{js,ts,tsx,css,md,html,json}': 'prettier --write',
+  '*.{js,ts,tsx,css,md,html,json}': 'yarn format',
   '*.go': () => 'make lint-server',
 };

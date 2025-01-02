@@ -10,9 +10,13 @@ import { FormValues } from './types';
 export function ComposeForm({
   handleContentChange,
   hasKubeEndpoint,
+  handleVersionChange,
+  versionOptions,
 }: {
   hasKubeEndpoint: boolean;
   handleContentChange: (type: DeploymentType, content: string) => void;
+  handleVersionChange: (newVersion: number) => void;
+  versionOptions: number[] | undefined;
 }) {
   const { errors, values } = useFormikContext<FormValues>();
 
@@ -54,13 +58,16 @@ export function ComposeForm({
       )}
 
       <WebEditorForm
+        data-cy="compose-editor"
         value={values.content}
-        yaml
+        type="yaml"
         id="compose-editor"
         placeholder="Define or paste the content of your docker compose file here"
         onChange={(value) => handleContentChange(DeploymentType.Compose, value)}
         error={errors.content}
         readonly={hasKubeEndpoint}
+        versions={versionOptions}
+        onVersionChange={handleVersionChange}
       >
         <div>
           You can get more information about Compose file format in the{' '}

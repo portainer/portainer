@@ -123,7 +123,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 				migrated = true
 			} else {
 				// delete subsequent duplicates
-				m.registryService.Delete(portainer.RegistryID(r.ID))
+				m.registryService.Delete(r.ID)
 			}
 		}
 	}

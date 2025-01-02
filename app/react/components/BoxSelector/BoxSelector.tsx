@@ -1,3 +1,5 @@
+import { FormError } from '@@/form-components/FormError';
+
 import styles from './BoxSelector.module.css';
 import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption, Value } from './types';
@@ -21,6 +23,7 @@ export type Props<T extends Value> = Union<T> & {
   options: ReadonlyArray<BoxSelectorOption<T>> | Array<BoxSelectorOption<T>>;
   slim?: boolean;
   hiddenSpacingCount?: number;
+  error?: string;
 };
 
 export function BoxSelector<T extends Value>({
@@ -28,6 +31,7 @@ export function BoxSelector<T extends Value>({
   options,
   slim = false,
   hiddenSpacingCount,
+  error,
   ...props
 }: Props<T>) {
   return (
@@ -54,6 +58,7 @@ export function BoxSelector<T extends Value>({
               <div key={index} className="flex-1" />
             ))}
         </div>
+        {error && <FormError>{error}</FormError>}
       </div>
     </div>
   );

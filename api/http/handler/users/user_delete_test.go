@@ -32,7 +32,7 @@ func Test_deleteUserRemovesAccessTokens(t *testing.T) {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	passwordChecker := security.NewPasswordStrengthChecker(store.SettingsService)
 
-	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil, passwordChecker)
+	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, passwordChecker)
 	h.DataStore = store
 
 	t.Run("standard user deletion removes all associated access tokens", func(t *testing.T) {

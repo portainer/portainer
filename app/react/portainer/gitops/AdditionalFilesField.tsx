@@ -22,6 +22,7 @@ export function AdditionalFileField({ onChange, value, errors }: Props) {
       addLabel="Add file"
       item={Item}
       itemBuilder={() => ''}
+      data-cy="gitops-additional-files"
     />
   );
 }
@@ -32,6 +33,7 @@ function Item({
   disabled,
   error,
   readOnly,
+  index,
 }: ItemProps<string>) {
   const [inputValue, updateInputValue] = useStateWrapper(item, onChange);
 
@@ -47,6 +49,7 @@ function Item({
           onChange={(e) => {
             updateInputValue(e.target.value);
           }}
+          data-cy={`gitops-additional-files_${index}`}
         />
       </InputGroup>
       {error && (

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
@@ -9,6 +9,7 @@ interface SearchPayload {
   username?: string;
   password?: string;
   tlsSkipVerify?: boolean;
+  createdFromCustomTemplateId?: number;
 }
 
 export function useSearch(payload: SearchPayload, enabled: boolean) {

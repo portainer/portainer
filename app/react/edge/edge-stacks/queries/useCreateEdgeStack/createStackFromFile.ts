@@ -2,7 +2,7 @@ import axios, {
   json2formData,
   parseAxiosError,
 } from '@/portainer/services/axios';
-import { RegistryId } from '@/react/portainer/registries/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 

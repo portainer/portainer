@@ -12,6 +12,7 @@
             <div class="col-sm-10">
               <input
                 type="text"
+                data-cy="tag-name-input"
                 class="form-control"
                 name="name"
                 ng-model="formValues.Name"
@@ -60,8 +61,4 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <tags-datatable title-text="Tags" title-icon="tag" dataset="tags" table-key="tags" order-by="Name" remove-action="removeAction"></tags-datatable>
-  </div>
-</div>
+<tags-datatable dataset="tags" on-remove="(removeAction)"></tags-datatable>

@@ -1,4 +1,4 @@
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { ImageStatus } from '@/react/docker/components/ImageStatus/types';
 
 export async function getStackImagesStatus(id: number) {
@@ -8,9 +8,9 @@ export async function getStackImagesStatus(id: number) {
     );
     return data;
   } catch (e) {
-    return {
-      Status: 'unknown',
-      Message: `Unable to retrieve image status for stack: ${id}`,
-    };
+    throw parseAxiosError(
+      e,
+      `Unable to retrieve image status for stack: ${id}`
+    );
   }
 }

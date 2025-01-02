@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	portainer "github.com/portainer/portainer/api"
 	consts "github.com/portainer/portainer/api/docker/consts"
@@ -47,11 +48,11 @@ func (c *DigestClient) ContainersImageStatus(ctx context.Context, containers []t
 	statuses := make([]Status, len(containers))
 	for i, ct := range containers {
 		var nodeName string
-		if swarmNodeId := ct.Labels[consts.SwarmNodeIdLabel]; swarmNodeId != "" {
+		if swarmNodeId := ct.Labels[consts.SwarmNodeIDLabel]; swarmNodeId != "" {
 			if swarmNodeName, ok := swarmID2NameCache.Get(swarmNodeId); ok {
 				nodeName, _ = swarmNodeName.(string)
 			} else {
-				node, _, err := cli.NodeInspectWithRaw(ctx, ct.Labels[consts.SwarmNodeIdLabel])
+				node, _, err := cli.NodeInspectWithRaw(ctx, ct.Labels[consts.SwarmNodeIDLabel])
 				if err != nil {
 					return Error
 				}
@@ -157,9 +158,9 @@ func (c *DigestClient) ServiceImageStatus(ctx context.Context, serviceID string,
 		return Error, nil
 	}
 
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
 		All:     true,
-		Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIdLabel+"="+serviceID)),
+		Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIDLabel+"="+serviceID)),
 	})
 	if err != nil {
 		log.Warn().Err(err).Str("serviceID", serviceID).Msg("cannot list container for the service")

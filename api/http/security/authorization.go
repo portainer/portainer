@@ -13,7 +13,11 @@ func IsAdmin(request *http.Request) (bool, error) {
 		return false, err
 	}
 
-	return tokenData.Role == portainer.AdministratorRole, nil
+	return IsAdminRole(tokenData.Role), nil
+}
+
+func IsAdminRole(role portainer.UserRole) bool {
+	return role == portainer.AdministratorRole
 }
 
 // AuthorizedResourceControlAccess checks whether the user can alter an existing resource control.

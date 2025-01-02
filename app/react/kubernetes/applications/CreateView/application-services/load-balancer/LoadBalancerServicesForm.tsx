@@ -76,6 +76,7 @@ export function LoadBalancerServicesForm({
                     to="kubernetes.cluster.setup"
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-cy="k8sAppCreate-clusterSetupLink"
                   >
                     Cluster Setup
                   </Link>{' '}
@@ -88,6 +89,7 @@ export function LoadBalancerServicesForm({
             <div className="flex">
               <Button
                 icon={RefreshCw}
+                data-cy="k8sAppCreate-refreshLoadBalancerButton"
                 color="default"
                 className="!ml-0"
                 onClick={() => loadBalancerEnabledQuery.refetch()}

@@ -1,11 +1,11 @@
-import { ContainerJSON } from '../../queries/container';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
 
 import { toDevicesViewModel } from './DevicesField';
 import { gpuFieldsetUtils } from './GpuFieldset';
 import { toViewModelCpu, toViewModelMemory } from './memory-utils';
 import { Values } from './ResourcesTab';
 
-export function toViewModel(config: ContainerJSON): Values {
+export function toViewModel(config: ContainerDetailsJSON): Values {
   return {
     runtime: {
       privileged: config.HostConfig?.Privileged || false,

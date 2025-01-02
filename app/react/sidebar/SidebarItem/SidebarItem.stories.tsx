@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { Clock, Icon } from 'lucide-react';
+import { Clock, type LucideIcon } from 'lucide-react';
 
 import { SidebarItem } from '.';
 
@@ -10,7 +10,7 @@ const meta: Meta = {
 export default meta;
 
 interface StoryProps {
-  icon?: Icon;
+  icon?: LucideIcon;
   label: string;
 }
 
@@ -22,6 +22,7 @@ function Template({ icon, label }: StoryProps) {
         params={{ endpointId: 1 }}
         icon={icon}
         label={label}
+        data-cy="sidebar-item"
       />
     </ul>
   );

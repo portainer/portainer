@@ -19,7 +19,5 @@ func Confirm(message string) (bool, error) {
 	}
 
 	answer = strings.ReplaceAll(answer, "\n", "")
-	answer = strings.ToLower(answer)
-
-	return answer == "y" || answer == "yes", nil
+	return strings.EqualFold(answer, "y") || strings.EqualFold(answer, "yes"), nil
 }

@@ -9,7 +9,7 @@ ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
 TAG=local
 
-SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.2 
+SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.2
 GOTESTSUM=go run gotest.tools/gotestsum@latest
 
 # Don't change anything below this line unless you know what you're doing
@@ -17,11 +17,13 @@ GOTESTSUM=go run gotest.tools/gotestsum@latest
 
 
 ##@ Building
-.PHONY: init-dist build-storybook build build-client build-server build-image devops
+.PHONY: all init-dist build-storybook build build-client build-server build-image devops
 init-dist:
 	@mkdir -p dist
 
-build-all: deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
+all: tidy deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
+
+build-all: all ## Alias for the 'all' target (used by CI)
 
 build-client: init-dist ## Build the client
 	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
@@ -30,7 +32,7 @@ build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
 build-image: build-all ## Build the Portainer image locally
-	docker buildx build --load -t portainerci/portainer:$(TAG) -f build/linux/Dockerfile .
+	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
 
 build-storybook: ## Build and serve the storybook files
 	yarn storybook:build
@@ -50,7 +52,7 @@ client-deps: ## Install client dependencies
 	yarn
 
 tidy: ## Tidy up the go.mod file
-	cd api && go mod tidy
+	@go mod tidy
 
 
 ##@ Cleanup
@@ -65,23 +67,25 @@ clean: ## Remove all build and download artifacts
 test: test-server test-client ## Run all tests
 
 test-client: ## Run client tests
-	yarn test $(ARGS)
+	yarn test $(ARGS) --coverage
 
 test-server:	## Run server tests
-	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...
+	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover -covermode=atomic -coverprofile=coverage.out ./...
 
 ##@ Dev
 .PHONY: dev dev-client dev-server
-dev: ## Run both the client and server in development mode	
+dev: ## Run both the client and server in development mode
 	make dev-server
 	make dev-client
 
-dev-client: ## Run the client in development mode 
+dev-client: ## Run the client in development mode
 	yarn dev
 
 dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
 
+dev-server-podman: build-server ## Run the server in development mode
+	@./dev/run_container_podman.sh
 
 ##@ Format
 .PHONY: format format-client format-server
@@ -114,7 +118,7 @@ dev-extension: build-server build-client ## Run the extension in development mod
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
 docs-build: init-dist ## Build docs
-	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ 
+	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs
 	yarn swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml

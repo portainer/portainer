@@ -21,7 +21,15 @@
   <label for="ldap_url" class="col-sm-3 col-lg-2 control-label flex flex-wrap text-left"> LDAP Server </label>
   <div class="col-sm-9 col-lg-10">
     <div class="mb-3 flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
-      <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_url"
+        ng-model="$ctrl.settings.URLs[$index]"
+        placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389"
+        required
+        data-cy="ldap-url-input"
+      />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
         <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
       </button>
@@ -45,7 +53,14 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <input
+        type="checkbox"
+        id="anonymous_mode"
+        ng-model="$ctrl.settings.AnonymousMode"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+        data-cy="anonymous-mode-checkbox"
+      />
       <span class="slider round"></span>
     </label>
   </div>
@@ -59,7 +74,7 @@
       <portainer-tooltip message="'Account that will be used to search for users.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="cn=user,dc=domain,dc=tld" />
+      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="cn=user,dc=domain,dc=tld" data-cy="ldap-username-input" />
     </div>
   </div>
 

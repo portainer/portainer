@@ -15,7 +15,6 @@ type (
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
-		FDOProfile() FDOProfileService
 		HelmUserRepository() HelmUserRepositoryService
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
@@ -36,6 +35,7 @@ type (
 	}
 
 	DataStore interface {
+		Connection() portainer.Connection
 		Open() (newStore bool, err error)
 		Init() error
 		Close() error
@@ -71,8 +71,9 @@ type (
 	}
 
 	PendingActionsService interface {
-		BaseCRUD[portainer.PendingActions, portainer.PendingActionsID]
+		BaseCRUD[portainer.PendingAction, portainer.PendingActionID]
 		GetNextIdentifier() int
+		DeleteByEndpointID(ID portainer.EndpointID) error
 	}
 
 	// EdgeStackService represents a service to manage Edge stacks
@@ -116,12 +117,6 @@ type (
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
 		BucketName() string
-	}
-
-	// FDOProfileService represents a service to manage FDO Profiles
-	FDOProfileService interface {
-		BaseCRUD[portainer.FDOProfile, portainer.FDOProfileID]
-		GetNextIdentifier() int
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

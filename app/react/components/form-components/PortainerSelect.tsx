@@ -36,7 +36,7 @@ interface SharedProps
 
 interface MultiProps<TValue> extends SharedProps {
   value: readonly TValue[];
-  onChange(value: readonly TValue[]): void;
+  onChange(value: TValue[]): void;
   options: Options<TValue>;
   isMulti: true;
   components?: SelectComponentsConfig<

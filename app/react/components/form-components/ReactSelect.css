@@ -96,7 +96,7 @@
   border-bottom-left-radius: 0;
 }
 
-.input-group .portainer-selector-root .portainer-selector__control:not(:last-child) {
+.input-group .portainer-selector-root .portainer-selector__control:not(:last-child, .portainer-selector__control--menu-is-open) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

@@ -41,11 +41,13 @@ func (o *OfflineGate) WaitingMiddleware(timeout time.Duration, next http.Handler
 		}
 
 		if !o.lock.RTryLockWithTimeout(timeout) {
-			log.Error().Msg("timeout waiting for the offline gate to signal")
-			httperror.WriteError(w, http.StatusRequestTimeout, "Timeout waiting for the offline gate to signal", http.ErrHandlerTimeout)
+			log.Error().Str("url", r.URL.Path).Msg("request timed out while waiting for the backup process to finish")
+			httperror.WriteError(w, http.StatusRequestTimeout, "Request timed out while waiting for the backup process to finish", http.ErrHandlerTimeout)
 			return
 		}
+
+		defer o.lock.RUnlock()
+
 		next.ServeHTTP(w, r)
-		o.lock.RUnlock()
 	})
 }

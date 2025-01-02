@@ -11,7 +11,7 @@ interface Props {
   annotations: Annotation[];
   handleAnnotationChange: (
     index: number,
-    key: 'Key' | 'Value',
+    key: 'key' | 'value',
     val: string
   ) => void;
   removeAnnotation: (index: number) => void;
@@ -33,7 +33,7 @@ export function AnnotationsForm({
   return (
     <>
       {annotations.map((annotation, i) => (
-        <div className="row" key={annotation.ID}>
+        <div className="row" key={annotation.id}>
           <div className="form-group col-sm-4 !m-0 !pl-0">
             <div className="input-group input-group-sm">
               <span className="input-group-addon required">Key</span>
@@ -42,15 +42,16 @@ export function AnnotationsForm({
                 type="text"
                 className="form-control form-control-sm"
                 placeholder={placeholder[0]}
-                defaultValue={annotation.Key}
+                defaultValue={annotation.key}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleAnnotationChange(i, 'Key', e.target.value)
+                  handleAnnotationChange(i, 'key', e.target.value)
                 }
+                data-cy={`annotation-key-${i}`}
               />
             </div>
-            {annotationErrors?.[i]?.Key && (
-              <FormError className="mt-1 !mb-0">
-                {annotationErrors[i]?.Key}
+            {annotationErrors?.[i]?.key && (
+              <FormError className="!mb-0 mt-1">
+                {annotationErrors[i]?.key}
               </FormError>
             )}
           </div>
@@ -62,21 +63,23 @@ export function AnnotationsForm({
                 type="text"
                 className="form-control form-control-sm"
                 placeholder={placeholder[1]}
-                defaultValue={annotation.Value}
+                defaultValue={annotation.value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleAnnotationChange(i, 'Value', e.target.value)
+                  handleAnnotationChange(i, 'value', e.target.value)
                 }
+                data-cy={`annotation-value-${i}`}
               />
             </div>
-            {annotationErrors?.[i]?.Value && (
-              <FormError className="mt-1 !mb-0">
-                {annotationErrors[i]?.Value}
+            {annotationErrors?.[i]?.value && (
+              <FormError className="!mb-0 mt-1">
+                {annotationErrors[i]?.value}
               </FormError>
             )}
           </div>
           <div className="col-sm-3 !m-0 !pl-0">
             <Button
               size="small"
+              data-cy={`remove-annotation-${i}`}
               color="dangerlight"
               className="btn-only-icon !ml-0"
               type="button"

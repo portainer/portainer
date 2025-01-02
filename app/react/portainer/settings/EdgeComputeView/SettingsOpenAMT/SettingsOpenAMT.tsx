@@ -122,6 +122,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                 >
                   <Switch
                     id="edge_enableOpenAMT"
+                    data-cy="edge-enableOpenAMT-switch"
                     name="edge_enableOpenAMT"
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
@@ -218,6 +219,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     >
                       <FileUploadField
                         inputId="certificate_file"
+                        data-cy="openAMT-certFileInput"
                         title="Upload file"
                         accept=".pfx"
                         value={certFile}
@@ -251,7 +253,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      data-cy="settings-fdoButton"
+                      data-cy="settings-OpenAMTButton"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >

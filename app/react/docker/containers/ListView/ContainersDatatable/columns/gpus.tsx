@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
-import type { DockerContainer } from '@/react/docker/containers/types';
+import type { ContainerListViewModel } from '@/react/docker/containers/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useContainerGpus } from '@/react/docker/containers/queries/gpus';
 
@@ -14,7 +14,7 @@ export const gpus = columnHelper.display({
 
 function GpusCell({
   row: { original: container },
-}: CellContext<DockerContainer, unknown>) {
+}: CellContext<ContainerListViewModel, unknown>) {
   const containerId = container.Id;
   const environmentId = useEnvironmentId();
   const gpusQuery = useContainerGpus(environmentId, containerId);

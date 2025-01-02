@@ -5,7 +5,7 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { StackType } from '@/react/common/stacks/types';
 
 import { Platform } from '../../types';
-import { useFetchTemplateFile } from '../../app-templates/queries/useFetchTemplateFile';
+import { useAppTemplateFile } from '../../app-templates/queries/useAppTemplateFile';
 import { getDefaultEdgeTemplateSettings } from '../types';
 
 import { FormValues, Method } from './types';
@@ -23,14 +23,22 @@ export function useInitialValues({
 
   const { appTemplateId, type = defaultType } = useAppTemplateParams();
 
-  const fileContentQuery = useFetchTemplateFile(appTemplateId);
-  if (fileContentQuery.isLoading) {
+  // don't make the file path 'docker-compose.yml' in a kube environment. Keep it empty with the existing 'manifest.yml' placeholder
+  const initialFilePathInRepository =
+    type === StackType.Kubernetes ? '' : 'docker-compose.yml';
+
+  const {
+    params: { fileContent = '' },
+  } = useCurrentStateAndParams();
+
+  const fileContentQuery = useAppTemplateFile(appTemplateId);
+  if (fileContentQuery.isInitialLoading) {
     return undefined;
   }
 
   return {
     Title: '',
-    FileContent: fileContentQuery.data ?? '',
+    FileContent: (fileContentQuery.data ?? '') || fileContent,
     Type: type,
     Platform: Platform.LINUX,
     File: undefined,
@@ -45,7 +53,7 @@ export function useInitialValues({
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
-      ComposeFilePathInRepository: 'docker-compose.yml',
+      ComposeFilePathInRepository: initialFilePathInRepository,
       AdditionalFiles: [],
       RepositoryURLValid: true,
       TLSSkipVerify: false,

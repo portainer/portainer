@@ -3,13 +3,12 @@ package users
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type adminInitPayload struct {
@@ -20,10 +19,10 @@ type adminInitPayload struct {
 }
 
 func (payload *adminInitPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Username) || govalidator.Contains(payload.Username, " ") {
+	if len(payload.Username) == 0 || strings.Contains(payload.Username, " ") {
 		return errors.New("Invalid username. Must not contain any whitespace")
 	}
-	if govalidator.IsNull(payload.Password) {
+	if len(payload.Password) == 0 {
 		return errors.New("Invalid password")
 	}
 	return nil

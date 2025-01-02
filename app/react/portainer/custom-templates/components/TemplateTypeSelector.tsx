@@ -5,7 +5,7 @@ import { Select } from '@@/form-components/Input';
 
 const typeOptions = [
   { label: 'Swarm', value: StackType.DockerSwarm },
-  { label: 'Standalone', value: StackType.DockerCompose },
+  { label: 'Standalone / Podman', value: StackType.DockerCompose },
 ];
 
 export function TemplateTypeSelector({
@@ -19,6 +19,7 @@ export function TemplateTypeSelector({
     <FormControl label="Type" required inputId="template-type">
       <Select
         name="type"
+        data-cy="custom-template-template-type"
         id="template-type"
         required
         options={typeOptions}

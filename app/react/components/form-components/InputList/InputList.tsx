@@ -3,6 +3,8 @@ import { FormikErrors } from 'formik';
 import { ArrowDown, ArrowUp, Plus, RotateCw, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
@@ -53,10 +55,11 @@ type RenderItemFunction<T> = (
   item: T,
   onChange: (value: T) => void,
   index: number,
+  dataCy: string,
   error?: ItemError<T>
 ) => React.ReactNode;
 
-interface Props<T> {
+interface Props<T> extends AutomationTestingProps {
   label?: string;
   value: T[];
   onChange(value: T[], e: OnChangeEvent<T>): void;
@@ -71,9 +74,7 @@ interface Props<T> {
   errors?: ArrayError<T[]>;
   textTip?: string;
   isAddButtonHidden?: boolean;
-  addButtonDataCy?: string;
   isDeleteButtonHidden?: boolean;
-  deleteButtonDataCy?: string;
   disabled?: boolean;
   addButtonError?: string;
   readOnly?: boolean;
@@ -95,9 +96,8 @@ export function InputList<T = DefaultType>({
   errors,
   textTip,
   isAddButtonHidden = false,
-  addButtonDataCy,
   isDeleteButtonHidden = false,
-  deleteButtonDataCy,
+  'data-cy': dataCy,
   disabled,
   addButtonError,
   readOnly,
@@ -106,6 +106,21 @@ export function InputList<T = DefaultType>({
   const initialItemsCount = useRef(value.length);
   const isAddButtonVisible = !(isAddButtonHidden || readOnly);
   const isDeleteButtonVisible = !(isDeleteButtonHidden || readOnly);
+  const {
+    handleMoveUp,
+    handleMoveDown,
+    handleRemoveItem,
+    handleAdd,
+    handleChangeItem,
+    toggleNeedsDeletion,
+  } = useInputList<T>({
+    value,
+    onChange,
+    itemBuilder,
+    itemKeyGetter,
+    movable,
+  });
+
   return (
     <div className="form-group" aria-label={ariaLabel || label}>
       {label && (
@@ -146,6 +161,7 @@ export function InputList<T = DefaultType>({
                     item,
                     (value: T) => handleChangeItem(key, value),
                     index,
+                    dataCy,
                     error
                   )
                 )}
@@ -158,6 +174,7 @@ export function InputList<T = DefaultType>({
                         onClick={() => handleMoveUp(index)}
                         className="vertical-center btn-only-icon"
                         icon={ArrowUp}
+                        data-cy={`${dataCy}-move-up_${index}`}
                       />
                       <Button
                         size="medium"
@@ -166,6 +183,7 @@ export function InputList<T = DefaultType>({
                         onClick={() => handleMoveDown(index)}
                         className="vertical-center btn-only-icon"
                         icon={ArrowDown}
+                        data-cy={`${dataCy}-move-down_${index}`}
                       />
                     </>
                   )}
@@ -175,7 +193,7 @@ export function InputList<T = DefaultType>({
                       size="medium"
                       onClick={() => handleRemoveItem(key, item)}
                       className="vertical-center btn-only-icon"
-                      data-cy={`${deleteButtonDataCy}_${index}`}
+                      data-cy={`${dataCy}RemoveButton_${index}`}
                       icon={Trash2}
                     />
                   )}
@@ -187,8 +205,8 @@ export function InputList<T = DefaultType>({
                         itemIndex={index}
                         initialItemsCount={initialItemsCount.current}
                         handleRemoveItem={handleRemoveItem}
-                        handleToggleNeedsDeletion={handleToggleNeedsDeletion}
-                        dataCy={`${deleteButtonDataCy}_${index}`}
+                        handleToggleNeedsDeletion={toggleNeedsDeletion}
+                        dataCy={`${dataCy}RemoveButton_${index}`}
                       />
                     )}
                 </div>
@@ -209,7 +227,7 @@ export function InputList<T = DefaultType>({
               className="!ml-0"
               size="small"
               icon={Plus}
-              data-cy={addButtonDataCy}
+              data-cy={`${dataCy}AddButton`}
             >
               {addLabel}
             </Button>
@@ -223,7 +241,21 @@ export function InputList<T = DefaultType>({
       )}
     </div>
   );
+}
 
+export function useInputList<T = DefaultType>({
+  value,
+  onChange,
+  itemBuilder = defaultItemBuilder as unknown as () => T,
+  itemKeyGetter = (item: T, index: number) => index,
+  movable = false,
+}: {
+  value: T[];
+  onChange(value: T[], e: OnChangeEvent<T>): void;
+  itemBuilder?(): T;
+  itemKeyGetter?(item: T, index: number): Key;
+  movable?: boolean;
+}) {
   function handleMoveUp(index: number) {
     if (index <= 0) {
       return;
@@ -260,7 +292,7 @@ export function InputList<T = DefaultType>({
     );
   }
 
-  function handleToggleNeedsDeletion(key: Key, item: CanUndoDeleteItem<T>) {
+  function toggleNeedsDeletion(key: Key, item: CanUndoDeleteItem<T>) {
     handleChangeItem(key, { ...item, needsDeletion: !item.needsDeletion });
   }
 
@@ -282,6 +314,15 @@ export function InputList<T = DefaultType>({
       item: newItemValue,
     });
   }
+
+  return {
+    handleMoveUp,
+    handleMoveDown,
+    handleRemoveItem,
+    handleAdd,
+    handleChangeItem,
+    toggleNeedsDeletion,
+  };
 }
 
 function defaultItemBuilder(): DefaultType {
@@ -294,7 +335,9 @@ function DefaultItem({
   error,
   disabled,
   readOnly,
-}: ItemProps<DefaultType>) {
+  index,
+  'data-cy': dataCy,
+}: ItemProps<DefaultType> & AutomationTestingProps) {
   return (
     <>
       <Input
@@ -303,6 +346,7 @@ function DefaultItem({
         className={clsx('!w-full', item.needsDeletion && 'striked')}
         disabled={disabled || item.needsDeletion}
         readOnly={readOnly}
+        data-cy={`${dataCy}RemoveButton_${index}`}
       />
       {error && <FormError>{error}</FormError>}
     </>
@@ -313,10 +357,17 @@ function renderDefaultItem(
   item: DefaultType,
   onChange: (value: DefaultType) => void,
   index: number,
+  dataCy: string,
   error?: ItemError<DefaultType>
 ) {
   return (
-    <DefaultItem item={item} onChange={onChange} error={error} index={index} />
+    <DefaultItem
+      item={item}
+      onChange={onChange}
+      error={error}
+      index={index}
+      data-cy={dataCy}
+    />
   );
 }
 

@@ -3,7 +3,6 @@ import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNF
 import { VolumesCIFSFormData } from '../../../components/volumesCIFSForm/volumesCifsFormModel';
 
 angular.module('portainer.docker').controller('CreateVolumeController', [
-  '$q',
   '$scope',
   '$state',
   'VolumeService',
@@ -12,9 +11,8 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
   'Authentication',
   'Notifications',
   'FormValidator',
-  'HttpRequestHelper',
   'endpoint',
-  function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper, endpoint) {
+  function ($scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, endpoint) {
     $scope.endpoint = endpoint;
 
     $scope.formValues = {
@@ -99,7 +97,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       }
       driverOptions.push({ name: 'o', value: options });
 
-      var mountPoint = data.mountPoint[0] === ':' ? data.mountPoint : ':' + data.mountPoint;
+      var mountPoint = data.mountPoint.indexOf(':') === -1 ? ':' + data.mountPoint : data.mountPoint;
       driverOptions.push({ name: 'device', value: mountPoint });
     }
 
@@ -126,10 +124,9 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       }
 
       var nodeName = $scope.formValues.NodeName;
-      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
       $scope.state.actionInProgress = true;
-      VolumeService.createVolume(volumeConfiguration)
+      VolumeService.createVolume(volumeConfiguration, nodeName)
         .then(function success(data) {
           const userId = userDetails.ID;
           const resourceControl = data.ResourceControl;

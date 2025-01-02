@@ -144,12 +144,7 @@ div.input-mask {
 }
 .widget .widget-footer {
   border-top: 1px solid #e9e9e9;
-  padding: 10px;
-}
-
-.widget .widget-footer {
-  border-top: 1px solid #e9e9e9;
-  padding: 10px;
+  padding: 20px;
 }
 .widget .widget-title .pagination,
 .widget .widget-footer .pagination {

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
@@ -70,6 +70,9 @@ export async function updateIngressControllerClassMap(
   ingressControllerClassMap: IngressControllerClassMap[],
   namespace?: string
 ) {
+  if (ingressControllerClassMap.length === 0) {
+    return [];
+  }
   try {
     const { data: controllerMaps } = await axios.put<
       IngressControllerClassMap[]

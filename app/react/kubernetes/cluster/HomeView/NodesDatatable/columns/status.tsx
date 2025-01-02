@@ -23,14 +23,12 @@ function StatusCell({
   }
 
   return (
-    <div className="whitespace-nowrap">
+    <div className="inline-flex whitespace-nowrap gap-x-2">
       <StatusBadge color={status === 'Ready' ? 'success' : 'warning'}>
         {status}
       </StatusBadge>
       {node.spec?.unschedulable && (
-        <StatusBadge color="warning" className="mt-2">
-          SchedulingDisabled
-        </StatusBadge>
+        <StatusBadge color="warning">SchedulingDisabled</StatusBadge>
       )}
     </div>
   );
@@ -38,7 +36,9 @@ function StatusCell({
 
 function getStatus(node: NodeRowData) {
   return (
-    node.status?.conditions?.find((condition) => condition.status === 'True')
-      ?.type ?? 'Not ready'
+    // only look for the ready type to identify if the node is either ready or not ready
+    node.status?.conditions?.find(
+      (condition) => condition.status === 'True' && condition.type === 'Ready'
+    )?.type ?? 'Not Ready'
   );
 }

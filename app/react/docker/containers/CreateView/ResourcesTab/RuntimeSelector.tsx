@@ -11,13 +11,15 @@ export function RuntimeSelector({
   onChange: (value: string) => void;
 }) {
   const environmentId = useEnvironmentId();
-  const infoQuery = useInfo(environmentId, (info) => [
-    { label: 'Default', value: '' },
-    ...Object.keys(info?.Runtimes || {}).map((runtime) => ({
-      label: runtime,
-      value: runtime,
-    })),
-  ]);
+  const infoQuery = useInfo(environmentId, {
+    select: (info) => [
+      { label: 'Default', value: '' },
+      ...Object.keys(info?.Runtimes || {}).map((runtime) => ({
+        label: runtime,
+        value: runtime,
+      })),
+    ],
+  });
 
   return (
     <PortainerSelect
@@ -26,6 +28,7 @@ export function RuntimeSelector({
       options={infoQuery.data || []}
       isLoading={infoQuery.isLoading}
       disabled={infoQuery.isLoading}
+      data-cy="docker-runtime-selector"
     />
   );
 }

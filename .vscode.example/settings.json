@@ -1,8 +1,0 @@
-{
-  "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast", "-E", "exportloopref"],
-  "gopls": {
-    "build.expandWorkspaceToModule": false
-  },
-  "gitlens.advanced.blame.customArguments": ["--ignore-revs-file", ".git-blame-ignore-revs"]
-}

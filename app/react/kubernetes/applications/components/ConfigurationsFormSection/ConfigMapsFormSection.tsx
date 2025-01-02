@@ -1,7 +1,7 @@
 import { FormikErrors } from 'formik';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useConfigMaps } from '@/react/kubernetes/configs/configmap.service';
+import { useK8sConfigMaps } from '@/react/kubernetes/configs/queries/useK8sConfigMaps';
 
 import { FormSection } from '@@/form-components/FormSection/FormSection';
 import { TextTip } from '@@/Tip/TextTip';
@@ -24,7 +24,7 @@ export function ConfigMapsFormSection({
   errors,
   namespace,
 }: Props) {
-  const configMapsQuery = useConfigMaps(useEnvironmentId(), namespace);
+  const configMapsQuery = useK8sConfigMaps(useEnvironmentId(), namespace);
   const configMaps = configMapsQuery.data || [];
 
   if (configMapsQuery.isLoading) {
@@ -46,8 +46,7 @@ export function ConfigMapsFormSection({
         onChange={onChange}
         errors={errors}
         isDeleteButtonHidden
-        deleteButtonDataCy="k8sAppCreate-configRemoveButton"
-        addButtonDataCy="k8sAppCreate-configAddButton"
+        data-cy="k8sAppCreate-config"
         disabled={configMaps.length === 0}
         addButtonError={
           configMaps.length === 0

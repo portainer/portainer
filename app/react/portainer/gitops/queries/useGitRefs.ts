@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
@@ -6,6 +6,7 @@ interface RefsPayload {
   repository: string;
   username?: string;
   password?: string;
+  createdFromCustomTemplateID?: number;
   tlsSkipVerify?: boolean;
 }
 

@@ -69,6 +69,7 @@ export function ResourceFieldset({
           min={0}
           max={maxCpu}
           step={0.1}
+          dataCy="k8sNamespaceCreate-resourceCpu"
         />
       </FormControl>
     </FormSection>

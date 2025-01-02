@@ -1,3 +1,5 @@
+export { StorageClass as KubernetesStorageClass } from './StorageClass';
+
 /**
  * KubernetesStorageClassAccessPolicies Model
  */
@@ -16,20 +18,4 @@ const _KubernetesStorageClassAccessPolicies = Object.freeze([
 
 export function KubernetesStorageClassAccessPolicies() {
   return JSON.parse(JSON.stringify(_KubernetesStorageClassAccessPolicies));
-}
-
-/**
- * KubernetesStorageClass Model
- */
-const _KubernetesStorageClass = Object.freeze({
-  Name: '',
-  AccessModes: [],
-  Provisioner: '',
-  AllowVolumeExpansion: false,
-});
-
-export class KubernetesStorageClass {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesStorageClass)));
-  }
 }

@@ -8,6 +8,7 @@ import { BasicTableSettings } from '@@/datatables/types';
 import { Button } from '@@/buttons';
 import { TableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { FileData } from './types';
 import { columns } from './columns';
@@ -36,6 +37,7 @@ function goToParent(onClick: () => void): FileData {
         color="link"
         icon={CornerLeftUp}
         className="!m-0 !p-0"
+        data-cy="component-goToParentButton"
       >
         Go to parent
       </Button>
@@ -85,16 +87,19 @@ export function FilesTable({
           Dir: false,
         },
       }}
-      extendTableOptions={withMeta({
-        table: 'files',
-        isEdit,
-        setIsEdit,
-        onRename,
-        onBrowse,
-        onDownload,
-        onDelete,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'files',
+          isEdit,
+          setIsEdit,
+          onRename,
+          onBrowse,
+          onDownload,
+          onDelete,
+        })
+      )}
       disableSelect
+      data-cy="files-datatable"
       renderTableActions={() => {
         if (!isUploadAllowed) {
           return null;
@@ -103,7 +108,12 @@ export function FilesTable({
         return (
           <Authorized authorizations="DockerAgentBrowsePut">
             <div className="flex flex-row items-center">
-              <Button color="light" icon={Upload} as="label">
+              <Button
+                color="light"
+                icon={Upload}
+                as="label"
+                data-cy="docker-agent-file-upload-button"
+              >
                 <input
                   type="file"
                   className="hidden"

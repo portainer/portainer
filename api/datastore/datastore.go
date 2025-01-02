@@ -16,8 +16,9 @@ import (
 )
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
+func NewStore(cliFlags *portainer.CLIFlags, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
+		flags:       cliFlags,
 		fileService: fileService,
 		connection:  connection,
 	}

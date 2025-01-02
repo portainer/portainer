@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -28,7 +27,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -51,15 +50,18 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 }
 
 func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-	rawURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+	tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	rawURL := "http://" + tunnelAddr
 
 	endpointURL, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 }
 
 func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	endpointURL := fmt.Sprintf("https://%s", endpoint.URL)
+	endpointURL := "https://" + endpoint.URL
 	remoteURL, err := url.Parse(endpointURL)
 	if err != nil {
 		return nil, err
@@ -86,7 +88,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 
 	remoteURL.Scheme = "https"
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}

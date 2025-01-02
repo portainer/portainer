@@ -1,0 +1,1 @@
+export { RegistriesDatatable } from './RegistriesDatatable';

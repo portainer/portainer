@@ -19,7 +19,9 @@ export function ApplicationIngressesTable({
   namespace,
   appServices,
 }: Props) {
-  const namespaceIngresses = useIngresses(environmentId, [namespace]);
+  const namespaceIngresses = useIngresses(environmentId, {
+    withServices: true,
+  });
   // getIngressPathsForAppServices could be expensive, so memoize it
   const ingressPathsForAppServices = useMemo(
     () => getIngressPathsForAppServices(namespaceIngresses.data, appServices),
@@ -48,6 +50,7 @@ export function ApplicationIngressesTable({
                 <Link
                   to="kubernetes.ingresses.edit"
                   params={{ name: ingressPath.ingressName, namespace }}
+                  data-cy={`ingress-link-${ingressPath.ingressName}`}
                 >
                   {ingressPath.ingressName}
                 </Link>

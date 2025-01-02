@@ -32,6 +32,34 @@
   border-top: 1px solid var(--border-table-top-color);
 }
 
+/* the first cell in the table should have 20px padding instead of 5px to match all other widgets */
+.widget .table:not(td .table) > thead > tr > th:first-child,
+.widget .table:not(td .table) > tbody > tr > th:first-child,
+.widget .table:not(td .table) > tfoot > tr > th:first-child,
+.widget .table:not(td .table) > thead > tr > td:first-child,
+.widget .table:not(td .table) > tbody > tr > td:first-child,
+.widget .table:not(td .table) > tfoot > tr > td:first-child {
+  padding-left: 20px;
+}
+
+/* the last cell in the table should have 20px padding instead of 5px to match all other widgets */
+.widget .table:not(td .table) > thead > tr > th:last-child,
+.widget .table:not(td .table) > tbody > tr > th:last-child,
+.widget .table:not(td .table) > tfoot > tr > th:last-child,
+.widget .table:not(td .table) > thead > tr > td:last-child,
+.widget .table:not(td .table) > tbody > tr > td:last-child,
+.widget .table:not(td .table) > tfoot > tr > td:last-child {
+  padding-right: 20px;
+}
+
+/* tables inside widgets should extend the full width of the widget, with 20px table cell padding padding on the left and right */
+.widget-body:not(.no-padding) > .table,
+.widget-body:not(.no-padding) > .widget-content > .table {
+  margin: 0 -20px;
+  width: calc(100% + 40px);
+  max-width: calc(100% + 40px);
+}
+
 .input-group-addon {
   color: var(--text-input-group-addon-color);
   background-color: var(--bg-input-group-addon-color);
@@ -40,6 +68,10 @@
 
 .input-group .form-control {
   z-index: unset;
+}
+
+.input-group-sm > .input-group-addon {
+  line-height: 1;
 }
 
 .text-danger {
@@ -163,17 +195,6 @@ pre {
   border-radius: 8px;
   background-color: var(--bg-pre-color);
   color: var(--text-pre-color);
-}
-json-tree .key {
-  color: var(--text-json-tree-color);
-}
-
-json-tree .leaf-value {
-  color: var(--text-json-tree-leaf-color);
-}
-
-json-tree .branch-preview {
-  color: var(--text-json-tree-branch-preview-color);
 }
 
 .progress {

@@ -1,7 +1,6 @@
 package archive
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -24,7 +23,7 @@ func listFiles(dir string) []string {
 	return items
 }
 
-func Test_shouldCreateArhive(t *testing.T) {
+func Test_shouldCreateArchive(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
 	os.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
@@ -34,12 +33,11 @@ func Test_shouldCreateArhive(t *testing.T) {
 
 	gzPath, err := TarGzDir(tmpdir)
 	assert.Nil(t, err)
-	assert.Equal(t, filepath.Join(tmpdir, fmt.Sprintf("%s.tar.gz", filepath.Base(tmpdir))), gzPath)
+	assert.Equal(t, filepath.Join(tmpdir, filepath.Base(tmpdir)+".tar.gz"), gzPath)
 
 	extractionDir := t.TempDir()
 	cmd := exec.Command("tar", "-xzf", gzPath, "-C", extractionDir)
-	err = cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		t.Fatal("Failed to extract archive: ", err)
 	}
 	extractedFiles := listFiles(extractionDir)
@@ -56,7 +54,7 @@ func Test_shouldCreateArhive(t *testing.T) {
 	wasExtracted("dir/.dotfile")
 }
 
-func Test_shouldCreateArhiveXXXXX(t *testing.T) {
+func Test_shouldCreateArchive2(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
 	os.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
@@ -66,12 +64,11 @@ func Test_shouldCreateArhiveXXXXX(t *testing.T) {
 
 	gzPath, err := TarGzDir(tmpdir)
 	assert.Nil(t, err)
-	assert.Equal(t, filepath.Join(tmpdir, fmt.Sprintf("%s.tar.gz", filepath.Base(tmpdir))), gzPath)
+	assert.Equal(t, filepath.Join(tmpdir, filepath.Base(tmpdir)+".tar.gz"), gzPath)
 
 	extractionDir := t.TempDir()
 	r, _ := os.Open(gzPath)
-	ExtractTarGz(r, extractionDir)
-	if err != nil {
+	if err := ExtractTarGz(r, extractionDir); err != nil {
 		t.Fatal("Failed to extract archive: ", err)
 	}
 	extractedFiles := listFiles(extractionDir)

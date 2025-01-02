@@ -13,7 +13,7 @@ type ServiceTx struct {
 func (service ServiceTx) Create(role *portainer.Role) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			role.ID = portainer.RoleID(id)
 			return int(role.ID), role
 		},

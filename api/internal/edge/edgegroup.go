@@ -4,7 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/tag"
+	"github.com/portainer/portainer/api/tag"
 )
 
 // EdgeGroupRelatedEndpoints returns a list of environments(endpoints) related to this Edge group
@@ -77,6 +77,7 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 				return true
 			}
 		}
+
 		return false
 	}
 
@@ -84,12 +85,10 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 	if endpointGroup.TagIDs != nil {
 		endpointTags = tag.Union(endpointTags, tag.Set(endpointGroup.TagIDs))
 	}
-	edgeGroupTags := tag.Set(edgeGroup.TagIDs)
 
 	if edgeGroup.PartialMatch {
-		intersection := tag.Intersection(endpointTags, edgeGroupTags)
-		return len(intersection) != 0
+		return tag.PartialMatch(edgeGroup.TagIDs, endpointTags)
 	}
 
-	return tag.FullMatch(edgeGroupTags, endpointTags)
+	return tag.FullMatch(edgeGroup.TagIDs, endpointTags)
 }

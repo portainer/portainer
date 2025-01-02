@@ -2,7 +2,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 
-import { useContainers } from '../../queries/containers';
+import { useContainers } from '../../queries/useContainers';
 import { ContainerStatus } from '../../types';
 
 export function ContainerSelector({
@@ -31,6 +31,7 @@ export function ContainerSelector({
       onChange={onChange}
       options={containersQuery.data || []}
       isLoading={containersQuery.isLoading}
+      data-cy="docker-container-selector"
     />
   );
 }

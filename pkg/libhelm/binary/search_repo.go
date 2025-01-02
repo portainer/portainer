@@ -4,7 +4,6 @@ package binary
 // The functionality does not rely on the implementation of `HelmPackageManager`
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -65,14 +64,14 @@ func (hbpm *helmBinaryPackageManager) SearchRepo(searchRepoOpts options.SearchRe
 		}
 	}
 
-	// Allow redirect behavior to be overriden if specified.
+	// Allow redirect behavior to be overridden if specified.
 	if client.CheckRedirect == nil {
 		client.CheckRedirect = defaultCheckRedirect
 	}
 
 	url, err := url.ParseRequestURI(searchRepoOpts.Repo)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("invalid helm chart URL: %s", searchRepoOpts.Repo))
+		return nil, errors.Wrap(err, "invalid helm chart URL: "+searchRepoOpts.Repo)
 	}
 
 	url.Path = path.Join(url.Path, "index.yaml")

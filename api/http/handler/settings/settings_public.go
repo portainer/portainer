@@ -19,8 +19,6 @@ type publicSettingsResponse struct {
 	RequiredPasswordLength int `json:"RequiredPasswordLength" example:"1"`
 	// Deployment options for encouraging deployment as code
 	GlobalDeploymentOptions portainer.GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
-	// Show the Kompose build option (discontinued in 2.18)
-	ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
@@ -36,8 +34,6 @@ type publicSettingsResponse struct {
 	// Whether team sync is enabled
 	TeamSync bool `json:"TeamSync" example:"true"`
 
-	// Whether FDO is enabled
-	IsFDOEnabled bool
 	// Whether AMT is enabled
 	IsAMTEnabled bool
 
@@ -71,6 +67,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 	}
 
 	publicSettings := generatePublicSettings(settings)
+
 	return response.JSON(w, publicSettings)
 }
 
@@ -81,11 +78,9 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		RequiredPasswordLength:    appSettings.InternalAuthSettings.RequiredPasswordLength,
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
 		GlobalDeploymentOptions:   appSettings.GlobalDeploymentOptions,
-		ShowKomposeBuildOption:    appSettings.ShowKomposeBuildOption,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  featureflags.FeatureFlags(),
-		IsFDOEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.FDOConfiguration.Enabled,
 		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 
@@ -96,7 +91,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 
 	publicSettings.IsDockerDesktopExtension = appSettings.IsDockerDesktopExtension
 
-	//if OAuth authentication is on, compose the related fields from application settings
+	// If OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
 		publicSettings.OAuthLogoutURI = appSettings.OAuthSettings.LogoutURI
 		publicSettings.OAuthLoginURI = fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s",
@@ -104,16 +99,18 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 			appSettings.OAuthSettings.ClientID,
 			appSettings.OAuthSettings.RedirectURI,
 			appSettings.OAuthSettings.Scopes)
-		//control prompt=login param according to the SSO setting
+
+		// Control prompt=login param according to the SSO setting
 		if !appSettings.OAuthSettings.SSO {
 			publicSettings.OAuthLoginURI += "&prompt=login"
 		}
 	}
-	//if LDAP authentication is on, compose the related fields from application settings
+	// If LDAP authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationLDAP && appSettings.LDAPSettings.GroupSearchSettings != nil {
 		if len(appSettings.LDAPSettings.GroupSearchSettings) > 0 {
 			publicSettings.TeamSync = len(appSettings.LDAPSettings.GroupSearchSettings[0].GroupBaseDN) > 0
 		}
 	}
+
 	return publicSettings
 }

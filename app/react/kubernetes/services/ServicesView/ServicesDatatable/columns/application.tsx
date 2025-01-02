@@ -4,7 +4,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { Link } from '@@/Link';
 
-import { Service } from '../../../types';
+import { ServiceRowData } from '../types';
 
 import { columnHelper } from './helper';
 
@@ -17,7 +17,7 @@ export const application = columnHelper.accessor(
   }
 );
 
-function Cell({ row, getValue }: CellContext<Service, string>) {
+function Cell({ row, getValue }: CellContext<ServiceRowData, string>) {
   const appName = getValue();
   const environmentId = useEnvironmentId();
 
@@ -30,6 +30,7 @@ function Cell({ row, getValue }: CellContext<Service, string>) {
         name: appName,
       }}
       title={appName}
+      data-cy={`service-application-link-${appName}`}
     >
       {appName}
     </Link>

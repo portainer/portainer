@@ -45,7 +45,7 @@ func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"token_type":   "Bearer",
 				"expires_in":   86400,
 				"access_token": AccessToken,
@@ -67,7 +67,7 @@ func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"username": "test-oauth-user",
 				"groups":   "testing",
 			})

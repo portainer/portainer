@@ -6,12 +6,18 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/pkg/edge"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
 )
 
 type edgeStackFromFileUploadPayload struct {
+	// Name of the stack
+	// Max length: 255
+	// Name must only contains lowercase characters, numbers, hyphens, or underscores
+	// Name must start with a lowercase character or number
+	// Example: stack-name or stack_123 or stackName
 	Name             string
 	StackFileContent []byte
 	EdgeGroups       []portainer.EdgeGroupID
@@ -31,6 +37,10 @@ func (payload *edgeStackFromFileUploadPayload) Validate(r *http.Request) error {
 		return httperrors.NewInvalidPayloadError("Invalid stack name")
 	}
 	payload.Name = name
+
+	if !edge.IsValidEdgeStackName(payload.Name) {
+		return httperrors.NewInvalidPayloadError("Invalid stack name. Stack name must only consist of lowercase alpha characters, numbers, hyphens, or underscores as well as start with a lowercase character or number")
+	}
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
@@ -75,10 +85,10 @@ func (payload *edgeStackFromFileUploadPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept multipart/form-data
 // @produce json
-// @param Name formData string true "Name of the stack"
+// @param Name formData string true "Name of the stack. it must only consist of lowercase alphanumeric characters, hyphens, or underscores as well as start with a letter or number"
 // @param file formData file true "Content of the Stack file"
 // @param EdgeGroups formData string true "JSON stringified array of Edge Groups ids"
-// @param DeploymentType formData int true "deploy type 0 - 'compose', 1 - 'kubernetes', 2 - 'nomad'"
+// @param DeploymentType formData int true "deploy type 0 - 'compose', 1 - 'kubernetes'"
 // @param Registries formData string false "JSON stringified array of Registry ids to use for this stack"
 // @param UseManifestNamespaces formData bool false "Uses the manifest's namespaces instead of the default one, relevant only for kube environments"
 // @param PrePullImage formData bool false "Pre Pull image"

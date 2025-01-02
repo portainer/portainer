@@ -1,12 +1,19 @@
 <section class="datatable" aria-label="Helm charts">
   <div class="toolBar vertical-center relative w-full flex-wrap !gap-x-5 !gap-y-1 !px-0">
-    <div class="toolBarTitle vertical-center">
-      {{ $ctrl.titleText }}
-    </div>
+    <div class="toolBarTitle vertical-center"> {{ $ctrl.titleText }} </div>
 
     <div class="searchBar vertical-center !mr-0">
       <pr-icon icon="'search'" class="searchIcon"></pr-icon>
-      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" aria-label="Search input" />
+      <input
+        type="text"
+        data-cy="helm-templates-search"
+        class="searchInput"
+        ng-model="$ctrl.state.textFilter"
+        placeholder="Search..."
+        auto-focus
+        ng-model-options="{ debounce: 300 }"
+        aria-label="Search input"
+      />
     </div>
     <div class="w-1/5">
       <por-select
@@ -20,7 +27,7 @@
     </div>
   </div>
   <div class="w-full">
-    <div class="mb-2 small text-muted"
+    <div class="small text-muted mb-2"
       >Select the Helm chart to use. Bring further Helm charts into your selection list via
       <a ui-sref="portainer.account({'#': 'helm-repositories'})">User settings - Helm repositories</a>.</div
     >

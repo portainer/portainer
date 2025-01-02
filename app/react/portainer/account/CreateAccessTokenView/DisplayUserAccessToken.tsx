@@ -1,11 +1,9 @@
-import { useRouter } from '@uirouter/react';
-
 import { Button, CopyButton } from '@@/buttons';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { TextTip } from '@@/Tip/TextTip';
+import { Link } from '@@/Link';
 
-export function DisplayUserAccessToken(apikey: string) {
-  const router = useRouter();
+export function DisplayUserAccessToken({ apikey }: { apikey: string }) {
   return (
     <>
       <FormSectionTitle>New access token</FormSectionTitle>
@@ -17,14 +15,21 @@ export function DisplayUserAccessToken(apikey: string) {
         <div className="inline-flex">
           <div className="">{apikey}</div>
           <div>
-            <CopyButton copyText={apikey} color="link" />
+            <CopyButton
+              copyText={apikey}
+              color="link"
+              data-cy="create-access-token-copy-button"
+            />
           </div>
         </div>
         <hr />
       </div>
       <Button
-        type="button"
-        onClick={() => router.stateService.go('portainer.account')}
+        as={Link}
+        props={{
+          to: 'portainer.account',
+        }}
+        data-cy="create-access-token-done-button"
       >
         Done
       </Button>

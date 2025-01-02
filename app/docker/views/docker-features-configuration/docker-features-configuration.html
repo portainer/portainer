@@ -6,10 +6,14 @@
       <rd-widget-body>
         <form class="form-horizontal" name="$ctrl.form">
           <div class="col-sm-12 form-section-title"> Host and filesystem </div>
-          <div ng-if="!$ctrl.isAgent" class="form-group">
+          <div class="form-group">
             <span class="col-sm-12 text-muted small vertical-center">
               <pr-icon icon="'info'" mode="'primary'" class-name="'space-right'"></pr-icon>
-              These features are only available for an Agent enabled environments.
+              <span class="text-muted"
+                >The environment must be <a href="https://docs.portainer.io/start/agent">running the Portainer Agent</a> to use this functionality, and the root of the host must be
+                bind-mounted to <b>/host</b> in the agent deployment. Check
+                <a href="https://docs.portainer.io/user/docker/host/setup#enable-host-management-features">our documentation</a> for more information.</span
+              >
             </span>
           </div>
           <div class="form-group">
@@ -150,9 +154,12 @@
           <!-- other -->
           <div class="col-sm-12 form-section-title"> Other </div>
           <div class="form-group">
-            <div class="col-sm-12">
-              <gpus-insights></gpus-insights>
+            <div class="col-sm-12" ng-if="!$ctrl.isDockerStandaloneEnv">
+              <text-tip children="'Showing GPU in the UI is currently only available with Docker Standalone and is limited to NVIDIA graphics cards.'" color="'blue'" />
             </div>
+          </div>
+
+          <div class="form-group">
             <div class="col-sm-12">
               <por-switch-field
                 label="'Show GPU in the UI'"
@@ -164,11 +171,20 @@
                 disabled="!$ctrl.isDockerStandaloneEnv"
               ></por-switch-field>
             </div>
-            <div class="col-sm-12">
-              <div class="pl-4">
-                <gpus-list ng-if="$ctrl.state.enableGPUManagement && $ctrl.endpoint" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+
+            <div ng-if="$ctrl.state.enableGPUManagement">
+              <div class="col-sm-12">
+                <text-tip children="'GPU support is currently limited to NVIDIA graphics cards only.'" color="'blue'" />
+              </div>
+              <div class="col-sm-12">
+                <div class="pl-4">
+                  <gpus-list ng-if="$ctrl.state.enableGPUManagement" value="$ctrl.endpoint.Gpus" on-change="($ctrl.onGpusChange)"></gpus-list>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="form-group">
             <div class="col-sm-12">
               <por-switch-field
                 label="'Show image up to date indicators for Stacks, Services and Containers'"

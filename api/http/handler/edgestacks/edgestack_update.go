@@ -6,7 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
-	"github.com/portainer/portainer/api/internal/set"
+	"github.com/portainer/portainer/api/set"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -57,17 +57,15 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var payload updateEdgeStackPayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var stack *portainer.EdgeStack
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		stack, err = handler.updateEdgeStack(tx, portainer.EdgeStackID(stackID), payload)
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
 			return httpErr
@@ -80,7 +78,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID portainer.EdgeStackID, payload updateEdgeStackPayload) (*portainer.EdgeStack, error) {
-	stack, err := tx.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	stack, err := tx.EdgeStack().EdgeStack(stackID)
 	if err != nil {
 		return nil, handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
@@ -122,14 +120,12 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 	stack.EdgeGroups = groupsIds
 
 	if payload.UpdateVersion {
-		err := handler.updateStackVersion(stack, payload.DeploymentType, []byte(payload.StackFileContent), "", relatedEndpointIds)
-		if err != nil {
+		if err := handler.updateStackVersion(stack, payload.DeploymentType, []byte(payload.StackFileContent), "", relatedEndpointIds); err != nil {
 			return nil, httperror.InternalServerError("Unable to update stack version", err)
 		}
 	}
 
-	err = tx.EdgeStack().UpdateEdgeStack(stack.ID, stack)
-	if err != nil {
+	if err := tx.EdgeStack().UpdateEdgeStack(stack.ID, stack); err != nil {
 		return nil, httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
@@ -160,8 +156,7 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 
 		delete(relation.EdgeStacks, edgeStackID)
 
-		err = tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-		if err != nil {
+		if err := tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation); err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to persist environment relation in database")
 		}
 	}
@@ -181,8 +176,7 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 
 		relation.EdgeStacks[edgeStackID] = true
 
-		err = tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
-		if err != nil {
+		if err := tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation); err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to persist environment relation in database")
 		}
 	}

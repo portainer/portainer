@@ -10,8 +10,8 @@ import {
   EnvironmentStatus,
   PlatformType,
   EdgeTypes,
+  EnvironmentGroupId,
 } from '@/react/portainer/environments/types';
-import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
@@ -261,6 +261,12 @@ export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
 
     const typesByPlatform = {
       [PlatformType.Docker]: [
+        EnvironmentType.Docker,
+        EnvironmentType.AgentOnDocker,
+        EnvironmentType.EdgeAgentOnDocker,
+      ],
+      // for podman keep the env type as docker (the containerEngine distinguishes podman from docker)
+      [PlatformType.Podman]: [
         EnvironmentType.Docker,
         EnvironmentType.AgentOnDocker,
         EnvironmentType.EdgeAgentOnDocker,

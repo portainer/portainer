@@ -3,7 +3,6 @@ package webhooks
 import (
 	"context"
 	"errors"
-	"io"
 	"net/http"
 	"strings"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 )
 
 // @summary Execute a webhook
@@ -26,15 +26,12 @@ import (
 // @failure 500
 // @router /webhooks/{id} [post]
 func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")
-
 	if err != nil {
 		return httperror.InternalServerError("Invalid service id parameter", err)
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
-
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a webhook with this token", err)
 	} else if err != nil {
@@ -46,7 +43,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	registryID := webhook.RegistryID
 	webhookType := webhook.WebhookType
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
@@ -83,16 +80,16 @@ func (handler *Handler) executeServiceWebhook(
 
 	service.Spec.TaskTemplate.ForceUpdate++
 
-	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+	imageName := strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+	service.Spec.TaskTemplate.ContainerSpec.Image = imageName
 
 	if imageTag != "" {
-		var tagIndex = strings.LastIndex(imageName, ":")
+		tagIndex := strings.LastIndex(imageName, ":")
 		if tagIndex == -1 {
 			tagIndex = len(imageName)
 		}
+
 		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
-	} else {
-		service.Spec.TaskTemplate.ContainerSpec.Image = imageName
 	}
 
 	serviceUpdateOptions := dockertypes.ServiceUpdateOptions{
@@ -113,19 +110,18 @@ func (handler *Handler) executeServiceWebhook(
 			}
 		}
 	}
+
 	if imageTag != "" {
-		rc, err := dockerClient.ImagePull(context.Background(), service.Spec.TaskTemplate.ContainerSpec.Image, dockertypes.ImagePullOptions{RegistryAuth: serviceUpdateOptions.EncodedRegistryAuth})
+		rc, err := dockerClient.ImagePull(context.Background(), service.Spec.TaskTemplate.ContainerSpec.Image, image.PullOptions{RegistryAuth: serviceUpdateOptions.EncodedRegistryAuth})
 		if err != nil {
 			return httperror.NotFound("Error pulling image with the specified tag", err)
 		}
-		defer func(rc io.ReadCloser) {
-			_ = rc.Close()
-		}(rc)
+		defer rc.Close()
 	}
-	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
 
-	if err != nil {
+	if _, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions); err != nil {
 		return httperror.InternalServerError("Error updating service", err)
 	}
+
 	return response.Empty(w)
 }

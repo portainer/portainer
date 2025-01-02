@@ -41,8 +41,7 @@
             Show custom values
           </button>
           <span class="small interactive vertical-center" ng-if="$ctrl.state.loadingValues" role="status">
-            <pr-icon icon="'refresh-cw'" class="mr-1"></pr-icon>
-            Loading values.yaml...
+            <inline-loader children="'Loading values.yaml...'" />
           </span>
           <button ng-if="$ctrl.state.showCustomValues" class="btn btn-xs btn-default vertical-center !ml-0 mr-2" ng-click="$ctrl.state.showCustomValues = false;">
             <pr-icon icon="'minus'" class="vertical-center"></pr-icon>

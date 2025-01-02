@@ -14,7 +14,6 @@ import { notifyError } from '@/portainer/services/notifications';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { generateNewIngressesFromFormPaths } from '@/react/kubernetes/applications/CreateView/application-services/utils';
 import { KubernetesPod } from '../pod/models';
-import { KubernetesApplication } from '../models/application/models';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */
@@ -64,7 +63,7 @@ class KubernetesApplicationService {
       apiService = this.KubernetesDaemonSetService;
     } else if (app.ApplicationType === KubernetesApplicationTypes.StatefulSet) {
       apiService = this.KubernetesStatefulSetService;
-    } else if (app instanceof KubernetesPod || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.Pod)) {
+    } else if (app instanceof KubernetesPod || KubernetesApplicationTypes.Pod) {
       apiService = this.KubernetesPodService;
     } else {
       throw new PortainerError('Unable to determine which association to use to retrieve API Service');

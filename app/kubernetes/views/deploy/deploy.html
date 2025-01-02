@@ -1,4 +1,4 @@
-<page-header ng-if="ctrl.state.viewReady" title="'Create from manifest'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Create from file'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -31,9 +31,9 @@
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
                   </label>
-                  <div class="col-sm-8 vertical-center pt-3">
+                  <div class="col-sm-8 vertical-center pt-1">
                     <label class="switch">
-                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" data-cy="use-namespce-from-menifest" />
                       <span class="slider round"></span>
                     </label>
                   </div>
@@ -44,6 +44,7 @@
                   <div class="col-sm-8">
                     <select
                       ng-if="!ctrl.formValues.namespace_toggle || ctrl.state.BuildMethod === ctrl.BuildMethods.HELM"
+                      data-cy="namespace-select"
                       ng-disabled="ctrl.formValues.namespace_toggle && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM"
                       class="form-control"
                       ng-model="ctrl.formValues.Namespace"
@@ -71,6 +72,7 @@
                   <div class="col-sm-8" ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.HELM">
                     <input
                       type="text"
+                      data-cy="name-input"
                       class="form-control"
                       ng-model="ctrl.formValues.Name"
                       id="name"
@@ -87,10 +89,15 @@
                 </div>
 
                 <div ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.BuildMethod !== ctrl.BuildMethods.HELM">
-                  <div class="w-fit mb-4">
+                  <div class="mb-4 w-fit">
                     <stack-name-label-insight></stack-name-label-insight>
                   </div>
-                  <kube-stack-name stack-name="ctrl.formValues.StackName" set-stack-name="(ctrl.setStackName)" stacks="ctrl.stacks"></kube-stack-name>
+                  <kube-stack-name
+                    stack-name="ctrl.formValues.StackName"
+                    set-stack-name="(ctrl.setStackName)"
+                    stacks="ctrl.stacks"
+                    error="ctrl.state.stackNameError"
+                  ></kube-stack-name>
                 </div>
                 <!-- !namespace -->
 
@@ -118,6 +125,7 @@
                     stack-type="3"
                     on-change="(ctrl.onChangeTemplateId)"
                     value="ctrl.state.templateId"
+                    is-load-failed="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId && ctrl.state.templateLoadFailed"
                   ></custom-template-selector>
 
                   <custom-templates-variables-field
@@ -127,16 +135,6 @@
                     on-change="(ctrl.onChangeTemplateVariables)"
                   ></custom-templates-variables-field>
                 </div>
-
-                <span ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId && ctrl.state.templateLoadFailed">
-                  <p class="small vertical-center text-danger mb-5" ng-if="ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId">
-                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
-                    <a ui-sref="kubernetes.templates.custom.edit({id: ctrl.state.templateId})">click here</a> for configuration.</p
-                  >
-                  <p class="small vertical-center text-danger mb-5" ng-if="!(ctrl.currentUser.isAdmin || ctrl.currentUser.id === ctrl.state.template.CreatedByUserId)">
-                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
-                  >
-                </span>
 
                 <!-- editor -->
                 <div class="mt-4">
@@ -175,11 +173,11 @@
                     <div class="col-sm-8">
                       <input
                         type="text"
+                        data-cy="k8sAppDeploy-urlFileUrl"
                         class="form-control"
                         ng-model="ctrl.formValues.ManifestURL"
                         id="manifest_url"
                         placeholder="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/controllers/nginx-deployment.yaml"
-                        data-cy="k8sAppDeploy-urlFileUrl"
                       />
                     </div>
                   </div>

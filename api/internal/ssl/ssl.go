@@ -64,8 +64,7 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 	// path not supplied and certificates doesn't exist - generate self-signed
 	certPath, keyPath = service.fileService.GetDefaultSSLCertsPath()
 
-	err = generateSelfSignedCertificates(host, certPath, keyPath)
-	if err != nil {
+	if err := generateSelfSignedCertificates(host, certPath, keyPath); err != nil {
 		return errors.Wrap(err, "failed generating self signed certs")
 	}
 
@@ -98,8 +97,7 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 		return errors.New("missing certificate files")
 	}
 
-	_, err := tls.X509KeyPair(certData, keyData)
-	if err != nil {
+	if _, err := tls.X509KeyPair(certData, keyData); err != nil {
 		return err
 	}
 
@@ -108,8 +106,7 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 		return err
 	}
 
-	err = service.cacheInfo(certPath, keyPath, false)
-	if err != nil {
+	if err := service.cacheInfo(certPath, keyPath, false); err != nil {
 		return err
 	}
 
@@ -130,8 +127,7 @@ func (service *Service) SetHTTPEnabled(httpEnabled bool) error {
 
 	settings.HTTPEnabled = httpEnabled
 
-	err = service.dataStore.SSLSettings().UpdateSettings(settings)
-	if err != nil {
+	if err := service.dataStore.SSLSettings().UpdateSettings(settings); err != nil {
 		return err
 	}
 
@@ -152,8 +148,7 @@ func (service *Service) cacheCertificate(certPath, keyPath string) error {
 }
 
 func (service *Service) cacheInfo(certPath string, keyPath string, selfSigned bool) error {
-	err := service.cacheCertificate(certPath, keyPath)
-	if err != nil {
+	if err := service.cacheCertificate(certPath, keyPath); err != nil {
 		return err
 	}
 

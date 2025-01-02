@@ -20,6 +20,7 @@ export function ForceDeploymentSwitch({
       <div className="col-sm-12">
         <SwitchField
           name="forceUpdate"
+          data-cy="gitops-force-redeployment-switch"
           featureId={FeatureId.FORCE_REDEPLOYMENT}
           checked={checked}
           label={label}

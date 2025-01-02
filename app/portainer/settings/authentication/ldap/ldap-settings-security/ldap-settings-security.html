@@ -1,6 +1,4 @@
-<div class="col-sm-12 form-section-title">
-  {{ $ctrl.title || 'LDAP security' }}
-</div>
+<div class="col-sm-12 form-section-title"> {{ $ctrl.title || 'LDAP security' }} </div>
 
 <!-- starttls -->
 <div class="form-group" ng-if="!$ctrl.settings.TLSConfig.TLS">
@@ -10,7 +8,7 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" ng-model="$ctrl.settings.StartTLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <input type="checkbox" ng-model="$ctrl.settings.StartTLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" data-cy="starttls-toggle" />
       <span class="slider round"></span>
     </label>
   </div>
@@ -25,7 +23,7 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" data-cy="tls-toggle" />
       <span class="slider round"></span>
     </label>
   </div>
@@ -40,7 +38,13 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLSSkipVerify" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <input
+        type="checkbox"
+        ng-model="$ctrl.settings.TLSConfig.TLSSkipVerify"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+        data-cy="tls-skip-verify-toggle"
+      />
       <span class="slider round"></span>
     </label>
   </div>

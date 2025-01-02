@@ -8,7 +8,7 @@
     "dashboard-tab": {
       "title": "Portainer",
       "root": "/public",
-      "src": "index.html"
+      "src": "http://localhost:49000"
     }
   }
 }

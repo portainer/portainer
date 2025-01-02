@@ -1,66 +1,37 @@
+import { getConfig } from '@/react/docker/configs/queries/useConfig';
+import { getConfigs } from '@/react/docker/configs/queries/useConfigs';
+
+import { deleteConfig } from '@/react/docker/configs/queries/useDeleteConfigMutation';
+import { createConfig } from '@/react/docker/configs/queries/useCreateConfigMutation';
 import { ConfigViewModel } from '../models/config';
 
-angular.module('portainer.docker').factory('ConfigService', [
-  '$q',
-  'Config',
-  function ConfigServiceFactory($q, Config) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('ConfigService', ConfigServiceFactory);
 
-    service.config = function (environmentId, configId) {
-      var deferred = $q.defer();
+/* @ngInspect */
+function ConfigServiceFactory(AngularToReact) {
+  const { useAxios } = AngularToReact;
 
-      Config.get({ id: configId, environmentId })
-        .$promise.then(function success(data) {
-          var config = new ConfigViewModel(data);
-          deferred.resolve(config);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve config details', err: err });
-        });
+  return {
+    configs: useAxios(listConfigsAngularJS), // config list + service create + service edit
+    config: useAxios(getConfigAngularJS), // config create + config edit
+    remove: useAxios(deleteConfig), // config list + config edit
+    create: useAxios(createConfig), // config create
+  };
 
-      return deferred.promise;
-    };
+  /**
+   * @param {EnvironmentId} environmentId
+   */
+  async function listConfigsAngularJS(environmentId) {
+    const data = await getConfigs(environmentId);
+    return data.map((c) => new ConfigViewModel(c));
+  }
 
-    service.configs = function (environmentId) {
-      var deferred = $q.defer();
-
-      Config.query({ environmentId })
-        .$promise.then(function success(data) {
-          var configs = data.map(function (item) {
-            return new ConfigViewModel(item);
-          });
-          deferred.resolve(configs);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve configs', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.remove = function (environmentId, configId) {
-      var deferred = $q.defer();
-
-      Config.remove({ environmentId, id: configId })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to remove config', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.create = function (environmentId, config) {
-      return Config.create({ environmentId }, config).$promise;
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId
+   * @param {ConfigId} configId
+   */
+  async function getConfigAngularJS(environmentId, configId) {
+    const data = await getConfig(environmentId, configId);
+    return new ConfigViewModel(data);
+  }
+}

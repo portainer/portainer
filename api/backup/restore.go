@@ -26,7 +26,7 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 	if password != "" {
 		archive, err = decrypt(archive, password)
 		if err != nil {
-			return errors.Wrap(err, "failed to decrypt the archive")
+			return errors.Wrap(err, "failed to decrypt the archive. Please ensure the password is correct and try again")
 		}
 	}
 

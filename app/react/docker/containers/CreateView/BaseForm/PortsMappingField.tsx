@@ -39,7 +39,7 @@ export function PortsMappingField({
         label="Port mapping"
         value={value}
         onChange={onChange}
-        addLabel="map additional port"
+        addLabel="Map additional port"
         itemBuilder={() => ({
           hostPort: '',
           containerPort: '',
@@ -50,6 +50,7 @@ export function PortsMappingField({
         disabled={disabled}
         readOnly={readOnly}
         tooltip="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
+        data-cy="docker-containers-ports-mapping"
       />
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">
@@ -73,11 +74,12 @@ function Item({
       <div className="flex items-center gap-2">
         <InputLabeled
           size="small"
+          data-cy={`hostPort-${index}`}
           disabled={disabled}
           readOnly={readOnly}
           value={item.hostPort}
           onChange={(e) => handleChange('hostPort', e.target.value)}
-          label="host"
+          label="Host"
           placeholder="e.g. 80"
           className="w-1/2"
           id={`hostPort-${index}`}
@@ -93,16 +95,20 @@ function Item({
           readOnly={readOnly}
           value={item.containerPort}
           onChange={(e) => handleChange('containerPort', e.target.value)}
-          label="container"
+          label="Container"
           placeholder="e.g. 80"
           className="w-1/2"
           id={`containerPort-${index}`}
+          data-cy={`containerPort-${index}`}
         />
 
         <ButtonSelector<Protocol>
           onChange={(value) => handleChange('protocol', value)}
           value={item.protocol}
-          options={[{ value: 'tcp' }, { value: 'udp' }]}
+          options={[
+            { value: 'tcp', label: 'TCP' },
+            { value: 'udp', label: 'UDP' },
+          ]}
           disabled={disabled}
           readOnly={readOnly}
         />

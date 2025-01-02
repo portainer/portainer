@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 
-import { configureFDO } from '@/portainer/hostmanagement/fdo/fdo.service';
 import { configureAMT } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
@@ -25,16 +24,6 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
     try {
       await configureAMT(formValues);
       Notifications.success('Success', `OpenAMT successfully ${formValues.enabled ? 'enabled' : 'disabled'}`);
-      $state.reload();
-    } catch (err) {
-      Notifications.error('Failure', err, 'Failed applying changes');
-    }
-  };
-
-  this.onSubmitFDO = async function (formValues) {
-    try {
-      await configureFDO(formValues);
-      Notifications.success('Success', `FDO successfully ${formValues.enabled ? 'enabled' : 'disabled'}`);
       $state.reload();
     } catch (err) {
       Notifications.error('Failure', err, 'Failed applying changes');

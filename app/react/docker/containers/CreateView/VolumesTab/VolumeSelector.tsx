@@ -8,10 +8,12 @@ export function VolumeSelector({
   value,
   onChange,
   inputId,
+  allowAuto,
 }: {
   value: string;
   onChange: (value?: string) => void;
   inputId?: string;
+  allowAuto: boolean;
 }) {
   const environmentId = useEnvironmentId();
   const volumesQuery = useVolumes(environmentId, {
@@ -20,26 +22,29 @@ export function VolumeSelector({
     },
   });
 
-  if (!volumesQuery.data) {
-    return null;
-  }
+  const initialVolumes = volumesQuery.data || [];
 
-  const volumes = volumesQuery.data;
+  const volumes = allowAuto
+    ? [...initialVolumes, { Name: 'auto', Driver: '' }]
+    : initialVolumes;
 
   const selectedValue = volumes.find((vol) => vol.Name === value);
-
   return (
     <Select
       placeholder="Select a volume"
       options={volumes}
       getOptionLabel={(vol) =>
-        `${truncate(vol.Name, 30)} - ${truncate(vol.Driver, 30)}`
+        vol.Name !== 'auto'
+          ? `${truncate(vol.Name, 30)} - ${truncate(vol.Driver, 30)}`
+          : 'auto'
       }
       getOptionValue={(vol) => vol.Name}
       isMulti={false}
       value={selectedValue}
       onChange={(vol) => onChange(vol?.Name)}
       inputId={inputId}
+      data-cy="docker-containers-volume-selector"
+      size="sm"
     />
   );
 }

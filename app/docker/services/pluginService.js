@@ -1,76 +1,51 @@
-import _ from 'lodash-es';
-import { PluginViewModel } from '../models/plugin';
+import { isFulfilled } from '@/portainer/helpers/promise-utils';
+import { getInfo } from '@/react/docker/proxy/queries/useInfo';
+import { aggregateData, getPlugins } from '@/react/docker/proxy/queries/usePlugins';
 
-angular.module('portainer.docker').factory('PluginService', [
-  '$q',
-  'Plugin',
-  'SystemService',
-  function PluginServiceFactory($q, Plugin, SystemService) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('PluginService', PluginServiceFactory);
 
-    service.plugins = function () {
-      var deferred = $q.defer();
-      var plugins = [];
+/* @ngInject */
+function PluginServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      Plugin.query({})
-        .$promise.then(function success(data) {
-          for (var i = 0; i < data.length; i++) {
-            var plugin = new PluginViewModel(data[i]);
-            plugins.push(plugin);
-          }
-        })
-        .finally(function final() {
-          deferred.resolve(plugins);
-        });
+  return {
+    volumePlugins: useAxios(injectEnvironmentId(volumePlugins)), // volume create
+    networkPlugins: useAxios(injectEnvironmentId(networksPlugins)), // network create
+    loggingPlugins: useAxios(injectEnvironmentId(loggingPlugins)), // service create + service edit
+  };
+}
 
-      return deferred.promise;
-    };
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function volumePlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Volume');
+}
 
-    function servicePlugins(systemOnly, pluginType, pluginVersion) {
-      var deferred = $q.defer();
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function networksPlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Network');
+}
 
-      $q.all({
-        system: SystemService.plugins(),
-        plugins: systemOnly ? [] : service.plugins(),
-      })
-        .then(function success(data) {
-          var aggregatedPlugins = [];
-          var systemPlugins = data.system;
-          var plugins = data.plugins;
+/**
+ * @param {EnvironmentId} environmentId Injected
+ * @param {boolean} systemOnly
+ */
+async function loggingPlugins(environmentId, systemOnly) {
+  const { systemPluginsData, pluginsData } = await getAllPlugins(environmentId);
+  return aggregateData(systemPluginsData, pluginsData, systemOnly, 'Log');
+}
 
-          if (systemPlugins[pluginType]) {
-            aggregatedPlugins = aggregatedPlugins.concat(systemPlugins[pluginType]);
-          }
+async function getAllPlugins(environmentId) {
+  const [system, plugins] = await Promise.allSettled([getInfo(environmentId), getPlugins(environmentId)]);
+  const systemPluginsData = isFulfilled(system) ? system.value.Plugins : undefined;
+  const pluginsData = isFulfilled(plugins) ? plugins.value : undefined;
 
-          for (var i = 0; i < plugins.length; i++) {
-            var plugin = plugins[i];
-            if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, pluginVersion)) {
-              aggregatedPlugins.push(plugin.Name);
-            }
-          }
-
-          deferred.resolve(aggregatedPlugins);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: err.msg, err: err });
-        });
-
-      return deferred.promise;
-    }
-
-    service.volumePlugins = function (systemOnly) {
-      return servicePlugins(systemOnly, 'Volume', 'docker.volumedriver/1.0');
-    };
-
-    service.networkPlugins = function (systemOnly) {
-      return servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
-    };
-
-    service.loggingPlugins = function (systemOnly) {
-      return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');
-    };
-
-    return service;
-  },
-]);
+  return { systemPluginsData, pluginsData };
+}

@@ -1,8 +1,8 @@
-import { ContainerJSON } from '../../queries/container';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
 
 import { Values } from './types';
 
-export function toViewModel(config: ContainerJSON): Values {
+export function toViewModel(config: ContainerDetailsJSON): Values {
   if (!config || !config.Config || !config.Config.Labels) {
     return [];
   }

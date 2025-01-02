@@ -3,7 +3,6 @@
 import dataflow from '@/assets/ico/dataflow-1.svg?c';
 import git from '@/assets/ico/git.svg?c';
 import kube from '@/assets/ico/kube.svg?c';
-import laptopcode from '@/assets/ico/laptop-code.svg?c';
 import ldap from '@/assets/ico/ldap.svg?c';
 import linux from '@/assets/ico/linux.svg?c';
 import memory from '@/assets/ico/memory.svg?c';
@@ -27,7 +26,7 @@ import google from '@/assets/ico/vendor/google.svg?c';
 import googlecloud from '@/assets/ico/vendor/googlecloud.svg?c';
 import kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
 import helm from '@/assets/ico/vendor/helm.svg?c';
-import linode from '@/assets/ico/vendor/linode.svg?c';
+import akamai from '@/assets/ico/vendor/akamai.svg?c';
 import microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import microsofticon from '@/assets/ico/vendor/microsoft-icon.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
@@ -40,7 +39,6 @@ export const SvgIcons = {
   dataflow,
   dockericon,
   git,
-  laptopcode,
   ldap,
   linux,
   memory,
@@ -62,7 +60,7 @@ export const SvgIcons = {
   googlecloud,
   kubernetes,
   helm,
-  linode,
+  akamai,
   microsoft,
   microsofticon,
   openldap,

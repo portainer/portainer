@@ -69,8 +69,17 @@ function CreateView() {
             <Widget.Body>
               <TextTip color="blue" className="mb-2">
                 Devices need to be allocated to an Edge group, visit the{' '}
-                <Link to="edge.groups">Edge Groups</Link> page to assign
-                environments and create groups.
+                <Link
+                  to="edge.groups"
+                  data-cy="update-schedules-create-edge-groups-link"
+                >
+                  Edge Groups
+                </Link>{' '}
+                page to assign environments and create groups.
+                <br />
+                You can upgrade from any agent version to 2.17 or later only.
+                You can not upgrade to an agent version prior to 2.17 . The
+                ability to rollback to originating version is for 2.15.0+ only.
               </TextTip>
 
               <Formik
@@ -91,13 +100,6 @@ function CreateView() {
                       error={errors.groupIds}
                     />
 
-                    <TextTip color="blue">
-                      You can upgrade from any agent version to 2.17 or later
-                      only. You can not upgrade to an agent version prior to
-                      2.17 . The ability to rollback to originating version is
-                      for 2.15.0+ only.
-                    </TextTip>
-
                     <div className="mt-2">
                       <ScheduleTypeSelector />
                     </div>
@@ -106,6 +108,7 @@ function CreateView() {
                       <div className="col-sm-12">
                         <LoadingButton
                           disabled={!isValid}
+                          data-cy="update-schedules-create-submit-button"
                           isLoading={createMutation.isLoading}
                           loadingText="Creating..."
                         >

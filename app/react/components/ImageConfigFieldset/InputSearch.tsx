@@ -11,6 +11,7 @@ export function InputSearch({
   options,
   placeholder,
   inputId,
+  'data-cy': dataCy,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -34,6 +35,7 @@ export function InputSearch({
       onChange={onChange}
       placeholder={placeholder}
       inputId={inputId}
+      data-cy={dataCy}
     />
   );
 }

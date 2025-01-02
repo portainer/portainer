@@ -1,3 +1,5 @@
+import './datatable.css';
+
 import {
   Table as TableInstance,
   TableState,
@@ -108,8 +110,9 @@ export function Datatable<D extends DefaultType>({
   );
 
   const allColumns = useMemo(
-    () => _.compact([!disableSelect && createSelectColumn<D>(), ...columns]),
-    [disableSelect, columns]
+    () =>
+      _.compact([!disableSelect && createSelectColumn<D>(dataCy), ...columns]),
+    [disableSelect, dataCy, columns]
   );
 
   const tableInstance = useReactTable<D>(
@@ -122,12 +125,13 @@ export function Datatable<D extends DefaultType>({
           pageIndex: page || 0,
         },
         sorting: settings.sortBy ? [settings.sortBy] : [],
+
+        ...initialTableState,
+
         globalFilter: {
           search: settings.search,
           ...initialTableState.globalFilter,
         },
-
-        ...initialTableState,
       },
       defaultColumn: {
         enableColumnFilter: false,
@@ -179,6 +183,7 @@ export function Datatable<D extends DefaultType>({
         description={description}
         renderTableActions={() => renderTableActions(selectedItems)}
         renderTableSettings={() => renderTableSettings(tableInstance)}
+        data-cy={`${dataCy}-header`}
       />
 
       <DatatableContent<D>
@@ -268,6 +273,21 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
 
   const filterValueLower = filterValue.search.toLowerCase();
 
+  if (typeof value === 'object') {
+    return Object.values(value).some((item) =>
+      filterPrimitive(item, filterValueLower)
+    );
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => filterPrimitive(item, filterValueLower));
+  }
+
+  return filterPrimitive(value, filterValueLower);
+}
+
+// only filter primitive values within objects and arrays, to avoid searching nested objects
+function filterPrimitive(value: unknown, filterValueLower: string) {
   if (
     typeof value === 'string' ||
     typeof value === 'number' ||
@@ -275,13 +295,6 @@ export function defaultGlobalFilterFn<D, TFilter extends { search: string }>(
   ) {
     return value.toString().toLowerCase().includes(filterValueLower);
   }
-
-  if (Array.isArray(value)) {
-    return value.some((item) =>
-      item.toString().toLowerCase().includes(filterValueLower)
-    );
-  }
-
   return false;
 }
 

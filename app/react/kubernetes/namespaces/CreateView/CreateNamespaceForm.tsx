@@ -10,18 +10,17 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { Widget, WidgetBody } from '@@/Widget';
 
 import { useIngressControllerClassMapQuery } from '../../cluster/ingressClass/useIngressControllerClassMap';
-import { NamespaceInnerForm } from '../components/NamespaceInnerForm';
+import { NamespaceInnerForm } from '../components/NamespaceForm/NamespaceInnerForm';
 import { useNamespacesQuery } from '../queries/useNamespacesQuery';
-
+import { useClusterResourceLimitsQuery } from '../queries/useResourceLimitsQuery';
+import { useCreateNamespaceMutation } from '../queries/useCreateNamespaceMutation';
+import { getNamespaceValidationSchema } from '../components/NamespaceForm/NamespaceForm.validation';
+import { transformFormValuesToNamespacePayload } from '../components/NamespaceForm/utils';
 import {
-  CreateNamespaceFormValues,
-  CreateNamespacePayload,
+  NamespaceFormValues,
+  NamespacePayload,
   UpdateRegistryPayload,
-} from './types';
-import { useClusterResourceLimitsQuery } from './queries/useResourceLimitsQuery';
-import { getNamespaceValidationSchema } from './CreateNamespaceForm.validation';
-import { transformFormValuesToNamespacePayload } from './utils';
-import { useCreateNamespaceMutation } from './queries/useCreateNamespaceMutation';
+} from '../types';
 
 export function CreateNamespaceForm() {
   const router = useRouter();
@@ -49,8 +48,8 @@ export function CreateNamespaceForm() {
   }
 
   const memoryLimit = resourceLimitsQuery.data?.Memory ?? 0;
-
-  const initialValues: CreateNamespaceFormValues = {
+  const cpuLimit = resourceLimitsQuery.data?.CPU ?? 0;
+  const initialValues: NamespaceFormValues = {
     name: '',
     ingressClasses: ingressClasses ?? [],
     resourceQuota: {
@@ -71,6 +70,7 @@ export function CreateNamespaceForm() {
           validateOnMount
           validationSchema={getNamespaceValidationSchema(
             memoryLimit,
+            cpuLimit,
             namespaceNames
           )}
         >
@@ -80,8 +80,8 @@ export function CreateNamespaceForm() {
     </Widget>
   );
 
-  function handleSubmit(values: CreateNamespaceFormValues, userName: string) {
-    const createNamespacePayload: CreateNamespacePayload =
+  function handleSubmit(values: NamespaceFormValues, userName: string) {
+    const createNamespacePayload: NamespacePayload =
       transformFormValuesToNamespacePayload(values, userName);
     const updateRegistriesPayload: UpdateRegistryPayload[] =
       values.registries.flatMap((registryFormValues) => {
@@ -93,7 +93,7 @@ export function CreateNamespaceForm() {
           return [];
         }
         const envNamespacesWithAccess =
-          selectedRegistry.RegistryAccesses[`${environmentId}`]?.Namespaces ||
+          selectedRegistry.RegistryAccesses?.[`${environmentId}`]?.Namespaces ||
           [];
         return {
           Id: selectedRegistry.Id,

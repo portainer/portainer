@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/unique"
+	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
@@ -193,7 +193,7 @@ func (handler *Handler) filterEndpointsByQuery(
 			return nil, 0, errors.WithMessage(err, "Unable to retrieve tags from the database")
 		}
 
-		tagsMap := make(map[portainer.TagID]string)
+		tagsMap := make(map[portainer.TagID]string, len(tags))
 		for _, tag := range tags {
 			tagsMap[tag.ID] = tag.Name
 		}
@@ -254,6 +254,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		if err != nil {
 			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
 		}
+
 		if edgeGroup.Dynamic {
 			endpointIDs, err := edgegroups.GetEndpointsByTags(datastore, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
@@ -261,6 +262,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 			}
 			edgeGroup.Endpoints = endpointIDs
 		}
+
 		envIds = append(envIds, edgeGroup.Endpoints...)
 	}
 
@@ -275,7 +277,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 		envIds = envIds[:n]
 	}
 
-	uniqueIds := unique.Unique(envIds)
+	uniqueIds := slicesx.Unique(envIds)
 	filteredEndpoints := filteredEndpointsByIds(endpoints, uniqueIds)
 
 	return filteredEndpoints, nil
@@ -302,8 +304,7 @@ func filterEndpointsBySearchCriteria(
 ) []portainer.Endpoint {
 	n := 0
 	for _, endpoint := range endpoints {
-		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
-		if endpointMatchSearchCriteria(&endpoint, endpointTags, searchCriteria) {
+		if endpointMatchSearchCriteria(&endpoint, tagsMap, searchCriteria) {
 			endpoints[n] = endpoint
 			n++
 
@@ -317,7 +318,7 @@ func filterEndpointsBySearchCriteria(
 			continue
 		}
 
-		if edgeGroupMatchSearchCriteria(&endpoint, edgeGroups, searchCriteria, endpoints, endpointGroups) {
+		if edgeGroupMatchSearchCriteria(&endpoint, edgeGroups, searchCriteria, endpointGroups) {
 			endpoints[n] = endpoint
 			n++
 
@@ -334,9 +335,14 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portai
 		status := endpoint.Status
 		if endpointutils.IsEdgeEndpoint(&endpoint) {
 			isCheckValid := false
+
 			edgeCheckinInterval := endpoint.EdgeCheckinInterval
-			if endpoint.EdgeCheckinInterval == 0 {
+			if edgeCheckinInterval == 0 {
 				edgeCheckinInterval = settings.EdgeAgentCheckinInterval
+			}
+
+			if endpoint.Edge.AsyncMode {
+				edgeCheckinInterval = getShortestAsyncInterval(&endpoint, settings)
 			}
 
 			if edgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
@@ -358,7 +364,7 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []portai
 	return endpoints[:n]
 }
 
-func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, searchCriteria string) bool {
+func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tagsMap map[portainer.TagID]string, searchCriteria string) bool {
 	if strings.Contains(strings.ToLower(endpoint.Name), searchCriteria) {
 		return true
 	}
@@ -373,8 +379,8 @@ func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, se
 		return true
 	}
 
-	for _, tag := range tags {
-		if strings.Contains(strings.ToLower(tag), searchCriteria) {
+	for _, tagID := range endpoint.TagIDs {
+		if strings.Contains(strings.ToLower(tagsMap[tagID]), searchCriteria) {
 			return true
 		}
 	}
@@ -384,16 +390,17 @@ func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, se
 
 func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGroups []portainer.EndpointGroup, tagsMap map[portainer.TagID]string, searchCriteria string) bool {
 	for _, group := range endpointGroups {
-		if group.ID == endpoint.GroupID {
-			if strings.Contains(strings.ToLower(group.Name), searchCriteria) {
-				return true
-			}
+		if group.ID != endpoint.GroupID {
+			continue
+		}
 
-			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
-			for _, tag := range tags {
-				if strings.Contains(strings.ToLower(tag), searchCriteria) {
-					return true
-				}
+		if strings.Contains(strings.ToLower(group.Name), searchCriteria) {
+			return true
+		}
+
+		for _, tagID := range group.TagIDs {
+			if strings.Contains(strings.ToLower(tagsMap[tagID]), searchCriteria) {
+				return true
 			}
 		}
 	}
@@ -406,11 +413,10 @@ func edgeGroupMatchSearchCriteria(
 	endpoint *portainer.Endpoint,
 	edgeGroups []portainer.EdgeGroup,
 	searchCriteria string,
-	endpoints []portainer.Endpoint,
 	endpointGroups []portainer.EndpointGroup,
 ) bool {
 	for _, edgeGroup := range edgeGroups {
-		relatedEndpointIDs := edge.EdgeGroupRelatedEndpoints(&edgeGroup, endpoints, endpointGroups)
+		relatedEndpointIDs := edge.EdgeGroupRelatedEndpoints(&edgeGroup, []portainer.Endpoint{*endpoint}, endpointGroups)
 
 		for _, endpointID := range relatedEndpointIDs {
 			if endpointID == endpoint.ID {
@@ -427,7 +433,7 @@ func edgeGroupMatchSearchCriteria(
 func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []portainer.EndpointType) []portainer.Endpoint {
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointType := range endpointTypes {
-		typeSet[portainer.EndpointType(endpointType)] = true
+		typeSet[endpointType] = true
 	}
 
 	n := 0
@@ -439,16 +445,6 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []port
 	}
 
 	return endpoints[:n]
-}
-
-func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.TagID) []string {
-	tags := make([]string, 0, len(tagIDs))
-
-	for _, tagID := range tagIDs {
-		tags = append(tags, tagsMap[tagID])
-	}
-
-	return tags
 }
 
 func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup, partialMatch bool) []portainer.Endpoint {
@@ -561,7 +557,7 @@ func filter(endpoints []portainer.Endpoint, predicate func(endpoint portainer.En
 }
 
 func getArrayQueryParameter(r *http.Request, parameter string) []string {
-	list, exists := r.Form[fmt.Sprintf("%s[]", parameter)]
+	list, exists := r.Form[parameter+"[]"]
 	if !exists {
 		list = []string{}
 	}
@@ -580,7 +576,6 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 		number, err := strconv.Atoi(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Unable to parse parameter %s", parameter)
-
 		}
 
 		result = append(result, T(number))
@@ -622,9 +617,36 @@ func getEdgeStackStatusParam(r *http.Request) (*portainer.EdgeStackStatusType, e
 		portainer.EdgeStackStatusRunning,
 		portainer.EdgeStackStatusDeploying,
 		portainer.EdgeStackStatusRemoving,
+		portainer.EdgeStackStatusCompleted,
 	}, edgeStackStatus) {
 		return nil, errors.New("invalid edgeStackStatus parameter")
 	}
 
 	return &edgeStackStatus, nil
+}
+
+func getShortestAsyncInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
+	var edgeIntervalUseDefault int = -1
+	pingInterval := endpoint.Edge.PingInterval
+	if pingInterval == edgeIntervalUseDefault {
+		pingInterval = settings.Edge.PingInterval
+	}
+	shortestAsyncInterval := pingInterval
+
+	snapshotInterval := endpoint.Edge.SnapshotInterval
+	if snapshotInterval == edgeIntervalUseDefault {
+		snapshotInterval = settings.Edge.SnapshotInterval
+	}
+	if shortestAsyncInterval > snapshotInterval {
+		shortestAsyncInterval = snapshotInterval
+	}
+
+	commandInterval := endpoint.Edge.CommandInterval
+	if commandInterval == edgeIntervalUseDefault {
+		commandInterval = settings.Edge.CommandInterval
+	}
+	if shortestAsyncInterval > commandInterval {
+		shortestAsyncInterval = commandInterval
+	}
+	return shortestAsyncInterval
 }

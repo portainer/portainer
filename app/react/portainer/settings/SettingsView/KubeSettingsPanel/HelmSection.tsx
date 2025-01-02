@@ -28,6 +28,7 @@ export function HelmSection() {
         <Field
           as={Input}
           id="helm-repo-url"
+          data-cy="helm-repo-url-input"
           name={name}
           placeholder="https://charts.bitnami.com/bitnami"
         />

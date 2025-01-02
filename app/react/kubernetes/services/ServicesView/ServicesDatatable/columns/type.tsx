@@ -2,7 +2,7 @@ import { Row } from '@tanstack/react-table';
 
 import { filterHOC } from '@@/datatables/Filter';
 
-import { Service } from '../../../types';
+import { ServiceRowData } from '../types';
 
 import { columnHelper } from './helper';
 
@@ -13,6 +13,9 @@ export const type = columnHelper.accessor('Type', {
     filter: filterHOC('Filter by type'),
   },
   enableColumnFilter: true,
-  filterFn: (row: Row<Service>, columnId: string, filterValue: string[]) =>
-    filterValue.length === 0 || filterValue.includes(row.original.Type),
+  filterFn: (
+    row: Row<ServiceRowData>,
+    columnId: string,
+    filterValue: string[]
+  ) => filterValue.length === 0 || filterValue.includes(row.original.Type),
 });

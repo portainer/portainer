@@ -11,6 +11,7 @@
             <div class="col-sm-11">
               <input
                 type="text"
+                data-cy="stack-name-input"
                 class="form-control"
                 ng-model="formValues.Name"
                 id="stack_name"
@@ -106,14 +107,16 @@
                 on-change="(onChangeTemplateVariables)"
               ></custom-templates-variables-field>
 
-              <span ng-if="state.Method === 'template' && state.selectedTemplateId && state.templateLoadFailed">
-                <p class="small vertical-center text-danger mb-5" ng-if="currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId">
-                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
-                  <a ui-sref="docker.templates.custom.edit({id: state.selectedTemplateId})">click here</a> for configuration.</p
-                >
-                <p class="small vertical-center text-danger mb-5" ng-if="!(currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId)">
-                  <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
-                >
+              <span ng-if="state.Method === 'template' && state.selectedTemplateId && state.templateLoadFailed" class="row">
+                <span class="col-sm-offset-3 col-lg-offset-2 col-sm-8">
+                  <p class="small vertical-center text-danger mb-5" ng-if="currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please
+                    <a ui-sref="docker.templates.custom.edit({id: state.selectedTemplateId})">click here</a> for configuration.</p
+                  >
+                  <p class="small vertical-center text-danger mb-5" ng-if="!(currentUser.isAdmin || currentUser.id === state.selectedTemplate.CreatedByUserId)">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'md'" feather="true"></pr-icon>Custom template could not be loaded, please contact your administrator.</p
+                  >
+                </span>
               </span>
             </div>
           </div>
@@ -152,12 +155,7 @@
           </div>
 
           <!-- environment-variables -->
-          <environment-variables-panel
-            values="formValues.Env"
-            explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’'"
-            on-change="(handleEnvVarChange)"
-          >
-          </environment-variables-panel>
+          <stack-environment-variables-panel values="formValues.Env" on-change="(handleEnvVarChange)" show-alert="true"> </stack-environment-variables-panel>
           <!-- !environment-variables -->
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- actions -->
@@ -166,7 +164,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="state.actionInProgress
               || !createStackForm.$valid
               || ((state.Method === 'editor' || state.Method === 'template') && (!formValues.StackFileContent || state.editorYamlValidationError))

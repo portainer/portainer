@@ -8,13 +8,14 @@ import { Authorized } from '@/react/hooks/useUser';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
+import { UnusedBadge } from '@@/Badge/UnusedBadge';
 
 import { DecoratedVolume } from '../../types';
 import { getTableMeta } from '../tableMeta';
 
 import { columnHelper } from './helper';
 
-export const name = columnHelper.accessor('Id', {
+export const name = columnHelper.accessor('Name', {
   id: 'name',
   header: 'Name',
   cell: Cell,
@@ -76,14 +77,14 @@ function Cell({
   const name = getValue();
 
   return (
-    <>
+    <div className="flex gap-2">
       <Link
         to=".volume"
         params={{
-          id: item.Id,
+          id: item.Name,
           nodeName: item.NodeName,
         }}
-        className="monospaced"
+        data-cy={`volume-link-${name}`}
       >
         {truncate(name, 40)}
       </Link>
@@ -98,20 +99,17 @@ function Cell({
             props={{
               to: 'docker.volumes.volume.browse',
               params: {
-                id: item.Id,
+                id: item.Name,
                 nodeName: item.NodeName,
               },
             }}
+            data-cy={`volume-browse-button-${name}`}
           >
-            browse
+            Browse
           </Button>
         </Authorized>
       )}
-      {item.dangling && (
-        <span className="label label-warning image-tag ml-2" role="status">
-          Unused
-        </span>
-      )}
-    </>
+      {item.dangling && <UnusedBadge />}
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Icon as IconTest } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { MouseEventHandler, PropsWithChildren } from 'react';
 
@@ -13,7 +13,7 @@ import { SidebarTooltip } from './SidebarTooltip';
 import { useSidebarSrefActive } from './useSidebarSrefActive';
 
 interface Props extends AutomationTestingProps {
-  icon?: IconTest;
+  icon?: LucideIcon;
   to: string;
   params?: object;
   label: string;
@@ -59,7 +59,7 @@ export function SidebarItem({
   return (
     <SidebarTooltip
       content={
-        <div className="bg-blue-8 be:bg-gray-8 th-dark:bg-gray-true-8 th-highcontrast:bg-black th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white rounded">
+        <div className="rounded bg-blue-8 be:bg-gray-8 th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white th-highcontrast:bg-black th-dark:bg-gray-true-8">
           <Wrapper label={label}>
             <ItemAnchor
               href={anchorProps.href}
@@ -86,7 +86,7 @@ type ItemAnchorProps = {
   className: string;
   isOpen: boolean;
   isSubMenu: boolean;
-  dataCy?: string;
+  dataCy: string;
 };
 
 function ItemAnchor({

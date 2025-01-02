@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -23,6 +24,7 @@ func Test_createEnvFile(t *testing.T) {
 			name: "should not add env file option if stack doesn't have env variables",
 			stack: &portainer.Stack{
 				ProjectPath: dir,
+				Env:         nil,
 			},
 			expected: "",
 		},
@@ -52,7 +54,7 @@ func Test_createEnvFile(t *testing.T) {
 			result, _ := createEnvFile(tt.stack)
 
 			if tt.expected != "" {
-				assert.Equal(t, "stack.env", result)
+				assert.Equal(t, filepath.Join(tt.stack.ProjectPath, "stack.env"), result)
 
 				f, _ := os.Open(path.Join(dir, "stack.env"))
 				content, _ := io.ReadAll(f)
@@ -76,7 +78,7 @@ func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 		},
 	}
 	result, err := createEnvFile(stack)
-	assert.Equal(t, "stack.env", result)
+	assert.Equal(t, filepath.Join(stack.ProjectPath, "stack.env"), result)
 	assert.NoError(t, err)
 	assert.FileExists(t, path.Join(dir, "stack.env"))
 	f, _ := os.Open(path.Join(dir, "stack.env"))

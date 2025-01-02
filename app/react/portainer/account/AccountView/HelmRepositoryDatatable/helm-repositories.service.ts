@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { success as notifySuccess } from '@/portainer/services/notifications';
@@ -82,7 +82,7 @@ export function useDeleteHelmRepositoriesMutation() {
 }
 
 export function useHelmRepositories(userId: number) {
-  return useQuery('helmrepositories', () => getHelmRepositories(userId), {
+  return useQuery(['helmrepositories'], () => getHelmRepositories(userId), {
     staleTime: 20,
     ...withError('Unable to retrieve Helm repositories'),
   });

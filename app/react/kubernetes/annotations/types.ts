@@ -1,9 +1,9 @@
 import { FormikErrors } from 'formik';
 
 export interface Annotation {
-  Key: string;
-  Value: string;
-  ID: string;
+  key: string;
+  value: string;
+  id: string;
 }
 
 export type AnnotationsPayload = Record<string, string>;

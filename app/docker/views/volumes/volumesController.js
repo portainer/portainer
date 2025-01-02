@@ -1,4 +1,4 @@
-import { confirmDelete } from '@@/modals/confirm';
+import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 angular.module('portainer.docker').controller('VolumesController', [
   '$q',
@@ -8,34 +8,24 @@ angular.module('portainer.docker').controller('VolumesController', [
   'ServiceService',
   'VolumeHelper',
   'Notifications',
-  'HttpRequestHelper',
   'Authentication',
   'endpoint',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, Authentication, endpoint) {
-    $scope.removeAction = function (selectedItems) {
-      confirmDelete('Do you want to remove the selected volume(s)?').then((confirmed) => {
-        if (confirmed) {
-          var actionCount = selectedItems.length;
-          angular.forEach(selectedItems, function (volume) {
-            HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
-            VolumeService.remove(volume)
-              .then(function success() {
-                Notifications.success('Volume successfully removed', volume.Id);
-                var index = $scope.volumes.indexOf(volume);
-                $scope.volumes.splice(index, 1);
-              })
-              .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to remove volume');
-              })
-              .finally(function final() {
-                --actionCount;
-                if (actionCount === 0) {
-                  $state.reload();
-                }
-              });
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, Authentication, endpoint) {
+    $scope.removeAction = async function (selectedItems) {
+      async function doRemove(volume) {
+        return VolumeService.remove(volume.Name, volume.NodeName)
+          .then(function success() {
+            Notifications.success('Volume successfully removed', volume.Name);
+            var index = $scope.volumes.indexOf(volume);
+            $scope.volumes.splice(index, 1);
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove volume');
           });
-        }
-      });
+      }
+
+      await processItemsInBatches(selectedItems, doRemove);
+      $state.reload();
     };
 
     $scope.getVolumes = getVolumes;
@@ -44,8 +34,8 @@ angular.module('portainer.docker').controller('VolumesController', [
       var endpointRole = $scope.applicationState.endpoint.mode.role;
 
       $q.all({
-        attached: VolumeService.volumes({ filters: { dangling: ['false'] } }),
-        dangling: VolumeService.volumes({ filters: { dangling: ['true'] } }),
+        attached: VolumeService.volumes({ dangling: ['false'] }),
+        dangling: VolumeService.volumes({ dangling: ['true'] }),
         services: endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? ServiceService.services() : [],
       })
         .then(function success(data) {

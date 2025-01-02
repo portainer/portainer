@@ -24,8 +24,7 @@ func setup(t *testing.T) string {
 		t.Fatal(errors.Wrap(err, "failed to open an archive"))
 	}
 
-	err = archive.ExtractTarGz(file, dir)
-	if err != nil {
+	if err := archive.ExtractTarGz(file, dir); err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to extract file from the archive to a folder %s", dir))
 	}
 
@@ -89,6 +88,29 @@ func Test_latestCommitID(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "68dcaa7bd452494043c64252ab90db0f98ecf8d2", id)
+}
+
+func Test_ListRefs(t *testing.T) {
+	service := Service{git: NewGitClient(true)}
+
+	repositoryURL := setup(t)
+
+	fs, err := service.ListRefs(repositoryURL, "", "", false, false)
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"refs/heads/main"}, fs)
+}
+
+func Test_ListFiles(t *testing.T) {
+	service := Service{git: NewGitClient(true)}
+
+	repositoryURL := setup(t)
+	referenceName := "refs/heads/main"
+
+	fs, err := service.ListFiles(repositoryURL, referenceName, "", "", false, false, []string{".yml"}, false)
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"docker-compose.yml"}, fs)
 }
 
 func getCommitHistoryLength(t *testing.T, err error, dir string) int {

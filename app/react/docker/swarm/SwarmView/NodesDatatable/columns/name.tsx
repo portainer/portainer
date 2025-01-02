@@ -31,7 +31,11 @@ function Cell({
   }
 
   return (
-    <Link to="docker.nodes.node" params={{ id: item.Id }}>
+    <Link
+      to="docker.nodes.node"
+      params={{ id: item.Id }}
+      data-cy={`node-link-${item.Id}`}
+    >
       {value}
     </Link>
   );

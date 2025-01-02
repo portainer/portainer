@@ -24,6 +24,7 @@ export function KubeNoteMinimumCharacters() {
         <div className="col-sm-12">
           <SwitchField
             label="Require a note on applications"
+            data-cy="kube-settings-require-note-on-applications-switch"
             checked={isEnabled}
             name="toggle_requireNoteOnApplications"
             onChange={(value) => setIsEnabled(value)}
@@ -46,6 +47,7 @@ export function KubeNoteMinimumCharacters() {
         >
           <Input
             name="minNoteLength"
+            data-cy="min-note-length-input"
             type="number"
             placeholder="50"
             min="1"

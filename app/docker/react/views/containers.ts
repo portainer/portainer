@@ -8,6 +8,7 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { LogView } from '@/react/docker/containers/LogView';
 import { CreateView } from '@/react/docker/containers/CreateView';
+import { InspectView } from '@/react/docker/containers/InspectView/InspectView';
 
 export const containersModule = angular
   .module('portainer.docker.react.views.containers', [])
@@ -26,7 +27,10 @@ export const containersModule = angular
     'containerLogView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(LogView))), [])
   )
-
+  .component(
+    'dockerContainerInspectView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(InspectView))), [])
+  )
   .config(config).name;
 
 /* @ngInject */
@@ -95,8 +99,7 @@ function config($stateRegistryProvider: StateRegistry) {
     url: '/inspect',
     views: {
       'content@': {
-        templateUrl: '~@/docker/views/containers/inspect/containerinspect.html',
-        controller: 'ContainerInspectController',
+        component: 'dockerContainerInspectView',
       },
     },
   });

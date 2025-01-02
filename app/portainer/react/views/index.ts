@@ -16,12 +16,22 @@ import { CreateHelmRepositoriesView } from '@/react/portainer/account/helm-repos
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
 import { updateSchedulesModule } from './update-schedules';
+import { environmentGroupModule } from './env-groups';
+import { registriesModule } from './registries';
+import { activityLogsModule } from './activity-logs';
+import { templatesModule } from './templates';
+import { usersModule } from './users';
 
 export const viewsModule = angular
   .module('portainer.app.react.views', [
     wizardModule,
     teamsModule,
     updateSchedulesModule,
+    environmentGroupModule,
+    registriesModule,
+    activityLogsModule,
+    templatesModule,
+    usersModule,
   ])
   .component(
     'homeView',

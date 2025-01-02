@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
-import type { Icon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
@@ -16,7 +16,7 @@ interface Props<T extends Value> {
   tooltip?: string;
   className?: string;
   type?: 'radio' | 'checkbox';
-  checkIcon: Icon;
+  checkIcon: LucideIcon;
 }
 
 export function BoxOption<T extends Value>({

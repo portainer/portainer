@@ -4,7 +4,6 @@ import { r2a } from '@/react-tools/react2angular';
 import { IngressClassDatatableAngular } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable/IngressClassDatatableAngular';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
-import { RegistriesSelector } from '@/react/kubernetes/namespaces/components/RegistriesFormSection/RegistriesSelector';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { withReactQuery } from '@/react-tools/withReactQuery';
@@ -23,7 +22,6 @@ import { ApplicationSummarySection } from '@/react/kubernetes/applications/compo
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
-import { ApplicationsStacksDatatable } from '@/react/kubernetes/applications/ListView/ApplicationsStacksDatatable';
 import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
 import { StackNameLabelInsight } from '@/react/kubernetes/DeployView/StackName/StackNameLabelInsight';
@@ -59,12 +57,18 @@ import { deploymentTypeValidation } from '@/react/kubernetes/applications/compon
 import { AppDeploymentTypeFormSection } from '@/react/kubernetes/applications/components/AppDeploymentTypeFormSection/AppDeploymentTypeFormSection';
 import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/EnvironmentVariablesFormSection';
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
-import { HelmInsightsBox } from '@/react/kubernetes/applications/ListView/ApplicationsDatatable/HelmInsightsBox';
+import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 
-import { applicationsModule } from './applications';
+import { namespacesModule } from './namespaces';
+import { clusterManagementModule } from './clusterManagement';
+import { registriesModule } from './registries';
 
 export const ngModule = angular
-  .module('portainer.kubernetes.react.components', [applicationsModule])
+  .module('portainer.kubernetes.react.components', [
+    namespacesModule,
+    clusterManagementModule,
+    registriesModule,
+  ])
   .component(
     'ingressClassDatatable',
     r2a(IngressClassDatatableAngular, [
@@ -74,7 +78,6 @@ export const ngModule = angular
       'initialIngressControllers',
       'allowNoneIngressClass',
       'isLoading',
-      'noIngressControllerLabel',
       'view',
     ])
   )
@@ -90,7 +93,6 @@ export const ngModule = angular
       'value',
     ])
   )
-  .component('helmInsightsBox', r2a(HelmInsightsBox, []))
   .component(
     'namespaceAccessUsersSelector',
     r2a(NamespaceAccessUsersSelector, [
@@ -101,15 +103,6 @@ export const ngModule = angular
       'dataCy',
       'placeholder',
       'name',
-    ])
-  )
-  .component(
-    'createNamespaceRegistriesSelector',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(RegistriesSelector))), [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
     ])
   )
   .component(
@@ -131,6 +124,7 @@ export const ngModule = angular
       'identifier',
       'data',
       'hideMessage',
+      'data-cy',
     ])
   )
   .component(
@@ -142,7 +136,14 @@ export const ngModule = angular
         ),
         { stackName: 'setStackName' }
       ),
-      ['setStackName', 'stackName', 'stacks', 'inputClassName', 'textTip']
+      [
+        'setStackName',
+        'stackName',
+        'stacks',
+        'inputClassName',
+        'textTip',
+        'error',
+      ]
     )
   )
   .component(
@@ -195,17 +196,14 @@ export const ngModule = angular
     )
   )
   .component(
-    'kubernetesApplicationsStacksDatatable',
-    r2a(withUIRouter(withCurrentUser(ApplicationsStacksDatatable)), [
+    'kubernetesIntegratedApplicationsDatatable',
+    r2a(withUIRouter(withCurrentUser(IntegratedAppsDatatable)), [
       'dataset',
-      'onRefresh',
-      'onRemove',
-      'namespace',
-      'namespaces',
-      'onNamespaceChange',
       'isLoading',
-      'showSystem',
-      'setSystemResources',
+      'onRefresh',
+      'tableKey',
+      'tableTitle',
+      'dataCy',
     ])
   );
 

@@ -12,12 +12,12 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 
-import { useRedeployApplicationMutation } from '../../application.queries';
 import { Application } from '../../types';
 import {
   applicationIsKind,
   matchLabelsToLabelSelectorValue,
 } from '../../utils';
+import { useRedeployApplicationMutation } from '../../queries/useRedeployApplicationMutation';
 
 type Props = {
   environmentId: EnvironmentId;

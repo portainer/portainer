@@ -50,6 +50,7 @@ export function ClusterIpServiceForm({
           <div className="text-muted vertical-center">ClusterIP</div>
           <Button
             icon={Trash2}
+            data-cy={`remove-service_${serviceIndex}`}
             color="dangerlight"
             className="!ml-0"
             onClick={() => {
@@ -174,6 +175,7 @@ export function ClusterIpServiceForm({
           <div className="flex">
             <Button
               icon={Plus}
+              data-cy={`add-port_${serviceIndex}`}
               color="default"
               className="!ml-0"
               onClick={() => {

@@ -7,18 +7,13 @@ import clsx from 'clsx';
 import { ComponentProps } from 'react';
 import Tippy from '@tippyjs/react';
 
-import { AutomationTestingProps } from '@/types';
-
 import 'tippy.js/dist/tippy.css';
 import { Link } from '@@/Link';
 import { IconProps, Icon } from '@@/Icon';
 
 import { useSidebarState } from '../useSidebarState';
 
-interface Props
-  extends IconProps,
-    ComponentProps<typeof Link>,
-    AutomationTestingProps {
+interface Props extends IconProps, ComponentProps<typeof Link> {
   label: string;
   ignorePaths?: string[];
 }

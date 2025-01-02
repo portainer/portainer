@@ -1,31 +1,23 @@
-angular.module('portainer.docker').factory('ExecService', [
-  '$q',
-  '$timeout',
-  'Exec',
-  function ExecServiceFactory($q, $timeout, Exec) {
-    'use strict';
-    var service = {};
+import { resizeTTY } from '@/react/docker/proxy/queries/useExecResizeTTYMutation';
 
-    service.resizeTTY = function (execId, width, height, timeout) {
-      var deferred = $q.defer();
+angular.module('portainer.docker').factory('ExecService', ExecServiceFactory);
 
-      $timeout(function () {
-        Exec.resize({}, { id: execId, height: height, width: width })
-          .$promise.then(function success(data) {
-            if (data.message) {
-              deferred.reject({ msg: 'Unable to resize tty of exec', err: data.message });
-            } else {
-              deferred.resolve(data);
-            }
-          })
-          .catch(function error(err) {
-            deferred.reject({ msg: 'Unable to resize tty of exec', err: err });
-          });
-      }, timeout);
+/* @ngInject */
+function ExecServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      return deferred.promise;
-    };
+  return {
+    resizeTTY: useAxios(injectEnvironmentId(resizeTTYAngularJS)),
+  };
 
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {string} execId
+   * @param {number} width
+   * @param {number} height
+   * @param timeout DEPRECATED: Previously used in pure AJS implementation
+   */
+  async function resizeTTYAngularJS(environmentId, execId, width, height) {
+    return resizeTTY(environmentId, execId, { width, height });
+  }
+}

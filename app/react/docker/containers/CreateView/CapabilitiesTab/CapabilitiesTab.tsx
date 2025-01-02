@@ -19,6 +19,7 @@ export function CapabilitiesTab({
           <div key={cap.key} className="w-1/3 text-center">
             <SwitchField
               labelClass="col-sm-6"
+              data-cy="docker-container-capability-switch"
               tooltip={cap.description}
               checked={values.includes(cap.key)}
               label={cap.key}

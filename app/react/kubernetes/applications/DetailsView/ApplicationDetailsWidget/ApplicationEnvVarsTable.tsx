@@ -98,6 +98,7 @@ export function ApplicationEnvVarsTable({ namespace, app }: Props) {
                           namespace,
                         }}
                         className="flex items-center"
+                        data-cy={`configmap-link-${envVar.resourseName}`}
                       >
                         <Icon
                           icon={envVar.type === 'configMap' ? FileCode : Lock}

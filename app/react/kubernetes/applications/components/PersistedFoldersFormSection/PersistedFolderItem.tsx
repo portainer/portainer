@@ -44,7 +44,7 @@ export function PersistedFolderItem({
   const formikError = isErrorType(error) ? error : undefined;
 
   return (
-    <div className="flex items-start flex-wrap gap-x-2 gap-y-2">
+    <div className="flex flex-wrap items-start gap-x-2 gap-y-2">
       <div>
         <InputGroup
           size="small"
@@ -99,7 +99,7 @@ export function PersistedFolderItem({
             <InputGroup
               size="small"
               className={clsx(
-                'min-w-fit flex',
+                'flex min-w-fit',
                 item.needsDeletion && 'striked'
               )}
             >
@@ -107,7 +107,7 @@ export function PersistedFolderItem({
                 Requested size
               </InputGroup.Addon>
               <Input
-                className="!rounded-none -mr-[1px] !w-20"
+                className="-mr-[1px] !w-20 !rounded-none"
                 type="number"
                 placeholder="e.g. 20"
                 min="0"

@@ -2,8 +2,9 @@ import { FormikErrors } from 'formik';
 import { array, object, SchemaOf, string } from 'yup';
 import _ from 'lodash';
 
-import { useLoggingPlugins } from '@/react/docker/proxy/queries/useServicePlugins';
+import { useLoggingPlugins } from '@/react/docker/proxy/queries/usePlugins';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useIsPodman } from '@/react/portainer/environments/queries/useIsPodman';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
@@ -30,8 +31,9 @@ export function LoggerConfig({
   errors?: FormikErrors<LogConfig>;
 }) {
   const envId = useEnvironmentId();
-
-  const pluginsQuery = useLoggingPlugins(envId, apiVersion < 1.25);
+  const isPodman = useIsPodman(envId);
+  const isSystem = apiVersion < 1.25;
+  const pluginsQuery = useLoggingPlugins(envId, isSystem, isPodman);
 
   if (!pluginsQuery.data) {
     return null;
@@ -52,6 +54,7 @@ export function LoggerConfig({
           value={value.type}
           onChange={(type) => onChange({ ...value, type: type || '' })}
           options={pluginOptions}
+          data-cy="docker-logging-driver-selector"
         />
       </FormControl>
 
@@ -82,6 +85,7 @@ export function LoggerConfig({
         itemBuilder={() => ({ option: '', value: '' })}
         disabled={isDisabled}
         errors={errors?.options}
+        data-cy="docker-logging-options"
       />
     </FormSection>
   );
@@ -95,6 +99,7 @@ function Item({
   item: { option, value },
   onChange,
   error,
+  index,
 }: ItemProps<{ option: string; value: string }>) {
   return (
     <div>
@@ -105,6 +110,7 @@ function Item({
             value={option}
             onChange={(e) => handleChange({ option: e.target.value })}
             placeholder="e.g. FOO"
+            data-cy={`docker-logging-option_${index}`}
           />
         </InputGroup>
         <InputGroup className="w-1/2">
@@ -113,6 +119,7 @@ function Item({
             value={value}
             onChange={(e) => handleChange({ value: e.target.value })}
             placeholder="e.g bar"
+            data-cy={`docker-logging-value_${index}`}
           />
         </InputGroup>
       </div>

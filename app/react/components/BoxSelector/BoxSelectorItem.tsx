@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Icon as ReactFeatherComponentType, Check } from 'lucide-react';
+import { type LucideIcon, Check } from 'lucide-react';
 import { Fragment } from 'react';
 
 import { Icon } from '@/react/components/Icon';
@@ -22,7 +22,7 @@ type Props<T extends Value> = {
   isSelected(value: T): boolean;
   type?: 'radio' | 'checkbox';
   slim?: boolean;
-  checkIcon?: ReactFeatherComponentType;
+  checkIcon?: LucideIcon;
 };
 
 export function BoxSelectorItem<T extends Value>({

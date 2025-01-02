@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { Service } from '../../../types';
+import { ServiceRowData } from '../types';
 
 import { ExternalIPLink } from './ExternalIPLink';
 import { columnHelper } from './helper';
@@ -46,7 +46,7 @@ export const externalIP = columnHelper.accessor(
   }
 );
 
-function Cell({ row }: CellContext<Service, string>) {
+function Cell({ row }: CellContext<ServiceRowData, string>) {
   if (row.original.Type === 'ExternalName') {
     if (row.original.ExternalName) {
       const linkTo = `http://${row.original.ExternalName}`;
@@ -106,7 +106,7 @@ function Cell({ row }: CellContext<Service, string>) {
 
 // calculate the scheme based on the ports of the service
 // favour https over http.
-function getSchemeAndPort(svc: Service): [string, number] {
+function getSchemeAndPort(svc: ServiceRowData): [string, number] {
   let scheme = '';
   let servicePort = 0;
 

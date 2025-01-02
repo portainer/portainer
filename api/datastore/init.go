@@ -57,7 +57,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			HelmRepositoryURL:        portainer.DefaultHelmRepositoryURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
 			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
-			KubectlShellImage:        portainer.DefaultKubectlShellImage,
+			KubectlShellImage:        *store.flags.KubectlShellImage,
 
 			IsDockerDesktopExtension: isDDExtention,
 		}

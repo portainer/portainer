@@ -1,8 +1,7 @@
 import { useStore } from 'zustand';
-import _ from 'lodash';
 
-import { environmentStore } from '@/react/hooks/current-environment-store';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { PageHeader } from '@@/PageHeader';
 import { confirmDelete } from '@@/modals/confirm';
@@ -28,7 +27,7 @@ export function ListView() {
     </>
   );
 
-  async function handleRemove(environments: Array<Environment>) {
+  async function handleRemove(environmentsToDelete: Array<Environment>) {
     const confirmed = await confirmDelete(
       'This action will remove all configurations associated to your environment(s). Continue?'
     );
@@ -39,17 +38,21 @@ export function ListView() {
 
     const id = constCurrentEnvironmentStore.environmentId;
     // If the current endpoint was deleted, then clean endpoint store
-    if (environments.some((e) => e.Id === id)) {
+    if (environmentsToDelete.some((e) => e.Id === id)) {
       constCurrentEnvironmentStore.clear();
     }
 
     deletionMutation.mutate(
-      environments.map((e) => e.Id),
+      environmentsToDelete.map((e) => ({
+        id: e.Id,
+        deleteCluster: false,
+        name: e.Name,
+      })),
       {
         onSuccess() {
           notifySuccess(
             'Environments successfully removed',
-            _.map(environments, 'Name').join(', ')
+            environmentsToDelete.map((e) => e.Name).join(', ')
           );
         },
       }

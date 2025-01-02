@@ -11,6 +11,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -30,8 +31,7 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	var payload RecreatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -40,8 +40,7 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
-	err = handler.bouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.bouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to force update service", err)
 	}
 
@@ -58,8 +57,9 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 	go func() {
 		images.EvictImageStatus(containerID)
 		images.EvictImageStatus(newContainer.Config.Labels[consts.ComposeStackNameLabel])
-		images.EvictImageStatus(newContainer.Config.Labels[consts.SwarmServiceIdLabel])
+		images.EvictImageStatus(newContainer.Config.Labels[consts.SwarmServiceIDLabel])
 	}()
+
 	return response.JSON(w, newContainer)
 }
 
@@ -67,6 +67,7 @@ func (handler *Handler) createResourceControl(oldContainerId string, newContaine
 	resourceControls, err := handler.dataStore.ResourceControl().ReadAll()
 	if err != nil {
 		log.Error().Err(err).Msg("Exporting Resource Controls")
+
 		return
 	}
 
@@ -74,11 +75,10 @@ func (handler *Handler) createResourceControl(oldContainerId string, newContaine
 	if resourceControl == nil {
 		return
 	}
+
 	resourceControl.ResourceID = newContainerId
-	err = handler.dataStore.ResourceControl().Create(resourceControl)
-	if err != nil {
+	if err := handler.dataStore.ResourceControl().Create(resourceControl); err != nil {
 		log.Error().Err(err).Str("containerId", newContainerId).Msg("Failed to create new resource control for container")
-		return
 	}
 }
 
@@ -86,12 +86,12 @@ func (handler *Handler) updateWebhook(oldContainerId string, newContainerId stri
 	webhook, err := handler.dataStore.Webhook().WebhookByResourceID(oldContainerId)
 	if err != nil {
 		log.Error().Err(err).Str("containerId", oldContainerId).Msg("cannot find webhook by containerId")
+
 		return
 	}
 
 	webhook.ResourceID = newContainerId
-	err = handler.dataStore.Webhook().Update(webhook.ID, webhook)
-	if err != nil {
+	if err := handler.dataStore.Webhook().Update(webhook.ID, webhook); err != nil {
 		log.Error().Err(err).Int("webhookId", int(webhook.ID)).Msg("cannot update webhook")
 	}
 }

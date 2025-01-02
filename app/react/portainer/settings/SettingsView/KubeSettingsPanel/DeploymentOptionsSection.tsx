@@ -22,6 +22,7 @@ export function DeploymentOptionsSection() {
         <div className="col-sm-12">
           <SwitchField
             label="Enforce code-based deployment"
+            data-cy="kube-settings-enforce-code-based-deployment"
             checked={values.hideAddWithForm}
             name="toggle_hideAddWithForm"
             featureId={FeatureId.ENFORCE_DEPLOYMENT_OPTIONS}
@@ -36,6 +37,7 @@ export function DeploymentOptionsSection() {
           <div className="col-sm-12">
             <SwitchField
               label="Allow web editor and custom template use"
+              data-cy="kube-settings-allow-web-editor-and-custom-template-use"
               checked={!values.hideWebEditor}
               name="toggle_hideWebEditor"
               onChange={(value) =>
@@ -47,6 +49,7 @@ export function DeploymentOptionsSection() {
           <div className="col-sm-12">
             <SwitchField
               label="Allow specifying of a manifest via a URL"
+              data-cy="kube-settings-allow-specifying-of-a-manifest-via-a-url"
               checked={!values.hideFileUpload}
               name="toggle_hideFileUpload"
               onChange={(value) =>
@@ -62,6 +65,7 @@ export function DeploymentOptionsSection() {
           <div className="col-sm-12">
             <SwitchField
               label="Allow per environment override"
+              data-cy="kube-settings-allow-per-environment-override"
               checked={values.perEnvOverride}
               onChange={(value) =>
                 setFieldValue('globalDeploymentOptions.perEnvOverride', value)
@@ -80,6 +84,7 @@ export function DeploymentOptionsSection() {
         <div className="col-sm-12">
           <SwitchField
             label="Allow stacks functionality with Kubernetes environments"
+            data-cy="kube-settings-allow-stacks-functionality"
             checked={!values.hideStacksFunctionality}
             onChange={(value) =>
               setFieldValue(

@@ -147,7 +147,8 @@ export function AuthFieldset({
 
 export function gitAuthValidation(
   gitCredentials: Array<GitCredential>,
-  isAuthEdit: boolean
+  isAuthEdit: boolean,
+  isCreatedFromCustomTemplate: boolean
 ): SchemaOf<GitAuthModel> {
   return object({
     RepositoryAuthentication: boolean().default(false),
@@ -160,7 +161,8 @@ export function gitAuthValidation(
       .default(''),
     RepositoryPassword: string()
       .when(['RepositoryAuthentication', 'RepositoryGitCredentialID'], {
-        is: (auth: boolean, id: number) => auth && !id && !isAuthEdit,
+        is: (auth: boolean, id: number) =>
+          auth && !id && !isAuthEdit && !isCreatedFromCustomTemplate,
         then: string().required('Password is required'),
       })
       .default(''),

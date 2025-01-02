@@ -14,6 +14,7 @@ export function SystemResourcesSettings({
     <Authorized authorizations="K8sAccessSystemNamespaces" adminOnlyCE>
       <Checkbox
         id="show-system-resources"
+        data-cy="show-system-resources"
         label="Show system resources"
         checked={value}
         onChange={(e) => onChange(e.target.checked)}

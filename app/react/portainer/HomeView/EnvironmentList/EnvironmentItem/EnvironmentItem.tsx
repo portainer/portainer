@@ -66,7 +66,10 @@ export function EnvironmentItem({
         params={dashboardRoute.params}
       >
         <div className="ml-2 flex justify-center self-center">
-          <EnvironmentIcon type={environment.Type} />
+          <EnvironmentIcon
+            type={environment.Type}
+            containerEngine={environment.ContainerEngine}
+          />
         </div>
         <div className="ml-3 mr-auto flex flex-col items-start justify-center gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

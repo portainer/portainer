@@ -67,8 +67,8 @@ export class StackViewModel implements IResource {
     this.Id = stack.Id;
     this.Type = stack.Type;
     this.Name = stack.Name;
-    this.EndpointId = stack.EndpointID;
-    this.SwarmId = stack.SwarmID;
+    this.EndpointId = stack.EndpointId;
+    this.SwarmId = stack.SwarmId;
     this.Env = stack.Env ? stack.Env : [];
     this.Option = stack.Option;
     this.IsComposeFormat = stack.IsComposeFormat;

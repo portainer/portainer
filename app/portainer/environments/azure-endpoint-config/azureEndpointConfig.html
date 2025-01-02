@@ -4,7 +4,15 @@
   <div class="form-group">
     <label for="azure_credential_appid" class="col-sm-3 col-lg-2 control-label text-left">Application ID</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="azure_credential_appid" ng-model="$ctrl.applicationId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required />
+      <input
+        type="text"
+        class="form-control"
+        name="azure_credential_appid"
+        ng-model="$ctrl.applicationId"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        required
+        data-cy="azure-credential-appid-input"
+      />
     </div>
   </div>
   <!-- !applicationId-input -->
@@ -12,7 +20,15 @@
   <div class="form-group">
     <label for="azure_credential_tenantid" class="col-sm-3 col-lg-2 control-label text-left">Tenant ID</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="azure_credential_tenantid" ng-model="$ctrl.tenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required />
+      <input
+        type="text"
+        class="form-control"
+        name="azure_credential_tenantid"
+        ng-model="$ctrl.tenantId"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        required
+        data-cy="azure-credential-tenantid-input"
+      />
     </div>
   </div>
   <!-- !tenantId-input -->
@@ -22,6 +38,7 @@
     <div class="col-sm-9 col-lg-10">
       <input
         type="text"
+        data-cy="azure-credential-authkey-input"
         class="form-control"
         name="azure_credential_authkey"
         ng-model="$ctrl.authenticationKey"

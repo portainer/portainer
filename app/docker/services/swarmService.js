@@ -1,27 +1,12 @@
-import { SwarmViewModel } from '../models/swarm';
+import { getSwarm } from '@/react/docker/proxy/queries/useSwarm';
 
-angular.module('portainer.docker').factory('SwarmService', [
-  '$q',
-  'Swarm',
-  function SwarmServiceFactory($q, Swarm) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('SwarmService', SwarmServiceFactory);
 
-    service.swarm = function (endpointId) {
-      var deferred = $q.defer();
+/* @ngInject */
+function SwarmServiceFactory(AngularToReact) {
+  const { useAxios } = AngularToReact;
 
-      Swarm.get(endpointId ? { endpointId } : undefined)
-        .$promise.then(function success(data) {
-          var swarm = new SwarmViewModel(data);
-          deferred.resolve(swarm);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve Swarm details', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    return service;
-  },
-]);
+  return {
+    swarm: useAxios(getSwarm), // stack service
+  };
+}

@@ -1,12 +1,5 @@
 import { TeamId } from '@/react/portainer/users/teams/types';
 
-export interface FDOConfiguration {
-  enabled: boolean;
-  ownerURL: string;
-  ownerUsername: string;
-  ownerPassword: string;
-}
-
 export interface TLSConfiguration {
   TLS: boolean;
   TLSSkipVerify: boolean;
@@ -72,11 +65,11 @@ export interface OAuthSettings {
   KubeSecretKey: string;
 }
 
-enum AuthenticationMethod {
+export enum AuthenticationMethod {
   /**
    * Internal represents the internal authentication method (authentication against Portainer API)
    */
-  Internal,
+  Internal = 1,
   /**
    * LDAP represents the LDAP authentication method (authentication against a LDAP server)
    */
@@ -85,6 +78,19 @@ enum AuthenticationMethod {
    * OAuth represents the OAuth authentication method (authentication against a authorization server)
    */
   OAuth,
+  /**
+   * AD represents the Active Directory authentication method (authentication against a Microsoft Active Directory server)
+   */
+  AD,
+}
+
+/**
+ * The definition are based on oauth2 lib definition @https://pkg.go.dev/golang.org/x/oauth2#AuthStyle
+ */
+export enum OAuthStyle {
+  AutoDetect = 0,
+  InParams,
+  InHeader,
 }
 
 type Feature = string;
@@ -106,7 +112,6 @@ export interface Settings {
   LDAPSettings: LDAPSettings;
   OAuthSettings: OAuthSettings;
   openAMTConfiguration: OpenAMTConfiguration;
-  fdoConfiguration: FDOConfiguration;
   FeatureFlagSettings: { [key: Feature]: boolean };
   SnapshotInterval: string;
   TemplatesURL: string;
@@ -188,8 +193,6 @@ export interface PublicSettingsResponse {
   KubeconfigExpiry: string;
   /** Whether team sync is enabled */
   TeamSync: boolean;
-  /** Whether FDO is enabled */
-  IsFDOEnabled: boolean;
   /** Whether AMT is enabled */
   IsAMTEnabled: boolean;
   /** Whether to hide default registry (only on BE) */

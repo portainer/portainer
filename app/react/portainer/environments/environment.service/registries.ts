@@ -1,7 +1,10 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { UserId } from '@/portainer/users/types';
-import { RegistryId, Registry } from '@/react/portainer/registries/types';
+import {
+  RegistryId,
+  Registry,
+} from '@/react/portainer/registries/types/registry';
 
 import { EnvironmentId } from '../types';
 
@@ -29,7 +32,7 @@ export async function updateEnvironmentRegistryAccess(
   try {
     await axios.put<void>(buildRegistryUrl(environmentId, registryId), access);
   } catch (e) {
-    throw parseAxiosError(e as Error);
+    throw parseAxiosError(e);
   }
 }
 
@@ -43,7 +46,7 @@ export async function getEnvironmentRegistries(
     });
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error);
+    throw parseAxiosError(e);
   }
 }
 
@@ -57,7 +60,7 @@ export async function getEnvironmentRegistry(
     );
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error);
+    throw parseAxiosError(e);
   }
 }
 

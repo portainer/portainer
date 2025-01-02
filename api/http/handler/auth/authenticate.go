@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -30,11 +29,11 @@ type authenticateResponse struct {
 }
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Username) {
+	if len(payload.Username) == 0 {
 		return errors.New("Invalid username")
 	}
 
-	if govalidator.IsNull(payload.Password) {
+	if len(payload.Password) == 0 {
 		return errors.New("Invalid password")
 	}
 
@@ -56,8 +55,7 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 // @router /auth [post]
 func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload authenticatePayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -75,7 +73,12 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 		if settings.AuthenticationMethod == portainer.AuthenticationInternal ||
 			settings.AuthenticationMethod == portainer.AuthenticationOAuth ||
 			(settings.AuthenticationMethod == portainer.AuthenticationLDAP && !settings.LDAPSettings.AutoCreateUsers) {
-			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
+			// avoid username enumeration timing attack by creating a fake user
+			// https://en.wikipedia.org/wiki/Timing_attack
+			user = &portainer.User{
+				Username: "portainer-fake-username",
+				Password: "$2a$10$abcdefghijklmnopqrstuvwx..ABCDEFGHIJKLMNOPQRSTUVWXYZ12", // fake but valid format bcrypt hash
+			}
 		}
 	}
 
@@ -99,8 +102,7 @@ func isUserInitialAdmin(user *portainer.User) bool {
 }
 
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
-	err := handler.CryptoService.CompareHashAndData(user.Password, password)
-	if err != nil {
+	if err := handler.CryptoService.CompareHashAndData(user.Password, password); err != nil {
 		return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 	}
 
@@ -110,9 +112,12 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 }
 
 func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
-	err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings)
-	if err != nil {
-		return httperror.Forbidden("Only initial admin is allowed to login without oauth", err)
+	if err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings); err != nil {
+		if errors.Is(err, httperrors.ErrUnauthorized) {
+			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
+		}
+
+		return httperror.InternalServerError("Unable to authenticate user against LDAP", err)
 	}
 
 	if user == nil {
@@ -122,14 +127,12 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 			PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 		}
 
-		err = handler.DataStore.User().Create(user)
-		if err != nil {
+		if err := handler.DataStore.User().Create(user); err != nil {
 			return httperror.InternalServerError("Unable to persist user inside the database", err)
 		}
 	}
 
-	err = handler.syncUserTeamsWithLDAPGroups(user, ldapSettings)
-	if err != nil {
+	if err := handler.syncUserTeamsWithLDAPGroups(user, ldapSettings); err != nil {
 		log.Warn().Err(err).Msg("unable to automatically sync user teams with ldap")
 	}
 
@@ -151,7 +154,6 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *p
 	security.AddAuthCookie(w, token, expirationTime)
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
-
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
@@ -176,22 +178,18 @@ func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settin
 	}
 
 	for _, team := range teams {
-		if teamExists(team.Name, userGroups) {
+		if !teamExists(team.Name, userGroups) || teamMembershipExists(team.ID, userMemberships) {
+			continue
+		}
 
-			if teamMembershipExists(team.ID, userMemberships) {
-				continue
-			}
+		membership := &portainer.TeamMembership{
+			UserID: user.ID,
+			TeamID: team.ID,
+			Role:   portainer.TeamMember,
+		}
 
-			membership := &portainer.TeamMembership{
-				UserID: user.ID,
-				TeamID: team.ID,
-				Role:   portainer.TeamMember,
-			}
-
-			err := handler.DataStore.TeamMembership().Create(membership)
-			if err != nil {
-				return err
-			}
+		if err := handler.DataStore.TeamMembership().Create(membership); err != nil {
+			return err
 		}
 	}
 

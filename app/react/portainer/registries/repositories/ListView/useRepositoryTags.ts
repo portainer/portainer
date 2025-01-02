@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';

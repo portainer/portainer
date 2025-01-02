@@ -13,6 +13,7 @@ import { useTableState } from '@@/datatables/useTableState';
 import { useRepeater } from '@@/datatables/useRepeater';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
 import { useColumns } from './columns';
 
@@ -51,12 +52,13 @@ export function NodesDatatable({
       columns={columns}
       dataset={dataset || []}
       isLoading={!dataset}
-      emptyContentLabel="No node available"
       settingsManager={tableState}
-      extendTableOptions={withMeta({
-        table: 'nodes',
-        haveAccessToNode,
-      })}
+      extendTableOptions={mergeOptions(
+        withMeta({
+          table: 'nodes',
+          haveAccessToNode,
+        })
+      )}
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
@@ -65,6 +67,7 @@ export function NodesDatatable({
           />
         </TableSettingsMenu>
       )}
+      data-cy="swarm-nodes-datatable"
     />
   );
 }

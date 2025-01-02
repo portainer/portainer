@@ -11,9 +11,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-const (
-	configObjectIdentifier = "ID"
-)
+const configObjectIdentifier = "ID"
 
 func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, endpointID portainer.EndpointID, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	config, _, err := dockerClient.ConfigInspectWithRaw(context.Background(), configID)
@@ -77,11 +75,10 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 // API schema references:
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigList
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigInspect
-func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
-	secretSpec := utils.GetJSONObject(responseObject, "Spec")
-	if secretSpec != nil {
-		secretLabelsObject := utils.GetJSONObject(secretSpec, "Labels")
-		return secretLabelsObject
+func selectorConfigLabels(responseObject map[string]any) map[string]any {
+	if secretSpec := utils.GetJSONObject(responseObject, "Spec"); secretSpec != nil {
+		return utils.GetJSONObject(secretSpec, "Labels")
 	}
+
 	return nil
 }

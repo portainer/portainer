@@ -45,7 +45,7 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 func (service *Service) Create(record *portainer.HelmUserRepository) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			record.ID = portainer.HelmUserRepositoryID(id)
 			return int(record.ID), record
 		},

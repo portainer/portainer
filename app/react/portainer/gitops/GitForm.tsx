@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { ComposePathField } from '@/react/portainer/gitops/ComposePathField';
 import { RefField } from '@/react/portainer/gitops/RefField';
 import { GitFormUrlField } from '@/react/portainer/gitops/GitFormUrlField';
-import { GitFormModel } from '@/react/portainer/gitops/types';
+import { DeployMethod, GitFormModel } from '@/react/portainer/gitops/types';
 import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { validateForm } from '@@/form-components/validate-form';
 import { SwitchField } from '@@/form-components/SwitchField';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
 
 import { GitCredential } from '../account/git-credentials/types';
 
@@ -25,7 +25,7 @@ interface Props {
   value: GitFormModel;
   onChange: (value: Partial<GitFormModel>) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES' | undefined;
-  deployMethod?: 'compose' | 'manifest';
+  deployMethod?: DeployMethod;
   isDockerStandalone?: boolean;
   isAdditionalFilesFieldVisible?: boolean;
   isForcePullVisible?: boolean;
@@ -34,6 +34,7 @@ interface Props {
   baseWebhookUrl?: string;
   webhookId?: string;
   webhooksDocs?: string;
+  createdFromCustomTemplateId?: number;
 }
 
 export function GitForm({
@@ -49,9 +50,9 @@ export function GitForm({
   baseWebhookUrl,
   webhookId,
   webhooksDocs,
+  createdFromCustomTemplateId,
 }: Props) {
   const [value, setValue] = useState(initialValue); // TODO: remove this state when form is not inside angularjs
-  const webhooksDocsUrl = useDocsUrl(webhooksDocs);
 
   return (
     <FormSection title="Git repository">
@@ -69,8 +70,23 @@ export function GitForm({
           handleChange({ RepositoryURLValid: value })
         }
         model={value}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
         errors={errors.RepositoryURL}
       />
+
+      <div className="form-group">
+        <div className="col-sm-12">
+          <SwitchField
+            label="Skip TLS Verification"
+            data-cy="gitops-skip-tls-verification-switch"
+            checked={value.TLSSkipVerify || false}
+            onChange={(value) => handleChange({ TLSSkipVerify: value })}
+            name="TLSSkipVerify"
+            tooltip="Enabling this will allow skipping TLS validation for any self-signed certificate."
+            labelClass="col-sm-3 col-lg-2"
+          />
+        </div>
+      </div>
 
       <RefField
         value={value.RepositoryReferenceName || ''}
@@ -78,6 +94,7 @@ export function GitForm({
         model={value}
         error={errors.RepositoryReferenceName}
         isUrlValid={value.RepositoryURLValid}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
       />
 
       <ComposePathField
@@ -89,6 +106,7 @@ export function GitForm({
         model={value}
         isDockerStandalone={isDockerStandalone}
         errors={errors.ComposeFilePathInRepository}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
       />
 
       {isAdditionalFilesFieldVisible && (
@@ -99,7 +117,7 @@ export function GitForm({
         />
       )}
 
-      {value.AutoUpdate && (
+      {isBE && value.AutoUpdate && (
         <AutoUpdateFieldset
           environmentType={environmentType}
           webhookId={webhookId || ''}
@@ -108,24 +126,11 @@ export function GitForm({
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}
           errors={errors.AutoUpdate as FormikErrors<GitFormModel['AutoUpdate']>}
-          webhooksDocs={webhooksDocsUrl}
+          webhooksDocs={webhooksDocs}
         />
       )}
 
       <TimeWindowDisplay />
-
-      <div className="form-group">
-        <div className="col-sm-12">
-          <SwitchField
-            label="Skip TLS Verification"
-            checked={value.TLSSkipVerify || false}
-            onChange={(value) => handleChange({ TLSSkipVerify: value })}
-            name="TLSSkipVerify"
-            tooltip="Enabling this will allow skipping TLS validation for any self-signed certificate."
-            labelClass="col-sm-3 col-lg-2"
-          />
-        </div>
-      </div>
     </FormSection>
   );
 
@@ -137,16 +142,25 @@ export function GitForm({
 
 export async function validateGitForm(
   gitCredentials: Array<GitCredential>,
-  formValues: GitFormModel
+  formValues: GitFormModel,
+  isCreatedFromCustomTemplate: boolean,
+  deployMethod: DeployMethod = 'compose'
 ) {
   return validateForm<GitFormModel>(
-    () => buildGitValidationSchema(gitCredentials),
+    () =>
+      buildGitValidationSchema(
+        gitCredentials,
+        isCreatedFromCustomTemplate,
+        deployMethod
+      ),
     formValues
   );
 }
 
 export function buildGitValidationSchema(
-  gitCredentials: Array<GitCredential>
+  gitCredentials: Array<GitCredential>,
+  isCreatedFromCustomTemplate: boolean,
+  deployMethod: DeployMethod
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
@@ -165,11 +179,15 @@ export function buildGitValidationSchema(
       .required('Repository URL is required'),
     RepositoryReferenceName: refFieldValidation(),
     ComposeFilePathInRepository: string().required(
-      'Compose file path is required'
+      deployMethod === 'compose'
+        ? 'Compose file path is required'
+        : 'Manifest file path is required'
     ),
     AdditionalFiles: array(string().required('Path is required')).default([]),
     RepositoryURLValid: boolean().default(false),
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
-  }).concat(gitAuthValidation(gitCredentials, false)) as SchemaOf<GitFormModel>;
+  }).concat(
+    gitAuthValidation(gitCredentials, false, isCreatedFromCustomTemplate)
+  ) as SchemaOf<GitFormModel>;
 }

@@ -1,100 +1,98 @@
-import { formatLogs } from '../helpers/logHelper';
+import { removeService } from '@/react/docker/services/ListView/ServicesDatatable/useRemoveServicesMutation';
+import { createService } from '@/react/docker/services/queries/useCreateServiceMutation';
+import { getService } from '@/react/docker/services/queries/useService';
+import { getServices } from '@/react/docker/services/queries/useServices';
+import { updateService } from '@/react/docker/services/queries/useUpdateServiceMutation';
+import { getServiceLogs } from '@/react/docker/services/queries/useServiceLogs';
+
 import { ServiceViewModel } from '../models/service';
+import { formatLogs } from '../helpers/logHelper';
 
-angular.module('portainer.docker').factory('ServiceService', [
-  '$q',
-  'Service',
-  function ServiceServiceFactory($q, Service) {
-    'use strict';
-    var service = {};
+angular.module('portainer.docker').factory('ServiceService', ServiceServiceFactory);
 
-    service.services = function (filters) {
-      var deferred = $q.defer();
+/* @ngInject */
+function ServiceServiceFactory(AngularToReact) {
+  const { useAxios, injectEnvironmentId } = AngularToReact;
 
-      Service.query({ filters: filters ? filters : {} })
-        .$promise.then(function success(data) {
-          var services = data.map(function (item) {
-            return new ServiceViewModel(item);
-          });
-          deferred.resolve(services);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve services', err: err });
-        });
+  return {
+    services: useAxios(injectEnvironmentId(getServicesAngularJS)), // dashboard + service list + swarm visualizer + volume list + stackservice + stack edit
+    service: useAxios(injectEnvironmentId(getServiceAngularJS)), // service edit + task edit
+    remove: useAxios(injectEnvironmentId(removeServiceAngularJS)), // service edit
+    update: useAxios(injectEnvironmentId(updateServiceAngularJS)), // service edit
+    create: useAxios(injectEnvironmentId(createServiceAngularJS)), // service create
+    logs: useAxios(injectEnvironmentId(serviceLogsAngularJS)), // service logs
+  };
 
-      return deferred.promise;
-    };
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {*} filters
+   */
+  async function getServicesAngularJS(environmentId, filters) {
+    const data = await getServices(environmentId, filters);
+    return data.map((s) => new ServiceViewModel(s));
+  }
 
-    service.service = function (id) {
-      var deferred = $q.defer();
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceId} serviceId
+   */
+  async function getServiceAngularJS(environmentId, serviceId) {
+    const data = await getService(environmentId, serviceId);
+    return new ServiceViewModel(data);
+  }
 
-      Service.get({ id: id })
-        .$promise.then(function success(data) {
-          var service = new ServiceViewModel(data);
-          deferred.resolve(service);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve service details', err: err });
-        });
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceViewModel} service
+   */
+  async function removeServiceAngularJS(environmentId, service) {
+    return removeService(environmentId, service.Id);
+  }
 
-      return deferred.promise;
-    };
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceViewModel} service
+   * @param {ServiceUpdateConfig} config
+   * @param {string?} rollback
+   */
+  async function updateServiceAngularJS(environmentId, service, config, rollback) {
+    const data = await getServiceAngularJS(environmentId, service.Id);
+    return updateService({
+      environmentId,
+      config,
+      serviceId: service.Id,
+      version: data.Version,
+      registryId: config.registryId,
+      rollback,
+    });
+  }
 
-    service.remove = function (service) {
-      var deferred = $q.defer();
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {Service} config
+   * @param {RegistryId} registryId
+   */
+  async function createServiceAngularJS(environmentId, config, registryId) {
+    return createService({ environmentId, config, registryId });
+  }
 
-      Service.remove({ id: service.Id })
-        .$promise.then(function success(data) {
-          if (data.message) {
-            deferred.reject({ msg: data.message, err: data.message });
-          } else {
-            deferred.resolve();
-          }
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to remove service', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.update = function (serv, config, rollback) {
-      return service.service(serv.Id).then((data) => {
-        const params = {
-          id: serv.Id,
-          version: data.Version,
-        };
-        if (rollback) {
-          params.rollback = rollback;
-        }
-        return Service.update(params, config).$promise;
-      });
-    };
-
-    service.logs = function (id, stdout, stderr, timestamps, since, tail) {
-      var deferred = $q.defer();
-
-      var parameters = {
-        id: id,
-        stdout: stdout || 0,
-        stderr: stderr || 0,
-        timestamps: timestamps || 0,
-        since: since || 0,
-        tail: tail || 'all',
-      };
-
-      Service.logs(parameters)
-        .$promise.then(function success(data) {
-          var logs = formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
-          deferred.resolve(logs);
-        })
-        .catch(function error(err) {
-          deferred.reject(err);
-        });
-
-      return deferred.promise;
-    };
-
-    return service;
-  },
-]);
+  /**
+   * @param {EnvironmentId} environmentId Injected
+   * @param {ServiceId} id
+   * @param {boolean?} stdout
+   * @param {boolean?} stderr
+   * @param {boolean?} timestamps
+   * @param {number?} since
+   * @param {number?} tail
+   */
+  async function serviceLogsAngularJS(environmentId, id, stdout = false, stderr = false, timestamps = false, since = 0, tail = 'all') {
+    const data = await getServiceLogs(environmentId, id, {
+      since,
+      stderr,
+      stdout,
+      tail,
+      timestamps,
+    });
+    return formatLogs(data, { stripHeaders: true, withTimestamps: !!timestamps });
+  }
+}

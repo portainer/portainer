@@ -1,0 +1,10 @@
+diff a/app/react/components/form-components/Input/Select.tsx b/app/react/components/form-components/Input/Select.tsx	(rejected hunks)
+@@ -10,7 +10,7 @@ export interface Option<T extends string | number>
+   disabled?: boolean;
+ }
+ 
+-interface Props<T extends string | number> {
++interface Props<T extends string | number> extends AutomationTestingProps {
+   options: Option<T>[];
+ }
+ 

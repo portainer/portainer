@@ -35,10 +35,10 @@ export function NameField({
     >
       <Input
         id={id}
+        data-cy="environmentCreate-nameInput"
         name="name"
         onChange={(e) => setDebouncedValue(e.target.value)}
         value={debouncedValue}
-        data-cy="endpointCreate-nameInput"
         placeholder={placeholder}
         readOnly={readonly}
       />

@@ -12,9 +12,9 @@ type IngressStatus = {
 };
 
 type Application = {
-  UID: string;
+  Uid: string;
   Name: string;
-  Type: string;
+  Kind: string;
 };
 
 export type ServiceType =
@@ -26,39 +26,17 @@ export type ServiceType =
 export type Service = {
   Name: string;
   UID: string;
+  Type: ServiceType;
   Namespace: string;
   Annotations?: Record<string, string>;
+  CreationDate: string;
   Labels?: Record<string, string>;
-  Type: ServiceType;
-  Ports: Array<ServicePort>;
+  AllocateLoadBalancerNodePorts?: boolean;
+  Ports?: Array<ServicePort>;
   Selector?: Record<string, string>;
-  ClusterIPs?: Array<string>;
   IngressStatus?: Array<IngressStatus>;
+  Applications?: Application[];
+  ClusterIPs?: Array<string>;
   ExternalName?: string;
   ExternalIPs?: Array<string>;
-  CreationTimestamp: string;
-  Applications?: Application[];
-
-  IsSystem?: boolean;
-};
-
-export type NodeMetrics = {
-  items: NodeMetric[];
-};
-
-export type NodeMetric = {
-  metadata: NodeMetricMetadata;
-  timestamp: Date;
-  usage: Usage;
-  window: string;
-};
-
-export type NodeMetricMetadata = {
-  creationTimestamp: Date;
-  name: string;
-};
-
-export type Usage = {
-  cpu: string;
-  memory: string;
 };

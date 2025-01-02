@@ -1,25 +1,27 @@
-import { Task, TaskSpec, TaskState } from 'docker-types/generated/1.41';
+import { Task } from 'docker-types/generated/1.41';
+
+import { DeepPick } from '@/types/deepPick';
 
 export class TaskViewModel {
-  Id: string;
+  Id: NonNullable<Task['ID']>;
 
-  Created: string;
+  Created: NonNullable<Task['CreatedAt']>;
 
-  Updated: string;
+  Updated: NonNullable<Task['UpdatedAt']>;
 
-  Slot: number;
+  Slot: NonNullable<Task['Slot']>;
 
-  Spec?: TaskSpec;
+  Spec?: Task['Spec'];
 
-  Status: Task['Status'];
+  Status?: Task['Status'];
 
-  DesiredState: TaskState;
+  DesiredState: NonNullable<Task['DesiredState']>;
 
-  ServiceId: string;
+  ServiceId: NonNullable<Task['ServiceID']>;
 
-  NodeId: string;
+  NodeId: NonNullable<Task['NodeID']>;
 
-  ContainerId: string = '';
+  ContainerId: DeepPick<Task, 'Status.ContainerStatus.ContainerID'>;
 
   constructor(data: Task) {
     this.Id = data.ID || '';

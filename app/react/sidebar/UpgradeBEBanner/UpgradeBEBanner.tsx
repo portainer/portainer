@@ -59,7 +59,7 @@ function UpgradeBEBanner() {
 
   if (
     !enabledPlatforms.includes(systemInfo.platform) &&
-    process.env.NODE_ENV !== 'development'
+    process.env.FORCE_SHOW_UPGRADE_BANNER !== ''
   ) {
     return null;
   }

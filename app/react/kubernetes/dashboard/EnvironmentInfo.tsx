@@ -23,7 +23,7 @@ export function EnvironmentInfo() {
           <table className="table">
             <tbody>
               <tr>
-                <td className="!border-none !pl-0">Environment</td>
+                <td className="!border-none">Environment</td>
                 <td
                   className="!border-none"
                   data-cy="dashboard-environmentName"
@@ -32,13 +32,13 @@ export function EnvironmentInfo() {
                 </td>
               </tr>
               <tr>
-                <td className="!border-t !pl-0">URL</td>
+                <td className="!border-t">URL</td>
                 <td className="!border-t" data-cy="dashboard-environmenturl">
                   {stripProtocol(environmentData.URL) || '-'}
                 </td>
               </tr>
               <tr>
-                <td className="!pl-0">Tags</td>
+                <td>Tags</td>
                 <td data-cy="dashboard-environmentTags">{tagNames}</td>
               </tr>
             </tbody>

@@ -1,6 +1,0 @@
-{
-  "dockerComposeYmlFilePaths": ["docker-compose.pull-dog.yml"],
-  "isLazy": true,
-  "expiry": "1.00:00:00",
-  "label": "test-instance-available"
-}

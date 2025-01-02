@@ -1,4 +1,10 @@
-import { PropsWithChildren, useEffect, useMemo } from 'react';
+import {
+  ComponentProps,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useMemo,
+} from 'react';
 import { useTransitionHook } from '@uirouter/react';
 
 import { BROWSER_OS_PLATFORM } from '@/react/constants';
@@ -15,7 +21,7 @@ import { buildConfirmButton } from './modals/utils';
 const otherEditorConfig = {
   tooltip: (
     <>
-      <div>CtrlF - Start searching</div>
+      <div>Ctrl+F - Start searching</div>
       <div>Ctrl+G - Find next</div>
       <div>Ctrl+Shift+G - Find previous</div>
       <div>Ctrl+Shift+F - Replace</div>
@@ -51,32 +57,21 @@ export const editorConfig = {
   win: otherEditorConfig,
 } as const;
 
-interface Props {
-  value: string;
-  onChange: (value: string) => void;
+type CodeEditorProps = ComponentProps<typeof CodeEditor>;
 
-  id: string;
-  placeholder?: string;
-  yaml?: boolean;
-  readonly?: boolean;
-  titleContent?: React.ReactNode;
+interface Props extends CodeEditorProps {
+  titleContent?: ReactNode;
   hideTitle?: boolean;
   error?: string;
-  height?: string;
 }
 
 export function WebEditorForm({
   id,
-  onChange,
-  placeholder,
-  value,
   titleContent = '',
   hideTitle,
-  readonly,
-  yaml,
   children,
   error,
-  height,
+  ...props
 }: PropsWithChildren<Props>) {
   return (
     <div>
@@ -99,12 +94,8 @@ export function WebEditorForm({
           <div className="col-sm-12 col-lg-12">
             <CodeEditor
               id={id}
-              placeholder={placeholder}
-              readonly={readonly}
-              yaml={yaml}
-              value={value}
-              onChange={onChange}
-              height={height}
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...props}
             />
           </div>
         </div>

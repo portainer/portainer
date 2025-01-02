@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
-	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
 	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
@@ -43,6 +42,7 @@ import (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
+	flags      *portainer.CLIFlags
 	connection portainer.Connection
 
 	fileService               portainer.FileService
@@ -55,7 +55,6 @@ type Store struct {
 	EndpointService           *endpoint.Service
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
-	FDOProfilesService        *fdoprofile.Service
 	HelmUserRepositoryService *helmuserrepository.Service
 	RegistryService           *registry.Service
 	ResourceControlService    *resourcecontrol.Service
@@ -137,12 +136,6 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ExtensionService = extensionService
-
-	fdoProfilesService, err := fdoprofile.NewService(store.connection)
-	if err != nil {
-		return err
-	}
-	store.FDOProfilesService = fdoProfilesService
 
 	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
 	if err != nil {
@@ -289,11 +282,6 @@ func (store *Store) EndpointRelation() dataservices.EndpointRelationService {
 	return store.EndpointRelationService
 }
 
-// FDOProfile gives access to the FDOProfile data management layer
-func (store *Store) FDOProfile() dataservices.FDOProfileService {
-	return store.FDOProfilesService
-}
-
 // HelmUserRepository access the helm user repository settings
 func (store *Store) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return store.HelmUserRepositoryService
@@ -398,11 +386,10 @@ type storeExport struct {
 	User               []portainer.User               `json:"users,omitempty"`
 	Version            models.Version                 `json:"version,omitempty"`
 	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
-	Metadata           map[string]interface{}         `json:"metadata,omitempty"`
+	Metadata           map[string]any                 `json:"metadata,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {
-
 	backup := storeExport{}
 
 	if c, err := store.CustomTemplate().ReadAll(); err != nil {
@@ -606,6 +593,7 @@ func (store *Store) Export(filename string) (err error) {
 	if err != nil {
 		return err
 	}
+
 	return os.WriteFile(filename, b, 0600)
 }
 
@@ -616,7 +604,7 @@ func (store *Store) Import(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal([]byte(s), &backup)
+	err = json.Unmarshal(s, &backup)
 	if err != nil {
 		return err
 	}

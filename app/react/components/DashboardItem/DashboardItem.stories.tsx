@@ -19,7 +19,14 @@ interface StoryProps {
 }
 
 function Template({ value, icon, type }: StoryProps) {
-  return <DashboardItem value={value} icon={icon} type={type} />;
+  return (
+    <DashboardItem
+      value={value}
+      icon={icon}
+      type={type}
+      data-cy="data-cy-example"
+    />
+  );
 }
 
 export const Primary: Story<StoryProps> = Template.bind({});
@@ -31,15 +38,25 @@ Primary.args = {
 
 export function WithLink() {
   return (
-    <Link to="example.page">
-      <DashboardItem value={1} icon={List} type="Example resource" />
+    <Link to="example.page" data-cy="data-cy-example">
+      <DashboardItem
+        value={1}
+        icon={List}
+        type="Example resource"
+        data-cy="data-cy-example"
+      />
     </Link>
   );
 }
 
 export function WithChildren() {
   return (
-    <DashboardItem value={1} icon={List} type="Example resource">
+    <DashboardItem
+      value={1}
+      icon={List}
+      type="Example resource"
+      data-cy="data-cy-example"
+    >
       <div>Children</div>
     </DashboardItem>
   );

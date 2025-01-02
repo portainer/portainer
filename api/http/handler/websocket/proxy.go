@@ -2,28 +2,27 @@ package websocket
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/logoutcontext"
+	"github.com/portainer/portainer/api/logoutcontext"
 
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
-	"github.com/portainer/portainer/api/crypto"
 	"github.com/rs/zerolog/log"
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tunnel, err := handler.ReverseTunnelService.GetActiveTunnel(params.endpoint)
+	tunnelAddr, err := handler.ReverseTunnelService.TunnelAddr(params.endpoint)
 	if err != nil {
 		return err
 	}
 
-	agentURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
+	agentURL, err := url.Parse("http://" + tunnelAddr)
 	if err != nil {
 		return err
 	}
@@ -34,7 +33,7 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	endpointURL := params.endpoint.URL
 	if params.endpoint.Type == portainer.AgentOnKubernetesEnvironment {
-		endpointURL = fmt.Sprintf("http://%s", params.endpoint.URL)
+		endpointURL = "http://" + params.endpoint.URL
 	}
 
 	agentURL, err := url.Parse(endpointURL)
@@ -93,7 +92,7 @@ func (handler *Handler) doProxyWebsocketRequest(
 	}
 
 	if isEdge {
-		handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+		handler.ReverseTunnelService.UpdateLastActivity(params.endpoint.ID)
 		handler.ReverseTunnelService.KeepTunnelAlive(params.endpoint.ID, r.Context(), portainer.WebSocketKeepAlive)
 	}
 

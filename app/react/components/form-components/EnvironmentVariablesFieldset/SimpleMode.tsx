@@ -34,6 +34,7 @@ export function SimpleMode({
         icon={Edit}
         className="!ml-0 p-0 hover:no-underline"
         onClick={onAdvancedModeClick}
+        data-cy="environment-variables-advanced-mode-button"
       >
         Advanced mode
       </Button>
@@ -50,6 +51,7 @@ export function SimpleMode({
         item={EnvironmentVariableItem}
         errors={errors}
         canUndoDelete={canUndoDelete}
+        data-cy="simple-environment-variable-fieldset"
       />
 
       <div className="flex gap-2">
@@ -60,6 +62,7 @@ export function SimpleMode({
           className="!ml-0"
           color="default"
           icon={Plus}
+          data-cy="add-environment-variable-button"
         >
           Add an environment variable
         </Button>
@@ -84,6 +87,7 @@ function FileEnv({ onChooseFile }: { onChooseFile: (file: Values) => void }) {
         accept=".env"
         value={file}
         color="default"
+        data-cy="load-environment-variables-from-file-button"
       />
 
       {fileTooBig && (

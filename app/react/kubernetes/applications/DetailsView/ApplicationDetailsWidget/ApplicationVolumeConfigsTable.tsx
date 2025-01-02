@@ -2,7 +2,7 @@ import { KeyToPath, Pod, Secret } from 'kubernetes-types/core/v1';
 import { Asterisk, Plus } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useSecrets } from '@/react/kubernetes/configs/secret.service';
+import { useK8sSecrets } from '@/react/kubernetes/configs/queries/useK8sSecrets';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
@@ -18,7 +18,7 @@ type Props = {
 export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
   const containerVolumeConfigs = getApplicationVolumeConfigs(app);
 
-  const { data: secrets } = useSecrets(useEnvironmentId(), namespace);
+  const { data: secrets } = useK8sSecrets(useEnvironmentId(), namespace);
 
   if (containerVolumeConfigs.length === 0) {
     return null;
@@ -81,6 +81,7 @@ export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
                     className="flex items-center"
                     to="kubernetes.secrets.secret"
                     params={{ name: volumeConfigName, namespace }}
+                    data-cy={`secret-link-${volumeConfigName}`}
                   >
                     <Icon icon={Plus} className="!mr-1" />
                     {volumeConfigName}
@@ -90,6 +91,7 @@ export function ApplicationVolumeConfigsTable({ namespace, app }: Props) {
                     className="flex items-center"
                     to="kubernetes.configmaps.configmap"
                     params={{ name: volumeConfigName, namespace }}
+                    data-cy={`config-link-${volumeConfigName}`}
                   >
                     <Icon icon={Plus} className="!mr-1" />
                     {volumeConfigName}

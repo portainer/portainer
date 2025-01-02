@@ -1,82 +1,82 @@
 import { List } from 'lucide-react';
-import { useEffect } from 'react';
+import { useRouter } from '@uirouter/react';
 
-import { useAuthorizations } from '@/react/hooks/useUser';
+import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
+import { useIngresses } from '@/react/kubernetes/ingresses/queries';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
-import { useRepeater } from '@@/datatables/useRepeater';
-import { useTableState } from '@@/datatables/useTableState';
+import { TableSettingsMenu } from '@@/datatables';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { KubernetesStack } from '../../types';
+import { useApplications } from '../../queries/useApplications';
+import { ApplicationsTableSettings } from '../useKubeAppsTableStore';
+import { useDeleteApplicationsMutation } from '../../queries/useDeleteApplicationsMutation';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
-import { Namespace } from './types';
-import { StacksSettingsMenu } from './StacksSettingsMenu';
 import { NamespaceFilter } from './NamespaceFilter';
-import { TableActions } from './TableActions';
-
-const storageKey = 'kubernetes.applications.stacks';
-
-const settingsStore = createStore(storageKey);
-
-interface Props {
-  dataset: Array<KubernetesStack>;
-  onRemove(selectedItems: Array<KubernetesStack>): void;
-  onRefresh(): Promise<void>;
-  namespace?: string;
-  namespaces: Array<Namespace>;
-  onNamespaceChange(namespace: string): void;
-  isLoading?: boolean;
-  showSystem?: boolean;
-  setSystemResources(showSystem: boolean): void;
-}
+import { getStacksFromApplications } from './getStacksFromApplications';
+import { Stack } from './types';
 
 export function ApplicationsStacksDatatable({
-  dataset,
-  onRemove,
-  onRefresh,
-  namespace = '',
-  namespaces,
-  onNamespaceChange,
-  isLoading,
-  showSystem,
-  setSystemResources,
-}: Props) {
-  const tableState = useTableState(settingsStore, storageKey);
-
-  useEffect(() => {
-    tableState.setShowSystemResources(showSystem || false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSystem]);
-
-  const { authorized } = useAuthorizations('K8sApplicationsW');
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  tableState,
+}: {
+  tableState: ApplicationsTableSettings & {
+    setSearch: (value: string) => void;
+    search: string;
+  };
+}) {
+  const router = useRouter();
+  const environmentId = useEnvironmentId();
+  const namespaceListQuery = useNamespacesQuery(environmentId);
+  const { authorized: hasWriteAuth } = useAuthorizations('K8sApplicationsW');
+  const applicationsQuery = useApplications(environmentId, {
+    refetchInterval: tableState.autoRefreshRate * 1000,
+    namespace: tableState.namespace,
+    withDependencies: true,
+  });
+  const ingressesQuery = useIngresses(environmentId);
+  const ingresses = ingressesQuery.data ?? [];
+  const applications = applicationsQuery.data ?? [];
+  const filteredApplications = tableState.showSystemResources
+    ? applications
+    : applications.filter(
+        (item) =>
+          !isSystemNamespace(item.ResourcePool, namespaceListQuery.data ?? [])
+      );
+  const stacks = getStacksFromApplications(filteredApplications);
+  const removeApplicationsMutation = useDeleteApplicationsMutation({
+    environmentId,
+    stacks,
+    ingresses,
+    reportStacks: true,
+  });
 
   return (
     <ExpandableDatatable
       getRowCanExpand={(row) => row.original.Applications.length > 0}
       title="Stacks"
       titleIcon={List}
-      dataset={dataset}
-      isLoading={isLoading}
+      dataset={stacks}
+      isLoading={applicationsQuery.isLoading || namespaceListQuery.isLoading}
       columns={columns}
       settingsManager={tableState}
-      disableSelect={!authorized}
+      disableSelect={!hasWriteAuth}
       renderSubRow={(row) => (
         <SubRows stack={row.original} span={row.getVisibleCells().length} />
       )}
-      noWidget
-      emptyContentLabel="No stack available."
       description={
         <div className="w-full">
-          <div className="min-w-[140px] float-right mr-2">
+          <div className="float-right mr-2 min-w-[140px]">
             <NamespaceFilter
-              namespaces={namespaces}
-              value={namespace}
-              onChange={onNamespaceChange}
+              namespaces={namespaceListQuery.data ?? []}
+              value={tableState.namespace}
+              onChange={tableState.setNamespace}
               showSystem={tableState.showSystemResources}
             />
           </div>
@@ -89,15 +89,31 @@ export function ApplicationsStacksDatatable({
         </div>
       }
       renderTableActions={(selectedItems) => (
-        <TableActions selectedItems={selectedItems} onRemove={onRemove} />
+        <Authorized authorizations="K8sApplicationsW">
+          <DeleteButton
+            confirmMessage="Are you sure that you want to remove the selected stack(s) ? This will remove all the applications associated to the stack(s)."
+            disabled={selectedItems.length === 0}
+            onConfirmed={() => handleRemoveStacks(selectedItems)}
+            data-cy="k8sApp-removeStackButton"
+          />
+        </Authorized>
       )}
       renderTableSettings={() => (
-        <StacksSettingsMenu
-          setSystemResources={setSystemResources}
-          settings={tableState}
-        />
+        <TableSettingsMenu>
+          <DefaultDatatableSettings settings={tableState} />
+        </TableSettingsMenu>
       )}
       getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
+      data-cy="applications-stacks-datatable"
     />
   );
+
+  function handleRemoveStacks(selectedItems: Stack[]) {
+    const applications = selectedItems.flatMap((stack) => stack.Applications);
+    removeApplicationsMutation.mutate(applications, {
+      onSuccess: () => {
+        router.stateService.reload();
+      },
+    });
+  }
 }

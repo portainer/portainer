@@ -8,7 +8,13 @@ function renderDefault({
   checked = false,
 }: Partial<PropsWithChildren<Props>> = {}) {
   return render(
-    <Switch id="id" name={name} checked={checked} onChange={() => {}} />
+    <Switch
+      id="id"
+      name={name}
+      checked={checked}
+      onChange={() => {}}
+      data-cy="switch"
+    />
   );
 }
 

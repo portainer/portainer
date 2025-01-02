@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/internal/randomstring"
-
 	"github.com/rs/zerolog/log"
 	authv1 "k8s.io/api/authorization/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -16,6 +15,8 @@ import (
 	rbacv1types "k8s.io/client-go/kubernetes/typed/rbac/v1"
 )
 
+const maxRetries = 5
+
 // IsRBACEnabled checks if RBAC is enabled in the cluster by creating a service account, then checking it's access to a resourcequota before and after setting a cluster role and cluster role binding
 func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	namespace := "default"
@@ -23,11 +24,11 @@ func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	resource := "resourcequotas"
 
 	saClient := kcl.cli.CoreV1().ServiceAccounts(namespace)
-	uniqueString := randomstring.RandomString(4) // append a unique string to resource names, incase they already exist
+	uniqueString := randomstring.RandomString(4) // Append a unique string to resource names, in case they already exist
 	saName := "portainer-rbac-test-sa-" + uniqueString
-	err := createServiceAccount(saClient, saName, namespace)
-	if err != nil {
+	if err := createServiceAccount(saClient, saName, namespace); err != nil {
 		log.Error().Err(err).Msg("Error creating service account")
+
 		return false, err
 	}
 	defer deleteServiceAccount(saClient, saName)
@@ -36,29 +37,30 @@ func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	allowed, err := checkServiceAccountAccess(accessReviewClient, saName, verb, resource, namespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error checking service account access")
+
 		return false, err
 	}
 
-	// if the service account with no authorizations is allowed, RBAC must be disabled
+	// If the service account with no authorizations is allowed, RBAC must be disabled
 	if allowed {
 		return false, nil
 	}
 
-	// otherwise give the service account an rbac authorisation and check again
+	// Otherwise give the service account an rbac authorisation and check again
 	roleClient := kcl.cli.RbacV1().Roles(namespace)
 	roleName := "portainer-rbac-test-role-" + uniqueString
-	err = createRole(roleClient, roleName, verb, resource, namespace)
-	if err != nil {
+	if err := createRole(roleClient, roleName, verb, resource, namespace); err != nil {
 		log.Error().Err(err).Msg("Error creating role")
+
 		return false, err
 	}
 	defer deleteRole(roleClient, roleName)
 
 	roleBindingClient := kcl.cli.RbacV1().RoleBindings(namespace)
 	roleBindingName := "portainer-rbac-test-role-binding-" + uniqueString
-	err = createRoleBinding(roleBindingClient, roleBindingName, roleName, saName, namespace)
-	if err != nil {
+	if err := createRoleBinding(roleBindingClient, roleBindingName, roleName, saName, namespace); err != nil {
 		log.Error().Err(err).Msg("Error creating role binding")
+
 		return false, err
 	}
 	defer deleteRoleBinding(roleBindingClient, roleBindingName)
@@ -66,10 +68,11 @@ func (kcl *KubeClient) IsRBACEnabled() (bool, error) {
 	allowed, err = checkServiceAccountAccess(accessReviewClient, saName, verb, resource, namespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error checking service account access with authorizations added")
+
 		return false, err
 	}
 
-	// if the service account allowed to list resource quotas after given rbac role, then RBAC is enabled
+	// If the service account allowed to list resource quotas after given rbac role, then RBAC is enabled
 	return allowed, nil
 }
 
@@ -80,13 +83,14 @@ func createServiceAccount(saClient corev1types.ServiceAccountInterface, name str
 			Namespace: namespace,
 		},
 	}
+
 	_, err := saClient.Create(context.Background(), serviceAccount, metav1.CreateOptions{})
+
 	return err
 }
 
 func deleteServiceAccount(saClient corev1types.ServiceAccountInterface, name string) {
-	err := saClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	if err != nil {
+	if err := saClient.Delete(context.Background(), name, metav1.DeleteOptions{}); err != nil {
 		log.Error().Err(err).Msg("Error deleting service account: " + name)
 	}
 }
@@ -105,13 +109,14 @@ func createRole(roleClient rbacv1types.RoleInterface, name string, verb string, 
 			},
 		},
 	}
+
 	_, err := roleClient.Create(context.Background(), role, metav1.CreateOptions{})
+
 	return err
 }
 
 func deleteRole(roleClient rbacv1types.RoleInterface, name string) {
-	err := roleClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	if err != nil {
+	if err := roleClient.Delete(context.Background(), name, metav1.DeleteOptions{}); err != nil {
 		log.Error().Err(err).Msg("Error deleting role: " + name)
 	}
 }
@@ -134,17 +139,20 @@ func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clust
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
+
 	roleBinding, err := roleBindingClient.Create(context.Background(), clusterRoleBinding, metav1.CreateOptions{})
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating role binding: " + clusterRoleBindingName)
+
 		return err
 	}
 
 	// Retry checkRoleBinding a maximum of 5 times with a 100ms wait after each attempt
-	maxRetries := 5
-	for i := 0; i < maxRetries; i++ {
+	for range maxRetries {
 		err = checkRoleBinding(roleBindingClient, roleBinding.Name)
+
 		time.Sleep(100 * time.Millisecond) // Wait for 100ms, even if the check passes
+
 		if err == nil {
 			break
 		}
@@ -154,17 +162,17 @@ func createRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, clust
 }
 
 func checkRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) error {
-	_, err := roleBindingClient.Get(context.Background(), name, metav1.GetOptions{})
-	if err != nil {
+	if _, err := roleBindingClient.Get(context.Background(), name, metav1.GetOptions{}); err != nil {
 		log.Error().Err(err).Msg("Error finding rolebinding: " + name)
+
 		return err
 	}
+
 	return nil
 }
 
 func deleteRoleBinding(roleBindingClient rbacv1types.RoleBindingInterface, name string) {
-	err := roleBindingClient.Delete(context.Background(), name, metav1.DeleteOptions{})
-	if err != nil {
+	if err := roleBindingClient.Delete(context.Background(), name, metav1.DeleteOptions{}); err != nil {
 		log.Error().Err(err).Msg("Error deleting role binding: " + name)
 	}
 }
@@ -183,9 +191,11 @@ func checkServiceAccountAccess(accessReviewClient authv1types.LocalSubjectAccess
 			User: "system:serviceaccount:default:" + serviceAccountName, // a workaround to be able to use the service account as a user
 		},
 	}
+
 	result, err := accessReviewClient.Create(context.Background(), subjectAccessReview, metav1.CreateOptions{})
 	if err != nil {
 		return false, err
 	}
+
 	return result.Status.Allowed, nil
 }

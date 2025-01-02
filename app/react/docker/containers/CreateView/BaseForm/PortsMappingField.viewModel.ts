@@ -14,13 +14,8 @@ type StringPortBinding = {
   containerPort: number;
 };
 
-type NumericPortBinding = {
-  hostPort: number;
-  protocol: Protocol;
-  containerPort: number;
-};
-
 type RangePortBinding = {
+  hostIp: string;
   hostPort: Range;
   protocol: Protocol;
   containerPort: Range;
@@ -42,9 +37,7 @@ export function toViewModel(portBindings: PortMap): Values {
     return value === 'tcp' || value === 'udp';
   }
 
-  function parsePorts(
-    portBindings: PortMap
-  ): Array<StringPortBinding | NumericPortBinding> {
+  function parsePorts(portBindings: PortMap): Array<StringPortBinding> {
     return Object.entries(portBindings).flatMap(([key, bindings]) => {
       const [containerPort, protocol] = key.split('/');
 
@@ -63,15 +56,24 @@ export function toViewModel(portBindings: PortMap): Values {
       }
 
       return bindings.map((binding) => {
+        let port = '';
+        if (binding.HostPort) {
+          port = binding.HostPort;
+        }
+        if (binding.HostIp) {
+          port = `${binding.HostIp}:${port}`;
+        }
+
         if (binding.HostPort?.includes('-')) {
+          // Range port
           return {
-            hostPort: binding.HostPort,
+            hostPort: port,
             protocol,
             containerPort: containerPortNumber,
           };
         }
         return {
-          hostPort: parseInt(binding.HostPort || '0', 10),
+          hostPort: port,
           protocol,
           containerPort: containerPortNumber,
         };
@@ -79,9 +81,9 @@ export function toViewModel(portBindings: PortMap): Values {
     });
   }
 
-  function sortPorts(ports: Array<StringPortBinding | NumericPortBinding>) {
-    const rangePorts = ports.filter(isStringPortBinding);
-    const nonRangePorts = ports.filter(isNumericPortBinding);
+  function sortPorts(ports: Array<StringPortBinding>) {
+    const rangePorts = ports.filter(isRangePortBinding);
+    const nonRangePorts = ports.filter((port) => !isRangePortBinding(port));
 
     return {
       rangePorts,
@@ -93,27 +95,40 @@ export function toViewModel(portBindings: PortMap): Values {
     };
   }
 
-  function combinePorts(ports: Array<NumericPortBinding>) {
+  function combinePorts(ports: Array<StringPortBinding>) {
     return ports
       .reduce((acc, port) => {
+        let hostIp = '';
+        let hostPort = 0;
+        if (port.hostPort.includes(':')) {
+          const [ipStr, portStr] = port.hostPort.split(':');
+          hostIp = ipStr;
+          hostPort = parseInt(portStr || '0', 10);
+        } else {
+          hostPort = parseInt(port.hostPort || '0', 10);
+        }
+
         const lastPort = acc[acc.length - 1];
         if (
           lastPort &&
+          lastPort.hostIp === hostIp &&
           lastPort.containerPort.end === port.containerPort - 1 &&
-          lastPort.hostPort.end === port.hostPort - 1 &&
+          lastPort.hostPort.end === hostPort - 1 &&
           lastPort.protocol === port.protocol
         ) {
+          lastPort.hostIp = hostIp;
           lastPort.containerPort.end = port.containerPort;
-          lastPort.hostPort.end = port.hostPort;
+          lastPort.hostPort.end = hostPort;
           return acc;
         }
 
         return [
           ...acc,
           {
+            hostIp,
             hostPort: {
-              start: port.hostPort,
-              end: port.hostPort,
+              start: hostPort,
+              end: hostPort,
             },
             containerPort: {
               start: port.containerPort,
@@ -123,34 +138,32 @@ export function toViewModel(portBindings: PortMap): Values {
           },
         ];
       }, [] as Array<RangePortBinding>)
-      .map(({ protocol, containerPort, hostPort }) => ({
-        hostPort: getRange(hostPort.start, hostPort.end),
+      .map(({ protocol, containerPort, hostPort, hostIp }) => ({
+        hostPort: getRange(hostPort.start, hostPort.end, hostIp),
         containerPort: getRange(containerPort.start, containerPort.end),
         protocol,
       }));
 
-    function getRange(start: number, end: number): string {
+    function getRange(start: number, end: number, hostIp?: string): string {
       if (start === end) {
         if (start === 0) {
           return '';
         }
 
+        if (hostIp) {
+          return `${hostIp}:${start}`;
+        }
         return start.toString();
       }
 
+      if (hostIp) {
+        return `${hostIp}:${start}-${end}`;
+      }
       return `${start}-${end}`;
     }
   }
 }
 
-function isNumericPortBinding(
-  port: StringPortBinding | NumericPortBinding
-): port is NumericPortBinding {
-  return port.hostPort !== 'string';
-}
-
-function isStringPortBinding(
-  port: StringPortBinding | NumericPortBinding
-): port is StringPortBinding {
-  return port.hostPort === 'string';
+function isRangePortBinding(port: StringPortBinding): boolean {
+  return port.hostPort.includes('-');
 }

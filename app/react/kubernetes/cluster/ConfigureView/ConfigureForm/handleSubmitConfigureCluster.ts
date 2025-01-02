@@ -1,7 +1,7 @@
 import { FormikHelpers } from 'formik';
 import { StorageClass } from 'kubernetes-types/storage/v1';
 import { compare } from 'fast-json-patch';
-import { UseMutationResult } from 'react-query';
+import { UseMutationResult } from '@tanstack/react-query';
 
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { UpdateEnvironmentPayload } from '@/react/portainer/environments/queries/useUpdateEnvironmentMutation';

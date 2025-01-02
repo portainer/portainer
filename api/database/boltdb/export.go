@@ -8,8 +8,8 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func backupMetadata(connection *bolt.DB) (map[string]interface{}, error) {
-	buckets := map[string]interface{}{}
+func backupMetadata(connection *bolt.DB) (map[string]any, error) {
+	buckets := map[string]any{}
 
 	err := connection.View(func(tx *bolt.Tx) error {
 		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
@@ -39,7 +39,7 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 	}
 	defer connection.Close()
 
-	backup := make(map[string]interface{})
+	backup := make(map[string]any)
 	if metadata {
 		meta, err := backupMetadata(connection)
 		if err != nil {
@@ -49,10 +49,10 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 		backup["__metadata"] = meta
 	}
 
-	err = connection.View(func(tx *bolt.Tx) error {
-		err = tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+	if err := connection.View(func(tx *bolt.Tx) error {
+		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
 			bucketName := string(name)
-			var list []interface{}
+			var list []any
 			version := make(map[string]string)
 			cursor := bucket.Cursor()
 			for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
@@ -60,7 +60,7 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 					continue
 				}
 
-				var obj interface{}
+				var obj any
 				err := c.UnmarshalObject(v, &obj)
 				if err != nil {
 					log.Error().
@@ -84,27 +84,22 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 				return nil
 			}
 
-			if len(list) > 0 {
-				if bucketName == "ssl" ||
-					bucketName == "settings" ||
-					bucketName == "tunnel_server" {
-					backup[bucketName] = nil
-					if len(list) > 0 {
-						backup[bucketName] = list[0]
-					}
-					return nil
+			if bucketName == "ssl" ||
+				bucketName == "settings" ||
+				bucketName == "tunnel_server" {
+				backup[bucketName] = nil
+				if len(list) > 0 {
+					backup[bucketName] = list[0]
 				}
-				backup[bucketName] = list
+
 				return nil
 			}
 
+			backup[bucketName] = list
+
 			return nil
 		})
-
-		return err
-	})
-
-	if err != nil {
+	}); err != nil {
 		return []byte("{}"), err
 	}
 

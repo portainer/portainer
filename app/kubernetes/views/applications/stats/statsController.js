@@ -4,7 +4,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
-import { getMetricsForPod } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForPod } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesApplicationStatsController {
   /* @ngInject */

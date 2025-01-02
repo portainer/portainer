@@ -1,6 +1,6 @@
 import { Service } from 'docker-types/generated/1.41';
 
-import { ServiceUpdateConfig } from '../queries/useUpdateServiceMutation';
+import { ServiceUpdateConfig } from '../types';
 
 export function convertServiceToConfig(service: Service): ServiceUpdateConfig {
   return {

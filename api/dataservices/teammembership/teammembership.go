@@ -72,7 +72,7 @@ func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]port
 func (service *Service) Create(membership *portainer.TeamMembership) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			membership.ID = portainer.TeamMembershipID(id)
 			return int(membership.ID), membership
 		},
@@ -84,8 +84,8 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 	return service.Connection.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+		func(obj any) (id int, ok bool) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
@@ -105,8 +105,8 @@ func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) er
 	return service.Connection.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+		func(obj any) (id int, ok bool) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
@@ -125,8 +125,8 @@ func (service *Service) DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.T
 	return service.Connection.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
-			membership, ok := obj.(portainer.TeamMembership)
+		func(obj any) (id int, ok bool) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
 				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)

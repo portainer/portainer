@@ -70,7 +70,11 @@ export function AccessControlPanel({
       {!isEditDisabled && !isEditMode && (
         <div className="row">
           <div>
-            <Button color="link" onClick={toggleEditMode}>
+            <Button
+              color="link"
+              onClick={toggleEditMode}
+              data-cy="change-ownership-button"
+            >
               <Icon icon={Edit} className="space-right" />
               Change ownership
             </Button>

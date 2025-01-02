@@ -9,7 +9,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
-	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 )
@@ -19,35 +18,34 @@ func TestEndpointDeleteEdgeGroupsConcurrently(t *testing.T) {
 
 	_, store := datastore.MustNewTestStore(t, true, false)
 
-	handler := NewHandler(testhelpers.NewTestRequestBouncer(), demo.NewService())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
 	handler.DataStore = store
-	handler.ProxyManager = proxy.NewManager(nil, nil, nil, nil, nil, nil, nil)
+	handler.ProxyManager = proxy.NewManager(nil)
+	handler.ProxyManager.NewProxyFactory(nil, nil, nil, nil, nil, nil, nil, nil)
 
 	// Create all the environments and add them to the same edge group
 
 	var endpointIDs []portainer.EndpointID
 
-	for i := 0; i < endpointsCount; i++ {
+	for i := range endpointsCount {
 		endpointID := portainer.EndpointID(i) + 1
 
-		err := store.Endpoint().Create(&portainer.Endpoint{
+		if err := store.Endpoint().Create(&portainer.Endpoint{
 			ID:   endpointID,
 			Name: "env-" + strconv.Itoa(int(endpointID)),
 			Type: portainer.EdgeAgentOnDockerEnvironment,
-		})
-		if err != nil {
+		}); err != nil {
 			t.Fatal("could not create endpoint:", err)
 		}
 
 		endpointIDs = append(endpointIDs, endpointID)
 	}
 
-	err := store.EdgeGroup().Create(&portainer.EdgeGroup{
+	if err := store.EdgeGroup().Create(&portainer.EdgeGroup{
 		ID:        1,
 		Name:      "edgegroup-1",
 		Endpoints: endpointIDs,
-	})
-	if err != nil {
+	}); err != nil {
 		t.Fatal("could not create edge group:", err)
 	}
 

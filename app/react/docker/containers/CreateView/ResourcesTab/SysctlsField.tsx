@@ -30,11 +30,12 @@ export function SysctlsField({
       label="Sysctls"
       errors={errors}
       itemBuilder={() => ({ name: '', value: '' })}
+      data-cy="docker-container-sysctls"
     />
   );
 }
 
-function Item({ item, onChange, error }: ItemProps<Sysctls>) {
+function Item({ item, onChange, error, index }: ItemProps<Sysctls>) {
   return (
     <div className="w-full">
       <div className="flex w-full gap-4">
@@ -45,6 +46,7 @@ function Item({ item, onChange, error }: ItemProps<Sysctls>) {
           placeholder="e.g. FOO"
           className="w-1/2"
           size="small"
+          data-cy={`docker-container-sysctl-name_${index}`}
         />
         <InputLabeled
           value={item.value}
@@ -53,6 +55,7 @@ function Item({ item, onChange, error }: ItemProps<Sysctls>) {
           placeholder="e.g. bar"
           className="w-1/2"
           size="small"
+          data-cy={`docker-container-sysctl-value_${index}`}
         />
       </div>
       {error && <FormError>{Object.values(error)[0]}</FormError>}

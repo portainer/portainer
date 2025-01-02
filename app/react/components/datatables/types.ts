@@ -1,5 +1,6 @@
 import { createStore } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { ColumnFiltersState } from '@tanstack/react-table';
 
 import { keyBuilder } from '@/react/hooks/useLocalStorage';
 
@@ -52,10 +53,11 @@ export interface SettableColumnsTableSettings {
 }
 
 export function hiddenColumnsSettings<T extends SettableColumnsTableSettings>(
-  set: ZustandSetFunc<T>
+  set: ZustandSetFunc<T>,
+  initialHiddenColumns: string[] = []
 ): SettableColumnsTableSettings {
   return {
-    hiddenColumns: [],
+    hiddenColumns: initialHiddenColumns,
     setHiddenColumns: (hiddenColumns: string[]) =>
       set((s) => ({ ...s, hiddenColumns })),
   };
@@ -67,12 +69,29 @@ export interface RefreshableTableSettings {
 }
 
 export function refreshableSettings<T extends RefreshableTableSettings>(
-  set: ZustandSetFunc<T>
+  set: ZustandSetFunc<T>,
+  autoRefreshRate = 0
 ): RefreshableTableSettings {
   return {
-    autoRefreshRate: 0,
+    autoRefreshRate,
     setAutoRefreshRate: (autoRefreshRate: number) =>
       set((s) => ({ ...s, autoRefreshRate })),
+  };
+}
+
+export interface FilteredColumnsTableSettings {
+  columnFilters: ColumnFiltersState;
+  setColumnFilters(columns: ColumnFiltersState): void;
+}
+
+export function filteredColumnsSettings<T extends FilteredColumnsTableSettings>(
+  set: ZustandSetFunc<T>
+): FilteredColumnsTableSettings {
+  return {
+    columnFilters: [],
+    setColumnFilters(columns) {
+      set((s) => ({ ...s, columnFilters: columns }));
+    },
   };
 }
 
@@ -96,6 +115,7 @@ export function createPersistedStore<T extends BasicTableSettings>(
         }) as T,
       {
         name: keyBuilder(`datatable_settings_${storageKey}`),
+        version: 1,
       }
     )
   );

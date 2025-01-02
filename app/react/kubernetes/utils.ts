@@ -13,7 +13,7 @@ export function parseCpu(cpu: string) {
 export function prepareAnnotations(annotations?: Annotation[]) {
   const result = annotations?.reduce(
     (acc, a) => {
-      acc[a.Key] = a.Value;
+      acc[a.key] = a.value;
       return acc;
     },
     {} as Record<string, string>

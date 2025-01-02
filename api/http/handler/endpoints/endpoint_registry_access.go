@@ -122,7 +122,7 @@ func (handler *Handler) updateRegistryAccess(tx dataservices.DataStoreTx, r *htt
 		registryAccess.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
-	registry.RegistryAccesses[portainer.EndpointID(endpointID)] = registryAccess
+	registry.RegistryAccesses[endpointID] = registryAccess
 
 	return tx.Registry().Update(registry.ID, registry)
 }
@@ -134,7 +134,7 @@ func (handler *Handler) updateKubeAccess(endpoint *portainer.Endpoint, registry 
 	namespacesToRemove := setDifference(oldNamespacesSet, newNamespacesSet)
 	namespacesToAdd := setDifference(newNamespacesSet, oldNamespacesSet)
 
-	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return err
 	}

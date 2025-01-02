@@ -47,6 +47,7 @@ export function ColumnVisibilityMenu<D extends object>({
                   <div key={column.id}>
                     <Checkbox
                       checked={column.getIsVisible()}
+                      data-cy="column-visibility-checkbox"
                       label={
                         typeof column.columnDef.header === 'string'
                           ? column.columnDef.header

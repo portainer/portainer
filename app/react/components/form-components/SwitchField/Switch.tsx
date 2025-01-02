@@ -55,7 +55,7 @@ export function Switch({
         />
         <span className="slider round before:content-['']" />
       </label>
-      {limitedToBE && <BEFeatureIndicator featureId={featureId} />}
+      {featureId && limitedToBE && <BEFeatureIndicator featureId={featureId} />}
     </>
   );
 }

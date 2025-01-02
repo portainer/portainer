@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/demo"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
@@ -28,7 +27,6 @@ func hideFields(endpoint *portainer.Endpoint) {
 type Handler struct {
 	*mux.Router
 	requestBouncer        security.BouncerService
-	demoService           *demo.Service
 	DataStore             dataservices.DataStore
 	FileService           portainer.FileService
 	ProxyManager          *proxy.Manager
@@ -44,11 +42,10 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.
-func NewHandler(bouncer security.BouncerService, demoService *demo.Service) *Handler {
+func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
-		demoService:    demoService,
 	}
 
 	h.Handle("/endpoints",
@@ -71,6 +68,8 @@ func NewHandler(bouncer security.BouncerService, demoService *demo.Service) *Han
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDeleteBatch))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/snapshot",

@@ -1,14 +1,12 @@
 package websocket
 
 import (
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -76,14 +74,6 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		log.Warn().
-			Err(err).
-			Msg("unable to retrieve user details from authentication token")
-		return err
-	}
-
 	r.Header.Del("Origin")
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
@@ -98,16 +88,15 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 	}
 	defer websocketConn.Close()
 
-	return hijackAttachStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
+	return hijackAttachStartOperation(websocketConn, params.endpoint, params.ID)
 }
 
 func hijackAttachStartOperation(
 	websocketConn *websocket.Conn,
 	endpoint *portainer.Endpoint,
 	attachID string,
-	token string,
 ) error {
-	dial, err := initDial(endpoint)
+	conn, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
@@ -117,24 +106,20 @@ func hijackAttachStartOperation(
 	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
 	// state. Setting TCP KeepAlive on the socket connection will prohibit
 	// ECONNTIMEOUT unless the socket connection truly is broken
-	if tcpConn, ok := dial.(*net.TCPConn); ok {
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
 		tcpConn.SetKeepAlive(true)
 		tcpConn.SetKeepAlivePeriod(30 * time.Second)
 	}
-
-	httpConn := httputil.NewClientConn(dial, nil)
-	defer httpConn.Close()
 
 	attachStartRequest, err := createAttachStartRequest(attachID)
 	if err != nil {
 		return err
 	}
 
-	return hijackRequest(websocketConn, httpConn, attachStartRequest, token)
+	return ws.HijackRequest(websocketConn, conn, attachStartRequest)
 }
 
 func createAttachStartRequest(attachID string) (*http.Request, error) {
-
 	request, err := http.NewRequest("POST", "/containers/"+attachID+"/attach?stdin=1&stdout=1&stderr=1&stream=1", nil)
 	if err != nil {
 		return nil, err

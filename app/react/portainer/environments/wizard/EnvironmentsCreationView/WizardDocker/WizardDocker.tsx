@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Zap, Network, Plug2 } from 'lucide-react';
 import _ from 'lodash';
 
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
@@ -10,6 +13,7 @@ import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
 
 import { BoxSelector, type BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
+import { Alert } from '@@/Alert';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
@@ -63,6 +67,8 @@ const options: BoxSelectorOption<
   },
 ]);
 
+const containerEngine = ContainerEngine.Docker;
+
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
   const [creationType, setCreationType] = useState(options[0].value);
 
@@ -70,6 +76,17 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
 
   return (
     <div className="form-horizontal">
+      {!isDockerStandalone && (
+        <Alert color="warn" className="col-sm-12 mb-2">
+          <div>
+            Only do this <b>once</b> for your environment, regardless of how
+            many nodes are in the cluster. You do <b>not</b> need to add each
+            node as an individual environment in Portainer. Adding just one node
+            (we recommend the manager node) will allow Portainer to manage the
+            entire cluster.
+          </div>
+        </Alert>
+      )}
       <BoxSelector
         onChange={(v) => setCreationType(v)}
         options={options}
@@ -123,6 +140,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
                 ? [commandsTabs.standaloneWindow]
                 : [commandsTabs.swarmWindows],
             }}
+            containerEngine={containerEngine}
           />
         );
       case 'edgeAgentAsync':
@@ -140,6 +158,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
                 ? [commandsTabs.standaloneWindow]
                 : [commandsTabs.swarmWindows],
             }}
+            containerEngine={containerEngine}
           />
         );
       default:

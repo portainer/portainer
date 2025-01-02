@@ -1,20 +1,24 @@
 package security
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/pkg/featureflags"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
-	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
+
+const apiKeyHeader = "X-API-KEY"
+const jwtTokenHeader = "Authorization"
 
 type (
 	BouncerService interface {
@@ -27,9 +31,10 @@ type (
 
 		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
 		AuthorizedEdgeEndpointOperation(*http.Request, *portainer.Endpoint) error
-		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
 		CookieAuthLookup(*http.Request) (*portainer.TokenData, error)
 		JWTAuthLookup(*http.Request) (*portainer.TokenData, error)
+		TrustedEdgeEnvironmentAccess(dataservices.DataStoreTx, *portainer.Endpoint) error
+		RevokeJWT(string)
 	}
 
 	// RequestBouncer represents an entity that manages API request accesses
@@ -37,6 +42,9 @@ type (
 		dataStore     dataservices.DataStore
 		jwtService    portainer.JWTService
 		apiKeyService apikey.APIKeyService
+		revokedJWT    sync.Map
+		hsts          bool
+		csp           bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -52,22 +60,30 @@ type (
 	tokenLookup func(*http.Request) (*portainer.TokenData, error)
 )
 
-const apiKeyHeader = "X-API-KEY"
-const jwtTokenHeader = "Authorization"
+var (
+	ErrInvalidKey = errors.New("Invalid API key")
+	ErrRevokedJWT = errors.New("the JWT has been revoked")
+)
 
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
-	return &RequestBouncer{
+	b := &RequestBouncer{
 		dataStore:     dataStore,
 		jwtService:    jwtService,
 		apiKeyService: apiKeyService,
+		hsts:          featureflags.IsEnabled("hsts"),
+		csp:           featureflags.IsEnabled("csp"),
 	}
+
+	go b.cleanUpExpiredJWT()
+
+	return b
 }
 
 // PublicAccess defines a security check for public API endpoints.
 // No authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
-	return mwSecureHeaders(h)
+	return MWSecureHeaders(h, bouncer.hsts, bouncer.csp)
 }
 
 // AdminAccess defines a security check for API endpoints that require an authorization check.
@@ -80,6 +96,7 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, true)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -92,6 +109,7 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, false)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -105,6 +123,7 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	h = bouncer.mwIsTeamLeader(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -116,6 +135,7 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
+
 	return h
 }
 
@@ -196,7 +216,8 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 		bouncer.CookieAuthLookup,
 		bouncer.JWTAuthLookup,
 	}, h)
-	h = mwSecureHeaders(h)
+	h = MWSecureHeaders(h, bouncer.hsts, bouncer.csp)
+
 	return h
 }
 
@@ -275,7 +296,7 @@ func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
 }
 
 // mwAuthenticateFirst authenticates a request an auth token.
-// A result of a first succeded token lookup would be used for the authentication.
+// A result of a first succeeded token lookup would be used for the authentication.
 func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var token *portainer.TokenData
@@ -284,23 +305,27 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			resultToken, err := lookup(r)
 			if err != nil {
 				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", httperrors.ErrUnauthorized)
+
 				return
 			}
 
 			if resultToken != nil {
 				token = resultToken
+
 				break
 			}
 		}
 
 		if token == nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "A valid authorization token is missing", httperrors.ErrUnauthorized)
+
 			return
 		}
 
 		user, _ := bouncer.dataStore.User().Read(token.ID)
 		if user == nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "An authorization token is invalid", httperrors.ErrUnauthorized)
+
 			return
 		}
 
@@ -317,9 +342,13 @@ func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.Tok
 		return nil, nil
 	}
 
-	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	tokenData, jti, _, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if _, ok := bouncer.revokedJWT.Load(jti); ok {
+		return nil, ErrRevokedJWT
 	}
 
 	return tokenData, nil
@@ -333,15 +362,46 @@ func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenD
 		return nil, nil
 	}
 
-	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	tokenData, jti, _, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
 		return nil, err
+	}
+
+	if _, ok := bouncer.revokedJWT.Load(jti); ok {
+		return nil, ErrRevokedJWT
 	}
 
 	return tokenData, nil
 }
 
-var ErrInvalidKey = errors.New("Invalid API key")
+func (bouncer *RequestBouncer) RevokeJWT(token string) {
+	_, jti, exp, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	if err != nil {
+		return
+	}
+
+	bouncer.revokedJWT.Store(jti, exp)
+}
+
+func (bouncer *RequestBouncer) cleanUpExpiredJWTPass() {
+	bouncer.revokedJWT.Range(func(key, value any) bool {
+		if t := value.(time.Time); t.IsZero() {
+			return true
+		} else if time.Now().After(t) {
+			bouncer.revokedJWT.Delete(key)
+		}
+
+		return true
+	})
+}
+
+func (bouncer *RequestBouncer) cleanUpExpiredJWT() {
+	ticker := time.NewTicker(time.Hour)
+
+	for range ticker.C {
+		bouncer.cleanUpExpiredJWTPass()
+	}
+}
 
 // apiKeyLookup looks up an verifies an api-key by:
 // - computing the digest of the raw api-key
@@ -370,13 +430,13 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 	}
 	if _, _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
 		log.Debug().Err(err).Msg("Failed to generate token")
-		return nil, fmt.Errorf("failed to generate token")
+		return nil, errors.New("failed to generate token")
 	}
 
 	if now := time.Now().UTC().Unix(); now-apiKey.LastUsed > 60 { // [seconds]
 		// update the last used time of the key
 		apiKey.LastUsed = now
-		bouncer.apiKeyService.UpdateAPIKey(&apiKey)
+		_ = bouncer.apiKeyService.UpdateAPIKey(&apiKey)
 	}
 
 	return tokenData, nil
@@ -392,6 +452,7 @@ func extractBearerToken(r *http.Request) (string, bool) {
 	if token != "" {
 		query.Del("token")
 		r.URL.RawQuery = query.Encode()
+
 		return token, true
 	}
 
@@ -461,10 +522,17 @@ func extractAPIKey(r *http.Request) (string, bool) {
 	return "", false
 }
 
-// mwSecureHeaders provides secure headers middleware for handlers.
-func mwSecureHeaders(next http.Handler) http.Handler {
+// MWSecureHeaders provides secure headers middleware for handlers.
+func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		if hsts {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000") // 365 days
+		}
+
+		if csp {
+			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud")
+		}
+
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})
@@ -505,11 +573,13 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 		settings, err := bouncer.dataStore.Settings().Settings()
 		if err != nil {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Unable to retrieve settings", err)
+
 			return
 		}
 
 		if !settings.EnableEdgeComputeFeatures {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Edge compute features are disabled", errors.New("Edge compute features are disabled"))
+
 			return
 		}
 
@@ -528,7 +598,12 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 // - public routes
 // - kubectl - a bearer token is needed, and no csrf token can be sent
 // - api token
-func ShouldSkipCSRFCheck(r *http.Request) (bool, error) {
+// - docker desktop extension
+func ShouldSkipCSRFCheck(r *http.Request, isDockerDesktopExtension bool) (bool, error) {
+	if isDockerDesktopExtension {
+		return true, nil
+	}
+
 	cookie, _ := r.Cookie(portainer.AuthCookieKey)
 	hasCookie := cookie != nil && cookie.Value != ""
 

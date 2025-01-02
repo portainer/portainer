@@ -87,10 +87,7 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
-
 			connection := DbConnection{Path: dir}
 
 			if tc.dbname == "both" {

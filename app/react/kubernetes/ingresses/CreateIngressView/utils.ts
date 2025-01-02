@@ -83,9 +83,9 @@ export function getAnnotationsForEdit(
   Object.keys(annotations).forEach((k) => {
     if (ignoreAnnotationsForEdit.indexOf(k) === -1) {
       result.push({
-        Key: k,
-        Value: annotations[k],
-        ID: uuidv4(),
+        key: k,
+        value: annotations[k],
+        id: uuidv4(),
       });
     }
   });

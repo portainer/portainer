@@ -1,10 +1,15 @@
 {
+  "api_key": null,
+  "customtemplates": null,
   "dockerhub": [
     {
       "Authentication": false,
       "Username": ""
     }
   ],
+  "edge_stack": null,
+  "edgegroups": null,
+  "edgejobs": null,
   "endpoint_groups": [
     {
       "AuthorizedTeams": null,
@@ -38,6 +43,7 @@
         "TenantID": ""
       },
       "ComposeSyntaxMaxVersion": "",
+      "ContainerEngine": "",
       "Edge": {
         "AsyncMode": false,
         "CommandInterval": 0,
@@ -102,6 +108,9 @@
       "UserAccessPolicies": {}
     }
   ],
+  "extension": null,
+  "helm_user_repository": null,
+  "pending_actions": null,
   "registries": [
     {
       "Authentication": true,
@@ -583,7 +592,6 @@
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
     "Edge": {
-      "AsyncMode": false,
       "CommandInterval": 0,
       "PingInterval": 0,
       "SnapshotInterval": 0
@@ -602,7 +610,7 @@
       "RequiredPasswordLength": 12
     },
     "KubeconfigExpiry": "0",
-    "KubectlShellImage": "portainer/kubectl-shell",
+    "KubectlShellImage": "portainer/kubectl-shell:2.25.0",
     "LDAPSettings": {
       "AnonymousMode": true,
       "AutoCreateUsers": true,
@@ -631,6 +639,7 @@
     "LogoURL": "",
     "OAuthSettings": {
       "AccessTokenURI": "",
+      "AuthStyle": 0,
       "AuthorizationURI": "",
       "ClientID": "",
       "DefaultTeamID": 0,
@@ -643,17 +652,10 @@
       "Scopes": "",
       "UserIdentifier": ""
     },
-    "ShowKomposeBuildOption": false,
     "SnapshotInterval": "5m",
     "TemplatesURL": "",
     "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
-    "fdoConfiguration": {
-      "enabled": false,
-      "ownerPassword": "",
-      "ownerURL": "",
-      "ownerUsername": ""
-    },
     "openAMTConfiguration": {
       "certFileContent": "",
       "certFileName": "",
@@ -670,6 +672,7 @@
     {
       "Docker": {
         "ContainerCount": 0,
+        "DiagnosticsData": {},
         "DockerSnapshotRaw": {
           "Containers": null,
           "Images": null,
@@ -677,6 +680,7 @@
             "Architecture": "",
             "BridgeNfIp6tables": false,
             "BridgeNfIptables": false,
+            "CDISpecDirs": null,
             "CPUSet": false,
             "CPUShares": false,
             "CgroupDriver": "",
@@ -774,6 +778,7 @@
         "GpuUseList": null,
         "HealthyContainerCount": 0,
         "ImageCount": 9,
+        "IsPodman": false,
         "NodeCount": 0,
         "RunningContainerCount": 5,
         "ServiceCount": 0,
@@ -808,7 +813,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 2,
-      "IsComposeFormat": false,
       "Name": "alpine",
       "Namespace": "",
       "Option": null,
@@ -831,7 +835,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 5,
-      "IsComposeFormat": false,
       "Name": "redis",
       "Namespace": "",
       "Option": null,
@@ -854,7 +857,6 @@
       "FromAppTemplate": false,
       "GitConfig": null,
       "Id": 6,
-      "IsComposeFormat": false,
       "Name": "nginx",
       "Namespace": "",
       "Option": null,
@@ -867,6 +869,8 @@
       "UpdatedBy": ""
     }
   ],
+  "tags": null,
+  "team_membership": null,
   "teams": [
     {
       "Id": 1,
@@ -939,6 +943,7 @@
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.21.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
-  }
+    "VERSION": "{\"SchemaVersion\":\"2.25.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+  },
+  "webhooks": null
 }

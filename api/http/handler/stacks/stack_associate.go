@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -95,7 +96,7 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 	}
 	if !canManage {
 		errMsg := "Stack management is disabled for non-admin users"
-		return httperror.Forbidden(errMsg, fmt.Errorf(errMsg))
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	stack.EndpointID = portainer.EndpointID(endpointID)

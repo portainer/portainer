@@ -43,8 +43,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	var payload teamUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -59,8 +58,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 		team.Name = payload.Name
 	}
 
-	err = handler.DataStore.Team().Update(team.ID, team)
-	if err != nil {
+	if err := handler.DataStore.Team().Update(team.ID, team); err != nil {
 		return httperror.NotFound("Unable to persist team changes inside the database", err)
 	}
 

@@ -11,12 +11,12 @@ export const annotationsSchema: SchemaOf<Annotation[]> = array(
 ).test(
   'unique',
   'Duplicate keys are not allowed.',
-  buildUniquenessTest(() => 'Duplicate keys are not allowed.', 'Key')
+  buildUniquenessTest(() => 'Duplicate keys are not allowed.', 'key')
 );
 
 function getAnnotationValidation(): SchemaOf<Annotation> {
   return object({
-    Key: string()
+    key: string()
       .required('Key is required.')
       .test('is-valid', (value, { createError }) => {
         if (!value) {
@@ -62,7 +62,7 @@ function getAnnotationValidation(): SchemaOf<Annotation> {
         }
         return true;
       }),
-    Value: string().required('Value is required.'),
-    ID: string().required('ID is required.'),
+    value: string().required('Value is required.'),
+    id: string().required('ID is required.'),
   });
 }

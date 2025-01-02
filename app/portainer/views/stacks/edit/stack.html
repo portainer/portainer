@@ -169,13 +169,12 @@
 
               <!-- environment-variables -->
               <div ng-if="stack">
-                <environment-variables-panel
+                <stack-environment-variables-panel
                   values="formValues.Env"
-                  explanation="'These values will be used as substitutions in the stack file. To reference the .env file in your compose file, use ‘stack.env’.'"
                   on-change="(handleEnvVarChange)"
                   show-help-message="true"
                   is-foldable="true"
-                ></environment-variables-panel>
+                ></stack-environment-variables-panel>
               </div>
               <!-- !environment-variables -->
 
@@ -242,7 +241,13 @@
   environment="endpoint"
 ></stack-containers-datatable>
 
-<docker-services-datatable ng-if="services && (!orphaned || orphanedRunning)" dataset="services" title-icon="list" on-refresh="(getServices)"></docker-services-datatable>
+<docker-services-datatable
+  ng-if="services && (!orphaned || orphanedRunning)"
+  dataset="services"
+  title-icon="list"
+  on-refresh="(getServices)"
+  table-key="'stack-services'"
+></docker-services-datatable>
 
 <!-- access-control-panel -->
 <access-control-panel

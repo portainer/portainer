@@ -2,33 +2,35 @@ import { Volume } from 'docker-types/generated/1.41';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { IResource } from '@/react/docker/components/datatable/createOwnershipColumn';
-import { PortainerMetadata } from '@/react/docker/types';
+import { PortainerResponse } from '@/react/docker/types';
 
 export class VolumeViewModel implements IResource {
   Id: string;
 
-  CreatedAt: string | undefined;
+  Name: Volume['Name'];
 
-  Driver: string;
+  CreatedAt?: Volume['CreatedAt'];
 
-  Options: Record<string, string>;
+  Driver: Volume['Driver'];
 
-  Labels: Record<string, string>;
+  Options: Volume['Options'];
 
-  StackName?: string;
+  Labels: Volume['Labels'];
 
-  Mountpoint: string;
+  Mountpoint: Volume['Mountpoint'];
+
+  // Portainer properties
 
   ResourceId?: string;
 
   NodeName?: string;
 
+  StackName?: string;
+
   ResourceControl?: ResourceControlViewModel;
 
-  constructor(
-    data: Volume & { Portainer?: PortainerMetadata; ResourceID?: string }
-  ) {
-    this.Id = data.Name;
+  constructor(data: PortainerResponse<Volume> & { ResourceID?: string }) {
+    this.Name = data.Name;
     this.CreatedAt = data.CreatedAt;
     this.Driver = data.Driver;
     this.Options = data.Options;
@@ -51,6 +53,11 @@ export class VolumeViewModel implements IResource {
       if (data.Portainer.Agent && data.Portainer.Agent.NodeName) {
         this.NodeName = data.Portainer.Agent.NodeName;
       }
+    }
+
+    this.Id = data.Name;
+    if (this.NodeName) {
+      this.Id = `${data.Name}-${this.NodeName}`;
     }
   }
 }

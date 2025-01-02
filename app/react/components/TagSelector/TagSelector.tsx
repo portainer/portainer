@@ -6,6 +6,7 @@ import { useCreateTagMutation, useTags } from '@/portainer/tags/queries';
 import { Creatable, Select } from '@@/form-components/ReactSelect';
 import { FormControl } from '@@/form-components/FormControl';
 import { Link } from '@@/Link';
+import { ArrayError } from '@@/form-components/InputList/InputList';
 
 import { TagButton } from '../TagButton';
 
@@ -13,6 +14,7 @@ interface Props {
   value: TagId[];
   allowCreate?: boolean;
   onChange(value: TagId[]): void;
+  errors?: ArrayError<TagId[]>;
 }
 
 interface Option {
@@ -20,7 +22,12 @@ interface Option {
   label: string;
 }
 
-export function TagSelector({ value, allowCreate = false, onChange }: Props) {
+export function TagSelector({
+  value,
+  allowCreate = false,
+  onChange,
+  errors,
+}: Props) {
   // change the struct because react-select has a bug with Creatable (https://github.com/JedWatson/react-select/issues/3417#issuecomment-461868989)
   const tagsQuery = useTags({
     select: (tags) => tags?.map((opt) => ({ label: opt.Name, value: opt.ID })),
@@ -45,7 +52,11 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
       <div className="form-group">
         <div className="col-sm-12 small text-muted">
           No tags available. Head over to the
-          <Link to="portainer.tags" className="space-right space-left">
+          <Link
+            to="portainer.tags"
+            className="space-right space-left"
+            data-cy="environment-tags-view-link"
+          >
             Tags view
           </Link>
           to add tags
@@ -58,19 +69,29 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
     <>
       {value.length > 0 && (
         <FormControl label="Selected tags">
-          {selectedTags.map((tag) => (
-            <TagButton
-              key={tag.value}
-              title="Remove tag"
-              value={tag.value}
-              label={tag.label}
-              onRemove={() => handleRemove(tag.value)}
-            />
-          ))}
+          <div data-cy="selected-tags">
+            {selectedTags.map((tag) => (
+              <TagButton
+                key={tag.value}
+                title="Remove tag"
+                value={tag.value}
+                label={tag.label}
+                onRemove={() => handleRemove(tag.value)}
+              />
+            ))}
+          </div>
         </FormControl>
       )}
 
-      <FormControl label="Tags" inputId="tags-selector">
+      <FormControl
+        label="Tags"
+        inputId="tags-selector"
+        errors={
+          typeof errors === 'string'
+            ? errors
+            : errors?.map((e) => e?.toString())
+        }
+      >
         <SelectComponent
           inputId="tags-selector"
           value={[] as { label: string; value: number }[]}
@@ -82,6 +103,7 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
           formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
           onCreateOption={handleCreateOption}
           aria-label="Tags"
+          data-cy="environment-tags-selector"
         />
       </FormControl>
     </>

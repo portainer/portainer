@@ -18,39 +18,6 @@ import {
   appRevisionAnnotation,
 } from './constants';
 
-// naked pods are pods which are not owned by a deployment, daemonset, statefulset or replicaset
-// https://kubernetes.io/docs/concepts/configuration/overview/#naked-pods-vs-replicasets-deployments-and-jobs
-// getNakedPods returns an array of naked pods from an array of pods, deployments, daemonsets and statefulsets
-export function getNakedPods(
-  pods: Pod[],
-  deployments: Deployment[],
-  daemonSets: DaemonSet[],
-  statefulSets: StatefulSet[]
-) {
-  const appLabels = [
-    ...deployments.map((deployment) => deployment.spec?.selector.matchLabels),
-    ...daemonSets.map((daemonSet) => daemonSet.spec?.selector.matchLabels),
-    ...statefulSets.map(
-      (statefulSet) => statefulSet.spec?.selector.matchLabels
-    ),
-  ];
-
-  const nakedPods = pods.filter((pod) => {
-    const podLabels = pod.metadata?.labels;
-    // if the pod has no labels, it is naked
-    if (!podLabels) return true;
-    // if the pod has labels, but no app labels, it is naked
-    return !appLabels.some((appLabel) => {
-      if (!appLabel) return false;
-      return Object.entries(appLabel).every(
-        ([key, value]) => podLabels[key] === value
-      );
-    });
-  });
-
-  return nakedPods;
-}
-
 // type guard to check if an application is a deployment, daemonset, statefulset or pod
 export function applicationIsKind<T extends Application>(
   appKind: 'Deployment' | 'DaemonSet' | 'StatefulSet' | 'Pod',

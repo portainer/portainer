@@ -29,6 +29,10 @@ func MustNewTestStore(t testing.TB, init, secure bool) (bool, *Store) {
 func NewTestStore(t testing.TB, init, secure bool) (bool, *Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
 	storePath := t.TempDir()
+	defaultKubectlShellImage := portainer.DefaultKubectlShellImage
+	flags := &portainer.CLIFlags{
+		KubectlShellImage: &defaultKubectlShellImage,
+	}
 
 	fileService, err := filesystem.NewService(storePath, "")
 	if err != nil {
@@ -45,34 +49,31 @@ func NewTestStore(t testing.TB, init, secure bool) (bool, *Store, func(), error)
 		panic(err)
 	}
 
-	store := NewStore(storePath, fileService, connection)
+	store := NewStore(flags, fileService, connection)
 	newStore, err := store.Open()
 	if err != nil {
 		return newStore, nil, nil, err
 	}
 
 	if init {
-		err = store.Init()
-		if err != nil {
+		if err := store.Init(); err != nil {
 			return newStore, nil, nil, err
 		}
 	}
 
 	if newStore {
-		// from MigrateData
+		// From MigrateData
 		v := models.Version{
 			SchemaVersion: portainer.APIVersion,
 			Edition:       int(portainer.PortainerCE),
 		}
-		err = store.VersionService.UpdateVersion(&v)
-		if err != nil {
+		if err := store.VersionService.UpdateVersion(&v); err != nil {
 			return newStore, nil, nil, err
 		}
 	}
 
 	teardown := func() {
-		err := store.Close()
-		if err != nil {
+		if err := store.Close(); err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
 	}

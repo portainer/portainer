@@ -8,7 +8,7 @@ import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
 import { Icon } from '@@/Icon';
 import { Badge } from '@@/Badge';
 
-import { EventsDatatable } from '../../components/KubernetesEventsDatatable';
+import { EventsDatatable } from '../../components/EventsDatatable';
 
 import {
   PlacementsDatatable,

@@ -8,15 +8,19 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/pkg/edge"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 )
 
 type edgeStackFromStringPayload struct {
 	// Name of the stack
-	Name string `example:"myStack" validate:"required"`
+	// Max length: 255
+	// Name must only contains lowercase characters, numbers, hyphens, or underscores
+	// Name must start with a lowercase character or number
+	// Example: stack-name or stack_123 or stackName
+	Name string `example:"stack-name" validate:"required"`
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// List of identifiers of EdgeGroups
@@ -33,11 +37,15 @@ type edgeStackFromStringPayload struct {
 }
 
 func (payload *edgeStackFromStringPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
+	if len(payload.Name) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid stack name")
 	}
 
-	if govalidator.IsNull(payload.StackFileContent) {
+	if !edge.IsValidEdgeStackName(payload.Name) {
+		return httperrors.NewInvalidPayloadError("Invalid stack name. Stack name must only consist of lowercase alpha characters, numbers, hyphens, or underscores as well as start with a lowercase character or number")
+	}
+
+	if len(payload.StackFileContent) == 0 {
 		return httperrors.NewInvalidPayloadError("Invalid stack file content")
 	}
 
@@ -93,7 +101,7 @@ func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolde
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	}
 	if hasWrongType {
-		return "", "", "", fmt.Errorf("edge stack with config do not match the environment type")
+		return "", "", "", errors.New("edge stack with config do not match the environment type")
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentCompose {
@@ -108,7 +116,6 @@ func (handler *Handler) storeFileContent(tx dataservices.DataStoreTx, stackFolde
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentKubernetes {
-
 		manifestPath = filesystem.ManifestFileDefaultName
 
 		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, manifestPath, fileContent)

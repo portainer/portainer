@@ -17,7 +17,7 @@ func NewTransport() *Transport {
 	}
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
+// RoundTrip is the implementation of the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	token := request.Header.Get("Private-Token")
 	if token == "" {

@@ -4,7 +4,7 @@ import { columnHelper } from './helper';
 
 export const ports = columnHelper.accessor(
   (row) =>
-    row.Ports.map(
+    row.Ports?.map(
       (port) =>
         `${port.Port}${port.NodePort !== 0 ? `:${port.NodePort}` : ''}/${
           port.Protocol
@@ -19,13 +19,13 @@ export const ports = columnHelper.accessor(
     ),
     id: 'ports',
     cell: ({ row }) => {
-      if (!row.original.Ports.length) {
+      if (!row.original.Ports?.length) {
         return '-';
       }
 
       return (
         <>
-          {row.original.Ports.map((port, index) => {
+          {row.original.Ports?.map((port, index) => {
             if (port.NodePort !== 0) {
               return (
                 <div key={index}>
@@ -44,8 +44,8 @@ export const ports = columnHelper.accessor(
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.Ports;
-      const b = rowB.original.Ports;
+      const a = rowA.original.Ports ?? [];
+      const b = rowB.original.Ports ?? [];
 
       if (!a.length && !b.length) return 0;
 

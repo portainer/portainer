@@ -6,12 +6,13 @@ import (
 
 	"github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
-	"github.com/portainer/portainer/api/internal/set"
+	"github.com/portainer/portainer/api/set"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 )
 
 type ImageResponse struct {
@@ -45,7 +46,7 @@ func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *http
 		return httpErr
 	}
 
-	images, err := cli.ImageList(r.Context(), types.ImageListOptions{})
+	images, err := cli.ImageList(r.Context(), image.ListOptions{})
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve Docker images", err)
 	}
@@ -63,7 +64,9 @@ func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *http
 
 	imageUsageSet := set.Set[string]{}
 	if withUsage {
-		containers, err := cli.ContainerList(r.Context(), types.ContainerListOptions{})
+		containers, err := cli.ContainerList(r.Context(), container.ListOptions{
+			All: true,
+		})
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve Docker containers", err)
 		}
@@ -75,7 +78,7 @@ func (handler *Handler) imagesList(w http.ResponseWriter, r *http.Request) *http
 
 	imagesList := make([]ImageResponse, len(images))
 	for i, image := range images {
-		if (image.RepoTags == nil || len(image.RepoTags) == 0) && (image.RepoDigests != nil && len(image.RepoDigests) > 0) {
+		if len(image.RepoTags) == 0 && len(image.RepoDigests) > 0 {
 			for _, repoDigest := range image.RepoDigests {
 				image.RepoTags = append(image.RepoTags, repoDigest[0:strings.Index(repoDigest, "@")]+":<none>")
 			}

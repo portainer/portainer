@@ -31,15 +31,18 @@ type (
 		// RegistryCredentials holds the credentials for a Docker registry.
 		// Used only for EE
 		RegistryCredentials []RegistryCredentials
-		// PrePullImage is a flag indicating if the agent should pull the image before deploying the stack.
+		// PrePullImage is a flag indicating if the agent must pull the image before deploying the stack.
 		// Used only for EE
 		PrePullImage bool
-		// RePullImage is a flag indicating if the agent should pull the image if it is already present on the node.
+		// RePullImage is a flag indicating if the agent must pull the image if it is already present on the node.
 		// Used only for EE
 		RePullImage bool
-		// RetryDeploy is a flag indicating if the agent should retry to deploy the stack if it fails.
+		// RetryDeploy is a flag indicating if the agent must retry to deploy the stack if it fails.
 		// Used only for EE
 		RetryDeploy bool
+		// RetryPeriod specifies the duration, in seconds, for which the agent should continue attempting to deploy the stack after a failure
+		// Used only for EE
+		RetryPeriod int
 		// EdgeUpdateID is the ID of the edge update related to this stack.
 		// Used only for EE
 		EdgeUpdateID int
@@ -55,6 +58,20 @@ type (
 		// Used only for EE async edge agent
 		// ReadyRePullImage is a flag to indicate whether the auto update is trigger to re-pull image
 		ReadyRePullImage bool
+
+		DeployerOptionsPayload DeployerOptionsPayload
+	}
+
+	DeployerOptionsPayload struct {
+		// Prune is a flag indicating if the agent must prune the containers or not when creating/updating an edge stack
+		// This flag drives `docker compose up --remove-orphans` and `docker stack up --prune` options
+		// Used only for EE
+		Prune bool
+		// RemoveVolumes is a flag indicating if the agent must remove the named volumes declared
+		// in the compose file and anonymouse volumes attached to containers
+		// This flag drives `docker compose down --volumes` option
+		// Used only for EE
+		RemoveVolumes bool
 	}
 
 	// RegistryCredentials holds the credentials for a Docker registry.

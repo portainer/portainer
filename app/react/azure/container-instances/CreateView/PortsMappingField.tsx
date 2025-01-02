@@ -49,6 +49,7 @@ export function PortsMappingField({
         errors={errors}
         disabled={disabled}
         readOnly={readOnly}
+        data-cy="aci-ports-mapping"
       />
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">
@@ -65,6 +66,7 @@ function Item({
   error,
   disabled,
   readOnly,
+  index,
 }: ItemProps<PortMapping>) {
   return (
     <div className={styles.item}>
@@ -80,6 +82,7 @@ function Item({
             disabled={disabled}
             readOnly={readOnly}
             type="number"
+            data-cy={`aci-ports-mapping-host-input_${index}`}
           />
         </InputGroup>
 
@@ -98,6 +101,7 @@ function Item({
             disabled={disabled}
             readOnly={readOnly}
             type="number"
+            data-cy={`aci-ports-mapping-container-port-input_${index}`}
           />
         </InputGroup>
 

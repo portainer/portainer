@@ -48,11 +48,11 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 			return errors.New("pid host disabled for non administrator users")
 		}
 
-		if !securitySettings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
+		if !securitySettings.AllowDeviceMappingForRegularUsers && len(service.Devices) > 0 {
 			return errors.New("device mapping disabled for non administrator users")
 		}
 
-		if !securitySettings.AllowSysctlSettingForRegularUsers && service.Sysctls != nil && len(service.Sysctls) > 0 {
+		if !securitySettings.AllowSysctlSettingForRegularUsers && len(service.Sysctls) > 0 {
 			return errors.New("sysctl setting disabled for non administrator users")
 		}
 

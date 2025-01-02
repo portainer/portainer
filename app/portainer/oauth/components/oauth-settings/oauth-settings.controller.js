@@ -4,7 +4,6 @@ import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.ser
 import { ModalType } from '@@/modals';
 import { confirm } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
-
 import providers, { getProviderByUrl } from './providers';
 
 const MS_TENANT_ID_PLACEHOLDER = 'TENANT_ID';
@@ -31,6 +30,7 @@ export default class OAuthSettingsController {
     this.addTeamMembershipMapping = this.addTeamMembershipMapping.bind(this);
     this.removeTeamMembership = this.removeTeamMembership.bind(this);
     this.onToggleAutoTeamMembership = this.onToggleAutoTeamMembership.bind(this);
+    this.onChangeAuthStyle = this.onChangeAuthStyle.bind(this);
   }
 
   onMicrosoftTenantIDChange() {
@@ -54,6 +54,7 @@ export default class OAuthSettingsController {
       this.settings.LogoutURI = provider.logoutUrl;
       this.settings.UserIdentifier = provider.userIdentifier;
       this.settings.Scopes = provider.scopes;
+      this.settings.AuthStyle = provider.authStyle;
 
       if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
         this.onMicrosoftTenantIDChange();
@@ -74,6 +75,12 @@ export default class OAuthSettingsController {
     this.$scope.$evalAsync(() => {
       this.settings.SSO = checked;
       this.settings.HideInternalAuth = false;
+    });
+  }
+
+  onChangeAuthStyle(val) {
+    this.$scope.$evalAsync(() => {
+      this.settings.AuthStyle = val;
     });
   }
 

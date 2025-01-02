@@ -13,7 +13,7 @@ type ServiceTx struct {
 func (service ServiceTx) Create(endpointGroup *portainer.EndpointGroup) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			endpointGroup.ID = portainer.EndpointGroupID(id)
 			return int(endpointGroup.ID), endpointGroup
 		},

@@ -10,6 +10,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-memory-reservation-input"
                 step="0.125"
                 min="0"
                 ng-model="service.ReservationMemoryBytes"
@@ -27,6 +28,7 @@
               <input
                 class="input-sm"
                 type="number"
+                data-cy="docker-service-memory-limit-input"
                 step="0.125"
                 min="0"
                 ng-model="service.LimitMemoryBytes"
@@ -44,6 +46,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-reservation-slider"
                 model="service.ReservationNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"
@@ -64,6 +67,7 @@
             </td>
             <td>
               <slider
+                data-cy="docker-service-cpu-limit-slider"
                 model="service.LimitNanoCPUs"
                 floor="0"
                 ceil="state.sliderMaxCpu"
@@ -92,7 +96,7 @@
             >Apply changes</button
           >
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
+            <pr-icon icon="'chevron-down'"></pr-icon>
           </button>
           <ul class="dropdown-menu">
             <li><a ng-click="cancelChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])">Reset changes</a></li>

@@ -15,7 +15,7 @@ import (
 // abosolutePath should be an absolute path to a directory.
 // Archive name will be <directoryName>.tar.gz and will be placed next to the directory.
 func TarGzDir(absolutePath string) (string, error) {
-	targzPath := filepath.Join(absolutePath, fmt.Sprintf("%s.tar.gz", filepath.Base(absolutePath)))
+	targzPath := filepath.Join(absolutePath, filepath.Base(absolutePath)+".tar.gz")
 	outFile, err := os.Create(targzPath)
 	if err != nil {
 		return "", err

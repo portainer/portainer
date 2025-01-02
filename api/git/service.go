@@ -9,6 +9,7 @@ import (
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/singleflight"
 )
 
 const (
@@ -139,12 +140,18 @@ func (service *Service) CloneRepository(destination, repositoryURL, referenceNam
 	return service.cloneRepository(destination, options)
 }
 
-func (service *Service) cloneRepository(destination string, options cloneOption) error {
+func (service *Service) repoManager(options baseOption) repoManager {
+	repoManager := service.git
+
 	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.download(context.TODO(), destination, options)
+		repoManager = service.azure
 	}
 
-	return service.git.download(context.TODO(), destination, options)
+	return repoManager
+}
+
+func (service *Service) cloneRepository(destination string, options cloneOption) error {
+	return service.repoManager(options.baseOption).download(context.TODO(), destination, options)
 }
 
 // LatestCommitID returns SHA1 of the latest commit of the specified reference
@@ -159,11 +166,7 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 		referenceName: referenceName,
 	}
 
-	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.latestCommitID(context.TODO(), options)
-	}
-
-	return service.git.latestCommitID(context.TODO(), options)
+	return service.repoManager(options.baseOption).latestCommitID(context.TODO(), options)
 }
 
 // ListRefs will list target repository's references without cloning the repository
@@ -174,21 +177,16 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 		service.repoRefCache.Remove(refCacheKey)
 		// Remove file caches pointed to the same repository
 		for _, fileCacheKey := range service.repoFileCache.Keys() {
-			key, ok := fileCacheKey.(string)
-			if ok {
-				if strings.HasPrefix(key, repositoryURL) {
-					service.repoFileCache.Remove(key)
-				}
+			if key, ok := fileCacheKey.(string); ok && strings.HasPrefix(key, repositoryURL) {
+				service.repoFileCache.Remove(key)
 			}
 		}
 	}
 
 	if service.repoRefCache != nil {
 		// Lookup the refs cache first
-		cache, ok := service.repoRefCache.Get(refCacheKey)
-		if ok {
-			refs, success := cache.([]string)
-			if success {
+		if cache, ok := service.repoRefCache.Get(refCacheKey); ok {
+			if refs, ok := cache.([]string); ok {
 				return refs, nil
 			}
 		}
@@ -201,31 +199,33 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 		tlsSkipVerify: tlsSkipVerify,
 	}
 
-	var (
-		refs []string
-		err  error
-	)
-	if isAzureUrl(options.repositoryUrl) {
-		refs, err = service.azure.listRefs(context.TODO(), options)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		refs, err = service.git.listRefs(context.TODO(), options)
-		if err != nil {
-			return nil, err
-		}
+	refs, err := service.repoManager(options).listRefs(context.TODO(), options)
+	if err != nil {
+		return nil, err
 	}
 
 	if service.cacheEnabled && service.repoRefCache != nil {
 		service.repoRefCache.Add(refCacheKey, refs)
 	}
+
 	return refs, nil
 }
+
+var singleflightGroup = &singleflight.Group{}
 
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
 func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, includedExts []string, tlsSkipVerify bool) ([]string, error) {
+	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify), strconv.FormatBool(dirOnly))
+
+	fs, err, _ := singleflightGroup.Do(repoKey, func() (any, error) {
+		return service.listFiles(repositoryURL, referenceName, username, password, dirOnly, hardRefresh, tlsSkipVerify)
+	})
+
+	return filterFiles(fs.([]string), includedExts), err
+}
+
+func (service *Service) listFiles(repositoryURL, referenceName, username, password string, dirOnly, hardRefresh bool, tlsSkipVerify bool) ([]string, error) {
 	repoKey := generateCacheKey(repositoryURL, referenceName, username, password, strconv.FormatBool(tlsSkipVerify), strconv.FormatBool(dirOnly))
 
 	if service.cacheEnabled && hardRefresh {
@@ -235,14 +235,9 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 
 	if service.repoFileCache != nil {
 		// lookup the files cache first
-		cache, ok := service.repoFileCache.Get(repoKey)
-		if ok {
-			files, success := cache.([]string)
-			if success {
-				// For the case while searching files in a repository without include extensions for the first time,
-				// but with include extensions for the second time
-				includedFiles := filterFiles(files, includedExts)
-				return includedFiles, nil
+		if cache, ok := service.repoFileCache.Get(repoKey); ok {
+			if files, ok := cache.([]string); ok {
+				return files, nil
 			}
 		}
 	}
@@ -258,28 +253,16 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 		dirOnly:       dirOnly,
 	}
 
-	var (
-		files []string
-		err   error
-	)
-	if isAzureUrl(options.repositoryUrl) {
-		files, err = service.azure.listFiles(context.TODO(), options)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		files, err = service.git.listFiles(context.TODO(), options)
-		if err != nil {
-			return nil, err
-		}
+	files, err := service.repoManager(options.baseOption).listFiles(context.TODO(), options)
+	if err != nil {
+		return nil, err
 	}
 
-	includedFiles := filterFiles(files, includedExts)
 	if service.cacheEnabled && service.repoFileCache != nil {
-		service.repoFileCache.Add(repoKey, includedFiles)
-		return includedFiles, nil
+		service.repoFileCache.Add(repoKey, files)
 	}
-	return includedFiles, nil
+
+	return files, nil
 }
 
 func (service *Service) purgeCache() {
@@ -306,6 +289,7 @@ func matchExtensions(target string, exts []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -316,10 +300,11 @@ func filterFiles(paths []string, includedExts []string) []string {
 
 	var includedFiles []string
 	for _, filename := range paths {
-		// filter out the filenames with non-included extension
+		// Filter out the filenames with non-included extension
 		if matchExtensions(filename, includedExts) {
 			includedFiles = append(includedFiles, filename)
 		}
 	}
+
 	return includedFiles
 }

@@ -40,11 +40,17 @@ function Cell({
       to="docker.containers.container"
       params={{ id: item.Container.Id, nodeName: item.Container.NodeName }}
       className="monospaced"
+      data-cy="docker-container-task-link"
     >
       {name}
     </Link>
   ) : (
-    <Link to="docker.tasks.task" params={{ id: value }} className="monospaced">
+    <Link
+      to="docker.tasks.task"
+      params={{ id: value }}
+      className="monospaced"
+      data-cy="docker-task-link"
+    >
       {name}
     </Link>
   );

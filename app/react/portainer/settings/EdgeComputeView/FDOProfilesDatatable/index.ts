@@ -1,1 +1,0 @@
-export { FDOProfilesDatatable } from './FDOProfilesDatatable';

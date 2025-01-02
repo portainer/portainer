@@ -26,6 +26,7 @@ import { servicesModule } from './services';
 import { networksModule } from './networks';
 import { swarmModule } from './swarm';
 import { volumesModule } from './volumes';
+import { templatesModule } from './templates';
 
 const ngModule = angular
   .module('portainer.docker.react.components', [
@@ -34,6 +35,7 @@ const ngModule = angular
     networksModule,
     swarmModule,
     volumesModule,
+    templatesModule,
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
@@ -116,7 +118,7 @@ const ngModule = angular
   )
   .component(
     'dockerContainerProcessesDatatable',
-    r2a(ProcessesDatatable, ['dataset', 'headers'])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ProcessesDatatable))), [])
   )
   .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
   .component(

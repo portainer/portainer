@@ -14,6 +14,7 @@ function renderDefault({
   return render(
     <Button
       type={type}
+      data-cy="button"
       color={color}
       size={size}
       disabled={disabled}

@@ -1,5 +1,5 @@
 import { Environment } from '@/react/portainer/environments/types';
-import { Registry } from '@/react/portainer/registries/types';
+import { Registry } from '@/react/portainer/registries/types/registry';
 
 enum WebhookType {
   Service = 1,

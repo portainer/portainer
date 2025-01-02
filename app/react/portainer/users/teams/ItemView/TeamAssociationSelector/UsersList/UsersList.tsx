@@ -46,6 +46,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
               onClick={() => handleAddAllMembers(users.map((u) => u.Id))}
               disabled={disabled || users.length === 0}
               icon={UserPlus}
+              data-cy="add-all-users-button"
             >
               Add all users
             </Button>
@@ -60,6 +61,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
           search,
           setSearch,
         }}
+        data-cy="users-datatable"
       />
     </RowProvider>
   );

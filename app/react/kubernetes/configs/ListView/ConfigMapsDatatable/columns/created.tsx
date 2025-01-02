@@ -1,8 +1,6 @@
 import { formatDate } from '@/portainer/filters/filters';
-import { appOwnerLabel } from '@/react/kubernetes/applications/constants';
 
 import { ConfigMapRowData } from '../types';
-import { configurationOwnerUsernameLabel } from '../../../constants';
 
 import { columnHelper } from './helper';
 
@@ -13,9 +11,7 @@ export const created = columnHelper.accessor((row) => getCreatedAtText(row), {
 });
 
 function getCreatedAtText(row: ConfigMapRowData) {
-  const owner =
-    row.metadata?.labels?.[configurationOwnerUsernameLabel] ||
-    row.metadata?.labels?.[appOwnerLabel];
-  const date = formatDate(row.metadata?.creationTimestamp);
+  const owner = row.ConfigurationOwner || row.ConfigurationOwnerId;
+  const date = formatDate(row.CreationDate);
   return owner ? `${date} by ${owner}` : date;
 }

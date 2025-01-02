@@ -5,7 +5,8 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
   'StateManager',
   'AgentService',
   'Authentication',
-  function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, Authentication) {
+  'Notifications',
+  function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, Authentication, Notifications) {
     var ctrl = this;
 
     ctrl.$onInit = initView;
@@ -24,25 +25,29 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       var nodeId = $stateParams.id;
       $q.all({
         node: NodeService.node(nodeId),
-      }).then(function (data) {
-        var node = data.node;
-        ctrl.originalNode = node;
-        ctrl.hostDetails = buildHostDetails(node);
-        ctrl.engineDetails = buildEngineDetails(node);
-        ctrl.nodeDetails = buildNodeDetails(node);
-        if (ctrl.state.isAgent) {
-          var agentApiVersion = applicationState.endpoint.agentApiVersion;
-          ctrl.state.agentApiVersion = agentApiVersion;
-          if (agentApiVersion < 2 || !ctrl.state.enableHostManagementFeatures) {
-            return;
-          }
+      })
+        .then(function (data) {
+          var node = data.node;
+          ctrl.originalNode = node;
+          ctrl.hostDetails = buildHostDetails(node);
+          ctrl.engineDetails = buildEngineDetails(node);
+          ctrl.nodeDetails = buildNodeDetails(node);
+          if (ctrl.state.isAgent) {
+            var agentApiVersion = applicationState.endpoint.agentApiVersion;
+            ctrl.state.agentApiVersion = agentApiVersion;
+            if (agentApiVersion < 2 || !ctrl.state.enableHostManagementFeatures) {
+              return;
+            }
 
-          AgentService.hostInfo(ctrl.endpoint.Id, node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-            ctrl.devices = agentHostInfo.PCIDevices;
-            ctrl.disks = agentHostInfo.PhysicalDisks;
-          });
-        }
-      });
+            AgentService.hostInfo(ctrl.endpoint.Id, node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+              ctrl.devices = agentHostInfo.PCIDevices;
+              ctrl.disks = agentHostInfo.PhysicalDisks;
+            });
+          }
+        })
+        .catch(function (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve node details');
+        });
     }
 
     function buildHostDetails(node) {

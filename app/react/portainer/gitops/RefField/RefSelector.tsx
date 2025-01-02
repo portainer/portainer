@@ -13,11 +13,13 @@ export function RefSelector({
   onChange,
   isUrlValid,
   stackId,
+  createdFromCustomTemplateId,
   inputId,
 }: {
   model: RefFieldModel;
   value: string;
   stackId?: StackId;
+  createdFromCustomTemplateId?: number;
   onChange: (value: string) => void;
   isUrlValid?: boolean;
   inputId: string;
@@ -26,6 +28,7 @@ export function RefSelector({
   const payload = {
     repository: model.RepositoryURL,
     stackId,
+    createdFromCustomTemplateId,
     tlsSkipVerify: model.TLSSkipVerify,
     ...creds,
   };

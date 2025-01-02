@@ -2,7 +2,10 @@ import _ from 'lodash';
 
 import { Team } from '@/react/portainer/users/teams/types';
 import { Role, User, UserId } from '@/portainer/users/types';
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 
 export function createMockUsers(
   count: number,
@@ -69,11 +72,17 @@ export function createMockEnvironment(): Environment {
     TagIds: [],
     GroupId: 1,
     Type: 1,
+    ContainerEngine: ContainerEngine.Docker,
     Name: 'environment',
     Status: 1,
     URL: 'url',
     Snapshots: [],
     Kubernetes: {
+      Flags: {
+        IsServerMetricsDetected: true,
+        IsServerIngressClassDetected: true,
+        IsServerStorageDetected: true,
+      },
       Snapshots: [],
       Configuration: {
         IngressClasses: [],
@@ -81,6 +90,9 @@ export function createMockEnvironment(): Environment {
         AllowNoneIngressClass: false,
       },
     },
+    UserAccessPolicies: {},
+    TeamAccessPolicies: {},
+    ComposeSyntaxMaxVersion: '0',
     EdgeKey: '',
     EnableGPUManagement: false,
     Id: 3,

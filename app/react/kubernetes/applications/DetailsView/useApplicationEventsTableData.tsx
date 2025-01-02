@@ -5,13 +5,10 @@ import { createStore } from '@/react/kubernetes/datatables/default-kube-datatabl
 
 import { useTableState } from '@@/datatables/useTableState';
 
-import {
-  useApplication,
-  useApplicationPods,
-  useApplicationServices,
-} from '../application.queries';
-
-import { useNamespaceEventsQuery } from './useNamespaceEventsQuery';
+import { useEvents } from '../../queries/useEvents';
+import { useApplication } from '../queries/useApplication';
+import { useApplicationServices } from '../queries/useApplicationServices';
+import { useApplicationPods } from '../queries/useApplicationPods';
 
 const storageKey = 'k8sAppEventsDatatable';
 const settingsStore = createStore(storageKey, { id: 'Date', desc: true });
@@ -49,13 +46,12 @@ export function useApplicationEventsTableData() {
     name,
     application
   );
-  const { data: events, ...eventsQuery } = useNamespaceEventsQuery(
-    environmentId,
+  const { data: events, ...eventsQuery } = useEvents(environmentId, {
     namespace,
-    {
+    queryOptions: {
       autoRefreshRate: appEventsTableState.autoRefreshRate * 1000,
-    }
-  );
+    },
+  });
 
   // related events are events that have the application id, or the id of a service or pod from the application
   const appEventsData = useMemo(() => {

@@ -1,5 +1,12 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-import { type EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
+import {
+  Environment,
+  EnvironmentId,
+  EnvironmentType,
+  EnvironmentSecuritySettings,
+  EnvironmentStatus,
+  EnvironmentGroupId,
+} from '@/react/portainer/environments/types';
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
@@ -9,13 +16,6 @@ import {
 } from '@/react/edge/edge-stacks/types';
 
 import { getPublicSettings } from '../../settings/settings.service';
-import type {
-  Environment,
-  EnvironmentId,
-  EnvironmentType,
-  EnvironmentSecuritySettings,
-  EnvironmentStatus,
-} from '../types';
 
 import { buildUrl } from './utils';
 

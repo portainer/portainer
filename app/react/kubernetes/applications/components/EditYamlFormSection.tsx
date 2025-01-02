@@ -29,13 +29,14 @@ export function EditYamlFormSection({
   return (
     <div>
       <WebEditorForm
+        data-cy="k8s-yaml-editor"
         value={values}
         readonly={!isAllowedToEdit}
         titleContent={<TitleContent isComposeFormat={isComposeFormat} />}
         onChange={(values) => onChange(values)}
         id={formId}
         placeholder="Define or paste the content of your manifest file here"
-        yaml
+        type="yaml"
       />
     </div>
   );

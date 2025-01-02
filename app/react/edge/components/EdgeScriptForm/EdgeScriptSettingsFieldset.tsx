@@ -55,10 +55,12 @@ export function EdgeScriptSettingsFieldset({
           >
             <Input
               type="text"
-              name="edgeIdGenerator"
               value={values.edgeIdGenerator}
+              name="edgeIdGenerator"
+              placeholder="e.g. uuidgen"
               id="edge-id-generator-input"
               onChange={(e) => setFieldValue(e.target.name, e.target.value)}
+              data-cy="edge-id-generator-input"
             />
           </FormControl>
           <div className="form-group">
@@ -80,7 +82,7 @@ export function EdgeScriptSettingsFieldset({
         <Field
           name="envVars"
           as={Input}
-          placeholder="foo=bar,myvar"
+          placeholder="e.g. foo=bar"
           id="env-variables-input"
         />
       </FormControl>
@@ -89,6 +91,7 @@ export function EdgeScriptSettingsFieldset({
         <div className="col-sm-12">
           <SwitchField
             checked={values.allowSelfSignedCertificates}
+            data-cy="allow-self-signed-certs-switch"
             onChange={(value) =>
               setFieldValue('allowSelfSignedCertificates', value)
             }

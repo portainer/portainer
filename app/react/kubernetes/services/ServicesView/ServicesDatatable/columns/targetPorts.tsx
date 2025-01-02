@@ -1,12 +1,12 @@
 import { columnHelper } from './helper';
 
 export const targetPorts = columnHelper.accessor(
-  (row) => row.Ports.map((port) => port.TargetPort).join(','),
+  (row) => row.Ports?.map((port) => port.TargetPort).join(','),
   {
     header: 'Target Ports',
     id: 'targetPorts',
     cell: ({ row }) => {
-      const ports = row.original.Ports.map((port) => port.TargetPort);
+      const ports = row.original.Ports?.map((port) => port.TargetPort) ?? [];
       if (!ports.length) {
         return '-';
       }
@@ -14,8 +14,8 @@ export const targetPorts = columnHelper.accessor(
       return ports.map((port, index) => <div key={index}>{port}</div>);
     },
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.Ports;
-      const b = rowB.original.Ports;
+      const a = rowA.original.Ports ?? [];
+      const b = rowB.original.Ports ?? [];
 
       if (!a.length && !b.length) return 0;
       if (!a.length) return 1;

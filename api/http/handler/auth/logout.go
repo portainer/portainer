@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/logoutcontext"
+	"github.com/portainer/portainer/api/logoutcontext"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
@@ -27,6 +27,8 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 	}
 
 	security.RemoveAuthCookie(w)
+
+	handler.bouncer.RevokeJWT(tokenData.Token)
 
 	return response.Empty(w)
 }

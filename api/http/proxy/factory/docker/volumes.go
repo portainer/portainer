@@ -7,18 +7,16 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/docker/docker/client"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/snapshot"
+
+	"github.com/docker/docker/client"
 )
 
-const (
-	volumeObjectIdentifier = "ResourceID"
-)
+const volumeObjectIdentifier = "ResourceID"
 
 func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, endpointID portainer.EndpointID, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	volume, err := dockerClient.VolumeInspect(context.Background(), volumeID)
@@ -45,32 +43,33 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 	}
 
 	// The "Volumes" field contains the list of volumes as an array of JSON objects
-	if responseObject["Volumes"] != nil {
-		volumeData := responseObject["Volumes"].([]interface{})
-
-		for _, volumeObject := range volumeData {
-			volume := volumeObject.(map[string]interface{})
-
-			err = transport.decorateVolumeResponseWithResourceID(volume)
-			if err != nil {
-				return fmt.Errorf("failed decorating volume response: %w", err)
-			}
-
-		}
-
-		resourceOperationParameters := &resourceOperationParameters{
-			resourceIdentifierAttribute: volumeObjectIdentifier,
-			resourceType:                portainer.VolumeResourceControl,
-			labelsObjectSelector:        selectorVolumeLabels,
-		}
-
-		volumeData, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, volumeData, executor)
-		if err != nil {
-			return err
-		}
-		// Overwrite the original volume list
-		responseObject["Volumes"] = volumeData
+	if responseObject["Volumes"] == nil {
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
+
+	volumeData := responseObject["Volumes"].([]any)
+
+	for _, volumeObject := range volumeData {
+		volume := volumeObject.(map[string]any)
+
+		if err := transport.decorateVolumeResponseWithResourceID(volume); err != nil {
+			return fmt.Errorf("failed decorating volume response: %w", err)
+		}
+	}
+
+	resourceOperationParameters := &resourceOperationParameters{
+		resourceIdentifierAttribute: volumeObjectIdentifier,
+		resourceType:                portainer.VolumeResourceControl,
+		labelsObjectSelector:        selectorVolumeLabels,
+	}
+
+	volumeData, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, volumeData, executor)
+	if err != nil {
+		return err
+	}
+
+	// Overwrite the original volume list
+	responseObject["Volumes"] = volumeData
 
 	return utils.RewriteResponse(response, responseObject, http.StatusOK)
 }
@@ -85,8 +84,7 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 		return err
 	}
 
-	err = transport.decorateVolumeResponseWithResourceID(responseObject)
-	if err != nil {
+	if err := transport.decorateVolumeResponseWithResourceID(responseObject); err != nil {
 		return fmt.Errorf("failed decorating volume response: %w", err)
 	}
 
@@ -99,7 +97,7 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject map[string]interface{}) error {
+func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject map[string]any) error {
 	if responseObject["Name"] == nil {
 		return errors.New("missing identifier in Docker resource detail response")
 	}
@@ -119,7 +117,7 @@ func (transport *Transport) decorateVolumeResponseWithResourceID(responseObject 
 // API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorVolumeLabels(responseObject map[string]any) map[string]any {
 	return utils.GetJSONObject(responseObject, "Labels")
 }
 
@@ -139,9 +137,10 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 		}
 		defer cli.Close()
 
-		_, err = cli.VolumeInspect(context.Background(), volumeID)
-		if err == nil {
-			return nil, errors.New("a volume with the same name already exists")
+		if _, err := cli.VolumeInspect(context.Background(), volumeID); err == nil {
+			return &http.Response{
+				StatusCode: http.StatusConflict,
+			}, errors.New("a volume with the same name already exists")
 		}
 	}
 
@@ -153,6 +152,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 	if response.StatusCode == http.StatusCreated {
 		err = transport.decorateVolumeCreationResponse(response, resourceType, tokenData.ID)
 	}
+
 	return response, err
 }
 
@@ -184,7 +184,6 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 }
 
 func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {
-
 	if request.Method == http.MethodGet {
 		return transport.rewriteOperation(request, transport.volumeInspectOperation)
 	}
@@ -199,6 +198,7 @@ func (transport *Transport) restrictedVolumeOperation(requestPath string, reques
 	if request.Method == http.MethodDelete {
 		return transport.executeGenericResourceDeletionOperation(request, resourceID, volumeName, portainer.VolumeResourceControl)
 	}
+
 	return transport.restrictedResourceOperation(request, resourceID, volumeName, portainer.VolumeResourceControl, false)
 }
 
@@ -207,18 +207,32 @@ func (transport *Transport) getVolumeResourceID(volumeName string) (string, erro
 	if err != nil {
 		return "", fmt.Errorf("failed fetching docker id: %w", err)
 	}
+
 	return fmt.Sprintf("%s_%s", volumeName, dockerID), nil
 }
 
 func (transport *Transport) getDockerID() (string, error) {
-	if len(transport.endpoint.Snapshots) > 0 {
-		dockerID, err := snapshot.FetchDockerID(transport.endpoint.Snapshots[0])
-		// ignore err - in case of error, just generate not from snapshot
-		if err == nil {
-			return dockerID, nil
+	transport.mu.Lock()
+	defer transport.mu.Unlock()
+
+	// Local cache
+	if transport.dockerID != "" {
+		return transport.dockerID, nil
+	}
+
+	// Snapshot cache
+	if transport.snapshotService != nil {
+		endpoint := portainer.Endpoint{ID: transport.endpoint.ID}
+
+		if err := transport.snapshotService.FillSnapshotData(&endpoint); err == nil {
+			if dockerID, err := snapshot.FetchDockerID(endpoint.Snapshots[0]); err == nil {
+				transport.dockerID = dockerID
+				return dockerID, nil
+			}
 		}
 	}
 
+	// Remote value
 	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, "", nil)
 	if err != nil {
 		return "", err
@@ -231,8 +245,11 @@ func (transport *Transport) getDockerID() (string, error) {
 	}
 
 	if info.Swarm.Cluster != nil {
-		return info.Swarm.Cluster.ID, nil
+		transport.dockerID = info.Swarm.Cluster.ID
+		return transport.dockerID, nil
 	}
 
-	return info.ID, nil
+	transport.dockerID = info.ID
+
+	return transport.dockerID, nil
 }

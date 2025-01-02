@@ -42,6 +42,7 @@ func CreateKubernetesStackGitBuilder(dataStore dataservices.DataStore,
 
 func (b *KubernetesStackGitBuilder) SetGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint) GitMethodStackBuildProcess {
 	b.GitMethodStackBuilder.SetGeneralInfo(payload, endpoint)
+
 	return b
 }
 
@@ -55,12 +56,13 @@ func (b *KubernetesStackGitBuilder) SetUniqueInfo(payload *StackPayload) GitMeth
 	b.stack.Name = payload.StackName
 	b.stack.EntryPoint = payload.ManifestFile
 	b.stack.CreatedBy = b.user.Username
-	b.stack.IsComposeFormat = payload.ComposeFormat
+
 	return b
 }
 
 func (b *KubernetesStackGitBuilder) SetGitRepository(payload *StackPayload) GitMethodStackBuildProcess {
 	b.GitMethodStackBuilder.SetGitRepository(payload)
+
 	return b
 }
 
@@ -92,6 +94,7 @@ func (b *KubernetesStackGitBuilder) Deploy(payload *StackPayload, endpoint *port
 
 func (b *KubernetesStackGitBuilder) SetAutoUpdate(payload *StackPayload) GitMethodStackBuildProcess {
 	b.GitMethodStackBuilder.SetAutoUpdate(payload)
+
 	return b
 }
 

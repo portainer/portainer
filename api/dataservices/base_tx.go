@@ -31,7 +31,7 @@ func (service BaseDataServiceTx[T, I]) Read(ID I) (*T, error) {
 func (service BaseDataServiceTx[T, I]) ReadAll() ([]T, error) {
 	var collection = make([]T, 0)
 
-	return collection, service.Tx.GetAllWithJsoniter(
+	return collection, service.Tx.GetAll(
 		service.Bucket,
 		new(T),
 		AppendFn(&collection),

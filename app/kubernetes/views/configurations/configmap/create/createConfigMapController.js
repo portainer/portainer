@@ -139,8 +139,6 @@ class KubernetesCreateConfigMapController {
         return;
       }
 
-      await this.getConfigurations();
-
       this.environmentId = this.EndpointProvider.endpointID();
       this.availableServiceAccounts = await getServiceAccounts(this.environmentId, this.resourcePools[0].Namespace.Name);
       this.formValues.ServiceAccountName = this.availableServiceAccounts.length > 0 ? this.availableServiceAccounts[0].metadata.name : '';

@@ -2,15 +2,21 @@ package portainer
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/pkg/featureflags"
-	v1 "k8s.io/api/core/v1"
+
+	"golang.org/x/oauth2"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/version"
 )
 
 type (
@@ -91,24 +97,6 @@ type (
 	// PowerState represents an AMT managed device power state
 	PowerState int
 
-	FDOConfiguration struct {
-		Enabled       bool   `json:"enabled"`
-		OwnerURL      string `json:"ownerURL"`
-		OwnerUsername string `json:"ownerUsername"`
-		OwnerPassword string `json:"ownerPassword"`
-	}
-
-	// FDOProfileID represents a fdo profile id
-	FDOProfileID int
-
-	FDOProfile struct {
-		ID            FDOProfileID `json:"id"`
-		Name          string       `json:"name"`
-		FilePath      string       `json:"filePath"`
-		NumberDevices int          `json:"numberDevices"`
-		DateCreated   int64        `json:"dateCreated"`
-	}
-
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -120,7 +108,6 @@ type (
 		Assets                    *string
 		Data                      *string
 		FeatureFlags              *[]string
-		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
@@ -146,6 +133,7 @@ type (
 		SecretKeyName             *string
 		LogLevel                  *string
 		LogMode                   *string
+		KubectlShellImage         *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -197,6 +185,16 @@ type (
 	// CustomTemplatePlatform represents a custom template platform
 	CustomTemplatePlatform int
 
+	// DiagnosticsData represents the diagnostics data for an environment
+	// this contains the logs, telnet, traceroute, dns and proxy information
+	// which will be part of the DockerSnapshot and KubernetesSnapshot structs
+	DiagnosticsData struct {
+		Log    string            `json:"Log,omitempty"`
+		Telnet map[string]string `json:"Telnet,omitempty"`
+		DNS    map[string]string `json:"DNS,omitempty"`
+		Proxy  map[string]string `json:"Proxy,omitempty"`
+	}
+
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
@@ -228,6 +226,8 @@ type (
 		NodeCount               int               `json:"NodeCount"`
 		GpuUseAll               bool              `json:"GpuUseAll"`
 		GpuUseList              []string          `json:"GpuUseList"`
+		IsPodman                bool              `json:"IsPodman"`
+		DiagnosticsData         *DiagnosticsData  `json:"DiagnosticsData"`
 	}
 
 	// DockerContainerSnapshot is an extent of Docker's Container struct
@@ -242,8 +242,8 @@ type (
 		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
 		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
 		Networks   []types.NetworkResource   `json:"Networks" swaggerignore:"true"`
-		Images     []types.ImageSummary      `json:"Images" swaggerignore:"true"`
-		Info       types.Info                `json:"Info" swaggerignore:"true"`
+		Images     []image.Summary           `json:"Images" swaggerignore:"true"`
+		Info       system.Info               `json:"Info" swaggerignore:"true"`
 		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
 
@@ -319,19 +319,16 @@ type (
 		Name   string                         `json:"Name"`
 		Status map[EndpointID]EdgeStackStatus `json:"Status"`
 		// StatusArray    map[EndpointID][]EdgeStackStatus `json:"StatusArray"`
-		CreationDate   int64         `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
-		ProjectPath    string        `json:"ProjectPath"`
-		EntryPoint     string        `json:"EntryPoint"`
-		Version        int           `json:"Version"`
-		NumDeployments int           `json:"NumDeployments"`
-		ManifestPath   string
-		DeploymentType EdgeStackDeploymentType
+		CreationDate   int64                   `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID           `json:"EdgeGroups"`
+		ProjectPath    string                  `json:"ProjectPath"`
+		EntryPoint     string                  `json:"EntryPoint"`
+		Version        int                     `json:"Version"`
+		NumDeployments int                     `json:"NumDeployments"`
+		ManifestPath   string                  `json:"ManifestPath"`
+		DeploymentType EdgeStackDeploymentType `json:"DeploymentType"`
 		// Uses the manifest's namespaces instead of the default one
 		UseManifestNamespaces bool
-
-		// Deprecated
-		Prune bool `json:"Prune,omitempty"`
 	}
 
 	EdgeStackDeploymentType int
@@ -378,15 +375,6 @@ type (
 	// EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
-	PendingActionsID int
-	PendingActions   struct {
-		ID         PendingActionsID `json:"ID"`
-		EndpointID EndpointID       `json:"EndpointID"`
-		Action     string           `json:"Action"`
-		ActionData interface{}      `json:"ActionData"`
-		CreatedAt  int64            `json:"CreatedAt"`
-	}
-
 	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
 	Endpoint struct {
@@ -396,6 +384,8 @@ type (
 		Name string `json:"Name" example:"my-environment"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
 		Type EndpointType `json:"Type" example:"1"`
+		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environmentes, otherwise '' for kubernetes environments.
+		ContainerEngine string `json:"ContainerEngine" example:"docker"`
 		// URL or IP address of the Docker host associated to this environment(endpoint)
 		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
 		// Environment(Endpoint) group identifier
@@ -560,23 +550,22 @@ type (
 
 	// Extension represents a deprecated Portainer extension
 	Extension struct {
-		// Extension Identifier
-		ID               ExtensionID        `json:"Id" example:"1"`
-		Enabled          bool               `json:"Enabled"`
-		Name             string             `json:"Name,omitempty"`
-		ShortDescription string             `json:"ShortDescription,omitempty"`
-		Description      string             `json:"Description,omitempty"`
-		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
-		Price            string             `json:"Price,omitempty"`
-		PriceDescription string             `json:"PriceDescription,omitempty"`
-		Deal             bool               `json:"Deal,omitempty"`
-		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty"`
-		Version          string             `json:"Version"`
-		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty"`
-		Logo             string             `json:"Logo,omitempty"`
+		ID               ExtensionID                 `json:"Id" example:"1"`
+		Enabled          bool                        `json:"Enabled"`
+		Name             string                      `json:"Name,omitempty"`
+		ShortDescription string                      `json:"ShortDescription,omitempty"`
+		Description      string                      `json:"Description,omitempty"`
+		DescriptionURL   string                      `json:"DescriptionURL,omitempty"`
+		Price            string                      `json:"Price,omitempty"`
+		PriceDescription string                      `json:"PriceDescription,omitempty"`
+		Deal             bool                        `json:"Deal,omitempty"`
+		Available        bool                        `json:"Available,omitempty"`
+		License          ExtensionLicenseInformation `json:"License,omitempty"`
+		Version          string                      `json:"Version"`
+		UpdateAvailable  bool                        `json:"UpdateAvailable"`
+		ShopURL          string                      `json:"ShopURL,omitempty"`
+		Images           []string                    `json:"Images,omitempty"`
+		Logo             string                      `json:"Logo,omitempty"`
 	}
 
 	// ExtensionID represents a extension identifier
@@ -616,8 +605,15 @@ type (
 	JobType int
 
 	K8sNamespaceInfo struct {
-		IsSystem  bool `json:"IsSystem"`
-		IsDefault bool `json:"IsDefault"`
+		Id             string                 `json:"Id"`
+		Name           string                 `json:"Name"`
+		Status         corev1.NamespaceStatus `json:"Status"`
+		Annotations    map[string]string      `json:"Annotations"`
+		CreationDate   string                 `json:"CreationDate"`
+		NamespaceOwner string                 `json:"NamespaceOwner"`
+		IsSystem       bool                   `json:"IsSystem"`
+		IsDefault      bool                   `json:"IsDefault"`
+		ResourceQuota  *corev1.ResourceQuota  `json:"ResourceQuota"`
 	}
 
 	K8sNodeLimits struct {
@@ -649,11 +645,12 @@ type (
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
 	KubernetesSnapshot struct {
-		Time              int64  `json:"Time"`
-		KubernetesVersion string `json:"KubernetesVersion"`
-		NodeCount         int    `json:"NodeCount"`
-		TotalCPU          int64  `json:"TotalCPU"`
-		TotalMemory       int64  `json:"TotalMemory"`
+		Time              int64            `json:"Time"`
+		KubernetesVersion string           `json:"KubernetesVersion"`
+		NodeCount         int              `json:"NodeCount"`
+		TotalCPU          int64            `json:"TotalCPU"`
+		TotalMemory       int64            `json:"TotalMemory"`
+		DiagnosticsData   *DiagnosticsData `json:"DiagnosticsData"`
 	}
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
@@ -743,8 +740,8 @@ type (
 		Groups []string
 	}
 
-	// LicenseInformation represents information about an extension license
-	LicenseInformation struct {
+	// ExtensionLicenseInformation represents information about an extension license
+	ExtensionLicenseInformation struct {
 		LicenseKey string `json:"LicenseKey,omitempty"`
 		Company    string `json:"Company,omitempty"`
 		Expiration string `json:"Expiration,omitempty"`
@@ -756,19 +753,20 @@ type (
 
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
-		KubeSecretKey        []byte `json:"KubeSecretKey"`
+		ClientID             string           `json:"ClientID"`
+		ClientSecret         string           `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string           `json:"AccessTokenURI"`
+		AuthorizationURI     string           `json:"AuthorizationURI"`
+		ResourceURI          string           `json:"ResourceURI"`
+		RedirectURI          string           `json:"RedirectURI"`
+		UserIdentifier       string           `json:"UserIdentifier"`
+		Scopes               string           `json:"Scopes"`
+		OAuthAutoCreateUsers bool             `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID           `json:"DefaultTeamID"`
+		SSO                  bool             `json:"SSO"`
+		LogoutURI            string           `json:"LogoutURI"`
+		KubeSecretKey        []byte           `json:"KubeSecretKey"`
+		AuthStyle            oauth2.AuthStyle `json:"AuthStyle"`
 	}
 
 	// Pair defines a key/value string pair
@@ -944,6 +942,18 @@ type (
 		HideStacksFunctionality bool `json:"hideStacksFunctionality" example:"false"`
 	}
 
+	Edge struct {
+		// The command list interval for edge agent - used in edge async mode (in seconds)
+		CommandInterval int `json:"CommandInterval" example:"5"`
+		// The ping interval for edge agent - used in edge async mode (in seconds)
+		PingInterval int `json:"PingInterval" example:"5"`
+		// The snapshot interval for edge agent - used in edge async mode (in seconds)
+		SnapshotInterval int `json:"SnapshotInterval" example:"5"`
+
+		// Deprecated 2.18
+		AsyncMode bool `json:"AsyncMode,omitempty" example:"false"`
+	}
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -956,7 +966,6 @@ type (
 		LDAPSettings         LDAPSettings                  `json:"LDAPSettings"`
 		OAuthSettings        OAuthSettings                 `json:"OAuthSettings"`
 		OpenAMTConfiguration OpenAMTConfiguration          `json:"openAMTConfiguration"`
-		FDOConfiguration     FDOConfiguration              `json:"fdoConfiguration"`
 		FeatureFlagSettings  map[featureflags.Feature]bool `json:"FeatureFlagSettings"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -966,8 +975,6 @@ type (
 		GlobalDeploymentOptions GlobalDeploymentOptions `json:"GlobalDeploymentOptions"`
 		// The default check in interval for edge agent (in seconds)
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
-		// Show the Kompose build option (discontinued in 2.18)
-		ShowKomposeBuildOption bool `json:"ShowKomposeBuildOption" example:"false"`
 		// Whether edge compute features are enabled
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures"`
 		// The duration of a user session
@@ -989,17 +996,7 @@ type (
 		// EdgePortainerURL is the URL that is exposed to edge agents
 		EdgePortainerURL string `json:"EdgePortainerUrl"`
 
-		Edge struct {
-			// The command list interval for edge agent - used in edge async mode (in seconds)
-			CommandInterval int `json:"CommandInterval" example:"5"`
-			// The ping interval for edge agent - used in edge async mode (in seconds)
-			PingInterval int `json:"PingInterval" example:"5"`
-			// The snapshot interval for edge agent - used in edge async mode (in seconds)
-			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-
-			// Deprecated 2.18
-			AsyncMode bool
-		}
+		Edge Edge `json:"Edge"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool `json:"DisplayDonationHeader,omitempty"`
@@ -1074,8 +1071,6 @@ type (
 		FromAppTemplate bool `example:"false"`
 		// Kubernetes namespace if stack is a kube application
 		Namespace string `example:"default"`
-		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
-		IsComposeFormat bool `example:"false"`
 	}
 
 	// StackOption represents the options for stack deployment
@@ -1301,7 +1296,6 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -1384,13 +1378,49 @@ type (
 		ValidateFlags(flags *CLIFlags) error
 	}
 
+	ComposeOptions struct {
+		Registries []Registry
+	}
+
+	ComposeUpOptions struct {
+		ComposeOptions
+
+		// ForceRecreate forces to recreate containers
+		ForceRecreate bool
+		// AbortOnContainerExit will stop the deployment if a container exits.
+		// This is useful when running a onetime task.
+		//
+		// When this is set, docker compose will output its logs to stdout
+		AbortOnContainerExit bool
+		Prune                bool
+	}
+
+	ComposeDownOptions struct {
+		// RemoveVolumes will remove the named volumes declared in the compose file
+		// and anonymous volumes attached to the stack's containers
+		// Drives `docker compose down --volumes`
+		RemoveVolumes bool
+	}
+
+	ComposeRunOptions struct {
+		ComposeOptions
+
+		// Remove will remove the container after it has stopped
+		Remove bool
+		// Args are the arguments to pass to the container
+		Args []string
+		// Detached will run the container in the background
+		Detached bool
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRecreate bool) error
+		Run(ctx context.Context, stack *Stack, endpoint *Endpoint, serviceName string, options ComposeRunOptions) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeUpOptions) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
-		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint, options ComposeOptions) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -1444,7 +1474,7 @@ type (
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
-		WriteJSONToFile(path string, content interface{}) error
+		WriteJSONToFile(path string, content any) error
 		FileExists(path string) (bool, error)
 		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
 		GetEdgeJobFolder(identifier string) string
@@ -1460,7 +1490,6 @@ type (
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
-		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		StoreMTLSCertificates(cert, caCert, key []byte) (string, string, string, error)
 		GetDefaultChiselPrivateKeyPath() string
 		StoreChiselPrivateKey(privateKey []byte) error
@@ -1486,28 +1515,34 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, time.Time, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
+		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
+		ServerVersion() (*version.Info, error)
+
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		IsRBACEnabled() (bool, error)
-		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
+		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
+		GetServiceAccounts(namespace string) ([]models.K8sServiceAccount, error)
+		DeleteServiceAccounts(reqs models.K8sServiceAccountDeleteRequests) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
-		CreateNamespace(info models.K8sNamespaceDetails) error
-		UpdateNamespace(info models.K8sNamespaceDetails) error
+		CreateNamespace(info models.K8sNamespaceDetails) (*corev1.Namespace, error)
+		UpdateNamespace(info models.K8sNamespaceDetails) (*corev1.Namespace, error)
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		GetNamespace(string) (K8sNamespaceInfo, error)
-		DeleteNamespace(namespace string) error
-		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		DeleteNamespace(namespace string) (*corev1.Namespace, error)
+		GetConfigMaps(namespace string) ([]models.K8sConfigMap, error)
+		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
+		GetApplications(namespace, nodename string, withDependencies bool) ([]models.K8sApplication, error)
 		GetMetrics() (models.K8sMetrics, error)
 		GetStorage() ([]KubernetesStorageClassConfig, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo, owner string) error
@@ -1516,7 +1551,7 @@ type (
 		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
 		CreateService(namespace string, service models.K8sServiceInfo) error
 		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string, lookupApplications bool) ([]models.K8sServiceInfo, error)
+		GetServices(namespace string) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetMaxResourceLimits(name string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
@@ -1526,13 +1561,22 @@ type (
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
+
+		GetClusterRoles() ([]models.K8sClusterRole, error)
+		DeleteClusterRoles(models.K8sClusterRoleDeleteRequests) error
+		GetClusterRoleBindings() ([]models.K8sClusterRoleBinding, error)
+		DeleteClusterRoleBindings(models.K8sClusterRoleBindingDeleteRequests) error
+
+		GetRoles(namespace string) ([]models.K8sRole, error)
+		DeleteRoles(models.K8sRoleDeleteRequests) error
+		GetRoleBindings(namespace string) ([]models.K8sRoleBinding, error)
+		DeleteRoleBindings(models.K8sRoleBindingDeleteRequests) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
 		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		ConvertCompose(data []byte) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes environment(endpoint) snapshots
@@ -1558,16 +1602,12 @@ type (
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		StopTunnelServer() error
-		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetTunnelStatusToActive(endpointID EndpointID)
-		SetTunnelStatusToRequired(endpointID EndpointID) error
-		SetTunnelStatusToIdle(endpointID EndpointID)
+		GenerateEdgeKey(apiURL, tunnelAddr string, endpointIdentifier int) string
+		Open(endpoint *Endpoint) error
+		Config(endpointID EndpointID) TunnelDetails
+		TunnelAddr(endpoint *Endpoint) (string, error)
+		UpdateLastActivity(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		GetTunnelDetails(endpointID EndpointID) TunnelDetails
-		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
-		AddEdgeJob(endpoint *Endpoint, edgeJob *EdgeJob)
-		RemoveEdgeJob(edgeJobID EdgeJobID)
-		RemoveEdgeJobFromEndpoint(endpointID EndpointID, edgeJobID EdgeJobID)
 	}
 
 	// Server defines the interface to serve the API
@@ -1595,7 +1635,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.21.0"
+	APIVersion = "2.25.0"
+	// Support annotation for the API version ("STS" for Short-Term Support or "LTS" for Long-Term Support)
+	APIVersionSupport = "STS"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1636,23 +1678,19 @@ const (
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
-	DefaultKubectlShellImage = "portainer/kubectl-shell"
+	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
 	AuthCookieKey = "portainer_api_key"
 	// PortainerCacheHeader is used to enabled FE caching for Kubernetes resources
 	PortainerCacheHeader = "X-Portainer-Cache"
+	// KubectlShellImageEnvVar is the environment variable used to override the default kubectl shell image
+	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 )
 
 // List of supported features
-const (
-	FeatureFdo = "fdo"
-)
-
-var SupportedFeatureFlags = []featureflags.Feature{
-	FeatureFdo,
-}
+var SupportedFeatureFlags = []featureflags.Feature{"hsts", "csp"}
 
 const (
 	_ AuthenticationMethod = iota
@@ -1724,7 +1762,33 @@ const (
 	EdgeStackStatusRollingBack
 	// EdgeStackStatusRolledBack represents an Edge stack which has rolled back
 	EdgeStackStatusRolledBack
+	// EdgeStackStatusCompleted represents a completed Edge stack
+	EdgeStackStatusCompleted
 )
+
+var edgeStackStatusTypeStr = map[EdgeStackStatusType]string{
+	EdgeStackStatusPending:             "Pending",
+	EdgeStackStatusDeploymentReceived:  "DeploymentReceived",
+	EdgeStackStatusError:               "Error",
+	EdgeStackStatusAcknowledged:        "Acknowledged",
+	EdgeStackStatusRemoved:             "Removed",
+	EdgeStackStatusRemoteUpdateSuccess: "RemoteUpdateSuccess",
+	EdgeStackStatusImagesPulled:        "ImagesPulled",
+	EdgeStackStatusRunning:             "Running",
+	EdgeStackStatusDeploying:           "Deploying",
+	EdgeStackStatusRemoving:            "Removing",
+	EdgeStackStatusPausedDeploying:     "PausedDeploying",
+	EdgeStackStatusRollingBack:         "RollingBack",
+	EdgeStackStatusRolledBack:          "RolledBack",
+	EdgeStackStatusCompleted:           "Completed",
+}
+
+func (s EdgeStackStatusType) String() string {
+	if str, ok := edgeStackStatusTypeStr[s]; ok {
+		return fmt.Sprintf("%d (%s)", s, str)
+	}
+	return fmt.Sprintf("%d (UNKNOWN)", s)
+}
 
 const (
 	_ EndpointStatus = iota
@@ -1736,7 +1800,7 @@ const (
 
 const (
 	_ EndpointType = iota
-	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint)
+	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint) via the Docker API or Socket
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Docker environment(endpoint)
 	AgentOnDockerEnvironment
@@ -1877,8 +1941,6 @@ const (
 	EdgeAgentIdle string = "IDLE"
 	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge environment(endpoint)
 	EdgeAgentManagementRequired string = "REQUIRED"
-	// EdgeAgentActive represents an active state for a tunnel connected to an Edge environment(endpoint)
-	EdgeAgentActive string = "ACTIVE"
 )
 
 // represents an authorization type
@@ -2123,4 +2185,9 @@ type PerDevConfigsFilterType string
 const (
 	PerDevConfigsTypeFile PerDevConfigsFilterType = "file"
 	PerDevConfigsTypeDir  PerDevConfigsFilterType = "dir"
+)
+
+const (
+	ContainerEngineDocker = "docker"
+	ContainerEnginePodman = "podman"
 )

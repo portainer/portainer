@@ -1,20 +1,13 @@
 import { useRouter } from '@uirouter/react';
-import { useMutation, useQueryClient } from 'react-query';
-import { Trash2, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import {
-  mutationOptions,
-  withError,
-  withInvalidate,
-} from '@/react-tools/react-query';
 
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
 import { Widget } from '@@/Widget';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { Team, TeamId, TeamMembership, TeamRole } from '../types';
-import { deleteTeam } from '../teams.service';
+import { Team, TeamMembership, TeamRole } from '../types';
+import { useDeleteTeamMutation } from '../queries/useDeleteTeamMutation';
 
 interface Props {
   team: Team;
@@ -23,7 +16,7 @@ interface Props {
 }
 
 export function Details({ team, memberships, isAdmin }: Props) {
-  const deleteMutation = useDeleteTeam();
+  const deleteMutation = useDeleteTeamMutation();
   const router = useRouter();
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
@@ -45,17 +38,19 @@ export function Details({ team, memberships, isAdmin }: Props) {
                 <tr>
                   <td>Name</td>
                   <td>
-                    {!teamSyncQuery.data && team.Name}
-                    {isAdmin && (
-                      <Button
-                        color="danger"
-                        size="xsmall"
-                        onClick={handleDeleteClick}
-                        icon={Trash2}
-                      >
-                        Delete this team
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      {!teamSyncQuery.data && team.Name}
+                      {isAdmin && (
+                        <DeleteButton
+                          size="xsmall"
+                          onConfirmed={handleDeleteClick}
+                          confirmMessage="Do you want to delete this team? Users in this team will not be deleted."
+                          data-cy={`delete-team-${team.Name}`}
+                        >
+                          Delete this team
+                        </DeleteButton>
+                      )}
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -75,29 +70,7 @@ export function Details({ team, memberships, isAdmin }: Props) {
   );
 
   async function handleDeleteClick() {
-    const confirmed = await confirmDelete(
-      `Do you want to delete this team? Users in this team will not be deleted.`
-    );
-    if (!confirmed) {
-      return;
-    }
-
-    deleteMutation.mutate(team.Id, {
-      onSuccess() {
-        router.stateService.go('portainer.teams');
-      },
-    });
+    router.stateService.go('portainer.teams');
+    deleteMutation.mutate(team.Id);
   }
-}
-
-function useDeleteTeam() {
-  const queryClient = useQueryClient();
-  return useMutation(
-    (id: TeamId) => deleteTeam(id),
-
-    mutationOptions(
-      withError('Unable to delete team'),
-      withInvalidate(queryClient, [['teams']])
-    )
-  );
 }

@@ -46,7 +46,7 @@ export function Tooltip({
         position={position}
         className={className}
       >
-        <HelpCircle className="lucide" aria-hidden="true" />
+        <HelpCircle className="lucide" />
       </TooltipWithChildren>
     </span>
   );

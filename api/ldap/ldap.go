@@ -75,7 +75,14 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 
 	userDN, err := searchUser(username, connection, settings.SearchSettings)
 	if err != nil {
-		return err
+		if errors.Is(err, errUserNotFound) {
+			// prevent user enumeration timing attack by attempting the bind with a fake user
+			// and whatever password was provided should definitely fail
+			// https://en.wikipedia.org/wiki/Timing_attack
+			userDN = "portainer-fake-ldap-username"
+		} else {
+			return err
+		}
 	}
 
 	err = connection.Bind(userDN, password)

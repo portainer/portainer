@@ -8,6 +8,7 @@ import (
 // NodesCount returns the total node number of all environments
 func NodesCount(endpoints []portainer.Endpoint) int {
 	nodes := 0
+
 	for _, env := range endpoints {
 		if !endpointutils.IsEdgeEndpoint(&env) || env.UserTrusted {
 			nodes += countNodes(&env)
@@ -27,12 +28,4 @@ func countNodes(endpoint *portainer.Endpoint) int {
 	}
 
 	return 1
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
 }

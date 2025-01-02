@@ -3,7 +3,6 @@ import _ from 'lodash-es';
 import PortainerError from 'Portainer/error';
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import { KubernetesPortainerAccessConfigMap } from 'Kubernetes/models/config-map/models';
 
 class KubernetesConfigMapService {
   /* @ngInject */
@@ -16,22 +15,6 @@ class KubernetesConfigMapService {
     this.createAsync = this.createAsync.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
-  }
-
-  getAccess(namespace, name) {
-    return this.$async(async () => {
-      try {
-        const params = new KubernetesCommonParams();
-        params.id = name;
-        const raw = await this.KubernetesConfigMaps(namespace).get(params).$promise;
-        return KubernetesConfigMapConverter.apiToPortainerAccessConfigMap(raw);
-      } catch (err) {
-        if (err.status === 404) {
-          return new KubernetesPortainerAccessConfigMap();
-        }
-        throw new PortainerError('Unable to retrieve Portainer accesses', err);
-      }
-    });
   }
 
   createAccess(config) {

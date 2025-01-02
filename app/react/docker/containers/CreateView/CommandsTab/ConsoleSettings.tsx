@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { mixed } from 'yup';
 import { ContainerConfig } from 'docker-types/generated/1.41';
 
+import { AutomationTestingProps } from '@/types';
+
 import { FormControl } from '@@/form-components/FormControl';
 
 const consoleSettingTypes = ['tty', 'interactive', 'both', 'none'] as const;
@@ -28,6 +30,7 @@ export function ConsoleSettings({
           </>
         }
         selected={value}
+        data-cy="container-console-interactive-tty"
       />
       <Item
         value="interactive"
@@ -38,6 +41,7 @@ export function ConsoleSettings({
           </>
         }
         selected={value}
+        data-cy="container-console-interactive"
       />
       <Item
         value="tty"
@@ -48,12 +52,14 @@ export function ConsoleSettings({
           </>
         }
         selected={value}
+        data-cy="container-console-tty"
       />
       <Item
         value="none"
         onChange={handleChange}
         label={<>None</>}
         selected={value}
+        data-cy="container-console-none"
       />
     </FormControl>
   );
@@ -68,16 +74,18 @@ function Item({
   selected,
   onChange,
   label,
+  'data-cy': dataCy,
 }: {
   value: ConsoleSetting;
   selected: ConsoleSetting;
   onChange(value: ConsoleSetting): void;
   label: ReactNode;
-}) {
+} & AutomationTestingProps) {
   return (
     <label className="radio-inline !m-0 w-1/2">
       <input
         type="radio"
+        data-cy={dataCy}
         name="container_console"
         value={value}
         checked={value === selected}

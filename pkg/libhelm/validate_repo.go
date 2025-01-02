@@ -28,7 +28,7 @@ func ValidateHelmRepositoryURL(repoUrl string, client *http.Client) error {
 
 	if client == nil {
 		client = &http.Client{
-			Timeout:   time.Second * 120,
+			Timeout:   120 * time.Second,
 			Transport: http.DefaultTransport,
 		}
 	}

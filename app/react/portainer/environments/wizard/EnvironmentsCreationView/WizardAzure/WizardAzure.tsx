@@ -127,6 +127,7 @@ export function WizardAzure({ onCreate }: Props) {
               <div className="col-sm-12">
                 <LoadingButton
                   className="vertical-center"
+                  data-cy="create-azure-environment-button"
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}

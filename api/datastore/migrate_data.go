@@ -32,7 +32,7 @@ func (store *Store) MigrateData() error {
 		return errors.Wrap(err, "while migrating legacy version")
 	}
 
-	migratorParams := store.newMigratorParameters(version)
+	migratorParams := store.newMigratorParameters(version, store.flags)
 	migrator := migrator.NewMigrator(migratorParams)
 
 	if !migrator.NeedsMigration() {
@@ -62,8 +62,9 @@ func (store *Store) MigrateData() error {
 	return nil
 }
 
-func (store *Store) newMigratorParameters(version *models.Version) *migrator.MigratorParameters {
+func (store *Store) newMigratorParameters(version *models.Version, flags *portainer.CLIFlags) *migrator.MigratorParameters {
 	return &migrator.MigratorParameters{
+		Flags:                   flags,
 		CurrentDBVersion:        version,
 		EndpointGroupService:    store.EndpointGroupService,
 		EndpointService:         store.EndpointService,
@@ -86,6 +87,7 @@ func (store *Store) newMigratorParameters(version *models.Version) *migrator.Mig
 		EdgeStackService:        store.EdgeStackService,
 		EdgeJobService:          store.EdgeJobService,
 		TunnelServerService:     store.TunnelServerService,
+		PendingActionsService:   store.PendingActionsService,
 	}
 }
 

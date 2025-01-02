@@ -19,13 +19,14 @@ export function TableSettingsMenu({
             className={clsx('table-setting-menu-btn', {
               'setting-active': isExpanded,
             })}
+            aria-label="Settings"
+            title="Settings"
           >
             <MoreVertical
               size="13"
               className="space-right"
               strokeWidth="3px"
               aria-hidden="true"
-              aria-label="Settings"
             />
           </MenuButton>
           <MenuList>

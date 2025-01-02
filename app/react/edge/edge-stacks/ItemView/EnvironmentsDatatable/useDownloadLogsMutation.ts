@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

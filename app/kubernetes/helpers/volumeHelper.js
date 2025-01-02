@@ -1,5 +1,4 @@
 import _ from 'lodash-es';
-import uuidv4 from 'uuid/v4';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models/appConstants';
 
 class KubernetesVolumeHelper {
@@ -19,18 +18,6 @@ class KubernetesVolumeHelper {
         (app.ApplicationType === KubernetesApplicationTypes.StatefulSet ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true)
       );
     });
-  }
-
-  static isUsed(item) {
-    return item.Applications.length !== 0;
-  }
-
-  static generatedApplicationConfigVolumeName(name) {
-    return 'config-' + name + '-' + uuidv4();
-  }
-
-  static isExternalVolume(volume) {
-    return !volume.PersistentVolumeClaim.ApplicationOwner;
   }
 }
 

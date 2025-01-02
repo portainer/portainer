@@ -33,7 +33,10 @@ test('the button is disabled when all fields are blank and enabled when all fiel
 });
 
 function renderComponent() {
-  const user = new UserViewModel({ Username: 'user' });
+  const user = new UserViewModel({
+    Username: 'admin',
+    Id: 1,
+  });
 
   const Wrapped = withTestQueryProvider(
     withUserProvider(withTestRouter(CreateUserAccessToken), user)

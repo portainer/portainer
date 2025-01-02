@@ -1,6 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 
 import { Link } from '@@/Link';
+import { Badge } from '@@/Badge';
 
 import { EdgeGroupListItemResponse } from '../../queries/useEdgeGroups';
 
@@ -23,11 +24,18 @@ function NameCell({
 
   return (
     <>
-      <Link to=".edit" params={{ groupId: item.Id }} title={name}>
+      <Link
+        to=".edit"
+        params={{ groupId: item.Id }}
+        title={name}
+        data-cy={`edge-group-link-${name}`}
+      >
         {name}
       </Link>
       {(item.HasEdgeJob || item.HasEdgeStack) && (
-        <span className="label label-info image-tag space-left">in use</span>
+        <Badge type="info" className="ml-1">
+          in use
+        </Badge>
       )}
     </>
   );

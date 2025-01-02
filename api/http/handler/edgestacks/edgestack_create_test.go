@@ -43,7 +43,7 @@ func TestCreateAndInspect(t *testing.T) {
 	}
 
 	payload := edgeStackFromStringPayload{
-		Name:             "Test Stack",
+		Name:             "test-stack",
 		StackFileContent: "stack content",
 		EdgeGroups:       []portainer.EdgeGroupID{1},
 		DeploymentType:   portainer.EdgeStackDeploymentCompose,
@@ -107,7 +107,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 
 	cases := []struct {
 		Name               string
-		Payload            interface{}
+		Payload            any
 		ExpectedStatusCode int
 		Method             string
 	}{
@@ -161,7 +161,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 		{
 			Name: "EdgeStackDeploymentKubernetes with Docker endpoint",
 			Payload: edgeStackFromStringPayload{
-				Name:             "Stack name",
+				Name:             "stack-name",
 				StackFileContent: "content",
 				EdgeGroups:       []portainer.EdgeGroupID{1},
 				DeploymentType:   portainer.EdgeStackDeploymentKubernetes,
@@ -172,7 +172,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 		{
 			Name: "Empty Stack File Content",
 			Payload: edgeStackFromStringPayload{
-				Name:             "Stack name",
+				Name:             "stack-name",
 				StackFileContent: "",
 				EdgeGroups:       []portainer.EdgeGroupID{1},
 				DeploymentType:   portainer.EdgeStackDeploymentCompose,
@@ -183,7 +183,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 		{
 			Name: "Clone Git repository error",
 			Payload: edgeStackFromGitRepositoryPayload{
-				Name:                     "Stack name",
+				Name:                     "stack-name",
 				RepositoryURL:            "github.com/portainer/portainer",
 				RepositoryReferenceName:  "ref name",
 				RepositoryAuthentication: false,
@@ -207,7 +207,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 			r := bytes.NewBuffer(jsonPayload)
 
 			// Create EdgeStack
-			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("/edge_stacks/create/%s", tc.Method), r)
+			req, err := http.NewRequest(http.MethodPost, "/edge_stacks/create/"+tc.Method, r)
 			if err != nil {
 				t.Fatal("request error:", err)
 			}

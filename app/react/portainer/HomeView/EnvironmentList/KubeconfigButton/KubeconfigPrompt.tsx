@@ -76,6 +76,7 @@ export function KubeconfigPrompt({
         <div className="mt-2 flex h-8 items-center">
           <Checkbox
             id="settings-container-truncate-name"
+            data-cy="select-all-checkbox"
             label="Select all (in this page)"
             checked={isAllPageSelected}
             onChange={handleSelectAll}
@@ -95,6 +96,7 @@ export function KubeconfigPrompt({
                 >
                   <Checkbox
                     id={`${env.Id}`}
+                    data-cy={`select-environment-checkbox-${env.Name}`}
                     label={`${env.Name} (${env.URL})`}
                     checked={selection.includes(env.Id)}
                     onChange={() =>
@@ -118,10 +120,18 @@ export function KubeconfigPrompt({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button onClick={onClose} color="default">
+        <Button
+          onClick={onClose}
+          color="default"
+          data-cy="cancel-kubeconfig-download-button"
+        >
           Cancel
         </Button>
-        <Button onClick={handleDownload} disabled={selection.length === 0}>
+        <Button
+          onClick={handleDownload}
+          disabled={selection.length === 0}
+          data-cy="download-kubeconfig-confirbutton"
+        >
           Download File
         </Button>
       </Modal.Footer>

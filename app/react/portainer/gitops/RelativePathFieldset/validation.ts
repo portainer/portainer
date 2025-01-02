@@ -13,7 +13,7 @@ export function relativePathValidation(): SchemaOf<RelativePathModel> {
       .default(''),
     SupportPerDeviceConfigs: boolean().default(false),
     PerDeviceConfigsPath: string()
-      .when(['SupportPerDeviceConfigs'], {
+      .when('SupportPerDeviceConfigs', {
         is: true,
         then: string().required('Directory is required'),
       })

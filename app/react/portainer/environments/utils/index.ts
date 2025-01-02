@@ -1,6 +1,21 @@
-import { Environment, EnvironmentType, PlatformType } from '../types';
+import { Cloud } from 'lucide-react';
 
-export function getPlatformType(envType: EnvironmentType) {
+import Kube from '@/assets/ico/kube.svg?c';
+import PodmanIcon from '@/assets/ico/vendor/podman-icon.svg?c';
+import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
+import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
+
+import {
+  Environment,
+  EnvironmentType,
+  ContainerEngine,
+  PlatformType,
+} from '../types';
+
+export function getPlatformType(
+  envType: EnvironmentType,
+  containerEngine?: ContainerEngine
+) {
   switch (envType) {
     case EnvironmentType.KubernetesLocal:
     case EnvironmentType.AgentOnKubernetes:
@@ -9,6 +24,9 @@ export function getPlatformType(envType: EnvironmentType) {
     case EnvironmentType.Docker:
     case EnvironmentType.AgentOnDocker:
     case EnvironmentType.EdgeAgentOnDocker:
+      if (containerEngine === ContainerEngine.Podman) {
+        return PlatformType.Podman;
+      }
       return PlatformType.Docker;
     case EnvironmentType.Azure:
       return PlatformType.Azure;
@@ -25,8 +43,11 @@ export function isKubernetesEnvironment(envType: EnvironmentType) {
   return getPlatformType(envType) === PlatformType.Kubernetes;
 }
 
-export function getPlatformTypeName(envType: EnvironmentType): string {
-  return PlatformType[getPlatformType(envType)];
+export function getPlatformTypeName(
+  envType: EnvironmentType,
+  containerEngine?: ContainerEngine
+): string {
+  return PlatformType[getPlatformType(envType, containerEngine)];
 }
 
 export function isAgentEnvironment(envType: EnvironmentType) {
@@ -102,5 +123,29 @@ export function getDashboardRoute(environment: Environment) {
       default:
         throw new Error(`Unsupported platform ${platform}`);
     }
+  }
+}
+
+export function getEnvironmentTypeIcon(
+  type: EnvironmentType,
+  containerEngine?: ContainerEngine
+) {
+  switch (type) {
+    case EnvironmentType.Azure:
+      return MicrosoftIcon;
+    case EnvironmentType.EdgeAgentOnDocker:
+      return Cloud;
+    case EnvironmentType.AgentOnKubernetes:
+    case EnvironmentType.EdgeAgentOnKubernetes:
+    case EnvironmentType.KubernetesLocal:
+      return Kube;
+    case EnvironmentType.AgentOnDocker:
+    case EnvironmentType.Docker:
+      if (containerEngine === ContainerEngine.Podman) {
+        return PodmanIcon;
+      }
+      return DockerIcon;
+    default:
+      throw new Error(`type ${type}-${EnvironmentType[type]} is not supported`);
   }
 }

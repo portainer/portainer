@@ -1,9 +1,7 @@
-import { Trash2, Plus } from 'lucide-react';
-
 import { Authorized } from '@/react/hooks/useUser';
 
-import { Link } from '@@/Link';
-import { Button } from '@@/buttons';
+import { AddButton } from '@@/buttons';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { DecoratedStack } from './types';
 
@@ -17,28 +15,18 @@ export function TableActions({
   return (
     <div className="flex items-center gap-2">
       <Authorized authorizations="PortainerStackDelete">
-        <Button
-          color="dangerlight"
+        <DeleteButton
           disabled={selectedItems.length === 0}
-          onClick={() => onRemove(selectedItems)}
-          icon={Trash2}
-          className="!m-0"
+          onConfirmed={() => onRemove(selectedItems)}
+          confirmMessage="Do you want to remove the selected stack(s)? Associated services will be removed as well."
           data-cy="stack-removeStackButton"
-        >
-          Remove
-        </Button>
+        />
       </Authorized>
 
       <Authorized authorizations="PortainerStackCreate">
-        <Button
-          as={Link}
-          props={{ to: '.newstack' }}
-          icon={Plus}
-          className="!m-0"
-          data-cy="stack-addStackButton"
-        >
+        <AddButton data-cy="stack-addStackButton" to=".newstack">
           Add stack
-        </Button>
+        </AddButton>
       </Authorized>
     </div>
   );

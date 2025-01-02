@@ -69,6 +69,7 @@ export function Dialog<T>({
             color={button.color}
             key={index}
             size="medium"
+            data-cy={button.dataCy}
           >
             {button.label} {button.timeout && count ? `(${count})` : null}
           </Button>

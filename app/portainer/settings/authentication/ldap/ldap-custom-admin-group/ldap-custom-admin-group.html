@@ -17,6 +17,7 @@
         <div class="col-sm-8 col-md-4">
           <input
             type="text"
+            data-cy="ldap-admin-group-basedn"
             class="form-control"
             id="ldap_admin_group_basedn_{{ $index }}"
             ng-model="config.GroupBaseDN"
@@ -35,6 +36,7 @@
         <div class="col-sm-8 col-md-4">
           <input
             type="text"
+            data-cy="ldap-admin-group-att"
             class="form-control"
             id="ldap_admin_group_att_{{ $index }}"
             ng-model="config.GroupAttribute"
@@ -54,6 +56,7 @@
         <div class="col-sm-8 col-md-10 vertical-center">
           <input
             type="text"
+            data-cy="ldap-admin-group-filter"
             class="form-control"
             id="ldap_admin_group_filter_{{ $index }}"
             ng-model="config.GroupFilter"
@@ -102,7 +105,14 @@
           Assign admin rights to group(s)
         </label>
         <label class="switch my-0 ml-7" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
-          <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" />
+          <input
+            id="admin-auto-populate"
+            ng-disabled="!$ctrl.enableAssignAdminGroup"
+            name="admin-auto-populate"
+            type="checkbox"
+            ng-model="$ctrl.settings.AdminAutoPopulate"
+            data-cy="admin-auto-populate"
+          />
           <span class="slider round before:content-['']"></span>
         </label>
       </div>

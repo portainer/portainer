@@ -10,6 +10,7 @@ import { useGitCredentials } from '@/react/portainer/account/git-credentials/git
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
+import { DeployMethod } from '@/react/portainer/gitops/types';
 
 import { file } from '@@/form-components/yup-file-validation';
 import {
@@ -22,8 +23,10 @@ import { initialBuildMethods } from './types';
 
 export function useValidation({
   viewType,
+  deployMethod,
 }: {
   viewType: 'kube' | 'docker' | 'edge';
+  deployMethod: DeployMethod;
 }) {
   const { user } = useCurrentUser();
   const gitCredentialsQuery = useGitCredentials(user.Id);
@@ -57,16 +60,25 @@ export function useValidation({
         }),
         Git: mixed().when('Method', {
           is: git.value,
-          then: () => buildGitValidationSchema(gitCredentialsQuery.data || []),
+          then: () =>
+            buildGitValidationSchema(
+              gitCredentialsQuery.data || [],
+              false,
+              deployMethod
+            ),
         }),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
       }).concat(
         commonFieldsValidation({
           templates: customTemplatesQuery.data,
-          viewType,
         })
       ),
-    [customTemplatesQuery.data, gitCredentialsQuery.data, viewType]
+    [
+      customTemplatesQuery.data,
+      gitCredentialsQuery.data,
+      viewType,
+      deployMethod,
+    ]
   );
 }

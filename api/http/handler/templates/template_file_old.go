@@ -8,8 +8,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type filePayload struct {
@@ -20,11 +18,11 @@ type filePayload struct {
 }
 
 func (payload *filePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryURL) {
+	if len(payload.RepositoryURL) == 0 {
 		return errors.New("Invalid repository url")
 	}
 
-	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
+	if len(payload.ComposeFilePathInRepository) == 0 {
 		return errors.New("Invalid file path")
 	}
 

@@ -3,15 +3,14 @@ import { OptionProps, components, MultiValueGenericProps } from 'react-select';
 
 import { Select } from '@@/form-components/ReactSelect';
 
-type Role = { Name: string };
-type Option = { Type: 'user' | 'team'; Id: number; Name: string; Role: Role };
+import { EnvironmentAccess } from './types';
 
 interface Props {
   name?: string;
-  value: Option[];
-  onChange(value: readonly Option[]): void;
-  options: Option[];
-  dataCy?: string;
+  value: EnvironmentAccess[];
+  onChange(value: readonly EnvironmentAccess[]): void;
+  options: EnvironmentAccess[];
+  dataCy: string;
   inputId?: string;
   placeholder?: string;
 }
@@ -29,8 +28,8 @@ export function NamespaceAccessUsersSelector({
     <Select
       isMulti
       name={name}
-      getOptionLabel={(option) => option.Name}
-      getOptionValue={(option) => `${option.Id}-${option.Type}`}
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => `${option.id}-${option.type}`}
       options={options}
       value={value}
       closeMenuOnSelect={false}
@@ -43,11 +42,14 @@ export function NamespaceAccessUsersSelector({
   );
 }
 
-function isOption(option: unknown): option is Option {
-  return !!option && typeof option === 'object' && 'Type' in option;
+function isOption(option: unknown): option is EnvironmentAccess {
+  return !!option && typeof option === 'object' && 'type' in option;
 }
 
-function OptionComponent({ data, ...props }: OptionProps<Option, true>) {
+function OptionComponent({
+  data,
+  ...props
+}: OptionProps<EnvironmentAccess, true>) {
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <components.Option data={data} {...props}>
@@ -59,7 +61,7 @@ function OptionComponent({ data, ...props }: OptionProps<Option, true>) {
 function MultiValueLabel({
   data,
   ...props
-}: MultiValueGenericProps<Option, true>) {
+}: MultiValueGenericProps<EnvironmentAccess, true>) {
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <components.MultiValueLabel data={data} {...props}>
@@ -68,15 +70,15 @@ function MultiValueLabel({
   );
 }
 
-function Label({ option }: { option: Option }) {
-  const Icon = option.Type === 'user' ? UserIcon : TeamIcon;
+function Label({ option }: { option: EnvironmentAccess }) {
+  const Icon = option.type === 'user' ? UserIcon : TeamIcon;
 
   return (
     <div className="flex items-center gap-1">
       <Icon />
-      <span>{option.Name}</span>
+      <span>{option.name}</span>
       <span>|</span>
-      <span>{option.Role.Name}</span>
+      <span>{option.role.name}</span>
     </div>
   );
 }

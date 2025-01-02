@@ -30,6 +30,7 @@ export function TableSettingsMenus({
         <Authorized authorizations="EndpointResourcesAccess">
           <Checkbox
             id="setting_all_orphaned_stacks"
+            data-cy="show-all-orphaned-stacks"
             label="Show all orphaned stacks"
             checked={tableState.showOrphanedStacks}
             onChange={(e) => {

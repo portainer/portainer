@@ -7,6 +7,7 @@ export const customTemplateSelector = {
   bindings: {
     newTemplatePath: '@',
     stackType: '<',
+    isLoadFailed: '<',
 
     value: '<',
     onChange: '<',

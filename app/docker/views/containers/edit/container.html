@@ -43,11 +43,12 @@
             Remove</button
           >
         </div>
-        <div class="btn-group" role="group" aria-label="..." ng-if="displayRecreateButton" authorization="DockerContainerCreate">
+        <div class="btn-group" role="group" aria-label="..." ng-if="displayRecreateButton || displayDuplicateEditButton" authorization="DockerContainerCreate">
           <button
             type="button"
             class="btn btn-light btn-sm"
             ng-disabled="state.recreateContainerInProgress || container.IsPortainer"
+            ng-if="displayRecreateButton"
             ng-click="recreate()"
             button-spinner="state.recreateContainerInProgress"
           >
@@ -57,7 +58,13 @@
             >
             <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
           </button>
-          <a class="btn btn-light btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })" ng-disabled="container.IsPortainer">
+          <a
+            class="btn btn-light btn-sm"
+            type="button"
+            ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })"
+            ng-disabled="container.IsPortainer"
+            ng-if="displayDuplicateEditButton"
+          >
             <pr-icon icon="'copy'"></pr-icon>
             Duplicate/Edit</a
           >
@@ -72,7 +79,7 @@
     <rd-widget>
       <rd-widget-header icon="box" title-text="Container status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
+        <table class="table" data-cy="container-status-table">
           <tbody>
             <tr>
               <td class="col-xs-6 col-sm-4 col-md-3 col-lg-3">ID</td>
@@ -88,7 +95,7 @@
               </td>
               <td ng-if="container.edit">
                 <form ng-submit="renameContainer()">
-                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" />
+                  <input type="text" class="containerNameInput" ng-model="container.newContainerName" data-cy="containerNameInput" />
                   <a href="" ng-click="container.edit = false;">
                     <pr-icon icon="'x'"></pr-icon>
                   </a>
@@ -139,7 +146,7 @@
             </tr>
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
               <td colspan="2">
-                <div class="btn-group" role="group" aria-label="...">
+                <div class="btn-group -ml-3" role="group" aria-label="...">
                   <a authorization="DockerContainerLogs" class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"
                     ><pr-icon icon="'file-text'" class-name="'space-right'"></pr-icon>Logs</a
                   >
@@ -218,7 +225,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="!state.pullImageValidity || !config.RegistryModel.Image || config.commitInProgress"
                 ng-click="commit()"
               >
@@ -327,7 +334,7 @@
     <rd-widget>
       <rd-widget-header icon="database" title-text="Volumes"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
+        <table class="table" data-cy="container-volumes-table">
           <thead>
             <tr>
               <th>Host/volume</th>
@@ -349,15 +356,5 @@
   </div>
 </div>
 
-<docker-container-networks-datatable
-  ng-if="container.NetworkSettings.Networks"
-  dataset="container.NetworkSettings.Networks"
-  container="container"
-  available-networks="availableNetworks"
-  on-join="(containerJoinNetwork)"
-  join-in-progress="state.joinNetworkInProgress"
-  on-leave="(containerLeaveNetwork)"
-  leave-in-progress="state.leaveNetworkInProgress"
-  node-name="nodeName"
->
+<docker-container-networks-datatable ng-if="container.NetworkSettings.Networks" dataset="container.NetworkSettings.Networks" container="container" node-name="nodeName">
 </docker-container-networks-datatable>

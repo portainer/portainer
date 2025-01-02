@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/slices"
+	"github.com/portainer/portainer/api/slicesx"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -162,7 +163,7 @@ func TestSortEndpointsByField(t *testing.T) {
 }
 
 func getEndpointIDs(environments []portainer.Endpoint) []portainer.EndpointID {
-	return slices.Map(environments, func(environment portainer.Endpoint) portainer.EndpointID {
+	return slicesx.Map(environments, func(environment portainer.Endpoint) portainer.EndpointID {
 		return environment.ID
 	})
 }

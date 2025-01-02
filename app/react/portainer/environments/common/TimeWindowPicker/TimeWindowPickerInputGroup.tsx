@@ -90,7 +90,7 @@ export function TimeWindowPickerInputGroup({
         <Select<Option<string>>
           options={timeZoneOptions}
           value={timeZoneOptions[timeZoneOptionIndex]}
-          className="basis-[fit-content] flex-1 min-w-fit max-w-xs"
+          className="min-w-fit max-w-xs flex-1 basis-[fit-content]"
           onChange={(newTimeZone) => {
             if (!newTimeZone) return;
             // update the utc time so that the local time displayed remains the same
@@ -111,6 +111,7 @@ export function TimeWindowPickerInputGroup({
             });
             onChangeTimeZone(newTimeZone.value);
           }}
+          data-cy="time-window-picker-timezone-select"
         />
       </div>
       {errors?.StartTime && <FormError>{errors.StartTime}</FormError>}

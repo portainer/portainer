@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/internal/url"
+	"github.com/portainer/portainer/api/url"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -26,12 +26,12 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 	urlString := endpoint.URL
 
 	if endpointutils.IsEdgeEndpoint(endpoint) {
-		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+		tunnelAddr, err := factory.reverseTunnelService.TunnelAddr(endpoint)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed starting tunnel")
 		}
 
-		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+		urlString = "http://" + tunnelAddr
 	}
 
 	endpointURL, err := url.ParseURL(urlString)
@@ -86,7 +86,7 @@ func (proxy *ProxyServer) start() error {
 		err := proxy.server.Serve(listener)
 		log.Debug().Str("host", proxyHost).Msg("exiting proxy server")
 
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Debug().Str("host", proxyHost).Err(err).Msg("proxy server exited with an error")
 		}
 	}()

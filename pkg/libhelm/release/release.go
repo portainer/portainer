@@ -3,7 +3,7 @@ package release
 import "github.com/portainer/portainer/pkg/libhelm/time"
 
 // Release is the struct that holds the information for a helm release.
-// The struct definitions have been copied from the offical Helm Golang client/library.
+// The struct definitions have been copied from the official Helm Golang client/library.
 
 // ReleaseElement is a struct that represents a release
 // This is the official struct from the helm project (golang codebase) - exported
@@ -28,7 +28,7 @@ type Release struct {
 	Chart Chart `json:"chart,omitempty"`
 	// Config is the set of extra Values added to the chart.
 	// These values override the default values inside of the chart.
-	Config map[string]interface{} `json:"config,omitempty"`
+	Config map[string]any `json:"config,omitempty"`
 	// Manifest is the string representation of the rendered template.
 	Manifest string `json:"manifest,omitempty"`
 	// Hooks are all of the hooks declared for this release.
@@ -57,7 +57,7 @@ type Chart struct {
 	// Templates for this chart.
 	Templates []*File `json:"templates"`
 	// Values are default config for this chart.
-	Values map[string]interface{} `json:"values"`
+	Values map[string]any `json:"values"`
 	// Schema is an optional JSON schema for imposing structure on Values
 	Schema []byte `json:"schema"`
 	// Files are miscellaneous files in a chart archive,
@@ -152,7 +152,7 @@ type Dependency struct {
 	Enabled bool `json:"enabled,omitempty"`
 	// ImportValues holds the mapping of source values to parent key to be imported. Each item can be a
 	// string or pair of child/parent sublist items.
-	ImportValues []interface{} `json:"import-values,omitempty"`
+	ImportValues []any `json:"import-values,omitempty"`
 	// Alias usable alias to be used for the chart
 	Alias string `json:"alias,omitempty"`
 }

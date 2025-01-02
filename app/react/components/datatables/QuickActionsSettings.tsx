@@ -25,6 +25,7 @@ export function QuickActionsSettings({ actions }: Props) {
       {actions.map(({ id, label }) => (
         <Checkbox
           key={id}
+          data-cy="quick-actions-checkbox"
           label={label}
           id={`quick-actions-${id}`}
           checked={!settings.hiddenQuickActions.includes(id)}

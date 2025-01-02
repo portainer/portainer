@@ -31,8 +31,7 @@ func setupHandler(t *testing.T) (*Handler, string) {
 	}
 
 	user := &portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
-	err = store.User().Create(user)
-	if err != nil {
+	if err := store.User().Create(user); err != nil {
 		t.Fatal(err)
 	}
 
@@ -66,8 +65,7 @@ func setupHandler(t *testing.T) (*Handler, string) {
 	}
 	settings.EnableEdgeComputeFeatures = true
 
-	err = handler.DataStore.Settings().UpdateSettings(settings)
-	if err != nil {
+	if err := handler.DataStore.Settings().UpdateSettings(settings); err != nil {
 		t.Fatal(err)
 	}
 
@@ -88,8 +86,7 @@ func createEndpointWithId(t *testing.T, store dataservices.DataStore, endpointID
 		LastCheckInDate: time.Now().Unix(),
 	}
 
-	err := store.Endpoint().Create(&endpoint)
-	if err != nil {
+	if err := store.Endpoint().Create(&endpoint); err != nil {
 		t.Fatal(err)
 	}
 
@@ -112,8 +109,7 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 		PartialMatch: false,
 	}
 
-	err := store.EdgeGroup().Create(&edgeGroup)
-	if err != nil {
+	if err := store.EdgeGroup().Create(&edgeGroup); err != nil {
 		t.Fatal(err)
 	}
 
@@ -138,13 +134,11 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 		},
 	}
 
-	err = store.EdgeStack().Create(edgeStack.ID, &edgeStack)
-	if err != nil {
+	if err := store.EdgeStack().Create(edgeStack.ID, &edgeStack); err != nil {
 		t.Fatal(err)
 	}
 
-	err = store.EndpointRelation().Create(&endpointRelation)
-	if err != nil {
+	if err := store.EndpointRelation().Create(&endpointRelation); err != nil {
 		t.Fatal(err)
 	}
 

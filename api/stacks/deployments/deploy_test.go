@@ -76,11 +76,11 @@ vJUUCFYm8+9p6gTVOcoMit+eGSwa81PCPEs1TnU1PV/PaDFeUhn/mg==
 type noopDeployer struct{}
 
 // without unpacker
-func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
+func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	return nil
 }
 
-func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
+func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error {
 	return nil
 }
 
@@ -89,7 +89,7 @@ func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *p
 }
 
 // with unpacker
-func (s *noopDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
+func (s *noopDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error {
 	return nil
 }
 func (s *noopDeployer) UndeployRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
@@ -101,7 +101,7 @@ func (s *noopDeployer) StartRemoteComposeStack(stack *portainer.Stack, endpoint 
 func (s *noopDeployer) StopRemoteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	return nil
 }
-func (s *noopDeployer) DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
+func (s *noopDeployer) DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	return nil
 }
 func (s *noopDeployer) UndeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
@@ -138,13 +138,14 @@ func agentServer(t *testing.T) string {
 		Handler: h,
 	}
 
+	errCh := make(chan error)
 	go func() {
-		err := s.Serve(l)
-		require.ErrorIs(t, err, http.ErrServerClosed)
+		errCh <- s.Serve(l)
 	}()
 
 	t.Cleanup(func() {
-		s.Shutdown(context.Background())
+		require.NoError(t, s.Shutdown(context.Background()))
+		require.ErrorIs(t, <-errCh, http.ErrServerClosed)
 	})
 
 	return "http://" + l.Addr().String()

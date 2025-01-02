@@ -27,6 +27,7 @@ export function ServiceTabs({
         >
           <input
             type="radio"
+            data-cy="service-type-radio"
             name="widget-tabs"
             className="hidden"
             value={serviceTypeOptions[index].value}

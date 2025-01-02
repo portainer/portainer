@@ -11,7 +11,8 @@ import { useEnvironment } from '@/react/portainer/environments/queries';
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useApplication, useApplicationPods } from '../../application.queries';
+import { useApplication } from '../../queries/useApplication';
+import { useApplicationPods } from '../../queries/useApplicationPods';
 
 import { ContainerRowData } from './types';
 import { getColumns } from './columns';
@@ -55,11 +56,11 @@ export function ApplicationContainersDatatable() {
         podsQuery.isLoading ||
         useServerMetricsQuery.isLoading
       }
-      emptyContentLabel="No containers found"
       title="Application containers"
       titleIcon={Server}
       getRowId={(row) => row.podName} // use pod name because it's unique (name is not unique)
       disableSelect
+      data-cy="k8s-application-containers-datatable"
     />
   );
 }

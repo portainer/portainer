@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react';
-import { PropsWithChildren } from 'react';
+import { ReactNode } from 'react';
 import clsx from 'clsx';
 
 import { Icon } from '@@/Icon';
@@ -7,6 +7,7 @@ import { Icon } from '@@/Icon';
 type Size = 'xs' | 'sm' | 'md';
 
 export type Props = {
+  children: ReactNode;
   className?: string;
   size?: Size;
 };
@@ -17,11 +18,7 @@ const sizeStyles: Record<Size, string> = {
   md: 'text-md',
 };
 
-export function InlineLoader({
-  children,
-  className,
-  size = 'sm',
-}: PropsWithChildren<Props>) {
+export function InlineLoader({ children, className, size = 'sm' }: Props) {
   return (
     <div
       className={clsx(

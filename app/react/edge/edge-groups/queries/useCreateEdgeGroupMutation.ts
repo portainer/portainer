@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TagId } from '@/portainer/tags/types';
@@ -34,7 +34,7 @@ export async function createEdgeGroup(requestPayload: CreateGroupPayload) {
   }
 }
 
-export function useCreateGroupMutation() {
+export function useCreateEdgeGroupMutation() {
   const queryClient = useQueryClient();
 
   return useMutation(

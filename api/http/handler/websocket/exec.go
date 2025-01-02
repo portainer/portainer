@@ -2,19 +2,15 @@ package websocket
 
 import (
 	"bytes"
-	"net"
 	"net/http"
-	"net/http/httputil"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
-	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
 
@@ -82,14 +78,6 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 }
 
 func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		log.Warn().
-			Err(err).
-			Msg("unable to retrieve user details from authentication token")
-		return err
-	}
-
 	r.Header.Del("Origin")
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
@@ -102,41 +90,28 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return err
 	}
+
 	defer websocketConn.Close()
 
-	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID, tokenData.Token)
+	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID)
 }
 
 func hijackExecStartOperation(
 	websocketConn *websocket.Conn,
 	endpoint *portainer.Endpoint,
 	execID string,
-	token string,
 ) error {
-	dial, err := initDial(endpoint)
+	conn, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
-
-	// When we set up a TCP connection for hijack, there could be long periods
-	// of inactivity (a long running command with no output) that in certain
-	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
-	// state. Setting TCP KeepAlive on the socket connection will prohibit
-	// ECONNTIMEOUT unless the socket connection truly is broken
-	if tcpConn, ok := dial.(*net.TCPConn); ok {
-		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(30 * time.Second)
-	}
-
-	httpConn := httputil.NewClientConn(dial, nil)
-	defer httpConn.Close()
 
 	execStartRequest, err := createExecStartRequest(execID)
 	if err != nil {
 		return err
 	}
 
-	return hijackRequest(websocketConn, httpConn, execStartRequest, token)
+	return ws.HijackRequest(websocketConn, conn, execStartRequest)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {

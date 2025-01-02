@@ -10,7 +10,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/url"
+	"github.com/portainer/portainer/api/url"
 )
 
 // GetAgentVersionAndPlatform returns the agent version and platform

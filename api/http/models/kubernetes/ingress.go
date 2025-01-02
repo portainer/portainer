@@ -44,6 +44,7 @@ type (
 		Port        int    `json:"Port"`
 		Path        string `json:"Path"`
 		PathType    string `json:"PathType"`
+		HasService  bool   `json:"HasService"`
 	}
 
 	// K8sIngressDeleteRequests is a mapping of namespace names to a slice of

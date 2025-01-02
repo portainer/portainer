@@ -87,6 +87,7 @@ export function APIForm({ onCreate }: Props) {
             <div className="col-sm-12">
               <LoadingButton
                 className="wizard-connect-button vertical-center"
+                data-cy="docker-aconnect-button"
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}

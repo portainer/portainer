@@ -1,7 +1,5 @@
 <page-header title="'User settings'" breadcrumbs="['User settings']" reload="true"> </page-header>
 
-<demo-feature-indicator ng-if="isDemoUser" content="'You cannot change the password of this account in the demo version of Portainer.'"> </demo-feature-indicator>
-
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <theme-settings></theme-settings>
@@ -56,7 +54,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm"
-                ng-disabled="isDemoUser || (AuthenticationMethod !== 1 && !isInitialAdmin) || !formValues.currentPassword || !formValues.newPassword || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
+                ng-disabled="(AuthenticationMethod !== 1 && !isInitialAdmin) || !formValues.currentPassword || !formValues.newPassword || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
                 ng-click="updatePassword()"
               >
                 Update password
@@ -88,18 +86,6 @@
 
 <application-settings-widget></application-settings-widget>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <access-tokens-datatable
-      title-text="Access tokens"
-      title-icon="key"
-      dataset="tokens"
-      table-key="tokens"
-      order-by="Description"
-      remove-action="removeAction"
-      ui-can-exit="uiCanExit"
-    ></access-tokens-datatable>
-  </div>
-</div>
+<access-tokens-datatable ui-can-exit="uiCanExit()"></access-tokens-datatable>
 
 <helm-repository-datatable></helm-repository-datatable>

@@ -24,9 +24,9 @@ export function NamespaceSelector({
     useNamespacesQuery(environmentId);
   const namespaceNames = Object.entries(namespaces ?? {})
     .filter(([, ns]) => !ns.IsSystem)
-    .map(([nsName]) => ({
-      label: nsName,
-      value: nsName,
+    .map(([, ns]) => ({
+      label: ns.Name,
+      value: ns.Name,
     }));
 
   return (

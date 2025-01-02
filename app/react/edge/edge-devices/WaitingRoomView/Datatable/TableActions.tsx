@@ -1,16 +1,15 @@
-import { Check, CheckCircle, Trash2 } from 'lucide-react';
+import { Check, CheckCircle } from 'lucide-react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/queries/useDeleteEnvironmentsMutation';
+import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/ListView/useDeleteEnvironmentsMutation';
 import { Environment } from '@/react/portainer/environments/types';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
 
 import { Button } from '@@/buttons';
-import { ModalType, openModal } from '@@/modals';
-import { confirm } from '@@/modals/confirm';
-import { buildConfirmButton } from '@@/modals/utils';
+import { openModal } from '@@/modals';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
 import { useAssociateDeviceMutation, useLicenseOverused } from '../queries';
 import { WaitingRoomEnvironment } from '../types';
@@ -36,14 +35,14 @@ export function TableActions({
 
   return (
     <>
-      <Button
-        onClick={() => handleRemoveDevice(selectedRows)}
+      <DeleteButton
+        onConfirmed={() => handleRemoveDevice(selectedRows)}
         disabled={selectedRows.length === 0}
-        color="dangerlight"
-        icon={Trash2}
+        data-cy="remove-device-button"
+        confirmMessage="You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup."
       >
         Remove Device
-      </Button>
+      </DeleteButton>
 
       <TooltipWithChildren
         message={
@@ -60,6 +59,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateAndAssign(selectedRows)}
+            data-cy="associate-and-assign-button"
             disabled={
               selectedRows.length === 0 || licenseOverused || !isPureAdmin
             }
@@ -86,6 +86,7 @@ export function TableActions({
         <span>
           <Button
             onClick={() => handleAssociateDevice(selectedRows)}
+            data-cy="associate-device-button"
             disabled={selectedRows.length === 0 || licenseOverused}
             icon={Check}
           >
@@ -122,20 +123,8 @@ export function TableActions({
   }
 
   async function handleRemoveDevice(devices: Environment[]) {
-    const confirmed = await confirm({
-      title: 'Are you sure?',
-      message:
-        "You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup.",
-      confirmButton: buildConfirmButton('Remove', 'danger'),
-      modalType: ModalType.Destructive,
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
     removeMutation.mutate(
-      devices.map((d) => d.Id),
+      devices.map((d) => ({ id: d.Id, name: d.Name })),
       {
         onSuccess() {
           notifySuccess('Success', 'Edge devices were hidden successfully');

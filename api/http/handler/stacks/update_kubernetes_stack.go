@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,7 +16,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -38,9 +36,10 @@ type kubernetesGitStackUpdatePayload struct {
 }
 
 func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.StackFileContent) {
+	if len(payload.StackFileContent) == 0 {
 		return errors.New("Invalid stack file content")
 	}
+
 	return nil
 }
 
@@ -48,13 +47,13 @@ func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error 
 	if err := update.ValidateAutoUpdateSettings(payload.AutoUpdate); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
-
 	if stack.GitConfig != nil {
-		//stop the autoupdate job if there is any
+		// Stop the autoupdate job if there is any
 		if stack.AutoUpdate != nil {
 			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		}
@@ -67,6 +66,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 		stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 		stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
+		stack.GitConfig.Authentication = nil
 		stack.AutoUpdate = payload.AutoUpdate
 
 		if payload.RepositoryAuthentication {
@@ -74,16 +74,15 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 			if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
 				password = stack.GitConfig.Authentication.Password
 			}
+
 			stack.GitConfig.Authentication = &gittypes.GitAuthentication{
 				Username: payload.RepositoryUsername,
 				Password: password,
 			}
-			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify)
-			if err != nil {
+
+			if _, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password, stack.GitConfig.TLSSkipVerify); err != nil {
 				return httperror.InternalServerError("Unable to fetch git repository", err)
 			}
-		} else {
-			stack.GitConfig.Authentication = nil
 		}
 
 		if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
@@ -99,8 +98,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	var payload kubernetesFileStackUpdatePayload
 
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
@@ -118,8 +116,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	if payload.StackName != stack.Name {
 		stack.Name = payload.StackName
-		err := handler.DataStore.Stack().Update(stack.ID, stack)
-		if err != nil {
+		if err := handler.DataStore.Stack().Update(stack.ID, stack); err != nil {
 			return httperror.InternalServerError("Failed to update stack name", err)
 		}
 	}
@@ -127,23 +124,21 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	// Refresh ECR registry secret if needed
 	// RefreshEcrSecret method checks if the namespace has any ECR registry
 	// otherwise return nil
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
 		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace)
 	}
 
-	//use temp dir as the stack project path for deployment
-	//so if the deployment failed, the original file won't be over-written
+	// Use temp dir as the stack project path for deployment
+	// so if the deployment failed, the original file won't be over-written
 	stack.ProjectPath = tempFileDir
 
-	_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
+	if _, err := handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
 		StackID:   int(stack.ID),
 		StackName: stack.Name,
 		Owner:     stack.CreatedBy,
 		Kind:      "content",
-	})
-
-	if err != nil {
+	}); err != nil {
 		return httperror.InternalServerError("Unable to deploy Kubernetes stack via file content", err)
 	}
 
@@ -154,12 +149,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		fileType := "Manifest"
-		if stack.IsComposeFormat {
-			fileType = "Compose"
-		}
-		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
-		return httperror.InternalServerError(errMsg, err)
+		return httperror.InternalServerError("Unable to persist Kubernetes Manifest file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 

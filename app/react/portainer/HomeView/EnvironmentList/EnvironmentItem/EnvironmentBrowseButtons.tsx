@@ -48,12 +48,14 @@ export function EnvironmentBrowseButtons({
                 ? 'Browse snapshot is only available for async environments'
                 : ''
             }
+            data-cy={`browse-snapshot-link-${environment.Name}`}
           >
             Browse snapshot
           </LinkButton>
         ) : (
           <Button
             icon={X}
+            data-cy={`close-snapshot-link-${environment.Name}`}
             onClick={onClickDisconnect}
             className="!m-0 w-full !py-0 opacity-60"
             size="medium"
@@ -78,11 +80,13 @@ export function EnvironmentBrowseButtons({
           onClick={onClickBrowse}
           color="primary"
           className="!m-0 w-full !py-0"
+          data-cy={`live-connect-link-${environment.Name}`}
         >
           Live connect
         </LinkButton>
       ) : (
         <Button
+          data-cy={`disconnect-link-${environment.Name}`}
           icon={WifiOff}
           onClick={onClickDisconnect}
           className="!m-0 w-full !py-0 opacity-60"

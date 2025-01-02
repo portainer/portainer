@@ -17,6 +17,7 @@ export const gitForm: IComponentOptions = {
     base-webhook-url="$ctrl.baseWebhookUrl"
     webhook-id="$ctrl.webhookId"
     webhooks-docs="$ctrl.webhooksDocs"
+    created-from-custom-template-id="$ctrl.createdFromCustomTemplateId"
     errors="$ctrl.errors">
   </react-git-form>
 </ng-form>`,
@@ -32,6 +33,7 @@ export const gitForm: IComponentOptions = {
     isAuthExplanationVisible: '<',
     webhookId: '@',
     webhooksDocs: '@',
+    createdFromCustomTemplateId: '<',
   },
   controller,
 };

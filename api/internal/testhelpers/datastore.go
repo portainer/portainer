@@ -4,6 +4,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/errors"
 )
@@ -16,7 +17,6 @@ type testDatastore struct {
 	endpoint                dataservices.EndpointService
 	endpointGroup           dataservices.EndpointGroupService
 	endpointRelation        dataservices.EndpointRelationService
-	fdoProfile              dataservices.FDOProfileService
 	helmUserRepository      dataservices.HelmUserRepositoryService
 	registry                dataservices.RegistryService
 	resourceControl         dataservices.ResourceControlService
@@ -34,6 +34,7 @@ type testDatastore struct {
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
 	pendingActionsService   dataservices.PendingActionsService
+	connection              portainer.Connection
 }
 
 func (d *testDatastore) Backup(path string) (string, error)                  { return "", nil }
@@ -52,10 +53,6 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
-
-func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
-	return d.fdoProfile
-}
 
 func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService {
 	return d.endpointRelation
@@ -88,6 +85,10 @@ func (d *testDatastore) PendingActions() dataservices.PendingActionsService {
 	return d.pendingActionsService
 }
 
+func (d *testDatastore) Connection() portainer.Connection {
+	return d.connection
+}
+
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false
 }
@@ -105,7 +106,8 @@ type datastoreOption = func(d *testDatastore)
 // NewDatastore creates new instance of testDatastore.
 // Will apply options before returning, opts will be applied from left to right.
 func NewDatastore(options ...datastoreOption) *testDatastore {
-	d := testDatastore{}
+	conn, _ := database.NewDatabase("boltdb", "", nil)
+	d := testDatastore{connection: conn}
 	for _, o := range options {
 		o(&d)
 	}
@@ -335,5 +337,98 @@ func (s *stubEndpointService) EndpointsByTeamID(teamID portainer.TeamID) ([]port
 func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
 	return func(d *testDatastore) {
 		d.endpoint = &stubEndpointService{endpoints: endpoints}
+	}
+}
+
+type stubStacksService struct {
+	stacks []portainer.Stack
+}
+
+func (s *stubStacksService) BucketName() string { return "stacks" }
+
+func (s *stubStacksService) Create(stack *portainer.Stack) error {
+	return nil
+}
+
+func (s *stubStacksService) Update(ID portainer.StackID, stack *portainer.Stack) error {
+	return nil
+}
+
+func (s *stubStacksService) Delete(ID portainer.StackID) error {
+	return nil
+}
+
+func (s *stubStacksService) Read(ID portainer.StackID) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.ID == ID {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) ReadAll() ([]portainer.Stack, error) {
+	return s.stacks, nil
+}
+
+func (s *stubStacksService) StacksByEndpointID(endpointID portainer.EndpointID) ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.EndpointID == endpointID {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) RefreshableStacks() ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.AutoUpdate != nil {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) StackByName(name string) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.Name == name {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) StacksByName(name string) ([]portainer.Stack, error) {
+	result := make([]portainer.Stack, 0)
+
+	for _, stack := range s.stacks {
+		if stack.Name == name {
+			result = append(result, stack)
+		}
+	}
+	return result, nil
+}
+
+func (s *stubStacksService) StackByWebhookID(webhookID string) (*portainer.Stack, error) {
+	for _, stack := range s.stacks {
+		if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook == webhookID {
+			return &stack, nil
+		}
+	}
+	return nil, errors.ErrObjectNotFound
+}
+
+func (s *stubStacksService) GetNextIdentifier() int {
+	return len(s.stacks)
+}
+
+// WithStacks option will instruct testDatastore to return provided stacks
+func WithStacks(stacks []portainer.Stack) datastoreOption {
+	return func(d *testDatastore) {
+		d.stack = &stubStacksService{stacks: stacks}
 	}
 }

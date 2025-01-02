@@ -1,11 +1,8 @@
 package compose
 
-import (
-	"github.com/portainer/portainer/pkg/libstack"
-	"github.com/portainer/portainer/pkg/libstack/compose/internal/composeplugin"
-)
+type ComposeDeployer struct{}
 
-// NewComposeDeployer will try to create a wrapper for docker-compose plugin
-func NewComposeDeployer(binaryPath, configPath string) (libstack.Deployer, error) {
-	return composeplugin.NewPluginWrapper(binaryPath, configPath)
+// NewComposeDeployer creates a new compose deployer
+func NewComposeDeployer() *ComposeDeployer {
+	return &ComposeDeployer{}
 }

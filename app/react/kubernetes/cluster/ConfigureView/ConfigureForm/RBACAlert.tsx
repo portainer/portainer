@@ -3,7 +3,7 @@ import { Alert } from '@@/Alert';
 export function RBACAlert() {
   return (
     <Alert color="warn" className="mb-4">
-      <div className="flex-flex-col">
+      <div className="flex flex-col">
         <p>
           Your cluster does not have Kubernetes role-based access control (RBAC)
           enabled.

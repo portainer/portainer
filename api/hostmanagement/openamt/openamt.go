@@ -97,7 +97,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {
@@ -128,7 +128,7 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {

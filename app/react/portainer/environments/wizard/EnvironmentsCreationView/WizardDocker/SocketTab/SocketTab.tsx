@@ -1,4 +1,7 @@
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 
 import { DeploymentScripts } from '../APITab/DeploymentScripts';
 
@@ -14,7 +17,10 @@ export function SocketTab({ onCreate }: Props) {
       <DeploymentScripts />
 
       <div className="mt-5">
-        <SocketForm onCreate={onCreate} />
+        <SocketForm
+          onCreate={onCreate}
+          containerEngine={ContainerEngine.Docker}
+        />
       </div>
     </>
   );

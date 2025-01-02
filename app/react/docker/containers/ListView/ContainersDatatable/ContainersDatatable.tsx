@@ -1,28 +1,30 @@
 import { Box } from 'lucide-react';
 
-import { Environment } from '@/react/portainer/environments/types';
-import type { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
+import { Environment } from '@/react/portainer/environments/types';
 
-import { Table, Datatable } from '@@/datatables';
-import {
-  buildAction,
-  QuickActionsSettings,
-} from '@@/datatables/QuickActionsSettings';
+import { Datatable, Table } from '@@/datatables';
 import {
   ColumnVisibilityMenu,
   getColumnVisibilityState,
 } from '@@/datatables/ColumnVisibilityMenu';
+import {
+  QuickActionsSettings,
+  buildAction,
+} from '@@/datatables/QuickActionsSettings';
+import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
+import { withColumnFilters } from '@@/datatables/extend-options/withColumnFilters';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { useTableState } from '@@/datatables/useTableState';
 
-import { useContainers } from '../../queries/containers';
+import { useContainers } from '../../queries/useContainers';
 
-import { createStore } from './datatable-store';
-import { ContainersDatatableSettings } from './ContainersDatatableSettings';
-import { useColumns } from './columns';
 import { ContainersDatatableActions } from './ContainersDatatableActions';
+import { ContainersDatatableSettings } from './ContainersDatatableSettings';
 import { RowProvider } from './RowContext';
+import { useColumns } from './columns';
+import { createStore } from './datatable-store';
 
 const storageKey = 'containers';
 const settingsStore = createStore(storageKey);
@@ -70,9 +72,10 @@ export function ContainersDatatable({
           isLoading={containersQuery.isLoading}
           isRowSelectable={(row) => !row.original.IsPortainer}
           initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+          data-cy="docker-containers-datatable"
           renderTableSettings={(tableInstance) => (
             <>
-              <ColumnVisibilityMenu<DockerContainer>
+              <ColumnVisibilityMenu<ContainerListViewModel>
                 table={tableInstance}
                 onChange={(hiddenColumns) => {
                   tableState.setHiddenColumns(hiddenColumns);
@@ -90,7 +93,12 @@ export function ContainersDatatable({
             </>
           )}
           dataset={containersQuery.data || []}
-          emptyContentLabel="No containers found"
+          extendTableOptions={mergeOptions(
+            withColumnFilters(
+              tableState.columnFilters,
+              tableState.setColumnFilters
+            )
+          )}
         />
       </TableSettingsProvider>
     </RowProvider>

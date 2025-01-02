@@ -10,7 +10,9 @@ export function filterNonAdministratorUsers(users: User[]) {
 type UserLike = Pick<User, 'Role'>;
 
 // To avoid creating divergence between CE and EE
-// isAdmin checks if the user is portainer admin or edge admin
+/**
+ * isEdgeAdmin checks if the user is edge admin or admin
+ */
 export function isEdgeAdmin(
   user: UserLike | undefined,
   environment?: Pick<Environment, 'Type'> | null
@@ -23,8 +25,10 @@ export function isEdgeAdmin(
 }
 
 // To avoid creating divergence between CE and EE
-// isPureAdmin checks only if the user is portainer admin
-// See bouncer.IsAdmin and bouncer.PureAdminAccess
+/**
+ * isPureAdmin checks if the user is portainer admin.
+ * See bouncer.IsAdmin and bouncer.PureAdminAccess
+ */
 export function isPureAdmin(user?: UserLike): boolean {
   return !!user && user.Role === Role.Admin;
 }

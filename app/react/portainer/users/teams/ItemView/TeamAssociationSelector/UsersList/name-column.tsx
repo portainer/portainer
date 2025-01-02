@@ -31,6 +31,7 @@ export function NameCell({
 
       <Button
         color="link"
+        data-cy={`add-member-${user.Username}`}
         className="space-left nopadding"
         disabled={disabled}
         icon={PlusCircle}

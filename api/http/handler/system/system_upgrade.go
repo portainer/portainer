@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"regexp"
 
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/platform"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -31,12 +29,6 @@ func (payload *systemUpgradePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-var platformToEndpointType = map[platform.ContainerPlatform]portainer.EndpointType{
-	platform.PlatformDockerStandalone: portainer.DockerEnvironment,
-	platform.PlatformDockerSwarm:      portainer.DockerEnvironment,
-	platform.PlatformKubernetes:       portainer.KubernetesLocalEnvironment,
-}
-
 // @id systemUpgrade
 // @summary Upgrade Portainer to BE
 // @description Upgrade Portainer to BE
@@ -51,40 +43,20 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	environment, err := handler.guessLocalEndpoint()
+	environment, err := handler.platformService.GetLocalEnvironment()
 	if err != nil {
-		return httperror.InternalServerError("Failed to guess local endpoint", err)
+		return httperror.InternalServerError("Failed to get local environment", err)
 	}
 
-	err = handler.upgradeService.Upgrade(environment, payload.License)
+	platform, err := handler.platformService.GetPlatform()
+	if err != nil {
+		return httperror.InternalServerError("Failed to get platform", err)
+	}
+
+	err = handler.upgradeService.Upgrade(platform, environment, payload.License)
 	if err != nil {
 		return httperror.InternalServerError("Failed to upgrade Portainer", err)
 	}
 
 	return response.Empty(w)
-}
-
-func (handler *Handler) guessLocalEndpoint() (*portainer.Endpoint, error) {
-	platform, err := platform.DetermineContainerPlatform()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to determine container platform")
-	}
-
-	endpointType, ok := platformToEndpointType[platform]
-	if !ok {
-		return nil, errors.New("failed to determine endpoint type")
-	}
-
-	endpoints, err := handler.dataStore.Endpoint().Endpoints()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve endpoints")
-	}
-
-	for _, endpoint := range endpoints {
-		if endpoint.Type == endpointType {
-			return &endpoint, nil
-		}
-	}
-
-	return nil, errors.New("failed to find local endpoint")
 }

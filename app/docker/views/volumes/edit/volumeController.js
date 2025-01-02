@@ -9,10 +9,12 @@ angular.module('portainer.docker').controller('VolumeController', [
   'ContainerService',
   'Notifications',
   'HttpRequestHelper',
+  'Authentication',
   'endpoint',
-  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, endpoint) {
+  function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper, Authentication, endpoint) {
     $scope.resourceType = ResourceControlType.Volume;
     $scope.endpoint = endpoint;
+    $scope.showBrowseAction = false;
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
@@ -21,7 +23,7 @@ angular.module('portainer.docker').controller('VolumeController', [
     $scope.removeVolume = function removeVolume() {
       confirmDelete('Do you want to remove this volume?').then((confirmed) => {
         if (confirmed) {
-          VolumeService.remove($scope.volume)
+          VolumeService.remove($scope.volume.Id)
             .then(function success() {
               Notifications.success('Volume successfully removed', $transition$.params().id);
               $state.go('docker.volumes', {});
@@ -41,6 +43,7 @@ angular.module('portainer.docker').controller('VolumeController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+      $scope.showBrowseAction = $scope.applicationState.endpoint.mode.agentProxy && (Authentication.isAdmin() || endpoint.SecuritySettings.allowVolumeBrowserForRegularUsers);
 
       VolumeService.volume($transition$.params().id)
         .then(function success(data) {
@@ -55,6 +58,8 @@ angular.module('portainer.docker').controller('VolumeController', [
 
           var containers = dataContainers.map(function (container) {
             container.volumeData = getVolumeDataFromContainer(container, $scope.volume.Id);
+
+            $scope.volume.NodeName = container.NodeName || '';
             return container;
           });
           $scope.containersUsingVolume = containers;

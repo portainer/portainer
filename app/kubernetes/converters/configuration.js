@@ -19,7 +19,8 @@ class KubernetesConfigurationConverter {
     res.IsRegistrySecret = secret.IsRegistrySecret;
     res.SecretType = secret.SecretType;
     if (secret.Annotations) {
-      res.ServiceAccountName = secret.Annotations['kubernetes.io/service-account.name'];
+      const serviceAccountAnnotation = secret.Annotations.find((a) => a.key === 'kubernetes.io/service-account.name');
+      res.ServiceAccountName = serviceAccountAnnotation ? serviceAccountAnnotation.value : undefined;
     }
     res.Labels = secret.Labels;
     return res;

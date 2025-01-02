@@ -15,8 +15,11 @@
               <td>{{ device.Name }}</td>
               <td>{{ device.Vendor }}</td>
             </tr>
-            <tr ng-if="!$ctrl.devices">
+            <tr ng-if="$ctrl.devices === undefined">
               <td colspan="2" class="text-muted text-center">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.devices === null">
+              <td colspan="2" class="text-muted text-center"> Failed to load devices. </td>
             </tr>
             <tr ng-if="$ctrl.devices.length === 0">
               <td colspan="2" class="text-muted text-center"> No device available. </td>

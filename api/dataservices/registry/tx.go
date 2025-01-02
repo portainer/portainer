@@ -13,7 +13,7 @@ type ServiceTx struct {
 func (service ServiceTx) Create(registry *portainer.Registry) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			registry.ID = portainer.RegistryID(id)
 			return int(registry.ID), registry
 		},

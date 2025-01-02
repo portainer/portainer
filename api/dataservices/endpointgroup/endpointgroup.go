@@ -41,7 +41,7 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 func (service *Service) Create(endpointGroup *portainer.EndpointGroup) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			endpointGroup.ID = portainer.EndpointGroupID(id)
 			return int(endpointGroup.ID), endpointGroup
 		},

@@ -1,12 +1,15 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
-import { RegistryId } from '@/react/portainer/registries/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 import { Pair } from '@/react/portainer/settings/types';
 import {
+  AutoUpdateResponse,
   GitFormModel,
   RelativePathModel,
 } from '@/react/portainer/gitops/types';
+import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
+import { UserId } from '@/portainer/users/types';
 
 import { DeploymentType, StaggerConfig } from '../../types';
 
@@ -18,7 +21,8 @@ export function useCreateEdgeStack() {
   return useMutation(createEdgeStack);
 }
 
-type BasePayload = {
+export type BasePayload = {
+  userId: UserId;
   /** Name of the stack */
   name: string;
   /** Content of the Stack file */
@@ -67,6 +71,7 @@ export type CreateEdgeStackPayload =
       payload: BasePayload & {
         git: GitFormModel;
         relativePathSettings?: RelativePathModel;
+        autoUpdate: AutoUpdateResponse | null;
       };
     };
 
@@ -87,34 +92,7 @@ function createEdgeStack({ method, payload }: CreateEdgeStackPayload) {
         Webhook: payload.webhook,
       });
     case 'git':
-      return createStackFromGit({
-        deploymentType: payload.deploymentType,
-        edgeGroups: payload.edgeGroups,
-        name: payload.name,
-        envVars: payload.envVars,
-        prePullImage: payload.prePullImage,
-        registries: payload.registries,
-        retryDeploy: payload.retryDeploy,
-        staggerConfig: payload.staggerConfig,
-        useManifestNamespaces: payload.useManifestNamespaces,
-        repositoryUrl: payload.git.RepositoryURL,
-        repositoryReferenceName: payload.git.RepositoryReferenceName,
-        filePathInRepository: payload.git.ComposeFilePathInRepository,
-        repositoryAuthentication: payload.git.RepositoryAuthentication,
-        repositoryUsername: payload.git.RepositoryUsername,
-        repositoryPassword: payload.git.RepositoryPassword,
-        repositoryGitCredentialId: payload.git.RepositoryGitCredentialID,
-        filesystemPath: payload.relativePathSettings?.FilesystemPath,
-        supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
-        perDeviceConfigsGroupMatchType:
-          payload.relativePathSettings?.PerDeviceConfigsGroupMatchType,
-        perDeviceConfigsMatchType:
-          payload.relativePathSettings?.PerDeviceConfigsMatchType,
-        perDeviceConfigsPath:
-          payload.relativePathSettings?.PerDeviceConfigsPath,
-        tlsSkipVerify: payload.git.TLSSkipVerify,
-        autoUpdate: payload.git.AutoUpdate,
-      });
+      return createStackAndGitCredential(payload.userId, payload);
     case 'string':
       return createStackFromFileContent({
         deploymentType: payload.deploymentType,
@@ -132,4 +110,43 @@ function createEdgeStack({ method, payload }: CreateEdgeStackPayload) {
     default:
       throw new Error('Invalid method');
   }
+}
+
+async function createStackAndGitCredential(
+  userId: UserId,
+  payload: BasePayload & {
+    git: GitFormModel;
+    relativePathSettings?: RelativePathModel;
+    autoUpdate: AutoUpdateResponse | null;
+  }
+) {
+  const newGitModel = await saveGitCredentialsIfNeeded(userId, payload.git);
+
+  return createStackFromGit({
+    deploymentType: payload.deploymentType,
+    edgeGroups: payload.edgeGroups,
+    name: payload.name,
+    envVars: payload.envVars,
+    prePullImage: payload.prePullImage,
+    registries: payload.registries,
+    retryDeploy: payload.retryDeploy,
+    staggerConfig: payload.staggerConfig,
+    useManifestNamespaces: payload.useManifestNamespaces,
+    repositoryUrl: newGitModel.RepositoryURL,
+    repositoryReferenceName: newGitModel.RepositoryReferenceName,
+    filePathInRepository: newGitModel.ComposeFilePathInRepository,
+    repositoryAuthentication: newGitModel.RepositoryAuthentication,
+    repositoryUsername: newGitModel.RepositoryUsername,
+    repositoryPassword: newGitModel.RepositoryPassword,
+    repositoryGitCredentialId: newGitModel.RepositoryGitCredentialID,
+    filesystemPath: payload.relativePathSettings?.FilesystemPath,
+    supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
+    perDeviceConfigsGroupMatchType:
+      payload.relativePathSettings?.PerDeviceConfigsGroupMatchType,
+    perDeviceConfigsMatchType:
+      payload.relativePathSettings?.PerDeviceConfigsMatchType,
+    perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
+    tlsSkipVerify: newGitModel.TLSSkipVerify,
+    autoUpdate: payload.autoUpdate,
+  });
 }

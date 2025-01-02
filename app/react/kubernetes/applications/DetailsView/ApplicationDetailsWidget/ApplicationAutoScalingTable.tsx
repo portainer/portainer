@@ -7,7 +7,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Tooltip } from '@@/Tip/Tooltip';
 
 import { Application } from '../../types';
-import { useApplicationHorizontalPodAutoscaler } from '../../application.queries';
+import { useApplicationHorizontalPodAutoscaler } from '../../queries/useApplicationHorizontalPodAutoscaler';
 
 type Props = {
   environmentId: EnvironmentId;

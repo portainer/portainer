@@ -81,7 +81,7 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 func (service *Service) Create(webhook *portainer.Webhook) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			webhook.ID = portainer.WebhookID(id)
 			return int(webhook.ID), webhook
 		},

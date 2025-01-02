@@ -1,4 +1,4 @@
-import { Edit, Plus } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useCallback, useState } from 'react';
 
@@ -9,27 +9,26 @@ import { Table } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 import { createPersistedStore } from '@@/datatables/types';
 import { DatatableFooter } from '@@/datatables/DatatableFooter';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 
 import { CustomTemplatesListItem } from './CustomTemplatesListItem';
 
 export function CustomTemplatesList({
   templates,
-  onSelect,
   onDelete,
   selectedId,
   templateLinkParams,
   storageKey,
 }: {
   templates?: CustomTemplate[];
-  onSelect?: (template: CustomTemplate['Id']) => void;
-  onDelete: (template: CustomTemplate['Id']) => void;
+  onDelete: (templateId: CustomTemplate['Id']) => void;
   selectedId?: CustomTemplate['Id'];
-  templateLinkParams?: (template: CustomTemplate) => {
-    to: string;
-    params: object;
-  };
+  templateLinkParams?: (template: CustomTemplate) =>
+    | {
+        to: string;
+        params: object;
+      }
+    | undefined;
   storageKey: string;
 }) {
   const [page, setPage] = useState(0);
@@ -57,10 +56,11 @@ export function CustomTemplatesList({
         title="Custom Templates"
         titleIcon={Edit}
         renderTableActions={() => (
-          <Button as={Link} props={{ to: '.new' }} icon={Plus}>
+          <AddButton data-cy="add-custom-template-button">
             Add Custom Template
-          </Button>
+          </AddButton>
         )}
+        data-cy="custom-templates-datatable-header"
       />
 
       <div className="blocklist gap-y-2 !px-[20px] !pb-[20px]" role="list">
@@ -68,7 +68,6 @@ export function CustomTemplatesList({
           <CustomTemplatesListItem
             key={template.Id}
             template={template}
-            onSelect={onSelect}
             isSelected={template.Id === selectedId}
             onDelete={onDelete}
             linkParams={templateLinkParams?.(template)}

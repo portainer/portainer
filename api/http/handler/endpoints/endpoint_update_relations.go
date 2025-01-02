@@ -88,13 +88,11 @@ func (handler *Handler) updateRelations(w http.ResponseWriter, r *http.Request) 
 			}
 
 			if updateRelations {
-				err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-				if err != nil {
+				if err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
 					return errors.WithMessage(err, "Unable to update environment")
 				}
 
-				err = handler.updateEdgeRelations(tx, endpoint)
-				if err != nil {
+				if err := handler.updateEdgeRelations(tx, endpoint); err != nil {
 					return errors.WithMessage(err, "Unable to update environment relations")
 				}
 			}

@@ -11,6 +11,8 @@ body:
         The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/orgs/portainer/discussions/categories/ideas) or a [general question about Portainer](https://github.com/orgs/portainer/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/orgs/portainer/discussions).
         
         You can also ask for help in our [community Slack channel](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA).
+
+        Please note that we only provide support for current versions of Portainer. You can find a list of supported versions in our [lifecycle policy](https://docs.portainer.io/start/lifecycle).
         
         **DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS**.
 
@@ -90,9 +92,26 @@ body:
   - type: dropdown
     attributes:
       label: Portainer version
-      description: We only provide support for the most recent version of Portainer and the previous 3 versions. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
+      description: We only provide support for current versions of Portainer as per the lifecycle policy linked above. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
       multiple: false
       options:
+        - '2.25.1'
+        - '2.25.0'
+        - '2.24.1'
+        - '2.24.0'
+        - '2.23.0'
+        - '2.22.0'
+        - '2.21.5'
+        - '2.21.4'
+        - '2.21.3'
+        - '2.21.2'
+        - '2.21.1'
+        - '2.21.0'
+        - '2.20.3'
+        - '2.20.2'
+        - '2.20.1'
+        - '2.20.0'
+        - '2.19.5'
         - '2.19.4'
         - '2.19.3'
         - '2.19.2'
@@ -102,11 +121,6 @@ body:
         - '2.18.3'
         - '2.18.2'
         - '2.18.1'
-        - '2.17.1'
-        - '2.17.0'
-        - '2.16.2'
-        - '2.16.1'
-        - '2.16.0'
     validations:
       required: true
 

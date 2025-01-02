@@ -45,7 +45,7 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) deleteEdgeStack(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID) error {
-	edgeStack, err := tx.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
+	edgeStack, err := tx.EdgeStack().EdgeStack(edgeStackID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", err)
 	} else if err != nil {

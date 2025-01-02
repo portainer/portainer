@@ -1,24 +1,30 @@
 import {
-  BasicTableSettings,
-  RefreshableTableSettings,
-  SettableColumnsTableSettings,
-  createPersistedStore,
+  type BasicTableSettings,
+  type FilteredColumnsTableSettings,
+  type RefreshableTableSettings,
+  type SettableColumnsTableSettings,
   hiddenColumnsSettings,
   refreshableSettings,
+  filteredColumnsSettings,
 } from '@@/datatables/types';
+import { useTableStateWithStorage } from '@@/datatables/useTableState';
 
 export interface TableSettings
   extends BasicTableSettings,
     SettableColumnsTableSettings,
-    RefreshableTableSettings {
+    RefreshableTableSettings,
+    FilteredColumnsTableSettings {
   showOrphanedStacks: boolean;
   setShowOrphanedStacks(value: boolean): void;
 }
 
-export function createStore(storageKey: string) {
-  return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
+const tableKey = 'docker_stacks';
+
+export function useStore() {
+  return useTableStateWithStorage<TableSettings>(tableKey, 'name', (set) => ({
     ...hiddenColumnsSettings(set),
     ...refreshableSettings(set),
+    ...filteredColumnsSettings(set),
     showOrphanedStacks: false,
     setShowOrphanedStacks(showOrphanedStacks) {
       set((s) => ({ ...s, showOrphanedStacks }));

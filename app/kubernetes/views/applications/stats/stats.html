@@ -57,7 +57,7 @@
           <div class="form-group">
             <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> Refresh rate </label>
             <div class="col-sm-3 col-md-2">
-              <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control">
+              <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control" data-cy="app-stats-refresh-rate">
                 <option value="30">30s</option>
                 <option value="60">60s</option>
               </select>

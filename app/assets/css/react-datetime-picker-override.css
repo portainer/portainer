@@ -5,82 +5,110 @@
   library css for buttons is overriden by `.widget .widget-body button`
   so we have to force margin: 0
 */
-.react-datetime-picker .react-calendar button {
+.react-daterange-picker__calendar .react-calendar button {
   margin: 0 !important;
 }
 
 /*
-  Extending Calendar.css from react-datetime-picker
+  Extending Calendar.css from react-daterange-picker__calendar
 */
-.react-datetime-picker .react-calendar {
+.react-daterange-picker__calendar .react-calendar {
   background: var(--bg-calendar-color);
   color: var(--text-main-color);
 }
 
 /* calendar nav buttons */
-.react-datetime-picker .react-calendar__navigation button:disabled {
-  background-color: var(--bg-calendar-color);
+.react-daterange-picker__calendar .react-calendar__navigation button:disabled {
+  background: var(--bg-calendar-color);
   @apply opacity-60;
   @apply brightness-95 th-dark:brightness-110;
 }
-.react-datetime-picker .react-calendar__navigation button:enabled:hover,
-.react-datetime-picker .react-calendar__navigation button:enabled:focus {
-  background-color: var(--bg-daterangepicker-color);
+.react-daterange-picker__calendar .react-calendar__navigation button:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__navigation button:enabled:focus {
+  background: var(--bg-daterangepicker-color);
 }
 
 /* date tile */
-.react-datetime-picker .react-calendar__tile:disabled {
-  background-color: var(--bg-calendar-color);
+.react-daterange-picker__calendar .react-calendar__tile:disabled {
+  background: var(--bg-calendar-color);
   @apply opacity-60;
   @apply brightness-95 th-dark:brightness-110;
 }
-.react-datetime-picker .react-calendar__tile:enabled:hover,
-.react-datetime-picker .react-calendar__tile:enabled:focus {
-  background-color: var(--bg-daterangepicker-hover);
+.react-daterange-picker__calendar .react-calendar__tile:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__tile:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
 }
 
 /* today's date tile */
-.react-datetime-picker .react-calendar__tile--now {
-  /* use background color to avoid white on yellow in dark/high contrast modes */
+.react-daterange-picker__calendar .react-calendar__tile--now {
   @apply th-highcontrast:text-[color:var(--bg-calendar-color)] th-dark:text-[color:var(--bg-calendar-color)];
+  border-radius: 0.25rem !important;
 }
-.react-datetime-picker .react-calendar__tile--now:enabled:hover,
-.react-datetime-picker .react-calendar__tile--now:enabled:focus {
+.react-daterange-picker__calendar .react-calendar__tile--now:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__tile--now:enabled:focus {
   background: var(--bg-daterangepicker-hover);
   color: var(--text-daterangepicker-hover);
 }
 
 /* probably date tile in range */
-.react-datetime-picker .react-calendar__tile--hasActive {
+.react-daterange-picker__calendar .react-calendar__tile--hasActive {
   background: var(--bg-daterangepicker-end-date);
   color: var(--text-daterangepicker-end-date);
 }
-.react-datetime-picker .react-calendar__tile--hasActive:enabled:hover,
-.react-datetime-picker .react-calendar__tile--hasActive:enabled:focus {
+.react-daterange-picker__calendar .react-calendar__tile--hasActive:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__tile--hasActive:enabled:focus {
   background: var(--bg-daterangepicker-hover);
   color: var(--text-daterangepicker-hover);
 }
 
-/* selected date tile */
-.react-datetime-picker .react-calendar__tile--active {
-  background: var(--bg-daterangepicker-active);
-  color: var(--text-daterangepicker-active);
-}
-.react-datetime-picker .react-calendar__tile--active:enabled:hover,
-.react-datetime-picker .react-calendar__tile--active:enabled:focus {
+.react-daterange-picker__calendar .react-calendar__tile--active:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__tile--active:enabled:focus {
   background: var(--bg-daterangepicker-hover);
   color: var(--text-daterangepicker-hover);
+}
+
+.react-daterange-picker__calendar
+  .react-calendar__month-view__days__day:hover:not(.react-daterange-picker__calendar .react-calendar__tile--hoverEnd):not(
+    .react-daterange-picker__calendar .react-calendar__tile--hoverStart
+  ):not(.react-calendar__tile--active) {
+  border-radius: 0.25rem !important;
 }
 
 /* on range select hover */
-.react-datetime-picker .react-calendar--selectRange .react-calendar__tile--hover {
-  background-color: var(--bg-daterangepicker-in-range);
+.react-daterange-picker__calendar .react-calendar--selectRange .react-calendar__tile--hover {
+  background: var(--bg-daterangepicker-in-range);
   color: var(--text-daterangepicker-in-range);
 }
 
 /*
-  Extending DateTimePicker.css from react-datetime-picker
+  Extending DateTimePicker.css from react-daterange-picker__calendar
 */
-.react-datetime-picker .react-datetime-picker--disabled {
+.react-daterange-picker__calendar .react-daterange-picker__calendar--disabled {
   @apply opacity-40;
+}
+
+/* selected date tile */
+.react-daterange-picker__calendar .react-calendar__tile--active {
+  background: var(--bg-daterangepicker-active) !important;
+  color: var(--text-daterangepicker-active) !important;
+}
+
+.react-daterange-picker__calendar .react-calendar__tile--rangeStart:not(.react-calendar__tile--rangeEnd),
+.react-daterange-picker__calendar .react-calendar__tile--hoverStart {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.react-daterange-picker__calendar .react-calendar__tile--rangeEnd:not(.react-calendar__tile--rangeStart),
+.react-daterange-picker__calendar .react-calendar__tile--hoverEnd {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.react-daterange-picker__calendar .react-calendar__month-view__days__day--weekend {
+  color: inherit;
+}
+
+.react-calendar__tile--active.react-calendar__month-view__days__day--weekend {
+  color: var(--text-daterangepicker-active);
 }

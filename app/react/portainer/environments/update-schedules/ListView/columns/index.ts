@@ -9,7 +9,7 @@ import { scheduledTime } from './scheduled-time';
 import { scheduleType } from './type';
 
 export const columns = [
-  buildNameColumn<DecoratedItem>('name', '.item'),
+  buildNameColumn<DecoratedItem>('name', '.item', 'update-schedules-name'),
   scheduledTime,
   groups,
   scheduleType,

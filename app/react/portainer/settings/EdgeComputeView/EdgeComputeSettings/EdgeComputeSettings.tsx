@@ -69,6 +69,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                 >
                   <Switch
                     id="edge_enable"
+                    data-cy="edge-enable-switch"
                     name="edge_enable"
                     className="space-right"
                     checked={values.EnableEdgeComputeFeatures}
@@ -103,6 +104,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                 >
                   <Switch
                     id="edge_enforce_id"
+                    data-cy="edge-enforce-id-switch"
                     name="edge_enforce_id"
                     className="space-right"
                     checked={values.EnforceEdgeID}

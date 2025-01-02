@@ -2,6 +2,7 @@ import {
   refreshableSettings,
   hiddenColumnsSettings,
   createPersistedStore,
+  filteredColumnsSettings,
 } from '@@/datatables/types';
 
 import { QuickAction, TableSettings } from './types';
@@ -12,6 +13,7 @@ export function createStore(storageKey: string) {
   return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
     ...hiddenColumnsSettings(set),
     ...refreshableSettings(set),
+    ...filteredColumnsSettings(set),
     truncateContainerName: TRUNCATE_LENGTH,
     setTruncateContainerName(truncateContainerName: number) {
       set({

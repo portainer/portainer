@@ -203,7 +203,7 @@ input:checked + .slider:before {
 /* Widget */
 
 .widget .widget-icon {
-  @apply mr-1 !p-2 text-lg;
+  @apply mr-1 !p-2 text-lg flex-none;
   @apply bg-blue-3 text-blue-8;
   @apply th-dark:bg-gray-9 th-dark:text-blue-3;
 

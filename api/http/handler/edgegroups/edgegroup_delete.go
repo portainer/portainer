@@ -19,8 +19,9 @@ import (
 // @security jwt
 // @param id path int true "EdgeGroup Id"
 // @success 204
+// @failure 409 "Edge group is in use by an Edge stack or Edge job"
 // @failure 503 "Edge compute features are disabled"
-// @failure 500
+// @failure 500 "Server error"
 // @router /edge_groups/{id} [delete]
 func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")

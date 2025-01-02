@@ -50,6 +50,7 @@ function Cell({
                       <div className="mt-2 text-right">
                         <Button
                           color="link"
+                          data-cy={`dismiss-error-${environment.Id}`}
                           className="small !ml-0 p-0"
                           onClick={handleDismissButton}
                         >

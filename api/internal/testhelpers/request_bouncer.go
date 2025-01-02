@@ -58,6 +58,8 @@ func (testRequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenData, 
 	return nil, nil
 }
 
+func (testRequestBouncer) RevokeJWT(jti string) {}
+
 // AddTestSecurityCookie adds a security cookie to the request
 func AddTestSecurityCookie(r *http.Request, jwt string) {
 	r.AddCookie(&http.Cookie{

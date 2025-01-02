@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
@@ -14,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // testHandler200 is a simple handler which returns HTTP status 200 OK
@@ -39,7 +41,6 @@ func tokenLookupEmpty(r *http.Request) (*portainer.TokenData, error) {
 }
 
 func Test_mwAuthenticateFirst(t *testing.T) {
-
 	_, store := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -154,7 +155,6 @@ func Test_extractKeyFromCookie(t *testing.T) {
 }
 
 func Test_extractBearerToken(t *testing.T) {
-
 	tt := []struct {
 		name               string
 		requestHeader      string
@@ -384,42 +384,53 @@ func Test_apiKeyLookup(t *testing.T) {
 }
 
 func Test_ShouldSkipCSRFCheck(t *testing.T) {
-
 	tt := []struct {
-		name           string
-		cookieValue    string
-		apiKey         string
-		authHeader     string
-		expectedResult bool
-		expectedError  bool
+		name                     string
+		cookieValue              string
+		apiKey                   string
+		authHeader               string
+		isDockerDesktopExtension bool
+		expectedResult           bool
+		expectedError            bool
 	}{
 		{
-			name:        "Should return false when cookie is present",
-			cookieValue: "test-cookie",
+			name:                     "Should return false (not skip) when cookie is present",
+			cookieValue:              "test-cookie",
+			isDockerDesktopExtension: false,
 		},
 		{
-			name:           "Should return true when cookie is not present",
-			cookieValue:    "",
-			expectedResult: true,
+			name:                     "Should return true (skip) when cookie is present and docker desktop extension is true",
+			cookieValue:              "test-cookie",
+			isDockerDesktopExtension: true,
+			expectedResult:           true,
 		},
 		{
-			name:           "Should return true when api key is present",
-			cookieValue:    "",
-			apiKey:         "test-api-key",
-			expectedResult: true,
+			name:                     "Should return true (skip) when cookie is not present",
+			cookieValue:              "",
+			isDockerDesktopExtension: false,
+			expectedResult:           true,
 		},
 		{
-			name:           "Should return true when auth header is present",
-			cookieValue:    "",
-			authHeader:     "test-auth-header",
-			expectedResult: true,
+			name:                     "Should return true (skip) when api key is present",
+			cookieValue:              "",
+			apiKey:                   "test-api-key",
+			isDockerDesktopExtension: false,
+			expectedResult:           true,
 		},
 		{
-			name:          "Should return false and error when both api key and auth header are present",
-			cookieValue:   "",
-			apiKey:        "test-api-key",
-			authHeader:    "test-auth-header",
-			expectedError: true,
+			name:                     "Should return true (skip) when auth header is present",
+			cookieValue:              "",
+			authHeader:               "test-auth-header",
+			isDockerDesktopExtension: false,
+			expectedResult:           true,
+		},
+		{
+			name:                     "Should return false (not skip) and error when both api key and auth header are present",
+			cookieValue:              "",
+			apiKey:                   "test-api-key",
+			authHeader:               "test-auth-header",
+			isDockerDesktopExtension: false,
+			expectedError:            true,
 		},
 	}
 
@@ -437,7 +448,7 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 				req.Header.Set(jwtTokenHeader, test.authHeader)
 			}
 
-			result, err := ShouldSkipCSRFCheck(req)
+			result, err := ShouldSkipCSRFCheck(req, test.isDockerDesktopExtension)
 			is.Equal(test.expectedResult, result)
 			if test.expectedError {
 				is.Error(err)
@@ -446,4 +457,73 @@ func Test_ShouldSkipCSRFCheck(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestJWTRevocation(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	jwtService, err := jwt.NewService("1h", store)
+	require.NoError(t, err)
+
+	err = store.User().Create(&portainer.User{ID: 1})
+	require.NoError(t, err)
+
+	jwtService.SetUserSessionDuration(time.Second)
+
+	token, _, err := jwtService.GenerateToken(&portainer.TokenData{ID: 1})
+	require.NoError(t, err)
+
+	settings, err := store.Settings().Settings()
+	require.NoError(t, err)
+
+	settings.KubeconfigExpiry = "0"
+
+	err = store.Settings().UpdateSettings(settings)
+	require.NoError(t, err)
+
+	kubeToken, err := jwtService.GenerateTokenForKubeconfig(&portainer.TokenData{ID: 1})
+	require.NoError(t, err)
+
+	apiKeyService := apikey.NewAPIKeyService(nil, nil)
+
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
+
+	r, err := http.NewRequest(http.MethodGet, "url", nil)
+	require.NoError(t, err)
+
+	r.Header.Add(jwtTokenHeader, "Bearer "+token)
+
+	r.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: token})
+
+	_, err = bouncer.JWTAuthLookup(r)
+	require.NoError(t, err)
+
+	_, err = bouncer.CookieAuthLookup(r)
+	require.NoError(t, err)
+
+	bouncer.RevokeJWT(token)
+	bouncer.RevokeJWT(kubeToken)
+
+	revokeLen := func() (l int) {
+		bouncer.revokedJWT.Range(func(key, value any) bool {
+			l++
+
+			return true
+		})
+
+		return l
+	}
+	require.Equal(t, 2, revokeLen())
+
+	_, err = bouncer.JWTAuthLookup(r)
+	require.Error(t, err)
+
+	_, err = bouncer.CookieAuthLookup(r)
+	require.Error(t, err)
+
+	time.Sleep(time.Second)
+
+	bouncer.cleanUpExpiredJWTPass()
+
+	require.Equal(t, 1, revokeLen())
 }

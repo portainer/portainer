@@ -15,7 +15,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/system"
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/pkg/errors"
@@ -24,7 +26,7 @@ import (
 )
 
 const (
-	defaultUnpackerImage       = "portainer/compose-unpacker:latest"
+	defaultUnpackerImage       = "portainer/compose-unpacker:" + portainer.APIVersion
 	composeUnpackerImageEnvVar = "COMPOSE_UNPACKER_IMAGE"
 	composePathPrefix          = "portainer-compose-unpacker"
 )
@@ -58,8 +60,7 @@ func (d *stackDeployer) DeployRemoteComposeStack(
 
 	// --force-recreate doesn't pull updated images
 	if forcePullImage {
-		err := d.composeStackManager.Pull(context.TODO(), stack, endpoint)
-		if err != nil {
+		if err := d.composeStackManager.Pull(context.TODO(), stack, endpoint, portainer.ComposeOptions{}); err != nil {
 			return err
 		}
 	}
@@ -69,7 +70,8 @@ func (d *stackDeployer) DeployRemoteComposeStack(
 		endpoint,
 		OperationDeploy,
 		unpackerCmdBuilderOptions{
-			registries: registries,
+			forceRecreate: forceRecreate,
+			registries:    registries,
 		},
 	)
 }
@@ -118,10 +120,10 @@ func (d *stackDeployer) DeployRemoteSwarmStack(
 	defer d.swarmStackManager.Logout(endpoint)
 
 	return d.remoteStack(stack, endpoint, OperationSwarmDeploy, unpackerCmdBuilderOptions{
-
-		pullImage:  pullImage,
-		prune:      prune,
-		registries: registries,
+		pullImage:     pullImage,
+		prune:         prune,
+		forceRecreate: stack.AutoUpdate != nil && stack.AutoUpdate.ForceUpdate,
+		registries:    registries,
 	})
 }
 
@@ -169,9 +171,9 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	}
 	defer cli.Close()
 
-	image := getUnpackerImage()
+	unpackerImg := getUnpackerImage()
 
-	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, unpackerImg, image.PullOptions{})
 	if err != nil {
 		return errors.Wrap(err, "unable to pull unpacker image")
 	}
@@ -182,7 +184,9 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	if err != nil {
 		return errors.Wrap(err, "unable to get agent info")
 	}
-	targetSocketBind := getTargetSocketBind(info.OSType)
+	// ensure the targetSocketBindHost is changed to podman for podman environments
+	targetSocketBindHost := getTargetSocketBindHost(info.OSType, endpoint.ContainerEngine)
+	targetSocketBindContainer := getTargetSocketBindContainer(info.OSType)
 
 	composeDestination := filesystem.JoinPaths(stack.ProjectPath, composePathPrefix)
 
@@ -194,26 +198,26 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 	}
 
 	log.Debug().
-		Str("image", image).
+		Str("image", unpackerImg).
 		Str("cmd", strings.Join(cmd, " ")).
 		Msg("running unpacker")
 
 	unpackerContainer, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: image,
+		Image: unpackerImg,
 		Cmd:   cmd,
 	}, &container.HostConfig{
 		Binds: []string{
 			fmt.Sprintf("%s:%s", composeDestination, composeDestination),
-			fmt.Sprintf("%s:%s", targetSocketBind, targetSocketBind),
+			fmt.Sprintf("%s:%s", targetSocketBindHost, targetSocketBindContainer),
 		},
 	}, nil, nil, fmt.Sprintf("portainer-unpacker-%d-%s-%d", stack.ID, stack.Name, rand.Intn(100)))
 
 	if err != nil {
 		return errors.Wrap(err, "unable to create unpacker container")
 	}
-	defer cli.ContainerRemove(ctx, unpackerContainer.ID, types.ContainerRemoveOptions{})
+	defer cli.ContainerRemove(ctx, unpackerContainer.ID, container.RemoveOptions{})
 
-	if err := cli.ContainerStart(ctx, unpackerContainer.ID, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(ctx, unpackerContainer.ID, container.StartOptions{}); err != nil {
 		return errors.Wrap(err, "start unpacker container error")
 	}
 
@@ -228,7 +232,7 @@ func (d *stackDeployer) remoteStack(stack *portainer.Stack, endpoint *portainer.
 
 	stdErr := &bytes.Buffer{}
 
-	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := cli.ContainerLogs(ctx, unpackerContainer.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get logs from unpacker container")
 	} else {
@@ -325,7 +329,19 @@ func getUnpackerImage() string {
 	return image
 }
 
-func getTargetSocketBind(osType string) string {
+func getTargetSocketBindHost(osType string, containerEngine string) string {
+	targetSocketBind := "//./pipe/docker_engine"
+	if strings.EqualFold(osType, "linux") {
+		if containerEngine == portainer.ContainerEnginePodman {
+			targetSocketBind = "/run/podman/podman.sock"
+		} else {
+			targetSocketBind = "/var/run/docker.sock"
+		}
+	}
+	return targetSocketBind
+}
+
+func getTargetSocketBindContainer(osType string) string {
 	targetSocketBind := "//./pipe/docker_engine"
 	if strings.EqualFold(osType, "linux") {
 		targetSocketBind = "/var/run/docker.sock"
@@ -335,6 +351,6 @@ func getTargetSocketBind(osType string) string {
 
 // Per https://stackoverflow.com/a/50590287 and Docker's LocalNodeState possible values
 // `LocalNodeStateInactive` means the node is not in a swarm cluster
-func isNotInASwarm(info *types.Info) bool {
+func isNotInASwarm(info *system.Info) bool {
 	return info.Swarm.LocalNodeState == swarm.LocalNodeStateInactive
 }

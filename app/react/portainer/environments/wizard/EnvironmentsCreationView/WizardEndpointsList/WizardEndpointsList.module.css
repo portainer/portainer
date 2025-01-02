@@ -22,8 +22,6 @@
 
 .wizard-list-image {
   grid-area: image;
-  font-size: 35px;
-  color: #337ab7;
 }
 
 .wizard-list-title {

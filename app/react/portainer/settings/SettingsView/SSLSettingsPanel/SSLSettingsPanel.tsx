@@ -68,6 +68,7 @@ function SSLSettingsPanel() {
                 <div className="col-sm-12">
                   <SwitchField
                     checked={values.forceHTTPS}
+                    data-cy="settings-ssl-force-https-switch"
                     label="Force HTTPS only"
                     labelClass="col-sm-3 col-lg-2"
                     name="forceHTTPS"
@@ -93,6 +94,7 @@ function SSLSettingsPanel() {
               >
                 <FileUploadField
                   inputId="ca-cert-field"
+                  data-cy="ssl-cert-file-upload"
                   name="certFile"
                   onChange={(file) => setFieldValue('certFile', file)}
                   value={values.certFile}
@@ -107,6 +109,7 @@ function SSLSettingsPanel() {
               >
                 <FileUploadField
                   inputId="ca-cert-field"
+                  data-cy="ssl-key-file-upload"
                   name="keyFile"
                   onChange={(file) => setFieldValue('keyFile', file)}
                   value={values.keyFile}
@@ -117,6 +120,7 @@ function SSLSettingsPanel() {
                 <div className="col-sm-12">
                   <LoadingButton
                     isLoading={mutation.isLoading || reloadingPage}
+                    data-cy="save-ssl-settings-button"
                     disabled={!dirty || !isValid}
                     loadingText={reloadingPage ? 'Reloading' : 'Saving'}
                     className="!ml-0"

@@ -8,6 +8,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useEnvironmentDeploymentOptions } from '@/react/portainer/environments/queries/useEnvironment';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { isKubernetesEnvironment } from '@/react/portainer/environments/utils';
+import { DeployMethod } from '@/react/portainer/gitops/types';
 
 import { useInitialValues } from './useInitialValues';
 import { FormValues, initialBuildMethods } from './types';
@@ -17,19 +18,22 @@ import { InnerForm } from './InnerForm';
 export function CreateForm({
   environmentId,
   viewType,
+  defaultType,
 }: {
   environmentId?: EnvironmentId;
   viewType: 'kube' | 'docker' | 'edge';
+  defaultType: StackType;
 }) {
+  const deployMethod: DeployMethod =
+    defaultType === StackType.Kubernetes ? 'manifest' : 'compose';
   const isEdge = !environmentId;
   const router = useRouter();
   const mutation = useCreateTemplateMutation();
-  const validation = useValidation({ viewType });
+  const validation = useValidation({ viewType, deployMethod });
   const buildMethods = useBuildMethods();
 
   const initialValues = useInitialValues({
-    defaultType:
-      viewType === 'kube' ? StackType.Kubernetes : StackType.DockerCompose,
+    defaultType,
     isEdge,
     buildMethods: buildMethods.map((method) => method.value),
   });

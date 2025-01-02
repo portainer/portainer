@@ -1,10 +1,10 @@
 import { TableOptions } from '@tanstack/react-table';
 
-type OptionExtender<T> = (options: TableOptions<T>) => TableOptions<T>;
+import { OptionsExtension } from './types';
 
-export function mergeOptions<T>(
-  ...extenders: Array<OptionExtender<T>>
-): OptionExtender<T> {
-  return (options: TableOptions<T>) =>
+export function mergeOptions<D>(
+  ...extenders: Array<OptionsExtension<D>>
+): OptionsExtension<D> {
+  return (options: TableOptions<D>) =>
     extenders.reduce((acc, option) => option(acc), options);
 }

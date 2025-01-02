@@ -9,6 +9,7 @@ export async function confirmContainerDeletion(title: string) {
     {
       confirmButton: buildConfirmButton('Remove', 'danger'),
       modalType: ModalType.Destructive,
+      'data-cy': 'confirm-container-delete-button',
     }
   );
 

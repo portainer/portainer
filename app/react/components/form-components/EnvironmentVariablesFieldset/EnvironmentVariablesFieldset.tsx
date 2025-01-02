@@ -34,6 +34,7 @@ export function EnvironmentVariablesFieldset({
       ) : (
         <AdvancedMode
           onSimpleModeClick={() => setSimpleMode(true)}
+          data-cy="env-var-advanced-mode"
           onChange={onChange}
           value={values}
         />

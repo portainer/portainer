@@ -6,10 +6,12 @@ import {
 
 import { DefaultType } from '../types';
 
+import { OptionsExtension } from './types';
+
 export function withControlledSelected<D extends DefaultType>(
   onChange?: (value: string[]) => void,
   value?: string[]
-) {
+): OptionsExtension<D> {
   return function extendTableOptions(options: TableOptions<D>) {
     if (!onChange || !value) {
       return options;

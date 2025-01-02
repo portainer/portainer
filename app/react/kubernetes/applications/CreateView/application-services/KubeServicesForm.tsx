@@ -42,7 +42,7 @@ export function KubeServicesForm({
 
   // start loading ingresses and controllers early to reduce perceived loading time
   const environmentId = useEnvironmentId();
-  useIngresses(environmentId, namespace ? [namespace] : []);
+  useIngresses(environmentId, { withServices: true });
   useIngressControllers(environmentId, namespace);
 
   // when the appName changes, update the names for each service

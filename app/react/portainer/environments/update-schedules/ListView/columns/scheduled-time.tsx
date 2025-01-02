@@ -1,6 +1,6 @@
 import { formatDate } from '@/portainer/filters/filters';
 
-import { FORMAT } from '../../common/ScheduledTimeField';
+import { FORMAT } from '@@/DateTimeField';
 
 import { columnHelper } from './helper';
 

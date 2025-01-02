@@ -3,7 +3,7 @@ import { useField, Field } from 'formik';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp/ContextHelp';
+import { useDocsUrl } from '@@/PageHeader/ContextHelp';
 
 // this value is taken from https://github.com/portainer/portainer/blob/develop/api/portainer.go#L1628
 const DEFAULT_URL =

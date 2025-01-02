@@ -59,9 +59,7 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	response, err := transport.baseTransport.RoundTrip(request)
 
 	if err == nil {
-		transport.reverseTunnelService.SetTunnelStatusToActive(transport.endpoint.ID)
-	} else {
-		transport.reverseTunnelService.SetTunnelStatusToIdle(transport.endpoint.ID)
+		transport.reverseTunnelService.UpdateLastActivity(transport.endpoint.ID)
 	}
 
 	return response, err

@@ -17,7 +17,7 @@ type FileUploadMethodStackBuildProcess interface {
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) FileUploadMethodStackBuildProcess
 	// Save the stack information to database
 	SaveStack() (*portainer.Stack, *httperror.HandlerError)
-	// Get reponse from http request. Use if it is needed
+	// Get response from HTTP request. Use if it is needed
 	GetResponse() string
 	// Process the upload file
 	SetUploadedFile(payload *StackPayload) FileUploadMethodStackBuildProcess
@@ -33,11 +33,11 @@ func (b *FileUploadMethodStackBuilder) SetGeneralInfo(payload *StackPayload, end
 	b.stack.EndpointID = endpoint.ID
 	b.stack.Status = portainer.StackStatusActive
 	b.stack.CreationDate = time.Now().Unix()
+
 	return b
 }
 
 func (b *FileUploadMethodStackBuilder) SetUniqueInfo(payload *StackPayload) FileUploadMethodStackBuildProcess {
-
 	return b
 }
 
@@ -52,6 +52,7 @@ func (b *FileUploadMethodStackBuilder) SetUploadedFile(payload *StackPayload) Fi
 		b.err = httperror.InternalServerError("Unable to persist Compose file on disk", err)
 		return b
 	}
+
 	b.stack.ProjectPath = projectPath
 
 	return b
@@ -63,13 +64,14 @@ func (b *FileUploadMethodStackBuilder) Deploy(payload *StackPayload, endpoint *p
 	}
 
 	// Deploy the stack
-	err := b.deploymentConfiger.Deploy()
-	if err != nil {
+	if err := b.deploymentConfiger.Deploy(); err != nil {
 		b.err = httperror.InternalServerError(err.Error(), err)
+
 		return b
 	}
 
 	b.doCleanUp = false
+
 	return b
 }
 

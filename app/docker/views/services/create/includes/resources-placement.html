@@ -4,10 +4,17 @@
   <div class="form-group">
     <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory reservation </label>
     <div class="col-sm-3">
-      <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
+      <slider
+        model="formValues.MemoryReservation"
+        floor="0"
+        ceil="state.sliderMaxMemory"
+        step="256"
+        ng-if="state.sliderMaxMemory"
+        data-cy="docker-services-create-memory-reservation-slider"
+      ></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
+      <input type="number" data-cy="docker-services-create-memory-reservation-input" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
     </div>
     <div class="col-sm-4">
       <p class="small text-muted" style="margin-top: 7px"> Minimum memory available on a node to run a task (<b>MB</b>) </p>
@@ -18,10 +25,17 @@
   <div class="form-group">
     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory limit </label>
     <div class="col-sm-3">
-      <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
+      <slider
+        model="formValues.MemoryLimit"
+        floor="0"
+        ceil="state.sliderMaxMemory"
+        step="256"
+        ng-if="state.sliderMaxMemory"
+        data-cy="docker-services-create-memory-limit-slider"
+      ></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
+      <input type="number" data-cy="docker-services-create-memory-limit-input" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
     </div>
     <div class="col-sm-4" style="margin-top: 7px">
       <p class="small text-muted"> Maximum memory usage per task (<b>MB</b>) </p>
@@ -32,7 +46,15 @@
   <div class="form-group">
     <label for="cpu-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU reservation </label>
     <div class="col-sm-5">
-      <slider model="formValues.CpuReservation" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
+      <slider
+        model="formValues.CpuReservation"
+        floor="0"
+        ceil="state.sliderMaxCpu"
+        step="0.25"
+        precision="2"
+        ng-if="state.sliderMaxCpu"
+        data-cy="docker-services-create-cpu-reservation-slider"
+      ></slider>
     </div>
     <div class="col-sm-4" style="margin-top: 20px">
       <p class="small text-muted"> Minimum CPU available on a node to run a task </p>
@@ -43,7 +65,15 @@
   <div class="form-group">
     <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
     <div class="col-sm-5">
-      <slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
+      <slider
+        model="formValues.CpuLimit"
+        floor="0"
+        ceil="state.sliderMaxCpu"
+        step="0.25"
+        precision="2"
+        ng-if="state.sliderMaxCpu"
+        data-cy="docker-services-create-cpu-limit-slider"
+      ></slider>
     </div>
     <div class="col-sm-4" style="margin-top: 20px">
       <p class="small text-muted"> Maximum CPU usage per task </p>
@@ -63,17 +93,17 @@
       <div ng-repeat="constraint in formValues.PlacementConstraints" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">name</span>
-          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" />
+          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" data-cy="docker-services-create-placement-constraint-name-{{ $index }}" />
         </div>
         <div class="input-group col-sm-1 input-group-sm">
-          <select name="constraintOperator" class="form-control" ng-model="constraint.operator">
+          <select name="constraintOperator" class="form-control" ng-model="constraint.operator" data-cy="docker-services-create-placement-constraint-operator-">
             <option value="==">==</option>
             <option value="!=">!=</option>
           </select>
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" />
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" data-cy="docker-services-create-placement-constraint-value-{{ $index }}" />
         </div>
         <button class="btn btn-dangerlight" type="button" ng-click="removePlacementConstraint($index)">
           <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
@@ -94,11 +124,23 @@
       <div ng-repeat="preference in formValues.PlacementPreferences" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">strategy</span>
-          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread" />
+          <input
+            type="text"
+            class="form-control"
+            ng-model="preference.strategy"
+            placeholder="e.g. spread"
+            data-cy="docker-services-create-placement-preference-strategy-{{ $index }}"
+          />
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. node.labels.datacenter" />
+          <input
+            type="text"
+            class="form-control"
+            ng-model="preference.value"
+            placeholder="e.g. node.labels.datacenter"
+            data-cy="docker-services-create-placement-preference-value-{{ $index }}"
+          />
         </div>
         <button class="btn btn-dangerlight" type="button" ng-click="removePlacementPreference($index)">
           <pr-icon icon="'trash-2'" size="'md'"></pr-icon>

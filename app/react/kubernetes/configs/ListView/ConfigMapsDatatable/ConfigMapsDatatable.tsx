@@ -1,31 +1,27 @@
 import { useMemo } from 'react';
-import { FileCode, Plus, Trash2 } from 'lucide-react';
-import { ConfigMap } from 'kubernetes-types/core/v1';
+import { FileCode } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { DefaultDatatableSettings } from '@/react/kubernetes/datatables/DefaultDatatableSettings';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
-import { useApplicationsQuery } from '@/react/kubernetes/applications/application.queries';
-import { Application } from '@/react/kubernetes/applications/types';
+import { useIsDeploymentOptionHidden } from '@/react/hooks/useIsDeploymentOptionHidden';
 import { pluralize } from '@/portainer/helpers/strings';
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
-import { Namespaces } from '@/react/kubernetes/namespaces/types';
+import { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
+import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFromManifestButton';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
-import { confirmDelete } from '@@/modals/confirm';
-import { Button } from '@@/buttons';
-import { Link } from '@@/Link';
+import { AddButton } from '@@/buttons';
 import { useTableState } from '@@/datatables/useTableState';
+import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import {
-  useConfigMapsForCluster,
-  useMutationDeleteConfigMaps,
-} from '../../configmap.service';
-import { IndexOptional } from '../../types';
+import { IndexOptional, Configuration } from '../../types';
+import { useDeleteConfigMaps } from '../../queries/useDeleteConfigMaps';
+import { useConfigMapsForCluster } from '../../queries/useConfigmapsForCluster';
 
-import { getIsConfigMapInUse } from './utils';
 import { ConfigMapRowData } from './types';
 import { columns } from './columns';
 
@@ -41,39 +37,23 @@ export function ConfigMapsDatatable() {
   );
 
   const environmentId = useEnvironmentId();
-  const { data: namespaces, ...namespacesQuery } = useNamespacesQuery(
-    environmentId,
-    {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
-    }
-  );
-  const namespaceNames = Object.keys(namespaces || {});
-  const { data: configMaps, ...configMapsQuery } = useConfigMapsForCluster(
-    environmentId,
-    namespaceNames,
-    {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
-    }
-  );
-  const { data: applications, ...applicationsQuery } = useApplicationsQuery(
-    environmentId,
-    namespaceNames
-  );
-
-  const filteredConfigMaps = useMemo(
-    () =>
-      configMaps?.filter(
-        (configMap) =>
+  const namespacesQuery = useNamespacesQuery(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+  });
+  const configMapsQuery = useConfigMapsForCluster(environmentId, {
+    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    select: (configMaps) =>
+      configMaps.filter(
+        (configmap) =>
           (canAccessSystemResources && tableState.showSystemResources) ||
-          !namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
-      ) || [],
-    [configMaps, tableState, canAccessSystemResources, namespaces]
-  );
+          !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
+      ),
+    isUsed: true,
+  });
+
   const configMapRowData = useConfigMapRowData(
-    filteredConfigMaps,
-    applications ?? [],
-    applicationsQuery.isLoading,
-    namespaces
+    configMapsQuery.data ?? [],
+    namespacesQuery.data
   );
 
   return (
@@ -85,9 +65,9 @@ export function ConfigMapsDatatable() {
       emptyContentLabel="No ConfigMaps found"
       title="ConfigMaps"
       titleIcon={FileCode}
-      getRowId={(row) => row.metadata?.uid ?? ''}
-      isRowSelectable={(row) =>
-        !namespaces?.[row.original.metadata?.namespace ?? ''].IsSystem
+      getRowId={(row) => row.UID ?? ''}
+      isRowSelectable={({ original: configmap }) =>
+        !isSystemNamespace(configmap.Namespace, namespacesQuery.data)
       }
       disableSelect={readOnly}
       renderTableActions={(selectedRows) => (
@@ -103,30 +83,27 @@ export function ConfigMapsDatatable() {
           showSystemResources={tableState.showSystemResources}
         />
       }
+      data-cy="k8s-configmaps-datatable"
     />
   );
 }
 
-// useConfigMapRowData appends the `inUse` property to the ConfigMap data (for the unused badge in the name column)
-// and wraps with useMemo to prevent unnecessary calculations
 function useConfigMapRowData(
-  configMaps: ConfigMap[],
-  applications: Application[],
-  applicationsLoading: boolean,
-  namespaces?: Namespaces
+  configMaps: Configuration[],
+  namespaces?: PortainerNamespace[]
 ): ConfigMapRowData[] {
   return useMemo(
     () =>
-      configMaps.map((configMap) => ({
+      configMaps?.map((configMap) => ({
         ...configMap,
-        inUse:
-          // if the apps are loading, set inUse to true to hide the 'unused' badge
-          applicationsLoading || getIsConfigMapInUse(configMap, applications),
+        inUse: configMap.IsUsed,
         isSystem: namespaces
-          ? namespaces?.[configMap.metadata?.namespace ?? '']?.IsSystem
+          ? namespaces.find(
+              (namespace) => namespace.Name === configMap.Namespace
+            )?.IsSystem ?? false
           : false,
-      })),
-    [configMaps, applicationsLoading, applications, namespaces]
+      })) || [],
+    [configMaps, namespaces]
   );
 }
 
@@ -135,65 +112,47 @@ function TableActions({
 }: {
   selectedItems: ConfigMapRowData[];
 }) {
+  const isAddConfigMapHidden = useIsDeploymentOptionHidden('form');
   const environmentId = useEnvironmentId();
-  const deleteConfigMapMutation = useMutationDeleteConfigMaps(environmentId);
+  const deleteConfigMapMutation = useDeleteConfigMaps(environmentId);
 
-  async function handleRemoveClick(configMaps: ConfigMap[]) {
-    const confirmed = await confirmDelete(
-      `Are you sure you want to remove the selected ${pluralize(
-        configMaps.length,
-        'ConfigMap'
-      )}?`
-    );
-    if (!confirmed) {
-      return;
-    }
+  return (
+    <Authorized authorizations="K8sConfigMapsW">
+      <DeleteButton
+        disabled={selectedItems.length === 0}
+        onConfirmed={() => handleRemoveClick(selectedItems)}
+        confirmMessage={`Are you sure you want to remove the selected ${pluralize(
+          selectedItems.length,
+          'ConfigMap'
+        )}`}
+        data-cy="k8sConfig-removeConfigButton"
+      />
 
+      {!isAddConfigMapHidden && (
+        <AddButton
+          to="kubernetes.configmaps.new"
+          data-cy="k8sConfig-addConfigWithFormButton"
+          color="secondary"
+        >
+          Add with form
+        </AddButton>
+      )}
+
+      <CreateFromManifestButton
+        params={{
+          tab: 'configmaps',
+        }}
+        data-cy="k8sConfig-deployFromManifestButton"
+      />
+    </Authorized>
+  );
+
+  async function handleRemoveClick(configMaps: ConfigMapRowData[]) {
     const configMapsToDelete = configMaps.map((configMap) => ({
-      namespace: configMap.metadata?.namespace ?? '',
-      name: configMap.metadata?.name ?? '',
+      namespace: configMap.Namespace ?? '',
+      name: configMap.Name ?? '',
     }));
 
     await deleteConfigMapMutation.mutateAsync(configMapsToDelete);
   }
-
-  return (
-    <Authorized authorizations="K8sConfigMapsW">
-      <Button
-        className="btn-wrapper"
-        color="dangerlight"
-        disabled={selectedItems.length === 0}
-        onClick={async () => {
-          handleRemoveClick(selectedItems);
-        }}
-        icon={Trash2}
-        data-cy="k8sConfig-removeConfigButton"
-      >
-        Remove
-      </Button>
-      <Link to="kubernetes.configmaps.new" className="ml-1">
-        <Button
-          className="btn-wrapper"
-          color="secondary"
-          icon={Plus}
-          data-cy="k8sConfig-addConfigWithFormButton"
-        >
-          Add with form
-        </Button>
-      </Link>
-      <Link
-        to="kubernetes.deploy"
-        params={{
-          referrer: 'kubernetes.configurations',
-          tab: 'configmaps',
-        }}
-        className="ml-1"
-        data-cy="k8sConfig-deployFromManifestButton"
-      >
-        <Button className="btn-wrapper" color="primary" icon={Plus}>
-          Create from manifest
-        </Button>
-      </Link>
-    </Authorized>
-  );
 }

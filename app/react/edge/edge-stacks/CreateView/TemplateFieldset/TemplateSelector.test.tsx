@@ -7,8 +7,8 @@ import { CustomTemplate } from '@/react/portainer/templates/custom-templates/typ
 import { server } from '@/setup-tests/server';
 import selectEvent from '@/react/test-utils/react-select';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
 
-import { SelectedTemplateValue } from './types';
 import { TemplateSelector } from './TemplateSelector';
 
 test('renders TemplateSelector component', async () => {
@@ -109,7 +109,10 @@ function renderComponent({
   customTemplates = [],
   error,
 }: {
-  onChange?: (value: SelectedTemplateValue) => void;
+  onChange?: (
+    template: TemplateViewModel | CustomTemplate | undefined,
+    type: 'app' | 'custom' | undefined
+  ) => void;
   appTemplates?: Array<Partial<AppTemplate>>;
   customTemplates?: Array<Partial<CustomTemplate>>;
   error?: string;
@@ -128,7 +131,7 @@ function renderComponent({
 
   render(
     <Wrapped
-      value={{ template: undefined, type: undefined }}
+      value={{ templateId: undefined, type: undefined }}
       onChange={onChange}
       error={error}
     />

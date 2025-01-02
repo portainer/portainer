@@ -77,7 +77,7 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 // API schema references:
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretList
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretInspect
-func selectorSecretLabels(responseObject map[string]interface{}) map[string]interface{} {
+func selectorSecretLabels(responseObject map[string]any) map[string]any {
 	secretSpec := utils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
 		secretLabelsObject := utils.GetJSONObject(secretSpec, "Labels")

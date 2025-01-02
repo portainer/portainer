@@ -29,6 +29,7 @@ import (
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "Not found"
+// @failure 409 "Stack name is not unique"
 // @failure 500 "Server error"
 // @router /stacks/{id}/start [post]
 func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -160,7 +161,7 @@ func (handler *Handler) startStack(
 			return handler.StackDeployer.StartRemoteComposeStack(stack, endpoint, filteredRegistries)
 		}
 
-		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, false)
+		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{})
 	case portainer.DockerSwarmStack:
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 

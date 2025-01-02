@@ -14,7 +14,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   '$scope',
   '$state',
   '$timeout',
-  'Service',
+  'ServiceService',
   'ServiceHelper',
   'ConfigService',
   'ConfigHelper',
@@ -29,8 +29,6 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   'Notifications',
   'FormValidator',
   'PluginService',
-  'RegistryService',
-  'HttpRequestHelper',
   'NodeService',
   'WebhookService',
   'endpoint',
@@ -39,7 +37,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope,
     $state,
     $timeout,
-    Service,
+    ServiceService,
     ServiceHelper,
     ConfigService,
     ConfigHelper,
@@ -54,8 +52,6 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     Notifications,
     FormValidator,
     PluginService,
-    RegistryService,
-    HttpRequestHelper,
     NodeService,
     WebhookService,
     endpoint
@@ -523,11 +519,9 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     function createNewService(config, accessControlData) {
       const registryModel = $scope.formValues.RegistryModel;
-      var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
-      HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
-      Service.create(config)
-        .$promise.then(function success(data) {
+      ServiceService.create(config, registryModel.Registry.Authentication ? registryModel.Registry.Id : 0)
+        .then(function success(data) {
           const serviceId = data.ID;
           const resourceControl = data.Portainer.ResourceControl;
           const userId = Authentication.getUserDetails().ID;

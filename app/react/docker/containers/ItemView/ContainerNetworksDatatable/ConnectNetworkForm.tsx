@@ -3,7 +3,7 @@ import { SchemaOf, object, string } from 'yup';
 import { useRouter } from '@uirouter/react';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
-import { useConnectContainerMutation } from '@/react/docker/networks/queries/useConnectContainer';
+import { useConnectContainerMutation } from '@/react/docker/networks/queries/useConnectContainerMutation';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -55,6 +55,7 @@ export function ConnectNetworkForm({
               </div>
               <LoadingButton
                 loadingText="Joining network..."
+                data-cy="connect-network-button"
                 isLoading={connectMutation.isLoading}
               >
                 Join Network

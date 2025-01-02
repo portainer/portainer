@@ -20,6 +20,7 @@ interface Props {
   error?: string;
   isUrlValid?: boolean;
   stackId?: StackId;
+  createdFromCustomTemplateId?: number;
 }
 
 export function RefField({
@@ -29,6 +30,7 @@ export function RefField({
   error,
   isUrlValid,
   stackId,
+  createdFromCustomTemplateId,
 }: Props) {
   const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
   const inputId = 'repository-reference-field';
@@ -51,6 +53,7 @@ export function RefField({
         model={model}
         isUrlValid={isUrlValid}
         stackId={stackId}
+        createdFromCustomTemplateId={createdFromCustomTemplateId}
       />
     </Wrapper>
   ) : (
@@ -69,6 +72,7 @@ export function RefField({
     >
       <Input
         id={inputId}
+        data-cy="repository-reference-input"
         value={inputValue}
         onChange={(e) => updateInputValue(e.target.value)}
         placeholder="refs/heads/main"

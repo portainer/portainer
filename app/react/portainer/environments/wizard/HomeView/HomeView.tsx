@@ -47,8 +47,12 @@ export function HomeView() {
                       We could not connect your local environment to Portainer.
                       <br />
                       Please ensure your environment is correctly exposed. For
-                      help with installation visit
-                      <a href="https://documentation.portainer.io/quickstart/">
+                      help with installation visit{' '}
+                      <a
+                        href="https://documentation.portainer.io/quickstart/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         https://documentation.portainer.io/quickstart
                       </a>
                     </p>
@@ -62,7 +66,11 @@ export function HomeView() {
 
                 <div className="flex flex-wrap gap-4">
                   {localEnvironmentAdded.status === 'success' && (
-                    <Link to="portainer.home" className={styles.link}>
+                    <Link
+                      to="portainer.home"
+                      className={styles.link}
+                      data-cy="wizard-get-started-link"
+                    >
                       <Option
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
@@ -75,7 +83,11 @@ export function HomeView() {
                       />
                     </Link>
                   )}
-                  <Link to="portainer.wizard.endpoints" className={styles.link}>
+                  <Link
+                    to="portainer.wizard.endpoints"
+                    className={styles.link}
+                    data-cy="wizard-add-environments-link"
+                  >
                     <Option
                       title="Add Environments"
                       icon={Plug2}

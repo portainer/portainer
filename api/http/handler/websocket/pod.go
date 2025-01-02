@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
@@ -69,8 +70,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
@@ -87,22 +87,20 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	r.Header.Del("Origin")
 
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
-		err := handler.proxyAgentWebsocketRequest(w, r, params)
-		if err != nil {
+		if err := handler.proxyAgentWebsocketRequest(w, r, params); err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
 		}
 
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
-		if err != nil {
+		if err := handler.proxyEdgeAgentWebsocketRequest(w, r, params); err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
 		}
 
 		return nil
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
@@ -139,8 +137,8 @@ func (handler *Handler) hijackPodExecStartOperation(
 
 	// errorChan is used to propagate errors from the go routines to the caller.
 	errorChan := make(chan error, 1)
-	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
-	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
+	go ws.StreamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
+	go ws.StreamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
 	// StartExecProcess is a blocking operation which streams IO to/from pod;
 	// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before
@@ -165,7 +163,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 		return "", false, err
 	}
 
-	kubecli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	kubecli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		return "", false, err
 	}
@@ -187,7 +185,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 	}
 
 	if token == "" {
-		return "", false, fmt.Errorf("can not get a valid user service account token")
+		return "", false, errors.New("can not get a valid user service account token")
 	}
 
 	return token, false, nil

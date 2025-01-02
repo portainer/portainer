@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import * as JsonPatch from 'fast-json-patch';
 import { RegistryTypes } from '@/portainer/models/registryTypes';
-import { getServices } from '@/react/kubernetes/networks/services/service';
+import { getServices } from '@/react/kubernetes/services/useNamespaceServices';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import { getGlobalDeploymentOptions } from '@/react/portainer/settings/settings.service';
 
@@ -25,6 +25,8 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 import { updateIngress, getIngresses } from '@/react/kubernetes/ingresses/service';
 import { confirmUpdateAppIngress } from '@/react/kubernetes/applications/CreateView/UpdateIngressPrompt';
+import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
+import { isVolumeUsed } from '@/react/kubernetes/volumes/utils';
 import { confirm, confirmUpdate, confirmWebEditorDiscard } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
@@ -127,6 +129,7 @@ class KubernetesCreateApplicationController {
       // a validation message will be shown. isExistingCPUReservationUnchanged and isExistingMemoryReservationUnchanged (with available resources being exceeded) is used to decide whether to show the message or not.
       isExistingCPUReservationUnchanged: false,
       isExistingMemoryReservationUnchanged: false,
+      stackNameError: '',
     };
 
     this.isAdmin = this.Authentication.isAdmin();
@@ -186,9 +189,16 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  onChangeStackName(stackName) {
+  onChangeStackName(name) {
     return this.$async(async () => {
-      this.formValues.StackName = stackName;
+      if (KUBE_STACK_NAME_VALIDATION_REGEX.test(name) || name === '') {
+        this.state.stackNameError = '';
+      } else {
+        this.state.stackNameError =
+          "Stack must consist of alphanumeric characters, '-', '_' or '.', must start and end with an alphanumeric character and must be 63 characters or less (e.g. 'my-name', or 'abc-123').";
+      }
+
+      this.formValues.StackName = name;
     });
   }
 
@@ -263,7 +273,12 @@ class KubernetesCreateApplicationController {
           { stackFile: this.stackFileContent, stackName: this.formValues.StackName }
         );
         this.state.isEditorDirty = false;
-        this.$window.location.reload();
+        this.Notifications.success('Success', 'Request to update application successfully submitted');
+        this.$state.go(
+          'kubernetes.applications.application',
+          { name: this.application.Name, namespace: this.application.ResourcePool, endpointId: this.endpoint.Id },
+          { inherit: false }
+        );
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
       } finally {
@@ -409,7 +424,7 @@ class KubernetesCreateApplicationController {
         const ingressNamesLoaded = this.ingresses.map((i) => i.Name);
         const areAllIngressesLoaded = uniqueIngressNamesUsed.every((ingressNameUsed) => ingressNamesLoaded.includes(ingressNameUsed));
         if (!areAllIngressesLoaded) {
-          this.refreshIngresses();
+          this.refreshIngresses(this.application.ResourcePool);
         }
       }
       // update the services
@@ -644,7 +659,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
+    const stackNameInvalid = this.state.stackNameError !== '';
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || stackNameInvalid;
   }
 
   isUpdateApplicationViaWebEditorButtonDisabled() {
@@ -770,7 +786,7 @@ class KubernetesCreateApplicationController {
         });
         this.volumes = volumes;
         const filteredVolumes = _.filter(this.volumes, (volume) => {
-          const isUnused = !KubernetesVolumeHelper.isUsed(volume);
+          const isUnused = !isVolumeUsed(volume);
           const isRWX = volume.PersistentVolumeClaim.storageClass && _.includes(volume.PersistentVolumeClaim.storageClass.AccessModes, 'RWX');
           return isUnused || isRWX;
         });
@@ -903,7 +919,7 @@ class KubernetesCreateApplicationController {
   async checkIngressesToUpdate() {
     let ingressesToUpdate = [];
     let servicePortsToUpdate = [];
-    const fullIngresses = await getIngresses(this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name);
+    const fullIngresses = await getIngresses(this.endpoint.Id);
     this.formValues.Services.forEach((updatedService) => {
       const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === updatedService.Name);
       const numberOfPortsInOldService = this.oldFormValues.Services[oldServiceIndex] && this.oldFormValues.Services[oldServiceIndex].Ports.length;
@@ -1128,6 +1144,9 @@ class KubernetesCreateApplicationController {
         }
 
         this.oldFormValues = angular.copy(this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.updateNamespaceLimits(this.namespaceWithQuota);
+        this.updateSliders(this.namespaceWithQuota);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

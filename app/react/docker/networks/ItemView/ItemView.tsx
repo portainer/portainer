@@ -1,19 +1,21 @@
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
-import { DockerContainer } from '@/react/docker/containers/types';
+import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
-import { useContainers } from '@/react/docker/containers/queries/containers';
+import { useContainers } from '@/react/docker/containers/queries/useContainers';
+import { notifySuccess } from '@/portainer/services/notifications';
 
-import { confirmDelete } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
 
-import { useNetwork, useDeleteNetwork } from '../queries';
+import { useDeleteNetwork } from '../queries/useDeleteNetworkMutation';
 import { isSystemNetwork } from '../network.helper';
 import { NetworkResponseContainers } from '../types';
+import { queryKeys } from '../queries/queryKeys';
+import { useNetwork } from '../queries/useNetwork';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -28,7 +30,7 @@ export function ItemView() {
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
   const networkQuery = useNetwork(environmentId, networkId, { nodeName });
-  const deleteNetworkMutation = useDeleteNetwork();
+  const deleteNetworkMutation = useDeleteNetwork(environmentId);
   const containersQuery = useContainers(environmentId, {
     filters: {
       network: [networkId],
@@ -70,13 +72,9 @@ export function ItemView() {
 
       <AccessControlPanel
         onUpdateSuccess={() =>
-          queryClient.invalidateQueries([
-            'environments',
-            environmentId,
-            'docker',
-            'networks',
-            networkId,
-          ])
+          queryClient.invalidateQueries(
+            queryKeys.item(environmentId, networkId)
+          )
         }
         resourceControl={resourceControl}
         resourceType={ResourceControlType.Network}
@@ -95,25 +93,21 @@ export function ItemView() {
   );
 
   async function onRemoveNetworkClicked() {
-    const message = 'Do you want to delete the network?';
-    const confirmed = await confirmDelete(message);
-
-    if (confirmed) {
-      deleteNetworkMutation.mutate(
-        { environmentId, networkId },
-        {
-          onSuccess: () => {
-            router.stateService.go('docker.networks');
-          },
-        }
-      );
-    }
+    deleteNetworkMutation.mutate(
+      { networkId, nodeName },
+      {
+        onSuccess: () => {
+          notifySuccess('Network successfully removed', networkId);
+          router.stateService.go('docker.networks');
+        },
+      }
+    );
   }
 }
 
 function filterContainersInNetwork(
   networkContainers?: NetworkResponseContainers,
-  containers: DockerContainer[] = []
+  containers: ContainerListViewModel[] = []
 ) {
   if (!networkContainers) {
     return [];

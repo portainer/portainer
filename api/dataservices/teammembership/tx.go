@@ -43,7 +43,7 @@ func (service ServiceTx) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]por
 func (service ServiceTx) Create(membership *portainer.TeamMembership) error {
 	return service.Tx.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			membership.ID = portainer.TeamMembershipID(id)
 			return int(membership.ID), membership
 		},
@@ -55,7 +55,7 @@ func (service ServiceTx) DeleteTeamMembershipByUserID(userID portainer.UserID) e
 	return service.Tx.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
+		func(obj any) (id int, ok bool) {
 			membership, ok := obj.(portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
@@ -76,7 +76,7 @@ func (service ServiceTx) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) e
 	return service.Tx.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
+		func(obj any) (id int, ok bool) {
 			membership, ok := obj.(portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")
@@ -96,7 +96,7 @@ func (service ServiceTx) DeleteTeamMembershipByTeamIDAndUserID(teamID portainer.
 	return service.Tx.DeleteAllObjects(
 		BucketName,
 		&portainer.TeamMembership{},
-		func(obj interface{}) (id int, ok bool) {
+		func(obj any) (id int, ok bool) {
 			membership, ok := obj.(portainer.TeamMembership)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to TeamMembership object")

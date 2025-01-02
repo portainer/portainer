@@ -20,11 +20,12 @@ export async function getIngress(
 
 export async function getIngresses(
   environmentId: EnvironmentId,
-  namespace: string
+  params?: { withServices?: boolean }
 ) {
   try {
     const { data: ingresses } = await axios.get<Ingress[]>(
-      buildUrl(environmentId, namespace)
+      `kubernetes/${environmentId}/ingresses`,
+      { params }
     );
     return ingresses;
   } catch (e) {
@@ -67,7 +68,7 @@ export async function updateIngress(
   ingress: Ingress
 ) {
   try {
-    return await axios.put(buildUrl(environmentId, ingress.Namespace), ingress);
+    await axios.put(buildUrl(environmentId, ingress.Namespace), ingress);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update an ingress');
   }

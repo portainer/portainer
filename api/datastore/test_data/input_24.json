@@ -43,6 +43,12 @@
       "PublicURL": "",
       "Snapshots": [
         {
+          "DiagnosticsData": {
+            "Log": "",
+            "DNS": {},
+            "Proxy": {},
+            "Telnet": {}
+          },
           "DockerVersion": "20.10.13",
           "HealthyContainerCount": 0,
           "ImageCount": 9,
@@ -69,7 +75,9 @@
                   "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
                 },
                 "Mounts": [],
-                "Names": ["/nginx_redis-master_1"],
+                "Names": [
+                  "/nginx_redis-master_1"
+                ],
                 "NetworkSettings": {
                   "Networks": {
                     "nginx_default": {
@@ -125,7 +133,9 @@
                   "kompose.service.type": "LoadBalancer"
                 },
                 "Mounts": [],
-                "Names": ["/redis_frontend_1"],
+                "Names": [
+                  "/redis_frontend_1"
+                ],
                 "NetworkSettings": {
                   "Networks": {
                     "redis_default": {
@@ -191,7 +201,9 @@
                     "Type": "volume"
                   }
                 ],
-                "Names": ["/redis_redis-master_1"],
+                "Names": [
+                  "/redis_redis-master_1"
+                ],
                 "NetworkSettings": {
                   "Networks": {
                     "redis_default": {
@@ -257,7 +269,9 @@
                     "Type": "volume"
                   }
                 ],
-                "Names": ["/redis_redis-slave_1"],
+                "Names": [
+                  "/redis_redis-slave_1"
+                ],
                 "NetworkSettings": {
                   "Networks": {
                     "redis_default": {
@@ -316,7 +330,9 @@
                     "Type": "volume"
                   }
                 ],
-                "Names": ["/httpd"],
+                "Names": [
+                  "/httpd"
+                ],
                 "NetworkSettings": {
                   "Networks": {
                     "bridge": {
@@ -361,8 +377,13 @@
                 "Id": "sha256:86a511f3915ac296298506d2caf827e9597483bf84115bbe4e1707829de8534a",
                 "Labels": null,
                 "ParentId": "sha256:d03d4e751a04005e130d20ca4f22b3074b1ffbfdcf6b59a5d85727e267d31d98",
-                "RepoDigests": ["prabhat/ubuntu@sha256:bfe1371854e7e0e28517a041bfda08ecb3b345738c62092bfdf04f0513c27219"],
-                "RepoTags": ["ubuntu-prabhat:latest", "prabhat/ubuntu:latest"],
+                "RepoDigests": [
+                  "prabhat/ubuntu@sha256:bfe1371854e7e0e28517a041bfda08ecb3b345738c62092bfdf04f0513c27219"
+                ],
+                "RepoTags": [
+                  "ubuntu-prabhat:latest",
+                  "prabhat/ubuntu:latest"
+                ],
                 "SharedSize": -1,
                 "Size": 753642080,
                 "VirtualSize": 753642080
@@ -373,8 +394,12 @@
                 "Id": "sha256:ff0fea8310f3957d9b1e6ba494f3e4b63cb348c76160c6c15578e65995ffaa87",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["ubuntu@sha256:bea6d19168bbfd6af8d77c2cc3c572114eb5d113e6f422573c93cb605a0e2ffb"],
-                "RepoTags": ["ubuntu:latest"],
+                "RepoDigests": [
+                  "ubuntu@sha256:bea6d19168bbfd6af8d77c2cc3c572114eb5d113e6f422573c93cb605a0e2ffb"
+                ],
+                "RepoTags": [
+                  "ubuntu:latest"
+                ],
                 "SharedSize": -1,
                 "Size": 72759731,
                 "VirtualSize": 72759731
@@ -385,8 +410,12 @@
                 "Id": "sha256:6b8e87fff1072470bbfc957a735e7e46007177864a7f61bd9e0f5872d3d7b4a5",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["httpd@sha256:73496cbfc473872dd185154a3b96faa4407d773e893c6a7b9d8f977c331bc45d"],
-                "RepoTags": ["httpd:latest"],
+                "RepoDigests": [
+                  "httpd@sha256:73496cbfc473872dd185154a3b96faa4407d773e893c6a7b9d8f977c331bc45d"
+                ],
+                "RepoTags": [
+                  "httpd:latest"
+                ],
                 "SharedSize": -1,
                 "Size": 143974476,
                 "VirtualSize": 143974476
@@ -397,7 +426,9 @@
                 "Id": "sha256:a4ca82e34b45e34c0a8bffe4e974983a528e8beca6030c1f9d17ac7f96c7847f",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["portainer/agent@sha256:ca1a51a745f2490cf5345883dd8c5f6a953a15251ab95af246ca9e2fb3436dde"],
+                "RepoDigests": [
+                  "portainer/agent@sha256:ca1a51a745f2490cf5345883dd8c5f6a953a15251ab95af246ca9e2fb3436dde"
+                ],
                 "RepoTags": null,
                 "SharedSize": -1,
                 "Size": 154347153,
@@ -415,7 +446,10 @@
                   "nginx@sha256:1c13bc6de5dfca749c377974146ac05256791ca2fe1979fc8e8278bf0121d285",
                   "prabhat/nginx@sha256:2468d48e476b6a079eb646e87620f96ce1818ac0c5b3a8450532cea64b3421f4"
                 ],
-                "RepoTags": ["nginx:latest", "prabhat/nginx:latest"],
+                "RepoTags": [
+                  "nginx:latest",
+                  "prabhat/nginx:latest"
+                ],
                 "SharedSize": -1,
                 "Size": 141505630,
                 "VirtualSize": 141505630
@@ -426,7 +460,9 @@
                 "Id": "sha256:6d1ef012b5674ad8a127ecfa9b5e6f5178d171b90ee462846974177fd9bdd39f",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["alpine@sha256:8421d9a84432575381bfabd248f1eb56f3aa21d9d7cd2511583c68c9b7511d10"],
+                "RepoDigests": [
+                  "alpine@sha256:8421d9a84432575381bfabd248f1eb56f3aa21d9d7cd2511583c68c9b7511d10"
+                ],
                 "RepoTags": null,
                 "SharedSize": -1,
                 "Size": 4206494,
@@ -438,8 +474,12 @@
                 "Id": "sha256:e2b3e8542af735080e6bda06873ce666e2319eea353884a88e45f3c9ef996846",
                 "Labels": {},
                 "ParentId": "",
-                "RepoDigests": ["gcr.io/google-samples/gb-frontend@sha256:d44e7d7491a537f822e7fe8615437e4a8a08f3a7a1d7d4cb9066b92f7556ba6d"],
-                "RepoTags": ["gcr.io/google-samples/gb-frontend:v4"],
+                "RepoDigests": [
+                  "gcr.io/google-samples/gb-frontend@sha256:d44e7d7491a537f822e7fe8615437e4a8a08f3a7a1d7d4cb9066b92f7556ba6d"
+                ],
+                "RepoTags": [
+                  "gcr.io/google-samples/gb-frontend:v4"
+                ],
                 "SharedSize": -1,
                 "Size": 512161546,
                 "VirtualSize": 512161546
@@ -450,8 +490,12 @@
                 "Id": "sha256:5f026ddffa27f011242781f7f2498538334e173869e7fe757008881fb48180b6",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["gcr.io/google_samples/gb-redisslave@sha256:90f62695e641e1a27d1a5e0bbb8b622205a48e18311b51b0da419ffad24b9016"],
-                "RepoTags": ["gcr.io/google_samples/gb-redisslave:v1"],
+                "RepoDigests": [
+                  "gcr.io/google_samples/gb-redisslave@sha256:90f62695e641e1a27d1a5e0bbb8b622205a48e18311b51b0da419ffad24b9016"
+                ],
+                "RepoTags": [
+                  "gcr.io/google_samples/gb-redisslave:v1"
+                ],
                 "SharedSize": -1,
                 "Size": 109508753,
                 "VirtualSize": 109508753
@@ -462,8 +506,12 @@
                 "Id": "sha256:e5e67996c442f903cda78dd983ea6e94bb4e542950fd2eba666b44cbd303df42",
                 "Labels": null,
                 "ParentId": "",
-                "RepoDigests": ["k8s.gcr.io/redis@sha256:f066bcf26497fbc55b9bf0769cb13a35c0afa2aa42e737cc46b7fb04b23a2f25"],
-                "RepoTags": ["k8s.gcr.io/redis:e2e"],
+                "RepoDigests": [
+                  "k8s.gcr.io/redis@sha256:f066bcf26497fbc55b9bf0769cb13a35c0afa2aa42e737cc46b7fb04b23a2f25"
+                ],
+                "RepoTags": [
+                  "k8s.gcr.io/redis:e2e"
+                ],
                 "SharedSize": -1,
                 "Size": 419003740,
                 "VirtualSize": 419003740
@@ -493,10 +541,22 @@
               "DockerRootDir": "/var/lib/docker",
               "Driver": "overlay2",
               "DriverStatus": [
-                ["Backing Filesystem", "extfs"],
-                ["Supports d_type", "true"],
-                ["Native Overlay Diff", "true"],
-                ["userxattr", "false"]
+                [
+                  "Backing Filesystem",
+                  "extfs"
+                ],
+                [
+                  "Supports d_type",
+                  "true"
+                ],
+                [
+                  "Native Overlay Diff",
+                  "true"
+                ],
+                [
+                  "userxattr",
+                  "false"
+                ]
               ],
               "ExperimentalBuild": false,
               "GenericResources": null,
@@ -532,9 +592,29 @@
               "PidsLimit": true,
               "Plugins": {
                 "Authorization": null,
-                "Log": ["awslogs", "fluentd", "gcplogs", "gelf", "journald", "json-file", "local", "logentries", "splunk", "syslog"],
-                "Network": ["bridge", "host", "ipvlan", "macvlan", "null", "overlay"],
-                "Volume": ["local"]
+                "Log": [
+                  "awslogs",
+                  "fluentd",
+                  "gcplogs",
+                  "gelf",
+                  "journald",
+                  "json-file",
+                  "local",
+                  "logentries",
+                  "splunk",
+                  "syslog"
+                ],
+                "Network": [
+                  "bridge",
+                  "host",
+                  "ipvlan",
+                  "macvlan",
+                  "null",
+                  "overlay"
+                ],
+                "Volume": [
+                  "local"
+                ]
               },
               "RegistryConfig": {
                 "AllowNondistributableArtifactsCIDRs": [],
@@ -547,7 +627,9 @@
                     "Secure": true
                   }
                 },
-                "InsecureRegistryCIDRs": ["127.0.0.0/8"],
+                "InsecureRegistryCIDRs": [
+                  "127.0.0.0/8"
+                ],
                 "Mirrors": []
               },
               "RuncCommit": {
@@ -565,7 +647,10 @@
                   "path": "runc"
                 }
               },
-              "SecurityOptions": ["name=apparmor", "name=seccomp,profile=default"],
+              "SecurityOptions": [
+                "name=apparmor",
+                "name=seccomp,profile=default"
+              ],
               "ServerVersion": "20.10.13",
               "SwapLimit": true,
               "Swarm": {
@@ -1481,12 +1566,16 @@
     {
       "Id": 1,
       "administrator_only": false,
-      "categories": ["docker"],
+      "categories": [
+        "docker"
+      ],
       "description": "Docker image registry",
       "image": "registry:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/registry.png",
       "platform": "linux",
-      "ports": ["5000/tcp"],
+      "ports": [
+        "5000/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1503,12 +1592,17 @@
     {
       "Id": 2,
       "administrator_only": false,
-      "categories": ["webserver"],
+      "categories": [
+        "webserver"
+      ],
       "description": "High performance web server",
       "image": "nginx:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/nginx.png",
       "platform": "linux",
-      "ports": ["80/tcp", "443/tcp"],
+      "ports": [
+        "80/tcp",
+        "443/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1528,12 +1622,16 @@
     {
       "Id": 3,
       "administrator_only": false,
-      "categories": ["webserver"],
+      "categories": [
+        "webserver"
+      ],
       "description": "Open-source HTTP server",
       "image": "httpd:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/httpd.png",
       "platform": "linux",
-      "ports": ["80/tcp"],
+      "ports": [
+        "80/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1550,12 +1648,18 @@
     {
       "Id": 4,
       "administrator_only": false,
-      "categories": ["webserver"],
+      "categories": [
+        "webserver"
+      ],
       "description": "HTTP/2 web server with automatic HTTPS",
       "image": "abiosoft/caddy:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/caddy.png",
       "platform": "linux",
-      "ports": ["80/tcp", "443/tcp", "2015/tcp"],
+      "ports": [
+        "80/tcp",
+        "443/tcp",
+        "2015/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1572,7 +1676,9 @@
     {
       "Id": 5,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "The most popular open-source database",
       "env": [
         {
@@ -1583,7 +1689,9 @@
       "image": "mysql:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mysql.png",
       "platform": "linux",
-      "ports": ["3306/tcp"],
+      "ports": [
+        "3306/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1600,7 +1708,9 @@
     {
       "Id": 6,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Performance beyond MySQL",
       "env": [
         {
@@ -1611,7 +1721,9 @@
       "image": "mariadb:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mariadb.png",
       "platform": "linux",
-      "ports": ["3306/tcp"],
+      "ports": [
+        "3306/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1628,7 +1740,9 @@
     {
       "Id": 7,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "The most advanced open-source database",
       "env": [
         {
@@ -1643,7 +1757,9 @@
       "image": "postgres:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/postgres.png",
       "platform": "linux",
-      "ports": ["5432/tcp"],
+      "ports": [
+        "5432/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1660,12 +1776,16 @@
     {
       "Id": 8,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Open-source document-oriented database",
       "image": "mongo:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mongo.png",
       "platform": "linux",
-      "ports": ["27017/tcp"],
+      "ports": [
+        "27017/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1682,13 +1802,18 @@
     {
       "Id": 9,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "command": "start --insecure",
       "description": "An open-source, survivable, strongly consistent, scale-out SQL database",
       "image": "cockroachdb/cockroach:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cockroachdb.png",
       "platform": "linux",
-      "ports": ["26257/tcp", "8080/tcp"],
+      "ports": [
+        "26257/tcp",
+        "8080/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1705,12 +1830,17 @@
     {
       "Id": 10,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "An open-source distributed SQL database",
       "image": "crate:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cratedb.png",
       "platform": "linux",
-      "ports": ["4200/tcp", "4300/tcp"],
+      "ports": [
+        "4200/tcp",
+        "4300/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1727,12 +1857,17 @@
     {
       "Id": 11,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Open-source search and analytics engine",
       "image": "elasticsearch:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/elasticsearch.png",
       "platform": "linux",
-      "ports": ["9200/tcp", "9300/tcp"],
+      "ports": [
+        "9200/tcp",
+        "9300/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1749,13 +1884,20 @@
     {
       "Id": 12,
       "administrator_only": false,
-      "categories": ["development", "project-management"],
+      "categories": [
+        "development",
+        "project-management"
+      ],
       "description": "Open-source end-to-end software development platform",
       "image": "gitlab/gitlab-ce:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/gitlab_ce.png",
       "note": "Default username is \u003cb\u003eroot\u003c/b\u003e. Check the \u003ca href=\"https://docs.gitlab.com/omnibus/docker/README.html#after-starting-a-container\" target=\"_blank\"\u003eGitlab documentation\u003c/a\u003e to get started.",
       "platform": "linux",
-      "ports": ["80/tcp", "443/tcp", "22/tcp"],
+      "ports": [
+        "80/tcp",
+        "443/tcp",
+        "22/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1778,7 +1920,9 @@
     {
       "Id": 13,
       "administrator_only": false,
-      "categories": ["storage"],
+      "categories": [
+        "storage"
+      ],
       "command": "server /data",
       "description": "A distributed object storage server built for cloud applications and devops",
       "env": [
@@ -1794,7 +1938,9 @@
       "image": "minio/minio:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/minio.png",
       "platform": "linux",
-      "ports": ["9000/tcp"],
+      "ports": [
+        "9000/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1814,7 +1960,9 @@
     {
       "Id": 14,
       "administrator_only": false,
-      "categories": ["storage"],
+      "categories": [
+        "storage"
+      ],
       "description": "Standalone AWS S3 protocol server",
       "env": [
         {
@@ -1829,7 +1977,9 @@
       "image": "scality/s3server",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/scality-s3.png",
       "platform": "linux",
-      "ports": ["8000/tcp"],
+      "ports": [
+        "8000/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1849,7 +1999,9 @@
     {
       "Id": 15,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Microsoft SQL Server on Linux",
       "env": [
         {
@@ -1864,7 +2016,9 @@
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
       "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
       "platform": "linux",
-      "ports": ["1433/tcp"],
+      "ports": [
+        "1433/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1876,7 +2030,9 @@
     {
       "Id": 16,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Microsoft SQL Server Developer for Windows containers",
       "env": [
         {
@@ -1891,7 +2047,9 @@
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
       "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
       "platform": "windows",
-      "ports": ["1433/tcp"],
+      "ports": [
+        "1433/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1908,7 +2066,9 @@
     {
       "Id": 17,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Microsoft SQL Server Express for Windows containers",
       "env": [
         {
@@ -1923,7 +2083,9 @@
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
       "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
       "platform": "windows",
-      "ports": ["1433/tcp"],
+      "ports": [
+        "1433/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -1940,12 +2102,16 @@
     {
       "Id": 18,
       "administrator_only": false,
-      "categories": ["serverless"],
+      "categories": [
+        "serverless"
+      ],
       "description": "Open-source serverless computing platform",
       "image": "iron/functions:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
       "platform": "linux",
-      "ports": ["8080/tcp"],
+      "ports": [
+        "8080/tcp"
+      ],
       "privileged": true,
       "repository": {
         "stackfile": "",
@@ -1963,7 +2129,9 @@
     {
       "Id": 19,
       "administrator_only": false,
-      "categories": ["serverless"],
+      "categories": [
+        "serverless"
+      ],
       "description": "Open-source user interface for IronFunctions",
       "env": [
         {
@@ -1974,7 +2142,9 @@
       "image": "iron/functions-ui:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
       "platform": "linux",
-      "ports": ["4000/tcp"],
+      "ports": [
+        "4000/tcp"
+      ],
       "privileged": true,
       "repository": {
         "stackfile": "",
@@ -1992,12 +2162,16 @@
     {
       "Id": 20,
       "administrator_only": false,
-      "categories": ["search-engine"],
+      "categories": [
+        "search-engine"
+      ],
       "description": "Open-source enterprise search platform",
       "image": "solr:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/solr.png",
       "platform": "linux",
-      "ports": ["8983/tcp"],
+      "ports": [
+        "8983/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2014,12 +2188,16 @@
     {
       "Id": 21,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "Open-source in-memory data structure store",
       "image": "redis:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/redis.png",
       "platform": "linux",
-      "ports": ["6379/tcp"],
+      "ports": [
+        "6379/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2036,12 +2214,17 @@
     {
       "Id": 22,
       "administrator_only": false,
-      "categories": ["messaging"],
+      "categories": [
+        "messaging"
+      ],
       "description": "Highly reliable enterprise messaging system",
       "image": "rabbitmq:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/rabbitmq.png",
       "platform": "linux",
-      "ports": ["5671/tcp", "5672/tcp"],
+      "ports": [
+        "5671/tcp",
+        "5672/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2058,13 +2241,17 @@
     {
       "Id": 23,
       "administrator_only": false,
-      "categories": ["blog"],
+      "categories": [
+        "blog"
+      ],
       "description": "Free and open-source blogging platform",
       "image": "ghost:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ghost.png",
       "note": "Access the blog management interface under \u003ccode\u003e/ghost/\u003c/code\u003e.",
       "platform": "linux",
-      "ports": ["2368/tcp"],
+      "ports": [
+        "2368/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2081,13 +2268,22 @@
     {
       "Id": 24,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "WebOps platform and hosting control panel",
       "image": "plesk/plesk:preview",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/plesk.png",
       "note": "Default credentials: admin / changeme",
       "platform": "linux",
-      "ports": ["21/tcp", "80/tcp", "443/tcp", "8880/tcp", "8443/tcp", "8447/tcp"],
+      "ports": [
+        "21/tcp",
+        "80/tcp",
+        "443/tcp",
+        "8880/tcp",
+        "8443/tcp",
+        "8447/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2099,7 +2295,9 @@
     {
       "Id": 25,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Another free and open-source CMS",
       "env": [
         {
@@ -2114,7 +2312,9 @@
       "image": "joomla:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/joomla.png",
       "platform": "linux",
-      "ports": ["80/tcp"],
+      "ports": [
+        "80/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2131,12 +2331,16 @@
     {
       "Id": 26,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Open-source content management framework",
       "image": "drupal:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/drupal.png",
       "platform": "linux",
-      "ports": ["80/tcp"],
+      "ports": [
+        "80/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2153,12 +2357,16 @@
     {
       "Id": 27,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "A free and open-source CMS built on top of Zope",
       "image": "plone:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/plone.png",
       "platform": "linux",
-      "ports": ["8080/tcp"],
+      "ports": [
+        "8080/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2175,12 +2383,18 @@
     {
       "Id": 28,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Open-source e-commerce platform",
       "image": "alankent/gsd:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/magento.png",
       "platform": "linux",
-      "ports": ["80/tcp", "3000/tcp", "3001/tcp"],
+      "ports": [
+        "80/tcp",
+        "3000/tcp",
+        "3001/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2197,7 +2411,10 @@
     {
       "Id": 29,
       "administrator_only": false,
-      "categories": ["Log Management", "Monitoring"],
+      "categories": [
+        "Log Management",
+        "Monitoring"
+      ],
       "description": "Collect logs, metrics and docker events",
       "env": [
         {
@@ -2231,7 +2448,9 @@
     {
       "Id": 30,
       "administrator_only": false,
-      "categories": ["Monitoring"],
+      "categories": [
+        "Monitoring"
+      ],
       "description": "Collect events and metrics",
       "env": [
         {
@@ -2270,7 +2489,9 @@
     {
       "Id": 31,
       "administrator_only": false,
-      "categories": ["marketing"],
+      "categories": [
+        "marketing"
+      ],
       "description": "Open-source marketing automation platform",
       "env": [
         {
@@ -2285,7 +2506,9 @@
       "image": "mautic/mautic:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mautic.png",
       "platform": "linux",
-      "ports": ["80/tcp"],
+      "ports": [
+        "80/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2302,7 +2525,9 @@
     {
       "Id": 32,
       "administrator_only": false,
-      "categories": ["streaming"],
+      "categories": [
+        "streaming"
+      ],
       "description": "Streaming media server",
       "env": [
         {
@@ -2317,7 +2542,12 @@
       "image": "sameersbn/wowza:4.1.2-8",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/wowza.png",
       "platform": "linux",
-      "ports": ["1935/tcp", "8086/tcp", "8087/tcp", "8088/tcp"],
+      "ports": [
+        "1935/tcp",
+        "8086/tcp",
+        "8087/tcp",
+        "8088/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2334,7 +2564,9 @@
     {
       "Id": 33,
       "administrator_only": false,
-      "categories": ["continuous-integration"],
+      "categories": [
+        "continuous-integration"
+      ],
       "description": "Open-source continuous integration tool",
       "env": [
         {
@@ -2345,7 +2577,10 @@
       "image": "jenkins/jenkins:lts",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/jenkins.png",
       "platform": "linux",
-      "ports": ["8080/tcp", "50000/tcp"],
+      "ports": [
+        "8080/tcp",
+        "50000/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2362,12 +2597,16 @@
     {
       "Id": 34,
       "administrator_only": false,
-      "categories": ["project-management"],
+      "categories": [
+        "project-management"
+      ],
       "description": "Open-source project management tool",
       "image": "redmine:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/redmine.png",
       "platform": "linux",
-      "ports": ["3000/tcp"],
+      "ports": [
+        "3000/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2384,7 +2623,9 @@
     {
       "Id": 35,
       "administrator_only": false,
-      "categories": ["project-management"],
+      "categories": [
+        "project-management"
+      ],
       "description": "Open-source business apps",
       "env": [
         {
@@ -2403,7 +2644,9 @@
       "image": "odoo:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/odoo.png",
       "platform": "linux",
-      "ports": ["8069/tcp"],
+      "ports": [
+        "8069/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2423,13 +2666,20 @@
     {
       "Id": 36,
       "administrator_only": false,
-      "categories": ["backup"],
+      "categories": [
+        "backup"
+      ],
       "description": "Open-source network backup",
       "image": "cfstras/urbackup",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/urbackup.png",
       "note": "This application web interface is exposed on the port 55414 inside the container.",
       "platform": "linux",
-      "ports": ["55413/tcp", "55414/tcp", "55415/tcp", "35622/tcp"],
+      "ports": [
+        "55413/tcp",
+        "55414/tcp",
+        "55415/tcp",
+        "35622/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2446,14 +2696,19 @@
     {
       "Id": 37,
       "administrator_only": false,
-      "categories": ["filesystem", "storage"],
+      "categories": [
+        "filesystem",
+        "storage"
+      ],
       "command": "--port 80 --database /data/database.db --scope /srv",
       "description": "A web file manager",
       "image": "filebrowser/filebrowser:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/filebrowser.png",
       "note": "Default credentials: admin/admin",
       "platform": "linux",
-      "ports": ["80/tcp"],
+      "ports": [
+        "80/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2473,7 +2728,9 @@
     {
       "Id": 38,
       "administrator_only": false,
-      "categories": ["development"],
+      "categories": [
+        "development"
+      ],
       "description": "ColdFusion (CFML) CLI",
       "env": [
         {
@@ -2483,7 +2740,10 @@
       "image": "ortussolutions/commandbox:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ortussolutions-commandbox.png",
       "platform": "linux",
-      "ports": ["8080/tcp", "8443/tcp"],
+      "ports": [
+        "8080/tcp",
+        "8443/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2495,7 +2755,9 @@
     {
       "Id": 39,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Open-source modular CMS",
       "env": [
         {
@@ -2511,7 +2773,10 @@
       "image": "ortussolutions/contentbox:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ortussolutions-contentbox.png",
       "platform": "linux",
-      "ports": ["8080/tcp", "8443/tcp"],
+      "ports": [
+        "8080/tcp",
+        "8443/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""
@@ -2531,7 +2796,9 @@
     {
       "Id": 40,
       "administrator_only": false,
-      "categories": ["portainer"],
+      "categories": [
+        "portainer"
+      ],
       "description": "Manage all the resources in your Swarm cluster",
       "image": "",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png",
@@ -2548,7 +2815,9 @@
     {
       "Id": 41,
       "administrator_only": false,
-      "categories": ["serverless"],
+      "categories": [
+        "serverless"
+      ],
       "description": "Serverless functions made simple",
       "image": "",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/openfaas.png",
@@ -2566,7 +2835,9 @@
     {
       "Id": 42,
       "administrator_only": false,
-      "categories": ["serverless"],
+      "categories": [
+        "serverless"
+      ],
       "description": "Open-source serverless computing platform",
       "image": "",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
@@ -2583,7 +2854,9 @@
     {
       "Id": 43,
       "administrator_only": false,
-      "categories": ["database"],
+      "categories": [
+        "database"
+      ],
       "description": "CockroachDB cluster",
       "image": "",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cockroachdb.png",
@@ -2600,7 +2873,9 @@
     {
       "Id": 44,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Wordpress setup with a MySQL database",
       "env": [
         {
@@ -2624,7 +2899,9 @@
     {
       "Id": 45,
       "administrator_only": false,
-      "categories": ["CMS"],
+      "categories": [
+        "CMS"
+      ],
       "description": "Wordpress setup with a MySQL database",
       "env": [
         {
@@ -2648,7 +2925,9 @@
     {
       "Id": 46,
       "administrator_only": false,
-      "categories": ["OPS"],
+      "categories": [
+        "OPS"
+      ],
       "description": "Microsoft Operations Management Suite Linux agent.",
       "env": [
         {
@@ -2676,7 +2955,10 @@
     {
       "Id": 47,
       "administrator_only": false,
-      "categories": ["Log Management", "Monitoring"],
+      "categories": [
+        "Log Management",
+        "Monitoring"
+      ],
       "description": "Collect logs, metrics and docker events",
       "env": [
         {
@@ -2702,7 +2984,9 @@
     {
       "Id": 48,
       "administrator_only": false,
-      "categories": ["Monitoring"],
+      "categories": [
+        "Monitoring"
+      ],
       "description": "Collect events and metrics",
       "env": [
         {
@@ -2724,12 +3008,16 @@
     {
       "Id": 49,
       "administrator_only": false,
-      "categories": ["docker"],
+      "categories": [
+        "docker"
+      ],
       "description": "Sonatype Nexus3 registry manager",
       "image": "sonatype/nexus3:latest",
       "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/sonatype.png",
       "platform": "linux",
-      "ports": ["8081/tcp"],
+      "ports": [
+        "8081/tcp"
+      ],
       "repository": {
         "stackfile": "",
         "url": ""

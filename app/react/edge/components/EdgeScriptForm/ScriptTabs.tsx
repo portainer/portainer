@@ -60,7 +60,9 @@ export function ScriptTabs({
         <>
           <Code>{cmd}</Code>
           <div className="mt-2">
-            <CopyButton copyText={cmd}>Copy</CopyButton>
+            <CopyButton copyText={cmd} data-cy="copy-edge-script-button">
+              Copy
+            </CopyButton>
           </div>
         </>
       ),

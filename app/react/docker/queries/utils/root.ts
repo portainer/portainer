@@ -1,5 +1,7 @@
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
+import { buildDockerUrl } from './buildDockerUrl';
+
 export const queryKeys = {
   root: (environmentId: EnvironmentId) => ['docker', environmentId] as const,
   snapshot: (environmentId: EnvironmentId) =>
@@ -10,10 +12,6 @@ export const queryKeys = {
     [...queryKeys.root(environmentId), 'plugins'] as const,
 };
 
-export function buildDockerUrl(environmentId: EnvironmentId) {
-  return `/docker/${environmentId}`;
-}
-
 export function buildDockerSnapshotUrl(environmentId: EnvironmentId) {
-  return `${buildDockerUrl(environmentId)}/snapshot`;
+  return buildDockerUrl(environmentId, 'snapshot');
 }

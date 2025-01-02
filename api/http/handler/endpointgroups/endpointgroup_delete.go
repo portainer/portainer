@@ -68,7 +68,7 @@ func (handler *Handler) deleteEndpointGroup(tx dataservices.DataStoreTx, endpoin
 	}
 
 	for _, endpoint := range endpoints {
-		if endpoint.GroupID == portainer.EndpointGroupID(endpointGroupID) {
+		if endpoint.GroupID == endpointGroupID {
 			endpoint.GroupID = portainer.EndpointGroupID(1)
 			err = tx.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {

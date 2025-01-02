@@ -4,17 +4,17 @@ import (
 	"context"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	k "github.com/portainer/portainer/api/kubernetes"
+
+	"github.com/pkg/errors"
 )
 
 type BaseStackDeployer interface {
-	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error
-	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error
+	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error
+	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error
 	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error
 }
 
@@ -44,7 +44,7 @@ func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStac
 		dataStore:           dataStore,
 	}
 }
-func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool, pullImage bool) error {
+func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -54,26 +54,29 @@ func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *porta
 	return d.swarmStackManager.Deploy(stack, prune, pullImage, endpoint)
 }
 
-func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage bool, forceRecreate bool) error {
+func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	d.swarmStackManager.Login(registries, endpoint)
-	defer d.swarmStackManager.Logout(endpoint)
+	options := portainer.ComposeOptions{Registries: registries}
 
 	// --force-recreate doesn't pull updated images
 	if forcePullImage {
-		err := d.composeStackManager.Pull(context.TODO(), stack, endpoint)
-		if err != nil {
+		if err := d.composeStackManager.Pull(context.TODO(), stack, endpoint, options); err != nil {
 			return err
 		}
 	}
 
-	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRecreate)
-	if err != nil {
+	if err := d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
+		ComposeOptions: options,
+		ForceRecreate:  forceRecreate,
+	}); err != nil {
 		d.composeStackManager.Down(context.TODO(), stack, endpoint)
+
+		return err
 	}
-	return err
+
+	return nil
 }
 
 func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
@@ -97,8 +100,7 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 		return errors.Wrap(err, "failed to create temp kub deployment files")
 	}
 
-	err = k8sDeploymentConfig.Deploy()
-	if err != nil {
+	if err := k8sDeploymentConfig.Deploy(); err != nil {
 		return errors.Wrap(err, "failed to deploy kubernetes application")
 	}
 

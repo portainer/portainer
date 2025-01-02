@@ -51,7 +51,7 @@ func FilterDirForEntryFile(dirEntries []DirEntry, entryFile string) []DirEntry {
 
 // FilterDirForCompatibility returns the content of the entry file if agent version is less than 2.19.0
 func FilterDirForCompatibility(dirEntries []DirEntry, entryFilePath, agentVersion string) (string, error) {
-	if semver.Compare(fmt.Sprintf("v%s", agentVersion), "v2.19.0") == -1 {
+	if semver.Compare("v"+agentVersion, "v2.19.0") == -1 {
 		for _, dirEntry := range dirEntries {
 			if dirEntry.IsFile {
 				if dirEntry.Name == entryFilePath {

@@ -17,7 +17,7 @@ interface Props {
   onChange(value: Gpu[]): void;
 }
 
-function Item({ item, onChange }: ItemProps<Gpu>) {
+function Item({ item, onChange, index }: ItemProps<Gpu>) {
   return (
     <div className="flex flex-grow gap-2">
       <InputGroup size="small" className="flex-grow">
@@ -28,6 +28,7 @@ function Item({ item, onChange }: ItemProps<Gpu>) {
           onChange={(e) => {
             onChange({ ...item, name: e.target.value });
           }}
+          data-cy={`docker-gpu-name_${index}`}
         />
       </InputGroup>
 
@@ -39,6 +40,7 @@ function Item({ item, onChange }: ItemProps<Gpu>) {
           onChange={(e) => {
             onChange({ ...item, value: e.target.value });
           }}
+          data-cy={`docker-gpu-value_${index}`}
         />
       </InputGroup>
     </div>
@@ -55,6 +57,7 @@ export function GpusList({ value, onChange }: Props) {
       itemBuilder={() => ({ value: '', name: '' })}
       addLabel="Add GPU"
       item={Item}
+      data-cy="docker-containers-gpus"
     />
   );
 }

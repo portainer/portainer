@@ -33,8 +33,7 @@ func (service ServiceTx) EndpointRelation(endpointID portainer.EndpointID) (*por
 	var endpointRelation portainer.EndpointRelation
 	identifier := service.service.connection.ConvertToKey(int(endpointID))
 
-	err := service.tx.GetObject(BucketName, identifier, &endpointRelation)
-	if err != nil {
+	if err := service.tx.GetObject(BucketName, identifier, &endpointRelation); err != nil {
 		return nil, err
 	}
 
@@ -129,19 +128,23 @@ func (service ServiceTx) updateEdgeStacksAfterRelationChange(previousRelationSta
 	// list how many time this stack is referenced in all relations
 	// in order to update the stack deployments count
 	for refStackId, refStackEnabled := range stacksToUpdate {
-		if refStackEnabled {
-			numDeployments := 0
-			for _, r := range relations {
-				for sId, enabled := range r.EdgeStacks {
-					if enabled && sId == refStackId {
-						numDeployments += 1
-					}
+		if !refStackEnabled {
+			continue
+		}
+
+		numDeployments := 0
+		for _, r := range relations {
+			for sId, enabled := range r.EdgeStacks {
+				if enabled && sId == refStackId {
+					numDeployments += 1
 				}
 			}
+		}
 
-			service.service.updateStackFnTx(service.tx, refStackId, func(edgeStack *portainer.EdgeStack) {
-				edgeStack.NumDeployments = numDeployments
-			})
+		if err := service.service.updateStackFnTx(service.tx, refStackId, func(edgeStack *portainer.EdgeStack) {
+			edgeStack.NumDeployments = numDeployments
+		}); err != nil {
+			log.Error().Err(err).Msg("could not update the number of deployments")
 		}
 	}
 }

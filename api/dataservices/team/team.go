@@ -19,8 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
+	if err := connection.SetServiceName(BucketName); err != nil {
 		return nil, err
 	}
 
@@ -30,6 +29,16 @@ func NewService(connection portainer.Connection) (*Service, error) {
 			Connection: connection,
 		},
 	}, nil
+}
+
+func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
+	return ServiceTx{
+		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.Team, portainer.TeamID]{
+			Bucket:     BucketName,
+			Connection: service.Connection,
+			Tx:         tx,
+		},
+	}
 }
 
 // TeamByName returns a team by name.
@@ -59,7 +68,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 func (service *Service) Create(team *portainer.Team) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			team.ID = portainer.TeamID(id)
 			return int(team.ID), team
 		},

@@ -35,6 +35,7 @@ export function ApplicationYAMLEditor() {
               identifier="application-yaml"
               data={fullApplicationYaml}
               hideMessage
+              data-cy="application-yaml"
             />
           </WidgetBody>
         </Widget>

@@ -3,7 +3,7 @@ import moment from 'moment';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { PORTAINER_FADEOUT } from '@/constants';
-import { getMetricsForNode } from '@/react/kubernetes/services/service.ts';
+import { getMetricsForNode } from '@/react/kubernetes/metrics/metrics.ts';
 
 class KubernetesNodeStatsController {
   /* @ngInject */

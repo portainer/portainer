@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/gofrs/uuid"
 )
 
@@ -24,7 +23,7 @@ type webhookCreatePayload struct {
 }
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.ResourceID) {
+	if len(payload.ResourceID) == 0 {
 		return errors.New("Invalid ResourceID")
 	}
 	if payload.EndpointID == 0 {
@@ -45,9 +44,9 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param body body webhookCreatePayload true "Webhook data"
 // @success 200 {object} portainer.Webhook
-// @failure 400
-// @failure 409
-// @failure 500
+// @failure 400 "Invalid request"
+// @failure 409 "A webhook for this resource already exists"
+// @failure 500 "Server error"
 // @router /webhooks [post]
 func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload webhookCreatePayload

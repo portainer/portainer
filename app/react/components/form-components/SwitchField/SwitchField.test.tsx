@@ -12,6 +12,7 @@ function renderDefault({
   return render(
     <SwitchField
       label={label}
+      data-cy="switch-field"
       name={name}
       checked={checked}
       onChange={onChange}

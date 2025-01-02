@@ -25,6 +25,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-constraint-key-input-{{ $index }}"
                   class="form-control"
                   ng-model="constraint.key"
                   placeholder="e.g. node.role"
@@ -43,6 +44,7 @@
                   ng-change="updatePlacementConstraint(service, constraint)"
                   ng-disabled="isUpdating"
                   disable-authorization="DockerServiceUpdate"
+                  data-cy="placement-constraint-operator=selectoer"
                 >
                   <option value="==">==</option>
                   <option value="!=">!=</option>
@@ -53,6 +55,7 @@
               <div class="input-group input-group-sm">
                 <input
                   type="text"
+                  data-cy="placement-constraint-value-input-{{ $index }}"
                   class="form-control"
                   ng-model="constraint.value"
                   placeholder="e.g. manager"
@@ -76,7 +79,7 @@
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceConstraints'])" ng-click="updateService(service)">Apply changes</button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
+            <pr-icon icon="'chevron-down'"></pr-icon>
           </button>
           <ul class="dropdown-menu">
             <li><a ng-click="cancelChanges(service, ['ServiceConstraints'])">Reset changes</a></li>

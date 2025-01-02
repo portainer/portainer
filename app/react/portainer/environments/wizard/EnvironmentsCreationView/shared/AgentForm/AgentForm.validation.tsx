@@ -1,4 +1,4 @@
-import { object, SchemaOf, string } from 'yup';
+import { mixed, object, SchemaOf, string } from 'yup';
 
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 
@@ -10,6 +10,7 @@ export function useValidation(): SchemaOf<CreateAgentEnvironmentValues> {
     name: useNameValidation(),
     environmentUrl: environmentValidation(),
     meta: metadataValidation(),
+    containerEngine: mixed().oneOf(['docker', 'podman']),
   });
 }
 

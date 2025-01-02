@@ -6,6 +6,7 @@ import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { AutocompleteSelect } from '@@/form-components/AutocompleteSelect';
+import { FormError } from '@@/form-components/FormError';
 
 type Props = {
   stackName: string;
@@ -13,6 +14,7 @@ type Props = {
   stacks?: string[];
   inputClassName?: string;
   textTip?: string;
+  error?: string;
 };
 
 export function StackName({
@@ -21,6 +23,7 @@ export function StackName({
   stacks = [],
   inputClassName,
   textTip = "Enter or select a 'stack' name to group multiple deployments together, or else leave empty to ignore.",
+  error = '',
 }: Props) {
   const isAdminQuery = useIsEdgeAdmin();
   const stackResults = useMemo(
@@ -39,7 +42,11 @@ export function StackName({
           <br />
           You can leave the stack name empty, or even turn off Kubernetes Stacks
           functionality entirely via{' '}
-          <Link to="portainer.settings" target="_blank">
+          <Link
+            to="portainer.settings"
+            target="_blank"
+            data-cy="k8s-deploy-stack-input-settings-link"
+          >
             Kubernetes Settings
           </Link>
           .
@@ -50,9 +57,11 @@ export function StackName({
 
   return (
     <>
-      <TextTip className="mb-4" color="blue">
-        {textTip}
-      </TextTip>
+      {textTip ? (
+        <TextTip className="mb-4" color="blue">
+          {textTip}
+        </TextTip>
+      ) : null}
       <div className="form-group">
         <label
           htmlFor="stack_name"
@@ -71,7 +80,9 @@ export function StackName({
             onChange={setStackName}
             placeholder="e.g. myStack"
             inputId="stack_name"
+            data-cy="k8s-deploy-stack-input"
           />
+          {error ? <FormError>{error}</FormError> : null}
         </div>
       </div>
     </>

@@ -2,6 +2,7 @@ package endpointedge
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -15,10 +16,12 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 type stackStatusResponse struct {
@@ -76,110 +79,102 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
-	cachedResp := handler.respondFromCache(w, r, portainer.EndpointID(endpointID))
-	if cachedResp {
+	if cachedResp := handler.respondFromCache(w, r, portainer.EndpointID(endpointID)); cachedResp {
 		return nil
 	}
 
 	if _, ok := handler.DataStore.Endpoint().Heartbeat(portainer.EndpointID(endpointID)); !ok {
 		// EE-5190
-		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
+		return httperror.Forbidden("Permission denied to access environment. The device has not been trusted yet", fmt.Errorf("unable to retrieve endpoint heartbeat. Environment ID: %d", endpointID))
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		// EE-5190
-		return httperror.Forbidden("Permission denied to access environment", errors.New("the device has not been trusted yet"))
+		return httperror.Forbidden("Permission denied to access environment. The device has not been trusted yet", fmt.Errorf("unable to retrieve endpoint from database: %w. Environment ID: %d", err, endpointID))
 	}
 
-	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+	firstConn := endpoint.LastCheckInDate == 0
+
+	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment. The device has not been trusted yet", fmt.Errorf("unauthorized Edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	handler.DataStore.Endpoint().UpdateHeartbeat(endpoint.ID)
 
-	err = handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint)
-	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+	if err := handler.requestBouncer.TrustedEdgeEnvironmentAccess(handler.DataStore, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment. The device has not been trusted yet", fmt.Errorf("untrusted Edge environment access: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	var statusResponse *endpointEdgeStatusInspectResponse
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID))
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		statusResponse, err = handler.inspectStatus(tx, r, portainer.EndpointID(endpointID), firstConn)
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
+			httpErr.Err = fmt.Errorf("edge polling error: %w. Environment name: %s", httpErr.Err, endpoint.Name)
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unexpected error", err)
+		return httperror.InternalServerError("Unexpected error", fmt.Errorf("edge polling error: %w. Environment name: %s", err, endpoint.Name))
 	}
 
 	return cacheResponse(w, endpoint.ID, *statusResponse)
 }
 
-func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID) (*endpointEdgeStatusInspectResponse, error) {
-	endpoint, err := tx.Endpoint().Endpoint(endpointID)
-	if err != nil {
-		return nil, err
-	}
-
-	if endpoint.EdgeID == "" {
-		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
-		endpoint.EdgeID = edgeIdentifier
-	}
-
-	// Take an initial snapshot
-	if endpoint.LastCheckInDate == 0 {
-		handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
-	}
+func (handler *Handler) parseHeaders(r *http.Request, endpoint *portainer.Endpoint) error {
+	endpoint.EdgeID = cmp.Or(endpoint.EdgeID, r.Header.Get(portainer.PortainerAgentEdgeIDHeader))
 
 	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
 	if agentPlatformErr != nil {
-		return nil, httperror.BadRequest("agent platform header is not valid", err)
+		return httperror.BadRequest("agent platform header is not valid", agentPlatformErr)
 	}
 	endpoint.Type = agentPlatform
 
 	version := r.Header.Get(portainer.PortainerAgentHeader)
 	endpoint.Agent.Version = version
 
+	return nil
+}
+
+func (handler *Handler) inspectStatus(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID, firstConn bool) (*endpointEdgeStatusInspectResponse, error) {
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := handler.parseHeaders(r, endpoint); err != nil {
+		return nil, err
+	}
+
+	// Take an initial snapshot
+	if firstConn {
+		if err := handler.ReverseTunnelService.Open(endpoint); err != nil {
+			log.Error().Err(err).Msg("could not open the tunnel")
+		}
+	}
+
 	endpoint.LastCheckInDate = time.Now().Unix()
 
-	err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
+	if err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
 		return nil, httperror.InternalServerError("Unable to persist environment changes inside the database", err)
 	}
 
-	checkinInterval := endpoint.EdgeCheckinInterval
-	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := tx.Settings().Settings()
-		if err != nil {
-			return nil, httperror.InternalServerError("Unable to retrieve settings from the database", err)
-		}
-		checkinInterval = settings.EdgeAgentCheckinInterval
-	}
-
-	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
+	tunnel := handler.ReverseTunnelService.Config(endpoint.ID)
 
 	statusResponse := endpointEdgeStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
-		CheckinInterval: checkinInterval,
+		CheckinInterval: edge.EffectiveCheckinInterval(tx, endpoint),
 		Credentials:     tunnel.Credentials,
 	}
 
-	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
+	schedules, handlerErr := handler.buildSchedules(tx, endpoint.ID)
 	if handlerErr != nil {
 		return nil, handlerErr
 	}
 	statusResponse.Schedules = schedules
-
-	if tunnel.Status == portainer.EdgeAgentManagementRequired {
-		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
-	}
 
 	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(tx, endpoint.ID)
 	if handlerErr != nil {
@@ -213,9 +208,33 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 	}
 }
 
-func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
+func (handler *Handler) buildSchedules(tx dataservices.DataStoreTx, endpointID portainer.EndpointID) ([]edgeJobResponse, *httperror.HandlerError) {
 	schedules := []edgeJobResponse{}
-	for _, job := range tunnel.Jobs {
+
+	edgeJobs, err := tx.EdgeJob().ReadAll()
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve Edge Jobs", err)
+	}
+
+	for _, job := range edgeJobs {
+		_, endpointHasJob := job.Endpoints[endpointID]
+		if !endpointHasJob {
+			for _, edgeGroupID := range job.EdgeGroups {
+				member, _, err := edge.EndpointInEdgeGroup(tx, endpointID, edgeGroupID)
+				if err != nil {
+					return nil, httperror.InternalServerError("Unable to retrieve relations", err)
+				} else if member {
+					endpointHasJob = true
+
+					break
+				}
+			}
+		}
+
+		if !endpointHasJob {
+			continue
+		}
+
 		var collectLogs bool
 		if _, ok := job.GroupLogsCollection[endpointID]; ok {
 			collectLogs = job.GroupLogsCollection[endpointID].CollectLogs
@@ -269,9 +288,8 @@ func (handler *Handler) buildEdgeStacks(tx dataservices.DataStoreTx, endpointID 
 func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statusResponse endpointEdgeStatusInspectResponse) *httperror.HandlerError {
 	rr := httptest.NewRecorder()
 
-	httpErr := response.JSON(rr, statusResponse)
-	if httpErr != nil {
-		return httpErr
+	if err := response.JSON(rr, statusResponse); err != nil {
+		return err
 	}
 
 	h := fnv.New32a()

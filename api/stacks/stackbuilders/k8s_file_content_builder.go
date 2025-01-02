@@ -1,7 +1,6 @@
 package stackbuilders
 
 import (
-	"fmt"
 	"strconv"
 	"sync"
 
@@ -40,6 +39,7 @@ func CreateK8sStackFileContentBuilder(dataStore dataservices.DataStore,
 
 func (b *K8sStackFileContentBuilder) SetGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint) FileContentMethodStackBuildProcess {
 	b.FileContentMethodStackBuilder.SetGeneralInfo(payload, endpoint)
+
 	return b
 }
 
@@ -47,13 +47,14 @@ func (b *K8sStackFileContentBuilder) SetUniqueInfo(payload *StackPayload) FileCo
 	if b.hasError() {
 		return b
 	}
+
 	b.stack.Name = payload.StackName
 	b.stack.Type = portainer.KubernetesStack
 	b.stack.EntryPoint = filesystem.ManifestFileDefaultName
 	b.stack.Namespace = payload.Namespace
 	b.stack.CreatedBy = b.User.Username
-	b.stack.IsComposeFormat = payload.ComposeFormat
 	b.stack.FromAppTemplate = payload.FromAppTemplate
+
 	return b
 }
 
@@ -65,14 +66,11 @@ func (b *K8sStackFileContentBuilder) SetFileContent(payload *StackPayload) FileC
 	stackFolder := strconv.Itoa(int(b.stack.ID))
 	projectPath, err := b.fileService.StoreStackFileFromBytes(stackFolder, b.stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		fileType := "Manifest"
-		if b.stack.IsComposeFormat {
-			fileType = "Compose"
-		}
-		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
-		b.err = httperror.InternalServerError(errMsg, err)
+		b.err = httperror.InternalServerError("Unable to persist Kubernetes Manifest file on disk", err)
+
 		return b
 	}
+
 	b.stack.ProjectPath = projectPath
 
 	return b
@@ -96,6 +94,7 @@ func (b *K8sStackFileContentBuilder) Deploy(payload *StackPayload, endpoint *por
 	k8sDeploymentConfig, err := deployments.CreateKubernetesStackDeploymentConfig(b.stack, b.KuberneteDeployer, k8sAppLabel, b.User, endpoint)
 	if err != nil {
 		b.err = httperror.InternalServerError("failed to create temp kub deployment files", err)
+
 		return b
 	}
 

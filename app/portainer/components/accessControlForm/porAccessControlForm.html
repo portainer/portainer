@@ -32,7 +32,7 @@
     ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))"
   >
     <div class="vertical-center w-full">
-      <label for="group-access" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
+      <label for="teams-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
         Authorized teams
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0"
@@ -63,7 +63,7 @@
   <!-- authorized-users -->
   <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
     <div class="vertical-center w-full">
-      <label for="group-access" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
+      <label for="users-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
         Authorized users
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0"

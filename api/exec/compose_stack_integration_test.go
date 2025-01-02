@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,25 +42,17 @@ func setup(t *testing.T) (*portainer.Stack, *portainer.Endpoint) {
 }
 
 func Test_UpAndDown(t *testing.T) {
-
 	testhelpers.IntegrationTest(t)
 
 	stack, endpoint := setup(t)
 
-	deployer, err := compose.NewComposeDeployer("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
+	deployer := compose.NewComposeDeployer()
 
-	w, err := NewComposeStackManager(deployer, nil)
-	if err != nil {
-		t.Fatalf("Failed creating manager: %s", err)
-	}
+	w := NewComposeStackManager(deployer, nil, nil)
 
 	ctx := context.TODO()
 
-	err = w.Up(ctx, stack, endpoint, false)
-	if err != nil {
+	if err := w.Up(ctx, stack, endpoint, portainer.ComposeUpOptions{}); err != nil {
 		t.Fatalf("Error calling docker-compose up: %s", err)
 	}
 
@@ -69,8 +60,7 @@ func Test_UpAndDown(t *testing.T) {
 		t.Fatal("container should exist")
 	}
 
-	err = w.Down(ctx, stack, endpoint)
-	if err != nil {
+	if err := w.Down(ctx, stack, endpoint); err != nil {
 		t.Fatalf("Error calling docker-compose down: %s", err)
 	}
 
@@ -80,7 +70,7 @@ func Test_UpAndDown(t *testing.T) {
 }
 
 func containerExists(containerName string) bool {
-	cmd := exec.Command("docker", "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
+	cmd := exec.Command("docker", "ps", "-a", "-f", "name="+containerName)
 
 	out, err := cmd.Output()
 	if err != nil {

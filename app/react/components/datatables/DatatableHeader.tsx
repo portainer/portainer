@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { IconProps } from '@@/Icon';
 
 import { SearchBar } from './SearchBar';
@@ -14,7 +16,7 @@ type Props = {
   renderTableActions?(): ReactNode;
   description?: ReactNode;
   titleId?: string;
-};
+} & AutomationTestingProps;
 
 export function DatatableHeader({
   onSearchChange,
@@ -25,12 +27,19 @@ export function DatatableHeader({
   titleIcon,
   description,
   titleId,
+  'data-cy': dataCy,
 }: Props) {
   if (!title) {
     return null;
   }
 
-  const searchBar = <SearchBar value={searchValue} onChange={onSearchChange} />;
+  const searchBar = (
+    <SearchBar
+      value={searchValue}
+      onChange={onSearchChange}
+      data-cy={`${dataCy}-search-input`}
+    />
+  );
   const tableActions = !!renderTableActions && (
     <Table.Actions>{renderTableActions()}</Table.Actions>
   );
@@ -44,6 +53,7 @@ export function DatatableHeader({
       label={title}
       icon={titleIcon}
       description={description}
+      data-cy={dataCy}
     >
       {searchBar}
       {tableActions}

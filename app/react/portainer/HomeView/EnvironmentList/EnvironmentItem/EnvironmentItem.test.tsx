@@ -2,10 +2,9 @@ import { http, HttpResponse } from 'msw';
 import { render } from '@testing-library/react';
 
 import {
-  EnvironmentGroup,
   EnvironmentGroupId,
-} from '@/react/portainer/environments/environment-groups/types';
-import { Environment } from '@/react/portainer/environments/types';
+  Environment,
+} from '@/react/portainer/environments/types';
 import { UserViewModel } from '@/portainer/models/user';
 import { Tag } from '@/portainer/tags/types';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
@@ -13,6 +12,7 @@ import { server } from '@/setup-tests/server';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 
 import { EnvironmentItem } from './EnvironmentItem';
 

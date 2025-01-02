@@ -20,11 +20,11 @@ angular
   .module('portainer.app', [
     'portainer.oauth',
     'portainer.rbac',
+    'portainer.registrymanagement',
     componentsModule,
     settingsModule,
     featureFlagModule,
     userActivityModule,
-    'portainer.shared.datatable',
     servicesModule,
     reactModule,
     sidebarModule,
@@ -201,17 +201,6 @@ angular
         },
       };
 
-      var deviceImport = {
-        name: 'portainer.endpoints.importDevice',
-        url: '/device',
-        views: {
-          'content@': {
-            templateUrl: './views/devices/import/importDevice.html',
-            controller: 'ImportDeviceController',
-          },
-        },
-      };
-
       const edgeAutoCreateScript = {
         name: 'portainer.endpoints.edgeAutoCreateScript',
         url: '/aeec',
@@ -222,26 +211,6 @@ angular
         },
         data: {
           docs: '/admin/environments/aeec',
-        },
-      };
-
-      var addFDOProfile = {
-        name: 'portainer.endpoints.profile',
-        url: '/profile',
-        views: {
-          'content@': {
-            component: 'addProfileView',
-          },
-        },
-      };
-
-      var editFDOProfile = {
-        name: 'portainer.endpoints.profile.edit',
-        url: '/:id',
-        views: {
-          'content@': {
-            component: 'editProfileView',
-          },
         },
       };
 
@@ -273,8 +242,7 @@ angular
         url: '/groups',
         views: {
           'content@': {
-            templateUrl: './views/groups/groups.html',
-            controller: 'GroupsController',
+            component: 'environmentGroupsListView',
           },
         },
         data: {
@@ -352,47 +320,6 @@ angular
         },
       };
 
-      var registries = {
-        name: 'portainer.registries',
-        url: '/registries',
-        views: {
-          'content@': {
-            templateUrl: './views/registries/registries.html',
-            controller: 'RegistriesController',
-          },
-        },
-        data: {
-          docs: '/admin/registries',
-          access: AccessHeaders.Admin,
-        },
-      };
-
-      var registry = {
-        name: 'portainer.registries.registry',
-        url: '/:id',
-        views: {
-          'content@': {
-            component: 'editRegistry',
-          },
-        },
-        data: {
-          docs: '/admin/registries/edit',
-        },
-      };
-
-      const registryCreation = {
-        name: 'portainer.registries.new',
-        url: '/new',
-        views: {
-          'content@': {
-            component: 'createRegistry',
-          },
-        },
-        data: {
-          docs: '/admin/registries/add',
-        },
-      };
-
       var settings = {
         name: 'portainer.settings',
         url: '/settings',
@@ -454,8 +381,7 @@ angular
         url: '/users',
         views: {
           'content@': {
-            templateUrl: './views/users/users.html',
-            controller: 'UsersController',
+            component: 'usersListView',
           },
         },
         data: {
@@ -487,9 +413,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeAutoCreateScript);
-      $stateRegistryProvider.register(deviceImport);
-      $stateRegistryProvider.register(addFDOProfile);
-      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);
@@ -497,9 +420,6 @@ angular
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
-      $stateRegistryProvider.register(registries);
-      $stateRegistryProvider.register(registry);
-      $stateRegistryProvider.register(registryCreation);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
       $stateRegistryProvider.register(settingsEdgeCompute);

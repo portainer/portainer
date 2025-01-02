@@ -18,7 +18,7 @@ export function ScaleForm({
   service: ServiceViewModel;
 }) {
   const environmentId = useEnvironmentId();
-  const mutation = useUpdateServiceMutation();
+  const mutation = useUpdateServiceMutation(environmentId);
   const router = useRouter();
   return (
     <Formik
@@ -45,9 +45,15 @@ export function ScaleForm({
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
-          <Button color="none" icon={X} onClick={() => onClose()} />
+          <Button
+            color="none"
+            icon={X}
+            onClick={() => onClose()}
+            data-cy={`scale-service-cancel-button-${service.Name}`}
+          />
           <LoadingButton
             isLoading={mutation.isLoading}
+            data-cy={`scale-service-submit-button-${service.Name}`}
             disabled={
               values.replicas === service.Replicas ||
               values.replicas < 0 ||

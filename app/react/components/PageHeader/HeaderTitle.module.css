@@ -10,6 +10,12 @@
 .menu-icon {
   background: var(--user-menu-icon-color);
   position: relative;
+  flex-shrink: 0;
+}
+
+.menu-icon:hover {
+  /* keep the links and button icon colors consistent on hover */
+  @apply text-gray-8 th-dark:text-gray-warm-7;
 }
 
 .menu-list {

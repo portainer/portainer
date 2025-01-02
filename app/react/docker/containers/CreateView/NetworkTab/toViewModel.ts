@@ -1,13 +1,14 @@
 import { DockerNetwork } from '@/react/docker/networks/types';
 
-import { ContainerJSON } from '../../queries/container';
-import { DockerContainer } from '../../types';
+import { ContainerDetailsJSON } from '../../queries/useContainer';
+import { ContainerListViewModel } from '../../types';
 
 import { CONTAINER_MODE, Values } from './types';
 
-export function getDefaultViewModel() {
+export function getDefaultViewModel(isWindows: boolean, isPodman?: boolean) {
+  const networkMode = getDefaultNetworkMode(isWindows, isPodman);
   return {
-    networkMode: 'bridge',
+    networkMode,
     hostname: '',
     domain: '',
     macAddress: '',
@@ -20,10 +21,17 @@ export function getDefaultViewModel() {
   };
 }
 
+export function getDefaultNetworkMode(isWindows: boolean, isPodman?: boolean) {
+  if (isWindows) return 'nat';
+  if (isPodman) return 'podman';
+  return 'bridge';
+}
+
 export function toViewModel(
-  config: ContainerJSON,
+  config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<DockerContainer> = []
+  runningContainers: Array<ContainerListViewModel> = [],
+  isPodman?: boolean
 ): Values {
   const dns = config.HostConfig?.Dns;
   const [primaryDns = '', secondaryDns = ''] = dns || [];
@@ -33,7 +41,8 @@ export function toViewModel(
   const [networkMode, container = ''] = getNetworkMode(
     config,
     networks,
-    runningContainers
+    runningContainers,
+    isPodman
   );
 
   const networkSettings = config.NetworkSettings?.Networks?.[networkMode];
@@ -60,10 +69,11 @@ export function toViewModel(
   };
 }
 
-function getNetworkMode(
-  config: ContainerJSON,
+export function getNetworkMode(
+  config: ContainerDetailsJSON,
   networks: Array<DockerNetwork>,
-  runningContainers: Array<DockerContainer> = []
+  runningContainers: Array<ContainerListViewModel> = [],
+  isPodman?: boolean
 ) {
   let networkMode = config.HostConfig?.NetworkMode || '';
   if (!networkMode) {
@@ -84,6 +94,9 @@ function getNetworkMode(
   const networkNames = networks.map((n) => n.Name);
 
   if (networkNames.includes(networkMode)) {
+    if (isPodman && networkMode === 'bridge') {
+      return ['podman'] as const;
+    }
     return [networkMode] as const;
   }
 
@@ -91,6 +104,9 @@ function getNetworkMode(
     networkNames.includes('bridge') &&
     (!networkMode || networkMode === 'default' || networkMode === 'bridge')
   ) {
+    if (isPodman) {
+      return ['podman'] as const;
+    }
     return ['bridge'] as const;
   }
 

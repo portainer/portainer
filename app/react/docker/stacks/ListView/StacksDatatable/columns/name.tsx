@@ -81,6 +81,7 @@ function NameLink({ item }: { item: DecoratedStack }) {
           external: true,
         }}
         title={name}
+        data-cy="docker-external-stack-link"
       >
         {name}
       </Link>
@@ -103,6 +104,7 @@ function NameLink({ item }: { item: DecoratedStack }) {
         orphanedRunning: item.OrphanedRunning,
       }}
       title={name}
+      data-cy={`docker-stack-link-${item.Name}`}
     >
       {name}
     </Link>

@@ -12,7 +12,7 @@ type Args = {
 };
 
 function Template({ label }: Args) {
-  return <AddButton>{label}</AddButton>;
+  return <AddButton data-cy="add-">{label}</AddButton>;
 }
 
 export const Primary: Story<Args> = Template.bind({});

@@ -34,18 +34,17 @@ type (
 )
 
 func (kcl *KubeClient) DeleteRegistrySecret(registry portainer.RegistryID, namespace string) error {
-	err := kcl.cli.CoreV1().Secrets(namespace).Delete(context.TODO(), kcl.RegistrySecretName(registry), metav1.DeleteOptions{})
-	if err != nil && !k8serrors.IsNotFound(err) {
+	if err := kcl.cli.CoreV1().Secrets(namespace).Delete(context.TODO(), kcl.RegistrySecretName(registry), metav1.DeleteOptions{}); err != nil && !k8serrors.IsNotFound(err) {
 		return errors.Wrap(err, "failed removing secret")
 	}
 
 	return nil
 }
 
-func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namespace string) (err error) {
+func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namespace string) error {
 	username, password, err := registryutils.GetRegEffectiveCredential(registry)
 	if err != nil {
-		return
+		return err
 	}
 
 	config := dockerConfig{
@@ -79,13 +78,11 @@ func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namesp
 		Type: v1.SecretTypeDockerConfigJson,
 	}
 
-	_, err = kcl.cli.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
-	if err != nil && !k8serrors.IsAlreadyExists(err) {
+	if _, err := kcl.cli.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{}); err != nil && !k8serrors.IsAlreadyExists(err) {
 		return errors.Wrap(err, "failed saving secret")
 	}
 
 	return nil
-
 }
 
 func (cli *KubeClient) IsRegistrySecret(namespace, secretName string) (bool, error) {
@@ -101,7 +98,6 @@ func (cli *KubeClient) IsRegistrySecret(namespace, secretName string) (bool, err
 	isSecret := secret.Type == v1.SecretTypeDockerConfigJson
 
 	return isSecret, nil
-
 }
 
 func (*KubeClient) RegistrySecretName(registryID portainer.RegistryID) string {

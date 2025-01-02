@@ -1,0 +1,364 @@
+.datatable .toolBar {
+  background-color: var(--bg-card-color);
+  overflow: auto;
+  padding: 20px;
+  font-size: 16px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.datatable .actionBar {
+  padding: 0;
+}
+
+.datatable .toolBar .toolBarTitle {
+  @apply items-center gap-1;
+  float: left;
+  color: var(--text-widget-header-color);
+  font-weight: 500;
+
+  flex: auto;
+  display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+.datatable .toolBar .settings {
+  float: right;
+  margin-top: 5px;
+}
+
+.datatable .toolBar .setting {
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.datatable .toolBar .setting-active {
+  @apply text-blue-7;
+}
+
+.toolBar .actionBar {
+  display: inline-flex;
+}
+
+.toolBar .settings {
+  text-align: right;
+  display: inline-flex;
+}
+
+.searchBar {
+  border: 1px solid var(--border-searchbar);
+  background: var(--bg-searchbar);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.toolBar .searchBar {
+  margin-right: 10px;
+  display: inline-flex;
+  min-height: 30px;
+  flex-basis: 7rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  align-items: center;
+  min-width: 7rem;
+  max-width: 14rem;
+}
+
+.searchBar .searchInput {
+  background: none;
+  border: none;
+  width: 90%;
+}
+
+.searchBar .searchIcon {
+  @apply text-gray-7;
+  @apply th-dark:text-gray-warm-5;
+  margin-right: 5px;
+}
+
+.searchBar .searchInput:active,
+.searchBar .searchInput:focus {
+  outline: none;
+}
+
+.datatable .pagination-controls {
+  margin-right: 15px;
+}
+
+.datatable .table {
+  margin-bottom: 0;
+}
+
+.datatable .footer {
+  background-color: var(--bg-card-color);
+  color: var(--text-main-color);
+  overflow: auto;
+  border-top: 1px solid var(--border-datatable-top-color);
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding-bottom: 10px;
+}
+
+.datatable .footer .infoBar {
+  float: left;
+  font-size: 12px;
+  margin: 15px 0 0 10px;
+}
+
+.datatable .footer .paginationControls {
+  float: right;
+  margin: 10px 10px 5px 0;
+}
+
+.datatable .footer .paginationControls .limitSelector {
+  font-size: 12px;
+}
+
+.datatable .footer .paginationControls .pagination {
+  margin: 0;
+}
+
+.datatable .pagination > li.disabled > a,
+.datatable .pagination > li.disabled > button {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.datatable .pagination > li.disabled {
+  cursor: not-allowed;
+}
+
+.datatable .pagination > li > a,
+.datatable .pagination > li > button,
+.pagination > li > span {
+  user-select: none;
+  float: none;
+}
+
+.datatable.datatable-empty .table > tbody > tr > td {
+  padding: 15px 0;
+}
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr {
+  height: 50px;
+  vertical-align: middle;
+}
+
+.datatable thead tr > th {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.widget .widget-body table thead th .table-filter {
+  color: #767676;
+  cursor: pointer;
+  font-size: 12px !important;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.widget .widget-body table thead th .filter-active {
+  color: #f0ad4e;
+  font-size: 12px !important;
+}
+
+.datatable .filterbar > th {
+  border: none;
+  font-size: 12px !important;
+  padding: 0;
+}
+
+.md-checkbox {
+  margin: 1px 0;
+  position: relative;
+}
+
+.md-checkbox label {
+  cursor: pointer;
+}
+
+.md-checkbox label:before,
+.md-checkbox label:after {
+  content: '';
+  left: 0;
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+}
+
+.md-checkbox label:before {
+  background: var(--bg-main-color);
+  border: 2px solid var(--bg-checkbox-border-color);
+  border-radius: 2px;
+  cursor: pointer;
+  height: 16px;
+  transition: background 0.3s;
+  width: 16px;
+}
+
+.md-checkbox input[type='checkbox'] {
+  margin-right: 5px;
+  opacity: 0;
+  outline: 0;
+}
+
+.md-checkbox input[type='checkbox']:checked + label:before {
+  background: #337ab7;
+  border: none;
+}
+
+.md-checkbox input[type='checkbox']:disabled + label:before {
+  background: #ececec;
+  border: 2px solid #ddd;
+  cursor: auto;
+}
+
+.md-checkbox input[type='checkbox']:checked + label:after {
+  border: 2px solid #fff;
+  border-right-style: none;
+  border-top-style: none;
+  height: 4px;
+  left: 4px;
+  top: 5px;
+  transform: rotate(-45deg);
+  width: 9px;
+}
+
+.md-radio {
+  margin: 6px 0;
+}
+
+.md-radio .md-radio-inline {
+  display: inline-block;
+}
+
+.md-radio input[type='radio'] {
+  display: none;
+}
+
+.md-radio input[type='radio']:checked + label:before {
+  animation: ripple 0.2s linear forwards;
+  border-color: #337ab7;
+}
+
+.md-radio input[type='radio']:checked + label:after {
+  transform: scale(1);
+}
+
+.md-radio label {
+  cursor: pointer;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: 0;
+  padding: 0 22px;
+  position: relative;
+  vertical-align: bottom;
+}
+
+.md-radio label:before,
+.md-radio label:after {
+  border-radius: 50%;
+  content: '';
+  position: absolute;
+  transition: all 0.3s ease;
+  transition-property: transform, border-color;
+}
+
+.md-radio label:before {
+  border: 2px solid black;
+  border: 2px solid rgba(0, 0, 0, 0.54);
+  height: 16px;
+  left: 0;
+  top: 0;
+  width: 16px;
+}
+
+.md-radio label:after {
+  background: #337ab7;
+  height: 8px;
+  left: 4px;
+  top: 4px;
+  transform: scale(0);
+  width: 8px;
+}
+
+.table th.selection,
+.table td.selection {
+  width: 30px;
+}
+
+.table-responsive tr > th:first-child,
+.table-responsive tr > td:first-child {
+  padding-left: 20px;
+}
+
+.table-responsive tr > th:last-child,
+.table-responsive tr > last-child {
+  padding-right: 20px;
+}
+
+.datatable .table-setting-menu-btn {
+  border: none;
+  background: none;
+}
+
+/* Multiple Tables in a row */
+.table-row-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+.table-in-row {
+  border: 1px solid var(--border-widget);
+  border-radius: 8px;
+  flex-grow: 2;
+}
+
+/* Databatle Setting Menu */
+
+.tableMenu {
+  border: 1px solid var(--border-bootbox);
+  border-radius: 8px;
+
+  color: var(--text-dropdown-menu-color);
+  padding: 15px;
+  background-color: var(--bg-dropdown-menu-color) !important;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  padding: 0px;
+  border-radius: 8px;
+  border: 1px var(--bg-dropdown-menu-color);
+  background-color: var(--bg-dropdown-menu-color);
+}
+
+.dropdown-menu .tableMenu {
+  border: 0px;
+}
+
+.tableMenu .menuHeader {
+  font-size: 16px;
+}
+
+.tableMenu .menuContent {
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.tableMenu .menuContent .md-radio:first-child {
+  margin: 0;
+}

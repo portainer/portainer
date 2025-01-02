@@ -63,6 +63,7 @@ export function InsightsBox({
       {insightCloseId && (
         <Button
           icon={X}
+          data-cy={`insight-close-${insightCloseId}`}
           className={clsx(
             'absolute right-2 top-3 flex !text-gray-7 hover:!text-gray-8 th-highcontrast:!text-gray-6 th-highcontrast:hover:!text-gray-5 th-dark:!text-gray-6 th-dark:hover:!text-gray-5',
             type === 'slim' && insightCloseId && 'top-1'

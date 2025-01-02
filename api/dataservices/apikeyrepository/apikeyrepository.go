@@ -21,8 +21,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
+	if err := connection.SetServiceName(BucketName); err != nil {
 		return nil, err
 	}
 
@@ -41,7 +40,7 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.APIKey{},
-		func(obj interface{}) (interface{}, error) {
+		func(obj any) (any, error) {
 			record, ok := obj.(*portainer.APIKey)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
@@ -62,11 +61,11 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 // Note: there is a 1-to-1 mapping of api-key and digest
 func (service *Service) GetAPIKeyByDigest(digest string) (*portainer.APIKey, error) {
 	var k *portainer.APIKey
-	stop := fmt.Errorf("ok")
+	stop := errors.New("ok")
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.APIKey{},
-		func(obj interface{}) (interface{}, error) {
+		func(obj any) (any, error) {
 			key, ok := obj.(*portainer.APIKey)
 			if !ok {
 				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
@@ -95,7 +94,7 @@ func (service *Service) GetAPIKeyByDigest(digest string) (*portainer.APIKey, err
 func (service *Service) Create(record *portainer.APIKey) error {
 	return service.Connection.CreateObject(
 		BucketName,
-		func(id uint64) (int, interface{}) {
+		func(id uint64) (int, any) {
 			record.ID = portainer.APIKeyID(id)
 
 			return int(record.ID), record

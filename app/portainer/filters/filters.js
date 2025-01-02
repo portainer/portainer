@@ -1,12 +1,6 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
-import { Cloud } from 'lucide-react';
-
-import Kube from '@/assets/ico/kube.svg?c';
-import DockerIcon from '@/assets/ico/vendor/docker-icon.svg?c';
-import MicrosoftIcon from '@/assets/ico/vendor/microsoft-icon.svg?c';
-import { EnvironmentType } from '@/react/portainer/environments/types';
 
 export function truncateLeftRight(text, max, left, right) {
   max = isNaN(max) ? 50 : max;
@@ -103,24 +97,6 @@ export function endpointTypeName(type) {
     return 'Edge Agent';
   }
   return '';
-}
-
-export function environmentTypeIcon(type) {
-  switch (type) {
-    case EnvironmentType.Azure:
-      return MicrosoftIcon;
-    case EnvironmentType.EdgeAgentOnDocker:
-      return Cloud;
-    case EnvironmentType.AgentOnKubernetes:
-    case EnvironmentType.EdgeAgentOnKubernetes:
-    case EnvironmentType.KubernetesLocal:
-      return Kube;
-    case EnvironmentType.AgentOnDocker:
-    case EnvironmentType.Docker:
-      return DockerIcon;
-    default:
-      throw new Error(`type ${type}-${EnvironmentType[type]} is not supported`);
-  }
 }
 
 export function truncate(text, length, end) {

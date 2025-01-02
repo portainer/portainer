@@ -17,8 +17,8 @@ func IsErrObjectNotFound(e error) bool {
 }
 
 // AppendFn appends elements to the given collection slice
-func AppendFn[T any](collection *[]T) func(obj interface{}) (interface{}, error) {
-	return func(obj interface{}) (interface{}, error) {
+func AppendFn[T any](collection *[]T) func(obj any) (any, error) {
+	return func(obj any) (any, error) {
 		element, ok := obj.(*T)
 		if !ok {
 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("type assertion failed")
@@ -32,8 +32,8 @@ func AppendFn[T any](collection *[]T) func(obj interface{}) (interface{}, error)
 }
 
 // FilterFn appends elements to the given collection when the predicate is true
-func FilterFn[T any](collection *[]T, predicate func(T) bool) func(obj interface{}) (interface{}, error) {
-	return func(obj interface{}) (interface{}, error) {
+func FilterFn[T any](collection *[]T, predicate func(T) bool) func(obj any) (any, error) {
+	return func(obj any) (any, error) {
 		element, ok := obj.(*T)
 		if !ok {
 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("type assertion failed")
@@ -50,8 +50,8 @@ func FilterFn[T any](collection *[]T, predicate func(T) bool) func(obj interface
 
 // FirstFn sets the element to the first one that satisfies the predicate and stops the computation, returns ErrStop on
 // success
-func FirstFn[T any](element *T, predicate func(T) bool) func(obj interface{}) (interface{}, error) {
-	return func(obj interface{}) (interface{}, error) {
+func FirstFn[T any](element *T, predicate func(T) bool) func(obj any) (any, error) {
+	return func(obj any) (any, error) {
 		e, ok := obj.(*T)
 		if !ok {
 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("type assertion failed")

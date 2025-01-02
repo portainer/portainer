@@ -10,8 +10,6 @@ import {
   ResourceObject,
 } from 'docker-types/generated/1.41';
 
-import { WithRequiredProperty } from '@/types';
-
 export class NodeViewModel {
   Model: Node;
 
@@ -55,7 +53,7 @@ export class NodeViewModel {
 
   Status: NodeStatus['State'];
 
-  Addr: WithRequiredProperty<NodeStatus, 'Addr'>['Addr'] = '';
+  Addr: Required<NodeStatus>['Addr'] = '';
 
   Leader: ManagerStatus['Leader'];
 

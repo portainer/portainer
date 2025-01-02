@@ -3,12 +3,10 @@ import { useMemo } from 'react';
 
 import { useServicesQuery } from '@/react/kubernetes/services/service';
 
-import {
-  useApplication,
-  useApplicationHorizontalPodAutoscaler,
-  useApplicationServices,
-} from '../../application.queries';
-import { useHorizontalAutoScalarQuery } from '../../autoscaling.service';
+import { useHorizontalPodAutoScaler } from '../../queries/useHorizontalPodAutoScaler';
+import { useApplication } from '../../queries/useApplication';
+import { useApplicationServices } from '../../queries/useApplicationServices';
+import { useApplicationHorizontalPodAutoscaler } from '../../queries/useApplicationHorizontalPodAutoscaler';
 
 export function useApplicationYAML() {
   const {
@@ -56,7 +54,7 @@ export function useApplicationYAML() {
       application
     );
   const { data: autoScalarYAML, ...autoScalarYAMLQuery } =
-    useHorizontalAutoScalarQuery<string>(
+    useHorizontalPodAutoScaler<string>(
       environmentId,
       namespace,
       autoScalar?.metadata?.name || '',
@@ -75,12 +73,12 @@ export function useApplicationYAML() {
   }, [applicationYAML, autoScalarYAML, servicesYAML]);
 
   const isApplicationYAMLLoading =
-    applicationQuery.isLoading ||
-    servicesQuery.isLoading ||
-    autoScalarsQuery.isLoading ||
-    applicationYAMLQuery.isLoading ||
-    servicesYAMLQuery.isLoading ||
-    autoScalarYAMLQuery.isLoading;
+    applicationQuery.isInitialLoading ||
+    servicesQuery.isInitialLoading ||
+    autoScalarsQuery.isInitialLoading ||
+    applicationYAMLQuery.isInitialLoading ||
+    servicesYAMLQuery.isInitialLoading ||
+    autoScalarYAMLQuery.isInitialLoading;
 
   return { fullApplicationYaml, isApplicationYAMLLoading };
 }
