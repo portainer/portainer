@@ -50,12 +50,20 @@ angular.module('portainer.docker').controller('ImportImageController', [
 
     async function uploadImageAsync() {
       $scope.state.actionInProgress = true;
+      $scope.state.progress = 0;
 
       var nodeName = $scope.formValues.NodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
       var file = $scope.formValues.UploadFile;
       try {
-        const { data } = await ImageService.uploadImage(file);
+        const onProgress = (progressEvent) => {
+          const progressPercent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          $scope.state.progress = progressPercent;
+          $scope.$apply();
+        };
+
+        const { data } = await ImageService.uploadImage(file, onProgress);
+
         if (data.error) {
           Notifications.error('Failure', data.error, 'Unable to upload image');
         } else if (data.stream) {
