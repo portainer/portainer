@@ -140,7 +140,12 @@ func (c *ComposeDeployer) Deploy(ctx context.Context, filePaths []string, option
 
 		project = project.WithoutUnnecessaryResources()
 
-		var opts api.UpOptions
+		opts := api.UpOptions{
+			Start: api.StartOptions{
+				Project: project,
+			},
+		}
+
 		if options.ForceRecreate {
 			opts.Create.Recreate = api.RecreateForce
 		}
