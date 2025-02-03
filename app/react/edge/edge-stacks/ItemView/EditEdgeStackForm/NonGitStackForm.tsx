@@ -143,7 +143,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
         updateVersion,
         webhook: values.webhookEnabled
           ? edgeStack.Webhook || createWebhookId()
-          : undefined,
+          : '',
         envVars: values.envVars,
         rollbackTo: values.rollbackTo,
         staggerConfig: values.staggerConfig,
