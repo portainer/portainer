@@ -79,7 +79,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	updateFn := func(stack *portainer.EdgeStack) (*portainer.EdgeStack, error) {
-		return handler.updateEdgeStackStatus(stack, endpoint, r, stack.ID, payload)
+		return handler.updateEdgeStackStatus(stack, stack.ID, payload)
 	}
 
 	stack, err := handler.stackCoordinator.UpdateStatus(r, portainer.EdgeStackID(stackID), updateFn)
@@ -99,7 +99,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, stack)
 }
 
-func (handler *Handler) updateEdgeStackStatus(stack *portainer.EdgeStack, endpoint *portainer.Endpoint, r *http.Request, stackID portainer.EdgeStackID, payload updateStatusPayload) (*portainer.EdgeStack, error) {
+func (handler *Handler) updateEdgeStackStatus(stack *portainer.EdgeStack, stackID portainer.EdgeStackID, payload updateStatusPayload) (*portainer.EdgeStack, error) {
 	if payload.Version > 0 && payload.Version < stack.Version {
 		return stack, nil
 	}

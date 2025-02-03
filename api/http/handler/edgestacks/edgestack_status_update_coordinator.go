@@ -60,6 +60,11 @@ func (c *EdgeStackStatusUpdateCoordinator) loop() {
 			return err
 		}
 
+		// Return early when the agent tries to update the status on a deleted stack
+		if stack == nil {
+			return nil
+		}
+
 		// 2. Mutate the edge stack opportunistically until there are no more pending updates
 		for {
 			stack, err = u.updateFn(stack)
