@@ -208,11 +208,9 @@ func (c *ComposeDeployer) Run(ctx context.Context, filePaths []string, serviceNa
 }
 
 // Remove stops and removes containers
-func (c *ComposeDeployer) Remove(ctx context.Context, projectName string, filePaths []string, options libstack.RemoveOptions) error {
-	if err := withCli(ctx, options.Options, func(ctx context.Context, cli *command.DockerCli) error {
-		composeService := compose.NewComposeService(cli)
-
-		return composeService.Down(ctx, projectName, api.DownOptions{RemoveOrphans: true, Volumes: options.Volumes})
+func (c *ComposeDeployer) Remove(ctx context.Context, filePaths []string, options libstack.RemoveOptions) error {
+	if err := withComposeService(ctx, filePaths, options.Options, func(composeService api.Service, project *types.Project) error {
+		return composeService.Down(ctx, project.Name, api.DownOptions{RemoveOrphans: true, Volumes: options.Volumes, Project: project})
 	}); err != nil {
 		return fmt.Errorf("compose down operation failed: %w", err)
 	}

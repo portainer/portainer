@@ -64,7 +64,7 @@ services:
 	require.Empty(t, waitResult.ErrorMsg)
 	require.Equal(t, libstack.StatusCompleted, waitResult.Status)
 
-	err = w.Remove(ctx, projectName, filePaths, libstack.RemoveOptions{})
+	err = w.Remove(ctx, filePaths, libstack.RemoveOptions{})
 	require.NoError(t, err)
 
 	require.False(t, containerExists(composeContainerName))
