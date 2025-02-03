@@ -167,7 +167,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {
 	relation, err := tx.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil {
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return err
 	}
 
@@ -183,6 +183,11 @@ func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpoi
 		edgeStackSet[edgeStackID] = true
 	}
 
+	if relation == nil {
+		relation = &portainer.EndpointRelation{
+			EndpointID: endpoint.ID,
+		}
+	}
 	relation.EdgeStacks = edgeStackSet
 
 	return tx.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
