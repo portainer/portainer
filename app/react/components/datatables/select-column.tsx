@@ -11,15 +11,22 @@ export function createSelectColumn<T>(dataCy: string): ColumnDef<T> {
       <Checkbox
         id="select-all"
         data-cy={`select-all-checkbox-${dataCy}`}
-        checked={table.getIsAllRowsSelected()}
+        checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomeRowsSelected()}
-        onChange={table.getToggleAllRowsSelectedHandler()}
+        onChange={(e) => {
+          // Select all rows if shift key is held down, otherwise only page rows
+          if (e.nativeEvent instanceof MouseEvent && e.nativeEvent.shiftKey) {
+            table.getToggleAllRowsSelectedHandler()(e);
+            return;
+          }
+          table.getToggleAllPageRowsSelectedHandler()(e);
+        }}
         disabled={table.getRowModel().rows.every((row) => !row.getCanSelect())}
         onClick={(e) => {
           e.stopPropagation();
         }}
         aria-label="Select all rows"
-        title="Select all rows"
+        title="Select all rows. Hold shift key to select across all pages."
       />
     ),
     cell: ({ row, table }) => (

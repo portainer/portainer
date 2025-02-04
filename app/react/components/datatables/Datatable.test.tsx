@@ -155,6 +155,50 @@ describe('Datatable', () => {
 
     expect(screen.getByText('No data available')).toBeInTheDocument();
   });
+
+  it('selects/deselects only page rows when select all is clicked', () => {
+    render(
+      <Datatable
+        dataset={mockData}
+        columns={mockColumns}
+        settingsManager={{ ...mockSettingsManager, pageSize: 2 }}
+        data-cy="test-table"
+      />
+    );
+
+    const selectAllCheckbox = screen.getByLabelText('Select all rows');
+    fireEvent.click(selectAllCheckbox);
+
+    // Check if all rows on the page are selected
+    expect(screen.getByText('2 item(s) selected')).toBeInTheDocument();
+
+    // Deselect
+    fireEvent.click(selectAllCheckbox);
+    const checkboxes: HTMLInputElement[] = screen.queryAllByRole('checkbox');
+    expect(checkboxes.filter((checkbox) => checkbox.checked).length).toBe(0);
+  });
+
+  it('selects/deselects all rows including other pages when select all is clicked with shift key', () => {
+    render(
+      <Datatable
+        dataset={mockData}
+        columns={mockColumns}
+        settingsManager={{ ...mockSettingsManager, pageSize: 2 }}
+        data-cy="test-table"
+      />
+    );
+
+    const selectAllCheckbox = screen.getByLabelText('Select all rows');
+    fireEvent.click(selectAllCheckbox, { shiftKey: true });
+
+    // Check if all rows on the page are selected
+    expect(screen.getByText('3 item(s) selected')).toBeInTheDocument();
+
+    // Deselect
+    fireEvent.click(selectAllCheckbox, { shiftKey: true });
+    const checkboxes: HTMLInputElement[] = screen.queryAllByRole('checkbox');
+    expect(checkboxes.filter((checkbox) => checkbox.checked).length).toBe(0);
+  });
 });
 
 // Test the defaultGlobalFilterFn used in searches
