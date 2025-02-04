@@ -31,8 +31,10 @@ const PortainerEdgeStackLabel = "io.portainer.edge_stack_id"
 var mu sync.Mutex
 
 func init() {
-	// Redirect Compose logging to zerolog
-	logrus.SetOutput(log.Logger)
+	logrus.SetOutput(&LogrusToZerologWriter{})
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableTimestamp: true,
+	})
 }
 
 func withCli(
