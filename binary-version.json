@@ -1,6 +1,6 @@
 {
-  "docker": "v27.1.2",
-  "helm": "v3.16.4",
-  "kubectl": "v1.31.4",
-  "mingit": "2.46.0.1"
+  "docker": "v27.5.1",
+  "helm": "v3.17.0",
+  "kubectl": "v1.32.1",
+  "mingit": "2.47.0.1"
 }
