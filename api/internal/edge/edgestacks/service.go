@@ -11,6 +11,7 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 	edgetypes "github.com/portainer/portainer/api/internal/edge/types"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 )
@@ -119,6 +120,9 @@ func (service *Service) updateEndpointRelations(tx dataservices.DataStoreTx, edg
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := endpointRelationService.EndpointRelation(endpointID)
 		if err != nil {
+			if tx.IsErrObjectNotFound(err) {
+				continue
+			}
 			return fmt.Errorf("unable to find endpoint relation in database: %w", err)
 		}
 
@@ -147,6 +151,14 @@ func (service *Service) DeleteEdgeStack(tx dataservices.DataStoreTx, edgeStackID
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
+			if tx.IsErrObjectNotFound(err) {
+				log.Warn().
+					Int("endpoint_id", int(endpointID)).
+					Msg("Unable to find endpoint relation in database, skipping")
+
+				continue
+			}
+
 			return errors.WithMessage(err, "Unable to find environment relation in database")
 		}
 

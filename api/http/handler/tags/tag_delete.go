@@ -133,8 +133,15 @@ func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {
 
 func updateEndpointRelations(tx dataservices.DataStoreTx, endpoint portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {
 	endpointRelation, err := tx.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil {
+	if err != nil && !tx.IsErrObjectNotFound(err) {
 		return err
+	}
+
+	if endpointRelation == nil {
+		endpointRelation = &portainer.EndpointRelation{
+			EndpointID: endpoint.ID,
+			EdgeStacks: make(map[portainer.EdgeStackID]bool),
+		}
 	}
 
 	endpointGroup, err := tx.EndpointGroup().Read(endpoint.GroupID)
@@ -147,6 +154,7 @@ func updateEndpointRelations(tx dataservices.DataStoreTx, endpoint portainer.End
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true
 	}
+
 	endpointRelation.EdgeStacks = stacksSet
 
 	return tx.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)

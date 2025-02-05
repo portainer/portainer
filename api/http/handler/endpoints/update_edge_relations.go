@@ -23,6 +23,7 @@ func (handler *Handler) updateEdgeRelations(tx dataservices.DataStoreTx, endpoin
 
 		relation = &portainer.EndpointRelation{
 			EndpointID: endpoint.ID,
+			EdgeStacks: map[portainer.EdgeStackID]bool{},
 		}
 		if err := tx.EndpointRelation().Create(relation); err != nil {
 			return errors.WithMessage(err, "Unable to create environment relation inside the database")

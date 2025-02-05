@@ -107,7 +107,7 @@ func (handler *Handler) updateEdgeStack(tx dataservices.DataStoreTx, stackID por
 
 	hasWrongType, err := hasWrongEnvironmentType(tx.Endpoint(), relatedEndpointIds, payload.DeploymentType)
 	if err != nil {
-		return nil, httperror.BadRequest("unable to check for existence of non fitting environments: %w", err)
+		return nil, httperror.InternalServerError("unable to check for existence of non fitting environments: %w", err)
 	}
 	if hasWrongType {
 		return nil, httperror.BadRequest("edge stack with config do not match the environment type", nil)
@@ -151,6 +151,9 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 	for endpointID := range endpointsToRemove {
 		relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
+			if tx.IsErrObjectNotFound(err) {
+				continue
+			}
 			return nil, nil, errors.WithMessage(err, "Unable to find environment relation in database")
 		}
 
@@ -170,10 +173,16 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 
 	for endpointID := range endpointsToAdd {
 		relation, err := tx.EndpointRelation().EndpointRelation(endpointID)
-		if err != nil {
+		if err != nil && !tx.IsErrObjectNotFound(err) {
 			return nil, nil, errors.WithMessage(err, "Unable to find environment relation in database")
 		}
 
+		if relation == nil {
+			relation = &portainer.EndpointRelation{
+				EndpointID: endpointID,
+				EdgeStacks: map[portainer.EdgeStackID]bool{},
+			}
+		}
 		relation.EdgeStacks[edgeStackID] = true
 
 		if err := tx.EndpointRelation().UpdateEndpointRelation(endpointID, relation); err != nil {

@@ -21,8 +21,15 @@ func (handler *Handler) updateEndpointRelations(tx dataservices.DataStoreTx, end
 	}
 
 	endpointRelation, err := tx.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil {
+	if err != nil && !tx.IsErrObjectNotFound(err) {
 		return err
+	}
+
+	if endpointRelation == nil {
+		endpointRelation = &portainer.EndpointRelation{
+			EndpointID: endpoint.ID,
+			EdgeStacks: make(map[portainer.EdgeStackID]bool),
+		}
 	}
 
 	edgeGroups, err := tx.EdgeGroup().ReadAll()
@@ -32,6 +39,9 @@ func (handler *Handler) updateEndpointRelations(tx dataservices.DataStoreTx, end
 
 	edgeStacks, err := tx.EdgeStack().EdgeStacks()
 	if err != nil {
+		if tx.IsErrObjectNotFound(err) {
+			return nil
+		}
 		return err
 	}
 

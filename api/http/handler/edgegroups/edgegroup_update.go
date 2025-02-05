@@ -186,6 +186,7 @@ func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpoi
 	if relation == nil {
 		relation = &portainer.EndpointRelation{
 			EndpointID: endpoint.ID,
+			EdgeStacks: make(map[portainer.EdgeStackID]bool),
 		}
 	}
 	relation.EdgeStacks = edgeStackSet
