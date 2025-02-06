@@ -55,11 +55,11 @@ async function deleteEnvironments(
   environments: { id: EnvironmentId; deleteCluster?: boolean }[]
 ) {
   try {
-    const { data } = await axios.delete<{
+    const { data } = await axios.post<{
       deleted: EnvironmentId[];
       errors: EnvironmentId[];
-    } | null>(buildUrl(), {
-      data: { endpoints: environments },
+    } | null>(buildUrl(undefined, 'delete'), {
+      endpoints: environments,
     });
     return data;
   } catch (e) {

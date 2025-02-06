@@ -91,7 +91,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
 // @failure 500 "Server error occurred while attempting to delete the specified environments."
-// @router /endpoints [delete]
+// @router /endpoints/delete [post]
 func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var p endpointDeleteBatchPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &p); err != nil {
@@ -125,6 +125,27 @@ func (handler *Handler) endpointDeleteBatch(w http.ResponseWriter, r *http.Reque
 	}
 
 	return response.Empty(w)
+}
+
+// @id EndpointDeleteBatchDeprecated
+// @summary Remove multiple environments
+// @deprecated
+// @description Deprecated: use the `POST` endpoint instead.
+// @description Remove multiple environments and optionally clean-up associated resources.
+// @description **Access policy**: Administrator only.
+// @tags endpoints
+// @security ApiKeyAuth || jwt
+// @accept json
+// @produce json
+// @param body body endpointDeleteBatchPayload true "List of environments to delete, with optional deleteCluster flag to clean-up associated resources (cloud environments only)"
+// @success 204 "Environment(s) successfully deleted."
+// @failure 207 {object} endpointDeleteBatchPartialResponse "Partial success. Some environments were deleted successfully, while others failed."
+// @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
+// @failure 403 "Unauthorized access or operation not allowed."
+// @failure 500 "Server error occurred while attempting to delete the specified environments."
+// @router /endpoints [delete]
+func (handler *Handler) endpointDeleteBatchDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	return handler.endpointDeleteBatch(w, r)
 }
 
 func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID portainer.EndpointID, deleteCluster bool) error {
