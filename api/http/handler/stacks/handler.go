@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/consts"
-	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -62,8 +61,6 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 
 	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
-	h.Handle("/stacks",
-		bouncer.AuthenticatedAccess(middlewares.Deprecated(h, deprecatedStackCreateUrlParser))).Methods(http.MethodPost) // Deprecated
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)
 	h.Handle("/stacks/{id}",

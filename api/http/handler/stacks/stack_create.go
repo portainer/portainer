@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -140,54 +139,4 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	return response.JSON(w, stack)
-}
-
-func getStackTypeFromQueryParameter(r *http.Request) (string, error) {
-	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
-	if err != nil {
-		return "", err
-	}
-
-	switch stackType {
-	case 1:
-		return "swarm", nil
-	case 2:
-		return "standalone", nil
-	case 3:
-		return "kubernetes", nil
-	}
-
-	return "", errors.New(request.ErrInvalidQueryParameter)
-}
-
-// @id StackCreate
-// @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
-// @description **Access policy**: authenticated
-// @tags stacks
-// @security ApiKeyAuth
-// @security jwt
-// @accept json,multipart/form-data
-// @produce json
-// @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack), 2 (Compose stack) or 3 (Kubernetes stack)." Enums(1,2,3)
-// @param method query string true "Stack deployment method. Possible values: file, string, repository or url." Enums(string, file, repository, url)
-// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
-// @param body body object true "for body documentation see the relevant /stacks/create/{type}/{method} endpoint"
-// @success 200 {object} portainer.Stack
-// @failure 400 "Invalid request"
-// @failure 500 "Server error"
-// @deprecated
-// @router /stacks [post]
-func deprecatedStackCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
-	if err != nil {
-		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
-	}
-
-	stackType, err := getStackTypeFromQueryParameter(r)
-	if err != nil {
-		return "", httperror.BadRequest("Invalid query parameter: type", err)
-	}
-
-	return fmt.Sprintf("/stacks/create/%s/%s", stackType, method), nil
 }

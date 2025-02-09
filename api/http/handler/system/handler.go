@@ -59,10 +59,6 @@ func NewHandler(bouncer security.BouncerService,
 	// Deprecated /status endpoint, will be removed in the future.
 	h.Handle("/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspectDeprecated))).Methods(http.MethodGet)
-	h.Handle("/status/version",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.versionDeprecated))).Methods(http.MethodGet)
-	h.Handle("/status/nodes",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.statusNodesCountDeprecated))).Methods(http.MethodGet)
 
 	return h
 }

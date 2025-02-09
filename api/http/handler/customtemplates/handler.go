@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 )
@@ -33,7 +32,6 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	h.Handle("/custom_templates/create/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateCreate))).Methods(http.MethodPost)
-	h.Handle("/custom_templates", middlewares.Deprecated(h, deprecatedCustomTemplateCreateUrlParser)).Methods(http.MethodPost) // Deprecated
 	h.Handle("/custom_templates",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateList))).Methods(http.MethodGet)
 	h.Handle("/custom_templates/{id}",

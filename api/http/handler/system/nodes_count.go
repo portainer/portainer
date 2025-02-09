@@ -8,8 +8,6 @@ import (
 	"github.com/portainer/portainer/api/internal/snapshot"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	"github.com/rs/zerolog/log"
 )
 
 type nodesCountResponse struct {
@@ -43,22 +41,4 @@ func (handler *Handler) systemNodesCount(w http.ResponseWriter, r *http.Request)
 	}
 
 	return response.JSON(w, &nodesCountResponse{Nodes: nodes})
-}
-
-// @id statusNodesCount
-// @summary Retrieve the count of nodes
-// @deprecated
-// @description Deprecated: use the `/system/nodes` endpoint instead.
-// @description **Access policy**: authenticated
-// @security ApiKeyAuth
-// @security jwt
-// @tags status
-// @produce json
-// @success 200 {object} nodesCountResponse "Success"
-// @failure 500 "Server error"
-// @router /status/nodes [get]
-func (handler *Handler) statusNodesCountDeprecated(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	log.Warn().Msg("The /status/nodes endpoint is deprecated, please use the /system/nodes endpoint instead")
-
-	return handler.systemNodesCount(w, r)
 }

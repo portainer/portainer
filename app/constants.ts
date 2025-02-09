@@ -5,7 +5,6 @@ export const API_ENDPOINT_CUSTOM_TEMPLATES = 'api/custom_templates';
 export const API_ENDPOINT_EDGE_GROUPS = 'api/edge_groups';
 export const API_ENDPOINT_EDGE_JOBS = 'api/edge_jobs';
 export const API_ENDPOINT_EDGE_STACKS = 'api/edge_stacks';
-export const API_ENDPOINT_EDGE_TEMPLATES = 'api/edge_templates';
 export const API_ENDPOINT_ENDPOINTS = 'api/endpoints';
 export const API_ENDPOINT_ENDPOINT_GROUPS = 'api/endpoint_groups';
 export const API_ENDPOINT_KUBERNETES = 'api/kubernetes';

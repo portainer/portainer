@@ -6,7 +6,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -30,8 +29,6 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 
 	h.Handle("/edge_jobs",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobList)))).Methods(http.MethodGet)
-	h.Handle("/edge_jobs",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(middlewares.Deprecated(h, deprecatedEdgeJobCreateUrlParser)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/create/{method}",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/{id}",

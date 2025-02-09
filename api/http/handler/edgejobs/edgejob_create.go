@@ -271,26 +271,3 @@ func (handler *Handler) addAndPersistEdgeJob(tx dataservices.DataStoreTx, edgeJo
 
 	return tx.EdgeJob().CreateWithID(edgeJob.ID, edgeJob)
 }
-
-// @id EdgeJobCreate
-// @summary Create an EdgeJob
-// @description **Access policy**: administrator
-// @tags edge_jobs
-// @security ApiKeyAuth
-// @security jwt
-// @produce json
-// @param method query string true "Creation Method" Enums(file, string)
-// @param body body object true "for body documentation see the relevant /edge_jobs/create/{method} endpoint"
-// @success 200 {object} portainer.EdgeGroup
-// @failure 503 "Edge compute features are disabled"
-// @failure 500
-// @deprecated
-// @router /edge_jobs [post]
-func deprecatedEdgeJobCreateUrlParser(w http.ResponseWriter, r *http.Request) (string, *httperror.HandlerError) {
-	method, err := request.RetrieveQueryParameter(r, "method", false)
-	if err != nil {
-		return "", httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
-	}
-
-	return "/edge_jobs/create/" + method, nil
-}
