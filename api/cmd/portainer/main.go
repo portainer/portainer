@@ -238,10 +238,10 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		return err
 	}
 
-	settings.SnapshotInterval = *cmp.Or(flags.SnapshotInterval, &settings.SnapshotInterval)
-	settings.LogoURL = *cmp.Or(flags.Logo, &settings.LogoURL)
-	settings.EnableEdgeComputeFeatures = *cmp.Or(flags.EnableEdgeComputeFeatures, &settings.EnableEdgeComputeFeatures)
-	settings.TemplatesURL = *cmp.Or(flags.Templates, &settings.TemplatesURL)
+	settings.SnapshotInterval = cmp.Or(*flags.SnapshotInterval, settings.SnapshotInterval)
+	settings.LogoURL = cmp.Or(*flags.Logo, settings.LogoURL)
+	settings.EnableEdgeComputeFeatures = cmp.Or(*flags.EnableEdgeComputeFeatures, settings.EnableEdgeComputeFeatures)
+	settings.TemplatesURL = cmp.Or(*flags.Templates, settings.TemplatesURL)
 
 	if *flags.Labels != nil {
 		settings.BlackListedLabels = *flags.Labels
