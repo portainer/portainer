@@ -6,6 +6,7 @@ import {
   EnvironmentSecuritySettings,
   EnvironmentStatus,
   EnvironmentGroupId,
+  PlatformType,
 } from '@/react/portainer/environments/types';
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
@@ -45,6 +46,7 @@ export interface BaseEnvironmentsQueryParams {
   agentVersions?: string[];
   updateInformation?: boolean;
   edgeCheckInPassedSeconds?: number;
+  platformTypes?: PlatformType[];
 }
 
 export type EnvironmentsQueryParams = BaseEnvironmentsQueryParams &

@@ -209,6 +209,7 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
     { value: PlatformType.Docker, label: 'Docker' },
     { value: PlatformType.Azure, label: 'Azure' },
     { value: PlatformType.Kubernetes, label: 'Kubernetes' },
+    { value: PlatformType.Podman, label: 'Podman' },
   ];
 
   if (connectionTypes.length === 0) {
@@ -216,15 +217,25 @@ function getPlatformTypeOptions(connectionTypes: ConnectionType[]) {
   }
 
   const connectionTypePlatformType = {
-    [ConnectionType.API]: [PlatformType.Docker, PlatformType.Azure],
-    [ConnectionType.Agent]: [PlatformType.Docker, PlatformType.Kubernetes],
+    [ConnectionType.API]: [
+      PlatformType.Docker,
+      PlatformType.Azure,
+      PlatformType.Podman,
+    ],
+    [ConnectionType.Agent]: [
+      PlatformType.Docker,
+      PlatformType.Kubernetes,
+      PlatformType.Podman,
+    ],
     [ConnectionType.EdgeAgentStandard]: [
       PlatformType.Kubernetes,
       PlatformType.Docker,
+      PlatformType.Podman,
     ],
     [ConnectionType.EdgeAgentAsync]: [
       PlatformType.Docker,
       PlatformType.Kubernetes,
+      PlatformType.Podman,
     ],
   };
 

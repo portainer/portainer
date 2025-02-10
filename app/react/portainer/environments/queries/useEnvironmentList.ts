@@ -1,8 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { withError } from '@/react-tools/react-query';
+import {
+  PlatformType,
+  EnvironmentStatus,
+} from '@/react/portainer/environments/types';
 
-import { EnvironmentStatus } from '../types';
 import {
   EnvironmentsQueryParams,
   getEnvironments,
@@ -97,6 +100,30 @@ export function useEnvironmentList(
       ...withError('Failure retrieving environments'),
     }
   );
+
+  if (data?.value && query && query.platformTypes) {
+    const platforms = Array.from(query.platformTypes);
+
+    if (
+      platforms.includes(PlatformType.Podman) !==
+      platforms.includes(PlatformType.Docker)
+    ) {
+      const isPodmanSelected = platforms.includes(PlatformType.Podman);
+      const containerEngineToExclude = isPodmanSelected ? 'docker' : 'podman';
+
+      const filteredList = data?.value.filter(
+        (env) => env.ContainerEngine !== containerEngineToExclude
+      );
+
+      return {
+        isLoading,
+        environments: filteredList,
+        totalCount: data ? data.totalCount : 0,
+        totalAvailable: data ? data.totalAvailable : 0,
+        updateAvailable: data ? data.updateAvailable : false,
+      };
+    }
+  }
 
   return {
     isLoading,
