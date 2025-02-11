@@ -3,8 +3,8 @@ package client
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
-	"maps"
 	"net/http"
 	"strings"
 	"time"
@@ -141,7 +141,6 @@ func createAgentClient(endpoint *portainer.Endpoint, endpointURL string, signatu
 
 type NodeNameTransport struct {
 	*http.Transport
-	nodeNames map[string]string
 }
 
 func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -176,16 +175,17 @@ func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error)
 		return resp, nil
 	}
 
-	t.nodeNames = make(map[string]string)
-	for _, r := range rs {
-		t.nodeNames[r.ID] = r.Portainer.Agent.NodeName
+	nodeNames, ok := req.Context().Value("nodeNames").(map[string]string)
+	if ok {
+		for idx, r := range rs {
+			// as there is no way to differentiate the same image available in multiple nodes only by their ID
+			// we append the index of the image in the payload response to match the node name later
+			// from the image.Summary[] list returned by docker's client.ImageList()
+			nodeNames[fmt.Sprintf("%s-%d", r.ID, idx)] = r.Portainer.Agent.NodeName
+		}
 	}
 
 	return resp, err
-}
-
-func (t *NodeNameTransport) NodeNames() map[string]string {
-	return maps.Clone(t.nodeNames)
 }
 
 func httpClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*http.Client, error) {
