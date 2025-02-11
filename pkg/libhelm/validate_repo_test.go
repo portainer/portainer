@@ -26,7 +26,7 @@ func Test_ValidateHelmRepositoryURL(t *testing.T) {
 		{"not helm repo", "http://google.com", true},
 		{"not valid repo with trailing slash", "http://google.com/", true},
 		{"not valid repo with trailing slashes", "http://google.com////", true},
-		{"bitnami helm repo", "https://charts.bitnami.com/bitnami/", false},
+		{"ingress helm repo", "https://kubernetes.github.io/ingress-nginx/", false},
 		{"gitlap helm repo", "https://charts.gitlab.io/", false},
 		{"portainer helm repo", "https://portainer.github.io/k8s/", false},
 		{"elastic helm repo", "https://helm.elastic.co/", false},

@@ -588,7 +588,7 @@ type (
 		// User identifier
 		UserID UserID `json:"UserId" example:"1"`
 		// Helm repository URL
-		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
+		URL string `json:"URL" example:"https://kubernetes.github.io/ingress-nginx"`
 	}
 
 	// QuayRegistryData represents data required for Quay registry to work
@@ -984,8 +984,8 @@ type (
 		KubeconfigExpiry string `json:"KubeconfigExpiry" example:"24h"`
 		// Whether telemetry is enabled
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
-		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
-		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
+		// Helm repository URL, defaults to ""
+		HelmRepositoryURL string `json:"HelmRepositoryURL"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
 		// TrustOnFirstConnect makes Portainer accepting edge agent connection by default
@@ -1672,8 +1672,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/v3/templates.json"
-	// DefaultHelmrepositoryURL represents the URL to the official templates supported by Bitnami
-	DefaultHelmRepositoryURL = "https://charts.bitnami.com/bitnami"
+	// DefaultHelmrepositoryURL set to empty string until oci support is added
+	DefaultHelmRepositoryURL = ""
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultUserSessionTimeout = "8h"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared

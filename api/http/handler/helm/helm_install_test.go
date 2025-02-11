@@ -45,7 +45,7 @@ func Test_helmInstall(t *testing.T) {
 	is.NotNil(h, "Handler should not fail")
 
 	// Install a single chart.  We expect to get these values back
-	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default", Repo: "https://charts.bitnami.com/bitnami"}
+	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default", Repo: "https://kubernetes.github.io/ingress-nginx"}
 	optdata, err := json.Marshal(options)
 	is.NoError(err)
 

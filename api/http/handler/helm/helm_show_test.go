@@ -31,7 +31,7 @@ func Test_helmShow(t *testing.T) {
 		t.Run(cmd, func(t *testing.T) {
 			is.NotNil(h, "Handler should not fail")
 
-			repoUrlEncoded := url.QueryEscape("https://charts.bitnami.com/bitnami")
+			repoUrlEncoded := url.QueryEscape("https://kubernetes.github.io/ingress-nginx")
 			chart := "nginx"
 			req := httptest.NewRequest("GET", fmt.Sprintf("/templates/helm/%s?repo=%s&chart=%s", cmd, repoUrlEncoded, chart), nil)
 			rr := httptest.NewRecorder()

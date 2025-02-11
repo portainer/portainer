@@ -46,7 +46,7 @@ type settingsUpdatePayload struct {
 	// Whether telemetry is enabled
 	EnableTelemetry *bool `example:"false"`
 	// Helm repository URL
-	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
+	HelmRepositoryURL *string `example:"https://kubernetes.github.io/ingress-nginx"`
 	// Kubectl Shell Image
 	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
 	// TrustOnFirstConnect makes Portainer accepting edge agent connection by default

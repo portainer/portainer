@@ -22,7 +22,7 @@ func Test_SearchRepo(t *testing.T) {
 
 	tests := []testCase{
 		{"not a helm repo", "https://portainer.io", true},
-		{"bitnami helm repo", "https://charts.bitnami.com/bitnami", false},
+		{"ingress helm repo", "https://kubernetes.github.io/ingress-nginx", false},
 		{"portainer helm repo", "https://portainer.github.io/k8s/", false},
 		{"gitlap helm repo with trailing slash", "https://charts.gitlab.io/", false},
 		{"elastic helm repo with trailing slash", "https://helm.elastic.co/", false},

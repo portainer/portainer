@@ -31,10 +31,40 @@
       >Select the Helm chart to use. Bring further Helm charts into your selection list via
       <a ui-sref="portainer.account({'#': 'helm-repositories'})">User settings - Helm repositories</a>.</div
     >
-    <beta-alert
-      is-html="true"
-      message="'Beta feature - so far, this functionality has been tested in limited scenarios. For more information, see this <a href=\'https://www.portainer.io/blog/portainer-now-with-helm-support\' target=\'_blank\' class=\'hyperlink\'>blog post on Portainer Helm support</a>.'"
-    ></beta-alert>
+    <div class="w-full">
+      <div class="small text-muted mb-2"
+        >Select the Helm chart to use. Bring further Helm charts into your selection list via
+        <a ui-sref="portainer.account({'#': 'helm-repositories'})">User settings - Helm repositories</a>.</div
+      >
+      <div class="relative flex w-fit gap-1 rounded-lg bg-gray-modern-3 p-4 text-sm th-highcontrast:bg-legacy-grey-3 th-dark:bg-legacy-grey-3 mt-2">
+        <div class="mt-0.5 shrink-0">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-lightbulb h-4 text-warning-7 th-highcontrast:text-warning-6 th-dark:text-warning-6"
+          >
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+            <path d="M9 18h6"></path>
+            <path d="M10 22h4"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="align-middle text-[0.9em] font-medium pr-10 mb-2">Disclaimer</p>
+          <div class="small">
+            At present Portainer does not support OCI format Helm charts. Support for OCI charts will be available in a future release.<br />
+            If you would like to provide feedback on OCI support or get access to early releases to test this functionality,
+            <a href="https://bit.ly/3WVkayl" target="_blank" rel="noopener noreferrer">please get in touch</a>.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="blocklist !px-0" role="list">

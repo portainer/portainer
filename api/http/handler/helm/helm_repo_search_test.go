@@ -20,7 +20,7 @@ func Test_helmRepoSearch(t *testing.T) {
 
 	assert.NotNil(t, h, "Handler should not fail")
 
-	repos := []string{"https://charts.bitnami.com/bitnami", "https://portainer.github.io/k8s"}
+	repos := []string{"https://kubernetes.github.io/ingress-nginx", "https://portainer.github.io/k8s"}
 
 	for _, repo := range repos {
 		t.Run(repo, func(t *testing.T) {

@@ -53,11 +53,11 @@ func Test_Install(t *testing.T) {
 	hbpm := NewHelmBinaryPackageManager(path)
 
 	t.Run("successfully installs nginx chart with name test-nginx", func(t *testing.T) {
-		// helm install test-nginx --repo https://charts.bitnami.com/bitnami nginx
+		// helm install test-nginx --repo https://kubernetes.github.io/ingress-nginx nginx
 		installOpts := options.InstallOptions{
 			Name:  "test-nginx",
 			Chart: "nginx",
-			Repo:  "https://charts.bitnami.com/bitnami",
+			Repo:  "https://kubernetes.github.io/ingress-nginx",
 		}
 
 		release, err := hbpm.Install(installOpts)
@@ -67,10 +67,10 @@ func Test_Install(t *testing.T) {
 	})
 
 	t.Run("successfully installs nginx chart with generated name", func(t *testing.T) {
-		// helm install --generate-name --repo https://charts.bitnami.com/bitnami nginx
+		// helm install --generate-name --repo https://kubernetes.github.io/ingress-nginx nginx
 		installOpts := options.InstallOptions{
 			Chart: "nginx",
-			Repo:  "https://charts.bitnami.com/bitnami",
+			Repo:  "https://kubernetes.github.io/ingress-nginx",
 		}
 		release, err := hbpm.Install(installOpts)
 		defer hbpm.run("uninstall", []string{release.Name}, nil)
@@ -79,7 +79,7 @@ func Test_Install(t *testing.T) {
 	})
 
 	t.Run("successfully installs nginx with values", func(t *testing.T) {
-		// helm install test-nginx-2 --repo https://charts.bitnami.com/bitnami nginx --values /tmp/helm-values3161785816
+		// helm install test-nginx-2 --repo https://kubernetes.github.io/ingress-nginx nginx --values /tmp/helm-values3161785816
 		values, err := createValuesFile("service:\n  port:  8081")
 		is.NoError(err, "should create a values file")
 
@@ -88,7 +88,7 @@ func Test_Install(t *testing.T) {
 		installOpts := options.InstallOptions{
 			Name:       "test-nginx-2",
 			Chart:      "nginx",
-			Repo:       "https://charts.bitnami.com/bitnami",
+			Repo:       "https://kubernetes.github.io/ingress-nginx",
 			ValuesFile: values,
 		}
 		release, err := hbpm.Install(installOpts)

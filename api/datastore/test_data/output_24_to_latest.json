@@ -605,7 +605,7 @@
     "GlobalDeploymentOptions": {
       "hideStacksFunctionality": false
     },
-    "HelmRepositoryURL": "https://charts.bitnami.com/bitnami",
+    "HelmRepositoryURL": "",
     "InternalAuthSettings": {
       "RequiredPasswordLength": 12
     },
