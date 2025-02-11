@@ -14,6 +14,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var (
+	ErrNoLocalEnvironment = errors.New("No local environment was detected")
+)
+
 type Service interface {
 	GetLocalEnvironment() (*portainer.Endpoint, error)
 	GetPlatform() (ContainerPlatform, error)
@@ -35,7 +39,7 @@ func (service *service) loadEnvAndPlatform() error {
 		return nil
 	}
 
-	environment, platform, err := guessLocalEnvironment(service.dataStore)
+	environment, platform, err := detectLocalEnvironment(service.dataStore)
 	if err != nil {
 		return err
 	}
@@ -73,7 +77,7 @@ var platformToEndpointType = map[ContainerPlatform][]portainer.EndpointType{
 	PlatformKubernetes: {portainer.KubernetesLocalEnvironment},
 }
 
-func guessLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoint, ContainerPlatform, error) {
+func detectLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoint, ContainerPlatform, error) {
 	platform := DetermineContainerPlatform()
 
 	if !slices.Contains([]ContainerPlatform{PlatformDocker, PlatformKubernetes}, platform) {
@@ -113,7 +117,7 @@ func guessLocalEnvironment(dataStore dataservices.DataStore) (*portainer.Endpoin
 		}
 	}
 
-	return nil, "", errors.New("failed to find local environment")
+	return nil, "", ErrNoLocalEnvironment
 }
 
 func checkDockerEnvTypeForUpgrade(environment *portainer.Endpoint) ContainerPlatform {

@@ -3,6 +3,7 @@ package system
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	plf "github.com/portainer/portainer/api/platform"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -46,7 +47,12 @@ func (handler *Handler) systemInfo(w http.ResponseWriter, r *http.Request) *http
 
 	platform, err := handler.platformService.GetPlatform()
 	if err != nil {
-		return httperror.InternalServerError("Failed to get platform", err)
+		if !errors.Is(err, plf.ErrNoLocalEnvironment) {
+			return httperror.InternalServerError("Failed to get platform", err)
+		}
+		// If no local environment is detected, we assume the platform is Docker
+		// UI will stop showing the upgrade banner
+		platform = plf.PlatformDocker
 	}
 
 	return response.JSON(w, &systemInfoResponse{

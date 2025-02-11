@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"regexp"
 
+	ceplf "github.com/portainer/portainer/api/platform"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -45,6 +46,9 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 
 	environment, err := handler.platformService.GetLocalEnvironment()
 	if err != nil {
+		if errors.Is(err, ceplf.ErrNoLocalEnvironment) {
+			return httperror.NotFound("The system upgrade feature is disabled because no local environment was detected.", err)
+		}
 		return httperror.InternalServerError("Failed to get local environment", err)
 	}
 
@@ -53,8 +57,7 @@ func (handler *Handler) systemUpgrade(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("Failed to get platform", err)
 	}
 
-	err = handler.upgradeService.Upgrade(platform, environment, payload.License)
-	if err != nil {
+	if err := handler.upgradeService.Upgrade(platform, environment, payload.License); err != nil {
 		return httperror.InternalServerError("Failed to upgrade Portainer", err)
 	}
 
