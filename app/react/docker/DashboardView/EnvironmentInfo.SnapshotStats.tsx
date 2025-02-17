@@ -23,7 +23,7 @@ export function SnapshotStats({
       </span>
       <span className="flex gap-1 items-center">
         <Icon icon={memoryIcon} />
-        {humanize(snapshot.TotalMemory)}
+        {humanize(snapshot.TotalMemory, 0, 2)}
       </span>
     </span>
   );

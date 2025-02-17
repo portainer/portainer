@@ -23,7 +23,7 @@
             </tr>
             <tr>
               <td>Total memory</td>
-              <td>{{ $ctrl.host.totalMemory | humansize }}</td>
+              <td>{{ $ctrl.host.totalMemory | humansize:0:2 }}</td>
             </tr>
             <tr ng-if="$ctrl.isBrowseEnabled">
               <td colspan="2">

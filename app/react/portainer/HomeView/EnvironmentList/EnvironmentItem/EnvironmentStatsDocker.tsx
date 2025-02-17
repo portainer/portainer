@@ -57,7 +57,7 @@ export function EnvironmentStatsDocker({ snapshot }: Props) {
 
       <StatsItem
         icon={Memory}
-        value={`${humanize(snapshot.TotalMemory)} RAM`}
+        value={`${humanize(snapshot.TotalMemory, 0, 2)} RAM`}
       />
 
       {snapshot.Swarm && (
