@@ -95,6 +95,8 @@ body:
       description: We only provide support for current versions of Portainer as per the lifecycle policy linked above. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
       multiple: false
       options:
+        - '2.27.1'
+        - '2.27.0'
         - '2.26.1'
         - '2.26.0'
         - '2.25.1'
