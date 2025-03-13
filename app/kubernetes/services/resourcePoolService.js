@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import { getNamespaces } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 /* @ngInject */
 export function KubernetesResourcePoolService(
@@ -11,7 +12,8 @@ export function KubernetesResourcePoolService(
   KubernetesNamespaceService,
   KubernetesResourceQuotaService,
   KubernetesIngressService,
-  KubernetesPortainerNamespaces
+  KubernetesPortainerNamespaces,
+  EndpointProvider
 ) {
   return {
     get,
@@ -37,9 +39,14 @@ export function KubernetesResourcePoolService(
 
   // getting the quota for all namespaces is costly by default, so disable getting it by default
   async function getAll({ getQuota = false }) {
-    const namespaces = await KubernetesNamespaceService.get();
+    const namespaces = await getNamespaces(EndpointProvider.endpointID());
+    // there is a lot of downstream logic using the angular namespace type with a '.Status' field (not '.Status.phase'), so format the status here to match this logic
+    const namespacesFormattedStatus = namespaces.map((namespace) => ({
+      ...namespace,
+      Status: namespace.Status.phase,
+    }));
     const pools = await Promise.all(
-      _.map(namespaces, async (namespace) => {
+      _.map(namespacesFormattedStatus, async (namespace) => {
         const name = namespace.Name;
         const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
         if (getQuota) {

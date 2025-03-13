@@ -6,13 +6,13 @@ import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { isTemplateVariablesEnabled, renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { getDeploymentOptions } from '@/react/portainer/environments/environment.service';
-import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
-import { editor, git, customTemplate, url, helm } from '@@/BoxSelector/common-options/build-methods';
 import { parseAutoUpdateResponse, transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
 import { baseStackWebhookUrl, createWebhookId } from '@/portainer/helpers/webhookHelper';
-import { confirmWebEditorDiscard } from '@@/modals/confirm';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { KUBE_STACK_NAME_VALIDATION_REGEX } from '@/react/kubernetes/DeployView/StackName/constants';
+import { confirmWebEditorDiscard } from '@@/modals/confirm';
+import { editor, git, customTemplate, url, helm } from '@@/BoxSelector/common-options/build-methods';
+import { kubernetes } from '@@/BoxSelector/common-options/deployment-methods';
 
 class KubernetesDeployController {
   /* @ngInject */
