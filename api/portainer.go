@@ -1544,7 +1544,7 @@ type (
 		GetConfigMaps(namespace string) ([]models.K8sConfigMap, error)
 		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
-		GetApplications(namespace, nodename string, withDependencies bool) ([]models.K8sApplication, error)
+		GetApplications(namespace, nodename string) ([]models.K8sApplication, error)
 		GetMetrics() (models.K8sMetrics, error)
 		GetStorage() ([]KubernetesStorageClassConfig, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo, owner string) error

@@ -10,7 +10,6 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // GetRoles gets all the roles for either at the cluster level or a given namespace in a k8s endpoint.
@@ -137,7 +136,7 @@ func (kcl *KubeClient) DeleteRoles(reqs models.K8sRoleDeleteRequests) error {
 		for _, name := range reqs[namespace] {
 			client := kcl.cli.RbacV1().Roles(namespace)
 
-			role, err := client.Get(context.Background(), name, v1.GetOptions{})
+			role, err := client.Get(context.Background(), name, metav1.GetOptions{})
 			if err != nil {
 				if k8serrors.IsNotFound(err) {
 					continue

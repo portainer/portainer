@@ -33,7 +33,7 @@ export function isExternalApplication(application: Application) {
 
 function getDeploymentRunningPods(deployment: Deployment): number {
   const availableReplicas = deployment.status?.availableReplicas ?? 0;
-  const totalReplicas = deployment.status?.replicas ?? 0;
+  const totalReplicas = deployment.spec?.replicas ?? 0;
   const unavailableReplicas = deployment.status?.unavailableReplicas ?? 0;
   return availableReplicas || totalReplicas - unavailableReplicas;
 }

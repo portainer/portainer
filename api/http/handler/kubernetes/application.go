@@ -69,7 +69,6 @@ func (handler *Handler) getApplicationsResources(w http.ResponseWriter, r *http.
 // @param id path int true "Environment(Endpoint) identifier"
 // @param namespace query string true "Namespace name"
 // @param nodeName query string true "Node name"
-// @param withDependencies query boolean false "Include dependencies in the response"
 // @success 200 {array} models.K8sApplication "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
@@ -117,12 +116,6 @@ func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.
 		return nil, httperror.BadRequest("Unable to parse the namespace query parameter", err)
 	}
 
-	withDependencies, err := request.RetrieveBooleanQueryParameter(r, "withDependencies", true)
-	if err != nil {
-		log.Error().Err(err).Str("context", "getAllKubernetesApplications").Msg("Unable to parse the withDependencies query parameter")
-		return nil, httperror.BadRequest("Unable to parse the withDependencies query parameter", err)
-	}
-
 	nodeName, err := request.RetrieveQueryParameter(r, "nodeName", true)
 	if err != nil {
 		log.Error().Err(err).Str("context", "getAllKubernetesApplications").Msg("Unable to parse the nodeName query parameter")
@@ -135,7 +128,7 @@ func (handler *Handler) getAllKubernetesApplications(r *http.Request) ([]models.
 		return nil, httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
 	}
 
-	applications, err := cli.GetApplications(namespace, nodeName, withDependencies)
+	applications, err := cli.GetApplications(namespace, nodeName)
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) {
 			log.Error().Err(err).Str("context", "getAllKubernetesApplications").Str("namespace", namespace).Str("nodeName", nodeName).Msg("Unable to get the list of applications")

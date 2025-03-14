@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/models/kubernetes"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/internal/errorlist"
 	corev1 "k8s.io/api/core/v1"
@@ -92,7 +91,7 @@ func (kcl *KubeClient) isSystemServiceAccount(namespace string) bool {
 
 // DeleteServices processes a K8sServiceDeleteRequest by deleting each service
 // in its given namespace.
-func (kcl *KubeClient) DeleteServiceAccounts(reqs kubernetes.K8sServiceAccountDeleteRequests) error {
+func (kcl *KubeClient) DeleteServiceAccounts(reqs models.K8sServiceAccountDeleteRequests) error {
 	var errors []error
 	for namespace := range reqs {
 		for _, serviceName := range reqs[namespace] {

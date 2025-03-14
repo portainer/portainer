@@ -7,7 +7,6 @@ import (
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/rs/zerolog/log"
 	appsv1 "k8s.io/api/apps/v1"
-	autoscalingv2 "k8s.io/api/autoscaling/v2"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -265,7 +264,12 @@ func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8s
 			if pod.Spec.Volumes != nil {
 				for _, podVolume := range pod.Spec.Volumes {
 					if podVolume.VolumeSource.PersistentVolumeClaim != nil && podVolume.VolumeSource.PersistentVolumeClaim.ClaimName == volume.PersistentVolumeClaim.Name && pod.Namespace == volume.PersistentVolumeClaim.Namespace {
-						application, err := kcl.ConvertPodToApplication(pod, replicaSetItems, deploymentItems, statefulSetItems, daemonSetItems, []corev1.Service{}, []autoscalingv2.HorizontalPodAutoscaler{}, false)
+						application, err := kcl.ConvertPodToApplication(pod, PortainerApplicationResources{
+							ReplicaSets:  replicaSetItems,
+							Deployments:  deploymentItems,
+							StatefulSets: statefulSetItems,
+							DaemonSets:   daemonSetItems,
+						}, false)
 						if err != nil {
 							log.Error().Err(err).Msg("Failed to convert pod to application")
 							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)

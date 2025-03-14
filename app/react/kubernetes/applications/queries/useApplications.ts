@@ -11,7 +11,6 @@ import { queryKeys } from './query-keys';
 type GetAppsParams = {
   namespace?: string;
   nodeName?: string;
-  withDependencies?: boolean;
 };
 
 type GetAppsQueryOptions = {

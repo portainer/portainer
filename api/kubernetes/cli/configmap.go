@@ -24,7 +24,7 @@ func (kcl *KubeClient) GetConfigMaps(namespace string) ([]models.K8sConfigMap, e
 // fetchConfigMapsForNonAdmin fetches the configMaps in the namespaces the user has access to.
 // This function is called when the user is not an admin.
 func (kcl *KubeClient) fetchConfigMapsForNonAdmin(namespace string) ([]models.K8sConfigMap, error) {
-	log.Debug().Msgf("Fetching volumes for non-admin user: %v", kcl.NonAdminNamespaces)
+	log.Debug().Msgf("Fetching configMaps for non-admin user: %v", kcl.NonAdminNamespaces)
 
 	if len(kcl.NonAdminNamespaces) == 0 {
 		return nil, nil
@@ -102,7 +102,7 @@ func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfig
 func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8sConfigMap) ([]models.K8sConfigMap, error) {
 	updatedConfigMaps := make([]models.K8sConfigMap, len(configMaps))
 
-	pods, replicaSets, _, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
+	portainerApplicationResources, err := kcl.fetchAllApplicationsListResources("", metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred during the CombineConfigMapsWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 	}
@@ -110,7 +110,7 @@ func (kcl *KubeClient) CombineConfigMapsWithApplications(configMaps []models.K8s
 	for index, configMap := range configMaps {
 		updatedConfigMap := configMap
 
-		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromConfigMap(configMap, pods, replicaSets)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromConfigMap(configMap, portainerApplicationResources.Pods, portainerApplicationResources.ReplicaSets)
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineConfigMapsWithApplications operation, unable to get applications from config map. Error: %w", err)
 		}

@@ -12,45 +12,58 @@ import (
 	labels "k8s.io/apimachinery/pkg/labels"
 )
 
+// PortainerApplicationResources contains collections of various Kubernetes resources
+// associated with a Portainer application.
+type PortainerApplicationResources struct {
+	Pods                     []corev1.Pod
+	ReplicaSets              []appsv1.ReplicaSet
+	Deployments              []appsv1.Deployment
+	StatefulSets             []appsv1.StatefulSet
+	DaemonSets               []appsv1.DaemonSet
+	Services                 []corev1.Service
+	HorizontalPodAutoscalers []autoscalingv2.HorizontalPodAutoscaler
+}
+
 // GetAllKubernetesApplications gets a list of kubernetes workloads (or applications) across all namespaces in the cluster
 // if the user is an admin, all namespaces in the current k8s environment(endpoint) are fetched using the fetchApplications function.
 // otherwise, namespaces the non-admin user has access to will be used to filter the applications based on the allowed namespaces.
-func (kcl *KubeClient) GetApplications(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
+func (kcl *KubeClient) GetApplications(namespace, nodeName string) ([]models.K8sApplication, error) {
 	if kcl.IsKubeAdmin {
-		return kcl.fetchApplications(namespace, nodeName, withDependencies)
+		return kcl.fetchApplications(namespace, nodeName)
 	}
 
-	return kcl.fetchApplicationsForNonAdmin(namespace, nodeName, withDependencies)
+	return kcl.fetchApplicationsForNonAdmin(namespace, nodeName)
 }
 
 // fetchApplications fetches the applications in the namespaces the user has access to.
 // This function is called when the user is an admin.
-func (kcl *KubeClient) fetchApplications(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
+func (kcl *KubeClient) fetchApplications(namespace, nodeName string) ([]models.K8sApplication, error) {
 	podListOptions := metav1.ListOptions{}
 	if nodeName != "" {
 		podListOptions.FieldSelector = "spec.nodeName=" + nodeName
 	}
-	if !withDependencies {
-		// TODO: make sure not to fetch services in fetchAllApplicationsListResources from this call
-		pods, replicaSets, deployments, statefulSets, daemonSets, _, _, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
-		if err != nil {
-			return nil, err
-		}
 
-		return kcl.convertPodsToApplications(pods, replicaSets, deployments, statefulSets, daemonSets, nil, nil)
-	}
-
-	pods, replicaSets, deployments, statefulSets, daemonSets, services, hpas, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
+	portainerApplicationResources, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	return kcl.convertPodsToApplications(pods, replicaSets, deployments, statefulSets, daemonSets, services, hpas)
+	applications, err := kcl.convertPodsToApplications(portainerApplicationResources)
+	if err != nil {
+		return nil, err
+	}
+
+	unhealthyApplications, err := fetchUnhealthyApplications(portainerApplicationResources)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(applications, unhealthyApplications...), nil
 }
 
 // fetchApplicationsForNonAdmin fetches the applications in the namespaces the user has access to.
 // This function is called when the user is not an admin.
-func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string, withDependencies bool) ([]models.K8sApplication, error) {
+func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string) ([]models.K8sApplication, error) {
 	log.Debug().Msgf("Fetching applications for non-admin user: %v", kcl.NonAdminNamespaces)
 
 	if len(kcl.NonAdminNamespaces) == 0 {
@@ -62,28 +75,24 @@ func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string, 
 		podListOptions.FieldSelector = "spec.nodeName=" + nodeName
 	}
 
-	if !withDependencies {
-		pods, replicaSets, _, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets(namespace, podListOptions)
-		if err != nil {
-			return nil, err
-		}
-
-		return kcl.convertPodsToApplications(pods, replicaSets, nil, nil, nil, nil, nil)
-	}
-
-	pods, replicaSets, deployments, statefulSets, daemonSets, services, hpas, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
+	portainerApplicationResources, err := kcl.fetchAllApplicationsListResources(namespace, podListOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	applications, err := kcl.convertPodsToApplications(pods, replicaSets, deployments, statefulSets, daemonSets, services, hpas)
+	applications, err := kcl.convertPodsToApplications(portainerApplicationResources)
+	if err != nil {
+		return nil, err
+	}
+
+	unhealthyApplications, err := fetchUnhealthyApplications(portainerApplicationResources)
 	if err != nil {
 		return nil, err
 	}
 
 	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sApplication, 0)
-	for _, application := range applications {
+	for _, application := range append(applications, unhealthyApplications...) {
 		if _, ok := nonAdminNamespaceSet[application.ResourcePool]; ok {
 			results = append(results, application)
 		}
@@ -93,11 +102,11 @@ func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string, 
 }
 
 // convertPodsToApplications processes pods and converts them to applications, ensuring uniqueness by owner reference.
-func (kcl *KubeClient) convertPodsToApplications(pods []corev1.Pod, replicaSets []appsv1.ReplicaSet, deployments []appsv1.Deployment, statefulSets []appsv1.StatefulSet, daemonSets []appsv1.DaemonSet, services []corev1.Service, hpas []autoscalingv2.HorizontalPodAutoscaler) ([]models.K8sApplication, error) {
+func (kcl *KubeClient) convertPodsToApplications(portainerApplicationResources PortainerApplicationResources) ([]models.K8sApplication, error) {
 	applications := []models.K8sApplication{}
 	processedOwners := make(map[string]struct{})
 
-	for _, pod := range pods {
+	for _, pod := range portainerApplicationResources.Pods {
 		if len(pod.OwnerReferences) > 0 {
 			ownerUID := string(pod.OwnerReferences[0].UID)
 			if _, exists := processedOwners[ownerUID]; exists {
@@ -106,7 +115,7 @@ func (kcl *KubeClient) convertPodsToApplications(pods []corev1.Pod, replicaSets 
 			processedOwners[ownerUID] = struct{}{}
 		}
 
-		application, err := kcl.ConvertPodToApplication(pod, replicaSets, deployments, statefulSets, daemonSets, services, hpas, true)
+		application, err := kcl.ConvertPodToApplication(pod, portainerApplicationResources, true)
 		if err != nil {
 			return nil, err
 		}
@@ -151,7 +160,9 @@ func (kcl *KubeClient) GetApplicationNamesFromConfigMap(configMap models.K8sConf
 	for _, pod := range pods {
 		if pod.Namespace == configMap.Namespace {
 			if isPodUsingConfigMap(&pod, configMap.Name) {
-				application, err := kcl.ConvertPodToApplication(pod, replicaSets, nil, nil, nil, nil, nil, false)
+				application, err := kcl.ConvertPodToApplication(pod, PortainerApplicationResources{
+					ReplicaSets: replicaSets,
+				}, false)
 				if err != nil {
 					return nil, err
 				}
@@ -168,7 +179,9 @@ func (kcl *KubeClient) GetApplicationNamesFromSecret(secret models.K8sSecret, po
 	for _, pod := range pods {
 		if pod.Namespace == secret.Namespace {
 			if isPodUsingSecret(&pod, secret.Name) {
-				application, err := kcl.ConvertPodToApplication(pod, replicaSets, nil, nil, nil, nil, nil, false)
+				application, err := kcl.ConvertPodToApplication(pod, PortainerApplicationResources{
+					ReplicaSets: replicaSets,
+				}, false)
 				if err != nil {
 					return nil, err
 				}
@@ -181,12 +194,12 @@ func (kcl *KubeClient) GetApplicationNamesFromSecret(secret models.K8sSecret, po
 }
 
 // ConvertPodToApplication converts a pod to an application, updating owner references if necessary
-func (kcl *KubeClient) ConvertPodToApplication(pod corev1.Pod, replicaSets []appsv1.ReplicaSet, deployments []appsv1.Deployment, statefulSets []appsv1.StatefulSet, daemonSets []appsv1.DaemonSet, services []corev1.Service, hpas []autoscalingv2.HorizontalPodAutoscaler, withResource bool) (*models.K8sApplication, error) {
+func (kcl *KubeClient) ConvertPodToApplication(pod corev1.Pod, portainerApplicationResources PortainerApplicationResources, withResource bool) (*models.K8sApplication, error) {
 	if isReplicaSetOwner(pod) {
-		updateOwnerReferenceToDeployment(&pod, replicaSets)
+		updateOwnerReferenceToDeployment(&pod, portainerApplicationResources.ReplicaSets)
 	}
 
-	application := createApplication(&pod, deployments, statefulSets, daemonSets, services, hpas)
+	application := createApplicationFromPod(&pod, portainerApplicationResources)
 	if application.ID == "" && application.Name == "" {
 		return nil, nil
 	}
@@ -203,9 +216,9 @@ func (kcl *KubeClient) ConvertPodToApplication(pod corev1.Pod, replicaSets []app
 	return &application, nil
 }
 
-// createApplication creates a K8sApplication object from a pod
+// createApplicationFromPod creates a K8sApplication object from a pod
 // it sets the application name, namespace, kind, image, stack id, stack name, and labels
-func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefulSets []appsv1.StatefulSet, daemonSets []appsv1.DaemonSet, services []corev1.Service, hpas []autoscalingv2.HorizontalPodAutoscaler) models.K8sApplication {
+func createApplicationFromPod(pod *corev1.Pod, portainerApplicationResources PortainerApplicationResources) models.K8sApplication {
 	kind := "Pod"
 	name := pod.Name
 
@@ -221,118 +234,170 @@ func createApplication(pod *corev1.Pod, deployments []appsv1.Deployment, statefu
 
 	switch kind {
 	case "Deployment":
-		for _, deployment := range deployments {
+		for _, deployment := range portainerApplicationResources.Deployments {
 			if deployment.Name == name && deployment.Namespace == pod.Namespace {
-				application.ApplicationType = "Deployment"
-				application.Kind = "Deployment"
-				application.ID = string(deployment.UID)
-				application.ResourcePool = deployment.Namespace
-				application.Name = name
-				application.Image = deployment.Spec.Template.Spec.Containers[0].Image
-				application.ApplicationOwner = deployment.Labels["io.portainer.kubernetes.application.owner"]
-				application.StackID = deployment.Labels["io.portainer.kubernetes.application.stackid"]
-				application.StackName = deployment.Labels["io.portainer.kubernetes.application.stack"]
-				application.Labels = deployment.Labels
-				application.MatchLabels = deployment.Spec.Selector.MatchLabels
-				application.CreationDate = deployment.CreationTimestamp.Time
-				application.TotalPodsCount = int(deployment.Status.Replicas)
-				application.RunningPodsCount = int(deployment.Status.ReadyReplicas)
-				application.DeploymentType = "Replicated"
-				application.Metadata = &models.Metadata{
-					Labels: deployment.Labels,
-				}
-
+				populateApplicationFromDeployment(&application, deployment)
 				break
 			}
 		}
-
 	case "StatefulSet":
-		for _, statefulSet := range statefulSets {
+		for _, statefulSet := range portainerApplicationResources.StatefulSets {
 			if statefulSet.Name == name && statefulSet.Namespace == pod.Namespace {
-				application.Kind = "StatefulSet"
-				application.ApplicationType = "StatefulSet"
-				application.ID = string(statefulSet.UID)
-				application.ResourcePool = statefulSet.Namespace
-				application.Name = name
-				application.Image = statefulSet.Spec.Template.Spec.Containers[0].Image
-				application.ApplicationOwner = statefulSet.Labels["io.portainer.kubernetes.application.owner"]
-				application.StackID = statefulSet.Labels["io.portainer.kubernetes.application.stackid"]
-				application.StackName = statefulSet.Labels["io.portainer.kubernetes.application.stack"]
-				application.Labels = statefulSet.Labels
-				application.MatchLabels = statefulSet.Spec.Selector.MatchLabels
-				application.CreationDate = statefulSet.CreationTimestamp.Time
-				application.TotalPodsCount = int(statefulSet.Status.Replicas)
-				application.RunningPodsCount = int(statefulSet.Status.ReadyReplicas)
-				application.DeploymentType = "Replicated"
-				application.Metadata = &models.Metadata{
-					Labels: statefulSet.Labels,
-				}
-
+				populateApplicationFromStatefulSet(&application, statefulSet)
 				break
 			}
 		}
-
 	case "DaemonSet":
-		for _, daemonSet := range daemonSets {
+		for _, daemonSet := range portainerApplicationResources.DaemonSets {
 			if daemonSet.Name == name && daemonSet.Namespace == pod.Namespace {
-				application.Kind = "DaemonSet"
-				application.ApplicationType = "DaemonSet"
-				application.ID = string(daemonSet.UID)
-				application.ResourcePool = daemonSet.Namespace
-				application.Name = name
-				application.Image = daemonSet.Spec.Template.Spec.Containers[0].Image
-				application.ApplicationOwner = daemonSet.Labels["io.portainer.kubernetes.application.owner"]
-				application.StackID = daemonSet.Labels["io.portainer.kubernetes.application.stackid"]
-				application.StackName = daemonSet.Labels["io.portainer.kubernetes.application.stack"]
-				application.Labels = daemonSet.Labels
-				application.MatchLabels = daemonSet.Spec.Selector.MatchLabels
-				application.CreationDate = daemonSet.CreationTimestamp.Time
-				application.TotalPodsCount = int(daemonSet.Status.DesiredNumberScheduled)
-				application.RunningPodsCount = int(daemonSet.Status.NumberReady)
-				application.DeploymentType = "Global"
-				application.Metadata = &models.Metadata{
-					Labels: daemonSet.Labels,
-				}
-
+				populateApplicationFromDaemonSet(&application, daemonSet)
 				break
 			}
 		}
-
 	case "Pod":
-		runningPodsCount := 1
-		if pod.Status.Phase != corev1.PodRunning {
-			runningPodsCount = 0
-		}
-
-		application.ApplicationType = "Pod"
-		application.Kind = "Pod"
-		application.ID = string(pod.UID)
-		application.ResourcePool = pod.Namespace
-		application.Name = pod.Name
-		application.Image = pod.Spec.Containers[0].Image
-		application.ApplicationOwner = pod.Labels["io.portainer.kubernetes.application.owner"]
-		application.StackID = pod.Labels["io.portainer.kubernetes.application.stackid"]
-		application.StackName = pod.Labels["io.portainer.kubernetes.application.stack"]
-		application.Labels = pod.Labels
-		application.MatchLabels = pod.Labels
-		application.CreationDate = pod.CreationTimestamp.Time
-		application.TotalPodsCount = 1
-		application.RunningPodsCount = runningPodsCount
-		application.DeploymentType = string(pod.Status.Phase)
-		application.Metadata = &models.Metadata{
-			Labels: pod.Labels,
-		}
+		populateApplicationFromPod(&application, *pod)
 	}
 
-	if application.ID != "" && application.Name != "" && len(services) > 0 {
-		updateApplicationWithService(&application, services)
+	if application.ID != "" && application.Name != "" && len(portainerApplicationResources.Services) > 0 {
+		updateApplicationWithService(&application, portainerApplicationResources.Services)
 	}
 
-	if application.ID != "" && application.Name != "" && len(hpas) > 0 {
-		updateApplicationWithHorizontalPodAutoscaler(&application, hpas)
+	if application.ID != "" && application.Name != "" && len(portainerApplicationResources.HorizontalPodAutoscalers) > 0 {
+		updateApplicationWithHorizontalPodAutoscaler(&application, portainerApplicationResources.HorizontalPodAutoscalers)
 	}
 
 	return application
+}
+
+// createApplicationFromDeployment creates a K8sApplication from a Deployment
+func createApplicationFromDeployment(deployment appsv1.Deployment) models.K8sApplication {
+	var app models.K8sApplication
+	populateApplicationFromDeployment(&app, deployment)
+	return app
+}
+
+// createApplicationFromStatefulSet creates a K8sApplication from a StatefulSet
+func createApplicationFromStatefulSet(statefulSet appsv1.StatefulSet) models.K8sApplication {
+	var app models.K8sApplication
+	populateApplicationFromStatefulSet(&app, statefulSet)
+	return app
+}
+
+// createApplicationFromDaemonSet creates a K8sApplication from a DaemonSet
+func createApplicationFromDaemonSet(daemonSet appsv1.DaemonSet) models.K8sApplication {
+	var app models.K8sApplication
+	populateApplicationFromDaemonSet(&app, daemonSet)
+	return app
+}
+
+func populateApplicationFromDeployment(application *models.K8sApplication, deployment appsv1.Deployment) {
+	application.ApplicationType = "Deployment"
+	application.Kind = "Deployment"
+	application.ID = string(deployment.UID)
+	application.ResourcePool = deployment.Namespace
+	application.Name = deployment.Name
+	application.ApplicationOwner = deployment.Labels["io.portainer.kubernetes.application.owner"]
+	application.StackID = deployment.Labels["io.portainer.kubernetes.application.stackid"]
+	application.StackName = deployment.Labels["io.portainer.kubernetes.application.stack"]
+	application.Labels = deployment.Labels
+	application.MatchLabels = deployment.Spec.Selector.MatchLabels
+	application.CreationDate = deployment.CreationTimestamp.Time
+	application.TotalPodsCount = 0
+	if deployment.Spec.Replicas != nil {
+		application.TotalPodsCount = int(*deployment.Spec.Replicas)
+	}
+	application.RunningPodsCount = int(deployment.Status.ReadyReplicas)
+	application.DeploymentType = "Replicated"
+	application.Metadata = &models.Metadata{
+		Labels: deployment.Labels,
+	}
+
+	// If the deployment has containers, use the first container's image
+	if len(deployment.Spec.Template.Spec.Containers) > 0 {
+		application.Image = deployment.Spec.Template.Spec.Containers[0].Image
+	}
+}
+
+func populateApplicationFromStatefulSet(application *models.K8sApplication, statefulSet appsv1.StatefulSet) {
+	application.Kind = "StatefulSet"
+	application.ApplicationType = "StatefulSet"
+	application.ID = string(statefulSet.UID)
+	application.ResourcePool = statefulSet.Namespace
+	application.Name = statefulSet.Name
+	application.ApplicationOwner = statefulSet.Labels["io.portainer.kubernetes.application.owner"]
+	application.StackID = statefulSet.Labels["io.portainer.kubernetes.application.stackid"]
+	application.StackName = statefulSet.Labels["io.portainer.kubernetes.application.stack"]
+	application.Labels = statefulSet.Labels
+	application.MatchLabels = statefulSet.Spec.Selector.MatchLabels
+	application.CreationDate = statefulSet.CreationTimestamp.Time
+	application.TotalPodsCount = 0
+	if statefulSet.Spec.Replicas != nil {
+		application.TotalPodsCount = int(*statefulSet.Spec.Replicas)
+	}
+	application.RunningPodsCount = int(statefulSet.Status.ReadyReplicas)
+	application.DeploymentType = "Replicated"
+	application.Metadata = &models.Metadata{
+		Labels: statefulSet.Labels,
+	}
+
+	// If the statefulSet has containers, use the first container's image
+	if len(statefulSet.Spec.Template.Spec.Containers) > 0 {
+		application.Image = statefulSet.Spec.Template.Spec.Containers[0].Image
+	}
+}
+
+func populateApplicationFromDaemonSet(application *models.K8sApplication, daemonSet appsv1.DaemonSet) {
+	application.Kind = "DaemonSet"
+	application.ApplicationType = "DaemonSet"
+	application.ID = string(daemonSet.UID)
+	application.ResourcePool = daemonSet.Namespace
+	application.Name = daemonSet.Name
+	application.ApplicationOwner = daemonSet.Labels["io.portainer.kubernetes.application.owner"]
+	application.StackID = daemonSet.Labels["io.portainer.kubernetes.application.stackid"]
+	application.StackName = daemonSet.Labels["io.portainer.kubernetes.application.stack"]
+	application.Labels = daemonSet.Labels
+	application.MatchLabels = daemonSet.Spec.Selector.MatchLabels
+	application.CreationDate = daemonSet.CreationTimestamp.Time
+	application.TotalPodsCount = int(daemonSet.Status.DesiredNumberScheduled)
+	application.RunningPodsCount = int(daemonSet.Status.NumberReady)
+	application.DeploymentType = "Global"
+	application.Metadata = &models.Metadata{
+		Labels: daemonSet.Labels,
+	}
+
+	if len(daemonSet.Spec.Template.Spec.Containers) > 0 {
+		application.Image = daemonSet.Spec.Template.Spec.Containers[0].Image
+	}
+}
+
+func populateApplicationFromPod(application *models.K8sApplication, pod corev1.Pod) {
+	runningPodsCount := 1
+	if pod.Status.Phase != corev1.PodRunning {
+		runningPodsCount = 0
+	}
+
+	application.ApplicationType = "Pod"
+	application.Kind = "Pod"
+	application.ID = string(pod.UID)
+	application.ResourcePool = pod.Namespace
+	application.Name = pod.Name
+	application.ApplicationOwner = pod.Labels["io.portainer.kubernetes.application.owner"]
+	application.StackID = pod.Labels["io.portainer.kubernetes.application.stackid"]
+	application.StackName = pod.Labels["io.portainer.kubernetes.application.stack"]
+	application.Labels = pod.Labels
+	application.MatchLabels = pod.Labels
+	application.CreationDate = pod.CreationTimestamp.Time
+	application.TotalPodsCount = 1
+	application.RunningPodsCount = runningPodsCount
+	application.DeploymentType = string(pod.Status.Phase)
+	application.Metadata = &models.Metadata{
+		Labels: pod.Labels,
+	}
+
+	// If the pod has containers, use the first container's image
+	if len(pod.Spec.Containers) > 0 {
+		application.Image = pod.Spec.Containers[0].Image
+	}
 }
 
 // updateApplicationWithService updates the application with the services that match the application's selector match labels
@@ -410,7 +475,9 @@ func (kcl *KubeClient) GetApplicationConfigurationOwnersFromConfigMap(configMap 
 	for _, pod := range pods {
 		if pod.Namespace == configMap.Namespace {
 			if isPodUsingConfigMap(&pod, configMap.Name) {
-				application, err := kcl.ConvertPodToApplication(pod, replicaSets, nil, nil, nil, nil, nil, false)
+				application, err := kcl.ConvertPodToApplication(pod, PortainerApplicationResources{
+					ReplicaSets: replicaSets,
+				}, false)
 				if err != nil {
 					return nil, err
 				}
@@ -436,7 +503,9 @@ func (kcl *KubeClient) GetApplicationConfigurationOwnersFromSecret(secret models
 	for _, pod := range pods {
 		if pod.Namespace == secret.Namespace {
 			if isPodUsingSecret(&pod, secret.Name) {
-				application, err := kcl.ConvertPodToApplication(pod, replicaSets, nil, nil, nil, nil, nil, false)
+				application, err := kcl.ConvertPodToApplication(pod, PortainerApplicationResources{
+					ReplicaSets: replicaSets,
+				}, false)
 				if err != nil {
 					return nil, err
 				}
@@ -453,4 +522,85 @@ func (kcl *KubeClient) GetApplicationConfigurationOwnersFromSecret(secret models
 	}
 
 	return configurationOwners, nil
+}
+
+// fetchUnhealthyApplications fetches applications that failed to schedule any pods
+// due to issues like missing resource limits or other scheduling constraints
+func fetchUnhealthyApplications(resources PortainerApplicationResources) ([]models.K8sApplication, error) {
+	var unhealthyApplications []models.K8sApplication
+
+	// Process Deployments
+	for _, deployment := range resources.Deployments {
+		if hasNoScheduledPods(deployment) {
+			app := createApplicationFromDeployment(deployment)
+			addRelatedResourcesToApplication(&app, resources)
+			unhealthyApplications = append(unhealthyApplications, app)
+		}
+	}
+
+	// Process StatefulSets
+	for _, statefulSet := range resources.StatefulSets {
+		if hasNoScheduledPods(statefulSet) {
+			app := createApplicationFromStatefulSet(statefulSet)
+			addRelatedResourcesToApplication(&app, resources)
+			unhealthyApplications = append(unhealthyApplications, app)
+		}
+	}
+
+	// Process DaemonSets
+	for _, daemonSet := range resources.DaemonSets {
+		if hasNoScheduledPods(daemonSet) {
+			app := createApplicationFromDaemonSet(daemonSet)
+			addRelatedResourcesToApplication(&app, resources)
+			unhealthyApplications = append(unhealthyApplications, app)
+		}
+	}
+
+	return unhealthyApplications, nil
+}
+
+// addRelatedResourcesToApplication adds Services and HPA information to the application
+func addRelatedResourcesToApplication(app *models.K8sApplication, resources PortainerApplicationResources) {
+	if app.ID == "" || app.Name == "" {
+		return
+	}
+
+	if len(resources.Services) > 0 {
+		updateApplicationWithService(app, resources.Services)
+	}
+
+	if len(resources.HorizontalPodAutoscalers) > 0 {
+		updateApplicationWithHorizontalPodAutoscaler(app, resources.HorizontalPodAutoscalers)
+	}
+}
+
+// hasNoScheduledPods checks if a workload has completely failed to schedule any pods
+// it checks for no replicas desired, i.e. nothing to schedule and see if any pods are running
+// if any pods exist at all (even if not ready), it returns false
+func hasNoScheduledPods(obj interface{}) bool {
+	switch resource := obj.(type) {
+	case appsv1.Deployment:
+		if resource.Status.Replicas > 0 {
+			return false
+		}
+
+		return resource.Status.ReadyReplicas == 0 && resource.Status.AvailableReplicas == 0
+
+	case appsv1.StatefulSet:
+		if resource.Status.Replicas > 0 {
+			return false
+		}
+
+		return resource.Status.ReadyReplicas == 0 && resource.Status.CurrentReplicas == 0
+
+	case appsv1.DaemonSet:
+		if resource.Status.CurrentNumberScheduled > 0 || resource.Status.NumberMisscheduled > 0 {
+			return false
+		}
+
+		return resource.Status.NumberReady == 0 && resource.Status.DesiredNumberScheduled > 0
+
+	default:
+		return false
+	}
 }

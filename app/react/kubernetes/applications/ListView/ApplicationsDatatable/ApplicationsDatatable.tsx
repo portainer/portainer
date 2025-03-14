@@ -57,7 +57,6 @@ export function ApplicationsDatatable({
   const applicationsQuery = useApplications(environmentId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
     namespace: tableState.namespace,
-    withDependencies: true,
   });
   const ingressesQuery = useIngresses(environmentId);
   const ingresses = ingressesQuery.data ?? [];

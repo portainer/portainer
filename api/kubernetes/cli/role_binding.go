@@ -7,11 +7,9 @@ import (
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/internal/errorlist"
 	"github.com/rs/zerolog/log"
-	corev1 "k8s.io/api/rbac/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // GetRoleBindings gets all the roleBindings for either at the cluster level or a given namespace in a k8s endpoint.
@@ -98,7 +96,7 @@ func (kcl *KubeClient) isSystemRoleBinding(rb *rbacv1.RoleBinding) bool {
 	return false
 }
 
-func (kcl *KubeClient) getRole(namespace, name string) (*corev1.Role, error) {
+func (kcl *KubeClient) getRole(namespace, name string) (*rbacv1.Role, error) {
 	client := kcl.cli.RbacV1().Roles(namespace)
 	return client.Get(context.Background(), name, metav1.GetOptions{})
 }
@@ -111,7 +109,7 @@ func (kcl *KubeClient) DeleteRoleBindings(reqs models.K8sRoleBindingDeleteReques
 		for _, name := range reqs[namespace] {
 			client := kcl.cli.RbacV1().RoleBindings(namespace)
 
-			roleBinding, err := client.Get(context.Background(), name, v1.GetOptions{})
+			roleBinding, err := client.Get(context.Background(), name, metav1.GetOptions{})
 			if err != nil {
 				if k8serrors.IsNotFound(err) {
 					continue
@@ -125,7 +123,7 @@ func (kcl *KubeClient) DeleteRoleBindings(reqs models.K8sRoleBindingDeleteReques
 				log.Error().Str("role_name", name).Msg("ignoring delete of 'system' role binding, not allowed")
 			}
 
-			if err := client.Delete(context.Background(), name, v1.DeleteOptions{}); err != nil {
+			if err := client.Delete(context.Background(), name, metav1.DeleteOptions{}); err != nil {
 				errors = append(errors, err)
 			}
 		}

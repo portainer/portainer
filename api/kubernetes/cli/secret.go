@@ -31,7 +31,7 @@ func (kcl *KubeClient) GetSecrets(namespace string) ([]models.K8sSecret, error) 
 // getSecretsForNonAdmin fetches the secrets in the namespaces the user has access to.
 // This function is called when the user is not an admin.
 func (kcl *KubeClient) getSecretsForNonAdmin(namespace string) ([]models.K8sSecret, error) {
-	log.Debug().Msgf("Fetching volumes for non-admin user: %v", kcl.NonAdminNamespaces)
+	log.Debug().Msgf("Fetching secrets for non-admin user: %v", kcl.NonAdminNamespaces)
 
 	if len(kcl.NonAdminNamespaces) == 0 {
 		return nil, nil
@@ -118,7 +118,7 @@ func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret) ([]models.K8sSecret, error) {
 	updatedSecrets := make([]models.K8sSecret, len(secrets))
 
-	pods, replicaSets, _, _, _, _, _, err := kcl.fetchAllPodsAndReplicaSets("", metav1.ListOptions{})
+	portainerApplicationResources, err := kcl.fetchAllApplicationsListResources("", metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 	}
@@ -126,7 +126,7 @@ func (kcl *KubeClient) CombineSecretsWithApplications(secrets []models.K8sSecret
 	for index, secret := range secrets {
 		updatedSecret := secret
 
-		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, pods, replicaSets)
+		applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, portainerApplicationResources.Pods, portainerApplicationResources.ReplicaSets)
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineSecretsWithApplications operation, unable to get applications from secret. Error: %w", err)
 		}

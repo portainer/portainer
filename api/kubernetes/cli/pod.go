@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	appsv1 "k8s.io/api/apps/v1"
-	autoscalingv2 "k8s.io/api/autoscaling/v2"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -110,7 +109,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 		},
 	}
 
-	shellPod, err := kcl.cli.CoreV1().Pods(portainerNamespace).Create(ctx, podSpec, metav1.CreateOptions{})
+	shellPod, err := kcl.cli.CoreV1().Pods(portainerNamespace).Create(context.TODO(), podSpec, metav1.CreateOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating shell pod")
 	}
@@ -158,7 +157,7 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase corev1.PodPha
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			pod, err := kcl.cli.CoreV1().Pods(pod.Namespace).Get(ctx, pod.Name, metav1.GetOptions{})
+			pod, err := kcl.cli.CoreV1().Pods(pod.Namespace).Get(context.TODO(), pod.Name, metav1.GetOptions{})
 			if err != nil {
 				return err
 			}
@@ -172,70 +171,67 @@ func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase corev1.PodPha
 	}
 }
 
-// fetchAllPodsAndReplicaSets fetches all pods and replica sets across the cluster, i.e. all namespaces
-func (kcl *KubeClient) fetchAllPodsAndReplicaSets(namespace string, podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, []autoscalingv2.HorizontalPodAutoscaler, error) {
-	return kcl.fetchResourcesWithOwnerReferences(namespace, podListOptions, false, false)
-}
-
 // fetchAllApplicationsListResources fetches all pods, replica sets, stateful sets, and daemon sets across the cluster, i.e. all namespaces
 // this is required for the applications list view
-func (kcl *KubeClient) fetchAllApplicationsListResources(namespace string, podListOptions metav1.ListOptions) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, []autoscalingv2.HorizontalPodAutoscaler, error) {
+func (kcl *KubeClient) fetchAllApplicationsListResources(namespace string, podListOptions metav1.ListOptions) (PortainerApplicationResources, error) {
 	return kcl.fetchResourcesWithOwnerReferences(namespace, podListOptions, true, true)
 }
 
 // fetchResourcesWithOwnerReferences fetches pods and other resources based on owner references
-func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podListOptions metav1.ListOptions, includeStatefulSets, includeDaemonSets bool) ([]corev1.Pod, []appsv1.ReplicaSet, []appsv1.Deployment, []appsv1.StatefulSet, []appsv1.DaemonSet, []corev1.Service, []autoscalingv2.HorizontalPodAutoscaler, error) {
+func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podListOptions metav1.ListOptions, includeStatefulSets, includeDaemonSets bool) (PortainerApplicationResources, error) {
 	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.Background(), podListOptions)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			return nil, nil, nil, nil, nil, nil, nil, nil
+			return PortainerApplicationResources{}, nil
 		}
-		return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list pods across the cluster: %w", err)
+		return PortainerApplicationResources{}, fmt.Errorf("unable to list pods across the cluster: %w", err)
 	}
 
-	// if replicaSet owner reference exists, fetch the replica sets
-	// this also means that the deployments will be fetched because deployments own replica sets
-	replicaSets := &appsv1.ReplicaSetList{}
-	deployments := &appsv1.DeploymentList{}
-	if containsReplicaSetOwnerReference(pods) {
-		replicaSets, err = kcl.cli.AppsV1().ReplicaSets(namespace).List(context.Background(), metav1.ListOptions{})
-		if err != nil && !k8serrors.IsNotFound(err) {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list replica sets across the cluster: %w", err)
-		}
-
-		deployments, err = kcl.cli.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
-		if err != nil && !k8serrors.IsNotFound(err) {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list deployments across the cluster: %w", err)
-		}
+	portainerApplicationResources := PortainerApplicationResources{
+		Pods: pods.Items,
 	}
 
-	statefulSets := &appsv1.StatefulSetList{}
-	if includeStatefulSets && containsStatefulSetOwnerReference(pods) {
-		statefulSets, err = kcl.cli.AppsV1().StatefulSets(namespace).List(context.Background(), metav1.ListOptions{})
+	replicaSets, err := kcl.cli.AppsV1().ReplicaSets(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil && !k8serrors.IsNotFound(err) {
+		return PortainerApplicationResources{}, fmt.Errorf("unable to list replica sets across the cluster: %w", err)
+	}
+	portainerApplicationResources.ReplicaSets = replicaSets.Items
+
+	deployments, err := kcl.cli.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil && !k8serrors.IsNotFound(err) {
+		return PortainerApplicationResources{}, fmt.Errorf("unable to list deployments across the cluster: %w", err)
+	}
+	portainerApplicationResources.Deployments = deployments.Items
+
+	if includeStatefulSets {
+		statefulSets, err := kcl.cli.AppsV1().StatefulSets(namespace).List(context.Background(), metav1.ListOptions{})
 		if err != nil && !k8serrors.IsNotFound(err) {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list stateful sets across the cluster: %w", err)
+			return PortainerApplicationResources{}, fmt.Errorf("unable to list stateful sets across the cluster: %w", err)
 		}
+		portainerApplicationResources.StatefulSets = statefulSets.Items
 	}
 
-	daemonSets := &appsv1.DaemonSetList{}
-	if includeDaemonSets && containsDaemonSetOwnerReference(pods) {
-		daemonSets, err = kcl.cli.AppsV1().DaemonSets(namespace).List(context.Background(), metav1.ListOptions{})
+	if includeDaemonSets {
+		daemonSets, err := kcl.cli.AppsV1().DaemonSets(namespace).List(context.Background(), metav1.ListOptions{})
 		if err != nil && !k8serrors.IsNotFound(err) {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list daemon sets across the cluster: %w", err)
+			return PortainerApplicationResources{}, fmt.Errorf("unable to list daemon sets across the cluster: %w", err)
 		}
+		portainerApplicationResources.DaemonSets = daemonSets.Items
 	}
 
 	services, err := kcl.cli.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
-		return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list services across the cluster: %w", err)
+		return PortainerApplicationResources{}, fmt.Errorf("unable to list services across the cluster: %w", err)
 	}
+	portainerApplicationResources.Services = services.Items
 
 	hpas, err := kcl.cli.AutoscalingV2().HorizontalPodAutoscalers(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
-		return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("unable to list horizontal pod autoscalers across the cluster: %w", err)
+		return PortainerApplicationResources{}, fmt.Errorf("unable to list horizontal pod autoscalers across the cluster: %w", err)
 	}
+	portainerApplicationResources.HorizontalPodAutoscalers = hpas.Items
 
-	return pods.Items, replicaSets.Items, deployments.Items, statefulSets.Items, daemonSets.Items, services.Items, hpas.Items, nil
+	return portainerApplicationResources, nil
 }
 
 // isPodUsingConfigMap checks if a pod is using a specific ConfigMap
