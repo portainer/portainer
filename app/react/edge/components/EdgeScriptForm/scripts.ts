@@ -153,13 +153,13 @@ export function buildWindowsStandaloneCommand(
       ? `$Env:PORTAINER_EDGE_ID = "@(${edgeIdGenerator})" \n\n`
       : ''
   }\
-docker run -d \\
-  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
-  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
-  --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
-  --restart always \\
-   ${env} \\
-  --name portainer_edge_agent \\
+docker run -d \`
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \`
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \`
+  --mount type=volume,src=portainer_agent_data,dst=C:\\data \`
+  --restart always \`
+   ${env} \`
+  --name portainer_edge_agent \`
   portainer/agent:${agentVersion}
   `;
 }
@@ -234,19 +234,19 @@ export function buildWindowsSwarmCommand(
       ? `$Env:PORTAINER_EDGE_ID = "@(${edgeIdGenerator})" \n\n`
       : ''
   }\
-docker network create \\
-  --driver overlay \\
+docker network create \`
+  --driver overlay \`
   portainer_agent_network;
 
-docker service create \\
-  --name portainer_edge_agent \\
-  --network portainer_agent_network \\
-  ${env} \\
-  --mode global \\
-  --constraint 'node.platform.os == windows' \\
-  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
-  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
-  --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
+docker service create \`
+  --name portainer_edge_agent \`
+  --network portainer_agent_network \`
+  ${env} \`
+  --mode global \`
+  --constraint 'node.platform.os == windows' \`
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \`
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \`
+  --mount type=volume,src=portainer_agent_data,dst=C:\\data \`
   portainer/agent:${agentVersion}
 `;
 }
