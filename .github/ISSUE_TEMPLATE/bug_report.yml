@@ -2,18 +2,17 @@ name: Bug Report
 description: Create a report to help us improve.
 labels: kind/bug,bug/need-confirmation
 body:
-
   - type: markdown
     attributes:
       value: |
         # Welcome!
-        
+
         The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/orgs/portainer/discussions/categories/ideas) or a [general question about Portainer](https://github.com/orgs/portainer/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/orgs/portainer/discussions).
-        
+
         You can also ask for help in our [community Slack channel](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA).
 
         Please note that we only provide support for current versions of Portainer. You can find a list of supported versions in our [lifecycle policy](https://docs.portainer.io/start/lifecycle).
-        
+
         **DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS**.
 
   - type: checkboxes
@@ -45,7 +44,7 @@ body:
   - type: textarea
     attributes:
       label: Problem Description
-      description: A clear and concise description of what the bug is. 
+      description: A clear and concise description of what the bug is.
     validations:
       required: true
 
@@ -71,7 +70,7 @@ body:
         1. Go to '...'
         2. Click on '....'
         3. Scroll down to '....'
-        4. See error   
+        4. See error
     validations:
       required: true
 
@@ -95,6 +94,7 @@ body:
       description: We only provide support for current versions of Portainer as per the lifecycle policy linked above. If you are on an older version of Portainer we recommend [upgrading first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
       multiple: false
       options:
+        - '2.28.0'
         - '2.27.1'
         - '2.27.0'
         - '2.26.1'
@@ -158,7 +158,7 @@ body:
   - type: input
     attributes:
       label: Browser
-      description: | 
+      description: |
         Enter your browser and version. Example: Google Chrome 114.0
     validations:
       required: false
