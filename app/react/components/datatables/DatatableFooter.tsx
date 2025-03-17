@@ -5,6 +5,7 @@ import { SelectedRowsCount } from './SelectedRowsCount';
 
 interface Props {
   totalSelected: number;
+  totalHiddenSelected: number;
   pageSize: number;
   page: number;
   onPageChange(page: number): void;
@@ -14,6 +15,7 @@ interface Props {
 
 export function DatatableFooter({
   totalSelected,
+  totalHiddenSelected,
   pageSize,
   page,
   onPageChange,
@@ -22,7 +24,7 @@ export function DatatableFooter({
 }: Props) {
   return (
     <Table.Footer>
-      <SelectedRowsCount value={totalSelected} />
+      <SelectedRowsCount value={totalSelected} hidden={totalHiddenSelected} />
       <PaginationControls
         showAll
         pageLimit={pageSize}

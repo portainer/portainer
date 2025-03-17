@@ -86,6 +86,7 @@ export function CustomTemplatesList({
         pageSize={listState.pageSize}
         pageCount={Math.ceil(filteredTemplates.length / listState.pageSize)}
         totalSelected={0}
+        totalHiddenSelected={0}
       />
     </Table.Container>
   );

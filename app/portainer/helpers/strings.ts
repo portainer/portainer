@@ -1,7 +1,7 @@
-export function pluralize(val: number, word: string, plural = `${word}s`) {
-  return [1, -1].includes(Number(val)) ? word : plural;
-}
-
-export function addPlural(value: number, word: string, plural = `${word}s`) {
-  return `${value} ${pluralize(value, word, plural)}`;
-}
+// Re-exporting so we don't have to update one meeeeellion files that are already importing these
+// functions from here.
+export {
+  pluralize,
+  addPlural,
+  grammaticallyJoin,
+} from '@/react/common/string-utils';

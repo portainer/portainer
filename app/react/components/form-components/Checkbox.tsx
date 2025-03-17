@@ -42,6 +42,8 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
       resolvedRef = defaultRef;
     }
 
+    // Need to check this on every render as the browser will always set the element's
+    // indeterminate state to false when the checkbox is clicked, even if the indeterminate prop hasn't changed
     useEffect(() => {
       if (resolvedRef === null || resolvedRef.current === null) {
         return;
@@ -50,7 +52,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
       if (typeof indeterminate !== 'undefined') {
         resolvedRef.current.indeterminate = indeterminate;
       }
-    }, [resolvedRef, indeterminate]);
+    });
 
     return (
       <div className="md-checkbox flex items-center" title={title || label}>

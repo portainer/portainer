@@ -171,6 +171,14 @@ export function Datatable<D extends DefaultType>({
 
   const selectedRowModel = tableInstance.getSelectedRowModel();
   const selectedItems = selectedRowModel.rows.map((row) => row.original);
+  const filteredItems = tableInstance
+    .getFilteredRowModel()
+    .rows.map((row) => row.original);
+
+  const hiddenSelectedItems = useMemo(
+    () => _.difference(selectedItems, filteredItems),
+    [selectedItems, filteredItems]
+  );
 
   return (
     <Table.Container noWidget={noWidget} aria-label={title}>
@@ -203,6 +211,7 @@ export function Datatable<D extends DefaultType>({
         pageSize={tableState.pagination.pageSize}
         pageCount={tableInstance.getPageCount()}
         totalSelected={selectedItems.length}
+        totalHiddenSelected={hiddenSelectedItems.length}
       />
     </Table.Container>
   );
