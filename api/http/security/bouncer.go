@@ -243,8 +243,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 			return
 		}
 
-		_, err = bouncer.dataStore.User().Read(tokenData.ID)
-		if bouncer.dataStore.IsErrObjectNotFound(err) {
+		if ok, err := bouncer.dataStore.User().Exists(tokenData.ID); !ok {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
@@ -322,9 +321,8 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		user, _ := bouncer.dataStore.User().Read(token.ID)
-		if user == nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "An authorization token is invalid", httperrors.ErrUnauthorized)
+		if ok, _ := bouncer.dataStore.User().Exists(token.ID); !ok {
+			httperror.WriteError(w, http.StatusUnauthorized, "The authorization token is invalid", httperrors.ErrUnauthorized)
 
 			return
 		}

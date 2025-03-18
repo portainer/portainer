@@ -28,6 +28,12 @@ func (service BaseDataServiceTx[T, I]) Read(ID I) (*T, error) {
 	return &element, nil
 }
 
+func (service BaseDataServiceTx[T, I]) Exists(ID I) (bool, error) {
+	identifier := service.Connection.ConvertToKey(int(ID))
+
+	return service.Tx.KeyExists(service.Bucket, identifier)
+}
+
 func (service BaseDataServiceTx[T, I]) ReadAll() ([]T, error) {
 	var collection = make([]T, 0)
 

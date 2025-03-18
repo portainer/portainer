@@ -9,6 +9,7 @@ import (
 type BaseCRUD[T any, I constraints.Integer] interface {
 	Create(element *T) error
 	Read(ID I) (*T, error)
+	Exists(ID I) (bool, error)
 	ReadAll() ([]T, error)
 	Update(ID I, element *T) error
 	Delete(ID I) error
@@ -40,6 +41,19 @@ func (service BaseDataService[T, I]) Read(ID I) (*T, error) {
 
 		return err
 	})
+}
+
+func (service BaseDataService[T, I]) Exists(ID I) (bool, error) {
+	var exists bool
+
+	err := service.Connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		exists, err = service.Tx(tx).Exists(ID)
+
+		return err
+	})
+
+	return exists, err
 }
 
 func (service BaseDataService[T, I]) ReadAll() ([]T, error) {

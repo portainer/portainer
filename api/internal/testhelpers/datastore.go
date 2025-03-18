@@ -151,6 +151,7 @@ func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User
 func (s *stubUserService) Create(user *portainer.User) error                      { return nil }
 func (s *stubUserService) Update(ID portainer.UserID, user *portainer.User) error { return nil }
 func (s *stubUserService) Delete(ID portainer.UserID) error                       { return nil }
+func (s *stubUserService) Exists(ID portainer.UserID) (bool, error)               { return false, nil }
 
 // WithUsers testDatastore option that will instruct testDatastore to return provided users
 func WithUsers(us []portainer.User) datastoreOption {
@@ -186,6 +187,9 @@ func (s *stubEdgeJobService) UpdateEdgeJobFunc(ID portainer.EdgeJobID, updateFun
 }
 func (s *stubEdgeJobService) Delete(ID portainer.EdgeJobID) error { return nil }
 func (s *stubEdgeJobService) GetNextIdentifier() int              { return 0 }
+func (s *stubEdgeJobService) Exists(ID portainer.EdgeJobID) (bool, error) {
+	return false, nil
+}
 
 // WithEdgeJobs option will instruct testDatastore to return provided jobs
 func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
@@ -424,6 +428,10 @@ func (s *stubStacksService) StackByWebhookID(webhookID string) (*portainer.Stack
 
 func (s *stubStacksService) GetNextIdentifier() int {
 	return len(s.stacks)
+}
+
+func (s *stubStacksService) Exists(ID portainer.StackID) (bool, error) {
+	return false, nil
 }
 
 // WithStacks option will instruct testDatastore to return provided stacks

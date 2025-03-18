@@ -244,6 +244,32 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 	})
 }
 
+func (connection *DbConnection) GetRawBytes(bucketName string, key []byte) ([]byte, error) {
+	var value []byte
+
+	err := connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		value, err = tx.GetRawBytes(bucketName, key)
+
+		return err
+	})
+
+	return value, err
+}
+
+func (connection *DbConnection) KeyExists(bucketName string, key []byte) (bool, error) {
+	var exists bool
+
+	err := connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		exists, err = tx.KeyExists(bucketName, key)
+
+		return err
+	})
+
+	return exists, err
+}
+
 func (connection *DbConnection) getEncryptionKey() []byte {
 	if !connection.isEncrypted {
 		return nil

@@ -6,6 +6,7 @@ import (
 
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )
@@ -29,6 +30,33 @@ func (tx *DbTransaction) GetObject(bucketName string, key []byte, object any) er
 	}
 
 	return tx.conn.UnmarshalObject(value, object)
+}
+
+func (tx *DbTransaction) GetRawBytes(bucketName string, key []byte) ([]byte, error) {
+	bucket := tx.tx.Bucket([]byte(bucketName))
+
+	value := bucket.Get(key)
+	if value == nil {
+		return nil, fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
+	}
+
+	if tx.conn.getEncryptionKey() != nil {
+		var err error
+
+		if value, err = decrypt(value, tx.conn.getEncryptionKey()); err != nil {
+			return value, errors.Wrap(err, "Failed decrypting object")
+		}
+	}
+
+	return value, nil
+}
+
+func (tx *DbTransaction) KeyExists(bucketName string, key []byte) (bool, error) {
+	bucket := tx.tx.Bucket([]byte(bucketName))
+
+	value := bucket.Get(key)
+
+	return value != nil, nil
 }
 
 func (tx *DbTransaction) UpdateObject(bucketName string, key []byte, object any) error {

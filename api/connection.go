@@ -6,8 +6,10 @@ import (
 
 type ReadTransaction interface {
 	GetObject(bucketName string, key []byte, object any) error
+	GetRawBytes(bucketName string, key []byte) ([]byte, error)
 	GetAll(bucketName string, obj any, append func(o any) (any, error)) error
 	GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj any, append func(o any) (any, error)) error
+	KeyExists(bucketName string, key []byte) (bool, error)
 }
 
 type Transaction interface {
