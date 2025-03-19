@@ -167,6 +167,16 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint, isInternal bool) clientV1.NamedCluster {
 	kubeConfigInternal := handler.kubeClusterAccessService.GetClusterDetails(r.Host, endpoint.ID, isInternal)
 
+	if isInternal {
+		return clientV1.NamedCluster{
+			Name: buildClusterName(endpoint.Name),
+			Cluster: clientV1.Cluster{
+				Server:                kubeConfigInternal.ClusterServerURL,
+				InsecureSkipTLSVerify: true,
+			},
+		}
+	}
+
 	selfSignedCert := false
 	serverUrl, err := url.Parse(kubeConfigInternal.ClusterServerURL)
 	if err != nil {

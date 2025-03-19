@@ -109,6 +109,7 @@ func (service *kubeClusterAccessService) GetClusterDetails(hostURL string, endpo
 		Str("host_URL", hostURL).
 		Str("HTTPS_bind_address", service.httpsBindAddr).
 		Str("base_URL", baseURL).
+		Bool("is_internal", isInternal).
 		Msg("kubeconfig")
 
 	clusterServerURL, err := url.JoinPath("https://", hostURL, baseURL, "/api/endpoints/", strconv.Itoa(int(endpointID)), "/kubernetes")
