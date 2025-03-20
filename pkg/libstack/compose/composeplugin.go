@@ -98,6 +98,11 @@ func withComposeService(
 			WorkingDir:  filepath.Dir(filePaths[0]),
 		}
 
+		if options.ProjectDir != "" {
+			// When relative paths are used in the compose file, the project directory is used as the base path
+			configDetails.WorkingDir = options.ProjectDir
+		}
+
 		for _, p := range filePaths {
 			configDetails.ConfigFiles = append(configDetails.ConfigFiles, types.ConfigFile{Filename: p})
 		}

@@ -68,7 +68,7 @@ func copyFile(src, dst string) error {
 	defer from.Close()
 
 	// has to include 'execute' bit, otherwise fails. MkdirAll follows `mkdir -m` restrictions
-	if err := os.MkdirAll(filepath.Dir(dst), 0744); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		return err
 	}
 	to, err := os.Create(dst)
