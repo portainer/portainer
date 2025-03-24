@@ -147,7 +147,7 @@
               </div>
             </div>
           </div>
-          <div ng-show="config.Driver === 'bridge' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
+          <div ng-show="config.Driver === 'bridge' || config.Driver === 'ipvlan' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
             <div class="col-sm-12 form-section-title"> IPV6 Network configuration </div>
             <!-- subnet-gateway-inputs -->
             <div class="form-group">
