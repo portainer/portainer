@@ -25,7 +25,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.1
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/go-cmp v0.6.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
@@ -48,21 +48,21 @@ require (
 	github.com/urfave/negroni v1.0.0
 	github.com/viney-shih/go-lock v1.1.1
 	go.etcd.io/bbolt v1.3.11
-	golang.org/x/crypto v0.35.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
 	golang.org/x/mod v0.21.0
-	golang.org/x/oauth2 v0.23.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/oauth2 v0.27.0
+	golang.org/x/sync v0.12.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
-	helm.sh/helm/v3 v3.17.1
-	k8s.io/api v0.32.1
-	k8s.io/apimachinery v0.32.1
-	k8s.io/cli-runtime v0.32.1
-	k8s.io/client-go v0.32.1
-	k8s.io/kubectl v0.32.1
-	k8s.io/metrics v0.32.1
+	helm.sh/helm/v3 v3.17.3
+	k8s.io/api v0.32.2
+	k8s.io/apimachinery v0.32.2
+	k8s.io/cli-runtime v0.32.2
+	k8s.io/client-go v0.32.2
+	k8s.io/kubectl v0.32.2
+	k8s.io/metrics v0.32.2
 	software.sslmate.com/src/go-pkcs12 v0.0.0-20210415151418-c5206de65a78
 )
 
@@ -278,10 +278,10 @@ require (
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/term v0.29.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/term v0.30.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
@@ -292,9 +292,9 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	k8s.io/apiextensions-apiserver v0.32.1 // indirect
-	k8s.io/apiserver v0.32.1 // indirect
-	k8s.io/component-base v0.32.1 // indirect
+	k8s.io/apiextensions-apiserver v0.32.2 // indirect
+	k8s.io/apiserver v0.32.2 // indirect
+	k8s.io/component-base v0.32.2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
