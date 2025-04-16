@@ -134,6 +134,7 @@ type (
 		LogLevel                  *string
 		LogMode                   *string
 		KubectlShellImage         *string
+		PullLimitCheckDisabled    *bool
 	}
 
 	// CustomTemplateVariableDefinition
@@ -1689,6 +1690,8 @@ const (
 	PortainerCacheHeader = "X-Portainer-Cache"
 	// KubectlShellImageEnvVar is the environment variable used to override the default kubectl shell image
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
+	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
+	PullLimitCheckDisabledEnvVar = "PULL_LIMIT_CHECK_DISABLED"
 )
 
 // List of supported features

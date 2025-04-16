@@ -575,6 +575,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		AdminCreationDone:           adminCreationDone,
 		PendingActionsService:       pendingActionsService,
 		PlatformService:             platformService,
+		PullLimitCheckDisabled:      *flags.PullLimitCheckDisabled,
 	}
 }
 

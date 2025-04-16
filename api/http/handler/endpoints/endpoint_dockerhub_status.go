@@ -80,6 +80,13 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 		}
 	}
 
+	if handler.PullLimitCheckDisabled {
+		return response.JSON(w, &dockerhubStatusResponse{
+			Limit:     10,
+			Remaining: 10,
+		})
+	}
+
 	httpClient := client.NewHTTPClient()
 	token, err := getDockerHubToken(httpClient, registry)
 	if err != nil {

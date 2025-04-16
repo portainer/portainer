@@ -112,6 +112,7 @@ type Server struct {
 	AdminCreationDone           chan struct{}
 	PendingActionsService       *pendingactions.PendingActionsService
 	PlatformService             platform.Service
+	PullLimitCheckDisabled      bool
 }
 
 // Start starts the HTTP server
@@ -181,6 +182,7 @@ func (server *Server) Start() error {
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 	endpointHandler.PendingActionsService = server.PendingActionsService
+	endpointHandler.PullLimitCheckDisabled = server.PullLimitCheckDisabled
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 

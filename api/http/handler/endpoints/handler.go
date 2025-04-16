@@ -26,19 +26,20 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer        security.BouncerService
-	DataStore             dataservices.DataStore
-	FileService           portainer.FileService
-	ProxyManager          *proxy.Manager
-	ReverseTunnelService  portainer.ReverseTunnelService
-	SnapshotService       portainer.SnapshotService
-	K8sClientFactory      *cli.ClientFactory
-	ComposeStackManager   portainer.ComposeStackManager
-	AuthorizationService  *authorization.Service
-	DockerClientFactory   *dockerclient.ClientFactory
-	BindAddress           string
-	BindAddressHTTPS      string
-	PendingActionsService *pendingactions.PendingActionsService
+	requestBouncer         security.BouncerService
+	DataStore              dataservices.DataStore
+	FileService            portainer.FileService
+	ProxyManager           *proxy.Manager
+	ReverseTunnelService   portainer.ReverseTunnelService
+	SnapshotService        portainer.SnapshotService
+	K8sClientFactory       *cli.ClientFactory
+	ComposeStackManager    portainer.ComposeStackManager
+	AuthorizationService   *authorization.Service
+	DockerClientFactory    *dockerclient.ClientFactory
+	BindAddress            string
+	BindAddressHTTPS       string
+	PendingActionsService  *pendingactions.PendingActionsService
+	PullLimitCheckDisabled bool
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.
