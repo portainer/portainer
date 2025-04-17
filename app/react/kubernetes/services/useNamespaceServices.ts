@@ -32,6 +32,9 @@ export async function getServices(
   environmentId: EnvironmentId,
   namespace: string
 ) {
+  if (!namespace) {
+    return [];
+  }
   try {
     const { data: services } = await axios.get<Service[]>(
       `kubernetes/${environmentId}/namespaces/${namespace}/services`
