@@ -349,7 +349,7 @@ func (server *Server) Start() error {
 			log.Info().Str("bind_address", server.BindAddress).Msg("starting HTTP server")
 			httpServer := &http.Server{
 				Addr:     server.BindAddress,
-				Handler:  handler,
+				Handler:  middlewares.PlaintextHTTPRequest(handler),
 				ErrorLog: errorLogger,
 			}
 
