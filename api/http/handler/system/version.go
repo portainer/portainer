@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/pkg/build"
+	libclient "github.com/portainer/portainer/pkg/libhttp/client"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
@@ -69,10 +70,14 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) *httperr
 }
 
 func GetLatestVersion() string {
+	if err := libclient.ExternalRequestDisabled(portainer.VersionCheckURL); err != nil {
+		log.Debug().Err(err).Msg("External request disabled: Version check")
+		return ""
+	}
+
 	motd, err := client.Get(portainer.VersionCheckURL, 5)
 	if err != nil {
 		log.Debug().Err(err).Msg("couldn't fetch latest Portainer release version")
-
 		return ""
 	}
 

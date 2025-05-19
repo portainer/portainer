@@ -1692,6 +1692,11 @@ const (
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
 	PullLimitCheckDisabledEnvVar = "PULL_LIMIT_CHECK_DISABLED"
+	// LicenseServerBaseURL represents the base URL of the API used to validate
+	// an extension license.
+	LicenseServerBaseURL = "https://api.portainer.io"
+	// URL to validate licenses along with system metadata.
+	LicenseCheckInURL = LicenseServerBaseURL + "/licenses/checkin"
 )
 
 // List of supported features

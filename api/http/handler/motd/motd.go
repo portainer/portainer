@@ -7,7 +7,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/pkg/libcrypto"
+	libclient "github.com/portainer/portainer/pkg/libhttp/client"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -37,6 +39,12 @@ type motdData struct {
 // @success 200 {object} motdResponse
 // @router /motd [get]
 func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
+	if err := libclient.ExternalRequestDisabled(portainer.MessageOfTheDayURL); err != nil {
+		log.Debug().Err(err).Msg("External request disabled: MOTD")
+		response.JSON(w, &motdResponse{Message: ""})
+		return
+	}
+
 	motd, err := client.Get(portainer.MessageOfTheDayURL, 0)
 	if err != nil {
 		response.JSON(w, &motdResponse{Message: ""})
