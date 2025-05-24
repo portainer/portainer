@@ -10,8 +10,13 @@ i18n
   .init({
     debug: true,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'zh'],
     interpolation: {
       escapeValue: false,
+    },
+    detection: {
+      order: ['localStorage', 'htmlTag', 'path', 'navigator'],
+      lookupLocalStorage: 'i18nextLng',
     },
   });
 
