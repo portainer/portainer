@@ -20,7 +20,7 @@ import (
 // @param id path int true "Environment identifier"
 // @param namespace path string true "The namespace name the events are associated to"
 // @param resourceId query string false "The resource id of the involved kubernetes object" example:"e5b021b6-4bce-4c06-bd3b-6cca906797aa"
-// @success 200 {object} models.Event[] "Success"
+// @success 200 {object} []kubernetes.K8sEvent "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
@@ -68,7 +68,7 @@ func (handler *Handler) getKubernetesEventsForNamespace(w http.ResponseWriter, r
 // @produce json
 // @param id path int true "Environment identifier"
 // @param resourceId query string false "The resource id of the involved kubernetes object"  example:"e5b021b6-4bce-4c06-bd3b-6cca906797aa"
-// @success 200 {object} models.Event[] "Success"
+// @success 200 {object} []kubernetes.K8sEvent "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
