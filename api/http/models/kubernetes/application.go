@@ -38,14 +38,30 @@ type K8sApplication struct {
 	Labels                  map[string]string                      `json:"Labels,omitempty"`
 	Resource                K8sApplicationResource                 `json:"Resource,omitempty"`
 	HorizontalPodAutoscaler *autoscalingv2.HorizontalPodAutoscaler `json:"HorizontalPodAutoscaler,omitempty"`
+	CustomResourceMetadata  CustomResourceMetadata                 `json:"CustomResourceMetadata,omitempty"`
 }
 
 type Metadata struct {
 	Labels map[string]string `json:"labels"`
 }
 
+type CustomResourceMetadata struct {
+	Kind       string `json:"kind"`
+	APIVersion string `json:"apiVersion"`
+	Plural     string `json:"plural"`
+}
+
 type Pod struct {
-	Status string `json:"Status"`
+	Name            string                 `json:"Name"`
+	ContainerName   string                 `json:"ContainerName"`
+	Image           string                 `json:"Image"`
+	ImagePullPolicy string                 `json:"ImagePullPolicy"`
+	Status          string                 `json:"Status"`
+	NodeName        string                 `json:"NodeName"`
+	PodIP           string                 `json:"PodIP"`
+	UID             string                 `json:"Uid"`
+	Resource        K8sApplicationResource `json:"Resource,omitempty"`
+	CreationDate    time.Time              `json:"CreationDate"`
 }
 
 type Configuration struct {
@@ -72,8 +88,8 @@ type TLSInfo struct {
 
 // Existing types
 type K8sApplicationResource struct {
-	CPURequest    float64 `json:"CpuRequest"`
-	CPULimit      float64 `json:"CpuLimit"`
-	MemoryRequest int64   `json:"MemoryRequest"`
-	MemoryLimit   int64   `json:"MemoryLimit"`
+	CPURequest    float64 `json:"CpuRequest,omitempty"`
+	CPULimit      float64 `json:"CpuLimit,omitempty"`
+	MemoryRequest int64   `json:"MemoryRequest,omitempty"`
+	MemoryLimit   int64   `json:"MemoryLimit,omitempty"`
 }
