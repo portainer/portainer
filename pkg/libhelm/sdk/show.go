@@ -2,7 +2,8 @@ package sdk
 
 import (
 	"fmt"
-	"os"
+	"net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm/options"
@@ -32,24 +33,32 @@ func (hspm *HelmSDKPackageManager) Show(showOpts options.ShowOptions) ([]byte, e
 		Str("output_format", string(showOpts.OutputFormat)).
 		Msg("Showing chart information")
 
-	// Initialize action configuration (no namespace or cluster access needed)
-	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, "", nil)
+	repoURL, err := parseRepoURL(showOpts.Repo)
 	if err != nil {
-		// error is already logged in initActionConfig
-		return nil, fmt.Errorf("failed to initialize helm configuration: %w", err)
+		log.Error().
+			Str("context", "HelmClient").
+			Str("repo", showOpts.Repo).
+			Err(err).
+			Msg("Invalid repository URL")
+		return nil, err
 	}
 
-	// Create temporary directory for chart download
-	tempDir, err := os.MkdirTemp("", "helm-show-*")
+	repoName, err := getRepoNameFromURL(repoURL.String())
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").
 			Err(err).
-			Msg("Failed to create temp directory")
-		return nil, fmt.Errorf("failed to create temp directory: %w", err)
+			Msg("Failed to get hostname from URL")
+		return nil, err
 	}
-	defer os.RemoveAll(tempDir)
+
+	// Initialize action configuration (no namespace or cluster access needed)
+	actionConfig := new(action.Configuration)
+	err = hspm.initActionConfig(actionConfig, "", nil)
+	if err != nil {
+		// error is already logged in initActionConfig
+		return nil, fmt.Errorf("failed to initialize helm configuration: %w", err)
+	}
 
 	// Create showClient action
 	showClient, err := initShowClient(actionConfig, showOpts)
@@ -68,11 +77,12 @@ func (hspm *HelmSDKPackageManager) Show(showOpts options.ShowOptions) ([]byte, e
 		Str("repo", showOpts.Repo).
 		Msg("Locating chart")
 
-	chartPath, err := showClient.ChartPathOptions.LocateChart(showOpts.Chart, hspm.settings)
+	fullChartPath := fmt.Sprintf("%s/%s", repoName, showOpts.Chart)
+	chartPath, err := showClient.ChartPathOptions.LocateChart(fullChartPath, hspm.settings)
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").
-			Str("chart", showOpts.Chart).
+			Str("chart", fullChartPath).
 			Str("repo", showOpts.Repo).
 			Err(err).
 			Msg("Failed to locate chart")
@@ -104,13 +114,10 @@ func (hspm *HelmSDKPackageManager) Show(showOpts options.ShowOptions) ([]byte, e
 // and return the show client.
 func initShowClient(actionConfig *action.Configuration, showOpts options.ShowOptions) (*action.Show, error) {
 	showClient := action.NewShowWithConfig(action.ShowAll, actionConfig)
-	showClient.ChartPathOptions.RepoURL = showOpts.Repo
-	showClient.ChartPathOptions.Version = showOpts.Version // If version is "", it will use the latest version
+	showClient.ChartPathOptions.Version = showOpts.Version
 
 	// Set output type based on ShowOptions
 	switch showOpts.OutputFormat {
-	case options.ShowAll:
-		showClient.OutputFormat = action.ShowAll
 	case options.ShowChart:
 		showClient.OutputFormat = action.ShowChart
 	case options.ShowValues:
@@ -126,4 +133,27 @@ func initShowClient(actionConfig *action.Configuration, showOpts options.ShowOpt
 	}
 
 	return showClient, nil
+}
+
+// getRepoNameFromURL extracts a unique repository identifier from a URL string.
+// It combines hostname and path to ensure uniqueness across different repositories on the same host.
+// Examples:
+// - https://portainer.github.io/test-public-repo/ -> portainer.github.io-test-public-repo
+// - https://portainer.github.io/another-repo/ -> portainer.github.io-another-repo
+// - https://charts.helm.sh/stable -> charts.helm.sh-stable
+func getRepoNameFromURL(urlStr string) (string, error) {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse URL: %w", err)
+	}
+
+	hostname := parsedURL.Hostname()
+	path := parsedURL.Path
+	path = strings.Trim(path, "/")
+	path = strings.ReplaceAll(path, "/", "-")
+
+	if path == "" {
+		return hostname, nil
+	}
+	return fmt.Sprintf("%s-%s", hostname, path), nil
 }

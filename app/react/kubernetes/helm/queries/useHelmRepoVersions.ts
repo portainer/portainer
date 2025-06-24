@@ -10,12 +10,15 @@ interface HelmSearch {
 }
 
 interface Entries {
-  [key: string]: { version: string }[];
+  [key: string]: { version: string; appVersion: string }[];
 }
 
 export interface ChartVersion {
+  Chart?: string;
   Repo: string;
+  Label?: string;
   Version: string;
+  AppVersion?: string;
 }
 
 /**
@@ -77,8 +80,10 @@ async function getSearchHelmRepo(
     const versions = data.entries[chart];
     return (
       versions?.map((v) => ({
+        Chart: chart,
         Repo: repo,
         Version: v.version,
+        AppVersion: v.appVersion,
       })) ?? []
     );
   } catch (err) {

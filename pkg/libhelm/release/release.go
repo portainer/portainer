@@ -36,6 +36,8 @@ type Release struct {
 	Manifest string `json:"manifest,omitempty"`
 	// Hooks are all of the hooks declared for this release.
 	Hooks []*Hook `json:"hooks,omitempty"`
+	// AppVersion is the app version of the release.
+	AppVersion string `json:"appVersion,omitempty"`
 	// Version is an int which represents the revision of the release.
 	Version int `json:"version,omitempty"`
 	// Namespace is the kubernetes namespace of the release.

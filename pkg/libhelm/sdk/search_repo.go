@@ -90,8 +90,17 @@ func (hspm *HelmSDKPackageManager) SearchRepo(searchRepoOpts options.SearchRepoO
 		return nil, errors.Wrap(err, "failed to ensure Helm directories exist")
 	}
 
+	repoName, err := getRepoNameFromURL(repoURL.String())
+	if err != nil {
+		log.Error().
+			Str("context", "HelmClient").
+			Err(err).
+			Msg("Failed to get hostname from URL")
+		return nil, err
+	}
+
 	// Download the index file and update repository configuration
-	indexPath, err := downloadRepoIndex(repoURL.String(), repoSettings, searchRepoOpts.Repo)
+	indexPath, err := downloadRepoIndex(repoURL.String(), repoSettings, repoName)
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").
@@ -163,7 +172,8 @@ func downloadRepoIndex(repoURLString string, repoSettings *cli.EnvSettings, repo
 	// Create chart repository object
 	rep, err := repo.NewChartRepository(
 		&repo.Entry{
-			URL: repoURLString,
+			Name: repoName,
+			URL:  repoURLString,
 		},
 		getter.All(repoSettings),
 	)

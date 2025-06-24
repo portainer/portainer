@@ -44,7 +44,6 @@ export function UpgradeButton({
     useCache
   );
   const versions = helmRepoVersionsQuery.data;
-  const repo = versions?.[0]?.Repo;
 
   // Combined loading state
   const isLoading =
@@ -63,16 +62,27 @@ export function UpgradeButton({
     latestVersionQuery?.data &&
       semverCompare(latestVersionAvailable, latestVersionQuery?.data) === 1
   );
-  const currentVersion = release?.chart.metadata?.version;
+
+  const currentRepo = versions?.find(
+    (v) =>
+      v.Chart === release?.chart.metadata?.name &&
+      v.AppVersion === release?.chart.metadata?.appVersion &&
+      v.Version === release?.chart.metadata?.version
+  )?.Repo;
 
   const editableHelmRelease: UpdateHelmReleasePayload = {
     name: releaseName,
     namespace: namespace || '',
     values: release?.values?.userSuppliedValues,
     chart: release?.chart.metadata?.name || '',
-    version: currentVersion,
-    repo,
+    appVersion: release?.chart.metadata?.appVersion,
+    version: release?.chart.metadata?.version,
+    repo: currentRepo ?? '',
   };
+
+  const filteredVersions = currentRepo
+    ? versions?.filter((v) => v.Repo === currentRepo) || []
+    : versions || [];
 
   return (
     <div className="relative">
@@ -151,7 +161,7 @@ export function UpgradeButton({
   async function handleUpgrade() {
     const submittedUpgradeValues = await openUpgradeHelmModal(
       editableHelmRelease,
-      versions
+      filteredVersions
     );
 
     if (submittedUpgradeValues) {

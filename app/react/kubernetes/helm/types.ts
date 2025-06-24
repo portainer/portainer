@@ -120,9 +120,10 @@ export interface InstallChartPayload {
 export interface UpdateHelmReleasePayload {
   namespace: string;
   values?: string;
-  repo?: string;
+  repo: string;
   name: string;
   chart: string;
+  appVersion?: string;
   version?: string;
   atomic?: boolean;
 }

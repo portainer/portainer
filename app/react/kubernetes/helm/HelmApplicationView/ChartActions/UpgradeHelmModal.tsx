@@ -19,39 +19,48 @@ import { useHelmChartValues } from '../../queries/useHelmChartValues';
 
 interface Props {
   onSubmit: OnSubmit<UpdateHelmReleasePayload>;
-  values: UpdateHelmReleasePayload;
+  payload: UpdateHelmReleasePayload;
   versions: ChartVersion[];
   chartName: string;
-  repo: string;
 }
 
 export function UpgradeHelmModal({
-  values,
+  payload,
   versions,
   onSubmit,
   chartName,
-  repo,
 }: Props) {
   const versionOptions: Option<ChartVersion>[] = versions.map((version) => {
-    const isCurrentVersion = version.Version === values.version;
-    const label = `${version.Repo}@${version.Version}${
+    const repo = payload.repo === version.Repo ? version.Repo : '';
+    const isCurrentVersion =
+      version.AppVersion === payload.appVersion &&
+      version.Version === payload.version;
+
+    const label = `${repo}@${version.Version}${
       isCurrentVersion ? ' (current)' : ''
     }`;
+
     return {
+      repo,
       label,
       value: version,
     };
   });
+
   const defaultVersion =
-    versionOptions.find((v) => v.value.Version === values.version)?.value ||
-    versionOptions[0]?.value;
+    versionOptions.find(
+      (v) =>
+        v.value.AppVersion === payload.appVersion &&
+        v.value.Version === payload.version &&
+        v.value.Repo === payload.repo
+    )?.value || versionOptions[0]?.value;
   const [version, setVersion] = useState<ChartVersion>(defaultVersion);
-  const [userValues, setUserValues] = useState<string>(values.values || '');
+  const [userValues, setUserValues] = useState<string>(payload.values || '');
   const [atomic, setAtomic] = useState<boolean>(true);
 
   const chartValuesRefQuery = useHelmChartValues({
     chart: chartName,
-    repo,
+    repo: version.Repo,
     version: version.Version,
   });
 
@@ -75,7 +84,7 @@ export function UpgradeHelmModal({
             >
               <Input
                 id="release-name-input"
-                value={values.name}
+                value={payload.name}
                 readOnly
                 disabled
                 data-cy="helm-release-name-input"
@@ -88,7 +97,7 @@ export function UpgradeHelmModal({
             >
               <Input
                 id="namespace-input"
-                value={values.namespace}
+                value={payload.namespace}
                 readOnly
                 disabled
                 data-cy="helm-namespace-input"
@@ -142,10 +151,10 @@ export function UpgradeHelmModal({
           <Button
             onClick={() =>
               onSubmit({
-                name: values.name,
+                name: payload.name,
                 values: userValues,
-                namespace: values.namespace,
-                chart: values.chart,
+                namespace: payload.namespace,
+                chart: payload.chart,
                 repo: version.Repo,
                 version: version.Version,
                 atomic,
@@ -165,13 +174,12 @@ export function UpgradeHelmModal({
 }
 
 export async function openUpgradeHelmModal(
-  values: UpdateHelmReleasePayload,
+  payload: UpdateHelmReleasePayload,
   versions: ChartVersion[]
 ) {
   return openModal(withReactQuery(withCurrentUser(UpgradeHelmModal)), {
-    values,
+    payload,
     versions,
-    chartName: values.chart,
-    repo: values.repo ?? '',
+    chartName: payload.chart,
   });
 }
