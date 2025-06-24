@@ -87,6 +87,14 @@ func (factory *ClientFactory) ClearClientCache() {
 // Remove the cached kube client so a new one can be created
 func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
 	factory.endpointProxyClients.Delete(strconv.Itoa(int(endpointID)))
+
+	endpointPrefix := strconv.Itoa(int(endpointID)) + "."
+
+	for key := range factory.endpointProxyClients.Items() {
+		if strings.HasPrefix(key, endpointPrefix) {
+			factory.endpointProxyClients.Delete(key)
+		}
+	}
 }
 
 // GetPrivilegedKubeClient checks if an existing client is already registered for the environment(endpoint) and returns it if one is found.
