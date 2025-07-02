@@ -135,6 +135,7 @@ type (
 		LogMode                   *string
 		KubectlShellImage         *string
 		PullLimitCheckDisabled    *bool
+		TrustedOrigins            *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -1692,6 +1693,13 @@ const (
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
 	PullLimitCheckDisabledEnvVar = "PULL_LIMIT_CHECK_DISABLED"
+	// LicenseServerBaseURL represents the base URL of the API used to validate
+	// an extension license.
+	LicenseServerBaseURL = "https://api.portainer.io"
+	// URL to validate licenses along with system metadata.
+	LicenseCheckInURL = LicenseServerBaseURL + "/licenses/checkin"
+	// TrustedOriginsEnvVar is the environment variable used to set the trusted origins for CSRF protection
+	TrustedOriginsEnvVar = "TRUSTED_ORIGINS"
 )
 
 // List of supported features
