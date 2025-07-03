@@ -437,3 +437,64 @@ func Test_IsDNSName(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsTrustedOrigin(t *testing.T) {
+	f := func(s string, expected bool) {
+		t.Helper()
+
+		result := IsTrustedOrigin(s)
+		if result != expected {
+			t.Fatalf("unexpected result for %q; got %t; want %t", s, result, expected)
+		}
+	}
+
+	// Valid trusted origins - host only
+	f("localhost", true)
+	f("example.com", true)
+	f("192.168.1.1", true)
+	f("api.example.com", true)
+	f("subdomain.example.org", true)
+
+	// Invalid trusted origins - host with port (no longer allowed)
+	f("localhost:8080", false)
+	f("example.com:3000", false)
+	f("192.168.1.1:443", false)
+	f("api.example.com:9000", false)
+
+	// Invalid trusted origins - empty or malformed
+	f("", false)
+	f("invalid url", false)
+	f("://example.com", false)
+
+	// Invalid trusted origins - with scheme
+	f("http://example.com", false)
+	f("https://localhost", false)
+	f("ftp://192.168.1.1", false)
+
+	// Invalid trusted origins - with user info
+	f("user@example.com", false)
+	f("user:pass@localhost", false)
+
+	// Invalid trusted origins - with path
+	f("example.com/path", false)
+	f("localhost/api", false)
+	f("192.168.1.1/static", false)
+
+	// Invalid trusted origins - with query parameters
+	f("example.com?param=value", false)
+	f("localhost:8080?query=test", false)
+
+	// Invalid trusted origins - with fragment
+	f("example.com#fragment", false)
+	f("localhost:3000#section", false)
+
+	// Invalid trusted origins - with multiple invalid components
+	f("https://user@example.com/path?query=value#fragment", false)
+	f("http://localhost:8080/api/v1?param=test", false)
+
+	// Edge cases - ports are no longer allowed
+	f("example.com:0", false)     // port 0 is no longer valid
+	f("example.com:65535", false) // max port number is no longer valid
+	f("example.com:99999", false) // invalid port number
+	f("example.com:-1", false)    // negative port
+}

@@ -52,6 +52,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
@@ -330,6 +331,18 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		featureflags.Parse(*flags.FeatureFlags, portainer.SupportedFeatureFlags)
 	}
 
+	trustedOrigins := []string{}
+	if *flags.TrustedOrigins != "" {
+		// validate if the trusted origins are valid urls
+		for _, origin := range strings.Split(*flags.TrustedOrigins, ",") {
+			if !validate.IsTrustedOrigin(origin) {
+				log.Fatal().Str("trusted_origin", origin).Msg("invalid url for trusted origin. Please check the trusted origins flag.")
+			}
+
+			trustedOrigins = append(trustedOrigins, origin)
+		}
+	}
+
 	fileService := initFileService(*flags.Data)
 	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
 	if encryptionKey == nil {
@@ -578,6 +591,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		PendingActionsService:       pendingActionsService,
 		PlatformService:             platformService,
 		PullLimitCheckDisabled:      *flags.PullLimitCheckDisabled,
+		TrustedOrigins:              trustedOrigins,
 	}
 }
 

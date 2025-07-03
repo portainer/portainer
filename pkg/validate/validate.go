@@ -80,3 +80,32 @@ func IsDNSName(s string) bool {
 
 	return !IsIP(s) && dnsNameRegex.MatchString(s)
 }
+
+func IsTrustedOrigin(s string) bool {
+	// Reject if a scheme is present
+	if strings.Contains(s, "://") {
+		return false
+	}
+
+	// Prepend http:// for parsing
+	strTemp := "http://" + s
+	parsedOrigin, err := url.Parse(strTemp)
+	if err != nil {
+		return false
+	}
+
+	// Validate host, and ensure no user, path, query, fragment, port, etc.
+	if parsedOrigin.Host == "" ||
+		parsedOrigin.User != nil ||
+		parsedOrigin.Path != "" ||
+		parsedOrigin.RawQuery != "" ||
+		parsedOrigin.Fragment != "" ||
+		parsedOrigin.Opaque != "" ||
+		parsedOrigin.RawFragment != "" ||
+		parsedOrigin.RawPath != "" ||
+		parsedOrigin.Port() != "" {
+		return false
+	}
+
+	return true
+}

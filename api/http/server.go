@@ -113,6 +113,7 @@ type Server struct {
 	PendingActionsService       *pendingactions.PendingActionsService
 	PlatformService             platform.Service
 	PullLimitCheckDisabled      bool
+	TrustedOrigins              []string
 }
 
 // Start starts the HTTP server
@@ -336,7 +337,7 @@ func (server *Server) Start() error {
 
 	handler = middlewares.WithPanicLogger(middlewares.WithSlowRequestsLogger(handler))
 
-	handler, err := csrf.WithProtect(handler)
+	handler, err := csrf.WithProtect(handler, server.TrustedOrigins)
 	if err != nil {
 		return errors.Wrap(err, "failed to create CSRF middleware")
 	}
