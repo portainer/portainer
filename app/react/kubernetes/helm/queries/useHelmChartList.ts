@@ -27,6 +27,7 @@ export function useHelmHTTPChartList(
     // one request takes a long time, so fail early to get feedback to the user faster
     retry: false,
     ...withGlobalError(`Unable to retrieve Helm charts from ${repository}`),
+    cacheTime: 1000 * 60 * 60 * 8, // 8 hours so that the chart list populates faster (keep stale time the same to always revalidate)
   });
 }
 
