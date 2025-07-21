@@ -104,6 +104,7 @@ class KubernetesStackLogsController {
       await this.getStackLogsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve stack logs');
+      this.stopRepeater();
     } finally {
       this.state.viewReady = true;
     }

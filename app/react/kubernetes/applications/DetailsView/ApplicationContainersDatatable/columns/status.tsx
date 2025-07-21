@@ -1,6 +1,9 @@
 import { CellContext } from '@tanstack/react-table';
 
-import { Badge, BadgeType } from '@@/Badge';
+import { pluralize } from '@/react/common/string-utils';
+
+import { Badge } from '@@/Badge';
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import { ContainerRowData } from '../types';
 
@@ -11,19 +14,24 @@ export const status = columnHelper.accessor('status', {
   cell: StatusCell,
 });
 
-function StatusCell({ getValue }: CellContext<ContainerRowData, string>) {
-  return <Badge type={getContainerStatusType(getValue())}>{getValue()}</Badge>;
-}
+function StatusCell({
+  getValue,
+}: CellContext<ContainerRowData, ContainerRowData['status']>) {
+  const statusData = getValue();
 
-function getContainerStatusType(status: string): BadgeType {
-  switch (status.toLowerCase()) {
-    case 'running':
-      return 'success';
-    case 'waiting':
-      return 'warn';
-    case 'terminated':
-      return 'info';
-    default:
-      return 'danger';
-  }
+  return (
+    <Badge type={statusData.type}>
+      <div className="flex items-center gap-1">
+        <span>
+          {statusData.status}
+          {statusData.restartCount &&
+            ` (Restarted ${statusData.restartCount} ${pluralize(
+              statusData.restartCount,
+              'time'
+            )})`}
+        </span>
+      </div>
+      {statusData.message && <Tooltip message={statusData.message} />}
+    </Badge>
+  );
 }

@@ -77,6 +77,7 @@ class KubernetesApplicationLogsController {
       await this.getApplicationLogsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
+      this.stopRepeater();
     } finally {
       this.state.viewReady = true;
     }

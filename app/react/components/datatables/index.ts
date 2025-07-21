@@ -11,3 +11,4 @@ export { TableHeaderRow } from './TableHeaderRow';
 export { TableRow } from './TableRow';
 export { TableContent } from './TableContent';
 export { TableFooter } from './TableFooter';
+export { TableSettingsMenuAutoRefresh } from './TableSettingsMenuAutoRefresh';

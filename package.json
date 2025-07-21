@@ -199,7 +199,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.3",
     "husky": "^8.0.0",
-    "kubernetes-types": "^1.26.0",
+    "kubernetes-types": "^1.30.0",
     "lint-staged": "^14.0.1",
     "lodash-webpack-plugin": "^0.11.6",
     "mini-css-extract-plugin": "^2.7.6",

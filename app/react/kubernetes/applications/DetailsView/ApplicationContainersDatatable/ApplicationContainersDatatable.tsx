@@ -1,14 +1,18 @@
 import { Server } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
-import { ContainerStatus, Pod } from 'kubernetes-types/core/v1';
+import { Pod } from 'kubernetes-types/core/v1';
 
 import { IndexOptional } from '@/react/kubernetes/configs/types';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 
-import { Datatable } from '@@/datatables';
+import {
+  Datatable,
+  TableSettingsMenu,
+  TableSettingsMenuAutoRefresh,
+} from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
 
 import { useApplication } from '../../queries/useApplication';
@@ -16,6 +20,7 @@ import { useApplicationPods } from '../../queries/useApplicationPods';
 
 import { ContainerRowData } from './types';
 import { getColumns } from './columns';
+import { computeContainerStatus } from './computeContainerStatus';
 
 const storageKey = 'k8sContainersDatatable';
 const settingsStore = createStore(storageKey);
@@ -36,13 +41,19 @@ export function ApplicationContainersDatatable() {
     environmentId,
     namespace,
     name,
-    resourceType
+    resourceType,
+    {
+      autoRefreshRate: tableState.autoRefreshRate * 1000,
+    }
   );
   const podsQuery = useApplicationPods(
     environmentId,
     namespace,
     name,
-    applicationQuery.data
+    applicationQuery.data,
+    {
+      autoRefreshRate: tableState.autoRefreshRate * 1000,
+    }
   );
   const appContainers = useContainersRowData(podsQuery.data);
 
@@ -61,6 +72,14 @@ export function ApplicationContainersDatatable() {
       getRowId={(row) => row.podName} // use pod name because it's unique (name is not unique)
       disableSelect
       data-cy="k8s-application-containers-datatable"
+      renderTableSettings={() => (
+        <TableSettingsMenu>
+          <TableSettingsMenuAutoRefresh
+            value={tableState.autoRefreshRate}
+            onChange={(value) => tableState.setAutoRefreshRate(value)}
+          />
+        </TableSettingsMenu>
+      )}
     />
   );
 }
@@ -73,8 +92,14 @@ function useContainersRowData(pods?: Pod[]): ContainerRowData[] {
       () =>
         pods?.flatMap((pod) => {
           const containers = [
-            ...(pod.spec?.containers || []),
-            ...(pod.spec?.initContainers || []),
+            ...(pod.spec?.containers?.map((c) => ({ ...c, isInit: false })) ||
+              []),
+            ...(pod.spec?.initContainers?.map((c) => ({
+              ...c,
+              isInit: true,
+              // https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/#sidecar-containers-and-pod-lifecycle
+              isSidecar: c.restartPolicy === 'Always',
+            })) || []),
           ];
           return containers.map((container) => ({
             ...container,
@@ -84,29 +109,12 @@ function useContainersRowData(pods?: Pod[]): ContainerRowData[] {
             creationDate: pod.status?.startTime ?? '',
             status: computeContainerStatus(
               container.name,
-              pod.status?.containerStatuses
+              pod.status?.containerStatuses,
+              pod.status?.initContainerStatuses
             ),
           }));
         }) || [],
       [pods]
     ) || []
   );
-}
-
-function computeContainerStatus(
-  containerName: string,
-  statuses?: ContainerStatus[]
-) {
-  const status = statuses?.find((status) => status.name === containerName);
-  if (!status) {
-    return 'Terminated';
-  }
-  const { state } = status;
-  if (state?.waiting) {
-    return 'Waiting';
-  }
-  if (!state?.running) {
-    return 'Terminated';
-  }
-  return 'Running';
 }

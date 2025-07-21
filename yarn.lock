@@ -12868,10 +12868,10 @@ klona@^2.0.6:
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.6.tgz#85bffbf819c03b2f53270412420a4555ef882e22"
   integrity sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==
 
-kubernetes-types@^1.26.0:
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/kubernetes-types/-/kubernetes-types-1.26.0.tgz#47b7db20eb084931cfebf67937cc6b9091dc3da3"
-  integrity sha512-jv0XaTIGW/p18jaiKRD85hLTYWx0yEj+cb6PDX3GdNa3dWoRxnD4Gv7+bE6C/ehcsp2skcdy34vT25jbPofDIQ==
+kubernetes-types@^1.30.0:
+  version "1.30.0"
+  resolved "https://registry.yarnpkg.com/kubernetes-types/-/kubernetes-types-1.30.0.tgz#f686cacb08ffc5f7e89254899c2153c723420116"
+  integrity sha512-Dew1okvhM/SQcIa2rcgujNndZwU8VnSapDgdxlYoB84ZlpAD43U6KLAFqYo17ykSFGHNPrg0qry0bP+GJd9v7Q==
 
 kuler@^2.0.0:
   version "2.0.0"
