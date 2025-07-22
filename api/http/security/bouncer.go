@@ -534,7 +534,7 @@ func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 		}
 
 		if csp {
-			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud; frame-ancestors 'none';")
+			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud js.hsforms.net; frame-ancestors 'none';")
 		}
 
 		w.Header().Set("X-Content-Type-Options", "nosniff")
