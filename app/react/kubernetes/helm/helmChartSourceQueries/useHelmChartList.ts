@@ -6,6 +6,8 @@ import { withGlobalError } from '@/react-tools/react-query';
 
 import { Chart, HelmChartsResponse } from '../types';
 
+import { queryKeys } from './query-keys';
+
 /**
  * React hook to fetch helm charts from the provided HTTP repository.
  * Charts are loaded from the specified repository URL.
@@ -21,7 +23,7 @@ export function useHelmHTTPChartList(
   enabled: boolean
 ) {
   return useQuery({
-    queryKey: [userId, repository, 'helm-charts'],
+    queryKey: queryKeys.charts(userId, repository),
     queryFn: () => getChartsFromRepo(repository),
     enabled: !!userId && !!repository && enabled,
     // one request takes a long time, so fail early to get feedback to the user faster

@@ -11,7 +11,7 @@ import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
 
 import { HelmRelease } from '../../types';
-import { useHelmHistory } from '../queries/useHelmHistory';
+import { useHelmHistory } from '../../helmReleaseQueries/useHelmHistory';
 
 import { ManifestDetails } from './ManifestDetails';
 import { NotesDetails } from './NotesDetails';

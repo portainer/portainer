@@ -113,6 +113,10 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 			Str("namespace", installOpts.Namespace).
 			Err(err).
 			Msg("Failed to install helm chart for helm release installation")
+		if installOpts.DryRun {
+			// remove installation wording for dry run. The inner error has enough context.
+			return nil, errors.Wrap(err, "dry-run failed")
+		}
 		return nil, errors.Wrap(err, "helm was not able to install the chart for helm release installation")
 	}
 
@@ -142,6 +146,7 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	installClient.Wait = installOpts.Wait
 	installClient.Timeout = installOpts.Timeout
 	installClient.Version = installOpts.Version
+	installClient.DryRun = installOpts.DryRun
 	err := configureChartPathOptions(&installClient.ChartPathOptions, installOpts.Version, installOpts.Repo, installOpts.Registry)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to configure chart path options for helm release installation")

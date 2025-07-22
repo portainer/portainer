@@ -10,17 +10,19 @@ import { Option } from '@/react/components/form-components/PortainerSelect';
 import { HelmRegistriesResponse } from '../types';
 import { RepoValue } from '../components/HelmRegistrySelect';
 
+import { queryKeys } from './query-keys';
+
 /**
  * Hook to fetch all Helm registries for the current user
  */
 export function useUserHelmRepositories<T = string[]>({
   select,
 }: {
-  select?: (registries: string[]) => T;
+  select?: (registries: HelmRegistriesResponse) => T;
 } = {}) {
   const { user } = useCurrentUser();
   return useQuery(
-    ['helm', 'registries'],
+    queryKeys.registries(user.Id),
     async () => getUserHelmRepositories(user.Id),
     {
       enabled: !!user.Id,
@@ -33,7 +35,8 @@ export function useUserHelmRepositories<T = string[]>({
 export function useHelmRepoOptions() {
   return useUserHelmRepositories({
     select: (registries) => {
-      const repoOptions = registries
+      const registryArray = flattenHelmRegistries(registries);
+      const repoOptions = registryArray
         .map<Option<RepoValue>>((registry) => ({
           label: registry,
           value: {
@@ -72,13 +75,18 @@ async function getUserHelmRepositories(userId: UserId) {
     const { data } = await axios.get<HelmRegistriesResponse>(
       `users/${userId}/helm/repositories`
     );
-    // compact will remove the global repository if it's empty
-    const repos = compact([
-      data.GlobalRepository.toLowerCase(),
-      ...data.UserRepositories.map((repo) => repo.URL.toLowerCase()),
-    ]);
-    return [...new Set(repos)];
+    return data;
   } catch (err) {
     throw parseAxiosError(err, 'Unable to retrieve helm repositories for user');
   }
+}
+
+/** get the unique global and user registries in one array */
+export function flattenHelmRegistries(registries: HelmRegistriesResponse) {
+  // compact will remove the global repository if it's empty
+  const repos = compact([
+    registries.GlobalRepository.toLowerCase(),
+    ...registries.UserRepositories.map((repo) => repo.URL.toLowerCase()),
+  ]);
+  return [...new Set(repos)];
 }

@@ -4,7 +4,9 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { HelmRelease } from '../../types';
+import { HelmRelease } from '../types';
+
+import { queryKeys } from './query-keys';
 
 export function useHelmHistory(
   environmentId: EnvironmentId,
@@ -12,7 +14,7 @@ export function useHelmHistory(
   namespace: string
 ) {
   return useQuery(
-    [environmentId, 'helm', 'releases', namespace, name, 'history'],
+    queryKeys.releaseHistory(environmentId, namespace, name),
     () => getHelmHistory(environmentId, name, namespace),
     {
       enabled: !!environmentId && !!name && !!namespace,

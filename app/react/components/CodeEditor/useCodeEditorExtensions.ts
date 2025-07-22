@@ -48,7 +48,7 @@ function yamlLanguage(schema?: JSONSchema7) {
     syntaxHighlighting(oneDarkHighlightStyle),
     // explicitly setting lineNumbers() as an extension ensures that the gutter order is the same between the diff viewer and the code editor
     lineNumbers(),
-    lintGutter(),
+    !!schema && lintGutter(),
     keymap.of([...defaultKeymap, ...completionKeymap, ...lintKeymap]),
     // only show completions when a schema is provided
     !!schema &&

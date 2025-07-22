@@ -7,7 +7,7 @@ import { getAllSettledItems } from '@/portainer/helpers/promise-utils';
 import { withGlobalError } from '@/react-tools/react-query';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { pluralize } from '@/portainer/helpers/strings';
-import { uninstallHelmApplication } from '@/react/kubernetes/helm/HelmApplicationView/queries/useUninstallHelmAppMutation';
+import { uninstallHelmApplication } from '@/react/kubernetes/helm/helmReleaseQueries/useUninstallHelmAppMutation';
 
 import { parseKubernetesAxiosError } from '../../axiosError';
 import { ApplicationRowData } from '../ListView/ApplicationsDatatable/types';

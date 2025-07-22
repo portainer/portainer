@@ -17,6 +17,7 @@ type InstallOptions struct {
 	ValuesFile              string
 	PostRenderer            string
 	Atomic                  bool
+	DryRun                  bool
 	Timeout                 time.Duration
 	KubernetesClusterAccess *KubernetesClusterAccess
 

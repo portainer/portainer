@@ -1,5 +1,7 @@
 import { Form, useFormikContext } from 'formik';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+
+import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
@@ -7,9 +9,10 @@ import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons';
 
 import { Chart } from '../types';
-import { useHelmChartValues } from '../queries/useHelmChartValues';
+import { useHelmChartValues } from '../helmChartSourceQueries/useHelmChartValues';
 import { HelmValuesInput } from '../components/HelmValuesInput';
-import { ChartVersion } from '../queries/useHelmRepoVersions';
+import { ChartVersion } from '../helmChartSourceQueries/useHelmRepoVersions';
+import { ManifestPreviewFormSection } from '../components/ManifestPreviewFormSection';
 
 import { HelmInstallFormValues } from './types';
 
@@ -30,6 +33,8 @@ export function HelmInstallInnerForm({
   isVersionsLoading,
   isRepoAvailable,
 }: Props) {
+  const environmentId = useEnvironmentId();
+  const [previewIsValid, setPreviewIsValid] = useState(false);
   const { values, setFieldValue, isSubmitting } =
     useFormikContext<HelmInstallFormValues>();
 
@@ -60,6 +65,25 @@ export function HelmInstallInnerForm({
       ...repoParams,
     },
     isLatestVersionFetched
+  );
+
+  const payload = useMemo(
+    () => ({
+      name: name || '',
+      namespace: namespace || '',
+      chart: selectedChart.name,
+      version: values?.version,
+      repo: selectedChart.repo,
+      values: values.values,
+    }),
+    [
+      name,
+      namespace,
+      selectedChart.name,
+      values?.version,
+      selectedChart.repo,
+      values.values,
+    ]
   );
 
   return (
@@ -93,13 +117,19 @@ export function HelmInstallInnerForm({
             isValuesRefLoading={chartValuesRefQuery.isInitialLoading}
           />
         </FormSection>
+        <ManifestPreviewFormSection
+          payload={payload}
+          onChangePreviewValidation={setPreviewIsValid}
+          title="Manifest preview"
+          environmentId={environmentId}
+        />
       </div>
 
       <LoadingButton
-        className="!ml-0"
+        className="!ml-0 mt-5"
         loadingText="Installing Helm chart"
         isLoading={isSubmitting}
-        disabled={!namespace || !name || !isRepoAvailable}
+        disabled={!namespace || !name || !isRepoAvailable || !previewIsValid}
         data-cy="helm-install"
       >
         Install

@@ -12,14 +12,14 @@ import { Alert } from '@@/Alert';
 
 import { HelmRelease } from '../types';
 import { useIsSystemNamespace } from '../../namespaces/queries/useIsSystemNamespace';
+import { useHelmRelease } from '../helmReleaseQueries/useHelmRelease';
+import { useHelmHistory } from '../helmReleaseQueries/useHelmHistory';
 
 import { HelmSummary } from './HelmSummary';
 import { ReleaseTabs } from './ReleaseDetails/ReleaseTabs';
-import { useHelmRelease } from './queries/useHelmRelease';
 import { ChartActions } from './ChartActions/ChartActions';
 import { HelmRevisionList } from './HelmRevisionList';
 import { HelmRevisionListSheet } from './HelmRevisionListSheet';
-import { useHelmHistory } from './queries/useHelmHistory';
 
 export function HelmApplicationView() {
   const environmentId = useEnvironmentId();

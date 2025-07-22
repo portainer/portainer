@@ -7,30 +7,48 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { HelmRelease, UpdateHelmReleasePayload } from '../types';
 
+import { queryKeys } from './query-keys';
+
 export function useUpdateHelmReleaseMutation(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: UpdateHelmReleasePayload) =>
       updateHelmRelease(environmentId, payload),
     ...withInvalidate(queryClient, [
-      [environmentId, 'helm', 'releases'],
+      queryKeys.releases(environmentId),
       applicationsQueryKeys.applications(environmentId),
     ]),
-    ...withGlobalError('Unable to uninstall helm application'),
+    ...withGlobalError('Unable to update Helm release'),
   });
 }
 
-async function updateHelmRelease(
+type UpdateHelmReleaseParams = {
+  dryRun?: boolean;
+};
+
+type UpdateHelmReleaseOptions = {
+  errorMessage?: string;
+};
+
+export async function updateHelmRelease(
   environmentId: EnvironmentId,
-  payload: UpdateHelmReleasePayload
+  payload: UpdateHelmReleasePayload,
+  params: UpdateHelmReleaseParams = {},
+  options: UpdateHelmReleaseOptions = {}
 ) {
   try {
     const { data } = await axios.post<HelmRelease>(
       `endpoints/${environmentId}/kubernetes/helm`,
-      payload
+      payload,
+      {
+        params,
+      }
     );
     return data;
   } catch (err) {
-    throw parseAxiosError(err, 'Unable to update helm release');
+    throw parseAxiosError(
+      err,
+      options.errorMessage ?? 'Unable to update helm release'
+    );
   }
 }

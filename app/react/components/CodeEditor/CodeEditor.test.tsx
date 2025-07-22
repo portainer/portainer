@@ -122,7 +122,7 @@ test('should apply custom height', async () => {
     <CodeEditor {...defaultProps} height={customHeight} />
   );
 
-  const editor = (await findByRole('textbox')).parentElement?.parentElement;
+  const editor = await findByRole('textbox');
   expect(editor).toHaveStyle({ height: customHeight });
 });
 

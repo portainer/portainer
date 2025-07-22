@@ -5,6 +5,8 @@ import { compact, flatMap } from 'lodash';
 import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
+import { queryKeys } from './query-keys';
+
 interface HelmSearch {
   entries: Entries;
 }
@@ -44,9 +46,9 @@ export function useHelmRepoVersions(
     queries: useMemo(
       () =>
         repoSources.map(({ repo }) => ({
-          queryKey: ['helm', 'repositories', chart, repo, useCache],
+          queryKey: queryKeys.chartVersions(repo || '', chart),
           queryFn: () => getSearchHelmRepo({ repo, chart, useCache }),
-          enabled: !!chart && repoSources.length > 0,
+          enabled: !!chart && !!repo,
           staleTime,
           ...withGlobalError(`Unable to retrieve versions from ${repo}`),
         })),

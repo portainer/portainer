@@ -3,8 +3,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
-
-import { GenericResource } from '../../../types';
+import { GenericResource } from '@/react/kubernetes/helm/types';
 
 import { ResourcesTable } from './ResourcesTable';
 
@@ -22,7 +21,7 @@ vi.mock('@/react/hooks/useEnvironmentId', () => ({
   useEnvironmentId: () => mockUseEnvironmentId(),
 }));
 
-vi.mock('../../queries/useHelmRelease', () => ({
+vi.mock('@/react/kubernetes/helm/helmReleaseQueries/useHelmRelease', () => ({
   useHelmRelease: () => mockUseHelmRelease(),
 }));
 

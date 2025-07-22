@@ -165,6 +165,7 @@ func initUpgradeClient(actionConfig *action.Configuration, upgradeOpts options.I
 	upgradeClient.Atomic = upgradeOpts.Atomic
 	upgradeClient.Wait = upgradeOpts.Wait
 	upgradeClient.Version = upgradeOpts.Version
+	upgradeClient.DryRun = upgradeOpts.DryRun
 	err := configureChartPathOptions(&upgradeClient.ChartPathOptions, upgradeOpts.Version, upgradeOpts.Repo, upgradeOpts.Registry)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to configure chart path options for helm release upgrade")

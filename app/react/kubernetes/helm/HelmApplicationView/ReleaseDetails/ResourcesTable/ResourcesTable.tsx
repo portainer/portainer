@@ -1,6 +1,7 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useHelmRelease } from '@/react/kubernetes/helm/helmReleaseQueries/useHelmRelease';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
@@ -12,8 +13,6 @@ import { useTableState } from '@@/datatables/useTableState';
 import { Widget } from '@@/Widget';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { TextTip } from '@@/Tip/TextTip';
-
-import { useHelmRelease } from '../../queries/useHelmRelease';
 
 import { columns } from './columns';
 import { useResourceRows } from './useResourceRows';

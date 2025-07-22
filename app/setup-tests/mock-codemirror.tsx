@@ -1,7 +1,36 @@
 export function mockCodeMirror() {
   vi.mock('@uiw/react-codemirror', () => ({
     __esModule: true,
-    default: () => <div />,
+    default: ({
+      value,
+      onChange,
+      readOnly,
+      placeholder,
+      height,
+      className,
+      id,
+      'data-cy': dataCy,
+    }: {
+      value?: string;
+      onChange?: (value: string) => void;
+      readOnly?: boolean;
+      placeholder?: string;
+      height?: string;
+      className?: string;
+      id?: string;
+      'data-cy'?: string;
+    }) => (
+      <textarea
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        readOnly={readOnly}
+        placeholder={placeholder}
+        style={height ? { height } : undefined}
+        className={className}
+        id={id}
+        data-cy={dataCy}
+      />
+    ),
     oneDarkHighlightStyle: {},
     keymap: {
       of: () => ({}),

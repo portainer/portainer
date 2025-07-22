@@ -11,11 +11,11 @@ import { confirmGenericDiscard } from '@@/modals/confirm';
 import { Option } from '@@/form-components/PortainerSelect';
 
 import { Chart } from '../types';
-import { useUpdateHelmReleaseMutation } from '../queries/useUpdateHelmReleaseMutation';
+import { useUpdateHelmReleaseMutation } from '../helmReleaseQueries/useUpdateHelmReleaseMutation';
 import {
   ChartVersion,
   useHelmRepoVersions,
-} from '../queries/useHelmRepoVersions';
+} from '../helmChartSourceQueries/useHelmRepoVersions';
 
 import { HelmInstallInnerForm } from './HelmInstallInnerForm';
 import { HelmInstallFormValues } from './types';

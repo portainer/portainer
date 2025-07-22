@@ -9,7 +9,7 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { confirm } from '@@/modals/confirm';
 import { ModalType } from '@@/modals';
 
-import { useHelmRollbackMutation } from '../queries/useHelmRollbackMutation';
+import { useHelmRollbackMutation } from '../../helmReleaseQueries/useHelmRollbackMutation';
 
 type Props = {
   latestRevision: number;

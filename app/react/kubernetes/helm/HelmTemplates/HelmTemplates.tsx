@@ -4,13 +4,13 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { FormSection } from '@@/form-components/FormSection';
 
-import { useHelmHTTPChartList } from '../queries/useHelmChartList';
+import { useHelmHTTPChartList } from '../helmChartSourceQueries/useHelmChartList';
 import { Chart } from '../types';
 import {
   HelmRegistrySelect,
   RepoValue,
 } from '../components/HelmRegistrySelect';
-import { useHelmRepoOptions } from '../queries/useHelmRepositories';
+import { useHelmRepoOptions } from '../helmChartSourceQueries/useHelmRepositories';
 
 import { HelmInstallForm } from './HelmInstallForm';
 import { HelmTemplatesSelectedItem } from './HelmTemplatesSelectedItem';

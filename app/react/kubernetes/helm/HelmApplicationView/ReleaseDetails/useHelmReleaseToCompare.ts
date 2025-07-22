@@ -1,7 +1,7 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { HelmRelease } from '../../types';
-import { useHelmRelease } from '../queries/useHelmRelease';
+import { useHelmRelease } from '../../helmReleaseQueries/useHelmRelease';
 
 import { DiffViewMode } from './DiffControl';
 

@@ -4,7 +4,9 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withGlobalError } from '@/react-tools/react-query';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { HelmRelease } from '../../types';
+import { HelmRelease } from '../types';
+
+import { queryKeys } from './query-keys';
 
 type Options<T> = {
   select?: (data: HelmRelease) => T;
@@ -27,15 +29,7 @@ export function useHelmRelease<T = HelmRelease>(
   const { select, showResources, refetchInterval, revision, staleTime } =
     options;
   return useQuery(
-    [
-      environmentId,
-      'helm',
-      'releases',
-      namespace,
-      name,
-      revision,
-      showResources,
-    ],
+    queryKeys.release(environmentId, namespace, name, revision, showResources),
     () =>
       getHelmRelease(environmentId, name, {
         namespace,

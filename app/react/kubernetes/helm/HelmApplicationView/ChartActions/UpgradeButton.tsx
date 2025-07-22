@@ -12,10 +12,13 @@ import { Tooltip } from '@@/Tip/Tooltip';
 import { Link } from '@@/Link';
 
 import { HelmRelease, UpdateHelmReleasePayload } from '../../types';
-import { useUpdateHelmReleaseMutation } from '../../queries/useUpdateHelmReleaseMutation';
-import { useHelmRepoVersions } from '../../queries/useHelmRepoVersions';
-import { useHelmRelease } from '../queries/useHelmRelease';
-import { useUserHelmRepositories } from '../../queries/useHelmRepositories';
+import { useUpdateHelmReleaseMutation } from '../../helmReleaseQueries/useUpdateHelmReleaseMutation';
+import { useHelmRepoVersions } from '../../helmChartSourceQueries/useHelmRepoVersions';
+import { useHelmRelease } from '../../helmReleaseQueries/useHelmRelease';
+import {
+  flattenHelmRegistries,
+  useUserHelmRepositories,
+} from '../../helmChartSourceQueries/useHelmRepositories';
 
 import { openUpgradeHelmModal } from './UpgradeHelmModal';
 
@@ -36,7 +39,9 @@ export function UpgradeButton({
   const [useCache, setUseCache] = useState(true);
   const updateHelmReleaseMutation = useUpdateHelmReleaseMutation(environmentId);
 
-  const userRepositoriesQuery = useUserHelmRepositories();
+  const userRepositoriesQuery = useUserHelmRepositories({
+    select: flattenHelmRegistries,
+  });
   const helmRepoVersionsQuery = useHelmRepoVersions(
     release?.chart.metadata?.name || '',
     60 * 60 * 1000, // 1 hour
@@ -164,7 +169,9 @@ export function UpgradeButton({
   async function handleUpgrade() {
     const submittedUpgradeValues = await openUpgradeHelmModal(
       editableHelmRelease,
-      filteredVersions
+      filteredVersions,
+      release?.manifest || '',
+      environmentId
     );
 
     if (submittedUpgradeValues) {

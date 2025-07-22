@@ -5,6 +5,8 @@ import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
 import { queryKeys as applicationsQueryKeys } from '@/react/kubernetes/applications/queries/query-keys';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
+import { queryKeys } from './query-keys';
+
 export function useUninstallHelmAppMutation(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -16,6 +18,7 @@ export function useUninstallHelmAppMutation(environmentId: EnvironmentId) {
       namespace?: string;
     }) => uninstallHelmApplication(environmentId, releaseName, namespace),
     ...withInvalidate(queryClient, [
+      queryKeys.releases(environmentId),
       applicationsQueryKeys.applications(environmentId),
     ]),
     ...withGlobalError('Unable to uninstall helm application'),

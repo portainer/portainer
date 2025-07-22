@@ -12,6 +12,7 @@ interface Props {
   titleClassName?: string;
   className?: string;
   htmlFor?: string;
+  setIsDefaultFolded?: (isDefaultFolded: boolean) => void;
 }
 
 export function FormSection({
@@ -23,6 +24,7 @@ export function FormSection({
   titleClassName,
   className,
   htmlFor = '',
+  setIsDefaultFolded,
 }: PropsWithChildren<Props>) {
   const [isExpanded, setIsExpanded] = useState(!defaultFolded);
   const id = `foldingButton${title}`;
@@ -39,7 +41,10 @@ export function FormSection({
             isExpanded={isExpanded}
             data-cy={id}
             id={id}
-            onClick={() => setIsExpanded((isExpanded) => !isExpanded)}
+            onClick={() => {
+              setIsExpanded((isExpanded) => !isExpanded);
+              setIsDefaultFolded?.(isExpanded);
+            }}
           />
         )}
 

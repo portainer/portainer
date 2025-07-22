@@ -9,7 +9,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import {
   useHelmRepoVersions,
   ChartVersion,
-} from '../../queries/useHelmRepoVersions';
+} from '../../helmChartSourceQueries/useHelmRepoVersions';
 import { HelmRelease } from '../../types';
 
 import { openUpgradeHelmModal } from './UpgradeHelmModal';
@@ -25,32 +25,56 @@ vi.mock('@/portainer/services/notifications', () => ({
   notifySuccess: vi.fn(),
 }));
 
-vi.mock('../../queries/useHelmRepositories', () => ({
-  useUserHelmRepositories: vi.fn(() => ({
-    data: ['repo1', 'repo2'],
-    isInitialLoading: false,
-    isError: false,
-  })),
-}));
+vi.mock('../../helmChartSourceQueries/useHelmRepositories', async () => {
+  const actual = await vi.importActual(
+    '../../helmChartSourceQueries/useHelmRepositories'
+  );
+  return {
+    ...actual,
+    useUserHelmRepositories: vi.fn(() => ({
+      data: ['repo1', 'repo2'],
+      isInitialLoading: false,
+      isError: false,
+    })),
+  };
+});
 
-vi.mock('../../queries/useHelmRepoVersions', () => ({
-  useHelmRepoVersions: vi.fn(),
-}));
+vi.mock('../../helmChartSourceQueries/useHelmRepoVersions', async () => {
+  const actual = await vi.importActual(
+    '../../helmChartSourceQueries/useHelmRepoVersions'
+  );
+  return {
+    ...actual,
+    useHelmRepoVersions: vi.fn(),
+  };
+});
 
 // Mock the useHelmRelease hook
-vi.mock('../queries/useHelmRelease', () => ({
-  useHelmRelease: vi.fn(() => ({
-    data: '1.0.0',
-  })),
-}));
+vi.mock('../../helmReleaseQueries/useHelmRelease', async () => {
+  const actual = await vi.importActual(
+    '../../helmReleaseQueries/useHelmRelease'
+  );
+  return {
+    ...actual,
+    useHelmRelease: vi.fn(() => ({
+      data: '1.0.0',
+    })),
+  };
+});
 
 // Mock the useUpdateHelmReleaseMutation hook
-vi.mock('../../queries/useUpdateHelmReleaseMutation', () => ({
-  useUpdateHelmReleaseMutation: vi.fn(() => ({
-    mutate: vi.fn(),
-    isLoading: false,
-  })),
-}));
+vi.mock('../../helmReleaseQueries/useUpdateHelmReleaseMutation', async () => {
+  const actual = await vi.importActual(
+    '../../helmReleaseQueries/useUpdateHelmReleaseMutation'
+  );
+  return {
+    ...actual,
+    useUpdateHelmReleaseMutation: vi.fn(() => ({
+      mutate: vi.fn(),
+      isLoading: false,
+    })),
+  };
+});
 
 function renderButton(props = {}) {
   const defaultProps = {
@@ -157,12 +181,14 @@ describe('UpgradeButton', () => {
         metadata: {
           name: 'test-chart',
           version: '1.0.0',
+          appVersion: '1.0.0',
         },
       },
       values: {
         userSuppliedValues: '{}',
       },
       manifest: '',
+      namespace: 'default',
     } as HelmRelease;
 
     vi.mocked(useHelmRepoVersions).mockReturnValue({
@@ -193,7 +219,9 @@ describe('UpgradeButton', () => {
         expect.arrayContaining([
           { Version: '1.0.0', Repo: 'stable' },
           { Version: '1.1.0', Repo: 'stable' },
-        ])
+        ]),
+        '', // releaseManifest
+        1 // environmentId
       );
     });
   });

@@ -5,7 +5,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
-import { useUninstallHelmAppMutation } from '../queries/useUninstallHelmAppMutation';
+import { useUninstallHelmAppMutation } from '../../helmReleaseQueries/useUninstallHelmAppMutation';
 
 export function UninstallButton({
   environmentId,

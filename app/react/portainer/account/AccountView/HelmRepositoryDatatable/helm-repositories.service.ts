@@ -4,6 +4,8 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { success as notifySuccess } from '@/portainer/services/notifications';
 import { withError } from '@/react-tools/react-query';
 import { pluralize } from '@/portainer/helpers/strings';
+import { queryKeys } from '@/react/kubernetes/helm/helmChartSourceQueries/query-keys';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import {
   CreateHelmRepositoryPayload,
@@ -52,11 +54,12 @@ export async function deleteHelmRepositories(repos: HelmRepository[]) {
 
 export function useDeleteHelmRepositoryMutation() {
   const queryClient = useQueryClient();
+  const { user } = useCurrentUser();
 
   return useMutation(deleteHelmRepository, {
     onSuccess: (_, helmRepository) => {
       notifySuccess('Helm repository deleted successfully', helmRepository.URL);
-      return queryClient.invalidateQueries(['helmrepositories']);
+      return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
     ...withError('Unable to delete Helm repository'),
   });
@@ -64,6 +67,7 @@ export function useDeleteHelmRepositoryMutation() {
 
 export function useDeleteHelmRepositoriesMutation() {
   const queryClient = useQueryClient();
+  const { user } = useCurrentUser();
 
   return useMutation(deleteHelmRepositories, {
     onSuccess: () => {
@@ -75,26 +79,31 @@ export function useDeleteHelmRepositoriesMutation() {
           'repositories'
         )} deleted successfully`
       );
-      return queryClient.invalidateQueries(['helmrepositories']);
+      return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
     ...withError('Unable to delete Helm repositories'),
   });
 }
 
 export function useHelmRepositories(userId: number) {
-  return useQuery(['helmrepositories'], () => getHelmRepositories(userId), {
-    staleTime: 20,
-    ...withError('Unable to retrieve Helm repositories'),
-  });
+  return useQuery(
+    queryKeys.registries(userId),
+    () => getHelmRepositories(userId),
+    {
+      staleTime: 20,
+      ...withError('Unable to retrieve Helm repositories'),
+    }
+  );
 }
 
 export function useCreateHelmRepositoryMutation() {
   const queryClient = useQueryClient();
+  const { user } = useCurrentUser();
 
   return useMutation(createHelmRepository, {
     onSuccess: (_, payload) => {
       notifySuccess('Helm repository created successfully', payload.URL);
-      return queryClient.invalidateQueries(['helmrepositories']);
+      return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
     ...withError('Unable to create Helm repository'),
   });

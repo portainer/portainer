@@ -36,14 +36,15 @@ vi.mock('@/portainer/services/notifications', () => ({
   ),
 }));
 
-vi.mock('../queries/useUpdateHelmReleaseMutation', () => ({
+vi.mock('../helmReleaseQueries/useUpdateHelmReleaseMutation', () => ({
   useUpdateHelmReleaseMutation: vi.fn(() => ({
     mutateAsync: vi.fn((...args) => mockMutate(...args)),
     isLoading: false,
   })),
+  updateHelmRelease: vi.fn(() => Promise.resolve({})),
 }));
 
-vi.mock('../queries/useHelmRepoVersions', () => ({
+vi.mock('../helmChartSourceQueries/useHelmRepoVersions', () => ({
   useHelmRepoVersions: vi.fn(() => ({
     data: [
       { Version: '1.0.0', AppVersion: '1.0.0' },
