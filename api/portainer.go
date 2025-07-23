@@ -1747,7 +1747,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.32.0-rc1"
+	APIVersion = "2.32.0"
 	// Support annotation for the API version ("STS" for Short-Term Support or "LTS" for Long-Term Support)
 	APIVersionSupport = "STS"
 	// Edition is what this edition of Portainer is called
