@@ -55,6 +55,10 @@ func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if r.RequestURI == "/" || strings.HasSuffix(r.RequestURI, ".html") {
+		w.Header().Set("Permissions-Policy", strings.Join(permissions, ","))
+	}
+
 	if !isHTML(r.Header["Accept"]) {
 		w.Header().Set("Cache-Control", "max-age=31536000")
 	} else {
