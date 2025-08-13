@@ -256,7 +256,10 @@ func (m *Migrator) initMigrations() {
 
 	m.addMigrations("2.32.0", m.addEndpointRelationForEdgeAgents_2_32_0)
 
-	m.addMigrations("2.33.0", m.migrateEdgeGroupEndpointsToRoars_2_33_0)
+	m.addMigrations("2.33.0-rc1", m.migrateEdgeGroupEndpointsToRoars_2_33_0)
+
+	//m.addMigrations("2.33.0", m.migrateEdgeGroupEndpointsToRoars_2_33_0)
+	// when we release 2.33.0 it will also run the rc-1 migration function
 
 	// Add new migrations above...
 	// One function per migration, each versions migration funcs in the same file.

@@ -615,7 +615,7 @@
       "RequiredPasswordLength": 12
     },
     "KubeconfigExpiry": "0",
-    "KubectlShellImage": "portainer/kubectl-shell:2.32.0",
+    "KubectlShellImage": "portainer/kubectl-shell:2.33.0-rc1",
     "LDAPSettings": {
       "AnonymousMode": true,
       "AutoCreateUsers": true,
@@ -944,7 +944,7 @@
     }
   ],
   "version": {
-    "VERSION": "{\"SchemaVersion\":\"2.32.0\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
+    "VERSION": "{\"SchemaVersion\":\"2.33.0-rc1\",\"MigratorCount\":1,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   },
   "webhooks": null
 }
