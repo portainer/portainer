@@ -1,11 +1,13 @@
 import { CellContext, Row } from '@tanstack/react-table';
+import { useRef } from 'react';
 
-import { isoDate, truncate } from '@/portainer/filters/filters';
+import { isoDate } from '@/portainer/filters/filters';
 import { useIsSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
 
 import { Link } from '@@/Link';
 import { SystemBadge } from '@@/Badge/SystemBadge';
 import { filterHOC } from '@@/datatables/Filter';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import { Application } from './types';
 import { helper } from './columns.helper';
@@ -40,14 +42,44 @@ function NamespaceCell({ row, getValue }: CellContext<Application, string>) {
 export const image = helper.accessor('Image', {
   header: 'Image',
   cell: ({ row: { original: item } }) => (
-    <>
-      {truncate(item.Image, 64)}
-      {item.Containers && item.Containers?.length > 1 && (
-        <>+ {item.Containers.length - 1}</>
-      )}
-    </>
+    <ImageCell image={item.Image} imageCount={item.Containers?.length || 0} />
   ),
 });
+
+function ImageCell({
+  image,
+  imageCount,
+}: {
+  image: string;
+  imageCount: number;
+}) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const isTruncated = isWidthTruncated();
+
+  const imageElement = (
+    <div className="inline-block max-w-xs truncate" ref={contentRef}>
+      {image}
+    </div>
+  );
+
+  if (isTruncated) {
+    return (
+      <TooltipWithChildren message={image}>{imageElement}</TooltipWithChildren>
+    );
+  }
+
+  return (
+    <div>
+      {imageElement}
+      {imageCount > 1 && <> + {imageCount - 1}</>}
+    </div>
+  );
+
+  function isWidthTruncated() {
+    const el = contentRef.current;
+    return el && el.scrollWidth > el.clientWidth;
+  }
+}
 
 export const appType = helper.accessor('ApplicationType', {
   header: 'Application type',
