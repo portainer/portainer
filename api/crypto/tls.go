@@ -1,18 +1,17 @@
 package crypto
 
 import (
-	"crypto/fips140"
 	"crypto/tls"
 	"crypto/x509"
 	"os"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/fips"
 )
 
 // CreateTLSConfiguration creates a basic tls.Config with recommended TLS settings
 func CreateTLSConfiguration(insecureSkipVerify bool) *tls.Config { //nolint:forbidigo
-	// TODO: use fips.FIPSMode() instead
-	return createTLSConfiguration(fips140.Enabled(), insecureSkipVerify)
+	return createTLSConfiguration(fips.FIPSMode(), insecureSkipVerify)
 }
 
 func createTLSConfiguration(fipsEnabled bool, insecureSkipVerify bool) *tls.Config { //nolint:forbidigo
@@ -58,8 +57,7 @@ func createTLSConfiguration(fipsEnabled bool, insecureSkipVerify bool) *tls.Conf
 // CreateTLSConfigurationFromBytes initializes a tls.Config using a CA certificate, a certificate and a key
 // loaded from memory.
 func CreateTLSConfigurationFromBytes(useTLS bool, caCert, cert, key []byte, skipClientVerification, skipServerVerification bool) (*tls.Config, error) { //nolint:forbidigo
-	// TODO: use fips.FIPSMode() instead
-	return createTLSConfigurationFromBytes(fips140.Enabled(), useTLS, caCert, cert, key, skipClientVerification, skipServerVerification)
+	return createTLSConfigurationFromBytes(fips.FIPSMode(), useTLS, caCert, cert, key, skipClientVerification, skipServerVerification)
 }
 
 func createTLSConfigurationFromBytes(fipsEnabled, useTLS bool, caCert, cert, key []byte, skipClientVerification, skipServerVerification bool) (*tls.Config, error) { //nolint:forbidigo
@@ -90,8 +88,7 @@ func createTLSConfigurationFromBytes(fipsEnabled, useTLS bool, caCert, cert, key
 // CreateTLSConfigurationFromDisk initializes a tls.Config using a CA certificate, a certificate and a key
 // loaded from disk.
 func CreateTLSConfigurationFromDisk(config portainer.TLSConfiguration) (*tls.Config, error) { //nolint:forbidigo
-	// TODO: use fips.FIPSMode() instead
-	return createTLSConfigurationFromDisk(fips140.Enabled(), config)
+	return createTLSConfigurationFromDisk(fips.FIPSMode(), config)
 }
 
 func createTLSConfigurationFromDisk(fipsEnabled bool, config portainer.TLSConfiguration) (*tls.Config, error) { //nolint:forbidigo

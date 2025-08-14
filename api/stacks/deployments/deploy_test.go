@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/stretchr/testify/assert"
@@ -203,6 +204,8 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
+	fips.InitFIPS(false)
+
 	cloneErr := errors.New("failed to clone")
 	_, store := datastore.MustNewTestStore(t, true, true)
 

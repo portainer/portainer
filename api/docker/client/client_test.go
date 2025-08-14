@@ -4,10 +4,14 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/fips"
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestHttpClient(t *testing.T) {
+	fips.InitFIPS(false)
+
 	// Valid TLS configuration
 	endpoint := &portainer.Endpoint{}
 	endpoint.TLSConfig = portainer.TLSConfiguration{TLS: true}

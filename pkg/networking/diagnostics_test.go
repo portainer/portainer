@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/portainer/portainer/pkg/fips"
 )
 
 // Response structs for each function
@@ -110,6 +112,8 @@ func TestProbeTelnetConnection(t *testing.T) {
 }
 
 func TestDetectProxy(t *testing.T) {
+	fips.InitFIPS(false)
+
 	tests := []struct {
 		name           string
 		url            string

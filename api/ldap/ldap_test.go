@@ -7,11 +7,14 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateConnectionForURL(t *testing.T) {
+	fips.InitFIPS(false)
+
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	defer srv.Close()
 

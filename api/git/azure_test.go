@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/pkg/fips"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -234,6 +235,8 @@ func Test_isAzureUrl(t *testing.T) {
 }
 
 func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
+	fips.InitFIPS(false)
+
 	type args struct {
 		options baseOption
 	}
@@ -308,6 +311,8 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 }
 
 func Test_azureDownloader_latestCommitID(t *testing.T) {
+	fips.InitFIPS(false)
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := `{
 		  "count": 1,

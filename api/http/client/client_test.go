@@ -6,11 +6,14 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestExecutePingOperationFailure(t *testing.T) {
+	fips.InitFIPS(false)
+
 	host := "http://localhost:1"
 	config := portainer.TLSConfiguration{
 		TLS:           true,
