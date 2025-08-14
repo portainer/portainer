@@ -10,14 +10,9 @@ import { useUpdateExperimentalSettingsMutation } from '@/react/portainer/setting
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { EnableOpenAIIntegrationSwitch } from './EnableOpenAIIntegrationSwitch';
+interface FormValues {}
 
-interface FormValues {
-  OpenAIIntegration: boolean;
-}
-const validation = yup.object({
-  OpenAIIntegration: yup.boolean(),
-});
+const validation = yup.object({});
 
 interface Props {
   settings: ExperimentalFeatures;
@@ -30,24 +25,19 @@ export function ExperimentalFeaturesSettingsForm({ settings }: Props) {
 
   const { mutate: updateSettings } = mutation;
 
-  const handleSubmit = useCallback(
-    (variables: FormValues) => {
-      updateSettings(
-        {
-          OpenAIIntegration: variables.OpenAIIntegration,
+  const handleSubmit = useCallback(() => {
+    updateSettings(
+      {},
+      {
+        onSuccess() {
+          notifySuccess(
+            'Success',
+            'Successfully updated experimental features settings'
+          );
         },
-        {
-          onSuccess() {
-            notifySuccess(
-              'Success',
-              'Successfully updated experimental features settings'
-            );
-          },
-        }
-      );
-    },
-    [updateSettings]
-  );
+      }
+    );
+  }, [updateSettings]);
 
   return (
     <Formik<FormValues>
@@ -75,8 +65,6 @@ export function ExperimentalFeaturesSettingsForm({ settings }: Props) {
             and ultimately make our features the best they can be. Disabling an
             experimental feature will prevent access to it.
           </div>
-
-          <EnableOpenAIIntegrationSwitch />
 
           <div className="form-group">
             <div className="col-sm-12">

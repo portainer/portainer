@@ -99,9 +99,7 @@ export interface DefaultRegistry {
   Hide: boolean;
 }
 
-export interface ExperimentalFeatures {
-  OpenAIIntegration: boolean;
-}
+export interface ExperimentalFeatures {}
 
 export interface Settings {
   LogoURL: string;
