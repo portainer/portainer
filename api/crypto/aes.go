@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/pbkdf2"
 	"crypto/rand"
 	"crypto/sha256"
 	"errors"
@@ -15,7 +16,6 @@ import (
 	"github.com/portainer/portainer/pkg/fips"
 
 	"golang.org/x/crypto/argon2"
-	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -248,7 +248,10 @@ func aesEncryptGCMFIPS(input io.Reader, output io.Writer, passphrase []byte) err
 		return err
 	}
 
-	key := pbkdf2.Key(passphrase, salt, pbkdf2Iterations, 32, sha256.New)
+	key, err := pbkdf2.Key(sha256.New, string(passphrase), salt, pbkdf2Iterations, 32)
+	if err != nil {
+		return fmt.Errorf("error deriving key: %w", err)
+	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -315,7 +318,10 @@ func aesDecryptGCMFIPS(input io.Reader, passphrase []byte) (io.Reader, error) {
 		return nil, err
 	}
 
-	key := pbkdf2.Key(passphrase, salt, pbkdf2Iterations, 32, sha256.New)
+	key, err := pbkdf2.Key(sha256.New, string(passphrase), salt, pbkdf2Iterations, 32)
+	if err != nil {
+		return nil, fmt.Errorf("error deriving key: %w", err)
+	}
 
 	// Initialize AES cipher block
 	block, err := aes.NewCipher(key)
