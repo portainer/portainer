@@ -460,3 +460,39 @@ func WithStacks(stacks []portainer.Stack) datastoreOption {
 		d.stack = &stubStacksService{stacks: stacks}
 	}
 }
+
+type stubPendingActionService struct {
+	actions []portainer.PendingAction
+	dataservices.PendingActionsService
+}
+
+func WithPendingActions(pendingActions []portainer.PendingAction) datastoreOption {
+	return func(d *testDatastore) {
+		d.pendingActionsService = &stubPendingActionService{
+			actions: pendingActions,
+		}
+	}
+}
+
+func (s *stubPendingActionService) ReadAll(predicates ...func(portainer.PendingAction) bool) ([]portainer.PendingAction, error) {
+	filtered := s.actions
+
+	for _, predicate := range predicates {
+		filtered = slicesx.Filter(filtered, predicate)
+	}
+
+	return filtered, nil
+}
+
+func (s *stubPendingActionService) Delete(ID portainer.PendingActionID) error {
+	actions := []portainer.PendingAction{}
+
+	for _, action := range s.actions {
+		if action.ID != ID {
+			actions = append(actions, action)
+		}
+	}
+	s.actions = actions
+
+	return nil
+}

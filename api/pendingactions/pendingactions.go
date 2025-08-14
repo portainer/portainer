@@ -71,10 +71,14 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 
 	isKubernetesEndpoint := endpointutils.IsKubernetesEndpoint(endpoint) && !endpointutils.IsEdgeEndpoint(endpoint)
 
-	// EndpointStatusUp is only relevant for non-Kubernetes endpoints
-	// Sometimes the endpoint is UP but the status is not updated in the database
 	if !isKubernetesEndpoint {
-		if endpoint.Status != portainer.EndpointStatusUp {
+		// Edge environments check the heartbeat
+		// Other environments check the endpoint status
+		if endpointutils.IsEdgeEndpoint(endpoint) {
+			if !endpoint.Heartbeat {
+				return
+			}
+		} else if endpoint.Status != portainer.EndpointStatusUp {
 			return
 		}
 	} else {
