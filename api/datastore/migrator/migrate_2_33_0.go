@@ -11,8 +11,10 @@ func (m *Migrator) migrateEdgeGroupEndpointsToRoars_2_33_0() error {
 	}
 
 	for _, eg := range egs {
-		eg.EndpointIDs = roar.FromSlice(eg.Endpoints)
-		eg.Endpoints = nil
+		if eg.EndpointIDs.Len() == 0 {
+			eg.EndpointIDs = roar.FromSlice(eg.Endpoints)
+			eg.Endpoints = nil
+		}
 
 		if err := m.edgeGroupService.Update(eg.ID, &eg); err != nil {
 			return err
