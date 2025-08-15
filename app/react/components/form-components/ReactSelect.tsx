@@ -1,9 +1,10 @@
 import ReactSelectCreatable, {
   CreatableProps as ReactSelectCreatableProps,
 } from 'react-select/creatable';
-import ReactSelectAsync, {
-  AsyncProps as ReactSelectAsyncProps,
-} from 'react-select/async';
+import {
+  AsyncPaginate as ReactSelectAsyncPaginate,
+  AsyncPaginateProps as ReactSelectAsyncPaginateProps,
+} from 'react-select-async-paginate';
 import ReactSelect, {
   components,
   GroupBase,
@@ -17,6 +18,9 @@ import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import './ReactSelect.css';
 import { AutomationTestingProps } from '@/types';
+
+const PAGE_SIZE = 100;
+const MAX_OPTIONS_WITHOUT_PAGINATION = 1000;
 
 interface DefaultOption {
   value: string;
@@ -86,7 +90,7 @@ export function Select<
     Group
   >(dataCy, componentsProp);
 
-  if ((options?.length || 0) > 1000) {
+  if ((options?.length || 0) > MAX_OPTIONS_WITHOUT_PAGINATION) {
     return (
       <TooManyResultsSelector
         size={size}
@@ -143,7 +147,7 @@ export function Async<
   className,
   size,
   ...props
-}: ReactSelectAsyncProps<Option, IsMulti, Group> & {
+}: ReactSelectAsyncPaginateProps<Option, Group, unknown, IsMulti> & {
   size?: 'sm' | 'md';
 } & AutomationTestingProps) {
   const { 'data-cy': dataCy, components: componentsProp, ...rest } = props;
@@ -155,7 +159,7 @@ export function Async<
   >(dataCy, componentsProp);
 
   return (
-    <ReactSelectAsync
+    <ReactSelectAsyncPaginate
       className={clsx(className, 'portainer-selector-root', size)}
       classNamePrefix="portainer-selector"
       components={memoizedComponents}
@@ -173,22 +177,29 @@ export function TooManyResultsSelector<
   options,
   isLoading,
   getOptionValue,
+  getOptionLabel,
   isItemVisible = (item, search) =>
-    !!getOptionValue?.(item).toLowerCase().includes(search.toLowerCase()),
+    search.trim() === '' ||
+    !!getOptionLabel?.(item).toLowerCase().includes(search.toLowerCase()),
   ...props
 }: RegularProps<Option, IsMulti, Group> & {
   isItemVisible?: (item: Option, search: string) => boolean;
 }) {
-  const defaultOptions = useMemo(() => options?.slice(0, 100), [options]);
-
   return (
     <Async
       isLoading={isLoading}
       getOptionValue={getOptionValue}
-      loadOptions={(search: string) =>
-        filterOptions<Option, Group>(options, isItemVisible, search)
+      loadOptions={(
+        search: string,
+        loadedOptions: OptionsOrGroups<Option, Group> | undefined
+      ) =>
+        filterOptions<Option, Group>(
+          options,
+          isItemVisible,
+          search,
+          loadedOptions
+        )
       }
-      defaultOptions={defaultOptions}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
@@ -201,17 +212,21 @@ function filterOptions<
 >(
   options: OptionsOrGroups<Option, Group> | undefined,
   isItemVisible: (item: Option, search: string) => boolean,
-  search: string
-): Promise<OptionsOrGroups<Option, Group> | undefined> {
-  return Promise.resolve<OptionsOrGroups<Option, Group> | undefined>(
-    options
-      ?.filter((item) =>
-        isGroup(item)
-          ? item.options.some((ni) => isItemVisible(ni, search))
-          : isItemVisible(item, search)
-      )
-      .slice(0, 100)
+  search: string,
+  loadedOptions?: OptionsOrGroups<Option, Group>
+) {
+  const filteredOptions = options?.filter((item) =>
+    isGroup(item)
+      ? item.options.some((ni) => isItemVisible(ni, search))
+      : isItemVisible(item, search)
   );
+
+  const offset = loadedOptions?.length ?? 0;
+
+  return {
+    options: filteredOptions?.slice(offset, offset + PAGE_SIZE) ?? [],
+    hasMore: (filteredOptions?.length ?? 0) > offset + PAGE_SIZE,
+  };
 }
 
 function isGroup<
