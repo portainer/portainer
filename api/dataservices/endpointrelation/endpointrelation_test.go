@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/dataservices/edgestack"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 
 	"github.com/stretchr/testify/require"
@@ -101,4 +102,39 @@ func TestUpdateRelation(t *testing.T) {
 	require.False(t, cacheKeyExists)
 	require.Equal(t, 0, edgeStacks[edgeStackID1].NumDeployments)
 	require.Equal(t, 0, edgeStacks[edgeStackID2].NumDeployments)
+}
+
+func TestAddEndpointRelationsForEdgeStack(t *testing.T) {
+	var conn portainer.Connection = &boltdb.DbConnection{Path: t.TempDir()}
+	err := conn.Open()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	service, err := NewService(conn)
+	require.NoError(t, err)
+
+	edgeStackService, err := edgestack.NewService(conn, func(t portainer.Transaction, esi portainer.EdgeStackID) {})
+	require.NoError(t, err)
+
+	service.RegisterUpdateStackFunction(edgeStackService.UpdateEdgeStackFuncTx)
+	require.NoError(t, edgeStackService.Create(1, &portainer.EdgeStack{}))
+	require.NoError(t, service.Create(&portainer.EndpointRelation{EndpointID: 1, EdgeStacks: map[portainer.EdgeStackID]bool{}}))
+	require.NoError(t, service.AddEndpointRelationsForEdgeStack([]portainer.EndpointID{1}, &portainer.EdgeStack{ID: 1}))
+}
+
+func TestEndpointRelations(t *testing.T) {
+	var conn portainer.Connection = &boltdb.DbConnection{Path: t.TempDir()}
+	err := conn.Open()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	service, err := NewService(conn)
+	require.NoError(t, err)
+
+	require.NoError(t, service.Create(&portainer.EndpointRelation{EndpointID: 1}))
+	rels, err := service.EndpointRelations()
+	require.NoError(t, err)
+	require.Equal(t, 1, len(rels))
 }

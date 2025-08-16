@@ -126,7 +126,7 @@ type (
 		EndpointRelation(EndpointID portainer.EndpointID) (*portainer.EndpointRelation, error)
 		Create(endpointRelation *portainer.EndpointRelation) error
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
-		AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStackID portainer.EdgeStackID) error
+		AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStack *portainer.EdgeStack) error
 		RemoveEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStackID portainer.EdgeStackID) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
 		BucketName() string

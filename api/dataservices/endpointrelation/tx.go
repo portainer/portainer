@@ -76,14 +76,14 @@ func (service ServiceTx) UpdateEndpointRelation(endpointID portainer.EndpointID,
 	return nil
 }
 
-func (service ServiceTx) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStackID portainer.EdgeStackID) error {
+func (service ServiceTx) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStack *portainer.EdgeStack) error {
 	for _, endpointID := range endpointIDs {
 		rel, err := service.EndpointRelation(endpointID)
 		if err != nil {
 			return err
 		}
 
-		rel.EdgeStacks[edgeStackID] = true
+		rel.EdgeStacks[edgeStack.ID] = true
 
 		identifier := service.service.connection.ConvertToKey(int(endpointID))
 		err = service.tx.UpdateObject(BucketName, identifier, rel)
@@ -97,8 +97,12 @@ func (service ServiceTx) AddEndpointRelationsForEdgeStack(endpointIDs []portaine
 	service.service.endpointRelationsCache = nil
 	service.service.mu.Unlock()
 
-	if err := service.service.updateStackFnTx(service.tx, edgeStackID, func(edgeStack *portainer.EdgeStack) {
-		edgeStack.NumDeployments += len(endpointIDs)
+	if err := service.service.updateStackFnTx(service.tx, edgeStack.ID, func(es *portainer.EdgeStack) {
+		es.NumDeployments += len(endpointIDs)
+
+		// sync changes in `edgeStack` in case it is re-persisted after `AddEndpointRelationsForEdgeStack` call
+		// to avoid overriding with the previous values
+		edgeStack.NumDeployments = es.NumDeployments
 	}); err != nil {
 		log.Error().Err(err).Msg("could not update the number of deployments")
 	}

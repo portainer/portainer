@@ -230,11 +230,11 @@ func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.Endpoi
 	return nil
 }
 
-func (s *stubEndpointRelationService) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStackID portainer.EdgeStackID) error {
+func (s *stubEndpointRelationService) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStack *portainer.EdgeStack) error {
 	for _, endpointID := range endpointIDs {
 		for i, r := range s.relations {
 			if r.EndpointID == endpointID {
-				s.relations[i].EdgeStacks[edgeStackID] = true
+				s.relations[i].EdgeStacks[edgeStack.ID] = true
 			}
 		}
 	}

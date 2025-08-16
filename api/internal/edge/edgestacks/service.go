@@ -111,7 +111,7 @@ func (service *Service) PersistEdgeStack(
 		}
 	}
 
-	if err := tx.EndpointRelation().AddEndpointRelationsForEdgeStack(relatedEndpointIds, stack.ID); err != nil {
+	if err := tx.EndpointRelation().AddEndpointRelationsForEdgeStack(relatedEndpointIds, stack); err != nil {
 		return nil, fmt.Errorf("unable to add endpoint relations: %w", err)
 	}
 

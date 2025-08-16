@@ -91,9 +91,9 @@ func (service *Service) UpdateEndpointRelation(endpointID portainer.EndpointID, 
 	})
 }
 
-func (service *Service) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStackID portainer.EdgeStackID) error {
+func (service *Service) AddEndpointRelationsForEdgeStack(endpointIDs []portainer.EndpointID, edgeStack *portainer.EdgeStack) error {
 	return service.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return service.Tx(tx).AddEndpointRelationsForEdgeStack(endpointIDs, edgeStackID)
+		return service.Tx(tx).AddEndpointRelationsForEdgeStack(endpointIDs, edgeStack)
 	})
 }
 
