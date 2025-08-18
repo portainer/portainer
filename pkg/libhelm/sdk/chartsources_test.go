@@ -6,11 +6,16 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/fips"
 	helmregistrycache "github.com/portainer/portainer/pkg/libhelm/cache"
 	"github.com/stretchr/testify/assert"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/registry"
 )
+
+func init() {
+	fips.InitFIPS(false)
+}
 
 func TestIsOCIRegistry(t *testing.T) {
 	t.Run("should return false for nil registry (HTTP repo)", func(t *testing.T) {
@@ -188,19 +193,40 @@ func TestLoginToOCIRegistry(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("should return nil for HTTP repository (nil registry)", func(t *testing.T) {
-		client, err := loginToOCIRegistry(nil)
+		client, err := createOCIRegistryClient(nil)
 		is.NoError(err)
 		is.Nil(client)
 	})
 
-	t.Run("should return nil for registry with auth disabled", func(t *testing.T) {
+	t.Run("should return client for registry with auth disabled (for TLS support)", func(t *testing.T) {
 		registry := &portainer.Registry{
 			URL:            "my-registry.io",
 			Authentication: false,
 		}
-		client, err := loginToOCIRegistry(registry)
+		client, err := createOCIRegistryClient(registry)
 		is.NoError(err)
-		is.Nil(client)
+		is.NotNil(client) // Now returns a client even without auth for potential TLS configuration
+	})
+
+	t.Run("should handle custom TLS configuration without authentication", func(t *testing.T) {
+		registry := &portainer.Registry{
+			URL:            "my-registry.io",
+			Authentication: false,
+			ManagementConfiguration: &portainer.RegistryManagementConfiguration{
+				TLSConfig: portainer.TLSConfiguration{
+					TLS:           true,
+					TLSSkipVerify: false,
+					// In a real scenario, these would point to actual cert files
+					TLSCACertPath: "",
+					TLSCertPath:   "",
+					TLSKeyPath:    "",
+				},
+			},
+		}
+		client, err := createOCIRegistryClient(registry)
+		// Should succeed even without cert files when they're empty strings
+		is.NoError(err)
+		is.NotNil(client) // Should get a client configured for TLS
 	})
 
 	t.Run("should return error for invalid credentials", func(t *testing.T) {
@@ -209,7 +235,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 			Authentication: true,
 			Username:       " ",
 		}
-		client, err := loginToOCIRegistry(registry)
+		client, err := createOCIRegistryClient(registry)
 		is.Error(err)
 		is.Nil(client)
 		// The error might be a validation error or a login error, both are acceptable
@@ -227,7 +253,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 		}
 		// this will fail because it can't connect to the registry,
 		// but it proves that the loginToOCIRegistry function is calling the login function.
-		client, err := loginToOCIRegistry(registry)
+		client, err := createOCIRegistryClient(registry)
 		is.Error(err)
 		is.Nil(client)
 		is.Contains(err.Error(), "failed to login to registry")
@@ -249,7 +275,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 		}
 		// this will fail because it can't connect to the registry,
 		// but it proves that the loginToOCIRegistry function is calling the login function.
-		client, err := loginToOCIRegistry(registry)
+		client, err := createOCIRegistryClient(registry)
 		is.Error(err)
 		is.Nil(client)
 		is.Contains(err.Error(), "failed to login to registry")

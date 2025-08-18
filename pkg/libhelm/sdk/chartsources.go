@@ -35,10 +35,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/pkg/libhelm/cache"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/registryhttp"
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/registry"
-	"oras.land/oras-go/v2/registry/remote/retry"
 )
 
 // IsOCIRegistry returns true if the registry is an OCI registry (not nil), false if it's an HTTP repository (nil)
@@ -140,14 +140,6 @@ func authenticateChartSource(actionConfig *action.Configuration, registry *porta
 		return errors.Wrap(err, "registry credential validation failed")
 	}
 
-	// No authentication required
-	if !registry.Authentication {
-		log.Debug().
-			Str("context", "HelmClient").
-			Msg("No OCI registry authentication required")
-		return nil
-	}
-
 	// Cache Strategy Decision: Use registry ID as cache key
 	// This provides optimal rate limiting protection since each registry only gets
 	// logged into once per Portainer instance, regardless of how many users access it.
@@ -180,14 +172,14 @@ func authenticateChartSource(actionConfig *action.Configuration, registry *porta
 		Str("context", "HelmClient").
 		Msg("Cache miss - creating new registry client")
 
-	registryClient, err := loginToOCIRegistry(registry)
+	registryClient, err := createOCIRegistryClient(registry)
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").
 			Str("registry_url", registry.URL).
 			Err(err).
-			Msg("Failed to login to registry")
-		return errors.Wrap(err, "failed to login to registry")
+			Msg("Failed to create registry client")
+		return errors.Wrap(err, "failed to create registry client")
 	}
 
 	// Cache the client if login was successful (registry ID-based key)
@@ -230,11 +222,13 @@ func configureOCIChartPathOptions(chartPathOptions *action.ChartPathOptions, reg
 	}
 }
 
-// loginToOCIRegistry performs registry login for OCI-based registries using Helm SDK
+// createOCIRegistryClient creates and optionally authenticates a registry client for OCI-based registries
+// Handles both authenticated and unauthenticated registries with proper TLS configuration
 // Tries to get a cached registry client if available, otherwise creates and caches a new one
-func loginToOCIRegistry(portainerRegistry *portainer.Registry) (*registry.Client, error) {
-	if IsHTTPRepository(portainerRegistry) || !portainerRegistry.Authentication {
-		return nil, nil // No authentication needed
+func createOCIRegistryClient(portainerRegistry *portainer.Registry) (*registry.Client, error) {
+	// Handle nil registry (HTTP repository)
+	if portainerRegistry == nil {
+		return nil, nil
 	}
 
 	// Check cache first using registry ID-based key
@@ -243,32 +237,70 @@ func loginToOCIRegistry(portainerRegistry *portainer.Registry) (*registry.Client
 	}
 
 	log.Debug().
-		Str("context", "loginToRegistry").
+		Str("context", "HelmClient").
 		Int("registry_id", int(portainerRegistry.ID)).
 		Str("registry_url", portainerRegistry.URL).
-		Msg("Attempting to login to OCI registry")
+		Bool("authentication", portainerRegistry.Authentication).
+		Msg("Creating OCI registry client")
 
-	registryClient, err := registry.NewClient(registry.ClientOptHTTPClient(retry.DefaultClient))
+	// Create an HTTP client with proper TLS configuration
+	httpClient, usePlainHTTP, err := registryhttp.CreateClient(portainerRegistry)
 	if err != nil {
+		log.Error().
+			Str("context", "HelmClient").
+			Str("registry_url", portainerRegistry.URL).
+			Err(err).
+			Msg("Failed to create HTTP client for registry")
+		return nil, errors.Wrap(err, "failed to create HTTP client for registry")
+	}
+
+	clientOptions := []registry.ClientOption{
+		registry.ClientOptHTTPClient(httpClient),
+	}
+
+	if usePlainHTTP {
+		clientOptions = append(clientOptions, registry.ClientOptPlainHTTP())
+	}
+
+	registryClient, err := registry.NewClient(clientOptions...)
+	if err != nil {
+		log.Error().
+			Str("context", "HelmClient").
+			Str("registry_url", portainerRegistry.URL).
+			Err(err).
+			Msg("Failed to create registry client")
 		return nil, errors.Wrap(err, "failed to create registry client")
 	}
 
-	loginOpts := []registry.LoginOption{
-		registry.LoginOptBasicAuth(portainerRegistry.Username, portainerRegistry.Password),
+	// Only perform login if authentication is enabled
+	if portainerRegistry.Authentication {
+		loginOpts := []registry.LoginOption{
+			registry.LoginOptBasicAuth(portainerRegistry.Username, portainerRegistry.Password),
+		}
+
+		err = registryClient.Login(portainerRegistry.URL, loginOpts...)
+		if err != nil {
+			log.Error().
+				Str("context", "HelmClient").
+				Str("registry_url", portainerRegistry.URL).
+				Err(err).
+				Msg("Failed to login to registry")
+			return nil, errors.Wrapf(err, "failed to login to registry %s", portainerRegistry.URL)
+		}
+
+		log.Debug().
+			Str("context", "createOCIRegistryClient").
+			Int("registry_id", int(portainerRegistry.ID)).
+			Str("registry_url", portainerRegistry.URL).
+			Msg("Successfully logged in to OCI registry")
+	} else {
+		log.Debug().
+			Str("context", "createOCIRegistryClient").
+			Int("registry_id", int(portainerRegistry.ID)).
+			Str("registry_url", portainerRegistry.URL).
+			Msg("Created unauthenticated OCI registry client")
 	}
 
-	err = registryClient.Login(portainerRegistry.URL, loginOpts...)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to login to registry %s", portainerRegistry.URL)
-	}
-
-	log.Debug().
-		Str("context", "loginToRegistry").
-		Int("registry_id", int(portainerRegistry.ID)).
-		Str("registry_url", portainerRegistry.URL).
-		Msg("Successfully logged in to OCI registry")
-
-	// Cache using registry ID-based key
 	cache.SetCachedRegistryClientByID(portainerRegistry.ID, registryClient)
 
 	return registryClient, nil

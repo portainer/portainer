@@ -138,9 +138,16 @@ func TestCreateClient_AuthenticationScenarios(t *testing.T) {
 				assert.NotNil(t, authClient, "Auth client should not be nil")
 				assert.NotNil(t, authClient.Credential, "Credential function should be set")
 			} else {
-				// Should use retry.DefaultClient (no authentication)
-				assert.Equal(t, retry.DefaultClient, client.Client,
-					"Expected retry.DefaultClient for anonymous access")
+				// For anonymous access without custom TLS, all registries should use retry.DefaultClient
+				// (Only registries with custom TLS configuration use a different retry client)
+				if tt.registry.ManagementConfiguration == nil || !tt.registry.ManagementConfiguration.TLSConfig.TLS {
+					assert.Equal(t, retry.DefaultClient, client.Client,
+						"Expected retry.DefaultClient for anonymous access without custom TLS")
+				} else {
+					// Custom TLS configuration means a custom retry client
+					assert.NotEqual(t, retry.DefaultClient, client.Client,
+						"Expected custom retry client for registry with custom TLS")
+				}
 			}
 		})
 	}

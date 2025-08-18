@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/registryhttp"
 	"github.com/rs/zerolog/log"
 	"oras.land/oras-go/v2/registry/remote"
 	"oras.land/oras-go/v2/registry/remote/auth"
-	"oras.land/oras-go/v2/registry/remote/retry"
 )
 
 func CreateClient(registry portainer.Registry) (*remote.Registry, error) {
@@ -16,6 +16,15 @@ func CreateClient(registry portainer.Registry) (*remote.Registry, error) {
 		log.Error().Err(err).Str("registryUrl", registry.URL).Msg("Failed to create registry client")
 		return nil, err
 	}
+
+	// Configure HTTP client based on registry type using the shared utility
+	httpClient, usePlainHTTP, err := registryhttp.CreateClient(&registry)
+	if err != nil {
+		return nil, err
+	}
+
+	registryClient.PlainHTTP = usePlainHTTP
+
 	// By default, oras sends multiple requests to get the full list of repos/tags/referrers.
 	// set a high page size limit for fewer round trips.
 	// e.g. https://github.com/oras-project/oras-go/blob/v2.6.0/registry/remote/registry.go#L129-L142
@@ -29,7 +38,7 @@ func CreateClient(registry portainer.Registry) (*remote.Registry, error) {
 		strings.TrimSpace(registry.Password) != "" {
 
 		registryClient.Client = &auth.Client{
-			Client: retry.DefaultClient,
+			Client: httpClient,
 			Cache:  auth.NewCache(),
 			Credential: auth.StaticCredential(registry.URL, auth.Credential{
 				Username: registry.Username,
@@ -43,8 +52,8 @@ func CreateClient(registry portainer.Registry) (*remote.Registry, error) {
 			Bool("authentication", true).
 			Msg("Created ORAS registry client with authentication")
 	} else {
-		// Use default client for anonymous access
-		registryClient.Client = retry.DefaultClient
+		// Use the configured HTTP client for anonymous access
+		registryClient.Client = httpClient
 
 		log.Debug().
 			Str("registryURL", registry.URL).
