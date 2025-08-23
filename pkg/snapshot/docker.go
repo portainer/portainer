@@ -356,17 +356,20 @@ type ContainerStats struct {
 func calculateContainerStats(containers []types.Container) ContainerStats {
 	var running, stopped, healthy, unhealthy int
 	for _, container := range containers {
+		log.Debug().Str("containerId", container.ID).Str("state", container.State).Str("status", container.Status).Msg("Container info")
+
 		switch container.State {
 		case "running":
 			running++
-		case "healthy":
-			running++
-			healthy++
-		case "unhealthy":
-			running++
-			unhealthy++
 		case "exited", "stopped":
 			stopped++
+		}
+
+		if strings.Contains(container.Status, "(healthy)") {
+			healthy++
+		}
+		if strings.Contains(container.Status, "(unhealthy)") {
+			unhealthy++
 		}
 	}
 
