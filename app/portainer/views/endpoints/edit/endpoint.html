@@ -57,8 +57,10 @@
   <information-panel ng-if="state.kubernetesEndpoint && (!state.edgeEndpoint || state.edgeAssociated)" title-text="Kubernetes features configuration">
     <span class="small text-muted vertical-center">
       <pr-icon icon="'wrench'" mode="'primary'"></pr-icon>
-      You should configure the features available in this Kubernetes environment in the
-      <a ui-sref="kubernetes.cluster.setup({endpointId: endpoint.Id})">Kubernetes configuration</a> view.
+      <div>
+        You should configure the features available in this Kubernetes environment in the
+        <a ui-sref="kubernetes.cluster.setup({endpointId: endpoint.Id})">Kubernetes configuration</a> view.
+      </div>
     </span>
   </information-panel>
 </div>

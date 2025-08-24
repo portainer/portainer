@@ -372,10 +372,16 @@ func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, pay
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            payload.Name,
-		URL:             portainerHost,
-		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		ID:   portainer.EndpointID(endpointID),
+		Name: payload.Name,
+		URL:  portainerHost,
+		Type: func() portainer.EndpointType {
+			// an empty container engine means that the endpoint is a Kubernetes endpoint
+			if payload.ContainerEngine == "" {
+				return portainer.EdgeAgentOnKubernetesEnvironment
+			}
+			return portainer.EdgeAgentOnDockerEnvironment
+		}(),
 		ContainerEngine: payload.ContainerEngine,
 		GroupID:         portainer.EndpointGroupID(payload.GroupID),
 		Gpus:            payload.Gpus,

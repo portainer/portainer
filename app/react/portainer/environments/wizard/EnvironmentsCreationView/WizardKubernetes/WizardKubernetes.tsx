@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Zap, UploadCloud } from 'lucide-react';
 import _ from 'lodash';
 
-import { Environment } from '@/react/portainer/environments/types';
+import {
+  ContainerEngine,
+  Environment,
+} from '@/react/portainer/environments/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -98,6 +101,7 @@ export function WizardKubernetes({ onCreate }: Props) {
               onCreate(environment, 'kubernetesEdgeAgentStandard')
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
+            containerEngine={ContainerEngine.Kubernetes}
           />
         );
       case 'edgeAgentAsync':
@@ -108,6 +112,7 @@ export function WizardKubernetes({ onCreate }: Props) {
               onCreate(environment, 'kubernetesEdgeAgentAsync')
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
+            containerEngine={ContainerEngine.Kubernetes}
           />
         );
       case 'kubeconfig':
