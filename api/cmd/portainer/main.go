@@ -408,7 +408,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	edgeStacksService := edgestacks.NewService(dataStore)
 
-	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
+	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.TLSCert, *flags.TLSKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
 	}

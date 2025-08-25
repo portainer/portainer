@@ -9,8 +9,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // Service implements the CLIService interface
@@ -35,16 +35,9 @@ func CLIFlags() *portainer.CLIFlags {
 		FeatureFlags:              kingpin.Flag("feat", "List of feature flags").Strings(),
 		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
-		TLS:                       kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
 		TLSSkipVerify:             kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
-		TLSCacert:                 kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
-		TLSCert:                   kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
-		TLSKey:                    kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
 		HTTPDisabled:              kingpin.Flag("http-disabled", "Serve portainer only on https").Default(defaultHTTPDisabled).Bool(),
 		HTTPEnabled:               kingpin.Flag("http-enabled", "Serve portainer on http").Default(defaultHTTPEnabled).Bool(),
-		SSL:                       kingpin.Flag("ssl", "Secure Portainer instance using SSL (deprecated)").Default(defaultSSL).Bool(),
-		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").String(),
-		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").String(),
 		Rollback:                  kingpin.Flag("rollback", "Rollback the database to the previous backup").Bool(),
 		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").String(),
 		AdminPassword:             kingpin.Flag("admin-password", "Set admin password with provided hash").String(),
@@ -70,7 +63,36 @@ func CLIFlags() *portainer.CLIFlags {
 func (Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	kingpin.Version(version)
 
+	var hasSSLFlag, hasSSLCertFlag, hasSSLKeyFlag bool
+	sslFlag := kingpin.Flag(
+		"ssl",
+		"Secure Portainer instance using SSL (deprecated)",
+	).Default(defaultSSL).IsSetByUser(&hasSSLFlag)
+	ssl := sslFlag.Bool()
+	sslCertFlag := kingpin.Flag(
+		"sslcert",
+		"Path to the SSL certificate used to secure the Portainer instance",
+	).IsSetByUser(&hasSSLCertFlag)
+	sslCert := sslCertFlag.String()
+	sslKeyFlag := kingpin.Flag(
+		"sslkey",
+		"Path to the SSL key used to secure the Portainer instance",
+	).IsSetByUser(&hasSSLKeyFlag)
+	sslKey := sslKeyFlag.String()
+
 	flags := CLIFlags()
+
+	var hasTLSFlag, hasTLSCertFlag, hasTLSKeyFlag bool
+	tlsFlag := kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).IsSetByUser(&hasTLSFlag)
+	flags.TLS = tlsFlag.Bool()
+	tlsCertFlag := kingpin.Flag(
+		"tlscert",
+		"Path to the TLS certificate file",
+	).Default(defaultTLSCertPath).IsSetByUser(&hasTLSCertFlag)
+	flags.TLSCert = tlsCertFlag.String()
+	tlsKeyFlag := kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).IsSetByUser(&hasTLSKeyFlag)
+	flags.TLSKey = tlsKeyFlag.String()
+	flags.TLSCacert = kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String()
 
 	kingpin.Parse()
 
@@ -81,6 +103,41 @@ func (Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		}
 
 		*flags.Assets = filepath.Join(filepath.Dir(ex), *flags.Assets)
+	}
+
+	// If the user didn't provide a tls flag remove the defaults to match previous behaviour
+	if !hasTLSFlag {
+		if !hasTLSCertFlag {
+			*flags.TLSCert = ""
+		}
+
+		if !hasTLSKeyFlag {
+			*flags.TLSKey = ""
+		}
+	}
+
+	if hasSSLFlag {
+		log.Warn().Msgf("the %q flag is deprecated. use %q instead.", sslFlag.Model().Name, tlsFlag.Model().Name)
+
+		if !hasTLSFlag {
+			flags.TLS = ssl
+		}
+	}
+
+	if hasSSLCertFlag {
+		log.Warn().Msgf("the %q flag is deprecated. use %q instead.", sslCertFlag.Model().Name, tlsCertFlag.Model().Name)
+
+		if !hasTLSCertFlag {
+			flags.TLSCert = sslCert
+		}
+	}
+
+	if hasSSLKeyFlag {
+		log.Warn().Msgf("the %q flag is deprecated. use %q instead.", sslKeyFlag.Model().Name, tlsKeyFlag.Model().Name)
+
+		if !hasTLSKeyFlag {
+			flags.TLSKey = sslKey
+		}
 	}
 
 	return flags, nil
@@ -108,10 +165,6 @@ func (Service) ValidateFlags(flags *portainer.CLIFlags) error {
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {
 	if *flags.NoAnalytics {
 		log.Warn().Msg("the --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect")
-	}
-
-	if *flags.SSL {
-		log.Warn().Msg("SSL is enabled by default and there is no need for the --ssl flag, it has been kept to allow migration of instances running a previous version of Portainer with this flag enabled")
 	}
 }
 

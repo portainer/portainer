@@ -122,14 +122,12 @@ type (
 		Templates                 *string
 		TLS                       *bool
 		TLSSkipVerify             *bool
+		HasTLSCacert              *bool
 		TLSCacert                 *string
 		TLSCert                   *string
 		TLSKey                    *string
 		HTTPDisabled              *bool
 		HTTPEnabled               *bool
-		SSL                       *bool
-		SSLCert                   *string
-		SSLKey                    *string
 		Rollback                  *bool
 		SnapshotInterval          *string
 		BaseURL                   *string

@@ -7,6 +7,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/RoaringBitmap/roaring/v2 v2.5.0
 	github.com/VictoriaMetrics/fastcache v1.12.0
+	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/aws/aws-sdk-go-v2 v1.30.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.27
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.24.1
@@ -54,7 +55,6 @@ require (
 	golang.org/x/mod v0.25.0
 	golang.org/x/oauth2 v0.29.0
 	golang.org/x/sync v0.16.0
-	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.18.5
@@ -86,7 +86,6 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.3 // indirect
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect

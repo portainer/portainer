@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/alecthomas/kingpin/v2"
 )
 
 type pairList []portainer.Pair
