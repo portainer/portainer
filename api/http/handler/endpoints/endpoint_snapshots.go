@@ -49,7 +49,7 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			continue
 		}
 
-		endpoint.Status = portainer.EndpointStatusUp
+		latestEndpointReference.Status = portainer.EndpointStatusUp
 		if snapshotError != nil {
 			log.Debug().
 				Str("endpoint", endpoint.Name).
@@ -57,7 +57,7 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 				Err(snapshotError).
 				Msg("background schedule error (environment snapshot), unable to create snapshot")
 
-			endpoint.Status = portainer.EndpointStatusDown
+			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
 		latestEndpointReference.Agent.Version = endpoint.Agent.Version
