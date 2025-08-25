@@ -10,6 +10,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker/consts"
+	"github.com/portainer/portainer/api/docker/stats"
 	edgeutils "github.com/portainer/portainer/pkg/edge"
 	networkingutils "github.com/portainer/portainer/pkg/networking"
 
@@ -207,7 +208,7 @@ func dockerSnapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Cl
 	snapshot.GpuUseAll = gpuUseAll
 	snapshot.GpuUseList = gpuUseList
 
-	stats := calculateContainerStats(containers)
+	stats := stats.CalculateContainerStats(containers)
 
 	snapshot.ContainerCount = stats.Total
 	snapshot.RunningContainerCount = stats.Running
@@ -343,41 +344,4 @@ func isPodman(version types.Version) bool {
 	}
 
 	return false
-}
-
-type ContainerStats struct {
-	Running   int
-	Stopped   int
-	Healthy   int
-	Unhealthy int
-	Total     int
-}
-
-func calculateContainerStats(containers []types.Container) ContainerStats {
-	var running, stopped, healthy, unhealthy int
-	for _, container := range containers {
-		log.Debug().Str("containerId", container.ID).Str("state", container.State).Str("status", container.Status).Msg("Container info")
-
-		switch container.State {
-		case "running":
-			running++
-		case "exited", "stopped":
-			stopped++
-		}
-
-		if strings.Contains(container.Status, "(healthy)") {
-			healthy++
-		}
-		if strings.Contains(container.Status, "(unhealthy)") {
-			unhealthy++
-		}
-	}
-
-	return ContainerStats{
-		Running:   running,
-		Stopped:   stopped,
-		Healthy:   healthy,
-		Unhealthy: unhealthy,
-		Total:     len(containers),
-	}
 }

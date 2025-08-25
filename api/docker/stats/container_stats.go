@@ -1,4 +1,4 @@
-package docker
+package stats
 
 import (
 	"strings"
@@ -20,18 +20,19 @@ func CalculateContainerStats(containers []types.Container) ContainerStats {
 	for _, container := range containers {
 		log.Debug().Str("containerId", container.ID).Str("state", container.State).Str("status", container.Status).Msg("Container info")
 
-		switch container.State {
-		case "running":
-			running++
-		case "exited", "stopped":
-			stopped++
-		}
-
 		if strings.Contains(container.Status, "(healthy)") {
+			running++
 			healthy++
-		}
-		if strings.Contains(container.Status, "(unhealthy)") {
+		} else if strings.Contains(container.Status, "(unhealthy)") {
+			running++
 			unhealthy++
+		} else {
+			switch container.State {
+			case "running":
+				running++
+			case "exited", "stopped":
+				stopped++
+			}
 		}
 	}
 
