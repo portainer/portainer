@@ -30,7 +30,7 @@ export function ContainerStatus({ stats }: Props) {
           {stats.healthy} healthy
         </div>
         <div className="vertical-center space-right">
-          <Icon icon={Heart} mode="danger" size="sm" />
+          <Icon icon={Heart} mode="warning" size="sm" />
           {stats.unhealthy} unhealthy
         </div>
       </div>

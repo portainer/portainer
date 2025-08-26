@@ -11,7 +11,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/docker/stats"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
 	"github.com/portainer/portainer/api/http/middlewares"
@@ -26,12 +26,12 @@ type imagesCounters struct {
 }
 
 type dashboardResponse struct {
-	Containers docker.ContainerStats `json:"containers"`
-	Services   int                   `json:"services"`
-	Images     imagesCounters        `json:"images"`
-	Volumes    int                   `json:"volumes"`
-	Networks   int                   `json:"networks"`
-	Stacks     int                   `json:"stacks"`
+	Containers stats.ContainerStats `json:"containers"`
+	Services   int                  `json:"services"`
+	Images     imagesCounters       `json:"images"`
+	Volumes    int                  `json:"volumes"`
+	Networks   int                  `json:"networks"`
+	Stacks     int                  `json:"stacks"`
 }
 
 // @id dockerDashboard
@@ -150,7 +150,7 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 				Size:  totalSize,
 			},
 			Services:   len(services),
-			Containers: docker.CalculateContainerStats(containers),
+			Containers: stats.CalculateContainerStats(containers),
 			Networks:   len(networks),
 			Volumes:    len(volumes),
 			Stacks:     stackCount,

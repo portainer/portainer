@@ -1,4 +1,4 @@
-package docker
+package stats
 
 import (
 	"testing"
@@ -10,11 +10,11 @@ import (
 func TestCalculateContainerStats(t *testing.T) {
 	containers := []types.Container{
 		{State: "running"},
-		{State: "running"},
+		{State: "running", Status: "Up 5 minutes (healthy)"},
 		{State: "exited"},
 		{State: "stopped"},
-		{State: "healthy"},
-		{State: "unhealthy"},
+		{State: "running", Status: "Up 10 minutes"},
+		{State: "running", Status: "Up about an hour (unhealthy)"},
 	}
 
 	stats := CalculateContainerStats(containers)
