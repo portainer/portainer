@@ -1,10 +1,19 @@
 package registries
 
 import (
+	"bytes"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
+
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_registryCreatePayload_Validate(t *testing.T) {
@@ -42,4 +51,47 @@ func Test_registryCreatePayload_Validate(t *testing.T) {
 		err := payload.Validate(nil)
 		assert.NoError(t, err)
 	})
+}
+
+func TestHandler_registryCreate(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, false, false)
+
+	payload := registryCreatePayload{
+		Name:           "Test registry",
+		Type:           portainer.ProGetRegistry,
+		URL:            "http://example.com",
+		BaseURL:        "http://example.com",
+		Authentication: false,
+		Username:       "username",
+		Password:       "password",
+		Gitlab:         portainer.GitlabRegistryData{},
+	}
+	payloadBytes, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(payloadBytes))
+	w := httptest.NewRecorder()
+
+	restrictedContext := &security.RestrictedRequestContext{IsAdmin: true, UserID: 1}
+
+	ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
+	r = r.WithContext(ctx)
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler.DataStore = store
+
+	handlerError := handler.registryCreate(w, r)
+	require.Nil(t, handlerError)
+
+	registry := portainer.Registry{}
+	err = json.NewDecoder(w.Body).Decode(&registry)
+	require.NoError(t, err)
+
+	assert.Equal(t, payload.Name, registry.Name)
+	assert.Equal(t, payload.Type, registry.Type)
+	assert.Equal(t, payload.URL, registry.URL)
+	assert.Equal(t, payload.BaseURL, registry.BaseURL)
+	assert.Equal(t, payload.Authentication, registry.Authentication)
+	assert.Equal(t, payload.Username, registry.Username)
+	assert.Empty(t, registry.Password)
 }
