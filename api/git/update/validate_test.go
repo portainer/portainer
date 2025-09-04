@@ -24,6 +24,16 @@ func Test_ValidateAutoUpdate(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "short interval value",
+			value:   &portainer.AutoUpdateSettings{Interval: "1s"},
+			wantErr: true,
+		},
+		{
+			name:    "valid webhook without interval",
+			value:   &portainer.AutoUpdateSettings{Webhook: "8dce8c2f-9ca1-482b-ad20-271e86536ada"},
+			wantErr: false,
+		},
+		{
 			name: "valid auto update",
 			value: &portainer.AutoUpdateSettings{
 				Webhook:  "8dce8c2f-9ca1-482b-ad20-271e86536ada",

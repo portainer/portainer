@@ -21,10 +21,14 @@ func ValidateAutoUpdateSettings(autoUpdate *portainer.AutoUpdateSettings) error 
 		return httperrors.NewInvalidPayloadError("invalid Webhook format")
 	}
 
-	if autoUpdate.Interval != "" {
-		if _, err := time.ParseDuration(autoUpdate.Interval); err != nil {
-			return httperrors.NewInvalidPayloadError("invalid Interval format")
-		}
+	if autoUpdate.Interval == "" {
+		return nil
+	}
+
+	if d, err := time.ParseDuration(autoUpdate.Interval); err != nil {
+		return httperrors.NewInvalidPayloadError("invalid Interval format")
+	} else if d < time.Minute {
+		return httperrors.NewInvalidPayloadError("interval must be at least 1 minute")
 	}
 
 	return nil
