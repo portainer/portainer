@@ -350,3 +350,62 @@ func legacyAesEncrypt(input io.Reader, output io.Writer, passphrase []byte) erro
 
 	return nil
 }
+
+func Test_hasEncryptedHeader(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     []byte
+		fipsMode bool
+		want     bool
+	}{
+		{
+			name:     "non-FIPS mode with valid header",
+			data:     []byte("AES256-GCM" + "some encrypted data"),
+			fipsMode: false,
+			want:     true,
+		},
+		{
+			name:     "non-FIPS mode with FIPS header",
+			data:     []byte("FIPS-AES256-GCM" + "some encrypted data"),
+			fipsMode: false,
+			want:     false,
+		},
+		{
+			name:     "FIPS mode with valid header",
+			data:     []byte("FIPS-AES256-GCM" + "some encrypted data"),
+			fipsMode: true,
+			want:     true,
+		},
+		{
+			name:     "FIPS mode with non-FIPS header",
+			data:     []byte("AES256-GCM" + "some encrypted data"),
+			fipsMode: true,
+			want:     false,
+		},
+		{
+			name:     "invalid header",
+			data:     []byte("INVALID-HEADER" + "some data"),
+			fipsMode: false,
+			want:     false,
+		},
+		{
+			name:     "empty data",
+			data:     []byte{},
+			fipsMode: false,
+			want:     false,
+		},
+		{
+			name:     "nil data",
+			data:     nil,
+			fipsMode: false,
+			want:     false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := hasEncryptedHeader(tt.data, tt.fipsMode)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

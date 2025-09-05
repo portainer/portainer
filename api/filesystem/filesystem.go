@@ -848,7 +848,7 @@ func defaultMTLSCertPathUnderFileStore() (string, string, string) {
 	return caCertPath, certPath, keyPath
 }
 
-// GetDefaultChiselPrivateKeyPath returns the chisle private key path
+// GetDefaultChiselPrivateKeyPath returns the chisel private key path
 func (service *Service) GetDefaultChiselPrivateKeyPath() string {
 	privateKeyPath := defaultChiselPrivateKeyPathUnderFileStore()
 	return service.wrapFileStore(privateKeyPath)
