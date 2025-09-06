@@ -22,6 +22,7 @@ type stackGitUpdatePayload struct {
 	AutoUpdate                  *portainer.AutoUpdateSettings
 	Env                         []portainer.Pair
 	Prune                       bool
+	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
@@ -131,6 +132,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	//update retrieved stack data based on the payload
+	stack.GitConfig.URL = payload.RepositoryURL
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.GitConfig.TLSSkipVerify = payload.TLSSkipVerify
 	stack.AutoUpdate = payload.AutoUpdate
