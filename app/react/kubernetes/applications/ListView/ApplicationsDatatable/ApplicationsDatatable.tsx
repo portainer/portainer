@@ -20,7 +20,11 @@ import { AddButton } from '@@/buttons';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
-import { PodKubernetesInstanceLabel, PodManagedByLabel } from '../../constants';
+import {
+  HelmReleaseNameAnnotation,
+  PodKubernetesInstanceLabel,
+  PodManagedByLabel,
+} from '../../constants';
 import { useApplications } from '../../queries/useApplications';
 import { ApplicationsTableSettings } from '../useKubeAppsTableStore';
 import { useDeleteApplicationsMutation } from '../../queries/useDeleteApplicationsMutation';
@@ -164,7 +168,9 @@ function separateHelmApps(applications: Application[]): ApplicationRowData[] {
     applications,
     (app) =>
       app.Metadata?.labels &&
-      app.Metadata.labels[PodKubernetesInstanceLabel] &&
+      (app.Metadata.labels[PodKubernetesInstanceLabel] ||
+        // 'meta.helm.sh/release-name' annotation fallback
+        app.Metadata.annotations?.[HelmReleaseNameAnnotation]) &&
       app.Metadata.labels[PodManagedByLabel] === 'Helm'
   );
 
@@ -172,7 +178,9 @@ function separateHelmApps(applications: Application[]): ApplicationRowData[] {
     helmApps,
     (app) =>
       `${app.ResourcePool}/${
-        app.Metadata?.labels[PodKubernetesInstanceLabel] ?? ''
+        app.Metadata?.labels[PodKubernetesInstanceLabel] ??
+        app.Metadata?.annotations?.[HelmReleaseNameAnnotation] ??
+        ''
       }`
   );
 

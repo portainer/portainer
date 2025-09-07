@@ -116,10 +116,10 @@ func parseRepoURL(repoURL string) (*url.URL, error) {
 	return parsedURL, nil
 }
 
-// getRepoNameFromURL generates a unique repository identifier from a URL.
+// GetRepoNameFromURL generates a unique repository identifier from a URL.
 // Combines hostname and path for uniqueness (e.g., "charts.helm.sh/stable" → "charts.helm.sh-stable").
 // Used for Helm's repositories.yaml entries, caching, and chart references.
-func getRepoNameFromURL(urlStr string) (string, error) {
+func GetRepoNameFromURL(urlStr string) (string, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse URL: %w", err)

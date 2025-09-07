@@ -269,7 +269,8 @@ func populateApplicationFromDeployment(application *models.K8sApplication, deplo
 	application.RunningPodsCount = int(deployment.Status.ReadyReplicas)
 	application.DeploymentType = "Replicated"
 	application.Metadata = &models.Metadata{
-		Labels: deployment.Labels,
+		Labels:      deployment.Labels,
+		Annotations: deployment.Annotations,
 	}
 
 	// If the deployment has containers, use the first container's image
@@ -297,7 +298,8 @@ func populateApplicationFromStatefulSet(application *models.K8sApplication, stat
 	application.RunningPodsCount = int(statefulSet.Status.ReadyReplicas)
 	application.DeploymentType = "Replicated"
 	application.Metadata = &models.Metadata{
-		Labels: statefulSet.Labels,
+		Labels:      statefulSet.Labels,
+		Annotations: statefulSet.Annotations,
 	}
 
 	// If the statefulSet has containers, use the first container's image
@@ -322,7 +324,8 @@ func populateApplicationFromDaemonSet(application *models.K8sApplication, daemon
 	application.RunningPodsCount = int(daemonSet.Status.NumberReady)
 	application.DeploymentType = "Global"
 	application.Metadata = &models.Metadata{
-		Labels: daemonSet.Labels,
+		Labels:      daemonSet.Labels,
+		Annotations: daemonSet.Annotations,
 	}
 
 	if len(daemonSet.Spec.Template.Spec.Containers) > 0 {
@@ -351,7 +354,8 @@ func populateApplicationFromPod(application *models.K8sApplication, pod corev1.P
 	application.RunningPodsCount = runningPodsCount
 	application.DeploymentType = string(pod.Status.Phase)
 	application.Metadata = &models.Metadata{
-		Labels: pod.Labels,
+		Labels:      pod.Labels,
+		Annotations: pod.Annotations,
 	}
 
 	// If the pod has containers, use the first container's image

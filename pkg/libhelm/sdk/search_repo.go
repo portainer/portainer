@@ -85,7 +85,7 @@ func (hspm *HelmSDKPackageManager) SearchRepo(searchRepoOpts options.SearchRepoO
 
 	// Update cache for HTTP repos
 	if IsHTTPRepository(searchRepoOpts.Registry) {
-		hspm.updateCache(searchRepoOpts.Repo, indexFile)
+		UpdateCache(searchRepoOpts.Repo, indexFile)
 	}
 
 	return convertAndMarshalIndex(indexFile, searchRepoOpts.Chart)
@@ -114,7 +114,7 @@ func (hspm *HelmSDKPackageManager) tryGetFromCache(repoURL, chartName string) []
 }
 
 // updateCache updates the cache with the provided index file and cleans up expired entries
-func (hspm *HelmSDKPackageManager) updateCache(repoURL string, indexFile *repo.IndexFile) {
+func UpdateCache(repoURL string, indexFile *repo.IndexFile) {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
@@ -151,7 +151,7 @@ func (hspm *HelmSDKPackageManager) downloadHTTPRepoIndex(repoURL string, repoSet
 		return nil, err
 	}
 
-	repoName, err := getRepoNameFromURL(parsedURL.String())
+	repoName, err := GetRepoNameFromURL(parsedURL.String())
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").

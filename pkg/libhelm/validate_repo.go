@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
-	"time"
+
+	"github.com/portainer/portainer/pkg/libhelm/sdk"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
-func ValidateHelmRepositoryURL(repoUrl string, client *http.Client) error {
+func ValidateHelmRepositoryURL(repoUrl string, _ *http.Client) error {
 	if repoUrl == "" {
 		return errors.New("URL is required")
 	}
@@ -28,26 +31,34 @@ func ValidateHelmRepositoryURL(repoUrl string, client *http.Client) error {
 		return fmt.Errorf("invalid helm repository URL '%s'", repoUrl)
 	}
 
-	url.Path = path.Join(url.Path, "index.yaml")
+	// Mirror Helm CLI behavior: download and parse index.yaml using getters
+	settings := cli.New()
 
-	if client == nil {
-		client = &http.Client{
-			Timeout:   120 * time.Second,
-			Transport: http.DefaultTransport,
-		}
+	// Use a deterministic repo name shared with the SDK helper so cache aligns
+	repoName, err := sdk.GetRepoNameFromURL(repoUrl)
+	if err != nil {
+		return fmt.Errorf("failed to derive repo name: %w", err)
 	}
 
-	response, err := client.Head(url.String())
+	r, err := repo.NewChartRepository(
+		&repo.Entry{
+			Name: repoName,
+			URL:  repoUrl,
+		},
+		getter.All(settings),
+	)
 	if err != nil {
 		return fmt.Errorf("%s is not a valid chart repository or cannot be reached: %w", repoUrl, err)
 	}
 
-	response.Body.Close()
+	indexPath, err := r.DownloadIndexFile()
+	if err != nil {
+		return fmt.Errorf("%s is not a valid chart repository or cannot be reached: %w", repoUrl, err)
+	}
 
-	// Success is indicated with 2xx status codes. 3xx status codes indicate a redirect.
-	statusOK := response.StatusCode >= 200 && response.StatusCode < 300
-	if !statusOK {
-		return fmt.Errorf("%s is not a valid chart repository or cannot be reached", repoUrl)
+	// Best-effort: load and seed in-memory cache for future SearchRepo calls
+	if indexFile, err := repo.LoadIndexFile(indexPath); err == nil {
+		sdk.UpdateCache(repoUrl, indexFile)
 	}
 
 	return nil

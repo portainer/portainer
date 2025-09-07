@@ -20,6 +20,7 @@ export interface Application {
   ApplicationType: AppType;
   Metadata?: {
     labels: Record<string, string>;
+    annotations: Record<string, string>;
   };
   Status: 'Ready' | string;
   TotalPodsCount: number;
