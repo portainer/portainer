@@ -24,6 +24,7 @@ interface Props {
   title?: string;
   displayWarning?: boolean;
   warningMessage?: string;
+  memoryUnit?: string;
 }
 
 export function ResourceReservation({
@@ -37,17 +38,18 @@ export function ResourceReservation({
   isLoading = false,
   displayWarning = false,
   warningMessage = '',
+  memoryUnit = 'MB',
 }: Props) {
   const memoryReservationAnnotation = `${getSafeValue(
     resourceReservation.memory
-  )} / ${memoryLimit} MB ${getPercentageString(
+  )} / ${memoryLimit} ${memoryUnit} ${getPercentageString(
     resourceReservation.memory,
     memoryLimit
   )}`;
 
   const memoryUsageAnnotation = `${getSafeValue(
     resourceUsage.memory
-  )} / ${memoryLimit} MB ${getPercentageString(
+  )} / ${memoryLimit} ${memoryUnit} ${getPercentageString(
     resourceUsage.memory,
     memoryLimit
   )}`;

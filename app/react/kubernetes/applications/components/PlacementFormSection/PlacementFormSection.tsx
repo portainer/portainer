@@ -1,7 +1,7 @@
 import { FormikErrors } from 'formik';
 import { useMemo } from 'react';
 
-import { useNodesQuery } from '@/react/kubernetes/cluster/HomeView/nodes.service';
+import { useNodesQuery } from '@/react/kubernetes/cluster/queries/useNodesQuery';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { FormSection } from '@@/form-components/FormSection';

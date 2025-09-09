@@ -1,9 +1,9 @@
 import angular from 'angular';
 import moment from 'moment';
 import filesizeParser from 'filesize-parser';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { PORTAINER_FADEOUT } from '@/constants';
-import { getMetricsForNode } from '@/react/kubernetes/metrics/metrics.ts';
+import { getMetricsForNode } from '@/react/kubernetes/metrics/queries/useNodeMetricsQuery';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 class KubernetesNodeStatsController {
   /* @ngInject */
@@ -86,7 +86,7 @@ class KubernetesNodeStatsController {
         const stats = await getMetricsForNode(this.$state.params.endpointId, this.state.transition.nodeName);
         if (stats) {
           const memory = filesizeParser(stats.usage.memory);
-          const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
+          const cpu = parseCPU(stats.usage.cpu);
           this.stats = {
             read: stats.metadata.creationTimestamp,
             MemoryUsage: memory,

@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 class KubernetesResourceReservationHelper {
   static computeResourceReservation(pods) {
@@ -15,7 +16,7 @@ class KubernetesResourceReservationHelper {
           }
 
           if (container.Requests.cpu) {
-            acc.CPU += KubernetesResourceReservationHelper.parseCPU(container.Requests.cpu);
+            acc.CPU += parseCPU(container.Requests.cpu);
           }
         }
 
@@ -23,24 +24,6 @@ class KubernetesResourceReservationHelper {
       },
       new KubernetesResourceReservation()
     );
-  }
-
-  static parseCPU(cpu) {
-    let res = parseInt(cpu, 10);
-    if (_.endsWith(cpu, 'm')) {
-      // milli
-      res /= 1000;
-    } else if (_.endsWith(cpu, 'u')) {
-      // micro
-      res /= 1000000;
-    } else if (_.endsWith(cpu, 'n')) {
-      // nano
-      res /= 1000000000;
-    } else if (_.endsWith(cpu, 'p')) {
-      // pico
-      res /= 1000000000000;
-    }
-    return res;
   }
 
   static megaBytesValue(value) {

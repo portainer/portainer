@@ -1,4 +1,4 @@
-import { parseCpu } from '@/react/kubernetes/utils';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 import { NodeRowData } from '../types';
 
@@ -10,5 +10,5 @@ export const cpu = columnHelper.accessor((row) => getCPU(row), {
 });
 
 function getCPU(node: NodeRowData) {
-  return parseCpu(node.status?.allocatable?.cpu ?? '');
+  return parseCPU(node.status?.allocatable?.cpu ?? '');
 }

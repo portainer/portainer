@@ -1,4 +1,4 @@
-import { getRole } from '../utils';
+import { getRole } from '../../../nodeUtils';
 
 import { columnHelper } from './helper';
 

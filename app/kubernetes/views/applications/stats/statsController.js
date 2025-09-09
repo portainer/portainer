@@ -2,9 +2,9 @@ import angular from 'angular';
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
 import { getMetricsForPod } from '@/react/kubernetes/metrics/metrics.ts';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 class KubernetesApplicationStatsController {
   /* @ngInject */
@@ -98,7 +98,7 @@ class KubernetesApplicationStatsController {
         const container = _.find(stats.containers, { name: this.state.transition.containerName });
         if (container) {
           const memory = filesizeParser(container.usage.memory);
-          const cpu = KubernetesResourceReservationHelper.parseCPU(container.usage.cpu);
+          const cpu = parseCPU(container.usage.cpu);
           this.stats = {
             read: stats.timestamp,
             preread: '',

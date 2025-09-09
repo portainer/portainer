@@ -28,7 +28,6 @@ import {
 } from '../constants';
 import {
   applicationIsKind,
-  bytesToReadableFormat,
   getResourceRequests,
   getRunningPods,
   getTotalPods,
@@ -38,6 +37,7 @@ import { Application, ApplicationPatch } from '../types';
 import { useNamespaceQuery } from '../../namespaces/queries/useNamespaceQuery';
 import { useApplication } from '../queries/useApplication';
 import { usePatchApplicationMutation } from '../queries/usePatchApplicationMutation';
+import { bytesToReadableFormat } from '../../utils';
 
 export function ApplicationSummaryWidget() {
   const stateAndParams = useCurrentStateAndParams();

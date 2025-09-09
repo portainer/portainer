@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Node } from 'kubernetes-types/core/v1';
+import filesizeParser from 'filesize-parser';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { getMetricsForAllNodes } from '@/react/kubernetes/metrics/metrics';
-import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
 import { withGlobalError } from '@/react-tools/react-query';
 import { NodeMetrics } from '@/react/kubernetes/metrics/types';
+import { getMebibytes, parseCPU } from '@/react/kubernetes/utils';
 
 export function useClusterResourceUsageQuery(
   environmentId: EnvironmentId,
@@ -31,12 +32,9 @@ export function useClusterResourceUsageQuery(
 function aggregateResourceUsage(data: NodeMetrics) {
   return data.items.reduce(
     (total, item) => ({
-      cpu:
-        total.cpu +
-        KubernetesResourceReservationHelper.parseCPU(item.usage.cpu),
-      memory:
-        total.memory +
-        KubernetesResourceReservationHelper.megaBytesValue(item.usage.memory),
+      cpu: total.cpu + parseCPU(item.usage.cpu),
+      // item.usage.memory is a string with a KiB unit. Get the bytes then the MiB
+      memory: total.memory + getMebibytes(filesizeParser(item.usage.memory)),
     }),
     {
       cpu: 0,

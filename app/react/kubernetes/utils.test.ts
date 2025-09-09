@@ -1,4 +1,5 @@
-import { parseCPU, convertBase2ToMiB } from './resourceQuotaUtils';
+import { parseCPU } from './utils';
+import { convertBase2ToMiB } from './namespaces/resourceQuotaUtils';
 
 // test parseCPU with '', '2', '100m', '100u'
 describe('parseCPU', () => {

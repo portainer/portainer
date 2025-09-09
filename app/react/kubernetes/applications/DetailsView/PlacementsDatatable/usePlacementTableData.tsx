@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { Pod, Taint, Node } from 'kubernetes-types/core/v1';
 import _ from 'lodash';
 
-import { useNodesQuery } from '@/react/kubernetes/cluster/HomeView/nodes.service';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from '@/kubernetes/pod/models';
+import { useNodesQuery } from '@/react/kubernetes/cluster/queries/useNodesQuery';
 
 import {
   BasicTableSettings,

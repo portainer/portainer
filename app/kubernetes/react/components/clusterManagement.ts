@@ -17,6 +17,6 @@ export const clusterManagementModule = angular
     'resourceEventsDatatable',
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(ResourceEventsDatatable))),
-      ['resourceId', 'storageKey', 'namespace', 'noWidget']
+      ['resourceId', 'storageKey', 'namespace', 'noWidget', 'isLoading']
     )
   ).name;

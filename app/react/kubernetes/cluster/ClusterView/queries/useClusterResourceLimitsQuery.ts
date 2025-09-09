@@ -5,9 +5,9 @@ import { Node } from 'kubernetes-types/core/v1';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { withGlobalError } from '@/react-tools/react-query';
-import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
-import { parseCpu } from '@/react/kubernetes/utils';
-import { getNodes } from '@/react/kubernetes/cluster/HomeView/nodes.service';
+import { getMebibytes, parseCPU } from '@/react/kubernetes/utils';
+
+import { getNodes } from '../../queries/useNodesQuery';
 
 export function useClusterResourceLimitsQuery(environmentId: EnvironmentId) {
   return useQuery(
@@ -29,16 +29,14 @@ function aggregateResourceLimits(nodes: Node[]) {
   const processedNodes = nodes.map((node) => ({
     ...node,
     memory: filesizeParser(node.status?.allocatable?.memory ?? ''),
-    cpu: parseCpu(node.status?.allocatable?.cpu ?? ''),
+    cpu: parseCPU(node.status?.allocatable?.cpu ?? ''),
   }));
 
   return {
     nodes: processedNodes,
     memoryLimit: reduce(
       processedNodes,
-      (acc, node) =>
-        KubernetesResourceReservationHelper.megaBytesValue(node.memory || 0) +
-        acc,
+      (acc, node) => getMebibytes(node.memory || 0) + acc,
       0
     ),
     cpuLimit: round(

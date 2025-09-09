@@ -24,6 +24,7 @@ import { AccessView } from '@/react/kubernetes/namespaces/AccessView/AccessView'
 import { JobsView } from '@/react/kubernetes/more-resources/JobsView/JobsView';
 import { ClusterView } from '@/react/kubernetes/cluster/ClusterView';
 import { HelmApplicationView } from '@/react/kubernetes/helm/HelmApplicationView';
+import { NodeView } from '@/react/kubernetes/cluster/NodeView/NodeView';
 import { KubectlShellView } from '@/react/kubernetes/cluster/KubectlShell/KubectlShellView';
 
 export const viewsModule = angular
@@ -92,6 +93,10 @@ export const viewsModule = angular
   .component(
     'kubernetesClusterView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ClusterView))), [])
+  )
+  .component(
+    'kubernetesNodeViewReact',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(NodeView))), [])
   )
   .component(
     'kubernetesConfigureView',

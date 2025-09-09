@@ -22,7 +22,7 @@ export function NamespaceView() {
   } = stateAndParams;
 
   const environmentId = useEnvironmentId();
-  const eventWarningCount = useEventWarningsCount(environmentId, namespace);
+  const eventWarningCount = useEventWarningsCount(environmentId, { namespace });
 
   const tabs: Tab[] = [
     {

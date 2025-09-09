@@ -10,6 +10,7 @@ export const defaultDeploymentUniqueLabel = 'pod-template-hash';
 export const appNameLabel = 'io.portainer.kubernetes.application.name';
 export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
 export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
+export const HelmReleaseNameAnnotation = 'meta.helm.sh/release-name';
 
 export const appRevisionAnnotation = 'deployment.kubernetes.io/revision';
 

@@ -15,6 +15,7 @@ import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePo
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 class KubernetesResourceQuotaConverter {
   static apiToResourceQuota(data, yaml) {
@@ -25,7 +26,7 @@ class KubernetesResourceQuotaConverter {
     res.CpuLimit = 0;
     res.MemoryLimit = 0;
     if (data.spec.hard && data.spec.hard[KubernetesPortainerResourceQuotaCPULimit]) {
-      res.CpuLimit = KubernetesResourceReservationHelper.parseCPU(data.spec.hard[KubernetesPortainerResourceQuotaCPULimit]);
+      res.CpuLimit = parseCPU(data.spec.hard[KubernetesPortainerResourceQuotaCPULimit]);
     }
     if (data.spec.hard && data.spec.hard[KubernetesPortainerResourceQuotaMemoryLimit]) {
       res.MemoryLimit = filesizeParser(data.spec.hard[KubernetesPortainerResourceQuotaMemoryLimit], { base: 10 });
@@ -38,7 +39,7 @@ class KubernetesResourceQuotaConverter {
 
     res.CpuLimitUsed = 0;
     if (data.status.used && data.status.used[KubernetesPortainerResourceQuotaCPULimit]) {
-      res.CpuLimitUsed = KubernetesResourceReservationHelper.parseCPU(data.status.used[KubernetesPortainerResourceQuotaCPULimit]);
+      res.CpuLimitUsed = parseCPU(data.status.used[KubernetesPortainerResourceQuotaCPULimit]);
     }
     res.Yaml = yaml ? yaml.data : '';
     res.ResourcePoolName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolNameLabel] : '';

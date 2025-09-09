@@ -59,23 +59,28 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	payload.TLSSkipVerify = skipTLSVerify
 
 	if useTLS && !skipTLSVerify {
+		numCertsProvided := 0
 		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
-		if err != nil {
-			return errors.New("invalid certificate file. Ensure that the file is uploaded correctly")
+		if err == nil {
+			payload.TLSCertFile = cert
+			numCertsProvided++
 		}
-		payload.TLSCertFile = cert
 
 		key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
-		if err != nil {
-			return errors.New("invalid key file. Ensure that the file is uploaded correctly")
+		if err == nil {
+			payload.TLSKeyFile = key
+			numCertsProvided++
 		}
-		payload.TLSKeyFile = key
 
 		ca, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
-		if err != nil {
-			return errors.New("invalid CA certificate file. Ensure that the file is uploaded correctly")
+		if err == nil {
+			payload.TLSCACertFile = ca
+			numCertsProvided++
 		}
-		payload.TLSCACertFile = ca
+
+		if numCertsProvided != 0 && numCertsProvided != 3 {
+			return errors.New("invalid TLS configuration: provide TLS certificate, key, and CA together, or none")
+		}
 	}
 
 	return nil

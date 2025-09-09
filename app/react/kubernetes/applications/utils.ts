@@ -8,7 +8,8 @@ import {
   ControllerRevision,
 } from 'kubernetes-types/apps/v1';
 import { Pod } from 'kubernetes-types/core/v1';
-import filesizeParser from 'filesize-parser';
+
+import { parseCPU, safeFilesizeParser } from '@/react/kubernetes/utils';
 
 import { Application, ApplicationPatch, Revision } from './types';
 import {
@@ -78,30 +79,6 @@ export function getTotalPods(
   }
 }
 
-function parseCpu(cpu: string) {
-  let res = parseInt(cpu, 10);
-  if (cpu.endsWith('m')) {
-    res /= 1000;
-  } else if (cpu.endsWith('n')) {
-    res /= 1000000000;
-  }
-  return res;
-}
-
-// bytesToReadableFormat converts bytes to a human readable string (e.g. '1.5 GB'), assuming base 10
-// there's some discussion about whether base 2 or base 10 should be used for memory units
-// https://www.quora.com/Is-1-GB-equal-to-1024-MB-or-1000-MB
-export function bytesToReadableFormat(memoryBytes: number) {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let unitIndex = 0;
-  let memoryValue = memoryBytes;
-  while (memoryValue > 1000 && unitIndex < units.length) {
-    memoryValue /= 1000;
-    unitIndex++;
-  }
-  return `${memoryValue.toFixed(1)} ${units[unitIndex]}`;
-}
-
 // getResourceRequests returns the total cpu and memory requests for all containers in an application
 export function getResourceRequests(application: Application) {
   const appContainers = applicationIsKind<Pod>('Pod', application)
@@ -114,8 +91,8 @@ export function getResourceRequests(application: Application) {
     (acc, container) => {
       const cpu = container.resources?.requests?.cpu;
       const memory = container.resources?.requests?.memory;
-      if (cpu) acc.cpu += parseCpu(cpu);
-      if (memory) acc.memoryBytes += filesizeParser(memory, { base: 10 });
+      if (cpu) acc.cpu += parseCPU(cpu);
+      if (memory) acc.memoryBytes += safeFilesizeParser(memory);
       return acc;
     },
     { cpu: 0, memoryBytes: 0 }
@@ -136,8 +113,8 @@ export function getResourceLimits(application: Application) {
     (acc, container) => {
       const cpu = container.resources?.limits?.cpu;
       const memory = container.resources?.limits?.memory;
-      if (cpu) acc.cpu += parseCpu(cpu);
-      if (memory) acc.memory += filesizeParser(memory, { base: 10 });
+      if (cpu) acc.cpu += parseCPU(cpu);
+      if (memory) acc.memory += safeFilesizeParser(memory);
       return acc;
     },
     { cpu: 0, memory: 0 }

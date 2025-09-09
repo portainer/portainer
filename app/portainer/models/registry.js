@@ -59,6 +59,11 @@ export function RegistryCreateRequest(model) {
   this.URL = _.replace(model.URL, /^https?\:\/\//i, '');
   this.URL = _.replace(this.URL, /\/$/, '');
   this.Authentication = model.Authentication;
+  // default TLS based on URL scheme: enable TLS unless explicitly http://
+  const isHttp = /^http:\/\//i.test(model.URL);
+  if (!isHttp) {
+    this.TLS = true;
+  }
   if (model.Authentication) {
     this.Username = model.Username;
     this.Password = model.Password;

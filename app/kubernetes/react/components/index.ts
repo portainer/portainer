@@ -127,6 +127,8 @@ export const ngModule = angular
       'data',
       'hideMessage',
       'data-cy',
+      'isLoading',
+      'isError',
     ])
   )
   .component(

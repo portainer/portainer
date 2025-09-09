@@ -415,14 +415,11 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const node = {
       name: 'kubernetes.cluster.node',
-      url: '/:nodeName',
+      url: '/:nodeName?tab',
       views: {
         'content@': {
-          component: 'kubernetesNodeView',
+          component: 'kubernetesNodeViewReact',
         },
-      },
-      data: {
-        docs: '/user/kubernetes/cluster/node',
       },
     };
 

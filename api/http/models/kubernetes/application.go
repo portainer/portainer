@@ -36,13 +36,15 @@ type K8sApplication struct {
 	Kind                    string                                 `json:"Kind,omitempty"`
 	MatchLabels             map[string]string                      `json:"MatchLabels,omitempty"`
 	Labels                  map[string]string                      `json:"Labels,omitempty"`
+	Annotations             map[string]string                      `json:"Annotations,omitempty"`
 	Resource                K8sApplicationResource                 `json:"Resource,omitempty"`
 	HorizontalPodAutoscaler *autoscalingv2.HorizontalPodAutoscaler `json:"HorizontalPodAutoscaler,omitempty"`
 	CustomResourceMetadata  CustomResourceMetadata                 `json:"CustomResourceMetadata,omitempty"`
 }
 
 type Metadata struct {
-	Labels map[string]string `json:"labels"`
+	Labels      map[string]string `json:"labels"`
+	Annotations map[string]string `json:"annotations"`
 }
 
 type CustomResourceMetadata struct {

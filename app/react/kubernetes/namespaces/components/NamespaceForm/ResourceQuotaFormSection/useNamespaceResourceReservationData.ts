@@ -1,12 +1,9 @@
 import { round } from 'lodash';
 
-import { getSafeValue } from '@/react/kubernetes/utils';
+import { getSafeValue, parseCPU } from '@/react/kubernetes/utils';
 import { PodMetrics } from '@/react/kubernetes/metrics/types';
-import { useMetricsForNamespace } from '@/react/kubernetes/metrics/queries/useMetricsForNamespace';
-import {
-  megaBytesValue,
-  parseCPU,
-} from '@/react/kubernetes/namespaces/resourceQuotaUtils';
+import { useNamespaceMetricsQuery } from '@/react/kubernetes/metrics/queries/useNamespaceMetricsQuery';
+import { megaBytesValue } from '@/react/kubernetes/namespaces/resourceQuotaUtils';
 
 import { useResourceQuotaUsed } from './useResourceQuotaUsed';
 import { ResourceQuotaFormValues } from './types';
@@ -20,13 +17,10 @@ export function useNamespaceResourceReservationData(
     environmentId,
     namespaceName
   );
-  const { data: metrics, isLoading: isMetricsLoading } = useMetricsForNamespace(
-    environmentId,
-    namespaceName,
-    {
+  const { data: metrics, isLoading: isMetricsLoading } =
+    useNamespaceMetricsQuery(environmentId, namespaceName, {
       select: aggregatePodUsage,
-    }
-  );
+    });
 
   return {
     cpuLimit: Number(resourceQuotaValues.cpu) || 0,

@@ -1,9 +1,10 @@
 import { round } from 'lodash';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 import { useNamespaceQuery } from '../../../queries/useNamespaceQuery';
-import { parseCPU, megaBytesValue } from '../../../resourceQuotaUtils';
+import { megaBytesValue } from '../../../resourceQuotaUtils';
 import { PortainerNamespace } from '../../../types';
 
 /**

@@ -202,3 +202,47 @@ func TestCreateClient_CustomTLSConfiguration(t *testing.T) {
 		assert.Equal(t, retry.DefaultClient, client, "No management config should use default client")
 	})
 }
+
+func TestCreateClient_TLSWithTrustedCerts_UsesDefaultClientHTTPS(t *testing.T) {
+	registry := &portainer.Registry{
+		Type: portainer.CustomRegistry,
+		URL:  "my-registry.local",
+		ManagementConfiguration: &portainer.RegistryManagementConfiguration{
+			TLSConfig: portainer.TLSConfiguration{
+				TLS:           true,
+				TLSSkipVerify: false,
+				TLSCACertPath: "",
+				TLSCertPath:   "",
+				TLSKeyPath:    "",
+			},
+		},
+	}
+
+	client, usePlainHTTP, err := CreateClient(registry)
+
+	require.NoError(t, err)
+	assert.False(t, usePlainHTTP, "Trusted TLS should use HTTPS")
+	assert.Equal(t, retry.DefaultClient, client, "Trusted TLS should use default retry client")
+}
+
+func TestCreateClient_CustomTLS_WithCertPathsMissing_ReturnsError(t *testing.T) {
+	registry := &portainer.Registry{
+		Type: portainer.CustomRegistry,
+		URL:  "my-registry.local",
+		ManagementConfiguration: &portainer.RegistryManagementConfiguration{
+			TLSConfig: portainer.TLSConfiguration{
+				TLS:           true,
+				TLSSkipVerify: false,
+				TLSCACertPath: "/not/found/ca.pem",
+				TLSCertPath:   "/not/found/cert.pem",
+				TLSKeyPath:    "/not/found/key.pem",
+			},
+		},
+	}
+
+	client, usePlainHTTP, err := CreateClient(registry)
+
+	require.Error(t, err)
+	assert.Nil(t, client)
+	assert.False(t, usePlainHTTP)
+}

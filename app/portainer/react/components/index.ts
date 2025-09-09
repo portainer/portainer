@@ -206,6 +206,7 @@ export const ngModule = angular
       'isLoading',
       'noOptionsMessage',
       'aria-label',
+      'size',
       'loadingMessage',
     ])
   )

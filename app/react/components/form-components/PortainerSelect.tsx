@@ -36,6 +36,7 @@ interface SharedProps<TValue>
     Pick<AriaAttributes, 'aria-label'> {
   name?: string;
   inputId?: string;
+  size?: 'sm' | 'md';
   placeholder?: string;
   disabled?: boolean;
   isClearable?: boolean;
@@ -115,6 +116,7 @@ export function SingleSelect<TValue = string>({
   noOptionsMessage,
   loadingMessage,
   isMulti,
+  size,
   ...aria
 }: SingleProps<TValue>) {
   const selectedValue =
@@ -144,6 +146,7 @@ export function SingleSelect<TValue = string>({
       components={components}
       isLoading={isLoading}
       noOptionsMessage={noOptionsMessage}
+      size={size}
       loadingMessage={loadingMessage}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...aria}
@@ -189,6 +192,7 @@ export function MultiSelect<TValue = string>({
   components,
   isLoading,
   noOptionsMessage,
+  size,
   loadingMessage,
   formatCreateLabel,
   onCreateOption,
@@ -219,6 +223,7 @@ export function MultiSelect<TValue = string>({
       components={components}
       isLoading={isLoading}
       noOptionsMessage={noOptionsMessage}
+      size={size}
       loadingMessage={loadingMessage}
       formatCreateLabel={formatCreateLabel}
       onCreateOption={onCreateOption}

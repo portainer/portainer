@@ -7,7 +7,7 @@ import { PodMetrics } from '../types';
 
 import { queryKeys } from './query-keys';
 
-export function useMetricsForNamespace<T = PodMetrics>(
+export function useNamespaceMetricsQuery<T = PodMetrics>(
   environmentId: EnvironmentId,
   namespaceName: string,
   queryOptions?: UseQueryOptions<PodMetrics, unknown, T>

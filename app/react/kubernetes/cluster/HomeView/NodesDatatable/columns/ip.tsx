@@ -1,4 +1,4 @@
-import { getInternalNodeIpAddress } from '../utils';
+import { getInternalNodeIpAddress } from '../../../nodeUtils';
 
 import { columnHelper } from './helper';
 

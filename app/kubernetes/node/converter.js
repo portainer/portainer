@@ -2,9 +2,9 @@ import _ from 'lodash-es';
 
 import * as JsonPatch from 'fast-json-patch';
 import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities, KubernetesPortainerNodeDrainLabel } from 'Kubernetes/node/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
 import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'Kubernetes/node/payload';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 class KubernetesNodeConverter {
   static apiToNode(data, res) {
@@ -45,7 +45,7 @@ class KubernetesNodeConverter {
       res.Status = 'Ready';
     }
 
-    res.CPU = KubernetesResourceReservationHelper.parseCPU(data.status.allocatable.cpu);
+    res.CPU = parseCPU(data.status.allocatable.cpu);
     res.Memory = data.status.allocatable.memory;
     res.Version = data.status.nodeInfo.kubeletVersion;
     const internalIP = _.find(data.status.addresses, { type: 'InternalIP' });

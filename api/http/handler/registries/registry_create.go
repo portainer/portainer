@@ -41,6 +41,8 @@ type registryCreatePayload struct {
 	Quay portainer.QuayRegistryData
 	// ECR specific details, required when type = 7
 	Ecr portainer.EcrData
+	// Use TLS
+	TLS bool `example:"true"`
 }
 
 func (payload *registryCreatePayload) Validate(_ *http.Request) error {
@@ -120,6 +122,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	registry.ManagementConfiguration = syncConfig(registry)
+	registry.ManagementConfiguration.TLSConfig.TLS = payload.TLS
 
 	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {

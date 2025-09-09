@@ -29,6 +29,7 @@ import PortainerError from 'Portainer/error';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
   const ports = _.map(pList, (item) => {
@@ -88,7 +89,7 @@ class KubernetesApplicationConverter {
       containers,
       (acc, item) => {
         if (item.resources.limits && item.resources.limits.cpu) {
-          acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.limits.cpu);
+          acc.Cpu += parseCPU(item.resources.limits.cpu);
         }
         if (item.resources.limits && item.resources.limits.memory) {
           acc.Memory += filesizeParser(item.resources.limits.memory, { base: 10 });
@@ -106,7 +107,7 @@ class KubernetesApplicationConverter {
       containers,
       (acc, item) => {
         if (item.resources.requests && item.resources.requests.cpu) {
-          acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.requests.cpu);
+          acc.Cpu += parseCPU(item.resources.requests.cpu);
         }
         if (item.resources.requests && item.resources.requests.memory) {
           acc.Memory += filesizeParser(item.resources.requests.memory, { base: 10 });

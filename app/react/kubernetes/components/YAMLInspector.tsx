@@ -8,11 +8,15 @@ import { AutomationTestingProps } from '@/types';
 import { WebEditorForm } from '@@/WebEditorForm';
 import { Button } from '@@/buttons';
 import { BETeaserButton } from '@@/BETeaserButton';
+import { Alert } from '@@/Alert';
+import { Loading } from '@@/Widget/Loading';
 
 type Props = {
   identifier: string;
   data: string;
   hideMessage?: boolean;
+  isLoading?: boolean;
+  isError?: boolean;
 } & AutomationTestingProps;
 
 export function YAMLInspector({
@@ -20,9 +24,19 @@ export function YAMLInspector({
   data,
   hideMessage,
   'data-cy': dataCy,
+  isLoading,
+  isError,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const yaml = useMemo(() => cleanYamlUnwantedFields(data), [data]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <Alert color="error">Error loading YAML</Alert>;
+  }
 
   return (
     <div>

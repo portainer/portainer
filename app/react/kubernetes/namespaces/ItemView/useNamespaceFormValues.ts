@@ -2,13 +2,10 @@ import { useMemo } from 'react';
 
 import { StorageClass } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
+import { parseCPU } from '@/react/kubernetes/utils';
 
 import { NamespaceFormValues, PortainerNamespace } from '../types';
-import {
-  megaBytesValue,
-  parseCPU,
-  convertBase2ToMiB,
-} from '../resourceQuotaUtils';
+import { megaBytesValue, convertBase2ToMiB } from '../resourceQuotaUtils';
 import { IngressControllerClassMap } from '../../cluster/ingressClass/types';
 
 interface ComputeInitialValuesParams {

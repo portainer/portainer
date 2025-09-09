@@ -90,13 +90,13 @@ describe('ClusterResourceReservation', () => {
 
     expect(
       await within(await screen.findByTestId('memory-reservation')).findByText(
-        '2147 / 8589 MB - 25%'
+        '2048 / 8192 MiB - 25%'
       )
     ).toBeVisible();
 
     expect(
       await within(await screen.findByTestId('memory-usage')).findByText(
-        '4294 / 8589 MB - 50%'
+        '4096 / 8192 MiB - 50%'
       )
     ).toBeVisible();
 
@@ -124,7 +124,7 @@ describe('ClusterResourceReservation', () => {
     // Should only show reservation bars
     expect(
       await within(await screen.findByTestId('memory-reservation')).findByText(
-        '2147 / 8589 MB - 25%'
+        '2048 / 8192 MiB - 25%'
       )
     ).toBeVisible();
 
@@ -152,7 +152,7 @@ describe('ClusterResourceReservation', () => {
     // Should only show reservation bars
     expect(
       await within(await screen.findByTestId('memory-reservation')).findByText(
-        '2147 / 8589 MB - 25%'
+        '2048 / 8192 MiB - 25%'
       )
     ).toBeVisible();
 
@@ -179,13 +179,13 @@ describe('ClusterResourceReservation', () => {
 
     expect(
       await within(await screen.findByTestId('memory-reservation')).findByText(
-        '2147 / 8589 MB - 25%'
+        '2048 / 8192 MiB - 25%'
       )
     ).toBeVisible();
 
     expect(
       await within(await screen.findByTestId('memory-usage')).findByText(
-        '0 / 8589 MB - 0%'
+        '0 / 8192 MiB - 0%'
       )
     ).toBeVisible();
 
