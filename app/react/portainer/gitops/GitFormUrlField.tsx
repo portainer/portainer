@@ -134,12 +134,5 @@ export function useUrlValidation(force: boolean) {
 }
 
 export function urlFieldValidation(): SchemaOf<string> {
-  return string()
-    .url('Invalid Url')
-    .required('Repository URL is required')
-    .default('');
-  // return string()
-  //   .url('Invalid Url')
-  //   .required('Repository URL is required')
-  //   .test('repo-exists', 'Repository does not exist', () => false);
+  return useUrlValidation(false);
 }
