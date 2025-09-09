@@ -43,12 +43,12 @@ func TestDBSecretPath(t *testing.T) {
 		keyFilenameFlag string
 		expected        string
 	}{
-		{keyFilenameFlag: "secret.txt", expected: "/run/portainer/secret.txt"},
+		{keyFilenameFlag: "secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "/tmp/secret.txt", expected: "/tmp/secret.txt"},
-		{keyFilenameFlag: "/run/portainer/secret.txt", expected: "/run/portainer/secret.txt"},
-		{keyFilenameFlag: "./secret.txt", expected: "/run/portainer/secret.txt"},
+		{keyFilenameFlag: "/run/secrets/secret.txt", expected: "/run/secrets/secret.txt"},
+		{keyFilenameFlag: "./secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "../secret.txt", expected: "/run/secret.txt"},
-		{keyFilenameFlag: "foo/bar/secret.txt", expected: "/run/portainer/foo/bar/secret.txt"},
+		{keyFilenameFlag: "foo/bar/secret.txt", expected: "/run/secrets/foo/bar/secret.txt"},
 	}
 
 	for _, test := range tests {
