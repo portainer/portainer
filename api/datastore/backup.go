@@ -14,6 +14,15 @@ import (
 // corruption and if a path is not given a default is used.
 // The path or an error are returned.
 func (store *Store) Backup(path string) (string, error) {
+	encryptionReq, err := store.connection.NeedsEncryptionMigration()
+	if err != nil {
+		return "", err
+	}
+
+	if encryptionReq {
+		store.connection.SetEncrypted(false)
+	}
+
 	if err := store.createBackupPath(); err != nil {
 		return "", err
 	}
@@ -25,7 +34,7 @@ func (store *Store) Backup(path string) (string, error) {
 	log.Info().Str("from", store.connection.GetDatabaseFilePath()).Str("to", backupFilename).Msgf("Backing up database")
 
 	// Close the store before backing up
-	err := store.Close()
+	err = store.Close()
 	if err != nil {
 		return "", fmt.Errorf("failed to close store before backup: %w", err)
 	}
@@ -35,10 +44,12 @@ func (store *Store) Backup(path string) (string, error) {
 		return "", fmt.Errorf("failed to create backup file: %w", err)
 	}
 
-	// reopen the store
-	_, err = store.Open()
-	if err != nil {
-		return "", fmt.Errorf("failed to reopen store after backup: %w", err)
+	if !encryptionReq {
+		// reopen the store
+		_, err = store.Open()
+		if err != nil {
+			return "", fmt.Errorf("failed to reopen store after backup: %w", err)
+		}
 	}
 
 	return backupFilename, nil
