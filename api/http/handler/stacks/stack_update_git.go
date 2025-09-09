@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -124,6 +125,16 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	} else if !canManage {
 		errMsg := "Stack editing is disabled for non-admin users"
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
+	}
+
+	// validate repository URL
+	if payload.RepositoryURL == "" {
+		return httperror.BadRequest("Invalid repository URL", errors.New("repository URL cannot be empty"))
+	}
+
+	_, err = url.ParseRequestURI(payload.RepositoryURL)
+	if err != nil {
+		return httperror.BadRequest("Invalid repository URL", errors.New("repository URL is not a valid URI"))
 	}
 
 	//stop the autoupdate job if there is any
