@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import { RefreshCcw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { string, StringSchema } from 'yup';
+import { SchemaOf, string, StringSchema } from 'yup';
 
 import {
   checkRepo,
@@ -131,4 +131,15 @@ export function useUrlValidation(force: boolean) {
     .url('Invalid Url')
     .required('Repository URL is required')
     .test('repo-exists', 'Repository does not exist', existenceTest);
+}
+
+export function urlFieldValidation(): SchemaOf<string> {
+  return string()
+    .url('Invalid Url')
+    .required('Repository URL is required')
+    .default('');
+  // return string()
+  //   .url('Invalid Url')
+  //   .required('Repository URL is required')
+  //   .test('repo-exists', 'Repository does not exist', () => false);
 }

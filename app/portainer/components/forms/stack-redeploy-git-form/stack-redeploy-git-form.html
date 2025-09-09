@@ -9,6 +9,12 @@
     additional-files="$ctrl.stack.AdditionalFiles"
   ></git-form-info-panel>
 
+  <git-form-url-field
+    value="$ctrl.formValues.RepositoryURL"
+    on-change="($ctrl.onChangeRepositoryURL)"
+    model="$ctrl.formValues"
+  ></git-form-url-field>
+
   <git-form-auto-update-fieldset
     value="$ctrl.formValues.AutoUpdate"
     on-change="($ctrl.onChangeAutoUpdate)"

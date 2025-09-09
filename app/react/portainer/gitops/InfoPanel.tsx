@@ -18,9 +18,15 @@ export function InfoPanel({
   return (
     <div className={clsx('form-group', className)}>
       <div className="col-sm-12">
-        <p>
-          This {type} was deployed from the git repository <code>{url}</code>.
-        </p>
+        {type === 'stack' ? (
+          <p>
+            This {type} was deployed from a git repository.
+          </p>
+        ) : (
+          <p>
+            This {type} was deployed from the git repository <code>{url}</code>.
+          </p>
+        )}
         <p>
           Update
           <code>{[configFilePath, ...additionalFiles].join(', ')}</code>
