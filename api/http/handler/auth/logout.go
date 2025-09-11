@@ -26,11 +26,10 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 		handler.KubernetesTokenCacheManager.RemoveUserFromCache(tokenData.ID)
 		handler.KubernetesClientFactory.ClearUserClientCache(strconv.Itoa(int(tokenData.ID)))
 		logoutcontext.Cancel(tokenData.Token)
+		handler.bouncer.RevokeJWT(tokenData.Token)
 	}
 
 	security.RemoveAuthCookie(w)
-
-	handler.bouncer.RevokeJWT(tokenData.Token)
 
 	return response.Empty(w)
 }
