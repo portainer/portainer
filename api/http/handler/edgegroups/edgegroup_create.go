@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/roar"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type edgeGroupCreatePayload struct {
@@ -111,5 +112,5 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		return nil
 	})
 
-	return txResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
+	return response.TxResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
 }

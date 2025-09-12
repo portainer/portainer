@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/portainer/portainer/pkg/validate"
 )
 
@@ -85,19 +86,18 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 // @router /edge_jobs/create/string [post]
 func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeJobCreateFromFileContentPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var edgeJob *portainer.EdgeJob
+	var err error
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, []byte(payload.FileContent))
-
 		return err
 	})
 
-	return txResponse(w, edgeJob, err)
+	return response.TxResponse(w, edgeJob, err)
 }
 
 func (handler *Handler) createEdgeJob(tx dataservices.DataStoreTx, payload *edgeJobBasePayload, fileContent []byte) (*portainer.EdgeJob, error) {
@@ -191,19 +191,18 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 // @router /edge_jobs/create/file [post]
 func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &edgeJobCreateFromFilePayload{}
-	err := payload.Validate(r)
-	if err != nil {
+	if err := payload.Validate(r); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var edgeJob *portainer.EdgeJob
+	var err error
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeJob, err = handler.createEdgeJob(tx, &payload.edgeJobBasePayload, payload.File)
-
 		return err
 	})
 
-	return txResponse(w, edgeJob, err)
+	return response.TxResponse(w, edgeJob, err)
 }
 
 func (handler *Handler) createEdgeJobObjectFromPayload(tx dataservices.DataStoreTx, payload *edgeJobBasePayload) *portainer.EdgeJob {

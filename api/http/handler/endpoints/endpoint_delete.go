@@ -62,18 +62,11 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid boolean query parameter", err)
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEndpoint(tx, portainer.EndpointID(endpointID), deleteCluster)
-	}); err != nil {
-		var handlerError *httperror.HandlerError
-		if errors.As(err, &handlerError) {
-			return handlerError
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 // @id EndpointDeleteBatch

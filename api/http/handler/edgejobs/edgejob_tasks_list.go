@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type taskContainer struct {
@@ -49,31 +50,33 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 		return err
 	})
 
-	results := filters.SearchOrderAndPaginate(tasks, params, filters.Config[*taskContainer]{
-		SearchAccessors: []filters.SearchAccessor[*taskContainer]{
-			func(tc *taskContainer) (string, error) {
-				switch tc.LogsStatus {
-				case portainer.EdgeJobLogsStatusPending:
-					return "pending", nil
-				case 0, portainer.EdgeJobLogsStatusIdle:
-					return "idle", nil
-				case portainer.EdgeJobLogsStatusCollected:
-					return "collected", nil
-				}
-				return "", errors.New("unknown state")
+	return response.TxFuncResponse(err, func() *httperror.HandlerError {
+		results := filters.SearchOrderAndPaginate(tasks, params, filters.Config[*taskContainer]{
+			SearchAccessors: []filters.SearchAccessor[*taskContainer]{
+				func(tc *taskContainer) (string, error) {
+					switch tc.LogsStatus {
+					case portainer.EdgeJobLogsStatusPending:
+						return "pending", nil
+					case 0, portainer.EdgeJobLogsStatusIdle:
+						return "idle", nil
+					case portainer.EdgeJobLogsStatusCollected:
+						return "collected", nil
+					}
+					return "", errors.New("unknown state")
+				},
+				func(tc *taskContainer) (string, error) {
+					return tc.EndpointName, nil
+				},
 			},
-			func(tc *taskContainer) (string, error) {
-				return tc.EndpointName, nil
+			SortBindings: []filters.SortBinding[*taskContainer]{
+				{Key: "EndpointName", Fn: func(a, b *taskContainer) int { return strings.Compare(a.EndpointName, b.EndpointName) }},
 			},
-		},
-		SortBindings: []filters.SortBinding[*taskContainer]{
-			{Key: "EndpointName", Fn: func(a, b *taskContainer) int { return strings.Compare(a.EndpointName, b.EndpointName) }},
-		},
+		})
+
+		filters.ApplyFilterResultsHeaders(&w, results)
+
+		return response.JSON(w, results.Items)
 	})
-
-	filters.ApplyFilterResultsHeaders(&w, results)
-
-	return txResponse(w, results.Items, err)
 }
 
 func listEdgeJobTasks(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID) ([]*taskContainer, error) {

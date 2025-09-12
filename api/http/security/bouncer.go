@@ -2,6 +2,7 @@ package security
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -534,7 +535,7 @@ func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 		}
 
 		if csp {
-			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud js.hsforms.net; object-src 'none'; frame-ancestors 'none';")
+			w.Header().Set("Content-Security-Policy", "script-src 'self' cdn.matomo.cloud js.hsforms.net www.google.com; object-src 'none'; frame-ancestors 'none';")
 		}
 
 		w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -555,12 +556,9 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		return nil, err
 	}
 
-	isTeamLeader := false
-	for _, membership := range memberships {
-		if membership.Role == portainer.TeamLeader {
-			isTeamLeader = true
-		}
-	}
+	isTeamLeader := slices.ContainsFunc(memberships, func(m portainer.TeamMembership) bool {
+		return m.Role == portainer.TeamLeader
+	})
 
 	return &RestrictedRequestContext{
 		IsAdmin:         false,

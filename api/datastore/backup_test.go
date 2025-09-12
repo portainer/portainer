@@ -5,15 +5,14 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
+	"github.com/stretchr/testify/require"
 
 	"github.com/rs/zerolog/log"
 )
 
 func TestStoreCreation(t *testing.T) {
 	_, store := MustNewTestStore(t, true, true)
-	if store == nil {
-		t.Fatal("Expect to create a store")
-	}
+	require.NotNil(t, store)
 
 	v, err := store.VersionService.Version()
 	if err != nil {

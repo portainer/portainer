@@ -54,13 +54,11 @@ client-deps: ## Install client dependencies
 tidy: ## Tidy up the go.mod file
 	@go mod tidy
 
-
 ##@ Cleanup
 .PHONY: clean
 clean: ## Remove all build and download artifacts
 	@echo "Clearing the dist directory..."
 	@rm -rf dist/*
-
 
 ##@ Testing
 .PHONY: test test-client test-server
@@ -105,15 +103,13 @@ lint: lint-client lint-server ## Lint all code
 lint-client: ## Lint client code
 	yarn lint
 
-lint-server: ## Lint server code
+lint-server: tidy ## Lint server code
 	golangci-lint run --timeout=10m -c .golangci.yaml
-
 
 ##@ Extension
 .PHONY: dev-extension
 dev-extension: build-server build-client ## Run the extension in development mode
 	make local -f build/docker-extension/Makefile
-
 
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean

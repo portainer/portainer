@@ -66,12 +66,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		stack, err = handler.updateEdgeStack(tx, portainer.EdgeStackID(stackID), payload)
 		return err
 	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
-
-		return httperror.InternalServerError("Unexpected error", err)
+		return response.TxErrorResponse(err)
 	}
 
 	if err := fillEdgeStackStatus(handler.DataStore, stack); err != nil {

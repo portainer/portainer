@@ -1,7 +1,6 @@
 package endpointgroups
 
 import (
-	"errors"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -39,16 +38,8 @@ func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.addEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
 	})
-	if err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) addEndpoint(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, endpointID portainer.EndpointID) error {

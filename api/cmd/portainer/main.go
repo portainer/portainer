@@ -309,13 +309,13 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 
 // dbSecretPath build the path to the file that contains the db encryption
 // secret. Normally in Docker this is built from the static path inside
-// /run/portainer for example: /run/portainer/<keyFilenameFlag> but for ease of
+// /run/secrets for example: /run/secrets/<keyFilenameFlag> but for ease of
 // use outside Docker it also accepts an absolute path
 func dbSecretPath(keyFilenameFlag string) string {
 	if path.IsAbs(keyFilenameFlag) {
 		return keyFilenameFlag
 	}
-	return path.Join("/run/portainer", keyFilenameFlag)
+	return path.Join("/run/secrets", keyFilenameFlag)
 }
 
 func loadEncryptionSecretKey(keyfilename string) []byte {

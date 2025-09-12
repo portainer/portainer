@@ -32,16 +32,8 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return deleteEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
 	})
-	if err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) error {

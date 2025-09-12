@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/roar"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 // @id EdgeGroupInspect
@@ -36,7 +37,7 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 
 	edgeGroup.Endpoints = edgeGroup.EndpointIDs.ToSlice()
 
-	return txResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
+	return response.TxResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
 }
 
 func getEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error) {

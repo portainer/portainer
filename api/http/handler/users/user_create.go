@@ -55,22 +55,13 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	var user *portainer.User
-
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		var err error
+	var err error
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		user, err = handler.createUser(tx, payload)
-
 		return err
-	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.JSON(w, user)
+	return response.TxResponse(w, user, err)
 }
 
 func (handler *Handler) createUser(tx dataservices.DataStoreTx, payload userCreatePayload) (*portainer.User, error) {

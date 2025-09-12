@@ -37,16 +37,8 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID))
 	})
-	if err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) deleteEndpointGroup(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID) error {

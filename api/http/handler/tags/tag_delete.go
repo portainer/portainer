@@ -1,7 +1,6 @@
 package tags
 
 import (
-	"errors"
 	"net/http"
 	"slices"
 
@@ -37,16 +36,8 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return deleteTag(tx, portainer.TagID(id))
 	})
-	if err != nil {
-		var handlerError *httperror.HandlerError
-		if errors.As(err, &handlerError) {
-			return handlerError
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func deleteTag(tx dataservices.DataStoreTx, tagID portainer.TagID) error {

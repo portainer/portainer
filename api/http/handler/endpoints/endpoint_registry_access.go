@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"errors"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -53,16 +52,8 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.updateRegistryAccess(tx, r, portainer.EndpointID(endpointID), portainer.RegistryID(registryID))
 	})
-	if err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) updateRegistryAccess(tx dataservices.DataStoreTx, r *http.Request, endpointID portainer.EndpointID, registryID portainer.RegistryID) error {

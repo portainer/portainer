@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"errors"
 	"net/http"
 	"slices"
 	"strconv"
@@ -54,7 +53,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		updateEdgeJobFn := func(edgeJob *portainer.EdgeJob, endpointID portainer.EndpointID, endpointsFromGroups []portainer.EndpointID) error {
 			mutationFn(edgeJob, endpointID, endpointsFromGroups)
 
@@ -62,16 +61,9 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		}
 
 		return handler.clearEdgeJobTaskLogs(tx, portainer.EdgeJobID(edgeJobID), portainer.EndpointID(taskID), updateEdgeJobFn)
-	}); err != nil {
-		var handlerError *httperror.HandlerError
-		if errors.As(err, &handlerError) {
-			return handlerError
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) clearEdgeJobTaskLogs(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID, endpointID portainer.EndpointID, updateEdgeJob func(*portainer.EdgeJob, portainer.EndpointID, []portainer.EndpointID) error) error {

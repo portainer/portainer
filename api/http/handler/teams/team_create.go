@@ -48,22 +48,13 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	var team *portainer.Team
-
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		var err error
+	var err error
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		team, err = createTeam(tx, payload)
-
 		return err
-	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.JSON(w, team)
+	return response.TxResponse(w, team, err)
 }
 
 func createTeam(tx dataservices.DataStoreTx, payload teamCreatePayload) (*portainer.Team, error) {

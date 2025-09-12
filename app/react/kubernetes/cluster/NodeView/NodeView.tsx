@@ -6,7 +6,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody, WidgetTabs } from '@@/Widget';
-import { findSelectedTabIndex, Tab } from '@@/Widget/WidgetTabs';
+import { Tab, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
 
@@ -54,7 +54,7 @@ export function NodeView() {
       environmentId,
     ]
   );
-  const currentTabIndex = findSelectedTabIndex(stateAndParams, tabs);
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

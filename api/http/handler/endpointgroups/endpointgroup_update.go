@@ -1,7 +1,6 @@
 package endpointgroups
 
 import (
-	"errors"
 	"net/http"
 	"reflect"
 
@@ -61,20 +60,12 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 	var endpointGroup *portainer.EndpointGroup
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		endpointGroup, err = handler.updateEndpointGroup(tx, portainer.EndpointGroupID(endpointGroupID), payload)
-
 		return err
-	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.JSON(w, endpointGroup)
+	return response.TxResponse(w, endpointGroup, err)
 }
 
 func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, payload endpointGroupUpdatePayload) (*portainer.EndpointGroup, error) {

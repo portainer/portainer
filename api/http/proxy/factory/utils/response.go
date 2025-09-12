@@ -63,7 +63,10 @@ type errorResponse struct {
 
 // WriteAccessDeniedResponse will create a new access denied response
 func WriteAccessDeniedResponse() (*http.Response, error) {
-	response := &http.Response{}
+	header := http.Header{}
+	header.Add("Content-Type", "application/json")
+
+	response := &http.Response{Header: header}
 	err := RewriteResponse(response, errorResponse{Message: "access denied to resource"}, http.StatusForbidden)
 
 	return response, err

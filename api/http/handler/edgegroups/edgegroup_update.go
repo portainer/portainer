@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type edgeGroupUpdatePayload struct {
@@ -158,7 +159,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return nil
 	})
 
-	return txResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
+	return response.TxResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
 }
 
 func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {

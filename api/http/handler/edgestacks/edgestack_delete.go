@@ -1,7 +1,6 @@
 package edgestacks
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -30,18 +29,11 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid edge stack identifier route variable", err)
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEdgeStack(tx, portainer.EdgeStackID(edgeStackID))
-	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) deleteEdgeStack(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID) error {

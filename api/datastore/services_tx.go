@@ -14,7 +14,9 @@ func (tx *StoreTx) IsErrObjectNotFound(err error) bool {
 	return tx.store.IsErrObjectNotFound(err)
 }
 
-func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService { return nil }
+func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService {
+	return tx.store.CustomTemplateService.Tx(tx.tx)
+}
 
 func (tx *StoreTx) PendingActions() dataservices.PendingActionsService {
 	return tx.store.PendingActionsService.Tx(tx.tx)

@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 	"github.com/segmentio/encoding/json"
 )
@@ -19,7 +19,7 @@ import (
 const serviceObjectIdentifier = "ID"
 
 func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, endpointID portainer.EndpointID, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
-	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, types.ServiceInspectOptions{})
+	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, swarm.ServiceInspectOptions{})
 	if err != nil {
 		return nil, err
 	}

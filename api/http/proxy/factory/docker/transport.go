@@ -2,6 +2,7 @@ package docker
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -15,12 +16,15 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/docker/client"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 
-	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/swarm"
+	dockerclient "github.com/docker/docker/client"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
@@ -36,7 +40,7 @@ type (
 		dataStore            dataservices.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
-		dockerClientFactory  *dockerclient.ClientFactory
+		dockerClientFactory  *client.ClientFactory
 		gitService           portainer.GitService
 		snapshotService      portainer.SnapshotService
 		dockerID             string
@@ -49,7 +53,7 @@ type (
 		DataStore            dataservices.DataStore
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
-		DockerClientFactory  *dockerclient.ClientFactory
+		DockerClientFactory  *client.ClientFactory
 	}
 
 	restrictedDockerOperationContext struct {
@@ -107,6 +111,9 @@ var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*ht
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
+	// from : /v1.41/containers/{id}/json
+	// or   : /containers/{id}/json
+	// to   : /containers/{id}/json
 	unversionedPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 
 	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
@@ -119,6 +126,10 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 	}
 
+	// from    : /containers/{id}/json
+	// trim to : containers/{id}/json
+	// pick    : [ containers, {id}, json ][0]
+	// prefix  : containers
 	prefix := strings.Split(strings.TrimPrefix(unversionedPath, "/"), "/")[0]
 
 	if proxyFunc := prefixProxyFuncMap[prefix]; proxyFunc != nil {
@@ -215,9 +226,10 @@ func (transport *Transport) proxyConfigRequest(request *http.Request, unversione
 		// Assume /configs/{id}
 		configID := path.Base(requestPath)
 
-		if request.Method == http.MethodGet {
+		switch request.Method {
+		case http.MethodGet:
 			return transport.rewriteOperation(request, transport.configInspectOperation)
-		} else if request.Method == http.MethodDelete {
+		case http.MethodDelete:
 			return transport.executeGenericResourceDeletionOperation(request, configID, configID, portainer.ConfigResourceControl)
 		}
 
@@ -248,7 +260,6 @@ func (transport *Transport) proxyContainerRequest(request *http.Request, unversi
 			if action == "json" {
 				return transport.rewriteOperation(request, transport.containerInspectOperation)
 			}
-
 			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 		} else if match, _ := path.Match("/containers/*", requestPath); match {
 			// Handle /containers/{id} requests
@@ -280,7 +291,10 @@ func (transport *Transport) proxyServiceRequest(request *http.Request, unversion
 		if match, _ := path.Match("/services/*/*", requestPath); match {
 			// Handle /services/{id}/{action} requests
 			serviceID := path.Base(path.Dir(requestPath))
-			transport.decorateRegistryAuthenticationHeader(request)
+
+			if err := transport.decorateRegistryAuthenticationHeader(request); err != nil {
+				return nil, err
+			}
 
 			return transport.restrictedResourceOperation(request, serviceID, serviceID, portainer.ServiceResourceControl, false)
 		} else if match, _ := path.Match("/services/*", requestPath); match {
@@ -320,28 +334,38 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request, unversione
 	}
 }
 
+func match(requestPath string, pattern string) bool {
+	ok, err := path.Match(pattern, requestPath)
+	return err == nil && ok
+}
+
 func (transport *Transport) proxyNetworkRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
 	requestPath := unversionedPath
 
-	switch requestPath {
-	case "/networks/create":
+	switch {
+	case requestPath == "/networks/create":
 		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
 
-	case "/networks":
+	case requestPath == "/networks":
 		return transport.rewriteOperation(request, transport.networkListOperation)
 
-	default:
-		// Assume /networks/{id}
-		networkID := path.Base(requestPath)
+	case request.Method == http.MethodPost && match(requestPath, "/networks/*/connect"),
+		request.Method == http.MethodPost && match(requestPath, "/networks/*/disconnect"):
 
-		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, transport.networkInspectOperation)
-		} else if request.Method == http.MethodDelete {
-			return transport.executeGenericResourceDeletionOperation(request, networkID, networkID, portainer.NetworkResourceControl)
-		}
-
+		networkID := path.Base(path.Dir(requestPath))
 		return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+
+	case request.Method == http.MethodGet && match(requestPath, "/networks/*"):
+		return transport.rewriteOperation(request, transport.networkInspectOperation)
+
+	case request.Method == http.MethodDelete && match(requestPath, "/networks/*"):
+		networkID := path.Base(requestPath)
+		return transport.executeGenericResourceDeletionOperation(request, networkID, networkID, portainer.NetworkResourceControl)
 	}
+
+	// Assume /networks/{id}
+	networkID := path.Base(requestPath)
+	return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
 }
 
 func (transport *Transport) proxySecretRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
@@ -358,9 +382,10 @@ func (transport *Transport) proxySecretRequest(request *http.Request, unversione
 		// Assume /secrets/{id}
 		secretID := path.Base(requestPath)
 
-		if request.Method == http.MethodGet {
+		switch request.Method {
+		case http.MethodGet:
 			return transport.rewriteOperation(request, transport.secretInspectOperation)
-		} else if request.Method == http.MethodDelete {
+		case http.MethodDelete:
 			return transport.executeGenericResourceDeletionOperation(request, secretID, secretID, portainer.SecretResourceControl)
 		}
 
@@ -413,7 +438,6 @@ func (transport *Transport) proxyBuildRequest(request *http.Request, _ string) (
 
 func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
 	remote := request.URL.Query().Get("remote")
-
 	if !strings.HasSuffix(remote, ".git") {
 		return nil
 	}
@@ -549,30 +573,99 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	}
 
 	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-	if resourceControl == nil {
-		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-		if dockerResourceID == "" {
-			dockerResourceID = resourceID
-		}
-
-		// This resource was created outside of portainer,
-		// is part of a Docker service or part of a Docker Swarm/Compose stack.
-		inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(dockerResourceID, agentTargetHeader, resourceType, resourceControls)
-		if err != nil {
-			return nil, err
-		}
-
-		if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+	if resourceControl != nil {
+		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return utils.WriteAccessDeniedResponse()
 		}
+		return transport.executeDockerRequest(request)
 	}
 
-	if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+
+	// the resourceID may be the resource name (as it's a valid proxy call to use the name and not the UUID)
+	// so get the real resource ID and retry with it
+	resourceID, err = getRealResourceID(client, resourceType, resourceID)
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControl = authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl != nil {
+		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+			return utils.WriteAccessDeniedResponse()
+		}
+		return transport.executeDockerRequest(request)
+	}
+
+	// If we still can't find the RC by provided ID or "real" (docker-extracted) ID
+	// it means this resource was created outside of portainer,
+	// is part of a Docker service or part of a Docker Swarm/Compose stack.
+	if dockerResourceID == "" {
+		dockerResourceID = resourceID
+	}
+	inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(client, dockerResourceID, resourceType, resourceControls)
+	if err != nil {
+		return nil, err
+	}
+
+	if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
 		return utils.WriteAccessDeniedResponse()
 	}
 
 	return transport.executeDockerRequest(request)
+}
+
+func getRealResourceID(client *dockerclient.Client, resourceType portainer.ResourceControlType, resourceId string) (string, error) {
+	switch resourceType {
+	case portainer.NetworkResourceControl:
+		network, err := client.NetworkInspect(context.Background(), resourceId, network.InspectOptions{})
+		if err != nil {
+			return "", err
+		}
+		return network.ID, nil
+
+	case portainer.ContainerResourceControl:
+		container, err := client.ContainerInspect(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return container.ID, nil
+
+	case portainer.VolumeResourceControl:
+		// volumes don't have an UUID and their UACresourceID has a particular construct that makes them unique
+		// e.g. fmt.Sprintf("%s_%s", volumeName, dockerID)
+		// see transport.getVolumeResourceID() / FetchDockerID()
+		// FetchDockerID fetches info.Swarm.Cluster.ID if environment(endpoint) is swarm and info.ID otherwise
+		// So: return empty ID but without error
+		return "", nil
+
+	case portainer.ServiceResourceControl:
+		service, _, err := client.ServiceInspectWithRaw(context.Background(), resourceId, swarm.ServiceInspectOptions{})
+		if err != nil {
+			return "", err
+		}
+		return service.ID, nil
+
+	case portainer.ConfigResourceControl:
+		config, _, err := client.ConfigInspectWithRaw(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return config.ID, nil
+
+	case portainer.SecretResourceControl:
+		secret, _, err := client.SecretInspectWithRaw(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return secret.ID, nil
+
+	}
+	return "", fmt.Errorf("Unknown resource type %v", resourceType)
 }
 
 // rewriteOperationWithLabelFiltering will create a new operation context with data that will be used

@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/roar"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
 type shadowedEdgeGroup struct {
@@ -44,7 +45,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 		return err
 	})
 
-	return txResponse(w, decoratedEdgeGroups, err)
+	return response.TxResponse(w, decoratedEdgeGroups, err)
 }
 
 func getEdgeGroupList(tx dataservices.DataStoreTx) ([]decoratedEdgeGroup, error) {

@@ -12,7 +12,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker/stats"
-	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
@@ -164,7 +163,5 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 		return nil
 	})
 
-	return errors.TxResponse(err, func() *httperror.HandlerError {
-		return response.JSON(w, resp)
-	})
+	return response.TxResponse(w, resp, err)
 }

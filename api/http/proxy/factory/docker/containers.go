@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -34,7 +35,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 		return nil, err
 	}
 
-	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
+	serviceName := container.Config.Labels[consts.SwarmServiceIDLabel]
 	if serviceName != "" {
 		serviceResourceControl := authorization.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
 		if serviceResourceControl != nil {

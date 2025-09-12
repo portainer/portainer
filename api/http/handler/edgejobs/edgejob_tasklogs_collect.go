@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"errors"
 	"net/http"
 	"slices"
 
@@ -39,7 +38,7 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("Invalid Task identifier route variable", err)
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		edgeJob, err := tx.EdgeJob().Read(portainer.EdgeJobID(edgeJobID))
 		if tx.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find an Edge job with the specified identifier inside the database", err)
@@ -81,14 +80,7 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 		}
 
 		return nil
-	}); err != nil {
-		var handlerError *httperror.HandlerError
-		if errors.As(err, &handlerError) {
-			return handlerError
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }

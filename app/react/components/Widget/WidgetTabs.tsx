@@ -74,8 +74,8 @@ export function findSelectedTabIndex(
 }
 
 export function useCurrentTabIndex(tabs: Tab[]) {
-  const prarms = useCurrentStateAndParams();
-  const currentTabIndex = findSelectedTabIndex(prarms, tabs);
+  const params = useCurrentStateAndParams();
+  const currentTabIndex = findSelectedTabIndex(params, tabs);
 
-  return [currentTabIndex];
+  return currentTabIndex;
 }

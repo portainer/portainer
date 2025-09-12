@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"errors"
 	"maps"
 	"net/http"
 	"strconv"
@@ -35,18 +34,11 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid Edge job identifier route variable", err)
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.deleteEdgeJob(tx, portainer.EdgeJobID(edgeJobID))
-	}); err != nil {
-		var handlerError *httperror.HandlerError
-		if errors.As(err, &handlerError) {
-			return handlerError
-		}
+	})
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) deleteEdgeJob(tx dataservices.DataStoreTx, edgeJobID portainer.EdgeJobID) error {

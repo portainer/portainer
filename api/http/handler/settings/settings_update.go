@@ -128,12 +128,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 		return err
 	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
-
-		return httperror.InternalServerError("Unexpected error", err)
+		return response.TxErrorResponse(err)
 	}
 
 	hideFields(settings)

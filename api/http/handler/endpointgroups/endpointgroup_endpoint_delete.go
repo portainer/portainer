@@ -1,7 +1,6 @@
 package endpointgroups
 
 import (
-	"errors"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -38,16 +37,8 @@ func (handler *Handler) endpointGroupDeleteEndpoint(w http.ResponseWriter, r *ht
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return handler.removeEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
 	})
-	if err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
 
-		return httperror.InternalServerError("Unexpected error", err)
-	}
-
-	return response.Empty(w)
+	return response.TxEmptyResponse(w, err)
 }
 
 func (handler *Handler) removeEndpoint(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, endpointID portainer.EndpointID) error {

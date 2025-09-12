@@ -54,7 +54,8 @@
 
 /* tables inside widgets should extend the full width of the widget, with 20px table cell padding padding on the left and right */
 .widget-body:not(.no-padding) > .table,
-.widget-body:not(.no-padding) > .widget-content .table {
+.widget-body:not(.no-padding) > .widget-content > .table,
+.widget-body:not(.no-padding) > .widget-content > form > .table {
   margin: 0 -20px;
   width: calc(100% + 40px);
   max-width: calc(100% + 40px);

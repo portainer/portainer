@@ -96,12 +96,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 
 		return nil
 	}); err != nil {
-		var httpErr *httperror.HandlerError
-		if errors.As(err, &httpErr) {
-			return httpErr
-		}
-
-		return httperror.InternalServerError("Unexpected error", err)
+		return response.TxErrorResponse(err)
 	}
 
 	if ok, _ := strconv.ParseBool(r.Header.Get("X-Portainer-No-Body")); ok {
