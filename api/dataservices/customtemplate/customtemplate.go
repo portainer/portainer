@@ -28,13 +28,12 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
-// CreateCustomTemplate uses the existing id and saves it.
-// TODO: where does the ID come from, and is it safe?
-func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
-	return service.Connection.CreateObjectWithId(BucketName, int(customTemplate.ID), customTemplate)
-}
-
-// GetNextIdentifier returns the next identifier for a custom template.
 func (service *Service) GetNextIdentifier() int {
 	return service.Connection.GetNextIdentifier(BucketName)
+}
+
+func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
+	return service.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Create(customTemplate)
+	})
 }

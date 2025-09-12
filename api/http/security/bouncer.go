@@ -2,6 +2,7 @@ package security
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -555,12 +556,9 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		return nil, err
 	}
 
-	isTeamLeader := false
-	for _, membership := range memberships {
-		if membership.Role == portainer.TeamLeader {
-			isTeamLeader = true
-		}
-	}
+	isTeamLeader := slices.ContainsFunc(memberships, func(m portainer.TeamMembership) bool {
+		return m.Role == portainer.TeamLeader
+	})
 
 	return &RestrictedRequestContext{
 		IsAdmin:         false,
