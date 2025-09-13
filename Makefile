@@ -105,6 +105,7 @@ lint-client: ## Lint client code
 
 lint-server: tidy ## Lint server code
 	golangci-lint run --timeout=10m -c .golangci.yaml
+	golangci-lint run --timeout=10m --new-from-rev=HEAD~ -c .golangci-forward.yaml
 
 ##@ Extension
 .PHONY: dev-extension
