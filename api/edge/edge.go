@@ -49,6 +49,11 @@ type (
 
 		// Is relative path supported
 		SupportRelativePath bool
+		// AlwaysCloneGitRepoForRelativePath is a flag indicating if the agent must always clone the git repository for relative path.
+		// This field is only valid when SupportRelativePath is true.
+		// Used only for EE
+		AlwaysCloneGitRepoForRelativePath bool
+
 		// Mount point for relative path
 		FilesystemPath string
 		// Used only for EE
