@@ -209,16 +209,16 @@ func dockerSnapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Cl
 	snapshot.GpuUseAll = gpuUseAll
 	snapshot.GpuUseList = gpuUseList
 
-	stats, err := stats.CalculateContainerStats(ctx, cli, containers)
+	result, err := stats.CalculateContainerStats(ctx, cli, snapshot.Swarm, containers)
 	if err != nil {
 		return fmt.Errorf("failed to calculate container stats: %w", err)
 	}
 
-	snapshot.ContainerCount = stats.Total
-	snapshot.RunningContainerCount = stats.Running
-	snapshot.StoppedContainerCount = stats.Stopped
-	snapshot.HealthyContainerCount = stats.Healthy
-	snapshot.UnhealthyContainerCount = stats.Unhealthy
+	snapshot.ContainerCount = result.Total
+	snapshot.RunningContainerCount = result.Running
+	snapshot.StoppedContainerCount = result.Stopped
+	snapshot.HealthyContainerCount = result.Healthy
+	snapshot.UnhealthyContainerCount = result.Unhealthy
 	snapshot.StackCount += len(stacks)
 
 	for _, container := range containers {

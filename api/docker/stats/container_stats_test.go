@@ -79,7 +79,7 @@ func TestCalculateContainerStats(t *testing.T) {
 
 	// Call the function and measure time
 	startTime := time.Now()
-	stats, err := CalculateContainerStats(context.Background(), mockClient, containers)
+	stats, err := CalculateContainerStats(context.Background(), mockClient, false, containers)
 	require.NoError(t, err, "failed to calculate container stats")
 	duration := time.Since(startTime)
 
@@ -120,7 +120,7 @@ func TestCalculateContainerStatsAllErrors(t *testing.T) {
 	mockClient.On("ContainerInspect", mock.Anything, "container2").Return(container.InspectResponse{}, errors.New("permission denied"))
 
 	// Call the function
-	stats, err := CalculateContainerStats(context.Background(), mockClient, containers)
+	stats, err := CalculateContainerStats(context.Background(), mockClient, false, containers)
 
 	// Assert that an error was returned
 	require.Error(t, err, "should return error when all containers fail to inspect")
@@ -231,4 +231,23 @@ func TestGetContainerStatus(t *testing.T) {
 			assert.Equal(t, testCase.expected, stat)
 		})
 	}
+}
+
+func TestCalculateContainerStatsForSwarm(t *testing.T) {
+	containers := []container.Summary{
+		{State: "running"},
+		{State: "running", Status: "Up 5 minutes (healthy)"},
+		{State: "exited"},
+		{State: "stopped"},
+		{State: "running", Status: "Up 10 minutes"},
+		{State: "running", Status: "Up about an hour (unhealthy)"},
+	}
+
+	stats := CalculateContainerStatsForSwarm(containers)
+
+	assert.Equal(t, 4, stats.Running)
+	assert.Equal(t, 2, stats.Stopped)
+	assert.Equal(t, 1, stats.Healthy)
+	assert.Equal(t, 1, stats.Unhealthy)
+	assert.Equal(t, 6, stats.Total)
 }

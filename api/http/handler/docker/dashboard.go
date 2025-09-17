@@ -143,7 +143,7 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 			stackCount = len(stacks)
 		}
 
-		containersStats, err := stats.CalculateContainerStats(r.Context(), cli, containers)
+		containersStats, err := stats.CalculateContainerStats(r.Context(), cli, info.Swarm.ControlAvailable, containers)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve Docker containers stats", err)
 		}

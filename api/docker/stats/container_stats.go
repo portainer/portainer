@@ -3,6 +3,7 @@ package stats
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/docker/docker/api/types/container"
@@ -20,7 +21,11 @@ type DockerClient interface {
 	ContainerInspect(ctx context.Context, containerID string) (container.InspectResponse, error)
 }
 
-func CalculateContainerStats(ctx context.Context, cli DockerClient, containers []container.Summary) (ContainerStats, error) {
+func CalculateContainerStats(ctx context.Context, cli DockerClient, isSwarm bool, containers []container.Summary) (ContainerStats, error) {
+	if isSwarm {
+		return CalculateContainerStatsForSwarm(containers), nil
+	}
+
 	var running, stopped, healthy, unhealthy int
 
 	var mu sync.Mutex
@@ -89,4 +94,32 @@ func getContainerStatus(state *container.State) ContainerStats {
 	}
 
 	return stat
+}
+
+// This is a temporary workaround to calculate container stats for Swarm
+// TODO: Remove this once we have a proper way to calculate container stats for Swarm
+func CalculateContainerStatsForSwarm(containers []container.Summary) ContainerStats {
+	var running, stopped, healthy, unhealthy int
+	for _, container := range containers {
+		switch container.State {
+		case "running":
+			running++
+		case "exited", "stopped":
+			stopped++
+		}
+
+		if strings.Contains(container.Status, "(healthy)") {
+			healthy++
+		} else if strings.Contains(container.Status, "(unhealthy)") {
+			unhealthy++
+		}
+	}
+
+	return ContainerStats{
+		Running:   running,
+		Stopped:   stopped,
+		Healthy:   healthy,
+		Unhealthy: unhealthy,
+		Total:     len(containers),
+	}
 }
