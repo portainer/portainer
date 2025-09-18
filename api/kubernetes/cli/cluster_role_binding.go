@@ -16,7 +16,7 @@ import (
 // GetClusterRoleBindings gets all the clusterRoleBindings for at the cluster level in a k8s endpoint.
 // It returns a list of K8sClusterRoleBinding objects.
 func (kcl *KubeClient) GetClusterRoleBindings() ([]models.K8sClusterRoleBinding, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchClusterRoleBindings()
 	}
 

@@ -19,7 +19,7 @@ import (
 // If the user is a kube admin, it returns all jobs in the namespace
 // Otherwise, it returns only the jobs in the non-admin namespaces
 func (kcl *KubeClient) GetJobs(namespace string, includeCronJobChildren bool) ([]models.K8sJob, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchJobs(namespace, includeCronJobChildren)
 	}
 

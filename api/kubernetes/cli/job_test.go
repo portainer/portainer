@@ -21,7 +21,7 @@ func (kcl *KubeClient) TestFetchJobs(t *testing.T) {
 	t.Run("admin client can fetch jobs from all namespaces", func(t *testing.T) {
 		kcl.cli = kfake.NewSimpleClientset()
 		kcl.instanceID = "test"
-		kcl.IsKubeAdmin = true
+		kcl.isKubeAdmin = true
 
 		jobs, err := kcl.GetJobs("", false)
 		if err != nil {
@@ -34,8 +34,8 @@ func (kcl *KubeClient) TestFetchJobs(t *testing.T) {
 	t.Run("non-admin client can fetch jobs from the default namespace only", func(t *testing.T) {
 		kcl.cli = kfake.NewSimpleClientset()
 		kcl.instanceID = "test"
-		kcl.IsKubeAdmin = false
-		kcl.NonAdminNamespaces = []string{"default"}
+		kcl.isKubeAdmin = false
+		kcl.SetClientNonAdminNamespaces([]string{"default"})
 
 		jobs, err := kcl.GetJobs("", false)
 		if err != nil {

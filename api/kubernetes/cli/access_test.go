@@ -5,7 +5,9 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	ktypes "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kfake "k8s.io/client-go/kubernetes/fake"
@@ -64,4 +66,28 @@ func Test_NamespaceAccessPoliciesDeleteNamespace_updatesPortainerConfig_whenConf
 			assert.Equal(t, test.expectedConfig, policies)
 		})
 	}
+}
+
+func TestKubeAdmin(t *testing.T) {
+	kcl := &KubeClient{}
+	require.False(t, kcl.GetIsKubeAdmin())
+
+	kcl.SetIsKubeAdmin(true)
+	require.True(t, kcl.GetIsKubeAdmin())
+
+	kcl.SetIsKubeAdmin(false)
+	require.False(t, kcl.GetIsKubeAdmin())
+}
+
+func TestClientNonAdminNamespaces(t *testing.T) {
+	kcl := &KubeClient{}
+
+	require.Empty(t, kcl.GetClientNonAdminNamespaces())
+
+	nss := []string{"ns1", "ns2"}
+	kcl.SetClientNonAdminNamespaces(nss)
+	require.Equal(t, nss, kcl.GetClientNonAdminNamespaces())
+
+	kcl.SetClientNonAdminNamespaces([]string{})
+	require.Empty(t, kcl.GetClientNonAdminNamespaces())
 }

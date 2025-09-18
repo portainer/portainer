@@ -40,9 +40,10 @@ func defaultSystemNamespaces() map[string]struct{} {
 // if the user is an admin, all namespaces in the current k8s environment(endpoint) are fetched using the fetchNamespaces function.
 // otherwise, namespaces the non-admin user has access to will be used to filter the namespaces based on the allowed namespaces.
 func (kcl *KubeClient) GetNamespaces() (map[string]portainer.K8sNamespaceInfo, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchNamespaces()
 	}
+
 	return kcl.fetchNamespacesForNonAdmin()
 }
 
@@ -52,7 +53,7 @@ func (kcl *KubeClient) fetchNamespacesForNonAdmin() (map[string]portainer.K8sNam
 		Str("context", "fetchNamespacesForNonAdmin").
 		Msg("Fetching namespaces for non-admin user")
 
-	if len(kcl.NonAdminNamespaces) == 0 {
+	if len(kcl.GetClientNonAdminNamespaces()) == 0 {
 		return nil, nil
 	}
 
@@ -142,6 +143,7 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) (*corev1
 			Str("context", "CreateNamespace").
 			Str("Namespace", info.Name).
 			Msg("Failed to create the namespace")
+
 		return nil, err
 	}
 
@@ -157,7 +159,7 @@ func (kcl *KubeClient) CreateNamespace(info models.K8sNamespaceDetails) (*corev1
 	return namespace, nil
 }
 
-// UpdateIngress updates an ingress in a given namespace in a k8s endpoint.
+// UpdateNamespace updates a namespace in a k8s endpoint.
 func (kcl *KubeClient) UpdateNamespace(info models.K8sNamespaceDetails) (*corev1.Namespace, error) {
 	portainerLabels := map[string]string{
 		namespaceNameLabel:  stackutils.SanitizeLabel(info.Name),
@@ -420,8 +422,10 @@ func (kcl *KubeClient) CombineNamespaceWithResourceQuota(namespace portainer.K8s
 // buildNonAdminNamespacesMap builds a map of non-admin namespaces.
 // the map is used to filter the namespaces based on the allowed namespaces.
 func (kcl *KubeClient) buildNonAdminNamespacesMap() map[string]struct{} {
-	nonAdminNamespaceSet := make(map[string]struct{}, len(kcl.NonAdminNamespaces))
-	for _, namespace := range kcl.NonAdminNamespaces {
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
+	nonAdminNamespaceSet := make(map[string]struct{}, len(nonAdminNamespaces))
+
+	for _, namespace := range nonAdminNamespaces {
 		if !isSystemDefaultNamespace(namespace) {
 			nonAdminNamespaceSet[namespace] = struct{}{}
 		}

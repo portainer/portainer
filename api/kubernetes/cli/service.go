@@ -15,9 +15,10 @@ import (
 // GetServices gets all the services for either at the cluster level or a given namespace in a k8s endpoint.
 // It returns a list of K8sServiceInfo objects.
 func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchServices(namespace)
 	}
+
 	return kcl.fetchServicesForNonAdmin(namespace)
 }
 
@@ -25,9 +26,13 @@ func (kcl *KubeClient) GetServices(namespace string) ([]models.K8sServiceInfo, e
 // the namespace will be coming from NonAdminNamespaces as non-admin users are restricted to certain namespaces.
 // it returns a list of K8sServiceInfo objects.
 func (kcl *KubeClient) fetchServicesForNonAdmin(namespace string) ([]models.K8sServiceInfo, error) {
-	log.Debug().Msgf("Fetching services for non-admin user: %v", kcl.NonAdminNamespaces)
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
 
-	if len(kcl.NonAdminNamespaces) == 0 {
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching services for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
 		return nil, nil
 	}
 

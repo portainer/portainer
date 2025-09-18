@@ -16,7 +16,7 @@ import (
 // GetServiceAccounts gets all the service accounts for either at the cluster level or a given namespace in a k8s endpoint.
 // It returns a list of K8sServiceAccount objects.
 func (kcl *KubeClient) GetServiceAccounts(namespace string) ([]models.K8sServiceAccount, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchServiceAccounts(namespace)
 	}
 

@@ -15,7 +15,7 @@ import (
 // If the user is a kube admin, it returns all cronjobs in the namespace
 // Otherwise, it returns only the cronjobs in the non-admin namespaces
 func (kcl *KubeClient) GetCronJobs(namespace string) ([]models.K8sCronJob, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchCronJobs(namespace)
 	}
 

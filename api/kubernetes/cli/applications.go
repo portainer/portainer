@@ -28,7 +28,7 @@ type PortainerApplicationResources struct {
 // if the user is an admin, all namespaces in the current k8s environment(endpoint) are fetched using the fetchApplications function.
 // otherwise, namespaces the non-admin user has access to will be used to filter the applications based on the allowed namespaces.
 func (kcl *KubeClient) GetApplications(namespace, nodeName string) ([]models.K8sApplication, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchApplications(namespace, nodeName)
 	}
 
@@ -64,9 +64,13 @@ func (kcl *KubeClient) fetchApplications(namespace, nodeName string) ([]models.K
 // fetchApplicationsForNonAdmin fetches the applications in the namespaces the user has access to.
 // This function is called when the user is not an admin.
 func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string) ([]models.K8sApplication, error) {
-	log.Debug().Msgf("Fetching applications for non-admin user: %v", kcl.NonAdminNamespaces)
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
 
-	if len(kcl.NonAdminNamespaces) == 0 {
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching applications for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
 		return nil, nil
 	}
 

@@ -87,17 +87,22 @@ func (kcl *KubeClient) GetIngress(namespace, ingressName string) (models.K8sIngr
 
 // GetIngresses gets all the ingresses for a given namespace in a k8s endpoint.
 func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchIngresses(namespace)
 	}
+
 	return kcl.fetchIngressesForNonAdmin(namespace)
 }
 
 // fetchIngressesForNonAdmin gets all the ingresses for non-admin users in a k8s endpoint.
 func (kcl *KubeClient) fetchIngressesForNonAdmin(namespace string) ([]models.K8sIngressInfo, error) {
-	log.Debug().Msgf("Fetching ingresses for non-admin user: %v", kcl.NonAdminNamespaces)
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
 
-	if len(kcl.NonAdminNamespaces) == 0 {
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching ingresses for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
 		return nil, nil
 	}
 

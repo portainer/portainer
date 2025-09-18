@@ -42,8 +42,8 @@ type (
 		cli                kubernetes.Interface
 		instanceID         string
 		mu                 sync.Mutex
-		IsKubeAdmin        bool
-		NonAdminNamespaces []string
+		isKubeAdmin        bool
+		nonAdminNamespaces []string
 	}
 )
 
@@ -147,6 +147,7 @@ func (factory *ClientFactory) GetProxyKubeClient(endpointID, userID string) (*Ku
 	if ok {
 		return client.(*KubeClient), true
 	}
+
 	return nil, false
 }
 
@@ -179,8 +180,8 @@ func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, k
 	return &KubeClient{
 		cli:                cli,
 		instanceID:         factory.instanceID,
-		IsKubeAdmin:        IsKubeAdmin,
-		NonAdminNamespaces: NonAdminNamespaces,
+		isKubeAdmin:        IsKubeAdmin,
+		nonAdminNamespaces: NonAdminNamespaces,
 	}, nil
 }
 
@@ -193,7 +194,7 @@ func (factory *ClientFactory) createCachedPrivilegedKubeClient(endpoint *portain
 	return &KubeClient{
 		cli:         cli,
 		instanceID:  factory.instanceID,
-		IsKubeAdmin: true,
+		isKubeAdmin: true,
 	}, nil
 }
 
@@ -371,6 +372,7 @@ func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint, da
 				log.Error().Err(err).Msgf("Error getting ingresses in environment %d", environment.ID)
 				return err
 			}
+
 			for _, ingress := range ingresses {
 				oldController, ok := ingress.Annotations["ingress.portainer.io/ingress-type"]
 				if !ok {

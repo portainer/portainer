@@ -16,7 +16,7 @@ import (
 // GetClusterRoles gets all the clusterRoles for at the cluster level in a k8s endpoint.
 // It returns a list of K8sClusterRole objects.
 func (kcl *KubeClient) GetClusterRoles() ([]models.K8sClusterRole, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchClusterRoles()
 	}
 

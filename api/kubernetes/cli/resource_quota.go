@@ -15,18 +15,23 @@ import (
 // if the user is an admin, all resource quotas in all namespaces are fetched.
 // otherwise, namespaces the non-admin user has access to will be used to filter the resource quotas.
 func (kcl *KubeClient) GetResourceQuotas(namespace string) (*[]corev1.ResourceQuota, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchResourceQuotas(namespace)
 	}
+
 	return kcl.fetchResourceQuotasForNonAdmin(namespace)
 }
 
 // fetchResourceQuotasForNonAdmin gets the resource quotas in the current k8s environment(endpoint) for a non-admin user.
 // the role of the user must have read access to the resource quotas in the defined namespaces.
 func (kcl *KubeClient) fetchResourceQuotasForNonAdmin(namespace string) (*[]corev1.ResourceQuota, error) {
-	log.Debug().Msgf("Fetching resource quotas for non-admin user: %v", kcl.NonAdminNamespaces)
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
 
-	if len(kcl.NonAdminNamespaces) == 0 {
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching resource quotas for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
 		return nil, nil
 	}
 

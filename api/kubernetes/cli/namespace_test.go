@@ -176,6 +176,7 @@ func Test_ToggleSystemState(t *testing.T) {
 		expectedPolicies := map[string]portainer.K8sNamespaceAccessPolicy{
 			"ns2": {UserAccessPolicies: portainer.UserAccessPolicies{2: {RoleID: 0}}},
 		}
+
 		actualPolicies, err := kcl.GetNamespaceAccessPolicies()
 		assert.NoError(t, err, "failed to fetch policies")
 		assert.Equal(t, expectedPolicies, actualPolicies)

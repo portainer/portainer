@@ -59,6 +59,7 @@ func Test_waitForPodStatus(t *testing.T) {
 
 		ctx, cancelFunc := context.WithTimeout(context.TODO(), 0*time.Second)
 		defer cancelFunc()
+
 		err = k.waitForPodStatus(ctx, v1.PodRunning, podSpec)
 		if !errors.Is(err, context.DeadlineExceeded) {
 			t.Errorf("waitForPodStatus should throw deadline exceeded error; err=%s", err)

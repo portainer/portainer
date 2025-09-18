@@ -12,7 +12,7 @@ import (
 // If the user is a kube admin, it returns all events in the namespace
 // Otherwise, it returns only the events in the non-admin namespaces
 func (kcl *KubeClient) GetEvents(namespace string, resourceId string) ([]models.K8sEvent, error) {
-	if kcl.IsKubeAdmin {
+	if kcl.GetIsKubeAdmin() {
 		return kcl.fetchAllEvents(namespace, resourceId)
 	}
 
@@ -22,7 +22,7 @@ func (kcl *KubeClient) GetEvents(namespace string, resourceId string) ([]models.
 // fetchEventsForNonAdmin returns all events in the given namespace and resource
 // It returns only the events in the non-admin namespaces
 func (kcl *KubeClient) fetchEventsForNonAdmin(namespace string, resourceId string) ([]models.K8sEvent, error) {
-	if len(kcl.NonAdminNamespaces) == 0 {
+	if len(kcl.GetClientNonAdminNamespaces()) == 0 {
 		return nil, nil
 	}
 
