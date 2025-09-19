@@ -14,7 +14,7 @@ export function useExportMutation() {
 async function exportActivityLogs(query: Omit<Query, 'limit'>) {
   try {
     const { data, headers } = await axios.get<Blob>('/useractivity/logs.csv', {
-      params: { ...query, limit: 2000 },
+      params: { ...query, limit: 0 },
       responseType: 'blob',
       headers: {
         'Content-type': 'text/csv',

@@ -20,7 +20,7 @@ export interface Query {
   limit: number;
   sortBy?: SortKey;
   sortDesc?: boolean;
-  search: string;
+  keyword: string;
   after?: number;
   before?: number;
 }
