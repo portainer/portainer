@@ -256,7 +256,7 @@ func (handler *Handler) filterEndpointsByQuery(
 	return filteredEndpoints, totalAvailableEndpoints, nil
 }
 
-func endpointStatusInStackMatchesFilter(stackStatus *portainer.EdgeStackStatusForEnv, envId portainer.EndpointID, statusFilter portainer.EdgeStackStatusType) bool {
+func endpointStatusInStackMatchesFilter(stackStatus *portainer.EdgeStackStatusForEnv, statusFilter portainer.EdgeStackStatusType) bool {
 	// consider that if the env has no status in the stack it is in Pending state
 	if statusFilter == portainer.EdgeStackStatusPending {
 		return stackStatus == nil || len(stackStatus.Status) == 0
@@ -272,55 +272,62 @@ func endpointStatusInStackMatchesFilter(stackStatus *portainer.EdgeStackStatusFo
 }
 
 func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId portainer.EdgeStackID, statusFilter *portainer.EdgeStackStatusType, datastore dataservices.DataStore) ([]portainer.Endpoint, error) {
-	stack, err := datastore.EdgeStack().EdgeStack(edgeStackId)
-	if err != nil {
-		return nil, errors.WithMessage(err, "Unable to retrieve edge stack from the database")
-	}
-
-	envIds := roar.Roar[portainer.EndpointID]{}
-	for _, edgeGroupdId := range stack.EdgeGroups {
-		edgeGroup, err := datastore.EdgeGroup().Read(edgeGroupdId)
+	var filteredEndpoints []portainer.Endpoint
+	if err := datastore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		stack, err := tx.EdgeStack().EdgeStack(edgeStackId)
 		if err != nil {
-			return nil, errors.WithMessage(err, "Unable to retrieve edge group from the database")
+			return errors.WithMessage(err, "Unable to retrieve edge stack from the database")
 		}
 
-		if edgeGroup.Dynamic {
-			endpointIDs, err := edgegroups.GetEndpointsByTags(datastore, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+		envIds := roar.Roar[portainer.EndpointID]{}
+		for _, edgeGroupId := range stack.EdgeGroups {
+			edgeGroup, err := tx.EdgeGroup().Read(edgeGroupId)
 			if err != nil {
-				return nil, errors.WithMessage(err, "Unable to retrieve environments and environment groups for Edge group")
+				return errors.WithMessage(err, "Unable to retrieve edge group from the database")
 			}
-			edgeGroup.EndpointIDs = roar.FromSlice(endpointIDs)
+
+			if edgeGroup.Dynamic {
+				endpointIDs, err := edgegroups.GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+				if err != nil {
+					return errors.WithMessage(err, "Unable to retrieve environments and environment groups for Edge group")
+				}
+				edgeGroup.EndpointIDs = roar.FromSlice(endpointIDs)
+			}
+
+			envIds.Union(edgeGroup.EndpointIDs)
 		}
 
-		envIds.Union(edgeGroup.EndpointIDs)
-	}
+		filteredEnvIds := roar.Roar[portainer.EndpointID]{}
+		filteredEnvIds.Union(envIds)
 
-	if statusFilter != nil {
-		var innerErr error
+		if statusFilter != nil {
+			var innerErr error
 
-		envIds.Iterate(func(envId portainer.EndpointID) bool {
-			edgeStackStatus, err := datastore.EdgeStackStatus().Read(edgeStackId, envId)
-			if dataservices.IsErrObjectNotFound(err) {
+			envIds.Iterate(func(envId portainer.EndpointID) bool {
+				edgeStackStatus, err := tx.EdgeStackStatus().Read(edgeStackId, envId)
+				if err != nil && !dataservices.IsErrObjectNotFound(err) {
+					innerErr = errors.WithMessagef(err, "Unable to retrieve edge stack status for environment %d", envId)
+					return false
+				}
+
+				if !endpointStatusInStackMatchesFilter(edgeStackStatus, *statusFilter) {
+					filteredEnvIds.Remove(envId)
+				}
+
 				return true
-			} else if err != nil {
-				innerErr = errors.WithMessagef(err, "Unable to retrieve edge stack status for environment %d", envId)
-				return false
+			})
+
+			if innerErr != nil {
+				return innerErr
 			}
-
-			if !endpointStatusInStackMatchesFilter(edgeStackStatus, portainer.EndpointID(envId), *statusFilter) {
-				envIds.Remove(envId)
-			}
-
-			return true
-		})
-
-		if innerErr != nil {
-			return nil, innerErr
 		}
+
+		filteredEndpoints = filteredEndpointsByIds(endpoints, filteredEnvIds)
+
+		return nil
+	}); err != nil {
+		return nil, err
 	}
-
-	filteredEndpoints := filteredEndpointsByIds(endpoints, envIds)
-
 	return filteredEndpoints, nil
 }
 
