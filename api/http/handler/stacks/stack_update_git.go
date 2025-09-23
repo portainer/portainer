@@ -73,6 +73,14 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError(msg, errors.New(msg))
 	}
 
+	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" &&
+		(stack.AutoUpdate == nil ||
+			(stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != payload.AutoUpdate.Webhook)) {
+		if isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook); !isUnique || err != nil {
+			return httperror.Conflict("Webhook ID already exists", errors.New("webhook ID already exists"))
+		}
+	}
+
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
 	// The EndpointID property is not available for these stacks, this API environment(endpoint)
 	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
