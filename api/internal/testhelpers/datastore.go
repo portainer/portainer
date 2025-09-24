@@ -113,7 +113,7 @@ type datastoreOption = func(d *testDatastore)
 // NewDatastore creates new instance of testDatastore.
 // Will apply options before returning, opts will be applied from left to right.
 func NewDatastore(options ...datastoreOption) *testDatastore {
-	conn, _ := database.NewDatabase("boltdb", "", nil)
+	conn, _ := database.NewDatabase("boltdb", "", nil, false)
 	d := testDatastore{connection: conn}
 
 	for _, o := range options {

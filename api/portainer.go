@@ -112,6 +112,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		CSP                       *bool
+		CompactDB                 *bool
 		Data                      *string
 		FeatureFlags              *[]string
 		EnableEdgeComputeFeatures *bool
@@ -1846,6 +1847,8 @@ const (
 	TrustedOriginsEnvVar = "TRUSTED_ORIGINS"
 	// CSPEnvVar is the environment variable used to enable/disable the Content Security Policy
 	CSPEnvVar = "CSP"
+	// CompactDBEnvVar is the environment variable used to enable/disable the startup compaction of the database
+	CompactDBEnvVar = "COMPACT_DB"
 )
 
 // List of supported features
