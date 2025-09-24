@@ -9,6 +9,7 @@ import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { Annotation } from '@/react/kubernetes/annotations/types';
 import { prepareAnnotations } from '@/react/kubernetes/utils';
+import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
@@ -43,6 +44,7 @@ import {
 export function CreateIngressView() {
   const environmentId = useEnvironmentId();
   const { params } = useCurrentStateAndParams();
+  useNamespaceAccessRedirect(params.namespace, { to: 'kubernetes.ingresses' });
   const { authorized: isAuthorizedToAddEdit } = useAuthorizations([
     'K8sIngressesW',
   ]);

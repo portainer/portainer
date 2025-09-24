@@ -156,6 +156,20 @@ function createCommonHandlers() {
     http.get('/api/endpoints/3/kubernetes/helm/test-release/history', () =>
       HttpResponse.json(helmReleaseHistory)
     ),
+    http.get('/api/kubernetes/3/namespaces', () =>
+      HttpResponse.json([
+        {
+          Id: 'default',
+          Name: 'default',
+          Status: { phase: 'Active' },
+          Annotations: null,
+          CreationDate: '2021-01-01T00:00:00Z',
+          NamespaceOwner: '',
+          IsSystem: false,
+          IsDefault: true,
+        },
+      ])
+    ),
     http.get('/api/kubernetes/3/namespaces/default/events', () =>
       HttpResponse.json([])
     ),

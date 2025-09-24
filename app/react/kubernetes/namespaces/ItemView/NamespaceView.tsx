@@ -2,6 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { AlertTriangle, Code, Layers, History } from 'lucide-react';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
+import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { PageHeader } from '@@/PageHeader';
 import { findSelectedTabIndex, Tab, WidgetTabs } from '@@/Widget/WidgetTabs';
@@ -20,6 +21,9 @@ export function NamespaceView() {
   const {
     params: { id: namespace },
   } = stateAndParams;
+  useNamespaceAccessRedirect(namespace, {
+    to: 'kubernetes.resourcePools',
+  });
 
   const environmentId = useEnvironmentId();
   const eventWarningCount = useEventWarningsCount(environmentId, namespace);

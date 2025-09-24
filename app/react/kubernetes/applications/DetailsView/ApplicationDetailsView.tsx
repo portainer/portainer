@@ -2,6 +2,7 @@ import { AlertTriangle, Code, History, Minimize2 } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import LaptopCode from '@/assets/ico/laptop-code.svg?c';
+import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { PageHeader } from '@@/PageHeader';
 import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
@@ -30,6 +31,7 @@ export function ApplicationDetailsView() {
   const {
     params: { namespace, name },
   } = stateAndParams;
+  useNamespaceAccessRedirect(namespace, { to: 'kubernetes.applications' });
 
   // placements table data
   const { placementsData, isPlacementsTableLoading, hasPlacementWarning } =

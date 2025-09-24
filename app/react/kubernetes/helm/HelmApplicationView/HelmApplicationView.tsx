@@ -5,6 +5,7 @@ import helm from '@/assets/ico/vendor/helm.svg?c';
 import { PageHeader } from '@/react/components/PageHeader';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { Authorized } from '@/react/hooks/useUser';
+import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { WidgetTitle, WidgetBody, Widget, Loading } from '@@/Widget';
 import { Card } from '@@/Card';
@@ -26,6 +27,7 @@ export function HelmApplicationView() {
   const queryClient = useQueryClient();
   const { params } = useCurrentStateAndParams();
   const { name, namespace, revision } = params;
+  useNamespaceAccessRedirect(namespace, { to: 'kubernetes.applications' });
   const helmHistoryQuery = useHelmHistory(environmentId, name, namespace);
   const latestRevision = helmHistoryQuery.data?.[0]?.version;
   const earlistRevision =
