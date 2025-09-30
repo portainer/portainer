@@ -46,7 +46,8 @@ func generateConfigFlags(token, server, namespace, kubeconfigPath string, insecu
 		return nil, errors.New("must provide either a kubeconfig path or a server")
 	}
 
-	configFlags := genericclioptions.NewConfigFlags(true)
+	// Pass 'false' to usePersistentConfig to prevent memory leaks.
+	configFlags := genericclioptions.NewConfigFlags(false)
 	if namespace != "" {
 		configFlags.Namespace = &namespace
 	}
