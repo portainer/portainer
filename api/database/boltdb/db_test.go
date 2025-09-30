@@ -5,6 +5,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/portainer/portainer/api/filesystem"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.etcd.io/bbolt"
@@ -123,10 +125,7 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 }
 
 func TestDBCompaction(t *testing.T) {
-	db := &DbConnection{
-		Path:    t.TempDir(),
-		Compact: true,
-	}
+	db := &DbConnection{Path: t.TempDir()}
 
 	err := db.Open()
 	require.NoError(t, err)
@@ -147,6 +146,7 @@ func TestDBCompaction(t *testing.T) {
 	require.NoError(t, err)
 
 	// Reopen the DB to trigger compaction
+	db.Compact = true
 	err = db.Open()
 	require.NoError(t, err)
 
@@ -168,9 +168,13 @@ func TestDBCompaction(t *testing.T) {
 	require.NoError(t, err)
 
 	// Failures
-
-	err = os.Mkdir(db.GetDatabaseFilePath()+compactedSuffix, 0o755)
+	compactedPath := db.GetDatabaseFilePath() + compactedSuffix
+	err = os.Mkdir(compactedPath, 0o755)
 	require.NoError(t, err)
+
+	f, err := os.Create(filesystem.JoinPaths(compactedPath, "somefile"))
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
 
 	err = db.Open()
 	require.NoError(t, err)
