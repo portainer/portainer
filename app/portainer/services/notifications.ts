@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import toastr from 'toastr';
 import sanitize from 'sanitize-html';
-import { v4 as uuid } from 'uuid';
 
 import { get as localStorageGet } from '@/react/hooks/useLocalStorage';
 import { notificationsStore } from '@/react/portainer/notifications/notifications-store';
@@ -102,7 +101,7 @@ function pickErrorMsg(e?: Error) {
 
 function saveNotification(title: string, text: string, type: string) {
   const notif: ToastNotification = {
-    id: uuid(),
+    id: crypto.randomUUID(),
     title,
     details: text,
     type,

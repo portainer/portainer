@@ -1,9 +1,7 @@
-import uuidv4 from 'uuid/v4';
-
 import { StorageClass } from '../storage-class/StorageClass';
 
 export class PersistentVolumeClaim {
-  Id: string = uuidv4();
+  Id: string = crypto.randomUUID();
 
   Name: string = '';
 

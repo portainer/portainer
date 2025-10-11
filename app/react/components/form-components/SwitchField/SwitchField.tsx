@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import uuid from 'uuid';
 import { ComponentProps, PropsWithChildren, ReactNode, useState } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
@@ -44,7 +43,7 @@ export function SwitchField({
   setTooltipHtmlMessage,
   valueExplanation,
 }: PropsWithChildren<Props>) {
-  const [toggleId] = useState(() => `toggle_${uuid()}`);
+  const [toggleId] = useState(() => `toggle_${crypto.randomUUID()}`);
   const toggleName = name ? `toggle_${name}` : '';
 
   return (

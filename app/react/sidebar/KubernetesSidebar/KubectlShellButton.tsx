@@ -1,6 +1,5 @@
 import { Terminal } from 'lucide-react';
 import clsx from 'clsx';
-import { v4 as uuidv4 } from 'uuid';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/react/hooks/useAnalytics';
@@ -51,7 +50,7 @@ export function KubectlShellButton({ environmentId }: Props) {
     window.open(
       `${url}#!/${environmentId}/kubernetes/kubectl-shell`,
       // give the window a unique name so that more than one can be opened
-      `kubectl-shell-${environmentId}-${uuidv4()}`,
+      `kubectl-shell-${environmentId}-${crypto.randomUUID()}`,
       'width=800,height=600'
     );
 

@@ -1,6 +1,5 @@
 import { FormikErrors } from 'formik';
 import { useMemo } from 'react';
-import uuidv4 from 'uuid/v4';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { StorageClass } from '@/react/portainer/environments/types';
@@ -114,7 +113,7 @@ function getAddButtonError(storageClasses: StorageClass[]) {
 }
 
 function getNewPVCName(applicationName: string) {
-  const name = `${applicationName}-${uuidv4()}`;
+  const name = `${applicationName}-${crypto.randomUUID()}`;
   // limit it to 63 characters to avoid exceeding the limit for the volume name
   const nameLimited = name.length > 63 ? name.substring(0, 63) : name;
   return nameLimited;

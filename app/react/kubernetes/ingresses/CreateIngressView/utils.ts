@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { SupportedIngControllerTypes } from '@/react/kubernetes/cluster/ingressClass/types';
 
 import { TLS, Ingress } from '../types';
@@ -69,7 +67,7 @@ export function prepareRuleHostsFromIngress(ing: Ingress) {
     if (!host) {
       h.NoHost = true;
     }
-    h.Key = uuidv4();
+    h.Key = crypto.randomUUID();
     return h;
   });
 
@@ -85,7 +83,7 @@ export function getAnnotationsForEdit(
       result.push({
         key: k,
         value: annotations[k],
-        id: uuidv4(),
+        id: crypto.randomUUID(),
       });
     }
   });
@@ -97,7 +95,7 @@ export function prepareRuleFromIngress(
   type?: SupportedIngControllerTypes
 ): Rule {
   return {
-    Key: uuidv4(),
+    Key: crypto.randomUUID(),
     IngressName: ing.Name,
     Namespace: ing.Namespace,
     IngressClassName: type === 'custom' ? 'none' : ing.ClassName,

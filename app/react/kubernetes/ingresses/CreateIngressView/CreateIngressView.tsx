@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -705,11 +704,11 @@ export function CreateIngressView() {
       Host: '',
       Secret: '',
       Paths: [],
-      Key: uuidv4(),
+      Key: crypto.randomUUID(),
     };
 
     const rule: Rule = {
-      Key: uuidv4(),
+      Key: crypto.randomUUID(),
       Namespace: namespace,
       IngressName: newKey,
       IngressClassName: ingressRule.IngressClassName || '',
@@ -724,7 +723,7 @@ export function CreateIngressView() {
     const rule = { ...ingressRule };
 
     const path: Path = {
-      Key: uuidv4(),
+      Key: crypto.randomUUID(),
       ServiceName: '',
       ServicePort: 0,
       Route: '',
@@ -736,7 +735,7 @@ export function CreateIngressView() {
       Secret: '',
       Paths: noHost ? [path] : [],
       NoHost: noHost,
-      Key: uuidv4(),
+      Key: crypto.randomUUID(),
     };
 
     rule.Hosts.push(host);
@@ -751,7 +750,7 @@ export function CreateIngressView() {
       ServicePort: 0,
       Route: '',
       PathType: 'Prefix',
-      Key: uuidv4(),
+      Key: crypto.randomUUID(),
     };
 
     rule.Hosts[hostIndex].Paths.push(path);
@@ -764,7 +763,7 @@ export function CreateIngressView() {
     const annotation: Annotation = {
       key: '',
       value: '',
-      id: uuidv4(),
+      id: crypto.randomUUID(),
     };
     switch (type) {
       case 'rewrite':

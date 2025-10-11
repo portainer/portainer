@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { useReducer, useState } from 'react';
 
 import {
@@ -76,7 +75,7 @@ export function EdgeAgentTab({
   );
 
   function handleCreate(environment: Environment) {
-    setEdgeInfo({ key: environment.EdgeKey, id: environment.EdgeID || uuid() });
+    setEdgeInfo({ key: environment.EdgeKey, id: environment.EdgeID || crypto.randomUUID() });
     onCreate(environment);
   }
 
