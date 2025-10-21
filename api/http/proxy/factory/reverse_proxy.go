@@ -23,6 +23,11 @@ var allowedHeaders = map[string]struct{}{
 	"X-Portainer-Volumename":    {},
 	"X-Registry-Auth":           {},
 	"X-Stream-Protocol-Version": {},
+	// WebSocket headers those are required for kubectl exec/attach/port-forward operations
+	"Sec-Websocket-Key":        {},
+	"Sec-Websocket-Version":    {},
+	"Sec-Websocket-Protocol":   {},
+	"Sec-Websocket-Extensions": {},
 }
 
 // newSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy

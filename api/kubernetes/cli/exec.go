@@ -12,6 +12,16 @@ import (
 	utilexec "k8s.io/client-go/util/exec"
 )
 
+var (
+	channelProtocolList = []string{
+		"v5.channel.k8s.io",
+		"v4.channel.k8s.io",
+		"v3.channel.k8s.io",
+		"v2.channel.k8s.io",
+		"channel.k8s.io",
+	}
+)
+
 // StartExecProcess will start an exec process inside a container located inside a pod inside a specific namespace
 // using the specified command. The stdin parameter will be bound to the stdin process and the stdout process will write
 // to the stdout parameter.
@@ -45,10 +55,18 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 		TTY:       true,
 	}, scheme.ParameterCodec)
 
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	exec, err := remotecommand.NewWebSocketExecutorForProtocols(
+		config,
+		"GET", // WebSocket uses GET for the upgrade request
+		req.URL().String(),
+		channelProtocolList...,
+	)
 	if err != nil {
-		errChan <- err
-		return
+		exec, err = remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+		if err != nil {
+			errChan <- err
+			return
+		}
 	}
 
 	err = exec.StreamWithContext(context.TODO(), remotecommand.StreamOptions{
