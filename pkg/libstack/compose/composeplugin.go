@@ -75,6 +75,11 @@ func withCli(
 		cli.ConfigFile().AuthConfigs[r.ServerAddress] = r
 	}
 
+	if cli.ConfigFile().CredentialsStore == "portainer" {
+		log.Debug().Msg("completely disabling portainer credential store helper")
+		cli.ConfigFile().CredentialsStore = ""
+	}
+
 	return cliFn(ctx, cli)
 }
 
