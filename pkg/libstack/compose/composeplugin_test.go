@@ -16,6 +16,7 @@ import (
 	"github.com/docker/cli/cli/command"
 	cmdcompose "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/pkg/api"
+	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/google/go-cmp/cmp"
 	"github.com/portainer/portainer/pkg/libstack"
 	zerolog "github.com/rs/zerolog/log"
@@ -595,7 +596,7 @@ func Test_MaxConcurrency(t *testing.T) {
 	err := w.Validate(ctx, filepaths, options)
 	require.NoError(t, err)
 
-	w.withComposeService(ctx, filepaths, options, func(service api.Service, _ *types.Project) error {
+	w.withComposeService(ctx, filepaths, options, func(service api.Compose, _ *types.Project) error {
 		if mockS, ok := service.(*mockComposeService); ok {
 			require.Equal(t, mockS.maxConcurrency, expectedMaxConcurrency)
 		} else {
@@ -1298,12 +1299,12 @@ func Test_createProject(t *testing.T) {
 	}
 }
 
-func createMockComposeService(dockerCli command.Cli) api.Service {
+func createMockComposeService(command.Cli, ...compose.Option) api.Compose {
 	return &mockComposeService{}
 }
 
 type mockComposeService struct {
-	api.Service
+	api.Compose
 	maxConcurrency int
 }
 

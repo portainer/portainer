@@ -7,7 +7,7 @@ import (
 )
 
 type ComposeDeployer struct {
-	createComposeServiceFn func(command.Cli) api.Service
+	createComposeServiceFn func(command.Cli, ...compose.Option) api.Compose
 }
 
 // NewComposeDeployer creates a new compose deployer
