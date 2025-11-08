@@ -402,6 +402,7 @@ angular.module('portainer.app').factory('StackService', [
         {
           env,
           prune,
+          RepositoryURL: gitConfig.RepositoryURL,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
@@ -431,6 +432,7 @@ angular.module('portainer.app').factory('StackService', [
         {
           AutoUpdate: transformAutoUpdateViewModel(gitConfig.AutoUpdate, webhookId),
           Env: env,
+          RepositoryURL: gitConfig.RepositoryURL,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,

@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -20,6 +21,7 @@ import (
 )
 
 type stackGitRedployPayload struct {
+	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
@@ -125,6 +127,17 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	// validate repository URL
+	if payload.RepositoryURL == "" {
+		return httperror.BadRequest("Invalid repository URL", errors.New("repository URL cannot be empty"))
+	}
+
+	_, err = url.ParseRequestURI(payload.RepositoryURL)
+	if err != nil {
+		return httperror.BadRequest("Invalid repository URL", errors.New("repository URL is not a valid URI"))
+	}
+
+	stack.GitConfig.URL = payload.RepositoryURL
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.Env = payload.Env
 	if stack.Type == portainer.DockerSwarmStack {

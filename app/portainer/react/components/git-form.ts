@@ -10,6 +10,7 @@ import { AuthFieldset } from '@/react/portainer/gitops/AuthFieldset';
 import { InfoPanel } from '@/react/portainer/gitops/InfoPanel';
 import { RefField } from '@/react/portainer/gitops/RefField';
 import { TimeWindowDisplay } from '@/react/portainer/gitops/TimeWindowDisplay';
+import { GitFormUrlField } from '@/react/portainer/gitops/GitFormUrlField';
 
 export const gitFormModule = angular
   .module('portainer.app.components.forms.git', [])
@@ -79,4 +80,15 @@ export const gitFormModule = angular
   .component(
     'timeWindowDisplay',
     r2a(withReactQuery(withUIRouter(TimeWindowDisplay)), [])
+  )
+  .component(
+    'reactGitFormUrlField',
+    r2a(withReactQuery(GitFormUrlField), [
+      'value',
+      'onChange',
+      'onChangeRepositoryValid',
+      'model',
+      'createdFromCustomTemplateId',
+      'errors',
+    ])
   ).name;
