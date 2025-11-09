@@ -117,9 +117,7 @@ div.input-mask {
 .widget .widget-body .error {
   color: #ff0000;
 }
-.widget .widget-body button {
-  margin-left: 5px;
-}
+
 .widget .widget-body div.alert {
   margin-bottom: 10px;
 }
