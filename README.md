@@ -62,6 +62,19 @@ When Portainer first starts, you are given the option to DISABLE analytics. If y
 
 Portainer supports "Current - 2 docker versions only. Prior versions may operate, however these are not supported.
 
+## Running Portainer using Docker (for Local Setup)
+
+You can easily run Portainer locally using Docker or Docker Compose.  
+This is useful for developers who want to explore Portainer CE before deploying it in production.
+
+### Using Docker Compose
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/portainer/portainer.git
+   cd portainer
+
+
 ## Licensing
 
 Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
