@@ -36,6 +36,7 @@ export function PrivateRegistryFieldset({
 }: Props) {
   const [checked, setChecked] = useState(isActive || false);
   const [selected, setSelected] = useState(value);
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
   const tooltipMessage =
     'This allows you to provide credentials when using a private registry that requires authentication';
@@ -47,6 +48,13 @@ export function PrivateRegistryFieldset({
   }, [isActive]);
 
   useEffect(() => {
+    // Skip onChange call on initial mount when checkbox is already checked
+    // to preserve the saved registry value
+    if (isInitialMount) {
+      setIsInitialMount(false);
+      return;
+    }
+    
     if (checked) {
       onChange();
     } else {
