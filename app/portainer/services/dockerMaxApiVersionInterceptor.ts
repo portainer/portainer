@@ -43,12 +43,21 @@ export async function dockerMaxAPIVersionInterceptor(
       );
 
       const apiVersion = parseFloat(data.ApiVersion ?? '0');
+      const minApiVersion = parseFloat(
+        (data as SystemVersion & { MinAPIVersion?: string }).MinAPIVersion ?? '0'
+      );
       const { maxDockerAPIVersion } = config;
 
-      if (apiVersion > maxDockerAPIVersion) {
+      const versionOverride = getDockerApiVersionOverride(
+        apiVersion,
+        minApiVersion,
+        maxDockerAPIVersion
+      );
+
+      if (versionOverride) {
         config.url = config.url?.replace(
           /docker/,
-          `docker/v${maxDockerAPIVersion}`
+          `docker/v${versionOverride}`
         );
       }
     }
@@ -57,4 +66,32 @@ export async function dockerMaxAPIVersionInterceptor(
     // if the interceptor errors, return the original config
     return rawConfig;
   }
+}
+
+export function getDockerApiVersionOverride(
+  apiVersion: number,
+  minApiVersion: number,
+  maxDockerApiVersion: number
+) {
+  const parsedApi = Number.isFinite(apiVersion) ? apiVersion : 0;
+  const parsedMin = Number.isFinite(minApiVersion) ? minApiVersion : 0;
+  const parsedMax = Number.isFinite(maxDockerApiVersion)
+    ? maxDockerApiVersion
+    : 0;
+
+  if (!parsedApi || !parsedMax) {
+    return null;
+  }
+
+  let desiredVersion = Math.min(parsedApi, parsedMax);
+
+  if (parsedMin > 0 && desiredVersion < parsedMin) {
+    desiredVersion = parsedMin;
+  }
+
+  if (desiredVersion === parsedApi) {
+    return null;
+  }
+
+  return desiredVersion;
 }
