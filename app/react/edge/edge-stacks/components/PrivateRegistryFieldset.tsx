@@ -54,7 +54,7 @@ export function PrivateRegistryFieldset({
       setIsInitialMount(false);
       return;
     }
-    
+
     if (checked) {
       onChange();
     } else {
