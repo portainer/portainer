@@ -19,3 +19,10 @@
 [theme='highcontrast'] .modal-content {
   border: 1px solid var(--border-widget);
 }
+
+.modal-dialog.resizable {
+  resize: both;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
