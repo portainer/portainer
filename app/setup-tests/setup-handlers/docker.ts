@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { SystemInfo, SystemVersion } from 'docker-types/generated/1.41';
+import { SystemInfo, SystemVersion } from 'docker-types/generated/1.44';
 
 export const dockerHandlers = [
   http.get<never, never, SystemInfo>(

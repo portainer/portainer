@@ -1,4 +1,4 @@
-import { Secret } from 'docker-types/generated/1.41';
+import { Secret } from 'docker-types/generated/1.44';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { PortainerResponse } from '@/react/docker/types';

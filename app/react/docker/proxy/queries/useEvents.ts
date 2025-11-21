@@ -1,4 +1,4 @@
-import { EventMessage } from 'docker-types/generated/1.41';
+import { EventMessage } from 'docker-types/generated/1.44';
 import { useQuery } from '@tanstack/react-query';
 
 import axios, {

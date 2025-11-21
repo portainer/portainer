@@ -1,4 +1,4 @@
-import { Service } from 'docker-types/generated/1.41';
+import { Service } from 'docker-types/generated/1.44';
 
 import { ServiceUpdateConfig } from '../types';
 

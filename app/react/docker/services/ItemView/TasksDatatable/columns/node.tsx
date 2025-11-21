@@ -1,4 +1,4 @@
-import { Node } from 'docker-types/generated/1.41';
+import { Node } from 'docker-types/generated/1.44';
 import { CellContext } from '@tanstack/react-table';
 
 import { useNodes } from '@/react/docker/proxy/queries/nodes/useNodes';

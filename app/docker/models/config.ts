@@ -1,4 +1,4 @@
-import { Config } from 'docker-types/generated/1.41';
+import { Config } from 'docker-types/generated/1.44';
 
 import { IResource } from '@/react/docker/components/datatable/createOwnershipColumn';
 import { PortainerResponse } from '@/react/docker/types';

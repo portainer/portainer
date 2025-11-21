@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { SystemVersion } from 'docker-types/generated/1.41';
+import { SystemVersion } from 'docker-types/generated/1.44';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';

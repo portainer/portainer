@@ -1,6 +1,6 @@
 import { FormikErrors } from 'formik';
 import { array, object, SchemaOf, string } from 'yup';
-import { DeviceMapping } from 'docker-types/generated/1.41';
+import { DeviceMapping } from 'docker-types/generated/1.44';
 
 import { FormError } from '@@/form-components/FormError';
 import { InputList, ItemProps } from '@@/form-components/InputList';

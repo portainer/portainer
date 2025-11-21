@@ -6,7 +6,7 @@ import {
   HostConfig,
   MountPoint,
   NetworkSettings,
-} from 'docker-types/generated/1.41';
+} from 'docker-types/generated/1.44';
 
 import { PortainerResponse } from '@/react/docker/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

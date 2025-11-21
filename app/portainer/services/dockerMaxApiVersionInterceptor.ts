@@ -1,4 +1,4 @@
-import { SystemVersion } from 'docker-types/generated/1.41';
+import { SystemVersion } from 'docker-types/generated/1.44';
 import Axios, { InternalAxiosRequestConfig } from 'axios';
 import { setupCache, buildMemoryStorage } from 'axios-cache-interceptor';
 

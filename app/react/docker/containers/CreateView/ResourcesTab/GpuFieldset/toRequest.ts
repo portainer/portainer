@@ -1,4 +1,4 @@
-import { DeviceRequest } from 'docker-types/generated/1.41';
+import { DeviceRequest } from 'docker-types/generated/1.44';
 
 import { Values } from './types';
 

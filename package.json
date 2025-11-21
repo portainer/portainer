@@ -92,7 +92,7 @@
     "codemirror-json-schema": "^0.8.0",
     "core-js": "^3.19.3",
     "date-fns": "^2.29.3",
-    "docker-types": "^1.43.1",
+    "docker-types": "^1.45.0",
     "fast-json-patch": "^3.1.1",
     "file-saver": "^2.0.5",
     "filesize": "~3.3.0",

@@ -1,4 +1,4 @@
-import { Volume } from 'docker-types/generated/1.41';
+import { Volume } from 'docker-types/generated/1.44';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';

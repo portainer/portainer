@@ -1,4 +1,4 @@
-import { ContainerSummary } from 'docker-types/generated/1.41';
+import { ContainerSummary } from 'docker-types/generated/1.44';
 
 import { PortainerResponse } from '@/react/docker/types';
 import { WithRequiredProperties } from '@/types';

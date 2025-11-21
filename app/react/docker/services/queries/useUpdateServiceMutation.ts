@@ -1,4 +1,4 @@
-import { ServiceUpdateResponse } from 'docker-types/generated/1.41';
+import { ServiceUpdateResponse } from 'docker-types/generated/1.44';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';

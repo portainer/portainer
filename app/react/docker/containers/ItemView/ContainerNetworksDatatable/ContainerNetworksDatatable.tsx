@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Network } from 'lucide-react';
-import { EndpointSettings, NetworkSettings } from 'docker-types/generated/1.41';
+import { EndpointSettings, NetworkSettings } from 'docker-types/generated/1.44';
 
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';

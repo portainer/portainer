@@ -1,4 +1,4 @@
-import { ImageInspect } from 'docker-types/generated/1.41';
+import { ImageInspect } from 'docker-types/generated/1.44';
 
 type ImageInspectConfig = NonNullable<ImageInspect['Config']>;
 

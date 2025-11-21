@@ -1,4 +1,4 @@
-import { EndpointPortConfig } from 'docker-types/generated/1.41';
+import { EndpointPortConfig } from 'docker-types/generated/1.44';
 import _ from 'lodash';
 
 import { Values } from './PortsMappingField';

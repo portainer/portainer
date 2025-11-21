@@ -1,6 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Clock } from 'lucide-react';
-import { EventMessage } from 'docker-types/generated/1.41';
+import { EventMessage } from 'docker-types/generated/1.44';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 

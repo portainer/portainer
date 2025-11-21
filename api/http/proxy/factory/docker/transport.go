@@ -111,7 +111,7 @@ var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*ht
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
-	// from : /v1.41/containers/{id}/json
+	// from : /v1.44/containers/{id}/json
 	// or   : /containers/{id}/json
 	// to   : /containers/{id}/json
 	unversionedPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")

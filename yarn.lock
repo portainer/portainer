@@ -9593,10 +9593,10 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docker-types@^1.43.1:
-  version "1.43.1"
-  resolved "https://registry.yarnpkg.com/docker-types/-/docker-types-1.43.1.tgz#3f1a644e29c85392e95c207bba15f16b675dca2a"
-  integrity sha512-eiihBU5LvZlNaeh/hGycsaoeutlPJ/0vyvEKvuBWnyilCq+IRWnv9e2+oh6AIpXEuHiWFowwHXmIlKlt07X3Mw==
+docker-types@^1.45.0:
+  version "1.45.0"
+  resolved "https://registry.yarnpkg.com/docker-types/-/docker-types-1.45.0.tgz#57f9eeb283364128fa472d25abc75563160aea4f"
+  integrity sha512-IvVAmwGbXVSEsD+Ld3pwIhCSm4YbnlZ9dPHbDVkgZUcE22MSkuIARREc7ipQ9JoMOzu7qMPD8H/KCpGnrZRo7A==
 
 doctrine@^2.1.0:
   version "2.1.0"

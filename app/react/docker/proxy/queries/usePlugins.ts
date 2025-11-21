@@ -3,7 +3,7 @@ import {
   Plugin,
   PluginInterfaceType,
   PluginsInfo,
-} from 'docker-types/generated/1.41';
+} from 'docker-types/generated/1.44';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -87,7 +87,7 @@ export function aggregateData(
         (plugin) =>
           plugin.Enabled &&
           // docker has an error in their types, so we need to cast to unknown first
-          // see https://docs.docker.com/engine/api/v1.41/#tag/Plugin/operation/PluginList
+          // see https://docs.docker.com/engine/api/v1.44/#tag/Plugin/operation/PluginList
           plugin.Config.Interface.Types.includes(
             pluginTypeToVersionMap[pluginType] as unknown as PluginInterfaceType
           )

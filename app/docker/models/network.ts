@@ -1,4 +1,4 @@
-import { IPAM, Network, NetworkContainer } from 'docker-types/generated/1.41';
+import { IPAM, Network, NetworkContainer } from 'docker-types/generated/1.44';
 
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { IResource } from '@/react/docker/components/datatable/createOwnershipColumn';

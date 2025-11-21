@@ -1,4 +1,4 @@
-import { Task } from 'docker-types/generated/1.41';
+import { Task } from 'docker-types/generated/1.44';
 
 import { DeepPick } from '@/types/deepPick';
 

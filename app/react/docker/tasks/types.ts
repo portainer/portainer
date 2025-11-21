@@ -1,4 +1,4 @@
-import { Task } from 'docker-types/generated/1.41';
+import { Task } from 'docker-types/generated/1.44';
 
 export type TaskId = NonNullable<Task['ID']>;
 

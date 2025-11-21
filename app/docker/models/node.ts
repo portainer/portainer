@@ -8,7 +8,7 @@ import {
   ObjectVersion,
   Platform,
   ResourceObject,
-} from 'docker-types/generated/1.41';
+} from 'docker-types/generated/1.44';
 
 export class NodeViewModel {
   Model: Node;

@@ -1,4 +1,4 @@
-import { HostConfig } from 'docker-types/generated/1.41';
+import { HostConfig } from 'docker-types/generated/1.44';
 
 import { commandArrayToString } from '@/docker/helpers/containers';
 
