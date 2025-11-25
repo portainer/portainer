@@ -45,7 +45,6 @@ const (
 // @param edgeDeviceUntrusted query bool false "if true, show only untrusted edge agents, if false show only trusted edge agents (relevant only for edge agents)"
 // @param edgeCheckInPassedSeconds query number false "if bigger then zero, show only edge agents that checked-in in the last provided seconds (relevant only for edge agents)"
 // @param excludeSnapshots query bool false "if true, the snapshot data won't be retrieved"
-// @param excludeSnapshotRaw query bool false "if true, the SnapshotRaw field won't be retrieved"
 // @param name query string false "will return only environments(endpoints) with this name"
 // @param edgeStackId query portainer.EdgeStackID false "will return the environements of the specified edge stack"
 // @param edgeStackStatus query string false "only applied when edgeStackId exists. Filter the returned environments based on their deployment status in the stack (not the environment status!)" Enum("Pending", "Ok", "Error", "Acknowledged", "Remove", "RemoteUpdateSuccess", "ImagesPulled")
@@ -63,7 +62,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 	sortField, _ := request.RetrieveQueryParameter(r, "sort", true)
 	sortOrder, _ := request.RetrieveQueryParameter(r, "order", true)
-	excludeRaw, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshotRaw", true)
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
 	if err != nil {
@@ -118,7 +116,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		endpointutils.UpdateEdgeEndpointHeartbeat(&paginatedEndpoints[idx], settings)
 
 		if !query.excludeSnapshots {
-			if err := handler.SnapshotService.FillSnapshotData(&paginatedEndpoints[idx], !excludeRaw); err != nil {
+			if err := handler.SnapshotService.FillSnapshotData(&paginatedEndpoints[idx], false); err != nil {
 				return httperror.InternalServerError("Unable to add snapshot data", err)
 			}
 		}
