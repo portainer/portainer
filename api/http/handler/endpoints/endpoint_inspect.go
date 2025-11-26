@@ -20,7 +20,6 @@ import (
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
 // @param excludeSnapshot query bool false "if true, the snapshot data won't be retrieved"
-// @param excludeSnapshotRaw query bool false "if true, the SnapshotRaw field won't be retrieved"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "Environment(Endpoint) not found"
@@ -53,10 +52,9 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 
 	excludeSnapshot, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshot", true)
-	excludeRaw, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshotRaw", true)
 
 	if !excludeSnapshot {
-		if err := handler.SnapshotService.FillSnapshotData(endpoint, !excludeRaw); err != nil {
+		if err := handler.SnapshotService.FillSnapshotData(endpoint, false); err != nil {
 			return httperror.InternalServerError("Unable to add snapshot data", err)
 		}
 	}
