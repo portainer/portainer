@@ -65,6 +65,9 @@ function StatusCell({
       case ContainerStatus.Stopped:
       case ContainerStatus.Dead:
       case ContainerStatus.Exited:
+        if (extractExitCode(container.StatusText) == '0') {
+          return 'default'
+        }
         return 'danger';
       case ContainerStatus.Healthy:
       case ContainerStatus.Running:
