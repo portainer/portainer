@@ -114,10 +114,18 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
-	err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.RemoveOptions{
+	envFilePath, err := createEnvFile(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to create env file")
+	}
+
+	filePaths := stackutils.GetStackFilePaths(stack, true)
+	err = manager.deployer.Remove(ctx, filePaths, libstack.RemoveOptions{
 		Options: libstack.Options{
-			WorkingDir: "",
-			Host:       url,
+			WorkingDir:  stack.ProjectPath,
+			EnvFilePath: envFilePath,
+			Host:        url,
+			ProjectName: stack.Name,
 		},
 	})
 

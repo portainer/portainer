@@ -79,7 +79,7 @@ func TestComposeProjectStatus(t *testing.T) {
 				t.Fatalf("[test: %s] Expected status message but got empty", testCase.TestName)
 			}
 
-			err = w.Remove(ctx, projectName, nil, libstack.RemoveOptions{})
+			err = w.Remove(ctx, nil, libstack.RemoveOptions{})
 			if err != nil {
 				t.Fatalf("[test: %s] Failed to remove compose project: %v", testCase.TestName, err)
 			}
