@@ -80,6 +80,65 @@ services:
 	require.False(t, containerExists(composeContainerName))
 }
 
+// Detect regression in container injections.
+// Ref BE-12432
+// Ref https://github.com/portainer/portainer/issues/12909
+func Test_UpAndDownWithInjection(t *testing.T) {
+	const content = `
+services:
+  test:
+    image: alpine:latest
+    container_name: "composetest_alpine"
+    command: ["sh", "-c", "cat /test.txt"]
+    configs:
+      - source: test-config
+        target: /test.txt
+
+configs:
+  test-config:
+    content: |
+      Hello from inline config!
+      This should appear in the container.
+`
+	const projectName = "composetest"
+	const containerName = "composetest_alpine"
+	w := NewComposeDeployer()
+
+	dir := t.TempDir()
+	ctx := context.Background()
+
+	filePath := createFile(t, dir, "docker-compose.yml", content)
+	filePaths := []string{filePath}
+
+	err := w.Validate(ctx, filePaths, libstack.Options{ProjectName: projectName})
+	require.NoError(t, err)
+
+	err = w.Pull(ctx, filePaths, libstack.Options{ProjectName: projectName})
+	require.NoError(t, err)
+
+	require.False(t, containerExists(containerName))
+
+	err = w.Deploy(ctx, filePaths, libstack.DeployOptions{
+		Options: libstack.Options{
+			ProjectName: projectName,
+		},
+	})
+	require.NoError(t, err)
+
+	require.True(t, containerExists(containerName))
+
+	waitResult := w.WaitForStatus(ctx, projectName, libstack.StatusCompleted)
+
+	require.Empty(t, waitResult.ErrorMsg)
+	require.Equal(t, libstack.StatusCompleted, waitResult.Status)
+
+	err = w.Remove(ctx, projectName, filePaths, libstack.RemoveOptions{})
+	require.NoError(t, err)
+
+	require.False(t, containerExists(containerName))
+
+}
+
 func TestRun(t *testing.T) {
 	w := NewComposeDeployer()
 
