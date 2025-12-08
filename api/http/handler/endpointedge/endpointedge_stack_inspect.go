@@ -40,18 +40,18 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	}
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "stackId")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge stack identifier route variable", fmt.Errorf("invalid Edge stack route variable: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.BadRequest("Invalid edge stack identifier route variable", fmt.Errorf("invalid Edge stack route variable: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	s, err, _ := edgeStackSingleFlightGroup.Do(strconv.Itoa(edgeStackID), func() (any, error) {
 		edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return nil, httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("unable to find the Edge stack from database: %w. Environment name: %s", err, endpoint.Name))
+			return nil, httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("unable to find the Edge stack from database: %w. Environment ID: %d", err, endpoint.ID))
 		}
 
 		return edgeStack, err
@@ -62,7 +62,7 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("failed to find Edge stack from the database: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", fmt.Errorf("failed to find Edge stack from the database: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	// WARNING: this variable must not be mutated
@@ -71,7 +71,7 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {
 		if fileName == "" {
-			return httperror.BadRequest("Docker is not supported by this stack", fmt.Errorf("no filename is provided for the Docker endpoint. Environment name: %s", endpoint.Name))
+			return httperror.BadRequest("Docker is not supported by this stack", fmt.Errorf("no filename is provided for the Docker endpoint. Environment ID: %d", endpoint.ID))
 		}
 	}
 
@@ -84,18 +84,18 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		fileName = edgeStack.ManifestPath
 
 		if fileName == "" {
-			return httperror.BadRequest("Kubernetes is not supported by this stack", fmt.Errorf("no filename is provided for the Kubernetes endpoint. Environment name: %s", endpoint.Name))
+			return httperror.BadRequest("Kubernetes is not supported by this stack", fmt.Errorf("no filename is provided for the Kubernetes endpoint. Environment ID: %d", endpoint.ID))
 		}
 	}
 
 	dirEntries, err := filesystem.LoadDir(edgeStack.ProjectPath)
 	if err != nil {
-		return httperror.InternalServerError("Unable to load repository", fmt.Errorf("failed to load project directory: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.InternalServerError("Unable to load repository", fmt.Errorf("failed to load project directory: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	fileContent, err := filesystem.FilterDirForCompatibility(dirEntries, fileName, endpoint.Agent.Version)
 	if err != nil {
-		return httperror.InternalServerError("File not found", fmt.Errorf("unable to find file: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.InternalServerError("File not found", fmt.Errorf("unable to find file: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	dirEntries = filesystem.FilterDirForEntryFile(dirEntries, fileName)

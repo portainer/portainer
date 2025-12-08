@@ -42,17 +42,17 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint); err != nil {
-		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.Forbidden("Permission denied to access environment", fmt.Errorf("unauthorized edge endpoint operation: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "jobID")
 	if err != nil {
-		return httperror.BadRequest("Invalid edge job identifier route variable", fmt.Errorf("invalid Edge job route variable: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.BadRequest("Invalid edge job identifier route variable", fmt.Errorf("invalid Edge job route variable: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	var payload logsPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", fmt.Errorf("invalid Edge job request payload: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.BadRequest("Invalid request payload", fmt.Errorf("invalid Edge job request payload: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
@@ -60,11 +60,11 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	}); err != nil {
 		var httpErr *httperror.HandlerError
 		if errors.As(err, &httpErr) {
-			httpErr.Err = fmt.Errorf("edge polling error: %w. Environment name: %s", httpErr.Err, endpoint.Name)
+			httpErr.Err = fmt.Errorf("edge polling error: %w. Environment ID: %d", httpErr.Err, endpoint.ID)
 			return httpErr
 		}
 
-		return httperror.InternalServerError("Unexpected error", fmt.Errorf("edge polling error: %w. Environment name: %s", err, endpoint.Name))
+		return httperror.InternalServerError("Unexpected error", fmt.Errorf("edge polling error: %w. Environment ID: %d", err, endpoint.ID))
 	}
 
 	return response.JSON(w, nil)
