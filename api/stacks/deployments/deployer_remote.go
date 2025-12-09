@@ -55,12 +55,11 @@ func (d *stackDeployer) DeployRemoteComposeStack(
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	d.swarmStackManager.Login(registries, endpoint)
-	defer d.swarmStackManager.Logout(endpoint)
+	options := portainer.ComposeOptions{Registries: registries}
 
 	// --force-recreate doesn't pull updated images
 	if forcePullImage {
-		if err := d.composeStackManager.Pull(context.TODO(), stack, endpoint, portainer.ComposeOptions{}); err != nil {
+		if err := d.composeStackManager.Pull(context.TODO(), stack, endpoint, options); err != nil {
 			return err
 		}
 	}
