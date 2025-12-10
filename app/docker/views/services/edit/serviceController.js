@@ -720,7 +720,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.onResetPorts = function (all = false) {
       $scope.$evalAsync(() => {
-        $scope.formValues.ports = portsMappingUtils.toViewModel($scope.service.Model.Spec.EndpointSpec.Ports);
+        $scope.formValues.ports = portsMappingUtils.toViewModel($scope.service.Model.Spec.EndpointSpec?.Ports);
 
         $scope.cancelChanges($scope.service, all ? undefined : ['Ports']);
       });
@@ -744,7 +744,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             $scope.lastVersion = service.Version;
           }
 
-          $scope.formValues.ports = portsMappingUtils.toViewModel(service.Model.Spec.EndpointSpec.Ports);
+          $scope.formValues.ports = portsMappingUtils.toViewModel(service.Model.Spec.EndpointSpec?.Ports);
 
           transformResources(service);
           translateServiceArrays(service);
