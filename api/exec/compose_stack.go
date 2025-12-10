@@ -65,7 +65,7 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 			EnvFilePath: envFilePath,
 			Host:        url,
 			ProjectName: stack.Name,
-			Registries:  portainerRegistriesToAuthConfigs(manager.dataStore, options.Registries),
+			Registries:  portainerRegistriesToAuthConfigs(manager.dataStore, options.ComposeOptions.Registries),
 		},
 		ForceRecreate:        options.ForceRecreate,
 		AbortOnContainerExit: options.AbortOnContainerExit,
