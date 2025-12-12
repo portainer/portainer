@@ -61,6 +61,8 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 
 	h.Handle("/stacks/create/{type}/{method}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
+	h.Handle("/stacks/save/{type}/{method}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackSave))).Methods(http.MethodPost)
 	h.Handle("/stacks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackList))).Methods(http.MethodGet)
 	h.Handle("/stacks/{id}",
