@@ -1,5 +1,3 @@
-import uuid from 'uuid';
-
 import {
   API_ENDPOINT_EDGE_STACKS,
   API_ENDPOINT_STACKS,
@@ -23,7 +21,7 @@ export function stackWebhookUrl(token: string) {
 }
 
 export function createWebhookId() {
-  return uuid();
+  return crypto.randomUUID();
 }
 
 export function baseEdgeStackWebhookUrl() {

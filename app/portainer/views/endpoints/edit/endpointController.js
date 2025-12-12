@@ -1,5 +1,4 @@
 import _ from 'lodash-es';
-import uuidv4 from 'uuid/v4';
 
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
@@ -325,7 +324,7 @@ function EndpointController(
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
 
           $scope.state.edgeAssociated = !!endpoint.EdgeID;
-          endpoint.EdgeID = endpoint.EdgeID || uuidv4();
+          endpoint.EdgeID = endpoint.EdgeID || crypto.randomUUID();
         }
 
         $scope.endpoint = endpoint;
