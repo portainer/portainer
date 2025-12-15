@@ -53,13 +53,11 @@ export function toViewModel(
     ipv6Address = networkSettings.IPAMConfig.IPv6Address || '';
   }
 
-  const macAddress = networkSettings?.MacAddress || '';
-
   return {
     networkMode,
     hostname: config.Config?.Hostname || '',
     domain: config.Config?.Domainname || '',
-    macAddress,
+    macAddress: '', // mac address is cleared between edit/duplicate
     ipv4Address,
     ipv6Address,
     primaryDns,
