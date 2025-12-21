@@ -105,7 +105,7 @@ lint: lint-client lint-server ## Lint all code
 lint-client: ## Lint client code
 	yarn lint
 
-lint-server: ## Lint server code
+lint-server: tidy ## Lint server code
 	golangci-lint run --timeout=10m -c .golangci.yaml
 
 
