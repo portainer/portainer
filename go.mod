@@ -13,12 +13,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.24.1
 	github.com/aws/smithy-go v1.20.3
 	github.com/cbroglie/mustache v1.4.0
-	github.com/compose-spec/compose-go/v2 v2.9.0
+	github.com/compose-spec/compose-go/v2 v2.9.1
 	github.com/containers/image/v5 v5.30.1
 	github.com/coreos/go-semver v0.3.1
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/docker/cli v28.5.1+incompatible
-	github.com/docker/compose/v2 v2.40.2
+	github.com/docker/compose/v2 v2.40.3
 	github.com/docker/docker v28.5.1+incompatible
 	github.com/fvbommel/sortorder v1.1.0
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
