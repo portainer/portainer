@@ -68,3 +68,16 @@ func TestEdgeGroupUpdateHandler(t *testing.T) {
 
 	require.ElementsMatch(t, []portainer.EndpointID{1, 2, 3}, responseGroup.Endpoints)
 }
+
+func TestEdgeGroupUpdatePanic(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler.DataStore = store
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPut, "/edge_groups/1", strings.NewReader("{}"))
+
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusNotFound, rr.Result().StatusCode)
+}

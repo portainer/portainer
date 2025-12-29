@@ -28,15 +28,21 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 		return httperror.BadRequest("Invalid Edge group identifier route variable", err)
 	}
 
-	var edgeGroup *portainer.EdgeGroup
+	var shadowEdgeGroup shadowedEdgeGroup
 	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-		edgeGroup, err = getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
-		return err
+		edgeGroup, err := getEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
+		if err != nil {
+			return err
+		}
+
+		edgeGroup.Endpoints = edgeGroup.EndpointIDs.ToSlice()
+
+		shadowEdgeGroup = shadowedEdgeGroup{EdgeGroup: *edgeGroup}
+
+		return nil
 	})
 
-	edgeGroup.Endpoints = edgeGroup.EndpointIDs.ToSlice()
-
-	return txResponse(w, shadowedEdgeGroup{EdgeGroup: *edgeGroup}, err)
+	return txResponse(w, shadowEdgeGroup, err)
 }
 
 func getEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error) {

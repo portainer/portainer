@@ -60,3 +60,22 @@ func TestEdgeGroupCreateHandler(t *testing.T) {
 
 	require.ElementsMatch(t, []portainer.EndpointID{1, 2, 3}, responseGroup.Endpoints)
 }
+
+func TestEdgeGroupCreatePanic(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler.DataStore = store
+
+	err := store.EdgeGroup().Create(&portainer.EdgeGroup{ID: 1, Name: "New Edge Group"})
+	require.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost,
+		"/edge_groups",
+		strings.NewReader(`{"Name": "New Edge Group", "Endpoints": [1, 2, 3]}`),
+	)
+
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusBadRequest, rr.Result().StatusCode)
+}
