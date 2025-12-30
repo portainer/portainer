@@ -22,5 +22,5 @@ export type FilesTableMeta = TableMeta<FileData> & {
 export function isFilesTableMeta(
   meta?: TableMeta<FileData>
 ): meta is FilesTableMeta {
-  return !!meta && meta.table === 'files';
+  return !!meta && 'table' in meta && meta.table === 'files';
 }

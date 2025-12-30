@@ -23,15 +23,17 @@
     "format": "prettier --log-level warn --write \"**/*.{js,css,html,jsx,tsx,ts}\"",
     "lint": "eslint --cache --fix './**/*.{js,jsx,ts,tsx}'",
     "test": "vitest run",
-    "sb": "yarn storybook",
+    "sb": "pnpm run storybook",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build -o ./dist/storybook",
     "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js",
-    "prepare": "cd ../.. && husky install package/server-ce/.husky"
+    "prepare": "cd ../.. && husky install package/server-ce/.husky",
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">= 16"
   },
+  "packageManager": "pnpm@10.26.2",
   "dependencies": {
     "@aws-crypto/sha256-js": "^2.0.0",
     "@codemirror/autocomplete": "^6.4.0",
@@ -79,7 +81,7 @@
     "angulartics": "^1.6.0",
     "axios": "^1.7",
     "axios-cache-interceptor": "^1.4.1",
-    "axios-progress-bar": "portainer/progress-bar-4-axios",
+    "axios-progress-bar": "git://github.com/portainer/progress-bar-4-axios",
     "babel-plugin-angularjs-annotate": "^0.10.0",
     "bootstrap": "^3.4.0",
     "buffer": "^6.0.3",
@@ -107,6 +109,7 @@
     "jsdom": "^24",
     "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
+    "lodash-es": "npm:lodash@4.17.21",
     "lucide-react": "^0.468.0",
     "markdown-to-jsx": "^7.7.4",
     "moment": "^2.29.1",
@@ -158,10 +161,14 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/angular": "^1.8.3",
     "@types/file-saver": "^2.0.4",
+    "@types/filesize": "^5.0.2",
     "@types/filesize-parser": "^1.5.1",
     "@types/jquery": "^3.5.10",
+    "@types/json-schema": "^7.0.15",
+    "@types/lodash": "^4.17.21",
     "@types/mustache": "^4.1.2",
     "@types/nprogress": "^0.2.0",
+    "@types/qs": "^6.9.17",
     "@types/react": "^17.0.37",
     "@types/react-datetime-picker": "^3.4.1",
     "@types/react-dom": "^17.0.11",
@@ -207,7 +214,6 @@
     "msw": "^2.0.11",
     "msw-storybook-addon": "2.0.0--canary.122.b3ed3b1.0",
     "ngtemplate-loader": "^2.1.0",
-    "plop": "^4.0.0",
     "postcss": "^8.4.33",
     "postcss-loader": "^7.3.3",
     "prettier": "^3.0.3",
@@ -234,21 +240,27 @@
     "webpack-dev-server": "^4.15.1",
     "webpack-merge": "^5.9.0"
   },
-  "resolutions": {
-    "**/jquery": "^3.6.0",
-    "decompress": "^4.2.1",
-    "**/lodash": "^4.17.21",
-    "js-yaml": "^3.14.0",
-    "minimist": "^1.2.6",
-    "http-proxy": "^1.18.1",
-    "**/@uirouter/react": "^1.0.7",
-    "**/@uirouter/angularjs": "1.0.11",
-    "**/moment": "^2.21.0",
-    "msw/**/wrap-ansi": "^7.0.0"
+  "pnpm": {
+    "overrides": {
+      "jquery": "^3.6.0",
+      "decompress": "^4.2.1",
+      "lodash": "^4.17.21",
+      "js-yaml": "^3.14.0",
+      "minimist": "^1.2.6",
+      "http-proxy": "^1.18.1",
+      "@uirouter/react": "^1.0.7",
+      "@uirouter/angularjs": "1.0.11",
+      "moment": "^2.21.0",
+      "msw>wrap-ansi": "^7.0.0",
+      "@types/react": "^17.0.37",
+      "@types/react-dom": "^17.0.11"
+    },
+    "configDependencies": {
+      "@pnpm/plugin-types-fixer": "0.1.0+sha512-bLww63gRHi7siYTqFJb5qNdcXadU0jv20Et6z5AryMZ7FlLolbEJOrXLpg8+amQZNHHNW1dfFUBGVw/9ezQbFg=="
+    }
   },
   "browserslist": "last 2 versions",
   "msw": {
     "workerDirectory": ".storybook/public"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

@@ -11,5 +11,5 @@ export type ContainerNetworkTableMeta = TableMeta<TableNetwork> & {
 export function isContainerNetworkTableMeta(
   meta?: TableMeta<TableNetwork>
 ): meta is ContainerNetworkTableMeta {
-  return !!meta && meta.table === 'container-networks';
+  return !!meta && 'table' in meta && meta.table === 'container-networks';
 }

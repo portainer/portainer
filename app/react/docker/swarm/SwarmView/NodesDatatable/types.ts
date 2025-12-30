@@ -10,5 +10,5 @@ export type TableMeta = BaseTableMeta<NodeViewModel> & {
 export function isTableMeta(
   meta?: BaseTableMeta<NodeViewModel>
 ): meta is TableMeta {
-  return !!meta && meta.table === 'nodes';
+  return !!meta && 'table' in meta && meta.table === 'nodes';
 }

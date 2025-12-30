@@ -8,7 +8,7 @@ interface TableMeta {
 }
 
 function isTableMeta(meta: BaseTableMeta<VolumeViewModel>): meta is TableMeta {
-  return meta.table === 'volumes';
+  return !!meta && 'table' in meta && meta.table === 'volumes';
 }
 
 export function getTableMeta(meta?: BaseTableMeta<VolumeViewModel>): TableMeta {

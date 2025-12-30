@@ -1,4 +1,4 @@
-import { Cell, flexRender } from '@tanstack/react-table';
+import { Cell, ColumnMeta, flexRender } from '@tanstack/react-table';
 import clsx from 'clsx';
 
 import { DefaultType } from './types';
@@ -20,10 +20,18 @@ export function TableRow<D extends DefaultType = DefaultType>({
       onClick={onClick}
     >
       {cells.map((cell) => (
-        <td key={cell.id} className={cell.column.columnDef.meta?.className}>
+        <td key={cell.id} className={getClassName(cell.column.columnDef.meta)}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}
     </tr>
   );
+}
+
+function getClassName<D extends DefaultType = DefaultType>(
+  meta: ColumnMeta<D, unknown> | undefined
+) {
+  return !!meta && 'className' in meta && typeof meta.className === 'string'
+    ? meta.className
+    : '';
 }

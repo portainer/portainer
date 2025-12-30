@@ -630,7 +630,7 @@ func main() {
 			Str("build_number", build.BuildNumber).
 			Str("image_tag", build.ImageTag).
 			Str("nodejs_version", build.NodejsVersion).
-			Str("yarn_version", build.YarnVersion).
+			Str("pnpm_version", build.PnpmVersion).
 			Str("webpack_version", build.WebpackVersion).
 			Str("go_version", build.GoVersion).
 			Msg("starting Portainer")

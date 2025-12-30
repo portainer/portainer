@@ -126,7 +126,7 @@ function BuildInfoModal({ closeModal }: { closeModal: () => void }) {
             <span className="text-muted small">
               Nodejs {Build.NodejsVersion}
             </span>
-            <span className="text-muted small">Yarn v{Build.YarnVersion}</span>
+            <span className="text-muted small">pnpm v{Build.PnpmVersion}</span>
             <span className="text-muted small">
               Webpack v{Build.WebpackVersion}
             </span>

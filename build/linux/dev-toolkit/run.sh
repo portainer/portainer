@@ -48,8 +48,8 @@ display_configuration() {
   /usr/local/go/bin/go version
   info "Node version"
   node -v
-  info "Yarn version"
-  yarn -v
+  info "Pnpm version"
+  pnpm -v
   info "Docker version"
   docker version
 }

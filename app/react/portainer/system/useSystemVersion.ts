@@ -19,7 +19,7 @@ export interface VersionResponse {
     BuildNumber: string;
     ImageTag: string;
     NodejsVersion: string;
-    YarnVersion: string;
+    PnpmVersion: string;
     WebpackVersion: string;
     GoVersion: string;
     GitCommit: string;

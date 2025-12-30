@@ -29,4 +29,4 @@ multiarch:
 	docker buildx create --name=buildx-multi-arch --driver=docker-container --driver-opt=network=host
 
 portainer:
-	yarn build
+	pnpm run build

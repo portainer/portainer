@@ -26,7 +26,7 @@ all: tidy deps build-server build-client ## Build the client, server and downloa
 build-all: all ## Alias for the 'all' target (used by CI)
 
 build-client: init-dist ## Build the client
-	export NODE_ENV=$(ENV) && yarn build --config $(WEBPACK_CONFIG)
+	export NODE_ENV=$(ENV) && pnpm run build --config $(WEBPACK_CONFIG)
 
 build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
@@ -35,7 +35,7 @@ build-image: build-all ## Build the Portainer image locally
 	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
 
 build-storybook: ## Build and serve the storybook files
-	yarn storybook:build
+	pnpm run storybook:build
 
 devops: clean deps build-client ## Build the everything target specifically for CI
 	echo "Building the devops binary..."
@@ -49,7 +49,7 @@ server-deps: init-dist ## Download dependant server binaries
 	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
 client-deps: ## Install client dependencies
-	yarn
+	pnpm install
 
 tidy: ## Tidy up the go.mod file
 	@go mod tidy
@@ -67,7 +67,7 @@ clean: ## Remove all build and download artifacts
 test: test-server test-client ## Run all tests
 
 test-client: ## Run client tests
-	yarn test $(ARGS) --coverage
+	pnpm run test $(ARGS) --coverage
 
 test-server:	## Run server tests
 	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover -covermode=atomic -coverprofile=coverage.out ./...
@@ -79,7 +79,7 @@ dev: ## Run both the client and server in development mode
 	make dev-client
 
 dev-client: ## Run the client in development mode
-	yarn dev
+	pnpm run dev
 
 dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh
@@ -93,7 +93,7 @@ dev-server-podman: build-server ## Run the server in development mode
 format: format-client format-server ## Format all code
 
 format-client: ## Format client code
-	yarn format
+	pnpm run format
 
 format-server: ## Format server code
 	go fmt ./...
@@ -103,7 +103,7 @@ format-server: ## Format server code
 lint: lint-client lint-server ## Lint all code
 
 lint-client: ## Lint client code
-	yarn lint
+	pnpm run lint
 
 lint-server: tidy ## Lint server code
 	golangci-lint run --timeout=10m -c .golangci.yaml
@@ -122,8 +122,8 @@ docs-build: init-dist ## Build docs
 	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs
-	yarn swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
-	yarn swagger-cli validate dist/docs/openapi.yaml
+	pnpm swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
+	pnpm swagger-cli validate dist/docs/openapi.yaml
 
 ##@ Helpers
 .PHONY: help

@@ -112,7 +112,7 @@ export function subscribe(listener: Listener) {
 }
 
 export function unsubscribe(listener: Listener) {
-  _.remove<Listener>(store.listeners, listener);
+  _.remove(store.listeners, listener);
 }
 
 function buildUrl(action = '') {

@@ -40,10 +40,8 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
 	&& apt-get install -y nodejs
 
-# Install Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-	&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-	&& apt-get update && apt-get -y install yarn
+# Install Package manager
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
 
 # Install Golang
 RUN cd /tmp \
