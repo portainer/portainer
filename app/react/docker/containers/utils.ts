@@ -43,10 +43,14 @@ export function toListViewModel(
     )
   );
 
-  const names = response.Names?.map((n) => {
+  let names = response.Names?.map((n) => {
     const nameWithoutSlash = n[0] === '/' ? n.slice(1) : n;
     return nameWithoutSlash;
   });
+
+  if (!names || names.length === 0) {
+    names = ['<empty_name>'];
+  }
 
   return {
     ...response,
