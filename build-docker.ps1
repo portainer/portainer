@@ -44,7 +44,7 @@ Write-Host "[3/6] Building client (webpack)..." -ForegroundColor Yellow
 Push-Location $ProjectRoot
 try {
     $env:NODE_ENV = "production"
-    pnpm run build --config webpack/webpack.production.js
+    pnpm exec webpack --config webpack/webpack.production.js
     if ($LASTEXITCODE -ne 0) {
         throw "Client build failed"
     }
