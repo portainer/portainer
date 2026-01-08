@@ -68,16 +68,49 @@ Write-Host "  Client built successfully" -ForegroundColor Green
 
 # 5. Download dependencies (docker binary, etc.)
 Write-Host "[5/7] Downloading binary dependencies..." -ForegroundColor Yellow
-# Check if docker binary exists, if not download
-if (-not (Test-Path "$ProjectRoot\dist\docker")) {
-    Write-Host "  Downloading docker binaries (this may take a while)..." -ForegroundColor Yellow
-    # Use WSL or skip if not available
-    if (Get-Command wsl -ErrorAction SilentlyContinue) {
-        wsl bash -c "cd '$($ProjectRoot -replace '\\','/' -replace 'C:','/mnt/c')' && ./build/download_binaries.sh linux amd64"
-    } else {
-        Write-Host "  WARNING: WSL not available, skipping binary download" -ForegroundColor Red
-        Write-Host "  You may need to manually download docker binaries to dist/docker" -ForegroundColor Red
+
+# Read docker version from binary-version.json
+$binaryVersionFile = "$ProjectRoot\binary-version.json"
+$dockerVersion = (Get-Content $binaryVersionFile | ConvertFrom-Json).docker
+# Remove 'v' prefix if present
+$dockerVersion = $dockerVersion -replace '^v', ''
+
+$downloadFolder = "$ProjectRoot\.tmp\download"
+$dockerBinaryPath = "$ProjectRoot\dist\docker"
+
+if (-not (Test-Path $dockerBinaryPath)) {
+    Write-Host "  Downloading docker binary (v$dockerVersion)..." -ForegroundColor Yellow
+    
+    # Create download folder
+    if (Test-Path $downloadFolder) {
+        Remove-Item -Recurse -Force $downloadFolder
     }
+    New-Item -ItemType Directory -Path $downloadFolder -Force | Out-Null
+    
+    # Map architecture
+    $downloadArch = switch ($Arch) {
+        "amd64" { "x86_64" }
+        "arm64" { "aarch64" }
+        "arm" { "armhf" }
+        default { $Arch }
+    }
+    
+    # Download docker binary for Linux
+    $dockerUrl = "https://download.docker.com/linux/static/stable/$downloadArch/docker-$dockerVersion.tgz"
+    $dockerTgz = "$downloadFolder\docker-binaries.tgz"
+    
+    Write-Host "  URL: $dockerUrl" -ForegroundColor Gray
+    Invoke-WebRequest -Uri $dockerUrl -OutFile $dockerTgz -UseBasicParsing
+    
+    # Extract using tar (available in Windows 10+)
+    tar -xf $dockerTgz -C $downloadFolder
+    
+    # Move docker binary to dist
+    Move-Item "$downloadFolder\docker\docker" "$ProjectRoot\dist\docker"
+    
+    Write-Host "  Docker binary downloaded" -ForegroundColor Green
+} else {
+    Write-Host "  Docker binary already exists, skipping download" -ForegroundColor Green
 }
 
 # 6. Copy mustache templates
