@@ -57,7 +57,7 @@ export function StackEditorTab({
     environmentVariables: stack.Env,
     prune: !!(stack.Option && stack.Option.Prune),
     stackFileContent: originalFileContent,
-    webhookId: stack.Webhook,
+    webhookId: stack.AutoUpdate?.Webhook || stack.Webhook,
   };
 
   return (

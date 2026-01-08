@@ -93,7 +93,7 @@ export class StackViewModel implements IResource {
     this.FromAppTemplate = stack.FromAppTemplate;
     this.AdditionalFiles = stack.AdditionalFiles || undefined;
     this.AutoUpdate = stack.AutoUpdate || undefined;
-    this.Webhook = stack.Webhook;
+    this.Webhook = stack.AutoUpdate?.Webhook || stack.Webhook;
     this.StackFileVersion = stack.StackFileVersion;
     this.PreviousDeploymentInfo = stack.PreviousDeploymentInfo;
 
