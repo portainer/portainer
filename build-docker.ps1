@@ -39,8 +39,21 @@ try {
 }
 Write-Host "  Binary built successfully" -ForegroundColor Green
 
-# 3. Build client (frontend)
-Write-Host "[3/6] Building client (webpack)..." -ForegroundColor Yellow
+# 3. Install client dependencies
+Write-Host "[3/7] Installing client dependencies (pnpm install)..." -ForegroundColor Yellow
+Push-Location $ProjectRoot
+try {
+    pnpm install
+    if ($LASTEXITCODE -ne 0) {
+        throw "pnpm install failed"
+    }
+} finally {
+    Pop-Location
+}
+Write-Host "  Dependencies installed" -ForegroundColor Green
+
+# 4. Build client (frontend)
+Write-Host "[4/7] Building client (webpack)..." -ForegroundColor Yellow
 Push-Location $ProjectRoot
 try {
     $env:NODE_ENV = "production"
@@ -53,8 +66,8 @@ try {
 }
 Write-Host "  Client built successfully" -ForegroundColor Green
 
-# 4. Download dependencies (docker binary, etc.)
-Write-Host "[4/6] Downloading binary dependencies..." -ForegroundColor Yellow
+# 5. Download dependencies (docker binary, etc.)
+Write-Host "[5/7] Downloading binary dependencies..." -ForegroundColor Yellow
 # Check if docker binary exists, if not download
 if (-not (Test-Path "$ProjectRoot\dist\docker")) {
     Write-Host "  Downloading docker binaries (this may take a while)..." -ForegroundColor Yellow
@@ -67,8 +80,8 @@ if (-not (Test-Path "$ProjectRoot\dist\docker")) {
     }
 }
 
-# 5. Copy mustache templates
-Write-Host "[5/6] Copying mustache templates..." -ForegroundColor Yellow
+# 6. Copy mustache templates
+Write-Host "[6/7] Copying mustache templates..." -ForegroundColor Yellow
 if (Test-Path "$ProjectRoot\mustache-templates") {
     if (Test-Path "$ProjectRoot\dist\mustache-templates") {
         Remove-Item -Recurse -Force "$ProjectRoot\dist\mustache-templates"
@@ -76,8 +89,8 @@ if (Test-Path "$ProjectRoot\mustache-templates") {
     Copy-Item -Recurse "$ProjectRoot\mustache-templates" "$ProjectRoot\dist\mustache-templates"
 }
 
-# 6. Build Docker image
-Write-Host "[6/6] Building Docker image..." -ForegroundColor Yellow
+# 7. Build Docker image
+Write-Host "[7/7] Building Docker image..." -ForegroundColor Yellow
 Push-Location $ProjectRoot
 try {
     docker buildx build --load -t $Tag -f build/linux/Dockerfile .
