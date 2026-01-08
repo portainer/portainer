@@ -7,7 +7,7 @@ import { PageHeader } from '@@/PageHeader';
 
 import { useSettings } from '../queries';
 import { Settings } from '../types';
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 import { ApplicationSettingsPanel } from './ApplicationSettingsPanel';
 import { BackupSettingsPanel } from './BackupSettingsView';
@@ -50,7 +50,7 @@ export function SettingsView() {
 
         <SSLSettingsPanelWrapper />
 
-        {isBE && <ExperimentalFeatures />}
+        {(isBE || isSrvFix) && <ExperimentalFeatures />}
 
         <HiddenContainersPanel />
 

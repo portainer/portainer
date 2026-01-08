@@ -1,7 +1,7 @@
 import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import clsx from 'clsx';
 
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Link } from '@@/Link';
 
@@ -43,7 +43,7 @@ export function Header({ logo: customLogo }: Props) {
           >
             <span className="font-medium">Powered by</span>
             <span className="font-semibold">
-              {isBE ? (
+              {isBE || isSrvFix ? (
                 'portainer business'
               ) : (
                 <a
@@ -89,10 +89,10 @@ function getLogo(isOpen: boolean, customLogo?: string) {
   }
 
   if (!isOpen) {
-    return isBE ? smallLogoBE : smallLogoCE;
+    return isBE || isSrvFix ? smallLogoBE : smallLogoCE;
   }
 
-  return isBE ? fullLogoBE : fullLogoCE;
+  return isBE || isSrvFix ? fullLogoBE : fullLogoCE;
 }
 
 function Logo({

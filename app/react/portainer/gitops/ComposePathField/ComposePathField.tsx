@@ -5,7 +5,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { Input } from '@@/form-components/Input';
 
 import { GitFormModel } from '../types';
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 import { PathSelector } from './PathSelector';
 
@@ -70,7 +70,7 @@ export function ComposePathField({
           required
           errors={errors}
         >
-          {isBE ? (
+          {isBE || isSrvFix ? (
             <PathSelector
               value={value}
               onChange={onChange}

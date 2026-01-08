@@ -8,7 +8,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { TextTip } from '@@/Tip/TextTip';
 
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 import { RefSelector } from './RefSelector';
 import { RefFieldModel } from './types';
@@ -34,7 +34,7 @@ export function RefField({
 }: Props) {
   const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
   const inputId = 'repository-reference-field';
-  return isBE ? (
+  return isBE || isSrvFix ? (
     <Wrapper
       inputId={inputId}
       errors={error}
@@ -109,7 +109,7 @@ function Wrapper({
 export function refFieldValidation(): SchemaOf<string> {
   return string()
     .when({
-      is: isBE,
+      is: isBE || isSrvFix,
       then: string().required('Repository reference name is required'),
     })
     .default('');

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
@@ -110,7 +110,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
             data-cy="portainerSidebar-registries"
           />
 
-          {isBE && (
+          {(isBE || isSrvFix) && (
             <SidebarItem
               to="portainer.licenses"
               label="Licenses"
@@ -144,7 +144,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
           </SidebarParent>
         </>
       )}
-      {isBE && !isPureAdmin && isAdmin && (
+      {(isBE || isSrvFix) && !isPureAdmin && isAdmin && (
         <SidebarParent
           label="Environment-related"
           icon={HardDrive}
@@ -189,7 +189,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
               data-cy="portainerSidebar-authentication"
             />
           )}
-          {isBE && (
+          {(isBE || isSrvFix) && (
             <SidebarItem
               to="portainer.settings.sharedcredentials"
               label="Shared Credentials"
@@ -228,7 +228,7 @@ export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
 function EdgeUpdatesSidebarItem() {
   const settingsQuery = usePublicSettings();
 
-  if (!isBE || !settingsQuery.data?.EnableEdgeComputeFeatures) {
+  if ((!isBE && !isSrvFix) || !settingsQuery.data?.EnableEdgeComputeFeatures) {
     return null;
   }
 

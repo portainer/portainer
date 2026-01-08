@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
+	dockercontainer "github.com/docker/docker/api/types/container"
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 )
@@ -55,6 +56,8 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	switch webhookType {
 	case portainer.ServiceWebhook:
 		return handler.executeServiceWebhook(w, endpoint, resourceID, registryID, imageTag)
+	case portainer.ContainerWebhook:
+		return handler.executeContainerWebhook(w, endpoint, resourceID, registryID, imageTag)
 	default:
 		return httperror.InternalServerError("Unsupported webhook type", errors.New("Webhooks for this resource are not currently supported"))
 	}
@@ -121,6 +124,65 @@ func (handler *Handler) executeServiceWebhook(
 
 	if _, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions); err != nil {
 		return httperror.InternalServerError("Error updating service", err)
+	}
+
+	return response.Empty(w)
+}
+
+func (handler *Handler) executeContainerWebhook(
+	w http.ResponseWriter,
+	endpoint *portainer.Endpoint,
+	resourceID string,
+	registryID portainer.RegistryID,
+	imageTag string,
+) *httperror.HandlerError {
+	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "", nil)
+	if err != nil {
+		return httperror.InternalServerError("Error creating docker client", err)
+	}
+	defer dockerClient.Close()
+
+	container, err := dockerClient.ContainerInspect(context.Background(), resourceID)
+	if err != nil {
+		return httperror.InternalServerError("Error looking up container", err)
+	}
+
+	// Pull new image if registry is specified
+	if registryID != 0 {
+		imageName := container.Config.Image
+		if imageTag != "" {
+			tagIndex := strings.LastIndex(imageName, ":")
+			if tagIndex == -1 {
+				tagIndex = len(imageName)
+			}
+			imageName = imageName[:tagIndex] + ":" + imageTag
+		}
+
+		registry, err := handler.DataStore.Registry().Read(registryID)
+		if err != nil {
+			return httperror.InternalServerError("Error getting registry", err)
+		}
+
+		pullOptions := image.PullOptions{}
+		if registry.Authentication {
+			registryutils.EnsureRegTokenValid(handler.DataStore, registry)
+			pullOptions.RegistryAuth, err = registryutils.GetRegistryAuthHeader(registry)
+			if err != nil {
+				return httperror.InternalServerError("Error getting registry auth header", err)
+			}
+		}
+
+		rc, err := dockerClient.ImagePull(context.Background(), imageName, pullOptions)
+		if err != nil {
+			return httperror.InternalServerError("Error pulling image", err)
+		}
+		defer rc.Close()
+	}
+
+	// Restart the container
+	timeout := 10
+	if err := dockerClient.ContainerRestart(context.Background(), container.ID, dockercontainer.StopOptions{Timeout: &timeout}); err != nil {
+		return httperror.InternalServerError("Error restarting container", err)
 	}
 
 	return response.Empty(w)

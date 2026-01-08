@@ -15,7 +15,7 @@ import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
 import { useCachedValidation } from '@@/form-components/useCachedTest';
 
-import { isBE } from '../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../feature-flags/feature-flags.service';
 
 import { GitFormModel } from './types';
 import { getAuthentication } from './utils';
@@ -55,7 +55,7 @@ export function GitFormUrlField({
         setForce(false);
       },
       // disabled check on CE since it's not supported
-      enabled: isBE,
+      enabled: isBE || isSrvFix,
     }
   );
 

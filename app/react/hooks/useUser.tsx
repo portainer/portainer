@@ -13,7 +13,7 @@ import { User } from '@/portainer/users/types';
 import { useLoadCurrentUser } from '@/portainer/users/queries/useLoadCurrentUser';
 
 import { useEnvironment } from '../portainer/environments/queries';
-import { isBE } from '../portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../portainer/feature-flags/feature-flags.service';
 
 interface State {
   user?: User;
@@ -120,7 +120,7 @@ export function useAuthorizations(
     return { authorized: true, isLoading: false };
   }
 
-  if (!isBE && adminOnlyCE) {
+  if (!isBE && !isSrvFix && adminOnlyCE) {
     return { authorized: false, isLoading: false };
   }
 
@@ -154,7 +154,7 @@ export function hasAuthorizations(
   authorizations: string | string[],
   environmentId?: EnvironmentId
 ) {
-  if (!isBE) {
+  if (!isBE && !isSrvFix) {
     return true;
   }
 

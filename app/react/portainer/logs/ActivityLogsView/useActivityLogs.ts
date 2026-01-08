@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 import { ActivityLogResponse, ActivityLogsResponse } from './types';
 
@@ -39,7 +39,7 @@ export function useActivityLogs(query: Query) {
 
 async function fetchActivityLogs(query: Query): Promise<ActivityLogsResponse> {
   try {
-    if (!isBE) {
+    if (!isBE && !isSrvFix) {
       return {
         logs: [{}, {}, {}, {}, {}] as Array<ActivityLogResponse>,
         totalCount: 5,

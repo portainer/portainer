@@ -1,7 +1,7 @@
 import { useField } from 'formik';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { SwitchField } from '@@/form-components/SwitchField';
@@ -31,7 +31,7 @@ export function KubeNoteMinimumCharacters() {
             featureId={FeatureId.K8S_REQUIRE_NOTE_ON_APPLICATIONS}
             labelClass="col-sm-3 col-lg-2"
             tooltip={`${
-              isBE ? '' : 'BE allows entry of notes in Add/Edit application. '
+              isBE || isSrvFix ? '' : 'BE allows entry of notes in Add/Edit application. '
             }Using this will enforce entry of a note in Add/Edit application (and prevent complete clearing of it in Application details).`}
           />
         </div>

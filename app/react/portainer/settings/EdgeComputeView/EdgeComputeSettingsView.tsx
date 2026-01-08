@@ -1,6 +1,6 @@
 import { Settings } from '@/react/portainer/settings/types';
 
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 import { EdgeComputeSettings } from './EdgeComputeSettings';
 import { DeploymentSyncOptions } from './DeploymentSyncOptions/DeploymentSyncOptions';
@@ -18,7 +18,7 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
 
       <DeploymentSyncOptions />
 
-      {isBE && <AutomaticEdgeEnvCreation />}
+      {(isBE || isSrvFix) && <AutomaticEdgeEnvCreation />}
     </div>
   );
 }

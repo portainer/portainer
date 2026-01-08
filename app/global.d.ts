@@ -84,6 +84,7 @@ declare module 'process' {
     namespace NodeJS {
       interface ProcessEnv {
         PORTAINER_EDITION: 'BE' | 'CE';
+        SRV_FIX?: 'true' | 'false';
       }
     }
   }

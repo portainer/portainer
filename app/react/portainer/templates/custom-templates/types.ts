@@ -11,7 +11,7 @@ import { VariableDefinition } from '../../custom-templates/components/CustomTemp
 import { Platform } from '../types';
 import { RegistryId } from '../../registries/types/registry';
 import { getDefaultRelativePathModel } from '../../gitops/RelativePathFieldset/types';
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 
 export type CustomTemplate = {
   Id: number;
@@ -126,7 +126,7 @@ export const CustomTemplateKubernetesType = StackType.Kubernetes;
 export function getDefaultEdgeTemplateSettings():
   | EdgeTemplateSettings
   | undefined {
-  if (!isBE) {
+  if (!isBE && !isSrvFix) {
     return undefined;
   }
 

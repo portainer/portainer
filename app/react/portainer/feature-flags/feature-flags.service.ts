@@ -1,6 +1,8 @@
 import { Edition, FeatureId, FeatureState } from './enums';
 
 export const isBE = process.env.PORTAINER_EDITION === 'BE';
+export const isSrvFix = process.env.SRV_FIX === 'true' || true;
+
 interface ServiceState {
   currentEdition: Edition;
   features: Record<FeatureId, Edition>;
@@ -74,5 +76,8 @@ export function selectShow(featureId?: FeatureId) {
 }
 
 export function isLimitedToBE(featureId?: FeatureId) {
+  if (isSrvFix) {
+    return false;
+  }
   return selectShow(featureId) === FeatureState.LIMITED_BE;
 }

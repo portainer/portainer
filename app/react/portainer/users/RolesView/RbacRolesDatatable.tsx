@@ -9,7 +9,7 @@ import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
-import { isBE } from '../../feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '../../feature-flags/feature-flags.service';
 import { FeatureId } from '../../feature-flags/enums';
 
 import { RbacRole } from './types';
@@ -52,6 +52,7 @@ function getColumns() {
       header: 'Description',
     }),
     !isBE &&
+      !isSrvFix &&
       columnHelper.display({
         id: 'be-indicator',
         cell: ({ row: { original: item } }) =>

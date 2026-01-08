@@ -26,6 +26,8 @@ type updateComposeStackPayload struct {
 	Env []portainer.Pair
 	// RepullImageAndRedeploy indicates whether to force repulling images and redeploying the stack
 	RepullImageAndRedeploy bool
+	// Webhook ID for stack update callbacks
+	Webhook string `example:"550e8400-e29b-41d4-a716-446655440000"`
 
 	// Deprecated(2.36): use RepullImageAndRedeploy instead for cleaner responsibility
 	// Force a pulling to current image with the original tag though the image is already the latest
@@ -49,6 +51,8 @@ type updateSwarmStackPayload struct {
 	Prune bool `example:"true"`
 	// RepullImageAndRedeploy indicates whether to force repulling images and redeploying the stack
 	RepullImageAndRedeploy bool
+	// Webhook ID for stack update callbacks
+	Webhook string `example:"550e8400-e29b-41d4-a716-446655440000"`
 
 	// Deprecated(2.36): use RepullImageAndRedeploy instead for cleaner responsibility
 	// Force a pulling to current image with the original tag though the image is already the latest
@@ -203,7 +207,6 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {
 		stack.FromAppTemplate = true
@@ -216,6 +219,24 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 
 	payload.RepullImageAndRedeploy = payload.RepullImageAndRedeploy || payload.PullImage
 	stack.Env = payload.Env
+
+	// Handle webhook
+	if payload.Webhook != "" {
+		if stack.AutoUpdate == nil || stack.AutoUpdate.Webhook != payload.Webhook {
+			isUnique, err := handler.checkUniqueWebhookID(payload.Webhook)
+			if err != nil {
+				return httperror.InternalServerError("Unable to check for webhook ID collision", err)
+			}
+			if !isUnique {
+				return httperror.Conflict("Webhook ID already exists", stackutils.ErrWebhookIDAlreadyExists)
+			}
+		}
+		stack.AutoUpdate = &portainer.AutoUpdateSettings{
+			Webhook: payload.Webhook,
+		}
+	} else {
+		stack.AutoUpdate = nil
+	}
 
 	if stack.GitConfig != nil {
 		// detach from git
@@ -270,7 +291,6 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {
 		stack.FromAppTemplate = true
@@ -282,6 +302,24 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 	}
 	payload.RepullImageAndRedeploy = payload.RepullImageAndRedeploy || payload.PullImage
 	stack.Env = payload.Env
+
+	// Handle webhook
+	if payload.Webhook != "" {
+		if stack.AutoUpdate == nil || stack.AutoUpdate.Webhook != payload.Webhook {
+			isUnique, err := handler.checkUniqueWebhookID(payload.Webhook)
+			if err != nil {
+				return httperror.InternalServerError("Unable to check for webhook ID collision", err)
+			}
+			if !isUnique {
+				return httperror.Conflict("Webhook ID already exists", stackutils.ErrWebhookIDAlreadyExists)
+			}
+		}
+		stack.AutoUpdate = &portainer.AutoUpdateSettings{
+			Webhook: payload.Webhook,
+		}
+	} else {
+		stack.AutoUpdate = nil
+	}
 
 	if stack.GitConfig != nil {
 		// detach from git

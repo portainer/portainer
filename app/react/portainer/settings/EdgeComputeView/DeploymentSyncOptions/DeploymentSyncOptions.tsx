@@ -5,7 +5,7 @@ import { Laptop } from 'lucide-react';
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
@@ -80,7 +80,7 @@ export function DeploymentSyncOptions() {
                   />
                 </FormSection>
 
-                {isBE && (
+                {(isBE || isSrvFix) && (
                   <FormSection title="Async Check-in Intervals">
                     <EdgeAsyncIntervalsForm
                       values={values.Edge}

@@ -4,7 +4,7 @@ import { Laptop } from 'lucide-react';
 import { Settings } from '@/react/portainer/settings/types';
 import { PortainerUrlField } from '@/react/portainer/common/PortainerUrlField';
 import { PortainerTunnelAddrField } from '@/react/portainer/common/PortainerTunnelAddrField';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -84,7 +84,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   capabilities.
                 </TextTip>
 
-                {isBE && values.EnableEdgeComputeFeatures && (
+                {(isBE || isSrvFix) && values.EnableEdgeComputeFeatures && (
                   <>
                     <PortainerUrlField
                       fieldName="EdgePortainerUrl"

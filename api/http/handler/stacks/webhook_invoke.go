@@ -1,9 +1,12 @@
 package stacks
 
 import (
+	"cmp"
 	"errors"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -38,13 +41,69 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		return httperror.NewError(statusCode, "Unable to find the stack by webhook ID", err)
 	}
 
-	if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-		var StackAuthorMissingErr *deployments.StackAuthorMissingErr
-		if errors.As(err, &StackAuthorMissingErr) {
-			return httperror.Conflict("Autoupdate for the stack isn't available", err)
-		}
+	// For Git-based stacks, use the existing RedeployWhenChanged logic
+	if stack.GitConfig != nil {
+		if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
+			var StackAuthorMissingErr *deployments.StackAuthorMissingErr
+			if errors.As(err, &StackAuthorMissingErr) {
+				return httperror.Conflict("Autoupdate for the stack isn't available", err)
+			}
 
-		return httperror.InternalServerError("Failed to update the stack", err)
+			return httperror.InternalServerError("Failed to update the stack", err)
+		}
+		return response.Empty(w)
+	}
+
+	// For non-Git stacks, redeploy directly
+	return handler.redeployStack(w, stack)
+}
+
+func (handler *Handler) redeployStack(w http.ResponseWriter, stack *portainer.Stack) *httperror.HandlerError {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find the environment associated to the stack", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find the environment associated to the stack", err)
+	}
+
+	// Get the stack author
+	author := cmp.Or(stack.UpdatedBy, stack.CreatedBy)
+	user, err := handler.DataStore.User().UserByUsername(author)
+	if err != nil {
+		return httperror.InternalServerError("Unable to find stack author", err)
+	}
+
+	// Get user memberships for registry filtering
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user memberships", err)
+	}
+
+	securityContext := &security.RestrictedRequestContext{
+		IsAdmin:         user.Role == portainer.AdministratorRole,
+		UserID:          user.ID,
+		UserMemberships: memberships,
+	}
+
+	switch stack.Type {
+	case portainer.DockerSwarmStack:
+		config, err := deployments.CreateSwarmStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, false, true)
+		if err != nil {
+			return httperror.InternalServerError("Failed to create deployment config", err)
+		}
+		if err := config.Deploy(); err != nil {
+			return httperror.InternalServerError("Failed to redeploy stack", err)
+		}
+	case portainer.DockerComposeStack:
+		config, err := deployments.CreateComposeStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, true, true)
+		if err != nil {
+			return httperror.InternalServerError("Failed to create deployment config", err)
+		}
+		if err := config.Deploy(); err != nil {
+			return httperror.InternalServerError("Failed to redeploy stack", err)
+		}
+	default:
+		return httperror.InternalServerError("Unsupported stack type for webhook", errors.New("unsupported stack type"))
 	}
 
 	return response.Empty(w)

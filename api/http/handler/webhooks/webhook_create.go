@@ -29,7 +29,7 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if payload.EndpointID == 0 {
 		return errors.New("Invalid EndpointID")
 	}
-	if payload.WebhookType != portainer.ServiceWebhook {
+	if payload.WebhookType != portainer.ServiceWebhook && payload.WebhookType != portainer.ContainerWebhook {
 		return errors.New("Invalid WebhookType")
 	}
 	return nil

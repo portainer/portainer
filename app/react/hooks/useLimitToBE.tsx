@@ -1,11 +1,11 @@
 import { useRouter } from '@uirouter/react';
 import { ComponentType } from 'react';
 
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { isBE, isSrvFix } from '@/react/portainer/feature-flags/feature-flags.service';
 
 export function useLimitToBE(defaultPath = 'portainer.home') {
   const router = useRouter();
-  if (!isBE) {
+  if (!isBE && !isSrvFix) {
     router.stateService.go(defaultPath);
     return true;
   }
