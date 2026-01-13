@@ -4,12 +4,12 @@ import { GitFormModel, RelativePathModel } from '../types';
 
 export function parseRelativePathResponse(stack: EdgeStack): RelativePathModel {
   return {
-    SupportRelativePath: stack.SupportRelativePath,
-    FilesystemPath: stack.FilesystemPath,
-    SupportPerDeviceConfigs: stack.SupportPerDeviceConfigs,
-    PerDeviceConfigsMatchType: stack.PerDeviceConfigsMatchType,
-    PerDeviceConfigsGroupMatchType: stack.PerDeviceConfigsGroupMatchType,
-    PerDeviceConfigsPath: stack.PerDeviceConfigsPath,
+    SupportRelativePath: stack.SupportRelativePath ?? false,
+    FilesystemPath: stack.FilesystemPath ?? '',
+    SupportPerDeviceConfigs: stack.SupportPerDeviceConfigs ?? false,
+    PerDeviceConfigsMatchType: stack.PerDeviceConfigsMatchType ?? '',
+    PerDeviceConfigsGroupMatchType: stack.PerDeviceConfigsGroupMatchType ?? '',
+    PerDeviceConfigsPath: stack.PerDeviceConfigsPath ?? '',
   };
 }
 
