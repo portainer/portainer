@@ -167,3 +167,21 @@ func DecodeDirEntries(dirEntries []DirEntry) error {
 
 	return nil
 }
+
+// GetDirEntriesByFilenames returns the dir entries that are files and match the provided filenames
+func GetDirEntriesByFilenames(dirEntries []DirEntry, names []string) []DirEntry {
+	var filteredDirEntries []DirEntry
+
+	for _, dirEntry := range dirEntries {
+		if !dirEntry.IsFile {
+			continue
+		}
+		for _, name := range names {
+			if dirEntry.Name == name {
+				filteredDirEntries = append(filteredDirEntries, dirEntry)
+			}
+		}
+	}
+
+	return filteredDirEntries
+}

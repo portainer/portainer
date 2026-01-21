@@ -30,6 +30,20 @@ func MultiFilterDirForPerDevConfigs(dirEntries []DirEntry, configPath string, mu
 	return deduplicate(filteredDirEntries), envFiles
 }
 
+// MultiFilterDirForPerDevConfigsWithDefaults filers the given dirEntries with multiple filter args, returns the merged entries for the given device
+// and always includes the defaultFilenames
+func MultiFilterDirForPerDevConfigsWithDefaults(dirEntries []DirEntry, configPath string, multiFilterArgs MultiFilterArgs, defaultFilenames []string) ([]DirEntry, []string) {
+
+	filteredDirEntries, envFiles := MultiFilterDirForPerDevConfigs(dirEntries, configPath, multiFilterArgs)
+
+	// Add files that should always be included
+	// e.g. entrypoint files
+	defaultDirEntries := GetDirEntriesByFilenames(dirEntries, defaultFilenames)
+	filteredDirEntries = append(filteredDirEntries, defaultDirEntries...)
+
+	return deduplicate(filteredDirEntries), envFiles
+}
+
 func deduplicate(dirEntries []DirEntry) []DirEntry {
 	var deduplicatedDirEntries []DirEntry
 

@@ -49,8 +49,11 @@ func TestMultiFilterDirForPerDevConfigs(t *testing.T) {
 	f(
 		baseDirEntries,
 		"configs",
-		MultiFilterArgs{{"folder1", portainer.PerDevConfigsTypeDir}},
-		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[5], baseDirEntries[6]},
+		MultiFilterArgs{
+			{"file1", portainer.PerDevConfigsTypeFile},
+			{"folder1", portainer.PerDevConfigsTypeDir},
+		},
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3], baseDirEntries[5], baseDirEntries[6]},
 	)
 
 	// Filter file1 and file2
@@ -73,6 +76,106 @@ func TestMultiFilterDirForPerDevConfigs(t *testing.T) {
 			{"folder2", portainer.PerDevConfigsTypeDir},
 		},
 		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[5], baseDirEntries[6], baseDirEntries[7], baseDirEntries[8]},
+	)
+}
+
+func TestMultiFilterDirForPerDevConfigsWithDefaults(t *testing.T) {
+	f := func(dirEntries []DirEntry, configPath string, multiFilterArgs MultiFilterArgs, defaultFilenames []string, wantDirEntries []DirEntry) {
+		t.Helper()
+
+		dirEntries, _ = MultiFilterDirForPerDevConfigsWithDefaults(dirEntries, configPath, multiFilterArgs, defaultFilenames)
+		require.Equal(t, wantDirEntries, dirEntries)
+	}
+
+	baseDirEntries := []DirEntry{
+		{".env", "", true, 420},
+		{"docker-compose.yaml", "", true, 420},
+		{"configs", "", false, 420},
+		{"configs/file1.conf", "", true, 420},
+		{"configs/file2.conf", "", true, 420},
+		{"configs/folder1", "", false, 420},
+		{"configs/folder1/config1", "", true, 420},
+		{"configs/folder2", "", false, 420},
+		{"configs/folder2/config2", "", true, 420},
+		{"configs/docker-compose-2.yaml", "", true, 420},
+		{"configs/folder2/docker-compose-3.yaml", "", true, 420},
+	}
+
+	// Filter file1
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{{"file1", portainer.PerDevConfigsTypeFile}},
+		nil,
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3]},
+	)
+
+	// Filter folder1
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{{"folder1", portainer.PerDevConfigsTypeDir}},
+		nil,
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[5], baseDirEntries[6]},
+	)
+
+	// Filter file1 and folder1
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{
+			{"file1", portainer.PerDevConfigsTypeFile},
+			{"folder1", portainer.PerDevConfigsTypeDir},
+		},
+		nil,
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3], baseDirEntries[5], baseDirEntries[6]},
+	)
+
+	// Filter file1 and file2
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{
+			{"file1", portainer.PerDevConfigsTypeFile},
+			{"file2", portainer.PerDevConfigsTypeFile},
+		},
+		nil,
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3], baseDirEntries[4]},
+	)
+
+	// Filter folder1 and folder2
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{
+			{"folder1", portainer.PerDevConfigsTypeDir},
+			{"folder2", portainer.PerDevConfigsTypeDir},
+		},
+		nil,
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[5], baseDirEntries[6], baseDirEntries[7], baseDirEntries[8], baseDirEntries[10]},
+	)
+
+	// Filter file1 and folder1 and docker-compose-2.yaml
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{
+			{"file1", portainer.PerDevConfigsTypeFile},
+			{"folder1", portainer.PerDevConfigsTypeDir},
+		},
+		[]string{"configs/docker-compose-2.yaml"},
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3], baseDirEntries[5], baseDirEntries[6], baseDirEntries[9]},
+	)
+
+	// Filter file1 and docker-compose-3.yaml
+	f(
+		baseDirEntries,
+		"configs",
+		MultiFilterArgs{
+			{"file1", portainer.PerDevConfigsTypeFile},
+		},
+		[]string{"configs/folder2/docker-compose-3.yaml"},
+		[]DirEntry{baseDirEntries[0], baseDirEntries[1], baseDirEntries[2], baseDirEntries[3], baseDirEntries[10]},
 	)
 }
 
