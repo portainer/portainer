@@ -180,3 +180,59 @@ func Test_Authenticate(t *testing.T) {
 	})
 
 }
+
+func Test_extractBaseMediaType(t *testing.T) {
+	tests := []struct {
+		name        string
+		contentType string
+		expected    string
+	}{
+		{
+			name:        "standard application/json",
+			contentType: "application/json",
+			expected:    "application/json",
+		},
+		{
+			name:        "application/json with charset",
+			contentType: "application/json; charset=utf-8",
+			expected:    "application/json",
+		},
+		{
+			name:        "malformed Cloudflare Content-Type",
+			contentType: "application/json; charset=utf-8, application/json",
+			expected:    "application/json",
+		},
+		{
+			name:        "text/plain",
+			contentType: "text/plain",
+			expected:    "text/plain",
+		},
+		{
+			name:        "application/x-www-form-urlencoded",
+			contentType: "application/x-www-form-urlencoded",
+			expected:    "application/x-www-form-urlencoded",
+		},
+		{
+			name:        "empty content type",
+			contentType: "",
+			expected:    "",
+		},
+		{
+			name:        "content type with leading/trailing spaces",
+			contentType: "  application/json  ",
+			expected:    "application/json",
+		},
+		{
+			name:        "uppercase content type",
+			contentType: "APPLICATION/JSON",
+			expected:    "application/json",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := extractBaseMediaType(tc.contentType)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}

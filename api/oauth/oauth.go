@@ -185,3 +185,20 @@ func buildConfig(config *portainer.OAuthSettings) *oauth2.Config {
 		},
 	}
 }
+
+// extractBaseMediaType extracts the base media type from a Content-Type header
+// when standard mime parsing fails. This handles malformed headers like
+// "application/json; charset=utf-8, application/json" from providers like Cloudflare.
+func extractBaseMediaType(contentType string) string {
+	contentType = strings.TrimSpace(contentType)
+	if contentType == "" {
+		return ""
+	}
+
+	// Extract the part before any semicolon or comma
+	if idx := strings.IndexAny(contentType, ";,"); idx != -1 {
+		contentType = contentType[:idx]
+	}
+
+	return strings.TrimSpace(strings.ToLower(contentType))
+}
