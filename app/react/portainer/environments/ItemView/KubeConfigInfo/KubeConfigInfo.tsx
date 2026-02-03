@@ -14,8 +14,8 @@ import { Link } from '@/react/components/Link';
 import { Icon } from '@/react/components/Icon';
 
 interface Props {
-  environmentId: EnvironmentId;
-  environmentType: EnvironmentType;
+  environmentId?: EnvironmentId;
+  environmentType?: EnvironmentType;
   edgeId?: string;
   status: EnvironmentStatus;
 }
@@ -26,6 +26,10 @@ export function KubeConfigInfo({
   edgeId,
   status,
 }: Props) {
+  if (!environmentType) {
+    return null;
+  }
+
   const isVisible =
     isKubernetesEnvironment(environmentType) &&
     (!isEdgeEnvironment(environmentType) || !!edgeId) &&

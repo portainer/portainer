@@ -6,8 +6,6 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
 import { withFormValidation } from '@/react-tools/withFormValidation';
-import { GroupAssociationTable } from '@/react/portainer/environments/environment-groups/components/GroupAssociationTable';
-import { AssociatedEnvironmentsSelector } from '@/react/portainer/environments/environment-groups/components/AssociatedEnvironmentsSelector';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 import { NamespacePortainerSelect } from '@/react/kubernetes/applications/components/NamespaceSelector/NamespaceSelector';
 
@@ -271,20 +269,7 @@ export const ngModule = angular
     'inlineLoader',
     r2a(InlineLoader, ['children', 'className', 'size'])
   )
-  .component(
-    'groupAssociationTable',
-    r2a(withReactQuery(GroupAssociationTable), [
-      'onClickRow',
-      'query',
-      'title',
-      'data-cy',
-    ])
-  )
-  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []))
-  .component(
-    'associatedEndpointsSelector',
-    r2a(withReactQuery(AssociatedEnvironmentsSelector), ['onChange', 'value'])
-  );
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []));
 
 export const componentsModule = ngModule.name;
 

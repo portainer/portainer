@@ -20,7 +20,9 @@ type endpointGroupUpdatePayload struct {
 	// Environment(Endpoint) group name
 	Name string `example:"my-environment-group"`
 	// Environment(Endpoint) group description
-	Description string `example:"description"`
+	Description *string `example:"description"`
+	// List of environment(endpoint) identifiers that will be part of this group
+	AssociatedEndpoints []portainer.EndpointID `example:"1,3"`
 	// List of tag identifiers associated to the environment(endpoint) group
 	TagIDs             []portainer.TagID `example:"3,4"`
 	UserAccessPolicies portainer.UserAccessPolicies
@@ -80,8 +82,8 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		endpointGroup.Name = payload.Name
 	}
 
-	if payload.Description != "" {
-		endpointGroup.Description = payload.Description
+	if payload.Description != nil {
+		endpointGroup.Description = *payload.Description
 	}
 
 	tagsChanged := false
@@ -161,7 +163,59 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 		return nil, httperror.InternalServerError("Unable to persist environment group changes inside the database", err)
 	}
 
-	if tagsChanged {
+	// Handle associated endpoints updates
+	endpointsChanged := false
+	if payload.AssociatedEndpoints != nil {
+		endpoints, err := tx.Endpoint().Endpoints()
+		if err != nil {
+			return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
+		}
+
+		// Build a set of the new endpoint IDs for quick lookup
+		newEndpointSet := make(map[portainer.EndpointID]bool)
+		for _, id := range payload.AssociatedEndpoints {
+			newEndpointSet[id] = true
+		}
+
+		for i := range endpoints {
+			endpoint := &endpoints[i]
+			wasInGroup := endpoint.GroupID == endpointGroup.ID
+			shouldBeInGroup := newEndpointSet[endpoint.ID]
+
+			if wasInGroup && !shouldBeInGroup {
+				// Remove from group (move to Unassigned)
+				endpoint.GroupID = portainer.EndpointGroupID(1)
+				if err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+					return nil, httperror.InternalServerError("Unable to update environment", err)
+				}
+				if err := handler.updateEndpointRelations(tx, endpoint, nil); err != nil {
+					return nil, httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
+				}
+				endpointsChanged = true
+			} else if !wasInGroup && shouldBeInGroup {
+				// Add to group
+				endpoint.GroupID = endpointGroup.ID
+				if err := tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+					return nil, httperror.InternalServerError("Unable to update environment", err)
+				}
+				if err := handler.updateEndpointRelations(tx, endpoint, endpointGroup); err != nil {
+					return nil, httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
+				}
+				endpointsChanged = true
+			}
+		}
+
+		// Update user authorizations when endpoints are added/removed from the group
+		// since group membership affects access control
+		if endpointsChanged {
+			if err := handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx); err != nil {
+				return nil, httperror.InternalServerError("Unable to update user authorizations", err)
+			}
+		}
+	}
+
+	// Reconcile endpoints in the group if tags changed (but endpoints weren't already reconciled)
+	if tagsChanged && !endpointsChanged {
 		endpoints, err := tx.Endpoint().Endpoints()
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)

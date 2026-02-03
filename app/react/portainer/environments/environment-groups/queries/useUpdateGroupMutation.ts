@@ -1,0 +1,53 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { TagId } from '@/portainer/tags/types';
+import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
+import { environmentQueryKeys } from '@/react/portainer/environments/queries/query-keys';
+
+import { EnvironmentGroupId, EnvironmentId } from '../../types';
+import { EnvironmentGroup } from '../types';
+
+import { buildUrl } from './build-url';
+import { queryKeys } from './query-keys';
+
+interface UpdateGroupPayload {
+  id: EnvironmentGroupId;
+  name: string;
+  description?: string;
+  tagIds?: Array<TagId>;
+  associatedEnvironments?: Array<EnvironmentId>;
+}
+
+export async function updateGroup({
+  id,
+  name,
+  description,
+  tagIds,
+  associatedEnvironments,
+}: UpdateGroupPayload) {
+  try {
+    const { data: group } = await axios.put<EnvironmentGroup>(buildUrl(id), {
+      Name: name,
+      Description: description,
+      TagIDs: tagIds,
+      AssociatedEndpoints: associatedEnvironments,
+    });
+    return group;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Failed to update group');
+  }
+}
+
+export function useUpdateGroupMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateGroup,
+    ...withGlobalError('Failed to update group'),
+    ...withInvalidate(queryClient, [
+      queryKeys.base(),
+      environmentQueryKeys.base(),
+    ]),
+  });
+}
