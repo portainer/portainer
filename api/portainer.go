@@ -549,6 +549,8 @@ type (
 		Status      HelmInstallStatus `json:"status"`
 		Message     string            `json:"message"`
 		Namespace   string            `json:"namespace"`
+		// Unix timestamp
+		LastAttemptTime int64 `json:"lastAttemptTime"`
 	}
 
 	ImageBundle struct {
