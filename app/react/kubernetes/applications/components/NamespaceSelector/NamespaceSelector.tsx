@@ -6,6 +6,18 @@ import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNam
 import { FormControl } from '@@/form-components/FormControl';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
+export function filterNamespaces(
+  namespaces: { IsSystem: boolean; Name: string }[] | undefined
+) {
+  return Object.values(namespaces ?? {})
+    .filter((ns) => !ns.IsSystem)
+    .map((ns) => ({
+      label: ns.Name,
+      value: ns.Name,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
 type Props = {
   onChange: (value: string) => void;
   values: string;
@@ -22,12 +34,7 @@ export function NamespaceSelector({
   const environmentId = useEnvironmentId();
   const { data: namespaces, ...namespacesQuery } =
     useNamespacesQuery(environmentId);
-  const namespaceNames = Object.entries(namespaces ?? {})
-    .filter(([, ns]) => !ns.IsSystem)
-    .map(([, ns]) => ({
-      label: ns.Name,
-      value: ns.Name,
-    }));
+  const namespaceNames = filterNamespaces(namespaces);
 
   return (
     <FormControl

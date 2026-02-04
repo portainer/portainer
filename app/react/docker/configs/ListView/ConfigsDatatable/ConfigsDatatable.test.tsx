@@ -44,6 +44,15 @@ beforeEach(() => {
   );
 });
 
+beforeAll(() => {
+  // set timezone explicitly to avoid daylight savings drift
+  vi.stubEnv('TZ', 'UTC');
+});
+
+afterAll(() => {
+  vi.unstubAllEnvs();
+});
+
 it('should return null when data is loading', () => {
   server.use(
     http.get('/api/endpoints/:environmentId/docker/configs', async () => {
