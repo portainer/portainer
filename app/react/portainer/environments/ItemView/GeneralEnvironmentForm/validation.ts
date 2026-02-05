@@ -27,7 +27,7 @@ export function useGeneralValidation({
         ? string().required('Environment address is required')
         : string().default(''),
     publicUrl: string().default(''),
-    tls: tlsConfigValidation({ optionalCert: true }),
+    tls: tlsConfigValidation({ optionalCert: true }).optional(),
     meta: metadataValidation(),
   });
 }

@@ -5,11 +5,15 @@ import {
 import { UpdateEnvironmentPayload } from '@/react/portainer/environments/queries/useUpdateEnvironmentMutation';
 import { stripProtocol } from '@/react/common/string-utils';
 
+import { isDockerAPIEnvironment } from '../../utils';
+
 import { GeneralEnvironmentFormValues } from './types';
 
 export function buildInitialValues(
   environment: Environment
 ): GeneralEnvironmentFormValues {
+  const isDockerAPI = isDockerAPIEnvironment(environment);
+
   return {
     name: environment.Name,
     environmentUrl: stripProtocol(environment.URL),
@@ -20,13 +24,15 @@ export function buildInitialValues(
       tagIds: environment.TagIds || [],
     },
 
-    tls: {
-      tls: environment.TLSConfig?.TLS || false,
-      skipVerify: environment.TLSConfig?.TLSSkipVerify || false,
-      caCertFile: undefined,
-      certFile: undefined,
-      keyFile: undefined,
-    },
+    tls: isDockerAPI
+      ? {
+          tls: environment.TLSConfig?.TLS || false,
+          skipVerify: environment.TLSConfig?.TLSSkipVerify || false,
+          caCertFile: undefined,
+          certFile: undefined,
+          keyFile: undefined,
+        }
+      : undefined,
   };
 }
 
@@ -42,12 +48,12 @@ export function buildUpdatePayload(
 
     URL: formatURL(values.environmentUrl, environmentType),
 
-    TLS: values.tls.tls,
-    TLSSkipVerify: values.tls.skipVerify,
-    TLSSkipClientVerify: values.tls.skipVerify,
-    TLSCACert: values.tls.caCertFile,
-    TLSCert: values.tls.certFile,
-    TLSKey: values.tls.keyFile,
+    TLS: values.tls?.tls,
+    TLSSkipVerify: values.tls?.skipVerify,
+    TLSSkipClientVerify: values.tls?.skipVerify,
+    TLSCACert: values.tls?.caCertFile,
+    TLSCert: values.tls?.certFile,
+    TLSKey: values.tls?.keyFile,
   };
 }
 

@@ -1,4 +1,4 @@
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikErrors } from 'formik';
 
 import { useUpdateEnvironmentMutation } from '@/react/portainer/environments/queries/useUpdateEnvironmentMutation';
 import { NameField } from '@/react/portainer/environments/common/NameField/NameField';
@@ -8,7 +8,6 @@ import { TLSFieldset } from '@/react/components/TLSFieldset';
 import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
 import {
   isAgentEnvironment,
-  isDockerAPIEnvironment,
   isLocalEnvironment,
 } from '@/react/portainer/environments/utils';
 import {
@@ -19,6 +18,7 @@ import {
 import { FormSection } from '@@/form-components/FormSection';
 import { Widget } from '@@/Widget/Widget';
 import { WidgetBody } from '@@/Widget';
+import { TLSConfig } from '@@/TLSFieldset/types';
 
 import { EnvironmentFormActions } from '../EnvironmentFormActions/EnvironmentFormActions';
 
@@ -33,7 +33,6 @@ interface Props {
 export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
   const updateMutation = useUpdateEnvironmentMutation();
 
-  const isDockerAPI = isDockerAPIEnvironment(environment);
   const isAgent = isAgentEnvironment(environment.Type);
   const isLocal = isLocalEnvironment(environment);
   const hasError = environment.Status === EnvironmentStatus.Error;
@@ -57,7 +56,7 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
           }}
           validateOnMount
         >
-          {(formik) => (
+          {({ values, setFieldValue, errors, isValid, dirty }) => (
             <Form className="form-horizontal">
               <FormSection title="Configuration">
                 <NameField />
@@ -69,16 +68,16 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
                   </>
                 )}
 
-                {!hasError && isDockerAPI && (
+                {!hasError && values.tls && (
                   <TLSFieldset
-                    values={formik.values.tls}
+                    values={values.tls}
                     onChange={(partialValues) => {
-                      formik.setFieldValue('tls', {
-                        ...formik.values.tls,
+                      setFieldValue('tls', {
+                        ...values.tls,
                         ...partialValues,
                       });
                     }}
-                    errors={formik.errors.tls}
+                    errors={errors.tls as FormikErrors<TLSConfig> | undefined}
                   />
                 )}
               </FormSection>
@@ -87,8 +86,8 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
 
               <EnvironmentFormActions
                 isLoading={updateMutation.isLoading}
-                isValid={formik.isValid}
-                isDirty={formik.dirty}
+                isValid={isValid}
+                isDirty={dirty}
               />
             </Form>
           )}

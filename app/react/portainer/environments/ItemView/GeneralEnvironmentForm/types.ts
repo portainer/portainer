@@ -6,7 +6,7 @@ export interface GeneralEnvironmentFormValues {
   environmentUrl: string;
   publicUrl: string;
 
-  tls: TLSConfig;
+  tls?: TLSConfig;
 
   meta: EnvironmentMetadata;
 }
