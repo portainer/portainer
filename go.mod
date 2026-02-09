@@ -1,6 +1,6 @@
 module github.com/portainer/portainer
 
-go 1.25.5
+go 1.25.7
 
 replace github.com/robfig/cron/v3 => github.com/robfig/cron/v3 v3.0.1 // Not actively maintained. Pinned to last known good version. Review needed when upgrading.
 
