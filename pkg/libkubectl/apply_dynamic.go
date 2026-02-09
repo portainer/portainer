@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -160,8 +161,9 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 		return "", fmt.Errorf("failed to marshal object to JSON: %w", err)
 	}
 
-	// Apply using Server-Side Apply
-	// This is more efficient and handles field ownership better than traditional apply
+	// Apply using Server-Side Apply (Patch). If the resource does not exist (404),
+	// fall back to Create so restoration can create Deployments and other resources
+	// that were removed (e.g. by Helm uninstall).
 	patchOptions := metav1.PatchOptions{
 		FieldManager: "portainer",
 		Force:        boolPtr(true),
@@ -175,7 +177,14 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 		patchOptions,
 	)
 	if err != nil {
-		return "", fmt.Errorf("failed to apply %s %s/%s: %w", gvk.Kind, namespace, name, err)
+		if apierrors.IsNotFound(err) {
+			_, createErr := resourceClient.Create(ctx, obj, metav1.CreateOptions{})
+			if createErr != nil {
+				return "", fmt.Errorf("failed to create %s %s/%s: %w", gvk.Kind, namespace, name, createErr)
+			}
+		} else {
+			return "", fmt.Errorf("failed to apply %s %s/%s: %w", gvk.Kind, namespace, name, err)
+		}
 	}
 
 	// Format output message

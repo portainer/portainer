@@ -110,6 +110,11 @@ func (hpm helmMockPackageManager) Uninstall(uninstallOpts options.UninstallOptio
 	return nil
 }
 
+// ForceRemoveRelease removes release history without deleting resources (not thread safe)
+func (hpm helmMockPackageManager) ForceRemoveRelease(uninstallOpts options.UninstallOptions) error {
+	return hpm.Uninstall(uninstallOpts)
+}
+
 // List a helm chart (not thread safe)
 func (hpm helmMockPackageManager) List(listOpts options.ListOptions) ([]release.ReleaseElement, error) {
 	return mockCharts, nil

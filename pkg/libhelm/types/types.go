@@ -14,6 +14,10 @@ type HelmPackageManager interface {
 	List(listOpts options.ListOptions) ([]release.ReleaseElement, error)
 	Upgrade(upgradeOpts options.InstallOptions) (*release.Release, error)
 	Uninstall(uninstallOpts options.UninstallOptions) error
+	// ForceRemoveRelease removes all release history (Helm secrets) without attempting
+	// to delete Kubernetes resources. Use as a last resort when Uninstall fails because
+	// CRDs are missing and Helm can't build kubernetes objects for deletion.
+	ForceRemoveRelease(uninstallOpts options.UninstallOptions) error
 	Get(getOpts options.GetOptions) (*release.Release, error)
 	GetHistory(historyOpts options.HistoryOptions) ([]*release.Release, error)
 	Rollback(rollbackOpts options.RollbackOptions) (*release.Release, error)

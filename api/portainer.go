@@ -586,7 +586,7 @@ type (
 
 	// RestoreSettings contains instructions for restoring environment-level settings
 	RestoreSettings struct {
-		Manifest string `json:"manifest"` // Base64-encoded Kubernetes YAML manifest
+		Manifest string `json:"manifest,omitempty"` // Base64-encoded Kubernetes YAML manifest
 	}
 
 	// RestoreSettingsBundle maps restore type to restoration instructions
