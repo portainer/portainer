@@ -81,7 +81,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.33.6
+// @version 2.33.7
 // @description.markdown api-description.md
 // @termsOfService
 
