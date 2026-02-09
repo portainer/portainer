@@ -56,7 +56,7 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 			return errors.New("sysctl setting disabled for non administrator users")
 		}
 
-		if !securitySettings.AllowSecurityOptForRegularUsers && service.SecurityOpt != nil && len(service.SecurityOpt) > 0 {
+		if !securitySettings.AllowSecurityOptForRegularUsers && len(service.SecurityOpt) > 0 {
 			return errors.New("security-opt setting disabled for non administrator users")
 		}
 

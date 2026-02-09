@@ -89,9 +89,9 @@
         "allowDeviceMappingForRegularUsers": true,
         "allowHostNamespaceForRegularUsers": true,
         "allowPrivilegedModeForRegularUsers": true,
+        "allowSecurityOptForRegularUsers": false,
         "allowStackManagementForRegularUsers": true,
         "allowSysctlSettingForRegularUsers": false,
-        "allowSecurityOptForRegularUsers": false,
         "allowVolumeBrowserForRegularUsers": false,
         "enableHostManagementFeatures": false
       },

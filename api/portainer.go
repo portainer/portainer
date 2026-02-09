@@ -2479,6 +2479,7 @@ func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
 		AllowHostNamespaceForRegularUsers:         false,
 		AllowPrivilegedModeForRegularUsers:        false,
 		AllowSysctlSettingForRegularUsers:         false,
+		AllowSecurityOptForRegularUsers:           false,
 		AllowVolumeBrowserForRegularUsers:         false,
 		EnableHostManagementFeatures:              false,
 

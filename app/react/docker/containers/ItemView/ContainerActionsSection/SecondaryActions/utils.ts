@@ -11,6 +11,7 @@ export function isRegularUserRestricted(
     !securitySettings.allowBindMountsForRegularUsers ||
     !securitySettings.allowDeviceMappingForRegularUsers ||
     !securitySettings.allowSysctlSettingForRegularUsers ||
+    !securitySettings.allowSecurityOptForRegularUsers ||
     !securitySettings.allowHostNamespaceForRegularUsers ||
     !securitySettings.allowPrivilegedModeForRegularUsers
   );

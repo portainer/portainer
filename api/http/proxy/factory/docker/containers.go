@@ -25,6 +25,7 @@ var (
 	ErrPIDHostNamespaceForbidden      = errors.New("forbidden to use pid host namespace")
 	ErrDeviceMappingForbidden         = errors.New("forbidden to use device mapping")
 	ErrSysCtlSettingsForbidden        = errors.New("forbidden to use sysctl settings")
+	ErrSecurityOptSettingsForbidden   = errors.New("forbidden to use security-opt settings")
 	ErrContainerCapabilitiesForbidden = errors.New("forbidden to use container capabilities")
 	ErrBindMountsForbidden            = errors.New("forbidden to use bind mounts")
 )
@@ -170,14 +171,14 @@ func containerHasBlackListedLabel(containerLabels map[string]any, labelBlackList
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged 	bool           `json:"Privileged"`
-			PidMode    	string         `json:"PidMode"`
-			Devices    	[]any          `json:"Devices"`
-			Sysctls    	map[string]any `json:"Sysctls"`
-			SecurityOpt	[]string       `json:"SecurityOpt"`
-			CapAdd     	[]string       `json:"CapAdd"`
-			CapDrop    	[]string       `json:"CapDrop"`
-			Binds      	[]string       `json:"Binds"`
+			Privileged  bool           `json:"Privileged"`
+			PidMode     string         `json:"PidMode"`
+			Devices     []any          `json:"Devices"`
+			Sysctls     map[string]any `json:"Sysctls"`
+			SecurityOpt []string       `json:"SecurityOpt"`
+			CapAdd      []string       `json:"CapAdd"`
+			CapDrop     []string       `json:"CapDrop"`
+			Binds       []string       `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 
@@ -228,7 +229,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !securitySettings.AllowSecurityOptForRegularUsers && len(partialContainer.HostConfig.SecurityOpt) > 0 {
-			return forbiddenResponse, errors.New("forbidden to use security-opt settings")
+			return forbiddenResponse, ErrSecurityOptSettingsForbidden
 		}
 
 		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {

@@ -25,11 +25,12 @@ export function SecurityOptField({
       label="SecurityOpt"
       errors={errors}
       itemBuilder={() => ''}
+      data-cy='docker-container-securityopts'
     />
   );
 }
 
-function Item({ item, onChange, error }: ItemProps<string>) {
+function Item({ item, onChange, error , index}: ItemProps<string>) {
   return (
     <div className="w-full">
       <div className="flex w-full gap-4">
@@ -40,9 +41,13 @@ function Item({ item, onChange, error }: ItemProps<string>) {
           placeholder="e.g. seccomp=unconfined"
           className="w-full"
           size="small"
+          data-cy={`docker-container-securityopt-name_${index}`}
         />
       </div>
-      {error && <FormError>{Object.values(error)[0]}</FormError>}
+      {error && (
+        <FormError>
+          {typeof error === 'string' ? error : Object.values(error)[0]}
+        </FormError>)}
     </div>
   );
 }
