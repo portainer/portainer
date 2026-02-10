@@ -292,7 +292,9 @@ function EndpointController(
           $scope.endpointType = 'remote';
         }
 
-        endpoint.URL = $filter('stripprotocol')(endpoint.URL);
+        if ($scope.state.azureEndpoint || $scope.state.edgeEndpoint) {
+          endpoint.URL = $filter('stripprotocol')(endpoint.URL);
+        }
 
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.state.edgeAssociated = !!endpoint.EdgeID;

@@ -76,9 +76,15 @@ export function isUnassociatedEdgeEnvironment(env: Environment) {
 
 export function isLocalEnvironment(environment: Environment) {
   return (
-    environment.URL.includes('unix://') ||
-    environment.URL.includes('npipe://') ||
+    isLocalDockerEnvironment(environment.URL) ||
     environment.Type === EnvironmentType.KubernetesLocal
+  );
+}
+
+export function isLocalDockerEnvironment(environmentUrl: string) {
+  return (
+    environmentUrl.startsWith('unix://') ||
+    environmentUrl.startsWith('npipe://')
   );
 }
 

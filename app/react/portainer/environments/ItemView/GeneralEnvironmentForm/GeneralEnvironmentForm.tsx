@@ -8,7 +8,7 @@ import { TLSFieldset } from '@/react/components/TLSFieldset';
 import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset';
 import {
   isAgentEnvironment,
-  isLocalEnvironment,
+  isLocalDockerEnvironment,
 } from '@/react/portainer/environments/utils';
 import {
   Environment,
@@ -34,7 +34,7 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
   const updateMutation = useUpdateEnvironmentMutation();
 
   const isAgent = isAgentEnvironment(environment.Type);
-  const isLocal = isLocalEnvironment(environment);
+  const isLocalDocker = isLocalDockerEnvironment(environment.URL);
   const hasError = environment.Status === EnvironmentStatus.Error;
   const validationSchema = useGeneralValidation({
     status: environment.Status,
@@ -48,7 +48,10 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
           initialValues={buildInitialValues(environment)}
           validationSchema={validationSchema}
           onSubmit={(values) => {
-            const payload = buildUpdatePayload(values, environment.Type);
+            const payload = buildUpdatePayload({
+              values,
+              environmentType: environment.Type,
+            });
             updateMutation.mutate(
               { id: environment.Id, payload },
               { onSuccess }
@@ -63,7 +66,10 @@ export function GeneralEnvironmentForm({ environment, onSuccess }: Props) {
 
                 {!hasError && (
                   <>
-                    <EnvironmentUrlField isAgent={isAgent} disabled={isLocal} />
+                    <EnvironmentUrlField
+                      isAgent={isAgent}
+                      disabled={isLocalDocker}
+                    />
                     <PublicUrlField />
                   </>
                 )}

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DefaultBodyType, http, HttpResponse } from 'msw';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, test } from 'vitest';
 
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
@@ -200,6 +200,214 @@ describe('GeneralEnvironmentForm', () => {
 
       expect(screen.getAllByRole('alert').length).toBeGreaterThan(0);
     });
+  });
+
+  describe('URL handling', () => {
+    test.each([
+      {
+        description: 'unix:// socket URL',
+        inputUrl: 'unix:///var/run/docker.sock',
+        expectedDisplay: 'unix:///var/run/docker.sock',
+        environmentType: EnvironmentType.Docker,
+      },
+      {
+        description: 'tcp:// Docker URL',
+        inputUrl: 'tcp://10.0.0.1:2375',
+        expectedDisplay: '10.0.0.1:2375',
+        environmentType: EnvironmentType.Docker,
+      },
+      {
+        description: 'https:// URL',
+        inputUrl: 'https://docker.example.com:2376',
+        expectedDisplay: 'docker.example.com:2376',
+        environmentType: EnvironmentType.Docker,
+      },
+      {
+        description: 'http:// URL',
+        inputUrl: 'http://docker.example.com:2375',
+        expectedDisplay: 'docker.example.com:2375',
+        environmentType: EnvironmentType.Docker,
+      },
+      {
+        description: 'URL without protocol',
+        inputUrl: '192.168.1.100:2375',
+        expectedDisplay: '192.168.1.100:2375',
+        environmentType: EnvironmentType.Docker,
+      },
+      {
+        description: 'Kubernetes local URL',
+        inputUrl: 'https://k8s.example.com:6443',
+        expectedDisplay: 'k8s.example.com:6443',
+        environmentType: EnvironmentType.KubernetesLocal,
+      },
+    ])(
+      'should handle $description correctly on load',
+      async ({ inputUrl, expectedDisplay, environmentType }) => {
+        const env = createMockEnvironment({
+          URL: inputUrl,
+          Type: environmentType,
+        });
+        renderComponent(env);
+
+        await waitFor(() => {
+          const urlInput = screen.getByLabelText('Environment URL');
+          expect(urlInput).toHaveValue(expectedDisplay);
+        });
+      }
+    );
+  });
+
+  describe('TLS visibility', () => {
+    test.each([
+      {
+        description: 'Docker tcp:// API',
+        url: 'tcp://10.0.0.1:2375',
+        environmentType: EnvironmentType.Docker,
+        shouldShowTLS: true,
+      },
+      {
+        description: 'Docker tcp:// API with TLS port',
+        url: 'tcp://docker.example.com:2376',
+        environmentType: EnvironmentType.Docker,
+        shouldShowTLS: true,
+      },
+      {
+        description: 'Docker unix:// socket',
+        url: 'unix:///var/run/docker.sock',
+        environmentType: EnvironmentType.Docker,
+        shouldShowTLS: false,
+      },
+      {
+        description: 'Agent on Docker',
+        url: 'tcp://agent:9001',
+        environmentType: EnvironmentType.AgentOnDocker,
+        shouldShowTLS: false,
+      },
+      {
+        description: 'Agent on Kubernetes',
+        url: 'agent-k8s:9001',
+        environmentType: EnvironmentType.AgentOnKubernetes,
+        shouldShowTLS: false,
+      },
+      {
+        description: 'Kubernetes Local',
+        url: 'https://k8s.local:6443',
+        environmentType: EnvironmentType.KubernetesLocal,
+        shouldShowTLS: false,
+      },
+      {
+        description: 'Edge Agent on Docker',
+        url: 'edge-agent:8000',
+        environmentType: EnvironmentType.EdgeAgentOnDocker,
+        shouldShowTLS: false,
+      },
+    ])(
+      'should $description - TLS visible: $shouldShowTLS',
+      async ({ url, environmentType, shouldShowTLS }) => {
+        const env = createMockEnvironment({
+          Type: environmentType,
+          URL: url,
+        });
+        renderComponent(env);
+
+        await waitFor(() => {
+          expect(screen.getByRole('textbox', { name: /Name/ })).toBeVisible();
+        });
+
+        if (shouldShowTLS) {
+          expect(screen.getByText(/TLS/i)).toBeVisible();
+        } else {
+          expect(screen.queryByText(/TLS/i)).not.toBeInTheDocument();
+        }
+      }
+    );
+  });
+
+  describe('Form submission', () => {
+    test.each([
+      {
+        description: 'Docker tcp:// URL',
+        environmentType: EnvironmentType.Docker,
+        inputUrl: '10.0.0.1:2375',
+        expectedPayloadUrl: 'tcp://10.0.0.1:2375',
+      },
+      {
+        description: 'Docker plain URL becomes tcp://',
+        environmentType: EnvironmentType.Docker,
+        inputUrl: 'docker.example.com:2376',
+        expectedPayloadUrl: 'tcp://docker.example.com:2376',
+      },
+      {
+        description: 'Kubernetes Local adds https://',
+        environmentType: EnvironmentType.KubernetesLocal,
+        inputUrl: 'k8s.local:6443',
+        expectedPayloadUrl: 'https://k8s.local:6443',
+      },
+    ])(
+      'should submit $description correctly',
+      async ({ environmentType, inputUrl, expectedPayloadUrl }) => {
+        let requestPayload: DefaultBodyType;
+
+        server.use(
+          http.put('/api/endpoints/:id', async ({ request }) => {
+            await new Promise((resolve) => {
+              setTimeout(resolve, 100);
+            });
+            requestPayload = await request.json();
+            return HttpResponse.json({});
+          })
+        );
+
+        const env = createMockEnvironment({
+          Id: 1,
+          Name: 'test-env',
+          Type: environmentType,
+        });
+        const onSuccess = vi.fn();
+        renderComponent(env, { onSuccess });
+
+        const nameInput = screen.getByRole('textbox', { name: /Name/ });
+
+        await waitFor(() => {
+          expect(nameInput).toBeVisible();
+        });
+
+        // Fill form fields
+        await userEvent.clear(nameInput);
+        await userEvent.type(nameInput, 'my-environment');
+
+        const urlInput = screen.getByLabelText('Environment URL');
+        await userEvent.clear(urlInput);
+        await userEvent.type(urlInput, inputUrl);
+
+        // Wait for debounce to complete (NameField uses useDebounce)
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500);
+        });
+
+        const submitButton = screen.getByRole('button', {
+          name: /update environment/i,
+        });
+
+        // Wait for Formik to process all changes and enable submit button
+        await waitFor(() => {
+          expect(submitButton).toBeEnabled();
+        });
+
+        await userEvent.click(submitButton);
+        expect(await screen.findByText(/updating environment/i)).toBeVisible();
+
+        // Verify payload
+        await waitFor(() => {
+          expect(requestPayload).toMatchObject({
+            Name: 'my-environment',
+            URL: expectedPayloadUrl,
+          });
+        });
+
+        expect(onSuccess).toHaveBeenCalled();
+      }
+    );
   });
 });
 
