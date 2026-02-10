@@ -204,14 +204,6 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 				endpointsChanged = true
 			}
 		}
-
-		// Update user authorizations when endpoints are added/removed from the group
-		// since group membership affects access control
-		if endpointsChanged {
-			if err := handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx); err != nil {
-				return nil, httperror.InternalServerError("Unable to update user authorizations", err)
-			}
-		}
 	}
 
 	// Reconcile endpoints in the group if tags changed (but endpoints weren't already reconciled)

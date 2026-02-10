@@ -161,12 +161,6 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 
-	if len(endpoint.UserAccessPolicies) > 0 || len(endpoint.TeamAccessPolicies) > 0 {
-		if err := handler.AuthorizationService.UpdateUsersAuthorizationsTx(tx); err != nil {
-			log.Warn().Err(err).Msg("Unable to update user authorizations")
-		}
-	}
-
 	if err := tx.EndpointRelation().DeleteEndpointRelation(endpoint.ID); err != nil {
 		log.Warn().Err(err).Msg("Unable to remove environment relation from the database")
 	}

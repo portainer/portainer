@@ -37,7 +37,10 @@ export function ItemView() {
     <>
       <PageHeader
         title="Team details"
-        breadcrumbs={[{ label: 'Teams' }, { label: team.Name }]}
+        breadcrumbs={[
+          { label: 'Teams', link: 'portainer.teams' },
+          { label: team.Name },
+        ]}
         reload
       />
 
