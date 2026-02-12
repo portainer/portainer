@@ -29,7 +29,7 @@ export function DescribeModal({
   );
 
   return (
-    <Modal onDismiss={onDismiss} size="lg" aria-label={title}>
+    <Modal onDismiss={onDismiss} size="lg" aria-label={title} resizable>
       <ModalHeader title={title} />
       <ModalBody>
         {isLoading ? (

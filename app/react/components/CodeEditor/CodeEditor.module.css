@@ -13,6 +13,9 @@
   --border-codemirror-cursor-color: var(--black-color);
   --bg-tooltip-color: var(--white-color);
   --text-tooltip-color: var(--black-color);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 :global([theme='dark']) .root {
@@ -206,4 +209,10 @@
 /* override the default content */
 .root :global(.cm-editor .cm-collapsedLines:after) {
   content: '';
+}
+
+.codeEditor :global(.cm-editor) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }

@@ -135,7 +135,7 @@ export function CodeEditor({
           )}
         </div>
       )}
-      <div className="overflow-hidden rounded-lg border border-solid border-gray-5 th-dark:border-gray-7 th-highcontrast:border-gray-2">
+      <div className="flex flex-col flex-grow overflow-hidden rounded-lg border border-solid border-gray-5 th-dark:border-gray-7 th-highcontrast:border-gray-2">
         {fileName && (
           <FileNameHeaderRow>
             <FileNameHeader

@@ -23,6 +23,7 @@ interface Props {
   'aria-labelledby'?: string;
   size?: 'md' | 'lg' | 'xl';
   className?: string;
+  resizable?: boolean;
 }
 
 export function Modal({
@@ -32,6 +33,7 @@ export function Modal({
   'aria-labelledby': ariaLabelledBy,
   size = 'md',
   className,
+  resizable
 }: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
@@ -39,7 +41,7 @@ export function Modal({
         isOpen
         className={clsx(
           styles.overlay,
-          'flex items-center justify-center z-50'
+          'flex items-center justify-center z-50',
         )}
         onDismiss={onDismiss}
       >
@@ -53,13 +55,14 @@ export function Modal({
               'w-[450px]': size === 'md',
               'w-[700px]': size === 'lg',
               'w-[1000px]': size === 'xl',
+              [styles.resizable]: resizable
             }
           )}
         >
           <div
             className={clsx(
               styles.modalContent,
-              'relative overflow-y-auto p-5 rounded-lg',
+              'relative overflow-y-auto p-5 rounded-lg flex flex-grow flex-col',
               className
             )}
           >
