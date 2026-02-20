@@ -576,7 +576,7 @@ type (
 	}
 
 	PolicyChartBundle struct {
-		PolicyChartSummary
+		PolicyChartSummary  `mapstructure:",squash"`
 		EncodedTgz          string             `json:"EncodedTgz"`
 		Namespace           string             `json:"Namespace"`
 		PreReleaseManifest  string             `json:"PreReleaseManifest,omitempty"`
