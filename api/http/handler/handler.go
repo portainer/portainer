@@ -6,6 +6,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
+	"github.com/portainer/portainer/api/http/handler/backupschedules"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
 	"github.com/portainer/portainer/api/http/handler/docker"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -23,6 +24,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
+	"github.com/portainer/portainer/api/http/handler/replicationschedules"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
@@ -44,6 +46,7 @@ import (
 type Handler struct {
 	AuthHandler            *auth.Handler
 	BackupHandler          *backup.Handler
+	BackupScheduleHandler  *backupschedules.Handler
 	CustomTemplatesHandler *customtemplates.Handler
 	DockerHandler          *docker.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
@@ -60,9 +63,10 @@ type Handler struct {
 	FileHandler            *file.Handler
 	LDAPHandler            *ldap.Handler
 	MOTDHandler            *motd.Handler
-	RegistryHandler        *registries.Handler
-	ResourceControlHandler *resourcecontrols.Handler
-	RoleHandler            *roles.Handler
+	RegistryHandler            *registries.Handler
+	ReplicationScheduleHandler *replicationschedules.Handler
+	ResourceControlHandler     *resourcecontrols.Handler
+	RoleHandler                *roles.Handler
 	SettingsHandler        *settings.Handler
 	SSLHandler             *ssl.Handler
 	OpenAMTHandler         *openamt.Handler
@@ -176,6 +180,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.EndpointEdgeHandler.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/backup_schedules"):
+		http.StripPrefix("/api", h.BackupScheduleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/backup"):
 		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/restore"):
@@ -220,6 +226,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):
 		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/replication_schedules"):
+		http.StripPrefix("/api", h.ReplicationScheduleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/resource_controls"):
 		http.StripPrefix("/api", h.ResourceControlHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/roles"):

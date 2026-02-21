@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/apikeyrepository"
+	"github.com/portainer/portainer/api/dataservices/backupschedule"
 	"github.com/portainer/portainer/api/dataservices/customtemplate"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/edgegroup"
@@ -21,6 +22,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
 	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
+	"github.com/portainer/portainer/api/dataservices/replicationschedule"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/role"
 	"github.com/portainer/portainer/api/dataservices/schedule"
@@ -49,6 +51,7 @@ type Store struct {
 	connection portainer.Connection
 
 	fileService               portainer.FileService
+	BackupScheduleService     *backupschedule.Service
 	CustomTemplateService     *customtemplate.Service
 	DockerHubService          *dockerhub.Service
 	EdgeGroupService          *edgegroup.Service
@@ -60,9 +63,10 @@ type Store struct {
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
 	HelmUserRepositoryService *helmuserrepository.Service
-	RegistryService           *registry.Service
-	ResourceControlService    *resourcecontrol.Service
-	RoleService               *role.Service
+	RegistryService            *registry.Service
+	ReplicationScheduleService *replicationschedule.Service
+	ResourceControlService     *resourcecontrol.Service
+	RoleService                *role.Service
 	APIKeyRepositoryService   *apikeyrepository.Service
 	ScheduleService           *schedule.Service
 	SettingsService           *settings.Service
@@ -80,6 +84,12 @@ type Store struct {
 }
 
 func (store *Store) initServices() error {
+	backupScheduleService, err := backupschedule.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.BackupScheduleService = backupScheduleService
+
 	authorizationsetService, err := role.NewService(store.connection)
 	if err != nil {
 		return err
@@ -160,6 +170,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.RegistryService = registryService
+
+	replicationScheduleService, err := replicationschedule.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.ReplicationScheduleService = replicationScheduleService
 
 	resourcecontrolService, err := resourcecontrol.NewService(store.connection)
 	if err != nil {
@@ -259,6 +275,11 @@ func (store *Store) PendingActions() dataservices.PendingActionsService {
 	return store.PendingActionsService
 }
 
+// BackupSchedule gives access to the BackupSchedule data management layer
+func (store *Store) BackupSchedule() dataservices.BackupScheduleService {
+	return store.BackupScheduleService
+}
+
 // CustomTemplate gives access to the CustomTemplate data management layer
 func (store *Store) CustomTemplate() dataservices.CustomTemplateService {
 	return store.CustomTemplateService
@@ -306,6 +327,11 @@ func (store *Store) HelmUserRepository() dataservices.HelmUserRepositoryService 
 // Registry gives access to the Registry data management layer
 func (store *Store) Registry() dataservices.RegistryService {
 	return store.RegistryService
+}
+
+// ReplicationSchedule gives access to the ReplicationSchedule data management layer
+func (store *Store) ReplicationSchedule() dataservices.ReplicationScheduleService {
+	return store.ReplicationScheduleService
 }
 
 // ResourceControl gives access to the ResourceControl data management layer

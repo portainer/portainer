@@ -528,10 +528,18 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
 
-	scheduler := scheduler.NewScheduler(shutdownCtx)
+	cronScheduler := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
-	if err := deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService); err != nil {
+	if err := deployments.StartStackSchedules(cronScheduler, stackDeployer, dataStore, gitService); err != nil {
 		log.Fatal().Err(err).Msg("failed to start stack scheduler")
+	}
+
+	jobScheduler := scheduler.NewJobScheduler(cronScheduler, dataStore)
+	if err := jobScheduler.ScheduleBackupJobs(); err != nil {
+		log.Fatal().Err(err).Msg("failed to schedule backup jobs")
+	}
+	if err := jobScheduler.ScheduleReplicationJobs(); err != nil {
+		log.Fatal().Err(err).Msg("failed to schedule replication jobs")
 	}
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
@@ -603,7 +611,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		SSLService:                  sslService,
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
-		Scheduler:                   scheduler,
+		Scheduler:                   cronScheduler,
+		JobScheduler:                jobScheduler,
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,

@@ -139,3 +139,49 @@ func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) stri
 
 	return strconv.Itoa(int(*entryID))
 }
+
+// AddJob schedules a new periodic job with a given cron spec.
+// Returns job id that could be used to stop the given job.
+func (s *Scheduler) AddJob(spec string, job func() error) (string, error) {
+	entryID := new(cron.EntryID)
+
+	cancelFn := func() {
+		log.Debug().Msg("job cancelled, stopping")
+		s.crontab.Remove(*entryID)
+		delete(s.activeJobs, *entryID)
+	}
+
+	jobFn := cron.FuncJob(func() {
+		err := job()
+		if err == nil {
+			return
+		}
+
+		var permErr *PermanentError
+		if errors.As(err, &permErr) {
+			log.Error().Err(permErr).Msg("job returned a permanent error, it will be stopped")
+
+			s.mu.Lock()
+			defer s.mu.Unlock()
+
+			cancelFn()
+
+			return
+		}
+
+		log.Error().Err(err).Msg("job returned an error, it will be rescheduled")
+	})
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var err error
+	*entryID, err = s.crontab.AddJob(spec, jobFn)
+	if err != nil {
+		return "", err
+	}
+
+	s.activeJobs[*entryID] = cancelFn
+
+	return strconv.Itoa(int(*entryID)), nil
+}

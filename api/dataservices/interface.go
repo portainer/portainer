@@ -48,7 +48,22 @@ type (
 		Backup(path string) (string, error)
 		Export(filename string) (err error)
 
+		BackupSchedule() BackupScheduleService
+		ReplicationSchedule() ReplicationScheduleService
+
 		DataStoreTx
+	}
+
+	// BackupScheduleService represents a service for managing backup schedule data
+	BackupScheduleService interface {
+		BaseCRUD[portainer.BackupSchedule, portainer.BackupScheduleID]
+		GetNextIdentifier() int
+	}
+
+	// ReplicationScheduleService represents a service for managing replication schedule data
+	ReplicationScheduleService interface {
+		BaseCRUD[portainer.ReplicationSchedule, portainer.ReplicationScheduleID]
+		GetNextIdentifier() int
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
