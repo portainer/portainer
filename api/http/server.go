@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
+	"github.com/portainer/portainer/api/http/handler/backupschedules"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
 	dockerhandler "github.com/portainer/portainer/api/http/handler/docker"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -36,6 +37,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
+	"github.com/portainer/portainer/api/http/handler/replicationschedules"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
@@ -106,6 +108,7 @@ type Server struct {
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelmtypes.HelmPackageManager
 	Scheduler                   *scheduler.Scheduler
+	JobScheduler                *scheduler.JobScheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
@@ -151,6 +154,14 @@ func (server *Server) Start() error {
 		server.ShutdownTrigger,
 		adminMonitor,
 	)
+
+	var backupScheduleHandler = backupschedules.NewHandler(requestBouncer)
+	backupScheduleHandler.DataStore = server.DataStore
+	backupScheduleHandler.JobScheduler = server.JobScheduler
+
+	var replicationScheduleHandler = replicationschedules.NewHandler(requestBouncer)
+	replicationScheduleHandler.DataStore = server.DataStore
+	replicationScheduleHandler.JobScheduler = server.JobScheduler
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore

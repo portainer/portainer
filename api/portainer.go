@@ -1058,6 +1058,42 @@ type (
 	// Deprecated in favor of EdgeJob
 	ScheduleID int
 
+	// BackupSchedule represents a scheduled backup job
+	BackupSchedule struct {
+		ID            BackupScheduleID `json:"Id" example:"1"`
+		Name          string           `json:"Name" example:"Weekly Backup"`
+		EndpointID    EndpointID       `json:"EndpointId" example:"1"`
+		Schedule      string           `json:"Schedule" example:"0 0 * * 0"` // Cron expression
+		Include       []string         `json:"Include"`                      // Container IDs or names
+		Exclude       []string         `json:"Exclude"`
+		Retention     int              `json:"Retention" example:"5"` // Number of backups to keep
+		TargetType    string           `json:"TargetType" example:"s3"`
+		TargetDetails map[string]any   `json:"TargetDetails"`
+		Created       int64            `json:"Created"`
+		Status        string           `json:"Status"`
+		LastRun       int64            `json:"LastRun"`
+	}
+
+	// BackupScheduleID represents a backup schedule identifier
+	BackupScheduleID int
+
+	// ReplicationSchedule represents a scheduled replication job
+	ReplicationSchedule struct {
+		ID         ReplicationScheduleID `json:"Id" example:"1"`
+		Name       string                `json:"Name" example:"Disaster Recovery"`
+		SourceID   EndpointID            `json:"SourceId" example:"1"`
+		TargetID   EndpointID            `json:"TargetId" example:"2"`
+		Schedule   string                `json:"Schedule" example:"0 0 * * *"`
+		Include    []string              `json:"Include"`
+		Exclude    []string              `json:"Exclude"`
+		Created    int64                 `json:"Created"`
+		Status     string                `json:"Status"`
+		LastRun    int64                 `json:"LastRun"`
+	}
+
+	// ReplicationScheduleID represents a replication schedule identifier
+	ReplicationScheduleID int
+
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
 		Endpoints     []EndpointID

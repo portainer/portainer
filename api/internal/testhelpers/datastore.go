@@ -13,6 +13,8 @@ import (
 var _ dataservices.DataStore = &testDatastore{}
 
 type testDatastore struct {
+	backupSchedule          dataservices.BackupScheduleService
+	replicationSchedule     dataservices.ReplicationScheduleService
 	customTemplate          dataservices.CustomTemplateService
 	edgeGroup               dataservices.EdgeGroupService
 	edgeJob                 dataservices.EdgeJobService
@@ -51,6 +53,10 @@ func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { r
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
+func (d *testDatastore) BackupSchedule() dataservices.BackupScheduleService { return d.backupSchedule }
+func (d *testDatastore) ReplicationSchedule() dataservices.ReplicationScheduleService {
+	return d.replicationSchedule
+}
 func (d *testDatastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
 func (d *testDatastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }
 func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { return d.edgeJob }
