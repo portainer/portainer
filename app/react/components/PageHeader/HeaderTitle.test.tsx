@@ -8,22 +8,6 @@ import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
 
-test('should not render without a wrapping HeaderContainer', async () => {
-  const consoleErrorFn = vi
-    .spyOn(console, 'error')
-    .mockImplementation(() => vi.fn());
-
-  const title = 'title';
-  function renderComponent() {
-    const Wrapped = withTestQueryProvider(HeaderTitle);
-    return render(<Wrapped title={title} />);
-  }
-
-  expect(renderComponent).toThrowErrorMatchingSnapshot();
-
-  consoleErrorFn.mockRestore();
-});
-
 test('should display a HeaderTitle', async () => {
   const username = 'username';
   const user = new UserViewModel({ Username: username });

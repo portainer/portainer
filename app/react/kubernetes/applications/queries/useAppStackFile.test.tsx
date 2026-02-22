@@ -5,6 +5,7 @@ import { HttpResponse } from 'msw';
 
 import { server, http } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { useAppStackFile } from './useAppStackFile';
 
@@ -46,6 +47,7 @@ describe('useAppStackFile', () => {
   });
 
   it('should handle fetch error for regular stack', async () => {
+    const restoreConsole = suppressConsoleLogs();
     server.use(
       http.get('/api/stacks/999/file', () =>
         HttpResponse.json({ message: 'Stack not found' }, { status: 404 })
@@ -57,6 +59,8 @@ describe('useAppStackFile', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
+
+    restoreConsole();
   });
 
   it('should not fetch when query is disabled', async () => {

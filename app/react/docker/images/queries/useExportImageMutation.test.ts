@@ -6,6 +6,7 @@ import { createElement, Fragment } from 'react';
 
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import {
   useExportMutation,
@@ -227,6 +228,8 @@ describe('exportImage', () => {
   });
 
   it('should throw error when export fails', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     server.use(
       http.get('/api/endpoints/:envId/docker/images/get', () =>
         HttpResponse.json({ message: 'Image not found' }, { status: 404 })
@@ -240,6 +243,8 @@ describe('exportImage', () => {
         images: [{ id: 'sha256:abc123', tags: ['nginx:latest'] }],
       })
     ).rejects.toThrow('Unable to export image');
+
+    restoreConsole();
   });
 
   it('should handle filename without content-disposition header', async () => {
@@ -297,6 +302,8 @@ describe('useExportMutation', () => {
   });
 
   it('should handle export error', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     server.use(
       http.get('/api/endpoints/:envId/docker/images/get', () =>
         HttpResponse.json({ message: 'Internal server error' }, { status: 500 })
@@ -315,6 +322,7 @@ describe('useExportMutation', () => {
     });
 
     expect(result.current.error).toBeDefined();
+    restoreConsole();
   });
 
   it('should export multiple images with node name', async () => {

@@ -12,6 +12,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { createMockStack, createMockUsers } from '@/react-tools/test-mocks';
 import { Role } from '@/portainer/users/types';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { StackEditorTab } from './StackEditorTab';
 
@@ -103,6 +104,8 @@ describe('StackEditorTab - Webhook ID Handling', () => {
 
   describe('Form submission', () => {
     it('should send webhook ID in API request when stack has webhook', async () => {
+      const restoreConsole = suppressConsoleLogs();
+
       const user = userEvent.setup();
       let capturedRequestBody: DefaultBodyType;
 
@@ -142,9 +145,12 @@ describe('StackEditorTab - Webhook ID Handling', () => {
 
       assert(capturedRequestBody && typeof capturedRequestBody === 'object');
       expect(capturedRequestBody?.webhook).toBe('existing-webhook-123');
+
+      restoreConsole();
     });
 
     it('should not send webhook ID in API request when stack has no webhook', async () => {
+      const restoreConsole = suppressConsoleLogs();
       const user = userEvent.setup();
       let capturedRequestBody: DefaultBodyType;
 
@@ -183,6 +189,7 @@ describe('StackEditorTab - Webhook ID Handling', () => {
       );
 
       expect(capturedRequestBody).not.toHaveProperty('webhook');
+      restoreConsole();
     });
   });
 });

@@ -7,6 +7,7 @@ import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import {
   Environment,
   EnvironmentType,
@@ -228,6 +229,10 @@ describe('EditGroupView', () => {
   });
 
   describe('Error state', () => {
+    // Suppress console logs for error state tests
+    const restoreConsole = suppressConsoleLogs();
+    afterAll(restoreConsole);
+
     it('should show error Alert when group fetch fails', async () => {
       renderEditGroupView({ groupData: null });
 
@@ -392,9 +397,7 @@ describe('EditGroupView', () => {
 
   describe('Error handling on update', () => {
     it('should handle API error gracefully on update', async () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const restoreConsole = suppressConsoleLogs();
 
       const mutationError = vi.fn();
       const errorMessage = 'Failed to update group';
@@ -429,7 +432,7 @@ describe('EditGroupView', () => {
         expect(mutationError).toHaveBeenCalled();
       });
 
-      consoleErrorSpy.mockRestore();
+      restoreConsole();
     });
   });
 

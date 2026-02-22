@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { RegistryTestConnection } from './RegistryTestConnection';
 
@@ -102,6 +103,8 @@ test('should show error message on failed test', async () => {
 });
 
 test('should show error message on network error', async () => {
+  const restoreConsole = suppressConsoleLogs();
+
   const user = userEvent.setup();
 
   // Mock network error
@@ -117,6 +120,8 @@ test('should show error message on network error', async () => {
       screen.getByText(/Failed to test registry connection/)
     ).toBeVisible();
   });
+
+  restoreConsole();
 });
 
 test('should send correct payload to API', async () => {

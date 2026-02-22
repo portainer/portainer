@@ -18,6 +18,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
 import { http, server } from '@/setup-tests/server';
 import { DeepPartial } from '@/types';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { StackRedeployGitForm } from './StackRedeployGitForm';
 
@@ -553,6 +554,10 @@ describe('StackRedeployGitForm', () => {
   });
 
   describe('Error handling', () => {
+    // Suppress console logs for error handling tests
+    const restoreConsole = suppressConsoleLogs();
+    afterAll(restoreConsole);
+
     it('should handle updateGitStack mutation errors gracefully', async () => {
       const user = userEvent.setup();
       server.use(

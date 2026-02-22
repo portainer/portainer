@@ -22,4 +22,7 @@ export const dockerHandlers = [
   http.get('/api/endpoints/:endpointId/docker/containers/json', () =>
     HttpResponse.json([])
   ),
+  http.get('/api/endpoints/:endpointId/docker/networks', () =>
+    HttpResponse.json([])
+  ),
 ];

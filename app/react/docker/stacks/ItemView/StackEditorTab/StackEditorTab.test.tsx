@@ -7,6 +7,7 @@ import { ComponentProps } from 'react';
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { createMockUsers, createMockStack } from '@/react-tools/test-mocks';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { Role } from '@/portainer/users/types';
@@ -69,6 +70,7 @@ beforeEach(() => {
 
 describe('initial loading', () => {
   it('should be empty when environment data is not loaded', async () => {
+    const restoreConsole = suppressConsoleLogs();
     setupMswHandlers({ shouldReturnEnv: false });
 
     const { container } = renderComponent();
@@ -77,6 +79,8 @@ describe('initial loading', () => {
     await waitFor(() => {
       expect(container.innerHTML).toBe('<div></div>');
     });
+
+    restoreConsole();
   });
 
   it('should be empty when schema data is not loaded', async () => {
@@ -141,6 +145,8 @@ describe('initial loading', () => {
 
 describe('form submission', () => {
   it('should show confirmation dialog before submitting', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     const mockConfirm = vi.mocked(confirmStackUpdate);
     renderComponent();
     const user = userEvent.setup();
@@ -162,9 +168,13 @@ describe('form submission', () => {
         false // stackType is DockerCompose
       );
     });
+
+    restoreConsole();
   });
 
   it('should call mutation API with correct payload', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     let capturedRequestBody: unknown;
 
     server.use(
@@ -203,6 +213,8 @@ describe('form submission', () => {
       },
       { timeout: 3000 }
     );
+
+    restoreConsole();
   });
 
   it('should not submit if confirmation is cancelled', async () => {
@@ -244,6 +256,8 @@ describe('form submission', () => {
   });
 
   it('should call onSubmitSuccess callback and show success notification after mutation completes', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     const onSubmitSuccess = vi.fn();
     renderComponent({ onSubmitSuccess });
     const user = userEvent.setup();
@@ -266,9 +280,13 @@ describe('form submission', () => {
       );
       expect(onSubmitSuccess).toHaveBeenCalled();
     });
+
+    restoreConsole();
   });
 
   it('should handle API errors during submission', async () => {
+    const restoreConsole = suppressConsoleLogs();
+
     server.use(
       http.put('/api/stacks/:id', () =>
         HttpResponse.json({ message: 'Stack update failed' }, { status: 500 })
@@ -295,6 +313,7 @@ describe('form submission', () => {
     });
 
     expect(deployButton).toBeEnabled();
+    restoreConsole();
   });
 });
 
