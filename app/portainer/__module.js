@@ -363,6 +363,66 @@ angular
         },
       };
 
+      const backupSchedules = {
+        name: 'portainer.backupSchedules',
+        url: '/backup-schedules',
+        views: {
+          'content@': {
+            component: 'backupSchedulesListView',
+          },
+        },
+      };
+
+      const backupScheduleNew = {
+        name: 'portainer.backupSchedules.new',
+        url: '/new',
+        views: {
+          'content@': {
+            component: 'backupScheduleItemView',
+          },
+        },
+      };
+
+      const backupScheduleEdit = {
+        name: 'portainer.backupSchedules.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'backupScheduleItemView',
+          },
+        },
+      };
+
+      const replicationSchedules = {
+        name: 'portainer.replicationSchedules',
+        url: '/replication-schedules',
+        views: {
+          'content@': {
+            component: 'replicationSchedulesListView',
+          },
+        },
+      };
+
+      const replicationScheduleNew = {
+        name: 'portainer.replicationSchedules.new',
+        url: '/new',
+        views: {
+          'content@': {
+            component: 'replicationScheduleItemView',
+          },
+        },
+      };
+
+      const replicationScheduleEdit = {
+        name: 'portainer.replicationSchedules.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'replicationScheduleItemView',
+          },
+        },
+      };
+
       var tags = {
         name: 'portainer.tags',
         url: '/tags',
@@ -425,6 +485,12 @@ angular
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
       $stateRegistryProvider.register(settingsEdgeCompute);
+      $stateRegistryProvider.register(backupSchedules);
+      $stateRegistryProvider.register(backupScheduleNew);
+      $stateRegistryProvider.register(backupScheduleEdit);
+      $stateRegistryProvider.register(replicationSchedules);
+      $stateRegistryProvider.register(replicationScheduleNew);
+      $stateRegistryProvider.register(replicationScheduleEdit);
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);

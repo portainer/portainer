@@ -52,7 +52,9 @@ func (s *JobScheduler) ScheduleBackupJobs() error {
 
 func (s *JobScheduler) scheduleBackup(schedule portainer.BackupSchedule) (string, error) {
 	job := func() error {
-		log.Info().Str("schedule", schedule.Name).Msg("Executing backup job")
+		log.Info().Str("schedule", schedule.Name).
+			Int("retention_days", schedule.Retention.Days).
+			Msg("Executing backup job with retention policy")
 		// Actual backup logic would go here
 		return nil
 	}
@@ -125,7 +127,10 @@ func (s *JobScheduler) ScheduleReplicationJobs() error {
 
 func (s *JobScheduler) scheduleReplication(schedule portainer.ReplicationSchedule) (string, error) {
 	job := func() error {
-		log.Info().Str("schedule", schedule.Name).Msg("Executing replication job")
+		log.Info().Str("schedule", schedule.Name).
+			Bool("failover_enabled", schedule.FailoverSettings.Enabled).
+			Interface("target_priorities", schedule.FailoverSettings.TargetPriorities).
+			Msg("Executing replication job with failover settings")
 		// Actual replication logic would go here
 		return nil
 	}

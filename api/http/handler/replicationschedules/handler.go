@@ -41,12 +41,13 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 }
 
 type replicationScheduleCreatePayload struct {
-	Name     string
-	SourceID portainer.EndpointID
-	TargetID portainer.EndpointID
-	Schedule string
-	Include  []string
-	Exclude  []string
+	Name             string
+	SourceID         portainer.EndpointID
+	TargetID         portainer.EndpointID
+	Schedule         string
+	Include          []string
+	Exclude          []string
+	FailoverSettings portainer.FailoverSettings
 }
 
 func (payload *replicationScheduleCreatePayload) Validate(r *http.Request) error {
@@ -75,13 +76,14 @@ func (h *Handler) replicationScheduleCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	schedule := &portainer.ReplicationSchedule{
-		Name:     payload.Name,
-		SourceID: payload.SourceID,
-		TargetID: payload.TargetID,
-		Schedule: payload.Schedule,
-		Include:  payload.Include,
-		Exclude:  payload.Exclude,
-		Created:  time.Now().Unix(),
+		Name:             payload.Name,
+		SourceID:         payload.SourceID,
+		TargetID:         payload.TargetID,
+		Schedule:         payload.Schedule,
+		Include:          payload.Include,
+		Exclude:          payload.Exclude,
+		FailoverSettings: payload.FailoverSettings,
+		Created:          time.Now().Unix(),
 	}
 
 	err := h.DataStore.ReplicationSchedule().Create(schedule)
@@ -122,10 +124,11 @@ func (h *Handler) replicationScheduleInspect(w http.ResponseWriter, r *http.Requ
 }
 
 type replicationScheduleUpdatePayload struct {
-	Name     string
-	Schedule string
-	Include  []string
-	Exclude  []string
+	Name             string
+	Schedule         string
+	Include          []string
+	Exclude          []string
+	FailoverSettings portainer.FailoverSettings
 }
 
 func (payload *replicationScheduleUpdatePayload) Validate(r *http.Request) error {
@@ -163,6 +166,7 @@ func (h *Handler) replicationScheduleUpdate(w http.ResponseWriter, r *http.Reque
 	schedule.Schedule = payload.Schedule
 	schedule.Include = payload.Include
 	schedule.Exclude = payload.Exclude
+	schedule.FailoverSettings = payload.FailoverSettings
 
 	err = h.DataStore.ReplicationSchedule().Update(schedule.ID, schedule)
 	if err != nil {

@@ -1,0 +1,12 @@
+[90m2026/02/22 06:12PM[0m [31mWRN[0m [1mgithub.com/portainer/portainer/api/cli/cli.go:172[0m[36m >[0m the --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect |
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/cmd/portainer/main.go:326[0m[36m >[0m encryption key file not present | [36mfilename=[0m/run/secrets/portainer
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/cmd/portainer/main.go:366[0m[36m >[0m proceeding without encryption key |
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/database/boltdb/db.go:137[0m[36m >[0m loading PortainerDB | [36mfilename=[0mportainer.db
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/internal/ssl/ssl.go:79[0m[36m >[0m no cert files found, generating self signed SSL certificates |
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/chisel/service.go:226[0m[36m >[0m generated a new Chisel private key file | [36mprivate-key=[0mdata/chisel/private-key.pem
+2026/02/22 18:12:54 server: Reverse tunnelling enabled
+2026/02/22 18:12:54 server: Fingerprint t8gHa5bI2+oDlybgqUUObrWsR3k3Hj+5u/CAZ++YI7M=
+2026/02/22 18:12:54 server: Listening on http://0.0.0.0:8000
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/cmd/portainer/main.go:648[0m[36m >[0m starting Portainer | [36mbuild_number=[0mN/A [36mgo_version=[0mgo1.25.7 [36mimage_tag=[0mN/A [36mnodejs_version=[0mv22.22.0 [36mpnpm_version=[0m10.26.2 [36mversion=[0m2.39.0 [36mwebpack_version=[0m5.105.0
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/http/server.go:380[0m[36m >[0m starting HTTPS server | [36mbind_address=[0m:9443
+[90m2026/02/22 06:12PM[0m [32mINF[0m [1mgithub.com/portainer/portainer/api/http/server.go:364[0m[36m >[0m starting HTTP server | [36mbind_address=[0m:9000

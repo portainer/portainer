@@ -1,5 +1,6 @@
 {
   "api_key": null,
+  "backup_schedules": null,
   "customtemplates": null,
   "dockerhub": [
     {
@@ -150,6 +151,7 @@
       "Username": "prabhatkhera"
     }
   ],
+  "replication_schedules": null,
   "resource_control": [
     {
       "AdministratorsOnly": false,

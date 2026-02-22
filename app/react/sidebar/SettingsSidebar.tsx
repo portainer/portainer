@@ -6,6 +6,7 @@ import {
   Radio,
   FileText,
   Bell,
+  Database,
 } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
@@ -70,6 +71,30 @@ export function SettingsSidebar({
       )}
       {isPureAdmin && (
         <>
+          <SidebarParent
+            label="Backup & Replication"
+            icon={Database}
+            to="portainer.backupSchedules"
+            pathOptions={{
+              includePaths: ['portainer.replicationSchedules'],
+            }}
+            data-cy="portainerSidebar-backupReplication"
+            listId="portainer-backupReplication"
+          >
+            <SidebarItem
+              to="portainer.backupSchedules"
+              label="Backups"
+              isSubMenu
+              data-cy="portainerSidebar-backupSchedules"
+            />
+            <SidebarItem
+              to="portainer.replicationSchedules"
+              label="Replications"
+              isSubMenu
+              data-cy="portainerSidebar-replicationSchedules"
+            />
+          </SidebarParent>
+
           <SidebarParent
             label="Environment-related"
             icon={HardDrive}

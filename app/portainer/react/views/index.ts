@@ -20,6 +20,7 @@ import { activityLogsModule } from './activity-logs';
 import { templatesModule } from './templates';
 import { usersModule } from './users';
 import { environmentsModule } from './environments';
+import { backupSchedulesModule } from './schedules';
 
 export const viewsModule = angular
   .module('portainer.app.react.views', [
@@ -32,6 +33,7 @@ export const viewsModule = angular
     templatesModule,
     usersModule,
     environmentsModule,
+    backupSchedulesModule,
   ])
   .component(
     'homeView',

@@ -1058,6 +1058,22 @@ type (
 	// Deprecated in favor of EdgeJob
 	ScheduleID int
 
+	// RetentionPolicy defines how many backups to keep for different intervals
+	RetentionPolicy struct {
+		Hours  int `json:"Hours"`
+		Days   int `json:"Days"`
+		Weeks  int `json:"Weeks"`
+		Months int `json:"Months"`
+		Years  int `json:"Years"`
+	}
+
+	// FailoverSettings defines configuration for replication failover
+	FailoverSettings struct {
+		Enabled          bool         `json:"Enabled"`
+		Timeout          string       `json:"Timeout"`
+		TargetPriorities []EndpointID `json:"TargetPriorities"`
+	}
+
 	// BackupSchedule represents a scheduled backup job
 	BackupSchedule struct {
 		ID            BackupScheduleID `json:"Id" example:"1"`
@@ -1066,7 +1082,7 @@ type (
 		Schedule      string           `json:"Schedule" example:"0 0 * * 0"` // Cron expression
 		Include       []string         `json:"Include"`                      // Container IDs or names
 		Exclude       []string         `json:"Exclude"`
-		Retention     int              `json:"Retention" example:"5"` // Number of backups to keep
+		Retention     RetentionPolicy  `json:"Retention"`
 		TargetType    string           `json:"TargetType" example:"s3"`
 		TargetDetails map[string]any   `json:"TargetDetails"`
 		Created       int64            `json:"Created"`
@@ -1079,16 +1095,17 @@ type (
 
 	// ReplicationSchedule represents a scheduled replication job
 	ReplicationSchedule struct {
-		ID         ReplicationScheduleID `json:"Id" example:"1"`
-		Name       string                `json:"Name" example:"Disaster Recovery"`
-		SourceID   EndpointID            `json:"SourceId" example:"1"`
-		TargetID   EndpointID            `json:"TargetId" example:"2"`
-		Schedule   string                `json:"Schedule" example:"0 0 * * *"`
-		Include    []string              `json:"Include"`
-		Exclude    []string              `json:"Exclude"`
-		Created    int64                 `json:"Created"`
-		Status     string                `json:"Status"`
-		LastRun    int64                 `json:"LastRun"`
+		ID               ReplicationScheduleID `json:"Id" example:"1"`
+		Name             string                `json:"Name" example:"Disaster Recovery"`
+		SourceID         EndpointID            `json:"SourceId" example:"1"`
+		TargetID         EndpointID            `json:"TargetId" example:"2"`
+		Schedule         string                `json:"Schedule" example:"0 0 * * *"`
+		Include          []string              `json:"Include"`
+		Exclude          []string              `json:"Exclude"`
+		FailoverSettings FailoverSettings      `json:"FailoverSettings"`
+		Created          int64                 `json:"Created"`
+		Status           string                `json:"Status"`
+		LastRun          int64                 `json:"LastRun"`
 	}
 
 	// ReplicationScheduleID represents a replication schedule identifier

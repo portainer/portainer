@@ -46,7 +46,7 @@ type backupScheduleCreatePayload struct {
 	Schedule      string
 	Include       []string
 	Exclude       []string
-	Retention     int
+	Retention     portainer.RetentionPolicy
 	TargetType    string
 	TargetDetails map[string]any
 }
@@ -127,7 +127,7 @@ type backupScheduleUpdatePayload struct {
 	Schedule      string
 	Include       []string
 	Exclude       []string
-	Retention     int
+	Retention     portainer.RetentionPolicy
 	TargetType    string
 	TargetDetails map[string]any
 }
