@@ -74,18 +74,10 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 		}
 	}
 
-	if err := d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
+	return d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
 		ComposeOptions: options,
 		ForceRecreate:  forceRecreate,
-	}); err != nil {
-		if err := d.composeStackManager.Down(context.TODO(), stack, endpoint); err != nil {
-			log.Warn().Err(err).Msg("failed to cleanup compose stack after failed deployment")
-		}
-
-		return err
-	}
-
-	return nil
+	})
 }
 
 func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
