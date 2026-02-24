@@ -1,12 +1,13 @@
 import { Trash2 } from 'lucide-react';
 import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import { AutomationTestingProps } from '@/types';
 
 import { confirmDelete } from '@@/modals/confirm';
 
-import { Button } from './Button';
 import { LoadingButton } from './LoadingButton';
+import { Button } from './Button';
 
 type ConfirmOrClick =
   | {
@@ -26,7 +27,10 @@ export function DeleteButton({
   size,
   children,
   isLoading,
+  text = 'Remove',
   loadingText = 'Removing...',
+  icon = false,
+  type,
   'data-cy': dataCy,
   ...props
 }: PropsWithChildren<
@@ -35,7 +39,10 @@ export function DeleteButton({
       size?: ComponentProps<typeof Button>['size'];
       disabled?: boolean;
       isLoading?: boolean;
+      text?: string;
       loadingText?: string;
+      icon?: boolean;
+      type?: ComponentProps<typeof Button>['type'];
     }
 >) {
   if (isLoading === undefined) {
@@ -46,10 +53,11 @@ export function DeleteButton({
         disabled={disabled || isLoading}
         onClick={() => handleClick()}
         icon={Trash2}
-        className="!m-0"
+        className={clsx('!m-0', icon ? 'btn-icon' : '')}
         data-cy={dataCy}
+        type={type}
       >
-        {children || 'Remove'}
+        {children || text}
       </Button>
     );
   }
@@ -65,6 +73,7 @@ export function DeleteButton({
       data-cy={dataCy}
       isLoading={isLoading}
       loadingText={loadingText}
+      type={type}
     >
       {children || 'Remove'}
     </LoadingButton>

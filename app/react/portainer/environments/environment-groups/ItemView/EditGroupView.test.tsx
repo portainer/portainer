@@ -298,14 +298,13 @@ describe('EditGroupView', () => {
 
       await user.click(submitButton);
 
-      // Verify the request URL and body
+      // Verify the request URL and body.
       await waitFor(() => {
         expect(requestUrl).toBe('/api/endpoint_groups/2');
         expect(requestBody).toEqual({
           Name: 'Updated Group',
           Description: 'Test description',
           TagIDs: [1],
-          AssociatedEndpoints: [1], // The associated environment ID
         });
       });
     });
@@ -451,21 +450,8 @@ describe('EditGroupView', () => {
       expect(elements[0]).toBeVisible();
     });
 
-    it('should include associated environment IDs in update payload', async () => {
+    it('should NOT include AssociatedEndpoints in update payload (backend preserves associations)', async () => {
       let requestBody: DefaultBodyType;
-
-      const associatedEnvs = [
-        {
-          ...mockEnvironment,
-          Id: 100,
-          Name: 'Env 100',
-        } as Partial<Environment>,
-        {
-          ...mockEnvironment,
-          Id: 200,
-          Name: 'Env 200',
-        } as Partial<Environment>,
-      ];
 
       server.use(
         http.put('/api/endpoint_groups/:id', async ({ request }) => {
@@ -475,9 +461,7 @@ describe('EditGroupView', () => {
       );
 
       const user = userEvent.setup();
-      renderEditGroupView({
-        associatedEnvironments: associatedEnvs,
-      });
+      renderEditGroupView();
 
       // Wait for form to populate
       const nameInput = await screen.findByLabelText(/Name/i);
@@ -495,11 +479,9 @@ describe('EditGroupView', () => {
 
       await user.click(submitButton);
 
-      // Verify the associated environments are included in payload
+      // Verify AssociatedEndpoints is absent — backend nil-check preserves existing memberships
       await waitFor(() => {
-        expect(requestBody).toMatchObject({
-          AssociatedEndpoints: [100, 200],
-        });
+        expect(requestBody).not.toHaveProperty('AssociatedEndpoints');
       });
     });
   });

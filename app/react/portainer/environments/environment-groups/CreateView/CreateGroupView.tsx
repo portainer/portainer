@@ -30,7 +30,7 @@ export function CreateGroupView() {
         ]}
       />
 
-      <div className="row">
+      <div className="row pb-20">
         <div className="col-sm-12">
           <Widget>
             <Widget.Body>

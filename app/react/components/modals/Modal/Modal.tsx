@@ -37,11 +37,11 @@ export function Modal({
     <Context.Provider value>
       <DialogOverlay
         isOpen
-        className={clsx(
-          styles.overlay,
-          'flex items-center justify-center z-50'
-        )}
+        className={clsx(styles.overlay, 'flex items-center justify-center')}
         onDismiss={onDismiss}
+        // When a Sheet is open and then a Modal opens, Radix DismissableLayer sets body.style.pointerEvents="none" for this modal overlay, so make it auto here.
+        // z-index ensures the modal renders above the base views and any Sheet (z-50).
+        style={{ zIndex: 60, pointerEvents: 'auto' }}
       >
         <DialogContent
           aria-label={ariaLabel}

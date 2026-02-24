@@ -9,26 +9,28 @@ import { object, string, array, number } from 'yup';
 import { useRef } from 'react';
 
 import { TagId } from '@/portainer/tags/types';
+import {
+  EnvironmentId,
+  EnvironmentGroupId,
+} from '@/react/portainer/environments/types';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
 import { useCanExit } from '@/react/hooks/useCanExit';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
-import { FormSection } from '@@/form-components/FormSection';
 import { TagSelector } from '@@/TagSelector';
 import { confirmGenericDiscard } from '@@/modals/confirm';
-import { FormActions } from '@@/form-components/FormActions';
+import { LoadingButton } from '@@/buttons';
+import { StickyFooter } from '@@/StickyFooter/StickyFooter';
 
-import { EnvironmentGroupId, EnvironmentId } from '../../types';
-
-import { AssociatedEnvironmentsSelector } from './AssociatedEnvironmentsSelector/AssociatedEnvironmentsSelector';
-import { AvailableEnvironmentsTable } from './AssociatedEnvironmentsSelector/AvailableEnvironmentsTable';
+import { FormModeEnvironmentsSelector } from './AssociatedEnvironmentsSelector/FormModeEnvironmentsSelector';
 
 export interface GroupFormValues {
   name: string;
   description: string;
   tagIds: Array<TagId>;
-  associatedEnvironments: Array<EnvironmentId>;
+  /** Used in create mode only — undefined in edit mode */
+  associatedEnvironments?: Array<EnvironmentId>;
 }
 
 interface Props {
@@ -48,7 +50,6 @@ const validationSchema = object({
   name: string().required('Name is required'),
   description: string(),
   tagIds: array(number()),
-  associatedEnvironments: array(),
 });
 
 export function GroupForm({
@@ -71,7 +72,6 @@ export function GroupForm({
       enableReinitialize
     >
       <InnerForm
-        initialValues={initialValues}
         submitLabel={submitLabel}
         submitLoadingLabel={submitLoadingLabel}
         groupId={groupId}
@@ -81,20 +81,17 @@ export function GroupForm({
 }
 
 interface InnerFormProps {
-  initialValues: GroupFormValues;
   submitLabel: string;
   submitLoadingLabel: string;
   groupId?: EnvironmentGroupId;
 }
 
 function InnerForm({
-  initialValues,
   submitLabel,
   submitLoadingLabel,
   groupId,
 }: InnerFormProps) {
   const isPureAdmin = useIsPureAdmin();
-  const isUnassignedGroup = groupId === 1;
   const {
     values,
     errors,
@@ -104,6 +101,7 @@ function InnerForm({
     dirty,
     isSubmitting,
   } = useFormikContext<GroupFormValues>();
+  const isCreateMode = !groupId;
 
   return (
     <Form className="form-horizontal">
@@ -140,31 +138,25 @@ function InnerForm({
         allowCreate={isPureAdmin}
       />
 
-      {isUnassignedGroup ? (
-        <FormSection title="Unassociated environments">
-          <AvailableEnvironmentsTable
-            title="Unassociated environments"
-            excludeIds={[]}
-            data-cy="group-unassociatedEndpoints"
-          />
-        </FormSection>
-      ) : (
-        <AssociatedEnvironmentsSelector
-          groupId={groupId}
-          associatedEnvironmentIds={values.associatedEnvironments}
-          initialAssociatedEnvironmentIds={initialValues.associatedEnvironments}
+      {isCreateMode && (
+        // Same UI as edit mode, but updates form values instead of the API
+        <FormModeEnvironmentsSelector
+          selectedIds={values.associatedEnvironments ?? []}
           onChange={(ids) => setFieldValue('associatedEnvironments', ids)}
         />
       )}
 
-      <FormActions
-        submitLabel={submitLabel}
-        loadingText={submitLoadingLabel}
-        isLoading={isSubmitting}
-        isValid={isValid && !isSubmitting && dirty}
-        errors={errors}
-        data-cy="group-submit-button"
-      />
+      <StickyFooter className="justify-end gap-4">
+        <LoadingButton
+          size="medium"
+          loadingText={submitLoadingLabel}
+          isLoading={isSubmitting}
+          disabled={!isValid || isSubmitting || !dirty}
+          data-cy="group-submit-button"
+        >
+          {submitLabel}
+        </LoadingButton>
+      </StickyFooter>
     </Form>
   );
 }

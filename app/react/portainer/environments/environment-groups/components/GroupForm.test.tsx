@@ -19,7 +19,6 @@ function renderGroupForm({
     name: '',
     description: '',
     tagIds: [],
-    associatedEnvironments: [],
   },
   onSubmit = vi.fn(),
   submitLabel = 'Create',
@@ -40,13 +39,23 @@ function renderGroupForm({
         { ID: 2, Name: 'staging' },
       ])
     ),
-    // Mock environments list for AssociatedEnvironmentsSelector
+    // Mock environments list for AssociatedEnvironmentsSelector and InlineAvailableEnvironmentsTable
     http.get('/api/endpoints', () =>
       HttpResponse.json([], {
         headers: {
           'x-total-count': '0',
           'x-total-available': '0',
         },
+      })
+    ),
+    // Mock group endpoint for AssociatedEnvironmentsSelector (edit mode)
+    http.get('/api/endpoint_groups/:id', ({ params }) =>
+      HttpResponse.json({
+        Id: Number(params.id),
+        Name: 'Test Group',
+        Description: '',
+        TagIds: [],
+        Policies: [],
       })
     )
   );
@@ -88,48 +97,43 @@ describe('GroupForm', () => {
       ).toBeVisible();
     });
 
-    it('should show Associated environments section when groupId is provided (not unassigned group)', async () => {
+    it('should not show Associated environments section when groupId is provided (edit mode)', async () => {
       renderGroupForm({ groupId: 2 });
 
-      // Wait for form to render
       await screen.findByLabelText(/Name/i);
 
-      // Check for section title using findByRole
+      // In edit mode, environments are managed by AssociatedEnvironmentsSelector component (rendered separately in EditGroupView)
       expect(
-        await screen.findByRole('heading', { name: /Associated environments/i })
-      ).toBeVisible();
+        screen.queryByRole('heading', { name: /Associated environments/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('add-environments-button')
+      ).not.toBeInTheDocument();
     });
 
-    it('should show Unassociated environments section when groupId is 1 (unassigned group)', async () => {
+    it('should not show environment section when groupId is 1 (unassigned group)', async () => {
       renderGroupForm({ groupId: 1 });
 
-      // Wait for form to render
       await screen.findByLabelText(/Name/i);
 
-      // Check for section title using findByRole
+      // In edit mode, environments are managed by AssociatedEnvironmentsSelector component (rendered separately)
       expect(
-        await screen.findByRole('heading', {
-          name: /Unassociated environments/i,
-        })
-      ).toBeVisible();
-
-      // Should NOT show "Associated environments" section (exact match to exclude "Unassociated")
-      const associatedElements = screen.queryAllByText(
-        /^Associated environments$/i
-      );
-      expect(associatedElements).toHaveLength(0);
+        screen.queryByRole('heading', { name: /Associated environments/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('add-environments-button')
+      ).not.toBeInTheDocument();
     });
 
-    it('should show Associated environments section in create mode (no groupId)', async () => {
+    it('should show associated environments table with Add button in create mode (no groupId)', async () => {
       renderGroupForm();
 
-      // Wait for form to render
       await screen.findByLabelText(/Name/i);
 
-      // Check for section title using findByRole
+      // FormModeEnvironmentsSelector renders AssociatedEnvironmentsTable with an Add button
       expect(
-        await screen.findByRole('heading', { name: /Associated environments/i })
-      ).toBeVisible();
+        await screen.findByTestId('add-environments-button')
+      ).toBeInTheDocument();
     });
   });
 
@@ -161,7 +165,6 @@ describe('GroupForm', () => {
           name: 'existing-group',
           description: '',
           tagIds: [],
-          associatedEnvironments: [],
         },
       });
 
@@ -169,7 +172,6 @@ describe('GroupForm', () => {
         name: /Create/i,
       });
 
-      // Form is valid but not dirty, so should be disabled
       expect(submitButton).toBeDisabled();
     });
 
@@ -235,7 +237,6 @@ describe('GroupForm', () => {
             name: 'test-group',
             description: 'Test description',
             tagIds: [],
-            associatedEnvironments: [],
           }),
           expect.anything()
         );
@@ -244,7 +245,6 @@ describe('GroupForm', () => {
 
     it('should show loading state during submission', async () => {
       const user = userEvent.setup();
-      // Create a promise that we can control
       let resolveSubmit: () => void;
       const onSubmit = vi.fn().mockImplementation(
         () =>
@@ -269,14 +269,12 @@ describe('GroupForm', () => {
 
       await user.click(submitButton);
 
-      // Should show loading state
       await waitFor(() => {
         expect(
           screen.getByRole('button', { name: /Creating.../i })
         ).toBeVisible();
       });
 
-      // Resolve the submission
       resolveSubmit!();
     });
   });
@@ -306,7 +304,6 @@ describe('GroupForm', () => {
           name: 'pre-filled-name',
           description: 'pre-filled-description',
           tagIds: [],
-          associatedEnvironments: [],
         },
       });
 

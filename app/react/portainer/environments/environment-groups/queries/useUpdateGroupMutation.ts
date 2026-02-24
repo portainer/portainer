@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { TagId } from '@/portainer/tags/types';
-import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
+import { withGlobalError } from '@/react-tools/react-query';
 import { environmentQueryKeys } from '@/react/portainer/environments/queries/query-keys';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { EnvironmentGroupId, EnvironmentId } from '../../types';
 import { EnvironmentGroup } from '../types';
@@ -44,10 +45,11 @@ export function useUpdateGroupMutation() {
 
   return useMutation({
     mutationFn: updateGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries(queryKeys.base());
+      queryClient.invalidateQueries(environmentQueryKeys.base());
+      notifySuccess('Success', 'Group successfully updated');
+    },
     ...withGlobalError('Failed to update group'),
-    ...withInvalidate(queryClient, [
-      queryKeys.base(),
-      environmentQueryKeys.base(),
-    ]),
   });
 }

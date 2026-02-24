@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
@@ -11,227 +11,204 @@ import {
   EnvironmentId,
 } from '@/react/portainer/environments/types';
 
+import { EnvironmentGroup } from '../../types';
+
 import { AssociatedEnvironmentsSelector } from './AssociatedEnvironmentsSelector';
 
-function createEnv(id: EnvironmentId, name: string): Environment {
-  return createMockEnvironment({ Id: id, Name: name, GroupId: 1 });
+vi.mock('@@/modals/confirm', () => ({
+  openConfirm: vi.fn().mockResolvedValue(true),
+  confirmDelete: vi.fn().mockResolvedValue(true),
+}));
+
+const mockGroup: EnvironmentGroup = {
+  Id: 2,
+  Name: 'Test Group',
+  Description: '',
+  TagIds: [],
+};
+
+function createEnv(id: EnvironmentId, name: string): Partial<Environment> {
+  return createMockEnvironment({ Id: id, Name: name });
 }
 
-function setupMockServer(environments: Array<Environment> = []) {
+function setupMockServer({
+  associatedEnvs = [] as Array<Partial<Environment>>,
+  availableEnvs = [] as Array<Partial<Environment>>,
+  onPut = undefined as ((body: unknown) => void) | undefined,
+} = {}) {
   server.use(
-    http.get('/api/endpoints', () =>
-      HttpResponse.json(environments, {
-        headers: {
-          'x-total-count': String(environments.length),
-          'x-total-available': String(environments.length),
-        },
-      })
-    )
+    http.get('/api/endpoint_groups/2', () => HttpResponse.json(mockGroup)),
+    http.get('/api/endpoints', ({ request }) => {
+      const url = new URL(request.url);
+      const groupIds = [
+        ...url.searchParams.getAll('groupIds'),
+        ...url.searchParams.getAll('groupIds[]'),
+      ];
+
+      function makeResponse(envs: Array<Partial<Environment>>) {
+        return HttpResponse.json(envs, {
+          headers: {
+            'x-total-count': String(envs.length),
+            'x-total-available': String(envs.length),
+          },
+        });
+      }
+
+      if (groupIds.includes('2')) return makeResponse(associatedEnvs);
+      if (groupIds.includes('1')) return makeResponse(availableEnvs);
+      return makeResponse([]);
+    }),
+    http.put('/api/endpoint_groups/2', async ({ request }) => {
+      const body = await request.json();
+      onPut?.(body);
+      return HttpResponse.json(mockGroup);
+    })
   );
 }
 
-function renderComponent({
-  associatedEnvironmentIds = [] as Array<EnvironmentId>,
-  initialAssociatedEnvironmentIds = [] as Array<EnvironmentId>,
-  onChange = vi.fn(),
-}: {
-  associatedEnvironmentIds?: Array<EnvironmentId>;
-  initialAssociatedEnvironmentIds?: Array<EnvironmentId>;
-  onChange?: (ids: Array<EnvironmentId>) => void;
-} = {}) {
+function renderComponent(groupId = 2) {
   const Wrapped = withTestQueryProvider(() => (
-    <AssociatedEnvironmentsSelector
-      associatedEnvironmentIds={associatedEnvironmentIds}
-      initialAssociatedEnvironmentIds={initialAssociatedEnvironmentIds}
-      onChange={onChange}
-    />
+    <AssociatedEnvironmentsSelector groupId={groupId} readOnly={false} />
   ));
 
-  return {
-    ...render(<Wrapped />),
-    onChange,
-  };
+  return render(<Wrapped />);
 }
 
 describe('AssociatedEnvironmentsSelector', () => {
   describe('Rendering', () => {
-    it('should render both Available and Associated environments tables', async () => {
+    it('renders the associated environments table', async () => {
       setupMockServer();
       renderComponent();
 
       expect(
-        screen.getByRole('heading', { name: 'Available environments' })
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { name: 'Associated environments' })
+        await screen.findByRole('heading', { name: 'Associated environments' })
       ).toBeVisible();
     });
 
-    it('should render instruction text', async () => {
+    it('renders an Add button', async () => {
       setupMockServer();
       renderComponent();
 
       expect(
-        await screen.findByText(/click on any environment entry to move it/i)
+        await screen.findByTestId('add-environments-button')
       ).toBeInTheDocument();
     });
 
-    it('should render Associated environments table with data-cy attribute', async () => {
-      setupMockServer();
+    it('renders a Remove button that is initially disabled', async () => {
+      setupMockServer({ associatedEnvs: [createEnv(10, 'my-env')] });
       renderComponent();
 
-      await waitFor(() => {
-        expect(screen.getByTestId('group-associatedEndpoints')).toBeVisible();
-      });
+      await screen.findByText('my-env');
+
+      const removeBtn = screen.getByTestId('remove-environments-button');
+      expect(removeBtn).toBeDisabled();
     });
 
-    it('should display initially associated environments in Associated table', async () => {
-      const envs = [createEnv(10, 'associated-env-1')];
+    it('displays environments returned by the API', async () => {
+      setupMockServer({ associatedEnvs: [createEnv(10, 'env-alpha')] });
+      renderComponent();
 
-      setupMockServer(envs);
-      renderComponent({
-        associatedEnvironmentIds: [10],
-        initialAssociatedEnvironmentIds: [10],
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText('associated-env-1')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Adding environments', () => {
-    it('should call onChange with new environment ID when clicking an available environment', async () => {
-      const user = userEvent.setup();
-      const onChange = vi.fn();
-
-      const envs = [createEnv(1, 'available-env')];
-      setupMockServer(envs);
-
-      renderComponent({ onChange });
-
-      const envRow = await screen.findByText('available-env');
-      await user.click(envRow);
-
-      expect(onChange).toHaveBeenCalledWith([1]);
-    });
-
-    it('should append new environment to existing associated IDs', async () => {
-      const user = userEvent.setup();
-      const onChange = vi.fn();
-
-      const envs = [createEnv(1, 'available-env'), createEnv(10, 'existing')];
-      setupMockServer(envs);
-
-      renderComponent({
-        associatedEnvironmentIds: [10],
-        initialAssociatedEnvironmentIds: [10],
-        onChange,
-      });
-
-      // Wait for the available table to be ready and find the row
-      const availableTable = await screen.findByTestId(
-        'group-availableEndpoints'
-      );
-      await within(availableTable).findByText('available-env');
-
-      // Find the row element that contains the text and click it
-      const rows = within(availableTable).getAllByRole('row');
-      const envRow = rows.find(
-        (row) => row.textContent?.includes('available-env')
-      );
-      expect(envRow).toBeDefined();
-      await user.click(envRow!);
-
-      // Wait for onChange to be called with the new environment ID appended
-      await waitFor(() => {
-        expect(onChange).toHaveBeenCalledWith([10, 1]);
-      });
+      expect(await screen.findByText('env-alpha')).toBeInTheDocument();
     });
   });
 
   describe('Removing environments', () => {
-    it('should call onChange without the removed environment ID', async () => {
+    it('enables Remove button when a row is selected', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      setupMockServer({ associatedEnvs: [createEnv(10, 'env-to-remove')] });
+      renderComponent();
 
-      const envs = [
-        createEnv(10, 'associated-env-1'),
-        createEnv(11, 'associated-env-2'),
-      ];
-      setupMockServer(envs);
+      await screen.findByText('env-to-remove');
 
-      renderComponent({
-        associatedEnvironmentIds: [10, 11],
-        initialAssociatedEnvironmentIds: [10, 11],
-        onChange,
+      // First checkbox is the select-all header, second is the first row
+      const checkboxes = screen.getAllByRole('checkbox');
+      await user.click(checkboxes[1]);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('remove-environments-button')).toBeEnabled();
       });
-
-      // Wait for initial query to load and row to appear in Associated table, then click
-      const associatedTable = await screen.findByTestId(
-        'group-associatedEndpoints'
-      );
-      const envRow =
-        await within(associatedTable).findByText('associated-env-1');
-      await user.click(envRow);
-
-      expect(onChange).toHaveBeenCalledWith([11]);
     });
 
-    it('should call onChange with empty array when removing last environment', async () => {
+    it('calls PUT with filtered environment IDs after confirming remove', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      let requestBody: unknown;
 
-      const envs = [createEnv(10, 'only-env')];
-      setupMockServer(envs);
-
-      renderComponent({
-        associatedEnvironmentIds: [10],
-        initialAssociatedEnvironmentIds: [10],
-        onChange,
+      setupMockServer({
+        associatedEnvs: [createEnv(10, 'env-a'), createEnv(11, 'env-b')],
+        onPut: (body) => {
+          requestBody = body;
+        },
       });
+      renderComponent();
 
-      const associatedTable = await screen.findByTestId(
-        'group-associatedEndpoints'
-      );
-      const envRow = await within(associatedTable).findByText('only-env');
-      await user.click(envRow);
+      await screen.findByText('env-a');
 
-      expect(onChange).toHaveBeenCalledWith([]);
+      // Select first row checkbox
+      const checkboxes = screen.getAllByRole('checkbox');
+      await user.click(checkboxes[1]);
+
+      const removeBtn = await screen.findByTestId('remove-environments-button');
+      await waitFor(() => expect(removeBtn).toBeEnabled());
+      await user.click(removeBtn);
+
+      await waitFor(() => {
+        expect(requestBody).toMatchObject({
+          AssociatedEndpoints: [11],
+        });
+      });
     });
   });
 
-  describe('Computed values', () => {
-    it('should identify added IDs (current but not initial)', () => {
-      // addedIds = associatedEnvironmentIds.filter(id => !initialAssociatedEnvironmentIds.includes(id))
-      // When current=[1,2,3] and initial=[2,3], added=[1]
-      setupMockServer();
+  describe('Adding environments (drawer)', () => {
+    it('opens the drawer when Add button is clicked', async () => {
+      const user = userEvent.setup();
+      setupMockServer({ availableEnvs: [createEnv(20, 'available-env')] });
+      renderComponent();
 
-      // This test validates the component's internal logic by checking the highlightIds
-      // passed to AssociatedEnvironmentsTable (newly added envs get "Unsaved" badge)
-      renderComponent({
-        associatedEnvironmentIds: [1, 2, 3],
-        initialAssociatedEnvironmentIds: [2, 3],
-      });
+      const addBtn = await screen.findByTestId('add-environments-button');
+      await user.click(addBtn);
 
-      // The component will compute addedIds=[1] internally
-      // We can't directly test internal state, but we verify it renders
-      expect(screen.getByTestId('group-associatedEndpoints')).toBeVisible();
+      expect(await screen.findByText('Add environments')).toBeVisible();
     });
 
-    it('should identify removed IDs (initial but not current)', () => {
-      // removedIds = initialAssociatedEnvironmentIds.filter(id => !associatedEnvironmentIds.includes(id))
-      // When current=[2,3] and initial=[1,2,3], removed=[1]
-      setupMockServer();
+    it('calls PUT with merged IDs when environments are added from drawer', async () => {
+      const user = userEvent.setup();
+      let requestBody: unknown;
 
-      renderComponent({
-        associatedEnvironmentIds: [2, 3],
-        initialAssociatedEnvironmentIds: [1, 2, 3],
+      setupMockServer({
+        associatedEnvs: [createEnv(10, 'existing-env')],
+        availableEnvs: [createEnv(20, 'new-env')],
+        onPut: (body) => {
+          requestBody = body;
+        },
       });
+      renderComponent();
 
-      // The component will compute removedIds=[1] internally
-      // and pass it as includeIds to AvailableEnvironmentsTable
-      expect(screen.getByTestId('group-availableEndpoints')).toBeVisible();
+      // Open drawer
+      const addBtn = await screen.findByTestId('add-environments-button');
+      await user.click(addBtn);
+
+      // Wait for drawer to open and available env to appear
+      await screen.findByText('Add environments');
+      await screen.findByText('new-env');
+
+      // Select the available env — find the drawer's checkboxes
+      // The drawer table has its own checkboxes after the main table ones
+      const allCheckboxes = screen.getAllByRole('checkbox');
+      // Last checkbox belongs to the drawer table row
+      await user.click(allCheckboxes[allCheckboxes.length - 1]);
+
+      // Click the Add button in the drawer footer
+      const confirmAddBtn = screen.getByTestId(
+        'add-environments-confirm-button'
+      );
+      await user.click(confirmAddBtn);
+
+      await waitFor(() => {
+        expect(requestBody).toMatchObject({
+          AssociatedEndpoints: expect.arrayContaining([10, 20]),
+        });
+      });
     });
   });
 });

@@ -1,126 +1,94 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import { EnvironmentGroupId } from '@/react/portainer/environments/types';
 
-import { FormSection } from '@@/form-components/FormSection';
+import { openConfirm } from '@@/modals/confirm';
+import { buildConfirmButton } from '@@/modals/utils';
 
-import { Environment, EnvironmentId } from '../../../types';
+import { useGroup } from '../../queries/useGroup';
+import { useUpdateGroupMutation } from '../../queries/useUpdateGroupMutation';
 
 import { EnvironmentTableData } from './types';
 import { AssociatedEnvironmentsTable } from './AssociatedEnvironmentsTable';
-import { AvailableEnvironmentsTable } from './AvailableEnvironmentsTable';
+import { AddEnvironmentsDrawer } from './AddEnvironmentsDrawer';
 
 interface Props {
-  /** Group ID when editing an existing group */
-  groupId?: number;
-  /** IDs of currently associated environments */
-  associatedEnvironmentIds: Array<EnvironmentId>;
-  /** IDs of initially associated environments for tracking unsaved changes */
-  initialAssociatedEnvironmentIds: Array<EnvironmentId>;
-  /** Called when environment IDs change */
-  onChange: (ids: Array<EnvironmentId>) => void;
+  groupId: EnvironmentGroupId;
+  /* For unassigned group, don't show the add/remove buttons and hide the checkbox */
+  readOnly: boolean;
 }
 
-export function AssociatedEnvironmentsSelector({
-  groupId,
-  associatedEnvironmentIds,
-  initialAssociatedEnvironmentIds,
-  onChange,
-}: Props) {
-  // Track full environment objects for display (populated when clicking rows)
-  const [environmentCache, setEnvironmentCache] = useState<
-    Map<EnvironmentId, EnvironmentTableData>
-  >(new Map());
+export function AssociatedEnvironmentsSelector({ groupId, readOnly }: Props) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Fetch initially associated environments to populate the cache
-  const initialEnvsQuery = useEnvironmentList(
-    groupId
-      ? {
-          groupIds: [groupId],
-          pageLimit: 0,
-        }
-      : {
-          endpointIds: initialAssociatedEnvironmentIds,
-        },
-    {
-      enabled: groupId
-        ? groupId !== 1
-        : initialAssociatedEnvironmentIds.length > 0,
-    }
-  );
+  const groupQuery = useGroup(groupId);
+  const environmentsQuery = useEnvironmentList({
+    groupIds: [groupId],
+    pageLimit: 0,
+  });
+  const updateMutation = useUpdateGroupMutation();
 
-  const environmentMap = useMemo(
-    () => buildEnvironmentMap(environmentCache, initialEnvsQuery.environments),
-    [environmentCache, initialEnvsQuery.environments]
-  );
-  const associatedSet = new Set(associatedEnvironmentIds);
-  const initialSet = new Set(initialAssociatedEnvironmentIds);
-
-  const addedIds = associatedEnvironmentIds.filter((id) => !initialSet.has(id));
-  const removedIds = initialAssociatedEnvironmentIds.filter(
-    (id) => !associatedSet.has(id)
-  );
-
-  const excludeIdsForAvailableEnvironments = groupId
-    ? addedIds
-    : associatedEnvironmentIds;
-
-  const associatedEnvironments = associatedEnvironmentIds
-    .map((id) => environmentMap.get(id))
-    .filter((env): env is Environment => env !== undefined);
+  const currentEnvironments = environmentsQuery.environments ?? [];
+  const currentIds = currentEnvironments.map((e) => e.Id);
 
   return (
-    <FormSection title="Associated environments">
-      <div className="small text-muted">
-        You can select which environment should be part of this group by moving
-        them to the associated environments table. Simply click on any
-        environment entry to move it from one table to the other.
-      </div>
+    <>
+      <AssociatedEnvironmentsTable
+        title="Associated environments"
+        environments={currentEnvironments}
+        isLoading={environmentsQuery.isLoading}
+        onRemove={handleRemove}
+        onOpenAddDrawer={() => setDrawerOpen(true)}
+        isRemoving={updateMutation.isLoading}
+        data-cy="group-associatedEndpoints"
+        readOnly={readOnly}
+      />
 
-      <div className="flex mt-4 gap-5 items-stretch">
-        <div className="w-1/2 flex flex-col">
-          <AvailableEnvironmentsTable
-            title="Available environments"
-            excludeIds={excludeIdsForAvailableEnvironments}
-            includeIds={removedIds}
-            highlightIds={removedIds}
-            onClickRow={handleAddEnvironment}
-            data-cy="group-availableEndpoints"
-          />
-        </div>
-        <div className="w-1/2 flex flex-col">
-          <AssociatedEnvironmentsTable
-            title="Associated environments"
-            environments={associatedEnvironments}
-            highlightIds={addedIds}
-            onClickRow={handleRemoveEnvironment}
-            data-cy="group-associatedEndpoints"
-          />
-        </div>
-      </div>
-    </FormSection>
+      <AddEnvironmentsDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        excludeIds={currentIds}
+        onAdd={handleAdd}
+        isLoading={updateMutation.isLoading}
+      />
+    </>
   );
 
-  function handleAddEnvironment(env: EnvironmentTableData) {
-    if (!associatedEnvironmentIds.includes(env.Id)) {
-      setEnvironmentCache((prev) => new Map(prev).set(env.Id, env));
-      onChange([...associatedEnvironmentIds, env.Id]);
-    }
+  function handleRemove(selected: EnvironmentTableData[]) {
+    const selectedIds = new Set(selected.map((e) => e.Id));
+    const remainingIds = currentIds.filter((id) => !selectedIds.has(id));
+
+    updateMutation.mutate({
+      id: groupId,
+      name: groupQuery.data?.Name ?? '',
+      description: groupQuery.data?.Description,
+      tagIds: groupQuery.data?.TagIds,
+      associatedEnvironments: remainingIds,
+    });
   }
 
-  function handleRemoveEnvironment(env: EnvironmentTableData) {
-    onChange(associatedEnvironmentIds.filter((id) => id !== env.Id));
-  }
-}
+  async function handleAdd(newEnvs: EnvironmentTableData[]): Promise<boolean> {
+    const confirmed = await openConfirm({
+      title: 'Are you sure?',
+      message: `Are you sure you want to add the selected environment(s) to this group?`,
+      confirmButton: buildConfirmButton('Add'),
+    });
 
-function buildEnvironmentMap(
-  cache: Map<EnvironmentId, EnvironmentTableData>,
-  envs: Array<Environment> | undefined
-): Map<EnvironmentId, EnvironmentTableData> {
-  return new Map([
-    ...cache.entries(),
-    ...(envs ?? []).map(
-      (env) => [env.Id, { Name: env.Name, Id: env.Id }] as const
-    ),
-  ]);
+    if (!confirmed) return false;
+
+    const mergedIds = [
+      ...new Set([...currentIds, ...newEnvs.map((e) => e.Id)]),
+    ];
+
+    updateMutation.mutate({
+      id: groupId,
+      name: groupQuery.data?.Name ?? '',
+      description: groupQuery.data?.Description,
+      tagIds: groupQuery.data?.TagIds,
+      associatedEnvironments: mergedIds,
+    });
+
+    return true;
+  }
 }

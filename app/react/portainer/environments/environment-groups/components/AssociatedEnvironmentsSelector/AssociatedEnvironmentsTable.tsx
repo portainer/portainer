@@ -1,15 +1,17 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import clsx from 'clsx';
 import { truncate } from 'lodash';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Plus } from 'lucide-react';
+import clsx from 'clsx';
 
-import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';
 
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
-import { Datatable, TableRow } from '@@/datatables';
-import { Badge } from '@@/Badge';
-import { Widget } from '@@/Widget';
+import { Datatable } from '@@/datatables';
+import { withControlledSelected } from '@@/datatables/extend-options/withControlledSelected';
+import { TableRow } from '@@/datatables/TableRow';
+import { DeleteButton } from '@@/buttons/DeleteButton';
+import { Button } from '@@/buttons';
 
 import { EnvironmentTableData } from './types';
 
@@ -18,64 +20,101 @@ const columnHelper = createColumnHelper<EnvironmentTableData>();
 interface Props extends AutomationTestingProps {
   title: string;
   environments: Array<EnvironmentTableData>;
-  onClickRow?: (env: EnvironmentTableData) => void;
-  highlightIds?: Array<EnvironmentId>;
+  onRemove(selected: EnvironmentTableData[]): void;
+  onOpenAddDrawer(): void;
+  isRemoving?: boolean;
+  isLoading?: boolean;
+  /** When false, Remove fires immediately without a confirmation dialog (e.g. create mode) */
+  confirmRemove?: boolean;
+  /** When true, don't show the add/remove buttons and hide the checkbox */
+  readOnly?: boolean;
 }
 
 export function AssociatedEnvironmentsTable({
   title,
   environments,
-  onClickRow,
-  highlightIds = [],
+  onRemove,
+  onOpenAddDrawer,
+  isRemoving,
+  isLoading,
+  confirmRemove = true,
+  readOnly = false,
   'data-cy': dataCy,
 }: Props) {
   const tableState = useTableStateWithoutStorage('Name');
-  const columns = useMemo(() => buildColumns(highlightIds), [highlightIds]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const columns = useMemo(() => buildColumns(), []);
 
   return (
-    <Widget className="flex-1 flex flex-col">
-      <div
-        className={clsx(
-          'h-full flex flex-col',
-          '[&_section.datatable]:flex-1 [&_section.datatable]:flex [&_section.datatable]:flex-col',
-          '[&_.footer]:!mt-auto'
+    // avoid padding issues with the widget
+    <div className="-mx-[15px]">
+      <Datatable<EnvironmentTableData>
+        disableSelect={readOnly}
+        isLoading={isLoading}
+        title={title}
+        columns={columns}
+        settingsManager={tableState}
+        dataset={environments}
+        getRowId={(row) => String(row.Id)}
+        renderRow={(row) => (
+          <TableRow<EnvironmentTableData>
+            cells={row.getVisibleCells()}
+            onClick={() => row.toggleSelected()}
+            className={clsx({ active: row.getIsSelected() })}
+            aria-selected={row.getIsSelected()}
+          />
         )}
-      >
-        <Datatable<EnvironmentTableData>
-          // noWidget to avoid padding issues with TableContainer
-          noWidget
-          title={title}
-          columns={columns}
-          settingsManager={tableState}
-          dataset={environments}
-          renderRow={(row) => (
-            <TableRow<EnvironmentTableData>
-              cells={row.getVisibleCells()}
-              onClick={onClickRow ? () => onClickRow(row.original) : undefined}
-            />
-          )}
-          disableSelect
-          data-cy={dataCy || 'environment-table'}
-        />
-      </div>
-    </Widget>
+        extendTableOptions={withControlledSelected(setSelectedIds, selectedIds)}
+        renderTableActions={(selectedItems) =>
+          readOnly ? null : (
+            <>
+              {confirmRemove ? (
+                <DeleteButton
+                  disabled={selectedItems.length === 0}
+                  isLoading={isRemoving}
+                  confirmMessage="Are you sure you want to remove the selected environment(s) from this group?"
+                  onConfirmed={() => handleRemove(selectedItems)}
+                  data-cy="remove-environments-button"
+                  type="button"
+                />
+              ) : (
+                <DeleteButton
+                  disabled={selectedItems.length === 0}
+                  onClick={() => {
+                    handleRemove(selectedItems);
+                  }}
+                  data-cy="remove-environments-button"
+                  type="button"
+                />
+              )}
+              <Button
+                icon={Plus}
+                onClick={onOpenAddDrawer}
+                data-cy="add-environments-button"
+              >
+                Add
+              </Button>
+            </>
+          )
+        }
+        data-cy={dataCy || 'environment-table'}
+      />
+    </div>
   );
+
+  function handleRemove(selectedItems: EnvironmentTableData[]) {
+    onRemove(selectedItems);
+    setSelectedIds([]);
+  }
 }
 
-function buildColumns(highlightIds: Array<EnvironmentId>) {
+function buildColumns() {
   return [
     columnHelper.accessor('Name', {
       header: 'Name',
       id: 'Name',
-      cell: ({ getValue, row }) => (
-        <span className="flex items-center gap-2">
-          <span title={getValue()}>{truncate(getValue(), { length: 64 })}</span>
-          {highlightIds.includes(row.original.Id) && (
-            <Badge type="muted" data-cy="unsaved-badge">
-              Unsaved
-            </Badge>
-          )}
-        </span>
+      cell: ({ getValue }) => (
+        <span title={getValue()}>{truncate(getValue(), { length: 64 })}</span>
       ),
     }),
   ];
