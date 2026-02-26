@@ -2,13 +2,13 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"time"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/errorlist"
 	"github.com/rs/zerolog/log"
 	batchv1 "k8s.io/api/batch/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -190,7 +190,7 @@ func (kcl *KubeClient) getCronJobExecutions(cronJobName string, jobs *batchv1.Jo
 // DeleteJobs deletes the provided list of jobs
 // it returns an error if any of the jobs are not found or if there is an error deleting the jobs
 func (kcl *KubeClient) DeleteJobs(payload models.K8sJobDeleteRequests) error {
-	var errors []error
+	var errs error
 	for namespace := range payload {
 		for _, jobName := range payload[namespace] {
 			client := kcl.cli.BatchV1().Jobs(namespace)
@@ -201,16 +201,16 @@ func (kcl *KubeClient) DeleteJobs(payload models.K8sJobDeleteRequests) error {
 					continue
 				}
 
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 
 			if err := client.Delete(context.Background(), jobName, metav1.DeleteOptions{}); err != nil {
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 		}
 	}
 
-	return errorlist.Combine(errors)
+	return errs
 }
 
 // getLatestJobCondition returns the latest condition of the job

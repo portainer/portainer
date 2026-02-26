@@ -1,4 +1,3 @@
-import uuidv4 from 'uuid/v4';
 import { useState } from 'react';
 
 import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
@@ -12,13 +11,13 @@ import { SwitchField } from '@@/form-components/SwitchField';
 export function WebhookFieldset({
   value,
   onChange,
-  hasWebhook,
+  webhookId,
 }: {
-  value: string;
-  onChange(value: string): void;
-
-  hasWebhook?: boolean;
+  value: boolean;
+  onChange(value: boolean): void;
+  webhookId: string;
 }) {
+  const [hasWebhook] = useState(() => value);
   const authQuery = useAuthorizations(
     hasWebhook ? ['PortainerWebhookDelete'] : ['PortainerWebhookCreate']
   );
@@ -36,6 +35,7 @@ export function WebhookFieldset({
         value={value}
         onChange={onChange}
         disabled={!authQuery.authorized}
+        webhookId={webhookId}
       />
     </Authorized>
   );
@@ -45,19 +45,19 @@ export function AuthorizedWebhook({
   value,
   onChange,
   disabled,
+  webhookId,
 }: {
-  value: string;
-  onChange(value: string): void;
+  value: boolean;
+  onChange(value: boolean): void;
   disabled?: boolean;
+  webhookId: string;
 }) {
-  const [cachedWebhookId, setCachedWebhookId] = useState(value);
-
   return (
     <FormSection title="Webhooks">
       <SwitchField
         name="enableWebhook"
-        checked={!!value}
-        onChange={(checked) => handleChange(checked)}
+        checked={value}
+        onChange={(checked) => onChange(checked)}
         labelClass="col-sm-2"
         tooltip="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
         label="Create a Stack webhook"
@@ -66,17 +66,8 @@ export function AuthorizedWebhook({
         disabled={disabled}
       />
       {value && (
-        <WebhookSettings baseUrl={baseStackWebhookUrl()} value={value} />
+        <WebhookSettings baseUrl={baseStackWebhookUrl()} value={webhookId} />
       )}
     </FormSection>
   );
-
-  function handleChange(enable: boolean) {
-    if (enable) {
-      onChange(cachedWebhookId || uuidv4());
-    } else {
-      setCachedWebhookId(value);
-      onChange('');
-    }
-  }
 }

@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices/edgegroup"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +16,7 @@ func TestMigrateEdgeGroupEndpointsToRoars_2_33_0Idempotency(t *testing.T) {
 	err := conn.Open()
 	require.NoError(t, err)
 
-	defer conn.Close()
+	defer logs.CloseAndLogErr(conn)
 
 	edgeGroupService, err := edgegroup.NewService(conn)
 	require.NoError(t, err)

@@ -75,35 +75,37 @@ export enum DeploymentType {
   Kubernetes,
 }
 
-export type EdgeStack = RelativePathModel & {
+export type EdgeStack = Partial<RelativePathModel> & {
   Id: number;
   Name: string;
   Status: { [key: EnvironmentId]: EdgeStackStatus };
   CreationDate: number;
   EdgeGroups: Array<EdgeGroup['Id']>;
-  Registries: RegistryId[];
   ProjectPath: string;
   EntryPoint: string;
   Version: number;
   NumDeployments: number;
   ManifestPath: string;
   DeploymentType: DeploymentType;
-  EdgeUpdateID: number;
-  ScheduledTime: string;
   UseManifestNamespaces: boolean;
-  PrePullImage: boolean;
-  RePullImage: boolean;
-  AutoUpdate?: AutoUpdateResponse;
-  GitConfig?: RepoConfigResponse;
-  Prune: boolean;
-  RetryDeploy: boolean;
-  Webhook: string;
-  StackFileVersion?: number;
-  PreviousDeploymentInfo: EdgeStackDeploymentInfo;
-  EnvVars?: EnvVar[];
-  StaggerConfig?: StaggerConfig;
-  SupportRelativePath: boolean;
-  FilesystemPath?: string;
-};
+} & Partial<{
+    // EE
+    Registries: RegistryId[];
+    EdgeUpdateID: number;
+    ScheduledTime: string;
+    PrePullImage: boolean;
+    RePullImage: boolean;
+    AutoUpdate?: AutoUpdateResponse;
+    GitConfig?: RepoConfigResponse;
+    Prune: boolean;
+    RetryDeploy: boolean;
+    Webhook: string;
+    StackFileVersion?: number;
+    PreviousDeploymentInfo: EdgeStackDeploymentInfo;
+    EnvVars?: EnvVar[];
+    StaggerConfig?: StaggerConfig;
+    SupportRelativePath: boolean;
+    FilesystemPath?: string;
+  }>;
 
 export { DeploymentType as EditorType };

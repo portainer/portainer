@@ -1,18 +1,14 @@
 package registryutils
 
 import (
+	"slices"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
 
 func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID portainer.EndpointID, namespace string) bool {
-	for _, ns := range registry.RegistryAccesses[endpointID].Namespaces {
-		if ns == namespace {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(registry.RegistryAccesses[endpointID].Namespaces, namespace)
 }
 
 func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, namespace string) error {

@@ -18,12 +18,13 @@ func TestHandler_webhookInvoke(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, true, true)
 
 	webhookID := newGuidString(t)
-	store.StackService.Create(&portainer.Stack{
+	err := store.StackService.Create(&portainer.Stack{
 		ID: 1,
 		AutoUpdate: &portainer.AutoUpdateSettings{
 			Webhook: webhookID,
 		},
 	})
+	require.NoError(t, err)
 
 	h := NewHandler(testhelpers.NewTestRequestBouncer())
 	h.DataStore = store

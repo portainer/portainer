@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -128,12 +129,12 @@ func (handler *Handler) hijackPodExecStartOperation(
 	if err != nil {
 		return httperror.InternalServerError("Unable to upgrade the connection", err)
 	}
-	defer websocketConn.Close()
+	defer logs.CloseAndLogErr(websocketConn)
 
 	stdinReader, stdinWriter := io.Pipe()
-	defer stdinWriter.Close()
+	defer logs.CloseAndLogErr(stdinWriter)
 	stdoutReader, stdoutWriter := io.Pipe()
-	defer stdoutWriter.Close()
+	defer logs.CloseAndLogErr(stdoutWriter)
 
 	// errorChan is used to propagate errors from the go routines to the caller.
 	errorChan := make(chan error, 1)

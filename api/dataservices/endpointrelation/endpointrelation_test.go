@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices/edgestack"
 	"github.com/portainer/portainer/api/internal/edge/cache"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +21,7 @@ func TestUpdateRelation(t *testing.T) {
 	err := conn.Open()
 	require.NoError(t, err)
 
-	defer conn.Close()
+	defer logs.CloseAndLogErr(conn)
 
 	service, err := NewService(conn)
 	require.NoError(t, err)
@@ -109,7 +110,7 @@ func TestAddEndpointRelationsForEdgeStack(t *testing.T) {
 	err := conn.Open()
 	require.NoError(t, err)
 
-	defer conn.Close()
+	defer logs.CloseAndLogErr(conn)
 
 	service, err := NewService(conn)
 	require.NoError(t, err)
@@ -128,7 +129,7 @@ func TestEndpointRelations(t *testing.T) {
 	err := conn.Open()
 	require.NoError(t, err)
 
-	defer conn.Close()
+	defer logs.CloseAndLogErr(conn)
 
 	service, err := NewService(conn)
 	require.NoError(t, err)

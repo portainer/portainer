@@ -9,9 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-type (
-	contextKey int
-)
+type contextKey int
 
 const (
 	contextAuthenticationKey contextKey = iota

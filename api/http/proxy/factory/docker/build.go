@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/archive"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
@@ -80,7 +81,11 @@ func buildOperation(request *http.Request) error {
 		}
 
 		tfb := archive.NewTarFileInBuffer()
-		defer tfb.Close()
+		defer func() {
+			if err := tfb.Close(); err != nil {
+				log.Warn().Err(err).Msg("failed to close tar buffer")
+			}
+		}()
 
 		for k := range request.MultipartForm.File {
 			f, hdr, err := request.FormFile(k)
@@ -88,7 +93,7 @@ func buildOperation(request *http.Request) error {
 				return err
 			}
 
-			defer f.Close()
+			defer logs.CloseAndLogErr(f)
 
 			log.Info().Str("filename", hdr.Filename).Int64("size", hdr.Size).Msg("upload the file to build image")
 

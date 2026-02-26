@@ -3,6 +3,7 @@ package resourcecontrol
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -64,11 +65,9 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 				return nil, stop
 			}
 
-			for _, subResourceID := range rc.SubResourceIDs {
-				if subResourceID == resourceID {
-					resourceControl = rc
-					return nil, stop
-				}
+			if slices.Contains(rc.SubResourceIDs, resourceID) {
+				resourceControl = rc
+				return nil, stop
 			}
 
 			return &portainer.ResourceControl{}, nil

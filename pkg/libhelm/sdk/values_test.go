@@ -186,9 +186,7 @@ func TestMergeValues(t *testing.T) {
 
 func TestGetHelmValuesFromFile(t *testing.T) {
 	// Create a temporary directory for test files
-	tempDir, err := os.MkdirTemp("", "helm-values-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	t.Run("empty file path returns empty map", func(t *testing.T) {
 		vals, err := GetHelmValuesFromFile("")

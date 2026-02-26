@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/jwt"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/fips"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -105,7 +106,7 @@ func createTestFile(targetPath string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer logs.CloseAndLogErr(f)
 
 	_, err = f.WriteString(testFileContent)
 
@@ -177,7 +178,10 @@ func Test_customTemplateGitFetch(t *testing.T) {
 	err = prepareTestFolder(template1.ProjectPath, template1.GitConfig.ConfigFilePath)
 	require.NoError(t, err, "error creating testing folder")
 
-	defer os.RemoveAll(filepath.Join(dir, "fixtures"))
+	defer func() {
+		err := os.RemoveAll(filepath.Join(dir, "fixtures"))
+		require.NoError(t, err)
+	}()
 
 	// setup services
 	jwtService, err := jwt.NewService("1h", store)

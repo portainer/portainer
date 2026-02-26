@@ -67,7 +67,7 @@ dev: ## Run both the client and server in development mode
 	make dev-client
 
 dev-client: ## Run the client in development mode
-	pnpm run dev
+	pnpm install && pnpm run dev
 
 dev-server: build-server ## Run the server in development mode
 	@./dev/run_container.sh

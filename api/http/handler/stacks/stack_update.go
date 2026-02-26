@@ -282,7 +282,9 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
+	if err := handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint); err != nil {
+		log.Warn().Err(err).Msg("remove stack file backup error")
+	}
 
 	return nil
 }
@@ -373,7 +375,9 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
+	if err := handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint); err != nil {
+		log.Warn().Err(err).Msg("remove stack file backup error")
+	}
 
 	return nil
 }

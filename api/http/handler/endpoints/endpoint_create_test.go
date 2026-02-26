@@ -73,7 +73,7 @@ func TestSaveEndpointAndUpdateAuthorizations(t *testing.T) {
 			endpoint := &portainer.Endpoint{
 				ID:      portainer.EndpointID(store.Endpoint().GetNextIdentifier()),
 				Type:    testCase.endpointType,
-				GroupID: portainer.EndpointGroupID(endpointGroup.ID),
+				GroupID: endpointGroup.ID,
 			}
 
 			err := h.saveEndpointAndUpdateAuthorizations(store, endpoint)

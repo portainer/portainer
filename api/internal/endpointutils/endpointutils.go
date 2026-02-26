@@ -187,10 +187,10 @@ func InitialStorageDetection(endpoint *portainer.Endpoint, endpointService datas
 	}
 	defer func() {
 		endpoint.Kubernetes.Flags.IsServerStorageDetected = true
-		endpointService.UpdateEndpoint(
-			endpoint.ID,
-			endpoint,
-		)
+
+		if err := endpointService.UpdateEndpoint(endpoint.ID, endpoint); err != nil {
+			log.Warn().Err(err).Msg("unable to store found StorageClasses inside the database")
+		}
 	}()
 
 	log.Info().Msg("attempting to detect storage classes in the cluster")

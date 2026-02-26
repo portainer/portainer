@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"slices"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -69,6 +70,10 @@ func NewPublicResourceControl(resourceIdentifier string, resourceType portainer.
 		Public:             true,
 		System:             false,
 	}
+}
+
+func NewEmptyRestrictedResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType) *portainer.ResourceControl {
+	return NewRestrictedResourceControl(resourceIdentifier, resourceType, []portainer.UserID{}, []portainer.TeamID{})
 }
 
 // NewRestrictedResourceControl will create a new resource control with user and team accesses restrictions.
@@ -174,10 +179,8 @@ func UserCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 	}
 
 	for _, authorizedTeamAccess := range resourceControl.TeamAccesses {
-		for _, userTeamID := range userTeamIDs {
-			if userTeamID == authorizedTeamAccess.TeamID {
-				return true
-			}
+		if slices.Contains(userTeamIDs, authorizedTeamAccess.TeamID) {
+			return true
 		}
 	}
 
@@ -192,10 +195,8 @@ func GetResourceControlByResourceIDAndType(resourceID string, resourceType porta
 			return &resourceControls[i]
 		}
 
-		for j := range resourceControls[i].SubResourceIDs {
-			if resourceID == resourceControls[i].SubResourceIDs[j] {
-				return &resourceControls[i]
-			}
+		if slices.Contains(resourceControls[i].SubResourceIDs, resourceID) {
+			return &resourceControls[i]
 		}
 	}
 

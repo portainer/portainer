@@ -13,6 +13,8 @@ import (
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/logs"
+	"github.com/rs/zerolog/log"
 
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/pkg/errors"
@@ -76,10 +78,13 @@ func (a *azureClient) download(ctx context.Context, destination string, opt clon
 	if err != nil {
 		return errors.Wrap(err, "failed to download a zip file from Azure DevOps")
 	}
-	defer os.Remove(zipFilepath)
+	defer func() {
+		if err := os.Remove(zipFilepath); err != nil {
+			log.Warn().Err(err).Msg("failed to remove temporary zip file")
+		}
+	}()
 
-	err = archive.UnzipFile(zipFilepath, destination)
-	if err != nil {
+	if err := archive.UnzipFile(zipFilepath, destination); err != nil {
 		return errors.Wrap(err, "failed to unzip file")
 	}
 
@@ -102,7 +107,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 		return "", errors.WithMessage(err, "failed to create temp file")
 	}
 
-	defer zipFile.Close()
+	defer logs.CloseAndLogErr(zipFile)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
 	if opt.username != "" || opt.password != "" {
@@ -123,14 +128,17 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneO
 		return "", errors.WithMessage(err, "failed to make an HTTP request")
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if res.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to download zip with a status \"%v\"", res.Status)
 	}
 
-	_, err = io.Copy(zipFile, res.Body)
-	if err != nil {
+	if _, err := io.Copy(zipFile, res.Body); err != nil {
 		return "", errors.WithMessage(err, "failed to save HTTP response to a file")
 	}
 
@@ -175,7 +183,11 @@ func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureI
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, checkAzureStatusCode(fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status), resp.StatusCode)
@@ -365,12 +377,12 @@ const (
 )
 
 func formatReferenceName(name string) string {
-	if strings.HasPrefix(name, branchPrefix) {
-		return strings.TrimPrefix(name, branchPrefix)
+	if after, ok := strings.CutPrefix(name, branchPrefix); ok {
+		return after
 	}
 
-	if strings.HasPrefix(name, tagPrefix) {
-		return strings.TrimPrefix(name, tagPrefix)
+	if after, ok := strings.CutPrefix(name, tagPrefix); ok {
+		return after
 	}
 
 	return name
@@ -417,7 +429,11 @@ func (a *azureClient) listRefs(ctx context.Context, opt baseOption) ([]string, e
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, checkAzureStatusCode(fmt.Errorf("failed to list refs with a status \"%v\"", resp.Status), resp.StatusCode)
@@ -477,7 +493,11 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to list tree url with a status \"%v\"", resp.Status)

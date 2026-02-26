@@ -178,6 +178,10 @@
   z-index: 10;
 }
 
+.portainer-selector__menu-portal {
+  z-index: 50 !important;
+}
+
 .portainer-selector__menu-portal .portainer-selector__menu .portainer-selector__option,
 .portainer-selector-root .portainer-selector__menu .portainer-selector__option {
   background-color: var(--bg-multiselect-color);

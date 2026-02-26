@@ -8,11 +8,12 @@ import { useSettings } from '@/react/portainer/settings/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   mutationOptions,
-  withError,
+  withGlobalError,
   withInvalidate,
 } from '@/react-tools/react-query';
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 import { useCurrentUser } from '@/react/hooks/useUser';
+import { userQueryKeys } from '@/portainer/users/queries/queryKeys';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
@@ -29,7 +30,7 @@ import { DecoratedUser } from './types';
 const store = createPersistedStore('users');
 
 export function UsersDatatable() {
-  const { handleRemove } = useRemoveMutation();
+  const removeMutation = useRemoveMutation();
   const { isPureAdmin } = useCurrentUser();
   const usersQuery = useUsers(isPureAdmin);
   const membershipsQuery = useTeamMemberships();
@@ -70,12 +71,22 @@ export function UsersDatatable() {
       titleIcon={UserIcon}
       settingsManager={tableState}
       isRowSelectable={(row) => row.original.Id !== 1}
-      renderTableActions={(selectedItems) => (
+      renderTableActions={(selectedUsers) => (
         <DeleteButton
-          disabled={selectedItems.length === 0}
+          disabled={selectedUsers.length === 0}
           confirmMessage="Do you want to remove the selected users? They will not be able to login into Portainer anymore."
-          onConfirmed={() => handleRemove(selectedItems.map((i) => i.Id))}
+          onConfirmed={() =>
+            removeMutation.mutate(
+              selectedUsers.map((i) => i.Id),
+              {
+                onSuccess: () => {
+                  notifySuccess('Users successfully removed', '');
+                },
+              }
+            )
+          }
           data-cy="remove-users-button"
+          isLoading={removeMutation.isLoading}
         />
       )}
       data-cy="users-datatable"
@@ -86,21 +97,11 @@ export function UsersDatatable() {
 function useRemoveMutation() {
   const queryClient = useQueryClient();
 
-  const deleteMutation = useMutation(
+  return useMutation(
     async (ids: TeamId[]) => processItemsInBatches(ids, deleteUser),
     mutationOptions(
-      withError('Unable to remove users'),
-      withInvalidate(queryClient, [['users']])
+      withGlobalError('Unable to remove users'),
+      withInvalidate(queryClient, [userQueryKeys.base()])
     )
   );
-
-  return { handleRemove };
-
-  async function handleRemove(teams: TeamId[]) {
-    deleteMutation.mutate(teams, {
-      onSuccess: () => {
-        notifySuccess('Teams successfully removed', '');
-      },
-    });
-  }
 }

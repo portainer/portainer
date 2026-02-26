@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,38 +21,34 @@ type PendingActionsService struct {
 
 var handlers = make(map[string]portainer.PendingActionHandler)
 
-func NewService(
-	dataStore dataservices.DataStore,
-	kubeFactory *kubecli.ClientFactory,
-) *PendingActionsService {
-	return &PendingActionsService{
-		dataStore:   dataStore,
-		kubeFactory: kubeFactory,
-		mu:          sync.Mutex{},
-	}
+func NewService(dataStore dataservices.DataStore, kubeFactory *kubecli.ClientFactory) *PendingActionsService {
+	return &PendingActionsService{dataStore: dataStore, kubeFactory: kubeFactory}
 }
 
 func (service *PendingActionsService) RegisterHandler(name string, handler portainer.PendingActionHandler) {
 	handlers[name] = handler
 }
 
-func (service *PendingActionsService) Create(action portainer.PendingAction) error {
+func (service *PendingActionsService) Create(tx dataservices.DataStoreTx, action portainer.PendingAction) error {
 	// Check if this pendingAction already exists
-	pendingActions, err := service.dataStore.PendingActions().ReadAll()
+	pendingActions, err := tx.PendingActions().ReadAll(func(a portainer.PendingAction) bool {
+		return a.EndpointID == action.EndpointID && a.Action == action.Action && reflect.DeepEqual(a.ActionData, action.ActionData)
+	})
 	if err != nil {
 		return fmt.Errorf("failed to retrieve pending actions: %w", err)
 	}
 
-	for _, dba := range pendingActions {
+	if len(pendingActions) > 0 {
 		// Same endpoint, same action and data, don't create a repeat
-		if dba.EndpointID == action.EndpointID && dba.Action == action.Action &&
-			reflect.DeepEqual(dba.ActionData, action.ActionData) {
-			log.Debug().Msgf("pending action %s already exists for environment %d, skipping...", action.Action, action.EndpointID)
-			return nil
-		}
+		log.Debug().
+			Str("action", action.Action).
+			Int("endpoint_id", int(action.EndpointID)).
+			Msg("pending action already exists for environment, skipping...")
+
+		return nil
 	}
 
-	return service.dataStore.PendingActions().Create(&action)
+	return tx.PendingActions().Create(&action)
 }
 
 func (service *PendingActionsService) Execute(id portainer.EndpointID) {
@@ -65,7 +62,8 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 
 	endpoint, err := service.dataStore.Endpoint().Endpoint(environmentID)
 	if err != nil {
-		log.Debug().Msgf("failed to retrieve environment %d: %v", environmentID, err)
+		log.Debug().Err(err).Int("endpoint_id", int(environmentID)).Msg("failed to retrieve environment")
+
 		return
 	}
 
@@ -86,48 +84,55 @@ func (service *PendingActionsService) execute(environmentID portainer.EndpointID
 		// creating a kube client and performing a simple operation
 		client, err := service.kubeFactory.GetPrivilegedKubeClient(endpoint)
 		if err != nil {
-			log.Debug().Msgf("failed to create Kubernetes client for environment %d: %v", environmentID, err)
+			log.Debug().
+				Err(err).
+				Int("endpoint_id", int(environmentID)).
+				Msg("failed to create Kubernetes client for environment")
+
 			return
 		}
 
 		if _, err = client.ServerVersion(); err != nil {
-			log.Debug().Err(err).Msgf("Environment %q (id: %d) is not up", endpoint.Name, environmentID)
+			log.Debug().
+				Err(err).
+				Str("endpoint_name", endpoint.Name).
+				Int("endpoint_id", int(environmentID)).
+				Msg("environment is not up")
+
 			return
 		}
 	}
 
-	pendingActions, err := service.dataStore.PendingActions().ReadAll()
+	pendingActions, err := service.dataStore.PendingActions().ReadAll(func(a portainer.PendingAction) bool {
+		return a.EndpointID == environmentID
+	})
 	if err != nil {
-		log.Warn().Msgf("failed to read pending actions: %v", err)
+		log.Warn().Err(err).Msg("failed to read pending actions")
 		return
 	}
 
 	if len(pendingActions) > 0 {
-		log.Debug().Msgf("Found %d pending actions", len(pendingActions))
+		log.Debug().Int("pending_action_count", len(pendingActions)).Msg("found pending actions")
 	}
 
-	for i, pendingAction := range pendingActions {
-		if pendingAction.EndpointID == environmentID {
-			if i == 0 {
-				// We have at least 1 pending action for this environment
-				log.Debug().Msgf("Executing pending actions for environment %d", environmentID)
-			}
+	for _, pendingAction := range pendingActions {
+		log.Debug().
+			Int("pending_action_id", int(pendingAction.ID)).
+			Str("action", pendingAction.Action).
+			Msg("executing pending action")
+		if err := service.executePendingAction(pendingAction, endpoint); err != nil {
+			log.Warn().Err(err).Msg("failed to execute pending action")
 
-			log.Debug().Msgf("executing pending action id=%d, action=%s", pendingAction.ID, pendingAction.Action)
-			err := service.executePendingAction(pendingAction, endpoint)
-			if err != nil {
-				log.Warn().Msgf("failed to execute pending action: %v", err)
-				continue
-			}
-
-			err = service.dataStore.PendingActions().Delete(pendingAction.ID)
-			if err != nil {
-				log.Warn().Msgf("failed to delete pending action: %v", err)
-				continue
-			}
-
-			log.Debug().Msgf("pending action %d finished", pendingAction.ID)
+			continue
 		}
+
+		if err := service.dataStore.PendingActions().Delete(pendingAction.ID); err != nil {
+			log.Warn().Err(err).Msg("failed to delete pending action")
+
+			continue
+		}
+
+		log.Debug().Int("pending_action_id", int(pendingAction.ID)).Msg("pending action finished")
 	}
 }
 
@@ -140,7 +145,8 @@ func (service *PendingActionsService) executePendingAction(pendingAction portain
 
 	handler, ok := handlers[pendingAction.Action]
 	if !ok {
-		log.Warn().Msgf("no handler found for pending action %s", pendingAction.Action)
+		log.Warn().Str("action", pendingAction.Action).Msg("no handler found for pending action")
+
 		return nil
 	}
 

@@ -47,7 +47,8 @@ func Test_updateUserRemovesAccessTokens(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		h.deleteUser(rr, user)
+		handlerErr := h.deleteUser(rr, user)
+		require.Nil(t, handlerErr)
 
 		is.Equal(http.StatusNoContent, rr.Code)
 

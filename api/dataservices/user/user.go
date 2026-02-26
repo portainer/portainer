@@ -65,6 +65,18 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 	return nil, err
 }
 
+func (service *Service) UserIDByUsername(username string) (portainer.UserID, error) {
+	user, err := service.UserByUsername(username)
+	if err != nil {
+		return 0, err
+	}
+
+	if user == nil {
+		return 0, dserrors.ErrObjectNotFound
+	}
+	return user.ID, nil
+}
+
 // UsersByRole return an array containing all the users with the specified role.
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)

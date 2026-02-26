@@ -38,7 +38,11 @@ func (handler *Handler) fetchTemplates() (*listResponse, *httperror.HandlerError
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve templates via the network", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("Failed to close templates response body")
+		}
+	}()
 
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return nil, httperror.InternalServerError("Unable to parse template file", err)

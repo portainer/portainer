@@ -4,6 +4,7 @@ import axios, {
 } from '@/portainer/services/axios';
 import { Pair } from '@/react/portainer/settings/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 
 import { Stack } from '../../types';
 
@@ -20,6 +21,7 @@ export type StandaloneFileUploadPayload = {
   /** A UUID to identify a webhook. The stack will be force updated and pull the latest image when the webhook was invoked. */
   Webhook?: string;
   environmentId: EnvironmentId;
+  Registries?: Array<RegistryId>;
 };
 
 export async function createStandaloneStackFromFile({

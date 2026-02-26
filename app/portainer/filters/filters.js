@@ -14,10 +14,6 @@ export function truncateLeftRight(text, max, left, right) {
   }
 }
 
-export function stripProtocol(url) {
-  return url.replace(/.*?:\/\//g, '');
-}
-
 export function humanize(bytes, round, base) {
   if (!round) {
     round = 1;

@@ -9,6 +9,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/logs"
 )
 
 // TarGzDir creates a tar.gz archive and returns it's path.
@@ -20,12 +23,13 @@ func TarGzDir(absolutePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer outFile.Close()
+	defer logs.CloseAndLogErr(outFile)
 
 	zipWriter := gzip.NewWriter(outFile)
-	defer zipWriter.Close()
+	defer logs.CloseAndLogErr(zipWriter)
+
 	tarWriter := tar.NewWriter(zipWriter)
-	defer tarWriter.Close()
+	defer logs.CloseAndLogErr(tarWriter)
 
 	err = filepath.Walk(absolutePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -86,7 +90,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 	if err != nil {
 		return err
 	}
-	defer zipReader.Close()
+	defer logs.CloseAndLogErr(zipReader)
 
 	tarReader := tar.NewReader(zipReader)
 
@@ -105,7 +109,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 		case tar.TypeDir:
 			// skip, dir will be created with a file
 		case tar.TypeReg:
-			p := filepath.Clean(filepath.Join(outputDirPath, header.Name))
+			p := filesystem.JoinPaths(outputDirPath, header.Name)
 			if err := os.MkdirAll(filepath.Dir(p), 0o744); err != nil {
 				return fmt.Errorf("Failed to extract dir %s", filepath.Dir(p))
 			}
@@ -116,7 +120,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 			if _, err := io.Copy(outFile, tarReader); err != nil {
 				return fmt.Errorf("Failed to extract file %s", header.Name)
 			}
-			outFile.Close()
+			logs.CloseAndLogErr(outFile)
 		default:
 			return fmt.Errorf("tar: unknown type: %v in %s",
 				header.Typeflag,

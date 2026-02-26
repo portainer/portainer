@@ -2,20 +2,18 @@ import { useFormikContext } from 'formik';
 
 import { GitForm } from '@/react/portainer/gitops/GitForm';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 
 import { FormValues } from '../types';
 
 import { StackRelativePathFieldset } from './StackRelativePathFieldset';
 
 interface Props {
-  baseWebhookUrl?: string;
   isDockerStandalone?: boolean;
+  webhookId: string;
 }
 
-export function GitSection({
-  baseWebhookUrl = '',
-  isDockerStandalone = false,
-}: Props) {
+export function GitSection({ webhookId, isDockerStandalone = false }: Props) {
   const { values, errors, setValues } = useFormikContext<FormValues>();
 
   return (
@@ -38,8 +36,8 @@ export function GitSection({
         isAuthExplanationVisible
         isForcePullVisible
         errors={errors.git}
-        baseWebhookUrl={baseWebhookUrl}
-        webhookId={values.webhookId}
+        baseWebhookUrl={baseStackWebhookUrl()}
+        webhookId={webhookId}
       />
       {isBE && (
         <StackRelativePathFieldset isDockerStandalone={isDockerStandalone} />

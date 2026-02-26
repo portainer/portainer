@@ -1,9 +1,8 @@
 import { object, SchemaOf, string } from 'yup';
 
 import { tlsConfigValidation } from '@/react/components/TLSFieldset/TLSFieldset';
-
-import { metadataValidation } from '../../shared/MetadataFieldset/validation';
-import { useNameValidation } from '../../shared/NameField';
+import { useNameValidation } from '@/react/portainer/environments/common/NameField/NameField';
+import { metadataValidation } from '@/react/portainer/environments/common/MetadataFieldset/validation';
 
 import { FormValues } from './types';
 

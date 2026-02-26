@@ -5,7 +5,7 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { PageHeader } from '@@/PageHeader';
-import { findSelectedTabIndex, Tab, WidgetTabs } from '@@/Widget/WidgetTabs';
+import { Tab, useCurrentTabIndex, WidgetTabs } from '@@/Widget/WidgetTabs';
 import { Badge } from '@@/Badge';
 import { Icon } from '@@/Icon';
 
@@ -64,7 +64,7 @@ export function NamespaceView() {
       selectedTabParam: 'YAML',
     },
   ];
-  const currentTabIndex = findSelectedTabIndex(stateAndParams, tabs);
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

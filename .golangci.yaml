@@ -1,4 +1,5 @@
 version: "2"
+
 run:
   allow-parallel-runners: true
 linters:
@@ -7,6 +8,7 @@ linters:
     - bodyclose
     - copyloopvar
     - depguard
+    - errcheck
     - errorlint
     - forbidigo
     - govet
@@ -19,8 +21,14 @@ linters:
     - durationcheck
     - errorlint
     - govet
+    - usetesting
     - zerologlint
     - testifylint
+    - modernize
+    - unconvert
+    - unused
+    - zerologlint
+    - exptostd
   settings:
     staticcheck:
       checks: ["all", "-ST1003", "-ST1005", "-ST1016", "-SA1019", "-QF1003"]
@@ -44,6 +52,8 @@ linters:
               desc: golang.org/x/crypto is not allowed because of FIPS mode
             - pkg: github.com/ProtonMail/go-crypto/openpgp
               desc: github.com/ProtonMail/go-crypto/openpgp is not allowed because of FIPS mode
+            - pkg: github.com/cosi-project/runtime
+              desc: github.com/cosi-project/runtime is not allowed because of FIPS mode
             - pkg: gopkg.in/yaml.v3
               desc: use go.yaml.in/yaml/v3 instead
     forbidigo:
@@ -63,12 +73,13 @@ linters:
       - comments
       - common-false-positives
       - legacy
-      - std-error-handling
     paths:
       - third_party$
       - builtin$
       - examples$
 formatters:
+  enable:
+    - gofmt
   exclusions:
     generated: lax
     paths:

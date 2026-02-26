@@ -115,19 +115,20 @@ func abortProxyOnLogout(ctx context.Context, proxy *websocketproxy.WebsocketProx
 	logoutCtx := logoutcontext.GetContext(token)
 
 	go func() {
-		log.Debug().
-			Msg("logout watcher for websocket proxy started")
+		log.Debug().Msg("logout watcher for websocket proxy started")
 
 		select {
 		case <-logoutCtx.Done():
-			log.Debug().
-				Msg("logout watcher for websocket proxy stopped as user logged out")
+			log.Debug().Msg("logout watcher for websocket proxy stopped as user logged out")
 			if wsConn != nil {
-				wsConn.Close()
+				if err := wsConn.Close(); err != nil {
+					log.Warn().
+						Err(err).
+						Msg("failed to close websocket connection on logout")
+				}
 			}
 		case <-ctx.Done():
-			log.Debug().
-				Msg("logout watcher for websocket proxy stopped as the ws connection closed")
+			log.Debug().Msg("logout watcher for websocket proxy stopped as the ws connection closed")
 		}
 	}()
 }

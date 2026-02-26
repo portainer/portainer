@@ -11,7 +11,7 @@ type K8sApplication struct {
 	ID                      string                                 `json:"Id"`
 	Name                    string                                 `json:"Name"`
 	Image                   string                                 `json:"Image"`
-	Containers              []interface{}                          `json:"Containers,omitempty"`
+	Containers              []any                                  `json:"Containers,omitempty"`
 	Services                []corev1.Service                       `json:"Services" swaggerignore:"true"`
 	CreationDate            time.Time                              `json:"CreationDate"`
 	ApplicationOwner        string                                 `json:"ApplicationOwner,omitempty"`
@@ -37,9 +37,9 @@ type K8sApplication struct {
 	MatchLabels             map[string]string                      `json:"MatchLabels,omitempty"`
 	Labels                  map[string]string                      `json:"Labels,omitempty"`
 	Annotations             map[string]string                      `json:"Annotations,omitempty"`
-	Resource                K8sApplicationResource                 `json:"Resource,omitempty"`
+	Resource                K8sApplicationResource                 `json:"Resource,omitzero"`
 	HorizontalPodAutoscaler *autoscalingv2.HorizontalPodAutoscaler `json:"HorizontalPodAutoscaler,omitempty" swaggerignore:"true"`
-	CustomResourceMetadata  CustomResourceMetadata                 `json:"CustomResourceMetadata,omitempty"`
+	CustomResourceMetadata  CustomResourceMetadata                 `json:"CustomResourceMetadata,omitzero"`
 	StackKind               string                                 `json:"StackKind,omitempty"`
 }
 
@@ -65,14 +65,14 @@ type Pod struct {
 	NodeName        string                 `json:"NodeName"`
 	PodIP           string                 `json:"PodIP"`
 	UID             string                 `json:"Uid"`
-	Resource        K8sApplicationResource `json:"Resource,omitempty"`
+	Resource        K8sApplicationResource `json:"Resource,omitzero"`
 	CreationDate    time.Time              `json:"CreationDate"`
 }
 
 type Configuration struct {
-	Data               map[string]interface{} `json:"Data,omitempty"`
-	Kind               string                 `json:"Kind"`
-	ConfigurationOwner string                 `json:"ConfigurationOwner"`
+	Data               map[string]any `json:"Data,omitempty"`
+	Kind               string         `json:"Kind"`
+	ConfigurationOwner string         `json:"ConfigurationOwner"`
 }
 
 type PublishedPort struct {

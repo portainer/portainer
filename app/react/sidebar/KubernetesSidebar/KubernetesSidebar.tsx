@@ -105,6 +105,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         to="kubernetes.moreResources.jobs"
         pathOptions={{
           includePaths: [
+            'kubernetes.moreResources.jobs',
             'kubernetes.moreResources.serviceAccounts',
             'kubernetes.moreResources.clusterRoles',
             'kubernetes.moreResources.roles',

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { FormSection } from './FormSection';
 
@@ -25,7 +25,7 @@ const exampleContent = `Content
       Nullam nec nibh maximus, consequat quam sed, dapibus purus. Donec facilisis commodo mi, in commodo augue molestie sed.
   `;
 
-export const Example: Story<Args> = Template.bind({});
+export const Example: StoryFn<Args> = Template.bind({});
 Example.args = {
   title: 'title',
   content: exampleContent,

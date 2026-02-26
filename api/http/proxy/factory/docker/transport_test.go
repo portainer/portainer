@@ -134,17 +134,17 @@ func TestTransport_getRealResourceID(t *testing.T) {
 
 	test := func(rctype portainer.ResourceControlType, name string, id string, errOnUnknown bool) {
 		// by id
-		got, err := getRealResourceID(client, rctype, id)
+		got, err := getDockerResourceUUID(client, rctype, id)
 		require.NoError(t, err)
 		require.Equal(t, id, got)
 
 		// by name
-		got, err = getRealResourceID(client, rctype, name)
+		got, err = getDockerResourceUUID(client, rctype, name)
 		require.NoError(t, err)
 		require.Equal(t, id, got)
 
 		// unknown for this type
-		_, err = getRealResourceID(client, rctype, "unknown")
+		_, err = getDockerResourceUUID(client, rctype, "unknown")
 		if errOnUnknown {
 			require.Error(t, err)
 		} else {
@@ -160,7 +160,7 @@ func TestTransport_getRealResourceID(t *testing.T) {
 	test(portainer.SecretResourceControl, "mysecret", "v9i7o4ivg33u4z3jfyxto162d", true)
 
 	// validate that other types are not supported
-	_, err = getRealResourceID(client, portainer.ContainerGroupResourceControl, "")
+	_, err = getDockerResourceUUID(client, portainer.ContainerGroupResourceControl, "")
 	require.Error(t, err)
 }
 
@@ -391,7 +391,8 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		require.Error(t, err)
 		require.Nil(t, r)
 		if r != nil {
-			r.Body.Close()
+			err = r.Body.Close()
+			require.NoError(t, err)
 		}
 	}
 
@@ -400,7 +401,8 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		require.Error(t, err)
 		require.Nil(t, r)
 		if r != nil {
-			r.Body.Close()
+			err = r.Body.Close()
+			require.NoError(t, err)
 		}
 	}
 }

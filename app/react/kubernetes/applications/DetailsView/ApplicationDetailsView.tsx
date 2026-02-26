@@ -5,7 +5,7 @@ import LaptopCode from '@/assets/ico/laptop-code.svg?c';
 import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { PageHeader } from '@@/PageHeader';
-import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 import { Icon } from '@@/Icon';
 import { Badge } from '@@/Badge';
 
@@ -105,7 +105,7 @@ export function ApplicationDetailsView() {
       selectedTabParam: 'YAML',
     },
   ];
-  const currentTabIndex = findSelectedTabIndex(stateAndParams, tabs);
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"maps"
 	"strconv"
 	"strings"
 
@@ -193,9 +194,7 @@ func addLabels(obj map[string]any, appLabels map[string]string) {
 	}
 
 	// merge app labels with existing labels
-	for k, v := range appLabels {
-		labels[k] = v
-	}
+	maps.Copy(labels, appLabels)
 
 	metadata["labels"] = labels
 	obj["metadata"] = metadata

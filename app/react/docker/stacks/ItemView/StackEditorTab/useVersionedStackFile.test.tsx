@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { useVersionedStackFile } from './useVersionedStackFile';
 
@@ -305,6 +306,9 @@ describe('useVersionedStackFile', () => {
   });
 
   describe('error handling', () => {
+    const restoreConsole = suppressConsoleLogs();
+    afterAll(restoreConsole);
+
     it('should handle API errors gracefully', async () => {
       server.use(
         http.get('/api/stacks/:id/file', () =>
@@ -420,6 +424,7 @@ describe('useVersionedStackFile', () => {
     });
 
     it('should clear loading state after failed fetch', async () => {
+      const restoreConsole = suppressConsoleLogs();
       server.use(
         http.get('/api/stacks/:id/file', () =>
           HttpResponse.json({ message: 'Error' }, { status: 500 })
@@ -435,6 +440,8 @@ describe('useVersionedStackFile', () => {
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
+
+      restoreConsole();
     });
   });
 

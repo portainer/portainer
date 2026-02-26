@@ -4,6 +4,7 @@ import axios, {
 } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Registry } from '@/react/portainer/registries/types/registry';
+import PortainerError from '@/portainer/error';
 
 import { buildImageFullURI } from '../utils';
 import { withRegistryAuthHeader } from '../../proxy/queries/utils';
@@ -33,8 +34,9 @@ export async function pushImage({
         transformResponse: jsonObjectsToArrayHandler,
       }
     );
+
     if (data[data.length - 1].error) {
-      throw new Error(data[data.length - 1].error);
+      throw new PortainerError(data[data.length - 1].error);
     }
   } catch (err) {
     throw parseAxiosError(err, 'Unable to push image');

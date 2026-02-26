@@ -44,12 +44,13 @@ const defaultProps = {
   isOrphaned: false,
   stackId: 1,
   isSaved: false,
+  webhookId: '',
 };
 
 const defaultInitialValues: StackEditorFormValues = {
   stackFileContent: 'version: "3"\nservices:\n  web:\n    image: nginx',
   environmentVariables: [],
-  webhookId: '',
+  enabledWebhook: false,
   prune: false,
 };
 
@@ -233,9 +234,8 @@ describe('orphaned stack behavior', () => {
 
     await waitFor(() => {
       const deployButton = screen.queryByTestId('stack-deploy-button');
-      if (deployButton) {
-        expect(deployButton).toBeDisabled();
-      }
+
+      expect(deployButton).toBeDisabled();
     });
   });
 
@@ -371,9 +371,8 @@ describe('form submission', () => {
 
     await waitFor(() => {
       const deployButton = screen.queryByTestId('stack-deploy-button');
-      if (deployButton) {
-        expect(deployButton).toBeDisabled();
-      }
+
+      expect(deployButton).toBeDisabled();
     });
   });
 

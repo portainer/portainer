@@ -1,7 +1,7 @@
 import { GaugeIcon } from 'lucide-react';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
-import { stripProtocol } from '@/portainer/filters/filters';
+import { stripProtocol } from '@/react/common/string-utils';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import {
   isAgentEnvironment,

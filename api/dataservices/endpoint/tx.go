@@ -89,6 +89,11 @@ func (service ServiceTx) Endpoints() ([]portainer.Endpoint, error) {
 	)
 }
 
+// ReadAll retrieves all the elements that satisfy all the provided predicates.
+func (service ServiceTx) ReadAll(predicates ...func(endpoint portainer.Endpoint) bool) ([]portainer.Endpoint, error) {
+	return dataservices.BaseDataServiceTx[portainer.Endpoint, portainer.EndpointID]{Bucket: BucketName, Connection: service.service.connection, Tx: service.tx}.ReadAll(predicates...)
+}
+
 func (service ServiceTx) EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool) {
 	log.Error().Str("func", "EndpointIDByEdgeID").Msg("cannot be called inside a transaction")
 

@@ -142,7 +142,9 @@ func (s *Service) TunnelAddr(endpoint *portainer.Endpoint) (string, error) {
 			continue
 		}
 
-		conn.Close()
+		if err := conn.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close tcp connection")
+		}
 
 		break
 	}

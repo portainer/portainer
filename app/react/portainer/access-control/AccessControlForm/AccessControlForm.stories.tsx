@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import { UserViewModel } from '@/portainer/models/user';
@@ -39,12 +39,12 @@ function Template({ userRole }: Args) {
   );
 }
 
-export const AdminAccessControl: Story<Args> = Template.bind({});
+export const AdminAccessControl: StoryFn<Args> = Template.bind({});
 AdminAccessControl.args = {
   userRole: Role.Admin,
 };
 
-export const NonAdminAccessControl: Story<Args> = Template.bind({});
+export const NonAdminAccessControl: StoryFn<Args> = Template.bind({});
 NonAdminAccessControl.args = {
   userRole: Role.Standard,
 };

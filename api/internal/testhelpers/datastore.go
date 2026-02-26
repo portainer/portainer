@@ -262,6 +262,8 @@ func WithEndpointRelations(relations []portainer.EndpointRelation) datastoreOpti
 }
 
 type stubEndpointService struct {
+	dataservices.EndpointService
+
 	endpoints []portainer.Endpoint
 }
 

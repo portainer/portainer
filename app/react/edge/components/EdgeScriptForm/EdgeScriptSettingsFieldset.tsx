@@ -1,6 +1,6 @@
 import { useFormikContext, Field } from 'formik';
 
-import { GroupField } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/MetadataFieldset/GroupsField';
+import { GroupField } from '@/react/portainer/environments/common/MetadataFieldset/GroupsField';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';

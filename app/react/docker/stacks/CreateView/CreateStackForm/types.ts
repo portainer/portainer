@@ -15,7 +15,7 @@ export interface BaseFormValues {
   name: string;
   env: EnvVarValues;
   accessControl: AccessControlFormData;
-  webhookId: string;
+  enableWebhook: boolean;
   registries: Array<RegistryId>;
 }
 

@@ -33,6 +33,7 @@ export function getSortType(value?: string): SortType | undefined {
 
 export type Query = EnvironmentsQueryParams & {
   page?: number;
+  /** Use 0 to fetch all environments without pagination (backend supports limit=0). */
   pageLimit?: number;
   sort?: SortType;
   order?: 'asc' | 'desc';
@@ -74,16 +75,10 @@ export function useEnvironmentList(
   const { isLoading, data } = useQuery(
     [
       ...environmentQueryKeys.base(),
-      {
-        page,
-        pageLimit,
-        sort,
-        order,
-        ...query,
-      },
+      { page, pageLimit, sort, order, ...query },
     ],
     async () => {
-      const start = (page - 1) * pageLimit + 1;
+      const start = pageLimit === 0 ? 0 : (page - 1) * pageLimit + 1;
 
       return getEnvironments({
         start,

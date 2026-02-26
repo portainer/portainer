@@ -3,8 +3,8 @@
   overflow: auto;
   padding: 20px;
   font-size: 16px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 
   display: flex;
   align-items: center;
@@ -100,8 +100,8 @@
   overflow: auto;
   border-top: 1px solid var(--border-datatable-top-color);
 
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
   padding-bottom: 10px;
 }
 

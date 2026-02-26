@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -34,7 +35,11 @@ func (service *Service) Authorization(configuration portainer.OpenAMTConfigurati
 	if err != nil {
 		return "", err
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
@@ -47,8 +52,7 @@ func (service *Service) Authorization(configuration portainer.OpenAMTConfigurati
 	}
 
 	var token authenticationResponse
-	err = json.Unmarshal(responseBody, &token)
-	if err != nil {
+	if err := json.Unmarshal(responseBody, &token); err != nil {
 		return "", err
 	}
 

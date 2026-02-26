@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -129,7 +130,11 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	if err != nil {
 		return "", err
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if response.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("unexpected status code %s", response.Status)

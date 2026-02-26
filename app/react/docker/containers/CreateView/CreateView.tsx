@@ -24,7 +24,7 @@ import { useSystemLimits, useIsWindows } from '../../proxy/queries/useInfo';
 import { useCreateOrReplaceMutation } from './useCreateMutation';
 import { useValidation } from './validation';
 import { useInitialValues, Values } from './useInitialValues';
-import { InnerForm } from './InnerForm';
+import { CreateInnerForm } from './CreateInnerForm';
 import { toRequest } from './toRequest';
 
 export function CreateView() {
@@ -49,9 +49,7 @@ function CreateForm() {
   const router = useRouter();
   const isWindows = useIsWindows(environmentId);
   const isAdminQuery = useIsEdgeAdmin();
-  const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin({
-    adminOnlyCE: true,
-  });
+  const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin();
   const [isDockerhubRateLimited, setIsDockerhubRateLimited] = useState(false);
 
   const mutation = useCreateOrReplaceMutation();
@@ -84,7 +82,6 @@ function CreateForm() {
 
   const environment = envQuery.data;
 
-  // if windows, hide capabilities. this is because capadd and capdel are not supported on windows
   const hideCapabilities =
     (!environment.SecuritySettings.allowContainerCapabilitiesForRegularUsers &&
       !isEnvironmentAdmin) ||
@@ -122,7 +119,7 @@ function CreateForm() {
         validateOnMount
         validationSchema={validationSchema}
       >
-        <InnerForm
+        <CreateInnerForm
           hideCapabilities={hideCapabilities}
           onChangeName={syncName}
           isDuplicate={isDuplicating}

@@ -264,7 +264,7 @@ func IsSelfSignedCertificate(certPem []byte) (bool, error) {
 	}
 
 	if !strings.Contains(string(certPem), "BEGIN CERTIFICATE") {
-		certPem = []byte(fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", string(certPem)))
+		certPem = fmt.Appendf(nil, "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", string(certPem))
 	}
 
 	block, _ := pem.Decode(certPem)

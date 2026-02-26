@@ -1,4 +1,4 @@
-import 'vitest-dom/extend-expect';
+import '@testing-library/jest-dom/vitest';
 
 import { mockCodeMirror } from './mock-codemirror';
 

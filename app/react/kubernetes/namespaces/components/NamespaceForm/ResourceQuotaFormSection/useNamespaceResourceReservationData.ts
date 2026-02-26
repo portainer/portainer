@@ -44,16 +44,16 @@ export function useNamespaceResourceReservationData(
  * @returns Aggregated resource usage. CPU cores are rounded to 3 decimal places. Memory is in MB.
  */
 function aggregatePodUsage(podMetricsList: PodMetrics) {
-  const containerResourceUsageList = podMetricsList.items.flatMap((i) =>
+  const containerResourceUsageList = podMetricsList.items?.flatMap((i) =>
     i.containers.map((c) => c.usage)
   );
-  const namespaceResourceUsage = containerResourceUsageList.reduce(
+  const namespaceResourceUsage = containerResourceUsageList?.reduce(
     (total, usage) => ({
       cpu: total.cpu + parseCPU(usage.cpu),
       memory: total.memory + megaBytesValue(usage.memory),
     }),
     { cpu: 0, memory: 0 }
-  );
+  ) || { cpu: 0, memory: 0 };
   namespaceResourceUsage.cpu = round(namespaceResourceUsage.cpu, 3);
   return namespaceResourceUsage;
 }

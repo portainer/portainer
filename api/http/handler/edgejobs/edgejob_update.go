@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -147,7 +148,9 @@ func (handler *Handler) updateEdgeSchedule(tx dataservices.DataStoreTx, edgeJob 
 
 	if len(payload.EdgeGroups) > 0 {
 		for _, edgeGroupID := range payload.EdgeGroups {
-			if _, err := tx.EdgeGroup().Read(edgeGroupID); err != nil {
+			if ok, err := tx.EdgeGroup().Exists(edgeGroupID); !ok {
+				return dserrors.ErrObjectNotFound
+			} else if err != nil {
 				return err
 			}
 

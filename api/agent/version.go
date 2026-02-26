@@ -11,20 +11,18 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/url"
+
+	"github.com/rs/zerolog/log"
 )
 
 // GetAgentVersionAndPlatform returns the agent version and platform
 //
 // it sends a ping to the agent and parses the version and platform from the headers
 func GetAgentVersionAndPlatform(endpointUrl string, tlsConfig *tls.Config) (portainer.AgentPlatform, string, error) { //nolint:forbidigo
-	httpCli := &http.Client{
-		Timeout: 3 * time.Second,
-	}
+	httpCli := &http.Client{Timeout: 3 * time.Second}
 
 	if tlsConfig != nil {
-		httpCli.Transport = &http.Transport{
-			TLSClientConfig: tlsConfig,
-		}
+		httpCli.Transport = &http.Transport{TLSClientConfig: tlsConfig}
 	}
 
 	parsedURL, err := url.ParseURL(endpointUrl + "/ping")
@@ -44,8 +42,10 @@ func GetAgentVersionAndPlatform(endpointUrl string, tlsConfig *tls.Config) (port
 		return 0, "", err
 	}
 
-	io.Copy(io.Discard, resp.Body)
-	resp.Body.Close()
+	_, _ = io.Copy(io.Discard, resp.Body)
+	if err := resp.Body.Close(); err != nil {
+		log.Warn().Err(err).Msg("failed to close response body")
+	}
 
 	if resp.StatusCode != http.StatusNoContent {
 		return 0, "", fmt.Errorf("Failed request with status %d", resp.StatusCode)

@@ -20,7 +20,11 @@ func (c *Client) Delete(ctx context.Context, manifests []string) (string, error)
 
 	cmd := delete.NewCmdDelete(c.factory, c.streams)
 	cmd.SetArgs(resourcesToArgs(manifests))
-	cmd.Flags().Set("ignore-not-found", "true")
+
+	if err := cmd.Flags().Set("ignore-not-found", "true"); err != nil {
+		return "", fmt.Errorf("error setting ignore-not-found flag: %w", err)
+	}
+
 	cmd.SetOut(buf)
 
 	err := cmd.ExecuteContext(ctx)

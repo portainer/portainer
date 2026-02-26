@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
@@ -194,7 +195,7 @@ func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExi
 		return err
 	}
 
-	defer finput.Close()
+	defer logs.CloseAndLogErr(finput)
 
 	exists, err = service.FileExists(toFilePath)
 	if err != nil {
@@ -217,7 +218,7 @@ func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExi
 		return err
 	}
 
-	defer foutput.Close()
+	defer logs.CloseAndLogErr(foutput)
 
 	buf := make([]byte, 1024)
 	for {
@@ -702,7 +703,7 @@ func (service *Service) createPEMFileInStore(content []byte, fileType, filePath 
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer logs.CloseAndLogErr(out)
 
 	return pem.Encode(out, block)
 }
@@ -1008,7 +1009,7 @@ func CreateFile(path string, r io.Reader) error {
 		return err
 	}
 
-	defer out.Close()
+	defer logs.CloseAndLogErr(out)
 
 	_, err = io.Copy(out, r)
 	return err

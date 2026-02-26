@@ -33,8 +33,7 @@ func parseForwardedHeaderProto(forwarded string) string {
 
 	// Split by semicolon to get key-value pairs within this proxy entry
 	// Format: key=value;key=value;key=value
-	pairs := strings.Split(firstPart, ";")
-	for _, pair := range pairs {
+	for pair := range strings.SplitSeq(firstPart, ";") {
 		// Split by equals sign to separate key and value
 		key, value, found := strings.Cut(pair, "=")
 		if !found {

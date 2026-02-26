@@ -12,7 +12,7 @@ export function mockFormValues(overrides: DeepPartial<FormValues>): FormValues {
       name: 'test-stack',
       env: [],
       accessControl: defaultValues(false, 1),
-      webhookId: '',
+      enableWebhook: false,
       registries: [],
       editor: {
         fileContent: '',

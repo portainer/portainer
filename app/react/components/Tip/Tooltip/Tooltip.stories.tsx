@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { Tooltip, Props } from './Tooltip';
 
@@ -16,7 +16,7 @@ function Template({ message, position }: JSX.IntrinsicAttributes & Props) {
   );
 }
 
-export const Primary: Story<Props> = Template.bind({});
+export const Primary: StoryFn<Props> = Template.bind({});
 Primary.args = {
   message: 'Tooltip example',
   position: 'bottom',

@@ -1,9 +1,9 @@
 import '../app/assets/css';
-import React from 'react';
 import { pushStateLocationPlugin, UIRouter } from '@uirouter/react';
 import { initialize as initMSW, mswLoader } from 'msw-storybook-addon';
 import { handlers } from '../app/setup-tests/server-handlers';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Preview } from '@storybook/react';
 
 initMSW(
   {
@@ -21,31 +21,30 @@ initMSW(
   handlers
 );
 
-export const parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' },
-  controls: {
-    matchers: {
-      color: /(background|color)$/i,
-      date: /Date$/,
-    },
-  },
-  msw: {
-    handlers,
-  },
-};
-
 const testQueryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },
 });
 
-export const decorators = [
-  (Story) => (
+const preview: Preview = {
+  decorators: (Story) => (
     <QueryClientProvider client={testQueryClient}>
       <UIRouter plugins={[pushStateLocationPlugin]}>
         <Story />
       </UIRouter>
     </QueryClientProvider>
   ),
-];
+  loaders: [mswLoader],
+  parameters: {
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/,
+      },
+    },
+    msw: {
+      handlers,
+    },
+  },
+};
 
-export const loaders = [mswLoader];
+export default preview;

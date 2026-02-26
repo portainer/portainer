@@ -1,6 +1,8 @@
 import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 import _ from 'lodash';
+import { useState } from 'react';
+import uuidv4 from 'uuid/v4';
 
 import { Stack, StackType } from '@/react/common/stacks/types';
 import { useDockerComposeSchema } from '@/react/hooks/useDockerComposeSchema/useDockerComposeSchema';
@@ -43,6 +45,7 @@ export function StackEditorTab({
   const envQuery = useCurrentEnvironment();
   const schemaQuery = useDockerComposeSchema();
   const apiVersion = useApiVersion(envQuery.data?.Id);
+  const [webhookId] = useState(() => stack.Webhook || uuidv4());
 
   if (!envQuery.data || !schemaQuery.data) {
     return null;
@@ -85,7 +88,7 @@ export function StackEditorTab({
               stackFileContent: values.stackFileContent,
               env: values.environmentVariables,
               prune: values.prune,
-              webhook: values.webhookId,
+              webhook: values.enabledWebhook ? webhookId : undefined,
               repullImageAndRedeploy: response.repullImageAndRedeploy,
               rollbackTo: values.rollbackTo,
             },
@@ -115,6 +118,7 @@ export function StackEditorTab({
         schema={schemaQuery.data}
         versions={versions}
         isSaved={mutation.isSuccess}
+        webhookId={webhookId}
       />
     </Formik>
   );

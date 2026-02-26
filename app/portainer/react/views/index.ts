@@ -7,8 +7,6 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { CreateUserAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
 import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeView/EdgeComputeSettingsView';
-import { EdgeAutoCreateScriptView } from '@/react/portainer/environments/EdgeAutoCreateScriptView';
-import { ListView as EnvironmentsListView } from '@/react/portainer/environments/ListView';
 import { BackupSettingsPanel } from '@/react/portainer/settings/SettingsView/BackupSettingsView/BackupSettingsPanel';
 import { SettingsView } from '@/react/portainer/settings/SettingsView/SettingsView';
 import { CreateHelmRepositoriesView } from '@/react/portainer/account/helm-repositories/CreateHelmRepositoryView';
@@ -21,6 +19,7 @@ import { registriesModule } from './registries';
 import { activityLogsModule } from './activity-logs';
 import { templatesModule } from './templates';
 import { usersModule } from './users';
+import { environmentsModule } from './environments';
 
 export const viewsModule = angular
   .module('portainer.app.react.views', [
@@ -32,17 +31,11 @@ export const viewsModule = angular
     activityLogsModule,
     templatesModule,
     usersModule,
+    environmentsModule,
   ])
   .component(
     'homeView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(HomeView))), [])
-  )
-  .component(
-    'edgeAutoCreateScriptView',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(EdgeAutoCreateScriptView))),
-      []
-    )
   )
   .component(
     'createUserAccessToken',
@@ -58,10 +51,7 @@ export const viewsModule = angular
       ['onSubmit', 'settings']
     )
   )
-  .component(
-    'environmentsListView',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(EnvironmentsListView))), [])
-  )
+
   .component(
     'backupSettingsPanel',
     r2a(withUIRouter(withReactQuery(withCurrentUser(BackupSettingsPanel))), [])

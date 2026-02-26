@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/libstack"
 
 	"github.com/compose-spec/compose-go/v2/cli"
@@ -65,7 +66,7 @@ func withCli(
 		return fmt.Errorf("unable to initialize the Docker client: %w", err)
 	}
 	mu.Unlock()
-	defer cli.Client().Close()
+	defer logs.CloseAndLogErr(cli.Client())
 
 	for _, r := range options.Registries {
 		if r.ServerAddress == "" || r.ServerAddress == registry.DefaultNamespace {

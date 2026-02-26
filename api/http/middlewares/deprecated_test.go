@@ -79,7 +79,7 @@ func TestDeprecated(t *testing.T) {
 			testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				handledPath = r.URL.Path
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("success"))
+				_, _ = w.Write([]byte("success"))
 			})
 
 			// Wrap with Deprecated middleware
@@ -119,7 +119,7 @@ func TestDeprecatedSimple(t *testing.T) {
 	// Create a test handler
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("test response"))
+		_, _ = w.Write([]byte("test response"))
 	})
 
 	// Wrap with DeprecatedSimple middleware

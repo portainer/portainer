@@ -17,18 +17,15 @@ func TarFileInBuffer(fileContent []byte, fileName string, mode int64) ([]byte, e
 		Size: int64(len(fileContent)),
 	}
 
-	err := tarWriter.WriteHeader(header)
-	if err != nil {
+	if err := tarWriter.WriteHeader(header); err != nil {
 		return nil, err
 	}
 
-	_, err = tarWriter.Write(fileContent)
-	if err != nil {
+	if _, err := tarWriter.Write(fileContent); err != nil {
 		return nil, err
 	}
 
-	err = tarWriter.Close()
-	if err != nil {
+	if err := tarWriter.Close(); err != nil {
 		return nil, err
 	}
 
@@ -43,10 +40,7 @@ type tarFileInBuffer struct {
 
 func NewTarFileInBuffer() *tarFileInBuffer {
 	var b bytes.Buffer
-	return &tarFileInBuffer{
-		b: &b,
-		w: tar.NewWriter(&b),
-	}
+	return &tarFileInBuffer{b: &b, w: tar.NewWriter(&b)}
 }
 
 // Put puts a single file to tar archive buffer.
@@ -61,11 +55,9 @@ func (t *tarFileInBuffer) Put(fileContent []byte, fileName string, mode int64) e
 		return err
 	}
 
-	if _, err := t.w.Write(fileContent); err != nil {
-		return err
-	}
+	_, err := t.w.Write(fileContent)
 
-	return nil
+	return err
 }
 
 // Bytes returns the archive as a byte array.

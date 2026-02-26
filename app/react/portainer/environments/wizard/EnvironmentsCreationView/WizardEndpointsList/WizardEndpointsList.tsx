@@ -1,7 +1,8 @@
 import { Plug2 } from 'lucide-react';
 import clsx from 'clsx';
 
-import { endpointTypeName, stripProtocol } from '@/portainer/filters/filters';
+import { stripProtocol } from '@/react/common/string-utils';
+import { endpointTypeName } from '@/portainer/filters/filters';
 import {
   getEnvironmentTypeIcon,
   isEdgeEnvironment,

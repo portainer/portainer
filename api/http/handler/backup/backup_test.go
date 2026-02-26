@@ -21,28 +21,34 @@ import (
 	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func init() {
 	fips.InitFIPS(false)
 }
 
-func listFiles(dir string) []string {
+func listFiles(t *testing.T, dir string) []string {
 	items := make([]string, 0)
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if path == dir {
 			return nil
 		}
 		items = append(items, path)
+
 		return nil
 	})
+	require.NoError(t, err)
 
 	return items
 }
 
 func contains(t *testing.T, list []string, path string) {
 	assert.Contains(t, list, path)
-	copyContent, _ := os.ReadFile(path)
+	copyContent, err := os.ReadFile(path)
+	require.NoError(t, err)
+
 	assert.Equal(t, "content\n", string(copyContent))
 }
 
@@ -63,23 +69,25 @@ func Test_backupHandlerWithoutPassword_shouldCreateATarballArchive(t *testing.T)
 	assert.Nil(t, handlerErr, "Handler should not fail")
 
 	response := w.Result()
-	body, _ := io.ReadAll(response.Body)
-	response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+	require.NoError(t, err)
+
+	err = response.Body.Close()
+	require.NoError(t, err)
 
 	tmpdir := t.TempDir()
 
 	archivePath := filepath.Join(tmpdir, "archive.tar.gz")
-	err := os.WriteFile(archivePath, body, 0600)
-	if err != nil {
+	if err := os.WriteFile(archivePath, body, 0600); err != nil {
 		t.Fatal("Failed to save downloaded .tar.gz archive: ", err)
 	}
+
 	cmd := exec.Command("tar", "-xzf", archivePath, "-C", tmpdir)
-	err = cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		t.Fatal("Failed to extract archive: ", err)
 	}
 
-	createdFiles := listFiles(tmpdir)
+	createdFiles := listFiles(t, tmpdir)
 
 	contains(t, createdFiles, path.Join(tmpdir, "portainer.key"))
 	contains(t, createdFiles, path.Join(tmpdir, "portainer.pub"))
@@ -107,7 +115,9 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 
 	response := w.Result()
 	body, _ := io.ReadAll(response.Body)
-	response.Body.Close()
+
+	err := response.Body.Close()
+	require.NoError(t, err)
 
 	tmpdir := t.TempDir()
 
@@ -117,17 +127,23 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 	}
 
 	archivePath := filepath.Join(tmpdir, "archive.tag.gz")
-	archive, _ := os.Create(archivePath)
-	defer archive.Close()
-	io.Copy(archive, dr)
+	archive, err := os.Create(archivePath)
+	require.NoError(t, err)
+
+	defer func() {
+		err := archive.Close()
+		require.NoError(t, err)
+	}()
+
+	_, err = io.Copy(archive, dr)
+	require.NoError(t, err)
 
 	cmd := exec.Command("tar", "-xzf", archivePath, "-C", tmpdir)
-	err = cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		t.Fatal("Failed to extract archive: ", err)
 	}
 
-	createdFiles := listFiles(tmpdir)
+	createdFiles := listFiles(t, tmpdir)
 
 	contains(t, createdFiles, path.Join(tmpdir, "portainer.key"))
 	contains(t, createdFiles, path.Join(tmpdir, "portainer.pub"))

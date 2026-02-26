@@ -95,6 +95,7 @@ export function EdgeAsyncIntervalsForm({
         tooltip={fieldSettings.ping.tooltip}
       >
         <Select
+          id="edge_checkin_ping"
           value={values.PingInterval}
           data-cy="edge-checkin-ping-interval-select"
           name="PingInterval"
@@ -110,6 +111,7 @@ export function EdgeAsyncIntervalsForm({
         tooltip={fieldSettings.snapshot.tooltip}
       >
         <Select
+          id="edge_checkin_snapshot"
           value={values.SnapshotInterval}
           data-cy="edge-checkin-snapshot-interval-select"
           name="SnapshotInterval"
@@ -125,6 +127,7 @@ export function EdgeAsyncIntervalsForm({
         tooltip={fieldSettings.command.tooltip}
       >
         <Select
+          id="edge_checkin_command"
           value={values.CommandInterval}
           data-cy="edge-checkin-command-interval-select"
           name="CommandInterval"

@@ -1,4 +1,4 @@
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -9,7 +9,6 @@ import { Stack, StackType } from '@/react/common/stacks/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { queryKeys } from '@/react/common/stacks/queries/query-keys';
-import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { notifyError } from '@/portainer/services/notifications';
 
 import { PageHeader } from '@@/PageHeader';
@@ -27,8 +26,6 @@ export function ItemView() {
     stackId,
     stackType,
   } = useParams();
-
-  useUnauthorizedRedirect();
 
   const queryClient = useQueryClient();
   const stackQuery = useStack(stackId, { enabled: isRegular || isOrphaned });
@@ -137,14 +134,4 @@ why stack.EndpointID and not params.envId?
     stackId: id,
     stackType: type,
   };
-}
-
-function useUnauthorizedRedirect() {
-  const isAdminQuery = useIsEdgeAdmin();
-  const router = useRouter();
-  useEffect(() => {
-    if (!isAdminQuery.isLoading && !isAdminQuery.isAdmin) {
-      router.stateService.go('docker.dashboard');
-    }
-  }, [isAdminQuery.isLoading, isAdminQuery.isAdmin, router.stateService]);
 }

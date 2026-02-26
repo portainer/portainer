@@ -9,20 +9,38 @@ const config: StorybookConfig = {
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
+    '@storybook/addon-webpack5-compiler-swc',
+    '@chromatic-com/storybook',
     {
-      name: '@storybook/addon-styling',
+      name: '@storybook/addon-styling-webpack',
+
       options: {
-        cssLoaderOptions: {
-          importLoaders: 1,
-          modules: {
-            localIdentName: '[path][name]__[local]',
-            auto: true,
-            exportLocalsConvention: 'camelCaseOnly',
+        rules: [
+          {
+            test: /\.css$/,
+            sideEffects: true,
+            use: [
+              require.resolve('style-loader'),
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  importLoaders: 1,
+                  modules: {
+                    localIdentName: '[path][name]__[local]',
+                    auto: true,
+                    exportLocalsConvention: 'camelCaseOnly',
+                  },
+                },
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  implementation: postcss,
+                },
+              },
+            ],
           },
-        },
-        postCss: {
-          implementation: postcss,
-        },
+        ],
       },
     },
   ],

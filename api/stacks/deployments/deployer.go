@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	k "github.com/portainer/portainer/api/kubernetes"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 )
@@ -48,8 +49,14 @@ func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *porta
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	d.swarmStackManager.Login(registries, endpoint)
-	defer d.swarmStackManager.Logout(endpoint)
+	if err := d.swarmStackManager.Login(registries, endpoint); err != nil {
+		log.Warn().Err(err).Msg("unable to login to registries for swarm stack deployment")
+	}
+	defer func() {
+		if err := d.swarmStackManager.Logout(endpoint); err != nil {
+			log.Warn().Err(err).Msg("unable to logout from registries after swarm stack deployment")
+		}
+	}()
 
 	return d.swarmStackManager.Deploy(stack, prune, pullImage, endpoint)
 }
@@ -67,16 +74,10 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 		}
 	}
 
-	if err := d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
+	return d.composeStackManager.Up(context.TODO(), stack, endpoint, portainer.ComposeUpOptions{
 		ComposeOptions: options,
 		ForceRecreate:  forceRecreate,
-	}); err != nil {
-		d.composeStackManager.Down(context.TODO(), stack, endpoint)
-
-		return err
-	}
-
-	return nil
+	})
 }
 
 func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {

@@ -2,6 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { Pair } from '@/react/portainer/settings/types';
 import { AutoUpdateResponse } from '@/react/portainer/gitops/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 
 import { Stack } from '../../types';
 
@@ -42,6 +43,7 @@ export type StandaloneGitRepositoryPayload = {
   /** TLSSkipVerify skips SSL verification when cloning the Git repository */
   tlsSkipVerify?: boolean;
   environmentId: EnvironmentId;
+  registries?: Array<RegistryId>;
 };
 
 export async function createStandaloneStackFromGit({

@@ -177,6 +177,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "an error occurred during the KubeClientMiddleware operation, permission denied to access the environment. Error: ", err)
+			return
 		}
 
 		// Check if we have a kubeclient against this auth token already, otherwise generate a new one
@@ -200,7 +201,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 
 		user, err := security.RetrieveUserFromRequest(r, handler.DataStore)
 		if err != nil {
-			httperror.InternalServerError("an error occurred during the KubeClientMiddleware operation, unable to retrieve the user from request. Error: ", err)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to retrieve the user from request. Error: ", err)
 			return
 		}
 		log.
@@ -255,6 +256,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to parse server URL for building kubeconfig. Error: ", err)
 			return
 		}
+
 		serverURL.Scheme = "https"
 		serverURL.Host = "localhost" + handler.KubernetesClientFactory.GetAddrHTTPS()
 		config.Clusters[0].Cluster.Server = serverURL.String()
@@ -264,6 +266,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to generate kubeconfig YAML. Error: ", err)
 			return
 		}
+
 		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml), isKubeAdmin, nonAdminNamespaces)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to create kubernetes client from kubeconfig. Error: ", err)

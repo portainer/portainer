@@ -1,26 +1,47 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi, type Mock } from 'vitest';
+import { vi } from 'vitest';
 import { Terminal } from 'xterm';
 import { fit } from 'xterm/lib/addons/fit/fit';
 
 import { terminalClose } from '@/portainer/services/terminal-window';
 import { error as notifyError } from '@/portainer/services/notifications';
+import { server, ws } from '@/setup-tests/server';
 
 import { KubectlShellView } from './KubectlShellView';
 
-// Mock modules first
+// Type helpers for MSW WebSocket connections
+type WSConnection = Parameters<
+  Parameters<ReturnType<typeof ws.link>['addEventListener']>[1]
+>[0];
+type ClientConnection = WSConnection['client'];
+type ServerConnection = WSConnection['server'];
+
+// Shared WebSocket links for all tests
+const wssLink = ws.link('wss://*/*');
+const wsLink = ws.link('ws://*/*');
+
+// Mock modules
 vi.mock('xterm', () => ({
-  Terminal: vi.fn(() => ({
-    open: vi.fn(),
-    setOption: vi.fn(),
-    focus: vi.fn(),
-    writeln: vi.fn(),
-    writeUtf8: vi.fn(),
-    onData: vi.fn(),
-    onKey: vi.fn(),
-    dispose: vi.fn(),
-  })),
+  Terminal: vi.fn(
+    class {
+      open = vi.fn();
+
+      setOption = vi.fn();
+
+      focus = vi.fn();
+
+      writeln = vi.fn();
+
+      writeUtf8 = vi.fn();
+
+      onData = vi.fn();
+
+      onKey = vi.fn();
+
+      dispose = vi.fn();
+    }
+  ),
 }));
 
 vi.mock('xterm/lib/addons/fit/fit', () => ({
@@ -43,21 +64,11 @@ vi.mock('@/portainer/services/notifications', () => ({
   error: vi.fn(),
 }));
 
-// Mock WebSocket globally
-const originalWebSocket = global.WebSocket;
-let mockWebSocket: {
-  send: Mock;
-  close: Mock;
-  addEventListener: Mock;
-  removeEventListener: Mock;
-  readyState: number;
-};
 let mockTerminalInstance: Partial<Terminal>;
 
 beforeEach(() => {
   vi.clearAllMocks();
 
-  // Create mock terminal instance
   mockTerminalInstance = {
     open: vi.fn(),
     setOption: vi.fn(),
@@ -69,28 +80,12 @@ beforeEach(() => {
     dispose: vi.fn(),
   };
 
-  // Mock Terminal constructor to return our mock instance
-  vi.mocked(Terminal).mockImplementation(
-    () => mockTerminalInstance as Terminal
-  );
+  vi.mocked(Terminal).mockImplementation(function Terminal(this: Terminal) {
+    Object.assign(this, mockTerminalInstance);
+  });
 
-  // Create mock WebSocket instance
-  mockWebSocket = {
-    send: vi.fn(),
-    close: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    readyState: WebSocket.OPEN,
-  };
-
-  global.WebSocket = vi.fn(() => mockWebSocket) as unknown as typeof WebSocket;
-
-  // Reset window methods
   Object.defineProperty(window, 'location', {
-    value: {
-      protocol: 'https:',
-      host: 'localhost:3000',
-    },
+    value: { protocol: 'https:', host: 'localhost:3000' },
     writable: true,
   });
 
@@ -103,142 +98,204 @@ beforeEach(() => {
     value: vi.fn(),
     writable: true,
   });
-});
 
-afterEach(() => {
-  global.WebSocket = originalWebSocket;
+  // Set up default echo handler for tests that don't need custom behavior
+  server.use(
+    wssLink.addEventListener('connection', ({ client, server }) => {
+      client.addEventListener('message', (event) => {
+        server.send(event.data);
+      });
+    })
+  );
 });
 
 describe('KubectlShellView', () => {
   it('renders loading state initially', () => {
     render(<KubectlShellView />);
-
     expect(screen.getByText('Loading Terminal...')).toBeInTheDocument();
   });
 
-  it('creates WebSocket connection with correct URL', () => {
+  it('creates WebSocket connection with correct URL', async () => {
+    let connectionUrl: string | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        connectionUrl = client.url.toString();
+      })
+    );
+
     render(<KubectlShellView />);
 
-    expect(global.WebSocket).toHaveBeenCalledWith(
+    await waitFor(() => expect(connectionUrl).toBeDefined());
+    expect(connectionUrl).toBe(
       'wss://localhost:3000/portainer/api/websocket/kubernetes-shell?endpointId=1'
     );
   });
 
-  it('creates WebSocket connection with ws protocol when location is http', () => {
+  it('creates WebSocket connection with ws protocol when location is http', async () => {
     Object.defineProperty(window, 'location', {
-      value: {
-        protocol: 'http:',
-        host: 'localhost:3000',
-      },
+      value: { protocol: 'http:', host: 'localhost:3000' },
       writable: true,
     });
 
+    let connectionUrl: string | undefined;
+
+    server.use(
+      wsLink.addEventListener('connection', ({ client }) => {
+        connectionUrl = client.url.toString();
+      })
+    );
+
     render(<KubectlShellView />);
 
-    expect(global.WebSocket).toHaveBeenCalledWith(
+    await waitFor(() => expect(connectionUrl).toBeDefined());
+    expect(connectionUrl).toBe(
       'ws://localhost:3000/portainer/api/websocket/kubernetes-shell?endpointId=1'
     );
   });
 
   it('sets up terminal event handlers on mount', () => {
     render(<KubectlShellView />);
-
     expect(mockTerminalInstance.onData).toHaveBeenCalled();
     expect(mockTerminalInstance.onKey).toHaveBeenCalled();
   });
 
   it('adds window resize listener on mount', () => {
     render(<KubectlShellView />);
-
     expect(window.addEventListener).toHaveBeenCalledWith(
       'resize',
       expect.any(Function)
     );
   });
 
-  it('sends terminal data to WebSocket when terminal data event fires', () => {
+  it('sends terminal data to WebSocket when terminal data event fires', async () => {
+    let receivedData: string | undefined;
+    let connectionEstablished = false;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        connectionEstablished = true;
+        client.addEventListener('message', (event) => {
+          receivedData = event.data as string;
+        });
+      })
+    );
+
     render(<KubectlShellView />);
 
-    const onDataCallback = (mockTerminalInstance.onData as Mock).mock
-      .calls[0][0] as (data: string) => void;
+    // Wait for WebSocket connection to be established
+    await waitFor(() => expect(connectionEstablished).toBe(true));
+
+    const onDataCallback = vi.mocked(mockTerminalInstance.onData!).mock
+      .calls[0]![0] as (data: string) => void;
     onDataCallback('test data');
 
-    expect(mockWebSocket.send).toHaveBeenCalledWith('test data');
+    await waitFor(() => expect(receivedData).toBe('test data'));
   });
 
-  it('closes WebSocket and disposes terminal when Ctrl+D is pressed', () => {
-    render(<KubectlShellView />);
+  it('closes WebSocket and disposes terminal when Ctrl+D is pressed', async () => {
+    let clientConnection: ClientConnection | undefined;
 
-    const onKeyCallback = (mockTerminalInstance.onKey as Mock).mock
-      .calls[0][0] as (event: { domEvent: KeyboardEvent }) => void;
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
+    render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
+
+    const onKeyCallback = vi.mocked(mockTerminalInstance.onKey!).mock
+      .calls[0]![0] as (event: { domEvent: KeyboardEvent }) => void;
     onKeyCallback({
-      domEvent: {
-        ctrlKey: true,
-        code: 'KeyD',
-      } as KeyboardEvent,
+      domEvent: { ctrlKey: true, code: 'KeyD' } as KeyboardEvent,
     });
 
-    expect(mockWebSocket.close).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.getByText('Console disconnected')).toBeInTheDocument();
+    });
     expect(mockTerminalInstance.dispose).toHaveBeenCalled();
   });
 
-  it('handles user typing in terminal', () => {
+  it('handles user typing in terminal', async () => {
+    let receivedData: string | undefined;
+    let connectionEstablished = false;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        connectionEstablished = true;
+        client.addEventListener('message', (event) => {
+          receivedData = event.data as string;
+        });
+      })
+    );
+
     render(<KubectlShellView />);
 
-    const onDataCallback = (mockTerminalInstance.onData as Mock).mock
-      .calls[0][0] as (data: string) => void;
+    // Wait for WebSocket connection to be established
+    await waitFor(() => expect(connectionEstablished).toBe(true));
 
-    // Simulate user typing a kubectl command
-    const userInput = 'kubectl get pods';
-    onDataCallback(userInput);
+    const onDataCallback = vi.mocked(mockTerminalInstance.onData!).mock
+      .calls[0]![0] as (data: string) => void;
+    onDataCallback('kubectl get pods');
 
-    expect(mockWebSocket.send).toHaveBeenCalledWith(userInput);
+    await waitFor(() => expect(receivedData).toBe('kubectl get pods'));
   });
 
-  it('handles Enter key in terminal', () => {
+  it('handles Enter key in terminal', async () => {
+    let receivedData: string | undefined;
+    let connectionEstablished = false;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        connectionEstablished = true;
+        client.addEventListener('message', (event) => {
+          receivedData = event.data as string;
+        });
+      })
+    );
+
     render(<KubectlShellView />);
 
-    const onDataCallback = (mockTerminalInstance.onData as Mock).mock
-      .calls[0][0] as (data: string) => void;
+    // Wait for WebSocket connection to be established
+    await waitFor(() => expect(connectionEstablished).toBe(true));
 
-    // Simulate user pressing Enter key
-    const enterKey = '\r';
-    onDataCallback(enterKey);
+    const onDataCallback = vi.mocked(mockTerminalInstance.onData!).mock
+      .calls[0]![0] as (data: string) => void;
+    onDataCallback('\r');
 
-    expect(mockWebSocket.send).toHaveBeenCalledWith(enterKey);
+    await waitFor(() => expect(receivedData).toBe('\r'));
   });
 
-  it('sets up WebSocket event listeners when socket is created', () => {
-    render(<KubectlShellView />);
+  it('sets up WebSocket event listeners when socket is created', async () => {
+    let clientConnection: ClientConnection | undefined;
 
-    expect(mockWebSocket.addEventListener).toHaveBeenCalledWith(
-      'open',
-      expect.any(Function)
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
     );
-    expect(mockWebSocket.addEventListener).toHaveBeenCalledWith(
-      'message',
-      expect.any(Function)
-    );
-    expect(mockWebSocket.addEventListener).toHaveBeenCalledWith(
-      'close',
-      expect.any(Function)
-    );
-    expect(mockWebSocket.addEventListener).toHaveBeenCalledWith(
-      'error',
-      expect.any(Function)
-    );
+
+    render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
+    expect(clientConnection).toBeDefined();
   });
 
-  it('opens terminal when WebSocket connection opens', () => {
+  it('opens terminal when WebSocket connection opens', async () => {
+    let serverConnection: ServerConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ server: wsServer }) => {
+        serverConnection = wsServer;
+      })
+    );
+
     render(<KubectlShellView />);
+    await waitFor(() => expect(serverConnection).toBeDefined());
 
-    const openCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'open'
-    )![1] as () => void;
-
-    openCallback();
-
-    expect(mockTerminalInstance.open).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockTerminalInstance.open).toHaveBeenCalled();
+    });
     expect(mockTerminalInstance.setOption).toHaveBeenCalledWith(
       'cursorBlink',
       true
@@ -254,80 +311,91 @@ describe('KubectlShellView', () => {
     expect(mockTerminalInstance.writeln).toHaveBeenCalledWith('');
   });
 
-  it('writes WebSocket message data to terminal', () => {
+  it('writes WebSocket message data to terminal', async () => {
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        client.send('terminal output');
+      })
+    );
+
     render(<KubectlShellView />);
 
-    const messageCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'message'
-    )![1] as (event: MessageEvent) => void;
+    await waitFor(() => expect(mockTerminalInstance.open).toHaveBeenCalled());
 
-    const mockEvent = { data: 'terminal output' } as MessageEvent;
-    messageCallback(mockEvent);
+    await waitFor(() => {
+      expect(mockTerminalInstance.writeUtf8).toHaveBeenCalled();
+    });
 
-    expect(mockTerminalInstance.writeUtf8).toHaveBeenCalled();
+    const writeCall = vi.mocked(mockTerminalInstance.writeUtf8)?.mock.calls[0];
+    expect(new TextDecoder().decode(writeCall![0] as Uint8Array)).toBe(
+      'terminal output'
+    );
   });
 
   it('shows disconnected state when WebSocket closes', async () => {
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
 
-    const closeCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'close'
-    )![1] as () => void;
-
-    closeCallback();
+    clientConnection!.close();
 
     await waitFor(() => {
       expect(screen.getByText('Console disconnected')).toBeInTheDocument();
     });
-
     expect(vi.mocked(terminalClose)).toHaveBeenCalled();
-    expect(mockWebSocket.close).toHaveBeenCalled();
     expect(mockTerminalInstance.dispose).toHaveBeenCalled();
   });
 
   it('shows disconnected state when WebSocket errors', async () => {
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        client.close(1003, 'Test error');
+      })
+    );
+
     render(<KubectlShellView />);
-
-    const errorCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'error'
-    )![1] as (event: Event) => void;
-
-    const mockError = new Event('error');
-    errorCallback(mockError);
 
     await waitFor(() => {
       expect(screen.getByText('Console disconnected')).toBeInTheDocument();
     });
-
     expect(vi.mocked(terminalClose)).toHaveBeenCalled();
-    expect(mockWebSocket.close).toHaveBeenCalled();
     expect(mockTerminalInstance.dispose).toHaveBeenCalled();
   });
 
-  it('does not show error notification when WebSocket error occurs and socket is closed', () => {
+  it('does not show error notification when WebSocket error occurs and socket is closed', async () => {
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        client.close();
+      })
+    );
+
     render(<KubectlShellView />);
 
-    // Set the WebSocket state to CLOSED
-    mockWebSocket.readyState = WebSocket.CLOSED;
-
-    const errorCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'error'
-    )![1] as (event: Event) => void;
-
-    const mockError = new Event('error');
-    errorCallback(mockError);
-
+    await waitFor(() => {
+      expect(screen.getByText('Console disconnected')).toBeInTheDocument();
+    });
     expect(vi.mocked(notifyError)).not.toHaveBeenCalled();
   });
 
   it('renders reload button in disconnected state', async () => {
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     render(<KubectlShellView />);
-
-    const closeCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'close'
-    )![1] as () => void;
-
-    closeCallback();
+    await waitFor(() => expect(clientConnection).toBeDefined());
+    clientConnection!.close();
 
     await waitFor(() => {
       const reloadButton = screen.getByTestId('k8sShell-reloadButton');
@@ -337,13 +405,17 @@ describe('KubectlShellView', () => {
   });
 
   it('renders close button in disconnected state', async () => {
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     render(<KubectlShellView />);
-
-    const closeCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'close'
-    )![1] as () => void;
-
-    closeCallback();
+    await waitFor(() => expect(clientConnection).toBeDefined());
+    clientConnection!.close();
 
     await waitFor(() => {
       const closeButton = screen.getByTestId('k8sShell-closeButton');
@@ -356,23 +428,25 @@ describe('KubectlShellView', () => {
     const user = userEvent.setup();
     const mockReload = vi.fn();
     Object.defineProperty(window, 'location', {
-      value: { reload: mockReload },
+      value: { ...window.location, reload: mockReload },
       writable: true,
     });
 
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
+    clientConnection!.close();
 
-    const closeCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'close'
-    )![1] as () => void;
-
-    closeCallback();
-
-    // Wait for button to appear in disconnected state
     const reloadButton = await screen.findByTestId('k8sShell-reloadButton');
     expect(reloadButton).toHaveTextContent('Reload');
 
-    // Click the button
     await user.click(reloadButton);
     expect(mockReload).toHaveBeenCalled();
   });
@@ -385,68 +459,82 @@ describe('KubectlShellView', () => {
       writable: true,
     });
 
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
+    clientConnection!.close();
 
-    const closeCallback = mockWebSocket.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'close'
-    )![1] as () => void;
-
-    closeCallback();
-
-    // Wait for button to appear in disconnected state
     const closeButton = await screen.findByTestId('k8sShell-closeButton');
     expect(closeButton).toHaveTextContent('Close');
 
-    // Click the button
     await user.click(closeButton);
     expect(mockClose).toHaveBeenCalled();
   });
 
-  it('removes event listeners on unmount', () => {
+  it('removes event listeners on unmount', async () => {
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     const { unmount } = render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
 
     unmount();
 
-    expect(mockWebSocket.removeEventListener).toHaveBeenCalledWith(
-      'open',
-      expect.any(Function)
-    );
-    expect(mockWebSocket.removeEventListener).toHaveBeenCalledWith(
-      'message',
-      expect.any(Function)
-    );
-    expect(mockWebSocket.removeEventListener).toHaveBeenCalledWith(
-      'close',
-      expect.any(Function)
-    );
-    expect(mockWebSocket.removeEventListener).toHaveBeenCalledWith(
-      'error',
-      expect.any(Function)
-    );
     expect(window.removeEventListener).toHaveBeenCalledWith(
       'resize',
       expect.any(Function)
     );
   });
 
-  it('fits terminal on window resize', () => {
-    render(<KubectlShellView />);
+  it('fits terminal on window resize', async () => {
+    let clientConnection: ClientConnection | undefined;
 
-    const resizeCallback = (window.addEventListener as Mock).mock.calls.find(
-      (call: unknown[]) => call[0] === 'resize'
-    )![1] as () => void;
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
+    render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
+
+    const resizeCallback = vi
+      .mocked(window.addEventListener)
+      .mock.calls.find(
+        (call: unknown[]) => call[0] === 'resize'
+      )![1] as () => void;
 
     resizeCallback();
 
     expect(vi.mocked(fit)).toHaveBeenCalledWith(mockTerminalInstance);
   });
 
-  it('cleans up resources on unmount', () => {
+  it('cleans up resources on unmount', async () => {
+    let clientConnection: ClientConnection | undefined;
+
+    server.use(
+      wssLink.addEventListener('connection', ({ client }) => {
+        clientConnection = client;
+      })
+    );
+
     const { unmount } = render(<KubectlShellView />);
+    await waitFor(() => expect(clientConnection).toBeDefined());
 
     unmount();
 
-    expect(mockWebSocket.close).toHaveBeenCalled();
     expect(mockTerminalInstance.dispose).toHaveBeenCalled();
     expect(window.removeEventListener).toHaveBeenCalledWith(
       'resize',

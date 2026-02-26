@@ -18,14 +18,14 @@ func Test_getOAuthToken(t *testing.T) {
 
 	t.Run("getOAuthToken fails upon invalid code", func(t *testing.T) {
 		code := ""
-		if _, err := GetOAuthToken(code, config); err == nil {
+		if _, err := GetOAuthToken(t.Context(), code, config); err == nil {
 			t.Errorf("getOAuthToken should fail upon providing invalid code; code=%v", code)
 		}
 	})
 
 	t.Run("getOAuthToken succeeds upon providing valid code", func(t *testing.T) {
 		code := validCode
-		token, err := GetOAuthToken(code, config)
+		token, err := GetOAuthToken(t.Context(), code, config)
 
 		if token == nil || err != nil {
 			t.Errorf("getOAuthToken should successfully return access token upon providing valid code")
@@ -92,19 +92,19 @@ func Test_getResource(t *testing.T) {
 	defer srv.Close()
 
 	t.Run("should fail upon missing Authorization Bearer header", func(t *testing.T) {
-		if _, err := GetResource("", config.ResourceURI); err == nil {
+		if _, err := GetResource(t.Context(), "", config.ResourceURI); err == nil {
 			t.Errorf("getResource should fail if access token is not provided in auth bearer header")
 		}
 	})
 
 	t.Run("should fail upon providing incorrect Authorization Bearer header", func(t *testing.T) {
-		if _, err := GetResource("incorrect-token", config.ResourceURI); err == nil {
+		if _, err := GetResource(t.Context(), "incorrect-token", config.ResourceURI); err == nil {
 			t.Errorf("getResource should fail if incorrect access token provided in auth bearer header")
 		}
 	})
 
 	t.Run("should succeed upon providing correct Authorization Bearer header", func(t *testing.T) {
-		if _, err := GetResource(oauthtest.AccessToken, config.ResourceURI); err != nil {
+		if _, err := GetResource(t.Context(), oauthtest.AccessToken, config.ResourceURI); err != nil {
 			t.Errorf("getResource should succeed if correct access token provided in auth bearer header")
 		}
 	})
@@ -118,7 +118,7 @@ func Test_Authenticate(t *testing.T) {
 		srv, config := oauthtest.RunOAuthServer(code, &portainer.OAuthSettings{})
 		defer srv.Close()
 
-		if _, err := authService.Authenticate(code, config); err == nil {
+		if _, err := authService.Authenticate(t.Context(), code, config); err == nil {
 			t.Error("Authenticate should fail to extract username from resource if incorrect UserIdentifier provided")
 		}
 	})
@@ -128,7 +128,7 @@ func Test_Authenticate(t *testing.T) {
 		srv, config := oauthtest.RunOAuthServer(code, config)
 		defer srv.Close()
 
-		username, err := authService.Authenticate(code, config)
+		username, err := authService.Authenticate(t.Context(), code, config)
 		if err != nil {
 			t.Errorf("Authenticate should succeed to extract username from resource if correct UserIdentifier provided; UserIdentifier=%s", config.UserIdentifier)
 		}

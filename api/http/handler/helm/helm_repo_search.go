@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 )
@@ -56,7 +57,10 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write(result)
+
+	if _, err := w.Write(result); err != nil {
+		log.Warn().Err(err).Msg("failed to write helm repo search response")
+	}
 
 	return nil
 }

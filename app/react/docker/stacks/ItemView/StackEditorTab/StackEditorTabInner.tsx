@@ -29,6 +29,7 @@ interface StackEditorTabInnerProps {
   versions?: Array<number>;
   stackId: Stack['Id'];
   isSaved: boolean;
+  webhookId: string;
 }
 
 export function StackEditorTabInner({
@@ -41,6 +42,7 @@ export function StackEditorTabInner({
   versions,
   stackId,
   isSaved,
+  webhookId,
 }: StackEditorTabInnerProps) {
   const { authorized: isAuthorizedToUpdate } = useAuthorizations(
     'PortainerStackUpdate'
@@ -139,8 +141,9 @@ export function StackEditorTabInner({
 
       {envType !== EnvironmentType.EdgeAgentOnDocker && (
         <WebhookFieldset
-          onChange={(value) => setFieldValue('webhookId', value)}
-          value={values.webhookId || ''}
+          onChange={(value) => setFieldValue('enabledWebhook', value)}
+          value={values.enabledWebhook}
+          webhookId={webhookId}
         />
       )}
 

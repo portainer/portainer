@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gorilla/mux"
 	"github.com/segmentio/encoding/json"
@@ -34,7 +35,10 @@ func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
 			w.Header().Set("Content-Type", "application/json")
 
 			if err := req.ParseForm(); err != nil {
-				fmt.Fprintf(w, "ParseForm() err: %v", err)
+				if _, innerErr := fmt.Fprintf(w, "ParseForm() err: %v", err); innerErr != nil {
+					log.Warn().Err(innerErr).Msg("failed to write response")
+				}
+
 				return
 			}
 
@@ -45,12 +49,14 @@ func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]any{
+			if err := json.NewEncoder(w).Encode(map[string]any{
 				"token_type":   "Bearer",
 				"expires_in":   86400,
 				"access_token": AccessToken,
 				"scope":        "groups",
-			})
+			}); err != nil {
+				log.Warn().Err(err).Msg("failed to write response")
+			}
 		},
 	).Methods(http.MethodPost)
 
@@ -67,10 +73,12 @@ func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]any{
+			if err := json.NewEncoder(w).Encode(map[string]any{
 				"username": "test-oauth-user",
 				"groups":   "testing",
-			})
+			}); err != nil {
+				log.Warn().Err(err).Msg("failed to write response")
+			}
 		},
 	).Methods(http.MethodGet)
 

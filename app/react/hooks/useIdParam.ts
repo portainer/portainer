@@ -6,7 +6,7 @@ export function useIdParam(param = 'id'): number {
   const stringId = params[param];
   const id = parseInt(stringId, 10);
   if (!id || Number.isNaN(id)) {
-    throw new Error('id url param is required');
+    throw new Error(`${param} url param is required`);
   }
 
   return id;

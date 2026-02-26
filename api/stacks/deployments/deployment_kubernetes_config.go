@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	k "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
 )
 
 type KubernetesStackDeploymentConfig struct {
@@ -45,7 +46,11 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 		return errors.Wrap(err, "failed to create temp kub deployment directory")
 	}
 
-	defer os.RemoveAll(tmpDir)
+	defer func() {
+		if err := os.RemoveAll(tmpDir); err != nil {
+			log.Warn().Err(err).Msg("failed to remove temp kub deployment directory")
+		}
+	}()
 
 	for _, fileName := range fileNames {
 		manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)

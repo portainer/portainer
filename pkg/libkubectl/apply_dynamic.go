@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -46,6 +47,17 @@ func (c *Client) ApplyDynamic(ctx context.Context, manifests []string) (string, 
 	}
 	mapper := restmapper.NewDiscoveryRESTMapper(groupResources)
 
+	// Get the namespace configured on the client (from form/API payload)
+	// The second return value indicates if the namespace was explicitly set
+	configuredNamespace, wasExplicitlySet, err := c.factory.ToRawKubeConfigLoader().Namespace()
+	if err != nil {
+		return "", fmt.Errorf("failed to get configured namespace: %w", err)
+	}
+	// Only treat as configured if it was explicitly set (not just defaulted from kubeconfig)
+	if !wasExplicitlySet {
+		configuredNamespace = ""
+	}
+
 	var results []string
 	var processErr error
 
@@ -70,15 +82,15 @@ func (c *Client) ApplyDynamic(ctx context.Context, manifests []string) (string, 
 		}
 
 		// Split by document separator if multiple resources in one manifest
-		resources := strings.Split(content, "\n---\n")
+		resources := strings.SplitSeq(content, "\n---\n")
 
-		for _, resource := range resources {
+		for resource := range resources {
 			resource = strings.TrimSpace(resource)
 			if resource == "" {
 				continue
 			}
 
-			result, err := c.applyResource(ctx, dynamicClient, mapper, []byte(resource))
+			result, err := c.applyResource(ctx, dynamicClient, mapper, []byte(resource), configuredNamespace)
 			if err != nil {
 				processErr = errors.Join(processErr, fmt.Errorf("failed to apply resource: %w", err))
 				continue
@@ -100,9 +112,9 @@ func (c *Client) ApplyDynamic(ctx context.Context, manifests []string) (string, 
 	return output, nil
 }
 
-// applyResource applies a single resource using Server-Side Apply
-func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interface, mapper meta.RESTMapper, resourceYAML []byte) (string, error) {
-	// Decode YAML to unstructured object
+// applyResource applies a single resource using Server-Side Apply.
+// configuredNamespace is the namespace set via form/API (empty string means "use manifest namespace").
+func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interface, mapper meta.RESTMapper, resourceYAML []byte, configuredNamespace string) (string, error) {
 	obj := &unstructured.Unstructured{}
 	decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(string(resourceYAML)), 4096)
 	if err := decoder.Decode(obj); err != nil {
@@ -126,21 +138,20 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 		return "", fmt.Errorf("failed to map resource type %s: %w", gvk.String(), err)
 	}
 
-	// Get namespace (if applicable)
-	namespace := obj.GetNamespace()
 	name := obj.GetName()
 
 	// Get the dynamic resource client
 	var resourceClient dynamic.ResourceInterface
+	var namespace string
+
 	if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
-		// Namespaced resource
-		if namespace == "" {
-			namespace = "default"
-			obj.SetNamespace(namespace)
+		namespace, err = resolveNamespace(configuredNamespace, obj.GetNamespace())
+		if err != nil {
+			return "", fmt.Errorf("namespace conflict for %s %q: %w", gvk.Kind, name, err)
 		}
+		obj.SetNamespace(namespace)
 		resourceClient = dynamicClient.Resource(mapping.Resource).Namespace(namespace)
 	} else {
-		// Cluster-scoped resource
 		resourceClient = dynamicClient.Resource(mapping.Resource)
 	}
 
@@ -150,8 +161,9 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 		return "", fmt.Errorf("failed to marshal object to JSON: %w", err)
 	}
 
-	// Apply using Server-Side Apply
-	// This is more efficient and handles field ownership better than traditional apply
+	// Apply using Server-Side Apply (Patch). If the resource does not exist (404),
+	// fall back to Create so restoration can create Deployments and other resources
+	// that were removed (e.g. by Helm uninstall).
 	patchOptions := metav1.PatchOptions{
 		FieldManager: "portainer",
 		Force:        boolPtr(true),
@@ -165,7 +177,14 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 		patchOptions,
 	)
 	if err != nil {
-		return "", fmt.Errorf("failed to apply %s %s/%s: %w", gvk.Kind, namespace, name, err)
+		if apierrors.IsNotFound(err) {
+			_, createErr := resourceClient.Create(ctx, obj, metav1.CreateOptions{})
+			if createErr != nil {
+				return "", fmt.Errorf("failed to create %s %s/%s: %w", gvk.Kind, namespace, name, createErr)
+			}
+		} else {
+			return "", fmt.Errorf("failed to apply %s %s/%s: %w", gvk.Kind, namespace, name, err)
+		}
 	}
 
 	// Format output message
@@ -173,7 +192,21 @@ func (c *Client) applyResource(ctx context.Context, dynamicClient dynamic.Interf
 	return fmt.Sprintf("%s/%s configured", resourceType, name), nil
 }
 
-// boolPtr returns a pointer to a bool value
+// resolveNamespace determines the namespace for a resource
+func resolveNamespace(configuredNamespace, manifestNamespace string) (string, error) {
+	// If both namespaces are set and don't match return an error (to match the behavior where the kubectl client (from the form/API) has a different namespace than the manifest)
+	if configuredNamespace != "" && manifestNamespace != "" && configuredNamespace != manifestNamespace {
+		return "", fmt.Errorf("the namespace %q from the manifest does not match the namespace %q set from the form/API", manifestNamespace, configuredNamespace)
+	}
+	if configuredNamespace != "" {
+		return configuredNamespace, nil
+	}
+	if manifestNamespace != "" {
+		return manifestNamespace, nil
+	}
+	return "default", nil
+}
+
 func boolPtr(b bool) *bool {
 	return &b
 }

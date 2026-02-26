@@ -48,8 +48,8 @@ export function parseAutoUpdateResponse(
 }
 
 export function transformAutoUpdateViewModel(
-  viewModel?: AutoUpdateModel,
-  webhookId?: string
+  viewModel: AutoUpdateModel | undefined,
+  webhookId: string | undefined
 ): AutoUpdateResponse | null {
   if (!viewModel || !viewModel.RepositoryAutomaticUpdates) {
     return null;

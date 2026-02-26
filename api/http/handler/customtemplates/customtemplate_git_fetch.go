@@ -61,7 +61,11 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 	}
 
 	// remove backup custom template folder
-	defer cleanUpBackupCustomTemplate(backupPath)
+	defer func() {
+		if err := cleanUpBackupCustomTemplate(backupPath); err != nil {
+			log.Warn().Err(err).Msg("failed to remove backup custom template folder")
+		}
+	}()
 
 	commitHash, err := stackutils.DownloadGitRepository(*customTemplate.GitConfig, handler.GitService, func() string {
 		return customTemplate.ProjectPath

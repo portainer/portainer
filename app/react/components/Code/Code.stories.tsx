@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { Code } from './Code';
 
@@ -16,18 +16,18 @@ function Template({ text, showCopyButton }: Args) {
   return <Code showCopyButton={showCopyButton}>{text}</Code>;
 }
 
-export const Primary: Story<Args> = Template.bind({});
+export const Primary: StoryFn<Args> = Template.bind({});
 Primary.args = {
   text: 'curl -X GET http://ultra-sound-money.eth',
   showCopyButton: true,
 };
 
-export const MultiLine: Story<Args> = Template.bind({});
+export const MultiLine: StoryFn<Args> = Template.bind({});
 MultiLine.args = {
   text: 'curl -X\n GET http://example-with-children.crypto',
 };
 
-export const MultiLineWithIcon: Story<Args> = Template.bind({});
+export const MultiLineWithIcon: StoryFn<Args> = Template.bind({});
 MultiLineWithIcon.args = {
   text: 'curl -X\n GET http://example-with-children.crypto',
   showCopyButton: true,

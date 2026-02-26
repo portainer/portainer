@@ -120,7 +120,10 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	defer cancelFunc()
 
 	if err := kcl.waitForPodStatus(timeoutCtx, corev1.PodRunning, shellPod); err != nil {
-		kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
+		innerErr := kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
+		if innerErr != nil {
+			log.Warn().Err(innerErr).Msg("error deleting shell pod after failing to wait for ready status")
+		}
 
 		return nil, errors.Wrap(err, "aborting pod creation; error waiting for shell pod ready status")
 	}
@@ -137,11 +140,17 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 		select {
 		case <-time.After(portainer.WebSocketKeepAlive):
 			log.Debug().Msg("pod removal schedule duration exceeded")
-			kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
+
+			if err := kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{}); err != nil {
+				log.Warn().Err(err).Msg("error deleting shell pod after max keep alive duration exceeded")
+			}
 		case <-ctx.Done():
 			err := ctx.Err()
 			log.Debug().Err(err).Msg("context error")
-			kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
+
+			if err := kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{}); err != nil {
+				log.Warn().Err(err).Msg("error deleting shell pod after context cancellation")
+			}
 		}
 	}()
 
@@ -188,9 +197,7 @@ func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podLi
 		return PortainerApplicationResources{}, fmt.Errorf("unable to list pods across the cluster: %w", err)
 	}
 
-	portainerApplicationResources := PortainerApplicationResources{
-		Pods: pods.Items,
-	}
+	portainerApplicationResources := PortainerApplicationResources{Pods: pods.Items}
 
 	replicaSets, err := kcl.cli.AppsV1().ReplicaSets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {

@@ -1,6 +1,8 @@
 import { TagId } from '@/portainer/tags/types';
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
 
+import { TLSConfiguration } from '../settings/types';
+
 export type EnvironmentGroupId = number;
 
 export type EdgeGroupId = number;
@@ -166,10 +168,7 @@ export type Environment = {
   Edge: EnvironmentEdge;
   SecuritySettings: EnvironmentSecuritySettings;
   Gpus?: { name: string; value: string }[];
-  TLSConfig?: {
-    TLS: boolean;
-    TLSSkipVerify: boolean;
-  };
+  TLSConfig?: TLSConfiguration;
   AzureCredentials?: {
     ApplicationID: string;
     TenantID: string;

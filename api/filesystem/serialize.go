@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"golang.org/x/mod/semver"
@@ -27,11 +28,8 @@ func FilterDirForEntryFile(dirEntries []DirEntry, entryFile string) []DirEntry {
 	for _, dirEntry := range dirEntries {
 		match := false
 		if dirEntry.IsFile {
-			for _, filter := range filters {
-				if filter == dirEntry.Name {
-					match = true
-					break
-				}
+			if slices.Contains(filters, dirEntry.Name) {
+				match = true
 			}
 		} else {
 			for _, filter := range filters {
@@ -166,4 +164,22 @@ func DecodeDirEntries(dirEntries []DirEntry) error {
 	}
 
 	return nil
+}
+
+// GetDirEntriesByFilenames returns the dir entries that are files and match the provided filenames
+func GetDirEntriesByFilenames(dirEntries []DirEntry, names []string) []DirEntry {
+	var filteredDirEntries []DirEntry
+
+	for _, dirEntry := range dirEntries {
+		if !dirEntry.IsFile {
+			continue
+		}
+		for _, name := range names {
+			if dirEntry.Name == name {
+				filteredDirEntries = append(filteredDirEntries, dirEntry)
+			}
+		}
+	}
+
+	return filteredDirEntries
 }

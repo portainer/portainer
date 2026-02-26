@@ -355,6 +355,18 @@ type (
 		CreatedBy string `example:"admin"`
 	}
 
+	// HelmConfig represents the Helm configuration for an edge stack
+	HelmConfig struct {
+		// Path to a Helm chart folder for Helm git deployments
+		ChartPath string `json:"ChartPath,omitempty" example:"charts/my-app"`
+		// Array of paths to Helm values YAML files for Helm git deployments
+		ValuesFiles []string `json:"ValuesFiles,omitempty" example:"['values/prod.yaml', 'values/secrets.yaml']"`
+		// Enable automatic rollback on deployment failure (equivalent to helm --atomic flag)
+		Atomic bool `json:"Atomic" example:"true"`
+		// Timeout for Helm operations (equivalent to helm --timeout flag)
+		Timeout string `json:"Timeout,omitempty" example:"5m0s"`
+	}
+
 	EdgeStackStatusForEnv struct {
 		EndpointID EndpointID
 		Status     []EdgeStackDeploymentStatus
@@ -436,7 +448,7 @@ type (
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
 		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty"`
+		AzureCredentials AzureCredentials `json:"AzureCredentials,omitzero"`
 		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
@@ -544,11 +556,16 @@ type (
 	}
 
 	PolicyChartStatus struct {
-		ChartName   string            `json:"chartName"`
-		Fingerprint string            `json:"fingerprint"`
-		Status      HelmInstallStatus `json:"status"`
-		Message     string            `json:"message"`
-		Namespace   string            `json:"namespace"`
+		// EnvironmentID is the endpoint this status belongs to.
+		// Stored so that ReadAll can group statuses by endpoint without parsing keys.
+		EnvironmentID EndpointID        `json:"environmentID,omitempty"`
+		ChartName     string            `json:"chartName"`
+		Fingerprint   string            `json:"fingerprint"`
+		Status        HelmInstallStatus `json:"status"`
+		Message       string            `json:"message"`
+		Namespace     string            `json:"namespace"`
+		// Unix timestamp
+		LastAttemptTime int64 `json:"lastAttemptTime"`
 	}
 
 	ImageBundle struct {
@@ -557,7 +574,7 @@ type (
 	}
 
 	PolicyChartBundle struct {
-		PolicyChartSummary
+		PolicyChartSummary  `mapstructure:",squash"`
 		EncodedTgz          string             `json:"EncodedTgz"`
 		Namespace           string             `json:"Namespace"`
 		PreReleaseManifest  string             `json:"PreReleaseManifest,omitempty"`
@@ -584,7 +601,7 @@ type (
 
 	// RestoreSettings contains instructions for restoring environment-level settings
 	RestoreSettings struct {
-		Manifest string `json:"manifest"` // Base64-encoded Kubernetes YAML manifest
+		Manifest string `json:"manifest,omitempty"` // Base64-encoded Kubernetes YAML manifest
 	}
 
 	// RestoreSettingsBundle maps restore type to restoration instructions
@@ -659,7 +676,7 @@ type (
 		PriceDescription string                      `json:"PriceDescription,omitempty"`
 		Deal             bool                        `json:"Deal,omitempty"`
 		Available        bool                        `json:"Available,omitempty"`
-		License          ExtensionLicenseInformation `json:"License,omitempty"`
+		License          ExtensionLicenseInformation `json:"License,omitzero"`
 		Version          string                      `json:"Version"`
 		UpdateAvailable  bool                        `json:"UpdateAvailable"`
 		ShopURL          string                      `json:"ShopURL,omitempty"`
@@ -1815,7 +1832,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, error)
+		Authenticate(ctx context.Context, code string, configuration *OAuthSettings) (string, error)
 	}
 
 	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
@@ -1855,9 +1872,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.37.0"
+	APIVersion = "2.39.0"
 	// Support annotation for the API version ("STS" for Short-Term Support or "LTS" for Long-Term Support)
-	APIVersionSupport = "STS"
+	APIVersionSupport = "LTS"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1911,6 +1928,8 @@ const (
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
 	PullLimitCheckDisabledEnvVar = "PULL_LIMIT_CHECK_DISABLED"
+	// FeatureFlagEnvVar is the environment variable used to set the list of enabled feature flags
+	FeatureFlagEnvVar = "FEATURE_FLAG"
 	// LicenseServerBaseURL represents the base URL of the API used to validate
 	// an extension license.
 	LicenseServerBaseURL = "https://api.portainer.io"
@@ -2451,3 +2470,18 @@ const (
 	HelmInstallStatusFailed       HelmInstallStatus = "failed"
 	HelmInstallStatusUninstalling HelmInstallStatus = "uninstalling"
 )
+
+func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
+	return EndpointSecuritySettings{
+		AllowBindMountsForRegularUsers:            false,
+		AllowContainerCapabilitiesForRegularUsers: false,
+		AllowDeviceMappingForRegularUsers:         false,
+		AllowHostNamespaceForRegularUsers:         false,
+		AllowPrivilegedModeForRegularUsers:        false,
+		AllowSysctlSettingForRegularUsers:         false,
+		AllowVolumeBrowserForRegularUsers:         false,
+		EnableHostManagementFeatures:              false,
+
+		AllowStackManagementForRegularUsers: true,
+	}
+}

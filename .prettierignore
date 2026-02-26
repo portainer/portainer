@@ -1,2 +1,3 @@
 dist
 api/datastore/test_data
+coverage

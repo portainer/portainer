@@ -2,8 +2,10 @@ package kubernetes
 
 import (
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
@@ -31,33 +33,23 @@ import (
 // @failure 500 "Server error occurred while attempting to retrieve ingress controllers"
 // @router /kubernetes/{id}/ingresscontrollers [get]
 func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Invalid environment identifier route variable")
-		return httperror.BadRequest("Invalid environment identifier route variable", err)
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err != nil {
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
-			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-		}
-
-		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
-	}
-
 	allowedOnly, err := request.RetrieveBooleanQueryParameter(r, "allowedOnly", true)
 	if err != nil {
-		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to retrieve allowedOnly query parameter")
-		return httperror.BadRequest("Unable to retrieve allowedOnly query parameter", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Invalid allowedOnly boolean query parameter")
+		return httperror.BadRequest("Invalid allowedOnly boolean query parameter", err)
+	}
+
+	// Get endpoint from context (may have policies applied in-memory)
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to fetch endpoint")
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
-		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to get privileged kube client")
-		return httperror.InternalServerError("Unable to get privileged kube client", err)
+		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to create Kubernetes client")
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
 	controllers, err := cli.GetIngressControllers()
@@ -72,6 +64,7 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
+	// Use the policy-applied endpoint for this check since it affects what's shown to the user.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
 		controllers = append(controllers, models.K8sIngressController{
 			Name:      "none",
@@ -79,37 +72,46 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 			Type:      "custom",
 		})
 	}
-	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	updatedClasses := []portainer.KubernetesIngressClassConfig{}
-	for i := range controllers {
-		controllers[i].Availability = true
-		if controllers[i].ClassName != "none" {
-			controllers[i].New = true
+
+	// Fetch raw endpoint and update IngressClasses within a transaction.
+	// This prevents policy-applied values from being persisted to the database.
+	var updatedClasses []portainer.KubernetesIngressClassConfig
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		rawEndpoint, err := tx.Endpoint().Endpoint(endpoint.ID)
+		if err != nil {
+			return err
 		}
 
-		updatedClass := portainer.KubernetesIngressClassConfig{
-			Name: controllers[i].ClassName,
-			Type: controllers[i].Type,
-		}
-
-		// Check if the controller is already known.
-		for _, existingClass := range existingClasses {
-			if controllers[i].ClassName != existingClass.Name {
-				continue
+		// Use raw endpoint's IngressClasses for building updatedClasses to persist original DB values.
+		existingClasses := rawEndpoint.Kubernetes.Configuration.IngressClasses
+		updatedClasses = []portainer.KubernetesIngressClassConfig{}
+		for i := range controllers {
+			controllers[i].Availability = true
+			if controllers[i].ClassName != "none" {
+				controllers[i].New = true
 			}
-			controllers[i].New = false
-			controllers[i].Availability = !existingClass.GloballyBlocked
-			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
-			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
-		}
-		updatedClasses = append(updatedClasses, updatedClass)
-	}
 
-	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.DataStore.Endpoint().UpdateEndpoint(
-		portainer.EndpointID(endpointID),
-		endpoint,
-	)
+			updatedClass := portainer.KubernetesIngressClassConfig{
+				Name: controllers[i].ClassName,
+				Type: controllers[i].Type,
+			}
+
+			// Check if the controller is already known.
+			for _, existingClass := range existingClasses {
+				if controllers[i].ClassName != existingClass.Name {
+					continue
+				}
+				controllers[i].New = false
+				controllers[i].Availability = !existingClass.GloballyBlocked
+				updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+				updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
+			}
+			updatedClasses = append(updatedClasses, updatedClass)
+		}
+
+		rawEndpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
+		return tx.Endpoint().UpdateEndpoint(rawEndpoint.ID, rawEndpoint)
+	})
 	if err != nil {
 		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to store found IngressClasses inside the database")
 		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
@@ -126,6 +128,7 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 		}
 		controllers = allowedControllers
 	}
+
 	return response.JSON(w, controllers)
 }
 
@@ -146,33 +149,22 @@ func (handler *Handler) getAllKubernetesIngressControllers(w http.ResponseWriter
 // @failure 500 "Server error occurred while attempting to retrieve ingress controllers by a namespace"
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [get]
 func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve environment identifier from request")
-		return httperror.BadRequest("Unable to retrieve environment identifier from request", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace identifier from request")
+		return httperror.BadRequest("Unable to retrieve namespace identifier from request", err)
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to find an environment with the specified identifier inside the database")
-			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-		}
-
-		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to find an environment with the specified identifier inside the database")
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to fetch endpoint")
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err != nil {
 		log.Error().Err(err).Str("context", "getAllKubernetesIngressControllers").Msg("Unable to create Kubernetes client")
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
-	}
-
-	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
-	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace from request")
-		return httperror.BadRequest("Unable to retrieve namespace from request", err)
 	}
 
 	currentControllers, err := cli.GetIngressControllers()
@@ -185,7 +177,9 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unable to retrieve ingress controllers from the Kubernetes")
 		return httperror.InternalServerError("Unable to retrieve ingress controllers from the Kubernetes", err)
 	}
+
 	// Add none controller if "AllowNone" is set for endpoint.
+	// Use the policy-applied endpoint for this check since it affects what's shown to the user.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
 		currentControllers = append(currentControllers, models.K8sIngressController{
 			Name:      "none",
@@ -194,55 +188,66 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		})
 	}
 
-	kubernetesConfig := endpoint.Kubernetes.Configuration
-	existingClasses := kubernetesConfig.IngressClasses
-	ingressAvailabilityPerNamespace := kubernetesConfig.IngressAvailabilityPerNamespace
-	updatedClasses := []portainer.KubernetesIngressClassConfig{}
+	// Use policy-applied endpoint for ingressAvailabilityPerNamespace since it affects the response.
+	ingressAvailabilityPerNamespace := endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace
 	controllers := models.K8sIngressControllers{}
 
-	for i := range currentControllers {
-		globallyblocked := false
-		currentControllers[i].Availability = true
-		if currentControllers[i].ClassName != "none" {
-			currentControllers[i].New = true
+	// Fetch raw endpoint and update IngressClasses within a transaction.
+	// This prevents policy-applied values from being persisted to the database.
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		rawEndpoint, err := tx.Endpoint().Endpoint(endpoint.ID)
+		if err != nil {
+			return err
 		}
 
-		updatedClass := portainer.KubernetesIngressClassConfig{
-			Name: currentControllers[i].ClassName,
-			Type: currentControllers[i].Type,
-		}
+		// Use raw endpoint's IngressClasses for building updatedClasses to persist original DB values.
+		existingClasses := rawEndpoint.Kubernetes.Configuration.IngressClasses
+		updatedClasses := []portainer.KubernetesIngressClassConfig{}
 
-		// Check if the controller is blocked globally or in the current
-		// namespace.
-		for _, existingClass := range existingClasses {
-			if currentControllers[i].ClassName != existingClass.Name {
-				continue
+		for i := range currentControllers {
+			globallyblocked := false
+			currentControllers[i].Availability = true
+			if currentControllers[i].ClassName != "none" {
+				currentControllers[i].New = true
 			}
-			currentControllers[i].New = false
-			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
-			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
 
-			globallyblocked = existingClass.GloballyBlocked
+			updatedClass := portainer.KubernetesIngressClassConfig{
+				Name: currentControllers[i].ClassName,
+				Type: currentControllers[i].Type,
+			}
 
-			// Check if the current namespace is blocked if ingressAvailabilityPerNamespace is set to true
-			if ingressAvailabilityPerNamespace {
-				for _, ns := range existingClass.BlockedNamespaces {
-					if namespace == ns {
-						currentControllers[i].Availability = false
+			// Check if the controller is blocked globally or in the current
+			// namespace.
+			for _, existingClass := range existingClasses {
+				if currentControllers[i].ClassName != existingClass.Name {
+					continue
+				}
+				currentControllers[i].New = false
+				updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+				updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
+
+				globallyblocked = existingClass.GloballyBlocked
+
+				// Check if the current namespace is blocked if ingressAvailabilityPerNamespace is set to true
+				if ingressAvailabilityPerNamespace {
+					for _, ns := range existingClass.BlockedNamespaces {
+						if namespace == ns {
+							currentControllers[i].Availability = false
+						}
 					}
 				}
 			}
+			if !globallyblocked {
+				controllers = append(controllers, currentControllers[i])
+			}
+			updatedClasses = append(updatedClasses, updatedClass)
 		}
-		if !globallyblocked {
-			controllers = append(controllers, currentControllers[i])
-		}
-		updatedClasses = append(updatedClasses, updatedClass)
-	}
 
-	// Update the database to match the list of found controllers.
-	// This includes pruning out controllers which no longer exist.
-	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.DataStore.Endpoint().UpdateEndpoint(portainer.EndpointID(endpointID), endpoint)
+		// Update the database to match the list of found controllers.
+		// This includes pruning out controllers which no longer exist.
+		rawEndpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
+		return tx.Endpoint().UpdateEndpoint(rawEndpoint.ID, rawEndpoint)
+	})
 	if err != nil {
 		log.Error().Err(err).Str("context", "getKubernetesIngressControllersByNamespace").Msg("Unable to store found IngressClasses inside the database")
 		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
@@ -268,21 +273,10 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 // @failure 500 "Server error occurred while attempting to update ingress controllers."
 // @router /kubernetes/{id}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to retrieve environment identifier from request")
-		return httperror.BadRequest("Unable to retrieve environment identifier from request", err)
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err != nil {
-		if handler.DataStore.IsErrObjectNotFound(err) {
-			log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
-			return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
-		}
-
-		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to find an environment with the specified identifier inside the database")
-		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to retrieve environment")
+		return httperror.BadRequest("Unable to retrieve environment", err)
 	}
 
 	payload := models.K8sIngressControllers{}
@@ -298,7 +292,6 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		return httperror.InternalServerError("Unable to get privileged kube client", err)
 	}
 
-	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	controllers, err := cli.GetIngressControllers()
 	if err != nil {
 		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
@@ -316,6 +309,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 	}
 
 	// Add none controller if "AllowNone" is set for endpoint.
+	// Use policy-applied endpoint for this check since it affects the response.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
 		controllers = append(controllers, models.K8sIngressController{
 			Name:      "none",
@@ -324,48 +318,55 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		})
 	}
 
-	updatedClasses := []portainer.KubernetesIngressClassConfig{}
-	for i := range controllers {
-		controllers[i].Availability = true
-		controllers[i].New = true
-
-		updatedClass := portainer.KubernetesIngressClassConfig{
-			Name: controllers[i].ClassName,
-			Type: controllers[i].Type,
+	// Fetch raw endpoint and update IngressClasses within a transaction.
+	// This prevents policy-applied values from being persisted to the database.
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		rawEndpoint, err := tx.Endpoint().Endpoint(endpoint.ID)
+		if err != nil {
+			return err
 		}
 
-		// Check if the controller is already known.
-		for _, existingClass := range existingClasses {
-			if controllers[i].ClassName != existingClass.Name {
-				continue
-			}
-			controllers[i].New = false
-			controllers[i].Availability = !existingClass.GloballyBlocked
-			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
-			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
-		}
-		updatedClasses = append(updatedClasses, updatedClass)
-	}
-
-	for _, p := range payload {
+		// Use raw endpoint's IngressClasses for building updatedClasses to persist original DB values.
+		existingClasses := rawEndpoint.Kubernetes.Configuration.IngressClasses
+		updatedClasses := []portainer.KubernetesIngressClassConfig{}
 		for i := range controllers {
-			// Now set new payload data
-			if updatedClasses[i].Name == p.ClassName {
-				updatedClasses[i].GloballyBlocked = !p.Availability
+			controllers[i].Availability = true
+			controllers[i].New = true
+
+			updatedClass := portainer.KubernetesIngressClassConfig{
+				Name: controllers[i].ClassName,
+				Type: controllers[i].Type,
+			}
+
+			// Check if the controller is already known.
+			for _, existingClass := range existingClasses {
+				if controllers[i].ClassName != existingClass.Name {
+					continue
+				}
+				controllers[i].New = false
+				controllers[i].Availability = !existingClass.GloballyBlocked
+				updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+				updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
+			}
+			updatedClasses = append(updatedClasses, updatedClass)
+		}
+
+		for _, p := range payload {
+			for i := range controllers {
+				// Now set new payload data
+				if updatedClasses[i].Name == p.ClassName {
+					updatedClasses[i].GloballyBlocked = !p.Availability
+				}
 			}
 		}
-	}
 
-	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.DataStore.Endpoint().UpdateEndpoint(
-		portainer.EndpointID(endpointID),
-		endpoint,
-	)
+		rawEndpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
+		return tx.Endpoint().UpdateEndpoint(rawEndpoint.ID, rawEndpoint)
+	})
 	if err != nil {
 		log.Error().Err(err).Str("context", "updateKubernetesIngressControllers").Msg("Unable to store found IngressClasses inside the database")
 		return httperror.InternalServerError("Unable to store found IngressClasses inside the database", err)
 	}
-
 	return response.Empty(w)
 }
 
@@ -388,12 +389,6 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 // @failure 500 "Server error occurred while attempting to update ingress controllers by namespace."
 // @router /kubernetes/{id}/namespaces/{namespace}/ingresscontrollers [put]
 func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Msg("Unable to fetch endpoint")
-		return httperror.NotFound("Unable to fetch endpoint", err)
-	}
-
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
 		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Msg("Unable to retrieve namespace from request")
@@ -407,75 +402,88 @@ func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.Res
 		return httperror.BadRequest("Unable to decode and validate the request payload", err)
 	}
 
-	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	updatedClasses := []portainer.KubernetesIngressClassConfig{}
-PayloadLoop:
-	for _, p := range payload {
-		for _, existingClass := range existingClasses {
-			if p.ClassName != existingClass.Name {
-				continue
-			}
-			updatedClass := portainer.KubernetesIngressClassConfig{
-				Name:            existingClass.Name,
-				Type:            existingClass.Type,
-				GloballyBlocked: existingClass.GloballyBlocked,
-			}
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Msg("Unable to fetch endpoint")
+		return httperror.InternalServerError("Unable to fetch endpoint", err)
+	}
 
-			// Handle "allow"
-			if p.Availability {
-				// remove the namespace from the list of blocked namespaces
-				// in the existingClass.
-				for _, blockedNS := range existingClass.BlockedNamespaces {
-					if blockedNS != namespace {
-						updatedClass.BlockedNamespaces = append(updatedClass.BlockedNamespaces, blockedNS)
+	// Fetch raw endpoint and update IngressClasses within a transaction.
+	// This prevents policy-applied values from being persisted to the database.
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		rawEndpoint, err := tx.Endpoint().Endpoint(endpoint.ID)
+		if err != nil {
+			return err
+		}
+
+		// Use raw endpoint's IngressClasses for building updatedClasses to persist original DB values.
+		existingClasses := rawEndpoint.Kubernetes.Configuration.IngressClasses
+		updatedClasses := []portainer.KubernetesIngressClassConfig{}
+
+		for _, p := range payload {
+			for _, existingClass := range existingClasses {
+				if p.ClassName != existingClass.Name {
+					continue
+				}
+				updatedClass := portainer.KubernetesIngressClassConfig{
+					Name:            existingClass.Name,
+					Type:            existingClass.Type,
+					GloballyBlocked: existingClass.GloballyBlocked,
+				}
+
+				// Handle "allow"
+				if p.Availability {
+					// remove the namespace from the list of blocked namespaces
+					// in the existingClass.
+					for _, blockedNS := range existingClass.BlockedNamespaces {
+						if blockedNS != namespace {
+							updatedClass.BlockedNamespaces = append(updatedClass.BlockedNamespaces, blockedNS)
+						}
 					}
-				}
 
-				updatedClasses = append(updatedClasses, updatedClass)
-				continue PayloadLoop
-			}
-
-			// Handle "disallow"
-			// If it's meant to be blocked we need to add the current
-			// namespace. First, check if it's already in the
-			// BlockedNamespaces and if not we append it.
-			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
-			for _, ns := range updatedClass.BlockedNamespaces {
-				if namespace == ns {
 					updatedClasses = append(updatedClasses, updatedClass)
-					continue PayloadLoop
+					break
+				}
+
+				// Handle "disallow"
+				// If it's meant to be blocked we need to add the current
+				// namespace. First, check if it's already in the
+				// BlockedNamespaces and if not we append it.
+				updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
+				if !slices.Contains(updatedClass.BlockedNamespaces, namespace) {
+					updatedClass.BlockedNamespaces = append(updatedClass.BlockedNamespaces, namespace)
+				}
+				updatedClasses = append(updatedClasses, updatedClass)
+				break
+			}
+		}
+
+		// At this point it's possible we had an existing class which was globally
+		// blocked and thus not included in the payload. As a result it is not yet
+		// part of updatedClasses, but we MUST include it or we would remove the
+		// global block.
+		for _, existingClass := range existingClasses {
+			found := false
+
+			for _, updatedClass := range updatedClasses {
+				if existingClass.Name == updatedClass.Name {
+					found = true
+					break
 				}
 			}
-			updatedClass.BlockedNamespaces = append(updatedClass.BlockedNamespaces, namespace)
-			updatedClasses = append(updatedClasses, updatedClass)
-		}
-	}
 
-	// At this point it's possible we had an existing class which was globally
-	// blocked and thus not included in the payload. As a result it is not yet
-	// part of updatedClasses, but we MUST include it or we would remove the
-	// global block.
-	for _, existingClass := range existingClasses {
-		found := false
-
-		for _, updatedClass := range updatedClasses {
-			if existingClass.Name == updatedClass.Name {
-				found = true
+			if !found {
+				updatedClasses = append(updatedClasses, existingClass)
 			}
 		}
 
-		if !found {
-			updatedClasses = append(updatedClasses, existingClass)
-		}
-	}
-	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-
-	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+		rawEndpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
+		return tx.Endpoint().UpdateEndpoint(rawEndpoint.ID, rawEndpoint)
+	})
 	if err != nil {
 		log.Error().Err(err).Str("context", "updateKubernetesIngressControllersByNamespace").Str("namespace", namespace).Msg("Unable to store BlockedIngressClasses inside the database")
 		return httperror.InternalServerError("Unable to store BlockedIngressClasses inside the database", err)
 	}
-
 	return response.Empty(w)
 }
 

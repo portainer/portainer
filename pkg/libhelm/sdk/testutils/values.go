@@ -2,6 +2,8 @@ package testutils
 
 import (
 	"os"
+
+	"github.com/portainer/portainer/api/logs"
 )
 
 // CreateValuesFile creates a temporary file with the given content for testing
@@ -11,14 +13,13 @@ func CreateValuesFile(values string) (string, error) {
 		return "", err
 	}
 
-	_, err = file.WriteString(values)
-	if err != nil {
-		file.Close()
+	if _, err := file.WriteString(values); err != nil {
+		logs.CloseAndLogErr(file)
+
 		return "", err
 	}
 
-	err = file.Close()
-	if err != nil {
+	if err := file.Close(); err != nil {
 		return "", err
 	}
 

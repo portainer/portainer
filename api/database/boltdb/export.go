@@ -3,6 +3,7 @@ package boltdb
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/logs"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 	bolt "go.etcd.io/bbolt"
@@ -37,7 +38,7 @@ func (c *DbConnection) ExportJSON(databasePath string, metadata bool) ([]byte, e
 	if err != nil {
 		return []byte("{}"), err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	backup := make(map[string]any)
 	if metadata {

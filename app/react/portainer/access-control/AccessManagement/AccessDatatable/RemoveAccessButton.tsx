@@ -5,9 +5,11 @@ import { Access } from './types';
 export function RemoveAccessButton({
   onClick,
   items,
+  isLoading,
 }: {
   onClick(items: Array<Access>): void;
   items: Array<Access>;
+  isLoading?: boolean;
 }) {
   return (
     <DeleteButton
@@ -15,6 +17,7 @@ export function RemoveAccessButton({
       onConfirmed={() => onClick(items)}
       disabled={items.length === 0}
       data-cy="remove-access-button"
+      isLoading={isLoading}
     />
   );
 }

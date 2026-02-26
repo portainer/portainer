@@ -53,5 +53,4 @@ type Connection interface {
 
 	UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error
 	ConvertToKey(v int) []byte
-	ConvertStringToKey(v string) []byte
 }

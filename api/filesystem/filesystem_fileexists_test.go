@@ -30,11 +30,12 @@ func Test_FileExists_whenFileNotExistsShouldReturnFalse(t *testing.T) {
 }
 
 func testHelperFileExists_fileExists(t *testing.T, checker func(path string) (bool, error)) {
-	file, err := os.CreateTemp("", t.Name())
+	file, err := os.CreateTemp(t.TempDir(), t.Name())
 	require.NoError(t, err, "CreateTemp should not fail")
 
 	t.Cleanup(func() {
-		os.RemoveAll(file.Name())
+		err := os.RemoveAll(file.Name())
+		require.NoError(t, err)
 	})
 
 	exists, err := checker(file.Name())

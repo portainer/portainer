@@ -1,4 +1,4 @@
-import { Story } from '@storybook/react';
+import { StoryFn } from '@storybook/react';
 
 import {
   Environment,
@@ -29,37 +29,37 @@ function Template({ environment }: Args) {
   );
 }
 
-export const DockerEnvironment: Story<Args> = Template.bind({});
+export const DockerEnvironment: StoryFn<Args> = Template.bind({});
 DockerEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.Docker),
 };
 
-export const DockerAgentEnvironment: Story<Args> = Template.bind({});
+export const DockerAgentEnvironment: StoryFn<Args> = Template.bind({});
 DockerAgentEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.AgentOnDocker),
 };
 
-export const DockerEdgeEnvironment: Story<Args> = Template.bind({});
+export const DockerEdgeEnvironment: StoryFn<Args> = Template.bind({});
 DockerEdgeEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.EdgeAgentOnDocker),
 };
 
-export const AzureEnvironment: Story<Args> = Template.bind({});
+export const AzureEnvironment: StoryFn<Args> = Template.bind({});
 AzureEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.Azure),
 };
 
-export const KubernetesLocalEnvironment: Story<Args> = Template.bind({});
+export const KubernetesLocalEnvironment: StoryFn<Args> = Template.bind({});
 KubernetesLocalEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.KubernetesLocal),
 };
 
-export const KubernetesAgentEnvironment: Story<Args> = Template.bind({});
+export const KubernetesAgentEnvironment: StoryFn<Args> = Template.bind({});
 KubernetesAgentEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.AgentOnKubernetes),
 };
 
-export const KubernetesEdgeEnvironment: Story<Args> = Template.bind({});
+export const KubernetesEdgeEnvironment: StoryFn<Args> = Template.bind({});
 KubernetesEdgeEnvironment.args = {
   environment: mockEnvironment(EnvironmentType.EdgeAgentOnKubernetes),
 };

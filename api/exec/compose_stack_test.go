@@ -71,7 +71,9 @@ func Test_createEnvFile(t *testing.T) {
 
 func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(path.Join(dir, ".env"), []byte("VAR1=VAL1\nVAR2=VAL2\n"), 0600)
+	err := os.WriteFile(path.Join(dir, ".env"), []byte("VAR1=VAL1\nVAR2=VAL2\n"), 0600)
+	require.NoError(t, err)
+
 	stack := &portainer.Stack{
 		ProjectPath: dir,
 		Env: []portainer.Pair{
@@ -83,8 +85,12 @@ func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	assert.Equal(t, filepath.Join(stack.ProjectPath, "stack.env"), result)
 	require.NoError(t, err)
 	assert.FileExists(t, path.Join(dir, "stack.env"))
-	f, _ := os.Open(path.Join(dir, "stack.env"))
-	content, _ := io.ReadAll(f)
+
+	f, err := os.Open(path.Join(dir, "stack.env"))
+	require.NoError(t, err)
+
+	content, err := io.ReadAll(f)
+	require.NoError(t, err)
 
 	assert.Equal(t, []byte("VAR1=VAL1\nVAR2=VAL2\n\nVAR1=NEW_VAL1\nVAR3=VAL3\n"), content)
 }

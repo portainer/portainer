@@ -26,7 +26,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           }
 
           try {
-            const status = await checkEndpointStatus(endpoint);
+            const { status, error } = await checkEndpointStatus(endpoint);
 
             if (endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
               await updateEndpointStatus(endpoint, status);
@@ -34,7 +34,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             endpoint.Status = status;
 
             if (status === EnvironmentStatus.Down) {
-              throw new Error(`The environment named ${endpoint.Name} is unreachable.`);
+              throw error || new Error(`The environment named ${endpoint.Name} is unreachable.`);
             }
 
             await StateManager.updateEndpointState(endpoint);
@@ -54,9 +54,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           async function checkEndpointStatus(endpoint) {
             try {
               await SystemService.ping(endpoint.Id);
-              return EnvironmentStatus.Up;
+              return { status: EnvironmentStatus.Up };
             } catch (e) {
-              return EnvironmentStatus.Down;
+              return { status: EnvironmentStatus.Down, error: e };
             }
           }
 

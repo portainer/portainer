@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/docker/stats"
+	"github.com/portainer/portainer/api/logs"
 	edgeutils "github.com/portainer/portainer/pkg/edge"
 	networkingutils "github.com/portainer/portainer/pkg/networking"
 
@@ -320,7 +321,7 @@ func dockerSnapshotContainerErrorLogs(snapshot *portainer.DockerSnapshot, cli *c
 	if err != nil {
 		return fmt.Errorf("failed to get container logs: %w", err)
 	}
-	defer rd.Close()
+	defer logs.CloseAndLogErr(rd)
 
 	var stdOut, stdErr bytes.Buffer
 	if _, err := stdcopy.StdCopy(&stdErr, &stdOut, rd); err != nil {

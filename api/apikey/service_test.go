@@ -157,7 +157,10 @@ func Test_UpdateAPIKey(t *testing.T) {
 
 	t.Run("Successfully updates the api-key LastUsed time", func(t *testing.T) {
 		user := portainer.User{ID: 1}
-		store.User().Create(&user)
+
+		err := store.User().Create(&user)
+		require.NoError(t, err)
+
 		_, apiKey, err := service.GenerateApiKey(user, "test-x")
 		require.NoError(t, err)
 

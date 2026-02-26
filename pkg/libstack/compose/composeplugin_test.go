@@ -207,7 +207,10 @@ func Test_Config(t *testing.T) {
 	dir := t.TempDir()
 	projectName := "configtest"
 
-	defer os.RemoveAll(dir)
+	defer func() {
+		err := os.RemoveAll(dir)
+		require.NoError(t, err)
+	}()
 
 	testCases := []struct {
 		name               string
@@ -670,7 +673,7 @@ func Test_MaxConcurrency(t *testing.T) {
 	err := w.Validate(ctx, filepaths, options)
 	require.NoError(t, err)
 
-	w.withComposeService(ctx, filepaths, options, func(service api.Compose, _ *types.Project) error {
+	err = w.withComposeService(ctx, filepaths, options, func(service api.Compose, _ *types.Project) error {
 		if mockS, ok := service.(*mockComposeService); ok {
 			require.Equal(t, expectedMaxConcurrency, mockS.maxConcurrency)
 		} else {
@@ -678,6 +681,7 @@ func Test_MaxConcurrency(t *testing.T) {
 		}
 		return nil
 	})
+	require.NoError(t, err)
 }
 
 func Test_createProject(t *testing.T) {
@@ -1346,14 +1350,13 @@ func Test_createProject(t *testing.T) {
 			}
 
 			defer func() {
-				var errs []error
+				var errs error
 				for _, f := range createdFiles {
-					errs = append(errs, os.Remove(f))
+					errs = errors.Join(errs, os.Remove(f))
 				}
 
-				err := errors.Join(errs...)
-				if err != nil {
-					t.Fatalf("Failed to remove config files: %v", err)
+				if errs != nil {
+					t.Fatalf("Failed to remove config files: %v", errs)
 				}
 			}()
 

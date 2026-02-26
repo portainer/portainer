@@ -9,6 +9,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/concurrent"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/segmentio/encoding/json"
 	"golang.org/x/mod/semver"
 	"oras.land/oras-go/v2/registry"
@@ -112,7 +113,7 @@ func descriptorHasMediaType(ctx context.Context, repository registry.Repository,
 	if err != nil {
 		return false
 	}
-	defer manifestReader.Close()
+	defer logs.CloseAndLogErr(manifestReader)
 
 	content, err := io.ReadAll(manifestReader)
 	if err != nil {
@@ -122,5 +123,6 @@ func descriptorHasMediaType(ctx context.Context, repository registry.Repository,
 	if err := json.Unmarshal(content, &manifest); err != nil {
 		return false
 	}
+
 	return manifest.Config.MediaType == expectedMediaType
 }

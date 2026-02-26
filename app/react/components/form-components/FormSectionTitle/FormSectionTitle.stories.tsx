@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 
 import { FormSectionTitle } from './FormSectionTitle';
@@ -14,7 +14,7 @@ function Template({
   return <FormSectionTitle>{children}</FormSectionTitle>;
 }
 
-export const Example: Story<PropsWithChildren<unknown>> = Template.bind({});
+export const Example: StoryFn<PropsWithChildren<unknown>> = Template.bind({});
 Example.args = {
   children: 'This is a title with children',
 };

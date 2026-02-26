@@ -11,7 +11,7 @@ import { confirm } from '@@/modals/confirm';
 import { Button } from '@@/buttons';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
-import { WidgetTitle } from '@@/Widget';
+import { WidgetIcon } from '@@/Widget/WidgetIcon';
 import { Checkbox } from '@@/form-components/Checkbox';
 import { Option, PortainerSelect } from '@@/form-components/PortainerSelect';
 
@@ -96,7 +96,12 @@ export function UpgradeHelmModal({
       aria-label="upgrade-helm"
     >
       <Modal.Header
-        title={<WidgetTitle className="px-5" title="Upgrade" icon={ArrowUp} />}
+        title={
+          <div className="inline-flex items-center gap-1 px-5">
+            <WidgetIcon icon={ArrowUp} />
+            <h2 className="text-base m-0 ml-1">Upgrade</h2>
+          </div>
+        }
       />
       <div className="flex-1 overflow-y-auto px-5">
         <Modal.Body>

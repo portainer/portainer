@@ -77,8 +77,12 @@ func (m *Migrator) updateRegistriesToDB32() error {
 				Namespaces:         []string{},
 			}
 		}
-		m.registryService.Update(registry.ID, &registry)
+
+		if err := m.registryService.Update(registry.ID, &registry); err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
@@ -121,10 +125,11 @@ func (m *Migrator) updateDockerhubToDB32() error {
 			if !migrated {
 				// keep this one entry
 				migrated = true
-			} else {
 				// delete subsequent duplicates
-				m.registryService.Delete(r.ID)
+			} else if err := m.registryService.Delete(r.ID); err != nil {
+				return err
 			}
+
 		}
 	}
 
@@ -138,7 +143,6 @@ func (m *Migrator) updateDockerhubToDB32() error {
 	}
 
 	for _, endpoint := range endpoints {
-
 		if endpoint.Type != portainer.KubernetesLocalEnvironment &&
 			endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
 			endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
@@ -146,18 +150,14 @@ func (m *Migrator) updateDockerhubToDB32() error {
 			userAccessPolicies := portainer.UserAccessPolicies{}
 			for userId := range endpoint.UserAccessPolicies {
 				if _, found := endpoint.UserAccessPolicies[userId]; found {
-					userAccessPolicies[userId] = portainer.AccessPolicy{
-						RoleID: 0,
-					}
+					userAccessPolicies[userId] = portainer.AccessPolicy{RoleID: 0}
 				}
 			}
 
 			teamAccessPolicies := portainer.TeamAccessPolicies{}
 			for teamId := range endpoint.TeamAccessPolicies {
 				if _, found := endpoint.TeamAccessPolicies[teamId]; found {
-					teamAccessPolicies[teamId] = portainer.AccessPolicy{
-						RoleID: 0,
-					}
+					teamAccessPolicies[teamId] = portainer.AccessPolicy{RoleID: 0}
 				}
 			}
 

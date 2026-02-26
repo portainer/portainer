@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
+	"github.com/portainer/portainer/api/logs"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -111,7 +112,11 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 	if err != nil {
 		return "Unable to create Docker Client connection", err
 	}
-	defer docker.Close()
+	defer func() {
+		if err := docker.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close docker client")
+		}
+	}()
 
 	if err := pullImage(ctx, docker, imageName); err != nil {
 		return "Could not pull image from registry", err
@@ -139,7 +144,7 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 		return err
 	}
 
-	defer out.Close()
+	defer logs.CloseAndLogErr(out)
 	outputBytes, err := io.ReadAll(out)
 	if err != nil {
 		log.Error().Str("image_name", imageName).Err(err).Msg("could not read image pull output")

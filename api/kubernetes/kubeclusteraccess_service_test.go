@@ -38,7 +38,9 @@ const certDataString = "MIIC5TCCAc2gAwIBAgIJAJ+poiEBdsplMA0GCSqGSIb3DQEBCwUAMBQx
 func createTempFile(filename, content string, t *testing.T) string {
 	tempPath := t.TempDir()
 	filePath := fmt.Sprintf("%s/%s", tempPath, filename)
-	os.WriteFile(filePath, []byte(content), 0644)
+
+	err := os.WriteFile(filePath, []byte(content), 0644)
+	require.NoError(t, err)
 
 	return filePath
 }

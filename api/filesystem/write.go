@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/logs"
 )
 
 // WriteToFile creates a file in the filesystem storage
@@ -17,7 +18,7 @@ func WriteToFile(dst string, content []byte) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to open a file %q", dst)
 	}
-	defer file.Close()
+	defer logs.CloseAndLogErr(file)
 
 	_, err = file.Write(content)
 	return errors.Wrapf(err, "failed to write a file %q", dst)

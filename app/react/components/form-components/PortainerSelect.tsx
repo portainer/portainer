@@ -50,6 +50,7 @@ interface SharedProps<TValue>
     rawInput: string
   ) => boolean;
   getOptionValue?: (option: TValue) => string;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 interface MultiProps<TValue> extends SharedProps<TValue> {
@@ -120,6 +121,7 @@ export function SingleSelect<TValue = string>({
   isMulti,
   size,
   getOptionValue,
+  onBlur,
   ...aria
 }: SingleProps<TValue>) {
   const selectedValue =
@@ -152,6 +154,7 @@ export function SingleSelect<TValue = string>({
       noOptionsMessage={noOptionsMessage}
       size={size}
       loadingMessage={loadingMessage}
+      onBlur={onBlur}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...aria}
     />
@@ -213,6 +216,7 @@ export function MultiSelect<TValue = string>({
   isCreatable,
   size,
   getOptionValue,
+  onBlur,
   ...aria
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const [inputValue, setInputValue] = useState('');
@@ -258,7 +262,8 @@ export function MultiSelect<TValue = string>({
     />
   );
 
-  function handleBlur() {
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+    onBlur?.(e);
     const trimmed = inputValue.trim();
     if (!trimmed || value.includes(trimmed as TValue)) {
       setInputValue('');

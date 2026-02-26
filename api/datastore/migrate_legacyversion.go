@@ -105,12 +105,18 @@ func (store *Store) getOrMigrateLegacyVersion() (*models.Version, error) {
 
 // finishMigrateLegacyVersion writes the new version to the DB and removes the old version keys from the DB
 func (store *Store) finishMigrateLegacyVersion(versionToWrite *models.Version) error {
-	err := store.VersionService.UpdateVersion(versionToWrite)
+	if err := store.VersionService.UpdateVersion(versionToWrite); err != nil {
+		return err
+	}
 
 	// Remove legacy keys if present
-	store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey))
-	store.connection.DeleteObject(bucketName, []byte(legacyEditionKey))
-	store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
+	if err := store.connection.DeleteObject(bucketName, []byte(legacyDBVersionKey)); err != nil {
+		return err
+	}
 
-	return err
+	if err := store.connection.DeleteObject(bucketName, []byte(legacyEditionKey)); err != nil {
+		return err
+	}
+
+	return store.connection.DeleteObject(bucketName, []byte(legacyInstanceKey))
 }

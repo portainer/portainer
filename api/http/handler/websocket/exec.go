@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -91,7 +92,7 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 		return err
 	}
 
-	defer websocketConn.Close()
+	defer logs.CloseAndLogErr(websocketConn)
 
 	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID)
 }

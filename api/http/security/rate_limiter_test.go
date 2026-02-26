@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestLimitAccess(t *testing.T) {
@@ -34,15 +36,18 @@ func TestLimitAccess(t *testing.T) {
 
 		resp, err := http.Get(ts.URL)
 		if err == nil {
-			resp.Body.Close()
+			err = resp.Body.Close()
+			require.NoError(t, err)
 		}
 
 		resp, err = http.Get(ts.URL)
 		if err != nil {
 			t.Fatal(err)
 		}
-		io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
+
+		_, _ = io.Copy(io.Discard, resp.Body)
+		err = resp.Body.Close()
+		require.NoError(t, err)
 
 		if status := resp.StatusCode; status != http.StatusForbidden {
 			t.Errorf("handler returned wrong status code: got %v want %v",

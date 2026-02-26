@@ -117,7 +117,11 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	}
 
 	tempFileDir, _ := os.MkdirTemp("", "kub_file_content")
-	defer os.RemoveAll(tempFileDir)
+	defer func() {
+		if err := os.RemoveAll(tempFileDir); err != nil {
+			log.Warn().Err(err).Msg("failed to remove temporary stack deployment directory")
+		}
+	}()
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
 		return httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
@@ -135,7 +139,9 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	// otherwise return nil
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
-		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace)
+		if err := registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace); err != nil {
+			log.Warn().Err(err).Msg("failed to refresh ECR registry secret")
+		}
 	}
 
 	// Use temp dir as the stack project path for deployment
@@ -162,7 +168,9 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	}
 	stack.ProjectPath = projectPath
 
-	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
+	if err := handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint); err != nil {
+		log.Warn().Err(err).Msg("remove stack file backup error")
+	}
 
 	return nil
 }

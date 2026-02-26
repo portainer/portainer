@@ -77,6 +77,9 @@ type (
 		// CreatedByUserId is the user ID that created this stack
 		// Used for adding labels to Kubernetes manifests
 		CreatedByUserId string
+
+		// HelmConfig represents the Helm configuration for an edge stack
+		HelmConfig portainer.HelmConfig
 	}
 
 	DeployerOptionsPayload struct {

@@ -309,7 +309,10 @@ func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statu
 	}
 
 	w.Header().Set("ETag", etag)
-	io.Copy(w, resp.Body)
+
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		log.Warn().Err(err).Msg("failed to copy response body")
+	}
 
 	return nil
 }

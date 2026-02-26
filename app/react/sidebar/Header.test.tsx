@@ -123,7 +123,7 @@ describe('Header', () => {
     const logo = screen.getByAltText('Logo');
     expect(logo).toHaveAttribute(
       'src',
-      expect.stringContaining('logomark-CE.svg')
+      expect.stringContaining('portainer-p-icon-white.svg')
     );
   });
 

@@ -546,18 +546,7 @@ func (handler *Handler) snapshotAndPersistEndpoint(tx dataservices.DataStoreTx, 
 }
 
 func (handler *Handler) saveEndpointAndUpdateAuthorizations(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
-	endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
-		AllowVolumeBrowserForRegularUsers: false,
-		EnableHostManagementFeatures:      false,
-
-		AllowSysctlSettingForRegularUsers:         true,
-		AllowBindMountsForRegularUsers:            true,
-		AllowPrivilegedModeForRegularUsers:        true,
-		AllowHostNamespaceForRegularUsers:         true,
-		AllowContainerCapabilitiesForRegularUsers: true,
-		AllowDeviceMappingForRegularUsers:         true,
-		AllowStackManagementForRegularUsers:       true,
-	}
+	endpoint.SecuritySettings = portainer.DefaultEndpointSecuritySettings()
 
 	if err := tx.Endpoint().Create(endpoint); err != nil {
 		return err

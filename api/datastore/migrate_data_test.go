@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/datastore/migrator"
+	"github.com/stretchr/testify/require"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/rs/zerolog/log"
@@ -53,9 +54,11 @@ func TestMigrateData(t *testing.T) {
 		}
 
 		testVersion(store, portainer.APIVersion, t)
-		store.Close()
+		err := store.Close()
+		require.NoError(t, err)
 
-		newStore, _ = store.Open()
+		newStore, err = store.Open()
+		require.NoError(t, err)
 		if newStore {
 			t.Error("Expect store to NOT be new DB")
 		}
@@ -63,8 +66,11 @@ func TestMigrateData(t *testing.T) {
 
 	t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
 		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&models.Version{SchemaVersion: "1.0", Edition: int(portainer.PortainerCE)})
-		store.MigrateData()
+		err := store.VersionService.UpdateVersion(&models.Version{SchemaVersion: "2.0", Edition: int(portainer.PortainerCE)})
+		require.NoError(t, err)
+
+		err = store.MigrateData()
+		require.NoError(t, err)
 
 		backupfilename := store.backupFilename()
 		if exists, _ := store.fileService.FileExists(backupfilename); !exists {
@@ -73,21 +79,28 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should recover and restore backup during migration critical failure", func(t *testing.T) {
-		os.Setenv("PORTAINER_TEST_MIGRATE_FAIL", "FAIL")
+		t.Setenv("PORTAINER_TEST_MIGRATE_FAIL", "FAIL")
 
 		version := "2.15"
 		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&models.Version{SchemaVersion: version, Edition: int(portainer.PortainerCE)})
-		store.MigrateData()
 
-		store.Open()
+		err := store.VersionService.UpdateVersion(&models.Version{SchemaVersion: version, Edition: int(portainer.PortainerCE)})
+		require.NoError(t, err)
+
+		err = store.MigrateData()
+		require.Error(t, err)
+
 		testVersion(store, version, t)
 	})
 
 	t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
 		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.StoreIsUpdating(true)
-		store.MigrateData()
+
+		err := store.VersionService.StoreIsUpdating(true)
+		require.NoError(t, err)
+
+		err = store.MigrateData()
+		require.Error(t, err)
 
 		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
 		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
@@ -115,10 +128,12 @@ func TestMigrateData(t *testing.T) {
 
 		if latestMigrations.Version.Equal(semver.MustParse(portainer.APIVersion)) {
 			v.MigratorCount = len(latestMigrations.MigrationFuncs)
-			store.VersionService.UpdateVersion(v)
+			err = store.VersionService.UpdateVersion(v)
+			require.NoError(t, err)
 		}
 
-		store.MigrateData()
+		err = store.MigrateData()
+		require.NoError(t, err)
 
 		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
 		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
@@ -141,8 +156,12 @@ func TestMigrateData(t *testing.T) {
 		}
 
 		v.MigratorCount = 1000
-		store.VersionService.UpdateVersion(v)
-		store.MigrateData()
+
+		err = store.VersionService.UpdateVersion(v)
+		require.NoError(t, err)
+
+		err = store.MigrateData()
+		require.NoError(t, err)
 
 		// If you get an error, it usually means that the backup folder doesn't exist (no backups). Expected!
 		// If the backup file is not blank, then it means a backup was created.  We don't want that because we
@@ -158,14 +177,14 @@ func TestRollback(t *testing.T) {
 	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
 		version := "2.11"
 
-		v := models.Version{
-			SchemaVersion: version,
-		}
+		v := models.Version{SchemaVersion: version}
 
 		_, store := MustNewTestStore(t, false, false)
-		store.VersionService.UpdateVersion(&v)
 
-		_, err := store.Backup("")
+		err := store.VersionService.UpdateVersion(&v)
+		require.NoError(t, err)
+
+		_, err = store.Backup("")
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -184,7 +203,9 @@ func TestRollback(t *testing.T) {
 			return
 		}
 
-		store.Open()
+		_, err = store.Open()
+		require.NoError(t, err)
+
 		testVersion(store, version, t)
 	})
 
@@ -197,9 +218,11 @@ func TestRollback(t *testing.T) {
 		}
 
 		_, store := MustNewTestStore(t, true, false)
-		store.VersionService.UpdateVersion(&v)
 
-		_, err := store.Backup("")
+		err := store.VersionService.UpdateVersion(&v)
+		require.NoError(t, err)
+
+		_, err = store.Backup("")
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -218,7 +241,8 @@ func TestRollback(t *testing.T) {
 			return
 		}
 
-		store.Open()
+		_, err = store.Open()
+		require.NoError(t, err)
 		testVersion(store, version, t)
 	})
 }
@@ -237,17 +261,17 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 	_, store := MustNewTestStore(t, true, false)
 
 	fmt.Println("store.path=", store.GetConnection().GetDatabaseFilePath())
-	store.connection.DeleteObject("version", []byte("VERSION"))
+
+	err = store.connection.DeleteObject("version", []byte("VERSION"))
+	require.NoError(t, err)
 
 	//	defer teardown()
-	err = importJSON(t, bytes.NewReader(srcJSON), store)
-	if err != nil {
+	if err := importJSON(t, bytes.NewReader(srcJSON), store); err != nil {
 		return err
 	}
 
 	// Run the actual migrations on our input database.
-	err = store.MigrateData()
-	if err != nil {
+	if err := store.MigrateData(); err != nil {
 		return err
 	}
 
@@ -260,8 +284,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 		}
 
 		v.InstanceID = "463d5c47-0ea5-4aca-85b1-405ceefee254"
-		err = store.VersionService.UpdateVersion(v)
-		if err != nil {
+		if err := store.VersionService.UpdateVersion(v); err != nil {
 			return err
 		}
 	}
@@ -270,10 +293,10 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 	// exportJson rather than ExportRaw. The exportJson function allows us to
 	// strip out the metadata which we don't want for our tests.
 	// TODO: update connection interface in CE to allow us to use ExportRaw and pass meta false
-	err = store.connection.Close()
-	if err != nil {
+	if err := store.connection.Close(); err != nil {
 		t.Fatalf("err closing bolt connection: %v", err)
 	}
+
 	con, ok := store.connection.(*boltdb.DbConnection)
 	if !ok {
 		t.Fatalf("backing database is not using boltdb, but the migrations test requires it")
@@ -302,11 +325,15 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 	// Compare the result we got with the one we wanted.
 	if diff := cmp.Diff(wantJSON, gotJSON); diff != "" {
 		gotPath := filepath.Join(os.TempDir(), "portainer-migrator-test-fail.json")
-		os.WriteFile(
+		err = os.WriteFile(
 			gotPath,
 			gotJSON,
 			0o600,
 		)
+		if err != nil {
+			log.Warn().Err(err).Msg("failed writing migrated output to temp file")
+		}
+
 		t.Errorf(
 			"migrate data from %s to %s failed\nwrote migrated input to %s\nmismatch (-want +got):\n%s",
 			srcPath,

@@ -9,12 +9,14 @@ interface Props {
   value: Option[];
   onChange(value: readonly Option[]): void;
   options: Option[];
+  isLoading?: boolean;
 }
 
 export function PorAccessManagementUsersSelector({
   options,
   value,
   onChange,
+  isLoading,
 }: Props) {
   return (
     <div className="form-group">
@@ -25,24 +27,23 @@ export function PorAccessManagementUsersSelector({
         Select user(s) and/or team(s)
       </label>
       <div className="col-sm-9 col-lg-4">
-        {options.length === 0 ? (
-          <span className="small text-muted">No users or teams available.</span>
-        ) : (
-          <Select
-            isMulti
-            getOptionLabel={(option) => option.Name}
-            getOptionValue={(option) => `${option.Id}-${option.Type}`}
-            options={options}
-            value={value}
-            closeMenuOnSelect={false}
-            onChange={onChange}
-            data-cy="component-selectUser"
-            id="component-selectUser"
-            inputId="users-selector"
-            placeholder="Select one or more users and/or teams"
-            components={{ MultiValueLabel, Option: OptionComponent }}
-          />
-        )}
+        <Select
+          isMulti
+          getOptionLabel={(option) => option.Name}
+          getOptionValue={(option) => `${option.Id}-${option.Type}`}
+          options={options}
+          value={value}
+          closeMenuOnSelect={false}
+          onChange={onChange}
+          data-cy="component-selectUser"
+          id="component-selectUser"
+          inputId="users-selector"
+          placeholder="Select one or more users and/or teams"
+          components={{ MultiValueLabel, Option: OptionComponent }}
+          isLoading={isLoading}
+          loadingMessage={() => 'Loading users and teams...'}
+          noOptionsMessage={() => 'No users or teams available.'}
+        />
       </div>
     </div>
   );

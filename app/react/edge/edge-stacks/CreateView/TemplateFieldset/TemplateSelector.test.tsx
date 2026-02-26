@@ -19,9 +19,7 @@ test('renders TemplateSelector component', async () => {
 });
 
 // TODO skipped select tests because the tests take too long to run
-
-// eslint-disable-next-line vitest/expect-expect
-test.skip('selects an edge app template', async () => {
+test.todo('selects an edge app template', async () => {
   const onChange = vi.fn();
 
   const selectedTemplate = {
@@ -50,8 +48,8 @@ test.skip('selects an edge app template', async () => {
   });
 });
 
-// eslint-disable-next-line vitest/expect-expect
-test.skip('selects an edge custom template', async () => {
+// eslint-disable-next-line @vitest/expect-expect
+test.todo('selects an edge custom template', async () => {
   const onChange = vi.fn();
 
   const selectedTemplate = {
@@ -87,21 +85,24 @@ test('renders with error', async () => {
   expect(errorElement).toBeInTheDocument();
 });
 
-test.skip('renders TemplateSelector component with no custom templates available', async () => {
-  renderComponent({
-    customTemplates: [],
-  });
+test.todo(
+  'renders TemplateSelector component with no custom templates available',
+  async () => {
+    renderComponent({
+      customTemplates: [],
+    });
 
-  const templateSelectorElement = screen.getByLabelText('Template');
-  expect(templateSelectorElement).toBeInTheDocument();
+    const templateSelectorElement = screen.getByLabelText('Template');
+    expect(templateSelectorElement).toBeInTheDocument();
 
-  await selectEvent.openMenu(templateSelectorElement);
+    await selectEvent.openMenu(templateSelectorElement);
 
-  const noCustomTemplatesElement = screen.getByText(
-    'No edge custom templates available'
-  );
-  expect(noCustomTemplatesElement).toBeInTheDocument();
-});
+    const noCustomTemplatesElement = screen.getByText(
+      'No edge custom templates available'
+    );
+    expect(noCustomTemplatesElement).toBeInTheDocument();
+  }
+);
 
 function renderComponent({
   onChange = vi.fn(),

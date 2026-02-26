@@ -12,6 +12,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/liboras"
 	"github.com/rs/zerolog/log"
@@ -407,7 +408,7 @@ func processOCITag(ctx context.Context, repository registry.Repository, registry
 	}
 
 	manifestContent, err := io.ReadAll(manifestReader)
-	manifestReader.Close()
+	logs.CloseAndLogErr(manifestReader)
 	if err != nil {
 		return nil, nil
 	}
@@ -428,7 +429,7 @@ func processOCITag(ctx context.Context, repository registry.Repository, registry
 		return nil, nil
 	}
 	cfgBytes, err := io.ReadAll(cfgReader)
-	cfgReader.Close()
+	logs.CloseAndLogErr(cfgReader)
 	if err != nil {
 		return nil, nil
 	}

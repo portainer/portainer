@@ -45,12 +45,12 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object any) error {
 		}
 	}
 
-	if e := json.Unmarshal(data, object); e != nil {
+	if err := json.Unmarshal(data, object); err != nil {
 		// Special case for the VERSION bucket. Here we're not using json
 		// So we need to return it as a string
 		s, ok := object.(*string)
 		if !ok {
-			return errors.Wrap(err, e.Error())
+			return errors.Wrap(err, "Failed unmarshalling object")
 		}
 
 		*s = string(data)

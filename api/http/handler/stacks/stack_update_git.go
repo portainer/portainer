@@ -76,7 +76,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" &&
 		(stack.AutoUpdate == nil ||
 			(stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != payload.AutoUpdate.Webhook)) {
-		if isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook); !isUnique || err != nil {
+		if isUnique, err := handler.checkUniqueWebhookID(handler.DataStore, payload.AutoUpdate.Webhook); !isUnique || err != nil {
 			return httperror.Conflict("Webhook ID already exists", errors.New("webhook ID already exists"))
 		}
 	}

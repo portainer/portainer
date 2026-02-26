@@ -11,6 +11,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/rs/zerolog/log"
 
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -143,11 +144,16 @@ func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		resp.Body.Close()
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+
 		return resp, err
 	}
 
-	resp.Body.Close()
+	if err := resp.Body.Close(); err != nil {
+		log.Warn().Err(err).Msg("failed to close response body")
+	}
 
 	resp.Body = io.NopCloser(bytes.NewReader(body))
 

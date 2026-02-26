@@ -139,15 +139,18 @@ overrides:
           'react/jsx-props-no-spreading': off
   - files:
       - app/**/*.test.*
+    plugins:
+      - '@vitest'
     extends:
-      - 'plugin:vitest/recommended'
+      - 'plugin:@vitest/legacy-recommended'
     env:
-      'vitest/env': true
+      '@vitest/env': true
     rules:
       'react/jsx-no-constructed-context-values': off
       '@typescript-eslint/no-restricted-imports': off
       no-restricted-imports: off
       'react/jsx-props-no-spreading': off
+      '@vitest/no-conditional-expect': warn
   - files:
       - app/**/*.stories.*
     rules:
@@ -155,3 +158,4 @@ overrides:
       '@typescript-eslint/no-restricted-imports': off
       no-restricted-imports: off
       'react/jsx-props-no-spreading': off
+      'storybook/no-renderer-packages': off

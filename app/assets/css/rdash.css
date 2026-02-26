@@ -88,7 +88,7 @@ div.input-mask {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   background: var(--bg-widget-color);
   border: 1px solid var(--border-widget);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .widget .widget-header .pagination,
 .widget .widget-footer .pagination {
@@ -103,7 +103,7 @@ div.input-mask {
 
 .widget .widget-body {
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .widget .widget-body table thead {
   background: var(--bg-widget-table-color);

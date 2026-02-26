@@ -1,0 +1,13 @@
+.actionBar {
+  /* Match the sidebar offset - uses the same CSS variable as the page-wrapper */
+  left: var(--sidebar-closed-width, 72px);
+
+  /* Must match sidebar transition exactly: all 0.4s ease 0s */
+  transition: all 0.4s ease 0s;
+  border-top: 1px solid var(--border-widget);
+}
+
+/* When sidebar is open, adjust the left position using global class */
+:global(#page-wrapper.open) .actionBar {
+  left: var(--sidebar-width, 300px);
+}

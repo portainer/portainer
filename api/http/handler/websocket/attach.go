@@ -6,10 +6,12 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/validate"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gorilla/websocket"
 )
@@ -86,7 +88,7 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return err
 	}
-	defer websocketConn.Close()
+	defer logs.CloseAndLogErr(websocketConn)
 
 	return hijackAttachStartOperation(websocketConn, params.endpoint, params.ID)
 }
@@ -107,8 +109,13 @@ func hijackAttachStartOperation(
 	// state. Setting TCP KeepAlive on the socket connection will prohibit
 	// ECONNTIMEOUT unless the socket connection truly is broken
 	if tcpConn, ok := conn.(*net.TCPConn); ok {
-		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(30 * time.Second)
+		if err := tcpConn.SetKeepAlive(true); err != nil {
+			log.Warn().Err(err).Msg("failed to set TCP keep-alive on connection")
+		}
+
+		if err := tcpConn.SetKeepAlivePeriod(30 * time.Second); err != nil {
+			log.Warn().Err(err).Msg("failed to set TCP keep-alive period on connection")
+		}
 	}
 
 	attachStartRequest, err := createAttachStartRequest(attachID)

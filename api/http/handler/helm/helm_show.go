@@ -69,7 +69,10 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write(result)
+
+	if _, err := w.Write(result); err != nil {
+		log.Warn().Err(err).Msg("failed to write helm show response")
+	}
 
 	return nil
 }

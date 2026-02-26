@@ -1,4 +1,5 @@
 import { ResourceControlType } from '@/react/portainer/access-control/types';
+import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.docker').controller('ConfigController', [
   '$scope',
@@ -15,8 +16,12 @@ angular.module('portainer.docker').controller('ConfigController', [
       $state.reload();
     };
 
-    $scope.removeConfig = function removeConfig(configId) {
-      ConfigService.remove(endpoint.Id, configId)
+    $scope.removeConfig = async function removeConfig(configId) {
+      if (!(await confirmDelete('Are you sure you want to delete this config?'))) {
+        return;
+      }
+
+      ConfigService.remove({ environmentId: endpoint.Id, configId })
         .then(function success() {
           Notifications.success('Success', 'Configuration successfully removed');
           $state.go('docker.configs', {});

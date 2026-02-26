@@ -60,6 +60,7 @@ vi.mock('@/portainer/services/notifications', () => ({
 describe('ImportExportButtons', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    server.resetHandlers();
     mockConfirmImageExport.mockResolvedValue(false);
   });
 
@@ -347,8 +348,6 @@ describe('ImportExportButtons', () => {
     });
 
     it('should not export when user cancels confirmation', async () => {
-      mockConfirmImageExport.mockResolvedValue(false);
-
       const selectedImages = [
         createMockImage({ id: 'sha256:abc123', tags: ['nginx:latest'] }),
       ];
@@ -376,11 +375,14 @@ describe('ImportExportButtons', () => {
       const exportButton = await waitFor(() =>
         screen.getByRole('button', { name: /export/i })
       );
+      mockConfirmImageExport.mockResolvedValue(false);
       await user.click(exportButton);
 
-      expect(mockConfirmImageExport).toHaveBeenCalled();
-      expect(apiCalled).toBe(false);
-      expect(mockSaveAs).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(mockConfirmImageExport).toHaveBeenCalled();
+        expect(apiCalled).toBe(false);
+        expect(mockSaveAs).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 	"oras.land/oras-go/v2/registry/remote/retry"
 )
@@ -57,7 +58,11 @@ func (c *Client) GetContainerPackages(ctx context.Context, useOrganisation bool,
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("GitHub API returned status %d: %s", resp.StatusCode, resp.Status)

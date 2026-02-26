@@ -9,13 +9,13 @@ import {
   Environment,
 } from '@/react/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
+import { NameField } from '@/react/portainer/environments/common/NameField/NameField';
+import { EnvironmentUrlField } from '@/react/portainer/environments/common/EnvironmentUrlField/EnvironmentUrlField';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 
-import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
 
-import { EnvironmentUrlField } from './EnvironmentUrlField';
 import { useValidation } from './AgentForm.validation';
 
 interface Props {

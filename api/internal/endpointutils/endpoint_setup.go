@@ -91,19 +91,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-
-		SecuritySettings: portainer.EndpointSecuritySettings{
-			AllowVolumeBrowserForRegularUsers: false,
-			EnableHostManagementFeatures:      false,
-
-			AllowSysctlSettingForRegularUsers:         true,
-			AllowBindMountsForRegularUsers:            true,
-			AllowPrivilegedModeForRegularUsers:        true,
-			AllowHostNamespaceForRegularUsers:         true,
-			AllowContainerCapabilitiesForRegularUsers: true,
-			AllowDeviceMappingForRegularUsers:         true,
-			AllowStackManagementForRegularUsers:       true,
-		},
+		SecuritySettings:   portainer.DefaultEndpointSecuritySettings(),
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -149,19 +137,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStor
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
-
-		SecuritySettings: portainer.EndpointSecuritySettings{
-			AllowVolumeBrowserForRegularUsers: false,
-			EnableHostManagementFeatures:      false,
-
-			AllowSysctlSettingForRegularUsers:         true,
-			AllowBindMountsForRegularUsers:            true,
-			AllowPrivilegedModeForRegularUsers:        true,
-			AllowHostNamespaceForRegularUsers:         true,
-			AllowContainerCapabilitiesForRegularUsers: true,
-			AllowDeviceMappingForRegularUsers:         true,
-			AllowStackManagementForRegularUsers:       true,
-		},
+		SecuritySettings:   portainer.DefaultEndpointSecuritySettings(),
 	}
 
 	if err := snapshotService.SnapshotEndpoint(endpoint); err != nil {

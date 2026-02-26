@@ -28,7 +28,7 @@ type Release struct {
 	// Info provides information about a release
 	Info *Info `json:"info,omitempty"`
 	// Chart is the chart that was released.
-	Chart Chart `json:"chart,omitempty"`
+	Chart Chart `json:"chart,omitzero"`
 	// Config is the set of extra Values added to the chart.
 	// These values override the default values inside of the chart.
 	Config map[string]any `json:"config,omitempty"`
@@ -46,11 +46,11 @@ type Release struct {
 	// Disabled encoding into Json cause labels are stored in storage driver metadata field.
 	Labels map[string]string `json:"-"`
 	// ChartReference are the labels that are used to identify the chart source.
-	ChartReference ChartReference `json:"chartReference,omitempty"`
+	ChartReference ChartReference `json:"chartReference,omitzero"`
 	// StackID is the ID of the Portainer stack associated with this release (if using GitOps)
 	StackID int `json:"stackID,omitempty"`
 	// Values are the values used to deploy the chart.
-	Values Values `json:"values,omitempty"`
+	Values Values `json:"values,omitzero"`
 }
 
 type Values struct {
@@ -204,9 +204,9 @@ type Lock struct {
 // Info describes release information.
 type Info struct {
 	// FirstDeployed is when the release was first deployed.
-	FirstDeployed time.Time `json:"first_deployed,omitempty"`
+	FirstDeployed time.Time `json:"first_deployed,omitzero"`
 	// LastDeployed is when the release was last deployed.
-	LastDeployed time.Time `json:"last_deployed,omitempty"`
+	LastDeployed time.Time `json:"last_deployed,omitzero"`
 	// Deleted tracks when this object was deleted.
 	Deleted time.Time `json:"deleted"`
 	// Description is human-friendly "log entry" about this release.
@@ -234,7 +234,7 @@ type Hook struct {
 	// Events are the events that this hook fires on.
 	Events []HookEvent `json:"events,omitempty"`
 	// LastRun indicates the date/time this was last run.
-	LastRun HookExecution `json:"last_run,omitempty"`
+	LastRun HookExecution `json:"last_run,omitzero"`
 	// Weight indicates the sort order for execution among similar Hook type
 	Weight int `json:"weight,omitempty"`
 	// DeletePolicies are the policies that indicate when to delete the hook
@@ -247,9 +247,9 @@ type HookEvent string
 // A HookExecution records the result for the last execution of a hook for a given release.
 type HookExecution struct {
 	// StartedAt indicates the date/time this hook was started
-	StartedAt time.Time `json:"started_at,omitempty"`
+	StartedAt time.Time `json:"started_at,omitzero"`
 	// CompletedAt indicates the date/time this hook was completed.
-	CompletedAt time.Time `json:"completed_at,omitempty"`
+	CompletedAt time.Time `json:"completed_at,omitzero"`
 	// Phase indicates whether the hook completed successfully
 	Phase HookPhase `json:"phase"`
 }

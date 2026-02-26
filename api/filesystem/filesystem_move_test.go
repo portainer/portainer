@@ -58,12 +58,14 @@ func Test_movePath_succesIfOverwriteSetWhenDestinationDirExists(t *testing.T) {
 func Test_movePath_successWhenSourceExistsAndDestinationIsMissing(t *testing.T) {
 	tmp := t.TempDir()
 	sourceDir := path.Join(tmp, "source")
-	os.Mkdir(sourceDir, 0766)
+	err := os.Mkdir(sourceDir, 0766)
+	require.NoError(t, err)
+
 	file1 := addFile(t, sourceDir, "dir", "file")
 	file2 := addFile(t, sourceDir, "file")
 	destinationDir := path.Join(tmp, "destination")
 
-	err := MoveDirectory(sourceDir, destinationDir, false)
+	err = MoveDirectory(sourceDir, destinationDir, false)
 	require.NoError(t, err)
 	assert.NoFileExists(t, file1, "source dir contents should be moved")
 	assert.NoFileExists(t, file2, "source dir contents should be moved")

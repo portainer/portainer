@@ -31,7 +31,14 @@ export function WebhookSettings({
       }
     >
       <div className="flex items-center gap-2">
-        <span className="text-muted">{truncateLeftRight(url)}</span>
+        <span
+          className="text-muted"
+          aria-label="webhook url"
+          role="textbox"
+          aria-readonly
+        >
+          {truncateLeftRight(url)}
+        </span>
         <CopyButton
           copyText={url}
           color="light"

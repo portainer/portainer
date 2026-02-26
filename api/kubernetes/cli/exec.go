@@ -3,8 +3,10 @@ package cli
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
+	"github.com/rs/zerolog/log"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -55,29 +57,43 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 		TTY:       true,
 	}, scheme.ParameterCodec)
 
+	streamOpts := remotecommand.StreamOptions{
+		Stdin:  stdin,
+		Stdout: stdout,
+		Tty:    true,
+	}
+
+	// Try WebSocket executor first, fall back to SPDY if it fails
 	exec, err := remotecommand.NewWebSocketExecutorForProtocols(
 		config,
 		"GET", // WebSocket uses GET for the upgrade request
 		req.URL().String(),
 		channelProtocolList...,
 	)
-	if err != nil {
-		exec, err = remotecommand.NewSPDYExecutor(config, "POST", req.URL())
-		if err != nil {
-			errChan <- err
+	if err == nil {
+		err = exec.StreamWithContext(context.TODO(), streamOpts)
+		if err == nil {
 			return
 		}
+
+		log.Warn().
+			Err(err).
+			Str("context", "StartExecProcess").
+			Msg("WebSocket exec failed, falling back to SPDY")
 	}
 
-	err = exec.StreamWithContext(context.TODO(), remotecommand.StreamOptions{
-		Stdin:  stdin,
-		Stdout: stdout,
-		Tty:    true,
-	})
+	// Fall back to SPDY executor
+	exec, err = remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		errChan <- fmt.Errorf("unable to create SPDY executor: %w", err)
+		return
+	}
+
+	err = exec.StreamWithContext(context.TODO(), streamOpts)
 	if err != nil {
 		var exitError utilexec.ExitError
 		if !errors.As(err, &exitError) {
-			errChan <- errors.New("unable to start exec process")
+			errChan <- fmt.Errorf("unable to start exec process: %w", err)
 		}
 	}
 }

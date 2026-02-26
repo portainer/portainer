@@ -11,6 +11,8 @@ import (
 	"net"
 	"os"
 	"time"
+
+	"github.com/portainer/portainer/api/logs"
 )
 
 // GenerateCertsForHost generates a self-signed certificate for host and saves them at certPath and keyPath
@@ -71,7 +73,7 @@ func createPEMEncodedFile(path, header string, data []byte) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer logs.CloseAndLogErr(file)
 
 	err = pem.Encode(file, &pem.Block{Type: header, Bytes: data})
 	if err != nil {

@@ -3,10 +3,16 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
+  build: {
+    // force tests to import svg as url
+    // TODO consider removing when moving from webpack
+    assetsInlineLimit: 0,
+  },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: [
+      './app/setup-tests/setup-websocket.ts',
       './app/setup-tests/setup-rtl.ts',
       './app/setup-tests/setup-msw.ts',
       './app/setup-tests/stub-modules.ts',

@@ -39,7 +39,9 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 		filteredValue := transport.filterContainerGroups(decoratedValue, context)
 		responseObject["value"] = filteredValue
 
-		utils.RewriteResponse(response, responseObject, http.StatusOK)
+		if err := utils.RewriteResponse(response, responseObject, http.StatusOK); err != nil {
+			return nil, err
+		}
 	} else {
 		return nil, errors.New("The container groups response has no value property")
 	}

@@ -3,6 +3,7 @@ package docker
 import (
 	portainer "github.com/portainer/portainer/api"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/snapshot"
 )
 
@@ -24,7 +25,7 @@ func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*p
 	if err != nil {
 		return nil, err
 	}
-	defer cli.Close()
+	defer logs.CloseAndLogErr(cli)
 
 	return snapshot.CreateDockerSnapshot(cli)
 }

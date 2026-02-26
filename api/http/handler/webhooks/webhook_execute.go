@@ -8,9 +8,11 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 
 	dockercontainer "github.com/docker/docker/api/types/container"
 	dockertypes "github.com/docker/docker/api/types"
@@ -74,7 +76,7 @@ func (handler *Handler) executeServiceWebhook(
 	if err != nil {
 		return httperror.InternalServerError("Error creating docker client", err)
 	}
-	defer dockerClient.Close()
+	defer logs.CloseAndLogErr(dockerClient)
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), resourceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
@@ -106,7 +108,10 @@ func (handler *Handler) executeServiceWebhook(
 		}
 
 		if registry.Authentication {
-			registryutils.EnsureRegTokenValid(handler.DataStore, registry)
+			if err := registryutils.EnsureRegTokenValid(handler.DataStore, registry); err != nil {
+				log.Warn().Err(err).Msgf("registry auth token renewal failed for registry %d", registry.ID)
+			}
+
 			serviceUpdateOptions.EncodedRegistryAuth, err = registryutils.GetRegistryAuthHeader(registry)
 			if err != nil {
 				return httperror.InternalServerError("Error getting registry auth header", err)
@@ -119,7 +124,7 @@ func (handler *Handler) executeServiceWebhook(
 		if err != nil {
 			return httperror.NotFound("Error pulling image with the specified tag", err)
 		}
-		defer rc.Close()
+		defer logs.CloseAndLogErr(rc)
 	}
 
 	if _, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions); err != nil {

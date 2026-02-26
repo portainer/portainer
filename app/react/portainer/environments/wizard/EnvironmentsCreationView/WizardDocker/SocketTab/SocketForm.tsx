@@ -8,13 +8,13 @@ import {
   ContainerEngine,
   Environment,
 } from '@/react/portainer/environments/types';
+import { NameField } from '@/react/portainer/environments/common/NameField/NameField';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
 
-import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { useValidation } from './SocketForm.validation';

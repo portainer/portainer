@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import { Switch } from './Switch';
@@ -40,12 +40,12 @@ function Template({ checked }: Args) {
   );
 }
 
-export const Checked: Story<Args> = Template.bind({});
+export const Checked: StoryFn<Args> = Template.bind({});
 Checked.args = {
   checked: true,
 };
 
-export const Unchecked: Story<Args> = Template.bind({});
+export const Unchecked: StoryFn<Args> = Template.bind({});
 Unchecked.args = {
   checked: false,
 };

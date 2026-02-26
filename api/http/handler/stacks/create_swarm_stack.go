@@ -192,28 +192,23 @@ func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference
 // @router /stacks/create/swarm/repository [post]
 func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload swarmStackFromGitRepositoryPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
-	if err != nil {
+	if isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true); err != nil {
 		return httperror.InternalServerError("Unable to check for name collision", err)
-	}
-	if !isUnique {
+	} else if !isUnique {
 		return stackExistsError(payload.Name)
 	}
 
 	//make sure the webhook ID is unique
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
-		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
-		if err != nil {
+		if isUnique, err := handler.checkUniqueWebhookID(handler.DataStore, payload.AutoUpdate.Webhook); err != nil {
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
-		}
-		if !isUnique {
+		} else if !isUnique {
 			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
 		}
 	}

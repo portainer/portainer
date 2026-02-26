@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
-import { withError, withInvalidate } from '@/react-tools/react-query';
+import { withGlobalError, withInvalidate } from '@/react-tools/react-query';
 import {
   EnvironmentId,
   EnvironmentStatusMessage,
@@ -19,9 +19,10 @@ import { environmentQueryKeys } from './query-keys';
 
 export function useUpdateEnvironmentMutation() {
   const queryClient = useQueryClient();
-  return useMutation(updateEnvironment, {
+  return useMutation({
+    mutationFn: updateEnvironment,
     ...withInvalidate(queryClient, [environmentQueryKeys.base()]),
-    ...withError('Unable to update environment'),
+    ...withGlobalError('Unable to update environment'),
   });
 }
 
@@ -40,9 +41,9 @@ export interface UpdateEnvironmentPayload extends Partial<Environment> {
   TLS: boolean;
   TLSSkipVerify: boolean;
   TLSSkipClientVerify: boolean;
-  AzureApplicationID: string;
-  AzureTenantID: string;
-  AzureAuthenticationKey: string;
+  AzureApplicationID?: string;
+  AzureTenantID?: string;
+  AzureAuthenticationKey?: string;
 
   IsSetStatusMessage: boolean;
   StatusMessage: EnvironmentStatusMessage;

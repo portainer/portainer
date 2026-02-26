@@ -98,18 +98,36 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 				// Special case.  If portainer.db and portainer.edb exist.
 				dbFile1 := path.Join(connection.Path, DatabaseFileName)
 				f, _ := os.Create(dbFile1)
-				f.Close()
-				defer os.Remove(dbFile1)
+
+				err := f.Close()
+				require.NoError(t, err)
+
+				defer func() {
+					err := os.Remove(dbFile1)
+					require.NoError(t, err)
+				}()
 
 				dbFile2 := path.Join(connection.Path, EncryptedDatabaseFileName)
 				f, _ = os.Create(dbFile2)
-				f.Close()
-				defer os.Remove(dbFile2)
+
+				err = f.Close()
+				require.NoError(t, err)
+
+				defer func() {
+					err := os.Remove(dbFile2)
+					require.NoError(t, err)
+				}()
 			} else if tc.dbname != "" {
 				dbFile := path.Join(connection.Path, tc.dbname)
 				f, _ := os.Create(dbFile)
-				f.Close()
-				defer os.Remove(dbFile)
+
+				err := f.Close()
+				require.NoError(t, err)
+
+				defer func() {
+					err := os.Remove(dbFile)
+					require.NoError(t, err)
+				}()
 			}
 
 			if tc.key {
@@ -136,7 +154,8 @@ func TestDBCompaction(t *testing.T) {
 			return err
 		}
 
-		b.Put([]byte("key"), []byte("value"))
+		err = b.Put([]byte("key"), []byte("value"))
+		require.NoError(t, err)
 
 		return nil
 	})

@@ -2,6 +2,7 @@ import { HttpResponse } from 'msw';
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server, http } from '@/setup-tests/server';
 
@@ -37,9 +38,9 @@ function renderComponent() {
     )
   );
 
-  const Wrapped = withTestQueryProvider(() => (
-    <WizardKubernetes onCreate={() => {}} />
-  ));
+  const Wrapped = withTestQueryProvider(
+    withTestRouter(() => <WizardKubernetes onCreate={() => {}} />)
+  );
   return render(<Wrapped />);
 }
 

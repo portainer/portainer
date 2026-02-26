@@ -15,54 +15,76 @@ export interface Tab {
 interface Props {
   currentTabIndex: number;
   tabs: Tab[];
+  useContainer?: boolean;
+  ariaLabel?: string;
 }
 
-// https://www.figma.com/file/g5TUMngrblkXM7NHSyQsD1/New-UI?type=design&node-id=148-2676&mode=design&t=JKyBWBupeC5WADk6-0
-export function WidgetTabs({ currentTabIndex, tabs }: Props) {
+export function WidgetTabs({
+  currentTabIndex,
+  tabs,
+  useContainer = true,
+  ariaLabel = 'Section navigation',
+}: Props) {
   // ensure that the selectedTab param is always valid
-  const invalidQueryParamValue = tabs.every(
+  const invalidQueryParamValue = tabs.some(
     (tab) => encodeURIComponent(tab.selectedTabParam) !== tab.selectedTabParam
   );
-
   if (invalidQueryParamValue) {
     throw new Error('Invalid query param value for tab');
   }
 
-  return (
-    <div className="row">
-      <div className="col-sm-12 !mb-0">
-        <div className="pl-2">
-          {tabs.map(({ name, icon }, index) => (
-            <Link
-              to="."
-              params={{ tab: tabs[index].selectedTabParam }}
-              key={index}
-              className={clsx(
-                'inline-flex items-center gap-2 border-0 border-b-2 border-solid bg-transparent px-4 py-2 hover:no-underline',
-                {
-                  'border-blue-8  text-blue-8 th-highcontrast:border-blue-6 th-highcontrast:text-blue-6 th-dark:border-blue-6 th-dark:text-blue-6':
-                    currentTabIndex === index,
-                  'border-transparent text-gray-7 hover:text-gray-8 th-highcontrast:text-gray-6 hover:th-highcontrast:text-gray-5 th-dark:text-gray-6 hover:th-dark:text-gray-5':
-                    currentTabIndex !== index,
-                }
-              )}
-              data-cy={`tab-${index}`}
-            >
-              {icon && <Icon icon={icon} />}
-              {name}
-            </Link>
-          ))}
-        </div>
+  const tabsComponent = (
+    <nav
+      aria-label={ariaLabel}
+      className={clsx(
+        'max-w-fit overflow-hidden rounded-xl',
+        'bg-[var(--bg-widget-color)] border border-solid border-[var(--border-widget)]'
+      )}
+    >
+      {/* additional div, so that the scrollbar doesn't overlap with rounded corners of the nav parent */}
+      <div className="flex items-center gap-1 p-1 overflow-x-auto">
+        {tabs.map(({ name, icon }, index) => (
+          <Link
+            to="."
+            params={{ tab: tabs[index].selectedTabParam }}
+            key={index}
+            className={clsx(
+              'inline-flex items-center gap-2 px-4 py-2 rounded-lg',
+              'hover:no-underline focus:no-underline text-gray-7 th-highcontrast:text-white th-dark:text-gray-6',
+              'transition-colors duration-200',
+              {
+                'border-inherit !bg-graphite-50 !text-graphite-900 hover:text-graphite-900 th-dark:!bg-graphite-600 th-dark:!text-white th-highcontrast:!bg-white th-highcontrast:!text-black':
+                  currentTabIndex === index,
+              },
+              {
+                'bg-transparent hover:bg-graphite-50 th-dark:hover:bg-graphite-600 th-highcontrast:hover:bg-white hover:text-gray-7 th-dark:hover:text-gray-6 th-highcontrast:hover:text-black':
+                  currentTabIndex !== index,
+              }
+            )}
+            data-cy={`tab-${index}`}
+            aria-current={currentTabIndex === index ? 'page' : undefined}
+          >
+            {icon && <Icon icon={icon} />}
+            {name}
+          </Link>
+        ))}
       </div>
-    </div>
+    </nav>
   );
+
+  if (useContainer) {
+    return (
+      <div className="row">
+        <div className="col-sm-12">{tabsComponent}</div>
+      </div>
+    );
+  }
+
+  return tabsComponent;
 }
 
 // findSelectedTabIndex returns the index of the tab, or 0 if none is selected
-export function findSelectedTabIndex(
-  { params }: { params: RawParams },
-  tabs: Tab[]
-) {
+export function findSelectedTabIndex(params: RawParams, tabs: Tab[]) {
   const selectedTabParam = params.tab || tabs[0].selectedTabParam;
   const currentTabIndex = tabs.findIndex(
     (tab) => tab.selectedTabParam === selectedTabParam
@@ -75,7 +97,7 @@ export function findSelectedTabIndex(
 
 export function useCurrentTabIndex(tabs: Tab[]) {
   const params = useCurrentStateAndParams();
-  const currentTabIndex = findSelectedTabIndex(params, tabs);
+  const currentTabIndex = findSelectedTabIndex(params.params, tabs);
 
   return currentTabIndex;
 }

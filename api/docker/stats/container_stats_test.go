@@ -3,9 +3,11 @@ package stats
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/containerd/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -37,6 +39,7 @@ func TestCalculateContainerStats(t *testing.T) {
 		{ID: "container8"},
 		{ID: "container9"},
 		{ID: "container10"},
+		{ID: "container11"},
 	}
 
 	// Setup mock expectations with different container states to test various scenarios
@@ -58,7 +61,6 @@ func TestCalculateContainerStats(t *testing.T) {
 		{"container10", container.StateDead, nil, ContainerStats{Running: 0, Stopped: 1, Healthy: 0, Unhealthy: 0}},
 	}
 
-	expected := ContainerStats{}
 	// Setup mock expectations for all containers with artificial delays to simulate real Docker calls
 	for _, state := range containerStates {
 		mockClient.On("ContainerInspect", mock.Anything, state.id).Return(container.InspectResponse{
@@ -68,14 +70,11 @@ func TestCalculateContainerStats(t *testing.T) {
 					Health: state.health,
 				},
 			},
-		}, nil).After(50 * time.Millisecond) // Simulate 50ms Docker API call
-
-		expected.Running += state.expected.Running
-		expected.Stopped += state.expected.Stopped
-		expected.Healthy += state.expected.Healthy
-		expected.Unhealthy += state.expected.Unhealthy
-		expected.Total++
+		}, nil).After(30 * time.Millisecond) // Simulate 30ms Docker API call
 	}
+
+	// Setup mock expectation for a container that returns NotFound error
+	mockClient.On("ContainerInspect", mock.Anything, "container11").Return(container.InspectResponse{}, fmt.Errorf("No such container: %w", errdefs.ErrNotFound)).After(50 * time.Millisecond)
 
 	// Call the function and measure time
 	startTime := time.Now()
@@ -84,11 +83,10 @@ func TestCalculateContainerStats(t *testing.T) {
 	duration := time.Since(startTime)
 
 	// Assert results
-	assert.Equal(t, expected, stats)
-	assert.Equal(t, expected.Running, stats.Running)
-	assert.Equal(t, expected.Stopped, stats.Stopped)
-	assert.Equal(t, expected.Healthy, stats.Healthy)
-	assert.Equal(t, expected.Unhealthy, stats.Unhealthy)
+	assert.Equal(t, 6, stats.Running)
+	assert.Equal(t, 4, stats.Stopped)
+	assert.Equal(t, 2, stats.Healthy)
+	assert.Equal(t, 2, stats.Unhealthy)
 	assert.Equal(t, 10, stats.Total)
 
 	// Verify concurrent processing by checking that all mock calls were made

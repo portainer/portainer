@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/pkg/libstack/compose"
 	"github.com/portainer/portainer/pkg/testhelpers"
+	"github.com/stretchr/testify/require"
 
 	"github.com/rs/zerolog/log"
 )
@@ -25,8 +26,11 @@ const composedContainerName = "compose_wrapper_test"
 func setup(t *testing.T) (*portainer.Stack, *portainer.Endpoint) {
 	dir := t.TempDir()
 	composeFileName := "compose_wrapper_test.yml"
-	f, _ := os.Create(filepath.Join(dir, composeFileName))
-	f.WriteString(composeFile)
+	f, err := os.Create(filepath.Join(dir, composeFileName))
+	require.NoError(t, err)
+
+	_, err = f.WriteString(composeFile)
+	require.NoError(t, err)
 
 	stack := &portainer.Stack{
 		ProjectPath: dir,
@@ -34,11 +38,7 @@ func setup(t *testing.T) (*portainer.Stack, *portainer.Endpoint) {
 		Name:        "project-name",
 	}
 
-	endpoint := &portainer.Endpoint{
-		URL: "unix://",
-	}
-
-	return stack, endpoint
+	return stack, &portainer.Endpoint{URL: "unix://"}
 }
 
 func Test_UpAndDown(t *testing.T) {

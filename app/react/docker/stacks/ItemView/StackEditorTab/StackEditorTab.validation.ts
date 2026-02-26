@@ -35,6 +35,6 @@ export function getValidationSchema(
     prune: boolean().default(false),
     registries: array(number().required()).default([]),
     rollbackTo: number().notRequired(),
-    webhookId: string().default(''),
+    enabledWebhook: boolean().default(false),
   });
 }

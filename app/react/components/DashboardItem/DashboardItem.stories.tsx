@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { List } from 'lucide-react';
 
 import { Link } from '@@/Link';
@@ -29,7 +29,7 @@ function Template({ value, icon, type }: StoryProps) {
   );
 }
 
-export const Primary: Story<StoryProps> = Template.bind({});
+export const Primary: StoryFn<StoryProps> = Template.bind({});
 Primary.args = {
   value: 1,
   icon: List,

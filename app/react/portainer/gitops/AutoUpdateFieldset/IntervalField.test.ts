@@ -3,10 +3,10 @@ import { describe, it, expect } from 'vitest';
 import { intervalValidation } from './IntervalField';
 
 describe('intervalValidation', () => {
-  it('rejects empty value with required message', async () => {
+  it('rejects empty value with invalid duration format message', async () => {
     const schema = intervalValidation();
     await expect(schema.validate('')).rejects.toThrow(
-      'This field is required.'
+      'Invalid duration format. Use formats like 5m, 1h30m, 7d, or 300s'
     );
   });
 
@@ -26,13 +26,13 @@ describe('intervalValidation', () => {
     await expect(schema.validate('90s')).resolves.toBe('90s');
   });
 
-  it('rejects sub-minute durations and invalid formats with minimum-interval message', async () => {
+  it('rejects sub-minute durations and invalid formats', async () => {
     const schema = intervalValidation();
     await expect(schema.validate('30s')).rejects.toThrow(
       'Minimum interval is 1m'
     );
     await expect(schema.validate('abc')).rejects.toThrow(
-      'Minimum interval is 1m'
+      'Invalid duration format. Use formats like 5m, 1h30m, 7d, or 300s'
     );
   });
 });

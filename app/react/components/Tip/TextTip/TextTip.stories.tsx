@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 
 import { TextTip } from './TextTip';
@@ -14,7 +14,7 @@ function Template({
   return <TextTip>{children}</TextTip>;
 }
 
-export const Primary: Story<PropsWithChildren<unknown>> = Template.bind({});
+export const Primary: StoryFn<PropsWithChildren<unknown>> = Template.bind({});
 Primary.args = {
   children: 'This is a text tip with children',
 };

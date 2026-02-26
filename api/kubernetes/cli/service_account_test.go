@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kfake "k8s.io/client-go/kubernetes/fake"
@@ -44,7 +45,10 @@ func Test_GetServiceAccount(t *testing.T) {
 		if err != nil {
 			t.Errorf("failed to create service acount; err=%s", err)
 		}
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
+		defer func() {
+			err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
+			require.NoError(t, err)
+		}()
 
 		sa, err := k.GetPortainerUserServiceAccount(tokenData)
 		if err != nil {
@@ -77,7 +81,10 @@ func Test_GetServiceAccount(t *testing.T) {
 		if err != nil {
 			t.Errorf("failed to create service acount; err=%s", err)
 		}
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
+		defer func() {
+			err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
+			require.NoError(t, err)
+		}()
 
 		sa, err := k.GetPortainerUserServiceAccount(tokenData)
 		if err != nil {

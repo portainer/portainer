@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -25,7 +26,7 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, error) {
+func (handler *Handler) authenticateOAuth(ctx context.Context, code string, settings *portainer.OAuthSettings) (string, error) {
 	if code == "" {
 		return "", errors.New("Invalid OAuth authorization code")
 	}
@@ -34,7 +35,7 @@ func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuth
 		return "", errors.New("Invalid OAuth configuration")
 	}
 
-	username, err := handler.OAuthService.Authenticate(code, settings)
+	username, err := handler.OAuthService.Authenticate(ctx, code, settings)
 	if err != nil {
 		return "", err
 	}
@@ -70,7 +71,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		return httperror.Forbidden("OAuth authentication is not enabled", errors.New("OAuth authentication is not enabled"))
 	}
 
-	username, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
+	username, err := handler.authenticateOAuth(r.Context(), payload.Code, &settings.OAuthSettings)
 	if err != nil {
 		log.Debug().Err(err).Msg("OAuth authentication error")
 

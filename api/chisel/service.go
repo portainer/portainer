@@ -89,10 +89,8 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 		return err
 	}
 
-	io.Copy(io.Discard, resp.Body)
-	resp.Body.Close()
-
-	return nil
+	_, _ = io.Copy(io.Discard, resp.Body)
+	return resp.Body.Close()
 }
 
 // KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done

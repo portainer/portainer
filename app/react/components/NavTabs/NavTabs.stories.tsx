@@ -1,4 +1,4 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import { NavTabs, type Option } from './NavTabs';
@@ -6,7 +6,7 @@ import { NavTabs, type Option } from './NavTabs';
 export default {
   title: 'Components/NavTabs',
   component: NavTabs,
-} as ComponentMeta<typeof NavTabs>;
+} as Meta<typeof NavTabs>;
 
 type Args = {
   options: Option[];
@@ -26,7 +26,7 @@ function Template({ options = [] }: Args) {
   );
 }
 
-export const Example: Story<Args> = Template.bind({});
+export const Example: StoryFn<Args> = Template.bind({});
 Example.args = {
   options: [
     { children: 'Content 1', id: 'option1', label: 'Option 1' },

@@ -1,9 +1,8 @@
 import { mixed, object, SchemaOf, string } from 'yup';
 
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
-
-import { metadataValidation } from '../MetadataFieldset/validation';
-import { useNameValidation } from '../NameField';
+import { useNameValidation } from '@/react/portainer/environments/common/NameField/NameField';
+import { metadataValidation } from '@/react/portainer/environments/common/MetadataFieldset/validation';
 
 export function useValidation(): SchemaOf<CreateAgentEnvironmentValues> {
   return object({

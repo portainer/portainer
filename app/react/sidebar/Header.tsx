@@ -7,8 +7,7 @@ import { Link } from '@@/Link';
 
 import fullLogoBE from './portainer_logo-BE.svg';
 import fullLogoCE from './portainer_logo-CE.svg';
-import smallLogoBE from './logomark-BE.svg';
-import smallLogoCE from './logomark-CE.svg';
+import portainerIcon from './portainer-p-icon-white.svg';
 import { useSidebarState } from './useSidebarState';
 import styles from './Header.module.css';
 

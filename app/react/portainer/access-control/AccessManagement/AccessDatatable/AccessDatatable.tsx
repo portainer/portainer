@@ -12,7 +12,7 @@ import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
 import { useTableState } from '@@/datatables/useTableState';
 import { withMeta } from '@@/datatables/extend-options/withMeta';
-import { Button } from '@@/buttons';
+import { LoadingButton } from '@@/buttons';
 import { TextTip } from '@@/Tip/TextTip';
 import { mergeOptions } from '@@/datatables/extend-options/mergeOptions';
 
@@ -20,16 +20,7 @@ import { useColumns } from './columns/useColumns';
 import { Access } from './types';
 import { RemoveAccessButton } from './RemoveAccessButton';
 
-export function AccessDatatable({
-  dataset,
-  tableKey,
-  onRemove,
-  onUpdate,
-  showWarning = false,
-  isUpdateEnabled = false,
-  showRoles = false,
-  inheritFrom = false,
-}: {
+type Props = {
   tableKey: string;
   dataset?: Array<Access>;
   onRemove(items: Array<Access>): void;
@@ -41,7 +32,22 @@ export function AccessDatatable({
   isUpdateEnabled?: boolean;
   showRoles?: boolean;
   inheritFrom?: boolean;
-}) {
+  isUpdatingAccess: boolean;
+  isLoading: boolean;
+};
+
+export function AccessDatatable({
+  dataset,
+  tableKey,
+  onRemove,
+  onUpdate,
+  showWarning = false,
+  isUpdateEnabled = false,
+  showRoles = false,
+  inheritFrom = false,
+  isUpdatingAccess,
+  isLoading,
+}: Props) {
   const columns = useColumns({ showRoles, inheritFrom });
   const [store] = useState(() => createPersistedStore(tableKey));
   const tableState = useTableState(store, tableKey);
@@ -53,7 +59,7 @@ export function AccessDatatable({
       title="Access"
       titleIcon={UserX}
       dataset={dataset || []}
-      isLoading={!dataset}
+      isLoading={isLoading}
       columns={columns}
       settingsManager={tableState}
       getRowId={(row) => `${row.Type}-${row.Id}`}
@@ -69,14 +75,16 @@ export function AccessDatatable({
           <RemoveAccessButton items={selectedItems} onClick={onRemove} />
 
           {isBE && isUpdateEnabled && (
-            <Button
+            <LoadingButton
               data-cy="update-access-button"
               icon={Check}
               disabled={rolesState.count === 0}
               onClick={handleUpdate}
+              isLoading={isUpdatingAccess}
+              loadingText="Updating..."
             >
               Update
-            </Button>
+            </LoadingButton>
           )}
         </>
       )}

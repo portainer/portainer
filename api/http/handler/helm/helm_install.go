@@ -10,11 +10,13 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/release"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -93,7 +95,7 @@ func (p *installChartPayload) Validate(_ *http.Request) error {
 		return fmt.Errorf("required field(s) missing: %s", strings.Join(required, ", "))
 	}
 
-	if errs := validation.IsDNS1123Subdomain(p.Name); len(errs) > 0 {
+	if err := validation.IsDNS1123Subdomain(p.Name); err != nil {
 		return errChartNameInvalid
 	}
 
@@ -122,10 +124,14 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload, dry
 		if err != nil {
 			return nil, err
 		}
-		defer os.Remove(file.Name())
+		defer func() {
+			if err := os.Remove(file.Name()); err != nil {
+				log.Warn().Err(err).Msg("failed to remove temporary helm values file")
+			}
+		}()
 
 		if _, err := file.WriteString(p.Values); err != nil {
-			file.Close()
+			logs.CloseAndLogErr(file)
 			return nil, err
 		}
 
@@ -209,8 +215,13 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 				return errors.Wrap(err, "failed to create a tmp helm manifest file")
 			}
 			defer func() {
-				tmpfile.Close()
-				os.Remove(tmpfile.Name())
+				if err := tmpfile.Close(); err != nil {
+					log.Warn().Err(err).Msg("failed to close tmp helm manifest file")
+				}
+
+				if err := os.Remove(tmpfile.Name()); err != nil {
+					log.Warn().Err(err).Msg("failed to remove tmp helm manifest file")
+				}
 			}()
 
 			if _, err := tmpfile.Write(resource); err != nil {

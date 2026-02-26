@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,7 +17,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -215,7 +215,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 			}
 		}
 
-		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
+		return fmt.Errorf("failed to remove kubernetes resources: %q: %w", out, err)
 	}
 
 	return fmt.Errorf("unsupported stack type: %v", stack.Type)
@@ -315,7 +315,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 
 	log.Debug().Msgf("Trying to delete Kubernetes stacks `%v` for endpoint `%d`", stacksToDelete, endpointID)
 
-	errors := make([]error, 0)
+	var errs error
 	// Delete all the stacks one by one
 	for _, stack := range stacksToDelete {
 		log.Debug().Msgf("Trying to delete Kubernetes stack id `%d`", stack.ID)
@@ -328,27 +328,27 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 		err = handler.deleteStack(securityContext.UserID, &stack, endpoint)
 		if err != nil {
 			log.Err(err).Msgf("Unable to delete Kubernetes stack `%d`", stack.ID)
-			errors = append(errors, err)
+			errs = errors.Join(errs, err)
 
 			continue
 		}
 
 		if err := handler.DataStore.Stack().Delete(stack.ID); err != nil {
-			errors = append(errors, err)
+			errs = errors.Join(errs, err)
 			log.Err(err).Msgf("Unable to remove the stack `%d` from the database", stack.ID)
 
 			continue
 		}
 
 		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
-			errors = append(errors, err)
+			errs = errors.Join(errs, err)
 			log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 		}
 
 		log.Debug().Msgf("Kubernetes stack `%d` deleted", stack.ID)
 	}
 
-	if len(errors) > 0 {
+	if errs != nil {
 		return httperror.InternalServerError("Unable to delete some Kubernetes stack(s). Check Portainer logs for more details", nil)
 	}
 

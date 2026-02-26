@@ -14,31 +14,38 @@ import (
 // corruption and if a path is not given a default is used.
 // The path or an error are returned.
 func (store *Store) Backup(path string) (string, error) {
+	if err := store.Close(); err != nil {
+		return "", fmt.Errorf("failed to close store before backup: %w", err)
+	}
+
+	filename, err := store.backupDBFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := store.Open(); err != nil {
+		return "", fmt.Errorf("failed to reopen store after backup: %w", err)
+	}
+
+	return filename, nil
+}
+
+// backupDBFile copies the database file to the backup location.
+// Does not manage connection state - works with the database file directly regardless of connection state.
+func (store *Store) backupDBFile(backupPath string) (string, error) {
 	if err := store.createBackupPath(); err != nil {
 		return "", err
 	}
 
 	backupFilename := store.backupFilename()
-	if path != "" {
-		backupFilename = path
-	}
-	log.Info().Str("from", store.connection.GetDatabaseFilePath()).Str("to", backupFilename).Msgf("Backing up database")
-
-	// Close the store before backing up
-	err := store.Close()
-	if err != nil {
-		return "", fmt.Errorf("failed to close store before backup: %w", err)
+	if backupPath != "" {
+		backupFilename = backupPath
 	}
 
-	err = store.fileService.Copy(store.connection.GetDatabaseFilePath(), backupFilename, true)
-	if err != nil {
+	log.Info().Str("from", store.connection.GetDatabaseFilePath()).Str("to", backupFilename).Msg("Backing up database")
+
+	if err := store.fileService.Copy(store.connection.GetDatabaseFilePath(), backupFilename, true); err != nil {
 		return "", fmt.Errorf("failed to create backup file: %w", err)
-	}
-
-	// reopen the store
-	_, err = store.Open()
-	if err != nil {
-		return "", fmt.Errorf("failed to reopen store after backup: %w", err)
 	}
 
 	return backupFilename, nil
@@ -50,15 +57,17 @@ func (store *Store) Restore() error {
 }
 
 func (store *Store) RestoreFromFile(backupFilename string) error {
-	store.Close()
+	if err := store.Close(); err != nil {
+		return err
+	}
+
 	if err := store.fileService.Copy(backupFilename, store.connection.GetDatabaseFilePath(), true); err != nil {
 		return fmt.Errorf("unable to restore backup file %q. err: %w", backupFilename, err)
 	}
 
 	log.Info().Str("from", backupFilename).Str("to", store.connection.GetDatabaseFilePath()).Msgf("database restored")
 
-	_, err := store.Open()
-	if err != nil {
+	if _, err := store.Open(); err != nil {
 		return fmt.Errorf("unable to determine version of restored portainer backup file: %w", err)
 	}
 
@@ -80,6 +89,7 @@ func (store *Store) createBackupPath() error {
 			return fmt.Errorf("unable to create backup folder: %w", err)
 		}
 	}
+
 	return nil
 }
 

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import { SwitchField } from './SwitchField';
@@ -43,14 +43,14 @@ function Template({ checked, label, labelClass }: Args) {
   );
 }
 
-export const Checked: Story<Args> = Template.bind({});
+export const Checked: StoryFn<Args> = Template.bind({});
 Checked.args = {
   checked: true,
   label: 'label',
   labelClass: 'col-sm-6',
 };
 
-export const Unchecked: Story<Args> = Template.bind({});
+export const Unchecked: StoryFn<Args> = Template.bind({});
 Unchecked.args = {
   checked: false,
   label: 'label',

@@ -78,9 +78,8 @@ func (config *SwarmStackDeploymentConfig) Deploy() error {
 
 	settings := &config.endpoint.SecuritySettings
 
-	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
-		err = stackutils.ValidateStackFiles(config.stack, settings, config.FileService)
-		if err != nil {
+	if !isAdminOrEndpointAdmin {
+		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService); err != nil {
 			return err
 		}
 	}

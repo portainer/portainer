@@ -7,6 +7,11 @@ import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environment
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
+import {
+  NameField,
+  useNameValidation,
+} from '@/react/portainer/environments/common/NameField/NameField';
+import { metadataValidation } from '@/react/portainer/environments/common/MetadataFieldset/validation';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
@@ -14,9 +19,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { BoxSelector, BoxSelectorOption } from '@@/BoxSelector';
 import { BadgeIcon } from '@@/BadgeIcon';
 
-import { NameField, useNameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
-import { metadataValidation } from '../shared/MetadataFieldset/validation';
 import { MoreSettingsSection } from '../shared/MoreSettingsSection';
 
 interface FormValues {

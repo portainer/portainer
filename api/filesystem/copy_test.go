@@ -19,12 +19,15 @@ func Test_copyFile_returnsError_whenSourceDoesNotExist(t *testing.T) {
 func Test_copyFile_shouldMakeAbackup(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	os.WriteFile(path.Join(tmpdir, "origin"), content, 0600)
 
-	err := copyFile(path.Join(tmpdir, "origin"), path.Join(tmpdir, "copy"))
+	err := os.WriteFile(path.Join(tmpdir, "origin"), content, 0600)
 	require.NoError(t, err)
 
-	copyContent, _ := os.ReadFile(path.Join(tmpdir, "copy"))
+	err = copyFile(path.Join(tmpdir, "origin"), path.Join(tmpdir, "copy"))
+	require.NoError(t, err)
+
+	copyContent, err := os.ReadFile(path.Join(tmpdir, "copy"))
+	require.NoError(t, err)
 	assert.Equal(t, content, copyContent)
 }
 
@@ -59,10 +62,14 @@ func Test_CopyPath_shouldSkipWhenNotExist(t *testing.T) {
 func Test_CopyPath_shouldCopyFile(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	os.WriteFile(path.Join(tmpdir, "file"), content, 0600)
 
-	os.MkdirAll(path.Join(tmpdir, "backup"), 0700)
-	err := CopyPath(path.Join(tmpdir, "file"), path.Join(tmpdir, "backup"))
+	err := os.WriteFile(path.Join(tmpdir, "file"), content, 0600)
+	require.NoError(t, err)
+
+	err = os.MkdirAll(path.Join(tmpdir, "backup"), 0700)
+	require.NoError(t, err)
+
+	err = CopyPath(path.Join(tmpdir, "file"), path.Join(tmpdir, "backup"))
 	require.NoError(t, err)
 
 	copyContent, err := os.ReadFile(path.Join(tmpdir, "backup", "file"))

@@ -119,6 +119,19 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	return endpoints, nil
 }
 
+// ReadAll retrieves all the elements that satisfy all the provided predicates.
+func (service *Service) ReadAll(predicates ...func(endpoint portainer.Endpoint) bool) ([]portainer.Endpoint, error) {
+	var endpoints []portainer.Endpoint
+	var err error
+
+	err = service.connection.ViewTx(func(tx portainer.Transaction) error {
+		endpoints, err = service.Tx(tx).ReadAll(predicates...)
+		return err
+	})
+
+	return endpoints, err
+}
+
 // EndpointIDByEdgeID returns the EndpointID from the given EdgeID using an in-memory index
 func (service *Service) EndpointIDByEdgeID(edgeID string) (portainer.EndpointID, bool) {
 	service.mu.RLock()

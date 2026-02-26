@@ -43,7 +43,9 @@ func Test_helmList(t *testing.T) {
 
 	// Install a single chart.  We expect to get these values back
 	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default"}
-	h.helmPackageManager.Upgrade(options)
+
+	_, err = h.helmPackageManager.Upgrade(options)
+	require.NoError(t, err)
 
 	t.Run("helmList", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/1/kubernetes/helm", nil)
@@ -60,7 +62,8 @@ func Test_helmList(t *testing.T) {
 		require.NoError(t, err, "ReadAll should not return error")
 
 		data := []release.ReleaseElement{}
-		json.Unmarshal(body, &data)
+		err = json.Unmarshal(body, &data)
+		require.NoError(t, err)
 		if is.Len(data, 1, "Expected one chart entry") {
 			is.Equal(options.Name, data[0].Name, "Name doesn't match")
 			is.Equal(options.Chart, data[0].Chart, "Chart doesn't match")

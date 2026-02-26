@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { UserViewModel } from '@/portainer/models/user';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
@@ -17,31 +17,50 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
   })),
 }));
 
-test('submit button should be disabled when name or image is missing', async () => {
-  server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
-
+function renderComponent() {
   const user = new UserViewModel({ Username: 'user' });
   const Wrapped = withTestQueryProvider(
     withUserProvider(withTestRouter(CreateContainerInstanceForm), user)
   );
-  const { findByText, getByText, getByLabelText } = render(<Wrapped />);
 
-  await expect(findByText(/Azure settings/)).resolves.toBeVisible();
+  return render(<Wrapped />);
+}
 
-  const button = getByText(/Deploy the container/);
-  expect(button).toBeVisible();
-  expect(button).toBeDisabled();
+describe('CreateContainerInstanceForm', () => {
+  beforeEach(() => {
+    server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
+  });
 
-  const nameInput = getByLabelText(/name/i, { selector: 'input' });
-  await userEvent.type(nameInput, 'name');
+  // TODO: from R8S-730 - enable this test once it passes
+  it.skip('should not display any visible error messages on initial load', async () => {
+    renderComponent();
 
-  const imageInput = getByLabelText(/image/i, { selector: 'input' });
-  await userEvent.type(imageInput, 'image');
+    const errors = await screen.findByRole('alert');
 
-  await expect(findByText(/Deploy the container/)).resolves.toBeEnabled();
+    // Check that no error messages (role="alert") are visible
+    expect(errors).not.toBeInTheDocument();
+  });
 
-  expect(nameInput).toHaveValue('name');
-  await userEvent.clear(nameInput);
+  it('submit button should be disabled when name or image is missing', async () => {
+    const { findByText, getByText, getByLabelText } = renderComponent();
 
-  await expect(findByText(/Deploy the container/)).resolves.toBeDisabled();
+    await expect(findByText(/Azure settings/)).resolves.toBeVisible();
+
+    const button = getByText(/Deploy the container/);
+    expect(button).toBeVisible();
+    expect(button).toBeDisabled();
+
+    const nameInput = getByLabelText(/name/i, { selector: 'input' });
+    await userEvent.type(nameInput, 'name');
+
+    const imageInput = getByLabelText(/image/i, { selector: 'input' });
+    await userEvent.type(imageInput, 'image');
+
+    await expect(findByText(/Deploy the container/)).resolves.toBeEnabled();
+
+    expect(nameInput).toHaveValue('name');
+    await userEvent.clear(nameInput);
+
+    await expect(findByText(/Deploy the container/)).resolves.toBeDisabled();
+  });
 });

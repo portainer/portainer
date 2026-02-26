@@ -21,7 +21,11 @@ interface Props {
   isTeamLeader?: boolean;
 }
 
-export function SettingsSidebar({ isPureAdmin, isAdmin, isTeamLeader }: Props) {
+export function SettingsSidebar({
+  isPureAdmin,
+  isAdmin,
+  isTeamLeader = false,
+}: Props) {
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
   });

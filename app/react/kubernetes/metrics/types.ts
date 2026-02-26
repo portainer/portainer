@@ -1,5 +1,5 @@
 export type PodMetrics = {
-  items: PodMetric[];
+  items?: PodMetric[];
 };
 
 export type PodMetric = {

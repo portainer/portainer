@@ -123,7 +123,7 @@ func agentServer(t *testing.T) string {
 		w.Header().Set(portainer.PortainerAgentHeader, "v2.19.0")
 		w.Header().Set(portainer.HTTPResponseAgentPlatform, strconv.Itoa(int(portainer.AgentPlatformDocker)))
 
-		response.Empty(w)
+		_ = response.Empty(w)
 	})
 
 	cert, err := tls.X509KeyPair([]byte(localhostCert), []byte(localhostKey))
@@ -267,7 +267,8 @@ func Test_redeployWhenChanged(t *testing.T) {
 
 	t.Run("can deploy docker compose stack", func(t *testing.T) {
 		stack.Type = portainer.DockerComposeStack
-		store.Stack().Update(stack.ID, &stack)
+		err = store.Stack().Update(stack.ID, &stack)
+		require.NoError(t, err)
 
 		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		require.NoError(t, err)
@@ -275,7 +276,8 @@ func Test_redeployWhenChanged(t *testing.T) {
 
 	t.Run("can deploy docker swarm stack", func(t *testing.T) {
 		stack.Type = portainer.DockerSwarmStack
-		store.Stack().Update(stack.ID, &stack)
+		err = store.Stack().Update(stack.ID, &stack)
+		require.NoError(t, err)
 
 		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		require.NoError(t, err)
@@ -283,7 +285,8 @@ func Test_redeployWhenChanged(t *testing.T) {
 
 	t.Run("can deploy kube app", func(t *testing.T) {
 		stack.Type = portainer.KubernetesStack
-		store.Stack().Update(stack.ID, &stack)
+		err = store.Stack().Update(stack.ID, &stack)
+		require.NoError(t, err)
 
 		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 		require.NoError(t, err)
@@ -305,12 +308,13 @@ func Test_getUserRegistries(t *testing.T) {
 
 	team := portainer.Team{ID: 1, Name: "team"}
 
-	store.TeamMembership().Create(&portainer.TeamMembership{
+	err = store.TeamMembership().Create(&portainer.TeamMembership{
 		ID:     1,
 		UserID: user.ID,
 		TeamID: team.ID,
 		Role:   portainer.TeamMember,
 	})
+	require.NoError(t, err)
 
 	registryReachableByUser := portainer.Registry{
 		ID:   1,

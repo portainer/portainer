@@ -5,6 +5,14 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic/fake"
+	k8stesting "k8s.io/client-go/testing"
 )
 
 // TestApplyDynamic tests require a Kubernetes cluster.
@@ -13,9 +21,8 @@ import (
 //   - With cluster: go test -v ./pkg/libkubectl -run TestApplyDynamic
 //   - Without cluster: Tests will skip automatically
 //
-// Cleanup: Tests automatically clean up resources by extracting resource identifiers
-// from manifests and using client.Delete(). Resources are deleted after each test
-// completes, keeping the cluster clean.
+// Cleanup: Tests automatically clean up resources using client.DeleteDynamic().
+// Resources are deleted after each test completes, keeping the cluster clean.
 
 // skipIfNoKubeconfig skips the test if no kubeconfig is available
 func skipIfNoKubeconfig(tb testing.TB) string {
@@ -38,54 +45,6 @@ func skipIfNoKubeconfig(tb testing.TB) string {
 	}
 
 	return kubeconfig
-}
-
-// extractResourceIdentifiers extracts resource identifiers (kind/name) from YAML manifests
-// Returns a slice of resource identifiers in the format "kind/name" that can be used with Delete()
-func extractResourceIdentifiers(manifests []string) []string {
-	var identifiers []string
-
-	for _, manifest := range manifests {
-		manifest = strings.TrimSpace(manifest)
-		if manifest == "" {
-			continue
-		}
-
-		// Split by document separator if multiple resources in one manifest
-		resources := strings.Split(manifest, "\n---\n")
-
-		for _, resource := range resources {
-			resource = strings.TrimSpace(resource)
-			if resource == "" {
-				continue
-			}
-
-			// Extract kind and name using simple string parsing
-			var kind, name string
-			lines := strings.Split(resource, "\n")
-			for _, line := range lines {
-				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "kind:") {
-					kind = strings.TrimSpace(strings.TrimPrefix(line, "kind:"))
-				} else if strings.HasPrefix(line, "name:") && name == "" {
-					// Get the first name (resource name, not nested names)
-					name = strings.TrimSpace(strings.TrimPrefix(line, "name:"))
-				}
-				// Stop after metadata section
-				if kind != "" && name != "" {
-					break
-				}
-			}
-
-			if kind != "" && name != "" {
-				// Convert kind to lowercase for kubectl format
-				identifier := strings.ToLower(kind) + "/" + name
-				identifiers = append(identifiers, identifier)
-			}
-		}
-	}
-
-	return identifiers
 }
 
 func TestApplyDynamic(t *testing.T) {
@@ -576,8 +535,9 @@ data:
 			// Skip if no Kubernetes cluster is available
 			kubeconfig := skipIfNoKubeconfig(t)
 
-			// Create client using local kubeconfig
-			client, err := NewClient(&ClientAccess{}, "default", kubeconfig, false)
+			// Create client with empty namespace to let manifest namespaces be used
+			// (simulates "use namespace from manifest" toggle being ON)
+			client, err := NewClient(&ClientAccess{}, "", kubeconfig, false)
 			if err != nil {
 				t.Fatalf("Failed to create client: %v", err)
 			}
@@ -586,14 +546,9 @@ data:
 			// This runs even if the test fails, ensuring cluster stays clean
 			if !tt.wantErr && len(tt.manifests) > 0 {
 				t.Cleanup(func() {
-					// Extract resource identifiers (kind/name) from manifests
-					resourceIDs := extractResourceIdentifiers(tt.manifests)
-					if len(resourceIDs) > 0 {
-						// Delete resources using client.Delete with resource identifiers
-						_, err := client.Delete(context.Background(), resourceIDs)
-						if err != nil {
-							t.Logf("Warning: failed to cleanup resources: %v", err)
-						}
+					_, err := client.DeleteDynamic(context.Background(), tt.manifests)
+					if err != nil {
+						t.Logf("Warning: failed to cleanup resources: %v", err)
 					}
 				})
 			}
@@ -613,6 +568,137 @@ data:
 				if output == "" && len(tt.manifests) > 0 && tt.manifests[0] != "" {
 					t.Errorf("ApplyDynamic() expected output but got empty string")
 				}
+			}
+		})
+	}
+}
+
+// newFakeDynamicClient creates a fake dynamic client that handles Server-Side Apply
+func newFakeDynamicClient() *fake.FakeDynamicClient {
+	client := fake.NewSimpleDynamicClient(runtime.NewScheme())
+	client.PrependReactor("patch", "*", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		patchAction := action.(k8stesting.PatchAction)
+		if patchAction.GetPatchType() == types.ApplyPatchType {
+			obj := &unstructured.Unstructured{}
+			if err := obj.UnmarshalJSON(patchAction.GetPatch()); err != nil {
+				return true, nil, err
+			}
+			return true, obj, nil
+		}
+		return false, nil, nil
+	})
+	return client
+}
+
+// newTestMapper creates a simple RESTMapper for common resource types
+func newTestMapper() meta.RESTMapper {
+	mapper := meta.NewDefaultRESTMapper([]schema.GroupVersion{
+		{Group: "", Version: "v1"},
+		{Group: "apps", Version: "v1"},
+	})
+	mapper.Add(schema.GroupVersionKind{Version: "v1", Kind: "ConfigMap"}, meta.RESTScopeNamespace)
+	mapper.Add(schema.GroupVersionKind{Version: "v1", Kind: "Secret"}, meta.RESTScopeNamespace)
+	mapper.Add(schema.GroupVersionKind{Version: "v1", Kind: "Namespace"}, meta.RESTScopeRoot)
+	mapper.Add(schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"}, meta.RESTScopeNamespace)
+	return mapper
+}
+
+// TestApplyResource unit tests for applyResource using fake client (no cluster needed)
+func TestApplyResource(t *testing.T) {
+	client := &Client{} // applyResource doesn't use Client fields directly
+	dynamicClient := newFakeDynamicClient()
+	mapper := newTestMapper()
+
+	tests := []struct {
+		name         string
+		yaml         string
+		configuredNS string
+		wantErr      bool
+		errContains  string
+	}{
+		{
+			name: "configmap with configured namespace",
+			yaml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+data:
+  key: value`,
+			configuredNS: "my-ns",
+		},
+		{
+			name: "configmap with manifest namespace",
+			yaml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+  namespace: manifest-ns
+data:
+  key: value`,
+			configuredNS: "",
+		},
+		{
+			name: "namespace conflict",
+			yaml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+  namespace: manifest-ns`,
+			configuredNS: "form-ns",
+			wantErr:      true,
+			errContains:  "namespace conflict",
+		},
+		{
+			name: "namespaces match",
+			yaml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+  namespace: same-ns`,
+			configuredNS: "same-ns",
+		},
+		{
+			name: "defaults to default namespace when neither set",
+			yaml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm`,
+			configuredNS: "",
+		},
+		{
+			name: "cluster-scoped resource ignores namespace",
+			yaml: `apiVersion: v1
+kind: Namespace
+metadata:
+  name: new-ns`,
+			configuredNS: "ignored",
+		},
+		{
+			name:        "invalid yaml",
+			yaml:        "not: valid: yaml: {{",
+			wantErr:     true,
+			errContains: "failed to decode",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := client.applyResource(context.Background(), dynamicClient, mapper, []byte(tt.yaml), tt.configuredNS)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error containing %q, got nil", tt.errContains)
+				} else if !strings.Contains(err.Error(), tt.errContains) {
+					t.Errorf("expected error containing %q, got %v", tt.errContains, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+			if result == "" {
+				t.Error("expected non-empty result")
 			}
 		})
 	}

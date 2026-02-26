@@ -48,9 +48,8 @@ func TestRollback(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+		require.NoError(t, err)
 
 		// Install first version
 		release, err := hspm.Upgrade(installOpts)
@@ -69,9 +68,10 @@ func TestRollback(t *testing.T) {
 		}
 
 		rolledBackRelease, err := hspm.Rollback(rollbackOpts)
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		require.NoError(t, err, "should successfully rollback release")
 		is.NotNil(rolledBackRelease, "should return non-nil release")
@@ -88,9 +88,8 @@ func TestRollback(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+		require.NoError(t, err)
 
 		// Install first version
 		release, err := hspm.Upgrade(installOpts)
@@ -113,9 +112,10 @@ func TestRollback(t *testing.T) {
 		}
 
 		rolledBackRelease, err := hspm.Rollback(rollbackOpts)
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		require.NoError(t, err, "should successfully rollback to specific revision")
 		is.NotNil(rolledBackRelease, "should return non-nil release")

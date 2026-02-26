@@ -92,7 +92,9 @@ func CreateTLSConfigurationFromDisk(config portainer.TLSConfiguration) (*tls.Con
 }
 
 func createTLSConfigurationFromDisk(fipsEnabled bool, config portainer.TLSConfiguration) (*tls.Config, error) { //nolint:forbidigo
-	if !config.TLS {
+	if !config.TLS && fipsEnabled {
+		return nil, fips.ErrTLSRequired
+	} else if !config.TLS {
 		return nil, nil
 	}
 

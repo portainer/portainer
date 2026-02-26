@@ -1,33 +1,31 @@
-import clsx from 'clsx';
+import { Step, StepData } from './Step';
 
-import styles from './Stepper.module.css';
-
-export interface Step {
-  label: string;
-}
+export type { StepData as Step };
 
 interface Props {
-  currentStep: number;
-  steps: Step[];
+  /** 0-based index of the current step */
+  currentStepIndex: number;
+  steps: Array<StepData>;
+  /** Callback with 0-based step index */
+  onStepClick?: (stepIndex: number) => void;
 }
 
-export function Stepper({ currentStep, steps }: Props) {
+export function Stepper({ currentStepIndex, steps, onStepClick }: Props) {
   return (
-    <div className={styles.stepperWrapper}>
+    <nav
+      aria-label="Progress steps"
+      className="flex flex-wrap items-center gap-2"
+    >
       {steps.map((step, index) => (
-        <div
+        <Step
           key={step.label}
-          className={clsx(styles.stepWrapper, {
-            [styles.active]: index + 1 === currentStep,
-            [styles.completed]: index + 1 < currentStep,
-          })}
-        >
-          <div className={styles.step}>
-            <div className={styles.stepCounter}>{index + 1}</div>
-            <div className={styles.stepName}>{step.label}</div>
-          </div>
-        </div>
+          step={step}
+          index={index}
+          currentStepIndex={currentStepIndex}
+          isLast={index === steps.length - 1}
+          onStepClick={onStepClick}
+        />
       ))}
-    </div>
+    </nav>
   );
 }

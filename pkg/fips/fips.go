@@ -2,6 +2,7 @@ package fips
 
 import (
 	"crypto/fips140"
+	"errors"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -10,6 +11,8 @@ import (
 var fipsMode, isInitialised bool
 
 var once sync.Once
+
+var ErrTLSRequired = errors.New("TLS configuration is required in FIPS mode")
 
 func InitFIPS(enabled bool) {
 	once.Do(func() {

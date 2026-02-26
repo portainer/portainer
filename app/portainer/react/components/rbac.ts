@@ -18,5 +18,7 @@ export const rbacModule = angular
       'showRoles',
       'showWarning',
       'tableKey',
+      'isUpdatingAccess',
+      'isLoading',
     ])
   ).name;

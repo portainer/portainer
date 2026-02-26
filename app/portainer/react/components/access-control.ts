@@ -54,5 +54,10 @@ export const accessControlModule = angular
   )
   .component(
     'porAccessManagementUsersSelector',
-    r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
+    r2a(PorAccessManagementUsersSelector, [
+      'onChange',
+      'options',
+      'value',
+      'isLoading',
+    ])
   ).name;

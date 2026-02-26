@@ -6,7 +6,7 @@
     // "module": "commonjs",
     // "module": "esnext",
     "incremental": true,
-    "target": "ES2018",
+    "target": "esnext",
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
@@ -40,7 +40,7 @@
       // https://github.com/jsonnext/codemirror-json-schema/issues/107#issuecomment-2144584296
       "yaml-schema": ["../node_modules/codemirror-json-schema/dist/yaml"]
     },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
   },
   "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
   "include": ["app", ".storybook"]

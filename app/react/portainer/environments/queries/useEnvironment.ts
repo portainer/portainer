@@ -13,17 +13,11 @@ export function useEnvironment<T = Environment>(
   options?: {
     autoRefreshRate?: number;
     excludeSnapshot?: boolean;
-    excludeSnapshotRaw?: boolean;
   }
 ) {
   return useQuery(
     environmentQueryKeys.item(environmentId!),
-    () =>
-      getEndpoint(
-        environmentId!,
-        options?.excludeSnapshot ?? undefined,
-        options?.excludeSnapshotRaw ?? undefined
-      ),
+    () => getEndpoint(environmentId!, options?.excludeSnapshot ?? undefined),
     {
       select,
       ...withError('Failed loading environment'),

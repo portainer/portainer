@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/images"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/Masterminds/semver"
 	"github.com/docker/docker/api/types"
@@ -75,7 +76,7 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	if err != nil {
 		return nil, errors.Wrap(err, "create client error")
 	}
-	defer cli.Close()
+	defer logs.CloseAndLogErr(cli)
 
 	log.Debug().Str("container_id", containerId).Msg("starting to fetch container information")
 
@@ -146,13 +147,19 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	c.sr.push(func() {
 		log.Debug().Str("container_id", containerId).Str("container", container.Name).Msg("restoring the container")
-		cli.ContainerRename(ctx, containerId, container.Name)
-
-		for _, network := range container.NetworkSettings.Networks {
-			cli.NetworkConnect(ctx, network.NetworkID, containerId, network)
+		if err := cli.ContainerRename(ctx, containerId, container.Name); err != nil {
+			log.Warn().Err(err).Msg("failure to rename container")
 		}
 
-		cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{})
+		for _, network := range container.NetworkSettings.Networks {
+			if err := cli.NetworkConnect(ctx, network.NetworkID, containerId, network); err != nil {
+				log.Warn().Err(err).Msg("failure to connect container to network")
+			}
+		}
+
+		if err := cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{}); err != nil {
+			log.Warn().Err(err).Msg("failure to start container")
+		}
 	})
 
 	log.Debug().Str("container", strings.Split(container.Name, "/")[1]).Msg("starting to create a new container")
@@ -175,8 +182,14 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 
 	c.sr.push(func() {
 		log.Debug().Str("container_id", create.ID).Msg("removing the new container")
-		cli.ContainerStop(ctx, create.ID, dockercontainer.StopOptions{})
-		cli.ContainerRemove(ctx, create.ID, dockercontainer.RemoveOptions{})
+
+		if err := cli.ContainerStop(ctx, create.ID, dockercontainer.StopOptions{}); err != nil {
+			log.Warn().Err(err).Msg("failure to stop container")
+		}
+
+		if err := cli.ContainerRemove(ctx, create.ID, dockercontainer.RemoveOptions{}); err != nil {
+			log.Warn().Err(err).Msg("failure to remove container")
+		}
 	})
 
 	if err != nil {

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@/setup-tests/server';
+import PortainerError from '@/portainer/error';
 
 import { getLicenses } from './license.service';
 import type { License } from './types';
@@ -37,7 +38,9 @@ describe('getLicenses', () => {
     const promise = getLicenses();
     await promise.then(thenFn, catchFn);
 
-    expect(catchFn).toHaveBeenCalledWith(new Error(details));
+    expect(catchFn).toHaveBeenCalledWith(
+      new PortainerError(details, new Error(message))
+    );
     expect(thenFn).not.toHaveBeenCalled();
   });
 });

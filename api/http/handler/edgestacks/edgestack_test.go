@@ -1,7 +1,6 @@
 package edgestacks
 
 import (
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -43,12 +42,7 @@ func setupHandler(t *testing.T) (*Handler, string) {
 		t.Fatal(err)
 	}
 
-	tmpDir, err := os.MkdirTemp(t.TempDir(), "portainer-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fs, err := filesystem.NewService(tmpDir, "")
+	fs, err := filesystem.NewService(t.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
 	}

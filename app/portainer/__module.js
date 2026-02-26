@@ -195,8 +195,7 @@ angular
         },
         views: {
           'content@': {
-            templateUrl: './views/endpoints/edit/endpoint.html',
-            controller: 'EndpointController',
+            component: 'environmentsItemView',
           },
         },
       };
@@ -256,8 +255,12 @@ angular
         url: '/:id',
         views: {
           'content@': {
-            templateUrl: './views/groups/edit/group.html',
-            controller: 'GroupController',
+            component: 'environmentGroupEditView',
+          },
+        },
+        params: {
+          id: {
+            type: 'int',
           },
         },
       };
@@ -267,8 +270,7 @@ angular
         url: '/new',
         views: {
           'content@': {
-            templateUrl: './views/groups/create/creategroup.html',
-            controller: 'CreateGroupController',
+            component: 'environmentGroupCreateView',
           },
         },
       };

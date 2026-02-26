@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { Config } from 'docker-types';
 
+import { isoDate } from '@/portainer/filters/filters';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
@@ -43,6 +44,15 @@ beforeEach(() => {
   );
 });
 
+beforeAll(() => {
+  // set timezone explicitly to avoid daylight savings drift
+  vi.stubEnv('TZ', 'UTC');
+});
+
+afterAll(() => {
+  vi.unstubAllEnvs();
+});
+
 it('should return null when data is loading', () => {
   server.use(
     http.get('/api/endpoints/:environmentId/docker/configs', async () => {
@@ -81,10 +91,11 @@ it('should render datatable with configs', async () => {
 });
 
 it('should display config creation date formatted', async () => {
+  const createdAt = '2024-06-15T14:30:00.000000000Z';
   const mockConfigs = [
     createMockConfig({
       ID: 'config-1',
-      CreatedAt: '2024-06-15T14:30:00.000000000Z',
+      CreatedAt: createdAt,
     }),
   ];
 
@@ -100,7 +111,8 @@ it('should display config creation date formatted', async () => {
     expect(screen.getByRole('region', { name: 'Configs' })).toBeVisible();
   });
 
-  expect(screen.getByText(/2024-06-15/)).toBeVisible();
+  const expectedDate = isoDate(mockConfigs[0].CreatedAt);
+  expect(screen.getByText(new RegExp(expectedDate))).toBeVisible();
 });
 
 it('should show Add config button for admin user', async () => {

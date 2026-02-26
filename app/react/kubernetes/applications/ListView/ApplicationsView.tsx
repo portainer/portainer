@@ -1,10 +1,9 @@
 import { BoxIcon, List } from 'lucide-react';
-import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
 import { PageHeader } from '@@/PageHeader';
-import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { ApplicationsDatatable } from './ApplicationsDatatable';
 import { ApplicationsStacksDatatable } from './ApplicationsStacksDatatable';
@@ -33,10 +32,7 @@ export function ApplicationsView() {
     },
   ];
 
-  const currentTabIndex = findSelectedTabIndex(
-    useCurrentStateAndParams(),
-    tabs
-  );
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

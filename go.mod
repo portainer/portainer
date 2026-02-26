@@ -1,6 +1,6 @@
 module github.com/portainer/portainer
 
-go 1.25.5
+go 1.25.7
 
 replace github.com/robfig/cron/v3 => github.com/robfig/cron/v3 v3.0.1 // Not actively maintained. Pinned to last known good version. Review needed when upgrading.
 
@@ -16,6 +16,7 @@ require (
 	github.com/aws/smithy-go v1.20.3
 	github.com/cbroglie/mustache v1.4.0
 	github.com/compose-spec/compose-go/v2 v2.9.1
+	github.com/containerd/containerd v1.7.29
 	github.com/coreos/go-semver v0.3.1
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/docker/cli v28.5.1+incompatible
@@ -113,7 +114,6 @@ require (
 	github.com/cloudflare/cfssl v1.6.4 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/containerd/console v1.0.5 // indirect
-	github.com/containerd/containerd v1.7.29 // indirect
 	github.com/containerd/containerd/api v1.9.0 // indirect
 	github.com/containerd/containerd/v2 v2.1.5 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect

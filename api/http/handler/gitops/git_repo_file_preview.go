@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/portainer/portainer/pkg/validate"
+	"github.com/rs/zerolog/log"
 )
 
 type fileResponse struct {
@@ -87,7 +88,11 @@ func (handler *Handler) gitOperationRepoFilePreview(w http.ResponseWriter, r *ht
 		return httperror.InternalServerError(newErr.Error(), newErr)
 	}
 
-	defer handler.fileService.RemoveDirectory(projectPath)
+	defer func() {
+		if err := handler.fileService.RemoveDirectory(projectPath); err != nil {
+			log.Warn().Err(err).Msg("failed to remove temporary project folder")
+		}
+	}()
 
 	fileContent, err := handler.fileService.GetFileContent(projectPath, payload.TargetFile)
 	if err != nil {

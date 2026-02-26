@@ -1,5 +1,7 @@
 import { Formik } from 'formik';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useState } from 'react';
+import uuidv4 from 'uuid/v4';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -13,7 +15,7 @@ import { getDefaultModel } from '@/react/portainer/gitops/types';
 
 import { FormValues } from './types';
 import { useValidationSchema } from './useValidationSchema';
-import { InnerForm } from './InnerForm';
+import { CreateStackInnerForm } from './CreateStackInnerForm';
 
 interface Props {
   environmentId: EnvironmentId;
@@ -29,7 +31,7 @@ export function CreateStackForm({ environmentId, isSwarm, swarmId }: Props) {
   const createStackMutation = useCreateStack();
   const { user } = useCurrentUser();
   const { isAdmin } = useIsEdgeAdmin();
-
+  const [webhookId] = useState(() => uuidv4());
   const validationSchema = useValidationSchema(environmentId);
 
   const initialValues: FormValues = {
@@ -52,7 +54,7 @@ export function CreateStackForm({ environmentId, isSwarm, swarmId }: Props) {
       variables: [],
     },
     env: [],
-    webhookId: '',
+    enableWebhook: false,
     registries: [],
     accessControl: defaultValues(isAdmin, user.Id),
   };
@@ -64,10 +66,11 @@ export function CreateStackForm({ environmentId, isSwarm, swarmId }: Props) {
       validationSchema={validationSchema}
       validateOnMount
     >
-      <InnerForm
+      <CreateStackInnerForm
         isDeploying={createStackMutation.isLoading}
         isSwarm={isSwarm}
         isSaved={createStackMutation.isSuccess}
+        webhookId={webhookId}
       />
     </Formik>
   );
@@ -75,12 +78,13 @@ export function CreateStackForm({ environmentId, isSwarm, swarmId }: Props) {
   async function handleSubmit(values: FormValues) {
     const stackType = isSwarm ? 'swarm' : 'standalone';
 
-    const payload = buildCreateStackPayload(
+    const payload = buildCreateStackPayload({
       values,
       environmentId,
       stackType,
-      swarmId
-    );
+      swarmId,
+      webhookId,
+    });
 
     createStackMutation.mutate(payload, {
       onSuccess: () => {
@@ -91,17 +95,25 @@ export function CreateStackForm({ environmentId, isSwarm, swarmId }: Props) {
   }
 }
 
-function buildCreateStackPayload(
-  values: FormValues,
-  environmentId: EnvironmentId,
-  stackType: 'swarm' | 'standalone',
-  swarmId: string
-): CreateStackPayload {
+function buildCreateStackPayload({
+  environmentId,
+  stackType,
+  swarmId,
+  values,
+  webhookId,
+}: {
+  values: FormValues;
+  environmentId: EnvironmentId;
+  stackType: 'swarm' | 'standalone';
+  swarmId: string;
+  webhookId: string;
+}): CreateStackPayload {
   const basePayload = {
     name: values.name,
     environmentId,
     env: values.env,
     accessControl: values.accessControl,
+    registries: values.registries,
   };
 
   switch (values.method) {
@@ -114,7 +126,7 @@ function buildCreateStackPayload(
             ...basePayload,
             swarmId,
             fileContent: values.editor.fileContent,
-            webhook: values.webhookId,
+            webhook: values.enableWebhook ? webhookId : undefined,
           },
         };
       }
@@ -124,7 +136,7 @@ function buildCreateStackPayload(
         payload: {
           ...basePayload,
           fileContent: values.editor.fileContent,
-          webhook: values.webhookId,
+          webhook: values.enableWebhook ? webhookId : undefined,
         },
       };
 
@@ -140,7 +152,7 @@ function buildCreateStackPayload(
             ...basePayload,
             swarmId,
             file: values.upload.file,
-            webhook: values.webhookId,
+            webhook: values.enableWebhook ? webhookId : undefined,
           },
         };
       }
@@ -150,7 +162,7 @@ function buildCreateStackPayload(
         payload: {
           ...basePayload,
           file: values.upload.file,
-          webhook: values.webhookId,
+          webhook: values.enableWebhook ? webhookId : undefined,
         },
       };
 
@@ -161,6 +173,7 @@ function buildCreateStackPayload(
           method: 'git',
           payload: {
             ...basePayload,
+            webhook: webhookId,
             swarmId,
             git: values.git,
             relativePathSettings: values.git.SupportRelativePath
@@ -182,6 +195,7 @@ function buildCreateStackPayload(
         payload: {
           ...basePayload,
           git: values.git,
+          webhook: webhookId,
           relativePathSettings: values.git.SupportRelativePath
             ? {
                 SupportRelativePath: true,
@@ -204,7 +218,7 @@ function buildCreateStackPayload(
             ...basePayload,
             swarmId,
             fileContent: values.template.fileContent,
-            webhook: values.webhookId,
+            webhook: values.enableWebhook ? webhookId : undefined,
             fromAppTemplate: true,
           },
         };
@@ -215,7 +229,7 @@ function buildCreateStackPayload(
         payload: {
           ...basePayload,
           fileContent: values.template.fileContent,
-          webhook: values.webhookId,
+          webhook: values.enableWebhook ? webhookId : undefined,
           fromAppTemplate: true,
         },
       };

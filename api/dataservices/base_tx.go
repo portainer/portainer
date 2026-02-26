@@ -72,3 +72,13 @@ func (service BaseDataServiceTx[T, I]) Delete(ID I) error {
 	identifier := service.Connection.ConvertToKey(int(ID))
 	return service.Tx.DeleteObject(service.Bucket, identifier)
 }
+
+func Read[T any](tx portainer.Transaction, bucket string, key []byte) (*T, error) {
+	var element T
+
+	if err := tx.GetObject(bucket, key, &element); err != nil {
+		return nil, err
+	}
+
+	return &element, nil
+}

@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/fips"
 )
 
 // BuildTransportAndSchemeFromTLSConfig returns a base HTTP transport configured
@@ -22,7 +23,9 @@ func BuildTransportAndSchemeFromTLSConfig(tlsCfg portainer.TLSConfiguration) (*h
 
 	baseTransport.TLSClientConfig = tlsConfig
 
-	if tlsConfig == nil {
+	if tlsConfig == nil && fips.FIPSMode() {
+		return nil, "", fips.ErrTLSRequired
+	} else if tlsConfig == nil {
 		return baseTransport, "http", nil
 	}
 

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/errorlist"
 	"github.com/rs/zerolog/log"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -55,7 +54,7 @@ func parseClusterRoleBinding(clusterRoleBinding rbacv1.ClusterRoleBinding) model
 // by deleting each cluster role binding in its given namespace. If deleting a specific cluster role binding
 // fails, the error is logged and we continue to delete the remaining cluster role bindings.
 func (kcl *KubeClient) DeleteClusterRoleBindings(reqs models.K8sClusterRoleBindingDeleteRequests) error {
-	var errors []error
+	var errs error
 
 	for _, name := range reqs {
 		client := kcl.cli.RbacV1().ClusterRoleBindings()
@@ -76,11 +75,11 @@ func (kcl *KubeClient) DeleteClusterRoleBindings(reqs models.K8sClusterRoleBindi
 
 		if err := client.Delete(context.Background(), name, metav1.DeleteOptions{}); err != nil {
 			log.Err(err).Str("role_name", name).Msg("unable to delete the cluster role binding")
-			errors = append(errors, err)
+			errs = errors.Join(errs, err)
 		}
 	}
 
-	return errorlist.Combine(errors)
+	return errs
 }
 
 func isSystemClusterRoleBinding(binding *rbacv1.ClusterRoleBinding) bool {

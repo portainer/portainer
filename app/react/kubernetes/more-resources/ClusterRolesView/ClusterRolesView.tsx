@@ -1,10 +1,9 @@
 import { UserCheck, Link } from 'lucide-react';
-import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
 import { PageHeader } from '@@/PageHeader';
-import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { ClusterRolesDatatable } from './ClusterRolesDatatable/ClusterRolesDatatable';
 import { ClusterRoleBindingsDatatable } from './ClusterRoleBindingsDatatable/ClusterRoleBindingsDatatable';
@@ -33,10 +32,7 @@ export function ClusterRolesView() {
     },
   ];
 
-  const currentTabIndex = findSelectedTabIndex(
-    useCurrentStateAndParams(),
-    tabs
-  );
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

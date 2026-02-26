@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -45,7 +46,9 @@ func YAML(rw http.ResponseWriter, data any) *httperror.HandlerError {
 		return httperror.InternalServerError("Unable to write YAML response", errors.New("failed to convert input to string"))
 	}
 
-	fmt.Fprint(rw, strData)
+	if _, err := fmt.Fprint(rw, strData); err != nil {
+		log.Warn().Err(err).Msg("failed to write YAML response")
+	}
 
 	return nil
 }

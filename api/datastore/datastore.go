@@ -32,34 +32,38 @@ func (store *Store) Open() (newStore bool, err error) {
 	}
 
 	if encryptionReq {
-		backupFilename, err := store.Backup("")
+		// NeedsEncryptionMigration() sets encrypted=true as a side effect when a key exists.
+		// We need to set it back to false so GetDatabaseFilePath() returns the path to the
+		// actual unencrypted file (portainer.db) that we want to back up.
+		store.connection.SetEncrypted(false)
+
+		// Use backupDBFile directly since connection isn't open yet
+		// and we don't want to trigger the close/open cycle of Backup()
+		backupFilename, err := store.backupDBFile("")
 		if err != nil {
 			return false, fmt.Errorf("failed to backup database prior to encrypting: %w", err)
 		}
 
-		err = store.encryptDB()
-		if err != nil {
-			store.RestoreFromFile(backupFilename) // restore from backup if encryption fails
-			return false, err
+		if err := store.encryptDB(); err != nil {
+			innerErr := store.RestoreFromFile(backupFilename) // restore from backup if encryption fails
+			return false, errors.Join(err, innerErr)
 		}
 	}
 
-	err = store.connection.Open()
-	if err != nil {
+	if err := store.connection.Open(); err != nil {
 		return false, err
 	}
 
-	err = store.initServices()
-	if err != nil {
+	if err := store.initServices(); err != nil {
 		return false, err
 	}
 
 	// If no settings object exists then assume we have a new store
-	_, err = store.SettingsService.Settings()
-	if err != nil {
+	if _, err := store.SettingsService.Settings(); err != nil {
 		if store.IsErrObjectNotFound(err) {
 			return true, nil
 		}
+
 		return false, err
 	}
 
@@ -72,19 +76,13 @@ func (store *Store) Close() error {
 
 func (store *Store) UpdateTx(fn func(dataservices.DataStoreTx) error) error {
 	return store.connection.UpdateTx(func(tx portainer.Transaction) error {
-		return fn(&StoreTx{
-			store: store,
-			tx:    tx,
-		})
+		return fn(&StoreTx{store: store, tx: tx})
 	})
 }
 
 func (store *Store) ViewTx(fn func(dataservices.DataStoreTx) error) error {
 	return store.connection.ViewTx(func(tx portainer.Transaction) error {
-		return fn(&StoreTx{
-			store: store,
-			tx:    tx,
-		})
+		return fn(&StoreTx{store: store, tx: tx})
 	})
 }
 
@@ -99,6 +97,7 @@ func (store *Store) CheckCurrentEdition() error {
 	if store.edition() != portainer.Edition {
 		return portainerErrors.ErrWrongDBEdition
 	}
+
 	return nil
 }
 
@@ -107,6 +106,7 @@ func (store *Store) edition() portainer.SoftwareEdition {
 	if store.IsErrObjectNotFound(err) {
 		edition = portainer.PortainerCE
 	}
+
 	return edition
 }
 
@@ -125,13 +125,11 @@ func (store *Store) Rollback(force bool) error {
 
 func (store *Store) encryptDB() error {
 	store.connection.SetEncrypted(false)
-	err := store.connection.Open()
-	if err != nil {
+	if err := store.connection.Open(); err != nil {
 		return err
 	}
 
-	err = store.initServices()
-	if err != nil {
+	if err := store.initServices(); err != nil {
 		return err
 	}
 
@@ -144,8 +142,7 @@ func (store *Store) encryptDB() error {
 
 	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
 
-	err = store.Export(exportFilename)
-	if err != nil {
+	if err := store.Export(exportFilename); err != nil {
 		log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
 
 		return err
@@ -154,38 +151,33 @@ func (store *Store) encryptDB() error {
 	log.Info().Msg("database backup exported")
 
 	// Close existing un-encrypted db so that we can delete the file later
-	store.connection.Close()
-
-	// Tell the db layer to create an encrypted db when opened
-	store.connection.SetEncrypted(true)
-	store.connection.Open()
-
-	// We have to init services before import
-	err = store.initServices()
-	if err != nil {
+	if err := store.connection.Close(); err != nil {
 		return err
 	}
 
-	err = store.Import(exportFilename)
-	if err != nil {
+	if err := store.Import(exportFilename); err != nil {
+		log.Error().Err(err).Msg("failed to import database backup")
+
 		// Remove the new encrypted file that we failed to import
-		os.Remove(store.connection.GetDatabaseFilePath())
+		if err := os.Remove(store.connection.GetDatabaseFilePath()); err != nil {
+			log.Error().Msg("failed to remove the file after import failure")
+		}
 
 		log.Fatal().Err(portainerErrors.ErrDBImportFailed).Msg("")
 	}
 
-	err = os.Remove(oldFilename)
-	if err != nil {
+	if err := os.Remove(oldFilename); err != nil {
 		log.Error().Msg("failed to remove the un-encrypted db file")
 	}
 
-	err = os.Remove(exportFilename)
-	if err != nil {
+	if err := os.Remove(exportFilename); err != nil {
 		log.Error().Msg("failed to remove the json backup file")
 	}
 
 	// Close db connection
-	store.connection.Close()
+	if err := store.connection.Close(); err != nil {
+		return err
+	}
 
 	log.Info().Msg("database successfully encrypted")
 

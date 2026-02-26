@@ -150,21 +150,16 @@ func (kcl *KubeClient) CombineSecretWithApplications(secret models.K8sSecret) (m
 		return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get pods. Error: %w", err)
 	}
 
-	containsReplicaSetOwner := false
-	for _, pod := range pods.Items {
-		containsReplicaSetOwner = isReplicaSetOwner(pod)
-		break
-	}
-
-	var replicaSets *appsv1.ReplicaSetList
-	if containsReplicaSetOwner {
-		replicaSets, err = kcl.cli.AppsV1().ReplicaSets(secret.Namespace).List(context.Background(), metav1.ListOptions{})
+	replicaSetsItems := []appsv1.ReplicaSet{}
+	if containsReplicaSetOwnerReference(pods) {
+		replicaSets, err := kcl.cli.AppsV1().ReplicaSets(secret.Namespace).List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get replica sets. Error: %w", err)
 		}
+		replicaSetsItems = replicaSets.Items
 	}
 
-	applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, pods.Items, replicaSets.Items)
+	applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromSecret(secret, pods.Items, replicaSetsItems)
 	if err != nil {
 		return models.K8sSecret{}, fmt.Errorf("an error occurred during the CombineSecretWithApplications operation, unable to get applications from secret. Error: %w", err)
 	}

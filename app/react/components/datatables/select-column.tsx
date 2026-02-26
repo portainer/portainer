@@ -67,7 +67,7 @@ export function createSelectColumn<T>(dataCy: string): ColumnDef<T> {
     ),
     enableHiding: false,
     meta: {
-      width: 50,
+      width: '50px',
     },
   };
 }

@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/portainer/portainer/api/logs"
+
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +20,7 @@ func UnzipFile(src string, dest string) error {
 	if err != nil {
 		return err
 	}
-	defer r.Close()
+	defer logs.CloseAndLogErr(r)
 
 	for _, f := range r.File {
 		p := filepath.Join(dest, f.Name)
@@ -30,7 +32,9 @@ func UnzipFile(src string, dest string) error {
 
 		if f.FileInfo().IsDir() {
 			// Make Folder
-			os.MkdirAll(p, os.ModePerm)
+			if err := os.MkdirAll(p, os.ModePerm); err != nil {
+				return err
+			}
 
 			continue
 		}
@@ -53,13 +57,13 @@ func unzipFile(f *zip.File, p string) error {
 	if err != nil {
 		return errors.Wrapf(err, "unzipFile: can't create file %s", p)
 	}
-	defer outFile.Close()
+	defer logs.CloseAndLogErr(outFile)
 
 	rc, err := f.Open()
 	if err != nil {
 		return errors.Wrapf(err, "unzipFile: can't open zip file %s in the archive", f.Name)
 	}
-	defer rc.Close()
+	defer logs.CloseAndLogErr(rc)
 
 	if _, err = io.Copy(outFile, rc); err != nil {
 		return errors.Wrapf(err, "unzipFile: can't copy an archived file content")

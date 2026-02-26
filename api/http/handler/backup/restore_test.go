@@ -118,7 +118,9 @@ func backup(t *testing.T, h *Handler, password string) []byte {
 	response := w.Result()
 	archive, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
-	response.Body.Close()
+
+	err = response.Body.Close()
+	require.NoError(t, err)
 
 	return archive
 }

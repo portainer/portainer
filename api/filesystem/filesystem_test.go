@@ -15,7 +15,8 @@ func createService(t *testing.T) *Service {
 	require.NoError(t, err, "NewService should not fail")
 
 	t.Cleanup(func() {
-		os.RemoveAll(dataStorePath)
+		err := os.RemoveAll(dataStorePath)
+		require.NoError(t, err)
 	})
 
 	return service

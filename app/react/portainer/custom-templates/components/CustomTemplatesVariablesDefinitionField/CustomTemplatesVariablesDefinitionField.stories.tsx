@@ -1,4 +1,4 @@
-import { ComponentMeta } from '@storybook/react';
+import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
 import {
@@ -10,7 +10,7 @@ export default {
   title: 'Custom Templates/Variables Definition Field',
   component: CustomTemplatesVariablesDefinitionField,
   args: {},
-} as ComponentMeta<typeof CustomTemplatesVariablesDefinitionField>;
+} as Meta<typeof CustomTemplatesVariablesDefinitionField>;
 
 function Template() {
   const [value, setValue] = useState<VariableDefinition[]>([

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { InsightsBox, Props } from './InsightsBox';
 
@@ -11,7 +11,7 @@ function Template({ header, content }: Props) {
   return <InsightsBox header={header} content={content} />;
 }
 
-export const Primary: Story<Props> = Template.bind({});
+export const Primary: StoryFn<Props> = Template.bind({});
 Primary.args = {
   header: 'Insights box header',
   content: 'This is the content of the insights box',

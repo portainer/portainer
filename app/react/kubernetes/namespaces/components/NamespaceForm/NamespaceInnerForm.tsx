@@ -35,10 +35,13 @@ export function NamespaceInnerForm({
   dirty,
   setFieldValue,
   values,
-  isSubmitting,
+  isUpdating,
   initialValues,
   isEdit,
-}: FormikProps<CreateNamespaceFormValues> & { isEdit?: boolean }) {
+}: FormikProps<CreateNamespaceFormValues> & {
+  isEdit?: boolean;
+  isUpdating: boolean;
+}) {
   const { authorized: hasNamespaceWriteAuth } = useAuthorizations(
     namespaceWriteAuth,
     undefined,
@@ -145,7 +148,7 @@ export function NamespaceInnerForm({
         <FormActions
           submitLabel={isEdit ? 'Update namespace' : 'Create namespace'}
           loadingText={isEdit ? 'Updating namespace' : 'Creating namespace'}
-          isLoading={isSubmitting}
+          isLoading={isUpdating}
           isValid={isValid && dirty}
           data-cy="k8sNamespaceCreate-submitButton"
         >

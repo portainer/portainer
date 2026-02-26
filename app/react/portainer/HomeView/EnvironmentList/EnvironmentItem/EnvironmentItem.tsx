@@ -2,10 +2,8 @@ import _ from 'lodash';
 import { Tag, Activity } from 'lucide-react';
 import clsx from 'clsx';
 
-import {
-  isoDateFromTimestamp,
-  stripProtocol,
-} from '@/portainer/filters/filters';
+import { stripProtocol } from '@/react/common/string-utils';
+import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import {
   type Environment,
   PlatformType,

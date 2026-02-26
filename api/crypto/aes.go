@@ -164,7 +164,9 @@ func aesEncryptGCM(input io.Reader, output io.Writer, passphrase []byte) error {
 			return err
 		}
 
-		nonce.Increment()
+		if err := nonce.Increment(); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -235,7 +237,9 @@ func aesDecryptGCM(input io.Reader, passphrase []byte) (io.Reader, error) {
 			return nil, err
 		}
 
-		nonce.Increment()
+		if err := nonce.Increment(); err != nil {
+			return nil, err
+		}
 	}
 
 	return &buf, nil

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_enableFeaturesFromFlags(t *testing.T) {
@@ -35,9 +36,10 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		err := os.Unsetenv("PORTAINER_FEATURE_FLAGS")
+		require.NoError(t, err)
 
-		os.Unsetenv("PORTAINER_FEATURE_FLAGS")
-		os.Setenv("PORTAINER_FEATURE_FLAGS", strings.Join(test.envFeatureFlags, ","))
+		t.Setenv("PORTAINER_FEATURE_FLAGS", strings.Join(test.envFeatureFlags, ","))
 
 		t.Run("testing", func(t *testing.T) {
 			Parse(test.cliFeatureFlags, supportedFeatures)

@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/libstack"
 
@@ -180,7 +181,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer envfile.Close()
+	defer logs.CloseAndLogErr(envfile)
 
 	// Copy from default .env file
 	defaultEnvPath := path.Join(stack.ProjectPath, path.Dir(stack.EntryPoint), ".env")
@@ -205,13 +206,14 @@ func copyDefaultEnvFile(w io.Writer, defaultEnvFilePath string) error {
 		return nil
 	}
 
-	defer defaultEnvFile.Close()
+	defer logs.CloseAndLogErr(defaultEnvFile)
 
 	if _, err = io.Copy(w, defaultEnvFile); err == nil {
 		if _, err = fmt.Fprintf(w, "\n"); err != nil {
 			return fmt.Errorf("failed to copy default env file: %w", err)
 		}
 	}
+
 	return nil
 	// If couldn't copy the .env file, then ignore the error and try to continue
 }
@@ -223,6 +225,7 @@ func copyConfigEnvVars(w io.Writer, envs []portainer.Pair) error {
 			return fmt.Errorf("failed to copy config env vars: %w", err)
 		}
 	}
+
 	return nil
 }
 

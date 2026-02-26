@@ -2,20 +2,8 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
-import {
-  arrayToStr,
-  endpointTypeName,
-  getPairKey,
-  getPairValue,
-  humanize,
-  ipAddress,
-  isoDate,
-  isoDateFromTimestamp,
-  labelsToStr,
-  stripProtocol,
-  truncate,
-  truncateLeftRight,
-} from './filters';
+import { stripProtocol } from '@/react/common/string-utils';
+import { arrayToStr, endpointTypeName, getPairKey, getPairValue, humanize, ipAddress, isoDate, isoDateFromTimestamp, labelsToStr, truncate, truncateLeftRight } from './filters';
 
 angular
   .module('portainer.app')

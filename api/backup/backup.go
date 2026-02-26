@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -97,7 +98,7 @@ func encrypt(path string, passphrase string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer in.Close()
+	defer logs.CloseAndLogErr(in)
 
 	outFileName := path + ".encrypted"
 	out, err := os.Create(outFileName)
@@ -105,7 +106,5 @@ func encrypt(path string, passphrase string) (string, error) {
 		return "", err
 	}
 
-	err = crypto.AesEncrypt(in, out, []byte(passphrase))
-
-	return outFileName, err
+	return outFileName, crypto.AesEncrypt(in, out, []byte(passphrase))
 }

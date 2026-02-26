@@ -85,14 +85,13 @@ func Test_createProject_win(t *testing.T) {
 			createdFiles := tc.createFilesFn()
 
 			defer func() {
-				var errs []error
+				var errs error
 				for _, f := range createdFiles {
-					errs = append(errs, os.Remove(f))
+					errs = errors.Join(errs, os.Remove(f))
 				}
 
-				err := errors.Join(errs...)
-				if err != nil {
-					t.Fatalf("Failed to remove config files: %v", err)
+				if errs != nil {
+					t.Fatalf("Failed to remove config files: %v", errs)
 				}
 			}()
 

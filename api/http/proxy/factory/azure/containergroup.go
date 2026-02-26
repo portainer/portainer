@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/rs/zerolog/log"
 )
 
 // proxy for /subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*
@@ -115,7 +116,9 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 
 	responseObject = transport.decorateContainerGroup(responseObject, context)
 
-	utils.RewriteResponse(response, responseObject, http.StatusOK)
+	if err := utils.RewriteResponse(response, responseObject, http.StatusOK); err != nil {
+		log.Warn().Err(err).Msg("failed to rewrite response")
+	}
 
 	return response, nil
 }
@@ -140,9 +143,13 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 		return nil, err
 	}
 
-	transport.removeResourceControl(responseObject, context)
+	if err := transport.removeResourceControl(responseObject, context); err != nil {
+		log.Warn().Err(err).Msg("failed to remove resource control")
+	}
 
-	utils.RewriteResponse(response, responseObject, http.StatusOK)
+	if err := utils.RewriteResponse(response, responseObject, http.StatusOK); err != nil {
+		log.Warn().Err(err).Msg("failed to rewrite response")
+	}
 
 	return response, nil
 }

@@ -30,7 +30,6 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
 
   if (registry.Type === RegistryTypes.ECR) {
     this.Region = registry.Ecr.Region;
-    this.TLSSkipVerify = true;
   }
 
   if (registry.Type === RegistryTypes.QUAY || registry.Type === RegistryTypes.ECR) {

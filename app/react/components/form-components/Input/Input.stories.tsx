@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import { Input } from './Input';
@@ -27,7 +27,7 @@ export function TextField({ disabled }: Args) {
   );
 }
 
-export const DisabledTextField: Story<Args> = TextField.bind({});
+export const DisabledTextField: StoryFn<Args> = TextField.bind({});
 DisabledTextField.args = {
   disabled: true,
 };

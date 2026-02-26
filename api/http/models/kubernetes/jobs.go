@@ -13,7 +13,7 @@ type K8sJob struct {
 	Namespace    string           `json:"Namespace"`
 	Name         string           `json:"Name"`
 	PodName      string           `json:"PodName"`
-	Container    corev1.Container `json:"Container,omitempty"`
+	Container    corev1.Container `json:"Container,omitzero"`
 	Command      string           `json:"Command,omitempty"`
 	BackoffLimit int32            `json:"BackoffLimit,omitempty"`
 	Completions  int32            `json:"Completions,omitempty"`

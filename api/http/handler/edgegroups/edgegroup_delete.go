@@ -3,9 +3,11 @@ package edgegroups
 import (
 	"errors"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -37,9 +39,9 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 }
 
 func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) error {
-	_, err := tx.EdgeGroup().Read(ID)
-	if tx.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
+	ok, err := tx.EdgeGroup().Exists(ID)
+	if !ok {
+		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", dserrors.ErrObjectNotFound)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
 	}
@@ -50,10 +52,8 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 	}
 
 	for _, edgeStack := range edgeStacks {
-		for _, groupID := range edgeStack.EdgeGroups {
-			if groupID == ID {
-				return httperror.Conflict("Edge group is used by an Edge stack", errors.New("edge group is used by an Edge stack"))
-			}
+		if slices.Contains(edgeStack.EdgeGroups, ID) {
+			return httperror.Conflict("Edge group is used by an Edge stack", errors.New("edge group is used by an Edge stack"))
 		}
 	}
 
@@ -63,10 +63,8 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 	}
 
 	for _, edgeJob := range edgeJobs {
-		for _, groupID := range edgeJob.EdgeGroups {
-			if groupID == ID {
-				return httperror.Conflict("Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
-			}
+		if slices.Contains(edgeJob.EdgeGroups, ID) {
+			return httperror.Conflict("Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
 		}
 	}
 

@@ -16,6 +16,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+
+	"github.com/rs/zerolog/log"
 )
 
 var filesToRestore = append(filesToBackup, "portainer.db")
@@ -31,17 +33,20 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 	}
 
 	restorePath := filepath.Join(filestorePath, "restore", time.Now().Format("20060102150405"))
-	defer os.RemoveAll(filepath.Dir(restorePath))
+	defer func() {
+		if err := os.RemoveAll(filepath.Dir(restorePath)); err != nil {
+			log.Warn().Err(err).Msg("failed to clean up restore files")
+		}
+	}()
 
-	err = extractArchive(archive, restorePath)
-	if err != nil {
+	if err := extractArchive(archive, restorePath); err != nil {
 		return errors.Wrap(err, "cannot extract files from the archive. Please ensure the password is correct and try again")
 	}
 
 	unlock := gate.Lock()
 	defer unlock()
 
-	if err = datastore.Close(); err != nil {
+	if err := datastore.Close(); err != nil {
 		return errors.Wrap(err, "Failed to stop db")
 	}
 
@@ -51,7 +56,7 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 		return errors.Wrap(err, "failed to restore from backup. Portainer database missing from backup file")
 	}
 
-	if err = restoreFiles(restorePath, filestorePath); err != nil {
+	if err := restoreFiles(restorePath, filestorePath); err != nil {
 		return errors.Wrap(err, "failed to restore the system state")
 	}
 
@@ -89,8 +94,7 @@ func getRestoreSourcePath(dir string) (string, error) {
 
 func restoreFiles(srcDir string, destinationDir string) error {
 	for _, filename := range filesToRestore {
-		err := filesystem.CopyPath(filepath.Join(srcDir, filename), destinationDir)
-		if err != nil {
+		if err := filesystem.CopyPath(filepath.Join(srcDir, filename), destinationDir); err != nil {
 			return err
 		}
 	}
@@ -98,14 +102,18 @@ func restoreFiles(srcDir string, destinationDir string) error {
 	// TODO:  This is very boltdb module specific once again due to the filename.  Move to bolt module? Refactor for another day
 
 	// Prevent the possibility of having both databases.  Remove any default new instance
-	os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName))
-	os.Remove(filepath.Join(destinationDir, boltdb.EncryptedDatabaseFileName))
+	if err := os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName)); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	if err := os.Remove(filepath.Join(destinationDir, boltdb.EncryptedDatabaseFileName)); err != nil && !os.IsNotExist(err) {
+		return err
+	}
 
 	// Now copy the database.  It'll be either portainer.db or portainer.edb
 
 	// Note: CopyPath does not return an error if the source file doesn't exist
-	err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir)
-	if err != nil {
+	if err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir); err != nil {
 		return err
 	}
 

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useEffect, useState } from 'react';
 
 import { Slider, Props } from './Slider';
@@ -41,7 +41,7 @@ function Template({
   );
 }
 
-export const Primary: Story<Props> = Template.bind({});
+export const Primary: StoryFn<Props> = Template.bind({});
 Primary.args = {
   min: 0,
   max: 100,

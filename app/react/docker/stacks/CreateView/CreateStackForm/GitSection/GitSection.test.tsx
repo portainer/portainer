@@ -42,7 +42,7 @@ describe('GitSection', () => {
 
   it('should render with auto update enabled', () => {
     renderComponent({
-      baseWebhookUrl: 'https://example.com',
+      webhookId: 'webhookId',
       initialValues: {
         AutoUpdate: {
           RepositoryAutomaticUpdates: true,
@@ -65,11 +65,11 @@ describe('GitSection', () => {
 });
 
 function renderComponent({
-  baseWebhookUrl,
+  webhookId = 'webhook',
   initialValues,
   isDockerStandalone,
 }: {
-  baseWebhookUrl?: string;
+  webhookId?: string;
   isDockerStandalone?: boolean;
   initialValues?: Partial<GitFormValues>;
 } = {}) {
@@ -100,7 +100,7 @@ function renderComponent({
       withTestQueryProvider(() => (
         <Formik initialValues={values} onSubmit={() => {}} validateOnMount>
           <GitSection
-            baseWebhookUrl={baseWebhookUrl}
+            webhookId={webhookId}
             isDockerStandalone={isDockerStandalone}
           />
         </Formik>

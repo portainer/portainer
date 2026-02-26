@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { DetailsTable } from './DetailsTable';
 import { DetailsRow } from './DetailsRow';
@@ -24,7 +24,7 @@ function Template({ key1, val1, key2, val2 }: Args) {
   );
 }
 
-export const Default: Story<Args> = Template.bind({});
+export const Default: StoryFn<Args> = Template.bind({});
 Default.args = {
   key1: 'Name',
   val1: 'My Cool App',

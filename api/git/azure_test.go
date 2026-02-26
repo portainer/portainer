@@ -333,13 +333,12 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 		  ]
 		}`
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(response))
+
+		_, _ = w.Write([]byte(response))
 	}))
 	defer server.Close()
 
-	a := &azureClient{
-		baseUrl: server.URL,
-	}
+	a := &azureClient{baseUrl: server.URL}
 
 	tests := []struct {
 		name    string
@@ -421,7 +420,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 			git := &testRepoManager{}
 
 			s := &Service{azure: azure, git: git}
-			s.cloneRepository("", cloneOption{
+			err := s.cloneRepository("", cloneOption{
 				fetchOption: fetchOption{
 					baseOption: baseOption{
 
@@ -430,6 +429,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 				},
 				depth: 1,
 			})
+			require.NoError(t, err)
 
 			// if azure API is called, git isn't and vice versa
 			assert.Equal(t, tt.called, azure.called)

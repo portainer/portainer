@@ -174,10 +174,6 @@ const tests: {
     },
     expected: [
       {
-        Id: 2,
-        Namespaces: ['newns'],
-      },
-      {
         Id: 1,
         Namespaces: ['newns'],
       },
@@ -354,10 +350,6 @@ const tests: {
       {
         Id: 1,
         Namespaces: [],
-      },
-      {
-        Id: 2,
-        Namespaces: ['newns'],
       },
     ],
   },

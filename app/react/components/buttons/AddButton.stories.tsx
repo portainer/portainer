@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { AddButton } from './AddButton';
 
@@ -15,7 +15,7 @@ function Template({ label }: Args) {
   return <AddButton data-cy="add-">{label}</AddButton>;
 }
 
-export const Primary: Story<Args> = Template.bind({});
+export const Primary: StoryFn<Args> = Template.bind({});
 Primary.args = {
   label: 'Create new container',
 };

@@ -2,11 +2,11 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/errorlist"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -92,7 +92,7 @@ func (kcl *KubeClient) isSystemServiceAccount(namespace string) bool {
 // DeleteServices processes a K8sServiceDeleteRequest by deleting each service
 // in its given namespace.
 func (kcl *KubeClient) DeleteServiceAccounts(reqs models.K8sServiceAccountDeleteRequests) error {
-	var errors []error
+	var errs error
 	for namespace := range reqs {
 		for _, serviceName := range reqs[namespace] {
 			client := kcl.cli.CoreV1().ServiceAccounts(namespace)
@@ -111,12 +111,12 @@ func (kcl *KubeClient) DeleteServiceAccounts(reqs models.K8sServiceAccountDelete
 			}
 
 			if err := client.Delete(context.Background(), serviceName, metav1.DeleteOptions{}); err != nil {
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 		}
 	}
 
-	return errorlist.Combine(errors)
+	return errs
 }
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.

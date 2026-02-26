@@ -496,7 +496,7 @@ func (service *Service) RemoveTeamAccessPolicies(tx dataservices.DataStoreTx, te
 		}
 	}
 
-	return service.UpdateUsersAuthorizationsTx(tx)
+	return nil
 }
 
 // RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
@@ -569,196 +569,12 @@ func (service *Service) RemoveUserAccessPolicies(tx dataservices.DataStoreTx, us
 	return nil
 }
 
-// UpdateUserAuthorizations will update the authorizations for the provided userid
-func (service *Service) UpdateUserAuthorizations(tx dataservices.DataStoreTx, userID portainer.UserID) error {
-	err := service.updateUserAuthorizations(tx, userID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
+// UpdateUsersAuthorizations is a no-op kept for backward compatibility with database migrations.
+//
+// Deprecated: This function previously populated the User.EndpointAuthorizations field which is
+// no longer used. Authorization is now computed dynamically via ResolveUserEndpointAccess.
 func (service *Service) UpdateUsersAuthorizations() error {
-	return service.UpdateUsersAuthorizationsTx(service.dataStore)
-}
-
-func (service *Service) UpdateUsersAuthorizationsTx(tx dataservices.DataStoreTx) error {
-	users, err := tx.User().ReadAll()
-	if err != nil {
-		return err
-	}
-
-	for _, user := range users {
-		err := service.updateUserAuthorizations(tx, user.ID)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
-}
-
-func (service *Service) updateUserAuthorizations(tx dataservices.DataStoreTx, userID portainer.UserID) error {
-	user, err := tx.User().Read(userID)
-	if err != nil {
-		return err
-	}
-
-	endpointAuthorizations, err := service.getAuthorizations(tx, user)
-	if err != nil {
-		return err
-	}
-
-	user.EndpointAuthorizations = endpointAuthorizations
-
-	return tx.User().Update(userID, user)
-}
-
-func (service *Service) getAuthorizations(tx dataservices.DataStoreTx, user *portainer.User) (portainer.EndpointAuthorizations, error) {
-	endpointAuthorizations := portainer.EndpointAuthorizations{}
-	if user.Role == portainer.AdministratorRole {
-		return endpointAuthorizations, nil
-	}
-
-	userMemberships, err := tx.TeamMembership().TeamMembershipsByUserID(user.ID)
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpoints, err := tx.Endpoint().Endpoints()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpointGroups, err := tx.EndpointGroup().ReadAll()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	roles, err := tx.Role().ReadAll()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpointAuthorizations = getUserEndpointAuthorizations(user, endpoints, endpointGroups, roles, userMemberships)
-
-	return endpointAuthorizations, nil
-}
-
-func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, roles []portainer.Role, userMemberships []portainer.TeamMembership) portainer.EndpointAuthorizations {
-	endpointAuthorizations := make(portainer.EndpointAuthorizations)
-
-	groupUserAccessPolicies := map[portainer.EndpointGroupID]portainer.UserAccessPolicies{}
-	groupTeamAccessPolicies := map[portainer.EndpointGroupID]portainer.TeamAccessPolicies{}
-	for _, endpointGroup := range endpointGroups {
-		groupUserAccessPolicies[endpointGroup.ID] = endpointGroup.UserAccessPolicies
-		groupTeamAccessPolicies[endpointGroup.ID] = endpointGroup.TeamAccessPolicies
-	}
-
-	for _, endpoint := range endpoints {
-		authorizations := getAuthorizationsFromUserEndpointPolicy(user, &endpoint, roles)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-
-			continue
-		}
-
-		authorizations = getAuthorizationsFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-
-			continue
-		}
-
-		authorizations = getAuthorizationsFromTeamEndpointPolicies(userMemberships, &endpoint, roles)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-
-			continue
-		}
-
-		authorizations = getAuthorizationsFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-		}
-	}
-
-	return endpointAuthorizations
-}
-
-func getAuthorizationsFromUserEndpointPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
-
-	policy, ok := endpoint.UserAccessPolicies[user.ID]
-	if ok {
-		policyRoles = append(policyRoles, policy.RoleID)
-	}
-
-	return getAuthorizationsFromRoles(policyRoles, roles)
-}
-
-func getAuthorizationsFromUserEndpointGroupPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.UserAccessPolicies) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
-
-	policy, ok := groupAccessPolicies[endpoint.GroupID][user.ID]
-	if ok {
-		policyRoles = append(policyRoles, policy.RoleID)
-	}
-
-	return getAuthorizationsFromRoles(policyRoles, roles)
-}
-
-func getAuthorizationsFromTeamEndpointPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
-
-	for _, membership := range memberships {
-		policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
-		if ok {
-			policyRoles = append(policyRoles, policy.RoleID)
-		}
-	}
-
-	return getAuthorizationsFromRoles(policyRoles, roles)
-}
-
-func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.TeamAccessPolicies) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
-
-	for _, membership := range memberships {
-		policy, ok := groupAccessPolicies[endpoint.GroupID][membership.TeamID]
-		if ok {
-			policyRoles = append(policyRoles, policy.RoleID)
-		}
-	}
-
-	return getAuthorizationsFromRoles(policyRoles, roles)
-}
-
-func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []portainer.Role) portainer.Authorizations {
-	var associatedRoles []portainer.Role
-
-	for _, id := range roleIdentifiers {
-		for _, role := range roles {
-			if role.ID == id {
-				associatedRoles = append(associatedRoles, role)
-
-				break
-			}
-		}
-	}
-
-	var authorizations portainer.Authorizations
-	highestPriority := 0
-	for _, role := range associatedRoles {
-		if role.Priority > highestPriority {
-			highestPriority = role.Priority
-			authorizations = role.Authorizations
-		}
-	}
-
-	return authorizations
 }
 
 func (service *Service) UserIsAdminOrAuthorized(tx dataservices.DataStoreTx, userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {

@@ -2,6 +2,7 @@ package logs
 
 import (
 	"fmt"
+	"io"
 	stdlog "log"
 	"os"
 
@@ -60,4 +61,10 @@ func formatMessage(i any) string {
 	}
 
 	return fmt.Sprintf("%s |", i)
+}
+
+func CloseAndLogErr(c io.Closer) {
+	if err := c.Close(); err != nil {
+		log.Error().Err(err).Msg("failure to close resource")
+	}
 }

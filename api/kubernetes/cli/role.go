@@ -2,10 +2,10 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/errorlist"
 	"github.com/rs/zerolog/log"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -131,7 +131,7 @@ func (kcl *KubeClient) isSystemRole(role *rbacv1.Role) bool {
 // DeleteRoles processes a K8sServiceDeleteRequest by deleting each role
 // in its given namespace.
 func (kcl *KubeClient) DeleteRoles(reqs models.K8sRoleDeleteRequests) error {
-	var errors []error
+	var errs error
 	for namespace := range reqs {
 		for _, name := range reqs[namespace] {
 			client := kcl.cli.RbacV1().Roles(namespace)
@@ -151,10 +151,10 @@ func (kcl *KubeClient) DeleteRoles(reqs models.K8sRoleDeleteRequests) error {
 			}
 
 			if err := client.Delete(context.TODO(), name, metav1.DeleteOptions{}); err != nil {
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 		}
 	}
 
-	return errorlist.Combine(errors)
+	return errs
 }

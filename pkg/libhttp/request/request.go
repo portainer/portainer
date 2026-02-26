@@ -11,6 +11,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/segmentio/encoding/json"
 )
 
@@ -32,7 +33,7 @@ func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) (
 	if err != nil {
 		return nil, "", err
 	}
-	defer file.Close()
+	defer logs.CloseAndLogErr(file)
 
 	fileContent, err := io.ReadAll(file)
 	if err != nil {

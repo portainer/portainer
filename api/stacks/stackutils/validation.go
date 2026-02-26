@@ -1,10 +1,11 @@
 package stackutils
 
 import (
+	portainer "github.com/portainer/portainer/api"
+
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 )
 
 func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {
@@ -24,7 +25,6 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 
 	composeConfig, err := loader.Load(composeConfigDetails, func(options *loader.Options) {
 		options.SkipValidation = true
-		options.SkipInterpolation = true
 	})
 	if err != nil {
 		return err
@@ -71,10 +71,10 @@ func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.Endp
 			return errors.Wrap(err, "failed to get stack file content")
 		}
 
-		err = IsValidStackFile(stackContent, securitySettings)
-		if err != nil {
+		if err := IsValidStackFile(stackContent, securitySettings); err != nil {
 			return errors.Wrap(err, "stack config file is invalid")
 		}
 	}
+
 	return nil
 }

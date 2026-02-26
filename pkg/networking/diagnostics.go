@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/logs"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 )
@@ -17,7 +19,7 @@ import (
 // ignores errors for the dns lookup since we want to know if the host is reachable
 func ProbeDNSConnection(url string) string {
 	_, host, _ := parseURL(url)
-	result := map[string]interface{}{
+	result := map[string]any{
 		"operation":      "dns lookup",
 		"remote_address": host,
 		"connected_at":   time.Now().Format(time.RFC3339),
@@ -44,7 +46,7 @@ func ProbeTelnetConnection(url string) string {
 		network = "tcp"
 	}
 
-	address := fmt.Sprintf("%s:%s", host, port)
+	address := net.JoinHostPort(host, port)
 	result := map[string]string{
 		"operation":      "telnet connection",
 		"local_address":  "unknown",
@@ -58,7 +60,7 @@ func ProbeTelnetConnection(url string) string {
 	if err != nil {
 		result["status"] = fmt.Sprintf("failed to connect to %s: %s", address, err)
 	} else {
-		defer connection.Close()
+		defer logs.CloseAndLogErr(connection)
 		result["local_address"] = connection.LocalAddr().String()
 		result["remote_address"] = connection.RemoteAddr().String()
 	}
@@ -90,7 +92,11 @@ func DetectProxy(url string) string {
 	if err != nil {
 		result["status"] = fmt.Sprintf("failed to make request: %s", err)
 	} else {
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				log.Warn().Err(err).Msg("failed to close response body")
+			}
+		}()
 
 		if resp.Request != nil {
 			result["local_address"] = resp.Request.Host

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -42,7 +43,7 @@ func (puller *Puller) Pull(ctx context.Context, img Image) error {
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer logs.CloseAndLogErr(out)
 
 	_, err = io.ReadAll(out)
 

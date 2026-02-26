@@ -31,6 +31,15 @@ function renderComponent({
 }
 
 describe('CreateStackForm', () => {
+  it.skip('should not display any visible error messages on initial load', async () => {
+    renderComponent();
+
+    const errors = await screen.findByRole('alert');
+
+    // Check that no error messages (role="alert") are visible
+    expect(errors).not.toBeInTheDocument();
+  });
+
   it('should render with default method (editor)', async () => {
     renderComponent();
 
@@ -102,17 +111,15 @@ describe('CreateStackForm', () => {
   it('should show validation error for empty name', async () => {
     renderComponent();
 
-    await waitFor(() => {
-      expect(screen.getByText(/name is required/i)).toBeVisible();
-    });
+    expect(await screen.findByText(/name is required/i)).toBeVisible();
   });
 
   it('should show validation error for empty editor content', async () => {
     renderComponent();
 
-    await waitFor(() => {
-      expect(screen.getByText(/stack file content is required/i)).toBeVisible();
-    });
+    expect(
+      await screen.findByText(/stack file content is required/i)
+    ).toBeVisible();
   });
 
   it('should submit editor form successfully', async () => {

@@ -61,11 +61,8 @@ angular
   .config(configApp);
 
 if (require) {
-  const req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
-  req
-    .keys()
-    .filter((path) => !path.includes('.test'))
-    .forEach(function (key) {
-      req(key);
-    });
+  const req = require.context('./', true, /^(?!.*\.test\.js$).*\.js$/im);
+  req.keys().forEach(function (key) {
+    req(key);
+  });
 }

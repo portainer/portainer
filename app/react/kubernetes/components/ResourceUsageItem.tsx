@@ -30,6 +30,7 @@ export function ResourceUsageItem({
           steps={[
             {
               value,
+              className: 'progress-bar',
             },
           ]}
           total={total}

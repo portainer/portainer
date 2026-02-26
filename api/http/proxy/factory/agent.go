@@ -96,6 +96,8 @@ func (proxy *ProxyServer) start() error {
 // Close shuts down the server
 func (proxy *ProxyServer) Close() {
 	if proxy.server != nil {
-		proxy.server.Close()
+		if err := proxy.server.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close proxy server")
+		}
 	}
 }

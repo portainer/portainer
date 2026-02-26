@@ -1,6 +1,6 @@
 import { Gauge } from 'lucide-react';
 
-import { stripProtocol } from '@/portainer/filters/filters';
+import { stripProtocol } from '@/react/common/string-utils';
 import { useTagsForEnvironment } from '@/portainer/tags/queries';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useEnvironment } from '@/react/portainer/environments/queries';

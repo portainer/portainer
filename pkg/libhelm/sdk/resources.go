@@ -244,7 +244,9 @@ func applyStatusToResource(res *unstructured.Unstructured, status *ResourceStatu
 		}
 	}
 
-	unstructured.SetNestedMap(res.Object, statusMap, "status")
+	if err := unstructured.SetNestedMap(res.Object, statusMap, "status"); err != nil {
+		log.Warn().Err(err).Msg("failed to set status on resource")
+	}
 }
 
 // flattenResources extracts items from a list resource and convert them to runtime.Objects

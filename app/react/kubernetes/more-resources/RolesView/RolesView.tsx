@@ -1,10 +1,9 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
 import { UserCheck, Link } from 'lucide-react';
 
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
 import { PageHeader } from '@@/PageHeader';
-import { WidgetTabs, Tab, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { WidgetTabs, Tab, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { RolesDatatable } from './RolesDatatable';
 import { RoleBindingsDatatable } from './RoleBindingsDatatable';
@@ -30,10 +29,7 @@ export function RolesView() {
     },
   ];
 
-  const currentTabIndex = findSelectedTabIndex(
-    useCurrentStateAndParams(),
-    tabs
-  );
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

@@ -94,10 +94,14 @@ body:
       description: We only provide support for current versions of Portainer as per the lifecycle policy linked above. If you are on an older version of Portainer we recommend [updating first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
       multiple: false
       options:
+        - '2.39.0'
+        - '2.38.1'
+        - '2.38.0'
         - '2.37.0'
         - '2.36.0'
         - '2.35.0'
         - '2.34.0'
+        - '2.33.7'
         - '2.33.6'
         - '2.33.5'
         - '2.33.4'
@@ -139,8 +143,6 @@ body:
         - '2.21.4'
         - '2.21.3'
         - '2.21.2'
-        - '2.21.1'
-        - '2.21.0'
     validations:
       required: true
 

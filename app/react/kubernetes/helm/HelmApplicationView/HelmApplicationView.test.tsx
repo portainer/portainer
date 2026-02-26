@@ -201,110 +201,104 @@ function renderComponent() {
   return render(<Wrapped />);
 }
 
-describe(
-  'HelmApplicationView',
-  () => {
-    beforeEach(() => {
-      // Set up default mock values
-      mockUseEnvironmentId.mockReturnValue(3);
-      mockUseCurrentStateAndParams.mockReturnValue({
-        params: {
-          name: 'test-release',
-          namespace: 'default',
-        },
-      });
+describe('HelmApplicationView', () => {
+  beforeEach(() => {
+    // Set up default mock values
+    mockUseEnvironmentId.mockReturnValue(3);
+    mockUseCurrentStateAndParams.mockReturnValue({
+      params: {
+        name: 'test-release',
+        namespace: 'default',
+      },
+    });
+  });
+
+  it('should display helm release details for minimal release when data is loaded', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    setupMockHandlers(
+      http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
+        HttpResponse.json(minimalHelmRelease)
+      )
+    );
+
+    const { findByText, findAllByText } = renderComponent();
+
+    // Check for the page header
+    expect(await findByText('Helm details')).toBeInTheDocument();
+
+    // Check for the details content - these values should appear somewhere in the card
+    expect(await findByText('default')).toBeInTheDocument(); // namespace
+    expect(await findByText('test-chart-2.2.2')).toBeInTheDocument(); // chart version
+    expect(await findByText('test-chart')).toBeInTheDocument(); // chart name
+    expect(await findByText('#1')).toBeInTheDocument(); // revision
+    expect(await findByText('Jan 1, 2021, 12:00 AM')).toBeInTheDocument(); // last deployed
+
+    // Check for the actual values
+    expect(await findAllByText(/test-release/)).toHaveLength(2); // title and breadcrumb
+    expect(await findAllByText(/test-chart/)).toHaveLength(2); // chart name appears twice
+
+    // There shouldn't be a notes tab when there are no notes
+    expect(screen.queryByText(/Notes/)).not.toBeInTheDocument();
+
+    // There shouldn't be an app version badge when it's missing
+    expect(screen.queryByText(/App version/)).not.toBeInTheDocument();
+
+    // Ensure there are no console errors
+    // eslint-disable-next-line no-console
+    expect(console.error).not.toHaveBeenCalled();
+
+    // Restore console.error
+    vi.spyOn(console, 'error').mockRestore();
+  });
+
+  it('should display error message when API request fails', async () => {
+    // Mock API failure
+    setupMockHandlers(
+      http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
+        HttpResponse.error()
+      )
+    );
+
+    // Mock console.error to prevent test output pollution
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    renderComponent();
+
+    // Wait for the error message to appear
+    expect(
+      await screen.findByText(
+        'Failed to load Helm application details',
+        {},
+        { timeout: 6500 }
+      )
+    ).toBeInTheDocument();
+
+    // Restore console.error
+    vi.spyOn(console, 'error').mockRestore();
+  });
+
+  it('should display additional details when available in helm release', async () => {
+    setupMockHandlers(
+      http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
+        HttpResponse.json(completeHelmRelease)
+      )
+    );
+
+    const { findByText } = renderComponent();
+
+    expect(await findByText('Helm details')).toBeInTheDocument();
+
+    await waitFor(() => {
+      // Look for specific tab text
+      expect(screen.getByText('Resources')).toBeInTheDocument();
+      expect(screen.getByText('Values')).toBeInTheDocument();
+      expect(screen.getByText('Manifest')).toBeInTheDocument();
+      expect(screen.getByText('Notes')).toBeInTheDocument();
+      expect(screen.getByText('Events')).toBeInTheDocument();
     });
 
-    it('should display helm release details for minimal release when data is loaded', async () => {
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      setupMockHandlers(
-        http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
-          HttpResponse.json(minimalHelmRelease)
-        )
-      );
-
-      const { findByText, findAllByText } = renderComponent();
-
-      // Check for the page header
-      expect(await findByText('Helm details')).toBeInTheDocument();
-
-      // Check for the details content - these values should appear somewhere in the card
-      expect(await findByText('default')).toBeInTheDocument(); // namespace
-      expect(await findByText('test-chart-2.2.2')).toBeInTheDocument(); // chart version
-      expect(await findByText('test-chart')).toBeInTheDocument(); // chart name
-      expect(await findByText('#1')).toBeInTheDocument(); // revision
-      expect(await findByText('Jan 1, 2021, 12:00 AM')).toBeInTheDocument(); // last deployed
-
-      // Check for the actual values
-      expect(await findAllByText(/test-release/)).toHaveLength(2); // title and breadcrumb
-      expect(await findAllByText(/test-chart/)).toHaveLength(2); // chart name appears twice
-
-      // There shouldn't be a notes tab when there are no notes
-      expect(screen.queryByText(/Notes/)).not.toBeInTheDocument();
-
-      // There shouldn't be an app version badge when it's missing
-      expect(screen.queryByText(/App version/)).not.toBeInTheDocument();
-
-      // Ensure there are no console errors
-      // eslint-disable-next-line no-console
-      expect(console.error).not.toHaveBeenCalled();
-
-      // Restore console.error
-      vi.spyOn(console, 'error').mockRestore();
-    });
-
-    it('should display error message when API request fails', async () => {
-      // Mock API failure
-      setupMockHandlers(
-        http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
-          HttpResponse.error()
-        )
-      );
-
-      // Mock console.error to prevent test output pollution
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      renderComponent();
-
-      // Wait for the error message to appear
-      expect(
-        await screen.findByText(
-          'Failed to load Helm application details',
-          {},
-          { timeout: 6500 }
-        )
-      ).toBeInTheDocument();
-
-      // Restore console.error
-      vi.spyOn(console, 'error').mockRestore();
-    });
-
-    it('should display additional details when available in helm release', async () => {
-      setupMockHandlers(
-        http.get('/api/endpoints/3/kubernetes/helm/test-release', () =>
-          HttpResponse.json(completeHelmRelease)
-        )
-      );
-
-      const { findByText } = renderComponent();
-
-      expect(await findByText('Helm details')).toBeInTheDocument();
-
-      await waitFor(() => {
-        // Look for specific tab text
-        expect(screen.getByText('Resources')).toBeInTheDocument();
-        expect(screen.getByText('Values')).toBeInTheDocument();
-        expect(screen.getByText('Manifest')).toBeInTheDocument();
-        expect(screen.getByText('Notes')).toBeInTheDocument();
-        expect(screen.getByText('Events')).toBeInTheDocument();
-      });
-
-      // Check for the app version in the summary section
-      expect(await screen.findByText('1.0.0')).toBeInTheDocument();
-    });
-  },
-  {
-    timeout: 7000,
-  }
-);
+    // Check for the app version in the summary section
+    expect(await screen.findByText('1.0.0')).toBeInTheDocument();
+  });
+}, 7000);

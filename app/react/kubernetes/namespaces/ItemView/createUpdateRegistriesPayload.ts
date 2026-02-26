@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash';
+import { difference, uniqBy } from 'lodash';
 
 import { Registry } from '@/react/portainer/registries/types/registry';
 
@@ -27,24 +27,32 @@ export function createUpdateRegistriesPayload({
     'Id'
   );
 
-  const payload = uniqueRegistries.map((registry) => {
-    const currentNamespaces =
-      registry.RegistryAccesses?.[`${environmentId}`]?.Namespaces || [];
+  const payload = uniqueRegistries
+    .map((registry) => {
+      const currentNamespaces =
+        registry.RegistryAccesses?.[`${environmentId}`]?.Namespaces || [];
 
-    const existsInNewValues = newRegistriesValues.some(
-      (r) => r.Id === registry.Id
-    );
+      const existsInNewValues = newRegistriesValues.some(
+        (r) => r.Id === registry.Id
+      );
 
-    // If registry is in new values, add namespace; if not, remove it
-    const updatedNamespaces = existsInNewValues
-      ? [...new Set([...currentNamespaces, namespaceName])]
-      : currentNamespaces.filter((ns) => ns !== namespaceName);
+      // If registry is in new values, add namespace; if not, remove it
+      const updatedNamespaces = existsInNewValues
+        ? [...new Set([...currentNamespaces, namespaceName])]
+        : currentNamespaces.filter((ns) => ns !== namespaceName);
 
-    return {
-      Id: registry.Id,
-      Namespaces: updatedNamespaces,
-    };
-  });
+      return {
+        Id: registry.Id,
+        Namespaces: updatedNamespaces,
+        // Track if the namespace list has actually changed (difference returns empty only if arrays have same elements)
+        hasChanged:
+          difference(currentNamespaces, updatedNamespaces).length > 0 ||
+          difference(updatedNamespaces, currentNamespaces).length > 0,
+      };
+    })
+    // Only include registries where the namespace access has changed
+    .filter((item) => item.hasChanged)
+    .map(({ Id, Namespaces }) => ({ Id, Namespaces }));
 
   return payload;
 }

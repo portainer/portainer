@@ -25,3 +25,10 @@ export function grammaticallyJoin(
   const last = values[values.length - 1];
   return `${allButLast.join(separator)}${lastSeparator}${last}`;
 }
+
+/**
+ * Strips the protocol from a URL. If the URL is not provided, returns an empty string.
+ */
+export function stripProtocol(url?: string) {
+  return url?.replace(/^.*?:\/\//, '') ?? '';
+}

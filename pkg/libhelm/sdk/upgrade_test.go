@@ -26,25 +26,26 @@ func TestUpgrade(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: upgradeOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: upgradeOpts.Name})
+		require.NoError(t, err)
 
 		release, err := hspm.Upgrade(upgradeOpts)
 		require.NoError(t, err, "should successfully install release via upgrade")
 		is.NotNil(release, "should return non-nil release")
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: upgradeOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: upgradeOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		is.Equal(upgradeOpts.Name, release.Name, "release name should match")
 		is.Equal(1, release.Version, "release version should be 1 for new install")
 		is.NotEmpty(release.Manifest, "release manifest should not be empty")
 
 		// Cleanup
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: upgradeOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: upgradeOpts.Name})
+			require.NoError(t, err)
+		}()
 	})
 
 	t.Run("when release exists, the chart should be upgraded", func(t *testing.T) {
@@ -57,16 +58,16 @@ func TestUpgrade(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+		require.NoError(t, err)
 
 		release, err := hspm.Upgrade(installOpts)
 		require.NoError(t, err, "should successfully install release")
 		is.NotNil(release, "should return non-nil release")
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		// Upgrade the release with the same options
 		upgradedRelease, err := hspm.Upgrade(installOpts)
@@ -88,21 +89,24 @@ func TestUpgrade(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+		require.NoError(t, err)
 
 		release, err := hspm.Upgrade(installOpts) // Cleanup
 		require.NoError(t, err, "should successfully install release")
 		is.NotNil(release, "should return non-nil release")
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		// Create values file
 		values, err := test.CreateValuesFile("service:\n  port:  8083")
 		require.NoError(t, err, "should create a values file")
-		defer os.Remove(values)
+		defer func() {
+			err := os.Remove(values)
+			require.NoError(t, err)
+		}()
 
 		// Now upgrade with values
 		upgradeOpts := options.InstallOptions{
@@ -132,21 +136,24 @@ func TestUpgrade(t *testing.T) {
 		}
 
 		// Ensure the release doesn't exist before test
-		hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+		require.NoError(t, err)
 
 		release, err := hspm.Upgrade(installOpts)
 		require.NoError(t, err, "should successfully install release")
 		is.NotNil(release, "should return non-nil release")
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: installOpts.Name,
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: installOpts.Name})
+			require.NoError(t, err)
+		}()
 
 		// Create invalid values file
 		values, err := test.CreateValuesFile("this is not valid yaml")
 		require.NoError(t, err, "should create a values file")
-		defer os.Remove(values)
+		defer func() {
+			err := os.Remove(values)
+			require.NoError(t, err)
+		}()
 
 		// Now upgrade with invalid values
 		upgradeOpts := options.InstallOptions{

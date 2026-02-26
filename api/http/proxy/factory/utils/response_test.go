@@ -10,7 +10,10 @@ import (
 func TestWriteAccessDeniedResponse(t *testing.T) {
 	r, err := WriteAccessDeniedResponse()
 	require.NoError(t, err)
-	defer r.Body.Close()
+	defer func() {
+		err = r.Body.Close()
+		require.NoError(t, err)
+	}()
 
 	require.NotNil(t, r)
 	require.Equal(t, "application/json", r.Header.Get("content-type"))

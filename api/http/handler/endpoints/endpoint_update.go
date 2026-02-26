@@ -210,7 +210,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 					endpoint.TLSConfig.TLSCACertPath = caCertPath
 				} else {
 					endpoint.TLSConfig.TLSCACertPath = ""
-					handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCA)
+
+					if err := handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCA); err != nil {
+						log.Warn().Err(err).Msg("Unable to remove CA cert from disk")
+					}
 				}
 			}
 
@@ -222,9 +225,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 					endpoint.TLSConfig.TLSKeyPath = keyPath
 				} else {
 					endpoint.TLSConfig.TLSCertPath = ""
-					handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCert)
+					if err := handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCert); err != nil {
+						log.Warn().Err(err).Msg("Unable to remove TLS cert from disk")
+					}
+
 					endpoint.TLSConfig.TLSKeyPath = ""
-					handler.FileService.DeleteTLSFile(folder, portainer.TLSFileKey)
+					if err := handler.FileService.DeleteTLSFile(folder, portainer.TLSFileKey); err != nil {
+						log.Warn().Err(err).Msg("Unable to remove TLS key from disk")
+					}
 				}
 			}
 		} else {
@@ -255,8 +263,11 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if updateAuthorizations && endpointutils.IsKubernetesEndpoint(endpoint) {
 		if err := handler.AuthorizationService.CleanNAPWithOverridePolicies(handler.DataStore, endpoint, nil); err != nil {
-			handler.PendingActionsService.Create(handlers.NewCleanNAPWithOverridePolicies(endpoint.ID, nil))
 			log.Warn().Err(err).Msgf("Unable to clean NAP with override policies for endpoint (%d). Will try to update when endpoint is online.", endpoint.ID)
+
+			if err := handler.PendingActionsService.Create(handler.DataStore, handlers.NewCleanNAPWithOverridePolicies(endpoint.ID, nil)); err != nil {
+				log.Warn().Err(err).Msg("unable to schedule pending action to clean NAP with override policies")
+			}
 		}
 	}
 

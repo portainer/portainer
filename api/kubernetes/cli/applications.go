@@ -549,7 +549,7 @@ func addRelatedResourcesToApplication(app *models.K8sApplication, resources Port
 // hasNoScheduledPods checks if a workload has completely failed to schedule any pods
 // it checks for no replicas desired, i.e. nothing to schedule and see if any pods are running
 // if any pods exist at all (even if not ready), it returns false
-func hasNoScheduledPods(obj interface{}) bool {
+func hasNoScheduledPods(obj any) bool {
 	switch resource := obj.(type) {
 	case appsv1.Deployment:
 		if resource.Status.Replicas > 0 {

@@ -1,4 +1,4 @@
-import { object, string, array, number, mixed, SchemaOf } from 'yup';
+import { object, array, number, mixed, SchemaOf, bool } from 'yup';
 
 import { accessControlFormValidation } from '@/react/portainer/access-control/AccessControlForm';
 import { GitCredential } from '@/react/portainer/account/git-credentials/types';
@@ -71,7 +71,7 @@ function getBaseValidationSchema({
     ),
     env: envVarValidation(),
     accessControl: accessControlFormValidation(isAdmin),
-    webhookId: string().default(''),
+    enableWebhook: bool().default(false),
     registries: array(number().required()).default([]),
   });
 }

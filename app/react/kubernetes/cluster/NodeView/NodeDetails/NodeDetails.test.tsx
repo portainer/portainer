@@ -183,6 +183,7 @@ describe('NodeDetails', () => {
   });
 
   it('shows drain warning when selecting Drain availability', async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     // Wait for component to load
@@ -192,11 +193,11 @@ describe('NodeDetails', () => {
 
     // Find the availability select and select Drain
     const availabilitySelect = screen.getByLabelText('Availability');
-    await select(availabilitySelect, 'Drain');
+    await select(availabilitySelect, 'Drain', { user });
 
     // Try to submit the form to trigger validation
     const submitButton = screen.getByRole('button', { name: /update node/i });
-    await userEvent.click(submitButton);
+    await user.click(submitButton);
 
     // Check that the confirmation modal is called with drain warning
     await waitFor(() => {
@@ -210,6 +211,7 @@ describe('NodeDetails', () => {
   });
 
   it('prevents submission when Portainer is running on node', async () => {
+    const user = userEvent.setup();
     setupMocks({ applications: mockPortainerApplications });
 
     renderComponent();
@@ -219,7 +221,7 @@ describe('NodeDetails', () => {
     });
 
     const availabilitySelect = screen.getByLabelText('Availability');
-    await select(availabilitySelect, 'Drain');
+    await select(availabilitySelect, 'Drain', { user });
 
     await waitFor(() => {
       expect(
@@ -232,6 +234,7 @@ describe('NodeDetails', () => {
   });
 
   it('prevents drain when only one node in cluster', async () => {
+    const user = userEvent.setup();
     setupMocks({ nodes: [mockNode] });
 
     renderComponent();
@@ -241,7 +244,7 @@ describe('NodeDetails', () => {
     });
 
     const availabilitySelect = screen.getByLabelText('Availability');
-    await select(availabilitySelect, 'Drain');
+    await select(availabilitySelect, 'Drain', { user });
 
     await waitFor(() => {
       expect(
@@ -254,6 +257,7 @@ describe('NodeDetails', () => {
   });
 
   it('prevents drain when another node is already draining', async () => {
+    const user = userEvent.setup();
     const drainingNodes = [
       mockNode,
       {
@@ -276,7 +280,7 @@ describe('NodeDetails', () => {
     });
 
     const availabilitySelect = screen.getByLabelText('Availability');
-    await select(availabilitySelect, 'Drain');
+    await select(availabilitySelect, 'Drain', { user });
 
     await waitFor(() => {
       expect(
@@ -286,6 +290,7 @@ describe('NodeDetails', () => {
   });
 
   it('shows cordon warning when submitting with Pause availability', async () => {
+    const user = userEvent.setup();
     vi.mocked(confirmUpdateNode).mockResolvedValue(true);
 
     renderComponent();
@@ -295,10 +300,10 @@ describe('NodeDetails', () => {
     });
 
     const availabilitySelect = screen.getByLabelText('Availability');
-    await select(availabilitySelect, 'Pause');
+    await select(availabilitySelect, 'Pause', { user });
 
     const submitButton = screen.getByRole('button', { name: /update node/i });
-    await userEvent.click(submitButton);
+    await user.click(submitButton);
 
     // Verify confirmation modal was called with cordon warning
     await waitFor(() => {

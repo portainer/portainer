@@ -2,10 +2,10 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
-	"github.com/portainer/portainer/api/internal/errorlist"
 	batchv1 "k8s.io/api/batch/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,7 +99,7 @@ func (kcl *KubeClient) isSystemCronJob(namespace string) bool {
 // DeleteCronJobs deletes the provided list of cronjobs in its namespace
 // it returns an error if any of the cronjobs are not found or if there is an error deleting the cronjobs
 func (kcl *KubeClient) DeleteCronJobs(payload models.K8sCronJobDeleteRequests) error {
-	var errors []error
+	var errs error
 	for namespace := range payload {
 		for _, cronJobName := range payload[namespace] {
 			client := kcl.cli.BatchV1().CronJobs(namespace)
@@ -110,14 +110,14 @@ func (kcl *KubeClient) DeleteCronJobs(payload models.K8sCronJobDeleteRequests) e
 					continue
 				}
 
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 
 			if err := client.Delete(context.Background(), cronJobName, metav1.DeleteOptions{}); err != nil {
-				errors = append(errors, err)
+				errs = errors.Join(errs, err)
 			}
 		}
 	}
 
-	return errorlist.Combine(errors)
+	return errs
 }

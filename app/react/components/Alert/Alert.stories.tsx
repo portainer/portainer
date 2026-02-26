@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { Alert } from './Alert';
 
@@ -21,21 +21,21 @@ function Template({ text, color, title }: Args) {
   );
 }
 
-export const Success: Story<Args> = Template.bind({});
+export const Success: StoryFn<Args> = Template.bind({});
 Success.args = {
   color: 'success',
   title: 'Success',
   text: 'This is a success alert. Very long text, Very long text,Very long text ,Very long text ,Very long text, Very long text',
 };
 
-export const Error: Story<Args> = Template.bind({});
+export const Error: StoryFn<Args> = Template.bind({});
 Error.args = {
   color: 'error',
   title: 'Error',
   text: 'This is an error alert',
 };
 
-export const Info: Story<Args> = Template.bind({});
+export const Info: StoryFn<Args> = Template.bind({});
 Info.args = {
   color: 'info',
   title: 'Info',

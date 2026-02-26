@@ -19,6 +19,7 @@ import { kubernetesHandlers } from './setup-handlers/kubernetes';
 import { endpointsHandlers } from './setup-handlers/endpoints';
 import { settingsHandlers } from './setup-handlers/settings';
 import { templatesHandlers } from './setup-handlers/templates';
+import { edgeHandlers } from './setup-handlers/edge';
 
 const tags: Tag[] = [
   { ID: 1, Name: 'tag1', Endpoints: {} },
@@ -54,13 +55,14 @@ export const handlers = [
   ...dockerHandlers,
   ...userHandlers,
   ...kubernetesHandlers,
+  ...edgeHandlers,
   http.get('/api/stacks', () => HttpResponse.json([])),
   http.get('/api/licenses/info', () => HttpResponse.json(licenseInfo)),
   http.get('/api/status/nodes', () => HttpResponse.json({ nodes: 3 })),
   http.get('/api/backup/s3/status', () => HttpResponse.json({ Failed: false })),
   http.get('/api/endpoint_groups', () => HttpResponse.json([])),
   http.get('/api/endpoint_groups/:groupId', ({ params }) => {
-    if (params.groupId instanceof Array) {
+    if (!params.groupId || params.groupId instanceof Array) {
       throw new Error('should be string');
     }
     const id = parseInt(params.groupId, 10);
@@ -80,6 +82,9 @@ export const handlers = [
   }),
 
   http.get<never, never, Partial<StatusResponse>>('/api/status', () =>
+    HttpResponse.json({})
+  ),
+  http.get<never, never, Partial<StatusResponse>>('/api/system/status', () =>
     HttpResponse.json({})
   ),
   http.get<never, never, Partial<VersionResponse>>('/api/system/version', () =>
@@ -104,4 +109,6 @@ export const handlers = [
     HttpResponse.json({ success: true })
   ),
   http.get('/api/webhooks', () => HttpResponse.json([])),
+  http.get('/api/policies', () => HttpResponse.json([])),
+  http.get('/api/roles', () => HttpResponse.json([])),
 ];

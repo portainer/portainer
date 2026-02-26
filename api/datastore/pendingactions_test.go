@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/pendingactions/actions"
 	"github.com/portainer/portainer/api/pendingactions/handlers"
+	"github.com/stretchr/testify/require"
 )
 
 type cleanNAPWithOverridePolicies struct {
@@ -16,7 +17,10 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 	t.Run("test ConvertCleanNAPWithOverridePoliciesPayload", func(t *testing.T) {
 
 		_, store := MustNewTestStore(t, true, false)
-		defer store.Close()
+		defer func() {
+			err := store.Close()
+			require.NoError(t, err)
+		}()
 
 		gid := portainer.EndpointGroupID(1)
 
@@ -92,7 +96,8 @@ func Test_ConvertCleanNAPWithOverridePoliciesPayload(t *testing.T) {
 				})
 			}
 
-			store.PendingActions().Delete(d.PendingAction.ID)
+			err = store.PendingActions().Delete(d.PendingAction.ID)
+			require.NoError(t, err)
 		}
 	})
 }

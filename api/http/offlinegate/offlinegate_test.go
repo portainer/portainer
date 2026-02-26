@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -78,7 +79,7 @@ func Test_waitingMiddleware_executesImmediately_whenNotLocked(t *testing.T) {
 		if elapsed >= timeout {
 			t.Error("WaitingMiddleware had likely timeout, when it shouldn't")
 		}
-		w.Write([]byte("success"))
+		_, _ = w.Write([]byte("success"))
 	})).ServeHTTP(response, request)
 
 	body, _ := io.ReadAll(response.Body)
@@ -113,7 +114,7 @@ func Test_waitingMiddleware_waitsForTheLockToBeReleased(t *testing.T) {
 		if elapsed >= timeout {
 			t.Error("WaitingMiddleware had likely timeout, when it shouldn't")
 		}
-		w.Write([]byte("success"))
+		_, _ = w.Write([]byte("success"))
 	})).ServeHTTP(response, request)
 
 	body, _ := io.ReadAll(response.Body)
@@ -142,7 +143,7 @@ func Test_waitingMiddleware_mayTimeout_whenLockedForTooLong(t *testing.T) {
 		if elapsed < timeout {
 			t.Error("WaitingMiddleware suppose to timeout, but it didnt")
 		}
-		w.Write([]byte("success"))
+		_, _ = w.Write([]byte("success"))
 	})).ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusRequestTimeout, response.Result().StatusCode, "Request support to timeout waiting for the gate")
@@ -159,7 +160,9 @@ func Test_waitingMiddleware_handlerPanics(t *testing.T) {
 
 	go func() {
 		defer func() {
-			recover()
+			if r := recover(); r != nil {
+				log.Warn().Msgf("Recovered in test: %v", r)
+			}
 
 			wg.Done()
 		}()

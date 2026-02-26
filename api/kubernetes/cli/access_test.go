@@ -55,7 +55,8 @@ func Test_NamespaceAccessPoliciesDeleteNamespace_updatesPortainerConfig_whenConf
 			_, err := k.cli.CoreV1().ConfigMaps(portainerNamespace).Create(context.Background(), config, metav1.CreateOptions{})
 			require.NoError(t, err, "failed to create a portainer config")
 			defer func() {
-				k.cli.CoreV1().ConfigMaps(portainerNamespace).Delete(context.Background(), portainerConfigMapName, metav1.DeleteOptions{})
+				err := k.cli.CoreV1().ConfigMaps(portainerNamespace).Delete(context.Background(), portainerConfigMapName, metav1.DeleteOptions{})
+				require.NoError(t, err)
 			}()
 
 			err = k.NamespaceAccessPoliciesDeleteNamespace(test.namespaceToDelete)

@@ -55,7 +55,11 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("invalid Azure credentials")
@@ -86,7 +90,11 @@ func Get(url string, timeout int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	if response.StatusCode != http.StatusOK {
 		log.Error().Int("status_code", response.StatusCode).Msg("unexpected status code")
@@ -138,8 +146,11 @@ func pingOperation(client *http.Client, target string) (bool, error) {
 		return false, err
 	}
 
-	io.Copy(io.Discard, resp.Body)
-	resp.Body.Close()
+	_, _ = io.Copy(io.Discard, resp.Body)
+
+	if err := resp.Body.Close(); err != nil {
+		log.Warn().Err(err).Msg("failed to close response body")
+	}
 
 	agentOnDockerEnvironment := resp.Header.Get(portainer.PortainerAgentHeader) != ""
 

@@ -1,8 +1,7 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
 import { Database, HardDrive } from 'lucide-react';
 
 import { PageHeader } from '@@/PageHeader';
-import { WidgetTabs, Tab, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { WidgetTabs, Tab, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { VolumesDatatable } from './VolumesDatatable';
 import { StorageDatatable } from './StorageDatatable';
@@ -23,10 +22,7 @@ export function VolumesView() {
     },
   ];
 
-  const currentTabIndex = findSelectedTabIndex(
-    useCurrentStateAndParams(),
-    tabs
-  );
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>

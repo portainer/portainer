@@ -61,7 +61,7 @@ export function KubeconfigPrompt({
       .every((env) => selection.includes(env.Id));
 
   return (
-    <Modal aria-label="Kubeconfig View" onDismiss={onClose}>
+    <Modal aria-label="Kubeconfig View" onDismiss={onClose} size="xl">
       <Modal.Header title="Download kubeconfig file" />
 
       <Modal.Body>
@@ -130,7 +130,7 @@ export function KubeconfigPrompt({
         <Button
           onClick={handleDownload}
           disabled={selection.length === 0}
-          data-cy="download-kubeconfig-confirbutton"
+          data-cy="download-kubeconfig-confirmbutton"
         >
           Download File
         </Button>

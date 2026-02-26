@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { useMemo } from 'react';
 
 import { UserContext } from '@/react/hooks/useUser';
@@ -39,7 +39,7 @@ function Template({ title }: StoryProps) {
   );
 }
 
-export const Primary: Story<StoryProps> = Template.bind({});
+export const Primary: StoryFn<StoryProps> = Template.bind({});
 Primary.args = {
   title: 'Container details',
 };

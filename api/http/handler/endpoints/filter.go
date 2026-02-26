@@ -242,7 +242,7 @@ func (handler *Handler) filterEndpointsByQuery(
 
 	if len(query.agentVersions) > 0 {
 		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
-			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
+			return !endpointutils.IsAgentEndpoint(&endpoint) || slices.Contains(query.agentVersions, endpoint.Agent.Version)
 		})
 	}
 	if query.edgeStackId != 0 {
@@ -686,16 +686,6 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 	}
 
 	return result, nil
-}
-
-func contains(strings []string, param string) bool {
-	for _, str := range strings {
-		if str == param {
-			return true
-		}
-	}
-
-	return false
 }
 
 func getEdgeStackStatusParam(r *http.Request) (*portainer.EdgeStackStatusType, error) {

@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react';
 
-import { FormSection } from '@@/form-components/FormSection';
+import { MetadataFieldset } from '@/react/portainer/environments/common/MetadataFieldset/MetadataFieldset';
 
-import { MetadataFieldset } from './MetadataFieldset';
+import { FormSection } from '@@/form-components/FormSection';
 
 export function MoreSettingsSection({ children }: PropsWithChildren<unknown>) {
   return (

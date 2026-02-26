@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 import { Play, RefreshCw, Square, Trash2 } from 'lucide-react';
 
@@ -45,7 +45,7 @@ function Template({
   );
 }
 
-export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
+export const Primary: StoryFn<PropsWithChildren<Props>> = Template.bind({});
 Primary.args = {
   size: 'small',
 };

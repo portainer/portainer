@@ -280,13 +280,7 @@ func contains(statuses []Status, status Status) bool {
 		return false
 	}
 
-	for _, s := range statuses {
-		if s == status {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(statuses, status)
 }
 
 func allMatch(statuses []Status, status Status) bool {

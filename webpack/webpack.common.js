@@ -46,7 +46,13 @@ module.exports = {
               relativeTo: projectRoot + '/',
             },
           },
-          { loader: 'html-loader' },
+          {
+            loader: 'html-loader',
+            options: {
+              esModule: false, // Keep CommonJS format for ngtemplate-loader compatibility
+              minimize: false, // Match old behavior, disable auto-minification
+            },
+          },
         ],
       },
 
@@ -103,9 +109,12 @@ module.exports = {
     },
     compress: true,
     port: 8999,
-    proxy: {
-      '/api': 'http://localhost:9000',
-    },
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:9000',
+      },
+    ],
     open: true,
     devMiddleware: {
       writeToDisk: true,
@@ -164,6 +173,12 @@ module.exports = {
       ],
     }),
   ],
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
   optimization: {
     moduleIds: 'deterministic',
     runtimeChunk: 'single',

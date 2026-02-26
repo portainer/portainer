@@ -139,8 +139,12 @@ func TestService_ListRefs_Azure_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
-	go service.ListRefs(privateAzureRepoURL, username, accessToken, gittypes.GitCredentialAuthType_Basic, false, false)
-	service.ListRefs(privateAzureRepoURL, username, accessToken, gittypes.GitCredentialAuthType_Basic, false, false)
+	go func() {
+		_, _ = service.ListRefs(privateAzureRepoURL, username, accessToken, gittypes.GitCredentialAuthType_Basic, false, false)
+	}()
+
+	_, err := service.ListRefs(privateAzureRepoURL, username, accessToken, gittypes.GitCredentialAuthType_Basic, false, false)
+	require.NoError(t, err)
 
 	time.Sleep(2 * time.Second)
 }
@@ -153,6 +157,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 		err          error
 		matchedCount int
 	}
+
 	service := newService(context.TODO(), 0, 0)
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
@@ -289,6 +294,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 				tt.extensions,
 				false,
 			)
+
 			if tt.expect.shouldFail {
 				require.Error(t, err)
 				if tt.expect.err != nil {
@@ -311,7 +317,21 @@ func TestService_ListFiles_Azure_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := newService(context.TODO(), repositoryCacheSize, 200*time.Millisecond)
 
-	go service.ListFiles(
+	go func() {
+		_, _ = service.ListFiles(
+			privateAzureRepoURL,
+			"refs/heads/main",
+			username,
+			accessToken,
+			gittypes.GitCredentialAuthType_Basic,
+			false,
+			false,
+			[]string{},
+			false,
+		)
+	}()
+
+	_, err := service.ListFiles(
 		privateAzureRepoURL,
 		"refs/heads/main",
 		username,
@@ -322,17 +342,7 @@ func TestService_ListFiles_Azure_Concurrently(t *testing.T) {
 		[]string{},
 		false,
 	)
-	service.ListFiles(
-		privateAzureRepoURL,
-		"refs/heads/main",
-		username,
-		accessToken,
-		gittypes.GitCredentialAuthType_Basic,
-		false,
-		false,
-		[]string{},
-		false,
-	)
+	require.NoError(t, err)
 
 	time.Sleep(2 * time.Second)
 }
@@ -342,6 +352,7 @@ func getRequiredValue(t *testing.T, name string) string {
 	if !ok {
 		t.Fatalf("can't find required env var \"%s\"", name)
 	}
+
 	return value
 }
 

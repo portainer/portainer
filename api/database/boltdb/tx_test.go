@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/stretchr/testify/require"
 )
 
 const testBucketName = "test-bucket"
@@ -17,70 +18,55 @@ type testStruct struct {
 }
 
 func TestTxs(t *testing.T) {
-	conn := DbConnection{
-		Path: t.TempDir(),
-	}
+	conn := DbConnection{Path: t.TempDir()}
 
 	err := conn.Open()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer conn.Close()
+	require.NoError(t, err)
+	defer func() {
+		err := conn.Close()
+		require.NoError(t, err)
+	}()
 
 	// Error propagation
 	err = conn.UpdateTx(func(tx portainer.Transaction) error {
 		return errors.New("this is an error")
 	})
-	if err == nil {
-		t.Fatal("an error was expected, got nil instead")
-	}
+	require.Error(t, err)
 
 	// Create an object
-	newObj := testStruct{
-		Key:   "key",
-		Value: "value",
-	}
+	newObj := testStruct{Key: "key", Value: "value"}
 
 	err = conn.UpdateTx(func(tx portainer.Transaction) error {
-		err = tx.SetServiceName(testBucketName)
-		if err != nil {
+		if err := tx.SetServiceName(testBucketName); err != nil {
 			return err
 		}
 
 		return tx.CreateObjectWithId(testBucketName, testId, newObj)
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	obj := testStruct{}
 	err = conn.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(testBucketName, conn.ConvertToKey(testId), &obj)
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if obj.Key != newObj.Key || obj.Value != newObj.Value {
 		t.Fatalf("expected %s:%s, got %s:%s instead", newObj.Key, newObj.Value, obj.Key, obj.Value)
 	}
 
 	// Update an object
-	updatedObj := testStruct{
-		Key:   "updated-key",
-		Value: "updated-value",
-	}
+	updatedObj := testStruct{Key: "updated-key", Value: "updated-value"}
 
 	err = conn.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.UpdateObject(testBucketName, conn.ConvertToKey(testId), &updatedObj)
 	})
+	require.NoError(t, err)
 
 	err = conn.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(testBucketName, conn.ConvertToKey(testId), &obj)
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if obj.Key != updatedObj.Key || obj.Value != updatedObj.Value {
 		t.Fatalf("expected %s:%s, got %s:%s instead", updatedObj.Key, updatedObj.Value, obj.Key, obj.Value)
@@ -90,16 +76,12 @@ func TestTxs(t *testing.T) {
 	err = conn.UpdateTx(func(tx portainer.Transaction) error {
 		return tx.DeleteObject(testBucketName, conn.ConvertToKey(testId))
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	err = conn.ViewTx(func(tx portainer.Transaction) error {
 		return tx.GetObject(testBucketName, conn.ConvertToKey(testId), &obj)
 	})
-	if !dataservices.IsErrObjectNotFound(err) {
-		t.Fatal(err)
-	}
+	require.True(t, dataservices.IsErrObjectNotFound(err))
 
 	// Get next identifier
 	err = conn.UpdateTx(func(tx portainer.Transaction) error {
@@ -112,15 +94,11 @@ func TestTxs(t *testing.T) {
 
 		return nil
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// Try to write in a read transaction
 	err = conn.ViewTx(func(tx portainer.Transaction) error {
 		return tx.CreateObjectWithId(testBucketName, testId, newObj)
 	})
-	if err == nil {
-		t.Fatal("an error was expected, got nil instead")
-	}
+	require.Error(t, err)
 }

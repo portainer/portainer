@@ -4,6 +4,7 @@ import axios, {
 } from '@/portainer/services/axios';
 import { Pair } from '@/react/portainer/settings/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { RegistryId } from '@/react/portainer/registries/types/registry';
 
 import { Stack } from '../../types';
 
@@ -24,6 +25,8 @@ export type SwarmFileUploadPayload = {
 
   file: File;
   environmentId: EnvironmentId;
+
+  Registries?: Array<RegistryId>;
 };
 
 export async function createSwarmStackFromFile({

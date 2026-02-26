@@ -281,7 +281,7 @@ func TestBaseTransport_AddTokenForExec_Integration(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		capturedRequest = r
 		capturedHeaders = r.Header.Clone()
-		w.Write([]byte("success"))
+		_, _ = w.Write([]byte("success"))
 	}))
 	defer testServer.Close()
 
@@ -342,7 +342,10 @@ func TestBaseTransport_AddTokenForExec_Integration(t *testing.T) {
 			// Call proxyPodsRequest which triggers addTokenForExec for POST /exec requests
 			resp, err := transport.proxyPodsRequest(request, "default")
 			require.NoError(t, err)
-			defer resp.Body.Close()
+			defer func() {
+				err := resp.Body.Close()
+				require.NoError(t, err)
+			}()
 
 			// Verify the response
 			assert.Equal(t, http.StatusOK, resp.StatusCode)

@@ -95,7 +95,7 @@ func (m *Migrator) NeedsMigration() bool {
 
 	// In this particular instance we should log a fatal error
 	if m.CurrentDBEdition() != portainer.PortainerCE {
-		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://documentation.portainer.io/v2.0-be/downgrade/be-to-ce/")
+		log.Fatal().Msg("the Portainer database is set for Portainer Business Edition, please follow the instructions in our documentation to downgrade it: https://docs.portainer.io/faqs/upgrading/can-i-downgrade-from-portainer-business-to-portainer-ce")
 
 		return false
 	}

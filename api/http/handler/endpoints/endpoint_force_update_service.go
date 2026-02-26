@@ -8,6 +8,7 @@ import (
 	portaineree "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/docker/images"
+	"github.com/portainer/portainer/api/logs"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -74,7 +75,7 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	if err != nil {
 		return httperror.InternalServerError("Error creating docker client", err)
 	}
-	defer dockerClient.Close()
+	defer logs.CloseAndLogErr(dockerClient)
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), payload.ServiceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {

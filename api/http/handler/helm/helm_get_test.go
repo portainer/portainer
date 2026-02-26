@@ -45,7 +45,9 @@ func Test_helmGet(t *testing.T) {
 
 	// Install a single chart, to be retrieved by the handler
 	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default"}
-	h.helmPackageManager.Upgrade(options)
+
+	_, err = h.helmPackageManager.Upgrade(options)
+	require.NoError(t, err)
 
 	t.Run("helmGet sucessfuly retrieves helm release", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/1/kubernetes/helm/"+options.Name+"?namespace="+options.Namespace, nil)
@@ -59,7 +61,9 @@ func Test_helmGet(t *testing.T) {
 		data := release.Release{}
 		body, err := io.ReadAll(rr.Body)
 		require.NoError(t, err, "ReadAll should not return error")
-		json.Unmarshal(body, &data)
+
+		err = json.Unmarshal(body, &data)
+		require.NoError(t, err)
 		is.Equal(http.StatusOK, rr.Code, "Status should be 200")
 		is.Equal("nginx-1", data.Name)
 	})

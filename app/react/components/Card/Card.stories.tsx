@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 
 import { Card, Props } from './Card';
@@ -14,5 +14,5 @@ function Template({
   return <Card>{children}</Card>;
 }
 
-export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
+export const Primary: StoryFn<PropsWithChildren<Props>> = Template.bind({});
 Primary.args = {};

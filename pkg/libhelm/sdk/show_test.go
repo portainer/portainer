@@ -24,9 +24,10 @@ func Test_Show(t *testing.T) {
 	}
 	release, err := hspm.Upgrade(installOpts)
 	if release != nil || err != nil {
-		defer hspm.Uninstall(options.UninstallOptions{
-			Name: "ingress-nginx",
-		})
+		defer func() {
+			err := hspm.Uninstall(options.UninstallOptions{Name: "ingress-nginx"})
+			require.NoError(t, err)
+		}()
 	}
 
 	t.Run("show requires chart, output format and repo or registry", func(t *testing.T) {

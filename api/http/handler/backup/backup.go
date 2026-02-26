@@ -8,6 +8,7 @@ import (
 	operations "github.com/portainer/portainer/api/backup"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/rs/zerolog/log"
 )
 
 type (
@@ -44,7 +45,11 @@ func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.Hand
 	if err != nil {
 		return httperror.InternalServerError("Failed to create backup", err)
 	}
-	defer os.RemoveAll(filepath.Dir(archivePath))
+	defer func() {
+		if err := os.RemoveAll(filepath.Dir(archivePath)); err != nil {
+			log.Warn().Err(err).Msg("failed to remove backup temp folder")
+		}
+	}()
 
 	w.Header().Set("Content-Disposition", "attachment; filename=portainer-backup_"+filepath.Base(archivePath))
 	http.ServeFile(w, r, archivePath)

@@ -99,7 +99,11 @@ func (proxy *dockerLocalProxy) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		httperror.WriteError(w, code, "Unable to proxy the request via the Docker socket", err)
 		return
 	}
-	defer res.Body.Close()
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("proxy error: failed to close response body")
+		}
+	}()
 
 	for k, vv := range res.Header {
 		for _, v := range vv {

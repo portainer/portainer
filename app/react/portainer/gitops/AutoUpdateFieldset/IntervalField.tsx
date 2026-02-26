@@ -1,5 +1,6 @@
-import { string } from 'yup';
 import parse from 'parse-duration';
+
+import { durationValidation } from '@/react/utils/validation';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -42,22 +43,13 @@ export function IntervalField({
 }
 
 export function intervalValidation() {
-  return (
-    string()
-      .required('This field is required.')
-      // TODO: find a regex that validates time.Duration
-      // .matches(
-      //   // validate golang time.Duration format
-      //   // https://cs.opensource.google/go/go/+/master:src/time/format.go;l=1590
-      //   /[-+]?([0-9]*(\.[0-9]*)?[a-z]+)+/g,
-      //   'Please enter a valid time interval.'
-      // )
-      .test('minimumInterval', 'Minimum interval is 1m', (value) => {
-        if (!value) {
-          return false;
-        }
-        const minutes = parse(value, 'minute');
-        return minutes !== null && minutes >= 1;
-      })
-  );
+  return durationValidation(false) // Don't allow empty - field is required
+    .required('This field is required.')
+    .test('minimumInterval', 'Minimum interval is 1m', (value) => {
+      if (!value) {
+        return false;
+      }
+      const minutes = parse(value, 'minute');
+      return minutes !== null && minutes >= 1;
+    });
 }

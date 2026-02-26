@@ -10,6 +10,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
 	"golang.org/x/sync/errgroup"
@@ -100,7 +101,11 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
@@ -112,6 +117,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
+
 		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
@@ -131,7 +137,11 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {

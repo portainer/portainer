@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/rs/zerolog/log"
 )
 
@@ -27,7 +28,11 @@ func HijackRequest(websocketConn *websocket.Conn, conn net.Conn, request *http.R
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Warn().Err(err).Msg("failed to close response body")
+		}
+	}()
 
 	// Check if the response status code indicates an upgrade (101 Switching Protocols)
 	if resp.StatusCode != http.StatusSwitchingProtocols {
@@ -73,7 +78,7 @@ func WriteReaderToWebSocket(websocketConn *websocket.Conn, mu *sync.Mutex, reade
 	input := make(chan string)
 	pingTicker := time.NewTicker(PingPeriod)
 	defer pingTicker.Stop()
-	defer websocketConn.Close()
+	defer logs.CloseAndLogErr(websocketConn)
 
 	mu.Lock()
 	websocketConn.SetReadLimit(ReaderBufferSize)
@@ -82,7 +87,9 @@ func WriteReaderToWebSocket(websocketConn *websocket.Conn, mu *sync.Mutex, reade
 	})
 
 	websocketConn.SetPingHandler(func(data string) error {
-		websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+		if err := websocketConn.SetWriteDeadline(time.Now().Add(WriteWait)); err != nil {
+			return err
+		}
 
 		return websocketConn.WriteMessage(websocket.PongMessage, []byte(data))
 	})
@@ -130,7 +137,9 @@ func wsWrite(websocketConn *websocket.Conn, mu *sync.Mutex, msg string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+	if err := websocketConn.SetWriteDeadline(time.Now().Add(WriteWait)); err != nil {
+		return err
+	}
 
 	return websocketConn.WriteMessage(websocket.TextMessage, []byte(msg))
 }
@@ -139,7 +148,9 @@ func wsPing(websocketConn *websocket.Conn, mu *sync.Mutex) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	websocketConn.SetWriteDeadline(time.Now().Add(WriteWait))
+	if err := websocketConn.SetWriteDeadline(time.Now().Add(WriteWait)); err != nil {
+		return err
+	}
 
 	return websocketConn.WriteMessage(websocket.PingMessage, nil)
 }

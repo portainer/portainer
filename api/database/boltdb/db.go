@@ -233,10 +233,6 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 	return b
 }
 
-func (connection *DbConnection) ConvertStringToKey(v string) []byte {
-	return []byte(v)
-}
-
 // keyToString Converts a key to a string value suitable for logging
 func keyToString(b []byte) string {
 	if len(b) != 8 {

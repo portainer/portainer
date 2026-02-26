@@ -20,7 +20,7 @@ describe('CreateStackForm validation schemas', () => {
       name: 'test-stack',
       env: [],
       accessControl: acDefaultValues(false, 1),
-      webhookId: '',
+      enableWebhook: false,
       registries: [],
       upload: undefined,
     };
@@ -40,7 +40,7 @@ describe('CreateStackForm validation schemas', () => {
       name: 'test-stack',
       env: [],
       accessControl: acDefaultValues(false, 1),
-      webhookId: '',
+      enableWebhook: false,
       registries: [],
       editor: undefined,
     };
@@ -60,7 +60,7 @@ describe('CreateStackForm validation schemas', () => {
       name: 'test-stack',
       env: [],
       accessControl: acDefaultValues(false, 1),
-      webhookId: '',
+      enableWebhook: false,
       registries: [],
       git: undefined,
     };

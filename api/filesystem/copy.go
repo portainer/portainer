@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/portainer/portainer/api/logs"
 )
 
 // CopyPath copies file or directory defined by the path to the toDir path
@@ -67,7 +69,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	defer from.Close()
+	defer logs.CloseAndLogErr(from)
 
 	// has to include 'execute' bit, otherwise fails. MkdirAll follows `mkdir -m` restrictions
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
@@ -77,7 +79,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	defer to.Close()
+	defer logs.CloseAndLogErr(to)
 
 	_, err = io.Copy(to, from)
 	return err

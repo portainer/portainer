@@ -37,10 +37,8 @@ function loadingButtonIcon(isLoading: boolean, defaultIcon: ReactNode) {
     return defaultIcon;
   }
   return (
-    <Icon
-      icon={Loader2}
-      className="ml-1 animate-spin-slow"
-      aria-label="loading"
-    />
+    <span className="flex items-center" role="status" aria-label="loading">
+      <Icon icon={Loader2} className="ml-1 animate-spin-slow" />
+    </span>
   );
 }

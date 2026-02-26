@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 
@@ -109,6 +109,15 @@ function renderComponent({
 describe('HelmInstallForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('should not display any visible error messages on initial load', async () => {
+    renderComponent({ namespace: '' });
+
+    await waitFor(() => {
+      // Check that no error messages (role="alert") are visible
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('should render the form with version selector and values editor', async () => {

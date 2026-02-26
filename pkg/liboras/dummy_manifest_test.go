@@ -122,7 +122,7 @@ func TestSafeDeleteTags(t *testing.T) {
 				} else if r.Method == "GET" {
 					// Return a minimal manifest for GET requests
 					w.Header().Set("Content-Type", "application/vnd.oci.image.manifest.v1+json")
-					w.Write([]byte(`{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","config":{"mediaType":"application/vnd.oci.image.config.v1+json","digest":"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","size":2},"layers":[]}`))
+					_, _ = w.Write([]byte(`{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","config":{"mediaType":"application/vnd.oci.image.config.v1+json","digest":"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","size":2},"layers":[]}`))
 				}
 
 			// Handle repository operations

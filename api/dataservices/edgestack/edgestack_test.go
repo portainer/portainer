@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/stretchr/testify/require"
 )
@@ -14,7 +15,7 @@ func TestUpdate(t *testing.T) {
 	err := conn.Open()
 	require.NoError(t, err)
 
-	defer conn.Close()
+	defer logs.CloseAndLogErr(conn)
 
 	service, err := NewService(conn, func(portainer.Transaction, portainer.EdgeStackID) {})
 	require.NoError(t, err)

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/containerd/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 )
 
@@ -35,8 +36,10 @@ func CalculateContainerStats(ctx context.Context, cli DockerClient, isSwarm bool
 	var aggErr error
 	var aggMu sync.Mutex
 
+	var processedCount int
 	for i := range containers {
 		id := containers[i].ID
+
 		semaphore <- struct{}{}
 		wg.Go(func() {
 			defer func() { <-semaphore }()
@@ -44,8 +47,17 @@ func CalculateContainerStats(ctx context.Context, cli DockerClient, isSwarm bool
 			containerInspection, err := cli.ContainerInspect(ctx, id)
 			stat := ContainerStats{}
 			if err != nil {
+				if errdefs.IsNotFound(err) {
+					// An edge case is reported that Docker can list containers with no names,
+					// but when inspecting a container with specific ID and it is not found.
+					// In this case, we can safely ignore the error.
+					// ref@https://linear.app/portainer/issue/BE-12567/500-error-when-loading-docker-dashboard-in-portainer
+					return
+				}
+
 				aggMu.Lock()
 				aggErr = errors.Join(aggErr, err)
+				processedCount++
 				aggMu.Unlock()
 				return
 			}
@@ -56,6 +68,7 @@ func CalculateContainerStats(ctx context.Context, cli DockerClient, isSwarm bool
 			stopped += stat.Stopped
 			healthy += stat.Healthy
 			unhealthy += stat.Unhealthy
+			processedCount++
 			mu.Unlock()
 		})
 	}
@@ -67,7 +80,7 @@ func CalculateContainerStats(ctx context.Context, cli DockerClient, isSwarm bool
 		Stopped:   stopped,
 		Healthy:   healthy,
 		Unhealthy: unhealthy,
-		Total:     len(containers),
+		Total:     processedCount,
 	}, aggErr
 }
 

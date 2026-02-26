@@ -23,9 +23,12 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 func tokenLookupSucceed(dataStore dataservices.DataStore, jwtService portainer.JWTService) tokenLookup {
 	return func(r *http.Request) (*portainer.TokenData, error) {
 		uid := portainer.UserID(1)
-		dataStore.User().Create(&portainer.User{ID: uid})
-		jwtService.GenerateToken(&portainer.TokenData{ID: uid})
-		return &portainer.TokenData{ID: 1}, nil
+		if err := dataStore.User().Create(&portainer.User{ID: uid}); err != nil {
+			return nil, err
+		}
+
+		_, _, err := jwtService.GenerateToken(&portainer.TokenData{ID: uid})
+		return &portainer.TokenData{ID: 1}, err
 	}
 }
 
@@ -351,7 +354,10 @@ func Test_apiKeyLookup(t *testing.T) {
 	t.Run("valid x-api-key header succeeds api-key lookup", func(t *testing.T) {
 		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
 		require.NoError(t, err)
-		defer apiKeyService.DeleteAPIKey(apiKey.ID)
+		defer func() {
+			err := apiKeyService.DeleteAPIKey(apiKey.ID)
+			require.NoError(t, err)
+		}()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Add("x-api-key", rawAPIKey)
@@ -366,7 +372,10 @@ func Test_apiKeyLookup(t *testing.T) {
 	t.Run("successful api-key lookup updates token last used time", func(t *testing.T) {
 		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
 		require.NoError(t, err)
-		defer apiKeyService.DeleteAPIKey(apiKey.ID)
+		defer func() {
+			err := apiKeyService.DeleteAPIKey(apiKey.ID)
+			require.NoError(t, err)
+		}()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Add("x-api-key", rawAPIKey)
@@ -539,7 +548,10 @@ func TestCSPHeaderDefault(t *testing.T) {
 
 	resp, err := http.Get(srv.URL + "/")
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		require.NoError(t, err)
+	}()
 
 	require.Contains(t, resp.Header, "Content-Security-Policy")
 }
@@ -555,7 +567,10 @@ func TestCSPHeaderDisabled(t *testing.T) {
 
 	resp, err := http.Get(srv.URL + "/")
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		require.NoError(t, err)
+	}()
 
 	require.NotContains(t, resp.Header, "Content-Security-Policy")
 }

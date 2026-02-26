@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 import { Clock, type LucideIcon } from 'lucide-react';
 
 import { SidebarItem } from '.';
@@ -28,13 +28,13 @@ function Template({ icon, label }: StoryProps) {
   );
 }
 
-export const Primary: Story<StoryProps> = Template.bind({});
+export const Primary: StoryFn<StoryProps> = Template.bind({});
 Primary.args = {
   icon: Clock,
   label: 'Item with icon',
 };
 
-export const WithoutIcon: Story<StoryProps> = Template.bind({});
+export const WithoutIcon: StoryFn<StoryProps> = Template.bind({});
 WithoutIcon.args = {
   label: 'Item without icon',
 };

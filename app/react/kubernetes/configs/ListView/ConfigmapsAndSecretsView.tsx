@@ -1,8 +1,7 @@
 import { FileCode, Lock } from 'lucide-react';
-import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { PageHeader } from '@@/PageHeader';
-import { Tab, WidgetTabs, findSelectedTabIndex } from '@@/Widget/WidgetTabs';
+import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { ConfigMapsDatatable } from './ConfigMapsDatatable';
 import { SecretsDatatable } from './SecretsDatatable';
@@ -23,10 +22,7 @@ const tabs: Tab[] = [
 ];
 
 export function ConfigmapsAndSecretsView() {
-  const currentTabIndex = findSelectedTabIndex(
-    useCurrentStateAndParams(),
-    tabs
-  );
+  const currentTabIndex = useCurrentTabIndex(tabs);
   return (
     <>
       <PageHeader

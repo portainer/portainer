@@ -165,7 +165,9 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	// otherwise return nil
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
-		registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace)
+		if err := registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace); err != nil {
+			return httperror.InternalServerError("Unable to refresh ECR registry secret", err)
+		}
 	}
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
@@ -212,7 +214,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	// Make sure the webhook ID is unique
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
-		if isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook); err != nil {
+		if isUnique, err := handler.checkUniqueWebhookID(handler.DataStore, payload.AutoUpdate.Webhook); err != nil {
 			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		} else if !isUnique {
 			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
