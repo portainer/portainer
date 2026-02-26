@@ -36,6 +36,7 @@ export interface BaseEnvironmentsQueryParams {
   tagIds?: TagId[];
   endpointIds?: EnvironmentId[];
   excludeIds?: EnvironmentId[];
+  excludeGroupIds?: EnvironmentGroupId[];
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
   status?: EnvironmentStatus[];

@@ -151,6 +151,46 @@ func Test_Filter_excludeIDs(t *testing.T) {
 	runTests(tests, t, handler, environments)
 }
 
+func Test_Filter_excludeGroupIDs(t *testing.T) {
+	groupA := portainer.EndpointGroupID(10)
+	groupB := portainer.EndpointGroupID(20)
+	groupC := portainer.EndpointGroupID(30)
+
+	endpoints := []portainer.Endpoint{
+		{ID: 1, GroupID: groupA, Type: portainer.DockerEnvironment},
+		{ID: 2, GroupID: groupA, Type: portainer.DockerEnvironment},
+		{ID: 3, GroupID: groupB, Type: portainer.DockerEnvironment},
+		{ID: 4, GroupID: groupB, Type: portainer.DockerEnvironment},
+		{ID: 5, GroupID: groupC, Type: portainer.DockerEnvironment},
+	}
+
+	handler := setupFilterTest(t, endpoints)
+
+	tests := []filterTest{
+		{
+			title:    "should exclude endpoints in groupA",
+			expected: []portainer.EndpointID{3, 4, 5},
+			query: EnvironmentsQuery{
+				excludeGroupIds: []portainer.EndpointGroupID{groupA},
+			},
+		},
+		{
+			title:    "should exclude endpoints in groupA and groupB",
+			expected: []portainer.EndpointID{5},
+			query: EnvironmentsQuery{
+				excludeGroupIds: []portainer.EndpointGroupID{groupA, groupB},
+			},
+		},
+		{
+			title:    "should return all endpoints when excludeGroupIds is empty",
+			expected: []portainer.EndpointID{1, 2, 3, 4, 5},
+			query:    EnvironmentsQuery{},
+		},
+	}
+
+	runTests(tests, t, handler, endpoints)
+}
+
 func BenchmarkFilterEndpointsBySearchCriteria_PartialMatch(b *testing.B) {
 	n := 10000
 

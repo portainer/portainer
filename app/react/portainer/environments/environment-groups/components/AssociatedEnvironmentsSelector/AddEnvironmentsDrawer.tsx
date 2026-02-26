@@ -5,7 +5,10 @@ import { truncate } from 'lodash';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { isSortType } from '@/react/portainer/environments/queries/useEnvironmentList';
-import { EnvironmentId } from '@/react/portainer/environments/types';
+import {
+  EnvironmentId,
+  EnvironmentGroupId,
+} from '@/react/portainer/environments/types';
 
 import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -31,8 +34,10 @@ const columns = [
 interface Props {
   open: boolean;
   onClose(): void;
-  /** IDs already in the group — excluded from the available list */
-  excludeIds: EnvironmentId[];
+  /** IDs already in the group — excluded from the available list. Use for create-form contexts where no group ID exists yet. */
+  excludeIds?: EnvironmentId[];
+  /** Endpoint group IDs whose members are excluded from the available list. Prefer this over excludeIds when a group ID is available, to avoid sending thousands of individual IDs in the URL. */
+  excludeGroupIds?: EnvironmentGroupId[];
   /** Called with the full env objects so callers can display names or extract IDs.
    *  Returns true if the add was committed, false if the user cancelled. */
   onAdd:
@@ -46,6 +51,7 @@ export function AddEnvironmentsDrawer({
   open,
   onClose,
   excludeIds,
+  excludeGroupIds,
   onAdd,
   isLoading,
 }: Props) {
@@ -66,6 +72,7 @@ export function AddEnvironmentsDrawer({
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     groupIds: [1],
     excludeIds,
+    excludeGroupIds,
   });
 
   function handleSelectionChange(ids: string[]) {
