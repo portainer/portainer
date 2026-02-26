@@ -155,6 +155,15 @@ func (store *Store) encryptDB() error {
 		return err
 	}
 
+	store.connection.SetEncrypted(true)
+	if err := store.connection.Open(); err != nil {
+		return err
+	}
+
+	if err := store.initServices(); err != nil {
+		return err
+	}
+
 	if err := store.Import(exportFilename); err != nil {
 		log.Error().Err(err).Msg("failed to import database backup")
 
