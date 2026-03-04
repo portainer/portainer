@@ -38,7 +38,7 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 	var customTemplate *portainer.CustomTemplate
 	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		customTemplate, err = tx.CustomTemplate().Read(portainer.CustomTemplateID(customTemplateID))
-		if handler.DataStore.IsErrObjectNotFound(err) {
+		if tx.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find a custom template with the specified identifier inside the database", err)
 		} else if err != nil {
 			return httperror.InternalServerError("Unable to find a custom template with the specified identifier inside the database", err)
