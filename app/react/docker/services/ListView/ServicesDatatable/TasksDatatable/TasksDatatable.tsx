@@ -25,6 +25,7 @@ export function TasksDatatable({
       search={search}
       aria-label="Tasks table"
       data-cy="docker-service-tasks-nested-datatable"
+      initialSortBy={{ id: 'Updated', desc: true }}
     />
   );
 }

@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import { difference } from 'lodash';
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -14,6 +16,7 @@ import { defaultGetRowId } from './defaultGetRowId';
 import { Table } from './Table';
 import { NestedTable } from './NestedTable';
 import { DatatableContent } from './DatatableContent';
+import { DatatableFooter } from './DatatableFooter';
 import { BasicTableSettings, DefaultType } from './types';
 
 interface Props<D extends DefaultType> extends AutomationTestingProps {
@@ -69,6 +72,18 @@ export function NestedDatatable<D extends DefaultType>({
     ...(enablePagination && { getPaginationRowModel: getPaginationRowModel() }),
   });
 
+  const tableState = tableInstance.getState();
+  const selectedRowModel = tableInstance.getSelectedRowModel();
+  const selectedItems = selectedRowModel.rows.map((row) => row.original);
+  const filteredItems = tableInstance
+    .getFilteredRowModel()
+    .rows.map((row) => row.original);
+
+  const hiddenSelectedItems = useMemo(
+    () => difference(selectedItems, filteredItems),
+    [selectedItems, filteredItems]
+  );
+
   return (
     <NestedTable>
       <Table.Container noWidget>
@@ -80,6 +95,17 @@ export function NestedDatatable<D extends DefaultType>({
           aria-label={ariaLabel}
           data-cy={dataCy}
         />
+        {enablePagination && (
+          <DatatableFooter
+            onPageChange={tableInstance.setPageIndex}
+            onPageSizeChange={tableInstance.setPageSize}
+            page={tableState.pagination.pageIndex}
+            pageSize={tableState.pagination.pageSize}
+            pageCount={tableInstance.getPageCount()}
+            totalSelected={selectedItems.length}
+            totalHiddenSelected={hiddenSelectedItems.length}
+          />
+        )}
       </Table.Container>
     </NestedTable>
   );
