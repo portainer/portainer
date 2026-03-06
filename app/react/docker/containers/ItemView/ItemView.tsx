@@ -5,7 +5,7 @@ import { ContainerDetailsViewModel } from '@/docker/models/containerDetails';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { trimContainerName } from '@/docker/filters/utils';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
+import { useEnvironmentRegistries } from '@/react/portainer/environments/queries/useEnvironmentRegistries';
 import { Registry } from '@/react/portainer/registries/types/registry';
 
 import { PageHeader } from '@@/PageHeader';
@@ -32,7 +32,7 @@ export function ItemView() {
     { select: (c) => new ContainerDetailsViewModel(c) }
   );
 
-  const registriesQuery = useRegistries();
+  const registriesQuery = useEnvironmentRegistries(environmentId);
 
   if (
     containerQuery.isLoading ||
