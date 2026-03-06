@@ -173,24 +173,19 @@ describe('getEnvironmentOptions', () => {
     });
   });
 
-  it('should create "Unassigned" group for GroupId = 1', () => {
+  it('should auto create an Others group if group is missing', () => {
     const environments: Environment[] = [
       { Id: 1, Name: 'Env 1', GroupId: 1 } as Environment,
+      { Id: 2, Name: 'Env 2', GroupId: 2 } as Environment,
     ];
+    const groups: EnvironmentGroup[] = [];
 
-    const result = getEnvironmentOptions([], environments);
-
-    expect(result[0].label).toBe('Unassigned');
-    expect(result[0].options[0]).toEqual({ label: 'Env 1', value: 1 });
-  });
-
-  it('should throw error if group is missing for non-unassigned GroupId', () => {
-    const environments: Environment[] = [
-      { Id: 1, Name: 'Env 1', GroupId: 2 } as Environment,
-    ];
-
-    expect(() => getEnvironmentOptions([], environments)).toThrow(
-      'Missing group with id 2'
-    );
+    const result = getEnvironmentOptions(groups, environments);
+    expect(result.length).toBe(1);
+    expect(result[0].label).toBe('Others');
+    expect(result[0].options).toEqual([
+      { label: 'Env 1', value: 1 },
+      { label: 'Env 2', value: 2 },
+    ]);
   });
 });

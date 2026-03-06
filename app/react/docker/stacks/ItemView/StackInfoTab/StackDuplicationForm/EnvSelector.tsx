@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { sortBy } from 'lodash';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
@@ -73,7 +74,11 @@ export function getEnvironmentOptions(
       return acc;
     }
 
-    const groupId = environment.GroupId;
+    let groupId = environment.GroupId;
+    if (!groups.some((g) => g.Id === groupId)) {
+      groupId = -1;
+    }
+
     if (!acc[groupId]) {
       acc[groupId] = [];
     }
@@ -87,13 +92,10 @@ export function getEnvironmentOptions(
   return Object.entries(groupedEnvironments).map(([groupId, envOptions]) => {
     const parsedGroupId = parseInt(groupId, 10);
     const group = groups.find((g) => g.Id === parsedGroupId);
-    if (!group && parsedGroupId !== 1) {
-      throw new Error(`Missing group with id ${groupId}`);
-    }
 
     return {
-      label: group?.Name || 'Unassigned',
-      options: envOptions,
+      label: group?.Name || 'Others',
+      options: sortBy(envOptions, 'label'),
     };
   });
 }
