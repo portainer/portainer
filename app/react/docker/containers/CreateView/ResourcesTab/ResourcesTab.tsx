@@ -13,6 +13,7 @@ import { GpuFieldset, GpuFieldsetValues } from './GpuFieldset';
 import { Values as RuntimeValues, RuntimeSection } from './RuntimeSection';
 import { DevicesField, Values as Devices } from './DevicesField';
 import { SysctlsField, Values as Sysctls } from './SysctlsField';
+import { SecurityOptField, Values as SecurityOpt } from './SecurityOptField';
 import {
   ResourceFieldset,
   Values as ResourcesValues,
@@ -24,6 +25,7 @@ export interface Values {
   devices: Devices;
 
   sysctls: Sysctls;
+  securityOpt: SecurityOpt;
 
   sharedMemorySize: number;
 
@@ -40,6 +42,7 @@ export function ResourcesTab({
   isInitFieldVisible,
   isDevicesFieldVisible,
   isSysctlFieldVisible,
+  isSecurityOptFieldVisible,
   renderLimits,
 }: {
   values: Values;
@@ -49,6 +52,7 @@ export function ResourcesTab({
   isInitFieldVisible: boolean;
   isDevicesFieldVisible: boolean;
   isSysctlFieldVisible: boolean;
+  isSecurityOptFieldVisible: boolean;
   renderLimits?: (values: ResourcesValues) => ReactNode;
 }) {
   const environmentId = useEnvironmentId();
@@ -85,6 +89,13 @@ export function ResourcesTab({
         <SysctlsField
           values={values.sysctls}
           onChange={(sysctls) => setFieldValue('sysctls', sysctls)}
+        />
+      )}
+
+      {isSecurityOptFieldVisible && (
+        <SecurityOptField
+          values={values.securityOpt}
+          onChange={(securityOpt) => setFieldValue('securityOpt', securityOpt)}
         />
       )}
 

@@ -33,6 +33,7 @@ describe('useCanDuplicateEditContainer', () => {
       allowBindMountsForRegularUsers: true,
       allowDeviceMappingForRegularUsers: true,
       allowSysctlSettingForRegularUsers: true,
+      allowSecurityOptForRegularUsers: true,
       allowHostNamespaceForRegularUsers: true,
       allowPrivilegedModeForRegularUsers: true,
       allowVolumeBrowserForRegularUsers: true,

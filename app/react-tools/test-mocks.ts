@@ -135,6 +135,7 @@ export function createMockEnvironment(
       allowHostNamespaceForRegularUsers: false,
       allowStackManagementForRegularUsers: false,
       allowSysctlSettingForRegularUsers: false,
+      allowSecurityOptForRegularUsers: false,
       allowVolumeBrowserForRegularUsers: false,
       enableHostManagementFeatures: false,
     },

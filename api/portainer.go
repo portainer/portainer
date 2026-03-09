@@ -647,6 +647,8 @@ type (
 		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use sysctl settings
 		AllowSysctlSettingForRegularUsers bool `json:"allowSysctlSettingForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use security-opt settings
+		AllowSecurityOptForRegularUsers bool `json:"allowSecurityOptForRegularUsers" example:"true"`
 		// Whether host management features are enabled
 		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
@@ -2477,6 +2479,7 @@ func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
 		AllowHostNamespaceForRegularUsers:         false,
 		AllowPrivilegedModeForRegularUsers:        false,
 		AllowSysctlSettingForRegularUsers:         false,
+		AllowSecurityOptForRegularUsers:           false,
 		AllowVolumeBrowserForRegularUsers:         false,
 		EnableHostManagementFeatures:              false,
 

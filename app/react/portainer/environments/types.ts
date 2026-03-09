@@ -119,6 +119,8 @@ export interface EnvironmentSecuritySettings {
   allowContainerCapabilitiesForRegularUsers: boolean;
   // Whether non-administrator should be able to use sysctl settings
   allowSysctlSettingForRegularUsers: boolean;
+  // Whether non-administrator should be able to use security-opt settings
+  allowSecurityOptForRegularUsers: boolean;
   // Whether host management features are enabled
   enableHostManagementFeatures: boolean;
 }

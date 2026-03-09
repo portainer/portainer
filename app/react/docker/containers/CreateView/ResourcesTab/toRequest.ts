@@ -24,6 +24,7 @@ export function toRequest(
       Sysctls: Object.fromEntries(
         values.sysctls.map((sysctl) => [sysctl.name, sysctl.value])
       ),
+      SecurityOpt: values.securityOpt,
       ShmSize: toConfigMemory(values.sharedMemorySize),
       DeviceRequests: gpuFieldsetUtils.toRequest(
         oldConfig.HostConfig.DeviceRequests || [],
