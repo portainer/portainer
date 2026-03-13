@@ -74,7 +74,6 @@ func Test_GenerateYAML(t *testing.T) {
 				name: portainer-ctx
 			current-context: portainer-ctx
 			kind: Config
-			preferences: {}
 			users:
 			- name: test-user
 				user:
