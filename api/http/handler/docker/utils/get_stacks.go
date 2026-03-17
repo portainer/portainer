@@ -19,6 +19,7 @@ type StackViewModel struct {
 	Name       string
 	IsExternal bool
 	Type       portainer.StackType
+	Labels     map[string]string
 }
 
 // GetDockerStacks retrieves all the stacks associated to a specific environment filtered by the user's access.
@@ -56,6 +57,7 @@ func GetDockerStacks(tx dataservices.DataStoreTx, securityContext *security.Rest
 				Name:       name,
 				IsExternal: true,
 				Type:       portainer.DockerComposeStack,
+				Labels:     container.Labels,
 			}
 		}
 	}
@@ -68,6 +70,7 @@ func GetDockerStacks(tx dataservices.DataStoreTx, securityContext *security.Rest
 				Name:       name,
 				IsExternal: true,
 				Type:       portainer.DockerSwarmStack,
+				Labels:     service.Spec.Labels,
 			}
 		}
 	}
@@ -79,7 +82,10 @@ func GetDockerStacks(tx dataservices.DataStoreTx, securityContext *security.Rest
 
 	return uac.FilterByResourceControl(stacksList, user, securityContext.UserMemberships,
 		func(item StackViewModel) (*portainer.ResourceControl, error) {
-			return uac.StackResourceControlGetter(tx, environmentID)(*item.InternalStack)
+			if item.InternalStack != nil {
+				return uac.StackResourceControlGetter(tx, environmentID)(*item.InternalStack)
+			}
+			return uac.ExternalStackResourceControlGetter(tx, environmentID)(uac.ExternalStack{Labels: item.Labels})
 		},
 	)
 }
