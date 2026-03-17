@@ -11,7 +11,7 @@ see also:
 ## Package Manager
 
 - **PNPM** 10+ (for frontend)
-- **Go** 1.25.7 (for backend)
+- **Go** 1.25.8 (for backend)
 
 ## Build Commands
 
