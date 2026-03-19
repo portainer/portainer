@@ -43,6 +43,7 @@ const defaultProps = {
   schema: { type: 'object' } as JSONSchema7,
   isOrphaned: false,
   stackId: 1,
+  isSubmitting: false,
   isSaved: false,
   webhookId: '',
 };
@@ -377,17 +378,7 @@ describe('form submission', () => {
   });
 
   it('should show loading text during submission', async () => {
-    const onSubmit = vi.fn().mockImplementation(() => new Promise(() => {})); // Never resolves
-    renderComponent({}, { onSubmit });
-    const user = userEvent.setup();
-
-    await waitFor(() => {
-      const deployButton = screen.getByTestId('stack-deploy-button');
-      expect(deployButton).toBeEnabled();
-    });
-
-    const deployButton = screen.getByTestId('stack-deploy-button');
-    await user.click(deployButton);
+    renderComponent({ isSubmitting: true }, {});
 
     await waitFor(() => {
       expect(screen.getByText(/Deployment in progress.../)).toBeInTheDocument();

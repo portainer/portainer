@@ -117,6 +117,7 @@ export function StackEditorTab({
         envType={envType}
         schema={schemaQuery.data}
         versions={versions}
+        isSubmitting={mutation.isLoading}
         isSaved={mutation.isSuccess}
         webhookId={webhookId}
       />

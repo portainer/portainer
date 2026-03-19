@@ -29,6 +29,7 @@ interface StackEditorTabInnerProps {
   versions?: Array<number>;
   stackId: Stack['Id'];
   isSaved: boolean;
+  isSubmitting: boolean;
   webhookId: string;
 }
 
@@ -42,20 +43,15 @@ export function StackEditorTabInner({
   versions,
   stackId,
   isSaved,
+  isSubmitting,
   webhookId,
 }: StackEditorTabInnerProps) {
   const { authorized: isAuthorizedToUpdate } = useAuthorizations(
     'PortainerStackUpdate'
   );
 
-  const {
-    values,
-    errors,
-    setFieldValue,
-    isSubmitting,
-    isValid,
-    initialValues,
-  } = useFormikContext<StackEditorFormValues>();
+  const { values, errors, setFieldValue, isValid, initialValues } =
+    useFormikContext<StackEditorFormValues>();
 
   usePreventExit(
     initialValues.stackFileContent,
