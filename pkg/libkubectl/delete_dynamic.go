@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -54,8 +55,20 @@ func (c *Client) DeleteDynamic(ctx context.Context, manifests []string) (string,
 			continue
 		}
 
+		var content string
+		if isManifestFile(manifest) {
+			data, err := os.ReadFile(manifest)
+			if err != nil {
+				errs = errors.Join(errs, fmt.Errorf("failed to read file %s: %w", manifest, err))
+				continue
+			}
+			content = string(data)
+		} else {
+			content = manifest
+		}
+
 		// Split by document separator if multiple resources in one manifest
-		for resource := range strings.SplitSeq(manifest, "\n---\n") {
+		for resource := range strings.SplitSeq(content, "\n---\n") {
 			resource = strings.TrimSpace(resource)
 			if resource == "" {
 				continue
