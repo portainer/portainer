@@ -64,7 +64,7 @@ func (kcl *KubeClient) fetchCronJobs(namespace string) ([]models.K8sCronJob, err
 
 // parseCronJob converts a batchv1.CronJob object to a models.K8sCronJob object.
 func (kcl *KubeClient) parseCronJob(cronJob batchv1.CronJob, jobsList *batchv1.JobList) models.K8sCronJob {
-	jobs, err := kcl.getCronJobExecutions(cronJob.Name, jobsList)
+	jobs, err := kcl.getCronJobExecutions(cronJob.Name, cronJob.Namespace, jobsList)
 	if err != nil {
 		return models.K8sCronJob{}
 	}

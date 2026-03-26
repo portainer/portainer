@@ -168,11 +168,15 @@ func getJobPodName(kcl *KubeClient, job batchv1.Job) string {
 
 // getCronJobExecutions returns the jobs for a given cronjob
 // it returns the jobs for the cronjob
-func (kcl *KubeClient) getCronJobExecutions(cronJobName string, jobs *batchv1.JobList) ([]models.K8sJob, error) {
+func (kcl *KubeClient) getCronJobExecutions(cronJobName string, cronJobNamespace string, jobs *batchv1.JobList) ([]models.K8sJob, error) {
 	maxItems := 5
 
 	results := make([]models.K8sJob, 0)
 	for _, job := range jobs.Items {
+		if job.Namespace != cronJobNamespace {
+			continue
+		}
+
 		for _, owner := range job.OwnerReferences {
 			if owner.Kind == "CronJob" && owner.Name == cronJobName {
 				results = append(results, kcl.parseJob(job))
