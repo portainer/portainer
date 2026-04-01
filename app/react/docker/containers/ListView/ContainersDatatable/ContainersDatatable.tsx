@@ -28,6 +28,7 @@ import { createStore } from './datatable-store';
 
 const storageKey = 'containers';
 const settingsStore = createStore(storageKey);
+const metricsColumnIds = ['cpu', 'memory', 'blockIO'];
 
 const actions = [
   buildAction('logs', 'Logs'),
@@ -54,8 +55,12 @@ export function ContainersDatatable({
     autoRefreshRate: tableState.autoRefreshRate * 1000,
   });
 
+  const isMetricsEnabled = !metricsColumnIds.every((id) =>
+    tableState.hiddenColumns.includes(id)
+  );
+
   return (
-    <RowProvider context={{ environment }}>
+    <RowProvider context={{ environment, isMetricsEnabled }}>
       <TableSettingsProvider settings={settingsStore}>
         <Datatable
           titleIcon={Box}

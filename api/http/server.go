@@ -51,6 +51,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
+	dockerstats "github.com/portainer/portainer/api/docker/stats"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -186,6 +187,7 @@ func (server *Server) Start() error {
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 	endpointHandler.PendingActionsService = server.PendingActionsService
 	endpointHandler.PullLimitCheckDisabled = server.PullLimitCheckDisabled
+	endpointHandler.MetricsCache = dockerstats.NewMetricsCache()
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 

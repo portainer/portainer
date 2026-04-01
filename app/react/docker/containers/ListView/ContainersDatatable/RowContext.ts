@@ -4,6 +4,7 @@ import { createRowContext } from '@@/datatables/RowContext';
 
 interface RowContextState {
   environment: Environment;
+  isMetricsEnabled: boolean;
 }
 
 const { RowProvider, useRowContext } = createRowContext<RowContextState>();
