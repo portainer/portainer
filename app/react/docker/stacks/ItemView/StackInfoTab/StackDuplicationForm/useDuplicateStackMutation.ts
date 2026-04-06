@@ -25,7 +25,7 @@ export async function duplicateStack({
   fileContent: string;
   targetEnvironmentId: EnvironmentId;
   type: StackType;
-  env?: Array<Pair>;
+  env?: Array<Pair> | null;
 }) {
   if (type === StackType.DockerSwarm) {
     const swarm = await getSwarm(targetEnvironmentId);

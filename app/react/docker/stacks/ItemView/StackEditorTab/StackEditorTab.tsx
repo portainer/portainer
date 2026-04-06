@@ -57,7 +57,7 @@ export function StackEditorTab({
   );
 
   const initialValues: StackEditorFormValues = {
-    environmentVariables: stack.Env,
+    environmentVariables: stack.Env || [],
     prune: !!(stack.Option && stack.Option.Prune),
     stackFileContent: originalFileContent,
     enabledWebhook: !!stack.Webhook,

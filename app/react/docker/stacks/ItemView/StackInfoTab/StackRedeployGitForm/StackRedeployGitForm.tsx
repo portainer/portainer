@@ -46,7 +46,7 @@ export function StackRedeployGitForm({ stack }: { stack: Stack }) {
       SaveCredential: false,
     },
     autoUpdate: parseAutoUpdateResponse(stack.AutoUpdate),
-    env: stack.Env,
+    env: stack.Env || [],
     prune: stack.Option?.Prune || false,
     refName: stack.GitConfig?.ReferenceName || '',
     tlsSkipVerify: stack.GitConfig?.TLSSkipVerify || false,

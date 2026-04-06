@@ -15,7 +15,7 @@ export function useUpdateStackMutation() {
 
 type Payload = {
   stackFileContent: string;
-  env?: EnvVarValues;
+  env?: EnvVarValues | null;
   prune?: boolean;
   webhook?: string;
   repullImageAndRedeploy?: boolean;

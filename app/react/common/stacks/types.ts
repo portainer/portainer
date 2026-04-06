@@ -54,7 +54,7 @@ export interface Stack {
   EndpointId: number;
   SwarmId: string;
   EntryPoint: string;
-  Env: EnvVar[];
+  Env: EnvVar[] | null;
   ResourceControl?: ResourceControlResponse;
   Status: StackStatus;
   ProjectPath: string;
@@ -84,7 +84,7 @@ export type StackFile = {
 };
 
 export interface GitStackPayload {
-  env: Array<EnvVar>;
+  env: Array<EnvVar> | null;
   prune?: boolean;
   RepositoryReferenceName?: string;
   RepositoryAuthentication?: boolean;

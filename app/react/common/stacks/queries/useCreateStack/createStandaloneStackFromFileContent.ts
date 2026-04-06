@@ -13,7 +13,7 @@ export interface StandaloneFileContentPayload {
 
   stackFileContent: string;
   /** List of environment variables */
-  env?: Array<Pair>;
+  env?: Array<Pair> | null;
 
   /** Whether the stack is from an app template */
   fromAppTemplate?: boolean;
