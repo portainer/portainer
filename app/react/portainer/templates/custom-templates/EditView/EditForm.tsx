@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -32,6 +33,7 @@ export function EditForm({
   const isGit = !!template.GitConfig;
 
   const router = useRouter();
+  const { t } = useTranslation();
   const disableEditor = useDisableEditor(isGit);
   const mutation = useUpdateTemplateMutation();
   const deployMethod: DeployMethod =
@@ -97,7 +99,7 @@ export function EditForm({
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Template updated successfully');
+          notifySuccess(t('common.success'), t('edge.custom_templates_updated'));
           router.stateService.go('^');
         },
       }

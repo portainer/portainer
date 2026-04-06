@@ -1,25 +1,25 @@
 <page-header
-  title="'Container console'"
+  title="'docker_containers.console_title' | i18n"
   breadcrumbs="[
-    { label:'Containers', link:'docker.containers' },
+    { label:('docker_containers.title' | i18n), link:'docker.containers' },
     {
       label:(container.Name | trimcontainername),
       link: 'docker.containers.container',
       linkParams: { id: container.Id },
-    }, 'Console']"
+    }, ('docker_containers.console' | i18n)]"
 >
 </page-header>
 
 <div class="row" ng-init="initView()" ng-show="loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="terminal" title-text="Execute"></rd-widget-header>
+      <rd-widget-header icon="terminal" title-text="{{ 'docker_containers.execute' | i18n }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div ng-if="state === states.disconnected">
             <!-- command-list -->
             <div class="form-group">
-              <label for="command" class="col-lg-1 col-sm-2 control-label text-left">Command</label>
+              <label for="command" class="col-lg-1 col-sm-2 control-label text-left">{{ 'docker_containers.command' | i18n }}</label>
               <div class="col-lg-11 col-sm-10">
                 <div class="input-group" ng-if="!formValues.isCustomCommand">
                   <span class="input-group-addon">
@@ -52,14 +52,14 @@
               <por-switch-field
                 label-class="'col-sm-1'"
                 checked="formValues.isCustomCommand"
-                label="'Use custom command'"
+                label="'docker_containers.use_custom_command' | i18n"
                 on-change="(handleIsCustomCommandChange)"
               ></por-switch-field>
             </div>
             <div class="form-group">
               <label class="col-lg-1 col-sm-2 control-label text-left">
-                User
-                <portainer-tooltip message="'Format is one of: user, user:group, uid or uid:gid'"></portainer-tooltip>
+                {{ 'docker_containers.user' | i18n }}
+                <portainer-tooltip message="'docker_containers.user_format_tooltip' | i18n"></portainer-tooltip>
               </label>
               <div class="col-lg-11 col-sm-10">
                 <input class="form-control" type="text" ng-model="formValues.user" placeholder="root" data-cy="container-exec-user" />
@@ -68,24 +68,24 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button type="button" class="btn btn-primary" ng-disabled="!container.State.Running" ng-click="connectExec()">
-                  <span>Connect</span>
+                  <span>{{ 'docker_containers.connect' | i18n }}</span>
                 </button>
                 <span class="small text-danger vertical-center" ng-hide="container.State.Running">
                   <pr-icon icon="'alert-triangle'" mode="'danger'"></pr-icon>
-                  The container is not running.
+                  {{ 'docker_containers.container_not_running' | i18n }}
                 </span>
               </div>
             </div>
           </div>
           <div ng-if="state !== states.disconnected">
             <label
-              >Exec into container as <code class="align-baseline !text-sm">{{ ::formValues.user || 'default user' }}</code> using command
+              >{{ 'docker_containers.exec_as_user' | i18n }} <code class="align-baseline !text-sm">{{ ::formValues.user || ('docker_containers.default_user' | i18n) }}</code> {{ 'docker_containers.using_command' | i18n }}
               <code class="align-baseline !text-sm">{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code>
               <terminal-tooltip class="align-sub"> </terminal-tooltip>
             </label>
             <button type="button" class="btn btn-primary" ng-click="disconnect()">
-              <span ng-show="state === states.connected">Disconnect</span>
-              <span ng-show="state === states.connecting">Connecting...</span>
+              <span ng-show="state === states.connected">{{ 'docker_containers.disconnect' | i18n }}</span>
+              <span ng-show="state === states.connecting">{{ 'docker_containers.connecting' | i18n }}</span>
             </button>
           </div>
         </form>

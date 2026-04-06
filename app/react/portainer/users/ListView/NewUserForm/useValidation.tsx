@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
 import { useUsers } from '@/portainer/users/queries';
+import i18n from '@/i18n';
 
 import { FormValues } from './FormValues';
 
@@ -19,10 +20,10 @@ export function useValidation(): SchemaOf<FormValues> {
 
     const base = object({
       username: string()
-        .required('Username is required')
+        .required(i18n.t('users.username_required'))
         .test({
           name: 'unique',
-          message: 'Username is already taken',
+          message: i18n.t('users.username_taken'),
           test: (value) => users.every((u) => u.Username !== value),
         }),
       password: string().default(''),
@@ -44,15 +45,15 @@ export function useValidation(): SchemaOf<FormValues> {
 function passwordValidation(minLength: number | undefined = 12) {
   return object({
     password: string()
-      .required('Password is required')
+      .required(i18n.t('users.password_required'))
       .min(
         minLength,
         ({ value, min }) =>
-          `The password must be at least ${min} characters long. (${value.length}/${min})`
+          i18n.t('users.password_min_length', { min, current: value.length })
       ),
     confirmPassword: string().oneOf(
       [ref('password'), null],
-      'Passwords must match'
+      i18n.t('users.passwords_must_match')
     ),
   });
 }

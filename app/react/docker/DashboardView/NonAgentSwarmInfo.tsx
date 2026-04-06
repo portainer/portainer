@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useInfoPanelState } from '@/react/hooks/useInfoPanelState';
 
@@ -10,6 +12,7 @@ import { useInfo } from '../proxy/queries/useInfo';
 const infoPanelId = 'docker-dashboard-info-01';
 
 export function NonAgentSwarmInfo() {
+  const { t } = useTranslation();
   const { isVisible, dismiss } = useInfoPanelState(infoPanelId);
   const envId = useEnvironmentId();
   const isManagerQuery = useInfo(envId, {
@@ -22,7 +25,7 @@ export function NonAgentSwarmInfo() {
   const isManager = isManagerQuery.data;
 
   return (
-    <InformationPanel title="Information" onDismiss={() => dismiss()}>
+    <InformationPanel title={t('docker.dashboard.non_agent_info')} onDismiss={() => dismiss()}>
       <TextTip color="blue">
         {isManager ? (
           <>

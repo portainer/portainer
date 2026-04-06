@@ -1,5 +1,7 @@
 import { object, mixed, array, number, SchemaOf } from 'yup';
 
+import i18n from '@/i18n';
+
 import { AccessControlFormData, ResourceControlOwnership } from '../types';
 
 export function validationSchema(
@@ -16,8 +18,8 @@ export function validationSchema(
     .test(
       'user-and-team',
       isAdmin
-        ? 'You must specify at least one team or user.'
-        : 'You must specify at least one team.',
+        ? i18n.t('validation.must_specify_team_or_user')
+        : i18n.t('validation.must_specify_team'),
       ({ ownership, authorizedTeams, authorizedUsers }) => {
         if (ownership !== ResourceControlOwnership.RESTRICTED) {
           return true;

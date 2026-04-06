@@ -1,33 +1,33 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="code" title-text="Host Details"></rd-widget-header>
+      <rd-widget-header icon="code" title-text="{{ 'docker_host.host_details' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Hostname</td>
+              <td>{{ 'docker_host.hostname' | i18n }}</td>
               <td>{{ $ctrl.host.name }}</td>
             </tr>
             <tr ng-if="$ctrl.host.os">
-              <td>OS Information</td>
+              <td>{{ 'docker_host.os_information' | i18n }}</td>
               <td>{{ $ctrl.host.os.type }} {{ $ctrl.host.os.arch }} {{ $ctrl.host.os.name }}</td>
             </tr>
             <tr ng-if="$ctrl.host.kernelVersion">
-              <td>Kernel Version</td>
+              <td>{{ 'docker_host.kernel_version' | i18n }}</td>
               <td>{{ $ctrl.host.kernelVersion }}</td>
             </tr>
             <tr>
-              <td>Total CPU</td>
+              <td>{{ 'docker_host.total_cpu' | i18n }}</td>
               <td>{{ $ctrl.host.totalCPU }}</td>
             </tr>
             <tr>
-              <td>Total memory</td>
+              <td>{{ 'docker_host.total_memory' | i18n }}</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
             <tr ng-if="$ctrl.isBrowseEnabled">
               <td colspan="2">
-                <button class="btn btn-primary btn-sm" title="Browse" ui-sref="{{ $ctrl.browseUrl }}"> Browse </button>
+                <button class="btn btn-primary btn-sm" title="{{ 'docker_host.browse' | i18n }}" ui-sref="{{ $ctrl.browseUrl }}"> {{ 'docker_host.browse' | i18n }} </button>
               </td>
             </tr>
           </tbody>

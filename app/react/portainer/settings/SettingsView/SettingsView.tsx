@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import angular from 'angular';
+import { useTranslation } from 'react-i18next';
 
 import { StateManager } from '@/portainer/services/types';
 
@@ -18,6 +19,7 @@ import { SSLSettingsPanelWrapper } from './SSLSettingsPanel/SSLSettingsPanel';
 import { ExperimentalFeatures } from './ExperimentalFeatures';
 
 export function SettingsView() {
+  const { t } = useTranslation();
   const settingsQuery = useSettings();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function SettingsView() {
 
   return (
     <>
-      <PageHeader title="Settings" breadcrumbs="Settings" reload />
+      <PageHeader title={t('settings.title')} breadcrumbs={t('settings.breadcrumbs')} reload />
 
       <div className="mx-4 space-y-4">
         {settingsQuery.data && (

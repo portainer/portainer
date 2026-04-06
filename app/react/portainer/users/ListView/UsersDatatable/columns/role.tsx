@@ -1,5 +1,6 @@
 import { User, UserPlus } from 'lucide-react';
 
+import i18n from '@/i18n';
 import { isEdgeAdmin } from '@/portainer/users/user.helpers';
 import { RoleNames } from '@/portainer/users/types';
 
@@ -10,10 +11,10 @@ import { helper } from './helper';
 export const role = helper.accessor(
   (item) =>
     `${RoleNames[item.Role]} ${
-      item.isTeamLeader ? ' - team leader' : ''
+      item.isTeamLeader ? i18n.t('users.team_leader_suffix') : ''
     }`.trim(),
   {
-    header: 'Role',
+    header: i18n.t('users.col_role') as string,
     cell: ({ getValue, row: { original: item } }) => {
       const icon =
         isEdgeAdmin({ Role: item.Role }) || item.isTeamLeader ? User : UserPlus;

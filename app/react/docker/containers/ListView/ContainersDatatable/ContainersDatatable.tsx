@@ -1,4 +1,5 @@
 import { Box } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { useShowGPUsColumn } from '@/react/docker/containers/utils';
@@ -46,6 +47,7 @@ export function ContainersDatatable({
   isHostColumnVisible,
   environment,
 }: Props) {
+  const { t } = useTranslation();
   const isGPUsColumnVisible = useShowGPUsColumn(environment);
   const columns = useColumns(isHostColumnVisible, isGPUsColumnVisible);
   const tableState = useTableState(settingsStore, storageKey);
@@ -59,7 +61,7 @@ export function ContainersDatatable({
       <TableSettingsProvider settings={settingsStore}>
         <Datatable
           titleIcon={Box}
-          title="Containers"
+          title={t('docker_containers.title')}
           settingsManager={tableState}
           columns={columns}
           renderTableActions={(selectedRows) => (

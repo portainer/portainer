@@ -1,8 +1,8 @@
 <form name="$ctrl.redeployGitForm">
-  <div class="col-sm-12 form-section-title"> Redeploy from git repository </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_git.redeploy_from_git' | i18n }} </div>
   <div class="form-group text-muted">
     <div class="col-sm-12">
-      <p> Pull the latest manifest from git and redeploy the application. </p>
+      <p> {{ 'portainer_git.pull_latest_manifest' | i18n }} </p>
     </div>
   </div>
   <git-form-auto-update-fieldset
@@ -22,7 +22,7 @@
         <a class="small interactive" ng-click="$ctrl.state.showConfig = !$ctrl.state.showConfig">
           <pr-icon ng-if="$ctrl.state.showConfig" icon="'minus'" class-name="'mr-1'"></pr-icon>
           <pr-icon ng-if="!$ctrl.state.showConfig" icon="'plus'" class-name="'mr-1'"></pr-icon>
-          {{ $ctrl.state.showConfig ? 'Hide' : 'Advanced' }} configuration
+          {{ $ctrl.state.showConfig ? ('portainer_git.hide' | i18n) : ('portainer_git.advanced' | i18n) }} {{ 'portainer_git.configuration' | i18n }}
         </a>
       </p>
     </div>
@@ -57,7 +57,7 @@
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title"> Actions </div>
+  <div class="col-sm-12 form-section-title"> {{ 'common.actions' | i18n }} </div>
   <!-- #Git buttons -->
   <button
     class="btn btn-sm btn-primary"
@@ -73,7 +73,7 @@
       <pr-icon icon="'refresh-cw'" class="!mr-1"></pr-icon>
       Pull and update application
     </span>
-    <span ng-show="$ctrl.state.redeployInProgress">In progress...</span>
+    <span ng-show="$ctrl.state.redeployInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
   </button>
 
   <button
@@ -87,7 +87,7 @@
     analytics-event="kubernetes-application-edit"
     analytics-properties="$ctrl.buildAnalyticsProperties()"
   >
-    <span ng-show="!$ctrl.state.saveGitSettingsInProgress"> Save settings </span>
-    <span ng-show="$ctrl.state.saveGitSettingsInProgress">In progress...</span>
+    <span ng-show="!$ctrl.state.saveGitSettingsInProgress"> {{ 'portainer_git.save_settings' | i18n }} </span>
+    <span ng-show="$ctrl.state.saveGitSettingsInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
   </button>
 </form>

@@ -1,30 +1,24 @@
 import { Field, useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { TextTip } from '@@/Tip/TextTip';
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
-import { ExternalLink } from '@@/ExternalLink';
 
 export function HelmSection() {
+  const { t } = useTranslation();
   const [{ name }, { error }] = useField<string>('helmRepositoryUrl');
 
   return (
-    <FormSection title="Helm repository">
+    <FormSection title={t('settings.helm_repo_title')}>
       <div className="mb-2">
         <TextTip color="blue">
-          You can specify the URL to your own{' '}
-          <ExternalLink
-            to="https://helm.sh/docs/topics/chart_repository/"
-            data-cy="helm-repository-link"
-          >
-            Helm repository
-          </ExternalLink>{' '}
-          here.
+          {t('settings.helm_repo_desc')}
         </TextTip>
       </div>
 
-      <FormControl label="URL" errors={error} inputId="helm-repo-url">
+      <FormControl label={t('settings.url')} errors={error} inputId="helm-repo-url">
         <Field
           as={Input}
           id="helm-repo-url"

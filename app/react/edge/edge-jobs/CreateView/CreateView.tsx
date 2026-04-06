@@ -1,16 +1,20 @@
+import { useTranslation } from 'react-i18next';
+
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 
 import { CreateEdgeJobForm } from './CreateEdgeJobForm';
 
 export function CreateView() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHeader
-        title="Create edge job"
+        title={t('edge.jobs_create')}
         breadcrumbs={[
-          { label: 'Edge jobs', link: 'edge.jobs' },
-          'Create edge job',
+          { label: t('edge.jobs_title'), link: 'edge.jobs' },
+          t('edge.jobs_create'),
         ]}
       />
 

@@ -1,6 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 
+import i18n from '@/i18n';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { GitCommitLink } from '@/react/portainer/gitops/GitCommitLink';
@@ -28,7 +29,8 @@ export const columns = _.compact([
     (item) =>
       item.StatusSummary?.AggregatedStatus?.[StatusType.Acknowledged] || 0,
     {
-      header: 'Acknowledged',
+      id: 'acknowledged',
+      header: () => i18n.t('edge.stacks.columns.acknowledged'),
       enableSorting: false,
       enableHiding: false,
       cell: ({ getValue, row }) => (
@@ -48,7 +50,8 @@ export const columns = _.compact([
       (item) =>
         item.StatusSummary?.AggregatedStatus?.[StatusType.ImagesPulled] || 0,
       {
-        header: 'Images pre-pulled',
+        id: 'imagesPulled',
+        header: () => i18n.t('edge.stacks.columns.images_pre_pulled'),
         cell: ({ getValue, row: { original: item } }) => {
           if (!item.PrePullImage) {
             return <div className="text-center">-</div>;
@@ -74,7 +77,8 @@ export const columns = _.compact([
       item.StatusSummary?.AggregatedStatus?.[StatusType.DeploymentReceived] ||
       0,
     {
-      header: 'Deployments received',
+      id: 'deploymentsReceived',
+      header: () => i18n.t('edge.stacks.columns.deployments_received'),
       cell: ({ getValue, row }) => (
         <DeploymentCounter
           count={getValue()}
@@ -92,7 +96,8 @@ export const columns = _.compact([
   columnHelper.accessor(
     (item) => item.StatusSummary?.AggregatedStatus?.[StatusType.Error] || 0,
     {
-      header: 'Deployments failed',
+      id: 'deploymentsFailed',
+      header: () => i18n.t('edge.stacks.columns.deployments_failed'),
       cell: ({ getValue, row }) => {
         const count = getValue();
 
@@ -141,7 +146,8 @@ export const columns = _.compact([
     },
   }),
   columnHelper.accessor('CreationDate', {
-    header: 'Creation Date',
+    id: 'creationDate',
+    header: () => i18n.t('edge.stacks.columns.creation_date'),
     cell: ({ getValue }) => isoDateFromTimestamp(getValue()),
     enableHiding: false,
   }),
@@ -150,7 +156,8 @@ export const columns = _.compact([
       (item) =>
         item.GitConfig ? item.GitConfig.ConfigHash : item.StackFileVersion,
       {
-        header: 'Target Version',
+        id: 'targetVersion',
+        header: () => i18n.t('edge.stacks.columns.target_version'),
         enableSorting: false,
         cell: ({ row: { original: item } }) => {
           if (item.GitConfig) {
@@ -176,19 +183,16 @@ export const columns = _.compact([
 function StatusHeader() {
   return (
     <>
-      Status
+      {i18n.t('edge.stacks_col_status')}
       <Tooltip
         position="top"
         message={
           <>
             <div>
-              The status feature for the Edge stack is only available for Edge
-              Agent versions 2.19.0 and above.
+              {i18n.t('edge.stacks_status_tooltip1')}
             </div>
             <div>
-              To access the status of your edge stack, it is essential to
-              upgrade your Edge Agent to a corresponding version that is
-              compatible with your Portainer server.
+              {i18n.t('edge.stacks_status_tooltip2')}
             </div>
           </>
         }

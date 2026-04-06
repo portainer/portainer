@@ -1,4 +1,5 @@
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { confirm } from '@@/modals/confirm';
 import { FormControl } from '@@/form-components/FormControl';
@@ -7,12 +8,13 @@ import { buildConfirmButton } from '@@/modals/utils';
 import { ModalType } from '@@/modals';
 
 export function EnabledWaitingRoomSwitch() {
+  const { t } = useTranslation();
   const [inputProps, meta, helpers] = useField<boolean>('EnableWaitingRoom');
 
   return (
     <FormControl
       inputId="edge_waiting_room"
-      label="Enable Edge Environment Waiting Room"
+      label={t('settings.enable_waiting_room_label')}
       size="medium"
       errors={meta.error}
     >
@@ -35,10 +37,9 @@ export function EnabledWaitingRoomSwitch() {
 
     const confirmed = await confirm({
       modalType: ModalType.Warn,
-      title: 'Disable Edge Environment Waiting Room',
-      message:
-        'By disabling the waiting room feature, all devices requesting association will be automatically associated and could pose a security risk. Are you sure?',
-      confirmButton: buildConfirmButton('Confirm', 'danger'),
+      title: t('settings.disable_waiting_room_title'),
+      message: t('settings.disable_waiting_room_message'),
+      confirmButton: buildConfirmButton(t('common.confirm'), 'danger'),
     });
 
     if (!confirmed) {

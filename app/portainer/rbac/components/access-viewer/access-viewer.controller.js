@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import i18n from '@/i18n';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { AccessViewerPolicyModel } from '@/react/portainer/users/RolesView/AccessViewer/model';
@@ -165,7 +166,7 @@ export default class AccessViewerController {
       const teamUsers = await this.teamMemberUsers(this.allUsers, this.teamMemberships);
       this.users = teamUsers.map((user) => ({ label: user.Username, value: user.Id }));
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve accesses');
+      this.Notifications.error(i18n.t('portainer_theme.failure'), err, i18n.t('roles.unable_retrieve_accesses'));
     }
   }
 }

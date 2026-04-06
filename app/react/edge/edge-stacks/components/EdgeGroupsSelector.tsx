@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
@@ -30,6 +31,7 @@ export function EdgeGroupsSelector({
   isGroupVisible = () => true,
   required,
 }: Props) {
+  const { t } = useTranslation();
   const [inputId] = useState(() => _.uniqueId('edge-groups-selector-'));
 
   const selector = (
@@ -44,14 +46,14 @@ export function EdgeGroupsSelector({
   return horizontal ? (
     <FormControl
       errors={error}
-      label="Edge Groups"
+      label={t('edge_groups.edge_groups_label')}
       required={required}
       inputId={inputId}
     >
       {selector}
     </FormControl>
   ) : (
-    <FormSection title={`Edge Groups${required ? ' *' : ''}`} htmlFor={inputId}>
+    <FormSection title={`${t('edge_groups.edge_groups_label')}${required ? ' *' : ''}`} htmlFor={inputId}>
       <div className="form-group">
         <div className="col-sm-12">{selector} </div>
         {error && (
@@ -75,6 +77,7 @@ function InnerSelector({
   onChange: (value: SingleValue[]) => void;
   inputId: string;
 }) {
+  const { t } = useTranslation();
   const edgeGroupsQuery = useEdgeGroups();
 
   const items = (edgeGroupsQuery.data || []).filter(isGroupVisible);
@@ -85,7 +88,7 @@ function InnerSelector({
 
   return items.length ? (
     <Select
-      aria-label="Edge groups"
+      aria-label={t('edge_groups.edge_groups_label')}
       options={items}
       isMulti
       getOptionLabel={(item) => item.Name}
@@ -94,7 +97,7 @@ function InnerSelector({
       onChange={(value) => {
         onChange(value.map((item) => item.Id));
       }}
-      placeholder="Select one or multiple group(s)"
+      placeholder={t('edge_groups.selector_placeholder')}
       closeMenuOnSelect={false}
       data-cy="edge-stacks-groups-selector"
       id="edge-stacks-groups-selector"
@@ -102,11 +105,11 @@ function InnerSelector({
     />
   ) : (
     <div className="small text-muted">
-      No Edge groups are available. Head over to the{' '}
+      {t('edge_groups.no_groups_available')}{' '}
       <Link to="edge.groups" data-cy="edge-stacks-groups-view-link">
-        Edge groups view
+        {t('edge_groups.edge_groups_view_link')}
       </Link>{' '}
-      to create one.
+      {t('edge_groups.to_create_one')}
     </div>
   );
 }

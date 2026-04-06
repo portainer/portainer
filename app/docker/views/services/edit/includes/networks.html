@@ -1,21 +1,21 @@
 <div id="service-network-specs">
   <rd-widget>
-    <rd-widget-header icon="list" title-text="Networks">
+    <rd-widget-header icon="list" title-text="{{ 'docker_services.networks_header' | i18n }}">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating"> <pr-icon icon="'plus'"></pr-icon> network </a>
+        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating"> <pr-icon icon="'plus'"></pr-icon> {{ 'docker_services.add_network' | i18n }} </a>
       </div>
     </rd-widget-header>
     <rd-widget-body ng-if="!service.Networks || service.Networks.length === 0">
-      <p>This service is not connected to any networks.</p>
+      <p>{{ 'docker_services.no_networks' | i18n }}</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.Networks && service.Networks.length > 0" classes="no-padding">
       <table class="table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>ID</th>
-            <th>IP address</th>
-            <th>Actions</th>
+            <th>{{ 'docker_services.name' | i18n }}</th>
+            <th>{{ 'docker_services.id' | i18n }}</th>
+            <th>{{ 'docker_services.ip_address' | i18n }}</th>
+            <th>{{ 'common.actions' | i18n }}</th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
                 style="width: initial; min-width: 50%"
                 data-cy="network-selector_{{ network.Name }}"
               >
-                <option disabled value="" selected>Select a network</option>
+                <option disabled value="" selected>{{ 'docker_services.select_a_network' | i18n }}</option>
               </select>
               <span ng-if="!network.Editable">{{ network.Name }}</span>
             </td>
@@ -55,14 +55,14 @@
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="isUpdating || !hasChanges(service, ['Networks'])" ng-click="updateService(service)">
-            Apply changes
+            {{ 'docker_services.apply_changes' | i18n }}
           </button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <pr-icon icon="'chevron-down'"></pr-icon>
           </button>
           <ul class="dropdown-menu">
-            <li><a ng-click="cancelChanges(service, ['Networks'])">Reset changes</a></li>
-            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+            <li><a ng-click="cancelChanges(service, ['Networks'])">{{ 'docker_services.reset_changes' | i18n }}</a></li>
+            <li><a ng-click="cancelChanges(service)">{{ 'docker_services.reset_all_changes' | i18n }}</a></li>
           </ul>
         </div>
       </div>

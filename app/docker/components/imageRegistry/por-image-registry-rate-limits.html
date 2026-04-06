@@ -3,31 +3,30 @@
     <div ng-if="$ctrl.pullRateLimits.remaining > 0" class="text-muted vertical-center">
       <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
       <span ng-if="$ctrl.isAuthenticated">
-        You are currently using a free account to pull images from DockerHub and will be limited to 200 pulls every 6 hours. Remaining pulls:
+        {{ 'docker_images.rate_limit_free_user' | i18n }}
         <span style="font-weight: bold">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
       </span>
       <span ng-if="!$ctrl.isAuthenticated">
         <span ng-if="$ctrl.isAdmin">
-          You are currently using an anonymous account to pull images from DockerHub and will be limited to 100 pulls every 6 hours. You can configure DockerHub authentication in
-          the
-          <a ui-sref="portainer.registries">Registries View</a>. Remaining pulls:
+          {{ 'docker_images.rate_limit_anonymous_admin' | i18n }}
+          <a ui-sref="portainer.registries">{{ 'docker_images.registries_view' | i18n }}</a>. {{ 'docker_images.remaining_pulls' | i18n }}
           <span style="font-weight: bold">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
         </span>
         <span ng-if="!$ctrl.isAdmin">
-          You are currently using an anonymous account to pull images from DockerHub and will be limited to 100 pulls every 6 hours. Contact your administrator to configure
-          DockerHub authentication. Remaining pulls: <span style="font-weight: bold">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
+          {{ 'docker_images.rate_limit_anonymous_user' | i18n }}
+          <span style="font-weight: bold">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
         </span>
       </span>
     </div>
     <div ng-if="$ctrl.pullRateLimits.remaining <= 0" class="text-warning vertical-center">
       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
       <span ng-if="$ctrl.isAuthenticated">
-        Your authorized pull count quota as a free user is now exceeded.
-        <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
+        {{ 'docker_images.rate_limit_exceeded_free' | i18n }}
+        <span ng-transclude="rateLimitExceeded">{{ 'docker_images.rate_limit_no_pull' | i18n }}</span>
       </span>
       <span ng-if="!$ctrl.isAuthenticated">
-        Your authorized pull count quota as an anonymous user is now exceeded.
-        <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
+        {{ 'docker_images.rate_limit_exceeded_anonymous' | i18n }}
+        <span ng-transclude="rateLimitExceeded">{{ 'docker_images.rate_limit_no_pull' | i18n }}</span>
       </span>
     </div>
   </div>

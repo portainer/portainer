@@ -1,4 +1,5 @@
 import { ComponentProps, PropsWithChildren } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -16,8 +17,8 @@ interface Props extends AutomationTestingProps {
 }
 
 export function FormActions({
-  submitLabel = 'Save',
-  loadingText = 'Saving',
+  submitLabel,
+  loadingText,
   isLoading,
   children,
   isValid,
@@ -25,8 +26,9 @@ export function FormActions({
   submitIcon,
   'data-cy': dataCy,
 }: PropsWithChildren<Props>) {
+  const { t } = useTranslation();
   return (
-    <FormSection title="Actions">
+    <FormSection title={t('common.actions')}>
       <div className="form-group">
         <div className="col-sm-12">
           <div className="flex item-center gap-3">

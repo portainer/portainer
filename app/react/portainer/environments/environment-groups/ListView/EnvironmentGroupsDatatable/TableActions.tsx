@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { DeleteButton } from '@@/buttons/DeleteButton';
@@ -12,18 +14,19 @@ export function TableActions({
 }: {
   selectedItems: EnvironmentGroup[];
 }) {
+  const { t } = useTranslation();
   const deleteMutation = useDeleteEnvironmentGroupsMutation();
 
   return (
     <>
       <DeleteButton
         disabled={selectedItems.length === 0}
-        confirmMessage="Are you sure you want to remove the selected environment group(s)?"
+        confirmMessage={t('env_groups.remove_confirm')}
         onConfirmed={handleRemove}
         data-cy="remove-environment-groups-button"
       />
 
-      <AddButton data-cy="add-environment-group-button">Add group</AddButton>
+      <AddButton data-cy="add-environment-group-button">{t('env_groups.add')}</AddButton>
     </>
   );
 
@@ -31,7 +34,7 @@ export function TableActions({
     const ids = selectedItems.map((item) => item.Id);
     deleteMutation.mutate(ids, {
       onSuccess() {
-        notifySuccess('Success', 'Environment Group(s) removed');
+        notifySuccess(t('common.success'), t('env_groups.removed'));
       },
     });
   }

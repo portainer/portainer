@@ -1,13 +1,14 @@
 import { CellContext } from '@tanstack/react-table';
 
 import { ContainerGroup } from '@/react/azure/types';
+import i18n from '@/i18n';
 
 import { Link } from '@@/Link';
 
 import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor('name', {
-  header: 'Name',
+  header: i18n.t('common.name') as string,
   cell: NameCell,
 });
 

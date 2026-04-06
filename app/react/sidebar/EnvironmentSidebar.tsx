@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { X, Slash } from 'lucide-react';
 import clsx from 'clsx';
 import { useStore } from 'zustand';
+import { useTranslation } from 'react-i18next';
 
 import {
   PlatformType,
@@ -28,6 +29,7 @@ export function EnvironmentSidebar() {
   const { query: currentEnvironmentQuery, clearEnvironment } =
     useCurrentEnvironment();
   const environment = currentEnvironmentQuery.data;
+  const { t } = useTranslation();
 
   const { isOpen } = useSidebarState();
 
@@ -42,9 +44,9 @@ export function EnvironmentSidebar() {
       ) : (
         <SidebarSectionTitle>
           <div className="flex items-center gap-1">
-            <span>Environment:</span>
+            <span>{t('sidebar.environment')}:</span>
             <Icon icon={Slash} className="text-xl !text-gray-6" />
-            <span className="text-sm text-gray-6">None selected</span>
+            <span className="text-sm text-gray-6">{t('sidebar.none_selected')}</span>
           </div>
         </SidebarSectionTitle>
       )}
@@ -124,6 +126,7 @@ interface TitleProps {
 
 function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
+  const { t } = useTranslation();
 
   const EnvironmentIcon = getPlatformIcon(
     environment.Type,
@@ -146,7 +149,7 @@ function Title({ environment, onClear }: TitleProps) {
       </span>
 
       <button
-        title="Clear environment"
+        title={t('sidebar.clear_environment')}
         type="button"
         onClick={onClear}
         className={clsx(

@@ -1,5 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import i18n from '@/i18n';
 
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 import { SERVER_TYPES } from '@/react/portainer/settings/AuthenticationView/ldap-options';
@@ -9,11 +10,22 @@ import { getDefaultValue as getDefaultSessionValue } from '@/react/portainer/set
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
 function SettingsAuthenticationController($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, LDAPService) {
+  const t = i18n.t.bind(i18n);
+  $scope.t = t;
+
+  // Page header translations
+  $scope.pageTitle = t('settings.authentication.title');
+  $scope.pageBreadcrumbs = [
+    { label: t('settings.title'), link: 'portainer.settings' },
+    { label: t('settings.authentication.breadcrumb') }
+  ];
+
   $scope.authMethod = 1;
 
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
+
   };
 
   $scope.formValues = {
@@ -94,12 +106,12 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
       .then(function success() {
         $scope.state.failedConnectivityCheck = false;
         $scope.state.successfulConnectivityCheck = true;
-        Notifications.success('Success', 'Connection to LDAP successful');
+        Notifications.success(t('common.success'), t('settings.authentication.ldap_connect_success'));
       })
       .catch(function error(err) {
         $scope.state.failedConnectivityCheck = true;
         $scope.state.successfulConnectivityCheck = false;
-        Notifications.error('Failure', err, 'Connection to LDAP failed');
+        Notifications.error(t('common.failure'), err, t('settings.authentication.ldap_connect_failed'));
       })
       .finally(function final() {
         $scope.state.uploadInProgress = false;
@@ -121,10 +133,10 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         return SettingsService.update(settings);
       })
       .then(function success() {
-        Notifications.success('Success', 'Authentication settings updated');
+        Notifications.success(t('common.success'), t('settings.authentication.update_success'));
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to update authentication settings');
+        Notifications.error(t('common.failure'), err, t('settings.authentication.update_error'));
       })
       .finally(function final() {
         $scope.state.uploadInProgress = false;
@@ -245,7 +257,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         $scope.state.initialServerType = settings.LDAPSettings.ServerType;
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve application settings');
+        Notifications.error(t('common.failure'), err, t('settings.authentication.retrieve_error'));
       });
   }
 

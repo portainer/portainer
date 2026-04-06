@@ -1,7 +1,9 @@
 import { FileCode } from 'lucide-react';
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
+import i18n from '@/i18n';
 import { RoleTypes } from '@/portainer/rbac/models/role';
 
 import { Datatable } from '@@/datatables';
@@ -26,10 +28,11 @@ export function RbacRolesDatatable({
   dataset: Array<RbacRole> | undefined;
 }) {
   const tableState = useTableState(store, tableKey);
+  const { t } = useTranslation();
 
   return (
     <Datatable
-      title="Roles"
+      title={t('roles.roles')}
       titleIcon={FileCode}
       dataset={dataset || []}
       columns={columns}
@@ -46,17 +49,17 @@ function getColumns() {
 
   return _.compact([
     columnHelper.accessor('Name', {
-      header: 'Name',
+      header: i18n.t('common.name') as string,
     }),
     columnHelper.accessor('Description', {
-      header: 'Description',
+      header: i18n.t('portainer_groups.description') as string,
     }),
     !isBE &&
       columnHelper.display({
         id: 'be-indicator',
         cell: ({ row: { original: item } }) =>
           item.Id === RoleTypes.STANDARD ? (
-            <b>Default</b>
+            <b>{i18n.t('roles.default')}</b>
           ) : (
             <BEFeatureIndicator featureId={FeatureId.RBAC_ROLES} />
           ),

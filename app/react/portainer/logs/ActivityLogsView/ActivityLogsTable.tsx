@@ -2,6 +2,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { History, Search } from 'lucide-react';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
+import i18n from '@/i18n';
 
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { Button } from '@@/buttons';
@@ -15,7 +16,7 @@ const columnHelper = createColumnHelper<ActivityLog>();
 const columns = [
   columnHelper.accessor('timestamp', {
     id: 'Timestamp',
-    header: 'Time',
+    header: () => i18n.t('activity_logs.time'),
     cell: ({ getValue }) => {
       const value = getValue();
       return value ? isoDateFromTimestamp(value) : '';
@@ -23,18 +24,18 @@ const columns = [
   }),
   columnHelper.accessor('username', {
     id: 'Username',
-    header: 'User',
+    header: () => i18n.t('activity_logs.user'),
   }),
   columnHelper.accessor('context', {
     id: 'Context',
-    header: 'Environment',
+    header: () => i18n.t('activity_logs.environment'),
   }),
   columnHelper.accessor('action', {
     id: 'Action',
-    header: 'Action',
+    header: () => i18n.t('activity_logs.action'),
   }),
   columnHelper.accessor('payload', {
-    header: 'Payload',
+    header: () => i18n.t('activity_logs.payload'),
     enableSorting: false,
     cell: ({ row, getValue }) =>
       getValue() ? (
@@ -44,7 +45,7 @@ const columns = [
           icon={Search}
           data-cy={`activity-logs-inspect_${row.index}`}
         >
-          inspect
+          {i18n.t('common.inspect')}
         </Button>
       ) : null,
   }),
@@ -75,7 +76,7 @@ export function ActivityLogsTable({
 }) {
   return (
     <ExpandableDatatable<ActivityLog>
-      title="Activity logs"
+      title={i18n.t('activity_logs.title')}
       titleIcon={History}
       columns={columns}
       dataset={dataset || []}

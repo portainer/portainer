@@ -1,4 +1,5 @@
 import { array, object, string } from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import { r2a } from '@/react-tools/react2angular';
 import { withControlledInput } from '@/react-tools/withControlledInput';
@@ -18,12 +19,13 @@ interface Props {
 }
 
 function Item({ item, onChange, index }: ItemProps<Gpu>) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-grow gap-2">
       <InputGroup size="small" className="flex-grow">
-        <InputGroup.Addon>GPU Name</InputGroup.Addon>
+        <InputGroup.Addon>{t('docker.gpus.gpu_name')}</InputGroup.Addon>
         <InputGroup.Input
-          placeholder="my-gpu"
+          placeholder={t('docker.gpus.gpu_name_placeholder')}
           value={item.name}
           onChange={(e) => {
             onChange({ ...item, name: e.target.value });
@@ -33,9 +35,9 @@ function Item({ item, onChange, index }: ItemProps<Gpu>) {
       </InputGroup>
 
       <InputGroup size="small" className="flex-grow">
-        <InputGroup.Addon>Index or UUID</InputGroup.Addon>
+        <InputGroup.Addon>{t('docker.gpus.index_or_uuid')}</InputGroup.Addon>
         <InputGroup.Input
-          placeholder="0 or GPU-6e2c7185-c3d3-ae22-da43-bc5267b89061"
+          placeholder={t('docker.gpus.index_or_uuid_placeholder')}
           value={item.value}
           onChange={(e) => {
             onChange({ ...item, value: e.target.value });
@@ -48,14 +50,15 @@ function Item({ item, onChange, index }: ItemProps<Gpu>) {
 }
 
 export function GpusList({ value, onChange }: Props) {
+  const { t } = useTranslation();
   return (
     <InputList<Gpu>
-      label="GPUs"
-      tooltip="You may optionally set up the GPUs that will be selectable against containers, although 'All GPUs' will always be available."
+      label={t('docker.gpus.label')}
+      tooltip={t('docker.gpus.tooltip')}
       value={value}
       onChange={onChange}
       itemBuilder={() => ({ value: '', name: '' })}
-      addLabel="Add GPU"
+      addLabel={t('docker.gpus.add_gpu')}
       item={Item}
       data-cy="docker-containers-gpus"
     />

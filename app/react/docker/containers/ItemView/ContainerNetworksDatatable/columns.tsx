@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 import { buildExpandColumn } from '@@/datatables/expand-column';
 import { buildNameColumnFromObject } from '@@/datatables/buildNameColumn';
 
@@ -15,20 +17,21 @@ export function buildColumns({ nodeName }: { nodeName?: string } = {}) {
         dataCy: 'docker-networks-name',
         linkParamsBuilder: () => ({ nodeName }),
       }),
-      header: 'Network',
+      id: 'name',
+      header: () => i18n.t('docker.containers.network_details.network'),
     },
     columnHelper.accessor((item) => item.IPAddress || '-', {
-      header: 'IP Address',
+      header: () => i18n.t('docker.containers.network_details.ip_address'),
       id: 'ip',
       enableSorting: false,
     }),
     columnHelper.accessor((item) => item.Gateway || '-', {
-      header: 'Gateway',
+      header: () => i18n.t('docker.containers.network_details.gateway'),
       id: 'gateway',
       enableSorting: false,
     }),
     columnHelper.accessor((item) => item.MacAddress || '-', {
-      header: 'MAC Address',
+      header: () => i18n.t('docker.containers.network_details.mac_address'),
       id: 'macAddress',
       enableSorting: false,
     }),

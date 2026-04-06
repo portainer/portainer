@@ -1,6 +1,8 @@
 import { CellContext, createColumnHelper } from '@tanstack/react-table';
 import { Users } from 'lucide-react';
 
+import i18n from '@/i18n';
+
 import { buildNameColumn } from '@@/datatables/buildNameColumn';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -12,7 +14,7 @@ const columnHelper = createColumnHelper<EnvironmentGroup>();
 export const columns = [
   buildNameColumn<EnvironmentGroup>('Name', '.group', 'environment-group-name'),
   columnHelper.display({
-    header: 'Actions',
+    header: i18n.t('env_groups.col_actions') as string,
     cell: ActionsCell,
   }),
 ];
@@ -31,7 +33,7 @@ function ActionsCell({
       icon={Users}
       data-cy={`manage-access-button_${item.Name}`}
     >
-      Manage access
+      {i18n.t('env_groups.manage_access')}
     </Button>
   );
 }

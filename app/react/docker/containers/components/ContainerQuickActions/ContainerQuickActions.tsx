@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { BarChart, FileText, Info, Paperclip, Terminal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerStatus } from '@/react/docker/containers/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -28,6 +29,7 @@ export function ContainerQuickActions({
   status: ContainerStatus;
   state: QuickActionsState;
 }) {
+  const { t } = useTranslation();
   const isActive =
     !!status &&
     [
@@ -44,7 +46,7 @@ export function ContainerQuickActions({
           <Link
             to="docker.containers.container.logs"
             params={{ id: containerId, nodeName }}
-            title="Logs"
+            title={t('docker_containers.quick_action_logs')}
             data-cy={`container-logs-${containerId}`}
           >
             <Icon icon={FileText} className="space-right" />
@@ -57,7 +59,7 @@ export function ContainerQuickActions({
           <Link
             to="docker.containers.container.inspect"
             params={{ id: containerId, nodeName }}
-            title="Inspect"
+            title={t('docker_containers.quick_action_inspect')}
             data-cy={`container-inspect-${containerId}`}
           >
             <Icon icon={Info} className="space-right" />
@@ -70,7 +72,7 @@ export function ContainerQuickActions({
           <Link
             to="docker.containers.container.stats"
             params={{ id: containerId, nodeName }}
-            title="Stats"
+            title={t('docker_containers.quick_action_stats')}
             data-cy={`container-stats-${containerId}`}
           >
             <Icon icon={BarChart} className="space-right" />
@@ -83,7 +85,7 @@ export function ContainerQuickActions({
           <Link
             to="docker.containers.container.exec"
             params={{ id: containerId, nodeName }}
-            title="Exec Console"
+            title={t('docker_containers.quick_action_exec')}
             data-cy={`container-exec-${containerId}`}
           >
             <Icon icon={Terminal} className="space-right" />
@@ -96,7 +98,7 @@ export function ContainerQuickActions({
           <Link
             to="docker.containers.container.attach"
             params={{ id: containerId, nodeName }}
-            title="Attach Console"
+            title={t('docker_containers.quick_action_attach')}
             data-cy={`container-attach-${containerId}`}
           >
             <Icon icon={Paperclip} className="space-right" />

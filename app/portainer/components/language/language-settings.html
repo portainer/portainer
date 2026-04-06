@@ -1,0 +1,10 @@
+<div class="mt-6">
+  <rd-widget>
+    <rd-widget-header icon="globe" title-text="{{ 'language_settings.title' | i18n }}"></rd-widget-header>
+    <rd-widget-body>
+      <form class="form-horizontal">
+        <box-selector radio-name="'language'" value="$ctrl.state.language" options="$ctrl.state.availableLanguages" on-change="($ctrl.setLanguage)"></box-selector>
+      </form>
+    </rd-widget-body>
+  </rd-widget>
+</div>

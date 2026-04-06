@@ -2,6 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
 import { Network, Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -41,22 +42,23 @@ const initialValues: FormValues = {
   },
 };
 
-const options: Array<BoxSelectorOption<'api'>> = [
-  {
-    description: '',
-    icon: <BadgeIcon icon={Network} size="3xl" />,
-    id: 'api',
-    label: 'API',
-    value: 'api',
-  },
-];
-
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
 }
 
 export function WizardAzure({ onCreate }: Props) {
+  const { t } = useTranslation();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
+
+  const options: Array<BoxSelectorOption<'api'>> = [
+    {
+      description: '',
+      icon: <BadgeIcon icon={Network} size="3xl" />,
+      id: 'api',
+      label: t('wizard_env.azure.api'),
+      value: 'api',
+    },
+  ];
 
   const [creationType, setCreationType] = useState(options[0].id);
   const mutation = useCreateAzureEnvironmentMutation();
@@ -83,7 +85,7 @@ export function WizardAzure({ onCreate }: Props) {
             <NameField />
 
             <FormControl
-              label="Application ID"
+              label={t('wizard_env.azure.application_id')}
               errors={errors.applicationId}
               inputId="applicationId-input"
               required
@@ -92,12 +94,12 @@ export function WizardAzure({ onCreate }: Props) {
                 name="applicationId"
                 id="applicationId-input"
                 as={Input}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                placeholder={t('wizard_env.azure.application_id_placeholder')}
               />
             </FormControl>
 
             <FormControl
-              label="Tenant ID"
+              label={t('wizard_env.azure.tenant_id')}
               errors={errors.tenantId}
               inputId="tenantId-input"
               required
@@ -106,12 +108,12 @@ export function WizardAzure({ onCreate }: Props) {
                 name="tenantId"
                 id="tenantId-input"
                 as={Input}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                placeholder={t('wizard_env.azure.application_id_placeholder')}
               />
             </FormControl>
 
             <FormControl
-              label="Authentication Key"
+              label={t('wizard_env.azure.auth_key')}
               errors={errors.authenticationKey}
               inputId="authenticationKey-input"
               required
@@ -120,7 +122,7 @@ export function WizardAzure({ onCreate }: Props) {
                 name="authenticationKey"
                 id="authenticationKey-input"
                 as={Input}
-                placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+                placeholder={t('wizard_env.azure.auth_key_placeholder')}
               />
             </FormControl>
 
@@ -131,12 +133,12 @@ export function WizardAzure({ onCreate }: Props) {
                 <LoadingButton
                   className="vertical-center"
                   data-cy="create-azure-environment-button"
-                  loadingText="Connecting environment..."
+                  loadingText={t('wizard_env.connecting')}
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
                   icon={Plug2}
                 >
-                  Connect
+                  {t('wizard_env.connect')}
                 </LoadingButton>
               </div>
             </div>
@@ -165,7 +167,7 @@ export function WizardAzure({ onCreate }: Props) {
       },
       {
         onSuccess(environment) {
-          notifySuccess('Environment created', environment.Name);
+          notifySuccess(t('wizard_env.env_created'), environment.Name);
           clearForm();
           onCreate(environment, 'aciApi');
         },
@@ -175,11 +177,12 @@ export function WizardAzure({ onCreate }: Props) {
 }
 
 function useValidation(): SchemaOf<FormValues> {
+  const { t } = useTranslation();
   return object({
     name: useNameValidation(),
-    applicationId: string().required('Application ID is required'),
-    tenantId: string().required('Tenant ID is required'),
-    authenticationKey: string().required('Authentication Key is required'),
+    applicationId: string().required(t('wizard_env.azure.application_id_required')),
+    tenantId: string().required(t('wizard_env.azure.tenant_id_required')),
+    authenticationKey: string().required(t('wizard_env.azure.auth_key_required')),
     meta: metadataValidation(),
   });
 }

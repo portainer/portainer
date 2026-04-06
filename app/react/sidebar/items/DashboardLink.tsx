@@ -1,4 +1,5 @@
 import { Layout } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';
@@ -15,12 +16,14 @@ export function DashboardLink({
   platformPath,
   'data-cy': dataCy,
 }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SidebarItem
       to={`${platformPath}.dashboard`}
       params={{ endpointId: environmentId }}
       icon={Layout}
-      label="Dashboard"
+      label={t('common.dashboard')}
       data-cy={dataCy}
     />
   );

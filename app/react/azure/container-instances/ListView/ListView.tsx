@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { deleteContainerGroup } from '@/react/azure/services/container-groups.service';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -13,6 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { ContainersDatatable } from './ContainersDatatable';
 
 export function ListView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
 
   const subscriptionsQuery = useSubscriptions(environmentId);
@@ -32,8 +34,8 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        title="Container list"
-        breadcrumbs="Container instances"
+        title={t('azure_dashboard.container_list_title')}
+        breadcrumbs={t('azure_dashboard.container_instances_breadcrumb')}
         reload
       />
 

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -13,6 +14,7 @@ import { FormSection } from '@@/form-components/FormSection';
 import { HelmTemplates } from '../HelmTemplates/HelmTemplates';
 
 export function HelmInstallView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const [namespace, setNamespace] = useState('');
   const [name, setName] = useState('');
@@ -39,13 +41,13 @@ export function HelmInstallView() {
 
   return (
     <>
-      <PageHeader title="Helm install" breadcrumbs="Helm install" reload />
+      <PageHeader title={t('kubernetes.helm.install.title')} breadcrumbs={t('kubernetes.helm.install.title')} reload />
       <div className="row">
         <div className="col-sm-12 form-horizontal">
           <Widget>
             <WidgetBody>
-              <FormSection title="Deploy to">
-                <FormControl label="Namespace" required>
+              <FormSection title={t('kubernetes.helm.install.deployTo')}>
+                <FormControl label={t('kubernetes.helm.install.namespace')} required>
                   <PortainerSelect
                     value={namespace}
                     onChange={setNamespace}
@@ -54,11 +56,11 @@ export function HelmInstallView() {
                   />
                 </FormControl>
 
-                <FormControl label="Release name" required>
+                <FormControl label={t('kubernetes.helm.install.releaseName')} required>
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. my-app"
+                    placeholder={t('kubernetes.helm.install.releaseNamePlaceholder')}
                     data-cy="k8sHelmInstall-nameInput"
                   />
                 </FormControl>

@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "dev": "webpack-dev-server",
+    "dev:mock": "cross-env MOCK_API=true webpack-dev-server",
     "start": "webpack -w",
     "build": "webpack",
     "format": "prettier --log-level warn --write \"**/*.{js,css,html,jsx,tsx,ts}\"",
@@ -188,6 +189,7 @@
     "babel-plugin-lodash": "^3.3.4",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
+    "cross-env": "10.1.0",
     "css-loader": "^6.8.1",
     "cssnano": "^6.0.1",
     "dotenv-webpack": "^8.0.1",

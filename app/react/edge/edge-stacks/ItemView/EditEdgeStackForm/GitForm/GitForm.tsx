@@ -1,5 +1,6 @@
 import { Form, Formik, useFormikContext } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { AuthFieldset } from '@/react/portainer/gitops/AuthFieldset';
 import { AutoUpdateFieldset } from '@/react/portainer/gitops/AutoUpdateFieldset';
@@ -62,6 +63,7 @@ interface FormValues {
 }
 
 export function GitForm({ stack }: { stack: EdgeStack }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const updateStackMutation = useUpdateEdgeStackGitMutation();
   const { saveCredentials, isLoading: isSaveCredentialsLoading } =
@@ -110,7 +112,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
 
           updateStackMutation.mutate(getPayload(values, credentialId, false), {
             onSuccess() {
-              notifySuccess('Success', 'Stack updated successfully');
+              notifySuccess(t('common.success'), t('edge.stacks.edit.update_success'));
               router.stateService.reload();
             },
           });
@@ -124,7 +126,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
 
     updateStackMutation.mutate(getPayload(values, credentialId, true), {
       onSuccess() {
-        notifySuccess('Success', 'Stack updated successfully');
+        notifySuccess(t('common.success'), t('edge.stacks.edit.update_success'));
         router.stateService.reload();
       },
     });
@@ -169,6 +171,7 @@ function InnerForm({
   webhookId: string;
 }) {
   const registriesQuery = useRegistries();
+  const { t } = useTranslation();
   const { values, setFieldValue, isValid, handleSubmit, errors, dirty } =
     useFormikContext<FormValues>();
 
@@ -187,18 +190,13 @@ function InnerForm({
 
       {hasKubeEndpoint && hasDockerEndpoint && (
         <TextTip>
-          There are no available deployment types when there is more than one
-          type of environment in your edge group selection (e.g. Kubernetes and
-          Docker environments). Please select edge groups that have environments
-          of the same type.
+          {t('edge.stacks.create.multiple_types_error')}
         </TextTip>
       )}
 
       {values.deploymentType === DeploymentType.Compose && hasKubeEndpoint && (
         <FormError>
-          Edge groups with kubernetes environments no longer support compose
-          deployment types in Portainer. Please select edge groups that only
-          have docker environments when using compose deployment types.
+          {t('edge.stacks.edit.compose_no_kube')}
         </FormError>
       )}
       <EdgeStackDeploymentTypeSelector
@@ -210,7 +208,7 @@ function InnerForm({
         }}
       />
 
-      <FormSection title="Update from git repository">
+      <FormSection title={t('edge.stacks.edit.update_from_git')}>
         <div className="row small">
           <div className="col-sm-12">
             <InfoPanel
@@ -237,7 +235,7 @@ function InnerForm({
         />
       </FormSection>
 
-      <FormSection title="Advanced configuration" isFoldable>
+      <FormSection title={t('edge.stacks.edit.advanced_configuration')} isFoldable>
         <RefField
           value={values.refName}
           onChange={(value) => setFieldValue('refName', value)}
@@ -281,25 +279,25 @@ function InnerForm({
         errorMessage={errors.privateRegistryId}
       />
 
-      <FormSection title="Actions">
+      <FormSection title={t('edge.stacks.edit.actions')}>
         <LoadingButton
           disabled={dirty || !isValid || isLoading}
           data-cy="pull-and-update-stack-button"
           isLoading={isUpdateVersion && isLoading}
-          loadingText="updating stack..."
+          loadingText={t('edge.stacks.edit.updating_stack')}
         >
-          Pull and update stack
+          {t('edge.stacks.edit.pull_and_update')}
         </LoadingButton>
 
         <LoadingButton
           type="button"
           disabled={!dirty || !isValid || isLoading}
           isLoading={!isUpdateVersion && isLoading}
-          loadingText="updating settings..."
+          loadingText={t('edge.stacks.edit.updating_settings')}
           onClick={onUpdateSettingsClick}
           data-cy="edge-stack-update-settings-button"
         >
-          Update settings
+          {t('edge.stacks.edit.update_settings')}
         </LoadingButton>
       </FormSection>
     </Form>

@@ -1,4 +1,5 @@
 import { useField, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -9,6 +10,7 @@ import { SwitchField } from '@@/form-components/SwitchField';
 import { useToggledValue } from '../useToggledValue';
 
 export function ScreenBannerFieldset() {
+  const { t } = useTranslation();
   const [{ name }, { error }] = useField<string>('loginBanner');
   const [isEnabled, setIsEnabled] = useToggledValue('loginBanner');
 
@@ -19,7 +21,7 @@ export function ScreenBannerFieldset() {
           <SwitchField
             labelClass="col-sm-3 col-lg-2"
             data-cy="logo-banner-switch"
-            label="Login screen banner"
+            label={t('settings.app.login_banner')}
             checked={isEnabled}
             name="toggle_login_banner"
             onChange={(checked) => setIsEnabled(checked)}
@@ -28,14 +30,13 @@ export function ScreenBannerFieldset() {
         </div>
 
         <div className="col-sm-12 text-muted small mt-2">
-          You can set a custom banner that will be shown to all users during
-          login.
+          {t('settings.app.banner_description')}
         </div>
       </div>
 
       {isEnabled && (
         <FormControl
-          label="Details"
+          label={t('settings.app.details')}
           inputId="custom_login_banner"
           errors={error}
           required
@@ -45,7 +46,7 @@ export function ScreenBannerFieldset() {
             name={name}
             rows="5"
             id="custom_login_banner"
-            placeholder="Banner details"
+            placeholder={t('settings.app.banner_details')}
           />
         </FormControl>
       )}

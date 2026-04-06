@@ -1,6 +1,7 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
 import { useSwarmId } from '@/react/docker/proxy/queries/useSwarm';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -8,6 +9,7 @@ import { Widget } from '@@/Widget';
 import { CreateStackForm } from './CreateStackForm/CreateStackForm';
 
 export function CreateView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
 
   const isSwarm = useIsSwarm(environmentId);
@@ -21,7 +23,7 @@ export function CreateView() {
 
   return (
     <>
-      <PageHeader title="Create stack" breadcrumbs="Stack creation" reload />
+      <PageHeader title={t('docker.stacks.create.title')} breadcrumbs={t('docker.stacks.create.breadcrumb')} reload />
 
       <div className="row">
         <div className="col-sm-12">

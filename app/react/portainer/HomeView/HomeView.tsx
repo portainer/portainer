@@ -1,6 +1,7 @@
 import { useStore } from 'zustand';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { environmentStore } from '@/react/hooks/current-environment-store';
 import { Environment } from '@/react/portainer/environments/types';
@@ -28,13 +29,14 @@ export function HomeView() {
   );
 
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function redirect() {
       const options = {
-        title: `Failed connecting to ${params.environmentName}`,
-        message: `There was an issue connecting to edge agent via tunnel. Click 'Retry' below to retry now, or wait 10 seconds to automatically retry.`,
-        confirmButton: buildConfirmButton('Retry', 'primary', 10),
+        title: t('home.failed_connecting', { name: params.environmentName }),
+        message: t('home.edge_tunnel_retry_message'),
+        confirmButton: buildConfirmButton(t('common.retry'), 'primary', 10),
         modalType: ModalType.Destructive,
       };
 
@@ -62,8 +64,8 @@ export function HomeView() {
     <>
       <PageHeader
         reload
-        title="Home"
-        breadcrumbs={[{ label: 'Environments' }]}
+        title={t('home.title')}
+        breadcrumbs={[{ label: t('home.breadcrumbs_environments') }]}
       />
 
       {process.env.PORTAINER_EDITION !== 'CE' && <LicenseNodePanel />}
@@ -90,15 +92,23 @@ export function HomeView() {
     }
     try {
       await snapshotEndpoints();
-      notifications.success('Success', 'Environments updated');
+      notifications.success(t('common.success'), t('home.snapshot_success'));
       router.stateService.reload();
     } catch (err) {
       notifications.error(
-        'Failure',
+        t('common.failure'),
         err as Error,
-        'An error occurred during environment snapshot'
+        t('home.snapshot_error')
       );
     }
+  }
+
+  async function confirmEndpointSnapshot() {
+    return confirm({
+      title: t('home.snapshot_confirm_title'),
+      modalType: ModalType.Warn,
+      message: t('home.snapshot_confirm_message'),
+    });
   }
 
   function handleBrowseClick(environment: Environment) {
@@ -106,13 +116,4 @@ export function HomeView() {
       setConnectingToEdgeEndpoint(true);
     }
   }
-}
-
-async function confirmEndpointSnapshot() {
-  return confirm({
-    title: 'Are you sure?',
-    modalType: ModalType.Warn,
-    message:
-      'Triggering a manual refresh will poll each environment to retrieve its information, this may take a few moments.',
-  });
 }

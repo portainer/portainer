@@ -1,6 +1,7 @@
 import { RotateCw } from 'lucide-react';
 import { Pod } from 'kubernetes-types/core/v1';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { notifySuccess, notifyError } from '@/portainer/services/notifications';
@@ -32,6 +33,7 @@ export function RedeployApplicationButton({
   appName,
   app,
 }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const redeployAppMutation = useRedeployApplicationMutation(
     environmentId,
@@ -51,7 +53,7 @@ export function RedeployApplicationButton({
         data-cy="k8sAppDetail-redeployButton"
       >
         <Icon icon={RotateCw} className="mr-1" />
-        Redeploy
+        {t('kubernetes.applications.redeploy')}
       </Button>
     </Authorized>
   );
@@ -76,7 +78,7 @@ export function RedeployApplicationButton({
     const confirmed = await confirm({
       title: 'Are you sure?',
       modalType: ModalType.Warn,
-      confirmButton: buildConfirmButton('Redeploy'),
+      confirmButton: buildConfirmButton(t('kubernetes.applications.redeploy')),
       message:
         'Redeploying terminates and restarts the application, which will cause service interruption. Do you wish to continue?',
     });
@@ -92,7 +94,7 @@ export function RedeployApplicationButton({
       { labelSelector },
       {
         onSuccess: () => {
-          notifySuccess('Success', 'Application successfully redeployed');
+          notifySuccess(t('common.success'), t('kubernetes.applications.notifications.redeployed'));
           router.stateService.reload();
         },
       }

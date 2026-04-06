@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { TextTip } from '@@/Tip/TextTip';
 import { Datatable } from '@@/datatables';
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
@@ -11,11 +13,12 @@ export function EffectiveAccessViewerDatatable({
   dataset?: Array<AccessViewerPolicyModel>;
 }) {
   const tableState = useTableStateWithStorage('access-viewer', 'Environment');
+  const { t } = useTranslation();
 
   if (dataset?.length === 0) {
     return (
       <TextTip color="blue">
-        The selected user does not have access to any environments.
+        {t('roles.no_access_to_environments')}
       </TextTip>
     );
   }
@@ -26,11 +29,10 @@ export function EffectiveAccessViewerDatatable({
       columns={columns}
       settingsManager={tableState}
       noWidget
-      title="Access"
+      title={t('roles.access')}
       description={
         <TextTip color="blue">
-          Effective role for each environment will be displayed for the selected
-          user.
+          {t('roles.effective_role_description')}
         </TextTip>
       }
       disableSelect

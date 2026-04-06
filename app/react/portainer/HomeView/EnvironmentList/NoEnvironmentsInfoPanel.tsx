@@ -1,29 +1,29 @@
+import { useTranslation } from 'react-i18next';
+
 import { InformationPanel } from '@@/InformationPanel';
 import { Link } from '@@/Link';
 import { TextTip } from '@@/Tip/TextTip';
 
 export function NoEnvironmentsInfoPanel({ isAdmin }: { isAdmin: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className="row">
       <div className="col-sm-12">
-        <InformationPanel title="Information">
+        <InformationPanel title={t('common.information')}>
           <TextTip>
             {isAdmin ? (
               <span>
-                No environment available for management. Please head over the{' '}
+                {t('home.no_environment_admin_prefix')}{' '}
                 <Link
                   to="portainer.wizard.endpoints"
                   data-cy="wizard-add-environments-link"
                 >
-                  environment wizard
+                  {t('home.environment_wizard_link')}
                 </Link>{' '}
-                to add an environment.
+                {t('home.no_environment_admin_suffix')}
               </span>
             ) : (
-              <span>
-                You do not have access to any environment. Please contact your
-                administrator.
-              </span>
+              <span>{t('home.no_environment_user')}</span>
             )}
           </TextTip>
         </InformationPanel>

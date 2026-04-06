@@ -2,6 +2,7 @@ import { CellContext } from '@tanstack/react-table';
 import { Users } from 'lucide-react';
 
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
+import i18n from '@/i18n';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -11,7 +12,7 @@ import { EnvironmentListItem } from '../types';
 import { columnHelper } from './helper';
 
 export const actions = columnHelper.display({
-  header: 'Actions',
+  header: () => i18n.t('environments.col_actions'),
   cell: Cell,
 });
 
@@ -36,7 +37,7 @@ function Cell({
       icon={Users}
       data-cy={`environment-manage-access-button-${environment.Name}`}
     >
-      Manage access
+      {i18n.t('environments.manage_access')}
     </Button>
   );
 }

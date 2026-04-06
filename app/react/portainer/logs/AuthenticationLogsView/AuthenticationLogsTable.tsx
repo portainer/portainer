@@ -1,9 +1,10 @@
 import { History } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable } from '@@/datatables';
 
 import { AuthLog } from './types';
-import { columns } from './columns';
+import { getColumns } from './columns';
 
 export function AuthenticationLogsTable({
   dataset,
@@ -28,11 +29,13 @@ export function AuthenticationLogsTable({
   totalItems: number;
   dataset?: Array<AuthLog>;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Datatable<AuthLog>
-      title="Authentication events"
+      title={t('logs.authentication')}
       titleIcon={History}
-      columns={columns}
+      columns={getColumns(t)}
       dataset={dataset || []}
       isLoading={!dataset}
       settingsManager={{
@@ -55,4 +58,4 @@ export function AuthenticationLogsTable({
       data-cy="authentication-logs-datatable"
     />
   );
-}
+} 

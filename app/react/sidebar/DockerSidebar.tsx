@@ -10,6 +10,7 @@ import {
   Edit,
   Network,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import {
   type Environment,
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export function DockerSidebar({ environmentId, environment }: Props) {
+  const { t } = useTranslation();
   const { authorized: isEnvironmentAdmin } = useIsEnvironmentAdmin({
     adminOnlyCE: true,
   });
@@ -48,13 +50,13 @@ export function DockerSidebar({ environmentId, environment }: Props) {
 
   const setupSubMenuProps = isSwarmManager
     ? {
-        label: 'Swarm',
+        label: t('docker.swarm.label'),
         icon: Trello,
         to: 'docker.swarm',
         dataCy: 'portainerSidebar-swarm',
       }
     : {
-        label: 'Host',
+        label: t('docker.host.label'),
         icon: Trello,
         to: 'docker.host',
         dataCy: 'portainerSidebar-host',
@@ -76,14 +78,14 @@ export function DockerSidebar({ environmentId, environment }: Props) {
       />
       <SidebarParent
         icon={Edit}
-        label="Templates"
+        label={t('docker.templates')}
         to="docker.templates"
         params={{ endpointId: environmentId }}
         data-cy="portainerSidebar-templates"
         listId="dockerSidebar-templates"
       >
         <SidebarItem
-          label="Application"
+          label={t('docker.app_templates')}
           to="docker.templates"
           ignorePaths={['docker.templates.custom']}
           params={{ endpointId: environmentId }}
@@ -91,7 +93,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           data-cy="portainerSidebar-appTemplates"
         />
         <SidebarItem
-          label="Custom"
+          label={t('docker.custom_templates')}
           to="docker.templates.custom"
           params={{ endpointId: environmentId }}
           isSubMenu
@@ -104,7 +106,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           to="docker.stacks"
           params={{ endpointId: environmentId }}
           icon={Layers}
-          label="Stacks"
+          label={t('docker.stacks.label')}
           data-cy="dockerSidebar-stacks"
         />
       )}
@@ -114,7 +116,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           to="docker.services"
           params={{ endpointId: environmentId }}
           icon={Shuffle}
-          label="Services"
+          label={t('docker.services.label')}
           data-cy="dockerSidebar-services"
         />
       )}
@@ -123,7 +125,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         to="docker.containers"
         params={{ endpointId: environmentId }}
         icon={Box}
-        label="Containers"
+        label={t('docker.containers.label')}
         data-cy="dockerSidebar-containers"
       />
 
@@ -131,7 +133,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         to="docker.images"
         params={{ endpointId: environmentId }}
         icon={List}
-        label="Images"
+        label={t('docker.images.label')}
         data-cy="dockerSidebar-images"
       />
 
@@ -139,7 +141,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         to="docker.networks"
         params={{ endpointId: environmentId }}
         icon={Network}
-        label="Networks"
+        label={t('docker.networks.label')}
         data-cy="dockerSidebar-networks"
       />
 
@@ -154,7 +156,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           to="docker.configs"
           params={{ endpointId: environmentId }}
           icon={Clipboard}
-          label="Configs"
+          label={t('docker.configs.label')}
           data-cy="dockerSidebar-configs"
         />
       )}
@@ -164,7 +166,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           to="docker.secrets"
           params={{ endpointId: environmentId }}
           icon={Lock}
-          label="Secrets"
+          label={t('docker.secrets.label')}
           data-cy="dockerSidebar-secrets"
         />
       )}
@@ -174,7 +176,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           to="docker.events"
           params={{ endpointId: environmentId }}
           icon={Clock}
-          label="Events"
+          label={t('docker.events.label')}
           data-cy="dockerSidebar-events"
         />
       )}
@@ -188,7 +190,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         listId="portainerSidebar-host-area"
       >
         <SidebarItem
-          label="Details"
+          label={t('docker.details')}
           isSubMenu
           to={setupSubMenuProps.to}
           params={{ endpointId: environmentId }}
@@ -202,7 +204,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           environmentId={environmentId}
         >
           <SidebarItem
-            label="Setup"
+            label={t('docker.setup')}
             isSubMenu
             to={featSubMenuTo}
             params={{ endpointId: environmentId }}
@@ -211,7 +213,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         </Authorized>
 
         <SidebarItem
-          label="Registries"
+          label={t('docker.registries')}
           isSubMenu
           to={registrySubMenuTo}
           params={{ endpointId: environmentId }}

@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
 import { Badge } from '@@/Badge';
@@ -8,7 +9,7 @@ import { columnHelper } from './helper';
 
 export const tags = columnHelper.accessor((item) => item.tags?.join(','), {
   id: 'tags',
-  header: 'Tags',
+  header: () => i18n.t('docker.images.columns.tags'),
   cell: Cell,
 });
 

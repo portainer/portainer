@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
 import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
@@ -25,6 +26,7 @@ export function Sidebar() {
 }
 
 function InnerSidebar() {
+  const { t } = useTranslation();
   const isPureAdmin = useIsPureAdmin();
   const isAdminQuery = useIsEdgeAdmin({ noEnvScope: true });
   const isTeamLeader = useIsCurrentUserTeamLeader();
@@ -64,7 +66,7 @@ function InnerSidebar() {
             <SidebarItem
               to="portainer.home"
               icon={Home}
-              label="Home"
+              label={t('sidebar.home')}
               data-cy="portainerSidebar-home"
             />
             <EnvironmentSidebar />

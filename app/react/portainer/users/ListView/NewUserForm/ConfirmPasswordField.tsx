@@ -1,5 +1,6 @@
 import { Check, XIcon } from 'lucide-react';
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { InputGroup } from '@@/form-components/InputGroup';
@@ -8,12 +9,13 @@ import { Icon } from '@@/Icon';
 import { FormValues } from './FormValues';
 
 export function ConfirmPasswordField() {
+  const { t } = useTranslation();
   const [{ name, onBlur, onChange, value }, { error }] =
     useField<FormValues['confirmPassword']>('confirmPassword');
   return (
     <FormControl
       inputId="confirm_password"
-      label="Confirm password"
+      label={t('users.confirm_password')}
       required
       errors={error}
     >

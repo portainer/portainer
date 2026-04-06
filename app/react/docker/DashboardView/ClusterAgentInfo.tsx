@@ -1,4 +1,5 @@
 import { GaugeIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -11,6 +12,7 @@ import { useApiVersion } from '../agent/queries/useApiVersion';
 import { ClusterVisualizerLink } from './ClusterVisualizerLink';
 
 export function ClusterAgentInfo() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
 
   const apiVersionQuery = useApiVersion(environmentId);
@@ -22,7 +24,7 @@ export function ClusterAgentInfo() {
 
   return (
     <Widget>
-      <Widget.Title icon={GaugeIcon} title="Cluster information" />
+      <Widget.Title icon={GaugeIcon} title={t('docker.dashboard.cluster_info')} />
       <Widget.Body className="!px-5 !py-0">
         <DetailsTable dataCy="cluster-agent-info">
           <DetailsTable.Row label="Nodes in the cluster">

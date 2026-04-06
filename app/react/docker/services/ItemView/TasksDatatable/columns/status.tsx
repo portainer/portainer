@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 
+import i18n from '@/i18n';
 import { taskStatusBadge } from '@/docker/filters/utils';
 
 import { multiple } from '@@/datatables/filter-types';
@@ -8,7 +9,8 @@ import { filterHOC } from '@@/datatables/Filter';
 import { columnHelper } from './helper';
 
 export const status = columnHelper.accessor((item) => item.Status?.State, {
-  header: 'Status',
+  id: 'status',
+  header: () => i18n.t('docker.services.tasks.columns.status'),
   enableColumnFilter: true,
   filterFn: multiple,
   meta: {

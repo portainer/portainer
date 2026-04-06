@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import {
   EnvironmentId,
   EnvironmentType,
@@ -31,6 +33,7 @@ export function ContainerStatusSection({
   onSuccessUpdate,
   registryId,
 }: Props) {
+  const { t } = useTranslation();
   const environmentQuery = useEnvironment(environmentId);
   const isRunning = container.State?.Running || false;
   const isCreated = container.State?.Status === 'created';
@@ -40,7 +43,7 @@ export function ContainerStatusSection({
 
   return (
     <Widget>
-      <Widget.Title icon="box" title="Container status" />
+      <Widget.Title icon="box" title={t('docker.containers.status.title')} />
       <WidgetBody className="no-padding">
         <DetailsTable dataCy="container-status-table">
           <DetailsTable.Row label="ID">{container.Id}</DetailsTable.Row>

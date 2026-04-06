@@ -1,6 +1,7 @@
 import { CellContext, ColumnDef } from '@tanstack/react-table';
 import { Eye, EyeOff, Users } from 'lucide-react';
 
+import i18n from '@/i18n';
 import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 
 import { Icon } from '@@/Icon';
@@ -17,7 +18,7 @@ export function createOwnershipColumn<D extends IResource>(
   return {
     accessorFn: (row) =>
       row.ResourceControl?.Ownership || ResourceControlOwnership.ADMINISTRATORS,
-    header: 'Ownership',
+    header: () => i18n.t('common.columns.ownership'),
     id: 'ownership',
     cell: OwnershipCell,
     enableHiding,

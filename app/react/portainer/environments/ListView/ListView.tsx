@@ -1,4 +1,5 @@
 import { useStore } from 'zustand';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { environmentStore } from '@/react/hooks/current-environment-store';
@@ -12,14 +13,15 @@ import { EnvironmentsDatatable } from './EnvironmentsDatatable';
 import { useDeleteEnvironmentsMutation } from './useDeleteEnvironmentsMutation';
 
 export function ListView() {
+  const { t } = useTranslation();
   const constCurrentEnvironmentStore = useStore(environmentStore);
   const deletionMutation = useDeleteEnvironmentsMutation();
 
   return (
     <>
       <PageHeader
-        title="Environments"
-        breadcrumbs="Environment management"
+        title={t('environments.title')}
+        breadcrumbs={t('environments.breadcrumbs')}
         reload
       />
 
@@ -29,7 +31,7 @@ export function ListView() {
 
   async function handleRemove(environmentsToDelete: Array<Environment>) {
     const confirmed = await confirmDelete(
-      'This action will remove all configurations associated to your environment(s). Continue?'
+      t('environments.remove_confirm')
     );
 
     if (!confirmed) {
@@ -51,7 +53,7 @@ export function ListView() {
       {
         onSuccess() {
           notifySuccess(
-            'Environments successfully removed',
+            t('environments.remove_success'),
             environmentsToDelete.map((e) => e.Name).join(', ')
           );
         },

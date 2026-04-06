@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Briefcase } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import './BEFeatureIndicator.css';
 
@@ -23,6 +24,7 @@ export function BEFeatureIndicator({
   showIcon = true,
   className = '',
 }: Props) {
+  const { t } = useTranslation();
   const { url, limitedToBE = false } = getFeatureDetails(featureId);
 
   return (
@@ -38,7 +40,7 @@ export function BEFeatureIndicator({
             <Icon icon={Briefcase} className="be-indicator-icon mr-1" />
           )}
           <span className="be-indicator-label break-words">
-            Business Feature
+            {t('common.be_feature')}
           </span>
         </a>
       )}

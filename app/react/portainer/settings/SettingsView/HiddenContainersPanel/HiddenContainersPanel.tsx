@@ -1,4 +1,5 @@
 import { Box } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 
@@ -12,6 +13,7 @@ import { AddLabelForm } from './AddLabelForm';
 import { HiddenContainersTable } from './HiddenContainersTable';
 
 export function HiddenContainersPanel() {
+  const { t } = useTranslation();
   const settingsQuery = useSettings((settings) => settings.BlackListedLabels);
   const mutation = useUpdateSettingsMutation();
 
@@ -22,12 +24,11 @@ export function HiddenContainersPanel() {
   const labels = settingsQuery.data;
   return (
     <Widget>
-      <Widget.Title icon={Box} title="Hidden containers" />
+      <Widget.Title icon={Box} title={t('settings.hidden_title')} />
       <Widget.Body>
         <div className="mb-3">
           <TextTip color="blue">
-            You can hide containers with specific labels from Portainer UI. You
-            need to specify the label name and value.
+            {t('settings.hidden_desc')}
           </TextTip>
         </div>
 
@@ -54,7 +55,7 @@ export function HiddenContainersPanel() {
       },
       {
         onSuccess: () => {
-          notifySuccess('Success', 'Hidden container settings updated');
+          notifySuccess('Success', t('settings.hidden_updated'));
         },
       }
     );

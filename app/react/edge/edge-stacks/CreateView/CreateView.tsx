@@ -1,15 +1,19 @@
+import { useTranslation } from 'react-i18next';
+
 import { PageHeader } from '@@/PageHeader';
 
 import { CreateForm } from './CreateForm';
 
 export function CreateView() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHeader
-        title="Create Edge Stack"
+        title={t('edge.stacks.create.title')}
         breadcrumbs={[
-          { label: 'Edge Stacks', link: 'edge.stacks' },
-          'Create Edge Stack',
+          { label: t('edge.stacks.create.breadcrumbs_label'), link: 'edge.stacks' },
+          t('edge.stacks.create.breadcrumbs_create'),
         ]}
         reload
       />

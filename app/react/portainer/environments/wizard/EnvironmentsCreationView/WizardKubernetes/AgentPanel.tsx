@@ -4,14 +4,14 @@ import { Environment } from '@/react/portainer/environments/types';
 
 import { AgentForm } from '../shared/AgentForm';
 
-import { deployments, DeploymentScripts } from './DeploymentScripts';
+import { DeploymentScripts } from './DeploymentScripts';
 
 interface Props {
   onCreate(environment: Environment): void;
 }
 
 export function AgentPanel({ onCreate }: Props) {
-  const [deployType, setDeployType] = useState(deployments[0].id);
+  const [deployType, setDeployType] = useState('k8sLoadBalancer');
   const defaultPort = deployType === 'k8sNodePort' ? '30778' : '9001';
   return (
     <>

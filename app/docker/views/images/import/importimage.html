@@ -1,4 +1,4 @@
-<page-header title="'Import image'" breadcrumbs="[{label:'Images', link:'docker.images'}, 'Import image']"> </page-header>
+<page-header title="'docker_images.import_title' | i18n" breadcrumbs="[{label:'docker.images.label' | i18n, link:'docker.images'}, 'docker_images.import_breadcrumb' | i18n]"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -6,13 +6,13 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- upload -->
-          <div class="col-sm-12 form-section-title"> Upload </div>
+          <div class="col-sm-12 form-section-title"> {{ 'docker_images.upload_section' | i18n }} </div>
           <div class="form-group">
-            <span class="col-sm-12 text-muted small"> You can upload a tar archive containing your images. </span>
+            <span class="col-sm-12 text-muted small"> {{ 'docker_images.import_upload_hint' | i18n }} </span>
           </div>
           <div class="form-group">
             <div class="col-sm-12 vertical-center">
-              <button type="button" class="btn btn-sm btn-primary !ml-0" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
+              <button type="button" class="btn btn-sm btn-primary !ml-0" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">{{ 'docker_images.select_file' | i18n }}</button>
               <span class="ml-1">
                 {{ formValues.UploadFile.name }}
                 <pr-icon icon="'x'" mode="'danger'" ng-if="!formValues.UploadFile"></pr-icon>
@@ -21,7 +21,7 @@
           </div>
           <!-- !upload -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-            <div class="col-sm-12 form-section-title"> Deployment </div>
+            <div class="col-sm-12 form-section-title"> {{ 'docker_images.deployment_section' | i18n }} </div>
             <!-- node-selection -->
             <node-selector model="formValues.NodeName" endpoint-id="endpoint.Id"> </node-selector>
             <!-- !node-selection -->
@@ -29,7 +29,7 @@
           <div class="row" authorization="DockerImageCreate">
             <div class="col-lg-12 col-md-12 col-xs-12 p-0">
               <rd-widget>
-                <rd-widget-header icon="tag" title-text="Tag the image"></rd-widget-header>
+                <rd-widget-header icon="tag" title-text="{{ 'docker_images.tag_the_image' | i18n }}"></rd-widget-header>
                 <rd-widget-body>
                   <!-- image-and-registry -->
                   <por-image-registry
@@ -46,7 +46,7 @@
             </div>
           </div>
           <!-- actions -->
-          <div class="col-sm-12 form-section-title"> Actions </div>
+          <div class="col-sm-12 form-section-title"> {{ 'docker_features.actions_section' | i18n }} </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -56,8 +56,8 @@
                 ng-click="uploadImage()"
                 button-spinner="state.actionInProgress"
               >
-                <span ng-hide="state.actionInProgress">Upload</span>
-                <span ng-show="state.actionInProgress">Images uploading in progress...</span>
+                <span ng-hide="state.actionInProgress">{{ 'docker_images.upload_button' | i18n }}</span>
+                <span ng-show="state.actionInProgress">{{ 'docker_images.upload_images_in_progress' | i18n }}</span>
               </button>
               <span class="text-danger ml-1" ng-if="state.formValidationError">{{ state.formValidationError }}</span>
             </div>

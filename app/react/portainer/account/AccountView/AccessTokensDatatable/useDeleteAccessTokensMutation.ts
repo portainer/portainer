@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import i18n from '@/i18n';
 import { withError, withInvalidate } from '@/react-tools/react-query';
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
@@ -17,7 +18,7 @@ export function useDeleteAccessTokensMutation() {
   return useMutation({
     mutationFn: (ids: Array<AccessToken['id']>) =>
       deleteAccessTokens(user.Id, ids),
-    ...withError('Failed to delete access tokens'),
+    ...withError(i18n.t('access_tokens.remove_error')),
     ...withInvalidate(queryClient, [queryKeys.base(user.Id)]),
   });
 }
@@ -35,6 +36,6 @@ async function deleteAccessToken(userId: number, id: AccessToken['id']) {
   try {
     await axios.delete(buildUrl(userId, id));
   } catch (e) {
-    throw parseAxiosError(e, 'Unable to delete access token');
+    throw parseAxiosError(e, i18n.t('access_tokens.remove_single_error'));
   }
 }

@@ -1,6 +1,8 @@
 import { TeamViewModel } from '../../models/team';
 import { TeamMembershipModel } from '../../models/teamMembership';
 
+import i18n from '@/i18n';
+
 angular.module('portainer.app').factory('TeamService', [
   '$q',
   'Teams',
@@ -18,7 +20,7 @@ angular.module('portainer.app').factory('TeamService', [
           deferred.resolve(teams);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve teams', err: err });
+          deferred.reject({ msg: i18n.t('portainer_users.unable_retrieve_teams'), err: err });
         });
       return deferred.promise;
     };
@@ -31,7 +33,7 @@ angular.module('portainer.app').factory('TeamService', [
           deferred.resolve(team);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve team details', err: err });
+          deferred.reject({ msg: i18n.t('portainer_users.unable_retrieve_team_details'), err: err });
         });
       return deferred.promise;
     };
@@ -47,7 +49,7 @@ angular.module('portainer.app').factory('TeamService', [
           deferred.resolve();
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create team', err: err });
+          deferred.reject({ msg: i18n.t('portainer_users.unable_create_team'), err: err });
         });
       return deferred.promise;
     };
@@ -66,7 +68,7 @@ angular.module('portainer.app').factory('TeamService', [
           deferred.resolve(memberships);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve user memberships for the team', err: err });
+          deferred.reject({ msg: i18n.t('portainer_users.unable_retrieve_memberships'), err: err });
         });
       return deferred.promise;
     };

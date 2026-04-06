@@ -1,10 +1,12 @@
 import { Clock } from 'lucide-react';
 import { useMemo } from 'react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
+import i18n from '@/i18n';
 
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
@@ -27,6 +29,7 @@ const settingsStore = createStore(storageKey);
 export default withLimitToBE(ListView);
 
 export function ListView() {
+  const { t } = useTranslation();
   const tableState = useTableState(settingsStore, storageKey);
 
   const listQuery = useList(true);
@@ -54,21 +57,21 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        title="Update & Rollback"
-        breadcrumbs="Update and rollback"
+        title={t('portainer.schedules.update_rollback_title')}
+        breadcrumbs={t('portainer.schedules.update_rollback_breadcrumb')}
         reload
       />
 
       <BetaAlert
         className="mb-2 ml-[15px]"
-        message="Beta feature - currently limited to standalone Linux edge devices."
+        message={t('portainer.schedules.beta_message')}
       />
 
       <Datatable
         dataset={items}
         columns={columns}
         settingsManager={tableState}
-        title="Update & rollback"
+        title={t('portainer.schedules.update_rollback_datatable')}
         titleIcon={Clock}
         isLoading={listQuery.isLoading}
         renderTableActions={(selectedRows) => (
@@ -86,6 +89,7 @@ function TableActions({
 }: {
   selectedRows: EdgeUpdateSchedule[];
 }) {
+  const { t } = useTranslation();
   const removeMutation = useRemoveMutation();
   return (
     <>
@@ -93,10 +97,10 @@ function TableActions({
         onConfirmed={() => handleRemove()}
         disabled={selectedRows.length === 0}
         data-cy="remove-update-schedules-button"
-        confirmMessage="Are you sure you want to remove these schedules?"
+        confirmMessage={t('portainer.schedules.remove_confirm')}
       />
       <AddButton to=".create" data-cy="add-update-schedules-button">
-        Add update & rollback schedule
+        {t('portainer.schedules.add_schedule')}
       </AddButton>
     </>
   );
@@ -104,7 +108,7 @@ function TableActions({
   async function handleRemove() {
     removeMutation.mutate(selectedRows, {
       onSuccess: () => {
-        notifySuccess('Success', 'Schedules successfully removed');
+        notifySuccess(i18n.t('common.success'), i18n.t('portainer.schedules.remove_success'));
       },
     });
   }

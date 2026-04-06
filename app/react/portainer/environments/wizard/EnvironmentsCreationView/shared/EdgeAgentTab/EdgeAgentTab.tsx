@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   ContainerEngine,
@@ -27,6 +28,7 @@ export function EdgeAgentTab({
   asyncMode = false,
   containerEngine = ContainerEngine.Docker,
 }: Props) {
+  const { t } = useTranslation();
   const [edgeInfo, setEdgeInfo] = useState<EdgeInfo>();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
@@ -66,7 +68,7 @@ export function EdgeAgentTab({
                 onClick={handleReset}
                 data-cy="edge-agent-tab-add-environment-button"
               >
-                Add another environment
+                {t('wizard_env.add_another')}
               </Button>
             </div>
           </div>

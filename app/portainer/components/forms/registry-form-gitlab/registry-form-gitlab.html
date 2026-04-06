@@ -1,5 +1,5 @@
 <form class="form-horizontal" name="registryFormGitlab" ng-submit="$ctrl.retrieveRegistries()">
-  <div class="col-sm-12 form-section-title"> Important notice </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.important_notice' | i18n }} </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       <p>
@@ -8,7 +8,7 @@
       </p>
     </span>
   </div>
-  <div class="col-sm-12 form-section-title"> GitLab registry connection details </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.gitlab_connection_details' | i18n }} </div>
   <!-- credentials-user -->
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label required text-left">Username</label>
@@ -19,7 +19,7 @@
           <div ng-messages="registryFormGitlab.registry_username.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -37,7 +37,7 @@
           <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -91,7 +91,7 @@
           <div ng-messages="registryFormGitlab.instance_url.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -121,7 +121,7 @@
           <div ng-messages="registryFormGitlab.registry_url.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -133,14 +133,14 @@
   <div class="form-group">
     <div class="col-sm-12">
       <button type="submit" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !registryFormGitlab.$valid" button-spinner="$ctrl.actionInProgress">
-        <span ng-hide="$ctrl.actionInProgress">Retrieve projects</span>
-        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+        <span ng-hide="$ctrl.actionInProgress">{{ 'portainer_registries.retrieve_projects' | i18n }}</span>
+        <span ng-show="$ctrl.actionInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
       </button>
     </div>
   </div>
 </form>
 <div class="form-horizontal" ng-if="$ctrl.projects">
-  <div class="col-sm-12 form-section-title"> GitLab projects </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.gitlab_projects' | i18n }} </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small"> Select the project's registries you want to manage. Portainer will create one registry for each selected project. </span>
     <span class="col-sm-12 text-muted small vertical-center">
@@ -163,8 +163,8 @@
         analytics-event="portainer-registry-creation"
         analytics-properties="{ metadata: { type: 'gitlab' } }"
       >
-        <span ng-hide="$ctrl.actionInProgress">Create registries</span>
-        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+        <span ng-hide="$ctrl.actionInProgress">{{ 'portainer_registries.create_registries' | i18n }}</span>
+        <span ng-show="$ctrl.actionInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
       </button>
     </div>
   </div>

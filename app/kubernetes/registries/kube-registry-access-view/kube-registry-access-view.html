@@ -1,17 +1,17 @@
-<page-header title="'Registry access'" breadcrumbs="[{label:'Registries', link:'kubernetes.registries'}, $ctrl.registry.Name, 'Access management']" reload="true"> </page-header>
+<page-header title="'k8s_registries.registry_access' | i18n" breadcrumbs="[{label:('sidebar.registries' | i18n), link:'kubernetes.registries'}, $ctrl.registry.Name, ('k8s_registries.access_management' | i18n)]" reload="true"> </page-header>
 
 <registry-details registry="$ctrl.registry" ng-if="$ctrl.registry"></registry-details>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="user-x" title-text="Create access"></rd-widget-header>
+      <rd-widget-header icon="user-x" title-text="{{ 'k8s_registries.create_access' | i18n }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
-            <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Select namespaces </label>
+            <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> {{ 'k8s_registries.select_namespaces' | i18n }} </label>
             <div class="col-sm-9 col-lg-4" style="margin-bottom: 15px">
-              <span class="small text-muted" ng-if="!$ctrl.resourcePools.length"> No namespaces available. </span>
+              <span class="small text-muted" ng-if="!$ctrl.resourcePools.length"> {{ 'k8s_registries.no_namespaces' | i18n }} </span>
 
               <namespaces-selector
                 ng-if="$ctrl.resourcePools.length"
@@ -24,7 +24,7 @@
             </div>
             <div class="col-sm-12 small text-muted vertical-center">
               <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-              Adding this registry will expose the registry credentials to all users of this namespace.
+              {{ 'k8s_registries.credentials_warning' | i18n }}
             </div>
           </div>
 
@@ -38,8 +38,8 @@
                 ng-click="$ctrl.submit()"
                 button-spinner="$ctrl.state.actionInProgress"
               >
-                <span ng-hide="$ctrl.state.actionInProgress" class="vertical-center"><pr-icon icon="'plus'" size="'sm'"></pr-icon> Create access</span>
-                <span ng-show="$ctrl.state.actionInProgress">Creating access...</span>
+                <span ng-hide="$ctrl.state.actionInProgress" class="vertical-center"><pr-icon icon="'plus'" size="'sm'"></pr-icon> {{ 'k8s_registries.create_access' | i18n }}</span>
+                <span ng-show="$ctrl.state.actionInProgress">{{ 'k8s_registries.creating_access' | i18n }}</span>
               </button>
             </div>
           </div>

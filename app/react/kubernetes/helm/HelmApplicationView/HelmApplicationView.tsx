@@ -1,5 +1,6 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import helm from '@/assets/ico/vendor/helm.svg?c';
 import { PageHeader } from '@/react/components/PageHeader';
@@ -23,6 +24,7 @@ import { HelmRevisionList } from './HelmRevisionList';
 import { HelmRevisionListSheet } from './HelmRevisionListSheet';
 
 export function HelmApplicationView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const queryClient = useQueryClient();
   const { params } = useCurrentStateAndParams();
@@ -45,9 +47,9 @@ export function HelmApplicationView() {
   return (
     <>
       <PageHeader
-        title="Helm details"
+        title={t('kubernetes.helm.details.title')}
         breadcrumbs={[
-          { label: 'Applications', link: 'kubernetes.applications' },
+          { label: t('kubernetes.helm.details.applications'), link: 'kubernetes.applications' },
           name,
         ]}
         reload
@@ -132,18 +134,19 @@ function HelmDetails({
   release,
   selectedRevision,
 }: HelmDetailsProps) {
+  const { t } = useTranslation();
   if (isLoading) {
     return <Loading />;
   }
 
   if (isError) {
     return (
-      <Alert color="error" title="Failed to load Helm application details" />
+      <Alert color="error" title={t('kubernetes.helm.details.failedToLoad')} />
     );
   }
 
   if (!release || !selectedRevision) {
-    return <Alert color="error" title="No Helm application details found" />;
+    return <Alert color="error" title={t('kubernetes.helm.details.noDetailsFound')} />;
   }
 
   return (

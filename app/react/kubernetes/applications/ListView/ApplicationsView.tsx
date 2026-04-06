@@ -1,4 +1,5 @@
 import { BoxIcon, List } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries/usePublicSettings';
 
@@ -10,6 +11,7 @@ import { ApplicationsStacksDatatable } from './ApplicationsStacksDatatable';
 import { useKubeAppsTableStore } from './useKubeAppsTableStore';
 
 export function ApplicationsView() {
+  const { t } = useTranslation();
   const tableState = useKubeAppsTableStore('kubernetes.applications', 'Name');
   const hideStacksQuery = usePublicSettings({
     select: (settings) =>
@@ -36,7 +38,7 @@ export function ApplicationsView() {
 
   return (
     <>
-      <PageHeader title="Application list" breadcrumbs="Applications" reload />
+      <PageHeader title={t('kubernetes.applications.title')} breadcrumbs={t('kubernetes.applications.breadcrumbs')} reload />
       {hideStacks ? (
         <ApplicationsDatatable tableState={tableState} hideStacks />
       ) : (

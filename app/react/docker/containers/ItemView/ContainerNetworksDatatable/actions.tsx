@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { Authorized } from '@/react/hooks/useUser';
 import { useDisconnectContainer } from '@/react/docker/networks/queries/useDisconnectContainerMutation';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -12,7 +13,8 @@ import { columnHelper } from './helper';
 
 export function buildActions({ nodeName }: { nodeName?: string } = {}) {
   return columnHelper.display({
-    header: 'Actions',
+    id: 'actions',
+    header: () => i18n.t('common.columns.actions'),
     cell: Cell,
   });
 

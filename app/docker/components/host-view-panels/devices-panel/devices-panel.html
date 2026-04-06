@@ -1,13 +1,13 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="code" title-text="PCI Devices"></rd-widget-header>
+      <rd-widget-header icon="code" title-text="{{ 'docker_host.pci_devices' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Vendor</th>
+              <th>{{ 'common.name' | i18n }}</th>
+              <th>{{ 'docker_host.vendor' | i18n }}</th>
             </tr>
           </thead>
           <tbody>
@@ -16,13 +16,13 @@
               <td>{{ device.Vendor }}</td>
             </tr>
             <tr ng-if="$ctrl.devices === undefined">
-              <td colspan="2" class="text-muted text-center">Loading...</td>
+              <td colspan="2" class="text-muted text-center">{{ 'common.loading' | i18n }}</td>
             </tr>
             <tr ng-if="$ctrl.devices === null">
-              <td colspan="2" class="text-muted text-center"> Failed to load devices. </td>
+              <td colspan="2" class="text-muted text-center"> {{ 'docker_host.failed_load_devices' | i18n }} </td>
             </tr>
             <tr ng-if="$ctrl.devices.length === 0">
-              <td colspan="2" class="text-muted text-center"> No device available. </td>
+              <td colspan="2" class="text-muted text-center"> {{ 'docker_host.no_device_available' | i18n }} </td>
             </tr>
           </tbody>
         </table>

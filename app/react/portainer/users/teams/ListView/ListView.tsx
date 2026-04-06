@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { useUsers } from '@/portainer/users/queries';
 import { useCurrentUser } from '@/react/hooks/useUser';
 
@@ -9,6 +11,7 @@ import { CreateTeamForm } from './CreateTeamForm';
 import { TeamsDatatable } from './TeamsDatatable';
 
 export function ListView() {
+  const { t } = useTranslation();
   const { isPureAdmin } = useCurrentUser();
 
   const usersQuery = useUsers(false);
@@ -17,8 +20,8 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        title="Teams"
-        breadcrumbs={[{ label: 'Teams management' }]}
+        title={t('teams.title')}
+        breadcrumbs={[{ label: t('teams.breadcrumbs') }]}
         reload
       />
 

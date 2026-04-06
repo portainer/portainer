@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { UserPlus, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { User, UserId } from '@/portainer/users/types';
 import { useCurrentUser } from '@/react/hooks/useUser';
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function UsersList({ users, disabled, teamId }: Props) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const addMemberMutation = useAddMemberMutation(teamId);
@@ -39,7 +41,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
         dataset={users}
         columns={columns}
         titleIcon={Users}
-        title="Users"
+        title={t('teams.users_list_title')}
         renderTableActions={() =>
           isPureAdmin && (
             <Button
@@ -48,7 +50,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
               icon={UserPlus}
               data-cy="add-all-users-button"
             >
-              Add all users
+            {t('teams.add_all')}
             </Button>
           )
         }
@@ -73,7 +75,7 @@ export function UsersList({ users, disabled, teamId }: Props) {
   function handleAddAllMembers(userIds: UserId[]) {
     addMemberMutation.mutate(userIds, {
       onSuccess() {
-        notifySuccess('Success', 'All users successfully added');
+        notifySuccess(t('common.success'), t('teams.add_all_success'));
       },
     });
   }

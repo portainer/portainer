@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { StackType } from '@/react/common/stacks/types';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -28,6 +29,7 @@ export function CreateForm({
     defaultType === StackType.Kubernetes ? 'manifest' : 'compose';
   const isEdge = !environmentId;
   const router = useRouter();
+  const { t } = useTranslation();
   const mutation = useCreateTemplateMutation();
   const validation = useValidation({ viewType, deployMethod });
   const buildMethods = useBuildMethods();
@@ -65,7 +67,7 @@ export function CreateForm({
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Template created');
+          notifySuccess(t('common.success'), t('edge.custom_templates_created'));
           router.stateService.go('^');
         },
       }

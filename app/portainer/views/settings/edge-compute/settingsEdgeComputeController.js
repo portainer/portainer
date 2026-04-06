@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import angular from 'angular';
+import i18n from '@/i18n';
 
 import { configureAMT } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 
@@ -8,25 +9,33 @@ angular.module('portainer.app').controller('SettingsEdgeComputeController', Sett
 /* @ngInject */
 export default function SettingsEdgeComputeController($q, $async, $state, Notifications, SettingsService, StateManager) {
   var ctrl = this;
+  this.t = i18n.t.bind(i18n);
+
+  // Page header translations
+  this.pageTitle = this.t('settings.edge.title');
+  this.pageBreadcrumbs = [
+    { label: this.t('settings.title'), link: 'portainer.settings' },
+    { label: this.t('settings.edge.breadcrumb') }
+  ];
 
   this.onSubmitEdgeCompute = async function (settings) {
     try {
       await SettingsService.update(settings);
-      Notifications.success('Success', 'Settings updated');
+      Notifications.success(ctrl.t('common.success'), ctrl.t('settings.edge.update_success'));
       StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Unable to update settings');
+      Notifications.error(ctrl.t('common.failure'), err, ctrl.t('settings.edge.update_error'));
     }
   };
 
   this.onSubmitOpenAMT = async function (formValues) {
     try {
       await configureAMT(formValues);
-      Notifications.success('Success', `OpenAMT successfully ${formValues.enabled ? 'enabled' : 'disabled'}`);
+      Notifications.success(ctrl.t('common.success'), ctrl.t(formValues.enabled ? 'settings.edge.openamt_success_enabled' : 'settings.edge.openamt_success_disabled'));
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Failed applying changes');
+      Notifications.error(ctrl.t('common.failure'), err, ctrl.t('settings.edge.openamt_error'));
     }
   };
 
@@ -50,7 +59,7 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
           },
         };
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve application settings');
+        Notifications.error(ctrl.t('common.failure'), err, ctrl.t('settings.edge.retrieve_error'));
       }
     });
   }

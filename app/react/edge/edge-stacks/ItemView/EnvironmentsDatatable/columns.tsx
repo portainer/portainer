@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import _ from 'lodash';
 
+import i18n from '@/i18n';
 import UpdatesAvailable from '@/assets/ico/icon_updates-available.svg?c';
 import UpToDate from '@/assets/ico/icon_up-to-date.svg?c';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
@@ -26,7 +27,7 @@ const columnHelper = createColumnHelper<EdgeStackEnvironment>();
 export const columns = _.compact([
   columnHelper.accessor('Name', {
     id: 'name',
-    header: 'Name',
+    header: () => i18n.t('edge.stacks.env.columns.name'),
     cell({ row: { original: env } }) {
       const { to, params } = getDashboardRoute(env);
       return (
@@ -42,7 +43,7 @@ export const columns = _.compact([
   }),
   columnHelper.accessor((env) => endpointStatusLabel(env.StackStatus.Status), {
     id: 'status',
-    header: 'Status',
+    header: () => i18n.t('edge.stacks.env.columns.status'),
     cell({ row: { original: env } }) {
       return (
         <ul className="list-none space-y-2">
@@ -57,7 +58,7 @@ export const columns = _.compact([
   }),
   columnHelper.accessor((env) => _.last(env.StackStatus.Status)?.Time, {
     id: 'statusDate',
-    header: 'Time',
+    header: () => i18n.t('edge.stacks.env.columns.time'),
     cell({ row: { original: env } }) {
       return (
         <ul className="list-none space-y-2">
@@ -74,14 +75,14 @@ export const columns = _.compact([
     ? [
         columnHelper.accessor((env) => endpointTargetVersionLabel(env), {
           id: 'targetVersion',
-          header: 'Target version',
+          header: () => i18n.t('edge.stacks.env.columns.target_version'),
           cell: TargetVersionCell,
         }),
         columnHelper.accessor(
           (env) => endpointDeployedVersionLabel(env.StackStatus),
           {
             id: 'deployedVersion',
-            header: 'Deployed version',
+            header: () => i18n.t('edge.stacks.env.columns.deployed_version'),
             cell: DeployedVersionCell,
           }
         ),
@@ -92,7 +93,7 @@ export const columns = _.compact([
       env.StackStatus.Status.find((s) => s.Type === StatusType.Error)?.Error,
     {
       id: 'error',
-      header: 'Error',
+      header: () => i18n.t('edge.stacks.env.columns.error'),
       cell: ErrorCell,
     }
   ),
@@ -100,14 +101,14 @@ export const columns = _.compact([
     ? [
         columnHelper.display({
           id: 'actions',
-          header: 'Actions',
+          header: () => i18n.t('edge.stacks.env.columns.actions'),
           cell({ row: { original: env } }) {
             return <EnvironmentActions environment={env} />;
           },
         }),
         columnHelper.display({
           id: 'actionStatus',
-          header: 'Action Status',
+          header: () => i18n.t('edge.stacks.env.columns.action_status'),
           cell({ row: { original: env } }) {
             return <ActionStatus environmentId={env.Id} />;
           },
@@ -154,30 +155,30 @@ function endpointStatusLabel(statusArray: Array<DeploymentStatus>) {
 
   statusArray.forEach((status) => {
     if (status.Type === StatusType.Acknowledged) {
-      labels.push('Acknowledged');
+      labels.push(i18n.t('edge.stacks.status.acknowledged'));
     }
     if (status.Type === StatusType.ImagesPulled) {
-      labels.push('Images pre-pulled');
+      labels.push(i18n.t('edge.stacks.status.images_pre_pulled'));
     }
     if (status.Type === StatusType.Running) {
-      labels.push('Deployed');
+      labels.push(i18n.t('edge.stacks.status.deployed'));
     }
     if (status.Type === StatusType.Error) {
-      labels.push('Failed');
+      labels.push(i18n.t('edge.stacks.status.failed'));
     }
     if (status.Type === StatusType.PausedDeploying) {
-      labels.push('Paused');
+      labels.push(i18n.t('edge.stacks.status.paused'));
     }
     if (status.Type === StatusType.RollingBack) {
-      labels.push('Rolling Back');
+      labels.push(i18n.t('edge.stacks.status.rolling_back'));
     }
     if (status.Type === StatusType.RolledBack) {
-      labels.push('Rolled Back');
+      labels.push(i18n.t('edge.stacks.status.rolled_back'));
     }
   });
 
   if (!labels.length) {
-    labels.push('Pending');
+    labels.push(i18n.t('edge.stacks.status.pending'));
   }
 
   return _.uniq(labels).join(', ');

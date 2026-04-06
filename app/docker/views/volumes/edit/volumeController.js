@@ -1,4 +1,5 @@
 import { ResourceControlType } from '@/react/portainer/access-control/types';
+import i18n from '@/i18n';
 import { confirmDelete } from '@@/modals/confirm';
 
 angular.module('portainer.docker').controller('VolumeController', [
@@ -21,15 +22,15 @@ angular.module('portainer.docker').controller('VolumeController', [
     };
 
     $scope.removeVolume = function removeVolume() {
-      confirmDelete('Do you want to remove this volume?').then((confirmed) => {
+      confirmDelete(i18n.t('docker.volumes.edit.confirmRemove')).then((confirmed) => {
         if (confirmed) {
           VolumeService.remove($scope.volume.Id)
             .then(function success() {
-              Notifications.success('Volume successfully removed', $transition$.params().id);
+              Notifications.success(i18n.t('docker.volumes.edit.volumeRemovedSuccess'), $transition$.params().id);
               $state.go('docker.volumes', {});
             })
             .catch(function error(err) {
-              Notifications.error('Failure', err, 'Unable to remove volume');
+              Notifications.error('Failure', err, i18n.t('docker.volumes.edit.unableToRemove'));
             });
         }
       });
@@ -65,7 +66,7 @@ angular.module('portainer.docker').controller('VolumeController', [
           $scope.containersUsingVolume = containers;
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve volume details');
+          Notifications.error('Failure', err, i18n.t('docker.volumes.edit.unableToRetrieveDetails'));
         });
     }
 

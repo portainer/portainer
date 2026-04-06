@@ -1,9 +1,9 @@
-<page-header title="'Image details'" breadcrumbs="[{label:'Images', link:'docker.images'}, image.Id]"> </page-header>
+<page-header title="'docker_images.image_details_title' | i18n" breadcrumbs="[{label:'docker.images.label' | i18n, link:'docker.images'}, image.Id]"> </page-header>
 
 <div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="tag" title-text="Image tags"></rd-widget-header>
+      <rd-widget-header icon="tag" title-text="{{ 'docker_images.image_tags_header' | i18n }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -15,19 +15,19 @@
                   }}</span>
                   <span class="input-group-btn" style="padding: 0px 5px">
                     <span style="margin: 0px 5px" authorization="DockerImagePush">
-                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="{{ 'docker_images.push_to_registry' | i18n }}" ng-click="pushTag(tag)">
                         <pr-icon icon="'upload'"></pr-icon>
                       </a>
                     </span>
 
                     <span class="mx-1 my-0" authorization="DockerImageCreate">
-                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="{{ 'docker_images.pull_from_registry' | i18n }}" ng-click="pullTag(tag)">
                         <pr-icon icon="'download'"></pr-icon>
                       </a>
                     </span>
 
                     <span class="mx-1 my-0" authorization="DockerImageDelete">
-                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="{{ 'docker_images.remove_tag' | i18n }}" ng-click="removeTag(tag)">
                         <pr-icon icon="'trash-2'"></pr-icon>
                       </a>
                     </span>
@@ -39,17 +39,16 @@
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-muted" authorization="DockerImageDelete">
-                Note: you can click on the upload icon <pr-icon icon="'upload'"></pr-icon> to push an image or on the download icon <pr-icon icon="'download'"></pr-icon> to pull an
-                image or on the trash icon <pr-icon icon="'trash-2'"></pr-icon> to delete a tag.
+                {{ 'docker_images.tag_icons_note' | i18n }} <pr-icon icon="'upload'"></pr-icon> {{ 'docker_images.tag_icons_note_push' | i18n }} <pr-icon icon="'download'"></pr-icon> {{ 'docker_images.tag_icons_note_pull' | i18n }} <pr-icon icon="'trash-2'"></pr-icon> {{ 'docker_images.tag_icons_note_delete' | i18n }}
               </span>
             </div>
             <div class="col-sm-12">
               <span id="downloadResourceHint" class="createResource ml-0" style="display: none">
-                Download in progress...
+                {{ 'docker_images.download_in_progress' | i18n }}
                 <pr-icon icon="'loader-2'" class-name="'animate-spin-slow ml-0.5'"></pr-icon>
               </span>
               <span id="uploadResourceHint" class="createResource ml-0.5" style="display: none">
-                Upload in progress...
+                {{ 'docker_images.upload_in_progress' | i18n }}
                 <pr-icon icon="'loader-2'" class-name="'animate-spin-slow ml-0.5'"></pr-icon>
               </span>
             </div>
@@ -63,7 +62,7 @@
 <div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="tag" title-text="Tag the image"></rd-widget-header>
+      <rd-widget-header icon="tag" title-text="{{ 'docker_images.tag_the_image' | i18n }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
@@ -80,13 +79,13 @@
           <!-- tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+              <span class="small text-muted">{{ 'docker_images.tag_note_prefix' | i18n }} <span class="label label-default">latest</span> {{ 'docker_images.tag_note_suffix' | i18n }}</span>
             </div>
           </div>
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm !ml-0" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm !ml-0" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">{{ 'docker_images.tag_button' | i18n }}</button>
             </div>
           </div>
         </form>
@@ -98,7 +97,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="list" title-text="Image details"></rd-widget-header>
+      <rd-widget-header icon="list" title-text="{{ 'docker_images.image_details_title' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -107,7 +106,7 @@
               <td>
                 {{ image.Id }}
                 <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)">
-                  <pr-icon icon="'trash-2'"></pr-icon> Delete this image
+                  <pr-icon icon="'trash-2'"></pr-icon> {{ 'docker_images.delete_this_image' | i18n }}
                 </button>
                 <button
                   authorization="DockerImageGet"
@@ -117,31 +116,31 @@
                   ng-disabled="state.exportInProgress"
                 >
                   <pr-icon icon="'download'"></pr-icon>
-                  <span ng-hide="state.exportInProgress">Export this image</span>
-                  <span ng-show="state.exportInProgress">Export in progress...</span>
+                  <span ng-hide="state.exportInProgress">{{ 'docker_images.export_this_image' | i18n }}</span>
+                  <span ng-show="state.exportInProgress">{{ 'docker_images.export_in_progress' | i18n }}</span>
                 </button>
               </td>
             </tr>
             <tr ng-if="image.Parent">
-              <td>Parent</td>
+              <td>{{ 'docker_images.parent' | i18n }}</td>
               <td
                 ><a ui-sref="docker.images.image({id: image.Parent})">{{ image.Parent }}</a></td
               >
             </tr>
             <tr>
-              <td>Size</td>
+              <td>{{ 'docker_images.size' | i18n }}</td>
               <td>{{ image.Size | humansize }}</td>
             </tr>
             <tr>
-              <td>Created</td>
+              <td>{{ 'common.created' | i18n }}</td>
               <td>{{ image.Created | getisodate }}</td>
             </tr>
             <tr>
-              <td>Build</td>
+              <td>{{ 'docker_images.build' | i18n }}</td>
               <td>Docker {{ image.DockerVersion }} on {{ image.Os }}, {{ image.Architecture }}</td>
             </tr>
             <tr ng-if="!(image.Labels | emptyobject)">
-              <td>Labels</td>
+              <td>{{ 'docker_images.labels' | i18n }}</td>
               <td>
                 <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in image.Labels">
@@ -152,7 +151,7 @@
               </td>
             </tr>
             <tr ng-if="image.Author">
-              <td>Author</td>
+              <td>{{ 'docker_images.author' | i18n }}</td>
               <td>{{ image.Author }}</td>
             </tr>
           </tbody>
@@ -167,13 +166,13 @@
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="list" title-text="Image layers"></rd-widget-header>
+      <rd-widget-header icon="list" title-text="{{ 'docker_images.image_layers_header' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
             <th class="whitespace-nowrap">
               <table-column-header
-                col-title="'Order'"
+                col-title="'docker_images.order' | i18n"
                 can-sort="true"
                 is-sorted="$ctrl.state.orderBy === 'Order'"
                 is-sorted-desc="$ctrl.state.orderBy === 'Order' && $ctrl.state.reverseOrder"
@@ -182,7 +181,7 @@
             </th>
             <th>
               <table-column-header
-                col-title="'Size'"
+                col-title="'docker_images.size' | i18n"
                 can-sort="true"
                 is-sorted="$ctrl.state.orderBy === 'Size'"
                 is-sorted-desc="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"
@@ -191,7 +190,7 @@
             </th>
             <th>
               <table-column-header
-                col-title="'Layer'"
+                col-title="'docker_images.layer' | i18n"
                 can-sort="true"
                 is-sorted="$ctrl.state.orderBy === 'Layer'"
                 is-sorted-desc="$ctrl.state.orderBy === 'Layer' && $ctrl.state.reverseOrder"

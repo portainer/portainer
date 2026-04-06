@@ -1,4 +1,5 @@
 import { Box } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerListViewModel } from '@/react/docker/containers/types';
 import { createStore } from '@/react/docker/containers/ListView/ContainersDatatable/datatable-store';
@@ -40,6 +41,7 @@ export interface Props {
 }
 
 export function StackContainersDatatable({ stackName }: Props) {
+  const { t } = useTranslation();
   const environmentQuery = useCurrentEnvironment();
   const tableState = useTableState(settingsStore, storageKey);
 
@@ -63,7 +65,7 @@ export function StackContainersDatatable({ stackName }: Props) {
     <RowProvider context={{ environment }}>
       <TableSettingsProvider settings={settingsStore}>
         <Datatable
-          title="Containers"
+          title={t('docker_containers.title')}
           titleIcon={Box}
           settingsManager={tableState}
           columns={columns}

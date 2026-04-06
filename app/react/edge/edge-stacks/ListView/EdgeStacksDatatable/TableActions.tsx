@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { AddButton } from '@@/buttons';
@@ -11,6 +13,7 @@ export function TableActions({
 }: {
   selectedItems: Array<DecoratedEdgeStack>;
 }) {
+  const { t } = useTranslation();
   const removeMutation = useDeleteEdgeStacksMutation();
 
   return (
@@ -18,11 +21,11 @@ export function TableActions({
       <DeleteButton
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
-        confirmMessage="Are you sure you want to remove the selected Edge stack(s)?"
+        confirmMessage={t('edge.stacks.confirm_remove')}
         data-cy="edgeStack-removeStackButton"
       />
 
-      <AddButton data-cy="edgeStack-addStackButton">Add stack</AddButton>
+      <AddButton data-cy="edgeStack-addStackButton">{t('edge.stacks.add')}</AddButton>
     </div>
   );
 
@@ -30,7 +33,7 @@ export function TableActions({
     const ids = selectedItems.map((item) => item.Id);
     removeMutation.mutate(ids, {
       onSuccess: () => {
-        notifySuccess('Success', 'Edge stack(s) removed');
+        notifySuccess(t('common.success'), t('edge.stacks.notifications.removed'));
       },
     });
   }

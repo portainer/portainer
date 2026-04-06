@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, OnSubmit, ModalType, openModal } from '@@/modals';
 import { Button } from '@@/buttons';
@@ -13,24 +14,23 @@ interface Props {
 
 function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
   const [pullLatest, setPullLatest] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <Modal
       onDismiss={() => onSubmit()}
       aria-label="confirm recreate container modal"
     >
-      <Modal.Header title="Are you sure?" modalType={ModalType.Destructive} />
+      <Modal.Header title={t('docker.containers.recreate.title')} modalType={ModalType.Destructive} />
 
       <Modal.Body>
         <p>
-          You&apos;re about to recreate this container and any non-persisted
-          data will be lost. This container will be removed and another one will
-          be created using the same configuration.
+          {t('docker.containers.recreate.message')}
         </p>
         <SwitchField
           name="pullLatest"
           data-cy="recreate-pull-latest-switch"
-          label="Re-pull image"
+          label={t('docker.containers.recreate.repull_image')}
           checked={pullLatest}
           onChange={setPullLatest}
           disabled={cannotPullImage}
@@ -38,8 +38,7 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
         {cannotPullImage && (
           <div className="mt-1 text-sm">
             <TextTip color="orange">
-              Cannot re-pull as the image is inaccessible - either it no longer
-              exists or the tag or name is no longer correct.
+              {t('docker.containers.recreate.cannot_repull')}
             </TextTip>
           </div>
         )}
@@ -50,14 +49,14 @@ function ConfirmRecreationModal({ onSubmit, cannotPullImage }: Props) {
           color="default"
           data-cy="cancel-recreate"
         >
-          Cancel
+          {t('docker.containers.recreate.cancel')}
         </Button>
         <Button
           onClick={() => onSubmit({ pullLatest })}
           color="danger"
           data-cy="confirm-recreate"
         >
-          Recreate
+          {t('docker.containers.recreate.confirm')}
         </Button>
       </Modal.Footer>
     </Modal>

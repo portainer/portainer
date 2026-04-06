@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { ServiceViewModel } from '@/docker/models/service';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { PublishedPortLink } from '@/react/docker/components/ImageStatus/PublishedPortLink';
@@ -13,7 +14,7 @@ export const ports = columnHelper.accessor(
       .map((port) => `${port.PublishedPort}:${port.TargetPort}`)
       .join(','),
   {
-    header: 'Published Ports',
+    header: () => i18n.t('docker.services.columns.published_ports'),
     id: 'ports',
     cell: Cell,
   }

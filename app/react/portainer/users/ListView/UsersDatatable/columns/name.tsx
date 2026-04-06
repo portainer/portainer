@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
@@ -9,7 +10,7 @@ import { DecoratedUser } from '../types';
 import { helper } from './helper';
 
 export const name = helper.accessor('Username', {
-  header: 'Name',
+  header: i18n.t('users.col_name'),
   cell: Cell,
 });
 

@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react';
 import { Formik, Form } from 'formik';
 
+import i18n from '@/i18n';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -36,14 +37,14 @@ export function BackupFileForm() {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
-                loadingText="Downloading settings..."
+                loadingText={i18n.t('settings.backup_downloading')}
                 data-cy="settings-downloadBackupLocalButton"
                 isLoading={isSubmitting}
                 disabled={!isValid}
                 className="!ml-0"
                 icon={Download}
               >
-                Download backup
+                {i18n.t('settings.backup_download')}
               </LoadingButton>
             </div>
           </div>
@@ -62,7 +63,7 @@ export function BackupFileForm() {
 
     downloadMutate.mutate(payload, {
       onSuccess() {
-        notifySuccess('Success', 'Downloaded backup successfully');
+        notifySuccess('Success', i18n.t('settings.backup_success'));
       },
     });
   }

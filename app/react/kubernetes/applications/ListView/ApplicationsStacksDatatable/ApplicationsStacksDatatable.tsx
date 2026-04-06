@@ -1,5 +1,6 @@
 import { List } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { SystemResourceDescription } from '@/react/kubernetes/datatables/SystemResourceDescription';
@@ -31,6 +32,7 @@ export function ApplicationsStacksDatatable({
     search: string;
   };
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const environmentId = useEnvironmentId();
   const namespaceListQuery = useNamespacesQuery(environmentId);
@@ -90,7 +92,7 @@ export function ApplicationsStacksDatatable({
       renderTableActions={(selectedItems) => (
         <Authorized authorizations="K8sApplicationsW">
           <DeleteButton
-            confirmMessage="Are you sure that you want to remove the selected stack(s) ? This will remove all the applications associated to the stack(s)."
+            confirmMessage={t('kubernetes.applications.confirm_remove_stacks')}
             disabled={selectedItems.length === 0}
             onConfirmed={() => handleRemoveStacks(selectedItems)}
             data-cy="k8sApp-removeStackButton"

@@ -1,6 +1,7 @@
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useCreateLocalDockerEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function SocketForm({ onCreate, containerEngine }: Props) {
+  const { t } = useTranslation();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     name: '',
@@ -58,12 +60,12 @@ export function SocketForm({ onCreate, containerEngine }: Props) {
               <LoadingButton
                 className="wizard-connect-button vertical-center"
                 data-cy="docker-socket-connect-button"
-                loadingText="Connecting environment..."
+                loadingText={t('wizard_env.connecting')}
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
                 icon={Plug2}
               >
-                Connect
+                {t('wizard_env.connect')}
               </LoadingButton>
             </div>
           </div>
@@ -82,7 +84,7 @@ export function SocketForm({ onCreate, containerEngine }: Props) {
       },
       {
         onSuccess(environment) {
-          notifySuccess('Environment created', environment.Name);
+          notifySuccess(t('wizard_env.env_created'), environment.Name);
           clearForm();
           onCreate(environment);
         },
@@ -92,6 +94,7 @@ export function SocketForm({ onCreate, containerEngine }: Props) {
 }
 
 function OverrideSocketFieldset() {
+  const { t } = useTranslation();
   const { values, setFieldValue, errors } = useFormikContext<FormValues>();
 
   return (
@@ -102,21 +105,21 @@ function OverrideSocketFieldset() {
             checked={values.overridePath}
             data-cy="create-docker-env-socket-override-switch"
             onChange={(checked) => setFieldValue('overridePath', checked)}
-            label="Override default socket path"
+            label={t('wizard_env.podman.override_socket_path')}
             labelClass="col-sm-3 col-lg-2"
           />
         </div>
       </div>
       {values.overridePath && (
         <FormControl
-          label="Socket Path"
-          tooltip="Path to the Podman socket. Remember to bind-mount the socket, see the important notice above for more information."
+          label={t('wizard_env.podman.socket_path')}
+          tooltip={t('wizard_env.podman.socket_path_tooltip')}
           errors={errors.socketPath}
         >
           <Field
             name="socketPath"
             as={Input}
-            placeholder="e.g. /run/podman/podman.sock (on Linux)"
+            placeholder={t('wizard_env.podman.socket_path_placeholder')}
           />
         </FormControl>
       )}

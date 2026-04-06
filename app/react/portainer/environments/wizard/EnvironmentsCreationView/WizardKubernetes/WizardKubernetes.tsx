@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Zap, UploadCloud } from 'lucide-react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import {
   ContainerEngine,
@@ -91,6 +92,7 @@ const legacyOptions: BoxSelectorOption<CreationType>[] = [
 ];
 
 export function WizardKubernetes({ onCreate }: Props) {
+  const { t } = useTranslation();
   const edgeAgentDocsUrl = useDocsUrl(
     '/faqs/getting-started/why-do-we-recommend-using-the-edge-agent-instead-of-the-traditional-agent'
   );

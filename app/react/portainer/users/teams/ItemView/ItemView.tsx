@@ -1,4 +1,5 @@
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { useUsers } from '@/portainer/users/queries';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
@@ -14,6 +15,7 @@ import { TeamAssociationSelector } from './TeamAssociationSelector';
 import { useTeamIdParam } from './useTeamIdParam';
 
 export function ItemView() {
+  const { t } = useTranslation();
   const teamId = useTeamIdParam();
 
   const isPureAdmin = useIsPureAdmin();
@@ -36,9 +38,9 @@ export function ItemView() {
   return (
     <>
       <PageHeader
-        title="Team details"
+        title={t('teams.detail_page_title')}
         breadcrumbs={[
-          { label: 'Teams', link: 'portainer.teams' },
+          { label: t('teams.breadcrumb_teams'), link: 'portainer.teams' },
           { label: team.Name },
         ]}
         reload
@@ -56,8 +58,7 @@ export function ItemView() {
         <div className="row">
           <div className="col-sm-12">
             <TextTip color="orange">
-              The team leader feature is disabled as external authentication is
-              currently enabled with team sync.
+              {t('teams.team_sync_tip')}
             </TextTip>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { Team } from '@/react/portainer/users/teams/types';
@@ -24,66 +25,72 @@ export function useOptions(
   teams?: Team[],
   isPublicVisible = false
 ) {
+  const { t } = useTranslation();
   const [options, setOptions] = useState<
     Array<BoxSelectorOption<ResourceControlOwnership>>
   >([]);
 
   useEffect(() => {
-    const options = isAdmin ? adminOptions() : nonAdminOptions(teams);
+    const translatedPublicOption: BoxSelectorOption<ResourceControlOwnership> =
+      {
+        ...publicOption,
+        label: t('access_control_form.ownership_public_label'),
+        description: t('access_control_form.ownership_public_desc'),
+      };
 
-    setOptions(isPublicVisible ? [...options, publicOption] : options);
-  }, [isAdmin, teams, isPublicVisible]);
+    const opts = isAdmin ? getAdminOptions() : getNonAdminOptions();
+    setOptions(isPublicVisible ? [...opts, translatedPublicOption] : opts);
+
+    function getAdminOptions() {
+      return [
+        buildOption(
+          'access_administrators',
+          <BadgeIcon
+            icon={ownershipIcon(ResourceControlOwnership.ADMINISTRATORS)}
+          />,
+          t('access_control_form.ownership_admin_label'),
+          t('access_control_form.ownership_admin_desc'),
+          ResourceControlOwnership.ADMINISTRATORS
+        ),
+        buildOption(
+          'access_restricted',
+          <BadgeIcon
+            icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)}
+          />,
+          t('access_control_form.ownership_restricted_label'),
+          t('access_control_form.ownership_restricted_desc'),
+          ResourceControlOwnership.RESTRICTED
+        ),
+      ];
+    }
+
+    function getNonAdminOptions() {
+      return _.compact([
+        buildOption(
+          'access_private',
+          <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.PRIVATE)} />,
+          t('access_control_form.ownership_private_label'),
+          t('access_control_form.ownership_private_desc'),
+          ResourceControlOwnership.PRIVATE
+        ),
+        teams &&
+          teams.length > 0 &&
+          buildOption(
+            'access_restricted',
+            <BadgeIcon
+              icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)}
+            />,
+            t('access_control_form.ownership_restricted_label'),
+            teams.length === 1
+              ? t('access_control_form.ownership_team_desc', {
+                  teamName: teams[0].Name,
+                })
+              : t('access_control_form.ownership_restricted_desc'),
+            ResourceControlOwnership.RESTRICTED
+          ),
+      ]);
+    }
+  }, [isAdmin, teams, isPublicVisible, t]);
 
   return options;
-}
-
-function adminOptions() {
-  return [
-    buildOption(
-      'access_administrators',
-      <BadgeIcon
-        icon={ownershipIcon(ResourceControlOwnership.ADMINISTRATORS)}
-      />,
-      'Administrators',
-      'I want to restrict the management of this resource to administrators only',
-      ResourceControlOwnership.ADMINISTRATORS
-    ),
-    buildOption(
-      'access_restricted',
-      <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)} />,
-      'Restricted',
-      'I want to restrict the management of this resource to a set of users and/or teams',
-      ResourceControlOwnership.RESTRICTED
-    ),
-  ];
-}
-function nonAdminOptions(teams?: Team[]) {
-  return _.compact([
-    buildOption(
-      'access_private',
-      <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.PRIVATE)} />,
-      'Private',
-      'I want to restrict this resource to be manageable by myself only',
-      ResourceControlOwnership.PRIVATE
-    ),
-    teams &&
-      teams.length > 0 &&
-      buildOption(
-        'access_restricted',
-        <BadgeIcon icon={ownershipIcon(ResourceControlOwnership.RESTRICTED)} />,
-        'Restricted',
-        teams.length === 1 ? (
-          <>
-            I want any member of my team (<b>{teams[0].Name}</b>) to be able to
-            manage this resource
-          </>
-        ) : (
-          <>
-            I want to restrict the management of this resource to one or more of
-            my teams
-          </>
-        ),
-        ResourceControlOwnership.RESTRICTED
-      ),
-  ]);
 }

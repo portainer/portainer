@@ -1,4 +1,5 @@
 import { Radio } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -15,6 +16,7 @@ const tableKey = 'registries';
 const store = createPersistedStore(tableKey);
 
 export function RegistriesDatatable() {
+  const { t } = useTranslation();
   const query = useRegistries();
 
   const tableState = useTableState(store, tableKey);
@@ -25,7 +27,7 @@ export function RegistriesDatatable() {
       dataset={query.data || []}
       isLoading={query.isLoading}
       settingsManager={tableState}
-      title="Registries"
+      title={t('registries.registries_title')}
       titleIcon={Radio}
       renderTableActions={(selectedItems) => (
         <>

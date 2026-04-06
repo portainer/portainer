@@ -1,5 +1,6 @@
 import { useReducer } from 'react';
 import { Edit, Eye } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
@@ -36,6 +37,7 @@ export function AccessControlPanel({
   environmentId,
   onUpdateSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
   const isAdminQuery = useIsEdgeAdmin();
   const isTeamLeader = useIsCurrentUserTeamLeader();
@@ -60,7 +62,7 @@ export function AccessControlPanel({
 
   return (
     <TableContainer>
-      <TableTitle label="Access control" icon={Eye} />
+      <TableTitle label={t('access_control.title')} icon={Eye} />
       <AccessControlPanelDetails
         resourceType={resourceType}
         resourceControl={resourceControl}
@@ -76,7 +78,7 @@ export function AccessControlPanel({
               data-cy="change-ownership-button"
             >
               <Icon icon={Edit} className="space-right" />
-              Change ownership
+              {t('access_control.change_ownership')}
             </Button>
           </div>
         </div>

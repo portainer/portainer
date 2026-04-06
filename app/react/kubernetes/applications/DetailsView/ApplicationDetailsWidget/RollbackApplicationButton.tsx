@@ -1,6 +1,7 @@
 import { Pod } from 'kubernetes-types/core/v1';
 import { RotateCcw } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { notifySuccess, notifyError } from '@/portainer/services/notifications';
@@ -37,6 +38,7 @@ export function RollbackApplicationButton({
   appName,
   app,
 }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const labelSelector = applicationIsKind<Pod>('Pod', app)
     ? ''
@@ -79,7 +81,7 @@ export function RollbackApplicationButton({
       data-cy="k8sAppDetail-rollbackButton"
     >
       <Icon icon={RotateCcw} className="mr-1" />
-      Rollback to previous configuration
+      {t('kubernetes.applications.rollback')}
     </Button>
   );
 
@@ -133,7 +135,7 @@ export function RollbackApplicationButton({
         },
         {
           onSuccess: () => {
-            notifySuccess('Success', 'Application successfully rolled back');
+            notifySuccess(t('common.success'), t('kubernetes.applications.notifications.rolled_back'));
             router.stateService.reload();
           },
           onError: (error) =>

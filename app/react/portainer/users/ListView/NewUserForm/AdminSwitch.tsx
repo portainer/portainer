@@ -1,10 +1,12 @@
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { FormValues } from './FormValues';
 
 export function AdminSwitch() {
+  const { t } = useTranslation();
   const [{ name, value }, , { setValue }] =
     useField<FormValues['isAdmin']>('isAdmin');
   return (
@@ -12,8 +14,8 @@ export function AdminSwitch() {
       <div className="col-sm-12">
         <SwitchField
           data-cy="user-adminSwitch"
-          label="Administrator"
-          tooltip="Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
+          label={t('users.administrator')}
+          tooltip={t('users.administrator_tooltip')}
           checked={value}
           onChange={(checked) => setValue(checked)}
           name={name}

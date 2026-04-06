@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Route from '@/assets/ico/route.svg?c';
 
 import { confirm } from '@@/modals/confirm';
@@ -35,6 +36,7 @@ export function IngressClassDatatable({
   noIngressControllerLabel,
   view,
 }: Props) {
+  const { t } = useTranslation();
   const tableState = useTableState(settingsStore, storageKey);
 
   return (
@@ -44,7 +46,7 @@ export function IngressClassDatatable({
         dataset={values || []}
         columns={columns}
         isLoading={isLoading}
-        title="Ingress Controllers"
+        title={t('wizard_kube_scripts.ingress_controllers_title')}
         titleIcon={Route}
         getRowId={(row) => `${row.Name}-${row.ClassName}-${row.Type}`}
         renderTableActions={(selectedRows) => renderTableActions(selectedRows)}
@@ -70,7 +72,7 @@ export function IngressClassDatatable({
               updateIngressControllers(selectedRows, values || [], false)
             }
           >
-            Disallow selected
+            {t('wizard_kube_scripts.disallow_selected')}
           </Button>
           <Button
             data-cy="allow-ingress-controllers-button"
@@ -84,7 +86,7 @@ export function IngressClassDatatable({
               updateIngressControllers(selectedRows, values || [], true)
             }
           >
-            Allow selected
+            {t('wizard_kube_scripts.allow_selected')}
           </Button>
         </ButtonGroup>
       </div>
@@ -102,7 +104,9 @@ export function IngressClassDatatable({
           {initialValues &&
             values &&
             isUnsavedChanges(initialValues, values) && (
-              <TextTip>Unsaved changes.</TextTip>
+              <TextTip>
+                {t('wizard_kube_scripts.unsaved_changes')}
+              </TextTip>
             )}
         </div>
       </div>
@@ -145,26 +149,23 @@ export function IngressClassDatatable({
 
       if (usedControllersToDisallow.length > 0) {
         const confirmed = await confirm({
-          title: 'Disallow in-use ingress controllers?',
+          title: t('wizard_kube_scripts.disallow_confirm_title'),
           modalType: ModalType.Warn,
           message: (
             <div>
-              <p>
-                There are ingress controllers you want to disallow that are in
-                use:
-              </p>
+              <p>{t('wizard_kube_scripts.disallow_confirm_message')}</p>
               <ul className="ml-6">
                 {usedControllersToDisallow.map((controller) => (
                   <li key={controller.ClassName}>{controller.ClassName}</li>
                 ))}
               </ul>
-              <p>
-                No new ingress rules can be created for the disallowed
-                controllers.
-              </p>
+              <p>{t('wizard_kube_scripts.disallow_confirm_note')}</p>
             </div>
           ),
-          confirmButton: buildConfirmButton('Disallow', 'warning'),
+          confirmButton: buildConfirmButton(
+            t('wizard_kube_scripts.disallow_button'),
+            'warning'
+          ),
         });
 
         if (!confirmed) {

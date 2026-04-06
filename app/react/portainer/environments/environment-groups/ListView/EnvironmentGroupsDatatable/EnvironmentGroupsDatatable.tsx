@@ -1,4 +1,5 @@
 import { Dice4 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -13,6 +14,7 @@ const tableKey = 'environment-groups';
 const store = createPersistedStore(tableKey);
 
 export function EnvironmentGroupsDatatable() {
+  const { t } = useTranslation();
   const query = useEnvironmentGroups();
   const tableState = useTableState(store, tableKey);
 
@@ -22,7 +24,7 @@ export function EnvironmentGroupsDatatable() {
       isLoading={query.isLoading}
       dataset={query.data || []}
       settingsManager={tableState}
-      title="Environment Groups"
+      title={t('env_groups.title')}
       titleIcon={Dice4}
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />

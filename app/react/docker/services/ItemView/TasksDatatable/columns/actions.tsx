@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
@@ -11,7 +12,8 @@ import { DecoratedTask } from '../types';
 import { columnHelper } from './helper';
 
 export const actions = columnHelper.display({
-  header: 'Actions',
+  id: 'actions',
+  header: () => i18n.t('docker.services.tasks.columns.actions'),
   cell: Cell,
 });
 

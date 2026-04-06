@@ -7,6 +7,7 @@ import {
   NetworkIcon,
   ShuffleIcon,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
@@ -27,6 +28,7 @@ import { ImagesTotalSize } from './ImagesTotalSize';
 import { useDashboard } from './useDashboard';
 
 export function DashboardView() {
+  const { t } = useTranslation();
   const envId = useEnvironmentId();
   const envQuery = useCurrentEnvironment();
   const isEnvAdminQuery = useIsEnvironmentAdmin();
@@ -44,7 +46,7 @@ export function DashboardView() {
 
   return (
     <>
-      <PageHeader title="Dashboard" breadcrumbs="Environment summary" reload />
+      <PageHeader title={t('docker.dashboard.title')} breadcrumbs={t('docker.dashboard.environmentSummary')} reload />
 
       <div className="mx-4 space-y-6">
         <InfoPanels isAgent={isAgentEnvironment(env.Type)} />
@@ -54,7 +56,7 @@ export function DashboardView() {
             <DashboardItem
               to="docker.stacks"
               icon={LayersIcon}
-              type="Stack"
+              type={t('docker.dashboard.stack')}
               value={dashboardStats.stacks}
               data-cy="stacks"
             />
@@ -64,7 +66,7 @@ export function DashboardView() {
             <DashboardItem
               to="docker.services"
               icon={ShuffleIcon}
-              type="Service"
+              type={t('docker.dashboard.service')}
               value={dashboardStats.services}
               data-cy="services"
             />
@@ -73,7 +75,7 @@ export function DashboardView() {
           <DashboardItem
             to="docker.containers"
             icon={BoxIcon}
-            type="Container"
+            type={t('docker.dashboard.container')}
             value={dashboardStats.containers.total}
             data-cy="containers"
           >
@@ -83,7 +85,7 @@ export function DashboardView() {
           <DashboardItem
             to="docker.images"
             icon={ListIcon}
-            type="Image"
+            type={t('docker.dashboard.image')}
             value={dashboardStats.images.total}
             data-cy="images"
           >
@@ -93,7 +95,7 @@ export function DashboardView() {
           <DashboardItem
             to="docker.volumes"
             icon={DatabaseIcon}
-            type="Volume"
+            type={t('docker.dashboard.volume')}
             value={dashboardStats.volumes}
             data-cy="volumes"
           />
@@ -101,7 +103,7 @@ export function DashboardView() {
           <DashboardItem
             to="docker.networks"
             icon={NetworkIcon}
-            type="Network"
+            type={t('docker.dashboard.network')}
             value={dashboardStats.networks}
             data-cy="networks"
           />
@@ -109,7 +111,7 @@ export function DashboardView() {
           {env.EnableGPUManagement && isStandalone && (
             <DashboardItem
               icon={CpuIcon}
-              type="GPU"
+              type={t('docker.dashboard.gpu')}
               value={env.Gpus?.length}
               data-cy="gpus"
             />

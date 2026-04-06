@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { Columns } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 
@@ -17,6 +18,7 @@ export function ColumnVisibilityMenu<D extends object>({
   value,
   table,
 }: Props<D>) {
+  const { t } = useTranslation();
   const columnsToHide = table.getAllColumns().filter((col) => col.getCanHide());
   if (!columnsToHide.length) {
     return null;
@@ -41,7 +43,7 @@ export function ColumnVisibilityMenu<D extends object>({
           </MenuButton>
           <MenuList>
             <div className="tableMenu">
-              <div className="menuHeader">Show / Hide Columns</div>
+              <div className="menuHeader">{t('common.show_hide_columns')}</div>
               <div className="menuContent">
                 {columnsToHide.map((column) => (
                   <div key={column.id}>

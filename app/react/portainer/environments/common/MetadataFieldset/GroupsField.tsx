@@ -1,4 +1,5 @@
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { EnvironmentGroupId } from '@/react/portainer/environments/types';
@@ -7,6 +8,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
 
 export function GroupField({ name = 'meta.groupId' }: { name?: string }) {
+  const { t } = useTranslation();
   const [fieldProps, metaProps, helpers] = useField<EnvironmentGroupId>(name);
 
   const groupsQuery = useGroups();
@@ -20,7 +22,7 @@ export function GroupField({ name = 'meta.groupId' }: { name?: string }) {
   }));
 
   return (
-    <FormControl label="Group" errors={metaProps.error}>
+    <FormControl label={t('environments.metadata.group_label')} errors={metaProps.error}>
       <Select
         name={name}
         data-cy="environment-group-select"

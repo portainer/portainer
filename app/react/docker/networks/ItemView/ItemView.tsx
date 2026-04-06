@@ -1,5 +1,6 @@
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
@@ -22,6 +23,7 @@ import { NetworkOptionsTable } from './NetworkOptionsTable';
 import { NetworkContainersTable } from './NetworkContainersTable';
 
 export function ItemView() {
+  const { t } = useTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -55,9 +57,9 @@ export function ItemView() {
   return (
     <>
       <PageHeader
-        title="Network details"
+        title={t('docker_networks.detail_title')}
         breadcrumbs={[
-          { link: 'docker.networks', label: 'Networks' },
+          { link: 'docker.networks', label: t('docker_networks.breadcrumb') },
           {
             link: 'docker.networks.network',
             label: networkQuery.data.Name,
@@ -97,7 +99,7 @@ export function ItemView() {
       { networkId, nodeName },
       {
         onSuccess: () => {
-          notifySuccess('Network successfully removed', networkId);
+          notifySuccess(t('docker_networks.remove_success'), networkId);
           router.stateService.go('docker.networks');
         },
       }

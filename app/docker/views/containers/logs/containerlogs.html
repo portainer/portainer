@@ -1,12 +1,12 @@
 <page-header
-  title="'Container logs'"
+  title="'docker_containers.logs_title' | i18n"
   breadcrumbs="[
-    { label:'Containers', link:'docker.containers' },
+    { label:('docker_containers.title' | i18n), link:'docker.containers' },
     { 
       label:(container.Name | trimcontainername),
       link: 'docker.containers.container', 
       linkParams: { id: container.Id }
-    }, 'Logs']"
+    }, ('docker_containers.logs' | i18n)]"
 >
 </page-header>
 

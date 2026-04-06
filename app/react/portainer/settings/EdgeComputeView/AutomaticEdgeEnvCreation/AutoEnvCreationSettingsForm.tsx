@@ -1,6 +1,7 @@
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useUpdateSettingsMutation } from '@/react/portainer/settings/queries';
@@ -22,6 +23,8 @@ interface Props {
 }
 
 export function AutoEnvCreationSettingsForm({ settings }: Props) {
+  const { t } = useTranslation();
+
   const initialValues: FormValues = {
     EnableWaitingRoom: !settings.TrustOnFirstConnect,
   };
@@ -37,14 +40,14 @@ export function AutoEnvCreationSettingsForm({ settings }: Props) {
         {
           onSuccess() {
             notifySuccess(
-              'Success',
-              'Successfully updated Automatic Environment Creation settings'
+              t('common.success'),
+              t('settings.auto_env_success')
             );
           },
         }
       );
     },
-    [updateSettings]
+    [updateSettings, t]
   );
 
   return (
@@ -62,13 +65,13 @@ export function AutoEnvCreationSettingsForm({ settings }: Props) {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
-                loadingText="generating..."
+                loadingText={t('settings.auto_env_generating')}
                 data-cy="save-auto-env-settings-button"
                 isLoading={mutation.isLoading}
                 disabled={!isValid || !dirty}
                 className="!ml-0"
               >
-                Save settings
+                {t('settings.save_settings')}
               </LoadingButton>
             </div>
           </div>

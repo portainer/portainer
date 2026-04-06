@@ -1,5 +1,6 @@
 import { Formik, Form } from 'formik';
 import { Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import {
   ContainerEngine,
@@ -38,6 +39,7 @@ export function EdgeAgentForm({
   asyncMode,
   containerEngine,
 }: Props) {
+  const { t } = useTranslation();
   const settingsQuery = useSettings();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
@@ -63,7 +65,7 @@ export function EdgeAgentForm({
           <EdgeAgentFieldset readonly={readonly} asyncMode={asyncMode} />
 
           <MoreSettingsSection>
-            <FormSection title="Check-in Intervals">
+            <FormSection title={t('wizard_env.check_in_intervals')}>
               {asyncMode ? (
                 <EdgeAsyncIntervalsForm
                   values={values.edge}
@@ -87,11 +89,11 @@ export function EdgeAgentForm({
                   className="vertical-center"
                   data-cy="edge-agent-form-submit-button"
                   isLoading={createMutation.isLoading}
-                  loadingText="Creating environment..."
+                  loadingText={t('wizard_env.creating')}
                   disabled={!isValid}
                   icon={Plug2}
                 >
-                  Create
+                  {t('wizard_env.create')}
                 </LoadingButton>
               </div>
             </div>

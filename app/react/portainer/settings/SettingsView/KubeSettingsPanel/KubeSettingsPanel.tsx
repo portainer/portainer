@@ -1,5 +1,6 @@
 import { Form, Formik } from 'formik';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import kubeIcon from '@/assets/ico/kube.svg?c';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -18,6 +19,7 @@ import { DeploymentOptionsSection } from './DeploymentOptionsSection';
 import { validation } from './validation';
 
 export function KubeSettingsPanel({ settings }: { settings: Settings }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId(false);
   const mutation = useUpdateSettingsMutation();
@@ -41,7 +43,7 @@ export function KubeSettingsPanel({ settings }: { settings: Settings }) {
 
   return (
     <Widget id="kubernetes-settings">
-      <Widget.Title icon={kubeIcon} title="Kubernetes settings" />
+      <Widget.Title icon={kubeIcon} title={t('settings.kube_title')} />
       <Widget.Body>
         <Formik
           initialValues={initialValues}
@@ -60,10 +62,10 @@ export function KubeSettingsPanel({ settings }: { settings: Settings }) {
                   <LoadingButton
                     isLoading={mutation.isLoading}
                     data-cy="save-kubernetes-settings-button"
-                    loadingText="Saving"
+                    loadingText={t('settings.kube_saving')}
                     className="!ml-0"
                   >
-                    Save Kubernetes settings
+                    {t('settings.kube_save')}
                   </LoadingButton>
                 </div>
               </div>
@@ -98,7 +100,7 @@ export function KubeSettingsPanel({ settings }: { settings: Settings }) {
               'deploymentOptions',
             ]);
           }
-          notifySuccess('Success', 'Kubernetes settings updated');
+          notifySuccess('Success', t('settings.kube_updated'));
         },
       }
     );

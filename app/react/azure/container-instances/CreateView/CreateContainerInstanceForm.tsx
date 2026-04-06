@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerInstanceFormValues } from '@/react/azure/types';
 import * as notifications from '@/portainer/services/notifications';
@@ -16,6 +17,7 @@ export function CreateContainerInstanceForm({
 }: {
   defaultValues?: Partial<ContainerInstanceFormValues>;
 }) {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const { isPureAdmin } = useCurrentUser();
 
@@ -65,10 +67,10 @@ export function CreateContainerInstanceForm({
   async function onSubmit(values: ContainerInstanceFormValues) {
     try {
       await mutateAsync(values);
-      notifications.success('Container successfully created', values.name);
+      notifications.success(t('azure_containers.create_success'), values.name);
       router.stateService.go('azure.containerinstances');
     } catch (e) {
-      notifications.error('Failure', e as Error, 'Unable to create container');
+      notifications.error('Failure', e as Error, t('azure_containers.create_error'));
     }
   }
 }

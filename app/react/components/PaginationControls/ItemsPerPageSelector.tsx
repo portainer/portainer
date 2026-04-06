@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   value: number;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ItemsPerPageSelector({ value, onChange, showAll }: Props) {
+  const { t } = useTranslation();
   const [id] = useState(() => `${_.uniqueId()}-items-per-page`);
   return (
     <span className="limitSelector">
@@ -15,7 +17,7 @@ export function ItemsPerPageSelector({ value, onChange, showAll }: Props) {
         className="space-right text-xs text-[--text-main-color] font-normal"
         htmlFor={id}
       >
-        Items per page
+        {t('common.items_per_page')}
       </label>
       <select
         id={id}
@@ -24,7 +26,7 @@ export function ItemsPerPageSelector({ value, onChange, showAll }: Props) {
         onChange={(e) => onChange(Number(e.target.value))}
         data-cy="paginationSelect"
       >
-        {showAll ? <option value={Number.MAX_SAFE_INTEGER}>All</option> : null}
+        {showAll ? <option value={Number.MAX_SAFE_INTEGER}>{t('common.all')}</option> : null}
         {[10, 25, 50, 100].map((v) => (
           <option value={v} key={v}>
             {v}

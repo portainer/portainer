@@ -1,6 +1,7 @@
 import { createColumnHelper, CellContext } from '@tanstack/react-table';
 import { Users } from 'lucide-react';
 
+import i18n from '@/i18n';
 import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { Icon } from '@@/Icon';
@@ -12,15 +13,15 @@ const helper = createColumnHelper<AccessViewerPolicyModel>();
 
 export const columns = [
   helper.accessor('EndpointName', {
-    header: 'Environment',
+    header: i18n.t('roles.environment') as string,
     id: 'Environment',
   }),
   helper.accessor('RoleName', {
-    header: 'Role',
+    header: i18n.t('portainer_access.role') as string,
     id: 'Role',
   }),
   helper.display({
-    header: 'Access Origin',
+    header: i18n.t('roles.access_origin') as string,
     cell: AccessCell,
   }),
 ];
@@ -33,12 +34,12 @@ function AccessCell({
   if (item.RoleId === 0) {
     return (
       <>
-        User access all environments
+        {i18n.t('roles.user_access_all_environments')}
         <Link
           to="portainer.settings.edgeCompute"
           data-cy={`manage-access-button-${item.RoleName}`}
         >
-          <Icon icon={Users} /> Manage access
+          <Icon icon={Users} /> {i18n.t('roles.manage_access')}
         </Link>
       </>
     );
@@ -46,7 +47,7 @@ function AccessCell({
 
   return (
     <>
-      {prefix(item.TeamName)} access defined on {item.AccessLocation}{' '}
+      {prefix(item.TeamName)} {i18n.t('roles.access_defined_on')} {item.AccessLocation}{' '}
       {!!item.GroupName && <code>{item.GroupName}</code>}{' '}
       {manageAccess(item, isPureAdmin)}
     </>
@@ -55,11 +56,11 @@ function AccessCell({
 
 function prefix(teamName: string | undefined) {
   if (!teamName) {
-    return 'User';
+    return i18n.t('roles.user_prefix');
   }
   return (
     <>
-      Team <code>{teamName}</code>
+      {i18n.t('roles.team_prefix')} <code>{teamName}</code>
     </>
   );
 }
@@ -75,7 +76,7 @@ function manageAccess(item: AccessViewerPolicyModel, isPureAdmin: boolean) {
       params={{ id: item.GroupId }}
       data-cy={`manage-access-button-${item.RoleName}`}
     >
-      <Icon icon={Users} /> Manage access
+      <Icon icon={Users} /> {i18n.t('roles.manage_access')}
     </Link>
   ) : (
     <Link
@@ -83,7 +84,7 @@ function manageAccess(item: AccessViewerPolicyModel, isPureAdmin: boolean) {
       params={{ id: item.EndpointId }}
       data-cy={`manage-access-button-${item.RoleName}`}
     >
-      <Icon icon={Users} /> Manage access
+      <Icon icon={Users} /> {i18n.t('roles.manage_access')}
     </Link>
   );
 }

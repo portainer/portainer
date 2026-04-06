@@ -1,4 +1,5 @@
 import { useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import helm from '@/assets/ico/vendor/helm.svg?c';
@@ -20,6 +21,7 @@ const storageKey = 'helmRepository';
 const settingsStore = createPersistedStore(storageKey);
 
 export function HelmRepositoryDatatable() {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const helmReposQuery = useHelmRepositories(user.Id);
 
@@ -65,7 +67,7 @@ export function HelmRepositoryDatatable() {
       description={<HelmDatatableDescription isAdmin={isAdminUser} />}
       settingsManager={tableState}
       columns={columns}
-      title="Helm repositories"
+      title={t('helm_repos.title')}
       titleIcon={helm}
       titleId="helm-repositories"
       renderTableActions={(selectedRows) => (
@@ -79,6 +81,7 @@ export function HelmRepositoryDatatable() {
 }
 
 function HelmDatatableDescription({ isAdmin }: { isAdmin: boolean }) {
+  const { t } = useTranslation();
   return (
     <TextTip color="blue" className="mb-3">
       <p>
@@ -89,13 +92,13 @@ function HelmDatatableDescription({ isAdmin }: { isAdmin: boolean }) {
       </p>
       {isAdmin && (
         <>
-          To manage your helm repositories globally, navigate to{' '}
+          {t('helm_repos.manage_hint')}{' '}
           <Link
             to="portainer.settings"
             params={{ '#': 'kubernetes-settings' }}
             data-cy="helm-settings-link"
           >
-            Settings &gt; General
+            {t('helm_repos.manage_link')}
           </Link>
           .
         </>

@@ -1,4 +1,5 @@
 import { Clipboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -19,6 +20,7 @@ const storageKey = 'docker_configs';
 const settingsStore = createStore(storageKey);
 
 export function ConfigsDatatable() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const tableState = useTableState(settingsStore, storageKey);
 
@@ -43,7 +45,7 @@ export function ConfigsDatatable() {
       dataset={dataset}
       columns={columns}
       settingsManager={tableState}
-      title="Configs"
+      title={t('docker.configs.table_title')}
       titleIcon={Clipboard}
       renderTableSettings={() => (
         <TableSettingsMenu>

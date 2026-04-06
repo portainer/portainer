@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
@@ -18,13 +19,15 @@ interface Props extends AutomationTestingProps {
 
 export function SearchBar({
   value,
-  placeholder = 'Search...',
+  placeholder,
   onChange,
   'data-cy': dataCy,
   className,
   children,
 }: Props) {
   const [searchValue, setSearchValue] = useDebounce(value, onChange);
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('common.search');
 
   function onClear() {
     setSearchValue('');
@@ -41,8 +44,8 @@ export function SearchBar({
         className="searchInput"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
-        placeholder={placeholder}
-        aria-label="Search input"
+        placeholder={resolvedPlaceholder}
+        aria-label={t('common.search_input_label')}
       />
       {children}
       <Button

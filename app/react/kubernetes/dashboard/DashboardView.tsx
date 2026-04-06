@@ -1,5 +1,6 @@
 import { Box, Database, FileCode, Layers, Lock, Shuffle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import Route from '@/assets/ico/route.svg?c';
@@ -18,6 +19,7 @@ import { useGetVolumesCountQuery } from './queries/getVolumesCountQuery';
 import { useGetNamespacesCountQuery } from './queries/getNamespacesCountQuery';
 
 export function DashboardView() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const environmentId = useEnvironmentId();
 
@@ -42,8 +44,8 @@ export function DashboardView() {
   return (
     <>
       <PageHeader
-        title="Dashboard"
-        breadcrumbs={[{ label: 'Environment summary' }]}
+        title={t('kubernetes.dashboard.title')}
+        breadcrumbs={[{ label: t('kubernetes.dashboard.environmentSummary') }]}
         reload
         onReload={() =>
           queryClient.invalidateQueries(['environments', environmentId])
@@ -58,7 +60,7 @@ export function DashboardView() {
             isRefetching={namespacesCountQuery.isRefetching}
             icon={Layers}
             to="kubernetes.resourcePools"
-            type="Namespace"
+            type={t('kubernetes.dashboard.namespace')}
             data-cy="dashboard-namespace"
           />
           <DashboardItem
@@ -67,7 +69,7 @@ export function DashboardView() {
             isRefetching={applicationsCountQuery.isRefetching}
             icon={Box}
             to="kubernetes.applications"
-            type="Application"
+            type={t('kubernetes.dashboard.application')}
             data-cy="dashboard-application"
           />
           <DashboardItem
@@ -76,7 +78,7 @@ export function DashboardView() {
             isRefetching={servicesCountQuery.isRefetching}
             icon={Shuffle}
             to="kubernetes.services"
-            type="Service"
+            type={t('kubernetes.dashboard.service')}
             data-cy="dashboard-service"
           />
           <DashboardItem
@@ -85,8 +87,8 @@ export function DashboardView() {
             isRefetching={ingressesCountQuery.isRefetching}
             icon={Route}
             to="kubernetes.ingresses"
-            type="Ingress"
-            pluralType="Ingresses"
+            type={t('kubernetes.dashboard.ingress')}
+            pluralType={t('kubernetes.dashboard.ingressPlural')}
             data-cy="dashboard-ingress"
           />
           <DashboardItem
@@ -96,7 +98,7 @@ export function DashboardView() {
             icon={FileCode}
             to="kubernetes.configurations"
             params={{ tab: 'configmaps' }}
-            type="ConfigMap"
+            type={t('kubernetes.dashboard.configMap')}
             data-cy="dashboard-configmaps"
           />
           <DashboardItem
@@ -106,7 +108,7 @@ export function DashboardView() {
             icon={Lock}
             to="kubernetes.configurations"
             params={{ tab: 'secrets' }}
-            type="Secret"
+            type={t('kubernetes.dashboard.secret')}
             data-cy="dashboard-secrets"
           />
           <DashboardItem
@@ -115,7 +117,7 @@ export function DashboardView() {
             isRefetching={volumesCountQuery.isRefetching}
             icon={Database}
             to="kubernetes.volumes"
-            type="Volume"
+            type={t('kubernetes.dashboard.volume')}
             data-cy="dashboard-volume"
           />
         </DashboardGrid>

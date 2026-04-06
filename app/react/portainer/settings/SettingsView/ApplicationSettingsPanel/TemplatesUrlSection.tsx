@@ -1,38 +1,32 @@
 import { useField, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
-import { useDocsUrl } from '@@/PageHeader/ContextHelp';
 
 // this value is taken from https://github.com/portainer/portainer/blob/develop/api/portainer.go#L1628
 const DEFAULT_URL =
   'https://raw.githubusercontent.com/portainer/templates/v3/templates.json';
 
 export function TemplatesUrlSection() {
+  const { t } = useTranslation();
   const [{ name }, { error }] = useField<string>('templatesUrl');
 
-  const buildTemplateDocUrl = useDocsUrl('/advanced/app-templates/build');
-
   return (
-    <FormSection title="App Templates">
+    <FormSection title={t('settings.app_templates')}>
       <div className="form-group">
         <div className="col-sm-12 text-muted small">
           <p>
-            You can specify the URL to your own template definitions file here.
-            See{' '}
-            <a href={buildTemplateDocUrl} target="_blank" rel="noreferrer">
-              Portainer documentation
-            </a>{' '}
-            for more details.
+            {t('settings.app_templates_desc')}
           </p>
           <p>
-            The default value is <a href={DEFAULT_URL}>{DEFAULT_URL}</a>
+            {t('settings.app_templates_default')} <a href={DEFAULT_URL}>{DEFAULT_URL}</a>
           </p>
         </div>
       </div>
 
-      <FormControl label="URL" inputId="templates_url" errors={error}>
+      <FormControl label={t('settings.url')} inputId="templates_url" errors={error}>
         <Field
           as={Input}
           id="templates_url"

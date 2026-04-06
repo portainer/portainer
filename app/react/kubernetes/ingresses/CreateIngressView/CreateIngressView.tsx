@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useK8sSecrets } from '@/react/kubernetes/configs/queries/useK8sSecrets';
@@ -42,6 +43,7 @@ import {
 } from './utils';
 
 export function CreateIngressView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const { params } = useCurrentStateAndParams();
   useNamespaceAccessRedirect(params.namespace, { to: 'kubernetes.ingresses' });
@@ -839,7 +841,7 @@ export function CreateIngressView() {
         { environmentId, ingress },
         {
           onSuccess: () => {
-            notifySuccess('Success', 'Ingress updated successfully');
+            notifySuccess(t('common.success'), t('kubernetes.ingresses.notifications.updated'));
             router.stateService.go('kubernetes.ingresses');
           },
         }
@@ -849,7 +851,7 @@ export function CreateIngressView() {
         { environmentId, ingress },
         {
           onSuccess: () => {
-            notifySuccess('Success', 'Ingress created successfully');
+            notifySuccess(t('common.success'), t('kubernetes.ingresses.notifications.created'));
             router.stateService.go('kubernetes.ingresses');
           },
         }

@@ -6,6 +6,7 @@ import {
   Trash2Icon,
 } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { Stack, StackStatus } from '@/react/common/stacks/types';
@@ -43,6 +44,7 @@ export function StackActions({
   const stopStackMutation = useStopStackMutation();
   const deleteStackMutation = useDeleteStackMutation();
   const detachFromGitMutation = useUpdateStackMutation();
+  const { t } = useTranslation();
 
   const isMutating =
     startStackMutation.isLoading ||
@@ -65,7 +67,7 @@ export function StackActions({
               disabled={isMutating}
               data-cy="stack-stop-btn"
             >
-              Stop this stack
+              {t('docker.stacks.stop_stack')}
             </Button>
           ) : (
             <Button
@@ -80,15 +82,15 @@ export function StackActions({
                   {
                     onError(err) {
                       notifyError(
-                        'Failure',
+                        t('common.failure'),
                         err as Error,
-                        'Unable to start stack'
+                        t('docker.stacks.notifications.unable_start')
                       );
                     },
                     onSuccess() {
                       notifySuccess(
-                        'Success',
-                        `Stack ${stack.Name} started successfully`
+                        t('common.success'),
+                        `Stack ${stack.Name} ${t('docker.stacks.notifications.started')}`
                       );
                       router.stateService.reload();
                     },
@@ -96,7 +98,7 @@ export function StackActions({
                 )
               }
             >
-              Start this stack
+              {t('docker.stacks.start_stack')}
             </Button>
           )}
         </Authorized>
@@ -111,7 +113,7 @@ export function StackActions({
           disabled={isMutating}
           data-cy="stack-delete-btn"
         >
-          Delete this stack
+          {t('docker.stacks.delete_stack')}
         </Button>
       </Authorized>
 
@@ -130,7 +132,7 @@ export function StackActions({
             },
           }}
         >
-          Create template from stack
+          {t('docker.stacks.create_template')}
         </Button>
       )}
 
@@ -149,9 +151,9 @@ export function StackActions({
             disabled={isMutating}
             data-cy="stack-detach-git-btn"
             isLoading={detachFromGitMutation.isLoading}
-            loadingText="Detachment in progress..."
+            loadingText={t('docker.stacks.detaching')}
           >
-            Detach from Git
+            {t('docker.stacks.detach_git')}
           </LoadingButton>
         </Authorized>
       )}
@@ -160,10 +162,10 @@ export function StackActions({
 
   async function handleStop() {
     const confirmed = await confirm({
-      title: 'Are you sure?',
+      title: t('docker.stacks.confirm_stop.title'),
       modalType: ModalType.Warn,
-      message: 'Are you sure you want to stop this stack?',
-      confirmButton: buildConfirmButton('Stop', 'danger'),
+      message: t('docker.stacks.confirm_stop.message'),
+      confirmButton: buildConfirmButton(t('common.stop'), 'danger'),
     });
 
     if (!confirmed) {
@@ -174,10 +176,10 @@ export function StackActions({
       { id: stackId, environmentId },
       {
         onError(err) {
-          notifyError('Failure', err as Error, 'Unable to stop stack');
+          notifyError(t('common.failure'), err as Error, t('docker.stacks.notifications.unable_stop'));
         },
         onSuccess() {
-          notifySuccess('Success', `Stack ${stack.Name} stopped successfully`);
+          notifySuccess(t('common.success'), `Stack ${stack.Name} ${t('docker.stacks.notifications.stopped')}`);
           router.stateService.reload();
         },
       }
@@ -186,7 +188,7 @@ export function StackActions({
 
   async function handleDelete() {
     const confirmed = await confirmDelete(
-      'Do you want to remove the stack? Associated services will be removed as well'
+      t('docker.stacks.confirm_delete')
     );
     if (!confirmed) {
       return;
@@ -201,13 +203,13 @@ export function StackActions({
       {
         onError(err) {
           notifyError(
-            'Failure',
+            t('common.failure'),
             err as Error,
-            `Unable to remove stack ${stack.Name}`
+            `${t('docker.stacks.notifications.unable_remove')} ${stack.Name}`
           );
         },
         onSuccess() {
-          notifySuccess('Stack successfully removed', stack.Name);
+          notifySuccess(t('docker.stacks.notifications.removed'), stack.Name);
           router.stateService.go('^');
         },
       }
@@ -217,9 +219,9 @@ export function StackActions({
   async function handleDetachFromGit() {
     const confirmed = await confirm({
       modalType: ModalType.Warn,
-      title: 'Are you sure?',
-      message: 'Do you want to detach the stack from Git?',
-      confirmButton: buildConfirmButton('Detach', 'danger'),
+      title: t('docker.stacks.confirm_detach.title'),
+      message: t('docker.stacks.confirm_detach.message'),
+      confirmButton: buildConfirmButton(t('common.detach'), 'danger'),
     });
 
     if (!confirmed) {

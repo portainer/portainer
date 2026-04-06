@@ -1,5 +1,6 @@
 import { CellContext, Column } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { truncate } from '@/portainer/filters/filters';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
@@ -12,7 +13,7 @@ import { columnHelper } from './helper';
 
 export const id = columnHelper.accessor('id', {
   id: 'id',
-  header: 'Id',
+  header: () => i18n.t('docker.images.columns.id'),
   cell: Cell,
   enableColumnFilter: true,
   filterFn: (

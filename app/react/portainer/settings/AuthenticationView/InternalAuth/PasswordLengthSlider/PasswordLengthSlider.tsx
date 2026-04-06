@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { SliderTooltip } from '@@/Tip/SliderTooltip';
 
@@ -23,27 +24,23 @@ type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
 
 const sliderProperties: Record<
   Strength,
-  { strength: string; color: string; text: string }
+  { strength: string; color: string }
 > = {
   weak: {
     strength: 'weak',
     color: '#F04438',
-    text: 'Weak password',
   },
   good: {
     strength: 'good',
     color: '#F79009',
-    text: 'Good password',
   },
   strong: {
     strength: 'strong',
     color: '#12B76A',
-    text: 'Strong password',
   },
   veryStrong: {
     strength: 'veryStrong',
     color: '#0BA5EC',
-    text: 'Very strong password',
   },
 };
 
@@ -54,7 +51,15 @@ export function PasswordLengthSlider({
   value,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
   const sliderProps = getSliderProps(value);
+
+  const strengthTexts: Record<string, string> = {
+    weak: t('password_check.weak'),
+    good: t('password_check.good'),
+    strong: t('password_check.strong'),
+    veryStrong: t('password_check.very_strong'),
+  };
 
   function getSliderProps(value: number) {
     if (value < 10) {
@@ -93,12 +98,12 @@ export function PasswordLengthSlider({
   const sliderTooltip = useCallback(
     (node, handleProps) => (
       <SliderTooltip
-        value={`${handleProps.value} characters`}
+        value={t('password_check.chars', { value: handleProps.value })}
         child={node}
         delay={800}
       />
     ),
-    []
+    [t]
   );
 
   return (
@@ -118,7 +123,7 @@ export function PasswordLengthSlider({
       <div className={clsx('col-sm-2', styles.sliderBadge)}>
         <Badge
           icon={getBadgeIcon(sliderProps.strength)}
-          value={sliderProps.text}
+          value={strengthTexts[sliderProps.strength]}
           color={sliderProps.color}
         />
       </div>

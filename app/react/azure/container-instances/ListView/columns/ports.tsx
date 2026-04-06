@@ -4,13 +4,14 @@ import { CellContext } from '@tanstack/react-table';
 import { ContainerGroup } from '@/react/azure/types';
 import { getPorts } from '@/react/azure/utils';
 import { getSchemeFromPort } from '@/react/common/network-utils';
+import i18n from '@/i18n';
 
 import { Icon } from '@@/Icon';
 
 import { columnHelper } from './helper';
 
 export const ports = columnHelper.accessor(getPorts, {
-  header: 'Published Ports',
+  header: i18n.t('azure_containers.published_ports') as string,
   cell: PortsCell,
   id: 'ports',
 });

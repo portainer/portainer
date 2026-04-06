@@ -1,4 +1,5 @@
 import { Box } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export function AzureSidebar({ environmentId }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
       <DashboardLink
@@ -21,7 +24,7 @@ export function AzureSidebar({ environmentId }: Props) {
         to="azure.containerinstances"
         params={{ endpointId: environmentId }}
         icon={Box}
-        label="Container instances"
+        label={t('azure.container_instances')}
         data-cy="azureSidebar-containerInstances"
       />
     </>

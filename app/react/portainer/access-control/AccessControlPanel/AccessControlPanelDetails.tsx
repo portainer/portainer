@@ -2,13 +2,13 @@ import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 import _ from 'lodash';
 import { Info } from 'lucide-react';
+import { useTranslation, TFunction } from 'react-i18next';
 
 import { truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/react/portainer/users/teams/types';
 import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
-import { pluralize } from '@/portainer/helpers/strings';
 import { ownershipIcon } from '@/react/docker/components/datatable/createOwnershipColumn';
 
 import { Link } from '@@/Link';
@@ -33,9 +33,11 @@ export function AccessControlPanelDetails({
   resourceType,
   isAuthorisedToFetchUsers = false,
 }: Props) {
+  const { t } = useTranslation();
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
-    resourceControl
+    resourceControl,
+    t
   );
 
   const {
@@ -56,24 +58,18 @@ export function AccessControlPanelDetails({
   let teamsMessage = teams.data && teams.data.join(', ');
   if (unauthoisedTeams > 0 && teams.isFetched) {
     teamsMessage += teamsLength > 0 ? ' and' : '';
-    teamsMessage += ` ${unauthoisedTeams} ${pluralize(
-      unauthoisedTeams,
-      'team'
-    )} you are not part of`;
+    teamsMessage += ` ${t('access_control.teams_not_part_of', { count: unauthoisedTeams })}`;
   }
 
   const userMessage = users.data
     ? users.data.join(', ')
-    : `${restrictedToUsers.length} ${pluralize(
-        restrictedToUsers.length,
-        'user'
-      )}`;
+    : t('access_control.users_count', { count: restrictedToUsers.length });
 
   return (
     <table className="table">
       <tbody>
         <tr data-cy="access-ownership">
-          <td className="w-1/5">Ownership</td>
+          <td className="w-1/5">{t('access_control.ownership_label')}</td>
           <td>
             <i
               className={clsx(ownershipIcon(ownership), 'space-right')}
@@ -81,19 +77,19 @@ export function AccessControlPanelDetails({
               aria-label="ownership-icon"
             />
             <span aria-label="ownership">{ownership}</span>
-            <Tooltip message={getOwnershipTooltip(ownership)} />
+            <Tooltip message={getOwnershipTooltip(ownership, t)} />
           </td>
         </tr>
         {inheritanceMessage}
         {restrictedToUsers.length > 0 && (
           <tr data-cy="access-authorisedUsers">
-            <td>Authorized users</td>
+            <td>{t('access_control.authorized_users_label')}</td>
             <td aria-label="authorized-users">{userMessage}</td>
           </tr>
         )}
         {restrictedToTeams.length > 0 && (
           <tr data-cy="access-authorisedTeams">
-            <td>Authorized teams</td>
+            <td>{t('access_control.authorized_teams_label')}</td>
             <td aria-label="authorized-teams">{teamsMessage}</td>
           </tr>
         )}
@@ -102,23 +98,27 @@ export function AccessControlPanelDetails({
   );
 }
 
-function getOwnershipTooltip(ownership: ResourceControlOwnership) {
+function getOwnershipTooltip(
+  ownership: ResourceControlOwnership,
+  t: TFunction
+) {
   switch (ownership) {
     case ResourceControlOwnership.PRIVATE:
-      return 'Management of this resource is restricted to a single user.';
+      return t('access_control.ownership_tooltip_private');
     case ResourceControlOwnership.RESTRICTED:
-      return 'This resource can be managed by a restricted set of users and/or teams.';
+      return t('access_control.ownership_tooltip_restricted');
     case ResourceControlOwnership.PUBLIC:
-      return 'This resource can be managed by any user with access to this environment.';
+      return t('access_control.ownership_tooltip_public');
     case ResourceControlOwnership.ADMINISTRATORS:
     default:
-      return 'This resource can only be managed by administrators.';
+      return t('access_control.ownership_tooltip_admin');
   }
 }
 
 function getInheritanceMessage(
   resourceType: ResourceControlType,
-  resourceControl?: ResourceControlViewModel
+  resourceControl: ResourceControlViewModel | undefined,
+  t: TFunction
 ) {
   if (!resourceControl || resourceControl.Type === resourceType) {
     return null;
@@ -132,8 +132,8 @@ function getInheritanceMessage(
     parentType === ResourceControlType.Service
   ) {
     return (
-      <InheritanceMessage tooltip="Access control applied on a service is also applied on each container of that service.">
-        Access control on this resource is inherited from the following service:
+      <InheritanceMessage tooltip={t('access_control.inheritance_service_tooltip')}>
+        {t('access_control.inheritance_service_msg')}
         <Link
           to="docker.services.service"
           params={{ id: resourceId }}
@@ -151,9 +151,8 @@ function getInheritanceMessage(
     parentType === ResourceControlType.Container
   ) {
     return (
-      <InheritanceMessage tooltip="Access control applied on a container created using a template is also applied on each volume associated to the container.">
-        Access control on this resource is inherited from the following
-        container:
+      <InheritanceMessage tooltip={t('access_control.inheritance_container_tooltip')}>
+        {t('access_control.inheritance_container_msg')}
         <Link
           to="docker.containers.container"
           params={{ id: resourceId }}
@@ -168,9 +167,9 @@ function getInheritanceMessage(
 
   if (parentType === ResourceControlType.Stack) {
     return (
-      <InheritanceMessage tooltip="Access control applied on a stack is also applied on each resource in the stack.">
+      <InheritanceMessage tooltip={t('access_control.inheritance_stack_tooltip')}>
         <span className="space-right">
-          Access control on this resource is inherited from the following stack:
+          {t('access_control.inheritance_stack_msg')}
         </span>
         {removeEndpointIdFromStackResourceId(resourceId)}
       </InheritanceMessage>

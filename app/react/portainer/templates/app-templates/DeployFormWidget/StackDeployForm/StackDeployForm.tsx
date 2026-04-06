@@ -1,7 +1,9 @@
 import { useRouter } from '@uirouter/react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
+import i18n from '@/i18n';
 import {
   SwarmCreatePayload,
   useCreateStack,
@@ -33,6 +35,7 @@ export function StackDeployForm({
   template: TemplateViewModel;
   unselect: () => void;
 }) {
+  const { t } = useTranslation();
   const isDeployable = useIsDeployable(template.Type);
 
   const router = useRouter();
@@ -67,7 +70,7 @@ export function StackDeployForm({
     return (
       <div className="form-group">
         <TextTip>
-          This template type cannot be deployed on this environment.
+          {t('portainer.templates.deploy.cannot_deploy')}
         </TextTip>
       </div>
     );
@@ -82,7 +85,7 @@ export function StackDeployForm({
     >
       {({ values, errors, setFieldValue, isValid }) => (
         <Form className="form-horizontal">
-          <FormSection title="Configuration">
+          <FormSection title={t('portainer.templates.deploy.configuration')}>
             <NameField
               value={values.name}
               onChange={(v) => setFieldValue('name', v)}
@@ -108,8 +111,8 @@ export function StackDeployForm({
           <FormActions
             isLoading={mutation.isLoading}
             isValid={isValid}
-            loadingText="Deployment in progress..."
-            submitLabel="Deploy the stack"
+            loadingText={t('portainer.templates.deploy.deploying')}
+            submitLabel={t('portainer.templates.deploy.deploy_the_stack')}
             data-cy="deploy-stack-button"
           >
             <Button
@@ -118,7 +121,7 @@ export function StackDeployForm({
               color="default"
               data-cy="cancel-deploy-stack-button"
             >
-              Hide
+              {t('portainer.templates.deploy.hide')}
             </Button>
           </FormActions>
         </Form>
@@ -154,7 +157,7 @@ export function StackDeployForm({
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Stack created');
+          notifySuccess(i18n.t('common.success'), i18n.t('portainer.templates.deploy.stack_created'));
           router.stateService.go('docker.stacks');
         },
       }

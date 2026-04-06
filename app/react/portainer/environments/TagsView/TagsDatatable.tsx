@@ -1,7 +1,9 @@
 import { TagIcon } from 'lucide-react';
 import { createColumnHelper } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { Tag } from '@/portainer/tags/types';
+import i18n from '@/i18n';
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -12,7 +14,7 @@ const columnHelper = createColumnHelper<Tag>();
 
 const columns = [
   columnHelper.accessor('Name', {
-    header: 'Name',
+    header: () => i18n.t('tags.col_name'),
   }),
 ];
 
@@ -27,11 +29,12 @@ export function TagsDatatable({
   dataset: Array<Tag> | undefined;
   onRemove: (selectedItems: Array<Tag>) => void;
 }) {
+  const { t } = useTranslation();
   const tableState = useTableState(store, tableKey);
 
   return (
     <Datatable
-      title="Tags"
+      title={t('tags.tags_title')}
       titleIcon={TagIcon}
       dataset={dataset || []}
       columns={columns}
@@ -40,7 +43,7 @@ export function TagsDatatable({
       renderTableActions={(selectedItems) => (
         <DeleteButton
           disabled={selectedItems.length === 0}
-          confirmMessage="Are you sure you want to remove the selected tag(s)?"
+          confirmMessage={t('tags.remove_confirm_tags')}
           onConfirmed={() => onRemove(selectedItems)}
           data-cy="remove-tag-button"
         />

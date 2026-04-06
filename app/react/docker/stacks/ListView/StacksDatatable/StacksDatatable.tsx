@@ -1,5 +1,6 @@
 import { Layers } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { useAuthorizations, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -31,6 +32,7 @@ export function StacksDatatable({
   dataset: Array<DecoratedStack>;
 }) {
   const tableState = useStore();
+  const { t } = useTranslation();
   useRepeater(tableState.autoRefreshRate, onReload);
   const isAdminQuery = useIsEdgeAdmin();
   const { authorized: canManageStacks } = useAuthorizations([
@@ -42,7 +44,7 @@ export function StacksDatatable({
   return (
     <Datatable<DecoratedStack>
       settingsManager={tableState}
-      title="Stacks"
+      title={t('docker.stacks.table_title')}
       titleIcon={Layers}
       renderTableActions={(selectedRows) => (
         <TableActions selectedItems={selectedRows} onRemove={onRemove} />

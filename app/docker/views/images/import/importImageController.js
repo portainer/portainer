@@ -1,4 +1,5 @@
 import { PorImageRegistryModel } from '@/docker/models/porImageRegistry';
+import i18n from '@/i18n';
 
 angular.module('portainer.docker').controller('ImportImageController', [
   '$scope',
@@ -37,7 +38,7 @@ angular.module('portainer.docker').controller('ImportImageController', [
         try {
           await ImageService.tagImage(id, repo, tag);
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to tag image');
+          Notifications.error(i18n.t('docker.images.import.failure'), err, i18n.t('docker.images.import.unableToTagImage'));
         }
       }
     }
@@ -55,7 +56,7 @@ angular.module('portainer.docker').controller('ImportImageController', [
       try {
         const { data } = await ImageService.uploadImage(file);
         if (data.error) {
-          Notifications.error('Failure', data.error, 'Unable to upload image');
+          Notifications.error(i18n.t('docker.images.import.failure'), data.error, i18n.t('docker.images.import.unableToUploadImage'));
         } else if (data.stream) {
           // docker has /n at the end of the stream, podman doesn't
           var regex = /Loaded.*?: (.*?)(?:\n|$)/g;
@@ -64,12 +65,12 @@ angular.module('portainer.docker').controller('ImportImageController', [
             await tagImage(imageIds[1]);
             $state.go('docker.images.image', { id: imageIds[1] }, { reload: true });
           }
-          Notifications.success('Success', 'Images successfully uploaded');
+          Notifications.success(i18n.t('docker.images.import.success'), i18n.t('docker.images.import.imagesUploadedSuccess'));
         } else {
-          Notifications.success('Success', 'The uploaded tar file contained multiple images. The provided tag therefore has been ignored.');
+          Notifications.success(i18n.t('docker.images.import.success'), i18n.t('docker.images.import.multipleImagesIgnoredTag'));
         }
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to upload image');
+        Notifications.error(i18n.t('docker.images.import.failure'), err, i18n.t('docker.images.import.unableToUploadImage'));
       } finally {
         $scope.state.actionInProgress = false;
       }

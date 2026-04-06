@@ -1,5 +1,6 @@
 import { object, string, number, boolean, array } from 'yup';
 
+import i18n from '@/i18n';
 import { validationSchema as accessControlSchema } from '@/react/portainer/access-control/AccessControlForm/AccessControlForm.validation';
 
 import { buildUniquenessTest } from '@@/form-components/validate-unique';
@@ -8,11 +9,13 @@ import { validationSchema as portsSchema } from './PortsMappingField.validation'
 
 export function validationSchema(isAdmin: boolean) {
   return object().shape({
-    name: string().required('Name is required.'),
-    image: string().required('Image is required.'),
-    subscription: string().required('Subscription is required.'),
-    resourceGroup: string().required('Resource group is required.'),
-    location: string().required('Location is required.'),
+    name: string().required(i18n.t('validation.name_required')),
+    image: string().required(i18n.t('validation.image_required')),
+    subscription: string().required(i18n.t('validation.subscription_required')),
+    resourceGroup: string().required(
+      i18n.t('validation.resource_group_required')
+    ),
+    location: string().required(i18n.t('validation.location_required')),
     os: string().oneOf(['Linux', 'Windows']),
     cpu: number().positive(),
     memory: number().positive(),
@@ -22,15 +25,17 @@ export function validationSchema(isAdmin: boolean) {
     env: array()
       .of(
         object().shape({
-          name: string().required('Environment variable name is required.'),
-          value: string().required('Environment variable value is required.'),
+          name: string().required(i18n.t('validation.env_var_name_required')),
+          value: string().required(
+            i18n.t('validation.env_var_value_required')
+          ),
         })
       )
       .test(
         'unique',
-        'This environment variable is already defined',
+        i18n.t('validation.env_var_already_defined'),
         buildUniquenessTest(
-          () => 'This environment variable is already defined',
+          () => i18n.t('validation.env_var_already_defined'),
           'name'
         )
       ),

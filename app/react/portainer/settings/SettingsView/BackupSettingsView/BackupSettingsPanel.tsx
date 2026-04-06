@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
@@ -10,17 +11,17 @@ import { BackupFileForm } from './BackupFileForm';
 import { BackupS3Form } from './BackupS3Form';
 
 export function BackupSettingsPanel() {
+  const { t } = useTranslation();
   const [backupType, setBackupType] = useState(options[0].value);
 
   return (
     <Widget>
-      <WidgetTitle icon={Download} title="Back up Portainer" />
+      <WidgetTitle icon={Download} title={t('settings.backup_title')} />
       <WidgetBody>
         <div className="form-horizontal">
-          <FormSection title="Backup configuration">
+          <FormSection title={t('settings.backup_config')}>
             <div className="form-group col-sm-12 text-muted small">
-              This will back up your Portainer server configuration and does not
-              include containers.
+              {t('settings.backup_desc')}
             </div>
             <BoxSelector
               slim

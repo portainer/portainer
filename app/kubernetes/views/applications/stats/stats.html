@@ -1,24 +1,24 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Application stats'"
+  title="'k8s_applications.stats_title' | i18n"
   breadcrumbs="[
-    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { label:('k8s_applications.namespaces' | i18n), link:'kubernetes.resourcePools' },
     {
       label:ctrl.state.transition.namespace,
       link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.state.transition.namespace }
     },
-    { label:'Applications', link:'kubernetes.applications' },
+    { label:('k8s_applications.applications' | i18n), link:'kubernetes.applications' },
     {
       label:ctrl.state.transition.applicationName,
       link: 'kubernetes.applications.application',
       linkParams:{ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace }
     },
-     'Pods',
+     ('k8s_logs.pods' | i18n),
      ctrl.state.transition.podName,
-     'Containers',
+     ('k8s_logs.containers' | i18n),
      ctrl.state.transition.containerName,
-     'Stats'
+     ('docker_containers.stats' | i18n)
      ]"
   reload="true"
 >
@@ -26,11 +26,10 @@
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
+<information-panel ng-if="!ctrl.state.getMetrics" title-text="{{ 'k8s_applications.unable_retrieve_metrics' | i18n }}">
   <span class="small text-warning vertical-center">
     <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-    Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
-    configured.
+    {{ 'k8s_applications.metrics_unavailable' | i18n }}
   </span>
 </information-panel>
 <div class="row" ng-if="ctrl.state.getMetrics">
@@ -41,7 +40,7 @@
           <div class="widget-icon space-right">
             <pr-icon icon="'info'"></pr-icon>
           </div>
-          <span class="vertical-center"> About statistics </span>
+          <span class="vertical-center"> {{ 'docker_containers.about_statistics' | i18n }} </span>
         </div>
       </div>
       <rd-widget-body>
@@ -49,13 +48,12 @@
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-warning">
-                This view displays real-time statistics about the container <b>{{ ctrl.state.transition.containerName | trimcontainername }}</b
-                >.
+                {{ 'k8s_applications.stats_realtime' | i18n:{ name: (ctrl.state.transition.containerName | trimcontainername) } }}
               </span>
             </div>
           </div>
           <div class="form-group">
-            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> Refresh rate </label>
+            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> {{ 'common.refresh_rate' | i18n }} </label>
             <div class="col-sm-3 col-md-2">
               <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control" data-cy="app-stats-refresh-rate">
                 <option value="30">30s</option>
@@ -70,7 +68,7 @@
             <div class="col-sm-12">
               <span class="small text-muted">
                 <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                Network stats are unavailable for this container.
+                {{ 'docker_containers.network_stats_unavailable' | i18n }}
               </span>
             </div>
           </div>
@@ -88,7 +86,7 @@
           <div class="widget-icon space-right">
             <pr-icon icon="'svg-memory'"></pr-icon>
           </div>
-          <span class="vertical-center"> Memory usage </span>
+          <span class="vertical-center"> {{ 'docker_containers.memory_usage' | i18n }} </span>
         </div>
       </div>
       <rd-widget-body>
@@ -105,7 +103,7 @@
           <div class="widget-icon space-right">
             <pr-icon icon="'cpu'"></pr-icon>
           </div>
-          <span class="vertical-center"> CPU usage </span>
+          <span class="vertical-center"> {{ 'docker_containers.cpu_usage' | i18n }} </span>
         </div>
       </div>
       <rd-widget-body>

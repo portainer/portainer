@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -28,6 +29,7 @@ interface Props {
 const settingsStore = createPersistedStore(storageKey, 'name');
 
 export function TeamsDatatable({ teams, isAdmin }: Props) {
+  const { t } = useTranslation();
   const { handleRemove } = useRemoveMutation();
   const tableState = useTableState(settingsStore, storageKey);
 
@@ -36,14 +38,14 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
       dataset={teams}
       columns={columns}
       settingsManager={tableState}
-      title="Teams"
+      title={t('teams.title')}
       titleIcon={Users}
       renderTableActions={(selectedRows) =>
         isAdmin && (
           <DeleteButton
             onConfirmed={() => handleRemoveClick(selectedRows)}
             disabled={selectedRows.length === 0}
-            confirmMessage="Are you sure you want to remove the selected teams?"
+            confirmMessage={t('teams.remove_confirm')}
             data-cy="remove-teams-button"
           />
         )
@@ -59,6 +61,7 @@ export function TeamsDatatable({ teams, isAdmin }: Props) {
 }
 
 function useRemoveMutation() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation(
@@ -66,7 +69,7 @@ function useRemoveMutation() {
       promiseSequence(ids.map((id) => () => deleteTeam(id))),
     {
       meta: {
-        error: { title: 'Failure', message: 'Unable to remove team' },
+        error: { title: t('common.failure'), message: t('teams.remove_error') },
       },
       onSuccess() {
         return queryClient.invalidateQueries(['teams']);
@@ -79,7 +82,7 @@ function useRemoveMutation() {
   async function handleRemove(teams: TeamId[]) {
     deleteMutation.mutate(teams, {
       onSuccess: () => {
-        notifySuccess('Teams successfully removed', '');
+        notifySuccess(t('teams.remove_success'), '');
       },
     });
   }

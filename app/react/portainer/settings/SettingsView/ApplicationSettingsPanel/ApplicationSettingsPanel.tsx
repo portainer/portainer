@@ -1,5 +1,6 @@
 import { Settings as SettingsIcon } from 'lucide-react';
 import { Field, Form, Formik, useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { useUpdateSettingsMutation } from '@/react/portainer/settings/queries';
@@ -25,6 +26,7 @@ export function ApplicationSettingsPanel({
   onSuccess(settings: Settings): void;
   settings: Settings;
 }) {
+  const { t } = useTranslation();
   const mutation = useUpdateSettingsMutation();
 
   const initialValues: Values = {
@@ -39,7 +41,7 @@ export function ApplicationSettingsPanel({
 
   return (
     <Widget>
-      <Widget.Title icon={SettingsIcon} title="Application settings" />
+      <Widget.Title icon={SettingsIcon} title={t('settings.app_settings')} />
       <Widget.Body>
         <Formik
           initialValues={initialValues}
@@ -64,7 +66,7 @@ export function ApplicationSettingsPanel({
       },
       {
         onSuccess(settings) {
-          notifySuccess('Success', 'Application settings updated');
+          notifySuccess(t('common.success'), t('settings.app_settings_updated'));
           onSuccess(settings);
         },
       }
@@ -73,12 +75,13 @@ export function ApplicationSettingsPanel({
 }
 
 function InnerForm({ isLoading }: { isLoading: boolean }) {
+  const { t } = useTranslation();
   const { values, setFieldValue, isValid, errors } = useFormikContext<Values>();
 
   return (
     <Form className="form-horizontal">
       <FormControl
-        label="Snapshot interval"
+        label={t('settings.app.snapshot_interval')}
         inputId="snapshot_interval"
         errors={errors.snapshotInterval}
         required
@@ -93,7 +96,7 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
 
       <EdgeCheckinIntervalField
         value={values.edgeAgentCheckinInterval}
-        label="Edge agent default poll frequency"
+        label={t('settings.app.edge_poll_frequency')}
         isDefaultHidden
         onChange={(value) => setFieldValue('edgeAgentCheckinInterval', value)}
       />
@@ -110,9 +113,9 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
             isLoading={isLoading}
             disabled={!isValid}
             data-cy="settings-saveSettingsButton"
-            loadingText="Saving..."
+            loadingText={t('settings.app.saving')}
           >
-            Save application settings
+            {t('settings.app.save_settings')}
           </LoadingButton>
         </div>
       </div>

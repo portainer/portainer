@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
 import type { ContainerListViewModel } from '@/react/docker/containers/types';
+import i18n from '@/i18n';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
 
@@ -11,7 +12,7 @@ import { TableSettings } from '../types';
 import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor((row) => row.Names[0], {
-  header: 'Name',
+  header: i18n.t('common.name') as string,
   id: 'name',
   cell: NameCell,
 });

@@ -1,4 +1,5 @@
 import { Check, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useDeleteEnvironmentsMutation } from '@/react/portainer/environments/ListView/useDeleteEnvironmentsMutation';
@@ -28,6 +29,7 @@ export function TableActions({
 }: {
   selectedRows: WaitingRoomEnvironment[];
 }) {
+  const { t } = useTranslation();
   const isPureAdmin = useIsPureAdmin();
   const associateMutation = useAssociateDeviceMutation();
   const removeMutation = useDeleteEnvironmentsMutation();
@@ -41,7 +43,7 @@ export function TableActions({
         data-cy="remove-device-button"
         confirmMessage="You're about to remove edge device(s) from waiting room, which will not be shown until next agent startup."
       >
-        Remove Device
+        {t('edge.devices.remove_device')}
       </DeleteButton>
 
       <TooltipWithChildren
@@ -66,7 +68,7 @@ export function TableActions({
             color="secondary"
             icon={CheckCircle}
           >
-            Associate and assignment
+            {t('edge.devices.associate_and_assign')}
           </Button>
         </span>
       </TooltipWithChildren>
@@ -90,7 +92,7 @@ export function TableActions({
             disabled={selectedRows.length === 0 || licenseOverused}
             icon={Check}
           >
-            Associate Device
+            {t('edge.devices.associate_device')}
           </Button>
         </span>
       </TooltipWithChildren>
@@ -116,7 +118,7 @@ export function TableActions({
       devices.map((d) => d.Id),
       {
         onSuccess() {
-          notifySuccess('Success', 'Edge devices associated successfully');
+          notifySuccess(t('common.success'), t('edge.devices.notifications.associated'));
         },
       }
     );
@@ -127,7 +129,7 @@ export function TableActions({
       devices.map((d) => ({ id: d.Id, name: d.Name })),
       {
         onSuccess() {
-          notifySuccess('Success', 'Edge devices were hidden successfully');
+          notifySuccess(t('common.success'), t('edge.devices.notifications.hidden'));
         },
       }
     );

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { InformationPanel } from '@@/InformationPanel';
@@ -12,13 +14,14 @@ import { useLicenseOverused, useUntrustedCount } from './queries';
 export default withLimitToBE(WaitingRoomView);
 
 function WaitingRoomView() {
+  const { t } = useTranslation();
   const untrustedCount = useUntrustedCount();
   const licenseOverused = useLicenseOverused(untrustedCount);
   return (
     <>
       <PageHeader
-        title="Waiting Room"
-        breadcrumbs={[{ label: 'Waiting Room' }]}
+        title={t('edge.waiting_room')}
+        breadcrumbs={[{ label: t('edge.waiting_room') }]}
         reload
       />
 
@@ -26,15 +29,14 @@ function WaitingRoomView() {
         <div className="col-sm-12">
           <InformationPanel>
             <TextTip color="blue">
-              Only environments generated from the{' '}
+              {t('edge.waiting_room_info_prefix')}{' '}
               <Link
                 to="portainer.endpoints.edgeAutoCreateScript"
                 data-cy="waitingRoom-edgeAutoCreateScriptLink"
               >
-                auto onboarding
+                {t('edge.waiting_room_info_link')}
               </Link>{' '}
-              script will appear here, manually added environments and edge
-              devices will bypass the waiting room.
+              {t('edge.waiting_room_info_suffix')}
             </TextTip>
           </InformationPanel>
         </div>
@@ -44,15 +46,14 @@ function WaitingRoomView() {
         <div className="row">
           <div className="col-sm-12">
             <Alert color="warn">
-              Associating all nodes in waiting room will exceed the node limit
-              of your current license. Go to{' '}
+              {t('edge.waiting_room_license_prefix')}{' '}
               <Link
                 to="portainer.licenses"
                 data-cy="waitingRoom-portainerLicensesLink"
               >
-                Licenses
+                {t('edge.waiting_room_license_link')}
               </Link>{' '}
-              page to view the current usage.
+              {t('edge.waiting_room_license_suffix')}
             </Alert>
           </div>
         </div>

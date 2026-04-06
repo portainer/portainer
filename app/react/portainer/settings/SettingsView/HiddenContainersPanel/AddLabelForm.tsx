@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react';
 import { SchemaOf, object, string } from 'yup';
 import { useReducer } from 'react';
 
+import i18n from '@/i18n';
+
 import { Button } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -31,7 +33,7 @@ export function AddLabelForm({
       {({ errors, isValid, dirty }) => (
         <Form className="form-horizontal">
           <div className="flex w-full items-start gap-4">
-            <FormControl label="Name" errors={errors.name} className="flex-1">
+            <FormControl label={i18n.t('settings.hidden_name')} errors={errors.name} className="flex-1">
               <Field
                 as={Input}
                 name="name"
@@ -39,7 +41,7 @@ export function AddLabelForm({
               />
             </FormControl>
 
-            <FormControl label="Value" errors={errors.value} className="flex-1">
+            <FormControl label={i18n.t('settings.hidden_value')} errors={errors.value} className="flex-1">
               <Field as={Input} name="value" placeholder="e.g. bar" />
             </FormControl>
 
@@ -49,7 +51,7 @@ export function AddLabelForm({
               icon={Plus}
               disabled={!dirty || !isValid || isLoading}
             >
-              Add filter
+              {i18n.t('settings.hidden_add_filter')}
             </Button>
           </div>
         </Form>
@@ -65,7 +67,7 @@ export function AddLabelForm({
 
 function validation(): SchemaOf<{ name: string; value: string }> {
   return object({
-    name: string().required('Name is required'),
+    name: string().required(i18n.t('settings.hidden_name_required')),
     value: string().default(''),
   });
 }

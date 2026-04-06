@@ -4,14 +4,14 @@
     <div class="limited-be-content">
       <rd-widget>
         <rd-widget-header icon="user-x">
-          <header-title> Effective access viewer </header-title>
+          <header-title> {{ 'roles.effective_access_viewer' | i18n }} </header-title>
         </rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal">
-            <div class="col-sm-12 form-section-title"> User </div>
+            <div class="col-sm-12 form-section-title"> {{ 'roles.user' | i18n }} </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted" ng-if="$ctrl.users.length === 0"> No user available </span>
+                <span class="small text-muted" ng-if="$ctrl.users.length === 0"> {{ 'roles.no_user_available' | i18n }} </span>
 
                 <por-select ng-if="$ctrl.users.length > 0" value="$ctrl.selectedUserId" options="$ctrl.users" on-change="($ctrl.onUserSelect)" placeholder="'Select a user'">
                 </por-select>

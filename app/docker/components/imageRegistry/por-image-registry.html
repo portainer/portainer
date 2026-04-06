@@ -1,7 +1,7 @@
 <!-- use registry -->
 <div class="row">
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
+    <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> {{ 'docker_images.registry' | i18n }} </label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
         data-cy="component-registrySelect"
@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image</label>
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">{{ 'common.image' | i18n }}</label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
@@ -37,7 +37,7 @@
             title="Search image on Docker Hub"
             target="_blank"
           >
-            <pr-icon icon="'svg-docker'" size="'md'"></pr-icon> Search
+            <pr-icon icon="'svg-docker'" size="'md'"></pr-icon> {{ 'docker_images.search' | i18n }}
           </a>
         </span>
       </div>
@@ -48,9 +48,9 @@
   <div ng-if="!$ctrl.model.UseRegistry">
     <div class="form-group">
       <span class="small">
-        <p class="text-muted ml-4"> When using advanced mode, image and repository <b>must be</b> publicly available. </p>
+        <p class="text-muted ml-4"> {{ 'docker_images.advanced_mode_notice' | i18n }} </p>
       </span>
-      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image </label>
+      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">{{ 'common.image' | i18n }} </label>
       <div ng-class="$ctrl.inputClass" class="col-sm-8">
         <input
           type="text"
@@ -71,8 +71,8 @@
       <div class="col-sm-3 col-lg-2"></div>
       <div class="col-sm-8" ng-messages="$ctrl.form.image_name.$error">
         <p class="text-warning vertical-center" ng-message="required">
-          <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> Image name is required.
-          <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span>
+          <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> {{ 'docker_images.image_name_required' | i18n }}
+          <span ng-if="$ctrl.canPull">{{ 'docker_images.tag_must_be_specified' | i18n }}</span>
         </p>
       </div>
     </div>
@@ -81,10 +81,10 @@
   <div class="form-group">
     <div class="col-sm-12">
       <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
-        <pr-icon icon="'database'"> </pr-icon> Simple mode
+        <pr-icon icon="'database'"> </pr-icon> {{ 'docker_images.simple_mode' | i18n }}
       </button>
       <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
-        <pr-icon icon="'globe'"> </pr-icon> Advanced mode
+        <pr-icon icon="'globe'"> </pr-icon> {{ 'docker_images.advanced_mode' | i18n }}
       </button>
     </div>
   </div>

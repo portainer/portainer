@@ -1,4 +1,5 @@
 import { FormikErrors, FormikHandlers } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
 
@@ -23,6 +24,7 @@ export function EdgeGroupsField({
   error,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
   const groupsQuery = useEdgeGroups();
 
   const selectedGroups = groupsQuery.data?.filter((group) =>
@@ -32,18 +34,18 @@ export function EdgeGroupsField({
   return (
     <div>
       <FormControl
-        label="Groups"
+        label={t('edge_groups.field_label')}
         required
         inputId="groups-select"
         errors={error}
-        tooltip="Updates are done based on groups, allowing you to choose multiple devices at the same time and the ability to roll out progressively across all environments by scheduling them for different days."
+        tooltip={t('edge_groups.field_desc')}
       >
         <Select
           name="groupIds"
           onBlur={onBlur}
           value={selectedGroups}
           inputId="groups-select"
-          placeholder="Select one or multiple group(s)"
+          placeholder={t('edge_groups.field_placeholder')}
           onChange={(selectedGroups) =>
             onChange(selectedGroups.map((g) => g.Id))
           }
@@ -57,9 +59,7 @@ export function EdgeGroupsField({
           id="update-schedules-edge-groups-select"
         />
       </FormControl>
-      <TextTip color="blue">
-        Select groups of Edge environments to update
-      </TextTip>
+      <TextTip color="blue">{t('edge_groups.field_title')}</TextTip>
     </div>
   );
 }

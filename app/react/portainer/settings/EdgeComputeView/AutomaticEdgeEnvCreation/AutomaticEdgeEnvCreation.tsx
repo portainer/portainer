@@ -1,4 +1,5 @@
 import { Laptop } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
@@ -7,6 +8,7 @@ import { useSettings } from '../../queries';
 import { AutoEnvCreationSettingsForm } from './AutoEnvCreationSettingsForm';
 
 export function AutomaticEdgeEnvCreation() {
+  const { t } = useTranslation();
   const settingsQuery = useSettings();
 
   if (!settingsQuery.data) {
@@ -17,7 +19,7 @@ export function AutomaticEdgeEnvCreation() {
 
   return (
     <Widget>
-      <WidgetTitle icon={Laptop} title="Automatic Edge Environment Creation" />
+      <WidgetTitle icon={Laptop} title={t('settings.edge.automatic_env_creation')} />
       <WidgetBody>
         <AutoEnvCreationSettingsForm settings={settings} />
       </WidgetBody>

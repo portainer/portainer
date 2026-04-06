@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Podman from '@/assets/ico/vendor/podman.svg?c';
@@ -22,84 +23,89 @@ export interface EnvironmentOption
   id: EnvironmentOptionValue;
   value: EnvironmentOptionValue;
 }
-export const existingEnvironmentTypes: EnvironmentOption[] = [
-  {
-    id: 'dockerStandalone',
-    value: 'dockerStandalone',
-    label: 'Docker Standalone',
-    icon: Docker,
-    iconType: 'logo',
-    description: 'Connect to Docker Standalone via URL/IP, API or Socket',
-  },
-  {
-    id: 'dockerSwarm',
-    value: 'dockerSwarm',
-    label: 'Docker Swarm',
-    icon: Docker,
-    iconType: 'logo',
-    description: 'Connect to Docker Swarm via URL/IP, API or Socket',
-  },
-  {
-    id: 'podman',
-    value: 'podman',
-    label: 'Podman',
-    icon: Podman,
-    iconType: 'logo',
-    description: 'Connect to Podman via URL/IP or Socket',
-  },
-  {
-    id: 'kubernetes',
-    value: 'kubernetes',
-    label: 'Kubernetes',
-    icon: Kubernetes,
-    iconType: 'logo',
-    description: 'Connect to a Kubernetes environment via URL/IP',
-  },
-  {
-    id: 'aci',
-    value: 'aci',
-    label: 'ACI',
-    description: 'Connect to ACI environment via API',
-    iconType: 'logo',
-    icon: Azure,
-  },
-];
 
-export const newEnvironmentTypes: EnvironmentOption[] = [
-  {
-    id: 'kaas',
-    value: 'kaas',
-    label: 'Provision KaaS Cluster (Deprecated)',
-    description:
-      "Provision a Kubernetes cluster via a cloud provider's Kubernetes as a Service",
-    icon: KaaS,
-    iconType: 'logo',
-    feature: FeatureId.KAAS_PROVISIONING,
-    disabledWhenLimited: true,
-  },
-  {
-    id: 'k8sInstall',
-    value: 'k8sInstall',
-    label: 'Create Kubernetes cluster',
-    description: 'Create a Kubernetes cluster on existing infrastructure',
-    icon: InstallK8s,
-    iconType: 'logo',
-    feature: FeatureId.K8SINSTALL,
-    disabledWhenLimited: true,
-  },
-];
+export function getExistingEnvironmentTypes(): EnvironmentOption[] {
+  return [
+    {
+      id: 'dockerStandalone',
+      value: 'dockerStandalone',
+      label: i18n.t('wizard_env_types.docker_standalone_label'),
+      icon: Docker,
+      iconType: 'logo',
+      description: i18n.t('wizard_env_types.docker_standalone_description'),
+    },
+    {
+      id: 'dockerSwarm',
+      value: 'dockerSwarm',
+      label: i18n.t('wizard_env_types.docker_swarm_label'),
+      icon: Docker,
+      iconType: 'logo',
+      description: i18n.t('wizard_env_types.docker_swarm_description'),
+    },
+    {
+      id: 'podman',
+      value: 'podman',
+      label: i18n.t('wizard_env_types.podman_label'),
+      icon: Podman,
+      iconType: 'logo',
+      description: i18n.t('wizard_env_types.podman_description'),
+    },
+    {
+      id: 'kubernetes',
+      value: 'kubernetes',
+      label: i18n.t('wizard_env_types.kubernetes_label'),
+      icon: Kubernetes,
+      iconType: 'logo',
+      description: i18n.t('wizard_env_types.kubernetes_description'),
+    },
+    {
+      id: 'aci',
+      value: 'aci',
+      label: i18n.t('wizard_env_types.aci_label'),
+      description: i18n.t('wizard_env_types.aci_description'),
+      iconType: 'logo',
+      icon: Azure,
+    },
+  ];
+}
 
-export const environmentTypes: EnvironmentOption[] = [
-  ...existingEnvironmentTypes,
-  ...newEnvironmentTypes,
-];
+export function getNewEnvironmentTypes(): EnvironmentOption[] {
+  return [
+    {
+      id: 'kaas',
+      value: 'kaas',
+      label: i18n.t('wizard_env_types.kaas_label'),
+      description: i18n.t('wizard_env_types.kaas_description'),
+      icon: KaaS,
+      iconType: 'logo',
+      feature: FeatureId.KAAS_PROVISIONING,
+      disabledWhenLimited: true,
+    },
+    {
+      id: 'k8sInstall',
+      value: 'k8sInstall',
+      label: i18n.t('wizard_env_types.k8s_install_label'),
+      description: i18n.t('wizard_env_types.k8s_install_description'),
+      icon: InstallK8s,
+      iconType: 'logo',
+      feature: FeatureId.K8SINSTALL,
+      disabledWhenLimited: true,
+    },
+  ];
+}
 
-export const formTitles: Record<EnvironmentOptionValue, string> = {
-  dockerStandalone: 'Connect to your Docker Standalone environment',
-  dockerSwarm: 'Connect to your Docker Swarm environment',
-  podman: 'Connect to your Podman environment',
-  kubernetes: 'Connect to your Kubernetes environment',
-  aci: 'Connect to your ACI environment',
-  kaas: 'Provision a KaaS environment',
-  k8sInstall: 'Create a Kubernetes cluster',
-};
+export function getEnvironmentTypes(): EnvironmentOption[] {
+  return [...getExistingEnvironmentTypes(), ...getNewEnvironmentTypes()];
+}
+
+export function getFormTitles(): Record<EnvironmentOptionValue, string> {
+  return {
+    dockerStandalone: i18n.t('wizard_env_types.form_title_docker_standalone'),
+    dockerSwarm: i18n.t('wizard_env_types.form_title_docker_swarm'),
+    podman: i18n.t('wizard_env_types.form_title_podman'),
+    kubernetes: i18n.t('wizard_env_types.form_title_kubernetes'),
+    aci: i18n.t('wizard_env_types.form_title_aci'),
+    kaas: i18n.t('wizard_env_types.form_title_kaas'),
+    k8sInstall: i18n.t('wizard_env_types.form_title_k8s_install'),
+  };
+}

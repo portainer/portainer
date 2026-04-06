@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
@@ -13,13 +14,15 @@ export function Footer() {
 }
 
 function CEFooter() {
+  const { t } = useTranslation();
+
   return (
     <div className={clsx(styles.root, 'text-center')}>
       <UpdateNotification />
 
       <FooterContent>
         <span>&copy;</span>
-        <span>Portainer Community Edition</span>
+        <span>{t('footer.community_edition')}</span>
 
         <BuildInfoModalButton />
       </FooterContent>
@@ -28,11 +31,13 @@ function CEFooter() {
 }
 
 function BEFooter() {
+  const { t } = useTranslation();
+
   return (
     <div className={clsx(styles.root, 'text-center')}>
       <FooterContent>
         <span>&copy;</span>
-        <span>Portainer Business Edition</span>
+        <span>{t('footer.business_edition')}</span>
 
         <BuildInfoModalButton />
       </FooterContent>

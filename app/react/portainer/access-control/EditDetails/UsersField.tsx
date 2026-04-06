@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { User } from '@/portainer/users/types';
 
 import { UsersSelector } from '@@/UsersSelector';
@@ -13,12 +15,13 @@ interface Props {
 }
 
 export function UsersField({ name, users, value, onChange, errors }: Props) {
+  const { t } = useTranslation();
   return (
     <FormControl
-      label="Authorized users"
+      label={t('access_control.users_field_label')}
       tooltip={
         users.length > 0
-          ? 'You can select which user(s) will be able to manage this resource.'
+          ? t('access_control.users_field_tooltip')
           : undefined
       }
       inputId="authorized-users-selector"
@@ -35,11 +38,9 @@ export function UsersField({ name, users, value, onChange, errors }: Props) {
         />
       ) : (
         <span className="small text-muted">
-          You have not yet created any users. Head over to the{' '}
-          <Link to="portainer.users" data-cy="access-control-users-link">
-            Users view
-          </Link>{' '}
-          to manage users.
+          {t('access_control.no_users_prefix')}{' '}
+          <Link to="portainer.users" data-cy="access-control-users-link">{t('access_control.no_users_link')}</Link>{' '}
+          {t('access_control.no_users_suffix')}
         </span>
       )}
     </FormControl>

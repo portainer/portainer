@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { AddButton } from '@@/buttons';
@@ -12,18 +14,21 @@ export function TableActions({
 }: {
   selectedItems: Array<EdgeGroup>;
 }) {
+  const { t } = useTranslation();
   const removeMutation = useDeleteEdgeGroupsMutation();
 
   return (
     <div className="flex items-center gap-2">
       <DeleteButton
-        confirmMessage="Do you want to remove the selected Edge Group(s)?"
+        confirmMessage={t('edge.groups.confirm_remove')}
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
         data-cy="remove-edge-group-button"
       />
 
-      <AddButton data-cy="add-edge-group-button">Add Edge group</AddButton>
+      <AddButton data-cy="add-edge-group-button">
+        {t('edge.groups.add')}
+      </AddButton>
     </div>
   );
 
@@ -31,7 +36,10 @@ export function TableActions({
     const ids = selectedItems.map((item) => item.Id);
     removeMutation.mutate(ids, {
       onSuccess: () => {
-        notifySuccess('Success', 'Edge Group(s) removed');
+        notifySuccess(
+          t('common.success'),
+          t('edge.groups.notifications.removed')
+        );
       },
     });
   }

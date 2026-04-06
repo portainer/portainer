@@ -2,6 +2,7 @@ import { ColumnDef, CellContext } from '@tanstack/react-table';
 import { UISrefProps } from '@uirouter/react';
 
 import { Link } from '@@/Link';
+import i18n from '@/i18n';
 
 import { DefaultType } from './types';
 import { defaultGetRowId } from './defaultGetRowId';
@@ -44,7 +45,7 @@ export function buildNameColumnFromObject<T extends DefaultType>({
   const cell = createCell();
 
   return {
-    header: 'Name',
+    header: i18n.t('common.name'),
     accessorKey: nameKey,
     id: 'name',
     cell,

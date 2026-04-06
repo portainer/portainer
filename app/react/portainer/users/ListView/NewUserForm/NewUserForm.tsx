@@ -1,5 +1,6 @@
 import { PlusIcon } from 'lucide-react';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useCurrentUser } from '@/react/hooks/useUser';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
@@ -21,6 +22,7 @@ import { TeamsFieldset } from './TeamsFieldset';
 import { useValidation } from './useValidation';
 
 export function NewUserForm() {
+  const { t } = useTranslation();
   const { isPureAdmin } = useCurrentUser();
   const teamsQuery = useTeams(!isPureAdmin);
   const settingsQuery = usePublicSettings();
@@ -37,7 +39,7 @@ export function NewUserForm() {
     <div className="row">
       <div className="col-sm-12">
         <Widget>
-          <Widget.Title icon={PlusIcon} title="Add a new user" />
+          <Widget.Title icon={PlusIcon} title={t('users.add_user')} />
           <Widget.Body>
             <Formik<FormValues>
               initialValues={{
@@ -60,7 +62,7 @@ export function NewUserForm() {
                   {
                     onSuccess() {
                       notifySuccess(
-                        'User successfully created',
+                        t('users.user_created'),
                         values.username
                       );
                       resetForm();
@@ -85,10 +87,10 @@ export function NewUserForm() {
 
                   <FormActions
                     data-cy="user-createUserButton"
-                    submitLabel="Create user"
+                    submitLabel={t('users.create_user')}
                     isLoading={createUserMutation.isLoading}
                     isValid={isValid}
-                    loadingText="Creating user..."
+                    loadingText={t('users.creating_user')}
                     errors={errors}
                     submitIcon={PlusIcon}
                   />

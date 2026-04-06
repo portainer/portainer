@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { DetailsTable } from '@@/DetailsTable';
 import { Button } from '@@/buttons';
@@ -14,11 +15,12 @@ export function HiddenContainersTable({
   isLoading: boolean;
   onDelete: (name: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <DetailsTable
-      headers={['Name', 'Value', '']}
+      headers={[t('settings.hidden_name'), t('settings.hidden_value'), '']}
       className="table-hover"
-      emptyMessage="No filter available."
+      emptyMessage={t('settings.hidden_no_filter')}
       dataCy="hidden-containers-table"
     >
       {labels.map((label, index) => (
@@ -34,7 +36,7 @@ export function HiddenContainersTable({
               onClick={() => onDelete(label.name)}
               disabled={isLoading}
             >
-              Remove
+              {t('common.remove')}
             </Button>,
           ]}
         >

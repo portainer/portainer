@@ -1,4 +1,5 @@
 import { UserCheck, Link } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
@@ -9,6 +10,7 @@ import { ClusterRolesDatatable } from './ClusterRolesDatatable/ClusterRolesDatat
 import { ClusterRoleBindingsDatatable } from './ClusterRoleBindingsDatatable/ClusterRoleBindingsDatatable';
 
 export function ClusterRolesView() {
+  const { t } = useTranslation();
   useUnauthorizedRedirect(
     {
       authorizations: ['K8sClusterRoleBindingsW', 'K8sClusterRolesW'],
@@ -38,7 +40,7 @@ export function ClusterRolesView() {
     <>
       <PageHeader
         title="Cluster Role list"
-        breadcrumbs="Cluster Roles"
+        breadcrumbs={t('kubernetes.cluster_roles.breadcrumbs')}
         reload
       />
       <>

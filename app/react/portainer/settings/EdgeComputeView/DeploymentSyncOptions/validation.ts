@@ -1,23 +1,24 @@
 import { boolean, number, object, SchemaOf } from 'yup';
 
-import { options as asyncIntervalOptions } from '@/react/edge/components/EdgeAsyncIntervalsForm';
+import i18n from '@/i18n';
+import { asyncIntervalValues as intervals } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 
 import { FormValues } from './types';
 
-const intervals = asyncIntervalOptions.map((option) => option.value);
-
 export function validationSchema(): SchemaOf<FormValues> {
   return object({
-    EdgeAgentCheckinInterval: number().required('This field is required.'),
+    EdgeAgentCheckinInterval: number().required(
+      i18n.t('validation.field_required')
+    ),
     Edge: object({
       PingInterval: number()
-        .required('This field is required.')
+        .required(i18n.t('validation.field_required'))
         .oneOf(intervals),
       SnapshotInterval: number()
-        .required('This field is required.')
+        .required(i18n.t('validation.field_required'))
         .oneOf(intervals),
       CommandInterval: number()
-        .required('This field is required.')
+        .required(i18n.t('validation.field_required'))
         .oneOf(intervals),
       AsyncMode: boolean().default(false),
     }),

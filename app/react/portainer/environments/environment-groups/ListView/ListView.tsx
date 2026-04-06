@@ -1,13 +1,17 @@
+import { useTranslation } from 'react-i18next';
+
 import { PageHeader } from '@@/PageHeader';
 
 import { EnvironmentGroupsDatatable } from './EnvironmentGroupsDatatable';
 
 export function ListView() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHeader
-        title="Environment Groups"
-        breadcrumbs="Environment group management"
+        title={t('groups.title')}
+        breadcrumbs={t('groups.breadcrumbs')}
         reload
       />
 
