@@ -3,6 +3,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Pod } from 'kubernetes-types/core/v1';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
@@ -40,6 +41,7 @@ import { usePatchApplicationMutation } from '../queries/usePatchApplicationMutat
 import { bytesToReadableFormat } from '../../utils';
 
 export function ApplicationSummaryWidget() {
+  const { t } = useTranslation();
   const stateAndParams = useCurrentStateAndParams();
   const {
     params: {
@@ -312,7 +314,7 @@ export function ApplicationSummaryWidget() {
           appKind: application.kind,
           patch,
         });
-        notifySuccess('Success', 'Application successfully updated');
+        notifySuccess(t('common.success'), t('kubernetes.applications.notifications.updated'));
       } catch (error) {
         notifyError(
           `Failed to ${applicationNote ? 'update' : 'save'} note`,

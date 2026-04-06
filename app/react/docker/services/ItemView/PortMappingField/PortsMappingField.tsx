@@ -1,4 +1,5 @@
 import { List, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 
@@ -39,6 +40,8 @@ export function PortsMappingField({
   onReset(all?: boolean): void;
   onSubmit(): void;
 }) {
+  const { t } = useTranslation();
+
   const { handleRemoveItem, handleAdd, handleChangeItem } = useInputList<Value>(
     {
       value: values,
@@ -55,7 +58,7 @@ export function PortsMappingField({
   return (
     <ServiceWidget
       titleIcon={List}
-      title="Published ports"
+      title={t('docker.services.published_ports')}
       labelForAddButton="port mapping"
       onAdd={handleAdd}
       hasChanges={hasChanges}

@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { ReactNode, useEffect, useState } from 'react';
+import { HardDrive, RefreshCcw } from 'lucide-react';
+import _ from 'lodash';
+import { useStore } from 'zustand';
+import { useTranslation } from 'react-i18next';
 
 import {
   Environment,
@@ -85,51 +87,9 @@ const SORT_OPTIONS: SortOption[] = [
 
 const storageKey = 'home_endpoints';
 
-const platformDetails: Record<
-  string,
-  { type: PlatformType; description: string }
-> = {
-  Docker: {
-    type: PlatformType.Docker,
-    description: 'Docker hosts and Swarm clusters',
-  },
-  Kubernetes: {
-    type: PlatformType.Kubernetes,
-    description: 'Kubernetes clusters and nodes',
-  },
-  Azure: { type: PlatformType.Azure, description: 'Azure Container Instances' },
-  Podman: { type: PlatformType.Podman, description: 'Podman Containers' },
-};
-
-const healthDetails: Record<
-  string,
-  { type: EnvironmentHealth; description: string }
-> = {
-  Up: {
-    type: EnvironmentHealth.Up,
-    description: 'Environments online and up-to-date',
-  },
-  Down: {
-    type: EnvironmentHealth.Down,
-    description: 'Environments currently offline or unreachable',
-  },
-  Outdated: {
-    type: EnvironmentHealth.Outdated,
-    description: 'Environments with agents that can be upgraded',
-  },
-  Heartbeat: {
-    type: EnvironmentHealth.Heartbeat,
-    description: 'Edge environments with active heartbeat',
-  },
-};
-
-const DEFAULT_PAGE_LIMIT = 100;
-
-export function EnvironmentList({
-  onClickBrowse,
-  headerFilter = 'all',
-  onHeaderFilterChange,
-}: Props) {
+export function EnvironmentList({ onClickBrowse, onRefresh }: Props) {
+  const { t } = useTranslation();
+  const currentEnvStore = useStore(environmentStore);
   const isPureAdmin = useIsPureAdmin();
   const summaryQuery = useEnvironmentSummaryCounts();
   const { params } = useCurrentStateAndParams();
@@ -272,28 +232,116 @@ export function EnvironmentList({
       {summaryQuery.isSuccess && summaryQuery.data.total === 0 && (
         <NoEnvironmentsInfoPanel isAdmin={isPureAdmin} />
       )}
-      <GroupSortTable
-        data={environmentRows}
-        isLoading={isLoading}
-        columns={columns}
-        renderRow={renderRow}
-        getGroupKey={getGroupKey}
-        renderGroupHeader={renderGroupHeader}
-        getRowId={(item) => item.Id.toString()}
-        tableState={tableState}
-        sortOptions={SORT_OPTIONS}
-        totalCount={totalCount}
-        availableGroupsBySort={availableGroupsBySort}
-        emptyContentLabel={{
-          withSearch: 'No environments match your search',
-          withoutSearch: 'No environments available.',
-        }}
-        loadingLabel="Loading..."
-        searchPlaceholder="Search environments..."
-        headerButtons={headerButtons}
-        data-cy="home-endpointList"
-      />
-    </div>
+
+      <TableContainer>
+        <div className="px-4">
+          <TableTitle
+            className="!px-0"
+            icon={HardDrive}
+            label={t('home.environments')}
+            description={
+              <div className="w-full text-sm text-gray-7">
+                {t('home.environments_description')}
+              </div>
+            }
+          >
+            <div className="flex items-center gap-4">
+              <SearchBar
+                className="!m-0 !min-w-[350px] !bg-transparent"
+                value={searchBarValue}
+                onChange={setSearchBarValue}
+                placeholder={t('home.search_placeholder')}
+                data-cy="home-endpointsSearchInput"
+              />
+              {isPureAdmin && (
+                <Button
+                  onClick={onRefresh}
+                  data-cy="home-refreshEndpointsButton"
+                  size="medium"
+                  color="light"
+                  icon={RefreshCcw}
+                  className="!m-0"
+                >
+                  {t('common.refresh')}
+                </Button>
+              )}
+              <KubeconfigButton
+                environments={environments}
+                envQueryParams={queryWithSort}
+              />
+
+              <AMTButton
+                environments={environments}
+                envQueryParams={queryWithSort}
+              />
+
+              {updateAvailable && <UpdateBadge />}
+            </div>
+          </TableTitle>
+          <div className="-mt-3">
+            <EnvironmentListFilters
+              setPlatformTypes={setPlatformTypes}
+              platformTypes={platformTypes}
+              setConnectionTypes={setConnectionTypes}
+              connectionTypes={connectionTypes}
+              statusOnChange={statusOnChange}
+              statusState={statusState}
+              tagOnChange={tagOnChange}
+              tagState={tagState}
+              groupOnChange={groupOnChange}
+              groupState={groupState}
+              setAgentVersions={setAgentVersions}
+              agentVersions={agentVersions}
+              clearFilter={clearFilter}
+              sortOnChange={sortOnchange}
+              sortOnDescending={sortOnDescending}
+              sortByDescending={sortByDescending}
+              sortByButton={sortByButton}
+              sortByState={sortByFilter}
+            />
+          </div>
+          <div
+            className="blocklist mt-5 !space-y-2 !p-0"
+            data-cy="home-endpointList"
+            role="list"
+          >
+            {renderItems(
+              isLoading,
+              totalCount,
+              environments.map((env) => (
+                <EnvironmentItem
+                  key={env.Id}
+                  environment={env}
+                  groupName={
+                    groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
+                  }
+                  onClickBrowse={() => onClickBrowse(env)}
+                  onClickDisconnect={() =>
+                    env.Id === currentEnvStore.environmentId
+                      ? currentEnvStore.clear()
+                      : null
+                  }
+                  isActive={env.Id === currentEnvStore.environmentId}
+                />
+              )),
+              t('common.loading'),
+              t('home.no_environments')
+            )}
+          </div>
+          <TableFooter className="!border-t-0">
+            <PaginationControls
+              className="!mr-0"
+              showAll={totalCount <= 100}
+              pageLimit={pageLimit}
+              page={page}
+              onPageChange={setPage}
+              pageCount={Math.ceil(totalCount / pageLimit)}
+              onPageLimitChange={setPageLimit}
+            />
+          </TableFooter>
+        </div>
+      </TableContainer>
+    </>
   );
 
   function applyHeaderFilter(filter: string) {
@@ -377,15 +425,62 @@ export function EnvironmentList({
 
     const hideCount = sortId === 'Health' && sortGroupFilter === null;
 
+  function tagOnChange(value: number[]) {
+    setTagState(value);
+    if (value.length === 0) {
+      setTagFilter([]);
+    } else {
+      const filteredTags = [...new Set(value)];
+      setTagFilter(filteredTags);
+    }
+  }
+
+  function clearFilter() {
+    setPlatformTypes([]);
+    setStatusState([]);
+    setStatusFilter([]);
+    setTagState([]);
+    setTagFilter([]);
+    setGroupState([]);
+    setGroupFilter([]);
+    setAgentVersions([]);
+    setConnectionTypes([]);
+  }
+
+  function sortOnchange(value?: 'Name' | 'Group' | 'Status') {
+    setSortByFilter(value);
+    setSortByButton(!!value);
+  }
+
+  function sortOnDescending() {
+    setSortByDescending(!sortByDescending);
+  }
+}
+
+function renderItems(
+  isLoading: boolean,
+  totalCount: number,
+  items: ReactNode,
+  loadingText: string,
+  noEnvText: string
+) {
+  if (isLoading) {
     return (
-      <GroupSortTableGroupRow
-        groupName={groupLabel || groupKey}
-        groupDescription={description}
-        groupIcon={icon}
-        count={hideCount ? undefined : count}
-      />
+      <div className="text-muted text-center" data-cy="home-loadingEndpoints">
+        {loadingText}
+      </div>
     );
   }
+
+  if (!totalCount) {
+    return (
+      <div className="text-muted text-center" data-cy="home-noEndpoints">
+        {noEnvText}
+      </div>
+    );
+  }
+
+  return items;
 }
 
 type EnvironmentRow = Environment & {

@@ -1,6 +1,7 @@
 import { ComponentProps } from 'react';
 import { HeartPulse, Server } from 'lucide-react';
 import { Health } from 'docker-types/generated/1.44';
+import { useTranslation } from 'react-i18next';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
@@ -20,12 +21,14 @@ interface Props {
 }
 
 export function HealthStatus({ health }: Props) {
+  const { t } = useTranslation();
+
   return (
     <TableContainer>
-      <TableTitle label="Container health" icon={Server} />
+      <TableTitle label={t('docker.containers.health.title')} icon={Server} />
 
       <DetailsTable dataCy="health-status-table">
-        <DetailsTable.Row label="Status">
+        <DetailsTable.Row label={t('docker.containers.health.status')}>
           {health.Status && health.Status !== 'none' ? (
             <div className="vertical-center">
               <Icon
@@ -36,16 +39,16 @@ export function HealthStatus({ health }: Props) {
               {health.Status}
             </div>
           ) : (
-            <div>No health status</div>
+            <div>{t('docker.containers.health.no_health_status')}</div>
           )}
         </DetailsTable.Row>
 
-        <DetailsTable.Row label="Failure count">
+        <DetailsTable.Row label={t('docker.containers.health.failure_count')}>
           <div className="vertical-center">{health.FailingStreak}</div>
         </DetailsTable.Row>
 
-        {!!health.Log?.length && (
-          <DetailsTable.Row label="Last output">
+        {!!health.Log && (
+          <DetailsTable.Row label={t('docker.containers.health.last_output')}>
             {health.Log[health.Log.length - 1].Output}
           </DetailsTable.Row>
         )}

@@ -2,6 +2,7 @@ import { Form, Formik } from 'formik';
 import { Key } from 'lucide-react';
 import { useState } from 'react';
 import { SchemaOf, bool, object } from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import { withHideOnExtension } from '@/react/hooks/withHideOnExtension';
 
@@ -28,6 +29,7 @@ interface FormValues {
 export const SSLSettingsPanelWrapper = withHideOnExtension(SSLSettingsPanel);
 
 function SSLSettingsPanel() {
+  const { t } = useTranslation();
   const settingsQuery = useSSLSettings();
   const [reloadingPage, setReloadingPage] = useState(false);
   const mutation = useUpdateSSLConfigMutation();
@@ -44,7 +46,7 @@ function SSLSettingsPanel() {
 
   return (
     <Widget>
-      <Widget.Title icon={Key} title="SSL certificate" />
+      <Widget.Title icon={Key} title={t('settings.ssl_title')} />
       <Widget.Body>
         <Formik
           initialValues={initialValues}
@@ -57,9 +59,7 @@ function SSLSettingsPanel() {
               <div className="form-group">
                 <div className="col-sm-12">
                   <TextTip color="orange">
-                    Forcing HTTPs only will cause Portainer to stop listening on
-                    the HTTP port. Any edge agent environment that is using HTTP
-                    will no longer be available.
+                    {t('settings.ssl_https_warning')}
                   </TextTip>
                 </div>
               </div>
@@ -69,7 +69,7 @@ function SSLSettingsPanel() {
                   <SwitchField
                     checked={values.forceHTTPS}
                     data-cy="settings-ssl-force-https-switch"
-                    label="Force HTTPS only"
+                    label={t('settings.ssl_force_https')}
                     labelClass="col-sm-3 col-lg-2"
                     name="forceHTTPS"
                     onChange={(value) => setFieldValue('forceHTTPS', value)}
@@ -80,15 +80,14 @@ function SSLSettingsPanel() {
               <div className="form-group">
                 <div className="col-sm-12">
                   <TextTip color="blue">
-                    Provide a new SSL Certificate to replace the existing one
-                    that is used for HTTPS connections.
+                    {t('settings.ssl_replace_desc')}
                   </TextTip>
                 </div>
               </div>
 
               <FormControl
-                label="SSL/TLS certificate"
-                tooltip="Select an X.509 certificate file, commonly a crt, cer or pem file."
+                label={t('settings.ssl_cert')}
+                tooltip={t('settings.ssl_cert_tooltip')}
                 inputId="ca-cert-field"
                 errors={errors.certFile}
               >
@@ -102,8 +101,8 @@ function SSLSettingsPanel() {
               </FormControl>
 
               <FormControl
-                label="SSL/TLS private key"
-                tooltip="Select a private key file, commonly a key, or pem file."
+                label={t('settings.ssl_key')}
+                tooltip={t('settings.ssl_key_tooltip')}
                 inputId="ca-cert-field"
                 errors={errors.keyFile}
               >
@@ -122,10 +121,10 @@ function SSLSettingsPanel() {
                     isLoading={mutation.isLoading || reloadingPage}
                     data-cy="save-ssl-settings-button"
                     disabled={!dirty || !isValid}
-                    loadingText={reloadingPage ? 'Reloading' : 'Saving'}
+                    loadingText={reloadingPage ? t('settings.ssl_reloading') : t('common.saving')}
                     className="!ml-0"
                   >
-                    Save SSL settings
+                    {t('settings.ssl_save')}
                   </LoadingButton>
                 </div>
               </div>

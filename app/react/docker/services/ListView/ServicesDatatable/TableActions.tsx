@@ -1,5 +1,6 @@
 import { RefreshCw } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { Authorized } from '@/react/hooks/useUser';
@@ -24,6 +25,7 @@ export function TableActions({
   isUpdateActionVisible?: boolean;
 }) {
   const environmentId = useEnvironmentId();
+  const { t } = useTranslation();
   const removeMutation = useRemoveServicesMutation(environmentId);
   const updateMutation = useForceUpdateServicesMutation(environmentId);
   const router = useRouter();
@@ -48,7 +50,7 @@ export function TableActions({
           <DeleteButton
             disabled={selectedItems.length === 0}
             onConfirmed={() => handleRemove(selectedItems)}
-            confirmMessage="Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too."
+            confirmMessage={t('docker.services.confirm_remove')}
             data-cy="service-removeServiceButton"
           />
         </Authorized>
@@ -64,7 +66,7 @@ export function TableActions({
 
   async function handleUpdate(selectedItems: Array<ServiceViewModel>) {
     const confirmed = await confirmServiceForceUpdate(
-      'Do you want to force an update of the selected service(s)? All the tasks associated to the selected service(s) will be recreated.'
+      t('docker.services.confirm_force_update')
     );
 
     if (!confirmed) {
@@ -78,7 +80,7 @@ export function TableActions({
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Service(s) successfully updated');
+          notifySuccess(t('common.success'), t('docker.services.notifications.updated'));
           router.stateService.reload();
         },
       }
@@ -90,7 +92,7 @@ export function TableActions({
       selectedItems.map((service) => service.Id),
       {
         onSuccess() {
-          notifySuccess('Success', 'Service(s) successfully removed');
+          notifySuccess(t('common.success'), t('docker.services.notifications.removed'));
           router.stateService.reload();
         },
       }

@@ -1,5 +1,5 @@
 <form class="form-horizontal" name="$ctrl.registryFormEcr" ng-submit="$ctrl.formAction()">
-  <div class="col-sm-12 form-section-title"> Important notice </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.important_notice' | i18n }} </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       For information on how to generate an Access Key, follow the
@@ -7,7 +7,7 @@
     </span>
   </div>
 
-  <div class="col-sm-12 form-section-title"> ECR connection details </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.ecr_connection_details' | i18n }} </div>
 
   <!-- name-input -->
   <div class="form-group">
@@ -29,11 +29,11 @@
           <div ng-messages="$ctrl.registryFormEcr.registry_name.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
             <p ng-message="used" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              A registry with the same name already exists.
+              {{ 'portainer_registries.name_already_exists' | i18n }}
             </p>
           </div>
         </div>
@@ -64,7 +64,7 @@
           <div ng-messages="$ctrl.registryFormEcr.registry_url.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -100,7 +100,7 @@
             <div ng-messages="$ctrl.registryFormEcr.registry_access_key.$error">
               <p ng-message="required" class="vertical-center">
                 <pr-icon icon="'alert-triangle'"></pr-icon>
-                This field is required.
+                {{ 'validation.field_required' | i18n }}
               </p>
             </div>
           </div>
@@ -119,7 +119,7 @@
             <div ng-messages="$ctrl.registryFormEcr.registry_secret_access_key.$error">
               <p ng-message="required" class="vertical-center">
                 <pr-icon icon="'alert-triangle'"></pr-icon>
-                This field is required.
+                {{ 'validation.field_required' | i18n }}
               </p>
             </div>
           </div>
@@ -147,11 +147,11 @@
             <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
               <p ng-message="required" class="vertical-center">
                 <pr-icon icon="'alert-triangle'"></pr-icon>
-                This field is required.
+                {{ 'validation.field_required' | i18n }}
               </p>
               <p ng-message="used" class="vertical-center">
                 <pr-icon icon="'alert-triangle'"></pr-icon>
-                A registry with the same name already exists.
+                {{ 'portainer_registries.name_already_exists' | i18n }}
               </p>
             </div>
           </div>
@@ -162,7 +162,7 @@
   </div>
 
   <!-- actions -->
-  <div class="col-sm-12 form-section-title"> Actions </div>
+  <div class="col-sm-12 form-section-title"> {{ 'common.actions' | i18n }} </div>
   <div class="form-group">
     <div class="col-sm-12">
       <button
@@ -176,7 +176,7 @@
         analytics-properties="{ metadata: { type: 'ecr' } }"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
-        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+        <span ng-show="$ctrl.actionInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
       </button>
     </div>
   </div>

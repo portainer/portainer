@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
@@ -7,18 +9,20 @@ export interface Props {
 }
 
 export function SaveAuthSettingsButton({ onSubmit, isLoading }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
-      <FormSectionTitle>Actions</FormSectionTitle>
+      <FormSectionTitle>{t('settings.actions_section')}</FormSectionTitle>
       <div className="form-group">
         <div className="col-sm-12">
           <LoadingButton
-            loadingText="Saving..."
+            loadingText={t('settings.saving')}
             data-cy="save-auth-settings-button"
             isLoading={isLoading}
             onClick={() => onSubmit()}
           >
-            Save settings
+            {t('settings.save_settings')}
           </LoadingButton>
         </div>
       </div>

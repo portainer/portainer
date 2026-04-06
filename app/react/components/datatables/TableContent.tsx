@@ -1,5 +1,6 @@
 import { Fragment, PropsWithChildren } from 'react';
 import { Row } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { DefaultType } from './types';
 
@@ -13,15 +14,21 @@ interface Props<T extends DefaultType = DefaultType> {
 export function TableContent<T extends DefaultType = DefaultType>({
   isLoading = false,
   rows,
-  emptyContent = 'No items available.',
+  emptyContent,
   renderRow,
 }: Props<T>) {
+  const { t } = useTranslation();
+
   if (isLoading) {
-    return <TableContentOneColumn>Loading...</TableContentOneColumn>;
+    return <TableContentOneColumn>{t('common.loading')}</TableContentOneColumn>;
   }
 
   if (!rows.length) {
-    return <TableContentOneColumn>{emptyContent}</TableContentOneColumn>;
+    return (
+      <TableContentOneColumn>
+        {emptyContent ?? t('common.no_items_available')}
+      </TableContentOneColumn>
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 import { useRouter } from '@uirouter/react';
 import { Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function Details({ team, memberships, isAdmin }: Props) {
+  const { t } = useTranslation();
   const deleteMutation = useDeleteTeamMutation();
   const router = useRouter();
   const teamSyncQuery = usePublicSettings<boolean>({
@@ -30,13 +32,13 @@ export function Details({ team, memberships, isAdmin }: Props) {
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <Widget>
-          <Widget.Title title="Team details" icon={Users} />
+          <Widget.Title title={t('teams.detail_widget_title')} icon={Users} />
 
           <Widget.Body className="no-padding">
             <table className="table">
               <tbody>
                 <tr>
-                  <td>Name</td>
+                  <td>{t('teams.name')}</td>
                   <td>
                     <div className="flex gap-2">
                       {!teamSyncQuery.data && team.Name}
@@ -44,21 +46,21 @@ export function Details({ team, memberships, isAdmin }: Props) {
                         <DeleteButton
                           size="xsmall"
                           onConfirmed={handleDeleteClick}
-                          confirmMessage="Do you want to delete this team? Users in this team will not be deleted."
+                          confirmMessage={t('teams.delete_confirm')}
                           data-cy={`delete-team-${team.Name}`}
                         >
-                          Delete this team
+                          {t('teams.delete_button')}
                         </DeleteButton>
                       )}
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>Leaders</td>
+                  <td>{t('teams.leaders')}</td>
                   <td>{!teamSyncQuery.data && leaderCount}</td>
                 </tr>
                 <tr>
-                  <td>Total users in team</td>
+                  <td>{t('teams.total_users')}</td>
                   <td>{memberships.length}</td>
                 </tr>
               </tbody>

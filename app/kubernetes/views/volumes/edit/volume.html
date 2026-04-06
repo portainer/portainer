@@ -1,14 +1,14 @@
 <page-header
   ng-if="ctrl.state.viewReady"
-  title="'Volume details'"
+  title="'k8s_volumes.volume_details' | i18n"
   breadcrumbs="[
-    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { label:('k8s_applications.namespaces' | i18n), link:'kubernetes.resourcePools' },
     {
       label:ctrl.volume.ResourcePool.Namespace.Name,
       link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.volume.ResourcePool.Namespace.Name }
     },
-    { label:'Volumes', link:'kubernetes.volumes' },
+    { label:('common.volumes' | i18n), link:'kubernetes.volumes' },
      ctrl.volume.PersistentVolumeClaim.Name,
      ]"
   reload="true"
@@ -26,13 +26,13 @@
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading class="vertical-center" data-cy="k8sVolDetail-volTab">
                 <pr-icon icon="'database'"></pr-icon>
-                Volume
+                {{ 'k8s_volumes.volume' | i18n }}
               </uib-tab-heading>
               <div class="widget-body">
                 <table class="table">
                   <tbody>
                     <tr>
-                      <td>Name</td>
+                      <td>{{ 'common.name' | i18n }}</td>
                       <td data-cy="k8sVolDetail-volName">
                         {{ ctrl.volume.PersistentVolumeClaim.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
@@ -40,7 +40,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Namespace</td>
+                      <td>{{ 'k8s_config.namespace' | i18n }}</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })" data-cy="k8sVolDetail-volNamespace">{{
                           ctrl.volume.ResourcePool.Namespace.Name
@@ -49,11 +49,11 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Storage Class</td>
+                      <td>{{ 'k8s_volumes.storage_class' | i18n }}</td>
                       <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.storageClass.Name }}</td>
                     </tr>
                     <tr>
-                      <td>Access Modes</td>
+                      <td>{{ 'k8s_volumes.access_modes' | i18n }}</td>
                       <td data-cy="k8sVolDetail-volAccessPolicy">
                         <div ng-repeat="(index, accessPolicy) in ctrl.state.volumeSharedAccessPolicies" class="flex flex-col gap-y-1">
                           <div class="flex items-center gap-x-1">
@@ -67,17 +67,17 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Provisioner</td>
+                      <td>{{ 'k8s_volumes.provisioner' | i18n }}</td>
                       <td data-cy="k8sVolDetail-volProvisioner">{{
                         ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.storageClass.Provisioner : '-'
                       }}</td>
                     </tr>
                     <tr>
-                      <td>Creation date</td>
+                      <td>{{ 'k8s_volumes.creation_date' | i18n }}</td>
                       <td data-cy="k8sVolDetail-volCreatedAt">{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
                     </tr>
                     <tr>
-                      <td>size</td>
+                      <td>{{ 'docker_host.size' | i18n }}</td>
                       <td ng-if="!ctrl.state.increaseSize">
                         {{ ctrl.volume.PersistentVolumeClaim.Storage }}
                         <button

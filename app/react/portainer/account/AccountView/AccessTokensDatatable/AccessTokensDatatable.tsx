@@ -1,4 +1,5 @@
 import { Key } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable } from '@@/datatables';
 import { createPersistedStore } from '@@/datatables/types';
@@ -13,6 +14,7 @@ const tableKey = 'access-tokens';
 const store = createPersistedStore(tableKey);
 
 export function AccessTokensDatatable() {
+  const { t } = useTranslation();
   const query = useAccessTokens();
   const tableState = useTableState(store, tableKey);
 
@@ -22,7 +24,7 @@ export function AccessTokensDatatable() {
       isLoading={query.isLoading}
       dataset={query.data || []}
       settingsManager={tableState}
-      title="Access tokens"
+      title={t('access_tokens.title')}
       titleIcon={Key}
       renderTableActions={(selectedItems) => (
         <TableActions selectedItems={selectedItems} />

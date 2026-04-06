@@ -1,4 +1,5 @@
 import moment from 'moment';
+import i18n from '@/i18n';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -7,6 +8,11 @@ export default class AuthLogsViewController {
   constructor($async, Notifications) {
     this.$async = $async;
     this.Notifications = Notifications;
+    this.t = i18n.t.bind(i18n);
+
+    // Page header translations
+    this.pageTitle = this.t('logs.authentication_title');
+    this.pageBreadcrumbs = [{ label: this.t('logs.authentication_breadcrumbs') }];
 
     this.limitedFeature = FeatureId.ACTIVITY_AUDIT;
     this.state = {
@@ -89,7 +95,7 @@ export default class AuthLogsViewController {
         this.state.logs = decorateLogs(logs);
         this.state.totalItems = totalCount;
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Failed loading auth activity logs');
+        this.Notifications.error(this.t('common.failure'), err, this.t('logs.load_error'));
       }
     });
   }

@@ -9,66 +9,81 @@ import { Icon } from '@@/Icon';
 
 import { ActivityType, AuthLog, AuthMethodType } from './types';
 
-const activityTypesProps = {
-  [ActivityType.AuthSuccess]: {
-    label: 'Authentication success',
-    icon: Check,
-    mode: 'success',
-  },
-  [ActivityType.AuthFailure]: {
-    label: 'Authentication failure',
-    icon: X,
-    mode: 'danger',
-  },
-  [ActivityType.Logout]: { label: 'Logout', icon: undefined, mode: undefined },
-} as const;
-
 const columnHelper = createColumnHelper<AuthLog>();
 
-export const columns = [
-  columnHelper.accessor('timestamp', {
-    header: 'Time',
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value ? isoDateFromTimestamp(value) : '';
+export function getColumns(t: (key: string) => string) {
+  const activityTypesProps = {
+    [ActivityType.AuthSuccess]: {
+      label: t('logs.result.success'),
+      icon: Check,
+      mode: 'success',
     },
-  }),
-  columnHelper.accessor('origin', {
-    header: 'Origin',
-  }),
-  columnHelper.accessor(({ context }) => AuthMethodType[context] || '', {
-    header: 'Context',
-    enableColumnFilter: true,
-    filterFn: multiple,
-    meta: {
-      filter: filterHOC('Filter'),
+    [ActivityType.AuthFailure]: {
+      label: t('logs.result.failure'),
+      icon: X,
+      mode: 'danger',
     },
-  }),
-  columnHelper.accessor('username', {
-    header: 'User',
-  }),
+    [ActivityType.Logout]: { label: t('logs.result.logout'), icon: undefined, mode: undefined },
+  } as const;
 
-  columnHelper.accessor((item) => activityTypesProps[item.type].label, {
-    header: 'Result',
-    enableColumnFilter: true,
-    filterFn: multiple,
-    meta: {
-      filter: filterHOC('Filter'),
-    },
-    cell({ row: { original: item } }) {
-      const props = activityTypesProps[item.type];
-      if (!props) {
-        return null;
-      }
+  const authMethodLabel = (context?: number) => {
+    switch (context) {
+      case AuthMethodType.Internal:
+        return t('logs.context.internal');
+      case AuthMethodType.LDAP:
+        return t('logs.context.ldap');
+      case AuthMethodType.OAuth:
+        return t('logs.context.oauth');
+      default:
+        return '';
+    }
+  };
 
-      const { label, icon, mode } = props;
+  return [
+    columnHelper.accessor('timestamp', {
+      header: t('logs.columns.time'),
+      cell: ({ getValue }) => {
+        const value = getValue();
+        return value ? isoDateFromTimestamp(value) : '';
+      },
+    }),
+    columnHelper.accessor('origin', {
+      header: t('logs.columns.origin'),
+    }),
+    columnHelper.accessor(({ context }) => authMethodLabel(context) || '', {
+      header: t('logs.columns.context'),
+      enableColumnFilter: true,
+      filterFn: multiple,
+      meta: {
+        filter: filterHOC('Filter'),
+      },
+    }),
+    columnHelper.accessor('username', {
+      header: t('logs.columns.user'),
+    }),
 
-      return (
-        <span className="flex items-center gap-1">
-          {label}
-          {icon && mode && <Icon icon={icon} mode={mode} />}
-        </span>
-      );
-    },
-  }),
-];
+    columnHelper.accessor((item) => activityTypesProps[item.type].label, {
+      header: t('logs.columns.result'),
+      enableColumnFilter: true,
+      filterFn: multiple,
+      meta: {
+        filter: filterHOC('Filter'),
+      },
+      cell({ row: { original: item } }) {
+        const props = activityTypesProps[item.type];
+        if (!props) {
+          return null;
+        }
+
+        const { label, icon, mode } = props;
+
+        return (
+          <span className="flex gap-1 items-center">
+            {label}
+            {icon && mode && <Icon icon={icon} mode={mode} />}
+          </span>
+        );
+      },
+    }),
+  ];
+}

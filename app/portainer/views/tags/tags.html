@@ -1,14 +1,14 @@
-<page-header title="'Tags'" breadcrumbs="['Tag management']" reload="true"> </page-header>
+<page-header title="pageTitle" breadcrumbs="pageBreadcrumbs" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="plus" title-text="Add a new tag"> </rd-widget-header>
+      <rd-widget-header icon="plus" title-text="{{ t('tags.add_new_tag') }}"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="tagCreationForm" ng-submit="createTag()">
           <!-- name-input -->
           <div class="form-group">
-            <label for="name" class="col-sm-2 control-label required text-left"> Name </label>
+            <label for="name" class="col-sm-2 control-label required text-left"> {{ t('tags.name') }} </label>
             <div class="col-sm-10">
               <input
                 type="text"
@@ -17,7 +17,7 @@
                 name="name"
                 ng-model="formValues.Name"
                 ng-change="checkNameValidity(tagCreationForm)"
-                placeholder="org/acme"
+                placeholder="{{ t('tags.name_placeholder') }}"
                 required
                 auto-focus
               />
@@ -26,11 +26,11 @@
                   <div ng-messages="tagCreationForm.name.$error">
                     <p ng-message="required" class="vertical-center">
                       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                      This field is required.
+                      {{ t('tags.name_required') }}
                     </p>
                     <p ng-message="validName" class="vertical-center">
                       <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                      This tag already exists.
+                      {{ t('tags.name_exists') }}
                     </p>
                   </div>
                 </div>
@@ -49,9 +49,9 @@
               >
                 <span ng-hide="state.actionInProgress" class="vertical-center">
                   <pr-icon icon="'plus'"></pr-icon>
-                  Create tag
+                  {{ t('tags.create_tag') }}
                 </span>
-                <span ng-show="state.actionInProgress">Creating tag...</span>
+                <span ng-show="state.actionInProgress">{{ t('tags.creating_tag') }}</span>
               </button>
             </div>
           </div>

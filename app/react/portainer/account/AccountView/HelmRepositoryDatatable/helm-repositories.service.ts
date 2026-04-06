@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
+import i18n from '@/i18n';
 import { success as notifySuccess } from '@/portainer/services/notifications';
 import { withError } from '@/react-tools/react-query';
 import { pluralize } from '@/portainer/helpers/strings';
@@ -23,7 +24,7 @@ export async function createHelmRepository(
     );
     return data.helmRepository;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to create Helm repository');
+    throw parseAxiosError(e as Error, i18n.t('helm_repos.create_error'));
   }
 }
 
@@ -32,7 +33,7 @@ export async function getHelmRepositories(userId: number) {
     const { data } = await axios.get<HelmRepositories>(buildUrl(userId));
     return data;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to get Helm repositories');
+    throw parseAxiosError(e as Error, i18n.t('helm_repos.retrieve_error'));
   }
 }
 
@@ -40,7 +41,7 @@ export async function deleteHelmRepository(repo: HelmRepository) {
   try {
     await axios.delete<HelmRepository[]>(buildUrl(repo.UserId, repo.Id));
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to delete Helm repository');
+    throw parseAxiosError(e as Error, i18n.t('helm_repos.delete_error'));
   }
 }
 
@@ -48,7 +49,7 @@ export async function deleteHelmRepositories(repos: HelmRepository[]) {
   try {
     await Promise.all(repos.map((repo) => deleteHelmRepository(repo)));
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to delete Helm repositories');
+    throw parseAxiosError(e as Error, i18n.t('helm_repos.delete_multi_error'));
   }
 }
 
@@ -58,10 +59,10 @@ export function useDeleteHelmRepositoryMutation() {
 
   return useMutation(deleteHelmRepository, {
     onSuccess: (_, helmRepository) => {
-      notifySuccess('Helm repository deleted successfully', helmRepository.URL);
+      notifySuccess(i18n.t('helm_repos.delete_success'), helmRepository.URL);
       return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
-    ...withError('Unable to delete Helm repository'),
+    ...withError(i18n.t('helm_repos.delete_error')),
   });
 }
 
@@ -72,7 +73,7 @@ export function useDeleteHelmRepositoriesMutation() {
   return useMutation(deleteHelmRepositories, {
     onSuccess: () => {
       notifySuccess(
-        'Success',
+        i18n.t('common.success'),
         `Helm ${pluralize(
           deleteHelmRepositories.length,
           'repository',
@@ -81,7 +82,7 @@ export function useDeleteHelmRepositoriesMutation() {
       );
       return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
-    ...withError('Unable to delete Helm repositories'),
+    ...withError(i18n.t('helm_repos.delete_multi_error')),
   });
 }
 
@@ -91,7 +92,7 @@ export function useHelmRepositories(userId: number) {
     () => getHelmRepositories(userId),
     {
       staleTime: 20,
-      ...withError('Unable to retrieve Helm repositories'),
+      ...withError(i18n.t('helm_repos.retrieve_error')),
     }
   );
 }
@@ -102,10 +103,10 @@ export function useCreateHelmRepositoryMutation() {
 
   return useMutation(createHelmRepository, {
     onSuccess: (_, payload) => {
-      notifySuccess('Helm repository created successfully', payload.URL);
+      notifySuccess(i18n.t('helm_repos.create_success'), payload.URL);
       return queryClient.invalidateQueries(queryKeys.registries(user.Id));
     },
-    ...withError('Unable to create Helm repository'),
+    ...withError(i18n.t('helm_repos.create_error')),
   });
 }
 

@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik';
 import _ from 'lodash';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { trimSHA, trimVersionTag } from '@/docker/filters/utils';
 import DockerIcon from '@/assets/ico/vendor/docker.svg?c';
@@ -41,6 +42,7 @@ export function SimpleForm({
   onChangeImage?: (name: string) => void;
   setFieldValue: <T>(field: string, value: T) => void;
 }) {
+  const { t } = useTranslation();
   const registryQuery = useRegistry(values.registryId);
 
   const registry = registryQuery.data;
@@ -51,7 +53,7 @@ export function SimpleForm({
   return (
     <>
       <FormControl
-        label="Registry"
+        label={t('common.imageConfig.registry')}
         inputId="registry-field"
         errors={errors?.registryId}
       >
@@ -62,7 +64,7 @@ export function SimpleForm({
         />
       </FormControl>
 
-      <FormControl label="Image" inputId="image-field" errors={errors?.image}>
+      <FormControl label={t('common.imageConfig.image')} inputId="image-field" errors={errors?.image}>
         <InputGroup>
           <InputGroup.Addon>{registryUrl}</InputGroup.Addon>
 
@@ -81,7 +83,7 @@ export function SimpleForm({
             <InputGroup.ButtonWrapper>
               <Button
                 as="a"
-                title="Search image on Docker Hub"
+                title={t('common.imageConfig.search_on_docker_hub')}
                 color="default"
                 props={{
                   href: `https://hub.docker.com/search?type=image&q=${trimVersionTag(
@@ -93,7 +95,7 @@ export function SimpleForm({
                 icon={DockerIcon}
                 data-cy="component-dockerHubSearchButton"
               >
-                Search
+                {t('common.imageConfig.search')}
               </Button>
             </InputGroup.ButtonWrapper>
           )}

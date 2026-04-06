@@ -1,5 +1,5 @@
 <form class="form-horizontal" name="$ctrl.registryFormQuay" ng-submit="$ctrl.formAction()">
-  <div class="col-sm-12 form-section-title"> Quay account details </div>
+  <div class="col-sm-12 form-section-title"> {{ 'portainer_registries.quay_account_details' | i18n }} </div>
   <!-- name-input -->
   <div class="form-group">
     <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
@@ -10,11 +10,11 @@
           <div ng-messages="$ctrl.registryFormQuay.registry_name.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
             <p ng-message="used" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              A registry with the same name already exists.
+              {{ 'portainer_registries.name_already_exists' | i18n }}
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@
           <div ng-messages="$ctrl.registryFormQuay.registry_username.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -59,7 +59,7 @@
           <div ng-messages="$ctrl.registryFormQuay.registry_password.$error">
             <p ng-message="required" class="vertical-center">
               <pr-icon icon="'alert-triangle'"></pr-icon>
-              This field is required.
+              {{ 'validation.field_required' | i18n }}
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@
             <div ng-messages="$ctrl.registryFormQuay.organisation_name.$error">
               <p ng-message="required" class="vertical-center">
                 <pr-icon icon="'alert-triangle'"></pr-icon>
-                This field is required.
+                {{ 'validation.field_required' | i18n }}
               </p>
             </div>
           </div>
@@ -110,7 +110,7 @@
   </div>
 
   <!-- actions -->
-  <div class="col-sm-12 form-section-title"> Actions </div>
+  <div class="col-sm-12 form-section-title"> {{ 'common.actions' | i18n }} </div>
   <div class="form-group">
     <div class="col-sm-12">
       <button
@@ -124,7 +124,7 @@
         analytics-properties="{ metadata: { type: 'quay' } }"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
-        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+        <span ng-show="$ctrl.actionInProgress">{{ 'portainer_registries.in_progress' | i18n }}</span>
       </button>
     </div>
   </div>

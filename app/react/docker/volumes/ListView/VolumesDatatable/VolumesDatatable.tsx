@@ -1,4 +1,5 @@
 import { Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
@@ -50,10 +51,11 @@ export function VolumesDatatable({
   const tableState = useTableState(store, storageKey);
   useRepeater(tableState.autoRefreshRate, onRefresh);
   const columns = useColumns();
+  const { t } = useTranslation();
 
   return (
     <Datatable
-      title="Volumes"
+      title={t('docker_volumes.title')}
       titleIcon={Database}
       columns={columns}
       dataset={dataset || []}

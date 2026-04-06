@@ -9,6 +9,7 @@ import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
 import { useStore } from 'zustand';
 import { AlertCircle, Bell, CheckCircle, Trash2 } from 'lucide-react';
+import { useTranslation, TFunction } from 'react-i18next';
 
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/react/hooks/useUser';
@@ -24,6 +25,7 @@ import headerStyles from './HeaderTitle.module.css';
 import notificationStyles from './NotificationsMenu.module.css';
 
 export function NotificationsMenu() {
+  const { t } = useTranslation();
   const notificationsStoreState = useStore(notificationsStore);
   const { removeNotification } = notificationsStoreState;
   const { clearUserNotifications } = notificationsStoreState;
@@ -75,7 +77,7 @@ export function NotificationsMenu() {
             )}
           >
             <div>
-              <h4>Notifications</h4>
+              <h4>{t('notifications.title')}</h4>
             </div>
             <div className={notificationStyles.itemLast}>
               {reducedNotifications?.length > 0 && (
@@ -88,7 +90,7 @@ export function NotificationsMenu() {
                   }}
                   data-cy="notification-deleteButton"
                 >
-                  Clear all
+                  {t('notifications.clear_all')}
                 </Button>
               )}
             </div>
@@ -114,14 +116,14 @@ export function NotificationsMenu() {
                 to="portainer.notifications"
                 data-cy="notifications-see-all-link"
               >
-                View all notifications
+                {t('notifications.view_all')}
               </Link>
             </div>
           </>
         ) : (
           <div className="flex flex-col items-center">
             <Icon icon={Bell} size="xl" />
-            <p className="my-5">You have no notifications yet.</p>
+            <p className="my-5">{t('notifications.no_notifications')}</p>
           </div>
         )}
       </MenuList>
@@ -143,6 +145,7 @@ interface MenuLinkProps extends AutomationTestingProps, UISrefProps {
 }
 
 function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
+  const { t } = useTranslation();
   const anchorProps = useSref(to, params);
 
   return (
@@ -167,7 +170,7 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
             {notification.details}
           </p>
           <p className="small text-muted">
-            {formatTime(notification.timeStamp)}
+            {formatTime(notification.timeStamp, t)}
           </p>
         </div>
         <div className={notificationStyles.deleteButton}>
@@ -188,7 +191,7 @@ function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
   );
 }
 
-function formatTime(timeCreated: Date) {
+function formatTime(timeCreated: Date, t: TFunction) {
   const timeStamp = new Date(timeCreated).valueOf().toString();
 
   const diff = Math.floor((Date.now() - parseInt(timeStamp, 10)) / 1000);
@@ -196,16 +199,16 @@ function formatTime(timeCreated: Date) {
   if (diff <= 86400) {
     let interval = Math.floor(diff / 3600);
     if (interval >= 1) {
-      return `${interval} hours ago`;
+      return t('notifications.hours_ago', { count: interval });
     }
     interval = Math.floor(diff / 60);
     if (interval >= 1) {
-      return `${interval} min ago`;
+      return t('notifications.min_ago', { count: interval });
     }
   }
   if (diff > 86400) {
     const formatDate = Moment(timeCreated).format('YYYY-MM-DD h:mm:ss');
     return formatDate;
   }
-  return 'Just now';
+  return t('notifications.just_now');
 }

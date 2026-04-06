@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { array, boolean, number, object, SchemaOf, string } from 'yup';
 import { useRouter } from '@uirouter/react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 
 import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
 import { EdgeStackDeploymentTypeSelector } from '@/react/edge/edge-stacks/components/EdgeStackDeploymentTypeSelector';
@@ -59,6 +61,7 @@ const forms = {
 };
 
 export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
+  const { t } = useTranslation();
   const mutation = useUpdateEdgeStackMutation();
   const fileQuery = useEdgeStackFile(edgeStack.Id, { skipErrors: true });
   const allowKubeToSelectCompose = useAllowKubeToSelectCompose(edgeStack);
@@ -107,7 +110,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
     if (isBE && values.deploymentType === DeploymentType.Compose) {
       const defaultToggle = values.prePullImage;
       const result = await confirmStackUpdate(
-        'Do you want to force an update of the stack?',
+        t('edge.stacks.edit.force_update_confirm'),
         defaultToggle
       );
       if (!result) {
@@ -150,7 +153,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
       },
       {
         onSuccess: () => {
-          notifySuccess('Success', 'Stack successfully deployed');
+          notifySuccess(t('common.success'), t('edge.stacks.edit.stack_deployed_success'));
           router.stateService.go('^');
         },
       }
@@ -190,6 +193,7 @@ function InnerForm({
     setFieldError,
     initialValues,
   } = useFormikContext<FormValues>();
+  const { t } = useTranslation();
 
   usePreventExit(initialValues.content, values.content, !isSaved);
 
@@ -230,18 +234,13 @@ function InnerForm({
 
       {hasKubeEndpoint && hasDockerEndpoint && (
         <TextTip>
-          There are no available deployment types when there is more than one
-          type of environment in your edge group selection (e.g. Kubernetes and
-          Docker environments). Please select edge groups that have environments
-          of the same type.
+          {t('edge.stacks.create.multiple_types_error')}
         </TextTip>
       )}
 
       {values.deploymentType === DeploymentType.Compose && hasKubeEndpoint && (
         <FormError>
-          Edge groups with kubernetes environments no longer support compose
-          deployment types in Portainer. Please select edge groups that only
-          have docker environments when using compose deployment types.
+          {t('edge.stacks.edit.compose_no_kube')}
         </FormError>
       )}
 
@@ -265,16 +264,16 @@ function InnerForm({
 
       {isBE && (
         <>
-          <FormSection title="Webhooks">
+          <FormSection title={t('edge.stacks.edit.webhooks')}>
             <div className="form-group">
               <div className="col-sm-12">
                 <SwitchField
-                  label="Create an Edge stack webhook"
+                  label={t('edge.stacks.edit.webhook_switch_label')}
                   data-cy="edge-stack-enable-webhook-switch"
                   checked={values.webhookEnabled}
                   labelClass="col-sm-3 col-lg-2"
                   onChange={(value) => setFieldValue('webhookEnabled', value)}
-                  tooltip="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
+                  tooltip={t('edge.stacks.edit.webhook_tooltip')}
                 />
               </div>
             </div>
@@ -288,9 +287,7 @@ function InnerForm({
                 />
 
                 <TextTip color="orange">
-                  Sending environment variables to the webhook is updating the
-                  stack with the new values. New variables names will be added
-                  to the stack and existing variables will be updated.
+                  {t('edge.stacks.edit.webhook_env_vars_tip')}
                 </TextTip>
               </>
             )}
@@ -342,7 +339,7 @@ function InnerForm({
         </>
       )}
 
-      <FormSection title="Actions">
+      <FormSection title={t('edge.stacks.edit.actions')}>
         <div className="form-group">
           <div className="col-sm-12">
             <LoadingButton
@@ -352,16 +349,15 @@ function InnerForm({
               disabled={!isValid || staggerUpdating}
               isLoading={isLoading}
               button-spinner="$ctrl.actionInProgress"
-              loadingText="Update in progress..."
+              loadingText={t('edge.stacks.edit.update_in_progress')}
             >
-              Update the stack
+              {t('edge.stacks.edit.update_the_stack')}
             </LoadingButton>
           </div>
           {staggerUpdating && (
             <div className="col-sm-12">
               <FormError>
-                Concurrent updates in progress, stack update temporarily
-                unavailable
+                {t('edge.stacks.edit.concurrent_updates')}
               </FormError>
             </div>
           )}
@@ -414,10 +410,10 @@ function useCachedContent() {
 
 function formValidation(): SchemaOf<FormValues> {
   return object({
-    content: string().required('Content is required'),
+    content: string().required(i18n.t('edge.stacks.edit.content_required') as string),
     deploymentType: number()
       .oneOf([0, 1, 2])
-      .required('Deployment type is required'),
+      .required(i18n.t('edge.stacks.edit.deployment_type_required') as string),
     privateRegistryId: number().optional(),
     prePullImage: boolean().default(false),
     retryDeploy: boolean().default(false),
@@ -425,7 +421,7 @@ function formValidation(): SchemaOf<FormValues> {
     edgeGroups: array()
       .of(number().required())
       .required()
-      .min(1, 'At least one edge group is required'),
+      .min(1, i18n.t('edge.stacks.edit.edge_group_required') as string),
     webhookEnabled: boolean().default(false),
     versions: array().of(number().optional()).optional(),
     envVars: envVarValidation(),

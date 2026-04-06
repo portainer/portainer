@@ -1,4 +1,5 @@
 import { UserCheck, Link } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
@@ -9,6 +10,7 @@ import { RolesDatatable } from './RolesDatatable';
 import { RoleBindingsDatatable } from './RoleBindingsDatatable';
 
 export function RolesView() {
+  const { t } = useTranslation();
   useUnauthorizedRedirect(
     { authorizations: ['K8sRoleBindingsW', 'K8sRolesW'], adminOnlyCE: true },
     { to: 'kubernetes.dashboard' }
@@ -33,7 +35,7 @@ export function RolesView() {
 
   return (
     <>
-      <PageHeader title="Role list" breadcrumbs="Roles" reload />
+      <PageHeader title={t('kubernetes.roles.title')} breadcrumbs={t('kubernetes.roles.breadcrumbs')} reload />
       <>
         <WidgetTabs tabs={tabs} currentTabIndex={currentTabIndex} />
         <div className="content">{tabs[currentTabIndex].widget}</div>

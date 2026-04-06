@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import type { ContainerListViewModel } from '@/react/docker/containers/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useContainerGpus } from '@/react/docker/containers/queries/gpus';
@@ -7,7 +8,7 @@ import { useContainerGpus } from '@/react/docker/containers/queries/gpus';
 import { columnHelper } from './helper';
 
 export const gpus = columnHelper.display({
-  header: 'GPUs',
+  header: () => i18n.t('docker.containers.columns.gpus'),
   id: 'gpus',
   cell: GpusCell,
 });

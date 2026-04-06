@@ -1,6 +1,7 @@
 import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { confirm, confirmChangePassword, confirmDelete } from '@@/modals/confirm';
+import i18n from '@/i18n';
 
 angular.module('portainer.app').controller('UserController', [
   '$q',
@@ -30,7 +31,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.deleteUser = function () {
-      confirmDelete('Do you want to remove this user? This user will not be able to login into Portainer anymore.').then((confirmed) => {
+      confirmDelete(i18n.t('portainer_users.delete_confirm_message')).then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -45,10 +46,10 @@ angular.module('portainer.app').controller('UserController', [
 
       if (username != oldUsername) {
         const confirmed = await confirm({
-          title: 'Are you sure?',
+          title: i18n.t('portainer_users.rename_confirm_title'),
           modalType: ModalType.Warn,
-          message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
-          confirmButton: buildConfirmButton('Update'),
+          message: i18n.t('portainer_users.rename_confirm_message', { oldUsername, username }),
+          confirmButton: buildConfirmButton(i18n.t('portainer_users.update_button')),
         });
 
         if (!confirmed) {
@@ -58,11 +59,11 @@ angular.module('portainer.app').controller('UserController', [
 
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          Notifications.success('Success', 'User successfully updated');
+          Notifications.success(i18n.t('common.success'), i18n.t('portainer_users.user_updated'));
           $state.reload();
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update user permissions');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('portainer_users.unable_update_permissions'));
         });
     };
 
@@ -74,7 +75,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { newPassword: $scope.formValues.newPassword })
         .then(function success() {
-          Notifications.success('Success', 'Password successfully updated');
+          Notifications.success(i18n.t('common.success'), i18n.t('portainer_users.password_updated'));
 
           if (isCurrentUser) {
             $state.go('portainer.logout');
@@ -83,18 +84,18 @@ angular.module('portainer.app').controller('UserController', [
           }
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update user password');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('portainer_users.unable_update_password'));
         });
     };
 
     function deleteUser() {
       UserService.deleteUser($scope.user.Id)
         .then(function success() {
-          Notifications.success('User successfully deleted', $scope.user.Username);
+          Notifications.success(i18n.t('portainer_users.user_deleted'), $scope.user.Username);
           $state.go('portainer.users');
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove user');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('portainer_users.unable_remove_user'));
         });
     }
 
@@ -126,7 +127,7 @@ angular.module('portainer.app').controller('UserController', [
           $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve user information');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('portainer_users.unable_retrieve_user_info'));
         });
     }
 

@@ -1,13 +1,13 @@
 <div>
-  <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title"> Access control </div>
+  <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title"> {{ 'portainer_access.access_control' | i18n }} </div>
   <!-- access-control-switch -->
   <div class="form-group">
     <div class="col-sm-12">
       <por-switch-field
         label-class="'col-sm-2'"
         checked="$ctrl.formData.AccessControlEnabled"
-        label="'Enable access control'"
-        tooltip="'When enabled, you can restrict the access and management of this resource.'"
+        label="'portainer_access.enable_access_control' | i18n"
+        tooltip="'portainer_access.enable_access_control_tooltip' | i18n"
         on-change="($ctrl.onChangeEnablement)"
         data-cy="portainer-accessMgmtToggle"
       ></por-switch-field>
@@ -33,19 +33,19 @@
   >
     <div class="vertical-center w-full">
       <label for="teams-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
-        Authorized teams
+        {{ 'portainer_access.authorized_teams' | i18n }}
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0"
-          message="'You can select which teams(s) will be able to manage this resource.'"
+          message="'portainer_access.teams_tooltip_admin' | i18n"
         ></portainer-tooltip>
         <portainer-tooltip
           ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 1"
-          message="'As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource.'"
+          message="'portainer_access.teams_tooltip_user' | i18n"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted">
-          You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
+          {{ 'portainer_access.no_teams_created' | i18n }}
         </span>
 
         <por-access-control-form-team-selector
@@ -64,15 +64,15 @@
   <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
     <div class="vertical-center w-full">
       <label for="users-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
-        Authorized users
+        {{ 'portainer_access.authorized_users' | i18n }}
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0"
-          message="'You can select which user(s) will be able to manage this resource.'"
+          message="'portainer_access.users_tooltip_admin' | i18n"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted">
-          You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
+          {{ 'portainer_access.no_users_created' | i18n }}
         </span>
 
         <por-access-control-form-user-selector

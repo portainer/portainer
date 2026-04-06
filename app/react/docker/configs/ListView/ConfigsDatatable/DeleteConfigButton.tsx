@@ -1,11 +1,12 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
+import i18n from '@/i18n';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { promiseSequence } from '@/portainer/helpers/promise-utils';
 import { withError, withInvalidate } from '@/react-tools/react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { pluralize } from '@/portainer/helpers/strings';
 
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
@@ -18,6 +19,7 @@ export function DeleteConfigButton({
 }: {
   selectedItems: Array<ConfigViewModel>;
 }) {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const mutation = useDeleteConfigListMutation(environmentId);
 
@@ -30,18 +32,16 @@ export function DeleteConfigButton({
           {
             onSuccess() {
               notifySuccess(
-                `${pluralize(
-                  selectedItems.length,
-                  'Config'
-                )} successfully removed`,
-                // log the item name if it's only one config
+                t('docker.configs.successfully_removed', {
+                  count: selectedItems.length,
+                }),
                 selectedItems.length === 1 ? selectedItems[0].Name : ''
               );
             },
           }
         );
       }}
-      confirmMessage="Do you want to remove the selected config(s)?"
+      confirmMessage={t('docker.configs.confirm_remove')}
       disabled={selectedItems.length === 0}
     />
   );
@@ -54,7 +54,7 @@ function useDeleteConfigListMutation(environmentId: EnvironmentId) {
       promiseSequence(
         ids.map((configId) => () => deleteConfig({ environmentId, configId }))
       ),
-    ...withError('Unable to remove configs'),
+    ...withGlobalError(i18n.t('docker.configs.unable_to_remove')),
     ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
   });
 }

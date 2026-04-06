@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 import { Laptop } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { OpenAMTConfiguration } from '@/react/edge/edge-devices/open-amt/types';
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function SettingsOpenAMT({ settings, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [certFile, setCertFile] = useState<File>();
   async function handleFileUpload(
     file: File,
@@ -95,13 +97,11 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon={Laptop} title="Intel OpenAMT" />
+        <WidgetTitle icon={Laptop} title={t('settings.openamt_title')} />
         <WidgetBody>
           <div className="mb-2">
             <Alert color="warn">
-              OpenAMT support is deprecated and will be removed in a future
-              version of Portainer. <br />
-              Please plan to migrate to alternative device management solutions.
+              {t('settings.openamt_deprecated')}
             </Alert>
           </div>
 
@@ -125,7 +125,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
               <Form className="form-horizontal" onSubmit={handleSubmit}>
                 <FormControl
                   inputId="edge_enableOpenAMT"
-                  label="Enable OpenAMT"
+                  label={t('settings.openamt_enable_label')}
                   errors={errors.enabled}
                   size="small"
                 >
@@ -141,8 +141,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                 </FormControl>
 
                 <TextTip color="blue" className="mb-2">
-                  When enabled, this will allow Portainer to interact with an
-                  OpenAMT MPS API.
+                  {t('settings.openamt_enable_tip')}
                 </TextTip>
 
                 {edgeComputeFeaturesEnabled && values.enabled && (
@@ -151,7 +150,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="mps_server"
-                      label="MPS Server"
+                      label={t('settings.mps_server_label')}
                       size="medium"
                       errors={errors.mpsServer}
                     >
@@ -159,7 +158,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         as={Input}
                         name="mpsServer"
                         id="mps_server"
-                        placeholder="Enter the MPS Server"
+                        placeholder={t('settings.mps_server_placeholder')}
                         value={values.mpsServer}
                         data-cy="openAMT-serverInput"
                       />
@@ -167,7 +166,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="mps_username"
-                      label="MPS User"
+                      label={t('settings.mps_user_label')}
                       size="medium"
                       errors={errors.mpsUser}
                     >
@@ -175,7 +174,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         as={Input}
                         name="mpsUser"
                         id="mps_username"
-                        placeholder="Enter the MPS User"
+                        placeholder={t('settings.mps_user_placeholder')}
                         value={values.mpsUser}
                         data-cy="openAMT-usernameInput"
                       />
@@ -183,9 +182,9 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="mps_password"
-                      label="MPS Password"
+                      label={t('settings.mps_password_label')}
                       size="medium"
-                      tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                      tooltip={t('settings.mps_password_tooltip')}
                       errors={errors.mpsPassword}
                     >
                       <Field
@@ -193,7 +192,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         type="password"
                         name="mpsPassword"
                         id="mps_password"
-                        placeholder="Enter the MPS Password"
+                        placeholder={t('settings.mps_password_placeholder')}
                         value={values.mpsPassword}
                         data-cy="openAMT-passwordInput"
                       />
@@ -203,16 +202,16 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="domain_name"
-                      label="Domain Name"
+                      label={t('settings.domain_name_label')}
                       size="medium"
-                      tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                      tooltip={t('settings.domain_name_tooltip')}
                       errors={errors.domainName}
                     >
                       <Field
                         as={Input}
                         name="domainName"
                         id="domain_name"
-                        placeholder="Enter the Domain Name"
+                        placeholder={t('settings.domain_name_placeholder')}
                         value={values.domainName}
                         data-cy="openAMT-domainInput"
                       />
@@ -220,16 +219,16 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="certificate_file"
-                      label="Provisioning Certificate File (.pfx)"
+                      label={t('settings.cert_file_label')}
                       size="medium"
-                      tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy.<br>The certificate must contain the private key.<br>On AMT 15 based devices you need to use SHA2."
+                      tooltip={t('settings.cert_file_tooltip')}
                       errors={errors.certFileContent}
                       setTooltipHtmlMessage
                     >
                       <FileUploadField
                         inputId="certificate_file"
                         data-cy="openAMT-certFileInput"
-                        title="Upload file"
+                        title={t('settings.cert_upload_button')}
                         accept=".pfx"
                         value={certFile}
                         onChange={(file) =>
@@ -240,9 +239,9 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
                     <FormControl
                       inputId="certificate_password"
-                      label="Provisioning Certificate Password"
+                      label={t('settings.cert_password_label')}
                       size="medium"
-                      tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                      tooltip={t('settings.mps_password_tooltip')}
                       errors={errors.certFilePassword}
                     >
                       <Field
@@ -264,9 +263,9 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                       disabled={!isValid || !dirty}
                       data-cy="settings-OpenAMTButton"
                       isLoading={isSubmitting}
-                      loadingText="Saving settings..."
+                      loadingText={t('settings.saving_settings')}
                     >
-                      Save settings
+                      {t('settings.save_settings')}
                     </LoadingButton>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { HardDrive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import i18n from '@/i18n';
 import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useParamState } from '@/react/hooks/useParamState';
@@ -85,17 +86,17 @@ export function EnvironmentsDatatable() {
   );
 
   const envStatusSelectOptions = [
-    { value: StatusType.Pending, label: 'Pending' },
-    { value: StatusType.Acknowledged, label: 'Acknowledged' },
-    { value: StatusType.ImagesPulled, label: 'Images pre-pulled' },
-    { value: StatusType.Running, label: 'Deployed' },
-    { value: StatusType.Error, label: 'Failed' },
+    { value: StatusType.Pending, label: i18n.t('edge.stacks.status.pending') },
+    { value: StatusType.Acknowledged, label: i18n.t('edge.stacks.status.acknowledged') },
+    { value: StatusType.ImagesPulled, label: i18n.t('edge.stacks.status.images_pre_pulled') },
+    { value: StatusType.Running, label: i18n.t('edge.stacks.status.deployed') },
+    { value: StatusType.Error, label: i18n.t('edge.stacks.status.failed') },
   ];
   if (isBE) {
     envStatusSelectOptions.concat([
-      { value: StatusType.PausedDeploying, label: 'Paused' },
-      { value: StatusType.RollingBack, label: 'Rolling back' },
-      { value: StatusType.RolledBack, label: 'Rolled back' },
+      { value: StatusType.PausedDeploying, label: i18n.t('edge.stacks.status.paused') },
+      { value: StatusType.RollingBack, label: i18n.t('edge.stacks.status.rolling_back') },
+      { value: StatusType.RolledBack, label: i18n.t('edge.stacks.status.rolled_back') },
     ]);
   }
 

@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 angular.module('portainer.docker').controller('HostViewController', [
   '$q',
   'SystemService',
@@ -44,7 +46,7 @@ angular.module('portainer.docker').controller('HostViewController', [
           }
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve engine details');
+          Notifications.error('Failure', err, i18n.t('docker.host.unableToRetrieveEngineDetails'));
         });
     }
 

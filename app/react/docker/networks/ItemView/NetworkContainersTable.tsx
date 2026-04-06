@@ -1,4 +1,5 @@
 import { Server, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -20,20 +21,21 @@ type Props = {
   networkId: NetworkId;
 };
 
-const tableHeaders = [
-  'Container Name',
-  'IPv4 Address',
-  'IPv6 Address',
-  'MacAddress',
-  'Actions',
-];
-
 export function NetworkContainersTable({
   networkContainers,
   nodeName,
   environmentId,
   networkId,
 }: Props) {
+  const { t } = useTranslation();
+  const tableHeaders = [
+    t('docker_networks.container_name'),
+    t('docker_networks.ipv4'),
+    t('docker_networks.ipv6'),
+    t('docker_networks.mac'),
+    t('docker_networks.actions'),
+  ];
+
   const disconnectContainer = useDisconnectContainer({
     environmentId,
     networkId,
@@ -45,7 +47,7 @@ export function NetworkContainersTable({
 
   return (
     <TableContainer>
-      <TableTitle label="Containers in network" icon={Server} />
+      <TableTitle label={t('docker_networks.containers_title')} icon={Server} />
       <DetailsTable
         headers={tableHeaders}
         dataCy="networkDetails-networkContainers"
@@ -93,7 +95,7 @@ export function NetworkContainersTable({
                   }}
                 >
                   <Icon icon={Trash2} class-name="icon-secondary icon-md" />
-                  Leave Network
+                  {t('docker_networks.leave_network')}
                 </Button>
               </Authorized>
             </td>

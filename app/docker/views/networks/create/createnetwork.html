@@ -1,4 +1,4 @@
-<page-header title="'Create network'" breadcrumbs="[{label:'Networks', link:'docker.networks'}, 'Add network']"> </page-header>
+<page-header title="'docker_networks.create_title' | i18n" breadcrumbs="[{label:'docker_networks.breadcrumb' | i18n, link:'docker.networks'}, 'docker_networks.add_network_breadcrumb' | i18n]"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -7,16 +7,16 @@
         <form class="form-horizontal" name="networkCreationForm">
           <!-- name-input -->
           <div class="form-group">
-            <label for="network_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
+            <label for="network_name" class="col-sm-2 col-lg-1 control-label text-left">{{ 'common.name' | i18n }}</label>
             <div class="col-sm-10 col-lg-11">
               <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork" data-cy="network-name-input" />
             </div>
           </div>
           <!-- !name-input -->
-          <div class="col-sm-12 form-section-title"> Driver configuration </div>
+          <div class="col-sm-12 form-section-title"> {{ 'docker_networks.driver_config_section' | i18n }} </div>
           <!-- driver-input -->
           <div class="form-group">
-            <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+            <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.driver_label' | i18n }}</label>
             <div class="col-sm-10 col-lg-11">
               <select
                 class="form-control"
@@ -25,7 +25,7 @@
                 ng-if="availableNetworkDrivers.length > 0"
                 data-cy="network-driver-select"
               >
-                <option disabled hidden value="">Select a driver</option>
+                <option disabled hidden value="">{{ 'docker_networks.select_a_driver' | i18n }}</option>
               </select>
               <input
                 type="text"
@@ -43,8 +43,8 @@
           <div class="form-group">
             <div class="col-sm-12 mt-1">
               <label class="control-label text-left">
-                Driver options
-                <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
+                {{ 'docker_networks.driver_options' | i18n }}
+                <portainer-tooltip message="'docker_networks.driver_options_tooltip' | i18n"></portainer-tooltip>
               </label>
             </div>
             <!-- driver-options-input-list -->
@@ -70,7 +70,7 @@
                   </span>
                 </div>
               </div>
-              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add driver option </div>
+              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> {{ 'docker_networks.add_driver_option' | i18n }} </div>
             </div>
             <!-- !driver-options-input-list -->
           </div>
@@ -79,10 +79,10 @@
           <network-macvlan-form ng-show="config.Driver === 'macvlan'" data="formValues.Macvlan" application-state="applicationState"></network-macvlan-form>
           <!-- !macvlan-management -->
           <div ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'swarm'">
-            <div class="col-sm-12 form-section-title"> IPV4 Network configuration </div>
+            <div class="col-sm-12 form-section-title"> {{ 'docker_networks.ipv4_config_section' | i18n }} </div>
             <!-- subnet-gateway-inputs -->
             <div class="form-group">
-              <label for="ipv4_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+              <label for="ipv4_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.subnet' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -93,7 +93,7 @@
                   data-cy="network-ipv4-subnet-input"
                 />
               </div>
-              <label for="ipv4_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+              <label for="ipv4_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.gateway' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -108,7 +108,7 @@
             <!-- !subnet-gateway-inputs -->
             <!-- iprange-auxaddr-inputs -->
             <div class="form-group">
-              <label for="ipv4_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
+              <label for="ipv4_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.ip_range' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -121,7 +121,7 @@
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV4.AuxiliaryAddresses track by $index" class="form-group">
-              <label for="ipv4_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <label for="ipv4_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.exclude_ip' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -137,21 +137,21 @@
                 <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
-                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> {{ 'docker_networks.exclude_ip_gateway_error' | i18n }}</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
               <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV4AuxAddress()">
-                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> {{ 'docker_networks.add_excluded_ip' | i18n }}
               </div>
             </div>
           </div>
           <div ng-show="config.Driver === 'bridge' || config.Driver === 'ipvlan' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
-            <div class="col-sm-12 form-section-title"> IPV6 Network configuration </div>
+            <div class="col-sm-12 form-section-title"> {{ 'docker_networks.ipv6_config_section' | i18n }} </div>
             <!-- subnet-gateway-inputs -->
             <div class="form-group">
-              <label for="ipv6_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+              <label for="ipv6_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.subnet' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -162,7 +162,7 @@
                   data-cy="network-ipv6-subnet-input"
                 />
               </div>
-              <label for="ipv6_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+              <label for="ipv6_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.gateway' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -177,7 +177,7 @@
             <!-- !subnet-gateway-inputs -->
             <!-- iprange-auxaddr-inputs -->
             <div class="form-group">
-              <label for="ipv6_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
+              <label for="ipv6_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.ip_range' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -190,7 +190,7 @@
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV6.AuxiliaryAddresses track by $index" class="form-group">
-              <label for="ipv6_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <label for="ipv6_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">{{ 'docker_networks.exclude_ip' | i18n }}</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
@@ -206,17 +206,17 @@
                 <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
-                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> {{ 'docker_networks.exclude_ip_gateway_error' | i18n }}</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
               <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV6AuxAddress()">
-                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> {{ 'docker_networks.add_excluded_ip' | i18n }}
               </div>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title"> Advanced configuration </div>
+          <div class="col-sm-12 form-section-title"> {{ 'docker_networks.advanced_config_section' | i18n }} </div>
           <!-- labels -->
           <div class="form-group">
             <!-- labels-input-list -->
@@ -235,7 +235,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add label </div>
+                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> {{ 'docker_networks.add_label' | i18n }} </div>
               </div>
             </div>
             <!-- !labels-input-list -->
@@ -247,8 +247,8 @@
               <por-switch-field
                 label-class="'col-sm-2'"
                 checked="config.Internal"
-                label="'Isolated network'"
-                tooltip="'An isolated network has no inbound or outbound communications.'"
+                label="'docker_networks.isolated_network' | i18n"
+                tooltip="'docker_networks.isolated_network_tooltip' | i18n"
                 on-change="(onChangeInternal)"
               ></por-switch-field>
             </div>
@@ -260,7 +260,7 @@
               <por-switch-field
                 label-class="'col-sm-2'"
                 checked="config.Attachable"
-                label="'Enable manual container attachment'"
+                label="'docker_networks.enable_manual_attachment' | i18n"
                 on-change="(onChangeAttachable)"
               ></por-switch-field>
             </div>
@@ -274,7 +274,7 @@
               config.Driver !== 'macvlan'
             "
           >
-            <div class="col-sm-12 form-section-title"> Deployment </div>
+            <div class="col-sm-12 form-section-title"> {{ 'docker_networks.deployment_section' | i18n }} </div>
             <!-- node-selection -->
             <node-selector model="formValues.NodeName" endpoint-id="endpoint.Id"> </node-selector>
             <!-- !node-selection -->
@@ -283,7 +283,7 @@
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
-          <div class="col-sm-12 form-section-title"> Actions </div>
+          <div class="col-sm-12 form-section-title"> {{ 'docker_networks.actions_section' | i18n }} </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -293,8 +293,8 @@
                 ng-click="create()"
                 button-spinner="state.actionInProgress"
               >
-                <span ng-hide="state.actionInProgress">Create the network</span>
-                <span ng-show="state.actionInProgress">Creating network...</span>
+                <span ng-hide="state.actionInProgress">{{ 'docker_networks.create_the_network' | i18n }}</span>
+                <span ng-show="state.actionInProgress">{{ 'docker_networks.creating_network' | i18n }}</span>
               </button>
               <span class="text-danger space-left" ng-if="state.formValidationError">{{ state.formValidationError }}</span>
             </div>

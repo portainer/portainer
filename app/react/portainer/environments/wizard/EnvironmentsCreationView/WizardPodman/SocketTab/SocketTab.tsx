@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import {
   ContainerEngine,
   Environment,
@@ -13,11 +15,12 @@ interface Props {
 }
 
 export function SocketTab({ onCreate }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
       <TextTip color="orange" className="mb-2" inline={false}>
-        To connect via socket, Portainer server must be running in a Podman
-        container.
+        {t('wizard_env.podman.socket_tab_notice')}
       </TextTip>
 
       <DeploymentScripts />

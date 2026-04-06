@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
@@ -7,15 +9,17 @@ import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
 import { NavContainer } from '@@/NavTabs/NavContainer';
 
-const deploymentPodman = [
-  {
-    id: 'all',
-    label: 'Linux (CentOS)',
-    command: linuxPodmanCommandRootful,
-  },
-];
-
 export function DeploymentScripts() {
+  const { t } = useTranslation();
+
+  const deploymentPodman = [
+    {
+      id: 'all',
+      label: t('wizard_env.podman.linux_centos'),
+      command: linuxPodmanCommandRootful,
+    },
+  ];
+
   const deployments = deploymentPodman;
   const [deployType, setDeployType] = useState(deployments[0].id);
 
@@ -53,6 +57,8 @@ interface DeployCodeProps {
 }
 
 function DeployCode({ code }: DeployCodeProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="code-script">
@@ -60,7 +66,7 @@ function DeployCode({ code }: DeployCodeProps) {
       </div>
       <div className="mt-2">
         <CopyButton copyText={code} data-cy="copy-deployment-script">
-          Copy command
+          {t('wizard_env.copy_command')}
         </CopyButton>
       </div>
     </>

@@ -1,5 +1,6 @@
 import { CellContext, createColumnHelper } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { sortOptionsFromColumns } from '@/react/common/api/sort.types';
 
 import { Button } from '@@/buttons';
@@ -15,13 +16,14 @@ const columnHelper = createColumnHelper<JobResult>();
 
 export const columns = [
   columnHelper.accessor('EndpointName', {
-    header: 'Environment',
+    header: () => i18n.t('edge.jobs.columns.environment'),
     meta: {
       className: 'w-1/2',
     },
   }),
   columnHelper.display({
-    header: 'Actions',
+    id: 'actions',
+    header: () => i18n.t('edge.jobs.columns.actions'),
     cell: ActionsCell,
     meta: {
       className: 'w-1/2',
@@ -43,9 +45,7 @@ function ActionsCell({
   switch (item.LogsStatus) {
     case LogsStatus.Pending:
       return (
-        <>
-          Logs marked for collection, please wait until the logs are available.
-        </>
+        <>{i18n.t('edge.jobs.results.logs_pending')}</>
       );
 
     case LogsStatus.Collected:
@@ -55,13 +55,13 @@ function ActionsCell({
             onClick={() => downloadLogsMutation.mutate(item.EndpointId)}
             data-cy={`edge-job-download-logs-${item.EndpointName}`}
           >
-            Download logs
+            {i18n.t('edge.jobs.results.download_logs')}
           </Button>
           <Button
             onClick={() => clearLogsMutations.mutate(item.EndpointId)}
             data-cy={`edge-job-clear-logs-${item.EndpointName}`}
           >
-            Clear logs
+            {i18n.t('edge.jobs.results.clear_logs')}
           </Button>
         </>
       );
@@ -72,7 +72,7 @@ function ActionsCell({
           onClick={() => collectLogsMutation.mutate(item.EndpointId)}
           data-cy={`edge-job-retrieve-logs-${item.EndpointName}`}
         >
-          Retrieve logs
+          {i18n.t('edge.jobs.results.retrieve_logs')}
         </Button>
       );
   }

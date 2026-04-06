@@ -1,4 +1,5 @@
 import { number, object, SchemaOf } from 'yup';
+import { useTranslation, TFunction } from 'react-i18next';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
@@ -13,52 +14,54 @@ export interface EdgeAsyncIntervalsValues {
   CommandInterval: number;
 }
 
-export const options: Options = [
-  { label: 'Use default interval', value: -1, isDefault: true },
-  {
-    value: 0,
-    label: 'disabled',
-  },
-  {
-    value: 60,
-    label: '1 minute',
-  },
-  {
-    value: 60 * 60,
-    label: '1 hour',
-  },
-  {
-    value: 24 * 60 * 60,
-    label: '1 day',
-  },
-  {
-    value: 7 * 24 * 60 * 60,
-    label: '1 week',
-  },
+export const asyncIntervalValues = [
+  -1,
+  0,
+  60,
+  60 * 60,
+  24 * 60 * 60,
+  7 * 24 * 60 * 60,
 ];
 
-const defaultFieldSettings = {
-  ping: {
-    label: 'Ping interval',
-    tooltip:
-      'Interval used by this Edge agent to check in with the Portainer instance',
-  },
-  snapshot: {
-    label: 'Snapshot interval',
-    tooltip: 'Interval used by this Edge agent to snapshot the agent state',
-  },
-  command: {
-    label: 'Command interval',
-    tooltip:
-      'Interval used by this Edge agent to fetch commands from the Portainer instance',
-  },
+function getOptions(t: TFunction): Options {
+  return [
+    { label: t('edge.use_default_interval'), value: -1, isDefault: true },
+    { value: 0, label: t('edge.disabled') },
+    { value: 60, label: t('edge.1_minute') },
+    { value: 60 * 60, label: t('edge.1_hour') },
+    { value: 24 * 60 * 60, label: t('edge.1_day') },
+    { value: 7 * 24 * 60 * 60, label: t('edge.1_week') },
+  ];
+}
+
+type FieldSettings = {
+  ping: { label: string; tooltip: string };
+  snapshot: { label: string; tooltip: string };
+  command: { label: string; tooltip: string };
 };
+
+function getDefaultFieldSettings(t: TFunction): FieldSettings {
+  return {
+    ping: {
+      label: t('edge.ping_interval'),
+      tooltip: t('edge.ping_interval_tooltip'),
+    },
+    snapshot: {
+      label: t('edge.snapshot_interval'),
+      tooltip: t('edge.snapshot_interval_tooltip'),
+    },
+    command: {
+      label: t('edge.command_interval'),
+      tooltip: t('edge.command_interval_tooltip'),
+    },
+  };
+}
 
 interface Props {
   values: EdgeAsyncIntervalsValues;
   isDefaultHidden?: boolean;
   readonly?: boolean;
-  fieldSettings?: typeof defaultFieldSettings;
+  fieldSettings?: FieldSettings;
   onChange(value: EdgeAsyncIntervalsValues): void;
 }
 
@@ -67,8 +70,12 @@ export function EdgeAsyncIntervalsForm({
   values,
   isDefaultHidden = false,
   readonly = false,
-  fieldSettings = defaultFieldSettings,
+  fieldSettings,
 }: Props) {
+  const { t } = useTranslation();
+  const options = getOptions(t);
+  const resolvedFieldSettings = fieldSettings ?? getDefaultFieldSettings(t);
+
   const pingIntervalOptions = useIntervalOptions(
     'Edge.PingInterval',
     options,
@@ -91,8 +98,8 @@ export function EdgeAsyncIntervalsForm({
     <>
       <FormControl
         inputId="edge_checkin_ping"
-        label={fieldSettings.ping.label}
-        tooltip={fieldSettings.ping.tooltip}
+        label={resolvedFieldSettings.ping.label}
+        tooltip={resolvedFieldSettings.ping.tooltip}
       >
         <Select
           id="edge_checkin_ping"
@@ -107,8 +114,8 @@ export function EdgeAsyncIntervalsForm({
 
       <FormControl
         inputId="edge_checkin_snapshot"
-        label={fieldSettings.snapshot.label}
-        tooltip={fieldSettings.snapshot.tooltip}
+        label={resolvedFieldSettings.snapshot.label}
+        tooltip={resolvedFieldSettings.snapshot.tooltip}
       >
         <Select
           id="edge_checkin_snapshot"
@@ -123,8 +130,8 @@ export function EdgeAsyncIntervalsForm({
 
       <FormControl
         inputId="edge_checkin_command"
-        label={fieldSettings.command.label}
-        tooltip={fieldSettings.command.tooltip}
+        label={resolvedFieldSettings.command.label}
+        tooltip={resolvedFieldSettings.command.tooltip}
       >
         <Select
           id="edge_checkin_command"
@@ -144,16 +151,16 @@ export function EdgeAsyncIntervalsForm({
   }
 }
 
-const intervals = options.map((option) => option.value);
-
 export function edgeAsyncIntervalsValidation(): SchemaOf<EdgeAsyncIntervalsValues> {
   return object({
-    PingInterval: number().required('This field is required.').oneOf(intervals),
+    PingInterval: number()
+      .required('This field is required.')
+      .oneOf(asyncIntervalValues),
     SnapshotInterval: number()
       .required('This field is required.')
-      .oneOf(intervals),
+      .oneOf(asyncIntervalValues),
     CommandInterval: number()
       .required('This field is required.')
-      .oneOf(intervals),
+      .oneOf(asyncIntervalValues),
   });
 }

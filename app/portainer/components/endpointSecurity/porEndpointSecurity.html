@@ -12,7 +12,7 @@
     </div>
   </div>
   <!-- !tls-checkbox -->
-  <div class="col-sm-12 form-section-title" ng-if="$ctrl.formData.TLS"> TLS mode </div>
+  <div class="col-sm-12 form-section-title" ng-if="$ctrl.formData.TLS"> {{ 'portainer_security.tls_mode' | i18n }} </div>
   <!-- note -->
   <div class="form-group" ng-if="$ctrl.formData.TLS">
     <div class="col-sm-12">
@@ -32,14 +32,14 @@
     on-change="($ctrl.onChangeTLSMode)"
   ></box-selector>
 
-  <div class="col-sm-12 form-section-title" ng-if="$ctrl.formData.TLS && $ctrl.formData.TLSMode !== 'tls_only'"> Required TLS files </div>
+  <div class="col-sm-12 form-section-title" ng-if="$ctrl.formData.TLS && $ctrl.formData.TLSMode !== 'tls_only'"> {{ 'portainer_security.required_tls_files' | i18n }} </div>
   <!-- tls-file-upload -->
   <div ng-if="$ctrl.formData.TLS">
     <!-- tls-file-ca -->
     <div class="form-group" ng-if="$ctrl.formData.TLSMode === 'tls_client_ca' || $ctrl.formData.TLSMode === 'tls_ca'">
       <label class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
       <div class="col-sm-9 col-lg-10">
-        <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCACert">Select file</button>
+        <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCACert">{{ 'portainer_security.select_file' | i18n }}</button>
         <span class="space-left">
           {{ $ctrl.formData.TLSCACert.name }}
           <pr-icon icon="'check'" ng-if="$ctrl.formData.TLSCACert && $ctrl.formData.TLSCACert === $ctrl.endpoint.TLSConfig.TLSCACert" mode="'success'"></pr-icon>
@@ -54,7 +54,7 @@
       <div class="form-group">
         <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
         <div class="col-sm-9 col-lg-10">
-          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCert">Select file</button>
+          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCert">{{ 'portainer_security.select_file' | i18n }}</button>
           <span class="space-left">
             {{ $ctrl.formData.TLSCert.name }}
             <pr-icon icon="'check'" ng-if="$ctrl.formData.TLSCert && $ctrl.formData.TLSCert === $ctrl.endpoint.TLSConfig.TLSCert" mode="'success'"></pr-icon>
@@ -67,7 +67,7 @@
       <div class="form-group">
         <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
         <div class="col-sm-9 col-lg-10">
-          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSKey">Select file</button>
+          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSKey">{{ 'portainer_security.select_file' | i18n }}</button>
           <span class="space-left">
             {{ $ctrl.formData.TLSKey.name }}
             <pr-icon icon="'check'" ng-if="$ctrl.formData.TLSKey && $ctrl.formData.TLSKey === $ctrl.endpoint.TLSConfig.TLSKey" mode="'success'"></pr-icon>

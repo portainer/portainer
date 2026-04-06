@@ -1,5 +1,6 @@
 import { useRouter } from '@uirouter/react';
 import { Pause, Play, RefreshCw, Slash, Square, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/react/hooks/useUser';
@@ -39,6 +40,7 @@ export function ContainersDatatableActions({
   isAddActionVisible,
   endpointId,
 }: Props) {
+  const { t } = useTranslation();
   const selectedItemCount = selectedItems.length;
   const hasPausedItemsSelected = selectedItems.some(
     (item) => item.State === ContainerStatus.Paused
@@ -87,7 +89,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
             icon={Play}
           >
-            Start
+            {t('docker_containers.start')}
           </Button>
         </Authorized>
 
@@ -99,7 +101,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
             icon={Square}
           >
-            Stop
+            {t('docker_containers.stop')}
           </Button>
         </Authorized>
 
@@ -111,7 +113,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0 || hasStoppedItemsSelected}
             icon={Slash}
           >
-            Kill
+            {t('docker_containers.kill')}
           </Button>
         </Authorized>
 
@@ -123,7 +125,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0}
             icon={RefreshCw}
           >
-            Restart
+            {t('docker_containers.restart')}
           </Button>
         </Authorized>
 
@@ -135,7 +137,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
             icon={Pause}
           >
-            Pause
+            {t('docker_containers.pause')}
           </Button>
         </Authorized>
 
@@ -147,7 +149,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
             icon={Play}
           >
-            Resume
+            {t('docker_containers.resume')}
           </Button>
         </Authorized>
 
@@ -159,7 +161,7 @@ export function ContainersDatatableActions({
             disabled={selectedItemCount === 0}
             icon={Trash2}
           >
-            Remove
+            {t('docker_containers.remove')}
           </Button>
         </Authorized>
       </ButtonGroup>
@@ -167,7 +169,7 @@ export function ContainersDatatableActions({
         <div className="space-left">
           <Authorized authorizations="DockerContainerCreate">
             <AddButton data-cy="add-docker-container-button">
-              Add container
+              {t('docker_containers.add_container')}
             </AddButton>
           </Authorized>
         </div>
@@ -176,8 +178,8 @@ export function ContainersDatatableActions({
   );
 
   function onStartClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully started';
-    const errorMessage = 'Unable to start container';
+    const successMessage = t('docker_containers.start_success');
+    const errorMessage = t('docker_containers.start_error');
     executeActionOnContainerList(
       selectedItems,
       startContainer,
@@ -187,8 +189,8 @@ export function ContainersDatatableActions({
   }
 
   function onStopClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully stopped';
-    const errorMessage = 'Unable to stop container';
+    const successMessage = t('docker_containers.stop_success');
+    const errorMessage = t('docker_containers.stop_error');
     executeActionOnContainerList(
       selectedItems,
       stopContainer,
@@ -198,8 +200,8 @@ export function ContainersDatatableActions({
   }
 
   function onRestartClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully restarted';
-    const errorMessage = 'Unable to restart container';
+    const successMessage = t('docker_containers.restart_success');
+    const errorMessage = t('docker_containers.restart_error');
     executeActionOnContainerList(
       selectedItems,
       restartContainer,
@@ -209,8 +211,8 @@ export function ContainersDatatableActions({
   }
 
   function onKillClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully killed';
-    const errorMessage = 'Unable to kill container';
+    const successMessage = t('docker_containers.kill_success');
+    const errorMessage = t('docker_containers.kill_error');
     executeActionOnContainerList(
       selectedItems,
       killContainer,
@@ -220,8 +222,8 @@ export function ContainersDatatableActions({
   }
 
   function onPauseClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully paused';
-    const errorMessage = 'Unable to pause container';
+    const successMessage = t('docker_containers.pause_success');
+    const errorMessage = t('docker_containers.pause_error');
     executeActionOnContainerList(
       selectedItems,
       pauseContainer,
@@ -231,8 +233,8 @@ export function ContainersDatatableActions({
   }
 
   function onResumeClick(selectedItems: ContainerListViewModel[]) {
-    const successMessage = 'Container successfully resumed';
-    const errorMessage = 'Unable to resume container';
+    const successMessage = t('docker_containers.resume_success');
+    const errorMessage = t('docker_containers.resume_error');
     executeActionOnContainerList(
       selectedItems,
       resumeContainer,
@@ -246,8 +248,9 @@ export function ContainersDatatableActions({
       (container) => container.State === 'running'
     );
 
-    const runningTitle = isOneContainerRunning ? 'running' : '';
-    const title = `You are about to remove one or more ${runningTitle} containers.`;
+    const title = isOneContainerRunning
+      ? t('docker_containers.remove_confirm_running')
+      : t('docker_containers.remove_confirm');
 
     const result = await confirmContainerDeletion(title);
     if (!result) {
@@ -294,14 +297,14 @@ export function ContainersDatatableActions({
           nodeName: container.NodeName,
         });
         notifications.success(
-          'Container successfully removed',
+          t('docker_containers.remove_success'),
           container.Names[0]
         );
       } catch (err) {
         notifications.error(
           'Failure',
           err as Error,
-          'Unable to remove container'
+          t('docker_containers.remove_error')
         );
       }
     }

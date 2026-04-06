@@ -1,4 +1,5 @@
 import { Field, useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 import { string } from 'yup';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -16,15 +17,16 @@ export function PortainerUrlField({
   fieldName,
   readonly,
   required,
-  tooltip = 'URL of the Portainer instance that the agent will use to initiate the communications.',
+  tooltip,
 }: Props) {
+  const { t } = useTranslation();
   const [, metaProps] = useField(fieldName);
   const id = `${fieldName}-input`;
 
   return (
     <FormControl
-      label="Portainer API server URL"
-      tooltip={tooltip}
+      label={t('portainer_url_field.label')}
+      tooltip={tooltip || t('portainer_url_field.tooltip')}
       required
       errors={metaProps.error}
       inputId={id}
@@ -33,7 +35,7 @@ export function PortainerUrlField({
         id={id}
         name={fieldName}
         as={Input}
-        placeholder="https://portainer.mydomain.tld"
+        placeholder={t('portainer_url_field.placeholder')}
         required={required}
         data-cy="endpointCreate-portainerServerUrlInput"
         readOnly={readonly}

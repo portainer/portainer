@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik';
 import { SchemaOf, string } from 'yup';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { STACK_NAME_VALIDATION_REGEX } from '@/react/constants';
 import { EnvironmentType } from '@/react/portainer/environments/types';
@@ -24,8 +25,10 @@ export function NameField({
   errors?: FormikErrors<string>;
   placeholder?: string;
 }) {
+  const { t } = useTranslation();
+
   return (
-    <FormControl inputId="name-input" label="Name" errors={errors} required>
+    <FormControl inputId="name-input" label={t('common.name', 'Name')} errors={errors} required>
       <Input
         id="name-input"
         onChange={(e) => onChange(e.target.value)}

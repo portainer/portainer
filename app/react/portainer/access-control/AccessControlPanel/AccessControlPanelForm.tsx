@@ -2,6 +2,7 @@ import { Form, Formik } from 'formik';
 import clsx from 'clsx';
 import { useMutation } from '@tanstack/react-query';
 import { object } from 'yup';
+import { useTranslation, TFunction } from 'react-i18next';
 
 import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -43,6 +44,7 @@ export function AccessControlPanelForm({
   onCancelClick,
   onUpdateSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const isAdminQuery = useIsEdgeAdmin();
 
@@ -108,7 +110,7 @@ export function AccessControlPanelForm({
                 onClick={onCancelClick}
                 data-cy="cancel-access-control-update-button"
               >
-                Cancel
+                {t('access_control.cancel')}
               </Button>
               <LoadingButton
                 size="small"
@@ -117,9 +119,9 @@ export function AccessControlPanelForm({
                 type="submit"
                 isLoading={isSubmitting}
                 disabled={!isValid}
-                loadingText="Updating Ownership"
+                loadingText={t('access_control.updating_ownership')}
               >
-                Update Ownership
+                {t('access_control.update_ownership')}
               </LoadingButton>
             </div>
           </div>
@@ -133,25 +135,24 @@ export function AccessControlPanelForm({
   }: {
     accessControl: AccessControlFormData;
   }) {
-    const confirmed = await confirmAccessControlUpdate();
+    const confirmed = await confirmAccessControlUpdate(t);
     if (!confirmed) {
       return;
     }
 
     updateAccess.mutate(accessControl, {
       onSuccess() {
-        notifySuccess('Success', 'Access control successfully updated');
+        notifySuccess('Success', t('access_control.update_success'));
       },
     });
   }
 }
 
-function confirmAccessControlUpdate() {
+function confirmAccessControlUpdate(t: TFunction) {
   return confirm({
     modalType: ModalType.Warn,
-    title: 'Are you sure?',
-    message:
-      'Changing the ownership of this resource will potentially restrict its management to some users.',
-    confirmButton: buildConfirmButton('Change ownership'),
+    title: t('access_control.confirm_title'),
+    message: t('access_control.confirm_message'),
+    confirmButton: buildConfirmButton(t('access_control.confirm_button')),
   });
 }

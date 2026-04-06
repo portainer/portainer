@@ -1,6 +1,7 @@
 import { User as UserIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { useUsers } from '@/portainer/users/queries';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
@@ -30,6 +31,7 @@ import { DecoratedUser } from './types';
 const store = createPersistedStore('users');
 
 export function UsersDatatable() {
+  const { t } = useTranslation();
   const removeMutation = useRemoveMutation();
   const { isPureAdmin } = useCurrentUser();
   const usersQuery = useUsers(isPureAdmin);
@@ -54,9 +56,9 @@ export function UsersDatatable() {
         isTeamLeader: teamMembership?.Role === TeamRole.Leader,
         authMethod:
           AuthenticationMethod[
-            user.Id === 1
-              ? AuthenticationMethod.Internal
-              : settingsQuery.data.AuthenticationMethod
+          user.Id === 1
+            ? AuthenticationMethod.Internal
+            : settingsQuery.data.AuthenticationMethod
           ],
       };
     });
@@ -67,20 +69,20 @@ export function UsersDatatable() {
       columns={columns}
       dataset={dataset || []}
       isLoading={!dataset}
-      title="Users"
+      title={t('users.title')}
       titleIcon={UserIcon}
       settingsManager={tableState}
       isRowSelectable={(row) => row.original.Id !== 1}
       renderTableActions={(selectedUsers) => (
         <DeleteButton
           disabled={selectedUsers.length === 0}
-          confirmMessage="Do you want to remove the selected users? They will not be able to login into Portainer anymore."
+          confirmMessage={t('users.remove_confirm')}
           onConfirmed={() =>
             removeMutation.mutate(
               selectedUsers.map((i) => i.Id),
               {
                 onSuccess: () => {
-                  notifySuccess('Users successfully removed', '');
+                  notifySuccess(t('users.remove_success'), '');
                 },
               }
             )
@@ -96,11 +98,12 @@ export function UsersDatatable() {
 
 function useRemoveMutation() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   return useMutation(
     async (ids: TeamId[]) => processItemsInBatches(ids, deleteUser),
     mutationOptions(
-      withError('Unable to remove users'),
+      withGlobalError(t('users.remove_error')),
       withInvalidate(queryClient, [userQueryKeys.base()])
     )
   );

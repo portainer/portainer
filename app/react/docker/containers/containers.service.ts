@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
+import i18n from '@/i18n';
 
 import { withAgentTargetHeader } from '../proxy/queries/utils';
 import { buildDockerProxyUrl } from '../proxy/queries/buildDockerProxyUrl';
@@ -24,7 +25,7 @@ export async function startContainer(
       }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed starting container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_starting'));
   }
 }
 
@@ -40,7 +41,7 @@ export async function stopContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed stopping container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_stopping'));
   }
 }
 
@@ -59,7 +60,7 @@ export async function recreateContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed recreating container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_recreating'));
   }
 }
 
@@ -75,7 +76,7 @@ export async function restartContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed restarting container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_restarting'));
   }
 }
 
@@ -91,7 +92,7 @@ export async function killContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed killing container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_killing'));
   }
 }
 
@@ -107,7 +108,7 @@ export async function pauseContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed pausing container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_pausing'));
   }
 }
 
@@ -123,7 +124,7 @@ export async function resumeContainer(
       { headers: { ...withAgentTargetHeader(nodeName) } }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed resuming container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_resuming'));
   }
 }
 
@@ -143,7 +144,7 @@ export async function renameContainer(
       }
     );
   } catch (e) {
-    throw parseAxiosError(e, 'Failed renaming container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_renaming'));
   }
 }
 
@@ -168,7 +169,7 @@ export async function removeContainer(
       throw new PortainerError(data.message);
     }
   } catch (e) {
-    throw parseAxiosError(e, 'Unable to remove container');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_removing'));
   }
 }
 
@@ -187,6 +188,6 @@ export async function getContainerLogs(
 
     return data;
   } catch (e) {
-    throw parseAxiosError(e, 'Unable to get container logs');
+    throw parseAxiosError(e, i18n.t('docker_containers.failed_getting_logs'));
   }
 }

@@ -1,6 +1,7 @@
 import { Shuffle } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ServiceViewModel } from '@/docker/models/service';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
@@ -59,6 +60,7 @@ export function ServicesDatatable({
 
   // useRef so that updating the parent filter doesn't cause a re-render
   const parentFilteredStatusRef = useRef<Map<string, boolean>>(new Map());
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const apiVersion = useApiVersion(environmentId);
   const tableState = useTableState(store, tableKey);
@@ -67,7 +69,7 @@ export function ServicesDatatable({
 
   return (
     <ExpandableDatatable
-      title="Services"
+      title={t('docker.services.table_title')}
       titleIcon={titleIcon}
       dataset={dataset || []}
       isLoading={!dataset}

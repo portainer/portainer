@@ -1,4 +1,5 @@
 import { DownloadIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Widget } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
@@ -15,6 +16,7 @@ export function FilterBar({
   onChange: (value?: { start: Date; end: Date | null }) => void;
   onExport: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Widget>
       <Widget.Body>
@@ -22,7 +24,7 @@ export function FilterBar({
           <DateRangePicker value={value} onChange={onChange} />
 
           <TextTip color="blue">
-            Portainer user activity logs have a maximum retention of 7 days.
+            {t('activity_logs.retention_note')}
           </TextTip>
 
           <div className="mt-4">
@@ -33,7 +35,7 @@ export function FilterBar({
               className="!ml-0"
               data-cy="activity-logs-export-csv-button"
             >
-              Export as CSV
+              {t('common.export_csv')}
             </Button>
           </div>
         </form>

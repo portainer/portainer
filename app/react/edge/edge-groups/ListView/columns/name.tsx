@@ -1,5 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
+
 import { Link } from '@@/Link';
 import { Badge } from '@@/Badge';
 
@@ -8,7 +10,7 @@ import { EdgeGroupListItemResponse } from '../../queries/useEdgeGroups';
 import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor('Name', {
-  header: 'Name',
+  header: () => i18n.t('edge.groups.columns.name'),
   cell: NameCell,
 });
 
@@ -34,7 +36,7 @@ function NameCell({
       </Link>
       {(item.HasEdgeJob || item.HasEdgeStack) && (
         <Badge type="info" className="ml-1">
-          in use
+          {i18n.t('edge.groups.in_use')}
         </Badge>
       )}
     </>

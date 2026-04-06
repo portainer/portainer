@@ -1,6 +1,7 @@
 import { Formik } from 'formik';
 import { useState } from 'react';
 import { ListIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAuthorizations } from '@/react/hooks/useUser';
@@ -25,6 +26,7 @@ export function CreateImageSection({
   containerId,
   onSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const mutation = useCommitContainerMutation(environmentId);
   const authorizedQuery = useAuthorizations('DockerImageCreate');
   const [isDockerhubRateLimited, setIsDockerhubRateLimited] = useState(false);
@@ -41,7 +43,7 @@ export function CreateImageSection({
 
   return (
     <Widget>
-      <Widget.Title icon={ListIcon} title="Create image" />
+      <Widget.Title icon={ListIcon} title={t('docker.containers.create_image.title')} />
       <Widget.Body>
         <Formik
           initialValues={initialValues}
@@ -71,7 +73,7 @@ export function CreateImageSection({
       },
       {
         onSuccess() {
-          notifySuccess('Image created', containerId);
+          notifySuccess(t('docker.containers.notifications.image_created'), containerId);
           onSuccess?.();
         },
       }

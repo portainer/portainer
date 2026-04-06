@@ -1,6 +1,7 @@
 import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DatatableHeader } from '@@/datatables/DatatableHeader';
 import { Table } from '@@/datatables';
@@ -44,6 +45,7 @@ export function AppTemplatesList({
     }))
   );
   const listState = useTableState(store, storageKey);
+  const { t } = useTranslation();
 
   const templates = useMemo(() => {
     if (!initialTemplates) {
@@ -73,7 +75,7 @@ export function AppTemplatesList({
       <DatatableHeader
         onSearchChange={handleSearchChange}
         searchValue={listState.search}
-        title="Templates"
+        title={t('common.templates')}
         titleIcon={Edit}
         description={
           <Filters

@@ -1,5 +1,6 @@
 import { HardDrive, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
@@ -24,6 +25,7 @@ export function EnvironmentsDatatable({
 }: {
   onRemove: (environments: Array<EnvironmentListItem>) => void;
 }) {
+  const { t } = useTranslation();
   const tableState = useTableState(settingsStore, tableKey);
 
   const [page, setPage] = useState(0);
@@ -56,7 +58,7 @@ export function EnvironmentsDatatable({
 
   return (
     <Datatable
-      title="Environments"
+      title={t('environments.title')}
       titleIcon={HardDrive}
       dataset={environmentsWithGroups}
       columns={columns}
@@ -79,7 +81,7 @@ export function EnvironmentsDatatable({
             className="!m-0"
             data-cy="remove-environments-button"
           >
-            Remove
+            {t('environments.remove')}
           </Button>
 
           {isBE && (
@@ -88,7 +90,7 @@ export function EnvironmentsDatatable({
               data-cy="environments-auto-onboarding-button"
               to="portainer.endpoints.edgeAutoCreateScript"
             >
-              Auto onboarding
+              {t('environments.auto_onboarding')}
             </AddButton>
           )}
 
@@ -97,7 +99,7 @@ export function EnvironmentsDatatable({
             params={{ referrer: 'environments' }}
             data-cy="environments-add-environments-button"
           >
-            Add environment
+            {t('environments.add')}
           </AddButton>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from '@@/Link';
 import { TeamsSelector } from '@@/TeamsSelector';
@@ -15,11 +16,12 @@ export function TeamsField({
   teams: Array<Team>;
   disabled?: boolean;
 }) {
+  const { t } = useTranslation();
   const [{ name, value }, { error }, { setValue }] =
     useField<FormValues['teams']>('teams');
 
   return (
-    <FormControl label="Add to team(s)" inputId="teams-field" errors={error}>
+    <FormControl label={t('users.add_to_teams')} inputId="teams-field" errors={error}>
       {teams.length > 0 ? (
         <TeamsSelector
           dataCy="user-teamSelect"
@@ -32,12 +34,7 @@ export function TeamsField({
         />
       ) : (
         <span className="small text-muted">
-          You don&apos;t seem to have any teams to add users into. Head over to
-          the{' '}
-          <Link to="portainer.teams" data-cy="teams-view-link">
-            Teams view
-          </Link>{' '}
-          to create some.
+          {t('users.no_teams_message')}
         </span>
       )}
     </FormControl>

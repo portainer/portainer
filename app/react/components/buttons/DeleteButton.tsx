@@ -1,6 +1,7 @@
 import { Trash2 } from 'lucide-react';
 import { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -45,6 +46,10 @@ export function DeleteButton({
       type?: ComponentProps<typeof Button>['type'];
     }
 >) {
+  const { t } = useTranslation();
+  const defaultLabel = children || t('common.remove');
+  const defaultLoadingText = loadingText || t('common.removing');
+
   if (isLoading === undefined) {
     return (
       <Button
@@ -57,7 +62,7 @@ export function DeleteButton({
         data-cy={dataCy}
         type={type}
       >
-        {children || text}
+        {defaultLabel}
       </Button>
     );
   }
@@ -72,10 +77,10 @@ export function DeleteButton({
       className="!m-0"
       data-cy={dataCy}
       isLoading={isLoading}
-      loadingText={loadingText}
+      loadingText={defaultLoadingText}
       type={type}
     >
-      {children || 'Remove'}
+      {defaultLabel}
     </LoadingButton>
   );
 

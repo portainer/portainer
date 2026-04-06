@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Check, X } from 'lucide-react';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { trimContainerName } from '@/docker/filters/utils';
@@ -40,6 +41,7 @@ export function EditNameForm({
   environmentId: EnvironmentId;
   nodeName: string | undefined;
 }) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (inputRef.current) {
@@ -70,7 +72,7 @@ export function EditNameForm({
             value={values.name}
             onChange={handleChange}
             data-cy="containerNameInput"
-            aria-label="Container name"
+            aria-label={t('docker.containers.item.containerName')}
           />
           <Button
             size="xsmall"
@@ -79,8 +81,8 @@ export function EditNameForm({
             onClick={() => onCancel()}
             type="button"
             data-cy="container-cancel-rename-button"
-            title="Cancel"
-            aria-label="Cancel Container name edit"
+            title={t('docker.containers.item.cancel')}
+            aria-label={t('docker.containers.item.cancelNameEdit')}
           >
             <Icon icon={X} className="lucide" />
           </Button>
@@ -91,8 +93,8 @@ export function EditNameForm({
             type="submit"
             data-cy="container-confirm-rename-button"
             disabled={isSubmitting}
-            title="Rename"
-            aria-label="Rename container"
+            title={t('docker.containers.item.rename')}
+            aria-label={t('docker.containers.item.renameContainer')}
           >
             <Icon icon={Check} className="lucide" />
           </Button>
@@ -118,7 +120,7 @@ export function EditNameForm({
         onSuccess(_, variables) {
           notifySuccess(
             'Success',
-            `Container successfully renamed to ${variables.name}`
+            t('docker.containers.item.renameSuccess', { name: variables.name })
           );
           onSuccess();
         },

@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import i18n from '@/i18n';
+
 import { openDialog, DialogOptions } from './Dialog';
 import { OnSubmit, ModalType } from './Modal';
 import { ButtonOptions } from './types';
@@ -40,28 +42,26 @@ export function confirmDestructive(options: Omit<ConfirmOptions, 'modalType'>) {
 export function confirmWebEditorDiscard() {
   return openConfirm({
     modalType: ModalType.Warn,
-    title: 'Are you sure?',
-    message:
-      'You currently have unsaved changes in the editor. Are you sure you want to leave?',
-    confirmButton: buildConfirmButton('Yes', 'danger'),
+    title: i18n.t('common.are_you_sure'),
+    message: i18n.t('confirm.unsaved_editor'),
+    confirmButton: buildConfirmButton(i18n.t('common.yes'), 'danger'),
   });
 }
 
 export function confirmGenericDiscard() {
   return openConfirm({
     modalType: ModalType.Warn,
-    title: 'Are you sure?',
-    message:
-      'You currently have unsaved changes. Are you sure you want to leave?',
-    confirmButton: buildConfirmButton('Yes', 'danger'),
+    title: i18n.t('common.are_you_sure'),
+    message: i18n.t('confirm.unsaved_generic'),
+    confirmButton: buildConfirmButton(i18n.t('common.yes'), 'danger'),
   });
 }
 
 export function confirmDelete(message: ReactNode) {
   return confirmDestructive({
-    title: 'Are you sure?',
+    title: i18n.t('common.are_you_sure'),
     message,
-    confirmButton: buildConfirmButton('Remove', 'danger'),
+    confirmButton: buildConfirmButton(i18n.t('common.remove'), 'danger'),
   });
 }
 
@@ -70,10 +70,10 @@ export async function confirmUpdate(
   callback: ConfirmCallback
 ) {
   const result = await openConfirm({
-    title: 'Are you sure?',
+    title: i18n.t('common.are_you_sure'),
     modalType: ModalType.Warn,
     message,
-    confirmButton: buildConfirmButton('Update'),
+    confirmButton: buildConfirmButton(i18n.t('common.update')),
   });
 
   callback(result);
@@ -84,9 +84,8 @@ export async function confirmUpdate(
 export function confirmChangePassword() {
   return openConfirm({
     modalType: ModalType.Warn,
-    title: 'Are you sure?',
-    message:
-      'You will be logged out after the password change. Do you want to change your password?',
-    confirmButton: buildConfirmButton('Change'),
+    title: i18n.t('common.are_you_sure'),
+    message: i18n.t('confirm.change_password'),
+    confirmButton: buildConfirmButton(i18n.t('common.change')),
   });
 }

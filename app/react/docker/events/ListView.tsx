@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -13,10 +14,11 @@ export function ListView() {
   const { since, until } = useDateRange();
   const envId = useEnvironmentId();
   const eventsQuery = useEvents(envId, { params: { since, until } });
+  const { t } = useTranslation();
 
   return (
     <>
-      <PageHeader title="Event list" breadcrumbs="Events" reload />
+      <PageHeader title={t('docker.events.title')} breadcrumbs={t('docker.events.breadcrumbs')} reload />
 
       <EventsDatatable dataset={eventsQuery.data} />
     </>

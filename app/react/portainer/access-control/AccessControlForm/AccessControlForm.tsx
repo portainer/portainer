@@ -1,4 +1,5 @@
 import { FormikErrors } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
@@ -26,6 +27,7 @@ export function AccessControlForm({
   errors,
   environmentId,
 }: Props) {
+  const { t } = useTranslation();
   const isAdminQuery = useIsEdgeAdmin();
 
   if (isAdminQuery.isLoading) {
@@ -38,7 +40,7 @@ export function AccessControlForm({
     values.ownership !== ResourceControlOwnership.PUBLIC;
   return (
     <>
-      {!hideTitle && <FormSectionTitle>Access control</FormSectionTitle>}
+      {!hideTitle && <FormSectionTitle>{t('access_control_form.title')}</FormSectionTitle>}
 
       <div className="form-group">
         <div className="col-sm-12">
@@ -46,9 +48,9 @@ export function AccessControlForm({
             data-cy="portainer-accessMgmtToggle"
             checked={accessControlEnabled}
             name={withNamespace('accessControlEnabled')}
-            label="Enable access control"
+            label={t('access_control_form.enable_label')}
             labelClass="col-sm-3 col-lg-2"
-            tooltip="When enabled, you can restrict the access and management of this resource."
+            tooltip={t('access_control_form.enable_description')}
             onChange={handleToggleEnable}
           />
         </div>

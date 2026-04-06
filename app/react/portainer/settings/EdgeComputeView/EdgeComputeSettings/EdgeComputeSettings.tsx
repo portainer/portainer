@@ -1,5 +1,6 @@
 import { Formik, Form } from 'formik';
 import { Laptop } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Settings } from '@/react/portainer/settings/types';
 import { PortainerUrlField } from '@/react/portainer/common/PortainerUrlField';
@@ -21,6 +22,8 @@ interface Props {
 }
 
 export function EdgeComputeSettings({ settings, onSubmit }: Props) {
+  const { t } = useTranslation();
+
   if (!settings) {
     return null;
   }
@@ -37,7 +40,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon={Laptop} title="Edge Compute settings" />
+        <WidgetTitle icon={Laptop} title={t('settings.edge_compute_title')} />
 
         <WidgetBody>
           <Formik
@@ -63,7 +66,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
               >
                 <FormControl
                   inputId="edge_enable"
-                  label="Enable Edge Compute features"
+                  label={t('settings.edge_enable_label')}
                   size="small"
                   errors={errors.EnableEdgeComputeFeatures}
                 >
@@ -80,15 +83,14 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                 </FormControl>
 
                 <TextTip color="blue" className="mb-2">
-                  Enable this setting to use Portainer Edge Compute
-                  capabilities.
+                  {t('settings.edge_enable_tip')}
                 </TextTip>
 
                 {isBE && values.EnableEdgeComputeFeatures && (
                   <>
                     <PortainerUrlField
                       fieldName="EdgePortainerUrl"
-                      tooltip="URL of this Portainer instance that will be used by Edge agents to initiate the communications."
+                      tooltip={t('settings.edge_portainer_url_tooltip')}
                     />
 
                     <PortainerTunnelAddrField fieldName="Edge.TunnelServerAddress" />
@@ -97,9 +99,9 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
 
                 <FormControl
                   inputId="edge_enforce_id"
-                  label="Enforce use of Portainer generated Edge ID"
+                  label={t('settings.edge_enforce_id_label')}
                   size="small"
-                  tooltip="This setting only applies to manually created environments."
+                  tooltip={t('settings.edge_enforce_id_tooltip')}
                   errors={errors.EnforceEdgeID}
                 >
                   <Switch
@@ -120,9 +122,9 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                       disabled={!isValid || !dirty}
                       data-cy="settings-edgeComputeButton"
                       isLoading={isSubmitting}
-                      loadingText="Saving settings..."
+                      loadingText={t('settings.saving_settings')}
                     >
-                      Save settings
+                      {t('settings.save_settings')}
                     </LoadingButton>
                   </div>
                 </div>

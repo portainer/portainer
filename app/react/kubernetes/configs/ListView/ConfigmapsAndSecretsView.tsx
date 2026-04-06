@@ -1,4 +1,5 @@
 import { FileCode, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@@/PageHeader';
 import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
@@ -22,12 +23,13 @@ const tabs: Tab[] = [
 ];
 
 export function ConfigmapsAndSecretsView() {
+  const { t } = useTranslation();
   const currentTabIndex = useCurrentTabIndex(tabs);
   return (
     <>
       <PageHeader
         title="ConfigMap & Secret lists"
-        breadcrumbs="ConfigMaps & Secrets"
+        breadcrumbs={t('kubernetes.configmaps.breadcrumbs')}
         reload
       />
       <>

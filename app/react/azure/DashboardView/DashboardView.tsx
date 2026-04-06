@@ -1,4 +1,5 @@
 import { Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import Subscription from '@/assets/ico/subscription.svg?c';
@@ -11,6 +12,7 @@ import { useResourceGroups } from '../queries/useResourceGroups';
 import { useSubscriptions } from '../queries/useSubscriptions';
 
 export function DashboardView() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
 
   const subscriptionsQuery = useSubscriptions(environmentId);
@@ -27,7 +29,7 @@ export function DashboardView() {
 
   return (
     <>
-      <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} reload />
+      <PageHeader title={t('azure_dashboard.home')} breadcrumbs={[{ label: t('azure_dashboard.dashboard_breadcrumb') }]} reload />
 
       <div className="mx-4">
         {subscriptionsQuery.data && (
@@ -38,7 +40,7 @@ export function DashboardView() {
               isLoading={subscriptionsQuery.isLoading}
               isRefetching={subscriptionsQuery.isRefetching}
               icon={Subscription}
-              type="Subscription"
+              type={t('azure_dashboard.subscription_type')}
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
               <DashboardItem
@@ -46,7 +48,7 @@ export function DashboardView() {
                 data-cy="resource-groups-count"
                 isLoading={resourceGroupsQuery.isLoading}
                 icon={Package}
-                type="Resource group"
+                type={t('azure_dashboard.resource_group_type')}
               />
             )}
           </DashboardGrid>

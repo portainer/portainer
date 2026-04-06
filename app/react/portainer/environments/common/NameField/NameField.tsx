@@ -1,4 +1,5 @@
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 import { string } from 'yup';
 
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
@@ -17,8 +18,9 @@ interface Props {
 export function NameField({
   readonly,
   tooltip,
-  placeholder = 'e.g. docker-prod01 / kubernetes-cluster01',
+  placeholder,
 }: Props) {
+  const { t } = useTranslation();
   const [{ value }, meta, { setValue }] = useField('name');
 
   const id = 'name-input';
@@ -27,7 +29,7 @@ export function NameField({
 
   return (
     <FormControl
-      label="Name"
+      label={t('environments.name_field.label')}
       required
       errors={meta.error}
       inputId={id}
@@ -39,7 +41,7 @@ export function NameField({
         name="name"
         onChange={(e) => setDebouncedValue(e.target.value)}
         value={debouncedValue}
-        placeholder={placeholder}
+        placeholder={placeholder || t('environments.name_field.placeholder')}
         readOnly={readonly}
       />
     </FormControl>

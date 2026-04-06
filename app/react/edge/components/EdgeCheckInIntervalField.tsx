@@ -1,3 +1,5 @@
+import { useTranslation, TFunction } from 'react-i18next';
+
 import { FormControl, Size } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
 
@@ -13,34 +15,32 @@ interface Props {
   size?: Size;
 }
 
-export const checkinIntervalOptions: Options = [
-  { label: 'Use default interval', value: 0, isDefault: true },
-  {
-    label: '5 seconds',
-    value: 5,
-  },
-  {
-    label: '10 seconds',
-    value: 10,
-  },
-  {
-    label: '30 seconds',
-    value: 30,
-  },
-  { label: '5 minutes', value: 300 },
-  { label: '1 hour', value: 3600 },
-  { label: '1 day', value: 86400 },
-];
+function getCheckinIntervalOptions(t: TFunction): Options {
+  return [
+    { label: t('edge.use_default_interval'), value: 0, isDefault: true },
+    { label: t('edge.5_seconds'), value: 5 },
+    { label: t('edge.10_seconds'), value: 10 },
+    { label: t('edge.30_seconds'), value: 30 },
+    { label: t('edge.5_minutes'), value: 300 },
+    { label: t('edge.1_hour'), value: 3600 },
+    { label: t('edge.1_day'), value: 86400 },
+  ];
+}
 
 export function EdgeCheckinIntervalField({
   value,
   readonly,
   onChange,
   isDefaultHidden = false,
-  label = 'Poll frequency',
-  tooltip = 'Interval used by this Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features.',
+  label,
+  tooltip,
   size = 'small',
 }: Props) {
+  const { t } = useTranslation();
+  const checkinIntervalOptions = getCheckinIntervalOptions(t);
+  const resolvedLabel = label ?? t('edge.poll_frequency');
+  const resolvedTooltip = tooltip ?? t('edge.poll_frequency_tooltip');
+
   const options = useIntervalOptions(
     'EdgeAgentCheckinInterval',
     checkinIntervalOptions,
@@ -50,8 +50,8 @@ export function EdgeCheckinIntervalField({
   return (
     <FormControl
       inputId="edge_checkin"
-      label={label}
-      tooltip={tooltip}
+      label={resolvedLabel}
+      tooltip={resolvedTooltip}
       size={size}
     >
       <Select

@@ -7,6 +7,7 @@ import {
 import { UISrefProps, useSref } from '@uirouter/react';
 import clsx from 'clsx';
 import { User, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { queryClient } from '@/react-tools/react-query';
 import { AutomationTestingProps } from '@/types';
@@ -15,6 +16,7 @@ import { useUser } from '@/react/hooks/useUser';
 import styles from './HeaderTitle.module.css';
 
 export function UserMenu() {
+  const { t } = useTranslation();
   const { user } = useUser();
 
   return (
@@ -25,7 +27,7 @@ export function UserMenu() {
           styles.menuButton
         )}
         data-cy="userMenu-button"
-        aria-label="User menu toggle"
+        aria-label={t('user_menu.toggle_label')}
       >
         <div
           className={clsx(
@@ -43,18 +45,18 @@ export function UserMenu() {
 
       <MenuList
         className={styles.menuList}
-        aria-label="User Menu"
+        aria-label={t('user_menu.menu_label')}
         data-cy="userMenu"
       >
         <MenuLink
           to="portainer.account"
-          label="My account"
+          label={t('user_menu.my_account')}
           data-cy="userMenu-myAccount"
         />
 
         <MenuLink
           to="portainer.logout"
-          label="Log out"
+          label={t('user_menu.log_out')}
           data-cy="userMenu-logOut"
         />
       </MenuList>

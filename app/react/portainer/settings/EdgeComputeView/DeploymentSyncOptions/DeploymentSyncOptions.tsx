@@ -1,6 +1,7 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 import { Laptop } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
 import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
@@ -16,27 +17,26 @@ import { useSettings, useUpdateSettingsMutation } from '../../queries';
 
 import { FormValues } from './types';
 
-const asyncIntervalFieldSettings = {
-  ping: {
-    label: 'Edge agent default ping frequency',
-    tooltip:
-      'Interval used by default by each Edge agent to ping the Portainer instance. Affects Edge environment management and Edge compute features.',
-  },
-  snapshot: {
-    label: 'Edge agent default snapshot frequency',
-    tooltip:
-      'Interval used by default by each Edge agent to snapshot the agent state.',
-  },
-  command: {
-    label: 'Edge agent default command frequency',
-    tooltip: 'Interval used by default by each Edge agent to execute commands.',
-  },
-};
-
 export function DeploymentSyncOptions() {
+  const { t } = useTranslation();
   const settingsQuery = useSettings();
   const settingsMutation = useUpdateSettingsMutation();
   const [formKey, resetForm] = useReducer((state) => state + 1, 0);
+
+  const asyncIntervalFieldSettings = {
+    ping: {
+      label: t('settings.edge_ping_label'),
+      tooltip: t('settings.edge_ping_tooltip'),
+    },
+    snapshot: {
+      label: t('settings.edge_snapshot_label'),
+      tooltip: t('settings.edge_snapshot_tooltip'),
+    },
+    command: {
+      label: t('settings.edge_command_label'),
+      tooltip: t('settings.edge_command_tooltip'),
+    },
+  };
 
   if (!settingsQuery.data) {
     return null;
@@ -54,7 +54,7 @@ export function DeploymentSyncOptions() {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon={Laptop} title="Deployment sync options" />
+        <WidgetTitle icon={Laptop} title={t('settings.deployment_sync_title')} />
         <WidgetBody>
           <Formik<FormValues>
             initialValues={initialValues}
@@ -64,24 +64,23 @@ export function DeploymentSyncOptions() {
             {({ setFieldValue, values, isValid, dirty }) => (
               <Form className="form-horizontal">
                 <TextTip color="blue">
-                  Default values set here will be available to choose as an
-                  option for edge environment creation
+                  {t('settings.deployment_sync_tip')}
                 </TextTip>
 
-                <FormSection title="Check-in Intervals">
+                <FormSection title={t('settings.check_in_intervals_section')}>
                   <EdgeCheckinIntervalField
                     value={values.EdgeAgentCheckinInterval}
                     onChange={(value) =>
                       setFieldValue('EdgeAgentCheckinInterval', value)
                     }
                     isDefaultHidden
-                    label="Edge agent default poll frequency"
-                    tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
+                    label={t('settings.edge_poll_label')}
+                    tooltip={t('settings.edge_poll_tooltip')}
                   />
                 </FormSection>
 
                 {isBE && (
-                  <FormSection title="Async Check-in Intervals">
+                  <FormSection title={t('settings.async_check_in_section')}>
                     <EdgeAsyncIntervalsForm
                       values={values.Edge}
                       onChange={(value) => setFieldValue('Edge', value)}
@@ -98,9 +97,9 @@ export function DeploymentSyncOptions() {
                       className="!ml-0"
                       data-cy="settings-deploySyncOptionsButton"
                       isLoading={settingsMutation.isLoading}
-                      loadingText="Saving settings..."
+                      loadingText={t('settings.saving_settings')}
                     >
-                      Save settings
+                      {t('settings.save_settings')}
                     </LoadingButton>
                   </div>
                 </div>
@@ -120,7 +119,7 @@ export function DeploymentSyncOptions() {
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Settings updated successfully');
+          notifySuccess(t('common.success'), t('settings.deployment_sync_success'));
           resetForm();
         },
       }

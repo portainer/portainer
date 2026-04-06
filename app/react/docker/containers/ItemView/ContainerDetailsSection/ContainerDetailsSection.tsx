@@ -1,4 +1,5 @@
 import { List } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerDetailsViewModel } from '@/docker/models/containerDetails';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -31,6 +32,7 @@ export function ContainerDetailsSection({
   nodeName,
   onUpdateSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const config = container.Config;
   const hostConfig = container.HostConfig;
 
@@ -44,7 +46,7 @@ export function ContainerDetailsSection({
 
   return (
     <Widget>
-      <Widget.Title icon={List} title="Container details" />
+      <Widget.Title icon={List} title={t('docker.containers.details.title')} />
       <Widget.Body>
         <DetailsTable dataCy="container-details-table">
           <ImageRow

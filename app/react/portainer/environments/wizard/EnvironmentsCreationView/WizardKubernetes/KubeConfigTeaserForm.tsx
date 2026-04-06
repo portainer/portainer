@@ -1,5 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import { Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
@@ -19,6 +20,7 @@ const initialValues = {
 };
 
 export function KubeConfigTeaserForm() {
+  const { t } = useTranslation();
   const kubeConfigImportDocUrl = useDocsUrl(
     '/admin/environments/add/kubernetes/import'
   );
@@ -27,7 +29,9 @@ export function KubeConfigTeaserForm() {
     <Formik initialValues={initialValues} onSubmit={() => {}} validateOnMount>
       {() => (
         <Form>
-          <FormSectionTitle>Environment details</FormSectionTitle>
+          <FormSectionTitle>
+            {t('wizard_kube_scripts.kube_config_details')}
+          </FormSectionTitle>
           <div className="form-group">
             <div className="col-sm-12">
               <TextTip color="blue">
@@ -37,49 +41,39 @@ export function KubeConfigTeaserForm() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Import the kubeconfig file
+                    {t('wizard_kube_scripts.kube_config_import_file')}
                   </a>{' '}
-                  of an existing Kubernetes cluster located on-premise or on a
-                  cloud platform. This will create a corresponding environment
-                  in Portainer and install the agent on the cluster. Please
-                  ensure:
+                  {t('wizard_kube_scripts.kube_config_desc')}
                 </span>
               </TextTip>
             </div>
             <div className="col-sm-12 text-muted text-xs">
               <ul className="p-2 pl-4">
-                <li>You have a load balancer enabled in your cluster</li>
-                <li>You specify current-context in your kubeconfig</li>
-                <li>
-                  The kubeconfig is self-contained - including any required
-                  credentials.
-                </li>
+                <li>{t('wizard_kube_scripts.kube_config_req1')}</li>
+                <li>{t('wizard_kube_scripts.kube_config_req2')}</li>
+                <li>{t('wizard_kube_scripts.kube_config_req3')}</li>
               </ul>
-              <p>
-                Note: Officially supported cloud providers are Civo, Akamai
-                Connected Cloud, DigitalOcean and Microsoft Azure (others are
-                not guaranteed to work at present)
-              </p>
+              <p>{t('wizard_kube_scripts.kube_config_cloud_note')}</p>
             </div>
           </div>
 
-          <FormControl label="Name" required>
+          <FormControl label={t('wizard_kube_scripts.name_label')} required>
             <Field
               name="name"
               as={Input}
               data-cy="endpointCreate-nameInput"
-              placeholder="e.g. docker-prod01 / kubernetes-cluster01"
+              placeholder={t('wizard_kube_scripts.name_placeholder')}
               readOnly
             />
           </FormControl>
 
           <FormControl
-            label="Kubeconfig file"
+            label={t('wizard_kube_scripts.kubeconfig_file')}
             required
             inputId="kubeconfig_file"
           >
             <Button disabled data-cy="kubeconfig-file-upload">
-              Select a file
+              {t('wizard_kube_scripts.select_file')}
             </Button>
           </FormControl>
 
@@ -88,12 +82,12 @@ export function KubeConfigTeaserForm() {
               <LoadingButton
                 className="wizard-connect-button !ml-0"
                 data-cy="kubeconfig-connect-environment-button"
-                loadingText="Connecting environment..."
+                loadingText={t('wizard_env.connecting')}
                 isLoading={false}
                 disabled
                 icon={Plug2}
               >
-                Connect
+                {t('wizard_env.connect')}
               </LoadingButton>
             </div>
           </div>

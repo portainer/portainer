@@ -1,5 +1,6 @@
 import { FormikErrors } from 'formik';
 import { SchemaOf, boolean, object } from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import { file, withFileSize } from '@@/form-components/yup-file-validation';
 import { FileUploadField } from '@@/form-components/FileUpload';
@@ -15,12 +16,13 @@ interface Props {
 }
 
 export function TLSFieldset({ values, onChange, errors }: Props) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            label="TLS"
+            label={t('tls.label')}
             data-cy="enable-tls-switch"
             checked={values.tls}
             onChange={(checked) => handleChange({ tls: checked })}
@@ -34,7 +36,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
-                label="Skip Certification Verification"
+                label={t('tls.skip_verification')}
                 data-cy="skip-verify-switch"
                 checked={!!values.skipVerify}
                 onChange={(checked) => handleChange({ skipVerify: checked })}
@@ -46,7 +48,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
           {!values.skipVerify && (
             <>
               <FormControl
-                label="TLS CA certificate"
+                label={t('tls.ca_certificate')}
                 inputId="ca-cert-field"
                 errors={errors?.caCertFile}
               >
@@ -58,7 +60,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
                 />
               </FormControl>
               <FormControl
-                label="TLS certificate"
+                label={t('tls.certificate')}
                 inputId="cert-field"
                 errors={errors?.certFile}
               >
@@ -70,7 +72,7 @@ export function TLSFieldset({ values, onChange, errors }: Props) {
                 />
               </FormControl>
               <FormControl
-                label="TLS key"
+                label={t('tls.key')}
                 inputId="tls-key-field"
                 errors={errors?.keyFile}
               >

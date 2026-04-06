@@ -2,6 +2,7 @@ import { CellContext } from '@tanstack/react-table';
 import { AlertCircle } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 
+import i18n from '@/i18n';
 import {
   isExternalStack,
   isOrphanedStack,
@@ -16,7 +17,7 @@ import { DecoratedStack } from '../types';
 import { columnHelper } from './helper';
 
 export const control = columnHelper.display({
-  header: 'Control',
+  header: () => i18n.t('docker.stacks.columns.control'),
   id: 'control',
   cell: ControlCell,
   enableHiding: false,

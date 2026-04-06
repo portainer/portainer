@@ -1,5 +1,6 @@
 import { Check, XIcon } from 'lucide-react';
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
 
@@ -14,18 +15,19 @@ export function UsernameField({
 }: {
   authMethod: AuthenticationMethod;
 }) {
+  const { t } = useTranslation();
   const [{ name, onBlur, onChange, value }, { error }] =
     useField<FormValues['username']>('username');
 
   return (
     <FormControl
       inputId="username-field"
-      label="Username"
+      label={t('users.username')}
       required
       errors={error}
       tooltip={
         authMethod === AuthenticationMethod.LDAP
-          ? 'Username must exactly match username defined in external LDAP source.'
+          ? t('users.username_ldap_tooltip')
           : null
       }
     >
@@ -33,7 +35,7 @@ export function UsernameField({
         <InputGroup.Input
           id="username-field"
           name={name}
-          placeholder="e.g. jdoe"
+          placeholder={t('users.username_placeholder')}
           data-cy="user-usernameInput"
           value={value}
           onChange={onChange}

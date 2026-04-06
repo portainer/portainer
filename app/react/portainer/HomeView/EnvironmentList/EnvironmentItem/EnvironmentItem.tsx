@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { Tag, Activity } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { stripProtocol } from '@/react/common/string-utils';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
@@ -47,6 +48,7 @@ export function EnvironmentItem({
   groupName,
   isActive,
 }: Props) {
+  const { t } = useTranslation();
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
@@ -83,7 +85,7 @@ export function EnvironmentItem({
                 {snapshotTime && (
                   <span
                     className="small text-muted vertical-center gap-1"
-                    title="Last snapshot time"
+                    title={t('common.last_snapshot_time')}
                   >
                     <Activity className="icon icon-sm" aria-hidden="true" />
                     {snapshotTime}
@@ -101,7 +103,7 @@ export function EnvironmentItem({
           <div className="small text-muted flex flex-wrap items-center gap-x-4 gap-y-2">
             {groupName && (
               <span className="font-semibold">
-                <span>Group: </span>
+                <span>{t('common.group')} </span>
                 <span>{groupName}</span>
               </span>
             )}
@@ -135,6 +137,7 @@ export function EnvironmentItem({
 }
 
 function useEnvironmentTagNames(tagIds?: TagId[]) {
+  const { t } = useTranslation();
   const tagsQuery = useTags({
     select: (tags) => {
       if (!tagIds) {
@@ -156,10 +159,10 @@ function useEnvironmentTagNames(tagIds?: TagId[]) {
   }
 
   if (isLoading) {
-    return 'Loading tags...';
+    return t('common.loading_tags');
   }
 
-  return 'No tags';
+  return t('common.no_tags');
 }
 
 function getSnapshotTime(environment: Environment) {

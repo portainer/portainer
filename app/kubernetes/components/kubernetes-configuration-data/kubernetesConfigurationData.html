@@ -1,26 +1,26 @@
 <ng-form name="kubernetesConfigurationDataCreationForm">
-  <div class="col-sm-12 form-section-title" style="margin-top: 10px"> Data </div>
+  <div class="col-sm-12 form-section-title" style="margin-top: 10px"> {{ 'k8s_config.data' | i18n }} </div>
 
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
-        <pr-icon icon="'list'"></pr-icon> Advanced mode
+        <pr-icon icon="'list'"></pr-icon> {{ 'k8s_config.advanced_mode' | i18n }}
       </button>
       <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
-        <pr-icon icon="'edit'"></pr-icon> Simple mode
+        <pr-icon icon="'edit'"></pr-icon> {{ 'k8s_config.simple_mode' | i18n }}
       </button>
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-      Switch to advanced mode to copy and paste multiple key/values
+      {{ 'k8s_config.switch_advanced_hint' | i18n }}
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'configmap'">
       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-      Generate a ConfigMap entry per line, use YAML format
+      {{ 'k8s_config.configmap_yaml_hint' | i18n }}
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'secret'">
       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
-      Generate a Secret entry per line, use YAML format
+      {{ 'k8s_config.secret_yaml_hint' | i18n }}
     </div>
   </div>
 

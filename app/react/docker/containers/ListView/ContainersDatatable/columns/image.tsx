@@ -2,11 +2,12 @@ import { CellContext } from '@tanstack/react-table';
 import { useSref } from '@uirouter/react';
 
 import type { ContainerListViewModel } from '@/react/docker/containers/types';
+import i18n from '@/i18n';
 
 import { columnHelper } from './helper';
 
 export const image = columnHelper.accessor('Image', {
-  header: 'Image',
+  header: i18n.t('common.image') as string,
   id: 'image',
   cell: ImageCell,
 });

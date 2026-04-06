@@ -1,4 +1,5 @@
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { pluralize } from '@/portainer/helpers/strings';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const deleteHelmRepoMutation = useDeleteHelmRepositoriesMutation();
 
@@ -32,7 +34,7 @@ export function HelmRepositoryDatatableActions({ selectedItems }: Props) {
         to="portainer.account.createHelmRepository"
         data-cy="helmRepository-addButton"
       >
-        Add Helm repository
+        {t('helm_repos.add')}
       </AddButton>
     </>
   );

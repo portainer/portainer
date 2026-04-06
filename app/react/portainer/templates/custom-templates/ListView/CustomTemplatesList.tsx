@@ -1,6 +1,7 @@
 import { Edit } from 'lucide-react';
 import _ from 'lodash';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 
@@ -34,6 +35,7 @@ export function CustomTemplatesList({
   const [page, setPage] = useState(0);
   const [store] = useState(() => createPersistedStore(storageKey));
   const listState = useTableState(store, storageKey);
+  const { t } = useTranslation();
 
   const filterBySearch = useCallback(
     (item: CustomTemplate) =>
@@ -53,11 +55,11 @@ export function CustomTemplatesList({
       <DatatableHeader
         onSearchChange={listState.setSearch}
         searchValue={listState.search}
-        title="Custom Templates"
+        title={t('edge.custom_templates_title')}
         titleIcon={Edit}
         renderTableActions={() => (
           <AddButton data-cy="add-custom-template-button">
-            Add Custom Template
+            {t('edge.custom_templates_add')}
           </AddButton>
         )}
         data-cy="custom-templates-datatable-header"
@@ -73,9 +75,9 @@ export function CustomTemplatesList({
             linkParams={templateLinkParams?.(template)}
           />
         ))}
-        {!templates && <div className="text-muted text-center">Loading...</div>}
+        {!templates && <div className="text-muted text-center">{t('common.loading')}</div>}
         {filteredTemplates.length === 0 && (
-          <div className="text-muted text-center">No templates available.</div>
+          <div className="text-muted text-center">{t('edge.custom_templates_empty')}</div>
         )}
       </div>
 

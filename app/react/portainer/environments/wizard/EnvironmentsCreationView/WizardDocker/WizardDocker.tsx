@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Zap, Network, Plug2 } from 'lucide-react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import {
   ContainerEngine,
@@ -97,6 +98,7 @@ const legacyOptions: BoxSelectorOption<CreationType>[] = [
 const containerEngine = ContainerEngine.Docker;
 
 export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
+  const { t } = useTranslation();
   const edgeAgentDocsUrl = useDocsUrl(
     '/faqs/getting-started/why-do-we-recommend-using-the-edge-agent-instead-of-the-traditional-agent'
   );
@@ -110,13 +112,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
     <div className="form-horizontal">
       {!isDockerStandalone && (
         <Alert color="warn" className="col-sm-12 mb-2">
-          <div>
-            Only do this <b>once</b> for your environment, regardless of how
-            many nodes are in the cluster. You do <b>not</b> need to add each
-            node as an individual environment in Portainer. Adding just one node
-            (we recommend the manager node) will allow Portainer to manage the
-            entire cluster.
-          </div>
+          <div>{t('wizard_env.docker.cluster_note')}</div>
         </Alert>
       )}
       <BoxSelector

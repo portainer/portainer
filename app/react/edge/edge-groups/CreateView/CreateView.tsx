@@ -1,4 +1,5 @@
 import { useRouter } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 
@@ -9,16 +10,17 @@ import { useCreateEdgeGroupMutation } from '../queries/useCreateEdgeGroupMutatio
 import { EdgeGroupForm } from '../components/EdgeGroupForm/EdgeGroupForm';
 
 export function CreateView() {
+  const { t } = useTranslation();
   const mutation = useCreateEdgeGroupMutation();
   const router = useRouter();
 
   return (
     <>
       <PageHeader
-        title="Create edge group"
+        title={t('edge.groups_create')}
         breadcrumbs={[
-          { label: 'Edge groups', link: 'edge.groups' },
-          'Add edge group',
+          { label: t('edge.groups_title'), link: 'edge.groups' },
+          t('edge.groups_add'),
         ]}
       />
 
@@ -36,8 +38,8 @@ export function CreateView() {
                     {
                       onSuccess: () => {
                         notifySuccess(
-                          'Success',
-                          'Edge group successfully created'
+                          t('common.success'),
+                          t('edge.groups_created')
                         );
                         router.stateService.go('^');
                       },

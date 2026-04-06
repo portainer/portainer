@@ -1,6 +1,7 @@
 import { confirmChangePassword } from '@@/modals/confirm';
 import { openDialog } from '@@/modals/Dialog';
 import { buildConfirmButton } from '@@/modals/utils';
+import i18n from '@/i18n';
 
 angular.module('portainer.app').controller('AccountController', [
   '$scope',
@@ -11,6 +12,13 @@ angular.module('portainer.app').controller('AccountController', [
   'SettingsService',
   'StateManager',
   function ($scope, $state, Authentication, UserService, Notifications, SettingsService, StateManager) {
+    const t = i18n.t.bind(i18n);
+    $scope.t = t;
+
+    // Page header translations
+    $scope.pageTitle = t('account.title');
+    $scope.pageBreadcrumbs = [{ label: t('account.breadcrumbs') }];
+
     $scope.formValues = {
       currentPassword: '',
       newPassword: '',
@@ -22,12 +30,12 @@ angular.module('portainer.app').controller('AccountController', [
       if (confirmed) {
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
-          Notifications.success('Success', 'Password successfully updated');
+          Notifications.success(t('account.success'), t('account.password_success'));
           StateManager.resetPasswordChangeSkips($scope.userID.toString());
           $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
-          Notifications.error('Failure', err, err.msg);
+          Notifications.error(t('account.failure'), err, err.msg);
         }
       }
     };
@@ -40,7 +48,7 @@ angular.module('portainer.app').controller('AccountController', [
           $state.go('portainer.home');
         }
       } catch (err) {
-        Notifications.error('Failure', err, err.msg);
+        Notifications.error(t('account.failure'), err, err.msg);
       }
     };
 
@@ -93,7 +101,7 @@ angular.module('portainer.app').controller('AccountController', [
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve application settings');
+          Notifications.error(t('account.failure'), err, t('account.unable_retrieve_settings'));
         });
     }
 
@@ -103,7 +111,7 @@ angular.module('portainer.app').controller('AccountController', [
 
 function confirmForceChangePassword() {
   return openDialog({
-    message: 'Please update your password to a stronger password to continue using Portainer',
+    message: i18n.t('account.force_change_message'),
     buttons: [buildConfirmButton('OK')],
   });
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { ContainerDetailsViewModel } from '@/docker/models/containerDetails';
@@ -21,6 +23,7 @@ export function ContainerActionsSection({
   container,
   onSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const authorizedQuery = useAuthorizations([
     'DockerContainerStart',
     'DockerContainerStop',
@@ -41,7 +44,7 @@ export function ContainerActionsSection({
   const isPortainer = container.IsPortainer || false;
   return (
     <Widget>
-      <Widget.Title icon="settings" title="Actions" />
+      <Widget.Title icon="settings" title={t('docker.containers.actions.title')} />
       <WidgetBody>
         <div className="flex gap-2">
           <PrimaryActions

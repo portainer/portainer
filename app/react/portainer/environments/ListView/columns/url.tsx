@@ -8,6 +8,8 @@ import {
 } from '@/react/portainer/environments/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 
+import i18n from '@/i18n';
+
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -55,7 +57,7 @@ function Cell({
                           onClick={handleDismissButton}
                         >
                           <span className="text-muted-light">
-                            Dismiss error (still visible in logs)
+                            {i18n.t('environments.dismiss_error')}
                           </span>
                         </Button>
                       </div>
@@ -103,7 +105,7 @@ function Cell({
       },
       {
         onSuccess: () => {
-          notifySuccess('Success', 'Error dismissed successfully');
+          notifySuccess(i18n.t('environments.success'), i18n.t('environments.error_dismissed'));
         },
       }
     );

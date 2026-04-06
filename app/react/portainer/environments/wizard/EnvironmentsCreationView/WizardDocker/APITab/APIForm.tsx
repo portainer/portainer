@@ -1,6 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useCreateRemoteEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function APIForm({ onCreate }: Props) {
+  const { t } = useTranslation();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
   const initialValues: FormValues = {
     url: '',
@@ -59,15 +61,15 @@ export function APIForm({ onCreate }: Props) {
 
           <FormControl
             inputId="url-field"
-            label="Docker API URL"
+            label={t('wizard_env.docker.api_url')}
             required
-            tooltip="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+            tooltip={t('wizard_env.docker.api_url_tooltip')}
           >
             <Field
               as={Input}
               id="url-field"
               name="url"
-              placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375"
+              placeholder={t('wizard_env.docker.api_url_placeholder')}
             />
           </FormControl>
 
@@ -88,12 +90,12 @@ export function APIForm({ onCreate }: Props) {
               <LoadingButton
                 className="wizard-connect-button vertical-center"
                 data-cy="docker-aconnect-button"
-                loadingText="Connecting environment..."
+                loadingText={t('wizard_env.connecting')}
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
                 icon={Plug2}
               >
-                Connect
+                {t('wizard_env.connect')}
               </LoadingButton>
             </div>
           </div>
@@ -116,7 +118,7 @@ export function APIForm({ onCreate }: Props) {
       },
       {
         onSuccess(environment) {
-          notifySuccess('Environment created', environment.Name);
+          notifySuccess(t('wizard_env.env_created'), environment.Name);
           clearForm();
           onCreate(environment);
         },

@@ -1,4 +1,5 @@
 import { Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';
@@ -15,12 +16,14 @@ export function VolumesLink({
   platformPath,
   'data-cy': dataCy,
 }: Props) {
+  const { t } = useTranslation();
+
   return (
     <SidebarItem
       to={`${platformPath}.volumes`}
       params={{ endpointId: environmentId }}
       icon={Database}
-      label="Volumes"
+      label={t('common.volumes')}
       data-cy={dataCy}
     />
   );

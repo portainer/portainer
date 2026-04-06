@@ -1,6 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 import { Search } from 'lucide-react';
 
+import i18n from '@/i18n';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 
@@ -15,7 +16,7 @@ import { columnHelper } from './helper';
 import { DefaultRegistryAction } from './DefaultRegistryAction';
 
 export const actions = columnHelper.display({
-  header: 'Actions',
+  header: i18n.t('registries.col_actions') as string,
   cell: Cell,
 });
 
@@ -62,7 +63,7 @@ export function BrowseButton({
           icon={Search}
           data-cy={`browse-registry-button-${registry.Name}`}
         >
-          Browse
+          {i18n.t('registries.browse')}
         </Button>
       )}
     </BEFeatureIndicator>

@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect } from 'react';
 import { Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import Route from '@/assets/ico/route.svg?c';
 
@@ -114,6 +115,7 @@ export function IngressForm({
   handleNamespaceChange,
   namespace,
 }: Props) {
+  const { t } = useTranslation();
   const hasNoHostRule = rule.Hosts?.some((host) => host.NoHost);
   const placeholderAnnotation =
     PlaceholderAnnotations[rule.IngressType || 'other'] ||
@@ -142,7 +144,7 @@ export function IngressForm({
 
   return (
     <Widget>
-      <WidgetTitle icon={Route} title="Ingress" />
+      <WidgetTitle icon={Route} title={t('ingress_form.title')} />
       <WidgetBody key={rule.Key + rule.Namespace}>
         <div className="row">
           <div className="form-horizontal">
@@ -151,12 +153,12 @@ export function IngressForm({
                 className="control-label text-muted col-sm-3 col-lg-2"
                 htmlFor="namespace"
               >
-                Namespace
+                {t('ingress_form.namespace')}
               </label>
               {isNamespaceOptionsLoading && (
                 <div className="col-sm-4">
                   <InlineLoader className="pt-2">
-                    Loading namespaces...
+                    {t('ingress_form.loading_namespaces')}
                   </InlineLoader>
                 </div>
               )}
@@ -179,10 +181,10 @@ export function IngressForm({
                       }
                       placeholder={
                         namespacesOptions.length
-                          ? 'Select a namespace'
-                          : 'No namespaces available'
+                          ? t('ingress_form.select_namespace')
+                          : t('ingress_form.no_namespaces')
                       }
-                      noOptionsMessage={() => 'No namespaces available'}
+                      noOptionsMessage={() => t('ingress_form.no_namespaces')}
                       data-cy="k8sAppCreate-namespaceSelect"
                       id="k8sAppCreate-namespaceSelect"
                     />
@@ -201,7 +203,7 @@ export function IngressForm({
                   className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_name"
                 >
-                  Ingress name
+                  {t('ingress_form.ingress_name')}
                 </label>
                 <div className="col-sm-4">
                   {isEdit ? (
@@ -211,7 +213,7 @@ export function IngressForm({
                       name="ingress_name"
                       type="text"
                       className="form-control"
-                      placeholder="Ingress name"
+                      placeholder={t('ingress_form.ingress_name')}
                       defaultValue={rule.IngressName}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         handleIngressChange('IngressName', e.target.value)
@@ -233,12 +235,12 @@ export function IngressForm({
                   className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_class"
                 >
-                  Ingress class
+                  {t('ingress_form.ingress_class')}
                 </label>
                 <div className="col-sm-4">
                   {isIngressClassOptionsLoading && (
                     <InlineLoader className="pt-2">
-                      Loading ingress classes...
+                      {t('ingress_form.loading_ingress_classes')}
                     </InlineLoader>
                   )}
                   {!isIngressClassOptionsLoading && (
@@ -247,8 +249,8 @@ export function IngressForm({
                         name="ingress_class"
                         placeholder={
                           ingressClassOptions.length
-                            ? 'Select an ingress class'
-                            : 'No ingress classes available'
+                            ? t('ingress_form.select_ingress_class')
+                            : t('ingress_form.no_ingress_classes')
                         }
                         options={ingressClassOptions}
                         value={
@@ -265,7 +267,7 @@ export function IngressForm({
                             ingressClassOption?.value || ''
                           )
                         }
-                        noOptionsMessage={() => 'No ingress classes available'}
+                        noOptionsMessage={() => t('ingress_form.no_ingress_classes')}
                         data-cy="k8sAppCreate-ingressClassSelect"
                         id="k8sAppCreate-ingressClassSelect"
                       />
@@ -282,7 +284,7 @@ export function IngressForm({
 
             <div className="col-sm-12 text-muted !mb-0 px-0">
               <div className="control-label !mb-3 text-left font-medium">
-                Annotations
+                {t('ingress_form.annotations')}
                 <Tooltip
                   message={
                     <div className="vertical-center">
@@ -320,7 +322,7 @@ export function IngressForm({
             )}
 
             <div className="col-sm-12 anntation-actions p-0">
-              <TooltipWithChildren message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.">
+              <TooltipWithChildren message={t('ingress_form.add_annotation_tooltip')}>
                 <span>
                   <Button
                     className="btn btn-sm btn-light !ml-0 mb-2"
@@ -329,14 +331,14 @@ export function IngressForm({
                     icon={Plus}
                   >
                     {' '}
-                    Add annotation
+                    {t('ingress_form.add_annotation')}
                   </Button>
                 </span>
               </TooltipWithChildren>
 
               {rule.IngressType === 'nginx' && (
                 <>
-                  <TooltipWithChildren message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.">
+                  <TooltipWithChildren message={t('ingress_form.rewrite_annotation_tooltip')}>
                     <span>
                       <Button
                         className="btn btn-sm btn-light mb-2 ml-2"
@@ -344,12 +346,12 @@ export function IngressForm({
                         icon={Plus}
                         data-cy="add-rewrite-annotation"
                       >
-                        Add rewrite annotation
+                        {t('ingress_form.add_rewrite_annotation')}
                       </Button>
                     </span>
                   </TooltipWithChildren>
 
-                  <TooltipWithChildren message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.">
+                  <TooltipWithChildren message={t('ingress_form.regex_annotation_tooltip')}>
                     <span>
                       <Button
                         className="btn btn-sm btn-light mb-2 ml-2"
@@ -357,7 +359,7 @@ export function IngressForm({
                         icon={Plus}
                         data-cy="add-regex-annotation"
                       >
-                        Add regular expression annotation
+                        {t('ingress_form.add_regex_annotation')}
                       </Button>
                     </span>
                   </TooltipWithChildren>
@@ -371,12 +373,12 @@ export function IngressForm({
                   icon={Plus}
                   data-cy="add-ingress-class-annotation"
                 >
-                  Add kubernetes.io/ingress.class annotation
+                  {t('ingress_form.add_ingress_class_annotation')}
                 </Button>
               )}
             </div>
 
-            <div className="col-sm-12 text-muted px-0">Rules</div>
+            <div className="col-sm-12 text-muted px-0">{t('ingress_form.rules')}</div>
           </div>
         )}
 
@@ -386,7 +388,7 @@ export function IngressForm({
               <div className="flex flex-col">
                 <div className="row rule-actions">
                   <div className="col-sm-3 p-0">
-                    {!host.NoHost ? 'Rule' : 'Fallback rule'}
+                    {!host.NoHost ? t('ingress_form.rule') : t('ingress_form.fallback_rule')}
                   </div>
                   <div className="col-sm-9 p-0 text-right">
                     <Button
@@ -398,7 +400,7 @@ export function IngressForm({
                       disabled={rule.Hosts.length === 1}
                       icon={Trash2}
                     >
-                      Remove rule
+                      {t('ingress_form.remove_rule')}
                     </Button>
                   </div>
                 </div>
@@ -411,7 +413,7 @@ export function IngressForm({
                           as="label"
                           htmlFor={`ingress_host_${hostIndex}`}
                         >
-                          Hostname
+                          {t('ingress_form.hostname')}
                         </InputGroup.Addon>
                         <InputGroup.Input
                           name={`ingress_host_${hostIndex}`}
@@ -440,7 +442,7 @@ export function IngressForm({
                           as="label"
                           htmlFor={`ingress_tls_${hostIndex}`}
                         >
-                          TLS secret
+                          {t('ingress_form.tls_secret')}
                         </InputGroup.Addon>
                         <Select
                           key={tlsOptions.toString() + host.Secret}
@@ -451,7 +453,7 @@ export function IngressForm({
                             host.Secret !== undefined
                               ? {
                                   value: host.Secret,
-                                  label: host.Secret || 'No TLS',
+                                  label: host.Secret || t('ingress_form.no_tls'),
                                 }
                               : null
                           }
@@ -460,10 +462,10 @@ export function IngressForm({
                           }
                           placeholder={
                             tlsOptions.length
-                              ? 'Select a TLS secret'
-                              : 'No TLS secrets available'
+                              ? t('ingress_form.select_tls_secret')
+                              : t('ingress_form.no_tls_secrets')
                           }
-                          noOptionsMessage={() => 'No TLS secrets available'}
+                          noOptionsMessage={() => t('ingress_form.no_tls_secrets')}
                           size="sm"
                           data-cy={`k8sAppCreate-tlsSelect_${hostIndex}`}
                           id={`k8sAppCreate-tlsSelect_${hostIndex}`}
@@ -483,7 +485,7 @@ export function IngressForm({
 
                     <div className="col-sm-12 col-lg-4 flex h-[30px] items-center pl-2">
                       <TextTip color="blue">
-                        You may also use the{' '}
+                        {t('ingress_form.create_secret_tip_prefix')}{' '}
                         <Link
                           to="kubernetes.secrets.new"
                           params={{ id: environmentID }}
@@ -491,32 +493,28 @@ export function IngressForm({
                           target="_blank"
                           data-cy={`k8sAppCreate-createSecretLink_${hostIndex}`}
                         >
-                          Create secret
+                          {t('ingress_form.create_secret_link')}
                         </Link>{' '}
-                        function, and reload the dropdown.
+                        {t('ingress_form.create_secret_tip_suffix')}
                       </TextTip>
                     </div>
                   </div>
                 )}
                 {host.NoHost && (
                   <TextTip color="blue">
-                    A fallback rule has no host specified. This rule only
-                    applies when an inbound request has a hostname that does not
-                    match with any of your other rules.
+                    {t('ingress_form.fallback_rule_description')}
                   </TextTip>
                 )}
 
                 <div className="row">
                   <div className="col-sm-12 text-muted !mb-0 mt-2 px-0">
-                    Paths
+                    {t('ingress_form.paths')}
                   </div>
                 </div>
 
                 {!host.Paths.length && (
                   <TextTip className="mt-2" color="blue">
-                    You may save the ingress without a path and it will then be
-                    an <b>ingress default</b> that a user may select via the
-                    hostname dropdown in Create/Edit application.
+                    {t('ingress_form.no_paths_tip')}
                   </TextTip>
                 )}
 
@@ -560,10 +558,10 @@ export function IngressForm({
                           }
                           placeholder={
                             serviceOptions.length
-                              ? 'Select a service'
-                              : 'No services available'
+                              ? t('ingress_form.select_service')
+                              : t('ingress_form.no_services')
                           }
-                          noOptionsMessage={() => 'No services available'}
+                          noOptionsMessage={() => t('ingress_form.no_services')}
                           size="sm"
                           data-cy={`k8sAppCreate-serviceSelect_${hostIndex}_${pathIndex}`}
                         />
@@ -590,7 +588,7 @@ export function IngressForm({
                               as="label"
                               htmlFor={`ingress_servicePort_${hostIndex}_${pathIndex}`}
                             >
-                              Service port
+                              {t('ingress_form.service_port')}
                             </InputGroup.Addon>
                             <Select
                               key={servicePorts.toString() + path.ServicePort}
@@ -622,10 +620,10 @@ export function IngressForm({
                               }
                               placeholder={
                                 servicePorts[path.ServiceName]?.length
-                                  ? 'Select a port'
-                                  : 'No ports available'
+                                  ? t('ingress_form.select_port')
+                                  : t('ingress_form.no_ports')
                               }
-                              noOptionsMessage={() => 'No ports available'}
+                              noOptionsMessage={() => t('ingress_form.no_ports')}
                               size="sm"
                               data-cy={`k8sAppCreate-servicePortSelect_${hostIndex}_${pathIndex}`}
                             />
@@ -651,7 +649,7 @@ export function IngressForm({
                           as="label"
                           htmlFor={`ingress_pathType_${hostIndex}_${pathIndex}`}
                         >
-                          Path type
+                          {t('ingress_form.path_type')}
                         </InputGroup.Addon>
                         <Select
                           key={servicePorts.toString() + path.PathType}
@@ -681,10 +679,10 @@ export function IngressForm({
                           }
                           placeholder={
                             pathTypes?.length
-                              ? 'Select a path type'
-                              : 'No path types available'
+                              ? t('ingress_form.select_path_type')
+                              : t('ingress_form.no_path_types')
                           }
-                          noOptionsMessage={() => 'No path types available'}
+                          noOptionsMessage={() => t('ingress_form.no_path_types')}
                           size="sm"
                           data-cy={`k8sAppCreate-pathTypeSelect_${hostIndex}_${pathIndex}`}
                         />
@@ -709,7 +707,7 @@ export function IngressForm({
                           as="label"
                           htmlFor={`ingress_route_${hostIndex}-${pathIndex}`}
                         >
-                          Path
+                          {t('ingress_form.path')}
                         </InputGroup.Addon>
                         <InputGroup.Input
                           className="form-control"
@@ -765,7 +763,7 @@ export function IngressForm({
                     icon={Plus}
                     data-cy={`k8sAppCreate-addPathButton_${hostIndex}`}
                   >
-                    Add path
+                    {t('ingress_form.add_path')}
                   </Button>
                 </div>
               </div>
@@ -782,7 +780,7 @@ export function IngressForm({
                 icon={Plus}
                 data-cy="k8sAppCreate-addHostButton"
               >
-                Add new host
+                {t('ingress_form.add_new_host')}
               </Button>
 
               <Button
@@ -793,9 +791,9 @@ export function IngressForm({
                 icon={Plus}
                 data-cy="k8sAppCreate-addFallbackButton"
               >
-                Add fallback rule
+                {t('ingress_form.add_fallback_rule')}
               </Button>
-              <Tooltip message="A fallback rule will be applied to all requests that do not match any of the defined hosts." />
+              <Tooltip message={t('ingress_form.fallback_rule_tooltip')} />
             </div>
           </div>
         )}

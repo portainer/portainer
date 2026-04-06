@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { Team } from '@/react/portainer/users/teams/types';
 
 import { TeamsSelector } from '@@/TeamsSelector';
@@ -21,13 +23,14 @@ export function TeamsField({
   onChange,
   errors,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <FormControl
-      label="Authorized teams"
+      label={t('access_control.teams_field_label')}
       tooltip={
         teams.length > 0
           ? overrideTooltip ||
-            'You can select which team(s) will be able to manage this resource.'
+            t('access_control.teams_field_tooltip')
           : undefined
       }
       inputId="authorized-teams-selector"
@@ -44,11 +47,9 @@ export function TeamsField({
         />
       ) : (
         <span className="small text-muted">
-          You have not yet created any teams. Head over to the{' '}
-          <Link to="portainer.teams" data-cy="teams-view-link">
-            Teams view
-          </Link>{' '}
-          to manage teams.
+          {t('access_control.no_teams_prefix')}{' '}
+          <Link to="portainer.teams" data-cy="teams-view-link">{t('access_control.no_teams_link')}</Link>{' '}
+          {t('access_control.no_teams_suffix')}
         </span>
       )}
     </FormControl>

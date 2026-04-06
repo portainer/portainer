@@ -1,9 +1,17 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import i18n from '@/i18n';
 
 angular.module('portainer.app').controller('TagsController', TagsController);
 
 function TagsController($scope, $state, $async, TagService, Notifications) {
+  const t = i18n.t.bind(i18n);
+  $scope.t = t; // Expose t function to template
+
+  // Page header translations
+  $scope.pageTitle = t('tags.title');
+  $scope.pageBreadcrumbs = [{ label: t('tags.breadcrumbs') }];
+
   $scope.state = {
     actionInProgress: false,
   };
@@ -34,10 +42,10 @@ function TagsController($scope, $state, $async, TagService, Notifications) {
       try {
         await TagService.deleteTag(tag.Id);
 
-        Notifications.success('Tag successfully removed', tag.Name);
+        Notifications.success(t('tags.remove_success'), tag.Name);
         _.remove($scope.tags, tag);
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to remove tag');
+        Notifications.error(t('common.failure'), err, t('tags.remove_error'));
       }
     }
 
@@ -48,11 +56,11 @@ function TagsController($scope, $state, $async, TagService, Notifications) {
     var tagName = $scope.formValues.Name;
     TagService.createTag(tagName)
       .then(function success() {
-        Notifications.success('Tag successfully created', tagName);
+        Notifications.success(t('tags.create_success'), tagName);
         $state.reload();
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to create tag');
+        Notifications.error(t('common.failure'), err, t('tags.create_error'));
       });
   };
 
@@ -62,7 +70,7 @@ function TagsController($scope, $state, $async, TagService, Notifications) {
         $scope.tags = data;
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve tags');
+        Notifications.error(t('common.failure'), err, t('tags.retrieve_error'));
         $scope.tags = [];
       });
   }

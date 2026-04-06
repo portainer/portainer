@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { pluralize } from '@/portainer/helpers/strings';
 import { notifySuccess } from '@/portainer/services/notifications';
 
@@ -8,6 +10,7 @@ import { Registry } from '../../types/registry';
 import { useDeleteRegistriesMutation } from './useDeleteRegistriesMutation';
 
 export function DeleteButton({ selectedItems }: { selectedItems: Registry[] }) {
+  const { t } = useTranslation();
   const mutation = useDeleteRegistriesMutation();
 
   const confirmMessage = getMessage(selectedItems.length);
@@ -26,7 +29,7 @@ export function DeleteButton({ selectedItems }: { selectedItems: Registry[] }) {
       selectedItems.map((item) => item.Id),
       {
         onSuccess() {
-          notifySuccess('Success', 'Registries removed');
+          notifySuccess(t('common.success'), t('registries.removed'));
         },
       }
     );

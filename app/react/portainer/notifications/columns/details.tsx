@@ -1,7 +1,9 @@
+import i18n from '@/i18n';
+
 import { columnHelper } from './helper';
 
 export const details = columnHelper.accessor('details', {
-  header: 'Details',
+  header: i18n.t('notifications.col_details'),
   id: 'details',
   cell: ({ getValue }) => {
     const value = getValue();

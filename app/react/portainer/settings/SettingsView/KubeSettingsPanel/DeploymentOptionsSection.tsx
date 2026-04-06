@@ -1,4 +1,5 @@
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -10,6 +11,7 @@ import { KubeNoteMinimumCharacters } from './KubeNoteMinimumCharacters';
 import { FormValues } from './types';
 
 export function DeploymentOptionsSection() {
+  const { t } = useTranslation();
   const {
     values: { globalDeploymentOptions: values },
     setFieldValue,
@@ -17,18 +19,18 @@ export function DeploymentOptionsSection() {
 
   const limitedFeature = isLimitedToBE(FeatureId.ENFORCE_DEPLOYMENT_OPTIONS);
   return (
-    <FormSection title="Deployment options">
+    <FormSection title={t('settings.deploy_title')}>
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            label="Enforce code-based deployment"
+            label={t('settings.deploy_enforce')}
             data-cy="kube-settings-enforce-code-based-deployment"
             checked={values.hideAddWithForm}
             name="toggle_hideAddWithForm"
             featureId={FeatureId.ENFORCE_DEPLOYMENT_OPTIONS}
             onChange={(value) => handleToggleAddWithForm(value)}
             labelClass="col-sm-3 col-lg-2"
-            tooltip="Hides the 'Add with form' buttons and prevents adding/editing of resources via forms"
+            tooltip={t('settings.deploy_enforce_tooltip')}
           />
         </div>
       </div>
@@ -36,7 +38,7 @@ export function DeploymentOptionsSection() {
         <div className="form-group flex flex-col gap-y-1">
           <div className="col-sm-12">
             <SwitchField
-              label="Allow web editor and custom template use"
+              label={t('settings.deploy_allow_editor')}
               data-cy="kube-settings-allow-web-editor-and-custom-template-use"
               checked={!values.hideWebEditor}
               name="toggle_hideWebEditor"
@@ -48,7 +50,7 @@ export function DeploymentOptionsSection() {
           </div>
           <div className="col-sm-12">
             <SwitchField
-              label="Allow specifying of a manifest via a URL"
+              label={t('settings.deploy_allow_url')}
               data-cy="kube-settings-allow-specifying-of-a-manifest-via-a-url"
               checked={!values.hideFileUpload}
               name="toggle_hideFileUpload"
@@ -64,7 +66,7 @@ export function DeploymentOptionsSection() {
         <div className="form-group">
           <div className="col-sm-12">
             <SwitchField
-              label="Allow per environment override"
+              label={t('settings.deploy_allow_override')}
               data-cy="kube-settings-allow-per-environment-override"
               checked={values.perEnvOverride}
               onChange={(value) =>
@@ -72,7 +74,7 @@ export function DeploymentOptionsSection() {
               }
               name="toggle_perEnvOverride"
               labelClass="col-sm-3 col-lg-2"
-              tooltip="Allows overriding of deployment options in the Cluster setup screen of each environment"
+              tooltip={t('settings.deploy_override_tooltip')}
             />
           </div>
         </div>
@@ -83,7 +85,7 @@ export function DeploymentOptionsSection() {
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
-            label="Allow stacks functionality with Kubernetes environments"
+            label={t('settings.deploy_allow_stacks')}
             data-cy="kube-settings-allow-stacks-functionality"
             checked={!values.hideStacksFunctionality}
             onChange={(value) =>
@@ -94,7 +96,7 @@ export function DeploymentOptionsSection() {
             }
             name="toggle_stacksFunctionality"
             labelClass="col-sm-3 col-lg-2"
-            tooltip="This allows you to group your applications/workloads into a single ‘stack’, and then view or delete an entire stack. If disabled, stacks functionality will not show in the UI."
+            tooltip={t('settings.deploy_stacks_tooltip')}
           />
         </div>
       </div>

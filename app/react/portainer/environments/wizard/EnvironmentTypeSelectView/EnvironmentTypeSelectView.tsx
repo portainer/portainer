@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from '@uirouter/react';
 import { Wand2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@@/buttons';
 import { PageHeader } from '@@/PageHeader';
@@ -10,42 +11,45 @@ import { FormSection } from '@@/form-components/FormSection';
 import { EnvironmentSelector } from './EnvironmentSelector';
 import {
   EnvironmentOptionValue,
-  existingEnvironmentTypes,
-  newEnvironmentTypes,
+  getExistingEnvironmentTypes,
+  getNewEnvironmentTypes,
 } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
+  const { t } = useTranslation();
   const [types, setTypes] = useState<EnvironmentOptionValue[]>([]);
   const router = useRouter();
+
+  const existingEnvironmentTypes = getExistingEnvironmentTypes();
+  const newEnvironmentTypes = getNewEnvironmentTypes();
 
   return (
     <>
       <PageHeader
-        title="Quick Setup"
-        breadcrumbs={[{ label: 'Environment Wizard' }]}
+        title={t('wizard_env.quick_setup')}
+        breadcrumbs={[{ label: t('wizard_env.environment_wizard') }]}
         reload
       />
 
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle icon={Wand2} title="Environment Wizard" />
+            <WidgetTitle icon={Wand2} title={t('wizard_env.environment_wizard')} />
             <WidgetBody>
               <div className="form-horizontal">
-                <FormSection title="Select your environment(s)">
+                <FormSection title={t('wizard_env_types.select_environments')}>
                   <p className="text-muted small">
-                    You can onboard different types of environments, select all
-                    that apply.
+                    {t('wizard_env_types.select_environments_description')}
                   </p>
                   <p className="control-label !mb-2">
-                    Connect to existing environments
+                    {t('wizard_env_types.connect_existing')}
                   </p>
                   <EnvironmentSelector
                     value={types}
                     onChange={setTypes}
                     options={existingEnvironmentTypes}
                   />
-                  <p className="control-label !mb-2">Set up new environments</p>
+                  <p className="control-label !mb-2">{t('wizard_env_types.setup_new')}</p>
                   <EnvironmentSelector
                     value={types}
                     onChange={setTypes}
@@ -63,7 +67,7 @@ export function EnvironmentTypeSelectView() {
                 onClick={() => startWizard()}
                 className="!ml-0"
               >
-                Start Wizard
+                {t('wizard_env_types.start_wizard')}
               </Button>
             </WidgetBody>
           </Widget>

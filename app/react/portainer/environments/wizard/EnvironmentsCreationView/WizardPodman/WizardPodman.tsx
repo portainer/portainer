@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Zap, Plug2 } from 'lucide-react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import {
   ContainerEngine,
@@ -83,6 +84,7 @@ const legacyOptions: BoxSelectorOption<CreationType>[] = [
 const containerEngine = ContainerEngine.Podman;
 
 export function WizardPodman({ onCreate }: Props) {
+  const { t } = useTranslation();
   const edgeAgentDocsUrl = useDocsUrl(
     '/faqs/getting-started/why-do-we-recommend-using-the-edge-agent-instead-of-the-traditional-agent'
   );
@@ -129,9 +131,10 @@ export function WizardPodman({ onCreate }: Props) {
       </FormSection>
 
       <TextTip color="orange" className="mb-2" inline={false}>
-        Currently, Portainer only supports <b>Podman 5</b> running in rootful
-        (privileged) mode on <b>CentOS 9</b> Linux environments. Rootless mode
-        and other Linux distros may work, but aren&apos;t officially supported.
+        {/* eslint-disable-next-line react/no-danger */}
+        <span
+          dangerouslySetInnerHTML={{ __html: t('wizard_env.podman.notice') }}
+        />
       </TextTip>
       {tab}
     </div>

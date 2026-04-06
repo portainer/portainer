@@ -1,4 +1,5 @@
 import { AlertTriangle, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 
@@ -13,6 +14,7 @@ export function PasswordCheckHint({
   passwordValid,
   forceChangePassword,
 }: Props) {
+  const { t } = useTranslation();
   const settingsQuery = usePublicSettings();
   const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
 
@@ -21,8 +23,8 @@ export function PasswordCheckHint({
       <p className="text-warning vertical-center">
         <Icon icon={AlertTriangle} className="icon-warning" />
         {forceChangePassword &&
-          'An administrator has changed your password requirements, '}
-        The password must be at least {minPasswordLength} characters long.
+          t('password_check.admin_changed_requirements')}
+        {t('password_check.min_length', { minPasswordLength })}
         {passwordValid && (
           <Icon icon={Check} className="!ml-1" mode="success" />
         )}

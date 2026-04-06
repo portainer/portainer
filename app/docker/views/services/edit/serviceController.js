@@ -27,6 +27,7 @@ import { ModalType } from '@@/modals';
 import { buildConfirmButton } from '@@/modals/utils';
 import { convertServiceToConfig } from '@/react/docker/services/common/convertServiceToConfig';
 import { portsMappingUtils } from '@/react/docker/services/ItemView/PortMappingField';
+import i18n from '@/i18n';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -363,7 +364,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             $scope.WebhookExists = false;
           })
           .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to delete webhook');
+            Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_delete_webhook'));
           });
       } else {
         WebhookService.createServiceWebhook(service.Id, endpoint.Id, $scope.initialRegistryID)
@@ -373,7 +374,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.Token);
           })
           .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to create webhook');
+            Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_create_webhook'));
           });
       }
     };
@@ -384,7 +385,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
       if ($scope.WebhookExists && registryChanged) {
         WebhookService.updateServiceWebhook($scope.webhookID, newRegistryID).catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update webhook');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_update_webhook'));
         });
       }
     };
@@ -563,18 +564,18 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config, 'previous')
         .then(function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error('Failure', data, 'Error');
+            Notifications.error(i18n.t('common.failure'), data, i18n.t('common.error'));
           } else {
-            Notifications.success('Success', 'Service successfully rolled back');
+            Notifications.success(i18n.t('common.success'), i18n.t('docker_services.service_rolled_back'));
             $scope.cancelChanges({});
             initView();
           }
         })
         .catch(function (e) {
           if (e.data.message && e.data.message.includes('does not have a previous spec')) {
-            Notifications.error('Failure', { message: 'No previous config to rollback to.' });
+            Notifications.error(i18n.t('common.failure'), { message: i18n.t('docker_services.no_previous_config') });
           } else {
-            Notifications.error('Failure', e, 'Unable to rollback service');
+            Notifications.error(i18n.t('common.failure'), e, i18n.t('docker_services.unable_rollback_service'));
           }
         })
         .finally(function () {
@@ -584,10 +585,10 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.rollbackService = function (service) {
       confirm({
-        title: 'Rollback service',
-        message: 'Are you sure you want to rollback?',
+        title: i18n.t('docker_services.rollback_service_title'),
+        message: i18n.t('docker_services.rollback_confirm_message'),
         modalType: ModalType.Warn,
-        confirmButton: buildConfirmButton('Yes', 'danger'),
+        confirmButton: buildConfirmButton(i18n.t('common.yes'), 'danger'),
       }).then((confirmed) => {
         if (!confirmed) {
           return;
@@ -606,22 +607,22 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error('Failure', data, 'Error');
+            Notifications.error(i18n.t('common.failure'), data, i18n.t('common.error'));
           } else {
-            Notifications.success('Service successfully updated', 'Service updated');
+            Notifications.success(i18n.t('docker_services.service_updated'), i18n.t('docker_services.service_updated_detail'));
             $scope.updateWebhookRegistryId();
           }
           $scope.cancelChanges({});
           initView();
         },
         function (e) {
-          Notifications.error('Failure', e, 'Unable to update service');
+          Notifications.error(i18n.t('common.failure'), e, i18n.t('docker_services.unable_update_service'));
         }
       );
     };
 
     $scope.removeService = function () {
-      confirmDelete('Do you want to remove this service? All the containers associated to this service will be removed too.').then((confirmed) => {
+      confirmDelete(i18n.t('docker_services.remove_service_confirm')).then((confirmed) => {
         if (!confirmed) {
           return;
         }
@@ -636,11 +637,11 @@ angular.module('portainer.docker').controller('ServiceController', [
           return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
         })
         .then(function success() {
-          Notifications.success('Success', 'Service successfully deleted');
+          Notifications.success(i18n.t('common.success'), i18n.t('docker_services.service_deleted'));
           $state.go('docker.services', {});
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove service');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_remove_service'));
         })
         .finally(function final() {
           $scope.state.deletionInProgress = false;
@@ -648,7 +649,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.forceUpdateService = function (service) {
-      confirmServiceForceUpdate('Do you want to force an update of the service? All the tasks associated to the service will be recreated.').then(function (result) {
+      confirmServiceForceUpdate(i18n.t('docker_services.force_update_confirm')).then(function (result) {
         if (!result) {
           return;
         }
@@ -669,12 +670,12 @@ angular.module('portainer.docker').controller('ServiceController', [
       $scope.state.updateInProgress = true;
       ServiceService.update(service, config)
         .then(function success() {
-          Notifications.success('Service successfully updated', service.Name);
+          Notifications.success(i18n.t('docker_services.service_updated'), service.Name);
           $scope.cancelChanges({});
           initView();
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_force_update_service'), service.Name);
         })
         .finally(function final() {
           $scope.state.updateInProgress = false;
@@ -855,7 +856,7 @@ angular.module('portainer.docker').controller('ServiceController', [
         .catch(function error(err) {
           $scope.secrets = [];
           $scope.configs = [];
-          Notifications.error('Failure', err, 'Unable to retrieve service details');
+          Notifications.error(i18n.t('common.failure'), err, i18n.t('docker_services.unable_retrieve_details'));
         })
         .finally(() => {
           $scope.isLoading = false;

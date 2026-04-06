@@ -1,6 +1,7 @@
 import { SchemaOf, array, object, boolean, string, mixed, number } from 'yup';
 
 import { nanNumberSchema } from '@/react-tools/yup-schemas';
+import i18n from '@/i18n';
 
 import { ServiceFormValues, ServicePort } from './types';
 import { prependWithSlash } from './utils';
@@ -55,13 +56,13 @@ export function kubeServicesValidation(
       Selector: object(),
       Ports: array(
         object({
-          port: nanNumberSchema('Service port number is required.')
-            .required('Service port number is required.')
-            .min(1, 'Service port number must be inside the range 1-65535.')
-            .max(65535, 'Service port number must be inside the range 1-65535.')
+          port: nanNumberSchema(i18n.t('kubernetes.validation.servicePortRequired') as string)
+            .required(i18n.t('kubernetes.validation.servicePortRequired') as string)
+            .min(1, i18n.t('kubernetes.validation.servicePortRange') as string)
+            .max(65535, i18n.t('kubernetes.validation.servicePortRange') as string)
             .test(
               'service-port-is-unique',
-              'Service port number must be unique.',
+              i18n.t('kubernetes.validation.servicePortUnique') as string,
               (servicePort, context) => {
                 // test for duplicate service ports within this service.
                 // yup gives access to context.parent which gives one ServicePort object.
@@ -87,12 +88,12 @@ export function kubeServicesValidation(
                 return duplicateServicePortCount <= 1;
               }
             ),
-          targetPort: nanNumberSchema('Container port number is required.')
-            .required('Container port number is required.')
-            .min(1, 'Container port number must be inside the range 1-65535.')
+          targetPort: nanNumberSchema(i18n.t('kubernetes.validation.containerPortRequired') as string)
+            .required(i18n.t('kubernetes.validation.containerPortRequired') as string)
+            .min(1, i18n.t('kubernetes.validation.containerPortRange') as string)
             .max(
               65535,
-              'Container port number must be inside the range 1-65535.'
+              i18n.t('kubernetes.validation.containerPortRange') as string
             ),
           name: string(),
           serviceName: string(),
@@ -100,7 +101,7 @@ export function kubeServicesValidation(
           nodePort: number()
             .test(
               'node-port-is-unique-in-service',
-              'Node port is already used in this service.',
+              i18n.t('kubernetes.validation.nodePortUniqueInService') as string,
               (nodePort, context) => {
                 if (nodePort === undefined || validationData === undefined) {
                   return true;
@@ -125,7 +126,7 @@ export function kubeServicesValidation(
             )
             .test(
               'node-port-is-unique-in-cluster',
-              'Node port is already used.',
+              i18n.t('kubernetes.validation.nodePortUniqueInCluster') as string,
               (nodePort, context) => {
                 if (nodePort === undefined || validationData === undefined) {
                   return true;
@@ -172,7 +173,7 @@ export function kubeServicesValidation(
             )
             .test(
               'node-port-minimum',
-              'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
+              i18n.t('kubernetes.validation.nodePortRange') as string,
               (nodePort, context) => {
                 if (nodePort === undefined || validationData === undefined) {
                   return true;
@@ -190,7 +191,7 @@ export function kubeServicesValidation(
             )
             .test(
               'node-port-maximum',
-              'Nodeport number must be inside the range 30000-32767 or blank for system allocated.',
+              i18n.t('kubernetes.validation.nodePortRange') as string,
               (nodePort, context) => {
                 if (nodePort === undefined || validationData === undefined) {
                   return true;
@@ -209,12 +210,12 @@ export function kubeServicesValidation(
           ingressPaths: array(
             object({
               IngressName: string().required(),
-              Host: string().required('Ingress hostname is required.'),
+              Host: string().required(i18n.t('kubernetes.validation.ingressHostnameRequired') as string),
               Path: string()
-                .required('Ingress path is required.')
+                .required(i18n.t('kubernetes.validation.ingressPathRequired') as string)
                 .test(
                   'path-is-unique',
-                  'Ingress path is already in use for this hostname.',
+                  i18n.t('kubernetes.validation.ingressPathUnique') as string,
                   (path, context) => {
                     if (
                       path === undefined ||

@@ -1,4 +1,5 @@
 import { notifyError, notifySuccess } from '@/portainer/services/notifications';
+import i18n from '@/i18n';
 import { userQueryKeys } from '@/portainer/users/queries/queryKeys';
 import { queryClient } from '@/react-tools/react-query';
 import { options } from '@/react/portainer/account/AccountView/theme-options';
@@ -33,9 +34,9 @@ export default class ThemeSettingsController {
       await this.UserService.updateUserTheme(this.state.userId, theme);
       await queryClient.invalidateQueries(userQueryKeys.user(this.state.userId));
 
-      notifySuccess('Success', 'User theme settings successfully updated');
+      notifySuccess(i18n.t('portainer_theme.success'), i18n.t('portainer_theme.theme_updated'));
     } catch (err) {
-      notifyError('Failure', err, 'Unable to update user theme settings');
+      notifyError(i18n.t('portainer_theme.failure'), err, i18n.t('portainer_theme.unable_update_theme'));
     }
   }
 
@@ -54,7 +55,7 @@ export default class ThemeSettingsController {
 
         this.state.themeColor = user.ThemeSettings.color || this.state.themeColor;
       } catch (err) {
-        notifyError('Failure', err, 'Unable to get user details');
+        notifyError(i18n.t('portainer_theme.failure'), err, i18n.t('portainer_theme.unable_get_user_details'));
       }
     });
   }

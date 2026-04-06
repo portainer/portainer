@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Users, UserX } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { User, UserId } from '@/portainer/users/types';
 import { TeamId, TeamRole } from '@/react/portainer/users/teams/types';
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
+  const { t } = useTranslation();
   const membershipsQuery = useTeamMemberships(teamId);
 
   const removeMemberMutation = useRemoveMemberMutation(
@@ -55,7 +57,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
         dataset={users}
         columns={columns}
         titleIcon={Users}
-        title="Team members"
+        title={t('teams.members_title')}
         renderTableActions={() =>
           isPureAdmin && (
             <Button
@@ -64,7 +66,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
               icon={UserX}
               data-cy="remove-all-users-button"
             >
-              Remove all users
+            {t('teams.remove_all')}
             </Button>
           )
         }
@@ -89,7 +91,7 @@ export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
   function handleRemoveMembers(userIds: UserId[]) {
     removeMemberMutation.mutate(userIds, {
       onSuccess() {
-        notifySuccess('Success', 'All users successfully removed');
+        notifySuccess(t('common.success'), t('teams.remove_all_success'));
       },
     });
   }

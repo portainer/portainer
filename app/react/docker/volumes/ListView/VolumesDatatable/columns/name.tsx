@@ -1,6 +1,7 @@
 import { CellContext, Column } from '@tanstack/react-table';
 import { Search } from 'lucide-react';
 
+import i18n from '@/i18n';
 import { truncate } from '@/portainer/filters/filters';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { Authorized } from '@/react/hooks/useUser';
@@ -17,7 +18,7 @@ import { columnHelper } from './helper';
 
 export const name = columnHelper.accessor('Name', {
   id: 'name',
-  header: 'Name',
+  header: () => i18n.t('docker.volumes.columns.name'),
   cell: Cell,
   enableColumnFilter: true,
   filterFn: (

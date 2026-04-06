@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { useParamState } from '@/react/hooks/useParamState';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useInfo } from '@/react/docker/proxy/queries/useInfo';
@@ -12,6 +14,7 @@ import { AppTemplatesList } from './AppTemplatesList';
 import { DeployForm } from './DeployFormWidget/DeployFormWidget';
 
 export function AppTemplatesView() {
+  const { t } = useTranslation();
   const envId = useEnvironmentId(false);
 
   const hasCreateAuthQuery = useAuthorizations([
@@ -33,7 +36,7 @@ export function AppTemplatesView() {
 
   return (
     <>
-      <PageHeader title="Application templates list" breadcrumbs="Templates" />
+      <PageHeader title={t('templates.title')} breadcrumbs={t('templates.breadcrumbs')} />
       {selectedTemplate && (
         <DeployForm
           template={selectedTemplate}

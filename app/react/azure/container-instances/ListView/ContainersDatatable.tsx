@@ -1,4 +1,5 @@
 import { Box } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ContainerGroup } from '@/react/azure/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -20,6 +21,7 @@ export interface Props {
 }
 
 export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
+  const { t } = useTranslation();
   const tableState = useTableState(settingsStore, tableKey);
 
   return (
@@ -27,7 +29,7 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
       dataset={dataset}
       columns={columns}
       settingsManager={tableState}
-      title="Containers"
+      title={t('azure_containers.containers_title')}
       titleIcon={Box}
       getRowId={(container) => container.id}
       data-cy="containers-datatable"
@@ -40,12 +42,12 @@ export function ContainersDatatable({ dataset, onRemoveClick }: Props) {
               onConfirmed={() =>
                 handleRemoveClick(selectedRows.map((r) => r.id))
               }
-              confirmMessage="Are you sure you want to delete the selected containers?"
+              confirmMessage={t('azure_containers.delete_confirm')}
             />
           </Authorized>
 
           <Authorized authorizations="AzureContainerGroupCreate">
-            <AddButton data-cy="add-container-button">Add container</AddButton>
+            <AddButton data-cy="add-container-button">{t('azure_containers.add_container')}</AddButton>
           </Authorized>
         </div>
       )}

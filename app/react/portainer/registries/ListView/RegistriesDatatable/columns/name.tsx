@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
 import { Link } from '@@/Link';
@@ -10,7 +11,7 @@ import { columnHelper } from './helper';
 import { DefaultRegistryName } from './DefaultRegistryName';
 
 export const name = columnHelper.accessor('Name', {
-  header: 'Name',
+  header: i18n.t('registries.col_name'),
   cell: Cell,
 });
 

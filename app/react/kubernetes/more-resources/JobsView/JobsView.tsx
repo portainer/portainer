@@ -1,4 +1,5 @@
 import { CalendarCheck2, CalendarSync } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useUnauthorizedRedirect } from '@/react/hooks/useUnauthorizedRedirect';
 
@@ -9,6 +10,7 @@ import { JobsDatatable } from './JobsDatatable/JobsDatatable';
 import { CronJobsDatatable } from './CronJobsDatatable/CronJobsDatatable';
 
 export function JobsView() {
+  const { t } = useTranslation();
   useUnauthorizedRedirect(
     { authorizations: ['K8sJobsR', 'K8sCronJobsR'] },
     { to: 'kubernetes.dashboard' }
@@ -35,7 +37,7 @@ export function JobsView() {
     <>
       <PageHeader
         title="Cron Job & Job lists"
-        breadcrumbs="Cron Jobs & Jobs"
+        breadcrumbs={t('kubernetes.jobs.breadcrumbs')}
         reload
       />
       <>

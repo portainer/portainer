@@ -1,19 +1,19 @@
-<page-header title="'Authentication settings'" breadcrumbs="[{label:'Settings', link:'portainer.settings'}, 'Authentication']" reload="true"> </page-header>
+<page-header title="pageTitle" breadcrumbs="pageBreadcrumbs" reload="true"> </page-header>
 
 <div class="row" ng-if="settings">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="users" title-text="Authentication"></rd-widget-header>
+      <rd-widget-header icon="users" ng-attr-title-text="{{ t('settings.authentication.header') }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="authSettingsForm">
-          <div class="col-sm-12 form-section-title"> Configuration </div>
+          <div class="col-sm-12 form-section-title" ng-bind="t('settings.authentication.configuration')"></div>
 
           <session-lifetime-select value="settings.UserSessionTimeout" on-change="(onChangeSessionLifetime)"> </session-lifetime-select>
 
           <div class="form-group">
             <span class="col-sm-12 text-muted small vertical-center">
               <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-yellow'"></pr-icon>
-              Changing from default is only recommended if you have additional layers of authentication in front of Portainer.
+              <span ng-bind="t('settings.authentication.session_warning')"></span>
             </span>
           </div>
 

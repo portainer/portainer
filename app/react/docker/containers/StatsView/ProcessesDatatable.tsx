@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { List } from 'lucide-react';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
@@ -24,6 +25,7 @@ type ProcessesDatatableProps = {
 };
 
 export function ProcessesDatatable() {
+  const { t } = useTranslation();
   const {
     params: { id: containerId },
   } = useCurrentStateAndParams();
@@ -38,7 +40,7 @@ export function ProcessesDatatable() {
 
   return (
     <Datatable
-      title="Processes"
+      title={t('docker.containers.processes.title')}
       titleIcon={List}
       dataset={topQuery.data?.rows ?? []}
       columns={topQuery.data?.columns ?? []}

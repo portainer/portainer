@@ -1,6 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 import { Node } from 'docker-types';
 
+import i18n from '@/i18n';
 import { ServiceViewModel } from '@/docker/models/service';
 import { useNodes } from '@/react/docker/proxy/queries/nodes/useNodes';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -12,7 +13,7 @@ import { matchesServiceConstraints } from './constraint-helper';
 import { ScaleServiceButton } from './ScaleServiceButton';
 
 export const schedulingMode = columnHelper.accessor('Mode', {
-  header: 'Scheduling Mode',
+  header: () => i18n.t('docker.services.columns.scheduling_mode'),
   cell: Cell,
   enableHiding: false,
 });

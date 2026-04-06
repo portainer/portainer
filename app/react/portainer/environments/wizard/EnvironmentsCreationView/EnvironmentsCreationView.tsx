@@ -2,6 +2,7 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useState, useMemo } from 'react';
 import _ from 'lodash';
 import { Wand2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { notifyError } from '@/portainer/services/notifications';
 import {
@@ -32,6 +33,7 @@ import { WizardEndpointsList } from './WizardEndpointsList';
 import { WizardPodman } from './WizardPodman';
 
 export function EnvironmentCreationView() {
+  const { t } = useTranslation();
   const {
     params: { localEndpointId: localEndpointIdParam, referrer, step: urlStep },
   } = useCurrentStateAndParams();
@@ -56,6 +58,7 @@ export function EnvironmentCreationView() {
       ).map((step) => ({ ...step, enabled: true })),
     [envTypes]
   );
+  );
 
   const { setAnalytics } = useAnalyticsState();
 
@@ -75,8 +78,8 @@ export function EnvironmentCreationView() {
   return (
     <div className="pb-20">
       <PageHeader
-        title="Quick Setup"
-        breadcrumbs={[{ label: 'Environment Wizard' }]}
+        title={t('wizard_env.quick_setup')}
+        breadcrumbs={[{ label: t('wizard_env.environment_wizard') }]}
         reload
       />
 
@@ -91,7 +94,7 @@ export function EnvironmentCreationView() {
       </div>
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon={Wand2} title="Environment Wizard" />
+          <WidgetTitle icon={Wand2} title={t('wizard_env.environment_wizard')} />
           <WidgetBody>
             <FormSection title={formTitles[currentStep.id]}>
               {currentStep.id === 'kaas' && (

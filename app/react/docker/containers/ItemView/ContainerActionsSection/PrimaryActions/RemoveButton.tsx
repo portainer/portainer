@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -25,6 +26,7 @@ export function RemoveButton({
   isRunning,
   isPortainer,
 }: RemoveButtonProps) {
+  const { t } = useTranslation();
   const removeMutation = useRemoveContainer();
 
   async function handleRemove() {
@@ -47,7 +49,7 @@ export function RemoveButton({
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Container successfully removed');
+          notifySuccess(t('common.success'), t('docker.containers.notifications.removed'));
         },
       }
     );

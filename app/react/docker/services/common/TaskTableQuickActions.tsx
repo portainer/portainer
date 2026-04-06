@@ -1,4 +1,5 @@
 import { FileText, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Authorized } from '@/react/hooks/useUser';
 
@@ -20,6 +21,8 @@ export function TaskTableQuickActions({
   taskId: string;
   state?: State;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="inline-flex space-x-1">
       {state.showQuickActionLogs && (
@@ -27,7 +30,7 @@ export function TaskTableQuickActions({
           <Link
             to="docker.tasks.task.logs"
             params={{ id: taskId }}
-            title="Logs"
+            title={t('docker.services.quick_actions.logs')}
             data-cy="docker-task-logs-link"
           >
             <Icon icon={FileText} className="space-right" />
@@ -40,7 +43,7 @@ export function TaskTableQuickActions({
           <Link
             to="docker.tasks.task"
             params={{ id: taskId }}
-            title="Inspect"
+            title={t('docker.services.quick_actions.inspect')}
             data-cy="docker-task-inspect-link"
           >
             <Icon icon={Info} className="space-right" />

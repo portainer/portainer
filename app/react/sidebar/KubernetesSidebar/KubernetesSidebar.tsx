@@ -7,6 +7,7 @@ import {
   Network,
   Server,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -24,6 +25,8 @@ interface Props {
 }
 
 export function KubernetesSidebar({ environmentId }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="-mt-2 mb-2 flex w-full justify-center">
@@ -40,7 +43,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         to="kubernetes.templates.custom"
         params={{ endpointId: environmentId }}
         icon={Edit}
-        label="Custom Templates"
+        label={t('kubernetes.custom_templates')}
         data-cy="k8sSidebar-customTemplates"
       />
 
@@ -48,7 +51,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         to="kubernetes.resourcePools"
         params={{ endpointId: environmentId }}
         icon={Layers}
-        label="Namespaces"
+        label={t('kubernetes.namespaces._label')}
         data-cy="k8sSidebar-namespaces"
       />
 
@@ -57,12 +60,12 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         includePaths={['kubernetes.helm', 'kubernetes.helminstall']}
         icon={Box}
-        label="Applications"
+        label={t('kubernetes.applications._label')}
         data-cy="k8sSidebar-applications"
       />
 
       <SidebarParent
-        label="Networking"
+        label={t('kubernetes.networking')}
         icon={Network}
         to="kubernetes.services"
         params={{ endpointId: environmentId }}
@@ -73,7 +76,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.services"
           params={{ endpointId: environmentId }}
-          label="Services"
+          label={t('kubernetes.services._label')}
           isSubMenu
           data-cy="k8sSidebar-services"
         />
@@ -81,7 +84,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.ingresses"
           params={{ endpointId: environmentId }}
-          label="Ingresses"
+          label={t('kubernetes.ingresses._label')}
           isSubMenu
           data-cy="k8sSidebar-ingresses"
         />
@@ -91,7 +94,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         to="kubernetes.configurations"
         params={{ endpointId: environmentId }}
         icon={Lock}
-        label="ConfigMaps & Secrets"
+        label={t('kubernetes.configurations')}
         data-cy="k8sSidebar-configurations"
       />
 
@@ -102,7 +105,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
       />
 
       <SidebarParent
-        label="More Resources"
+        label={t('kubernetes.more_resources')}
         to="kubernetes.moreResources.jobs"
         pathOptions={{
           includePaths: [
@@ -120,7 +123,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.moreResources.jobs"
           params={{ endpointId: environmentId }}
-          label="Cron Jobs & Jobs"
+          label={t('kubernetes.cron_jobs')}
           data-cy="k8sSidebar-jobs"
           isSubMenu
         />
@@ -132,21 +135,21 @@ export function KubernetesSidebar({ environmentId }: Props) {
           <SidebarItem
             to="kubernetes.moreResources.serviceAccounts"
             params={{ endpointId: environmentId }}
-            label="Service Accounts"
+            label={t('kubernetes.service_accounts._label')}
             data-cy="k8sSidebar-serviceAccounts"
             isSubMenu
           />
           <SidebarItem
             to="kubernetes.moreResources.clusterRoles"
             params={{ endpointId: environmentId }}
-            label="Cluster Roles"
+            label={t('kubernetes.cluster_roles._label')}
             data-cy="k8sSidebar-clusterRoles"
             isSubMenu
           />
           <SidebarItem
             to="kubernetes.moreResources.roles"
             params={{ endpointId: environmentId }}
-            label="Roles"
+            label={t('kubernetes.roles._label')}
             data-cy="k8sSidebar-Roles"
             isSubMenu
           />
@@ -154,7 +157,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
       </SidebarParent>
 
       <SidebarParent
-        label="Cluster"
+        label={t('kubernetes.cluster._label')}
         icon={Server}
         to="kubernetes.cluster"
         params={{ endpointId: environmentId }}
@@ -163,7 +166,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         listId="k8sSidebar-cluster-area"
       >
         <SidebarItem
-          label="Details"
+          label={t('kubernetes.details')}
           to="kubernetes.cluster"
           ignorePaths={[
             'kubernetes.cluster.setup',
@@ -181,7 +184,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           <SidebarItem
             to="kubernetes.cluster.setup"
             params={{ endpointId: environmentId }}
-            label="Setup"
+            label={t('kubernetes.setup')}
             isSubMenu
             data-cy="k8sSidebar-setup"
           />
@@ -195,7 +198,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           <SidebarItem
             to="kubernetes.cluster.securityConstraint"
             params={{ endpointId: environmentId }}
-            label="Security constraints"
+            label={t('kubernetes.security_constraints')}
             isSubMenu
             data-cy="k8sSidebar-securityConstraints"
           />
@@ -210,7 +213,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
             <SidebarItem
               to="kubernetes.cluster.securityConstraint"
               params={{ endpointId: environmentId }}
-              label="Security Constraints"
+              label={t('kubernetes.security_constraints')}
               isSubMenu
               data-cy="k8sSidebar-securityConstraints"
             />
@@ -220,7 +223,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.registries"
           params={{ endpointId: environmentId }}
-          label="Registries"
+          label={t('kubernetes.registries')}
           isSubMenu
           data-cy="k8sSidebar-registries"
         />

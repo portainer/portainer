@@ -11,6 +11,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
+const useMockApi = process.env.MOCK_API === 'true';
+
 /** @type {import('webpack').Configuration} */
 module.exports = {
   entry: {

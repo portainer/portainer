@@ -1,4 +1,5 @@
 import { MultiValue } from 'react-select';
+import { useTranslation } from 'react-i18next';
 
 import { Registry } from '@/react/portainer/registries/types/registry';
 import { useCurrentUser } from '@/react/hooks/useUser';
@@ -21,6 +22,7 @@ export function RegistriesSelector({
   inputId,
   isEditingDisabled,
 }: Props) {
+  const { t } = useTranslation();
   const { isPureAdmin } = useCurrentUser();
 
   if (options.length === 0) {
@@ -68,7 +70,7 @@ export function RegistriesSelector({
       inputId={inputId}
       data-cy="namespaceCreate-registrySelect"
       id="namespaceCreate-registrySelect"
-      placeholder="Select one or more registries"
+      placeholder={t('kubernetes.registries_select_placeholder')}
       isDisabled={isEditingDisabled}
     />
   );

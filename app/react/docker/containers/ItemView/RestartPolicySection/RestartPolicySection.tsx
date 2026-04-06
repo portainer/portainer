@@ -1,5 +1,7 @@
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from '@/i18n';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { Authorized } from '@/react/hooks/useUser';
@@ -27,10 +29,10 @@ interface Props {
 }
 
 const restartPolicyOptions: Array<Option<RestartPolicy>> = [
-  { label: 'None', value: RestartPolicy.No },
-  { label: 'On Failure', value: RestartPolicy.OnFailure },
-  { label: 'Always', value: RestartPolicy.Always },
-  { label: 'Unless Stopped', value: RestartPolicy.UnlessStopped },
+  { label: i18n.t('docker.containers.restart_policy.never'), value: RestartPolicy.No },
+  { label: i18n.t('docker.containers.restart_policy.on_failure'), value: RestartPolicy.OnFailure },
+  { label: i18n.t('docker.containers.restart_policy.always'), value: RestartPolicy.Always },
+  { label: i18n.t('docker.containers.restart_policy.unless_stopped'), value: RestartPolicy.UnlessStopped },
 ];
 
 export function RestartPolicySection({
@@ -41,6 +43,7 @@ export function RestartPolicySection({
   maximumRetryCount = 0,
   onUpdateSuccess,
 }: Props) {
+  const { t } = useTranslation();
   const updateMutation = useUpdateRestartPolicyMutation();
 
   return (
@@ -111,7 +114,7 @@ export function RestartPolicySection({
       },
       {
         onSuccess: () => {
-          notifySuccess('Success', 'Restart policy updated');
+          notifySuccess(t('common.success'), t('docker.containers.notifications.restart_policy_updated'));
 
           onUpdateSuccess?.(values);
         },

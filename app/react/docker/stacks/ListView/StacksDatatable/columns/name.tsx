@@ -1,5 +1,6 @@
 import { CellContext, Column } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { StackStatus } from '@/react/common/stacks/types';
@@ -26,7 +27,7 @@ const filterOptions = [
 type FilterOption = (typeof filterOptions)[number];
 
 export const name = columnHelper.accessor('Name', {
-  header: 'Name',
+  header: () => i18n.t('docker.stacks.columns.name'),
   id: 'name',
   cell: NameCell,
   enableHiding: false,

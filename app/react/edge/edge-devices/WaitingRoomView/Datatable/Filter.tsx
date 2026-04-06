@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { HomepageFilter } from '@/react/portainer/HomeView/EnvironmentList/HomepageFilter';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useEdgeGroups } from '@/react/edge/edge-groups/queries/useEdgeGroups';
@@ -8,11 +9,11 @@ import { PortainerSelect } from '@@/form-components/PortainerSelect';
 import { useFilterStore } from './filter-store';
 
 const checkInOptions = [
-  { value: 0, label: 'Show all time' },
-  { value: 60 * 60, label: 'Show past hour' },
-  { value: 60 * 60 * 24, label: 'Show past day' },
-  { value: 60 * 60 * 24 * 7, label: 'Show past week' },
-  { value: 60 * 60 * 24 * 14, label: 'Show past 14 days' },
+  { value: 0, label: i18n.t('edge.devices.filter.all_time') },
+  { value: 60 * 60, label: i18n.t('edge.devices.filter.past_hour') },
+  { value: 60 * 60 * 24, label: i18n.t('edge.devices.filter.past_day') },
+  { value: 60 * 60 * 24 * 7, label: i18n.t('edge.devices.filter.past_week') },
+  { value: 60 * 60 * 24 * 14, label: i18n.t('edge.devices.filter.past_14_days') },
 ];
 
 export function Filter() {

@@ -6,6 +6,8 @@ import { FormikErrors } from 'formik';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
+import { useTranslation } from 'react-i18next';
+
 import { FormControl } from '@@/form-components/FormControl';
 
 import 'react-datetime-picker/dist/DateTimePicker.css';
@@ -23,8 +25,9 @@ export function DateRangePicker({
   name?: string;
   error?: FormikErrors<Value>;
 }) {
+  const { t } = useTranslation();
   return (
-    <FormControl label="Date range" errors={error}>
+    <FormControl label={t('common.date_range')} errors={error}>
       <div className="w-1/2">
         <WojtekmajRangePicker
           format="y-MM-dd"

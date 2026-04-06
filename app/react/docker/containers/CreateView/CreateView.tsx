@@ -1,6 +1,7 @@
 import { Formik } from 'formik';
 import { useRouter } from '@uirouter/react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useIsEdgeAdmin, useIsEnvironmentAdmin } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -16,7 +17,6 @@ import { confirmDestructive } from '@@/modals/confirm';
 import { buildConfirmButton } from '@@/modals/utils';
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
-import { HelpLink } from '@@/HelpLink';
 
 import { useContainers } from '../queries/useContainers';
 import { useSystemLimits, useIsWindows } from '../../proxy/queries/useInfo';
@@ -28,13 +28,15 @@ import { CreateInnerForm } from './CreateInnerForm';
 import { toRequest } from './toRequest';
 
 export function CreateView() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHeader
-        title="Create container"
+        title={t('docker.containers.create.title')}
         breadcrumbs={[
-          { label: 'Containers', link: 'docker.containers' },
-          'Add container',
+          { label: t('docker.containers.label'), link: 'docker.containers' },
+          t('docker.containers.create.addContainer'),
         ]}
         reload
       />
@@ -45,6 +47,7 @@ export function CreateView() {
 }
 
 function CreateForm() {
+  const { t } = useTranslation();
   const environmentId = useEnvironmentId();
   const router = useRouter();
   const isWindows = useIsWindows(environmentId);
@@ -98,15 +101,9 @@ function CreateForm() {
       {isDuplicating && (
         <div className="row">
           <div className="col-sm-12">
-            <InformationPanel title-text="Caution">
+            <InformationPanel title-text={t('docker.containers.create.caution')}>
               <TextTip>
-                The new container may fail to start if the image is changed, and
-                settings from the previous container aren&apos;t compatible.
-                Common causes include entrypoint, cmd or{' '}
-                <HelpLink docLink="/user/docker/containers/advanced">
-                  other settings
-                </HelpLink>{' '}
-                set by an image.
+                {t('docker.containers.create.cautionMessage')}{' '}
               </TextTip>
             </InformationPanel>
           </div>
@@ -133,10 +130,9 @@ function CreateForm() {
   async function handleSubmit(values: Values) {
     if (oldContainer) {
       const confirmed = await confirmDestructive({
-        title: 'Are you sure?',
-        message:
-          'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
-        confirmButton: buildConfirmButton('Replace', 'danger'),
+        title: t('docker.containers.create.confirmTitle'),
+        message: t('docker.containers.create.confirmMessage'),
+        confirmButton: buildConfirmButton(t('docker.containers.create.confirmReplace'), 'danger'),
       });
 
       if (!confirmed) {
@@ -165,7 +161,7 @@ function CreateForm() {
       },
       {
         onSuccess() {
-          notifySuccess('Success', 'Container successfully created');
+          notifySuccess('Success', t('docker.containers.create.successMessage'));
           router.stateService.go('docker.containers');
         },
       }

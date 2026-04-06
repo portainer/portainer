@@ -4,6 +4,7 @@ import {
   getEnvironmentTypeIcon,
   getPlatformTypeName,
 } from '@/react/portainer/environments/utils';
+import i18n from '@/i18n';
 
 import { Icon } from '@@/Icon';
 
@@ -23,7 +24,7 @@ export const type = columnHelper.accessor(
     containerEngine: rowItem.ContainerEngine,
   }),
   {
-    header: 'Type',
+    header: () => i18n.t('environments.col_type'),
     cell: Cell,
     id: 'Type',
   }

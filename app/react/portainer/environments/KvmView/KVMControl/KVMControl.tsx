@@ -1,4 +1,5 @@
 import { KVM } from '@open-amt-cloud-toolkit/ui-toolkit-react/reactjs/src/kvm.bundle';
+import { useTranslation } from 'react-i18next';
 
 import './KVMControl.css';
 
@@ -9,7 +10,8 @@ export interface KVMControlProps {
 }
 
 export function KVMControl({ deviceId, server, token }: KVMControlProps) {
-  if (!deviceId || !server || !token) return <div>Loading...</div>;
+  const { t } = useTranslation();
+  if (!deviceId || !server || !token) return <div>{t('common.loading')}</div>;
 
   return (
     <KVM

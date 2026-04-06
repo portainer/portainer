@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { User } from '@/portainer/users/types';
 
 import { Select } from '@@/form-components/ReactSelect';
@@ -16,6 +18,7 @@ export function PorAccessControlFormUserSelector({
   options,
   inputId,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <Select
       isMulti
@@ -28,7 +31,7 @@ export function PorAccessControlFormUserSelector({
       data-cy="portainer-selectUserAccess"
       id="portainer-selectUserAccess"
       inputId={inputId}
-      placeholder="Select one or more users"
+      placeholder={t('access_control_form.users_selector_placeholder')}
     />
   );
 }

@@ -1,7 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Clock } from 'lucide-react';
 import { EventMessage } from 'docker-types';
+import { useTranslation } from 'react-i18next';
 
+import i18n from '@/i18n';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 
 import { Datatable } from '@@/datatables';
@@ -14,17 +16,19 @@ const columnHelper = createColumnHelper<EventMessage>();
 
 export const columns = [
   columnHelper.accessor('time', {
-    header: 'Date',
+    header: () => i18n.t('docker.events.date'),
     cell: ({ getValue }) => {
       const value = getValue();
       return isoDateFromTimestamp(value);
     },
   }),
   columnHelper.accessor((c) => c.Type, {
-    header: 'Type',
+    id: 'type',
+    header: () => i18n.t('docker.events.type'),
   }),
   columnHelper.accessor((c) => createEventDetails(c), {
-    header: 'Details',
+    id: 'details',
+    header: () => i18n.t('docker.events.details'),
   }),
 ];
 
@@ -40,6 +44,7 @@ export function EventsDatatable({
   dataset?: Array<EventMessage>;
 }) {
   const tableState = useTableState(settingsStore, tableKey);
+  const { t } = useTranslation();
 
   return (
     <Datatable
@@ -47,7 +52,7 @@ export function EventsDatatable({
       isLoading={!dataset}
       columns={columns}
       settingsManager={tableState}
-      title="Events"
+      title={t('docker.events.table_title')}
       titleIcon={Clock}
       disableSelect
       data-cy="docker-events-datatable"

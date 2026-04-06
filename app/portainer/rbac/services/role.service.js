@@ -1,12 +1,13 @@
 import { RoleViewModel, RoleTypes } from '../models/role';
+import i18n from '@/i18n';
 
 export function RoleService() {
   const rolesData = [
-    new RoleViewModel(RoleTypes.ENDPOINT_ADMIN, 'Environment administrator', 'Full control of all resources in an environment', []),
-    new RoleViewModel(RoleTypes.OPERATOR, 'Operator', 'Operational Control of all existing resources in an environment', []),
-    new RoleViewModel(RoleTypes.HELPDESK, 'Helpdesk', 'Read-only access of all resources in an environment', []),
-    new RoleViewModel(RoleTypes.READ_ONLY, 'Read-only user', 'Read-only access of assigned resources in an environment', []),
-    new RoleViewModel(RoleTypes.STANDARD, 'Standard user', 'Full control of assigned resources in an environment', []),
+    new RoleViewModel(RoleTypes.ENDPOINT_ADMIN, i18n.t('roles.env_admin'), i18n.t('roles.env_admin_desc'), []),
+    new RoleViewModel(RoleTypes.OPERATOR, i18n.t('roles.operator'), i18n.t('roles.operator_desc'), []),
+    new RoleViewModel(RoleTypes.HELPDESK, i18n.t('roles.helpdesk'), i18n.t('roles.helpdesk_desc'), []),
+    new RoleViewModel(RoleTypes.READ_ONLY, i18n.t('roles.read_only'), i18n.t('roles.read_only_desc'), []),
+    new RoleViewModel(RoleTypes.STANDARD, i18n.t('roles.standard'), i18n.t('roles.standard_desc'), []),
   ];
 
   return {

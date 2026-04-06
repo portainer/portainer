@@ -1,6 +1,7 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 import { Plug2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useCreateAgentEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -38,6 +39,7 @@ export function AgentForm({
   envDefaultPort,
   containerEngine = ContainerEngine.Docker,
 }: Props) {
+  const { t } = useTranslation();
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
 
   const mutation = useCreateAgentEnvironmentMutation();
@@ -63,12 +65,12 @@ export function AgentForm({
               <LoadingButton
                 className="wizard-connect-button vertical-center"
                 data-cy="agent-connect-environment-button"
-                loadingText="Connecting environment..."
+                loadingText={t('wizard_env.connecting')}
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
                 icon={Plug2}
               >
-                Connect
+                {t('wizard_env.connect')}
               </LoadingButton>
             </div>
           </div>
@@ -82,7 +84,7 @@ export function AgentForm({
       { ...values, containerEngine },
       {
         onSuccess(environment) {
-          notifySuccess('Environment created', environment.Name);
+          notifySuccess(t('wizard_env.env_created'), environment.Name);
           clearForm();
           onCreate(environment);
         },

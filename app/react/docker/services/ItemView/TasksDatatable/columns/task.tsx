@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { isAgentEnvironment } from '@/react/portainer/environments/utils';
 
@@ -11,7 +12,7 @@ import { getTableMeta } from '../meta';
 import { columnHelper } from './helper';
 
 export const task = columnHelper.accessor('Id', {
-  header: 'Id',
+  header: () => i18n.t('docker.services.tasks.columns.id'),
   cell: Cell,
 });
 

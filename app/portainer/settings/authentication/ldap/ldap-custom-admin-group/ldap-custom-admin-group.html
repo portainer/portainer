@@ -90,7 +90,7 @@
           ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
           limited-feature-tabindex="-1"
         >
-          Fetch Admin Group(s)
+          {{ 'portainer_ldap.fetch_admin_groups' | i18n }}
         </button>
         <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="vertical-center ml-6">
           <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
@@ -119,7 +119,7 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate && $ctrl.groups">
-      <label for="group-access" class="control-label col-sm-2 text-left"> Select Group(s) </label>
+      <label for="group-access" class="control-label col-sm-2 text-left"> {{ 'portainer_ldap.select_groups' | i18n }} </label>
       <div class="col-sm-8">
         <por-select
           data-cy="'group-access-selector'"

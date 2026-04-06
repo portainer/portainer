@@ -1,9 +1,9 @@
-<page-header title="'Volume details'" breadcrumbs="[{label:'Volumes', link:'docker.volumes'}, volume.Id]"> </page-header>
+<page-header title="'docker_volumes.details_title' | i18n" breadcrumbs="[{label:'common.volumes' | i18n, link:'docker.volumes'}, volume.Id]"> </page-header>
 
 <div class="row" ng-if="volume">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="database" title-text="Volume details"></rd-widget-header>
+      <rd-widget-header icon="database" title-text="{{ 'docker_volumes.details_header' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -18,27 +18,27 @@
                   authorization="DockerAgentBrowseList"
                 >
                   <pr-icon icon="'search'" class="leading-none"></pr-icon>
-                  Browse
+                  {{ 'docker_volumes.browse_button' | i18n }}
                 </button>
                 <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"
-                  ><pr-icon icon="'trash-2'" class="leading-none"></pr-icon> Remove this volume</button
+                  ><pr-icon icon="'trash-2'" class="leading-none"></pr-icon> {{ 'docker_volumes.remove_this_volume' | i18n }}</button
                 >
               </td>
             </tr>
             <tr>
-              <td>Created</td>
+              <td>{{ 'common.created' | i18n }}</td>
               <td>{{ volume.CreatedAt | getisodate }}</td>
             </tr>
             <tr>
-              <td>Mount path</td>
+              <td>{{ 'docker_volumes.mount_path' | i18n }}</td>
               <td>{{ volume.Mountpoint }}</td>
             </tr>
             <tr>
-              <td>Driver</td>
+              <td>{{ 'docker_volumes.driver_label' | i18n }}</td>
               <td>{{ volume.Driver }}</td>
             </tr>
             <tr ng-if="!(volume.Labels | emptyobject)">
-              <td>Labels</td>
+              <td>{{ 'docker_images.labels' | i18n }}</td>
               <td>
                 <table class="table-bordered table-condensed table">
                   <tr ng-repeat="(k, v) in volume.Labels">
@@ -70,7 +70,7 @@
 <div class="row" ng-if="!(volume.Options | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="settings" title-text="Volume options"></rd-widget-header>
+      <rd-widget-header icon="settings" title-text="{{ 'docker_volumes.options_header' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -87,13 +87,13 @@
 <div class="row" ng-if="containersUsingVolume.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="box" title-text="Containers using volume"></rd-widget-header>
+      <rd-widget-header icon="box" title-text="{{ 'docker_volumes.containers_using_header' | i18n }}"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
-            <th>Container Name</th>
-            <th>Mounted At</th>
-            <th>Read-only</th>
+            <th>{{ 'docker_volumes.container_name' | i18n }}</th>
+            <th>{{ 'docker_volumes.mounted_at' | i18n }}</th>
+            <th>{{ 'docker_volumes.read_only' | i18n }}</th>
           </thead>
           <tbody>
             <tr ng-repeat="container in containersUsingVolume">

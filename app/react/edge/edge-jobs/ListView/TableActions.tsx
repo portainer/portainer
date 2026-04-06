@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { AddButton } from '@@/buttons';
@@ -12,18 +14,19 @@ export function TableActions({
 }: {
   selectedItems: Array<EdgeJob>;
 }) {
+  const { t } = useTranslation();
   const removeMutation = useDeleteEdgeJobsMutation();
 
   return (
     <div className="flex items-center gap-2">
       <DeleteButton
-        confirmMessage="Do you want to remove the selected Edge Job(s)?"
+        confirmMessage={t('edge.jobs.confirm_remove')}
         disabled={selectedItems.length === 0}
         onConfirmed={() => handleRemove(selectedItems)}
         data-cy="remove-edge-jobs-button"
       />
 
-      <AddButton data-cy="add-edge-job-button">Add Edge job</AddButton>
+      <AddButton data-cy="add-edge-job-button">{t('edge.jobs.add')}</AddButton>
     </div>
   );
 
@@ -31,7 +34,7 @@ export function TableActions({
     const ids = selectedItems.map((item) => item.Id);
     removeMutation.mutate(ids, {
       onSuccess: () => {
-        notifySuccess('Success', 'Edge Job(s) removed');
+        notifySuccess(t('common.success'), t('edge.jobs.notifications.removed'));
       },
     });
   }

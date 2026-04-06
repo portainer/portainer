@@ -1,4 +1,5 @@
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { Authorized } from '@/react/hooks/useUser';
@@ -60,6 +61,7 @@ export function BaseForm({
   onRateLimit: (limited?: boolean) => void;
 }) {
   const { setFieldValue, values, errors, isValid } = useFormikContext<Values>();
+  const { t } = useTranslation();
   const environmentQuery = useCurrentEnvironment();
   const isAgentOnSwarm = useIsAgentOnSwarm();
   if (!environmentQuery.data) {
@@ -82,7 +84,7 @@ export function BaseForm({
           error={errors?.name}
         />
 
-        <FormSection title="Image Configuration">
+        <FormSection title={t('docker.containers.create.imageConfiguration')}>
           <ImageConfigFieldset
             values={values.image}
             setFieldValue={(field, value) =>
@@ -96,8 +98,8 @@ export function BaseForm({
             <div className="form-group">
               <div className="col-sm-12">
                 <SwitchField
-                  label="Always pull the image"
-                  tooltip="When enabled, Portainer will automatically try to pull the specified image before creating the container."
+                  label={t('docker.containers.create.alwaysPull')}
+                  tooltip={t('docker.containers.create.alwaysPullTooltip')}
                   checked={values.alwaysPull}
                   onChange={(alwaysPull) =>
                     setFieldValue('alwaysPull', alwaysPull)
@@ -112,13 +114,13 @@ export function BaseForm({
 
         {canUseWebhook && (
           <Authorized authorizations="PortainerWebhookCreate" adminOnlyCE>
-            <FormSection title="Webhook">
+            <FormSection title={t('docker.containers.create.webhook')}>
               <div className="form-group">
                 <div className="col-sm-12">
                   <SwitchField
-                    label="Create a container webhook"
+                    label={t('docker.containers.create.createWebhook')}
                     data-cy="container-webhook-switch"
-                    tooltip="Create a webhook (or callback URI) to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
+                    tooltip={t('docker.containers.create.createWebhookTooltip')}
                     checked={values.enableWebhook}
                     onChange={(enableWebhook) =>
                       setFieldValue('enableWebhook', enableWebhook)
@@ -132,13 +134,13 @@ export function BaseForm({
           </Authorized>
         )}
 
-        <FormSection title="Network ports configuration">
+        <FormSection title={t('docker.containers.create.networkPorts')}>
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
-                label="Publish all exposed ports to random host ports"
+                label={t('docker.containers.create.publishAllPorts')}
                 data-cy="publish-all-ports-switch"
-                tooltip="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."
+                tooltip={t('docker.containers.create.publishAllPortsTooltip')}
                 checked={values.publishAllPorts}
                 onChange={(publishAllPorts) =>
                   setFieldValue('publishAllPorts', publishAllPorts)
@@ -156,7 +158,7 @@ export function BaseForm({
         </FormSection>
 
         {isAgentOnSwarm && (
-          <FormSection title="Deployment">
+          <FormSection title={t('docker.containers.create.deployment')}>
             <NodeSelector
               value={values.nodeName}
               onChange={(nodeName) => setFieldValue('nodeName', nodeName)}
@@ -176,9 +178,9 @@ export function BaseForm({
         <div className="form-group">
           <div className="col-sm-12">
             <SwitchField
-              label="Auto remove"
+              label={t('docker.containers.create.autoRemove')}
               data-cy="container-auto-remove-switch"
-              tooltip="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
+              tooltip={t('docker.containers.create.autoRemoveTooltip')}
               checked={values.autoRemove}
               onChange={(autoRemove) => setFieldValue('autoRemove', autoRemove)}
               labelClass="col-sm-3 col-lg-2"
@@ -189,12 +191,12 @@ export function BaseForm({
         <div className="form-group">
           <div className="col-sm-12">
             <LoadingButton
-              loadingText="Deployment in progress..."
+              loadingText={t('docker.containers.create.deploymentInProgress')}
               data-cy="deploy-container-button"
               isLoading={isLoading}
               disabled={!isValid}
             >
-              Deploy the container
+              {t('docker.containers.create.deployContainer')}
             </LoadingButton>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { LayoutGrid } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
@@ -14,12 +15,13 @@ const tableKey = 'edge-groups';
 const settingsStore = createPersistedStore(tableKey);
 
 export function EdgeGroupsDatatable() {
+  const { t } = useTranslation();
   const tableState = useTableState(settingsStore, tableKey);
   const edgeGroupsQuery = useEdgeGroups();
 
   return (
     <Datatable
-      title="Edge Groups"
+      title={t('edge.groups_title')}
       titleIcon={LayoutGrid}
       columns={columns}
       dataset={edgeGroupsQuery.data || []}

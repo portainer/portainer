@@ -4,6 +4,7 @@ import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { Column, Row, TableMeta } from '@tanstack/react-table';
 import { Check, Filter } from 'lucide-react';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 
@@ -26,6 +27,7 @@ export function MultipleSelectionFilter({
   onChange,
   menuTitle = 'Filter by state',
 }: MultipleSelectionFilterProps) {
+  const { t } = useTranslation();
   const enabled = value.length > 0;
 
   // This will make sure that if the current value has options that are not in the options list,
@@ -43,7 +45,7 @@ export function MultipleSelectionFilter({
             'filter-active': enabled,
           })}
         >
-          Filter
+          {t('common.filter')}
           <Icon icon={enabled ? Check : Filter} />
         </MenuButton>
         <MenuPopover className="dropdown-menu">

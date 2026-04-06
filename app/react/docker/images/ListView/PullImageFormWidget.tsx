@@ -1,6 +1,7 @@
 import { DownloadIcon } from 'lucide-react';
 import { Formik } from 'formik';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
@@ -20,6 +21,7 @@ export function PullImageFormWidget({
 }: {
   isNodeVisible: boolean;
 }) {
+  const { t } = useTranslation();
   const envId = useEnvironmentId();
   const mutation = usePullImageMutation(envId);
   const authorizedQuery = useAuthorizations('DockerImageCreate');
@@ -38,7 +40,7 @@ export function PullImageFormWidget({
 
   return (
     <Widget>
-      <Widget.Title icon={DownloadIcon} title="Pull image" />
+      <Widget.Title icon={DownloadIcon} title={t('docker.images.pull.title')} />
       <Widget.Body>
         <Formik
           initialValues={initialValues}
@@ -69,7 +71,7 @@ export function PullImageFormWidget({
       },
       {
         onSuccess() {
-          notifySuccess('Image successfully pulled', config.image);
+          notifySuccess(t('docker.images.pull.successMessage'), config.image);
         },
       }
     );

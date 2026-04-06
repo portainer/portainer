@@ -1,5 +1,6 @@
 import { CellContext } from '@tanstack/react-table';
 
+import i18n from '@/i18n';
 import { ImagesListResponse } from '@/react/docker/images/queries/useImages';
 
 import { Badge } from '@@/Badge';
@@ -7,14 +8,11 @@ import { Tooltip } from '@@/Tip/Tooltip/Tooltip';
 
 import { columnHelper } from './helper';
 
-export const tags = columnHelper.accessor(
-  (item) => (isDangling(item.tags) ? 'Dangling' : item.tags?.join(',')),
-  {
-    id: 'tags',
-    header: 'Tags',
-    cell: Cell,
-  }
-);
+export const tags = columnHelper.accessor((item) => item.tags?.join(','), {
+  id: 'tags',
+  header: () => i18n.t('docker.images.columns.tags'),
+  cell: Cell,
+});
 
 function Cell({
   row: { original: item },

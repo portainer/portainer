@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@@/PageHeader';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
@@ -12,6 +13,7 @@ import { useExportMutation } from './useExportMutation';
 import { FilterBar } from './FilterBar';
 
 export function ActivityLogsView() {
+  const { t } = useTranslation();
   const exportMutation = useExportMutation();
   const [range, setRange] = useState<
     { start: Date; end: Date | null } | undefined
@@ -39,8 +41,8 @@ export function ActivityLogsView() {
   return (
     <>
       <PageHeader
-        title="User activity logs"
-        breadcrumbs="User activity logs"
+        title={t('logs.activity_title')}
+        breadcrumbs={t('logs.activity_breadcrumbs')}
         reload
       />
 

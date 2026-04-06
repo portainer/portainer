@@ -1,5 +1,6 @@
 import { mixed, object, SchemaOf, string } from 'yup';
 
+import i18n from '@/i18n';
 import { CreateAgentEnvironmentValues } from '@/react/portainer/environments/environment.service/create';
 import { useNameValidation } from '@/react/portainer/environments/common/NameField/NameField';
 import { metadataValidation } from '@/react/portainer/environments/common/MetadataFieldset/validation';
@@ -15,10 +16,10 @@ export function useValidation(): SchemaOf<CreateAgentEnvironmentValues> {
 
 function environmentValidation() {
   return string()
-    .required('This field is required')
+    .required(i18n.t('validation.field_required'))
     .test(
       'address',
-      'Environment address must be of the form <IP>:<PORT> or <HOST>:<PORT>.',
+      i18n.t('validation.env_address_format'),
       (environmentUrl) => validateAddress(environmentUrl)
     );
 }

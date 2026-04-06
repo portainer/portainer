@@ -1,16 +1,19 @@
+import { useTranslation } from 'react-i18next';
+
 import { PageHeader } from '@@/PageHeader';
 import { Widget, WidgetBody } from '@@/Widget';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 
 export function CreateView() {
+  const { t } = useTranslation();
   return (
     <>
       <PageHeader
-        title="Create container instance"
+        title={t('azure_containers.create_title')}
         breadcrumbs={[
-          { link: 'azure.containerinstances', label: 'Container instances' },
-          { label: 'Add container' },
+          { link: 'azure.containerinstances', label: t('azure_containers.container_instances') },
+          { label: t('azure_containers.add_container') },
         ]}
         reload
       />

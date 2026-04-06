@@ -3,6 +3,7 @@ import { CellContext } from '@tanstack/react-table';
 import { useAuthorizations } from '@/react/hooks/useUser';
 import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
 import { ContainerListViewModel } from '@/react/docker/containers/types';
+import i18n from '@/i18n';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
 
@@ -11,7 +12,7 @@ import { TableSettings } from '../types';
 import { columnHelper } from './helper';
 
 export const quickActions = columnHelper.display({
-  header: 'Quick Actions',
+  header: i18n.t('common.quick_actions') as string,
   id: 'actions',
   cell: QuickActionsCell,
 });

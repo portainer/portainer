@@ -1,4 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
@@ -13,6 +14,7 @@ import { Button } from '@@/buttons';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 export function DefaultRegistryAction() {
+  const { t } = useTranslation();
   const settingsQuery = usePublicSettings({
     select: (settings) => settings.DefaultRegistry?.Hide,
   });
@@ -36,14 +38,11 @@ export function DefaultRegistryAction() {
             onClick={() => handleShowOrHide(true)}
             disabled={isLimited}
           >
-            Hide for all users
+            {t('registries.hide_for_all_users')}
           </Button>
           <BEFeatureIndicator featureId={FeatureId.HIDE_DOCKER_HUB_ANONYMOUS} />
           {isLimited && (
-            <Tooltip
-              message="This hides the option in any registry dropdown prompts but does not prevent a user from deploying anonymously from Docker Hub directly via YAML.
-            Note: Docker Hub (anonymous) will continue to show as the ONLY option if there are NO other registries available to the user."
-            />
+            <Tooltip message={t('registries.hide_tooltip')} />
           )}
         </div>
       ) : (
@@ -53,12 +52,9 @@ export function DefaultRegistryAction() {
             icon={Eye}
             onClick={() => handleShowOrHide(false)}
           >
-            Show for all users
+            {t('registries.show_for_all_users')}
           </Button>
-          <Tooltip
-            message="This reveals the option in any registry dropdown prompts.
-                    (but note that the Docker Hub (anonymous) option only shows if there is no credentialled Docker Hub option available to the user)."
-          />
+          <Tooltip message={t('registries.show_tooltip')} />
         </div>
       )}
     </>
@@ -72,8 +68,8 @@ export function DefaultRegistryAction() {
       {
         onSuccess() {
           notifySuccess(
-            'Success',
-            'Default registry Settings updated successfully'
+            t('registries.success'),
+            t('registries.default_registry_updated')
           );
         },
       }

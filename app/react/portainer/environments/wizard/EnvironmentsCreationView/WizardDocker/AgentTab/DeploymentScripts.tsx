@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { useAgentDetails } from '@/react/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
@@ -7,37 +9,39 @@ import { Code } from '@@/Code';
 import { NavTabs } from '@@/NavTabs';
 import { NavContainer } from '@@/NavTabs/NavContainer';
 
-const deploymentsStandalone = [
-  {
-    id: 'linux',
-    label: 'Linux & Windows WSL',
-    command: linuxStandaloneCommand,
-  },
-  {
-    id: 'win',
-    label: 'Windows WCS',
-    command: winStandaloneCommand,
-  },
-];
-
-const deploymentsSwarm = [
-  {
-    id: 'linux',
-    label: 'Linux & Windows WSL',
-    command: linuxSwarmCommand,
-  },
-  {
-    id: 'win',
-    label: 'Windows WCS',
-    command: winSwarmCommand,
-  },
-];
-
 interface Props {
   isDockerStandalone?: boolean;
 }
 
 export function DeploymentScripts({ isDockerStandalone }: Props) {
+  const { t } = useTranslation();
+
+  const deploymentsStandalone = [
+    {
+      id: 'linux',
+      label: t('wizard_docker_scripts.linux_wsl'),
+      command: linuxStandaloneCommand,
+    },
+    {
+      id: 'win',
+      label: t('wizard_docker_scripts.windows_wcs'),
+      command: winStandaloneCommand,
+    },
+  ];
+
+  const deploymentsSwarm = [
+    {
+      id: 'linux',
+      label: t('wizard_docker_scripts.linux_wsl'),
+      command: linuxSwarmCommand,
+    },
+    {
+      id: 'win',
+      label: t('wizard_docker_scripts.windows_wcs'),
+      command: winSwarmCommand,
+    },
+  ];
+
   const deployments = isDockerStandalone
     ? deploymentsStandalone
     : deploymentsSwarm;
@@ -77,6 +81,8 @@ interface DeployCodeProps {
 }
 
 function DeployCode({ code }: DeployCodeProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="code-script">
@@ -84,7 +90,7 @@ function DeployCode({ code }: DeployCodeProps) {
       </div>
       <div className="mt-2">
         <CopyButton copyText={code} data-cy="copy-deployment-script">
-          Copy command
+          {t('wizard_env.copy_command')}
         </CopyButton>
       </div>
     </>

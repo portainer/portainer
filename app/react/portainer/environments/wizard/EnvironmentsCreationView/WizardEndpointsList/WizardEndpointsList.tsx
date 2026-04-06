@@ -1,5 +1,6 @@
 import { Plug2 } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { stripProtocol } from '@/react/common/string-utils';
 import { endpointTypeName } from '@/portainer/filters/filters';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function WizardEndpointsList({ environmentIds }: Props) {
+  const { t } = useTranslation();
   const { environments } = useEnvironmentList(
     { endpointIds: environmentIds },
     {
@@ -46,7 +48,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
 
   return (
     <Widget>
-      <WidgetTitle icon={Plug2} title="New Environments" />
+      <WidgetTitle icon={Plug2} title={t('wizard.new_environments')} />
       <WidgetBody>
         {environments.map((environment) => (
           <div className={styles.wizardListWrapper} key={environment.Id}>
@@ -66,10 +68,10 @@ export function WizardEndpointsList({ environmentIds }: Props) {
             </div>
             <div className={styles.wizardListTitle}>{environment.Name}</div>
             <div className={styles.wizardListSubtitle}>
-              URL: {stripProtocol(environment.URL)}
+              {t('wizard_env.url_prefix')}{stripProtocol(environment.URL)}
             </div>
             <div className={styles.wizardListType}>
-              Type: {endpointTypeName(environment.Type)}
+              {t('wizard_env.type_prefix')}{endpointTypeName(environment.Type)}
             </div>
             {isEdgeEnvironment(environment.Type) && (
               <div className={styles.wizardListEdgeStatus}>

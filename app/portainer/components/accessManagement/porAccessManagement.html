@@ -1,14 +1,14 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget ng-if="ctrl.availableUsersAndTeams && ctrl.accessControlledEntity">
-      <rd-widget-header icon="user-check" title-text="Create access"></rd-widget-header>
+      <rd-widget-header icon="user-check" title-text="{{ 'portainer_access.create_access' | i18n }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
             <span class="col-sm-12 small text-warning">
               <p class="vertical-center">
                 <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
-                Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
+                {{ 'portainer_access.user_access_warning' | i18n }}
               </p>
             </span>
           </div>
@@ -20,7 +20,7 @@
           ></por-access-management-users-selector>
 
           <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
-            <label class="col-sm-3 col-lg-2 control-label text-left"> Role </label>
+            <label class="col-sm-3 col-lg-2 control-label text-left"> {{ 'portainer_access.role' | i18n }} </label>
             <div class="col-sm-9 col-lg-6">
               <div class="flex items-center">
                 <div>
@@ -50,9 +50,9 @@
               >
                 <span ng-hide="ctrl.state.actionInProgress" class="vertical-center">
                   <pr-icon icon="'plus'"></pr-icon>
-                  Create access
+                  {{ 'portainer_access.create_access' | i18n }}
                 </span>
-                <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
+                <span ng-show="ctrl.state.actionInProgress">{{ 'portainer_access.creating_access' | i18n }}</span>
               </button>
             </div>
           </div>

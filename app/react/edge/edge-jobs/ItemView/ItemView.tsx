@@ -1,4 +1,5 @@
 import { ListIcon, WrenchIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useIdParam } from '@/react/hooks/useIdParam';
 
@@ -26,7 +27,9 @@ const TABS_FOR_INDEX: Tab[] = [
   },
 ];
 
+
 export function ItemView() {
+  const { t } = useTranslation();
   const id = useIdParam();
   const edgeJobQuery = useEdgeJob(id);
   const currentTabIndex = useCurrentTabIndex(TABS_FOR_INDEX);
@@ -39,7 +42,7 @@ export function ItemView() {
 
   const tabs: Tab[] = [
     {
-      name: 'Configuration',
+      name: t('edge.jobs_tab_config'),
       icon: WrenchIcon,
       widget: (
         <div className="row">
@@ -55,7 +58,7 @@ export function ItemView() {
       selectedTabParam: 'configuration',
     },
     {
-      name: 'Results',
+      name: t('edge.jobs_tab_results'),
       icon: ListIcon,
       widget: <ResultsDatatable jobId={edgeJob.Id} />,
       selectedTabParam: 'results',
@@ -65,8 +68,8 @@ export function ItemView() {
   return (
     <>
       <PageHeader
-        title="Edge job details"
-        breadcrumbs={[{ label: 'Edge jobs', link: 'edge.jobs' }, edgeJob.Name]}
+        title={t('edge.jobs_details')}
+        breadcrumbs={[{ label: t('edge.jobs_title'), link: 'edge.jobs' }, edgeJob.Name]}
       />
 
       {tabs.length === 1 ? (

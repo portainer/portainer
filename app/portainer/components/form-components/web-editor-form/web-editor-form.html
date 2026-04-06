@@ -1,7 +1,7 @@
 <ng-form name="$ctrl.webEditorForm">
   <div class="web-editor overflow-x-hidden">
     <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title pr-0"
-      >Web editor
+      >{{ 'portainer_editor.web_editor' | i18n }}
       <div class="text-muted small vertical-center float-right mt-0">
         <span ng-if="$ctrl.BROWSER_OS_PLATFORM !== 'mac'" class="vertical-center">Ctrl+F for search</span>
         <span ng-if="$ctrl.BROWSER_OS_PLATFORM === 'mac'" class="vertical-center">Cmd+F for search</span>

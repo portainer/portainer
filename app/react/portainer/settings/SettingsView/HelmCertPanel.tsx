@@ -1,6 +1,7 @@
 import { Form, Formik, useFormikContext } from 'formik';
 import { Key } from 'lucide-react';
 import { SchemaOf, object } from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 
@@ -24,6 +25,7 @@ interface FormValues {
 }
 
 export function HelmCertPanel() {
+  const { t } = useTranslation();
   const mutation = useUpdateSSLConfigMutation();
   const initialValues = {
     clientCertFile: null,
@@ -34,7 +36,7 @@ export function HelmCertPanel() {
       <Widget>
         <Widget.Title
           icon={Key}
-          title="Certificate Authority file for Kubernetes Helm repositories"
+          title={t('settings.helm.title')}
         />
         <Widget.Body>
           <Formik
@@ -59,7 +61,7 @@ export function HelmCertPanel() {
       { clientCertFile },
       {
         onSuccess() {
-          notifySuccess('Success', 'Helm certificate updated');
+          notifySuccess('Success', t('settings.helm.updated'));
         },
       }
     );
@@ -67,6 +69,7 @@ export function HelmCertPanel() {
 }
 
 function InnerForm({ isLoading }: { isLoading: boolean }) {
+  const { t } = useTranslation();
   const { values, setFieldValue, errors, isValid } =
     useFormikContext<FormValues>();
 
@@ -75,15 +78,14 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
       <div className="form-group">
         <div className="col-sm-12">
           <TextTip color="blue">
-            Provide an additional CA file containing certificate(s) for HTTPS
-            connections to Helm repositories.
+            {t('settings.helm.description')}
           </TextTip>
         </div>
       </div>
 
       <FormControl
-        label="CA file"
-        tooltip="Select a CA file containing your X.509 certificate(s), commonly a crt, cer or pem file."
+        label={t('settings.helm_ca_file')}
+        tooltip={t('settings.helm_ca_tooltip')}
         inputId="ca-cert-field"
         errors={errors?.clientCertFile}
       >
@@ -100,8 +102,8 @@ function InnerForm({ isLoading }: { isLoading: boolean }) {
       <FormActions
         isValid={isValid}
         isLoading={isLoading}
-        submitLabel="Apply changes"
-        loadingText="Saving in progress..."
+        submitLabel={t('settings.helm_apply')}
+        loadingText={t('settings.helm_saving')}
         data-cy="helm-cert-panel-submit-button"
       />
     </Form>

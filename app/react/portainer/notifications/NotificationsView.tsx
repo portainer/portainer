@@ -1,6 +1,7 @@
 import { Bell } from 'lucide-react';
 import { useStore } from 'zustand';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useTranslation } from 'react-i18next';
 
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { react2angular } from '@/react-tools/react2angular';
@@ -25,13 +26,14 @@ const settingsStore = createPersistedStore(storageKey, {
 });
 
 export function NotificationsView() {
+  const { t } = useTranslation();
   const { user } = useUser();
 
   const userNotifications: ToastNotification[] =
     useStore(notificationsStore, (state) => state.userNotifications[user.Id]) ||
     [];
 
-  const breadcrumbs = 'Notifications';
+  const breadcrumbs = t('notifications.title');
   const tableState = useTableState(settingsStore, storageKey);
 
   const {
@@ -40,10 +42,10 @@ export function NotificationsView() {
 
   return (
     <>
-      <PageHeader title="Notifications" breadcrumbs={breadcrumbs} reload />
+      <PageHeader title={t('notifications.title')} breadcrumbs={breadcrumbs} reload />
       <Datatable
         columns={columns}
-        title="Notifications"
+        title={t('notifications.title')}
         titleIcon={Bell}
         dataset={userNotifications}
         settingsManager={tableState}
@@ -59,6 +61,7 @@ export function NotificationsView() {
 }
 
 function TableActions({ selectedRows }: { selectedRows: ToastNotification[] }) {
+  const { t } = useTranslation();
   const { user } = useUser();
   const notificationsStoreState = useStore(notificationsStore);
   return (
@@ -66,7 +69,7 @@ function TableActions({ selectedRows }: { selectedRows: ToastNotification[] }) {
       onConfirmed={() => handleRemove()}
       disabled={selectedRows.length === 0}
       data-cy="remove-notifications-button"
-      confirmMessage="Are you sure you want to remove the selected notifications?"
+      confirmMessage={t('notifications.remove_confirm')}
     />
   );
 

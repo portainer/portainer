@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { Team } from '@/react/portainer/users/teams/types';
 
 import { Select } from '@@/form-components/ReactSelect';
@@ -16,6 +18,7 @@ export function PorAccessControlFormTeamSelector({
   options,
   inputId,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <Select
       isMulti
@@ -28,7 +31,7 @@ export function PorAccessControlFormTeamSelector({
       data-cy="portainer-selectTeamAccess"
       id="portainer-selectTeamAccess"
       inputId={inputId}
-      placeholder="Select one or more teams"
+      placeholder={t('access_control_form.teams_selector_placeholder')}
     />
   );
 }

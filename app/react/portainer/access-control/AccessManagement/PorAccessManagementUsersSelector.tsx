@@ -1,5 +1,6 @@
 import { User as UserIcon, Users as TeamIcon } from 'lucide-react';
 import { OptionProps, components, MultiValueGenericProps } from 'react-select';
+import { useTranslation } from 'react-i18next';
 
 import { Select } from '@@/form-components/ReactSelect';
 
@@ -18,13 +19,14 @@ export function PorAccessManagementUsersSelector({
   onChange,
   isLoading,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="form-group">
       <label
         className="col-sm-3 col-lg-2 control-label text-left"
         htmlFor="users-selector"
       >
-        Select user(s) and/or team(s)
+        {t('access_control_form.select_users_teams')}
       </label>
       <div className="col-sm-9 col-lg-4">
         <Select
@@ -38,11 +40,11 @@ export function PorAccessManagementUsersSelector({
           data-cy="component-selectUser"
           id="component-selectUser"
           inputId="users-selector"
-          placeholder="Select one or more users and/or teams"
+          placeholder={t('access_control_form.select_users_teams_placeholder')}
           components={{ MultiValueLabel, Option: OptionComponent }}
           isLoading={isLoading}
-          loadingMessage={() => 'Loading users and teams...'}
-          noOptionsMessage={() => 'No users or teams available.'}
+          loadingMessage={() => t('access_control_form.loading_users_teams')}
+          noOptionsMessage={() => t('access_control_form.no_users_teams')}
         />
       </div>
     </div>
