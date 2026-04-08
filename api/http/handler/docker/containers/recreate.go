@@ -1,6 +1,7 @@
 package containers
 
 import (
+	"context"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -46,7 +47,7 @@ func (handler *Handler) recreate(w http.ResponseWriter, r *http.Request) *httper
 
 	agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
 
-	newContainer, err := handler.containerService.Recreate(r.Context(), endpoint, containerID, payload.PullImage, "", agentTargetHeader)
+	newContainer, err := handler.containerService.Recreate(context.TODO(), endpoint, containerID, payload.PullImage, "", agentTargetHeader)
 	if err != nil {
 		return httperror.InternalServerError("Error recreating container", err)
 	}
