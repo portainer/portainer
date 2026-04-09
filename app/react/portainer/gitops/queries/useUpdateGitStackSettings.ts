@@ -4,6 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { GitStackPayload } from '@/react/common/stacks/types';
 import { buildStackUrl } from '@/react/common/stacks/queries/buildUrl';
 import { queryKeys } from '@/react/common/stacks/queries/query-keys';
+import { withGlobalError } from '@/react-tools/react-query';
 
 async function updateGitStackSettings(
   stackId: number,
@@ -39,5 +40,6 @@ export function useUpdateGitStackSettings() {
         exact: true,
       });
     },
+    ...withGlobalError('Unable to save stack settings'),
   });
 }

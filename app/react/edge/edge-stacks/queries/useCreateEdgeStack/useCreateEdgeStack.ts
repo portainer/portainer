@@ -120,7 +120,7 @@ async function createStackAndGitCredential(
     autoUpdate: AutoUpdateResponse | null;
   }
 ) {
-  const newGitModel = await saveGitCredentialsIfNeeded(userId, payload.git);
+  const resolvedAuth = await saveGitCredentialsIfNeeded(userId, payload.git);
 
   return createStackFromGit({
     deploymentType: payload.deploymentType,
@@ -132,13 +132,13 @@ async function createStackAndGitCredential(
     retryDeploy: payload.retryDeploy,
     staggerConfig: payload.staggerConfig,
     useManifestNamespaces: payload.useManifestNamespaces,
-    repositoryUrl: newGitModel.RepositoryURL,
-    repositoryReferenceName: newGitModel.RepositoryReferenceName,
-    filePathInRepository: newGitModel.ComposeFilePathInRepository,
-    repositoryAuthentication: newGitModel.RepositoryAuthentication,
-    repositoryUsername: newGitModel.RepositoryUsername,
-    repositoryPassword: newGitModel.RepositoryPassword,
-    repositoryGitCredentialId: newGitModel.RepositoryGitCredentialID,
+    repositoryUrl: payload.git.RepositoryURL,
+    repositoryReferenceName: payload.git.RepositoryReferenceName,
+    filePathInRepository: payload.git.ComposeFilePathInRepository,
+    repositoryAuthentication: resolvedAuth.RepositoryAuthentication,
+    repositoryUsername: resolvedAuth.RepositoryUsername,
+    repositoryPassword: resolvedAuth.RepositoryPassword,
+    repositoryGitCredentialId: resolvedAuth.RepositoryGitCredentialID,
     filesystemPath: payload.relativePathSettings?.FilesystemPath,
     supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
     perDeviceConfigsGroupMatchType:
@@ -146,7 +146,7 @@ async function createStackAndGitCredential(
     perDeviceConfigsMatchType:
       payload.relativePathSettings?.PerDeviceConfigsMatchType,
     perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
-    tlsSkipVerify: newGitModel.TLSSkipVerify,
+    tlsSkipVerify: payload.git.TLSSkipVerify,
     autoUpdate: payload.autoUpdate,
   });
 }

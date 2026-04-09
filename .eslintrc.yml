@@ -114,6 +114,9 @@ overrides:
       '@typescript-eslint/explicit-module-boundary-types': off
       '@typescript-eslint/no-unused-vars': 'error'
       '@typescript-eslint/no-explicit-any': 'error'
+      '@typescript-eslint/switch-exhaustiveness-check': 'error'
+      'consistent-return': 'off'
+      'default-case': off
       'jsx-a11y/label-has-associated-control':
         - error
         - assert: either
