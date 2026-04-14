@@ -17,12 +17,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInspectHandler(t *testing.T) {
+func TestCustomTemplateFile(t *testing.T) {
 	_, ds := datastore.MustNewTestStore(t, true, false)
 	require.NotNil(t, ds)
 
 	fs, err := filesystem.NewService(t.TempDir(), t.TempDir())
 	require.NoError(t, err)
+
+	templateContent := "some template content"
+	templateEntrypoint := "entrypoint"
 
 	require.NoError(t, ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		require.NoError(t, tx.User().Create(&portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}))
@@ -37,8 +40,16 @@ func TestInspectHandler(t *testing.T) {
 		require.NoError(t, tx.Team().Create(&portainer.Team{ID: 1}))
 		require.NoError(t, tx.TeamMembership().Create(&portainer.TeamMembership{ID: 1, UserID: 3, TeamID: 1, Role: portainer.TeamMember}))
 
-		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 1}))
-		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 2}))
+		// template 1
+		path, err := fs.StoreCustomTemplateFileFromBytes("1", templateEntrypoint, []byte(templateContent))
+		require.NoError(t, err)
+		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 1, EntryPoint: templateEntrypoint, ProjectPath: path}))
+
+		// template 2
+		path, err = fs.StoreCustomTemplateFileFromBytes("2", templateEntrypoint, []byte(templateContent))
+		require.NoError(t, err)
+		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 2, EntryPoint: templateEntrypoint, ProjectPath: path}))
+
 		require.NoError(t, tx.ResourceControl().Create(&portainer.ResourceControl{ID: 1, ResourceID: "2", Type: portainer.CustomTemplateResourceControl,
 			UserAccesses: []portainer.UserResourceAccess{{UserID: 2}},
 			TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}},
@@ -49,12 +60,12 @@ func TestInspectHandler(t *testing.T) {
 	handler := NewHandler(testhelpers.NewTestRequestBouncer(), ds, fs, nil)
 
 	test := func(templateID string, restrictedContext *security.RestrictedRequestContext) (*httptest.ResponseRecorder, *httperror.HandlerError) {
-		r := httptest.NewRequest(http.MethodGet, "/custom_templates/"+templateID, nil)
+		r := httptest.NewRequest(http.MethodGet, "/custom_templates/"+templateID+"/file", nil)
 		r = mux.SetURLVars(r, map[string]string{"id": templateID})
 		ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
 		r = r.WithContext(ctx)
 		rr := httptest.NewRecorder()
-		return rr, handler.customTemplateInspect(rr, r)
+		return rr, handler.customTemplateFile(rr, r)
 	}
 
 	t.Run("unknown id should get not found error", func(t *testing.T) {
@@ -67,9 +78,9 @@ func TestInspectHandler(t *testing.T) {
 		rr, r := test("1", &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(1), template.ID)
+		var res struct{ FileContent string }
+		require.NoError(t, json.NewDecoder(rr.Body).Decode(&res))
+		require.Equal(t, templateContent, res.FileContent)
 	})
 
 	t.Run("std should not access adminonly template", func(t *testing.T) {
@@ -82,18 +93,18 @@ func TestInspectHandler(t *testing.T) {
 		rr, r := test("2", &security.RestrictedRequestContext{UserID: 2})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(2), template.ID)
+		var res struct{ FileContent string }
+		require.NoError(t, json.NewDecoder(rr.Body).Decode(&res))
+		require.Equal(t, templateContent, res.FileContent)
 	})
 
 	t.Run("std should access template via team access", func(t *testing.T) {
 		rr, r := test("2", &security.RestrictedRequestContext{UserID: 3, UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}}})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(2), template.ID)
+		var res struct{ FileContent string }
+		require.NoError(t, json.NewDecoder(rr.Body).Decode(&res))
+		require.Equal(t, templateContent, res.FileContent)
 	})
 
 	t.Run("std should not access template without access", func(t *testing.T) {
