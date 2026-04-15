@@ -1,6 +1,7 @@
+import path from 'path';
+
 import { StorybookConfig } from '@storybook/react-webpack5';
 
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { Configuration } from 'webpack';
 import postcss from 'postcss';
 
@@ -85,12 +86,7 @@ const config: StorybookConfig = {
       ...config,
       resolve: {
         ...config.resolve,
-        plugins: [
-          ...(config.resolve?.plugins || []),
-          new TsconfigPathsPlugin({
-            extensions: config.resolve?.extensions,
-          }),
-        ],
+        tsconfig: path.resolve(__dirname, '..', 'tsconfig.json'),
       },
       module: {
         ...config.module,
@@ -101,11 +97,17 @@ const config: StorybookConfig = {
   staticDirs: ['./public'],
   typescript: {
     reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      compilerOptions: {
+        outDir: path.resolve(__dirname, '..', 'dist/public'),
+      },
+    },
   },
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
   },
+  docs: {},
 };
 
 export default config;

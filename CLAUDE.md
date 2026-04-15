@@ -27,9 +27,13 @@ make dev                # Run both in dev mode
 make dev-client         # Start webpack-dev-server (port 8999)
 make dev-server         # Run containerized Go server
 
-pnpm run dev            # Webpack dev server
-pnpm run build          # Build frontend with webpack
-pnpm run test           # Run frontend tests
+# Frontend
+pnpm dev            # Webpack dev server
+pnpm build          # Build frontend with webpack
+pnpm typecheck      # Run typecheck for frontend (with tsc)
+pnpm lint           # lint frontend (with eslint)
+pnpm test           # test frontend (with vitest)
+pnpm format         # format frontend (with prettier)
 
 # Testing
 make test               # All tests (backend + frontend)

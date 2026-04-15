@@ -6,14 +6,14 @@
 
 .background-error {
   padding-top: 55px;
-  background-image: url(~assets/images/icon-error.svg);
+  background-image: url(~@/assets/images/icon-error.svg);
   background-repeat: no-repeat;
   background-position: top left;
 }
 
 .background-warning {
   padding-top: 55px;
-  background-image: url(~assets/images/icon-warning.svg);
+  background-image: url(~@/assets/images/icon-warning.svg);
   background-repeat: no-repeat;
   background-position: top left;
 }

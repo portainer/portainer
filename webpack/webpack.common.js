@@ -5,7 +5,6 @@ const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 const CopyPlugin = require('copy-webpack-plugin');
@@ -26,7 +25,6 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        type: 'javascript/auto',
         enforce: 'pre',
         exclude: /node_modules/,
         use: ['source-map-loader'],
@@ -163,6 +161,7 @@ module.exports = {
       shorthands: true,
       collections: true,
       paths: true,
+      flattening: true,
     }),
     new CopyPlugin({
       patterns: [
@@ -212,10 +211,6 @@ module.exports = {
       'yaml-schema': path.resolve(projectRoot, 'node_modules/codemirror-json-schema/dist/yaml'),
     },
     extensions: ['.js', '.ts', '.tsx'],
-    plugins: [
-      new TsconfigPathsPlugin({
-        extensions: ['.js', '.ts', '.tsx'],
-      }),
-    ],
+    tsconfig: path.resolve(projectRoot, 'tsconfig.json'),
   },
 };
