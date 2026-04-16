@@ -447,26 +447,14 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 	return tokenData, nil
 }
 
-// extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
+// extractBearerToken extracts the Bearer token from the Authorization header and returns the token.
 func extractBearerToken(r *http.Request) (string, bool) {
-	// Token might be set via the "token" query parameter.
-	// For example, in websocket requests
-	// For these cases, hide the token from the query
-	query := r.URL.Query()
-	token := query.Get("token")
-	if token != "" {
-		query.Del("token")
-		r.URL.RawQuery = query.Encode()
-
-		return token, true
-	}
-
 	tokens, ok := r.Header[jwtTokenHeader]
 	if !ok || len(tokens) == 0 {
 		return "", false
 	}
 
-	token = tokens[0]
+	token := tokens[0]
 	token = strings.TrimPrefix(token, "Bearer ")
 
 	return token, true
