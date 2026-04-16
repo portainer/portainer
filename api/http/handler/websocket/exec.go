@@ -32,7 +32,6 @@ type execStartOperationPayload struct {
 // @produce json
 // @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
 // @param nodeName query string false "node name"
-// @param token query string true "JWT token used for authentication against this environment(endpoint)"
 // @success 200
 // @failure 400
 // @failure 409

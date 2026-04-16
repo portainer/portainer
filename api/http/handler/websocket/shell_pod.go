@@ -18,7 +18,6 @@ import (
 // @accept json
 // @produce json
 // @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
-// @param token query string true "JWT token used for authentication against this environment(endpoint)"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
