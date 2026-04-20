@@ -108,6 +108,141 @@ func mockDockerAPIServer(t *testing.T, routes RoutesDefinition) (*httptest.Serve
 	return srv, version
 }
 
+func TestTransport_adminProxy(t *testing.T) {
+	t.Parallel()
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	std1 := portainer.User{ID: 2, Username: "std1", Role: portainer.StandardUserRole}
+	std2 := portainer.User{ID: 3, Username: "std2", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	require.NoError(t, ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.User().Create(&admin))
+		require.NoError(t, tx.User().Create(&std1))
+		require.NoError(t, tx.User().Create(&std2))
+		require.NoError(t, tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env",
+			UserAccessPolicies: portainer.UserAccessPolicies{std1.ID: portainer.AccessPolicy{RoleID: 1}},
+		}))
+
+		return nil
+	}))
+	srv, version := mockDockerAPIServer(t, RoutesDefinition{
+		// allowed routes
+		{http.MethodGet, "/plugins"}:            nil,
+		{http.MethodGet, "/plugins/xxx/json"}:   nil,
+		{http.MethodGet, "/plugins/privileges"}: nil,
+		// admin routes ; see `adminOnlyRoutes`
+		{http.MethodDelete, "/plugins/xxx"}:              nil,
+		{http.MethodPost, "/plugins/sshfs/enable"}:       nil, // simulate plugin "sshfs"
+		{http.MethodPost, "/plugins/vieux/sshfs/enable"}: nil, // simulate "vieux/sshfs"
+		{http.MethodPost, "/plugins/xxx/disable"}:        nil,
+		{http.MethodPost, "/plugins/pull"}:               nil,
+		{http.MethodPost, "/plugins/xxx/push"}:           nil,
+		{http.MethodPost, "/plugins/xxx/upgrade"}:        nil,
+		{http.MethodPost, "/plugins/xxx/set"}:            nil,
+		{http.MethodPost, "/plugins/create"}:             nil,
+	})
+	defer srv.Close()
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	test := func(method string, url string, token portainer.TokenData) (*http.Response, error) {
+		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, nil)
+		req = req.WithContext(security.StoreTokenData(req, &token))
+		require.NotNil(t, req)
+
+		return transport.ProxyDockerRequest(req)
+	}
+
+	adminToken := portainer.TokenData{ID: admin.ID, Username: admin.Username, Role: admin.Role}
+	std1Token := portainer.TokenData{ID: std1.ID, Username: std1.Username, Role: std1.Role}
+	std2Token := portainer.TokenData{ID: std2.ID, Username: std2.Username, Role: std2.Role}
+
+	{
+		r, err := test(http.MethodGet, "/plugins", adminToken)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodGet, "/plugins", std1Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodGet, "/plugins", std2Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/pull", adminToken)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/pull", std1Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusForbidden, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/pull", std2Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusForbidden, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/sshfs/enable", adminToken)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/sshfs/enable", std2Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusForbidden, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/vieux/sshfs/enable", adminToken)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	{
+		r, err := test(http.MethodPost, "/plugins/vieux/sshfs/enable", std2Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusForbidden, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+}
+
 func TestTransport_getRealResourceID(t *testing.T) {
 	srv, _ := mockDockerAPIServer(t, RoutesDefinition{
 		{http.MethodGet, "/networks"}:           []network.Summary{{ID: "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", Name: "mynetwork"}},

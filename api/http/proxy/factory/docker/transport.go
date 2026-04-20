@@ -22,6 +22,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/slicesx"
 
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
@@ -109,6 +110,28 @@ var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*ht
 	"volumes":    (*Transport).proxyVolumeRequest,
 }
 
+type route struct {
+	method  string
+	pattern *regexp.Regexp
+}
+
+var adminOnlyRoutes = []route{
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/enable$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/disable$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/pull$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/push$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/upgrade$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/set$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/create$`)},
+	{http.MethodDelete, regexp.MustCompile(`^/plugins/.+$`)},
+}
+
+func isAdminOnlyRoute(method string, path string) bool {
+	return slicesx.Some(adminOnlyRoutes, func(r route) bool {
+		return method == r.method && r.pattern.MatchString(path)
+	})
+}
+
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
@@ -135,6 +158,10 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 
 	if proxyFunc := prefixProxyFuncMap[prefix]; proxyFunc != nil {
 		return proxyFunc(transport, request, unversionedPath)
+	}
+
+	if isAdminOnlyRoute(request.Method, unversionedPath) {
+		return transport.administratorOperation(request)
 	}
 
 	return transport.executeDockerRequest(request)
