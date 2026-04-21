@@ -113,7 +113,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	namespaceRouter := endpointRouter.PathPrefix("/namespaces/{namespace}").Subrouter()
 	namespaceRouter.Handle("/configmaps/{configmap}", httperror.LoggerHandler(h.getKubernetesConfigMap)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/events", httperror.LoggerHandler(h.getKubernetesEventsForNamespace)).Methods(http.MethodGet)
-	namespaceRouter.Handle("/system", bouncer.RestrictedAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
+	namespaceRouter.Handle("/system", bouncer.AdminAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.getKubernetesIngressControllersByNamespace)).Methods(http.MethodGet)
 	namespaceRouter.Handle("/ingresscontrollers", httperror.LoggerHandler(h.updateKubernetesIngressControllersByNamespace)).Methods(http.MethodPut)
 	namespaceRouter.Handle("/ingresses/{ingress}", httperror.LoggerHandler(h.getKubernetesIngress)).Methods(http.MethodGet)
