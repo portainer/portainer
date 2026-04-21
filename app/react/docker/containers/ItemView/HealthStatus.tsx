@@ -44,7 +44,7 @@ export function HealthStatus({ health }: Props) {
           <div className="vertical-center">{health.FailingStreak}</div>
         </DetailsTable.Row>
 
-        {!!health.Log && (
+        {!!health.Log?.length && (
           <DetailsTable.Row label="Last output">
             {health.Log[health.Log.length - 1].Output}
           </DetailsTable.Row>
