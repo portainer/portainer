@@ -4,7 +4,8 @@ WEBPACK_CONFIG=webpack/webpack.$(ENV).js
 TAG=local
 
 SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.2
-GOTESTSUM=go run gotest.tools/gotestsum@latest
+GOTESTSUM_VERSION?=v1.13.0
+GOTESTSUM=go run gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
 
 # Don't change anything below this line unless you know what you're doing
 .DEFAULT_GOAL := help
@@ -57,8 +58,10 @@ test: test-server test-client ## Run all tests
 test-client: ## Run client tests
 	pnpm run test $(ARGS) --coverage
 
+TEST_PACKAGES?=./...
+
 test-server:	## Run server tests
-	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover -covermode=atomic -coverprofile=coverage.out ./...
+	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover -covermode=atomic -coverprofile=coverage.out $(TEST_PACKAGES)
 
 ##@ Dev
 .PHONY: dev dev-client dev-server
