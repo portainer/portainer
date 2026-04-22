@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Home } from 'lucide-react';
+import { GitBranch, Home } from 'lucide-react';
 
 import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
 import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
@@ -66,6 +66,12 @@ function InnerSidebar() {
               icon={Home}
               label="Home"
               data-cy="portainerSidebar-home"
+            />
+            <SidebarItem
+              to="portainer.workflows"
+              icon={GitBranch}
+              label="Workflows"
+              data-cy="portainerSidebar-workflows"
             />
             <EnvironmentSidebar />
             {isAdmin && <EdgeComputeSidebar />}

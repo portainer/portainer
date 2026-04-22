@@ -76,7 +76,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 
 		userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
 
-		stacks = authorization.FilterAuthorizedStacks(stacks, user, userTeamIDs)
+		stacks = authorization.FilterAuthorizedStacks(stacks, user.ID, userTeamIDs)
 	}
 
 	for _, stack := range stacks {

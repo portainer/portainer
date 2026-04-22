@@ -9,6 +9,8 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
+
+	"github.com/portainer/portainer/api/http/handler/gitops/workflows"
 )
 
 // Handler is the HTTP handler used to handle git repo operation
@@ -31,6 +33,9 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 
 	authenticatedRouter.Handle("/gitops/repo/file/preview", httperror.LoggerHandler(h.gitOperationRepoFilePreview)).Methods(http.MethodPost)
+
+	workflowsHandler := workflows.NewHandler(dataStore)
+	authenticatedRouter.PathPrefix("/gitops/workflows").Handler(workflowsHandler)
 
 	return h
 }

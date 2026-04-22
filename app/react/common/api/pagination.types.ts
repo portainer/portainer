@@ -85,7 +85,7 @@ export function withPaginationQueryParams({
 }
 
 export type PaginatedResults<T> = {
-  data: T;
+  data: T | null;
   totalCount: number;
   totalAvailable: number;
 };

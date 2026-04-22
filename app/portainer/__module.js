@@ -298,6 +298,15 @@ angular
           docs: '/user/home',
         },
       };
+      var workflows = {
+        name: 'portainer.workflows',
+        url: '/workflows',
+        views: {
+          'content@': {
+            component: 'workflowsView',
+          },
+        },
+      };
 
       var init = {
         name: 'portainer.init',
@@ -420,6 +429,7 @@ angular
       $stateRegistryProvider.register(groupAccess);
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
+      $stateRegistryProvider.register(workflows);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(settings);

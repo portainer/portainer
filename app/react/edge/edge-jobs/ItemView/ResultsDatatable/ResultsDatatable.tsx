@@ -22,7 +22,7 @@ export function ResultsDatatable({ jobId }: { jobId: EdgeJob['Id'] }) {
   const jobResultsQuery = useJobResults(jobId, {
     ...queryOptionsFromTableState({ ...tableState }, sortOptions),
     refetchInterval(dataset) {
-      const anyCollecting = dataset?.data.some(
+      const anyCollecting = dataset?.data?.some(
         (r) => r.LogsStatus === LogsStatus.Pending
       );
 
