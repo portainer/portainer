@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import clsx from 'clsx';
 
 import { Modal, OnSubmit, ModalType, openModal } from '@@/modals';
 import { Button } from '@@/buttons';
@@ -8,12 +7,13 @@ import { SwitchField } from '@@/form-components/SwitchField';
 import { ImagesListResponse } from '../../queries/useImages';
 
 interface Props {
-  onSubmit: OnSubmit<{ pruneAll: boolean }>;
+  onSubmit: OnSubmit<{ pruneAll: boolean; clearBuildCache: boolean }>;
   images?: ImagesListResponse[];
 }
 
 function ConfirmPruneModal({ onSubmit, images = [] }: Props) {
   const [pruneAll, setPruneAll] = useState(false);
+  const [clearBuildCache, setClearBuildCache] = useState(false);
 
   const hasUntaggedImages = images.some(
     (img) => !img.tags || img.tags.length === 0
@@ -29,23 +29,29 @@ function ConfirmPruneModal({ onSubmit, images = [] }: Props) {
         <p>
           This will delete all untagged (dangling) images in this environment.
         </p>
-        <SwitchField
-          name="pruneAll"
-          data-cy="prune-all-unused-switch"
-          label="Delete all unused images"
-          tooltip="Delete all unused images, even if they are tagged."
-          checked={pruneAll}
-          onChange={setPruneAll}
-        />
-        <p
-          className={clsx(
-            'text-muted mt-1 text-xs',
-            // use invisible class to avoid layout shift
-            showValidationMessage ? 'visible' : 'invisible'
+        <div className="mb-4">
+          <SwitchField
+            name="pruneAll"
+            data-cy="prune-all-unused-switch"
+            label="Delete all unused images"
+            tooltip="Delete all unused images, even if they are tagged."
+            checked={pruneAll}
+            onChange={setPruneAll}
+          />
+          {showValidationMessage && (
+            <p className="text-muted mt-1 text-xs">
+              No untagged (dangling) images available to delete.
+            </p>
           )}
-        >
-          No untagged (dangling) images available to delete.
-        </p>
+        </div>
+        <SwitchField
+          name="clearBuildCache"
+          data-cy="prune-clear-build-cache-switch"
+          label="Clear Docker build cache"
+          tooltip="This removes cached build layers that are no longer in use. Future builds may take longer until the cache is rebuilt."
+          checked={clearBuildCache}
+          onChange={setClearBuildCache}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button
@@ -56,7 +62,7 @@ function ConfirmPruneModal({ onSubmit, images = [] }: Props) {
           Cancel
         </Button>
         <Button
-          onClick={() => onSubmit({ pruneAll })}
+          onClick={() => onSubmit({ pruneAll, clearBuildCache })}
           color="danger"
           data-cy="prune-confirm"
         >

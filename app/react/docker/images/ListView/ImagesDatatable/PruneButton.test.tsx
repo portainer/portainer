@@ -148,7 +148,10 @@ describe('PruneButton', () => {
     });
 
     it('should call API with dangling filter when pruneAll is false', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       let requestFilters = '';
       server.use(
@@ -179,7 +182,10 @@ describe('PruneButton', () => {
     });
 
     it('should call API with dangling=false filter when pruneAll is true', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: true });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: true,
+        clearBuildCache: false,
+      });
 
       let requestFilters = '';
       server.use(
@@ -215,7 +221,10 @@ describe('PruneButton', () => {
 
   describe('Success Notification', () => {
     it('should show success notification with space reclaimed', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', () =>
@@ -245,7 +254,10 @@ describe('PruneButton', () => {
     });
 
     it('should show success notification with correct space reclaimed', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', () =>
@@ -275,7 +287,10 @@ describe('PruneButton', () => {
     });
 
     it('should handle small space reclaimed', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', () =>
@@ -300,8 +315,11 @@ describe('PruneButton', () => {
       });
     });
 
-    it('should handle zero space reclaimed', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+    it('should show contextual message when zero bytes reclaimed', async () => {
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', () =>
@@ -321,15 +339,95 @@ describe('PruneButton', () => {
       await waitFor(() => {
         expect(mockNotifySuccess).toHaveBeenCalledWith(
           'Images pruned',
-          'Reclaimed 0 B'
+          'Reclaimed 0 B - the image layers may still be in use by other images, or are still in the Docker build cache.'
         );
       });
+    });
+
+    it('should call build cache prune API when clearBuildCache is toggled', async () => {
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: true,
+      });
+
+      let buildPruneCalled = false;
+      server.use(
+        http.post('/api/endpoints/:envId/docker/images/prune', () =>
+          HttpResponse.json({ ImagesDeleted: [], SpaceReclaimed: 0 })
+        ),
+        http.post('/api/endpoints/:envId/docker/build/prune', () => {
+          buildPruneCalled = true;
+          return HttpResponse.json({ CachesDeleted: [], SpaceReclaimed: 0 });
+        })
+      );
+
+      const user = userEvent.setup();
+      renderComponent([{ id: 'img1', used: false, tags: ['tag1'] }]);
+      await user.click(screen.getByRole('button', { name: /prune/i }));
+
+      await waitFor(() => expect(mockNotifySuccess).toHaveBeenCalled());
+      expect(buildPruneCalled).toBe(true);
+    });
+
+    it('should not call build cache prune API when clearBuildCache is false', async () => {
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
+
+      let buildPruneCalled = false;
+      server.use(
+        http.post('/api/endpoints/:envId/docker/images/prune', () =>
+          HttpResponse.json({ ImagesDeleted: [], SpaceReclaimed: 0 })
+        ),
+        http.post('/api/endpoints/:envId/docker/build/prune', () => {
+          buildPruneCalled = true;
+          return HttpResponse.json({ CachesDeleted: [], SpaceReclaimed: 0 });
+        })
+      );
+
+      const user = userEvent.setup();
+      renderComponent([{ id: 'img1', used: false, tags: ['tag1'] }]);
+      await user.click(screen.getByRole('button', { name: /prune/i }));
+
+      await waitFor(() => expect(mockNotifySuccess).toHaveBeenCalled());
+      expect(buildPruneCalled).toBe(false);
+    });
+
+    it('should show combined space reclaimed from image and build cache prune', async () => {
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: true,
+      });
+
+      server.use(
+        http.post('/api/endpoints/:envId/docker/images/prune', () =>
+          HttpResponse.json({ ImagesDeleted: [], SpaceReclaimed: 52428800 })
+        ),
+        http.post('/api/endpoints/:envId/docker/build/prune', () =>
+          HttpResponse.json({ CachesDeleted: [], SpaceReclaimed: 52428800 })
+        )
+      );
+
+      const user = userEvent.setup();
+      renderComponent([{ id: 'img1', used: false, tags: ['tag1'] }]);
+      await user.click(screen.getByRole('button', { name: /prune/i }));
+
+      await waitFor(() =>
+        expect(mockNotifySuccess).toHaveBeenCalledWith(
+          'Images pruned',
+          'Reclaimed 104.9 MB'
+        )
+      );
     });
   });
 
   describe('Error Handling', () => {
     it('should show error notification on API failure', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
 
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', () =>
@@ -350,12 +448,45 @@ describe('PruneButton', () => {
         );
       });
     });
+
+    it('should show success for images pruned and separate error when build cache prune fails', async () => {
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: true,
+      });
+
+      server.use(
+        http.post('/api/endpoints/:envId/docker/images/prune', () =>
+          HttpResponse.json({ ImagesDeleted: [], SpaceReclaimed: 0 })
+        ),
+        http.post('/api/endpoints/:envId/docker/build/prune', () =>
+          HttpResponse.json({ message: 'Server error' }, { status: 500 })
+        )
+      );
+
+      const user = userEvent.setup();
+      renderComponent([{ id: 'img1', used: false, tags: ['tag1'] }]);
+      await user.click(screen.getByRole('button', { name: /prune/i }));
+
+      await waitFor(() => {
+        expect(mockNotifySuccess).toHaveBeenCalledWith(
+          'Images pruned',
+          expect.stringContaining('Reclaimed 0 B')
+        );
+        expect(mockNotifyError).toHaveBeenCalledWith(
+          'Failed to clear Docker build cache',
+          expect.anything()
+        );
+      });
+    });
   });
 
   describe('Loading State', () => {
     it('should show loading state while pruning', async () => {
-      mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
-
+      mockConfirmPruneImages.mockResolvedValue({
+        pruneAll: false,
+        clearBuildCache: false,
+      });
       // Use a deferred promise so we control exactly when the request resolves,
       // avoiding non-deterministic setTimeout timing.
       let resolveRequest!: () => void;

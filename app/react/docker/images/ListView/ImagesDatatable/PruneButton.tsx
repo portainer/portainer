@@ -19,7 +19,7 @@ interface Props {
 
 export function PruneButton({ images }: Props) {
   const environmentId = useEnvironmentId();
-  const pruneImagesMutation = usePruneImagesMutation(environmentId);
+  const pruneMutation = usePruneImagesMutation(environmentId);
 
   const hasPrunableImages = images.some((image) => !image.used);
 
@@ -28,7 +28,7 @@ export function PruneButton({ images }: Props) {
       color="default"
       icon={hasPrunableImages ? BrushCleaning : Check}
       onClick={handlePrune}
-      isLoading={pruneImagesMutation.isLoading}
+      isLoading={pruneMutation.isLoading}
       loadingText="Pruning..."
       data-cy="image-pruneButton"
       disabled={!hasPrunableImages}
@@ -60,12 +60,18 @@ export function PruneButton({ images }: Props) {
       return;
     }
 
-    pruneImagesMutation.mutate(
-      { all: result.pruneAll },
+    pruneMutation.mutate(
+      { all: result.pruneAll, clearBuildCache: result.clearBuildCache },
       {
-        onSuccess: (data) => {
-          const space = humanize(data.SpaceReclaimed);
-          notifySuccess('Images pruned', `Reclaimed ${space}`);
+        onSuccess: ({ SpaceReclaimed, buildCacheError }) => {
+          const message =
+            SpaceReclaimed === 0
+              ? 'Reclaimed 0 B - the image layers may still be in use by other images, or are still in the Docker build cache.'
+              : `Reclaimed ${humanize(SpaceReclaimed)}`;
+          notifySuccess('Images pruned', message);
+          if (buildCacheError) {
+            notifyError('Failed to clear Docker build cache', buildCacheError);
+          }
         },
         onError: (error) => {
           notifyError('Failed to prune images', error);

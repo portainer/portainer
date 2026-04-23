@@ -465,7 +465,11 @@ func (transport *Transport) proxyTaskRequest(request *http.Request, unversionedP
 	}
 }
 
-func (transport *Transport) proxyBuildRequest(request *http.Request, _ string) (*http.Response, error) {
+func (transport *Transport) proxyBuildRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	if unversionedPath == "/build/prune" {
+		return transport.administratorOperation(request)
+	}
+
 	if err := transport.updateDefaultGitBranch(request); err != nil {
 		return nil, err
 	}

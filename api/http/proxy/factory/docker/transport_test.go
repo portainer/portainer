@@ -608,3 +608,67 @@ func TestTransport_proxyImageRequest_Prune(t *testing.T) {
 		require.NoError(t, r.Body.Close())
 	}
 }
+
+func TestTransport_proxyBuildRequest_Prune(t *testing.T) {
+	t.Parallel()
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	std1 := portainer.User{ID: 2, Username: "std1", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	require.NoError(t, ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.User().Create(&admin))
+		require.NoError(t, tx.User().Create(&std1))
+		require.NoError(t, tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env",
+			UserAccessPolicies: portainer.UserAccessPolicies{std1.ID: portainer.AccessPolicy{RoleID: 1}},
+		}))
+
+		return nil
+	}))
+
+	srv, version := mockDockerAPIServer(t, RoutesDefinition{
+		{http.MethodPost, "/build/prune"}: struct {
+			CachesDeleted  []string `json:"CachesDeleted"`
+			SpaceReclaimed int      `json:"SpaceReclaimed"`
+		}{
+			CachesDeleted:  []string{},
+			SpaceReclaimed: 0,
+		},
+	})
+	defer srv.Close()
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	test := func(method string, url string, token portainer.TokenData) (*http.Response, error) {
+		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, nil)
+		req = req.WithContext(security.StoreTokenData(req, &token))
+		require.NotNil(t, req)
+
+		return transport.proxyBuildRequest(req, url)
+	}
+
+	adminToken := portainer.TokenData{ID: admin.ID, Username: admin.Username, Role: admin.Role}
+	std1Token := portainer.TokenData{ID: std1.ID, Username: std1.Username, Role: std1.Role}
+
+	// Admin should be able to prune build cache
+	{
+		r, err := test(http.MethodPost, "/build/prune", adminToken)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+
+	// Standard user should NOT be able to prune build cache (administrator operation)
+	{
+		r, err := test(http.MethodPost, "/build/prune", std1Token)
+		require.NoError(t, err)
+		require.NotNil(t, r)
+		require.Equal(t, http.StatusForbidden, r.StatusCode)
+		require.NoError(t, r.Body.Close())
+	}
+}

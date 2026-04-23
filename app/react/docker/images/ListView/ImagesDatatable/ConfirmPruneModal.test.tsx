@@ -44,7 +44,7 @@ describe('ConfirmPruneModal', () => {
     expect(result).toBeUndefined();
   });
 
-  it('should return pruneAll: false when Continue is clicked without toggling switch', async () => {
+  it('should return pruneAll: false and clearBuildCache: false when Continue is clicked without toggling switches', async () => {
     const user = userEvent.setup();
     const resultPromise = confirmPruneImages();
 
@@ -54,28 +54,50 @@ describe('ConfirmPruneModal', () => {
     await user.click(confirmButton);
 
     const result = await resultPromise;
-    expect(result).toEqual({ pruneAll: false });
+    expect(result).toEqual({ pruneAll: false, clearBuildCache: false });
   });
 
-  it('should return pruneAll: true when switch is toggled and Continue is clicked', async () => {
+  it('should return pruneAll: true when first switch is toggled and Continue is clicked', async () => {
     const user = userEvent.setup();
     const resultPromise = confirmPruneImages();
 
-    const switchInput = await screen.findByRole('checkbox');
-    await user.click(switchInput);
+    const [pruneAllSwitch] = await screen.findAllByRole('checkbox');
+    await user.click(pruneAllSwitch);
 
     const confirmButton = screen.getByRole('button', { name: /continue/i });
     await user.click(confirmButton);
 
     const result = await resultPromise;
-    expect(result).toEqual({ pruneAll: true });
+    expect(result).toEqual({ pruneAll: true, clearBuildCache: false });
   });
 
-  it('should have switch unchecked by default', async () => {
+  it('should have both switches unchecked by default', async () => {
     confirmPruneImages();
 
-    const switchInput = await screen.findByRole('checkbox');
-    expect(switchInput).not.toBeChecked();
+    const switches = await screen.findAllByRole('checkbox');
+    switches.forEach((s) => expect(s).not.toBeChecked());
+  });
+
+  it('should render switch for clearing Docker build cache', async () => {
+    confirmPruneImages();
+
+    await waitFor(() => {
+      expect(screen.getByText('Clear Docker build cache')).toBeVisible();
+    });
+  });
+
+  it('should return clearBuildCache: true when build cache switch is toggled', async () => {
+    const user = userEvent.setup();
+    const resultPromise = confirmPruneImages();
+
+    const [, buildCacheSwitch] = await screen.findAllByRole('checkbox');
+    await user.click(buildCacheSwitch);
+
+    const confirmButton = screen.getByRole('button', { name: /continue/i });
+    await user.click(confirmButton);
+
+    const result = await resultPromise;
+    expect(result).toEqual({ pruneAll: false, clearBuildCache: true });
   });
 
   it('should show validation message when no untagged images but unused images exist', async () => {
@@ -94,7 +116,7 @@ describe('ConfirmPruneModal', () => {
         screen.getByText(
           /No untagged \(dangling\) images available to delete\./
         )
-      ).not.toHaveClass('invisible');
+      ).toBeVisible();
     });
   });
 
@@ -111,10 +133,10 @@ describe('ConfirmPruneModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
+        screen.queryByText(
           /No untagged \(dangling\) images available to delete\./
         )
-      ).toHaveClass('invisible');
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -135,18 +157,18 @@ describe('ConfirmPruneModal', () => {
         screen.getByText(
           /No untagged \(dangling\) images available to delete\./
         )
-      ).not.toHaveClass('invisible');
+      ).toBeVisible();
     });
 
-    const switchInput = await screen.findByRole('checkbox');
-    await user.click(switchInput);
+    const [pruneAllSwitch] = await screen.findAllByRole('checkbox');
+    await user.click(pruneAllSwitch);
 
     await waitFor(() => {
       expect(
-        screen.getByText(
+        screen.queryByText(
           /No untagged \(dangling\) images available to delete\./
         )
-      ).toHaveClass('invisible');
+      ).not.toBeInTheDocument();
     });
   });
 });

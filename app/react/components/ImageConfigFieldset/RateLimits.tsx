@@ -81,7 +81,7 @@ function RateLimitsInner({
               <>
                 You are currently using a free account to pull images from
                 DockerHub and will be limited to 200 pulls every 6 hours.
-                Remaining pulls:
+                Remaining pulls:{' '}
                 <span className="font-bold">
                   {pullRateLimits.remaining}/{pullRateLimits.limit}
                 </span>
