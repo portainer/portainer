@@ -4,4 +4,5 @@ configure({ testIdAttribute: 'data-cy' });
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
 });

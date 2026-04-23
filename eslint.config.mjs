@@ -117,6 +117,47 @@ export default defineConfig([
         },
       ],
       'no-restricted-exports': ['error', { restrictedNamedExports: ['default', 'then'] }],
+      // Secure-context-only APIs (unavailable over HTTP — Portainer is commonly deployed without TLS).
+      // Each entry names the safe alternative. The approved implementations (e.g. useCopy) carry an
+      // eslint-disable comment so this list stays the single source of truth.
+      //
+      // To check whether a new API requires a secure context, fetch its MDN page and look for
+      // "Secure context" in the response:
+      //   https://developer.mozilla.org/en-US/docs/Web/API/{Interface}/{method}
+      // See docs/guidelines/frontend-conventions.md § "Secure-context APIs" for the full policy.
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'crypto',
+          property: 'randomUUID',
+          message: "crypto.randomUUID() requires a secure context (HTTPS). Use `import { v4 as uuidv4 } from 'uuid'` instead.",
+        },
+        {
+          object: 'crypto',
+          property: 'subtle',
+          message: 'crypto.subtle requires a secure context (HTTPS). Use a server-side cryptographic alternative.',
+        },
+        {
+          object: 'navigator',
+          property: 'clipboard',
+          message: 'navigator.clipboard requires a secure context (HTTPS). Use the `useCopy` hook or `CopyButton` component (@@/buttons/CopyButton) — they include a non-secure fallback.',
+        },
+        {
+          object: 'navigator',
+          property: 'mediaDevices',
+          message: 'navigator.mediaDevices requires a secure context (HTTPS) and will not work in all Portainer deployment contexts.',
+        },
+        {
+          object: 'navigator',
+          property: 'credentials',
+          message: 'navigator.credentials requires a secure context (HTTPS) and will not work in all Portainer deployment contexts.',
+        },
+        {
+          object: 'navigator',
+          property: 'serviceWorker',
+          message: 'navigator.serviceWorker requires a secure context (HTTPS) and will not work in all Portainer deployment contexts.',
+        },
+      ],
 
       '@typescript-eslint/no-use-before-define': ['error', { functions: false, allowNamedExports: true }],
       '@typescript-eslint/no-shadow': 'off',
@@ -220,6 +261,8 @@ export default defineConfig([
       'vitest/no-conditional-expect': 'warn',
       'max-classes-per-file': 'off',
       'no-empty-function': 'off',
+      // Tests mock secure-context APIs directly — the restriction is for production code only
+      'no-restricted-properties': 'off',
     },
   },
 

@@ -29,7 +29,9 @@ export function useCopy(
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard
     // https://caniuse.com/?search=clipboard
-    if (navigator.clipboard) {
+    // eslint-disable-next-line no-restricted-properties -- this file IS the approved secure-context-safe wrapper; consumers must use useCopy or CopyButton
+    if (window.isSecureContext && navigator.clipboard) {
+      // eslint-disable-next-line no-restricted-properties -- see above
       navigator.clipboard.writeText(text);
     } else {
       // https://stackoverflow.com/a/57192718

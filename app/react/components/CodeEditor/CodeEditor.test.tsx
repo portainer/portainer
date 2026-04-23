@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Extension } from '@codemirror/state';
 
+import { mockClipboard } from '@/react/test-utils/clipboard';
+
 import { CodeEditor } from './CodeEditor';
 
 const mockExtension: Extension = { extension: [] };
@@ -45,22 +47,17 @@ test('should display placeholder when provided', async () => {
 
 test('should show copy button and copy content', async () => {
   const testValue = 'test content';
+  const { writeText } = mockClipboard();
+
   const { findByText } = render(
     <CodeEditor {...defaultProps} value={testValue} />
   );
-
-  const mockClipboard = {
-    writeText: vi.fn(),
-  };
-  Object.assign(navigator, {
-    clipboard: mockClipboard,
-  });
 
   const copyButton = await findByText('Copy');
   expect(copyButton).toBeVisible();
 
   await userEvent.click(copyButton);
-  expect(navigator.clipboard.writeText).toHaveBeenCalledWith(testValue);
+  expect(writeText).toHaveBeenCalledWith(testValue);
 });
 
 test('should handle read-only mode', async () => {

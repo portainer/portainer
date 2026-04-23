@@ -1,5 +1,7 @@
 import { fireEvent, render } from '@testing-library/react';
 
+import { mockClipboard } from '@/react/test-utils/clipboard';
+
 import { CopyButton } from './CopyButton';
 
 test('should display a CopyButton with children', async () => {
@@ -15,14 +17,7 @@ test('should display a CopyButton with children', async () => {
 });
 
 test('CopyButton should copy text to clipboard', async () => {
-  // override navigator.clipboard.writeText (to test copy to clipboard functionality)
-  let clipboardText = '';
-  const writeText = vi.fn((text) => {
-    clipboardText = text;
-  });
-  Object.assign(navigator, {
-    clipboard: { writeText },
-  });
+  const { writeText } = mockClipboard();
 
   const children = 'button';
   const copyText = 'text successfully copied to clipboard';
@@ -36,6 +31,5 @@ test('CopyButton should copy text to clipboard', async () => {
   expect(button).toBeTruthy();
 
   fireEvent.click(button);
-  expect(clipboardText).toBe(copyText);
-  expect(writeText).toHaveBeenCalled();
+  expect(writeText).toHaveBeenCalledWith(copyText);
 });

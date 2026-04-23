@@ -356,11 +356,16 @@ describe('PruneButton', () => {
     it('should show loading state while pruning', async () => {
       mockConfirmPruneImages.mockResolvedValue({ pruneAll: false });
 
+      // Use a deferred promise so we control exactly when the request resolves,
+      // avoiding non-deterministic setTimeout timing.
+      let resolveRequest!: () => void;
+      const requestDeferred = new Promise<void>((resolve) => {
+        resolveRequest = resolve;
+      });
+
       server.use(
         http.post('/api/endpoints/:envId/docker/images/prune', async () => {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 100);
-          });
+          await requestDeferred;
           return HttpResponse.json({
             ImagesDeleted: [],
             SpaceReclaimed: 0,
@@ -376,6 +381,20 @@ describe('PruneButton', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Pruning...')).toBeVisible();
+      });
+
+      resolveRequest();
+
+      // Wait for the in-flight request to complete before the test exits.
+      await waitFor(() => expect(mockNotifySuccess).toHaveBeenCalled(), {
+        timeout: 3000,
+      });
+
+      // Flush any remaining queued XHR events (e.g. loadend ProgressEvent) so
+      // they fire before jsdom tears down the environment, preventing an
+      // "ProgressEvent is not defined" unhandled rejection.
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
       });
     });
   });
