@@ -19,7 +19,7 @@ export function InformationPanel({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <Widget className="!border-none">
+    <Widget className="border-none">
       <WidgetBody className={bodyClassName}>
         <div style={wrapperStyle}>
           {title && (

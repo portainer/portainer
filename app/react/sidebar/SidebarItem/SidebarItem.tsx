@@ -5,6 +5,7 @@ import { MouseEventHandler, PropsWithChildren } from 'react';
 import { AutomationTestingProps } from '@/types';
 
 import { Icon } from '@@/Icon';
+import { Badge } from '@@/Badge';
 
 import { useSidebarState } from '../useSidebarState';
 
@@ -20,6 +21,7 @@ interface Props extends AutomationTestingProps {
   isSubMenu?: boolean;
   ignorePaths?: string[];
   includePaths?: string[];
+  count?: number;
 }
 
 export function SidebarItem({
@@ -30,6 +32,7 @@ export function SidebarItem({
   isSubMenu = false,
   ignorePaths = [],
   includePaths = [],
+  count,
   'data-cy': dataCy,
 }: Props) {
   const { isOpen } = useSidebarState();
@@ -47,6 +50,7 @@ export function SidebarItem({
         dataCy={dataCy}
         isOpen={isOpen}
         isSubMenu={isSubMenu}
+        count={count}
       >
         {!!icon && <Icon icon={icon} className={clsx('flex [&>svg]:w-4')} />}
         {(isOpen || isSubMenu) && <span>{label}</span>}
@@ -68,6 +72,7 @@ export function SidebarItem({
               dataCy={dataCy}
               isOpen={isOpen}
               isSubMenu={isSubMenu}
+              count={count}
             >
               <span className="px-3">{label}</span>
             </ItemAnchor>
@@ -87,6 +92,7 @@ type ItemAnchorProps = {
   isOpen: boolean;
   isSubMenu: boolean;
   dataCy: string;
+  count?: number;
 };
 
 function ItemAnchor({
@@ -96,6 +102,7 @@ function ItemAnchor({
   isOpen,
   isSubMenu,
   dataCy,
+  count,
   children,
 }: PropsWithChildren<ItemAnchorProps>) {
   return (
@@ -116,6 +123,10 @@ function ItemAnchor({
       data-cy={dataCy}
     >
       {children}
+      {(isOpen || isSubMenu) && count !== undefined && count > 0 && (
+        // 99 is for a conventional badge overflow cap, same pattern as GitHub/Slack notification badges
+        <Badge type="info">{count > 99 ? '99+' : count}</Badge>
+      )}
     </a>
   );
 }
