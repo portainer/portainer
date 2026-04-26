@@ -63,18 +63,21 @@ export function SortByGroup<TSortKey extends string>({
   );
 }
 
-const baseBtn =
-  'px-4 py-1.5 text-xs align-middle font-medium transition-colors';
-const activeBtn =
-  'z-10 border-none rounded-md font-medium ' +
-  'bg-white text-gray-8 ' +
-  'th-dark:bg-gray-iron-10 th-dark:text-white ' +
-  'th-highcontrast:bg-white th-highcontrast:text-black';
-const inactiveBtn =
-  'text-muted border-none rounded-md ' +
-  'bg-gray-4 hover:bg-gray-2 ' +
-  'th-dark:bg-gray-iron-11 th-dark:text-white th-dark:hover:bg-gray-iron-9 ' +
-  'th-highcontrast:bg-black th-highcontrast:text-white th-highcontrast:hover:bg-white th-highcontrast:hover:text-black';
+const baseBtn = clsx(
+  'px-4 py-1.5 align-middle text-xs font-medium transition-colors'
+);
+const activeBtn = clsx(
+  'z-10 rounded-md border-none font-medium',
+  'bg-white text-gray-8',
+  'th-dark:bg-gray-iron-10 th-dark:text-white',
+  'th-highcontrast:border th-highcontrast:border-solid th-highcontrast:bg-transparent th-highcontrast:text-white'
+);
+const inactiveBtn = clsx(
+  'text-muted rounded-md border-none',
+  'bg-gray-4 hover:bg-gray-2',
+  'th-dark:bg-gray-iron-11 th-dark:text-white th-dark:hover:bg-gray-iron-9',
+  'th-highcontrast:bg-black th-highcontrast:text-white th-highcontrast:hover:bg-white th-highcontrast:hover:text-black'
+);
 
 interface SortOptionItemProps<TSortKey extends string> {
   option: SortOption<TSortKey>;
@@ -113,7 +116,11 @@ function SortOptionItem<TSortKey extends string>({
         options={groupOptions?.[option.key]}
         selected={groupFilter}
         onSelect={onGroupFilterChange}
-        badge={isActive ? groupFilter : undefined}
+        badge={
+          isActive
+            ? getGroupLabel(groupOptions, option.key, groupFilter)
+            : undefined
+        }
         className={className}
         data-cy={`${dataCy}-sort-by-${option.key.toLowerCase()}-button`}
         onClick={() => {
@@ -139,4 +146,18 @@ function SortOptionItem<TSortKey extends string>({
       {option.label}
     </button>
   );
+}
+
+function getGroupLabel(
+  groupOptions: Record<string, DropdownOption[]> | undefined,
+  groupKey: string,
+  filter: string | null
+): string | null {
+  if (!filter) {
+    return null;
+  }
+
+  const option = groupOptions?.[groupKey]?.find((o) => o.key === filter);
+  if (!option) return null;
+  return option.label ?? option.key;
 }

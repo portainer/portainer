@@ -67,14 +67,18 @@ function InnerSidebar() {
               label="Home"
               data-cy="portainerSidebar-home"
             />
+
+            <EnvironmentSidebar />
+
             <SidebarItem
               to="portainer.workflows"
               icon={GitBranch}
               label="Workflows"
               data-cy="portainerSidebar-workflows"
             />
-            <EnvironmentSidebar />
+
             {isAdmin && <EdgeComputeSidebar />}
+
             <SettingsSidebar
               isPureAdmin={isPureAdmin}
               isAdmin={isAdmin}

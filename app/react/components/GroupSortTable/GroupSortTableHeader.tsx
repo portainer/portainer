@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import clsx from 'clsx';
 
 import { AutomationTestingProps } from '@/types';
@@ -18,10 +18,11 @@ interface Props<TSortKey extends string> {
   onSearchChange: (term: string) => void;
   sortOptions: SortOption<TSortKey>[];
   searchPlaceholder?: string;
-  actionButton?: React.ReactNode;
+  actionButton?: ReactNode;
   groupFilter: string | null;
   groupOptions?: Record<string, DropdownOption[]>;
   onGroupFilterChange: (value: string | null) => void;
+  headerButtons?: ReactNode;
 }
 
 export function GroupSortTableHeader<TSortKey extends string>({
@@ -35,6 +36,7 @@ export function GroupSortTableHeader<TSortKey extends string>({
   groupFilter,
   groupOptions,
   onGroupFilterChange,
+  headerButtons,
   'data-cy': dataCy,
 }: Props<TSortKey> & AutomationTestingProps) {
   return (
@@ -42,7 +44,7 @@ export function GroupSortTableHeader<TSortKey extends string>({
       className={clsx(
         'flex items-center justify-between gap-3 px-5 py-3',
         'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-10',
-        'border-0 border-b border-solid border-gray-4'
+        'border-0 border-b border-solid border-gray-5 th-dark:border-gray-9'
       )}
     >
       <SortByGroup
@@ -55,6 +57,7 @@ export function GroupSortTableHeader<TSortKey extends string>({
         dataCy={dataCy}
       />
       <div className="ml-auto flex items-center gap-2">
+        {headerButtons}
         <SearchBar
           value={searchTerm}
           placeholder={searchPlaceholder}

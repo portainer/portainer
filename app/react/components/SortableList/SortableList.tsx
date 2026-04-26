@@ -60,18 +60,14 @@ export function SortableList<T>({
         sortBy={activeSortKey}
         onSortChange={(key) => {
           tableState.setSortBy(key, false);
-          tableState.setGroupFilter(null);
-          tableState.setPage(0);
         }}
         searchTerm={tableState.search}
         onSearchChange={(value) => {
           tableState.setSearch(value);
-          tableState.setPage(0);
         }}
         groupFilter={tableState.groupFilter}
         onGroupFilterChange={(value) => {
           tableState.setGroupFilter(value);
-          tableState.setPage(0);
         }}
         groupOptions={groupOptions}
         sortOptions={sortOptions}

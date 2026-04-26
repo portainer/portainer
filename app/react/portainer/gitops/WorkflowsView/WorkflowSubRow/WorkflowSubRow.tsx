@@ -11,9 +11,9 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
   const status = deriveSubRowStatuses(item);
 
   return (
-    <div className="overflow-hidden rounded border border-solid border-gray-3 text-xs th-dark:border-gray-8">
+    <div className="overflow-hidden rounded border border-solid border-gray-3 text-xs th-dark:border-gray-9">
       <table className="w-full table-fixed border-collapse">
-        <thead className="border-0 border-b border-solid border-gray-3 bg-gray-2 th-dark:border-gray-8 th-dark:bg-gray-iron-11">
+        <thead className="border-0 border-b border-solid border-gray-3 bg-gray-2 th-dark:border-gray-9 th-dark:bg-gray-iron-11">
           <tr>
             <Th>Source</Th>
             <Th divider>Artifacts</Th>
@@ -66,10 +66,12 @@ function SourceCell({
     <Block status={status} className="flex items-start gap-2">
       <Dot status={status} className="mt-1.5" />
       <div className="min-w-0">
-        <p className="m-0 font-semibold text-gray-9 th-dark:text-white">
+        <p className="m-0 font-semibold text-gray-9 th-highcontrast:text-white th-dark:text-white">
           {name}
         </p>
-        <p className="m-0 mt-0.5 break-all text-gray-5">{url}</p>
+        <p className="m-0 mt-0.5 break-all text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-3">
+          {url}
+        </p>
       </div>
     </Block>
   );
@@ -85,7 +87,9 @@ function ArtifactCell({
   return (
     <Block status={status} className="flex items-center gap-2">
       <Dot status={status} />
-      <span className="font-mono text-gray-7 th-dark:text-gray-4">{path}</span>
+      <span className="font-mono text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-4">
+        {path}
+      </span>
     </Block>
   );
 }
@@ -94,9 +98,9 @@ function Th({ children, divider }: { children: ReactNode; divider?: boolean }) {
   return (
     <th
       className={clsx(
-        'w-1/3 px-4 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-5',
+        'w-1/3 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider text-gray-7 th-highcontrast:text-white th-dark:text-white',
         divider &&
-          'border-0 border-l border-solid border-gray-3 th-dark:border-gray-8'
+          'border-0 border-l border-solid border-gray-3 th-dark:border-gray-9'
       )}
     >
       {children}

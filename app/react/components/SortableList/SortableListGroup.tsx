@@ -31,7 +31,7 @@ export function SortableListGroup<T>({
           className={clsx(
             'flex items-center gap-2 px-5 py-2.5',
             'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-11',
-            'border-0 border-b border-solid border-gray-4 th-dark:border-gray-8'
+            'border-0 border-b border-solid border-gray-5 th-dark:border-gray-9'
           )}
         >
           {group.icon && (

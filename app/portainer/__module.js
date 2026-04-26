@@ -11,6 +11,7 @@ import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
 import { helpersModule } from './helpers';
 import { AccessHeaders, requiresAuthHook } from './authorization-guard';
+import { filterParam, paginationParams } from './helpers/stateParamHelper';
 
 async function initAuthentication(Authentication) {
   return await Authentication.init();
@@ -298,9 +299,16 @@ angular
           docs: '/user/home',
         },
       };
+
       var workflows = {
         name: 'portainer.workflows',
-        url: '/workflows',
+        url: '/workflows?search&sort&order&page&pageSize&status&type&platform',
+        params: {
+          ...paginationParams('name'),
+          status: filterParam(),
+          type: filterParam(),
+          platform: filterParam(),
+        },
         views: {
           'content@': {
             component: 'workflowsView',

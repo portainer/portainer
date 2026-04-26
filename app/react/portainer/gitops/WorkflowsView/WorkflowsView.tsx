@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { PageHeader } from '@@/PageHeader';
 import { StatusSummaryBar } from '@@/StatusSummaryBar/StatusSummaryBar';
@@ -7,18 +7,13 @@ import {
   SortableGroup,
   SortOption,
 } from '@@/SortableList/SortableList';
-import { useSortableListState } from '@@/SortableList/sortable-list.store';
 
 import { useWorkflows } from '../queries/useWorkflows';
 import { useWorkflowsSummary } from '../queries/useWorkflowsSummary';
 
 import { WorkflowCard } from './WorkflowCard';
-import {
-  DeploymentPlatform,
-  Workflow,
-  WorkflowStatus,
-  WorkflowType,
-} from './types';
+import { Workflow, WorkflowStatus } from './types';
+import { useListState } from './useListState';
 
 const STATUS_CONFIG: Array<{
   key: WorkflowStatus;
@@ -60,8 +55,8 @@ const GROUP_FIELD: Record<string, (item: Workflow) => string> = {
 };
 
 export function WorkflowsView() {
-  const [statusFilter, setStatusFilter] = useState<WorkflowStatus | null>(null);
-  const tableState = useSortableListState('workflows', 'name');
+  const tableState = useListState();
+
   const sortBy = tableState.sortBy?.id ?? 'name';
 
   const workflowsQuery = useWorkflows({
@@ -70,9 +65,9 @@ export function WorkflowsView() {
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     start: tableState.page * tableState.pageSize,
     limit: tableState.pageSize,
-    status: statusFilter ?? groupFilter<WorkflowStatus>('status'),
-    type: groupFilter<WorkflowType>('type'),
-    platform: groupFilter<DeploymentPlatform>('platform'),
+    status: tableState.status ?? undefined,
+    type: tableState.type ?? undefined,
+    platform: tableState.platform ?? undefined,
   });
 
   const summaryQuery = useWorkflowsSummary();
@@ -92,7 +87,6 @@ export function WorkflowsView() {
       ...GROUP_OPTIONS,
       status: statusSegments,
     }),
-
     [statusSegments]
   );
 
@@ -111,11 +105,8 @@ export function WorkflowsView() {
         <StatusSummaryBar
           total={summaryTotal}
           segments={statusSegments}
-          value={statusFilter}
-          onChange={(v) => {
-            setStatusFilter(v);
-            tableState.setPage(0);
-          }}
+          value={tableState.status}
+          onChange={tableState.setStatus}
           radioGroupName="workflows-status"
         />
         <SortableList
@@ -135,10 +126,6 @@ export function WorkflowsView() {
       </div>
     </>
   );
-
-  function groupFilter<T>(key: string) {
-    return sortBy === key ? (tableState.groupFilter as T | null) : undefined;
-  }
 }
 
 function buildGroups(

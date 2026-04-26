@@ -20,7 +20,7 @@ export function SortableListPager({
   const safePage = Math.min(page, totalPages - 1);
 
   return (
-    <div className="flex items-center justify-between px-5 py-3 text-xs text-gray-7 th-dark:text-gray-4">
+    <div className="flex items-center justify-between px-5 py-3 text-xs text-gray-7 th-highcontrast:text-gray-4 th-dark:text-gray-4">
       <SortableListPagerInfo
         page={safePage}
         totalCount={totalCount}

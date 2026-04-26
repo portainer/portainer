@@ -7,16 +7,12 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { Workflow } from './types';
+import { Workflow, WorkflowType } from './types';
 import { StatusBadge, TypeBadge } from './WorkflowBadges';
 import { WorkflowSubRow } from './WorkflowSubRow/WorkflowSubRow';
 
 export function WorkflowCard({ item }: { item: Workflow }) {
   const { to, params } = getStackLink(item);
-  const syncLabel = item.lastSyncDate
-    ? moment.unix(item.lastSyncDate).fromNow()
-    : '-';
-  const syncTitle = item.type === 'edgeStack' ? 'Oldest sync' : 'Last sync';
 
   return (
     <SortableListItem>
@@ -38,12 +34,7 @@ export function WorkflowCard({ item }: { item: Workflow }) {
               <StatusBadge status={item.status} />
               <TypeBadge type={item.type} />
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-gray-5">
-              <Icon icon={WatchIcon} size="xs" />
-              <span>
-                {syncTitle}: {syncLabel}
-              </span>
-            </div>
+            <SyncLabel type={item.type} date={item.lastSyncDate} />
           </div>
           <WorkflowSubRow item={item} />
           {item.statusMessage && (
@@ -55,6 +46,20 @@ export function WorkflowCard({ item }: { item: Workflow }) {
         </div>
       </div>
     </SortableListItem>
+  );
+}
+
+function SyncLabel({ type, date }: { type: WorkflowType; date: number }) {
+  const syncLabel = date ? moment.unix(date).fromNow() : '-';
+  const syncTitle = type === 'edgeStack' ? 'Oldest sync' : 'Last sync';
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-3">
+      <Icon icon={WatchIcon} size="xs" />
+      <span>
+        {syncTitle}: {syncLabel}
+      </span>
+    </div>
   );
 }
 

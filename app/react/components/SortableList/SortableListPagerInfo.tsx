@@ -35,7 +35,7 @@ export function SortableListPagerInfo({
       <select
         className={clsx(
           'rounded border border-solid border-gray-4 bg-transparent px-2 py-1',
-          'text-xs text-gray-7 th-dark:border-gray-7 th-dark:text-gray-4',
+          'text-xs text-gray-7 th-highcontrast:text-gray-4 th-dark:border-gray-7 th-dark:text-gray-4',
           'cursor-pointer focus:outline-none'
         )}
         value={pageSize}
