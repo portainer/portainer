@@ -60,7 +60,7 @@ export function useUpdateGitStack(stack: Stack) {
         await updateGitStack(stack.Id, stack.EndpointId, {
           Env: values.env,
           Prune: values.prune,
-          StackName: values.kube.name,
+          StackName: values.kube.name.trim() || undefined,
           RepositoryAuthentication: resolvedAuth.RepositoryAuthentication,
           RepositoryGitCredentialID: resolvedAuth.RepositoryGitCredentialID,
           RepositoryUsername: resolvedAuth.RepositoryUsername,

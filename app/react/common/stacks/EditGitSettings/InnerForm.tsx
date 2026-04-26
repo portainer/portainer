@@ -72,7 +72,9 @@ export function InnerForm({
                     stackName={values.kube?.name ?? ''}
                     setStackName={(value) => {
                       setFieldValue('kube.name', value);
-                      setFieldValue('redeployNow', true);
+                      if (value && value !== stackName) {
+                        setFieldValue('redeployNow', true);
+                      }
                     }}
                     error={errors.kube?.name}
                   />

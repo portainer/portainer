@@ -22,7 +22,7 @@ export function useValidationSchema(
       object({
         kube: isKubernetes
           ? object({
-              name: string().required('Stack name is required'),
+              name: string().default(''),
             }).required()
           : object({ name: string().default('') }).optional(),
         git: buildGitValidationSchema(
