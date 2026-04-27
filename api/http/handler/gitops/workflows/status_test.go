@@ -72,13 +72,13 @@ func TestWorkflowsList_StackStatusDerivation(t *testing.T) {
 				return nil
 			}))
 
-			h := NewHandler(store)
+			h := NewHandler(store, nil)
 			rr := httptest.NewRecorder()
 			h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
 
 			items := decodeWorkflows(t, rr)
 			require.Len(t, items, 1)
-			assert.Equal(t, tc.expectedStatus, items[0].Status, tc.name)
+			assert.Equal(t, tc.expectedStatus, items[0].Status.Target.Status, tc.name)
 		})
 	}
 }

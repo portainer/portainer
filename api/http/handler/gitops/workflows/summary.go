@@ -26,7 +26,7 @@ func (h *Handler) summary(w http.ResponseWriter, r *http.Request) *httperror.Han
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	items, err := h.getWorkflows(cacheKey(securityContext, nil), securityContext, nil)
+	items, err := h.getWorkflows(r.Context(), cacheKey(securityContext, nil), securityContext, nil)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve workflows", err)
 	}

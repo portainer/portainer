@@ -34,7 +34,7 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	authenticatedRouter.Handle("/gitops/repo/file/preview", httperror.LoggerHandler(h.gitOperationRepoFilePreview)).Methods(http.MethodPost)
 
-	workflowsHandler := workflows.NewHandler(dataStore)
+	workflowsHandler := workflows.NewHandler(dataStore, gitService)
 	authenticatedRouter.PathPrefix("/gitops/workflows").Handler(workflowsHandler)
 
 	return h

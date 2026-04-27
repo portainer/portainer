@@ -63,17 +63,30 @@ type Target struct {
 	GroupStatus  map[portainer.EdgeGroupID]Status `json:"groupStatus,omitempty"`
 }
 
+// WorkflowPhaseStatus represents the status of one phase (source, artifact, or target) of a workflow.
+// All three phases share the Status type; source and artifact only ever emit healthy, error, or unknown.
+type WorkflowPhaseStatus struct {
+	Status Status `json:"status"`
+	Error  string `json:"error,omitempty"`
+}
+
+// WorkflowStatusObject is the structured status reported for a workflow.
+type WorkflowStatusObject struct {
+	Source   WorkflowPhaseStatus `json:"source"`
+	Artifact WorkflowPhaseStatus `json:"artifact"`
+	Target   WorkflowPhaseStatus `json:"target"`
+}
+
 type Workflow struct {
-	ID            int                  `json:"id"`
-	Name          string               `json:"name"`
-	Type          Type                 `json:"type"`
-	Platform      DeploymentPlatform   `json:"platform"`
-	Status        Status               `json:"status"`
-	StatusMessage string               `json:"statusMessage,omitempty"`
-	GitConfig     *gittypes.RepoConfig `json:"gitConfig,omitempty"`
-	Target        Target               `json:"target"`
-	CreationDate  int64                `json:"creationDate"`
-	LastSyncDate  int64                `json:"lastSyncDate"`
+	ID           int                  `json:"id"`
+	Name         string               `json:"name"`
+	Type         Type                 `json:"type"`
+	Platform     DeploymentPlatform   `json:"platform"`
+	Status       WorkflowStatusObject `json:"status"`
+	GitConfig    *gittypes.RepoConfig `json:"gitConfig,omitempty"`
+	Target       Target               `json:"target"`
+	CreationDate int64                `json:"creationDate"`
+	LastSyncDate int64                `json:"lastSyncDate"`
 }
 
 type StatusSummary struct {

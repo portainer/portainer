@@ -7,12 +7,15 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { Workflow, WorkflowType } from './types';
+import { effectiveWorkflowStatus, Workflow, WorkflowType } from './types';
 import { StatusBadge, TypeBadge } from './WorkflowBadges';
 import { WorkflowSubRow } from './WorkflowSubRow/WorkflowSubRow';
 
 export function WorkflowCard({ item }: { item: Workflow }) {
   const { to, params } = getStackLink(item);
+
+  const { status: effectiveStatus, error: errorMessage } =
+    effectiveWorkflowStatus(item);
 
   return (
     <SortableListItem>
@@ -31,16 +34,16 @@ export function WorkflowCard({ item }: { item: Workflow }) {
               >
                 {item.name}
               </Link>
-              <StatusBadge status={item.status} />
+              <StatusBadge status={effectiveStatus} />
               <TypeBadge type={item.type} />
             </div>
             <SyncLabel type={item.type} date={item.lastSyncDate} />
           </div>
           <WorkflowSubRow item={item} />
-          {item.statusMessage && (
+          {errorMessage && (
             <div className="mt-2.5 flex items-center gap-1.5 text-xs text-error-8">
               <Icon icon={AlertTriangle} size="sm" className="shrink-0" />
-              {item.statusMessage}
+              {errorMessage}
             </div>
           )}
         </div>

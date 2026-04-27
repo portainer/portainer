@@ -5,11 +5,8 @@ import { Workflow, WorkflowStatus } from '../types';
 
 import { Block, Dot } from './Block';
 import { TargetCell } from './TargetCell';
-import { deriveSubRowStatuses } from './status';
 
 export function WorkflowSubRow({ item }: { item: Workflow }) {
-  const status = deriveSubRowStatuses(item);
-
   return (
     <div className="overflow-hidden rounded border border-solid border-gray-3 text-xs th-dark:border-gray-9">
       <table className="w-full table-fixed border-collapse">
@@ -27,7 +24,7 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
                 <SourceCell
                   name={item.name}
                   url={item.gitConfig.URL}
-                  status={status.source}
+                  status={item.status.source.status}
                 />
               )}
             </Td>
@@ -35,7 +32,7 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
               {item.gitConfig && (
                 <ArtifactCell
                   path={item.gitConfig.ConfigFilePath}
-                  status={status.artifact}
+                  status={item.status.artifact.status}
                 />
               )}
             </Td>
@@ -43,7 +40,7 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
               <TargetCell
                 target={item.target}
                 type={item.type}
-                status={status.target}
+                status={item.status.target.status}
               />
             </Td>
           </tr>

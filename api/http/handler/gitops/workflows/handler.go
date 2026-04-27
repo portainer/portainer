@@ -5,6 +5,7 @@ import (
 	"time"
 
 	gocache "github.com/patrickmn/go-cache"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
@@ -18,15 +19,17 @@ const (
 
 type Handler struct {
 	*mux.Router
-	dataStore dataservices.DataStore
-	cache     *gocache.Cache
+	dataStore  dataservices.DataStore
+	gitService portainer.GitService
+	cache      *gocache.Cache
 }
 
-func NewHandler(dataStore dataservices.DataStore) *Handler {
+func NewHandler(dataStore dataservices.DataStore, gitService portainer.GitService) *Handler {
 	h := &Handler{
-		Router:    mux.NewRouter(),
-		dataStore: dataStore,
-		cache:     gocache.New(cacheTTL, cacheCleanupInterval),
+		Router:     mux.NewRouter(),
+		dataStore:  dataStore,
+		gitService: gitService,
+		cache:      gocache.New(cacheTTL, cacheCleanupInterval),
 	}
 
 	h.Handle("/gitops/workflows", httperror.LoggerHandler(h.list)).Methods(http.MethodGet)

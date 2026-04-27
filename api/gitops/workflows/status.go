@@ -2,37 +2,37 @@ package workflows
 
 import portainer "github.com/portainer/portainer/api"
 
-func deriveStackStatus(s portainer.Stack) (Status, string) {
+func deriveStackTargetState(s portainer.Stack) WorkflowPhaseStatus {
 	if len(s.DeploymentStatus) == 0 {
-		return StatusHealthy, ""
+		return WorkflowPhaseStatus{Status: StatusHealthy}
 	}
 	last := s.DeploymentStatus[len(s.DeploymentStatus)-1]
 	switch last.Status {
 	case portainer.StackStatusActive:
-		return StatusHealthy, ""
+		return WorkflowPhaseStatus{Status: StatusHealthy}
 	case portainer.StackStatusError:
-		return StatusError, last.Message
+		return WorkflowPhaseStatus{Status: StatusError, Error: last.Message}
 	case portainer.StackStatusDeploying:
-		return StatusSyncing, ""
+		return WorkflowPhaseStatus{Status: StatusSyncing}
 	case portainer.StackStatusInactive:
-		return StatusPaused, ""
+		return WorkflowPhaseStatus{Status: StatusPaused}
 	default:
-		return StatusUnknown, ""
+		return WorkflowPhaseStatus{Status: StatusUnknown}
 	}
 }
 
-func deriveEdgeStackStatus(statuses []portainer.EdgeStackStatusForEnv) (Status, string) {
+func deriveEdgeStackTargetState(statuses []portainer.EdgeStackStatusForEnv) WorkflowPhaseStatus {
 	result := StatusUnknown
 	for _, epStatus := range statuses {
 		ws, msg := endpointWorkflowStatus(epStatus)
 		if ws == StatusError {
-			return ws, msg
+			return WorkflowPhaseStatus{Status: ws, Error: msg}
 		}
 		if statusPriority(ws) > statusPriority(result) {
 			result = ws
 		}
 	}
-	return result, ""
+	return WorkflowPhaseStatus{Status: result}
 }
 
 func endpointWorkflowStatus(epStatus portainer.EdgeStackStatusForEnv) (Status, string) {
@@ -64,11 +64,23 @@ func endpointWorkflowStatus(epStatus portainer.EdgeStackStatusForEnv) (Status, s
 	}
 }
 
-// CountByStatus counts workflows per status and returns a StatusSummary.
+// EffectiveStatus returns the highest-priority status across all three phases of a workflow.
+func EffectiveStatus(w Workflow) Status {
+	s := w.Status.Target.Status
+	if statusPriority(w.Status.Source.Status) > statusPriority(s) {
+		s = w.Status.Source.Status
+	}
+	if statusPriority(w.Status.Artifact.Status) > statusPriority(s) {
+		s = w.Status.Artifact.Status
+	}
+	return s
+}
+
+// CountByStatus counts workflows per effective status and returns a StatusSummary.
 func CountByStatus(workflows []Workflow) StatusSummary {
 	var s StatusSummary
 	for _, w := range workflows {
-		switch w.Status {
+		switch EffectiveStatus(w) {
 		case StatusHealthy:
 			s.Healthy++
 		case StatusSyncing:

@@ -28,12 +28,14 @@ export function useGitRefs<T = string[]>(
     onSuccess,
     onSettled,
     suppressError,
+    cacheTime = 0,
   }: {
     enabled?: boolean;
     select?: (data: string[]) => T;
     onSuccess?(data: T): void;
     onSettled?(data: T | undefined, error: unknown): void;
     suppressError?: boolean;
+    cacheTime?: number;
   } = {}
 ) {
   return useQuery({
@@ -41,7 +43,7 @@ export function useGitRefs<T = string[]>(
     queryFn: () => listRefs(payload),
     enabled: isBE && enabled,
     retry: false,
-    cacheTime: 0,
+    cacheTime,
     select,
     onSuccess,
     onSettled,

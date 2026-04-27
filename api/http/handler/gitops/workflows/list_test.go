@@ -2,6 +2,7 @@ package workflows
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"testing/synctest"
@@ -10,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	ce "github.com/portainer/portainer/api/gitops/workflows"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +32,7 @@ func TestWorkflowsList_GitConfigFilter(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
 
@@ -59,7 +61,7 @@ func TestWorkflowsList_EndpointIDsFilter(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "endpointIds[]=1&endpointIds[]=2"))
 
@@ -87,7 +89,7 @@ func TestWorkflowsList_Pagination(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "start=0&limit=2"))
 
@@ -112,7 +114,7 @@ func TestWorkflowsList_Search(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=alpha"))
 
@@ -139,7 +141,7 @@ func TestWorkflowsList_SearchByURL(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=org1"))
 
@@ -164,7 +166,7 @@ func TestWorkflowsList_Sort(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "sort=name&order=desc"))
 
@@ -197,7 +199,7 @@ func TestWorkflowsList_Cache(t *testing.T) {
 
 	// Create the handler outside the bubble so the go-cache cleanup goroutine
 	// is not part of the bubble and does not block synctest.Test from returning.
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	synctest.Test(t, func(t *testing.T) {
 		// First request at fake T=0: populates cache.
@@ -246,7 +248,7 @@ func TestWorkflowsList_CacheImmutableAfterSort(t *testing.T) {
 		}))
 	}
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	// First request: no sort — cache miss, populates cache as [alpha, beta, gamma].
 	rr := httptest.NewRecorder()
@@ -288,7 +290,7 @@ func TestWorkflowsList_CacheSeparateKeys(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	rr1 := httptest.NewRecorder()
 	h.ServeHTTP(rr1, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "endpointIds[]=1"))
@@ -301,4 +303,84 @@ func TestWorkflowsList_CacheSeparateKeys(t *testing.T) {
 	items2 := decodeWorkflows(t, rr2)
 	require.Len(t, items2, 1)
 	assert.Equal(t, "env2-stack", items2[0].Name)
+}
+
+func TestWorkflowsList_StatusFilter(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{
+			ID: 1, Name: "healthy-stack",
+			GitConfig: gitConfig("https://github.com/x/1"),
+		}))
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{
+			ID: 2, Name: "error-stack",
+			GitConfig:        gitConfig("https://github.com/x/2"),
+			DeploymentStatus: []portainer.StackDeploymentStatus{{Status: portainer.StackStatusError}},
+		}))
+		require.NoError(t, tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
+		return nil
+	}))
+
+	h := NewHandler(store, nil)
+
+	t.Run("status=healthy returns only healthy workflows", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "status=healthy"))
+		items := decodeWorkflows(t, rr)
+		require.Len(t, items, 1)
+		assert.Equal(t, "healthy-stack", items[0].Name)
+	})
+
+	t.Run("status=error returns only error workflows", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "status=error"))
+		items := decodeWorkflows(t, rr)
+		require.Len(t, items, 1)
+		assert.Equal(t, "error-stack", items[0].Name)
+	})
+}
+
+func TestWorkflowsList_InvalidFilterParams(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+	require.NoError(t, store.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
+	h := NewHandler(store, nil)
+
+	for _, query := range []string{"status=garbage", "type=garbage", "platform=garbage"} {
+		t.Run(query, func(t *testing.T) {
+			t.Parallel()
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, query))
+			assert.Equal(t, http.StatusBadRequest, rr.Code)
+		})
+	}
+}
+
+func TestWorkflowsList_RedactsCredentials(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	cfg := gitConfig("https://github.com/x/secure")
+	cfg.Authentication = &gittypes.GitAuthentication{Username: "user", Password: "s3cr3t"}
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{
+			ID: 1, Name: "secure-stack", GitConfig: cfg,
+		}))
+		require.NoError(t, tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
+		return nil
+	}))
+
+	h := NewHandler(store, nil)
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
+
+	items := decodeWorkflows(t, rr)
+	require.Len(t, items, 1)
+	require.NotNil(t, items[0].GitConfig)
+	require.NotNil(t, items[0].GitConfig.Authentication)
+	assert.Equal(t, "user", items[0].GitConfig.Authentication.Username)
+	assert.Empty(t, items[0].GitConfig.Authentication.Password)
 }

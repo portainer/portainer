@@ -7,16 +7,19 @@ import (
 
 // MapStackToWorkflow converts a stack to a Workflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
-func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig) Workflow {
-	status, msg := deriveStackStatus(s)
+// source and artifact are the pre-computed git phase statuses from the caller.
+func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) Workflow {
 	return Workflow{
-		ID:            int(s.ID),
-		Name:          s.Name,
-		Type:          TypeStack,
-		Platform:      platformFromStackType(s.Type),
-		Status:        status,
-		StatusMessage: msg,
-		GitConfig:     gitConfig,
+		ID:       int(s.ID),
+		Name:     s.Name,
+		Type:     TypeStack,
+		Platform: platformFromStackType(s.Type),
+		Status: WorkflowStatusObject{
+			Source:   source,
+			Artifact: artifact,
+			Target:   deriveStackTargetState(s),
+		},
+		GitConfig: gitConfig,
 		Target: Target{
 			EndpointID: s.EndpointID,
 			Namespace:  s.Namespace,
@@ -28,20 +31,23 @@ func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig) Workf
 
 // MapEdgeStackToWorkflow converts an edge stack to a Workflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
-func MapEdgeStackToWorkflow(es portainer.EdgeStack, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID) Workflow {
-	status, msg := deriveEdgeStackStatus(statuses)
+// source and artifact are the pre-computed git phase statuses from the caller.
+func MapEdgeStackToWorkflow(es portainer.EdgeStack, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
 	platform := DeploymentPlatformDockerStandalone
 	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		platform = DeploymentPlatformKubernetes
 	}
 	return Workflow{
-		ID:            int(es.ID),
-		Name:          es.Name,
-		Type:          TypeEdgeStack,
-		Platform:      platform,
-		Status:        status,
-		StatusMessage: msg,
-		GitConfig:     gitConfig,
+		ID:       int(es.ID),
+		Name:     es.Name,
+		Type:     TypeEdgeStack,
+		Platform: platform,
+		Status: WorkflowStatusObject{
+			Source:   source,
+			Artifact: artifact,
+			Target:   deriveEdgeStackTargetState(statuses),
+		},
+		GitConfig: gitConfig,
 		Target: Target{
 			EdgeGroupIDs: es.EdgeGroups,
 			GroupStatus:  edgeStackTargetStatuses(es.EdgeGroups, statuses, groupEndpoints),

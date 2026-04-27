@@ -12,8 +12,8 @@ import { useWorkflows } from '../queries/useWorkflows';
 import { useWorkflowsSummary } from '../queries/useWorkflowsSummary';
 
 import { WorkflowCard } from './WorkflowCard';
-import { Workflow, WorkflowStatus } from './types';
 import { useListState } from './useListState';
+import { effectiveWorkflowStatus, Workflow, WorkflowStatus } from './types';
 
 const STATUS_CONFIG: Array<{
   key: WorkflowStatus;
@@ -49,7 +49,7 @@ const GROUP_OPTIONS: Record<string, Array<{ key: string; label: string }>> = {
 };
 
 const GROUP_FIELD: Record<string, (item: Workflow) => string> = {
-  status: (item) => item.status,
+  status: (item: Workflow) => effectiveWorkflowStatus(item).status,
   type: (item) => item.type,
   platform: (item) => item.platform,
 };

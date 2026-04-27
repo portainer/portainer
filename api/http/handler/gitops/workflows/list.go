@@ -2,6 +2,7 @@ package workflows
 
 import (
 	"cmp"
+	"context"
 	"net/http"
 	"slices"
 	"strconv"
@@ -55,7 +56,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 
 	key := cacheKey(securityContext, endpointIDs)
 
-	items, err := h.getWorkflows(key, securityContext, endpointIDs)
+	items, err := h.getWorkflows(r.Context(), key, securityContext, endpointIDs)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve workflows", err)
 	}
@@ -65,7 +66,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		if err != nil {
 			return httperror.BadRequest("Invalid status parameter", err)
 		}
-		items = slicesx.FilterInPlace(items, func(i svc.Workflow) bool { return i.Status == s })
+		items = slicesx.FilterInPlace(items, func(i svc.Workflow) bool { return svc.EffectiveStatus(i) == s })
 	}
 
 	if workflowType, _ := request.RetrieveQueryParameter(r, "type", true); workflowType != "" {
@@ -97,7 +98,9 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		SortBindings: []filters.SortBinding[svc.Workflow]{
 			{Key: "name", Fn: func(a, b svc.Workflow) int { return strings.Compare(a.Name, b.Name) }},
 			{Key: "type", Fn: func(a, b svc.Workflow) int { return strings.Compare(string(a.Type), string(b.Type)) }},
-			{Key: "status", Fn: func(a, b svc.Workflow) int { return strings.Compare(string(a.Status), string(b.Status)) }},
+			{Key: "status", Fn: func(a, b svc.Workflow) int {
+				return strings.Compare(string(svc.EffectiveStatus(a)), string(svc.EffectiveStatus(b)))
+			}},
 			{Key: "creationDate", Fn: func(a, b svc.Workflow) int { return cmp.Compare(a.CreationDate, b.CreationDate) }},
 			{Key: "lastSyncDate", Fn: func(a, b svc.Workflow) int { return cmp.Compare(a.LastSyncDate, b.LastSyncDate) }, NullsLast: func(i svc.Workflow) bool { return i.LastSyncDate == 0 }},
 			{Key: "platform", Fn: func(a, b svc.Workflow) int { return strings.Compare(string(a.Platform), string(b.Platform)) }},
@@ -121,12 +124,12 @@ func redactWorkflowCredentials(items []svc.Workflow) []svc.Workflow {
 	return items
 }
 
-func (h *Handler) getWorkflows(key string, sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) ([]svc.Workflow, error) {
+func (h *Handler) getWorkflows(ctx context.Context, key string, sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) ([]svc.Workflow, error) {
 	if cached, ok := h.cache.Get(key); ok {
 		return slices.Clone(cached.([]svc.Workflow)), nil
 	}
 
-	result, err := h.fetchWorkflows(sc, set.ToSet(endpointIDs))
+	result, err := h.fetchWorkflows(ctx, sc, set.ToSet(endpointIDs))
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +137,8 @@ func (h *Handler) getWorkflows(key string, sc *security.RestrictedRequestContext
 	return slices.Clone(result), nil
 }
 
-func (h *Handler) fetchWorkflows(sc *security.RestrictedRequestContext, endpointIDSet set.Set[portainer.EndpointID]) ([]svc.Workflow, error) {
-	var items []svc.Workflow
+func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedRequestContext, endpointIDSet set.Set[portainer.EndpointID]) ([]svc.Workflow, error) {
+	var entries []portainer.Stack
 	err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		stacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool {
 			return s.GitConfig != nil && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
@@ -165,13 +168,22 @@ func (h *Handler) fetchWorkflows(sc *security.RestrictedRequestContext, endpoint
 			if ep, ok := endpointMap[s.EndpointID]; ok && !endpointMatchesStackType(ep, s.Type) {
 				continue
 			}
-			items = append(items, svc.MapStackToWorkflow(s, s.GitConfig))
+			entries = append(entries, s)
 		}
 
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return items, err
+	items := make([]svc.Workflow, 0, len(entries))
+	for _, s := range entries {
+		source, artifact := computeGitPhases(ctx, h.gitService, s.GitConfig)
+		items = append(items, svc.MapStackToWorkflow(s, s.GitConfig, source, artifact))
+	}
+
+	return items, nil
 }
 
 func cacheKey(sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) string {
