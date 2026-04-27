@@ -32,7 +32,7 @@ func TestWorkflowsList_GitConfigFilter(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
 
@@ -61,7 +61,7 @@ func TestWorkflowsList_EndpointIDsFilter(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "endpointIds[]=1&endpointIds[]=2"))
 
@@ -89,7 +89,7 @@ func TestWorkflowsList_Pagination(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "start=0&limit=2"))
 
@@ -114,7 +114,7 @@ func TestWorkflowsList_Search(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=alpha"))
 
@@ -141,7 +141,7 @@ func TestWorkflowsList_SearchByURL(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=org1"))
 
@@ -166,7 +166,7 @@ func TestWorkflowsList_Sort(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "sort=name&order=desc"))
 
@@ -199,7 +199,7 @@ func TestWorkflowsList_Cache(t *testing.T) {
 
 	// Create the handler outside the bubble so the go-cache cleanup goroutine
 	// is not part of the bubble and does not block synctest.Test from returning.
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 
 	synctest.Test(t, func(t *testing.T) {
 		// First request at fake T=0: populates cache.
@@ -248,7 +248,7 @@ func TestWorkflowsList_CacheImmutableAfterSort(t *testing.T) {
 		}))
 	}
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 
 	// First request: no sort — cache miss, populates cache as [alpha, beta, gamma].
 	rr := httptest.NewRecorder()
@@ -290,7 +290,7 @@ func TestWorkflowsList_CacheSeparateKeys(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 
 	rr1 := httptest.NewRecorder()
 	h.ServeHTTP(rr1, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "endpointIds[]=1"))
@@ -323,7 +323,7 @@ func TestWorkflowsList_StatusFilter(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 
 	t.Run("status=healthy returns only healthy workflows", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -346,7 +346,7 @@ func TestWorkflowsList_InvalidFilterParams(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
 	require.NoError(t, store.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 
 	for _, query := range []string{"status=garbage", "type=garbage", "platform=garbage"} {
 		t.Run(query, func(t *testing.T) {
@@ -373,7 +373,7 @@ func TestWorkflowsList_RedactsCredentials(t *testing.T) {
 		return nil
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
 

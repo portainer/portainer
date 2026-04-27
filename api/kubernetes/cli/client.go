@@ -125,8 +125,8 @@ func (factory *ClientFactory) GetPrivilegedKubeClient(endpoint *portainer.Endpoi
 
 // GetPrivilegedUserKubeClient checks if an existing admin client is already registered for the environment(endpoint) and user and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
-func (factory *ClientFactory) GetPrivilegedUserKubeClient(endpoint *portainer.Endpoint, userID string) (*KubeClient, error) {
-	key := strconv.Itoa(int(endpoint.ID)) + ".admin." + userID
+func (factory *ClientFactory) GetPrivilegedUserKubeClient(endpoint *portainer.Endpoint, userID portainer.UserID) (*KubeClient, error) {
+	key := strconv.Itoa(int(endpoint.ID)) + ".admin." + strconv.Itoa(int(userID))
 	pcl, ok := factory.endpointProxyClients.Get(key)
 	if ok {
 		return pcl.(*KubeClient), nil

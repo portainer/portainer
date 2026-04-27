@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
@@ -19,6 +20,8 @@ func endpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackTy
 		return len(ep.Snapshots) > 0 && ep.Snapshots[0].Swarm
 	case portainer.DockerComposeStack:
 		return len(ep.Snapshots) == 0 || !ep.Snapshots[0].Swarm
+	case portainer.KubernetesStack:
+		return endpointutils.IsKubernetesEndpoint(&ep)
 	default:
 		return true
 	}

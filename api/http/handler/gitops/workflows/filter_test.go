@@ -33,7 +33,7 @@ func TestWorkflowsList_RBAC_NonAdminNoAccess(t *testing.T) {
 		GitConfig: gitConfig("https://github.com/x/no-rc"),
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.StandardUserRole, ""))
 
@@ -70,7 +70,7 @@ func TestWorkflowsList_RBAC_NonAdminWithAccess(t *testing.T) {
 		},
 	}))
 
-	h := NewHandler(store, nil)
+	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.StandardUserRole, ""))
 

@@ -15,7 +15,7 @@ func Filter[T any](input []T, predicate func(T) bool) []T {
 	return result
 }
 
-// Filter in place all elements from input that predicate returns truthy for and returns an array of the removed elements.
+// Filter in place all elements from input that predicate returns truthy for.
 //
 // Note: Unlike `Filter`, this method mutates input.
 func FilterInPlace[T any](input []T, predicate func(T) bool) []T {

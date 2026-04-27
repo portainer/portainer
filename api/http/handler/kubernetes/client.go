@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
@@ -33,7 +32,7 @@ func (handler *Handler) prepareKubeClient(r *http.Request) (*cli.KubeClient, *ht
 		return nil, httperror.InternalServerError("Unable to retrieve token data associated to the request.", err)
 	}
 
-	pcli, err := handler.KubernetesClientFactory.GetPrivilegedUserKubeClient(endpoint, strconv.Itoa(int(tokenData.ID)))
+	pcli, err := handler.KubernetesClientFactory.GetPrivilegedUserKubeClient(endpoint, tokenData.ID)
 	if err != nil {
 		log.Error().Err(err).Str("context", "prepareKubeClient").Msg("Unable to get a privileged Kubernetes client for the user.")
 		return nil, httperror.InternalServerError("Unable to get a privileged Kubernetes client for the user.", err)

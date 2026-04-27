@@ -116,7 +116,7 @@ export function WorkflowsView() {
           groups={groups}
           totalCount={totalCount}
           isLoading={workflowsQuery.isLoading}
-          getItemKey={(item) => item.id}
+          getItemKey={(item) => `${item.type}-${item.id}`}
           showGroupHeaders
           emptyMessage="No workflows found"
           searchPlaceholder="Search"

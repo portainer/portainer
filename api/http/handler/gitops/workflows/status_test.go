@@ -72,7 +72,7 @@ func TestWorkflowsList_StackStatusDerivation(t *testing.T) {
 				return nil
 			}))
 
-			h := NewHandler(store, nil)
+			h := NewHandler(store, nil, nil)
 			rr := httptest.NewRecorder()
 			h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, ""))
 
