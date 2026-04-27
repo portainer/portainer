@@ -30,6 +30,7 @@ LABEL git_commit=$GIT_COMMIT \
   org.opencontainers.image.vendor="Portainer.io" \
   org.opencontainers.image.url="https://www.portainer.io" \
   org.opencontainers.image.documentation="https://docs.portainer.io" \
+  org.opencontainers.image.source="https://github.com/portainer/portainer" \
   io.portainer.server="true"
 
 ENTRYPOINT ["/portainer.exe"]
