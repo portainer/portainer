@@ -19,6 +19,7 @@ type MockCommonProps = Record<string, unknown>;
 type MockWithChildren = { children?: ReactNode };
 type MockMenuButtonProps = MockWithChildren & {
   as?: ComponentType<MockCommonProps>;
+  onClick?: () => void;
 } & MockCommonProps;
 type MockMenuItemProps = MockWithChildren & {
   onSelect?: () => void;
@@ -88,21 +89,28 @@ vi.mock('@reach/menu-button', () => {
   function MenuButton({
     children,
     as: Component,
+    onClick: externalOnClick,
     ...props
   }: MockMenuButtonProps) {
     const ctx = useContext(MenuCtx);
-    function onClick() {
+    function handleClick() {
+      externalOnClick?.();
       ctx?.setOpen(!ctx.isOpen);
     }
     if (Component) {
       return (
-        <Component data-cy="menu-button" onClick={onClick} {...props}>
+        <Component data-cy="menu-button" onClick={handleClick} {...props}>
           {children}
         </Component>
       );
     }
     return (
-      <button data-cy="menu-button" type="button" onClick={onClick} {...props}>
+      <button
+        data-cy="menu-button"
+        type="button"
+        onClick={handleClick}
+        {...props}
+      >
         {children}
       </button>
     );

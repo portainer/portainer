@@ -52,14 +52,14 @@ describe('GroupSortTableHeader', () => {
     expect(screen.getByRole('menuitem', { name: /Kubernetes/ })).toBeVisible();
   });
 
-  test('clicking an inactive sort button calls onSortChange and opens the dropdown', async () => {
+  test('clicking an inactive grouped sort button opens the dropdown without calling onSortChange', async () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     renderHeader({ sortBy: 'Group', onSortChange });
 
     await user.click(screen.getByRole('button', { name: /Platform/i }));
 
-    expect(onSortChange).toHaveBeenCalledWith('Platform');
+    expect(onSortChange).not.toHaveBeenCalled();
     expect(screen.getByRole('menu', { name: /Platform/i })).toBeVisible();
   });
 

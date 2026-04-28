@@ -149,6 +149,16 @@ func TestSortEndpointsByField(t *testing.T) {
 				environments[3].ID,
 			},
 		},
+		{
+			name:      "sort by platform type ascending groups same-platform types together",
+			sortField: "PlatformType",
+			expected: []portainer.EndpointID{
+				environments[0].ID,
+				environments[1].ID,
+				environments[2].ID,
+				environments[3].ID,
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -167,4 +177,10 @@ func getEndpointIDs(environments []portainer.Endpoint) []portainer.EndpointID {
 	return slicesx.Map(environments, func(environment portainer.Endpoint) portainer.EndpointID {
 		return environment.ID
 	})
+}
+
+func TestGetSortKey(t *testing.T) {
+	assert.Equal(t, sortKey("Name"), getSortKey("Name"))
+	assert.Equal(t, sortKey("PlatformType"), getSortKey("PlatformType"))
+	assert.Equal(t, sortKey(""), getSortKey("unknown"))
 }

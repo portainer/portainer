@@ -549,3 +549,180 @@ func TestGetShortestAsyncInterval(t *testing.T) {
 
 	require.Equal(t, 10, getShortestAsyncInterval(endpoint, settings))
 }
+
+func Test_filterEndpointsByPlatform(t *testing.T) {
+	ep := func(id portainer.EndpointID, epType portainer.EndpointType, containerEngine string) portainer.Endpoint {
+		return portainer.Endpoint{
+			ID:              id,
+			Type:            epType,
+			ContainerEngine: containerEngine,
+		}
+	}
+
+	docker := ep(1, portainer.DockerEnvironment, portainer.ContainerEngineDocker)
+	agentDocker := ep(2, portainer.AgentOnDockerEnvironment, portainer.ContainerEngineDocker)
+	edgeAgentDocker := ep(3, portainer.EdgeAgentOnDockerEnvironment, portainer.ContainerEngineDocker)
+	podman := ep(4, portainer.DockerEnvironment, portainer.ContainerEnginePodman)
+	agentPodman := ep(5, portainer.AgentOnDockerEnvironment, portainer.ContainerEnginePodman)
+	edgeAgentPodman := ep(6, portainer.EdgeAgentOnDockerEnvironment, portainer.ContainerEnginePodman)
+	k8sLocal := ep(7, portainer.KubernetesLocalEnvironment, "")
+	agentK8s := ep(8, portainer.AgentOnKubernetesEnvironment, "")
+	edgeAgentK8s := ep(9, portainer.EdgeAgentOnKubernetesEnvironment, "")
+	azure := ep(10, portainer.AzureEnvironment, "")
+
+	type args struct {
+		endpoints     []portainer.Endpoint
+		platformTypes []portainer.PlatformType
+	}
+	tests := []struct {
+		name string
+		args args
+		want []portainer.Endpoint
+	}{
+		// Docker platform types
+		{
+			name: "DockerEnvironment is Docker platform",
+			args: args{endpoints: []portainer.Endpoint{docker}, platformTypes: []portainer.PlatformType{portainer.DockerPlatformType}},
+			want: []portainer.Endpoint{docker},
+		},
+		{
+			name: "AgentOnDockerEnvironment is Docker platform",
+			args: args{endpoints: []portainer.Endpoint{agentDocker}, platformTypes: []portainer.PlatformType{portainer.DockerPlatformType}},
+			want: []portainer.Endpoint{agentDocker},
+		},
+		{
+			name: "EdgeAgentOnDockerEnvironment is Docker platform",
+			args: args{endpoints: []portainer.Endpoint{edgeAgentDocker}, platformTypes: []portainer.PlatformType{portainer.DockerPlatformType}},
+			want: []portainer.Endpoint{edgeAgentDocker},
+		},
+		// Podman platform types
+		{
+			name: "DockerEnvironment with Podman engine is Podman platform",
+			args: args{endpoints: []portainer.Endpoint{podman}, platformTypes: []portainer.PlatformType{portainer.PodmanPlatformType}},
+			want: []portainer.Endpoint{podman},
+		},
+		{
+			name: "AgentOnDockerEnvironment with Podman engine is Podman platform",
+			args: args{endpoints: []portainer.Endpoint{agentPodman}, platformTypes: []portainer.PlatformType{portainer.PodmanPlatformType}},
+			want: []portainer.Endpoint{agentPodman},
+		},
+		{
+			name: "EdgeAgentOnDockerEnvironment with Podman engine is Podman platform",
+			args: args{endpoints: []portainer.Endpoint{edgeAgentPodman}, platformTypes: []portainer.PlatformType{portainer.PodmanPlatformType}},
+			want: []portainer.Endpoint{edgeAgentPodman},
+		},
+		// Kubernetes platform types
+		{
+			name: "KubernetesLocalEnvironment is Kubernetes platform",
+			args: args{endpoints: []portainer.Endpoint{k8sLocal}, platformTypes: []portainer.PlatformType{portainer.KubernetesPlatformType}},
+			want: []portainer.Endpoint{k8sLocal},
+		},
+		{
+			name: "AgentOnKubernetesEnvironment is Kubernetes platform",
+			args: args{endpoints: []portainer.Endpoint{agentK8s}, platformTypes: []portainer.PlatformType{portainer.KubernetesPlatformType}},
+			want: []portainer.Endpoint{agentK8s},
+		},
+		{
+			name: "EdgeAgentOnKubernetesEnvironment is Kubernetes platform",
+			args: args{endpoints: []portainer.Endpoint{edgeAgentK8s}, platformTypes: []portainer.PlatformType{portainer.KubernetesPlatformType}},
+			want: []portainer.Endpoint{edgeAgentK8s},
+		},
+		// Azure platform type
+		{
+			name: "AzureEnvironment is Azure platform",
+			args: args{endpoints: []portainer.Endpoint{azure}, platformTypes: []portainer.PlatformType{portainer.AzurePlatformType}},
+			want: []portainer.Endpoint{azure},
+		},
+		// Filter behaviour
+		{
+			name: "filters out non-matching platform types",
+			args: args{
+				endpoints:     []portainer.Endpoint{docker, k8sLocal, azure},
+				platformTypes: []portainer.PlatformType{portainer.DockerPlatformType},
+			},
+			want: []portainer.Endpoint{docker},
+		},
+		{
+			name: "multiple platform types returns all matches",
+			args: args{
+				endpoints:     []portainer.Endpoint{docker, agentDocker, edgeAgentDocker, podman, k8sLocal, agentK8s, edgeAgentK8s, azure},
+				platformTypes: []portainer.PlatformType{portainer.DockerPlatformType, portainer.KubernetesPlatformType},
+			},
+			want: []portainer.Endpoint{docker, agentDocker, edgeAgentDocker, k8sLocal, agentK8s, edgeAgentK8s},
+		},
+		{
+			name: "Podman endpoints not returned when filtering for Docker",
+			args: args{
+				endpoints:     []portainer.Endpoint{docker, podman, agentPodman},
+				platformTypes: []portainer.PlatformType{portainer.DockerPlatformType},
+			},
+			want: []portainer.Endpoint{docker},
+		},
+		{
+			name: "returns empty when no endpoints match filter",
+			args: args{
+				endpoints:     []portainer.Endpoint{k8sLocal, azure},
+				platformTypes: []portainer.PlatformType{portainer.DockerPlatformType},
+			},
+			want: []portainer.Endpoint{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, filterEndpointsByPlatform(tt.args.endpoints, tt.args.platformTypes), "filterEndpointsByPlatform(%v, %v)", tt.args.endpoints, tt.args.platformTypes)
+		})
+	}
+}
+
+func Test_FilterQuery_PlatformTypes(t *testing.T) {
+	t.Parallel()
+	dockerEndpoint := portainer.Endpoint{ID: 1, GroupID: 1, Type: portainer.DockerEnvironment}
+	kubernetesEndpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.KubernetesLocalEnvironment}
+	azureEndpoint := portainer.Endpoint{ID: 3, GroupID: 1, Type: portainer.AzureEnvironment}
+
+	endpoints := []portainer.Endpoint{dockerEndpoint, kubernetesEndpoint, azureEndpoint}
+	handler := setupFilterTest(t, endpoints)
+
+	tests := []filterTest{
+		{
+			title:    "platformTypes filter returns only matching platform",
+			expected: []portainer.EndpointID{dockerEndpoint.ID},
+			query:    EnvironmentsQuery{platformTypes: []portainer.PlatformType{portainer.DockerPlatformType}},
+		},
+		{
+			title:    "multiple platformTypes returns all matching platforms",
+			expected: []portainer.EndpointID{dockerEndpoint.ID, kubernetesEndpoint.ID},
+			query:    EnvironmentsQuery{platformTypes: []portainer.PlatformType{portainer.DockerPlatformType, portainer.KubernetesPlatformType}},
+		},
+	}
+
+	runTests(tests, t, handler, endpoints)
+}
+
+func Test_FilterQuery_Outdated(t *testing.T) {
+	t.Parallel()
+	currentVersion := portainer.APIVersion
+	upToDateEndpoint := portainer.Endpoint{ID: 1, GroupID: 1, Type: portainer.AgentOnDockerEnvironment}
+	upToDateEndpoint.Agent.Version = currentVersion
+
+	outdatedEndpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.AgentOnDockerEnvironment}
+	outdatedEndpoint.Agent.Version = "2.0.0"
+
+	endpoints := []portainer.Endpoint{upToDateEndpoint, outdatedEndpoint}
+	handler := setupFilterTest(t, endpoints)
+
+	tests := []filterTest{
+		{
+			title:    "outdated filter returns only outdated endpoints",
+			expected: []portainer.EndpointID{outdatedEndpoint.ID},
+			query:    EnvironmentsQuery{outdated: true},
+		},
+		{
+			title:    "outdated=false returns all endpoints",
+			expected: []portainer.EndpointID{upToDateEndpoint.ID, outdatedEndpoint.ID},
+			query:    EnvironmentsQuery{outdated: false},
+		},
+	}
+
+	runTests(tests, t, handler, endpoints)
+}

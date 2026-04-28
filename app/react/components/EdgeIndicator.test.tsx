@@ -17,7 +17,6 @@ test('when edge id is not set, should show unassociated label', async () => {
 test('given edge id and last checkin is set, should show heartbeat', async () => {
   const { queryByLabelText } = await renderComponent('id', 1);
 
-  expect(queryByLabelText('edge-heartbeat')).toBeVisible();
   expect(queryByLabelText('edge-last-checkin')).toBeVisible();
 });
 

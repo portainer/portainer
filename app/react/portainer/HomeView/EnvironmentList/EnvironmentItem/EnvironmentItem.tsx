@@ -32,8 +32,11 @@ import { AgentDetails } from './AgentDetails';
 interface Props {
   environment: Environment;
   groupName?: string;
+
   onClickBrowse(): void;
+
   onClickDisconnect(): void;
+
   isActive: boolean;
 }
 
@@ -76,7 +79,7 @@ export function EnvironmentItem({
               <EdgeIndicator environment={environment} showLastCheckInDate />
             ) : (
               <>
-                <EnvironmentStatusBadge status={environment.Status} />
+                <EnvironmentStatusBadge environment={environment} />
                 {snapshotTime && (
                   <span
                     className="small text-muted vertical-center gap-1"
@@ -112,7 +115,7 @@ export function EnvironmentItem({
           <EnvironmentStats environment={environment} />
         </div>
       </BlocklistItem>
-      {/* 
+      {/*
       Buttons are extracted out of the main button because it causes errors with react and accessibility issues
       see https://stackoverflow.com/questions/66409964/warning-validatedomnesting-a-cannot-appear-as-a-descendant-of-a
       */}

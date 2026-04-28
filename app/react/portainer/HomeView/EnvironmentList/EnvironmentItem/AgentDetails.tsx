@@ -31,10 +31,11 @@ function EdgeAgentDetails({ environment }: { environment: Environment }) {
     return null;
   }
 
-  const agentVersion = environment.Agent.Version;
+  const { Version: agentVersion, IsOutdated } = environment.Agent;
 
   const { Version } = systemStatus;
   const isSmaller =
+    IsOutdated ||
     !agentVersion || // agents before 2.15 don't send the version so it will be empty
     isVersionSmaller(agentVersion, Version);
 

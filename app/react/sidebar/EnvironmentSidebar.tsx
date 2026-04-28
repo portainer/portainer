@@ -15,7 +15,7 @@ import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { Icon } from '@@/Icon';
 
-import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
+import { getPlatformIconByEnvironment } from '../portainer/environments/utils/get-platform-icon';
 
 import styles from './EnvironmentSidebar.module.css';
 import { AzureSidebar } from './AzureSidebar';
@@ -125,7 +125,7 @@ interface TitleProps {
 function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
 
-  const EnvironmentIcon = getPlatformIcon(
+  const EnvironmentIcon = getPlatformIconByEnvironment(
     environment.Type,
     environment.ContainerEngine
   );

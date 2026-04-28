@@ -5,6 +5,7 @@ import (
 
 	"github.com/fvbommel/sortorder"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type comp[T any] func(a, b T) int
@@ -61,6 +62,11 @@ func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroup
 			return stringComp(a.EdgeID, b.EdgeID)
 		}
 
+	case sortKeyPlatformType:
+		less = func(a, b portainer.Endpoint) int {
+			return int(endpointutils.EndpointPlatformType(&a) - endpointutils.EndpointPlatformType(&b))
+		}
+
 	}
 
 	slices.SortStableFunc(environments, func(a, b portainer.Endpoint) int {
@@ -82,11 +88,12 @@ const (
 	sortKeyStatus          sortKey = "Status"
 	sortKeyLastCheckInDate sortKey = "LastCheckIn"
 	sortKeyEdgeID          sortKey = "EdgeID"
+	sortKeyPlatformType    sortKey = "PlatformType"
 )
 
 func getSortKey(sortField string) sortKey {
 	fieldAsSortKey := sortKey(sortField)
-	if slices.Contains([]sortKey{sortKeyName, sortKeyGroup, sortKeyStatus, sortKeyLastCheckInDate, sortKeyEdgeID}, fieldAsSortKey) {
+	if slices.Contains([]sortKey{sortKeyName, sortKeyGroup, sortKeyStatus, sortKeyLastCheckInDate, sortKeyEdgeID, sortKeyPlatformType}, fieldAsSortKey) {
 		return fieldAsSortKey
 	}
 

@@ -22,6 +22,7 @@ export interface MenuButtonProps
   menuClassName?: string;
   dropdownPosition?: 'left' | 'right';
   children: ReactNode;
+  onClick?: () => void;
 }
 
 export function MenuButton({
@@ -36,6 +37,7 @@ export function MenuButton({
   menuClassName,
   dropdownPosition = 'right',
   'data-cy': dataCy,
+  onClick,
 }: PropsWithChildren<MenuButtonProps>) {
   return (
     <Menu>
@@ -48,6 +50,7 @@ export function MenuButton({
         title={title}
         icon={icon}
         data-cy={dataCy}
+        onClick={onClick}
       >
         {children}
         <Icon icon={ChevronDown} size="xs" className="ml-1" />

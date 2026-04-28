@@ -28,7 +28,7 @@ export function SortByGroup<TSortKey extends string>({
   dataCy,
 }: SortByGroupProps<TSortKey>) {
   return (
-    <>
+    <div className="flex items-center gap-3">
       <span
         className="text-xs font-semibold tracking-wider text-gray-11 th-highcontrast:text-white th-dark:text-white"
         data-cy="sort-by-label"
@@ -59,7 +59,7 @@ export function SortByGroup<TSortKey extends string>({
           />
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -115,19 +115,19 @@ function SortOptionItem<TSortKey extends string>({
         label={option.label}
         options={groupOptions?.[option.key]}
         selected={groupFilter}
-        onSelect={onGroupFilterChange}
+        onSelect={(value) => {
+          if (!isActive) {
+            onSortChange(option.key);
+          }
+          onGroupFilterChange(value);
+        }}
         badge={
           isActive
-            ? getGroupLabel(groupOptions, option.key, groupFilter)
+            ? getFilterBadge(groupOptions, option.key, groupFilter)
             : undefined
         }
         className={className}
         data-cy={`${dataCy}-sort-by-${option.key.toLowerCase()}-button`}
-        onClick={() => {
-          if (!isActive) {
-            onSortChange(option.key);
-          }
-        }}
       />
     );
   }
@@ -139,6 +139,7 @@ function SortOptionItem<TSortKey extends string>({
       onClick={() => {
         if (!isActive) {
           onSortChange(option.key);
+          onGroupFilterChange(null);
         }
       }}
       data-cy={`${dataCy}-sort-by-${option.key.toLowerCase()}-button`}
@@ -148,7 +149,7 @@ function SortOptionItem<TSortKey extends string>({
   );
 }
 
-function getGroupLabel(
+function getFilterBadge(
   groupOptions: Record<string, DropdownOption[]> | undefined,
   groupKey: string,
   filter: string | null

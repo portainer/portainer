@@ -1,11 +1,7 @@
-import { Cpu, HardDrive } from 'lucide-react';
-
 import { KubernetesSnapshot } from '@/react/portainer/environments/types';
 import { humanize } from '@/portainer/filters/filters';
-import { addPlural } from '@/portainer/helpers/strings';
-import Memory from '@/assets/ico/memory.svg?c';
 
-import { StatsItem } from '@@/StatsItem';
+import { CPUStats, MemoryStats, NodeStats } from '@@/StatsItem';
 
 interface Props {
   snapshot?: KubernetesSnapshot;
@@ -18,17 +14,11 @@ export function EnvironmentStatsKubernetes({ snapshot }: Props) {
 
   return (
     <>
-      <StatsItem icon={Cpu} value={`${snapshot.TotalCPU} CPU`} />
+      <NodeStats value={snapshot.NodeCount} />
 
-      <StatsItem
-        icon={Memory}
-        value={`${humanize(snapshot.TotalMemory)} RAM`}
-      />
+      <CPUStats value={snapshot.TotalCPU} />
 
-      <StatsItem
-        value={addPlural(snapshot.NodeCount, 'node')}
-        icon={HardDrive}
-      />
+      <MemoryStats value={humanize(snapshot.TotalMemory)} />
     </>
   );
 }

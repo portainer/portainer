@@ -2,8 +2,6 @@ import { Activity } from 'lucide-react';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { Environment } from '@/react/portainer/environments/types';
-import heartbeatup from '@/assets/ico/heartbeat-up.svg?c';
-import heartbeatdown from '@/assets/ico/heartbeat-down.svg?c';
 
 import { EnvironmentStatusBadgeItem } from './EnvironmentStatusBadgeItem';
 
@@ -16,8 +14,6 @@ export function EdgeIndicator({
   environment,
   showLastCheckInDate = false,
 }: Props) {
-  const heartbeat = environment.Heartbeat;
-
   const associated = !!environment.EdgeID;
   if (!associated) {
     return (
@@ -35,14 +31,6 @@ export function EdgeIndicator({
       aria-label="edge-status"
       className="flex items-center gap-1"
     >
-      <EnvironmentStatusBadgeItem
-        color={heartbeat ? 'success' : 'danger'}
-        icon={heartbeat ? heartbeatup : heartbeatdown}
-        aria-label="edge-heartbeat"
-      >
-        heartbeat
-      </EnvironmentStatusBadgeItem>
-
       {showLastCheckInDate && !!environment.LastCheckInDate && (
         <span
           className="small text-muted vertical-center"

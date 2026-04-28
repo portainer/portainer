@@ -27,7 +27,7 @@ export function StatusSummaryBar<TValue extends string = string>({
   ariaLabel = 'Filter by status',
   'data-cy': dataCy = 'status-summary-bar',
 }: Props<TValue>) {
-  const isAllSelected = !value;
+  const isAllSelected = !value || value === 'all' || value === 'custom';
   const activeLabel = segments.find((s) => s.key === value)?.label;
 
   function handleSegmentClick(key: TValue) {

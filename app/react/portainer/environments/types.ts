@@ -146,7 +146,7 @@ export interface EnvironmentStatusMessage {
 }
 
 export type Environment = {
-  Agent: { Version: string };
+  Agent: { Version: string; IsOutdated?: boolean };
   Id: EnvironmentId;
   Type: EnvironmentType;
   ContainerEngine?: ContainerEngine;
@@ -214,4 +214,11 @@ export enum PlatformType {
   Kubernetes,
   Azure,
   Podman,
+}
+
+export enum EnvironmentHealth {
+  Down,
+  Outdated,
+  Up,
+  Heartbeat,
 }

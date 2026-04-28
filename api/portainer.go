@@ -693,6 +693,9 @@ type (
 	// EndpointType represents the type of an environment(endpoint)
 	EndpointType int
 
+	// PlatformType represents the platform that an agent is running on
+	PlatformType int
+
 	// EndpointRelation represents a environment(endpoint) relation object
 	EndpointRelation struct {
 		EndpointID EndpointID
@@ -2140,6 +2143,14 @@ const (
 	AgentOnKubernetesEnvironment
 	// EdgeAgentOnKubernetesEnvironment represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
 	EdgeAgentOnKubernetesEnvironment
+)
+
+const (
+	DockerPlatformType PlatformType = iota
+	KubernetesPlatformType
+	AzurePlatformType
+	PodmanPlatformType
+	UnknownPlatformType
 )
 
 const (

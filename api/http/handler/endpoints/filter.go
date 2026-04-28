@@ -15,6 +15,8 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/roar"
+	"github.com/portainer/portainer/api/set"
+	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 
 	"github.com/pkg/errors"
@@ -23,6 +25,7 @@ import (
 type EnvironmentsQuery struct {
 	search           string
 	types            []portainer.EndpointType
+	platformTypes    []portainer.PlatformType
 	tagIds           []portainer.TagID
 	endpointIds      []portainer.EndpointID
 	tagsPartialMatch bool
@@ -34,6 +37,7 @@ type EnvironmentsQuery struct {
 	excludeSnapshots         bool
 	name                     string
 	agentVersions            []string
+	outdated                 bool
 	edgeCheckInPassedSeconds int
 	edgeStackId              portainer.EdgeStackID
 	edgeStackStatus          *portainer.EdgeStackStatusType
@@ -60,6 +64,11 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	}
 
 	endpointTypes, err := getNumberArrayQueryParameter[portainer.EndpointType](r, "types")
+	if err != nil {
+		return EnvironmentsQuery{}, err
+	}
+
+	platformTypes, err := getNumberArrayQueryParameter[portainer.PlatformType](r, "platformTypes")
 	if err != nil {
 		return EnvironmentsQuery{}, err
 	}
@@ -98,6 +107,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	agentVersions := getArrayQueryParameter(r, "agentVersions")
 
+	outdated, _ := request.RetrieveBooleanQueryParameter(r, "outdated", true)
+
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
 
 	var edgeAsync *bool
@@ -122,6 +133,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	return EnvironmentsQuery{
 		search:                   search,
 		types:                    endpointTypes,
+		platformTypes:            platformTypes,
 		tagIds:                   tagIDs,
 		endpointIds:              endpointIDs,
 		excludeIds:               excludeIDs,
@@ -134,6 +146,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		excludeSnapshots:         excludeSnapshots,
 		name:                     name,
 		agentVersions:            agentVersions,
+		outdated:                 outdated,
 		edgeCheckInPassedSeconds: edgeCheckInPassedSeconds,
 		edgeStackId:              portainer.EdgeStackID(edgeStackId),
 		edgeStackStatus:          edgeStackStatus,
@@ -249,6 +262,10 @@ func (handler *Handler) filterEndpointsByQuery(
 		filteredEndpoints = filterEndpointsByTypes(filteredEndpoints, query.types)
 	}
 
+	if len(query.platformTypes) > 0 {
+		filteredEndpoints = filterEndpointsByPlatform(filteredEndpoints, query.platformTypes)
+	}
+
 	if len(query.tagIds) > 0 {
 		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, query.tagIds, groups, query.tagsPartialMatch)
 	}
@@ -258,6 +275,13 @@ func (handler *Handler) filterEndpointsByQuery(
 			return !endpointutils.IsAgentEndpoint(&endpoint) || slices.Contains(query.agentVersions, endpoint.Agent.Version)
 		})
 	}
+
+	if query.outdated {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			return isOutdated(&endpoint)
+		})
+	}
+
 	if query.edgeStackId != 0 {
 		f, err := filterEndpointsByEdgeStack(filteredEndpoints, query.edgeStackId, query.edgeStackStatus, handler.DataStore)
 		if err != nil {
@@ -553,20 +577,19 @@ func edgeGroupMatchSearchCriteria(
 }
 
 func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []portainer.EndpointType) []portainer.Endpoint {
-	typeSet := map[portainer.EndpointType]bool{}
-	for _, endpointType := range endpointTypes {
-		typeSet[endpointType] = true
-	}
+	typeSet := set.ToSet(endpointTypes)
 
-	n := 0
-	for _, endpoint := range endpoints {
-		if typeSet[endpoint.Type] {
-			endpoints[n] = endpoint
-			n++
-		}
-	}
+	return slicesx.Filter(endpoints, func(e portainer.Endpoint) bool {
+		return typeSet[e.Type]
+	})
+}
 
-	return endpoints[:n]
+func filterEndpointsByPlatform(endpoints []portainer.Endpoint, platformTypes []portainer.PlatformType) []portainer.Endpoint {
+	typeSet := set.ToSet(platformTypes)
+
+	return slicesx.Filter(endpoints, func(e portainer.Endpoint) bool {
+		return typeSet[endpointutils.EndpointPlatformType(&e)]
+	})
 }
 
 func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup, partialMatch bool) []portainer.Endpoint {

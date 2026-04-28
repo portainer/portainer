@@ -37,11 +37,13 @@ export function Widget({
   mRef,
   id,
   'aria-label': ariaLabel,
+  'data-cy': dataCy,
 }: PropsWithChildren<{
   className?: string;
   mRef?: Ref<HTMLDivElement>;
   id?: string;
   'aria-label'?: string;
+  'data-cy'?: string;
 }>) {
   // Only generate titleId once on mount if aria-label is not provided
   const [titleId] = useState(() => (ariaLabel ? undefined : generateId()));
@@ -55,6 +57,7 @@ export function Widget({
         ref={mRef}
         aria-label={ariaLabel}
         aria-labelledby={titleId}
+        data-cy={dataCy}
       >
         {children}
       </section>

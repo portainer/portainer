@@ -42,7 +42,7 @@ export function GroupSortTableHeader<TSortKey extends string>({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-3 px-5 py-3',
+        'flex flex-wrap items-center justify-between gap-3 px-5 py-3',
         'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-10',
         'border-0 border-b border-solid border-gray-5 th-dark:border-gray-9'
       )}
@@ -54,7 +54,7 @@ export function GroupSortTableHeader<TSortKey extends string>({
         groupFilter={groupFilter}
         groupOptions={groupOptions}
         onGroupFilterChange={onGroupFilterChange}
-        dataCy={dataCy}
+        data-cy={`${dataCy}-sort`}
       />
       <div className="ml-auto flex items-center gap-2">
         {headerButtons}

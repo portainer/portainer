@@ -19,6 +19,7 @@ export const SortOptions = [
   'Name',
   'Group',
   'Status',
+  'PlatformType',
   'LastCheckIn',
   'EdgeID',
 ] as const;

@@ -86,6 +86,7 @@ function ButtonsGrid({
   children: ReactNode[];
   className?: string;
 }) {
+  const elementChildren = children.filter((child) => child);
   return (
     <div
       className={clsx(
@@ -95,17 +96,17 @@ function ButtonsGrid({
         // * hovering the buttons won't make the button's icon flicker
         'rounded-r-lg border border-solid',
         'border-y-transparent border-r-transparent',
-        'border-l-gray-5 th-highcontrast:border-l-white th-dark:border-l-gray-9',
+        'border-l-gray-4 th-highcontrast:border-l-white th-dark:border-l-gray-8',
         'overflow-hidden',
         className
       )}
     >
-      {children.map((child, index) => (
+      {elementChildren.map((child, index) => (
         <div
           key={index}
           className={clsx({
-            'border-0 border-b border-solid border-b-gray-5 th-highcontrast:border-b-white th-dark:border-b-gray-9':
-              index < children.length - 1,
+            'border-0 border-b border-solid border-b-gray-4 th-highcontrast:border-b-white th-dark:border-b-gray-8':
+              index < elementChildren.length - 1,
           })}
         >
           {child}

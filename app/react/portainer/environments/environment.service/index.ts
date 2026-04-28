@@ -53,6 +53,7 @@ export interface BaseEnvironmentsQueryParams {
   platformTypes?: PlatformType[];
   edgeGroupIds?: EdgeGroupId[];
   excludeEdgeGroupIds?: EdgeGroupId[];
+  outdated?: boolean;
 }
 
 export type EnvironmentsQueryParams = BaseEnvironmentsQueryParams &
@@ -107,6 +108,48 @@ export async function getEnvironments(
       totalAvailable: parseInt(totalAvailable, 10),
       updateAvailable,
     };
+  } catch (e) {
+    throw parseAxiosError(e as Error);
+  }
+}
+
+export interface GroupCount {
+  groupName: string;
+  groupID: number;
+  count: number;
+}
+
+export interface PlatformCounts {
+  docker: number;
+  kubernetes: number;
+  podman: number;
+  azure: number;
+}
+
+export interface HealthCounts {
+  down: number;
+  up: number;
+  heartbeat: number;
+  outdated: number;
+}
+
+export interface EnvironmentSummaryCounts {
+  total: number;
+  up: number;
+  down: number;
+  outdated: number;
+  unassigned: number;
+  byGroup: GroupCount[];
+  byPlatformType: PlatformCounts;
+  byHealth: HealthCounts;
+}
+
+export async function getEnvironmentSummaryCounts() {
+  try {
+    const { data } = await axios.get<EnvironmentSummaryCounts>(
+      buildUrl(undefined, 'summary')
+    );
+    return data;
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

@@ -1,4 +1,8 @@
-import { getPlatformType } from '@/react/portainer/environments/utils';
+import {
+  getPlatformType,
+  IconSize,
+  IconSizeClass,
+} from '@/react/portainer/environments/utils';
 import {
   ContainerEngine,
   EnvironmentType,
@@ -19,11 +23,27 @@ const icons: {
   [PlatformType.Azure]: Azure,
 };
 
-export function getPlatformIcon(
+export function getPlatformIconByEnvironment(
   type: EnvironmentType,
   containerEngine?: ContainerEngine
 ) {
   const platform = getPlatformType(type, containerEngine);
 
   return icons[platform];
+}
+
+export function getPlatformIconByPlatform(
+  platform: PlatformType,
+  size?: IconSize
+) {
+  const platformName = PlatformType[platform];
+  const BaseIcon = icons[platform];
+
+  return (
+    <BaseIcon
+      className={size !== undefined ? IconSizeClass[size] : undefined}
+      role="img"
+      aria-label={platformName}
+    />
+  );
 }
