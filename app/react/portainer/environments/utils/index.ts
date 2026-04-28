@@ -50,6 +50,10 @@ export function getPlatformTypeName(
   return PlatformType[getPlatformType(envType, containerEngine)];
 }
 
+export function isSnapshotBrowsingSupported(environment: Environment) {
+  return isDockerEnvironment(environment.Type) && isEdgeAsync(environment);
+}
+
 export function isAgentEnvironment(envType: EnvironmentType) {
   return (
     isEdgeEnvironment(envType) ||

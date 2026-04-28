@@ -1,5 +1,3 @@
-import { Zap } from 'lucide-react';
-
 import {
   Environment,
   EnvironmentType,
@@ -23,9 +21,9 @@ export function EnvironmentTypeTag({
 
   return (
     <span className="vertical-center gap-1">
-      <Zap className="icon icon-xs vertical-center" aria-hidden="true" />
-
-      <span>{typeLabel}</span>
+      <span className="small text-muted vertical-center font-medium">
+        {typeLabel}
+      </span>
     </span>
   );
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { useStore } from 'zustand';
 import { ColumnDef, Row } from '@tanstack/react-table';
 
 import {
@@ -17,8 +16,6 @@ import {
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useIsPureAdmin } from '@/react/hooks/useUser';
-import { environmentStore } from '@/react/hooks/current-environment-store';
-import { EnvironmentItem } from '@/react/portainer/HomeView/EnvironmentList/EnvironmentItem';
 import {
   getPlatformType,
   isEdgeEnvironment,
@@ -33,6 +30,7 @@ import { getHealthIcon } from '@/react/portainer/environments/utils/get-health-i
 import { getGroupIcon } from '@/react/portainer/environments/utils/get-group-icon';
 import { UpdateBadge } from '@/react/portainer/HomeView/EnvironmentList/UpdateBadge';
 import { KubeconfigButton } from '@/react/portainer/HomeView/EnvironmentList/KubeconfigButton';
+import { EnvironmentCard } from '@/react/portainer/HomeView/EnvironmentList/EnvironmentItem/EnvironmentCard';
 
 import { GroupSortTable } from '@@/GroupSortTable/GroupSortTable';
 import { GroupSortTableGroupRow } from '@@/GroupSortTable/GroupSortTableGroupRow';
@@ -125,7 +123,6 @@ export function EnvironmentList({
   onHeaderFilterChange,
 }: Props) {
   const isPureAdmin = useIsPureAdmin();
-  const currentEnvStore = useStore(environmentStore);
   const summaryQuery = useEnvironmentSummaryCounts();
   const { params } = useCurrentStateAndParams();
   const router = useRouter();
@@ -337,16 +334,10 @@ export function EnvironmentList({
     return (
       <tr>
         <td colSpan={Number.MAX_SAFE_INTEGER} className="!p-0">
-          <EnvironmentItem
+          <EnvironmentCard
             environment={env}
             groupName={env.groupName}
             onClickBrowse={() => onClickBrowse(env)}
-            onClickDisconnect={() =>
-              env.Id === currentEnvStore.environmentId
-                ? currentEnvStore.clear()
-                : null
-            }
-            isActive={env.Id === currentEnvStore.environmentId}
           />
         </td>
       </tr>
