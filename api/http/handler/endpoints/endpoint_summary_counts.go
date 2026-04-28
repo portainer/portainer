@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -60,92 +61,121 @@ const UnassignedGroupID = portainer.EndpointGroupID(1)
 // @failure 500 "Server error"
 // @router /endpoints/summary [get]
 func (handler *Handler) endpointSummaryCounts(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
-	}
-
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environments from the database", err)
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
-	}
-
-	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
-
-	// Filter out untrusted edge endpoints to match the environment list behavior
-	trustedEndpoints := make([]portainer.Endpoint, 0, len(filteredEndpoints))
-	for i := range filteredEndpoints {
-		ep := &filteredEndpoints[i]
-		if endpointutils.IsEdgeEndpoint(ep) && !ep.UserTrusted {
-			continue
-		}
-		trustedEndpoints = append(trustedEndpoints, filteredEndpoints[i])
-	}
-
-	counts := EnvironmentSummaryCountsResponse{
-		Total: len(trustedEndpoints),
-	}
-
-	groupCounts := make(map[portainer.EndpointGroupID]int)
-	platformCounts := platformCounts{}
-	healthCounts := healthCounts{}
-
-	for i := range trustedEndpoints {
-		endpoint := &trustedEndpoints[i]
-
-		switch endpointutils.EndpointPlatformType(endpoint) {
-		case portainer.DockerPlatformType:
-			platformCounts.Docker++
-		case portainer.KubernetesPlatformType:
-			platformCounts.Kubernetes++
-		case portainer.AzurePlatformType:
-			platformCounts.Azure++
-		case portainer.PodmanPlatformType:
-			platformCounts.Podman++
-		case portainer.UnknownPlatformType:
-			log.Error().Int("endpoint_id", int(endpoint.ID)).Msg("Unknown platform type")
+	var counts EnvironmentSummaryCountsResponse
+	err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		endpointGroups, err := tx.EndpointGroup().ReadAll()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 		}
 
-		groupCounts[endpoint.GroupID]++
-
-		if endpoint.GroupID == UnassignedGroupID {
-			counts.Unassigned++
+		endpoints, err := tx.Endpoint().Endpoints()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environments from the database", err)
 		}
 
-		// Both counts.* and healthCounts.* are non-exclusive: an outdated env
-		// contributes to its connection bucket (Up / Down) and to Outdated.
-		outdated := isOutdated(endpoint)
-		status := resolveEndpointStatus(endpoint)
-
-		if outdated {
-			counts.Outdated++
-			healthCounts.Outdated++
+		settings, err := tx.Settings().Settings()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 		}
 
-		switch status {
-		case portainer.EndpointStatusUp:
-			healthCounts.Up++
-			counts.Up++
-		default:
-			healthCounts.Down++
-			counts.Down++
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
-	}
 
-	counts.ByGroup = parseGroupCounts(groupCounts, endpointGroups)
-	counts.ByPlatformType = platformCounts
-	counts.ByHealth = healthCounts
+		filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
-	return response.JSON(w, counts)
+		// Filter out untrusted edge endpoints to match the environment list behavior
+		trustedEndpoints := make([]portainer.Endpoint, 0, len(filteredEndpoints))
+		for i := range filteredEndpoints {
+			ep := &filteredEndpoints[i]
+			if endpointutils.IsEdgeEndpoint(ep) && !ep.UserTrusted {
+				continue
+			}
+			trustedEndpoints = append(trustedEndpoints, filteredEndpoints[i])
+		}
+
+		counts = EnvironmentSummaryCountsResponse{
+			Total: len(trustedEndpoints),
+		}
+
+		groupCounts := make(map[portainer.EndpointGroupID]int)
+		platformCounts := platformCounts{}
+		healthCounts := healthCounts{}
+
+		for i := range trustedEndpoints {
+			endpoint := &trustedEndpoints[i]
+
+			switch endpointutils.EndpointPlatformType(endpoint) {
+			case portainer.DockerPlatformType:
+				platformCounts.Docker++
+			case portainer.KubernetesPlatformType:
+				platformCounts.Kubernetes++
+			case portainer.AzurePlatformType:
+				platformCounts.Azure++
+			case portainer.PodmanPlatformType:
+				platformCounts.Podman++
+			case portainer.UnknownPlatformType:
+				log.Error().Int("endpoint_id", int(endpoint.ID)).Msg("Unknown platform type")
+			}
+
+			groupCounts[endpoint.GroupID]++
+
+			if endpoint.GroupID == UnassignedGroupID {
+				counts.Unassigned++
+			}
+
+			// Both counts.* and healthCounts.* are non-exclusive: an outdated env
+			// contributes to its connection bucket (Up / Down) and to Outdated.
+			outdated := isOutdated(endpoint)
+			status := resolveEndpointStatus(endpoint, settings)
+
+			if outdated {
+				counts.Outdated++
+				healthCounts.Outdated++
+			}
+
+			switch status {
+			case statusHeartbeat:
+				healthCounts.Heartbeat++
+				healthCounts.Up++
+				counts.Up++
+			case statusUp:
+				healthCounts.Up++
+				counts.Up++
+			case statusDown:
+				healthCounts.Down++
+				counts.Down++
+			}
+		}
+
+		counts.ByGroup = parseGroupCounts(groupCounts, endpointGroups)
+		counts.ByPlatformType = platformCounts
+		counts.ByHealth = healthCounts
+
+		return nil
+	})
+
+	return response.TxResponse(w, counts, err)
 }
 
-func resolveEndpointStatus(endpoint *portainer.Endpoint) portainer.EndpointStatus {
-	return endpoint.Status
+// iota order overlaps with portainer.EndpointStatus (Up=1, Down=2) so non-edge
+// endpoints can pass their Status straight through. statusHeartbeat (0) is
+// edge-only.
+const (
+	statusHeartbeat = iota
+	statusUp
+	statusDown
+)
+
+func resolveEndpointStatus(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
+	if endpointutils.IsEdgeEndpoint(endpoint) {
+		if endpointutils.GetHeartbeatStatus(endpoint, settings) {
+			return statusHeartbeat
+		}
+		return statusDown
+	}
+	return int(endpoint.Status)
 }
 
 func parseGroupCounts(counts map[portainer.EndpointGroupID]int, endpointGroups []portainer.EndpointGroup) []groupCount {

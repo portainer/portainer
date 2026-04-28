@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
@@ -24,6 +25,7 @@ func TestSummaryCounts(t *testing.T) {
 		agentVersion    string
 		containerEngine string
 		userTrusted     bool
+		lastCheckInDate int64
 	}
 
 	currentVersion := portainer.APIVersion
@@ -131,6 +133,21 @@ func TestSummaryCounts(t *testing.T) {
 			},
 		},
 		{
+			name: "trusted edge endpoints classified by heartbeat, not stored status",
+			endpoints: []testEndpoint{
+				// Recent check-in: heartbeat alive → counted as Up + Heartbeat.
+				{endpointType: portainer.EdgeAgentOnDockerEnvironment, status: portainer.EndpointStatusUp, groupID: 2, agentVersion: currentVersion, userTrusted: true, lastCheckInDate: time.Now().Unix()},
+				// Stored Up but never checked in: counted as Down.
+				{endpointType: portainer.EdgeAgentOnDockerEnvironment, status: portainer.EndpointStatusUp, groupID: 2, agentVersion: currentVersion, userTrusted: true, lastCheckInDate: 0},
+			},
+			expectedCounts: EnvironmentSummaryCountsResponse{
+				Total: 2, Up: 1, Down: 1, Outdated: 0, Unassigned: 0,
+				ByGroup:        []groupCount{{GroupID: 2, GroupName: "", Count: 2}},
+				ByPlatformType: platformCounts{Docker: 2},
+				ByHealth:       healthCounts{Up: 1, Down: 1, Heartbeat: 1},
+			},
+		},
+		{
 			name:      "no endpoints returns all zeros",
 			endpoints: []testEndpoint{},
 			expectedCounts: EnvironmentSummaryCountsResponse{
@@ -155,6 +172,7 @@ func TestSummaryCounts(t *testing.T) {
 					GroupID:         ep.groupID,
 					ContainerEngine: ep.containerEngine,
 					UserTrusted:     ep.userTrusted,
+					LastCheckInDate: ep.lastCheckInDate,
 				}
 				endpoint.Agent.Version = ep.agentVersion
 
@@ -202,33 +220,52 @@ func TestSummaryCounts(t *testing.T) {
 }
 
 func TestResolveEndpointStatus(t *testing.T) {
+	settings := &portainer.Settings{EdgeAgentCheckinInterval: 60}
+
 	tests := []struct {
 		name           string
-		endpointType   portainer.EndpointType
-		status         portainer.EndpointStatus
-		expectedStatus portainer.EndpointStatus
+		endpoint       *portainer.Endpoint
+		expectedStatus int
 	}{
 		{
-			name:           "non-edge endpoint returns stored up status",
-			endpointType:   portainer.DockerEnvironment,
-			status:         portainer.EndpointStatusUp,
-			expectedStatus: portainer.EndpointStatusUp,
+			name: "non-edge endpoint returns stored up status",
+			endpoint: &portainer.Endpoint{
+				Type:   portainer.DockerEnvironment,
+				Status: portainer.EndpointStatusUp,
+			},
+			expectedStatus: statusUp,
 		},
 		{
-			name:           "non-edge endpoint returns stored down status",
-			endpointType:   portainer.DockerEnvironment,
-			status:         portainer.EndpointStatusDown,
-			expectedStatus: portainer.EndpointStatusDown,
+			name: "non-edge endpoint returns stored down status",
+			endpoint: &portainer.Endpoint{
+				Type:   portainer.DockerEnvironment,
+				Status: portainer.EndpointStatusDown,
+			},
+			expectedStatus: statusDown,
+		},
+		{
+			name: "edge endpoint with recent check-in returns heartbeat",
+			endpoint: &portainer.Endpoint{
+				Type:            portainer.EdgeAgentOnDockerEnvironment,
+				Status:          portainer.EndpointStatusUp,
+				LastCheckInDate: time.Now().Unix(),
+			},
+			expectedStatus: statusHeartbeat,
+		},
+		{
+			name: "edge endpoint with stale check-in returns down regardless of stored status",
+			endpoint: &portainer.Endpoint{
+				Type:            portainer.EdgeAgentOnDockerEnvironment,
+				Status:          portainer.EndpointStatusUp,
+				LastCheckInDate: 0,
+			},
+			expectedStatus: statusDown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			endpoint := &portainer.Endpoint{
-				Type:   tt.endpointType,
-				Status: tt.status,
-			}
-			assert.Equal(t, tt.expectedStatus, resolveEndpointStatus(endpoint))
+			assert.Equal(t, tt.expectedStatus, resolveEndpointStatus(tt.endpoint, settings))
 		})
 	}
 }

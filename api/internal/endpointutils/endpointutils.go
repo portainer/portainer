@@ -228,8 +228,12 @@ func UpdateEdgeEndpointHeartbeat(endpoint *portainer.Endpoint, settings *portain
 		return
 	}
 
+	endpoint.Heartbeat = GetHeartbeatStatus(endpoint, settings)
+}
+
+func GetHeartbeatStatus(endpoint *portainer.Endpoint, settings *portainer.Settings) bool {
 	checkInInterval := getEndpointCheckinInterval(endpoint, settings)
-	endpoint.Heartbeat = time.Now().Unix()-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
+	return time.Now().Unix()-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
 }
 
 func getEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) int {

@@ -22,24 +22,20 @@ export function MotdPanel() {
   }
 
   return (
-    <>
+    <div className="mx-5 mb-4">
       {!!motd.Style && <style>{motd.Style}</style>}
-      <div className="row">
-        <div className="col-sm-12">
-          <InformationPanel
-            onDismiss={() => onDismiss(motd.Hash)}
-            title={motd.Title}
-            wrapperStyle={camelCaseKeys(motd.ContentLayout)}
-            bodyClassName="motd-body"
-          >
-            <span className="text-muted">
-              {/* eslint-disable-next-line react/no-danger */}
-              <p dangerouslySetInnerHTML={{ __html: sanitize(motd.Message) }} />
-            </span>
-          </InformationPanel>
-        </div>
-      </div>
-    </>
+      <InformationPanel
+        onDismiss={() => onDismiss(motd.Hash)}
+        title={motd.Title}
+        wrapperStyle={camelCaseKeys(motd.ContentLayout)}
+        bodyClassName="motd-body"
+      >
+        <span className="text-muted">
+          {/* eslint-disable-next-line react/no-danger */}
+          <p dangerouslySetInnerHTML={{ __html: sanitize(motd.Message) }} />
+        </span>
+      </InformationPanel>
+    </div>
   );
 
   function onDismiss(hash: string) {

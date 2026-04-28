@@ -66,7 +66,7 @@ export function HomeView() {
   }, [params, setConnectingToEdgeEndpoint, router, clearStore]);
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <PageHeader
         reload
         title="Home"
@@ -80,9 +80,11 @@ export function HomeView() {
       {process.env.PORTAINER_EDITION !== 'CE' && <BackupFailedPanel />}
 
       {connectingToEdgeEndpoint ? (
-        <EdgeLoadingSpinner />
+        <div className="flex flex-1 flex-col items-center justify-center">
+          <EdgeLoadingSpinner />
+        </div>
       ) : (
-        <>
+        <div className="mx-5 flex flex-col gap-6">
           <EnvironmentHeader
             activeFilter={headerFilter}
             onFilterChange={setHeaderFilter}
@@ -92,9 +94,9 @@ export function HomeView() {
             headerFilter={headerFilter}
             onHeaderFilterChange={setHeaderFilter}
           />
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 
   function handleBrowseClick(environment: Environment) {
