@@ -157,7 +157,7 @@ func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedReq
 			return err
 		}
 
-		stacks, err = filterStacksByAccess(tx, stacks, sc)
+		stacks, err = filterDockerStacksByAccess(tx, stacks, sc)
 		if err != nil {
 			return err
 		}
@@ -176,7 +176,12 @@ func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedReq
 	if err != nil {
 		return nil, err
 	}
-	entries, err = filterK8SStacks(entries, endpointMap, h.k8sFactory, sc.UserID)
+	accessMap, err := buildEndpointAccessMap(h.k8sFactory, sc, endpointMap)
+	if err != nil {
+		return nil, err
+	}
+
+	entries, err = filterK8SStacks(entries, endpointMap, h.k8sFactory, accessMap)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +202,7 @@ func shouldPerformEnvLookup(endpoint *portainer.Endpoint) bool {
 			(endpointutils.IsEdgeEndpoint(endpoint) && !endpoint.Edge.AsyncMode))
 }
 
-func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.EndpointID]portainer.Endpoint, k8sFactory *cli.ClientFactory, userId portainer.UserID) ([]portainer.Stack, error) {
+func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.EndpointID]portainer.Endpoint, k8sFactory *cli.ClientFactory, accessMap map[portainer.EndpointID]endpointAccess) ([]portainer.Stack, error) {
 	k8sStacks, result := slicesx.Partition(items, func(s portainer.Stack) bool {
 		return s.Type == portainer.KubernetesStack
 	})
@@ -212,10 +217,15 @@ func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.Endpoint
 			continue
 		}
 
-		kcl, err := k8sFactory.GetPrivilegedUserKubeClient(&ep, userId)
+		kcl, err := k8sFactory.GetPrivilegedKubeClient(&ep)
 		if err != nil {
 			return nil, err
 		}
+
+		access := accessMap[envID]
+		kcl.SetIsKubeAdmin(access.isKubeAdmin)
+		kcl.SetClientNonAdminNamespaces(access.nonAdminNamespaces)
+
 		apps, err := kcl.GetApplications("", "")
 		if err != nil {
 			return nil, err

@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/snapshot"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -46,12 +47,21 @@ func buildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (ma
 	return m, nil
 }
 
-func filterStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
+type endpointAccess struct {
+	isKubeAdmin        bool
+	nonAdminNamespaces []string
+}
+
+// filterDockerStacksByAccess filters stacks to only those the current user can access.
+func filterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
 	if sc.IsAdmin {
 		return stacks, nil
 	}
 
-	stackResourceIDSet := set.ToSet(slicesx.Map(stacks, func(s portainer.Stack) string {
+	// do not try to check UAC on kube stacks
+	filtered, dockerStacks := slicesx.Partition(stacks, func(s portainer.Stack) bool { return s.Type == portainer.KubernetesStack })
+
+	stackResourceIDSet := set.ToSet(slicesx.Map(dockerStacks, func(s portainer.Stack) string {
 		return stackutils.ResourceControlID(s.EndpointID, s.Name)
 	}))
 
@@ -62,8 +72,51 @@ func filterStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack,
 		return nil, err
 	}
 
-	stacks = authorization.DecorateStacks(stacks, resourceControls)
+	dockerStacks = authorization.DecorateStacks(dockerStacks, resourceControls)
 
 	userTeamIDs := authorization.TeamIDs(sc.UserMemberships)
-	return authorization.FilterAuthorizedStacks(stacks, sc.UserID, userTeamIDs), nil
+	filtered = append(filtered, authorization.FilterAuthorizedStacks(dockerStacks, sc.UserID, userTeamIDs)...)
+	return filtered, nil
+}
+
+func resolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, ep *portainer.Endpoint) (endpointAccess, error) {
+	if sc.IsAdmin {
+		return endpointAccess{isKubeAdmin: true}, nil
+	}
+
+	pcli, err := k8sFactory.GetPrivilegedKubeClient(ep)
+	if err != nil {
+		return endpointAccess{}, fmt.Errorf("unable to get privileged kube client for endpoint %d: %w", ep.ID, err)
+	}
+
+	teamIDs := make([]int, 0, len(sc.UserMemberships))
+	for _, m := range sc.UserMemberships {
+		teamIDs = append(teamIDs, int(m.TeamID))
+	}
+
+	nonAdminNamespaces, err := pcli.GetNonAdminNamespaces(int(sc.UserID), teamIDs, ep.Kubernetes.Configuration.RestrictDefaultNamespace)
+	if err != nil {
+		return endpointAccess{}, fmt.Errorf("unable to retrieve non-admin namespaces for endpoint %d: %w", ep.ID, err)
+	}
+
+	return endpointAccess{isKubeAdmin: false, nonAdminNamespaces: nonAdminNamespaces}, nil
+}
+
+func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, endpointMap map[portainer.EndpointID]portainer.Endpoint) (map[portainer.EndpointID]endpointAccess, error) {
+	result := make(map[portainer.EndpointID]endpointAccess, len(endpointMap))
+
+	for epID, ep := range endpointMap {
+		if !endpointutils.IsKubernetesEndpoint(&ep) {
+			continue
+		}
+
+		access, err := resolveKubeAccess(k8sFactory, sc, &ep)
+		if err != nil {
+			return nil, err
+		}
+
+		result[epID] = access
+	}
+
+	return result, nil
 }
