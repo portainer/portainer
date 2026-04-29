@@ -2,10 +2,12 @@ package sdk
 
 import (
 	"errors"
+	"os"
 	"strings"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/fips"
 	helmregistrycache "github.com/portainer/portainer/pkg/libhelm/cache"
 
@@ -195,8 +197,24 @@ func TestConfigureChartPathOptions(t *testing.T) {
 	})
 }
 
+// isolateHelmRegistryConfig redirects Helm's credential store to an empty temp dir
+// so tests never read ~/.config/helm/registry/config.json (which may be absent or corrupt).
+// Must be called before t.Parallel().
+func isolateHelmRegistryConfig(t *testing.T) {
+	t.Helper()
+	tmp := t.TempDir()
+	dir := filesystem.JoinPaths(tmp, "registry")
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatalf("failed to create isolated helm registry dir: %v", err)
+	}
+	if err := os.WriteFile(filesystem.JoinPaths(dir, "config.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("failed to write isolated helm registry config: %v", err)
+	}
+	t.Setenv("HELM_CONFIG_HOME", tmp)
+}
+
 func TestLoginToOCIRegistry(t *testing.T) {
-	t.Parallel()
+	isolateHelmRegistryConfig(t)
 	is := assert.New(t)
 
 	t.Run("should return nil for HTTP repository (nil registry)", func(t *testing.T) {
@@ -292,7 +310,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 }
 
 func TestAuthenticateChartSource(t *testing.T) {
-	t.Parallel()
+	isolateHelmRegistryConfig(t)
 	t.Run("should do return default client for HTTP repo", func(t *testing.T) {
 		is := assert.New(t)
 		actionConfig := &action.Configuration{}
