@@ -8,6 +8,30 @@ import {
 } from './scripts';
 import { ScriptFormValues } from './types';
 
+it('buildLinuxPodmanCommand should include PODMAN=1', () => {
+  const command = buildLinuxPodmanCommand(
+    '2.19.0',
+    'test-edge-key',
+    {
+      allowSelfSignedCertificates: false,
+      authEnabled: false,
+      edgeGroupsIds: [],
+      edgeIdGenerator: '',
+      envVars: '',
+      group: 0,
+      os: 'linux',
+      platform: 'podman',
+      tagsIds: [],
+      tlsEnabled: false,
+    },
+    false,
+    'test-edge-id',
+    'test-secret'
+  );
+
+  expect(command).toContain('PODMAN=1');
+});
+
 describe.each([
   {
     name: 'buildLinuxStandaloneCommand',

@@ -75,6 +75,7 @@ function linuxPodmanCommandRootful(agentVersion: string, agentSecret: string) {
 sudo podman volume create portainer\n
 sudo podman run -d \\
 -p 9001:9001 ${secret}\\
+-e PODMAN=1 \\
 --name portainer_agent \\
 --restart=always \\
 --privileged \\

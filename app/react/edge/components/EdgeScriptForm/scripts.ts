@@ -106,6 +106,7 @@ export function buildLinuxPodmanCommand(
       agentSecret,
       useAsyncMode
     ),
+    'PODMAN=1',
     ...metaEnvVars(properties),
   ]);
 
