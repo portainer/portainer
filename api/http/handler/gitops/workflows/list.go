@@ -142,6 +142,8 @@ func (h *Handler) getWorkflows(ctx context.Context, key string, sc *security.Res
 
 func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedRequestContext, endpointIDSet set.Set[portainer.EndpointID]) ([]svc.Workflow, error) {
 	var entries []portainer.Stack
+	var endpointMap map[portainer.EndpointID]portainer.Endpoint
+
 	err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		stacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool {
 			return s.GitConfig != nil && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
@@ -150,7 +152,7 @@ func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedReq
 			return err
 		}
 
-		endpointMap, err := buildEndpointMap(tx, stacks)
+		endpointMap, err = buildEndpointMap(tx, stacks)
 		if err != nil {
 			return err
 		}
@@ -169,13 +171,12 @@ func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedReq
 			entries = append(entries, s)
 		}
 
-		entries, err = filterK8SStacks(entries, endpointMap, h.k8sFactory, sc.UserID)
-		if err != nil {
-			return err
-		}
-
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	entries, err = filterK8SStacks(entries, endpointMap, h.k8sFactory, sc.UserID)
 	if err != nil {
 		return nil, err
 	}
