@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 // TarGzDir creates a tar.gz archive and returns it's path.
@@ -105,7 +107,7 @@ func ExtractTarGz(r io.Reader, outputDirPath string) error {
 		case tar.TypeDir:
 			// skip, dir will be created with a file
 		case tar.TypeReg:
-			p := filepath.Clean(filepath.Join(outputDirPath, header.Name))
+			p := filesystem.JoinPaths(outputDirPath, header.Name)
 			if err := os.MkdirAll(filepath.Dir(p), 0o744); err != nil {
 				return fmt.Errorf("Failed to extract dir %s", filepath.Dir(p))
 			}

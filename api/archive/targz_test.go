@@ -1,13 +1,17 @@
 package archive
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"testing"
 
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func listFiles(dir string) []string {
@@ -83,4 +87,57 @@ func Test_shouldCreateArchive2(t *testing.T) {
 	wasExtracted("outer")
 	wasExtracted("dir/inner")
 	wasExtracted("dir/.dotfile")
+}
+
+func TestExtractTarGzPathTraversal(t *testing.T) {
+	testDir := t.TempDir()
+
+	// Create an evil file with a path traversal attempt
+	tarPath := filesystem.JoinPaths(testDir, "evil.tar.gz")
+
+	evilFile, err := os.Create(tarPath)
+	require.NoError(t, err)
+
+	gzWriter := gzip.NewWriter(evilFile)
+	tarWriter := tar.NewWriter(gzWriter)
+
+	content := []byte("evil content")
+
+	header := &tar.Header{
+		Name:     "../evil.txt",
+		Mode:     0600,
+		Size:     int64(len(content)),
+		Typeflag: tar.TypeReg,
+	}
+
+	err = tarWriter.WriteHeader(header)
+	require.NoError(t, err)
+
+	_, err = tarWriter.Write(content)
+	require.NoError(t, err)
+
+	err = tarWriter.Close()
+	require.NoError(t, err)
+
+	err = gzWriter.Close()
+	require.NoError(t, err)
+
+	err = evilFile.Close()
+	require.NoError(t, err)
+
+	// Attempt to extract the evil file
+	extractionDir := filesystem.JoinPaths(testDir, "extraction")
+	err = os.Mkdir(extractionDir, 0700)
+	require.NoError(t, err)
+
+	tarFile, err := os.Open(tarPath)
+	require.NoError(t, err)
+
+	// Check that the file didn't escape
+	err = ExtractTarGz(tarFile, extractionDir)
+	require.NoError(t, err)
+	require.NoFileExists(t, filesystem.JoinPaths(testDir, "evil.txt"))
+
+	err = tarFile.Close()
+	require.NoError(t, err)
 }

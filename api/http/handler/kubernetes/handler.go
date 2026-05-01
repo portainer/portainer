@@ -176,6 +176,7 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "an error occurred during the KubeClientMiddleware operation, permission denied to access the environment. Error: ", err)
+			return
 		}
 
 		// Check if we have a kubeclient against this auth token already, otherwise generate a new one
