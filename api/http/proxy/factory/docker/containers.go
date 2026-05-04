@@ -170,18 +170,23 @@ func containerHasBlackListedLabel(containerLabels map[string]any, labelBlackList
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool           `json:"Privileged"`
-			PidMode    string         `json:"PidMode"`
-			Devices    []any          `json:"Devices"`
-			Sysctls    map[string]any `json:"Sysctls"`
-			CapAdd     []string       `json:"CapAdd"`
-			CapDrop    []string       `json:"CapDrop"`
-			Binds      []string       `json:"Binds"`
+			Privileged  bool           `json:"Privileged"`
+			PidMode     string         `json:"PidMode"`
+			Devices     []any          `json:"Devices"`
+			Sysctls     map[string]any `json:"Sysctls"`
+			SecurityOpt []string       `json:"SecurityOpt"`
+			CapAdd      []string       `json:"CapAdd"`
+			CapDrop     []string       `json:"CapDrop"`
+			Binds       []string       `json:"Binds"`
+			Mounts      []struct {
+				Type string `json:"Type"`
+			} `json:"Mounts"`
 		} `json:"HostConfig"`
 	}
 
 	forbiddenResponse := &http.Response{
 		StatusCode: http.StatusForbidden,
+		Body:       http.NoBody,
 	}
 
 	tokenData, err := security.RetrieveTokenData(request)
@@ -233,6 +238,14 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
 			for _, bind := range partialContainer.HostConfig.Binds {
 				if strings.HasPrefix(bind, "/") {
+					return forbiddenResponse, ErrBindMountsForbidden
+				}
+			}
+		}
+
+		if !securitySettings.AllowBindMountsForRegularUsers && len(partialContainer.HostConfig.Mounts) > 0 {
+			for _, mount := range partialContainer.HostConfig.Mounts {
+				if mount.Type == "bind" {
 					return forbiddenResponse, ErrBindMountsForbidden
 				}
 			}
