@@ -3,21 +3,26 @@ package git
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/portainer/portainer/api/archive"
+	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func setup(t *testing.T) string {
 	dir := t.TempDir()
-	bareRepoDir := filepath.Join(dir, "test-clone.git")
+	bareRepoDir := filesystem.JoinPaths(dir, "test-clone.git")
 
 	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
 	if err != nil {
@@ -52,7 +57,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	t.Logf("Cloning into %s", dir)
 	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "", gittypes.GitCredentialAuthType_Basic, false)
 	assert.NoError(t, err)
-	assert.NoDirExists(t, filepath.Join(dir, ".git"))
+	assert.NoDirExists(t, filesystem.JoinPaths(dir, ".git"))
 }
 
 func Test_cloneRepository(t *testing.T) {
@@ -143,6 +148,112 @@ func getCommitHistoryLength(t *testing.T, dir string) int {
 	}
 
 	return count
+}
+
+func Test_noSymlinkFS_Symlink(t *testing.T) {
+	fs := NewNoSymlinkFS(osfs.New(t.TempDir()))
+	err := fs.Symlink("../../../etc/passwd", "evil-link")
+	require.ErrorIs(t, err, gittypes.ErrSymlinkDetected)
+}
+
+func Test_noSymlinkFS_OtherOperations(t *testing.T) {
+	dir := t.TempDir()
+	fs := NewNoSymlinkFS(osfs.New(dir))
+
+	f, err := fs.Create("test.txt")
+	require.NoError(t, err)
+
+	_, err = f.Write([]byte("hello"))
+	require.NoError(t, err)
+
+	err = f.Close()
+	require.NoError(t, err)
+
+	info, err := fs.Stat("test.txt")
+	require.NoError(t, err)
+	require.Equal(t, "test.txt", info.Name())
+}
+
+func createBareRepoWithSymlink(t *testing.T) string {
+	t.Helper()
+
+	bareDir := filesystem.JoinPaths(t.TempDir(), "symlink-repo.git")
+
+	repo, err := git.PlainInit(bareDir, true)
+	require.NoError(t, err)
+
+	storer := repo.Storer
+
+	fileBlob := &plumbing.MemoryObject{}
+	fileBlob.SetType(plumbing.BlobObject)
+
+	_, err = fileBlob.Write([]byte("hello world\n"))
+	require.NoError(t, err)
+
+	fileHash, err := storer.SetEncodedObject(fileBlob)
+	require.NoError(t, err)
+
+	symlinkBlob := &plumbing.MemoryObject{}
+	symlinkBlob.SetType(plumbing.BlobObject)
+
+	_, err = symlinkBlob.Write([]byte("../../../etc/passwd"))
+	require.NoError(t, err)
+
+	symlinkHash, err := storer.SetEncodedObject(symlinkBlob)
+	require.NoError(t, err)
+
+	tree := &object.Tree{
+		Entries: []object.TreeEntry{
+			{Name: "evil-link", Mode: filemode.Symlink, Hash: symlinkHash},
+			{Name: "file.txt", Mode: filemode.Regular, Hash: fileHash},
+		},
+	}
+
+	treeObj := &plumbing.MemoryObject{}
+
+	err = tree.Encode(treeObj)
+	require.NoError(t, err)
+
+	treeHash, err := storer.SetEncodedObject(treeObj)
+	require.NoError(t, err)
+
+	sig := object.Signature{Name: "Test", Email: "test@test.com", When: time.Now()}
+	commit := &object.Commit{
+		Message:   "add symlink",
+		Author:    sig,
+		Committer: sig,
+		TreeHash:  treeHash,
+	}
+
+	commitObj := &plumbing.MemoryObject{}
+
+	err = commit.Encode(commitObj)
+	require.NoError(t, err)
+
+	commitHash, err := storer.SetEncodedObject(commitObj)
+	require.NoError(t, err)
+
+	err = storer.SetReference(plumbing.NewHashReference("refs/heads/main", commitHash))
+	require.NoError(t, err)
+
+	err = storer.SetReference(plumbing.NewSymbolicReference(plumbing.HEAD, "refs/heads/main"))
+	require.NoError(t, err)
+
+	return bareDir
+}
+
+func Test_Download_RejectsSymlink(t *testing.T) {
+	client := NewGitClient(false)
+	repoURL := createBareRepoWithSymlink(t)
+
+	err := client.Download(t.Context(), t.TempDir(), &git.CloneOptions{
+		URL:          repoURL,
+		Depth:        1,
+		SingleBranch: true,
+		Tags:         git.NoTags,
+	})
+	require.Error(t, err)
+	require.ErrorIs(t, err, gittypes.ErrSymlinkDetected)
 }
 
 func Test_listRefsPrivateRepository(t *testing.T) {
