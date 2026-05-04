@@ -13,6 +13,7 @@ export type { SortOption };
 
 interface Props<TSortKey extends string> {
   sortBy: TSortKey;
+  sortDesc: boolean;
   onSortChange: (key: TSortKey) => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
@@ -27,6 +28,7 @@ interface Props<TSortKey extends string> {
 
 export function GroupSortTableHeader<TSortKey extends string>({
   sortBy,
+  sortDesc,
   onSortChange,
   searchTerm,
   onSearchChange,
@@ -43,12 +45,12 @@ export function GroupSortTableHeader<TSortKey extends string>({
     <div
       className={clsx(
         'flex flex-wrap items-center justify-between gap-3 px-5 py-3',
-        'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-10',
-        'border-0 border-b border-solid border-gray-5 th-dark:border-gray-9'
+        'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-10'
       )}
     >
       <SortByGroup
         sortBy={sortBy}
+        sortDesc={sortDesc}
         onSortChange={onSortChange}
         sortOptions={sortOptions}
         groupFilter={groupFilter}

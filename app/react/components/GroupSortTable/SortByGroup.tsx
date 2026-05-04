@@ -6,10 +6,13 @@ export interface SortOption<TSortKey extends string = string> {
   key: TSortKey;
   label: string;
   grouped?: boolean;
+  descendingLabel?: string;
+  ascendingLabel?: string;
 }
 
 export interface SortByGroupProps<TSortKey extends string> {
   sortBy: TSortKey;
+  sortDesc: boolean;
   onSortChange: (key: TSortKey) => void;
   sortOptions: SortOption<TSortKey>[];
   groupFilter: string | null;
@@ -20,6 +23,7 @@ export interface SortByGroupProps<TSortKey extends string> {
 
 export function SortByGroup<TSortKey extends string>({
   sortBy,
+  sortDesc,
   onSortChange,
   sortOptions,
   groupFilter,
@@ -49,6 +53,7 @@ export function SortByGroup<TSortKey extends string>({
             key={option.key}
             option={option}
             isActive={sortBy === option.key}
+            sortDesc={sortDesc}
             isFirst={index === 0}
             isLast={index === sortOptions.length - 1}
             onSortChange={onSortChange}
@@ -82,6 +87,7 @@ const inactiveBtn = clsx(
 interface SortOptionItemProps<TSortKey extends string> {
   option: SortOption<TSortKey>;
   isActive: boolean;
+  sortDesc: boolean;
   isFirst: boolean;
   isLast: boolean;
   onSortChange: (key: TSortKey) => void;
@@ -94,6 +100,7 @@ interface SortOptionItemProps<TSortKey extends string> {
 function SortOptionItem<TSortKey extends string>({
   option,
   isActive,
+  sortDesc,
   isFirst,
   isLast,
   onSortChange,
@@ -132,19 +139,30 @@ function SortOptionItem<TSortKey extends string>({
     );
   }
 
+  const badge = isActive
+    ? sortDesc
+      ? option.descendingLabel || 'Desc'
+      : option.ascendingLabel || 'Asc'
+    : null;
+
   return (
     <button
       type="button"
       className={className}
       onClick={() => {
+        onSortChange(option.key);
         if (!isActive) {
-          onSortChange(option.key);
           onGroupFilterChange(null);
         }
       }}
       data-cy={`${dataCy}-sort-by-${option.key.toLowerCase()}-button`}
     >
       {option.label}
+      {badge && (
+        <span className="py-0.2 ml-1 rounded-md bg-blue-7 px-1 text-[10px] font-normal text-white">
+          {badge}
+        </span>
+      )}
     </button>
   );
 }

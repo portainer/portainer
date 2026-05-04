@@ -521,7 +521,7 @@ test('URL param groupBy=platform&filter=docker activates Docker platform filter 
   });
 });
 
-test('URL param filter without groupBy is ignored (default Group sort used)', async () => {
+test('URL param filter without groupBy is ignored (default Age sort used)', async () => {
   let capturedParams: URLSearchParams | null = null;
 
   // filter present but no groupBy — the component should bail out early
@@ -540,12 +540,12 @@ test('URL param filter without groupBy is ignored (default Group sort used)', as
     ]
   );
 
-  // status[] should not be sent; sort defaults to Group
+  // status[] should not be sent; sort defaults to Age
   await waitFor(() => {
     expect(capturedParams).not.toBeNull();
   });
   expect(capturedParams!.getAll('status[]')).toHaveLength(0);
-  expect(capturedParams!.get('sort')).toBe('Group');
+  expect(capturedParams!.get('sort')).toBe('Age');
 });
 
 test('selecting a sort/filter updates URL via stateService.go', async () => {

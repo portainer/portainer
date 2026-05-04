@@ -21,6 +21,7 @@ function renderHeader(
 ) {
   const props = {
     sortBy: 'Group' as string,
+    sortDesc: false,
     onSortChange: vi.fn(),
     searchTerm: '',
     onSearchChange: vi.fn(),

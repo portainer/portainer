@@ -58,8 +58,11 @@ export function SortableList<T>({
     <SortableListCard>
       <GroupSortTableHeader
         sortBy={activeSortKey}
+        sortDesc={tableState.sortBy?.desc ?? false}
         onSortChange={(key) => {
-          tableState.setSortBy(key, false);
+          const newDesc =
+            tableState.sortBy?.id === key ? !tableState.sortBy.desc : false;
+          tableState.setSortBy(key, newDesc);
         }}
         searchTerm={tableState.search}
         onSearchChange={(value) => {

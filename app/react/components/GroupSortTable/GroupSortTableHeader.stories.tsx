@@ -29,13 +29,20 @@ type SortKey = (typeof sortOptions)[number]['key'];
 
 export function Interactive() {
   const [sortBy, setSortBy] = useState<SortKey>('name');
+  const [sortDesc, setSortDesc] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [groupFilter, setGroupFilter] = useState<string | null>(null);
+
+  function handleSortChange(key: SortKey) {
+    setSortDesc((prev) => (sortBy === key ? !prev : false));
+    setSortBy(key);
+  }
 
   return (
     <GroupSortTableHeader
       sortBy={sortBy}
-      onSortChange={setSortBy}
+      sortDesc={sortDesc}
+      onSortChange={handleSortChange}
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
       sortOptions={[...sortOptions]}
@@ -50,12 +57,19 @@ export function Interactive() {
 
 export function WithGroupFilter() {
   const [sortBy, setSortBy] = useState<SortKey>('group');
+  const [sortDesc, setSortDesc] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  function handleSortChange(key: SortKey) {
+    setSortDesc((prev) => (sortBy === key ? !prev : false));
+    setSortBy(key);
+  }
 
   return (
     <GroupSortTableHeader
       sortBy={sortBy}
-      onSortChange={setSortBy}
+      sortDesc={sortDesc}
+      onSortChange={handleSortChange}
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
       sortOptions={[...sortOptions]}
@@ -70,13 +84,20 @@ export function WithGroupFilter() {
 
 export function WithActionButton() {
   const [sortBy, setSortBy] = useState<SortKey>('name');
+  const [sortDesc, setSortDesc] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [groupFilter, setGroupFilter] = useState<string | null>(null);
+
+  function handleSortChange(key: SortKey) {
+    setSortDesc((prev) => (sortBy === key ? !prev : false));
+    setSortBy(key);
+  }
 
   return (
     <GroupSortTableHeader
       sortBy={sortBy}
-      onSortChange={setSortBy}
+      sortDesc={sortDesc}
+      onSortChange={handleSortChange}
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
       sortOptions={[...sortOptions]}

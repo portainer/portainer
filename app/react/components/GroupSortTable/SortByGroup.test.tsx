@@ -139,6 +139,7 @@ function renderComponent({
     withTestRouter(() => (
       <SortByGroup
         sortBy={sortBy}
+        sortDesc={false}
         onSortChange={onSortChange}
         sortOptions={sortOptions}
         groupFilter={groupFilter}
@@ -162,13 +163,13 @@ describe('SortByGroup', () => {
       expect(onSortChange).toHaveBeenCalledExactlyOnceWith('Name');
     });
 
-    test('clicking the already-active button does not call onSortChange', async () => {
+    test('clicking the already-active non-grouped button calls onSortChange to toggle sort order', async () => {
       const user = userEvent.setup();
       const { onSortChange } = renderComponent({ sortBy: 'Name' });
 
-      await user.click(screen.getByRole('button', { name: /^Name$/i }));
+      await user.click(screen.getByRole('button', { name: /^Name Asc/i }));
 
-      expect(onSortChange).not.toHaveBeenCalled();
+      expect(onSortChange).toHaveBeenCalledExactlyOnceWith('Name');
     });
   });
 

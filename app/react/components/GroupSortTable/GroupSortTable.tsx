@@ -117,6 +117,7 @@ export function GroupSortTable<TItem extends object>({
     <Widget className="overflow-clip [&_table]:bg-transparent" data-cy={dataCy}>
       <GroupSortTableHeader
         sortBy={sortBy}
+        sortDesc={tableState.sortBy?.desc ?? false}
         onSortChange={handleSortChange}
         searchTerm={tableState.search}
         onSearchChange={(value) => {
@@ -185,11 +186,15 @@ export function GroupSortTable<TItem extends object>({
       return renderRow(row);
     }
 
+    const header = renderGroupHeader(groupKey, groupCountByKey[groupKey] ?? 0);
+    if (header == null) {
+      return renderRow(row);
+    }
     return (
       <>
         <tr>
           <td colSpan={Number.MAX_SAFE_INTEGER} className="!p-0">
-            {renderGroupHeader(groupKey, groupCountByKey[groupKey] ?? 0)}
+            {header}
           </td>
         </tr>
         {renderRow(row)}
@@ -199,7 +204,9 @@ export function GroupSortTable<TItem extends object>({
 
   function handleSortChange(key: string) {
     tableState.setPage(1);
-    tableState.setSortBy(key, false);
+    const newDesc =
+      tableState.sortBy?.id === key ? !tableState.sortBy.desc : false;
+    tableState.setSortBy(key, newDesc);
   }
 
   function handleGroupFilterChange(value: string | null) {

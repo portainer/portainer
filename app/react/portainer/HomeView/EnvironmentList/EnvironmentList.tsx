@@ -33,6 +33,7 @@ import { KubeconfigButton } from '@/react/portainer/HomeView/EnvironmentList/Kub
 import { EnvironmentCard } from '@/react/portainer/HomeView/EnvironmentList/EnvironmentItem/EnvironmentCard';
 
 import { GroupSortTable } from '@@/GroupSortTable/GroupSortTable';
+import { SortOption } from '@@/GroupSortTable/SortByGroup';
 import { GroupSortTableGroupRow } from '@@/GroupSortTable/GroupSortTableGroupRow';
 import { useGroupSortTableState } from '@@/GroupSortTable/useGroupSortTableState';
 
@@ -57,6 +58,7 @@ const HEALTH_SORT_ORDER: Record<string, number> = {
 };
 
 const columns: ColumnDef<EnvironmentRow>[] = [
+  { id: 'Age', accessorKey: 'age' },
   { id: 'Platform', accessorKey: 'platformName' },
   { id: 'Group', accessorKey: 'groupName' },
   {
@@ -69,7 +71,13 @@ const columns: ColumnDef<EnvironmentRow>[] = [
   { id: 'Name', accessorKey: 'Name' },
 ];
 
-const SORT_OPTIONS = [
+const SORT_OPTIONS: SortOption[] = [
+  {
+    key: 'Age',
+    label: 'Age',
+    descendingLabel: 'Newest',
+    ascendingLabel: 'Oldest',
+  },
   { key: 'Group', label: 'Group', grouped: true },
   { key: 'Platform', label: 'Platform', grouped: true },
   { key: 'Health', label: 'Health', grouped: true },
@@ -129,7 +137,7 @@ export function EnvironmentList({
 
   const tableState = useGroupSortTableState(
     storageKey,
-    'Group',
+    'Age',
     DEFAULT_PAGE_LIMIT
   );
 
@@ -188,6 +196,8 @@ export function EnvironmentList({
   const environmentRows = useMemo<EnvironmentRow[]>(() => {
     const rows = environments.map((env) => ({
       ...env,
+      // Use Environment ID to sort age as lower ID = older environment
+      age: env.Id,
       groupName: groupNameById.get(env.GroupId) ?? 'Unassigned',
       platformName:
         PlatformType[getPlatformType(env.Type, env.ContainerEngine)],
@@ -359,6 +369,8 @@ export function EnvironmentList({
     } else if (sortId === 'Health' && healthDetails[groupKey]) {
       icon = getHealthIcon(healthDetails[groupKey].type, 'md');
       description = healthDetails[groupKey].description;
+    } else if (sortId === 'Age') {
+      return null;
     } else {
       icon = getGroupIcon('md');
     }
@@ -377,6 +389,7 @@ export function EnvironmentList({
 }
 
 type EnvironmentRow = Environment & {
+  age: number;
   groupName: string;
   platformName: string;
   healthLabel: string;
