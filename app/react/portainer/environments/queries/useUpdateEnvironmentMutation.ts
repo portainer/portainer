@@ -94,8 +94,10 @@ async function uploadTLSFilesForEndpoint(
     if (!cert) {
       return null;
     }
+    const formData = new FormData();
+    formData.append('file', cert);
     try {
-      return axios.post<void>(`upload/tls/${type}`, cert, {
+      return axios.post<void>(`upload/tls/${type}`, formData, {
         params: { folder: id },
       });
     } catch (e) {
