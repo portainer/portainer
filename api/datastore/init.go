@@ -59,6 +59,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			KubectlShellImage:        *store.flags.KubectlShellImage,
 
 			IsDockerDesktopExtension: isDDExtention,
+			EnforceEdgeID:            true,
 		}
 
 		return store.SettingsService.UpdateSettings(defaultSettings)
