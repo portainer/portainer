@@ -7,6 +7,7 @@ import (
 var (
 	ErrIncorrectRepositoryURL = errors.New("git repository could not be found, please ensure that the URL is correct")
 	ErrAuthenticationFailure  = errors.New("authentication failed, please ensure that the git credentials are correct")
+	ErrSymlinkDetected        = errors.New("repository contains a symlink, which is not allowed for security reasons")
 )
 
 type GitCredentialAuthType int
