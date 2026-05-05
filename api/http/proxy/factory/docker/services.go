@@ -24,7 +24,11 @@ type partialServiceSpec struct {
 			CapabilityAdd  []string       `json:"CapabilityAdd"`
 			CapabilityDrop []string       `json:"CapabilityDrop"`
 			Sysctls        map[string]any `json:"Sysctls"`
-			Mounts         []struct {
+			Privileges     *struct {
+				Seccomp  *struct{ Mode string } `json:"Seccomp"`
+				AppArmor *struct{ Mode string } `json:"AppArmor"`
+			} `json:"Privileges"`
+			Mounts []struct {
 				Type          string `json:"Type"`
 				VolumeOptions *struct {
 					DriverConfig *struct {

@@ -235,7 +235,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, ErrContainerCapabilitiesForbidden
 		}
 
-		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+		if !securitySettings.AllowBindMountsForRegularUsers && len(partialContainer.HostConfig.Binds) > 0 {
 			for _, bind := range partialContainer.HostConfig.Binds {
 				if strings.HasPrefix(bind, "/") {
 					return forbiddenResponse, ErrBindMountsForbidden
@@ -264,4 +264,46 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 	}
 
 	return response, err
+}
+
+func (transport *Transport) decorateContainerUpdateOperation(request *http.Request, containerID string) (*http.Response, error) {
+	type PartialContainerUpdate struct {
+		Devices []any `json:"Devices"`
+	}
+
+	forbiddenResponse := &http.Response{
+		StatusCode: http.StatusForbidden,
+	}
+
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if isAdminOrEndpointAdmin {
+		return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
+	}
+
+	securitySettings, err := transport.fetchEndpointSecuritySettings()
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	partialUpdate := &PartialContainerUpdate{}
+	if err := json.Unmarshal(body, partialUpdate); err != nil {
+		return nil, err
+	}
+
+	if !securitySettings.AllowDeviceMappingForRegularUsers && len(partialUpdate.Devices) > 0 {
+		return forbiddenResponse, ErrDeviceMappingForbidden
+	}
+
+	request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 }
