@@ -1,9 +1,11 @@
 package compose
 
 import (
+	"archive/tar"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"maps"
 	"os"
 	"path/filepath"
@@ -24,6 +26,7 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/docker/compose/v2/pkg/utils"
+	buildtypes "github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/registry"
 	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
@@ -102,17 +105,21 @@ func withCli(
 	return cliFn(ctx, cli)
 }
 
-func (c *ComposeDeployer) withComposeService(
+// withComposeServiceFull initialises the Docker CLI and compose service, then
+// calls composeFn with both the CLI and the compose service. Use this when the
+// caller needs direct Docker API access alongside the compose service (e.g. to
+// call client.ImageBuild instead of composeService.Build).
+func (c *ComposeDeployer) withComposeServiceFull(
 	ctx context.Context,
 	filePaths []string,
 	options libstack.Options,
-	composeFn func(api.Compose, *types.Project) error,
+	composeFn func(*command.DockerCli, api.Compose, *types.Project) error,
 ) error {
 	return withCli(ctx, options, func(ctx context.Context, cli *command.DockerCli) error {
 		composeService := c.createComposeServiceFn(cli)
 
 		if len(filePaths) == 0 {
-			return composeFn(composeService, nil)
+			return composeFn(cli, composeService, nil)
 		}
 
 		project, err := createProject(ctx, filePaths, options)
@@ -132,13 +139,24 @@ func (c *ComposeDeployer) withComposeService(
 			composeService.MaxConcurrency(parallel)
 		}
 
-		return composeFn(composeService, project)
+		return composeFn(cli, composeService, project)
+	})
+}
+
+func (c *ComposeDeployer) withComposeService(
+	ctx context.Context,
+	filePaths []string,
+	options libstack.Options,
+	composeFn func(api.Compose, *types.Project) error,
+) error {
+	return c.withComposeServiceFull(ctx, filePaths, options, func(_ *command.DockerCli, cs api.Compose, p *types.Project) error {
+		return composeFn(cs, p)
 	})
 }
 
 // Deploy creates and starts containers
 func (c *ComposeDeployer) Deploy(ctx context.Context, filePaths []string, options libstack.DeployOptions) error {
-	return c.withComposeService(ctx, filePaths, options.Options, func(composeService api.Compose, project *types.Project) error {
+	return c.withComposeServiceFull(ctx, filePaths, options.Options, func(cli *command.DockerCli, composeService api.Compose, project *types.Project) error {
 		addServiceLabels(project, false, options.EdgeStackID)
 
 		project = project.WithoutUnnecessaryResources()
@@ -164,8 +182,20 @@ func (c *ComposeDeployer) Deploy(ctx context.Context, filePaths []string, option
 			opts.Start.OnExit = api.CascadeStop
 		}
 
-		if err := composeService.Build(ctx, project, api.BuildOptions{}); err != nil {
-			return fmt.Errorf("compose build operation failed: %w", err)
+		// For remote Docker hosts, bypass the buildx driver selection path and use
+		// the classic POST /build API directly. The buildx path probes /grpc via
+		// DialHijack (HTTP upgrade); when that probe fails through Portainer's proxy
+		// layer, the docker-container driver is chosen and subsequently fails with
+		// "unable to upgrade to tcp, received 200" during exec/attach.
+		// See: https://github.com/portainer/portainer/issues/12754
+		if options.Host != "" {
+			if err := buildServicesClassic(ctx, cli, project); err != nil {
+				return fmt.Errorf("compose build operation failed: %w", err)
+			}
+		} else {
+			if err := composeService.Build(ctx, project, api.BuildOptions{}); err != nil {
+				return fmt.Errorf("compose build operation failed: %w", err)
+			}
 		}
 
 		if err := composeService.Up(ctx, project, opts); err != nil {
@@ -176,6 +206,122 @@ func (c *ComposeDeployer) Deploy(ctx context.Context, filePaths []string, option
 
 		return nil
 	})
+}
+
+// buildServicesClassic builds each compose service that declares a build section
+// using the Docker daemon's classic POST /build API. Unlike the buildx path,
+// this API uses a plain HTTP request with a tar body — no HTTP upgrade (TCP hijack)
+// is required, so it works through Portainer's remote Docker proxy layer.
+//
+// Limitations vs. composeService.Build():
+//   - .dockerignore is not applied client-side (the daemon handles unknown files)
+//   - Symlinks in the build context are not followed
+//   - BuildKit-only features (cache mounts, SSH, secrets, multi-platform) are unavailable
+func buildServicesClassic(ctx context.Context, cli *command.DockerCli, project *types.Project) error {
+	for _, service := range project.Services {
+		if service.Build == nil {
+			continue
+		}
+
+		imageName := service.Image
+		if imageName == "" {
+			imageName = project.Name + "-" + service.Name
+		}
+
+		buildOpts := buildtypes.ImageBuildOptions{
+			Tags:       []string{imageName},
+			Dockerfile: service.Build.Dockerfile,
+			BuildArgs:  map[string]*string(service.Build.Args),
+			Target:     service.Build.Target,
+			Labels:     map[string]string(service.Build.Labels),
+			Remove:     true,
+		}
+
+		contextPath := service.Build.Context
+		if contextPath == "" {
+			contextPath = project.WorkingDir
+		}
+		if !filepath.IsAbs(contextPath) {
+			contextPath = filepath.Join(project.WorkingDir, contextPath)
+		}
+
+		// URL-based contexts (git://, http://, https://) are fetched server-side.
+		if strings.Contains(contextPath, "://") {
+			buildOpts.RemoteContext = contextPath
+			resp, err := cli.Client().ImageBuild(ctx, nil, buildOpts)
+			if err != nil {
+				return fmt.Errorf("service %s: remote context build failed: %w", service.Name, err)
+			}
+			_, _ = io.Copy(io.Discard, resp.Body)
+			_ = resp.Body.Close()
+			continue
+		}
+
+		// Local directory context: stream a tar to the daemon.
+		buildCtx, err := tarDirectory(contextPath)
+		if err != nil {
+			return fmt.Errorf("service %s: failed to create build context: %w", service.Name, err)
+		}
+
+		resp, err := cli.Client().ImageBuild(ctx, buildCtx, buildOpts)
+		_ = buildCtx.Close()
+		if err != nil {
+			return fmt.Errorf("service %s: build failed: %w", service.Name, err)
+		}
+		_, _ = io.Copy(io.Discard, resp.Body)
+		_ = resp.Body.Close()
+	}
+
+	return nil
+}
+
+// tarDirectory streams a directory as an uncompressed tar archive via an io.Pipe.
+func tarDirectory(dir string) (io.ReadCloser, error) {
+	if _, err := os.Stat(dir); err != nil {
+		return nil, err
+	}
+
+	pr, pw := io.Pipe()
+	go func() {
+		tw := tar.NewWriter(pw)
+		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			rel, err := filepath.Rel(dir, path)
+			if err != nil {
+				return err
+			}
+			if rel == "." {
+				return nil
+			}
+			hdr, err := tar.FileInfoHeader(info, "")
+			if err != nil {
+				return err
+			}
+			hdr.Name = rel
+			if err := tw.WriteHeader(hdr); err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			f, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer f.Close() //nolint:errcheck
+			_, err = io.Copy(tw, f)
+			return err
+		})
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		pw.CloseWithError(tw.Close())
+	}()
+
+	return pr, nil
 }
 
 // Run runs the given service just once, without considering dependencies
