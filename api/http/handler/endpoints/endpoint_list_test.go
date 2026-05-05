@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -78,12 +79,14 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
 			is := assert.New(t)
-			query := ""
+			var sb strings.Builder
 			for _, filter := range test.filter {
-				query += fmt.Sprintf("agentVersions[]=%s&", filter)
+				sb.WriteString("agentVersions[]=")
+				sb.WriteString(filter)
+				sb.WriteString("&")
 			}
 
-			req := buildEndpointListRequest(query)
+			req := buildEndpointListRequest(sb.String())
 
 			resp, err := doEndpointListRequest(req, handler, is)
 			is.NoError(err)

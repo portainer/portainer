@@ -44,7 +44,7 @@ func ProbeTelnetConnection(url string) string {
 		network = "tcp"
 	}
 
-	address := fmt.Sprintf("%s:%s", host, port)
+	address := net.JoinHostPort(host, port)
 	result := map[string]string{
 		"operation":      "telnet connection",
 		"local_address":  "unknown",

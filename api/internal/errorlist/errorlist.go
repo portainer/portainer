@@ -1,6 +1,9 @@
 package errorlist
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 // Combine a slice of errors into a single error
 // to use this, generate errors by appending to errorList in a loop, then return combine(errorList)
@@ -9,10 +12,12 @@ func Combine(errorList []error) error {
 		return nil
 	}
 
-	errorMsg := "Multiple errors occurred:"
+	var sb strings.Builder
+	sb.WriteString("Multiple errors occurred:")
 	for _, err := range errorList {
-		errorMsg += "\n" + err.Error()
+		sb.WriteString("\n")
+		sb.WriteString(err.Error())
 	}
 
-	return errors.New(errorMsg)
+	return errors.New(sb.String())
 }
