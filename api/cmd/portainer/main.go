@@ -248,6 +248,10 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	settings.EnableEdgeComputeFeatures = cmp.Or(*flags.EnableEdgeComputeFeatures, settings.EnableEdgeComputeFeatures)
 	settings.TemplatesURL = cmp.Or(*flags.Templates, settings.TemplatesURL)
 
+	if flags.KubectlShellImageSet {
+		settings.KubectlShellImage = *flags.KubectlShellImage
+	}
+
 	if *flags.Labels != nil {
 		settings.BlackListedLabels = *flags.Labels
 	}

@@ -141,6 +141,7 @@ type (
 		LogLevel                  *string
 		LogMode                   *string
 		KubectlShellImage         *string
+		KubectlShellImageSet      bool
 		PullLimitCheckDisabled    *bool
 		TrustedOrigins            *string
 	}
