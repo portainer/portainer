@@ -1,6 +1,7 @@
 package compose
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -12,20 +13,28 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/distribution/reference"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/libstack"
+	retry "github.com/portainer/portainer/pkg/retry"
 
 	"github.com/compose-spec/compose-go/v2/cli"
 	"github.com/compose-spec/compose-go/v2/types"
+	cerrdefs "github.com/containerd/errdefs"
 	"github.com/docker/cli/cli/command"
+	configtypes "github.com/docker/cli/cli/config/types"
 	"github.com/docker/cli/cli/flags"
 	cmdcompose "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/docker/compose/v2/pkg/utils"
+	"github.com/docker/docker/api/types/image"
+	registrytypes "github.com/docker/docker/api/types/registry"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/registry"
 	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
 	"github.com/sirupsen/logrus"
 )
 
@@ -230,10 +239,139 @@ func (c *ComposeDeployer) Remove(ctx context.Context, projectName string, filePa
 	return nil
 }
 
+// Separator is used for naming components
+const separator = "-"
+
+// getImageNameOrDefault computes the default image name for a service
+func getImageNameOrDefault(service types.ServiceConfig, projectName string) string {
+	imageName := service.Image
+	if imageName == "" {
+		imageName = projectName + separator + service.Name
+	}
+	return imageName
+}
+
+// encodeRegistryAuth finds the registry credentials for the given image and returns
+// the base64-encoded auth string expected by the Docker service API.
+// Returns an empty string (no error) when no matching credentials are found.
+func encodeRegistryAuth(image string, registries []configtypes.AuthConfig) (string, error) {
+	named, err := reference.ParseNormalizedNamed(image)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse image reference %q: %w", image, err)
+	}
+
+	domain := reference.Domain(named)
+	if domain == "docker.io" {
+		domain = registry.IndexServer
+	}
+
+	for _, r := range registries {
+		if r.ServerAddress == domain {
+			encoded, err := registrytypes.EncodeAuthConfig(registrytypes.AuthConfig{
+				Username:      r.Username,
+				Password:      r.Password,
+				ServerAddress: r.ServerAddress,
+				Auth:          r.Auth,
+				IdentityToken: r.IdentityToken,
+				RegistryToken: r.RegistryToken,
+			})
+			if err != nil {
+				return "", fmt.Errorf("failed to encode auth for registry %s: %w", domain, err)
+			}
+			return encoded, nil
+		}
+	}
+
+	return "", nil
+}
+
 // Pull pulls images
 func (c *ComposeDeployer) Pull(ctx context.Context, filePaths []string, options libstack.Options) error {
-	if err := c.withComposeService(ctx, filePaths, options, func(composeService api.Compose, project *types.Project) error {
-		return composeService.Pull(ctx, project, api.PullOptions{})
+	if err := withCli(ctx, options, func(ctx context.Context, cli *command.DockerCli) error {
+		project, err := createProject(ctx, filePaths, options)
+		if err != nil {
+			return fmt.Errorf("failed to create compose project: %w", err)
+		}
+
+		for _, s := range project.Services {
+			imageName := getImageNameOrDefault(s, project.Name)
+			encodedAuth, err := encodeRegistryAuth(imageName, options.Registries)
+			if err != nil {
+				return fmt.Errorf("failed to encode registry auth: %w", err)
+			}
+
+			_, err = retry.RetryWithWarnings("Pull image: "+imageName, retry.Default, func() (string, error) {
+				_, err := cli.Client().ImageInspect(ctx, imageName)
+				if cerrdefs.IsNotFound(err) {
+					reader, err := cli.Client().ImagePull(ctx, imageName, image.PullOptions{
+						Platform:     s.Platform,
+						RegistryAuth: encodedAuth,
+					})
+					if err != nil {
+						return "", fmt.Errorf("failed to pull image: %w", err)
+					}
+
+					defer logs.CloseAndLogErr(reader)
+
+					scanner := bufio.NewScanner(reader)
+					for scanner.Scan() {
+						message := scanner.Text()
+						log.Debug().
+							Str("ProjectName", options.ProjectName).
+							Str("Host", options.Host).
+							Str("Image", imageName).
+							Msg(message)
+
+						var m jsonmessage.JSONMessage
+						err := json.Unmarshal([]byte(message), &m)
+						if err != nil {
+							log.Error().
+								Err(err).
+								Str("ProjectName", options.ProjectName).
+								Str("Host", options.Host).
+								Str("Image", imageName).
+								Msg("ComposeDeployer.Pull: failed to json Unmarshal image pull message.")
+							return "", fmt.Errorf("failed to json Unmarshal image pull message: %w", err)
+						}
+
+						if m.Error != nil {
+							log.Error().
+								Err(m.Error).
+								Str("ProjectName", options.ProjectName).
+								Str("Host", options.Host).
+								Str("Image", imageName).
+								Msg("ComposeDeployer.Pull: error pulling image")
+							return "", fmt.Errorf("error pulling image: %w", m.Error)
+						}
+					}
+					if err := scanner.Err(); err != nil {
+						log.Error().
+							Err(err).
+							Str("ProjectName", options.ProjectName).
+							Str("Host", options.Host).
+							Str("Image", imageName).
+							Msg("ComposeDeployer.Pull: error reading from pull reader")
+						return "", fmt.Errorf("error reading from pull reader: %w", err)
+					}
+
+					return "", nil
+				} else if err != nil {
+					return "", fmt.Errorf("failed to inspect image: %w", err)
+				} else {
+					return "", nil
+				}
+			})
+			if err != nil {
+				log.Error().
+					Err(err).
+					Str("ProjectName", options.ProjectName).
+					Str("Host", options.Host).
+					Str("Image", imageName).
+					Msg("ComposeDeployer.Pull: failed to pull image")
+				return fmt.Errorf("failed to pull image: %w", err)
+			}
+		}
+		return nil
 	}); err != nil {
 		return fmt.Errorf("compose pull operation failed: %w", err)
 	}
@@ -355,9 +493,14 @@ func createProject(ctx context.Context, configFilepaths []string, options libsta
 	}
 
 	var osPortainerEnvVars []string
+	var composeEnvVars []string
 	for _, ev := range os.Environ() {
 		if strings.HasPrefix(ev, portainerEnvVarsPrefix) {
 			osPortainerEnvVars = append(osPortainerEnvVars, ev)
+		}
+
+		if strings.HasPrefix(ev, "COMPOSE_") {
+			composeEnvVars = append(composeEnvVars, ev)
 		}
 	}
 
@@ -367,6 +510,7 @@ func createProject(ctx context.Context, configFilepaths []string, options libsta
 		cli.WithoutEnvironmentResolution,
 		cli.WithResolvedPaths(!slices.Contains(options.ConfigOptions, "--no-path-resolution")),
 		cli.WithEnv(osPortainerEnvVars),
+		cli.WithEnv(composeEnvVars),
 		cli.WithEnv(options.Env),
 		cli.WithEnvFiles(envFiles...),
 		func(o *cli.ProjectOptions) error {
