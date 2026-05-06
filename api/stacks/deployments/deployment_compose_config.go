@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/pkg/errors"
@@ -43,6 +44,10 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 	}
 
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
+
+	if err := registryutils.ValidateRegistriesECRTokens(tx, filteredRegistries); err != nil {
+		return nil, err
+	}
 
 	config := &ComposeStackDeploymentConfig{
 		stack:          stack,

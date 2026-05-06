@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func (s *Service) GetEncodedAuthorizationToken() (token *string, expiry *time.Time, err error) {
-	getAuthorizationTokenOutput, err := s.client.GetAuthorizationToken(context.TODO(), nil)
+func (s *Service) GetEncodedAuthorizationToken(ctx context.Context) (token *string, expiry *time.Time, err error) {
+	getAuthorizationTokenOutput, err := s.client.GetAuthorizationToken(ctx, nil)
 	if err != nil {
 		return
 	}
@@ -27,8 +27,8 @@ func (s *Service) GetEncodedAuthorizationToken() (token *string, expiry *time.Ti
 	return
 }
 
-func (s *Service) GetAuthorizationToken() (token *string, expiry *time.Time, err error) {
-	tokenEncodedStr, expiry, err := s.GetEncodedAuthorizationToken()
+func (s *Service) GetAuthorizationToken(ctx context.Context) (token *string, expiry *time.Time, err error) {
+	tokenEncodedStr, expiry, err := s.GetEncodedAuthorizationToken(ctx)
 	if err != nil {
 		return
 	}
