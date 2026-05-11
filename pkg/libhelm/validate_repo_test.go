@@ -100,7 +100,7 @@ func TestValidateHelmRepositoryURL(t *testing.T) {
 func Test_ValidateSeedsCacheAndSearchUsesCache(t *testing.T) {
 	const indexYAML = "apiVersion: v1\nentries: {}\ngenerated: \"2020-01-01T00:00:00Z\"\n"
 
-	var requestCount int32
+	var requestCount atomic.Int32
 	var fail bool
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +109,7 @@ func Test_ValidateSeedsCacheAndSearchUsesCache(t *testing.T) {
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			atomic.AddInt32(&requestCount, 1)
+			requestCount.Add(1)
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(indexYAML))
 			return
@@ -128,5 +128,5 @@ func Test_ValidateSeedsCacheAndSearchUsesCache(t *testing.T) {
 	// validate cache is used
 	err := ValidateHelmRepositoryURL(srv.URL, nil)
 	require.NoError(t, err)
-	require.Equal(t, int32(1), atomic.LoadInt32(&requestCount))
+	require.Equal(t, int32(1), requestCount.Load())
 }
