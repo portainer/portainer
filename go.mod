@@ -39,7 +39,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/joho/godotenv v1.4.0
-	github.com/jpillora/chisel v1.10.0
+	github.com/jpillora/chisel v1.11.6
 	github.com/klauspost/compress v1.18.2
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/opencontainers/go-digest v1.0.0
