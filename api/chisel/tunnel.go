@@ -9,6 +9,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/edge/cache"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -236,4 +237,13 @@ func encryptCredentials(username, password, key string) (string, error) {
 	}
 
 	return base64.RawStdEncoding.EncodeToString(encryptedCredentials), nil
+}
+
+func endpointHasSnapshot(dataStore dataservices.DataStore, endpointID portainer.EndpointID) bool {
+	s, err := dataStore.Snapshot().Read(endpointID)
+	if err != nil {
+		return false
+	}
+
+	return s.Docker != nil || s.Kubernetes != nil
 }
