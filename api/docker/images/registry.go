@@ -121,7 +121,7 @@ func findBestMatchRegistry(repository string, registries []portainer.Registry) (
 		return nil, errors.New("no registries matched")
 	}
 
-	registriesCache.Set(repository, match, 0)
+	registriesCache.Set(repository, *match, 0)
 
 	return match, nil
 }

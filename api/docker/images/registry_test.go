@@ -57,6 +57,24 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 	})
 }
 
+func TestFindBestMatchRegistryCachesMatch(t *testing.T) {
+	registriesCache.Flush()
+	t.Cleanup(registriesCache.Flush)
+
+	image := "private.registry.example.com/library/nginx:latest"
+	registries := []portainer.Registry{
+		createNewRegistry("private.registry.example.com", "", true),
+	}
+
+	registry, err := findBestMatchRegistry(image, registries)
+	require.NoError(t, err)
+	require.Equal(t, "private.registry.example.com", registry.URL)
+
+	cached, err := cachedRegistry(image)
+	require.NoError(t, err)
+	require.Equal(t, registry, cached)
+}
+
 func createNewRegistry(domain, username string, auth bool) portainer.Registry {
 	registry := portainer.Registry{
 		URL:            domain,
