@@ -30,6 +30,7 @@ import (
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
 // @param endpointId query int true "Environment identifier"
+// @param force query boolean false "Set to true to remove the Portainer stack record even when the underlying compose/swarm undeploy fails (e.g. when the Docker daemon is unreachable). Any orphaned containers must be cleaned up separately."
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -112,13 +113,18 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
+	force, _ := request.RetrieveBooleanQueryParameter(r, "force", true)
+
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
 	if err := handler.deleteStack(r.Context(), securityContext.UserID, stack, endpoint); err != nil {
-		return httperror.InternalServerError(err.Error(), err)
+		if !force {
+			return httperror.InternalServerError(err.Error(), err)
+		}
+		log.Warn().Err(err).Int("stackId", id).Msg("undeploy failed but force=true was set; proceeding to remove the Portainer stack record. Any orphaned containers must be cleaned up manually.")
 	}
 
 	if err := handler.DataStore.Stack().Delete(portainer.StackID(id)); err != nil {
