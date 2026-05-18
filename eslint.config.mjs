@@ -140,7 +140,8 @@ export default defineConfig([
         {
           object: 'navigator',
           property: 'clipboard',
-          message: 'navigator.clipboard requires a secure context (HTTPS). Use the `useCopy` hook or `CopyButton` component (@@/buttons/CopyButton) — they include a non-secure fallback.',
+          message:
+            'navigator.clipboard requires a secure context (HTTPS). Use the `useCopy` hook or `CopyButton` component (@@/buttons/CopyButton) — they include a non-secure fallback.',
         },
         {
           object: 'navigator',
@@ -263,6 +264,7 @@ export default defineConfig([
       'no-empty-function': 'off',
       // Tests mock secure-context APIs directly — the restriction is for production code only
       'no-restricted-properties': 'off',
+      'vitest/expect-expect': ['warn', { assertFunctionNames: ['expect*', 'assert*', 'verify*'] }],
     },
   },
 

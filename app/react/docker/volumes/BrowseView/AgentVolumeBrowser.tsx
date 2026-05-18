@@ -9,11 +9,10 @@ const tableKey = 'host-browser';
 
 const settingsStore = createPersistedStore(tableKey, 'Name');
 
-interface Props
-  extends Omit<
-    ComponentProps<typeof FilesTable>,
-    'onSearchChange' | 'tableState' | 'title'
-  > {
+interface Props extends Omit<
+  ComponentProps<typeof FilesTable>,
+  'onSearchChange' | 'tableState' | 'title'
+> {
   relativePath: string;
 }
 

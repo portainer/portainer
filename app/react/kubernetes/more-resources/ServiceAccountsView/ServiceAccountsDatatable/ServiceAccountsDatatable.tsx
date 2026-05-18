@@ -28,8 +28,7 @@ import { useGetAllServiceAccountsQuery } from './queries/useGetAllServiceAccount
 
 const storageKey = 'serviceAccounts';
 interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+  extends KubeTableSettings, FilteredColumnsTableSettings {}
 
 export function ServiceAccountsDatatable() {
   const environmentId = useEnvironmentId();

@@ -219,7 +219,8 @@ func isOutdated(endpoint *portainer.Endpoint) bool {
 	}
 
 	if endpoint.Agent.Version == "" {
-		return true
+		edgeHasCheckedInWithoutVersion := endpointutils.IsEdgeEndpoint(endpoint) && endpoint.LastCheckInDate > 0
+		return edgeHasCheckedInWithoutVersion
 	}
 
 	latestVersion := canonicalizeSemver(portainer.APIVersion)

@@ -141,8 +141,7 @@ describe('ClusterResourceReservation', () => {
 
   it('should not display resource usage if metrics server is not enabled', async () => {
     const disabledMetricsEnvironment = createMockEnvironment();
-    disabledMetricsEnvironment.Kubernetes.Configuration.UseServerMetrics =
-      false;
+    disabledMetricsEnvironment.Kubernetes.Configuration.UseServerMetrics = false;
     mockUseCurrentEnvironment.mockReturnValue(
       createMockQueryResult(disabledMetricsEnvironment)
     );

@@ -10,7 +10,6 @@ import { ldapGroupSearch } from './ldap-group-search';
 import { ldapGroupSearchItem } from './ldap-group-search-item';
 import { ldapUserSearch } from './ldap-user-search';
 import { ldapUserSearchItem } from './ldap-user-search-item';
-import { ldapCustomAdminGroup } from './ldap-custom-admin-group';
 import { ldapCustomGroupSearch } from './ldap-custom-group-search';
 import { ldapSettingsSecurity } from './ldap-settings-security';
 import { ldapCustomUserSearch } from './ldap-custom-user-search';
@@ -32,5 +31,4 @@ export default angular
   .component('ldapCustomGroupSearch', ldapCustomGroupSearch)
   .component('ldapSettingsOpenLdap', ldapSettingsOpenLdap)
   .component('ldapSettingsSecurity', ldapSettingsSecurity)
-  .component('ldapCustomUserSearch', ldapCustomUserSearch)
-  .component('ldapCustomAdminGroup', ldapCustomAdminGroup).name;
+  .component('ldapCustomUserSearch', ldapCustomUserSearch).name;

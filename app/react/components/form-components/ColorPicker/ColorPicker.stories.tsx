@@ -1,11 +1,11 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { ColorPicker } from './ColorPicker';
 
 export default {
   component: ColorPicker,
-  title: 'Components/Form/ColorPicker',
+  title: 'Components/Forms/ColorPicker',
 } as Meta;
 
 export function Default() {

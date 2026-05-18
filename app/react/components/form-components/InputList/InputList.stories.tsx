@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { Input, Select } from '../Input';
@@ -7,7 +7,7 @@ import { InputList } from './InputList';
 import { DefaultType } from './types';
 
 const meta: Meta = {
-  title: 'Components/Form/InputList',
+  title: 'Components/Forms/InputList',
   component: InputList,
 };
 

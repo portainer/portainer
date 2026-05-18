@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 
 import { Edition, FeatureId } from '@/react/portainer/feature-flags/enums';
 import { init as initFeatureService } from '@/react/portainer/feature-flags/feature-flags.service';

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 
@@ -7,6 +7,7 @@ import { ServiceWidget } from './ServiceWidget';
 const Wrapped = withUserProvider(ServiceWidget);
 
 const meta: Meta<typeof ServiceWidget> = {
+  title: 'Components/Services/ServiceWidget',
   component: ServiceWidget,
   render: (args) => <Wrapped {...args} />,
   args: {

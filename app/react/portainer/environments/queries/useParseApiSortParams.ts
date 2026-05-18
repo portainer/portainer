@@ -22,7 +22,7 @@ export function useParseSortGroupApiParams(
           : undefined;
         return group ? { groupIds: [group.Id] } : {};
       }
-      case 'Platform': {
+      case 'PlatformType': {
         const typesByPlatform: Record<string, PlatformType> = {
           Docker: PlatformType.Docker,
           Podman: PlatformType.Podman,

@@ -1,10 +1,10 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { Clock, type LucideIcon } from 'lucide-react';
 
 import { SidebarItem } from '.';
 
 const meta: Meta = {
-  title: 'Sidebar/SidebarItem',
+  title: 'Components/Sidebar/SidebarItem',
   component: SidebarItem,
 };
 export default meta;

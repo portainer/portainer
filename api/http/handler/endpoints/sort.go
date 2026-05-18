@@ -20,7 +20,21 @@ func stringComp(a, b string) int {
 	}
 }
 
-func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroups []portainer.EndpointGroup, sortField sortKey, isSortDesc bool) {
+func healthRank(endpoint *portainer.Endpoint, settings *portainer.Settings) int {
+	status := resolveEndpointStatus(endpoint, settings)
+	if status == statusDown {
+		return 0
+	}
+	if isOutdated(endpoint) {
+		return 1
+	}
+	if status == statusHeartbeat {
+		return 2
+	}
+	return 3
+}
+
+func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroups []portainer.EndpointGroup, sortField sortKey, isSortDesc bool, settings *portainer.Settings) {
 	if sortField == "" {
 		return
 	}
@@ -66,7 +80,14 @@ func sortEnvironmentsByField(environments []portainer.Endpoint, environmentGroup
 		less = func(a, b portainer.Endpoint) int {
 			return int(endpointutils.EndpointPlatformType(&a) - endpointutils.EndpointPlatformType(&b))
 		}
-
+	case sortKeyHealth:
+		less = func(a, b portainer.Endpoint) int {
+			return healthRank(&a, settings) - healthRank(&b, settings)
+		}
+	case sortKeyId:
+		less = func(a, b portainer.Endpoint) int {
+			return int(a.ID - b.ID)
+		}
 	}
 
 	slices.SortStableFunc(environments, func(a, b portainer.Endpoint) int {
@@ -89,11 +110,13 @@ const (
 	sortKeyLastCheckInDate sortKey = "LastCheckIn"
 	sortKeyEdgeID          sortKey = "EdgeID"
 	sortKeyPlatformType    sortKey = "PlatformType"
+	sortKeyHealth          sortKey = "Health"
+	sortKeyId              sortKey = "Id"
 )
 
 func getSortKey(sortField string) sortKey {
 	fieldAsSortKey := sortKey(sortField)
-	if slices.Contains([]sortKey{sortKeyName, sortKeyGroup, sortKeyStatus, sortKeyLastCheckInDate, sortKeyEdgeID, sortKeyPlatformType}, fieldAsSortKey) {
+	if slices.Contains([]sortKey{sortKeyName, sortKeyGroup, sortKeyStatus, sortKeyLastCheckInDate, sortKeyEdgeID, sortKeyPlatformType, sortKeyHealth, sortKeyId}, fieldAsSortKey) {
 		return fieldAsSortKey
 	}
 

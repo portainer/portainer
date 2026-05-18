@@ -14,6 +14,7 @@ interface Props<T> {
   renderColumnHeaders?: (groupKey: string, items: T[]) => ReactNode;
   getItemKey?: (item: T, index: number) => string | number;
   emptyMessage: string;
+  'data-cy'?: string;
 }
 
 export function SortableListBody<T>({
@@ -24,6 +25,7 @@ export function SortableListBody<T>({
   renderColumnHeaders,
   getItemKey,
   emptyMessage,
+  'data-cy': dataCy,
 }: Props<T>) {
   if (isLoading) {
     if (groups.length === 0) {
@@ -59,6 +61,7 @@ export function SortableListBody<T>({
         renderItem={renderItem}
         renderColumnHeaders={renderColumnHeaders}
         getItemKey={getItemKey}
+        data-cy={dataCy}
       />
     );
   }
@@ -77,6 +80,7 @@ interface GroupsProps<T> {
   renderItem: (item: T, index: number) => ReactNode;
   renderColumnHeaders?: (groupKey: string, items: T[]) => ReactNode;
   getItemKey?: (item: T, index: number) => string | number;
+  'data-cy'?: string;
 }
 
 function Groups<T>({
@@ -85,9 +89,10 @@ function Groups<T>({
   renderItem,
   renderColumnHeaders,
   getItemKey,
+  'data-cy': dataCy,
 }: GroupsProps<T>) {
   return (
-    <>
+    <div data-cy={dataCy}>
       {groups.map((group) => (
         <SortableListGroup
           key={group.key}
@@ -98,6 +103,6 @@ function Groups<T>({
           getItemKey={getItemKey}
         />
       ))}
-    </>
+    </div>
   );
 }

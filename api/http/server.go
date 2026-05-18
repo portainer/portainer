@@ -31,7 +31,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
-	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
@@ -91,7 +90,6 @@ type Server struct {
 	FileService                 portainer.FileService
 	DataStore                   dataservices.DataStore
 	GitService                  portainer.GitService
-	OpenAMTService              portainer.OpenAMTService
 	APIKeyService               apikey.APIKeyService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
@@ -241,11 +239,6 @@ func (server *Server) Start(ctx context.Context) error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	openAMTHandler := openamt.NewHandler(requestBouncer)
-	openAMTHandler.OpenAMTService = server.OpenAMTService
-	openAMTHandler.DataStore = server.DataStore
-	openAMTHandler.DockerClientFactory = server.DockerClientFactory
-
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
@@ -320,7 +313,6 @@ func (server *Server) Start(ctx context.Context) error {
 		HelmTemplatesHandler:   helmTemplatesHandler,
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
-		OpenAMTHandler:         openAMTHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
@@ -354,7 +346,7 @@ func (server *Server) Start(ctx context.Context) error {
 			log.Info().Str("bind_address", server.BindAddress).Msg("starting HTTP server")
 			httpServer := &http.Server{
 				Addr:     server.BindAddress,
-				Handler:  middlewares.PlaintextHTTPRequest(handler),
+				Handler:  handler,
 				ErrorLog: errorLogger,
 			}
 

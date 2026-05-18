@@ -3,7 +3,8 @@
 <host-details-panel
   host="$ctrl.hostDetails"
   is-browse-enabled="$ctrl.isAdmin && $ctrl.isAgent && $ctrl.agentApiVersion > 1 && $ctrl.hostFeaturesEnabled"
-  browse-url="{{ $ctrl.browseUrl }}"
+  browse-url="$ctrl.browseUrl"
+  endpoint-id="$ctrl.endpointId"
 ></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>

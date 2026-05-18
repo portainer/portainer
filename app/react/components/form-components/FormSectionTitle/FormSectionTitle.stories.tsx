@@ -1,11 +1,11 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { PropsWithChildren } from 'react';
 
 import { FormSectionTitle } from './FormSectionTitle';
 
 export default {
   component: FormSectionTitle,
-  title: 'Components/Form/FormSectionTitle',
+  title: 'Components/Forms/FormSectionTitle',
 } as Meta;
 
 function Template({

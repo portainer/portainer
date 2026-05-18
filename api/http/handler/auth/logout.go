@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/logoutcontext"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -29,7 +31,16 @@ func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperro
 		handler.bouncer.RevokeJWT(tokenData.Token)
 	}
 
-	security.RemoveAuthCookie(w)
+	var settings *portainer.Settings
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		settings, err = tx.Settings().Settings()
+		return err
+	}); err != nil {
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
+	}
+
+	security.RemoveAuthCookie(w, handler.isSecureCookie(r, settings.ForceSecureCookies))
 
 	return response.Empty(w)
 }

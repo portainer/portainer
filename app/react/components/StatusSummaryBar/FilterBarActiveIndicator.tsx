@@ -6,6 +6,7 @@ interface Props {
 export function FilterBarActiveIndicator({ label, onClear }: Props) {
   return (
     <div
+      role="status"
       className="flex items-center gap-4 whitespace-nowrap bg-gray-2 px-5 th-highcontrast:bg-transparent th-dark:bg-gray-iron-10"
       data-cy="active-filter-indicator"
     >

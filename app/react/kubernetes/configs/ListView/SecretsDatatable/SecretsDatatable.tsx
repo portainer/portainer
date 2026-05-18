@@ -108,9 +108,9 @@ function useSecretRowData(
           ...secret,
           inUse: secret.IsUsed,
           isSystem: namespaces
-            ? namespaces.find(
+            ? (namespaces.find(
                 (namespace) => namespace.Name === secret.Namespace
-              )?.IsSystem ?? false
+              )?.IsSystem ?? false)
             : false,
           registryId,
         };

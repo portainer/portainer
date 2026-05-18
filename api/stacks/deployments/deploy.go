@@ -122,6 +122,11 @@ func redeployWhenChangedSecondStage(
 ) error {
 	var gitCommitChangedOrForceUpdate bool
 
+	// pendingHash holds the new commit hash to apply after deployment is attempted,
+	// preventing pre-deployment failures (e.g. registry lookup) from advancing the
+	// stored hash and causing subsequent polls to skip this commit.
+	var pendingHash string
+
 	if !stack.FromAppTemplate {
 		updated, newHash, err := update.UpdateGitObject(ctx, gitService, fmt.Sprintf("stack:%d", stack.ID), stack.GitConfig, false, stack.ProjectPath)
 		if err != nil {
@@ -129,9 +134,7 @@ func redeployWhenChangedSecondStage(
 		}
 
 		if updated {
-			stack.GitConfig.ConfigHash = newHash
-
-			stack.UpdateDate = time.Now().Unix()
+			pendingHash = newHash
 			gitCommitChangedOrForceUpdate = updated
 		}
 
@@ -149,6 +152,10 @@ func redeployWhenChangedSecondStage(
 		return tx.Stack().Update(stack.ID, stack)
 	}); err != nil {
 		return errors.WithMessagef(err, "failed to set the deploying status for stack %v", stack.ID)
+	}
+
+	if pendingHash != "" {
+		stack.GitConfig.ConfigHash = pendingHash
 	}
 
 	stack.CurrentDeploymentInfo = &portainer.StackDeploymentInfo{
@@ -203,6 +210,8 @@ func redeployWhenChangedSecondStage(
 	deployErr := redeployStack(stack)
 
 	if err := datastore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stack.UpdateDate = time.Now().Unix()
+
 		stackutils.UpdateStackStatusFromDeploymentResult(stack, deployErr)
 		return tx.Stack().Update(stack.ID, stack)
 	}); err != nil {

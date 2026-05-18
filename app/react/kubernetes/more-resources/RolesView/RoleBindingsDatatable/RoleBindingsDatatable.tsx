@@ -30,8 +30,7 @@ import { useDeleteRoleBindingsMutation } from './queries/useDeleteRoleBindingsMu
 
 const storageKey = 'roleBindings';
 interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+  extends KubeTableSettings, FilteredColumnsTableSettings {}
 
 export function RoleBindingsDatatable() {
   const environmentId = useEnvironmentId();

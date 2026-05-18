@@ -6,7 +6,9 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -60,8 +62,12 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
+	var settings *portainer.Settings
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		settings, err = tx.Settings().Settings()
+		return err
+	}); err != nil {
 		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
@@ -89,7 +95,7 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 	}
 
 	if user != nil && isUserInitialAdmin(user) || settings.AuthenticationMethod == portainer.AuthenticationInternal {
-		return handler.authenticateInternal(rw, user, payload.Password)
+		return handler.authenticateInternal(rw, r, user, payload.Password, settings.ForceSecureCookies)
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationOAuth {
@@ -97,7 +103,7 @@ func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) *h
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
-		return handler.authenticateLDAP(rw, user, payload.Username, payload.Password, &settings.LDAPSettings)
+		return handler.authenticateLDAP(rw, r, user, payload.Username, payload.Password, &settings.LDAPSettings, settings.ForceSecureCookies)
 	}
 
 	return httperror.NewError(http.StatusUnprocessableEntity, "Login method is not supported", httperrors.ErrUnauthorized)
@@ -107,17 +113,17 @@ func isUserInitialAdmin(user *portainer.User) bool {
 	return int(user.ID) == 1
 }
 
-func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
+func (handler *Handler) authenticateInternal(w http.ResponseWriter, r *http.Request, user *portainer.User, password string, forceSecureCookies bool) *httperror.HandlerError {
 	if err := handler.CryptoService.CompareHashAndData(user.Password, password); err != nil {
 		return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
 	}
 
 	forceChangePassword := !handler.passwordStrengthChecker.Check(password)
 
-	return handler.writeToken(w, user, forceChangePassword)
+	return handler.writeToken(w, r, user, forceChangePassword, forceSecureCookies)
 }
 
-func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
+func (handler *Handler) authenticateLDAP(w http.ResponseWriter, r *http.Request, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings, forceSecureCookies bool) *httperror.HandlerError {
 	if err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings); err != nil {
 		if errors.Is(err, httperrors.ErrUnauthorized) {
 			return httperror.NewError(http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized)
@@ -142,24 +148,28 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		log.Warn().Err(err).Msg("unable to automatically sync user teams with ldap")
 	}
 
-	return handler.writeToken(w, user, false)
+	return handler.writeToken(w, r, user, false, forceSecureCookies)
 }
 
-func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, forceChangePassword bool) *httperror.HandlerError {
+func (handler *Handler) writeToken(w http.ResponseWriter, r *http.Request, user *portainer.User, forceChangePassword bool, forceSecureCookies bool) *httperror.HandlerError {
 	tokenData := composeTokenData(user, forceChangePassword)
 
-	return handler.persistAndWriteToken(w, tokenData)
+	return handler.persistAndWriteToken(w, r, tokenData, forceSecureCookies)
 }
 
-func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
+func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, r *http.Request, tokenData *portainer.TokenData, forceSecureCookies bool) *httperror.HandlerError {
 	token, expirationTime, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
 
-	security.AddAuthCookie(w, token, expirationTime)
+	security.AddAuthCookie(w, token, expirationTime, handler.isSecureCookie(r, forceSecureCookies))
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
+}
+
+func (handler *Handler) isSecureCookie(r *http.Request, forceSecureCookies bool) bool {
+	return r.TLS != nil || middlewares.IsHTTPSRequest(r) || forceSecureCookies
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {

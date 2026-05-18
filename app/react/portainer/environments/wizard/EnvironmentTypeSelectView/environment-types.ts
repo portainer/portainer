@@ -17,8 +17,7 @@ export type EnvironmentOptionValue =
   | 'kaas'
   | 'k8sInstall';
 
-export interface EnvironmentOption
-  extends BoxSelectorOption<EnvironmentOptionValue> {
+export interface EnvironmentOption extends BoxSelectorOption<EnvironmentOptionValue> {
   id: EnvironmentOptionValue;
   value: EnvironmentOptionValue;
 }

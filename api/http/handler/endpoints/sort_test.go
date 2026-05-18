@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"testing"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/slicesx"
@@ -164,9 +165,9 @@ func TestSortEndpointsByField(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			is := assert.New(t)
-			sortEnvironmentsByField(environments, environmentGroups, "Name", false) // reset to default sort order
+			sortEnvironmentsByField(environments, environmentGroups, "Name", false, nil) // reset to default sort order
 
-			sortEnvironmentsByField(environments, environmentGroups, tt.sortField, tt.isSortDesc)
+			sortEnvironmentsByField(environments, environmentGroups, tt.sortField, tt.isSortDesc, nil)
 
 			is.Equal(tt.expected, getEndpointIDs(environments))
 		})
@@ -176,6 +177,62 @@ func TestSortEndpointsByField(t *testing.T) {
 func getEndpointIDs(environments []portainer.Endpoint) []portainer.EndpointID {
 	return slicesx.Map(environments, func(environment portainer.Endpoint) portainer.EndpointID {
 		return environment.ID
+	})
+}
+
+func TestSortEndpointsByHealth(t *testing.T) {
+	t.Parallel()
+
+	settings := &portainer.Settings{EdgeAgentCheckinInterval: 30}
+
+	// Down: non-edge with Status=2
+	down := portainer.Endpoint{
+		ID:     0,
+		Name:   "down-env",
+		Type:   portainer.DockerEnvironment,
+		Status: portainer.EndpointStatusDown,
+	}
+	// Outdated: edge agent with empty version and a prior check-in (old agent style, no version reported)
+	outdated := portainer.Endpoint{
+		ID:              1,
+		Name:            "outdated-env",
+		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		Status:          portainer.EndpointStatusUp,
+		LastCheckInDate: time.Now().Unix(),
+		// IsEdgeEndpoint + Agent.Version == "" + LastCheckInDate > 0 → isOutdated returns true
+	}
+	// Heartbeat: edge that checked in recently with a current agent version (not outdated)
+	heartbeat := portainer.Endpoint{
+		ID:              2,
+		Name:            "heartbeat-env",
+		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		LastCheckInDate: time.Now().Unix(),
+	}
+	heartbeat.Agent.Version = portainer.APIVersion
+	// Up: non-edge with Status=1
+	up := portainer.Endpoint{
+		ID:     3,
+		Name:   "up-env",
+		Type:   portainer.DockerEnvironment,
+		Status: portainer.EndpointStatusUp,
+	}
+
+	t.Run("ascending: Down → Outdated → Heartbeat → Up", func(t *testing.T) {
+		environments := []portainer.Endpoint{up, heartbeat, outdated, down}
+		sortEnvironmentsByField(environments, nil, sortKeyHealth, false, settings)
+		assert.Equal(t,
+			[]portainer.EndpointID{down.ID, outdated.ID, heartbeat.ID, up.ID},
+			getEndpointIDs(environments),
+		)
+	})
+
+	t.Run("descending: Up → Heartbeat → Outdated → Down", func(t *testing.T) {
+		environments := []portainer.Endpoint{down, outdated, heartbeat, up}
+		sortEnvironmentsByField(environments, nil, sortKeyHealth, true, settings)
+		assert.Equal(t,
+			[]portainer.EndpointID{up.ID, heartbeat.ID, outdated.ID, down.ID},
+			getEndpointIDs(environments),
+		)
 	})
 }
 

@@ -98,9 +98,9 @@ function useConfigMapRowData(
         ...configMap,
         inUse: configMap.IsUsed,
         isSystem: namespaces
-          ? namespaces.find(
+          ? (namespaces.find(
               (namespace) => namespace.Name === configMap.Namespace
-            )?.IsSystem ?? false
+            )?.IsSystem ?? false)
           : false,
       })) || [],
     [configMaps, namespaces]

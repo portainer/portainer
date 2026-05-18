@@ -48,7 +48,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	deployer := compose.NewComposeDeployer()
 
-	w := NewComposeStackManager(deployer, nil, nil)
+	w := NewComposeStackManager(deployer, nil)
 
 	if err := w.Up(t.Context(), stack, endpoint, portainer.ComposeUpOptions{}); err != nil {
 		t.Fatalf("Error calling docker-compose up: %s", err)

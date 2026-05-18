@@ -168,6 +168,22 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const helmInstall = {
+      name: 'kubernetes.helminstall',
+      url: '/helm?referrer',
+      views: {
+        'content@': {
+          component: 'helmInstallView',
+        },
+      },
+      params: {
+        yaml: '',
+      },
+      data: {
+        docs: '/user/kubernetes/applications/manifest/helm',
+      },
+    };
+
     const services = {
       name: 'kubernetes.services',
       url: '/services',
@@ -495,22 +511,6 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
       data: {
         docs: '/user/kubernetes/applications/manifest',
-      },
-    };
-
-    const helmInstall = {
-      name: 'kubernetes.helminstall',
-      url: '/helm?referrer',
-      views: {
-        'content@': {
-          component: 'helmInstallView',
-        },
-      },
-      params: {
-        yaml: '',
-      },
-      data: {
-        docs: '/user/kubernetes/applications/manifest/helm',
       },
     };
 

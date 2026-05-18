@@ -89,7 +89,7 @@ export function useGroups<T>(
   getSearchText: (item: T) => string,
   getGroupIcon?: (key: string) => ReactNode
 ): { groups: SortableGroup<T>[]; totalCount: number } {
-  const sortBy = tableState.sortBy?.id ?? defaultSortKey;
+  const sortBy = tableState.groupBy ?? tableState.sortBy?.id ?? defaultSortKey;
   return useMemo(
     () =>
       computePagedGroups({

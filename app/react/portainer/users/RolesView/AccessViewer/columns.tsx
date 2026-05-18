@@ -6,16 +6,21 @@ import { useCurrentUser } from '@/react/hooks/useUser';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import { AccessViewerPolicyModel } from './model';
+import { AccessLocation, AccessViewerPolicyModel } from './model';
+
+const ACCESS_LOCATION_LABELS: Record<AccessLocation, string> = {
+  [AccessLocation.Environment]: 'environment',
+  [AccessLocation.EnvironmentGroup]: 'environment group',
+};
 
 const helper = createColumnHelper<AccessViewerPolicyModel>();
 
 export const columns = [
-  helper.accessor('EndpointName', {
+  helper.accessor('endpointName', {
     header: 'Environment',
     id: 'Environment',
   }),
-  helper.accessor('RoleName', {
+  helper.accessor('roleName', {
     header: 'Role',
     id: 'Role',
   }),
@@ -25,30 +30,40 @@ export const columns = [
   }),
 ];
 
+const manageAccessLabel = (
+  <span className="inline-flex items-center gap-1">
+    <Icon icon={Users} />
+    Manage access
+  </span>
+);
+
 function AccessCell({
   row: { original: item },
 }: CellContext<AccessViewerPolicyModel, unknown>) {
   const { isPureAdmin } = useCurrentUser();
 
-  if (item.RoleId === 0) {
+  if (item.roleId === 0) {
     return (
       <>
         User access all environments
-        <Link
-          to="portainer.settings.edgeCompute"
-          data-cy={`manage-access-button-${item.RoleName}`}
-        >
-          <Icon icon={Users} /> Manage access
-        </Link>
+        <div>
+          <Link
+            to="portainer.settings.edgeCompute"
+            data-cy={`manage-access-button-${item.roleName}`}
+          >
+            {manageAccessLabel}
+          </Link>
+        </div>
       </>
     );
   }
 
   return (
     <>
-      {prefix(item.TeamName)} access defined on {item.AccessLocation}{' '}
-      {!!item.GroupName && <code>{item.GroupName}</code>}{' '}
-      {manageAccess(item, isPureAdmin)}
+      {prefix(item.teamName)} access defined on{' '}
+      {ACCESS_LOCATION_LABELS[item.accessLocation]}{' '}
+      {!!item.groupName && <code>{item.groupName}</code>}
+      <div>{manageAccess(item, isPureAdmin)}</div>
     </>
   );
 }
@@ -69,21 +84,25 @@ function manageAccess(item: AccessViewerPolicyModel, isPureAdmin: boolean) {
     return null;
   }
 
-  return item.GroupName ? (
-    <Link
-      to="portainer.groups.group.access"
-      params={{ id: item.GroupId }}
-      data-cy={`manage-access-button-${item.RoleName}`}
-    >
-      <Icon icon={Users} /> Manage access
-    </Link>
-  ) : (
+  if (item.groupName) {
+    return (
+      <Link
+        to="portainer.groups.group.access"
+        params={{ id: item.groupId }}
+        data-cy={`manage-access-button-${item.roleName}`}
+      >
+        {manageAccessLabel}
+      </Link>
+    );
+  }
+
+  return (
     <Link
       to="portainer.endpoints.endpoint.access"
-      params={{ id: item.EndpointId }}
-      data-cy={`manage-access-button-${item.RoleName}`}
+      params={{ id: item.endpointId }}
+      data-cy={`manage-access-button-${item.roleName}`}
     >
-      <Icon icon={Users} /> Manage access
+      {manageAccessLabel}
     </Link>
   );
 }

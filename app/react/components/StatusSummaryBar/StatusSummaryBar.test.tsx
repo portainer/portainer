@@ -79,7 +79,7 @@ describe('StatusSummaryBar', () => {
     const onChange = vi.fn();
     renderComponent({ value: 'down', onChange });
 
-    expect(screen.getByTestId('active-filter-indicator')).toBeVisible();
+    expect(screen.getByRole('status')).toBeVisible();
     expect(
       screen.getByRole('button', { name: /clear filter/i })
     ).toBeInTheDocument();

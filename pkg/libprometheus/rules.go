@@ -2,6 +2,7 @@ package libprometheus
 
 import (
 	"context"
+	"slices"
 	"strconv"
 	"time"
 
@@ -50,7 +51,14 @@ func ReloadRules(mgr *rules.Manager, evalInterval time.Duration, alertsFilePath 
 // ExtractAlertStates returns the current evaluation state for each alerting rule
 // managed by the given rules.Manager.
 func ExtractAlertStates(mgr *rules.Manager) []pkgmetrics.EdgeAlertRuleState {
-	var states []pkgmetrics.EdgeAlertRuleState
+	type aggregateState struct {
+		state          pkgmetrics.AlertRuleStateType
+		lastEvaluation int64
+		lastError      string
+		severity       string
+	}
+
+	aggregated := make(map[int]aggregateState)
 
 	for _, group := range mgr.RuleGroups() {
 		for _, rule := range group.Rules() {
@@ -82,14 +90,86 @@ func ExtractAlertStates(mgr *rules.Manager) []pkgmetrics.EdgeAlertRuleState {
 				lastErr = alertRule.LastError().Error()
 			}
 
-			states = append(states, pkgmetrics.EdgeAlertRuleState{
-				RuleID:         ruleID,
-				State:          state,
-				LastEvaluation: alertRule.GetEvaluationTimestamp().UnixMilli(),
-				LastError:      lastErr,
-			})
+			tierSeverity := alertRule.Labels().Get(pkgmetrics.AlertTierLabel)
+			statePriority := alertStatePriority(state)
+			evalMillis := alertRule.GetEvaluationTimestamp().UnixMilli()
+
+			existing, exists := aggregated[ruleID]
+			if !exists {
+				aggregated[ruleID] = aggregateState{
+					state:          state,
+					lastEvaluation: evalMillis,
+					lastError:      lastErr,
+					severity:       tierSeverity,
+				}
+				continue
+			}
+
+			existingStatePriority := alertStatePriority(existing.state)
+			winsState := statePriority > existingStatePriority
+			tiebreakWins := statePriority == existingStatePriority && tierSeverityPriority(tierSeverity) > tierSeverityPriority(existing.severity)
+
+			if winsState || tiebreakWins {
+				existing.state = state
+				existing.severity = tierSeverity
+				existing.lastError = lastErr
+			}
+
+			if evalMillis > existing.lastEvaluation {
+				existing.lastEvaluation = evalMillis
+			}
+
+			aggregated[ruleID] = existing
 		}
 	}
 
+	if len(aggregated) == 0 {
+		return nil
+	}
+
+	ruleIDs := make([]int, 0, len(aggregated))
+	for ruleID := range aggregated {
+		ruleIDs = append(ruleIDs, ruleID)
+	}
+	slices.Sort(ruleIDs)
+
+	states := make([]pkgmetrics.EdgeAlertRuleState, 0, len(ruleIDs))
+	for _, ruleID := range ruleIDs {
+		state := aggregated[ruleID]
+		states = append(states, pkgmetrics.EdgeAlertRuleState{
+			RuleID:         ruleID,
+			State:          state.state,
+			LastEvaluation: state.lastEvaluation,
+			LastError:      state.lastError,
+		})
+	}
+
 	return states
+}
+
+func alertStatePriority(state pkgmetrics.AlertRuleStateType) int {
+	switch state {
+	case pkgmetrics.AlertRuleStateFiring:
+		return 2
+	case pkgmetrics.AlertRuleStatePending:
+		return 1
+	default:
+		return 0
+	}
+}
+
+// tierSeverityPriority mirrors the canonical severity ordering from the EE
+// alertexpr package. CE cannot import EE, so this is a
+// deliberate duplicate — keep the values aligned if the canonical list changes.
+func tierSeverityPriority(severity string) int {
+	switch severity {
+	case "critical":
+		return 2
+	case "warning":
+		return 1
+	case "info":
+		return 0
+	default:
+		return -1
+	}
 }

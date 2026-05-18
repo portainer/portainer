@@ -6,16 +6,17 @@ import {
 } from '@reach/menu-button';
 import { UISrefProps, useSref } from '@uirouter/react';
 import clsx from 'clsx';
-import { User, ChevronDown } from 'lucide-react';
+import { UserIcon, ChevronDown } from 'lucide-react';
 
 import { queryClient } from '@/react-tools/react-query';
 import { AutomationTestingProps } from '@/types';
-import { useUser } from '@/react/hooks/useUser';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import styles from './HeaderTitle.module.css';
+import { ThemeSelector } from './UserMenuThemeSelector';
 
 export function UserMenu() {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
 
   return (
     <Menu>
@@ -35,7 +36,7 @@ export function UserMenu() {
             'th-dark:text-gray-warm-7'
           )}
         >
-          <User className="lucide" />
+          <UserIcon className="lucide" />
         </div>
         {user && <span>{user.Username}</span>}
         <ChevronDown className={styles.arrowDown} />
@@ -57,6 +58,10 @@ export function UserMenu() {
           label="Log out"
           data-cy="userMenu-logOut"
         />
+
+        <hr className="my-1 border-t border-gray-5 th-highcontrast:border-gray-7 th-dark:border-gray-7" />
+
+        <ThemeSelector user={user} />
       </MenuList>
     </Menu>
   );
@@ -78,7 +83,7 @@ function MenuLink({
   return (
     <ReachMenuLink
       href={anchorProps.href}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent) => {
         queryClient.clear();
         anchorProps.onClick(e);
       }}

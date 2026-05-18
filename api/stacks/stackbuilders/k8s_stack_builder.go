@@ -57,13 +57,16 @@ func CreateKubernetesStackUrlBuilder(dataStore dataservices.DataStore,
 	}
 }
 
-func (b *KubernetesStackBuilder) prepare(_ context.Context, payload *StackPayload) error {
+func (b *KubernetesStackBuilder) prepare(_ context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.Name = payload.StackName
 	b.stack.Type = portainer.KubernetesStack
 	b.stack.EntryPoint = filesystem.ManifestFileDefaultName
 	b.stack.Namespace = payload.Namespace
-	b.stack.CreatedBy = b.user.Username
 	b.stack.FromAppTemplate = payload.FromAppTemplate
+
+	if err := b.initCreatedBy(userID); err != nil {
+		return err
+	}
 
 	content, err := b.contentFn(payload)
 	if err != nil {

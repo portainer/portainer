@@ -1,19 +1,16 @@
-import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
+
+import { Card as CardPrimitive } from '../primitives/Card';
 
 export interface Props {
   className?: string;
 }
 
+/** @deprecated Use Card.Container from @@/primitives/Card with variant="filled" */
 export function Card({ className, children }: PropsWithChildren<Props>) {
   return (
-    <div
-      className={clsx(
-        className,
-        'rounded-lg border border-solid border-gray-5 bg-gray-neutral-3 p-5 th-highcontrast:border-white th-highcontrast:bg-black th-dark:border-legacy-grey-3 th-dark:bg-gray-iron-11'
-      )}
-    >
-      {children}
-    </div>
+    <CardPrimitive.Container variant="filled" className={className}>
+      <CardPrimitive.Body>{children}</CardPrimitive.Body>
+    </CardPrimitive.Container>
   );
 }

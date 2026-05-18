@@ -133,7 +133,7 @@ export function sortOptionsFromColumns(
 ): SortOptions {
   return compact(
     columns.map((c) =>
-      c.enableSorting === false ? undefined : c.id ?? c.accessorKey
+      c.enableSorting === false ? undefined : (c.id ?? c.accessorKey)
     )
   );
 }

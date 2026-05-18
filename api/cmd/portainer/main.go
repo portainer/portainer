@@ -26,7 +26,6 @@ import (
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
-	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
@@ -53,6 +52,7 @@ import (
 	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhelm"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/google/uuid"
@@ -243,6 +243,10 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	settings.EnableEdgeComputeFeatures = cmp.Or(*flags.EnableEdgeComputeFeatures, settings.EnableEdgeComputeFeatures)
 	settings.TemplatesURL = cmp.Or(*flags.Templates, settings.TemplatesURL)
 
+	if flags.KubectlShellImageSet {
+		settings.KubectlShellImage = *flags.KubectlShellImage
+	}
+
 	if *flags.Labels != nil {
 		settings.BlackListedLabels = *flags.Labels
 	}
@@ -334,7 +338,6 @@ func loadEncryptionSecretKey(keyfilename string) []byte {
 }
 
 func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdownTrigger context.CancelFunc) portainer.Server {
-
 	if flags.FeatureFlags != nil {
 		featureflags.Parse(*flags.FeatureFlags, portainer.SupportedFeatureFlags)
 	}
@@ -394,9 +397,6 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 
 	gitService := git.NewService(shutdownCtx)
 
-	// Setting insecureSkipVerify to true to preserve the old behaviour.
-	openAMTService := openamt.NewService(true)
-
 	cryptoService := crypto.Service{}
 
 	signatureService := initDigitalSignatureService()
@@ -437,16 +437,11 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 
 	reverseTunnelService.ProxyManager = proxyManager
 
-	dockerConfigPath := fileService.GetDockerConfigPath()
-
 	composeDeployer := compose.NewComposeDeployer()
 
-	composeStackManager := exec.NewComposeStackManager(composeDeployer, proxyManager, dataStore)
+	composeStackManager := exec.NewComposeStackManager(composeDeployer, proxyManager)
 
-	swarmStackManager, err := exec.NewSwarmStackManager(*flags.Assets, dockerConfigPath, signatureService, fileService, reverseTunnelService, dataStore)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed initializing swarm stack manager")
-	}
+	swarmStackManager := exec.NewSwarmStackManager(libswarm.NewSwarmDeployer(), proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, proxyManager)
 
@@ -589,7 +584,6 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
-		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		KubeClusterAccessService:    kubeClusterAccessService,

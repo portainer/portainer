@@ -8,7 +8,8 @@ import {
 } from '@@/datatables/types';
 
 interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     RefreshableTableSettings,
     BackendPaginationTableSettings {}
 

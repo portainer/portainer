@@ -43,7 +43,7 @@ export function useUpdateGitStack(stack: Stack) {
         RepositoryAuthentication: resolvedAuth.RepositoryAuthentication,
         RepositoryGitCredentialID: resolvedAuth.RepositoryGitCredentialID,
         RepositoryUsername: resolvedAuth.RepositoryUsername,
-        RepositoryPassword: resolvedAuth.RepositoryPassword,
+        RepositoryPassword: resolvedAuth.RepositoryPassword || undefined,
         RepositoryAuthorizationType: resolvedAuth.RepositoryAuthorizationType,
         TLSSkipVerify: values.git.TLSSkipVerify,
         AutoUpdate: autoUpdate,
@@ -64,7 +64,7 @@ export function useUpdateGitStack(stack: Stack) {
           RepositoryAuthentication: resolvedAuth.RepositoryAuthentication,
           RepositoryGitCredentialID: resolvedAuth.RepositoryGitCredentialID,
           RepositoryUsername: resolvedAuth.RepositoryUsername,
-          RepositoryPassword: resolvedAuth.RepositoryPassword,
+          RepositoryPassword: resolvedAuth.RepositoryPassword || undefined,
           RepositoryAuthorizationType: resolvedAuth.RepositoryAuthorizationType,
           RepullImageAndRedeploy: repullImageAndRedeploy,
         });

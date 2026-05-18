@@ -1,11 +1,11 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { useEffect, useState } from 'react';
 
 import { Slider, Props } from './Slider';
 
 export default {
   component: Slider,
-  title: 'Components/Form/Slider',
+  title: 'Components/Forms/Slider',
 } as Meta;
 
 function Template({

@@ -32,9 +32,6 @@ type publicSettingsResponse struct {
 	// Whether team sync is enabled
 	TeamSync bool `json:"TeamSync" example:"true"`
 
-	// Whether AMT is enabled
-	IsAMTEnabled bool
-
 	Edge struct {
 		// The ping interval for edge agent - used in edge async mode [seconds]
 		PingInterval int `json:"PingInterval" example:"60"`
@@ -78,7 +75,6 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		GlobalDeploymentOptions:   appSettings.GlobalDeploymentOptions,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  featureflags.FeatureFlags(),
-		IsAMTEnabled:              appSettings.EnableEdgeComputeFeatures && appSettings.OpenAMTConfiguration.Enabled,
 	}
 
 	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval

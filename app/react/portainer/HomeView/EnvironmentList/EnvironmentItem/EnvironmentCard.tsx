@@ -50,7 +50,7 @@ export function EnvironmentCard({
     environment.Snapshots.length > 0;
 
   return (
-    <div className="relative">
+    <div className="relative border-0 border-b border-solid border-gray-5 th-highcontrast:border-white th-dark:border-gray-9">
       <BlocklistItem
         as={hasDashboardRoute ? Link : 'button'}
         className="!m-0 flex flex-wrap gap-4 !border-none !pr-14"

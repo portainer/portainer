@@ -116,6 +116,61 @@ func TestCreateEndpointFailure(t *testing.T) {
 	require.Nil(t, endpoint)
 }
 
+func TestValidateEndpointCreatePayload_TLS(t *testing.T) {
+	t.Parallel()
+	fips.InitFIPS(false)
+
+	testCases := []struct {
+		name          string
+		formValues    map[string][]string
+		expectedError string
+	}{
+		{
+			name: "edge agent env with TLS rejected",
+			formValues: map[string][]string{
+				"Name":                 {"Test Endpoint"},
+				"EndpointCreationType": {"4"},
+				"TLS":                  {"true"},
+			},
+			expectedError: "TLS is not supported for Edge Agent environments",
+		},
+		{
+			name: "edge agent env without TLS succeeds",
+			formValues: map[string][]string{
+				"Name":                 {"Test Endpoint"},
+				"EndpointCreationType": {"4"},
+				"URL":                  {"https://portainer.example:9443"},
+			},
+			expectedError: "",
+		},
+		{
+			name: "non-edge agent env with TLS allowed",
+			formValues: map[string][]string{
+				"Name":                 {"Test Endpoint"},
+				"EndpointCreationType": {"2"},
+				"TLS":                  {"true"},
+				"TLSSkipVerify":        {"true"},
+				"TLSSkipClientVerify":  {"true"},
+			},
+			expectedError: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			r := http.Request{Form: tc.formValues}
+			p := &endpointCreatePayload{}
+			err := p.Validate(&r)
+
+			if tc.expectedError == "" {
+				require.NoError(t, err)
+			} else {
+				require.EqualError(t, err, tc.expectedError)
+			}
+		})
+	}
+}
+
 func TestCreateEdgeAgentEndpoint_ContainerEngineMapping(t *testing.T) {
 	t.Parallel()
 	fips.InitFIPS(false)

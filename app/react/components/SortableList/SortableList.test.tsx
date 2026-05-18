@@ -35,14 +35,17 @@ describe('SortableList', () => {
     expect(screen.getByText('Theta')).toBeInTheDocument();
   });
 
-  it('calls setSortBy when a sort option is clicked', async () => {
+  it('calls setGroupFilter when a sort option is clicked', async () => {
     const user = userEvent.setup();
-    const setSortBy = vi.fn();
-    renderList({ state: { setSortBy } });
+    const setGroupFilter = vi.fn();
+    renderList({ state: { setGroupFilter } });
 
     await user.click(screen.getByText('Status'));
 
-    expect(setSortBy).toHaveBeenCalledWith('status', false);
+    expect(setGroupFilter).toHaveBeenCalledWith({
+      group: 'status',
+      groupValue: null,
+    });
   });
 
   it('shows group headers when showGroupHeaders=true and multiple groups', () => {
@@ -166,6 +169,57 @@ describe('SortableList', () => {
     expect(screen.getByText('★')).toBeInTheDocument();
   });
 
+  describe('sortBy case-insensitive normalisation', () => {
+    it('shows group headers when sortBy.id is uppercased', () => {
+      renderList({
+        groups: makeStatusGroups(ITEMS),
+        state: { sortBy: { id: 'STATUS', desc: false } },
+        groupOptions: {
+          status: [{ key: 'healthy' }, { key: 'error' }, { key: 'syncing' }],
+        },
+        showGroupHeaders: true,
+      });
+
+      expect(screen.getByText('Healthy')).toBeInTheDocument();
+    });
+
+    it('shows group headers when sortBy.id is mixed-case', () => {
+      renderList({
+        groups: makeStatusGroups(ITEMS),
+        state: { sortBy: { id: 'Status', desc: false } },
+        groupOptions: {
+          status: [{ key: 'healthy' }, { key: 'error' }, { key: 'syncing' }],
+        },
+        showGroupHeaders: true,
+      });
+
+      expect(screen.getByText('Healthy')).toBeInTheDocument();
+    });
+
+    it('highlights the sort option whose key matches case-insensitively', () => {
+      renderList({
+        state: { sortBy: { id: 'STATUS', desc: false } },
+      });
+
+      expect(screen.getByRole('button', { name: /Status/i })).toHaveTextContent(
+        'Asc'
+      );
+    });
+
+    it('shows no active sort option when sortBy.id has no match', () => {
+      renderList({
+        state: { sortBy: { id: 'unknown', desc: false } },
+      });
+
+      expect(
+        screen.getByRole('button', { name: /Name/i })
+      ).not.toHaveTextContent('Asc');
+      expect(
+        screen.getByRole('button', { name: /Status/i })
+      ).not.toHaveTextContent('Asc');
+    });
+  });
+
   it('renders the group description in the group header', () => {
     const groups: SortableGroup<Item>[] = [
       {
@@ -263,6 +317,8 @@ function createMockState(
     setPageSize: vi.fn(),
     page: 0,
     setPage: vi.fn(),
+    groupBy: null,
+    setGroupBy: vi.fn(),
     groupFilter: null,
     setGroupFilter: vi.fn(),
     search: '',

@@ -17,6 +17,8 @@ export const RoleNames: { [key in Role]: string } = {
   [Role.EdgeAdmin]: 'edge administrator',
 };
 
+export type ThemeColor = 'dark' | 'light' | 'highcontrast' | 'auto';
+
 export type User = {
   Id: UserId;
   Username: string;
@@ -26,6 +28,6 @@ export type User = {
   };
   UseCache: boolean;
   ThemeSettings: {
-    color: 'dark' | 'light' | 'highcontrast' | 'auto';
+    color: ThemeColor;
   };
 };

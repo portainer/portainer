@@ -10,7 +10,8 @@ import {
 } from './SystemResourcesSettings';
 
 export interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     RefreshableTableSettings,
     SystemResourcesTableSettings {}
 

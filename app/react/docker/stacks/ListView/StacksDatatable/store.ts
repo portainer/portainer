@@ -10,7 +10,8 @@ import {
 import { useTableStateWithStorage } from '@@/datatables/useTableState';
 
 export interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     SettableColumnsTableSettings,
     RefreshableTableSettings,
     FilteredColumnsTableSettings {

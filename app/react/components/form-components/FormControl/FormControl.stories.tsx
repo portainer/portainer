@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { Input, Select } from '../Input';
@@ -6,7 +6,7 @@ import { Input, Select } from '../Input';
 import { FormControl } from './FormControl';
 
 export default {
-  title: 'Components/Form/Control',
+  title: 'Components/Forms/Control',
 } as Meta;
 
 interface TextFieldProps {

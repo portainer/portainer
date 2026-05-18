@@ -22,7 +22,8 @@ import { TableActions } from './TableActions';
 import { useColumns } from './columns';
 
 interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     RefreshableTableSettings,
     FilteredColumnsTableSettings {}
 

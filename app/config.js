@@ -1,5 +1,4 @@
 import { agentInterceptor } from '@/react/portainer/services/axios/axios';
-import { csrfInterceptor, csrfTokenReaderInterceptorAngular } from './portainer/services/csrf';
 import { dispatchCacheRefreshEventIfNeeded } from './portainer/services/http-request.helper';
 
 /* @ngInject */
@@ -24,11 +23,6 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
 
   $httpProvider.interceptors.push(() => ({
     request: agentInterceptor,
-  }));
-
-  $httpProvider.interceptors.push(() => ({
-    response: csrfTokenReaderInterceptorAngular,
-    request: csrfInterceptor,
   }));
 
   $uibTooltipProvider.setTriggers({

@@ -119,12 +119,10 @@ export function filteredColumnsSettings<T extends FilteredColumnsTableSettings>(
 }
 
 export interface BasicTableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings {}
+  extends SortableTableSettings, PaginationTableSettings {}
 
 export interface TableSettingsWithRefreshable
-  extends BasicTableSettings,
-    RefreshableTableSettings {}
+  extends BasicTableSettings, RefreshableTableSettings {}
 
 export function createPersistedStore<T extends BasicTableSettings>(
   storageKey: string,

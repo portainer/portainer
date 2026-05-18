@@ -17,6 +17,7 @@ import { ProcessesDatatable } from '@/react/docker/containers/StatsView/Processe
 import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 import { StacksDatatable } from '@/react/docker/stacks/ListView/StacksDatatable';
 import { NetworksDatatable } from '@/react/docker/networks/ListView/NetworksDatatable';
+import { HostDetailsPanel } from '@/react/docker/host/HostDetailsPanel/HostDetailsPanel';
 
 import { containersModule } from './containers';
 import { servicesModule } from './services';
@@ -108,6 +109,15 @@ const ngModule = angular
       'isImageNotificationEnabled',
       'onReload',
       'onRemove',
+    ])
+  )
+  .component(
+    'hostDetailsPanel',
+    r2a(withUIRouter(withReactQuery(HostDetailsPanel)), [
+      'host',
+      'isBrowseEnabled',
+      'browseUrl',
+      'endpointId',
     ])
   );
 export const componentsModule = ngModule.name;

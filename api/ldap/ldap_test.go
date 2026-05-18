@@ -34,7 +34,8 @@ func TestCreateConnectionForURL(t *testing.T) {
 	conn, err := createConnectionForURL(settings.URL, settings)
 	require.NoError(t, err)
 	require.NotNil(t, conn)
-	conn.Close()
+	err = conn.Close()
+	require.NoError(t, err)
 
 	// TLS
 
@@ -46,7 +47,8 @@ func TestCreateConnectionForURL(t *testing.T) {
 	conn, err = createConnectionForURL(settings.URL, settings)
 	require.NoError(t, err)
 	require.NotNil(t, conn)
-	conn.Close()
+	err = conn.Close()
+	require.NoError(t, err)
 
 	// Invalid TLS
 

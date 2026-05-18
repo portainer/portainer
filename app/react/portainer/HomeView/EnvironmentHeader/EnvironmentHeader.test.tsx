@@ -1,11 +1,21 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { EnvironmentHeader } from './EnvironmentHeader';
+
+vi.mock('@uirouter/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@uirouter/react')>();
+  return {
+    ...actual,
+    useCurrentStateAndParams: vi.fn(),
+    useRouter: vi.fn(),
+  };
+});
 
 const mockCounts = {
   total: 10,
@@ -14,17 +24,21 @@ const mockCounts = {
   unassigned: 1,
 };
 
-function renderComponent(
-  props: Partial<React.ComponentProps<typeof EnvironmentHeader>> = {}
-) {
-  const defaultProps: React.ComponentProps<typeof EnvironmentHeader> = {
-    activeFilter: 'all',
-    onFilterChange: vi.fn(),
-    ...props,
-  };
+const mockGo = vi.fn();
 
+function setupMocks(params: Record<string, unknown> = {}) {
+  vi.mocked(useCurrentStateAndParams).mockReturnValue({
+    state: {} as never,
+    params,
+  });
+  vi.mocked(useRouter).mockReturnValue({
+    stateService: { go: mockGo },
+  } as never);
+}
+
+function renderComponent() {
   const Wrapped = withTestQueryProvider(EnvironmentHeader);
-  return { ...render(<Wrapped {...defaultProps} />), props: defaultProps };
+  return render(<Wrapped />);
 }
 
 function mockSummaryCounts(counts = mockCounts) {
@@ -34,12 +48,14 @@ function mockSummaryCounts(counts = mockCounts) {
 }
 
 describe('EnvironmentHeader', () => {
-  it('should render counts and toggle filter on click', async () => {
-    const user = userEvent.setup();
-    const onFilterChange = vi.fn();
-    mockSummaryCounts();
+  beforeEach(() => {
+    mockGo.mockClear();
+    setupMocks();
+  });
 
-    renderComponent({ onFilterChange });
+  it('renders all status segments with counts', async () => {
+    mockSummaryCounts();
+    renderComponent();
 
     await waitFor(() => {
       expect(
@@ -56,17 +72,37 @@ describe('EnvironmentHeader', () => {
     expect(
       screen.getByRole('radio', { name: /filter by unassigned/i })
     ).toBeVisible();
-
-    await user.click(screen.getByRole('radio', { name: /filter by up/i }));
-    expect(onFilterChange).toHaveBeenCalledWith('up');
   });
 
-  it('should reset to all when Total is clicked while a filter is active', async () => {
+  it('navigates with correct params when Down segment is clicked', async () => {
     const user = userEvent.setup();
-    const onFilterChange = vi.fn();
     mockSummaryCounts();
+    renderComponent();
 
-    renderComponent({ activeFilter: 'up', onFilterChange });
+    await waitFor(() => {
+      expect(
+        screen.getByRole('radio', { name: /filter by down/i })
+      ).toBeVisible();
+    });
+
+    await user.click(screen.getByRole('radio', { name: /filter by down/i }));
+    expect(mockGo).toHaveBeenCalledWith(
+      '.',
+      expect.objectContaining({
+        groupBy: 'Health',
+        groupFilter: 'Down',
+        page: 0,
+        search: '',
+      }),
+      { reload: false }
+    );
+  });
+
+  it('clears params when Total is clicked while a filter is active', async () => {
+    const user = userEvent.setup();
+    mockSummaryCounts();
+    setupMocks({ groupBy: 'health', groupFilter: 'up' });
+    renderComponent();
 
     await waitFor(() => {
       expect(
@@ -75,6 +111,15 @@ describe('EnvironmentHeader', () => {
     });
 
     await user.click(screen.getByRole('radio', { name: /filter by total/i }));
-    expect(onFilterChange).toHaveBeenCalledWith('all');
+    expect(mockGo).toHaveBeenCalledWith(
+      '.',
+      expect.objectContaining({
+        groupBy: 'Id',
+        groupFilter: null,
+        page: 0,
+        search: '',
+      }),
+      { reload: false }
+    );
   });
 });

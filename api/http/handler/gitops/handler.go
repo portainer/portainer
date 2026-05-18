@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/portainer/portainer/api/http/handler/gitops/sources"
 	"github.com/portainer/portainer/api/http/handler/gitops/workflows"
 )
 
@@ -37,6 +38,9 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	workflowsHandler := workflows.NewHandler(dataStore, gitService, k8sFactory)
 	authenticatedRouter.PathPrefix("/gitops/workflows").Handler(workflowsHandler)
+
+	sourcesHandler := sources.NewHandler(dataStore, gitService, k8sFactory)
+	authenticatedRouter.PathPrefix("/gitops/sources").Handler(sourcesHandler)
 
 	return h
 }

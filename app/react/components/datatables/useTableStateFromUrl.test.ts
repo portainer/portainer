@@ -62,6 +62,8 @@ describe('useTableStateFromUrl', () => {
       sort: 'age',
       order: 'desc',
       page: 0,
+      groupBy: null,
+      groupFilter: null,
     });
   });
 

@@ -7,8 +7,10 @@ import { buildCancelButton, buildConfirmButton } from './utils';
 
 export type ConfirmCallback = OnSubmit<boolean>;
 
-export interface ConfirmOptions
-  extends Omit<DialogOptions<boolean>, 'title' | 'buttons'> {
+export interface ConfirmOptions extends Omit<
+  DialogOptions<boolean>,
+  'title' | 'buttons'
+> {
   title: string;
   confirmButton?: ButtonOptions<true>;
   cancelButtonLabel?: string;

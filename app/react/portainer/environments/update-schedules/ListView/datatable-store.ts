@@ -8,7 +8,8 @@ import {
 } from '@/react/components/datatables/types';
 
 interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     SettableColumnsTableSettings,
     RefreshableTableSettings {}
 

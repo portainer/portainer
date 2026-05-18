@@ -26,38 +26,7 @@ export function SortableListGroup<T>({
 }: Props<T>) {
   return (
     <div>
-      {showHeader && (
-        <div
-          className={clsx(
-            'flex items-center gap-2 px-5 py-2.5',
-            'bg-gray-2 th-highcontrast:bg-black th-dark:bg-gray-iron-11',
-            'border-0 border-b border-solid border-gray-5 th-dark:border-gray-9'
-          )}
-        >
-          {group.icon && (
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center text-gray-7">
-              {group.icon}
-            </span>
-          )}
-          <span className="text-xs font-semibold text-gray-9 th-highcontrast:text-white th-dark:text-gray-2">
-            {group.label}
-          </span>
-          <span
-            className={clsx(
-              'rounded-full px-1.5 py-0.5 text-xs font-medium',
-              'bg-gray-3 text-gray-7',
-              'th-dark:bg-gray-7 th-dark:text-gray-3'
-            )}
-          >
-            {group.items.length}
-          </span>
-          {group.description && (
-            <span className="ml-1 text-xs text-gray-6">
-              {group.description}
-            </span>
-          )}
-        </div>
-      )}
+      {showHeader && <SortableListGroupHeader group={group} />}
 
       {renderColumnHeaders && (
         <div>{renderColumnHeaders(group.key, group.items)}</div>
@@ -69,6 +38,49 @@ export function SortableListGroup<T>({
             {renderItem(item, index)}
           </Fragment>
         ))}
+      </div>
+    </div>
+  );
+}
+
+interface HeaderProps<T> {
+  group: SortableGroup<T>;
+}
+
+function SortableListGroupHeader<T>({ group }: HeaderProps<T>) {
+  const groupName = group.label ? group.label : group.key;
+  const groupIcon = group.icon;
+  const count = group.items.length;
+  const groupDescription = group.description;
+
+  return (
+    <div
+      className={clsx(
+        'flex items-center gap-3 bg-gray-2 px-4 py-3 th-highcontrast:bg-black th-dark:bg-gray-iron-10',
+        'border-0 border-b border-solid border-gray-5 th-highcontrast:border-white th-dark:border-gray-9'
+      )}
+    >
+      {groupIcon && (
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center">
+          {groupIcon}
+        </div>
+      )}
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-sm font-semibold text-gray-11 th-highcontrast:text-white th-dark:text-white">
+            {groupName}
+          </span>
+          {count !== undefined && (
+            <span className="inline-flex items-center justify-center rounded-full bg-gray-4 px-2 py-0.5 text-xs font-medium text-gray-9 th-highcontrast:bg-black th-highcontrast:text-white th-dark:bg-gray-7 th-dark:text-gray-3">
+              {count}
+            </span>
+          )}
+        </div>
+        {groupDescription && (
+          <span className="truncate text-xs text-gray-7 th-highcontrast:text-white th-dark:text-gray-5">
+            {groupDescription}
+          </span>
+        )}
       </div>
     </div>
   );

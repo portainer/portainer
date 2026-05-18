@@ -72,15 +72,15 @@ export function AppIngressPathForm({
       );
       const newIngressHostValue = ingressHosts.includes(ingressPath?.Host ?? '')
         ? ingressPath?.Host
-        : ingressHosts[0] ?? '';
+        : (ingressHosts[0] ?? '');
       const ingressNames = ingressHostOptionsWithCurrentValue.map(
         (i) => i.ingressName
       );
       const newIngressNameValue = ingressNames.includes(
         ingressPath?.IngressName ?? ''
       )
-        ? ingressPath?.IngressName ?? ''
-        : ingressNames[0] ?? '';
+        ? (ingressPath?.IngressName ?? '')
+        : (ingressNames[0] ?? '');
 
       const newIngressPath = {
         ...ingressPath,

@@ -17,7 +17,7 @@ type stackBuildProcess interface {
 	setGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint)
 	// prepare handles all pre-save steps: sets type-specific metadata, stores
 	// files on disk, or clones the git repository.
-	prepare(ctx context.Context, payload *StackPayload) error
+	prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error
 	saveStack() (*portainer.Stack, error)
 	deploy(ctx context.Context, endpoint *portainer.Endpoint) error
 	// postDeploy runs after a successful deployment: for git builders it enables
@@ -33,10 +33,10 @@ type stackBuildProcess interface {
 // The stack is saved to DB with Status=Deploying and returned immediately.
 // Deployment runs in a background goroutine. The caller must poll
 // GET /stacks/{id} to track completion.
-func Build(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
+func Build(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
 	builder.setGeneralInfo(payload, endpoint)
 
-	if err := builder.prepare(ctx, payload); err != nil {
+	if err := builder.prepare(ctx, payload, userID); err != nil {
 		return nil, httperror.InternalServerError("Failed to prepare stack", err)
 	}
 

@@ -37,18 +37,6 @@ export interface Pair {
   value?: string;
 }
 
-export interface OpenAMTConfiguration {
-  enabled: boolean;
-  mpsServer: string;
-  mpsUser: string;
-  mpsPassword: string;
-  mpsToken: string;
-  certFileName: string;
-  certFileContent: string;
-  certFilePassword: string;
-  domainName: string;
-}
-
 export interface OAuthSettings {
   ClientID: string;
   ClientSecret?: string;
@@ -110,7 +98,6 @@ export interface Settings {
   InternalAuthSettings: { RequiredPasswordLength: number };
   LDAPSettings: LDAPSettings;
   OAuthSettings: OAuthSettings;
-  openAMTConfiguration: OpenAMTConfiguration;
   FeatureFlagSettings: { [key: Feature]: boolean };
   SnapshotInterval: string;
   TemplatesURL: string;
@@ -138,6 +125,7 @@ export interface Settings {
   AllowStackManagementForRegularUsers: boolean;
   AllowDeviceMappingForRegularUsers: boolean;
   AllowContainerCapabilitiesForRegularUsers: boolean;
+  ForceSecureCookies: boolean;
   GlobalDeploymentOptions?: GlobalDeploymentOptions;
   Edge: {
     PingInterval: number;
@@ -189,8 +177,6 @@ export interface PublicSettingsResponse {
   KubeconfigExpiry: string;
   /** Whether team sync is enabled */
   TeamSync: boolean;
-  /** Whether AMT is enabled */
-  IsAMTEnabled: boolean;
   /** Whether to hide default registry (only on BE) */
   DefaultRegistry?: {
     Hide: boolean;

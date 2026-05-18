@@ -1,1 +1,0 @@
-export { SettingsOpenAMT } from './SettingsOpenAMT';

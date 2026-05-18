@@ -4,17 +4,22 @@ const (
 	// AlertRuleIDLabel is the Prometheus label key used to correlate alerts
 	// with their Portainer alert rule ID across agent and server packages.
 	AlertRuleIDLabel = "alert_rule_id"
+	// AlertTierLabel marks generated evaluator rules that belong to a parent tiered rule.
+	AlertTierLabel = "portainer_alert_tier"
 
-	ClusterCPUUsageCoresMetric           = "portainer_edge_agent_cluster_cpu_usage_cores"
-	ClusterCPUCapacityCoresMetric        = "portainer_edge_agent_cluster_cpu_capacity_cores"
-	ClusterMemoryWorkingSetBytesMetric   = "portainer_edge_agent_cluster_memory_working_set_bytes"
-	ClusterMemoryCapacityBytesMetric     = "portainer_edge_agent_cluster_memory_capacity_bytes"
-	ClusterFilesystemUsedBytesMetric     = "portainer_edge_agent_cluster_filesystem_used_bytes"
-	ClusterFilesystemCapacityBytesMetric = "portainer_edge_agent_cluster_filesystem_capacity_bytes"
-	ClusterNetworkReceiveBytesMetric     = "portainer_edge_agent_cluster_network_receive_bytes_total"
-	ClusterNetworkTransmitBytesMetric    = "portainer_edge_agent_cluster_network_transmit_bytes_total"
-	ClusterNodeReadyMetric               = "portainer_edge_agent_node_ready"
-	ClusterNodeUnschedulableMetric       = "portainer_edge_agent_node_unschedulable"
+	ClusterCPUUsageCoresMetric                 = "portainer_edge_agent_cluster_cpu_usage_cores"
+	ClusterCPUCapacityCoresMetric              = "portainer_edge_agent_cluster_cpu_capacity_cores"
+	ClusterMemoryWorkingSetBytesMetric         = "portainer_edge_agent_cluster_memory_working_set_bytes"
+	ClusterMemoryCapacityBytesMetric           = "portainer_edge_agent_cluster_memory_capacity_bytes"
+	ClusterFilesystemUsedBytesMetric           = "portainer_edge_agent_cluster_filesystem_used_bytes"
+	ClusterFilesystemCapacityBytesMetric       = "portainer_edge_agent_cluster_filesystem_capacity_bytes"
+	ClusterNetworkReceiveBytesMetric           = "portainer_edge_agent_cluster_network_receive_bytes_total"
+	ClusterNetworkTransmitBytesMetric          = "portainer_edge_agent_cluster_network_transmit_bytes_total"
+	ClusterNodeReadyMetric                     = "portainer_edge_agent_node_ready"
+	ClusterNodeUnschedulableMetric             = "portainer_edge_agent_node_unschedulable"
+	ClusterEtcdHealthyMetric                   = "portainer_edge_agent_etcd_healthy"
+	ClusterEtcdHealthValidMetric               = "portainer_edge_agent_etcd_health_valid"
+	ClusterAPIServerTLSCertExpirySecondsMetric = "portainer_edge_agent_apiserver_tls_cert_expiry_seconds"
 )
 
 // EdgeAlertBatch is the generic envelope pushed by edge agents.
@@ -99,5 +104,6 @@ type EdgeAlertRule struct {
 	Severity           string            `json:"severity"`
 	PromqlExpr         string            `json:"promql_expr"`
 	ForDurationMinutes int               `json:"for_duration_minutes,omitempty"`
+	Labels             map[string]string `json:"labels,omitempty"`
 	Annotations        map[string]string `json:"annotations,omitempty"`
 }

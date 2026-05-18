@@ -15,11 +15,10 @@ export function useSecretsLinkedToDefaultSA(namespace: string) {
     namespace: string
   ) {
     return registries
-      .filter(
-        (registry) =>
-          registry.RegistryAccesses?.[environmentId]?.Namespaces?.includes(
-            namespace
-          )
+      .filter((registry) =>
+        registry.RegistryAccesses?.[environmentId]?.Namespaces?.includes(
+          namespace
+        )
       )
       .map((registry) => `registry-${registry.Id}`);
   }

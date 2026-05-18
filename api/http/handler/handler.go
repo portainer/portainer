@@ -18,7 +18,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/gitops"
 	"github.com/portainer/portainer/api/http/handler/helm"
-	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
@@ -65,7 +64,6 @@ type Handler struct {
 	RoleHandler            *roles.Handler
 	SettingsHandler        *settings.Handler
 	SSLHandler             *ssl.Handler
-	OpenAMTHandler         *openamt.Handler
 	StackHandler           *stacks.Handler
 	StorybookHandler       *storybook.Handler
 	SystemHandler          *system.Handler
@@ -81,8 +79,9 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.41.0
+// @version 2.41.1
 // @description.markdown api-description.md
+// @x-tagGroups [{"name":"Access Control","tags":["auth","roles","team_memberships","teams","users"]},{"name":"Administration","tags":["backup","ldap","motd","settings","status","system","ssl","upload"]},{"name":"Docker","tags":["templates","custom_templates","docker","registries","resource_controls","stacks","webhooks","websocket"]},{"name":"Edge Compute","tags":["edge_groups","edge_jobs","edge","edge_stacks"]},{"name":"Environment Management","tags":["endpoint_groups","endpoints","tags"]},{"name":"GitOps","tags":["gitops"]},{"name":"Kubernetes","tags":["helm","kubernetes"]}]
 // @termsOfService
 
 // @contact.email info@portainer.io
@@ -104,70 +103,100 @@ type Handler struct {
 
 // @tag.name auth
 // @tag.description Authenticate against Portainer HTTP API
+// @tag.x-displayName Authentication
 // @tag.name backup
 // @tag.description Manage backups
+// @tag.x-displayName Backup
 // @tag.name custom_templates
 // @tag.description Manage Custom Templates
+// @tag.x-displayName Custom templates
 // @tag.name docker
 // @tag.description Manage Docker resources
+// @tag.x-displayName Docker resources
 // @tag.name edge
-// @tag.description Manage Edge related environment(endpoint) settings
+// @tag.description Manage Edge related settings
+// @tag.x-displayName Edge settings
 // @tag.name edge_groups
 // @tag.description Manage Edge Groups
+// @tag.x-displayName Edge groups
 // @tag.name edge_jobs
 // @tag.description Manage Edge Jobs
+// @tag.x-displayName Edge jobs
 // @tag.name edge_stacks
 // @tag.description Manage Edge Stacks
+// @tag.x-displayName Edge stacks
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
+// @tag.x-displayName Edge templates
 // @tag.name endpoint_groups
-// @tag.description Manage environment(endpoint) groups
+// @tag.description Manage environment groups
+// @tag.x-displayName Environment groups
 // @tag.name endpoints
-// @tag.description Manage Docker environments(endpoints)
+// @tag.description Manage environments
+// @tag.x-displayName Environments
 // @tag.name gitops
 // @tag.description Operate git repository
+// @tag.x-displayName GitOps
 // @tag.name helm
 // @tag.description Manage Helm charts
-// @tag.name intel
-// @tag.description Manage Intel AMT settings
+// @tag.x-displayName Helm charts
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
+// @tag.x-displayName Kubernetes
 // @tag.name ldap
 // @tag.description Manage LDAP settings
+// @tag.x-displayName LDAP
 // @tag.name motd
 // @tag.description Fetch the message of the day
+// @tag.x-displayName Message of the day
 // @tag.name registries
 // @tag.description Manage Docker registries
+// @tag.x-displayName Registries
 // @tag.name resource_controls
 // @tag.description Manage access control on Docker resources
+// @tag.x-displayName Resource controls
 // @tag.name roles
 // @tag.description Manage roles
+// @tag.x-displayName Roles
 // @tag.name settings
 // @tag.description Manage Portainer settings
+// @tag.x-displayName Portainer settings
 // @tag.name ssl
 // @tag.description Manage ssl settings
+// @tag.x-displayName SSL
 // @tag.name stacks
 // @tag.description Manage stacks
+// @tag.x-displayName Stacks
 // @tag.name status
 // @tag.description Information about the Portainer instance
+// @tag.x-displayName Portainer status
 // @tag.name system
 // @tag.description Manage Portainer system
+// @tag.x-displayName Portainer system
 // @tag.name tags
 // @tag.description Manage tags
+// @tag.x-displayName Tags
 // @tag.name team_memberships
 // @tag.description Manage team memberships
+// @tag.x-displayName Team memberships
 // @tag.name teams
 // @tag.description Manage teams
+// @tag.x-displayName Teams
 // @tag.name templates
 // @tag.description Manage App Templates
+// @tag.x-displayName App templates
 // @tag.name upload
 // @tag.description Upload files
+// @tag.x-displayName Upload files
 // @tag.name users
 // @tag.description Manage users
+// @tag.x-displayName Users
 // @tag.name webhooks
 // @tag.description Manage webhooks
+// @tag.x-displayName Webhooks
 // @tag.name websocket
 // @tag.description Create exec sessions using websockets
+// @tag.x-displayName Websocket
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -244,8 +273,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/ssl"):
 		http.StripPrefix("/api", h.SSLHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/open_amt"):
-		http.StripPrefix("/api", h.OpenAMTHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/teams"):
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):

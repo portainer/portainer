@@ -32,10 +32,6 @@ func CreateKubernetesStackDeploymentConfig(stack *portainer.Stack, kubeDeployer 
 	}
 }
 
-func (config *KubernetesStackDeploymentConfig) GetUsername() string {
-	return config.user.Username
-}
-
 func (config *KubernetesStackDeploymentConfig) Deploy(ctx context.Context) error {
 	fileNames := stackutils.GetStackFilePaths(config.stack, false)
 

@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { Form, Formik } from 'formik';
 import { http, HttpResponse } from 'msw';
 
@@ -10,7 +10,7 @@ import { DeployMethod, GitFormModel } from './types';
 
 export default {
   component: GitForm,
-  title: 'Forms/GitForm',
+  title: 'Components/Forms/GitForm',
   parameters: {
     msw: {
       handlers: [

@@ -35,8 +35,7 @@ import { CronJobsExecutionsInnerDatatable } from './CronJobsExecutionsInnerDatat
 const storageKey = 'cronJobs';
 
 interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+  extends KubeTableSettings, FilteredColumnsTableSettings {}
 
 interface CronJobsExecutionsProps {
   item: Job[];

@@ -51,7 +51,6 @@ export function SidebarParent({
       <div
         className={clsx(
           'flex h-8 w-full items-center rounded-md transition-colors duration-200 ease-in-out hover:bg-graphite-500',
-          isSidebarOpen && 'pl-3',
           // only highlight the parent when the sidebar is closed/contracted and a child item is selected
           (!isSidebarOpen || !isExpanded) && anchorProps.className
         )}
@@ -59,7 +58,10 @@ export function SidebarParent({
       >
         <button
           type="button"
-          className="flex h-full flex-1 cursor-pointer items-center border-none bg-transparent"
+          className={clsx(
+            'flex h-full flex-1 cursor-pointer items-center border-none bg-transparent p-0',
+            isSidebarOpen && 'pl-3'
+          )}
           onClick={() => setIsExpanded(true)}
         >
           <Link

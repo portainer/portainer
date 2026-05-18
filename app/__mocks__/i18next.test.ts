@@ -19,7 +19,7 @@ describe('mockT', () => {
     ${'{{number}} of {{total}}'}        | ${{ number: 0, total: 999 }}                  | ${'0 of 999'}
     ${'There was an error:\n{{error}}'} | ${{ error: 'Failed' }}                        | ${'There was an error:\nFailed'}
     ${'Click:{{li}}{{li2}}{{li_3}}'}    | ${{ li: '', li2: 'https://', li_3: '!@#$%' }} | ${'Click:https://!@#$%'}
-    ${'{{happy}}😏y✔{{sad}}{{laugh}}'} | ${{ happy: '😃', sad: '😢', laugh: '🤣' }}    | ${'😃😏y✔😢🤣'}
+    ${'{{happy}}😏y✔{{sad}}{{laugh}}'}  | ${{ happy: '😃', sad: '😢', laugh: '🤣' }}    | ${'😃😏y✔😢🤣'}
   `(
     'should return correctly while handling arguments in different scenarios',
     ({ testText, args, expectedText }) => {

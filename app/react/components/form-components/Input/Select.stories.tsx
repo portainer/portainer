@@ -1,10 +1,10 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { Select } from './Select';
 
 export default {
-  title: 'Components/Form/Select',
+  title: 'Components/Forms/Select',
   args: {
     disabled: false,
   },

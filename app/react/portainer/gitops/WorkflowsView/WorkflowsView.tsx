@@ -108,6 +108,7 @@ export function WorkflowsView() {
           value={tableState.status}
           onChange={tableState.setStatus}
           radioGroupName="workflows-status"
+          isLoading={summaryQuery.isLoading}
         />
         <SortableList
           tableState={tableState}

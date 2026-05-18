@@ -39,7 +39,7 @@ var (
 	allRoles = []portainer.Role{roleAdmin, roleOperator, roleHelpdesk, roleReadOnly}
 )
 
-func TestComputeBaseRole_UserEndpointAccess(t *testing.T) {
+func TestResolveUserEndpointAccess_UserEndpointAccess(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -60,14 +60,14 @@ func TestComputeBaseRole_UserEndpointAccess(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
+	access := ResolveUserEndpointAccess(input)
 
-	is.NotNil(role)
-	is.Equal(roleOperator.ID, role.ID)
-	is.Equal("Operator", role.Name)
+	is.NotNil(access)
+	is.Equal(roleOperator.ID, access.Role.ID)
+	is.Equal("Operator", access.Role.Name)
 }
 
-func TestComputeBaseRole_UserGroupAccess(t *testing.T) {
+func TestResolveUserEndpointAccess_UserGroupAccess(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -94,14 +94,14 @@ func TestComputeBaseRole_UserGroupAccess(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
+	access := ResolveUserEndpointAccess(input)
 
-	is.NotNil(role)
-	is.Equal(roleHelpdesk.ID, role.ID)
-	is.Equal("Helpdesk", role.Name)
+	is.NotNil(access)
+	is.Equal(roleHelpdesk.ID, access.Role.ID)
+	is.Equal("Helpdesk", access.Role.Name)
 }
 
-func TestComputeBaseRole_TeamEndpointAccess(t *testing.T) {
+func TestResolveUserEndpointAccess_TeamEndpointAccess(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -126,13 +126,13 @@ func TestComputeBaseRole_TeamEndpointAccess(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
+	access := ResolveUserEndpointAccess(input)
 
-	is.NotNil(role)
-	is.Equal(roleReadOnly.ID, role.ID)
+	is.NotNil(access)
+	is.Equal(roleReadOnly.ID, access.Role.ID)
 }
 
-func TestComputeBaseRole_TeamGroupAccess(t *testing.T) {
+func TestResolveUserEndpointAccess_TeamGroupAccess(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -164,13 +164,13 @@ func TestComputeBaseRole_TeamGroupAccess(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
+	access := ResolveUserEndpointAccess(input)
 
-	is.NotNil(role)
-	is.Equal(roleOperator.ID, role.ID)
+	is.NotNil(access)
+	is.Equal(roleOperator.ID, access.Role.ID)
 }
 
-func TestComputeBaseRole_Precedence(t *testing.T) {
+func TestResolveUserEndpointAccess_Precedence(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -199,9 +199,9 @@ func TestComputeBaseRole_Precedence(t *testing.T) {
 			Roles:         allRoles,
 		}
 
-		role := ComputeBaseRole(input)
-		is.NotNil(role)
-		is.Equal(roleOperator.ID, role.ID, "Direct endpoint access should take precedence")
+		access := ResolveUserEndpointAccess(input)
+		is.NotNil(access)
+		is.Equal(roleOperator.ID, access.Role.ID, "Direct endpoint access should take precedence")
 	})
 
 	t.Run("User access takes precedence over team access", func(t *testing.T) {
@@ -227,9 +227,9 @@ func TestComputeBaseRole_Precedence(t *testing.T) {
 			Roles:           allRoles,
 		}
 
-		role := ComputeBaseRole(input)
-		is.NotNil(role)
-		is.Equal(roleHelpdesk.ID, role.ID, "User access should take precedence over team access")
+		access := ResolveUserEndpointAccess(input)
+		is.NotNil(access)
+		is.Equal(roleHelpdesk.ID, access.Role.ID, "User access should take precedence over team access")
 	})
 
 	t.Run("Team endpoint access takes precedence over team group access", func(t *testing.T) {
@@ -261,13 +261,13 @@ func TestComputeBaseRole_Precedence(t *testing.T) {
 			Roles:           allRoles,
 		}
 
-		role := ComputeBaseRole(input)
-		is.NotNil(role)
-		is.Equal(roleReadOnly.ID, role.ID, "Team endpoint access should take precedence over team group access")
+		access := ResolveUserEndpointAccess(input)
+		is.NotNil(access)
+		is.Equal(roleReadOnly.ID, access.Role.ID, "Team endpoint access should take precedence over team group access")
 	})
 }
 
-func TestComputeBaseRole_NoAccess(t *testing.T) {
+func TestResolveUserEndpointAccess_NoAccess(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -294,11 +294,11 @@ func TestComputeBaseRole_NoAccess(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
-	is.Nil(role)
+	access := ResolveUserEndpointAccess(input)
+	is.Nil(access)
 }
 
-func TestComputeBaseRole_MultipleTeams_HighestPriorityWins(t *testing.T) {
+func TestResolveUserEndpointAccess_MultipleTeams_HighestPriorityWins(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
@@ -326,10 +326,60 @@ func TestComputeBaseRole_MultipleTeams_HighestPriorityWins(t *testing.T) {
 		Roles:           allRoles,
 	}
 
-	role := ComputeBaseRole(input)
+	access := ResolveUserEndpointAccess(input)
 
-	is.NotNil(role)
-	is.Equal(roleReadOnly.ID, role.ID, "Highest priority role should be selected when user is in multiple teams")
+	is.NotNil(access)
+	is.Equal(roleReadOnly.ID, access.Role.ID, "Highest priority role should be selected when user is in multiple teams")
+}
+
+func TestResolveUserEndpointAccess_Source(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	user := &portainer.User{ID: 1}
+	memberships := []portainer.TeamMembership{{UserID: 1, TeamID: 100}}
+
+	t.Run("user-endpoint resolution flags neither group nor team", func(t *testing.T) {
+		access := ResolveUserEndpointAccess(ResolverInput{
+			User: user, Roles: allRoles,
+			Endpoint: &portainer.Endpoint{ID: 1, GroupID: 10, UserAccessPolicies: portainer.UserAccessPolicies{1: {RoleID: roleOperator.ID}}},
+		})
+		is.NotNil(access)
+		is.Equal(portainer.EndpointGroupID(0), access.Source.GroupID)
+		is.Equal(portainer.TeamID(0), access.Source.TeamID)
+	})
+
+	t.Run("user-group resolution flags the group", func(t *testing.T) {
+		access := ResolveUserEndpointAccess(ResolverInput{
+			User: user, Roles: allRoles,
+			Endpoint:      &portainer.Endpoint{ID: 1, GroupID: 10},
+			EndpointGroup: portainer.EndpointGroup{ID: 10, UserAccessPolicies: portainer.UserAccessPolicies{1: {RoleID: roleOperator.ID}}},
+		})
+		is.NotNil(access)
+		is.Equal(portainer.EndpointGroupID(10), access.Source.GroupID)
+		is.Equal(portainer.TeamID(0), access.Source.TeamID)
+	})
+
+	t.Run("team-endpoint resolution flags the team only", func(t *testing.T) {
+		access := ResolveUserEndpointAccess(ResolverInput{
+			User: user, Roles: allRoles, UserMemberships: memberships,
+			Endpoint: &portainer.Endpoint{ID: 1, GroupID: 10, TeamAccessPolicies: portainer.TeamAccessPolicies{100: {RoleID: roleOperator.ID}}},
+		})
+		is.NotNil(access)
+		is.Equal(portainer.EndpointGroupID(0), access.Source.GroupID)
+		is.Equal(portainer.TeamID(100), access.Source.TeamID)
+	})
+
+	t.Run("team-group resolution flags both group and team", func(t *testing.T) {
+		access := ResolveUserEndpointAccess(ResolverInput{
+			User: user, Roles: allRoles, UserMemberships: memberships,
+			Endpoint:      &portainer.Endpoint{ID: 1, GroupID: 10},
+			EndpointGroup: portainer.EndpointGroup{ID: 10, TeamAccessPolicies: portainer.TeamAccessPolicies{100: {RoleID: roleOperator.ID}}},
+		})
+		is.NotNil(access)
+		is.Equal(portainer.EndpointGroupID(10), access.Source.GroupID)
+		is.Equal(portainer.TeamID(100), access.Source.TeamID)
+	})
 }
 
 func TestResolveUserEndpointAccess(t *testing.T) {

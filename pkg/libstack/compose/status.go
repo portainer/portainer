@@ -93,7 +93,7 @@ func getServiceStatus(ctx context.Context, service service) (libstack.Status, st
 func getContainerLogsTail(ctx context.Context, service service) (string, error) {
 	var combinedOutput bytes.Buffer
 
-	if err := withCli(ctx, libstack.Options{ProjectName: service.Project}, func(ctx context.Context, cli *command.DockerCli) error {
+	if err := libstack.WithCli(ctx, libstack.DockerCliOptions{}, func(ctx context.Context, cli *command.DockerCli) error {
 		out, err := cli.Client().ContainerLogs(ctx, service.Name, container.LogsOptions{
 			ShowStdout: true,
 			ShowStderr: true,
@@ -144,25 +144,11 @@ func aggregateStatuses(ctx context.Context, services []service) (libstack.Status
 		Str("errorMessage", errorMessage).
 		Msg("check_status")
 
-	switch {
-	case errorMessage != "":
+	if errorMessage != "" {
 		return libstack.StatusError, errorMessage
-	case statusCounts[libstack.StatusStarting] > 0:
-		return libstack.StatusStarting, ""
-	case statusCounts[libstack.StatusRemoving] > 0:
-		return libstack.StatusRemoving, ""
-	case statusCounts[libstack.StatusCompleted] == servicesCount:
-		return libstack.StatusCompleted, ""
-	case statusCounts[libstack.StatusRunning]+statusCounts[libstack.StatusCompleted] == servicesCount:
-		return libstack.StatusRunning, ""
-	case statusCounts[libstack.StatusStopped] == servicesCount:
-		return libstack.StatusStopped, ""
-	case statusCounts[libstack.StatusRemoved] == servicesCount:
-		return libstack.StatusRemoved, ""
-	default:
-		return libstack.StatusUnknown, ""
 	}
 
+	return libstack.AggregateStatusCounts(statusCounts, servicesCount), ""
 }
 
 func (c *ComposeDeployer) WaitForStatus(ctx context.Context, name string, status libstack.Status) libstack.WaitResult {

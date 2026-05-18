@@ -13,7 +13,8 @@ export interface SettableQuickActionsTableSettings<TAction> {
 }
 
 export interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     SettableColumnsTableSettings,
     SettableQuickActionsTableSettings<QuickAction>,
     RefreshableTableSettings,

@@ -11,10 +11,11 @@ import {
 import { useTableState, TableState } from '@@/datatables/useTableState';
 
 interface SortableListSettings
-  extends BasicTableSettings,
-    BackendPaginationTableSettings {
+  extends BasicTableSettings, BackendPaginationTableSettings {
+  groupBy: string | null;
+  setGroupBy: (group: string | null) => void;
   groupFilter: string | null;
-  setGroupFilter: (filter: string | null) => void;
+  setGroupFilter: (value: { group: string; groupValue: string | null }) => void;
 }
 
 export type SortableListState = TableState<SortableListSettings>;
@@ -24,9 +25,26 @@ function sortableListExtras(
 ): Partial<SortableListSettings> {
   return {
     ...backendPaginationSettings<SortableListSettings>(set),
+    groupBy: null,
+    setGroupBy: (group) => set((s) => ({ ...s, groupBy: group })),
     groupFilter: null,
-    setGroupFilter: (filter: string | null) =>
-      set((s) => ({ ...s, groupFilter: filter, page: 0 })),
+    setGroupFilter: ({
+      group,
+      groupValue,
+    }: {
+      group: string;
+      groupValue: string | null;
+    }) =>
+      set((s) => ({
+        ...s,
+        sortBy: {
+          id: group,
+          desc: s.sortBy?.id === group ? !s.sortBy.desc : false,
+        },
+        groupBy: group,
+        groupFilter: groupValue,
+        page: 0,
+      })),
   };
 }
 

@@ -3,10 +3,10 @@ package libprometheus_test
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/portainer/portainer/api/filesystem"
 	libprom "github.com/portainer/portainer/pkg/libprometheus"
 	pkgmetrics "github.com/portainer/portainer/pkg/metrics"
 	prometheusreg "github.com/prometheus/client_golang/prometheus"
@@ -64,7 +64,7 @@ func TestReloadRules(t *testing.T) {
 
 	t.Run("valid rule file loads successfully", func(t *testing.T) {
 		dir := t.TempDir()
-		alertsFile := filepath.Join(dir, "alerts.yaml")
+		alertsFile := filesystem.JoinPaths(dir, "alerts.yaml")
 
 		rulesYAML := `groups:
   - name: test-group
@@ -90,30 +90,38 @@ func TestReloadRules(t *testing.T) {
 }
 
 func TestExtractAlertStates(t *testing.T) {
-	reg := prometheusreg.NewRegistry()
-	db, err := libprom.NewInMemoryTSDB(reg)
-	require.NoError(t, err)
-	defer func() { require.NoError(t, db.Close()) }()
+	newTestRuleManager := func(t *testing.T) *rules.Manager {
+		t.Helper()
 
-	engine := libprom.NewEngine()
+		reg := prometheusreg.NewRegistry()
+		db, err := libprom.NewInMemoryTSDB(reg)
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			require.NoError(t, db.Close())
+		})
 
-	mgr := libprom.NewRuleManager(libprom.RuleManagerConfig{
-		Engine:     engine,
-		Queryable:  db,
-		Appendable: db,
-		NotifyFunc: func(_ context.Context, _ string, _ ...*rules.Alert) {},
-		Context:    context.Background(),
-		Registerer: reg,
-	})
+		engine := libprom.NewEngine()
+
+		return libprom.NewRuleManager(libprom.RuleManagerConfig{
+			Engine:     engine,
+			Queryable:  db,
+			Appendable: db,
+			NotifyFunc: func(_ context.Context, _ string, _ ...*rules.Alert) {},
+			Context:    context.Background(),
+			Registerer: reg,
+		})
+	}
 
 	t.Run("no rules returns nil", func(t *testing.T) {
+		mgr := newTestRuleManager(t)
 		states := libprom.ExtractAlertStates(mgr)
 		assert.Nil(t, states)
 	})
 
 	t.Run("loaded rules return states", func(t *testing.T) {
+		mgr := newTestRuleManager(t)
 		dir := t.TempDir()
-		alertsFile := filepath.Join(dir, "alerts.yaml")
+		alertsFile := filesystem.JoinPaths(dir, "alerts.yaml")
 
 		rulesYAML := `groups:
   - name: test-group
@@ -132,5 +140,61 @@ func TestExtractAlertStates(t *testing.T) {
 		require.Len(t, states, 1)
 		assert.Equal(t, 7, states[0].RuleID)
 		assert.Equal(t, pkgmetrics.AlertRuleStateOK, states[0].State)
+	})
+
+	t.Run("duplicate alert_rule_id values are aggregated", func(t *testing.T) {
+		mgr := newTestRuleManager(t)
+		dir := t.TempDir()
+		alertsFile := filesystem.JoinPaths(dir, "alerts.yaml")
+
+		rulesYAML := `groups:
+  - name: test-group
+    rules:
+      - alert: CpuWarning
+        expr: up == 0
+        labels:
+          alert_rule_id: "42"
+          severity: warning
+      - alert: CpuCritical
+        expr: up >= 0
+        labels:
+          alert_rule_id: "42"
+          severity: critical
+`
+		require.NoError(t, os.WriteFile(alertsFile, []byte(rulesYAML), 0o644))
+		require.NoError(t, libprom.ReloadRules(mgr, 15*time.Second, alertsFile))
+
+		states := libprom.ExtractAlertStates(mgr)
+		require.Len(t, states, 1)
+		assert.Equal(t, 42, states[0].RuleID)
+		assert.Equal(t, pkgmetrics.AlertRuleStateOK, states[0].State)
+	})
+
+	t.Run("states are returned in stable rule ID order", func(t *testing.T) {
+		mgr := newTestRuleManager(t)
+		dir := t.TempDir()
+		alertsFile := filesystem.JoinPaths(dir, "alerts.yaml")
+
+		rulesYAML := `groups:
+  - name: test-group
+    rules:
+      - alert: RuleTen
+        expr: up == 0
+        labels:
+          alert_rule_id: "10"
+          severity: warning
+      - alert: RuleThree
+        expr: up >= 0
+        labels:
+          alert_rule_id: "3"
+          severity: critical
+`
+		require.NoError(t, os.WriteFile(alertsFile, []byte(rulesYAML), 0o644))
+		require.NoError(t, libprom.ReloadRules(mgr, 15*time.Second, alertsFile))
+
+		states := libprom.ExtractAlertStates(mgr)
+		require.Len(t, states, 2)
+		assert.Equal(t, 3, states[0].RuleID)
+		assert.Equal(t, 10, states[1].RuleID)
 	})
 }

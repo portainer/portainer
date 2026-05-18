@@ -47,8 +47,8 @@ export type DeepPick<T extends object, P extends string | string[]> = Prettify<
   P extends string
     ? DeepPickFromString<DeepRequired<T, P>, P>
     : P extends string[]
-    ? DeepPickFromArray<DeepRequired<T, P>, P>
-    : never
+      ? DeepPickFromArray<DeepRequired<T, P>, P>
+      : never
 >;
 
 /**
@@ -64,10 +64,8 @@ type DeepPickFromString<T extends object, P extends string> = DeepPickFromArray<
  * Transform union of path-arrays to tuple of path-arrays
  * from `['a', 'b', 'c'] | ['c' | 'd' | 'e']` to `[['a', 'b', 'c'], ['c' | 'd' | 'e']]`
  */
-type DeepPickFromArray<
-  T extends object,
-  P extends string[],
-> = ToTuple<P> extends string[][] ? DeepPickRec<T, ToTuple<P>> : never;
+type DeepPickFromArray<T extends object, P extends string[]> =
+  ToTuple<P> extends string[][] ? DeepPickRec<T, ToTuple<P>> : never;
 
 // Recursively pick each path-array of tuple and union the resulting types
 type DeepPickRec<T extends object, P extends string[][]> = P[0] extends string[]

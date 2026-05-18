@@ -31,8 +31,7 @@ import { useDeleteRolesMutation } from './queries/useDeleteRolesMutation';
 
 const storageKey = 'roles';
 interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+  extends KubeTableSettings, FilteredColumnsTableSettings {}
 
 export function RolesDatatable() {
   const environmentId = useEnvironmentId();

@@ -1,4 +1,4 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { NavTabs, type Option } from './NavTabs';

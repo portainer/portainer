@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import type { Meta } from '@storybook/react';
+import type { Meta } from '@storybook/react-webpack5';
 import { User } from 'lucide-react';
 
 import { Widget } from './Widget';

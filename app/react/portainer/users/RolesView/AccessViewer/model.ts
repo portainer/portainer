@@ -1,53 +1,31 @@
-import {
-  Environment,
-  EnvironmentId,
-} from '@/react/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 
 import { RbacRole } from '../types';
 import { Team, TeamId } from '../../teams/types';
 
-export class AccessViewerPolicyModel {
-  EndpointId: EnvironmentId;
+/**
+ * AccessLocation describes which part of the access model granted the user
+ * their effective role on an environment. Wire values match the CE backend
+ * `AccessLocation` type — display labels are derived in the UI layer.
+ */
+export const AccessLocation = {
+  Environment: 'environment',
+  EnvironmentGroup: 'environmentGroup',
+} as const;
 
-  EndpointName: string;
+export type AccessLocation =
+  (typeof AccessLocation)[keyof typeof AccessLocation];
 
-  RoleId: RbacRole['Id'];
-
-  RoleName: RbacRole['Name'];
-
-  RolePriority: RbacRole['Priority'];
-
-  GroupId?: EnvironmentGroup['Id'];
-
-  GroupName?: EnvironmentGroup['Name'];
-
-  TeamId?: TeamId;
-
-  TeamName?: Team['Name'];
-
-  AccessLocation: string;
-
-  constructor(
-    policy: { RoleId: RbacRole['Id'] },
-    endpoint: Environment,
-    roles: Record<RbacRole['Id'], RbacRole>,
-    group?: EnvironmentGroup,
-    team?: Team
-  ) {
-    this.EndpointId = endpoint.Id;
-    this.EndpointName = endpoint.Name;
-    this.RoleId = policy.RoleId;
-    this.RoleName = roles[policy.RoleId].Name;
-    this.RolePriority = roles[policy.RoleId].Priority;
-    if (group) {
-      this.GroupId = group.Id;
-      this.GroupName = group.Name;
-    }
-    if (team) {
-      this.TeamId = team.Id;
-      this.TeamName = team.Name;
-    }
-    this.AccessLocation = group ? 'environment group' : 'environment';
-  }
+export interface AccessViewerPolicyModel {
+  endpointId: EnvironmentId;
+  endpointName: string;
+  roleId: RbacRole['Id'];
+  roleName: RbacRole['Name'];
+  rolePriority: RbacRole['Priority'];
+  groupId?: EnvironmentGroup['Id'];
+  groupName?: EnvironmentGroup['Name'];
+  teamId?: TeamId;
+  teamName?: Team['Name'];
+  accessLocation: AccessLocation;
 }

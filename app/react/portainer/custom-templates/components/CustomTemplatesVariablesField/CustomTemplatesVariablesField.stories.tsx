@@ -8,7 +8,7 @@ import {
 } from './CustomTemplatesVariablesField';
 
 export default {
-  title: 'Custom Templates/Variables Field',
+  title: 'Components/Custom Templates/Variables Field',
   component: CustomTemplatesVariablesField,
 };
 

@@ -226,17 +226,6 @@ angular
         },
       };
 
-      var endpointKVM = {
-        name: 'portainer.endpoints.endpoint.kvm',
-        url: '/kvm?deviceId&deviceName',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/kvm/endpointKVM.html',
-            controller: 'EndpointKVMController',
-          },
-        },
-      };
-
       var groups = {
         name: 'portainer.groups',
         url: '/groups',
@@ -289,7 +278,12 @@ angular
 
       var home = {
         name: 'portainer.home',
-        url: '/home?redirect&environmentId&environmentName&route&groupBy&filter',
+        url: '/home?redirect&environmentId&environmentName&route&groupBy&groupFilter&search&order',
+        params: {
+          ...paginationParams('Id'),
+          groupBy: filterParam('Id'),
+          groupFilter: filterParam(),
+        },
         views: {
           'content@': {
             component: 'homeView',
@@ -300,18 +294,41 @@ angular
         },
       };
 
+      var gitopsBase = {
+        name: 'portainer.gitops',
+        url: '/gitops',
+        abstract: true,
+      };
+
       var workflows = {
-        name: 'portainer.workflows',
-        url: '/workflows?search&sort&order&page&pageSize&status&type&platform',
+        name: 'portainer.gitops.workflows',
+        url: '/workflows?search&sort&order&page&pageSize&status&type&platform&groupBy&groupFilter',
         params: {
           ...paginationParams('name'),
           status: filterParam(),
           type: filterParam(),
           platform: filterParam(),
+          groupBy: filterParam(),
+          groupFilter: filterParam(),
         },
         views: {
           'content@': {
             component: 'workflowsView',
+          },
+        },
+      };
+
+      var gitopsSources = {
+        name: 'portainer.gitops.sources',
+        url: '/sources?search&sort&order&page&pageSize&status&type',
+        params: {
+          ...paginationParams('name'),
+          status: filterParam(),
+          type: filterParam(),
+        },
+        views: {
+          'content@': {
+            component: 'sourcesListView',
           },
         },
       };
@@ -430,14 +447,15 @@ angular
       $stateRegistryProvider.register(endpoints);
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(endpointAccess);
-      $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
+      $stateRegistryProvider.register(gitopsBase);
       $stateRegistryProvider.register(workflows);
+      $stateRegistryProvider.register(gitopsSources);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(settings);

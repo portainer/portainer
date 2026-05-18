@@ -29,8 +29,7 @@ type Color =
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props<TasProps = unknown>
-  extends AriaAttributes,
-    AutomationTestingProps {
+  extends AriaAttributes, AutomationTestingProps {
   icon?: ReactNode | ComponentType<unknown>;
 
   color?: Color;

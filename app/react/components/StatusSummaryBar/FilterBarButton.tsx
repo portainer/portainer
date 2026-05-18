@@ -19,6 +19,7 @@ interface Props extends AutomationTestingProps {
   onClick: () => void;
   name: string;
   color?: Color;
+  isLoading?: boolean;
 }
 
 export function FilterBarButton({
@@ -28,9 +29,10 @@ export function FilterBarButton({
   onClick,
   name,
   color,
+  isLoading = false,
   'data-cy': dataCy,
 }: Props) {
-  if (count === 0) {
+  if (!isLoading && count === 0) {
     return null;
   }
 
@@ -79,7 +81,11 @@ export function FilterBarButton({
       )}
       {!colors && (
         <span className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold">{count}</span>
+          {isLoading ? (
+            <span className="h-8 w-8 animate-pulse rounded bg-gray-3 th-dark:bg-gray-8" />
+          ) : (
+            <span className="text-2xl font-bold">{count}</span>
+          )}
           <span className="text-base uppercase tracking-wide text-[var(--text-muted-color)]">
             {label}
           </span>

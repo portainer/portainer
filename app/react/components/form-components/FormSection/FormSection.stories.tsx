@@ -1,10 +1,10 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 
 import { FormSection } from './FormSection';
 
 export default {
   component: FormSection,
-  title: 'Components/Form/FormSection',
+  title: 'Components/Forms/FormSection',
 } as Meta;
 
 interface Args {

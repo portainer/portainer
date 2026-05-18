@@ -41,8 +41,8 @@ export function ValuesDetails({
           data-cy="values-details-code-editor"
           value={
             isUserSupplied
-              ? values?.userSuppliedValues ?? ''
-              : values?.computedValues ?? ''
+              ? (values?.userSuppliedValues ?? '')
+              : (values?.computedValues ?? '')
           }
           readonly
           fileName={`Revision #${selectedRevisionNumber}`}
@@ -57,13 +57,13 @@ export function ValuesDetails({
           selectedRevisionNumber={selectedRevisionNumber}
           newText={
             isUserSupplied
-              ? values?.userSuppliedValues ?? ''
-              : values?.computedValues ?? ''
+              ? (values?.userSuppliedValues ?? '')
+              : (values?.computedValues ?? '')
           }
           originalText={
             isUserSupplied
-              ? compareValues?.userSuppliedValues ?? ''
-              : compareValues?.computedValues ?? ''
+              ? (compareValues?.userSuppliedValues ?? '')
+              : (compareValues?.computedValues ?? '')
           }
           id="values-details-diff-viewer"
           data-cy="values-details-diff-viewer"

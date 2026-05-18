@@ -13,13 +13,7 @@ type Props = {
   stack?: Stack;
 };
 
-export function EditButtons({
-  isEdge,
-  stackId,
-  externalApp,
-
-  stack,
-}: Props) {
+export function EditButtons({ isEdge, stackId, externalApp, stack }: Props) {
   if (isEdge) {
     return (
       <Authorized authorizations="K8sApplicationDetailsW">

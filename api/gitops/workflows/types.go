@@ -57,10 +57,11 @@ func ParsePlatform(s string) (DeploymentPlatform, error) {
 }
 
 type Target struct {
-	EndpointID   portainer.EndpointID             `json:"endpointId,omitempty"`
-	Namespace    string                           `json:"namespace,omitempty"`
-	EdgeGroupIDs []portainer.EdgeGroupID          `json:"edgeGroupIds,omitempty"`
-	GroupStatus  map[portainer.EdgeGroupID]Status `json:"groupStatus,omitempty"`
+	EndpointID          portainer.EndpointID             `json:"endpointId,omitempty"`
+	Namespace           string                           `json:"namespace,omitempty"`
+	EdgeGroupIDs        []portainer.EdgeGroupID          `json:"edgeGroupIds,omitempty"`
+	GroupStatus         map[portainer.EdgeGroupID]Status `json:"groupStatus,omitempty"`
+	ResolvedEndpointIDs []portainer.EndpointID           `json:"resolvedEndpointIds,omitempty"`
 }
 
 // WorkflowPhaseStatus represents the status of one phase (source, artifact, or target) of a workflow.

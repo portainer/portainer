@@ -17,8 +17,7 @@ import { DecoratedTask } from './types';
 const storageKey = 'docker-service-tasks';
 
 interface TableSettings
-  extends BasicTableSettings,
-    FilteredColumnsTableSettings {}
+  extends BasicTableSettings, FilteredColumnsTableSettings {}
 
 export function TasksDatatable({
   dataset,

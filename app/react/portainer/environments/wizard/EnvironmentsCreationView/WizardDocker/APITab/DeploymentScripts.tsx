@@ -9,12 +9,12 @@ import { TextTip } from '@@/Tip/TextTip';
 const deployments = [
   {
     id: 'linux',
-    label: 'Linux',
+    label: 'Linux & Windows WSL',
     command: `-v "/var/run/docker.sock:/var/run/docker.sock"`,
   },
   {
     id: 'win',
-    label: 'Windows',
+    label: 'Windows WCS',
     command: '-v \\.\\pipe\\docker_engine:\\.\\pipe\\docker_engine',
   },
 ];

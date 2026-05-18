@@ -94,6 +94,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
+	if payload.TLS != nil && *payload.TLS && endpointutils.IsEdgeEndpoint(endpoint) {
+		return httperror.BadRequest("TLS is not supported for Edge Agent environments", nil)
+	}
+
 	updateEndpointProxy := shouldReloadTLSConfiguration(endpoint, &payload)
 
 	if payload.Name != nil {
@@ -247,7 +251,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			}
 		}
 
-		if !endpointutils.IsLocalEndpoint(endpoint) && endpointutils.IsKubernetesEndpoint(endpoint) {
+		isStandardKubeAgent := !endpointutils.IsLocalEndpoint(endpoint) && endpointutils.IsKubernetesEndpoint(endpoint) && !endpointutils.IsEdgeEndpoint(endpoint)
+		if isStandardKubeAgent {
 			endpoint.TLSConfig.TLS = true
 			endpoint.TLSConfig.TLSSkipVerify = true
 		}

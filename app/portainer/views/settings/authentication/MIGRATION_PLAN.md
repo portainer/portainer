@@ -156,14 +156,14 @@ BE-6604 (Parent: Authentication Settings Migration)
 - [x] PR 3: [BE-12585](https://linear.app/portainer/issue/BE-12585) AutoUserProvisionToggle → shared component
 - **LDAP Shared Components** (Parallel - No Dependencies)
   - [x] PR 4: [BE-12586](https://linear.app/portainer/issue/BE-12586) LdapSettingsDnBuilder
-  - [ ] PR 5: [BE-12587](https://linear.app/portainer/issue/BE-12587) LdapSettingsGroupDnBuilder
+  - [x] PR 5: [BE-12587](https://linear.app/portainer/issue/BE-12587) LdapSettingsGroupDnBuilder
   - [x] PR 6: [BE-12588](https://linear.app/portainer/issue/BE-12588) Extend TLSFieldset with StartTLS
   - [x] PR 7: [BE-12589](https://linear.app/portainer/issue/BE-12589) LdapSettingsTestLogin
 - **LDAP Variants** (Blocked by PR 4-7)
   - [ ] PR 8: [BE-12590](https://linear.app/portainer/issue/BE-12590) LdapSettingsCustom
   - [ ] PR 9: [BE-12591](https://linear.app/portainer/issue/BE-12591) LdapSettingsOpenLdap
 - **EE Features**
-  - [ ] PR 10: [BE-12592](https://linear.app/portainer/issue/BE-12592) [EE] AdminGroupsMultiSelect
+  - [x] PR 10: [BE-12592](https://linear.app/portainer/issue/BE-12592) [EE] AdminGroupsMultiSelect
 - **Container** (Blocked by PR 3, 8, 9, 10)
   - [ ] PR 11: [BE-12593](https://linear.app/portainer/issue/BE-12593) LdapSettings container
 

@@ -3,7 +3,7 @@ ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
 TAG=local
 
-SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.2
+SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.6
 GOTESTSUM_VERSION?=v1.13.0
 GOTESTSUM=go run gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
 
@@ -108,7 +108,7 @@ dev-extension: build-server build-client ## Run the extension in development mod
 ##@ Docs
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
 docs-build: init-dist ## Build docs
-	go mod download -x
+	go mod download
 	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs

@@ -27,6 +27,7 @@ vi.mock('@@/Link', () => ({
     params?: { tab?: string };
   }) => (
     <a
+      {...props}
       data-cy={dataCy}
       href={`#?tab=${params?.tab ?? ''}`}
       onClick={() => {
@@ -34,7 +35,6 @@ vi.mock('@@/Link', () => ({
           mockParams = { ...mockParams, tab: params.tab };
         }
       }}
-      {...props}
     >
       {children}
     </a>

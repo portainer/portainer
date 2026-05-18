@@ -1,6 +1,5 @@
 import angular from 'angular';
 
-import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
 import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
 import { AuthenticationMethodSelector } from '@/react/portainer/settings/AuthenticationView/AuthenticationMethodSelector';
 import { r2a } from '@/react-tools/react2angular';
@@ -20,10 +19,11 @@ import { SessionLifetimeSelect } from '@/react/portainer/settings/Authentication
 import { LdapSecurityFieldset } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/LdapSecurityFieldset/LdapSecurityFieldset';
 import { DnBuilder } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/DnEntriesField/DnBuilder';
 import { GroupDnBuilder } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/DnEntriesField/GroupDnBuilder';
+import { withControlledInput } from '@/react-tools/withControlledInput';
+import { AdminGroupsSectionCE } from '@/react/portainer/settings/AuthenticationView/LDAPAuth/AdminGroupsSection';
 
 export const settingsModule = angular
   .module('portainer.app.react.components.settings', [])
-  .component('settingsOpenAmt', r2a(SettingsOpenAMT, ['onSubmit', 'settings']))
   .component(
     'sessionLifetimeSelect',
     r2a(SessionLifetimeSelect, ['value', 'onChange'])
@@ -109,4 +109,26 @@ export const settingsModule = angular
       'limitedFeatureId',
       'title',
     ])
+  )
+  .component(
+    'ldapCustomAdminGroup',
+    r2a(
+      withReactQuery(
+        withControlledInput(AdminGroupsSectionCE, {
+          searchSettings: 'onSearchSettingsChange',
+          autoPopulate: 'onAutoPopulateChange',
+          selectedAdminGroups: 'onSelectedAdminGroupsChange',
+        })
+      ),
+      [
+        'searchSettings',
+        'onSearchSettingsChange',
+        'autoPopulate',
+        'onAutoPopulateChange',
+        'selectedAdminGroups',
+        'onSelectedAdminGroupsChange',
+        'limitedFeatureId',
+        'isLimitedFeatureSelfContained',
+      ]
+    )
   ).name;

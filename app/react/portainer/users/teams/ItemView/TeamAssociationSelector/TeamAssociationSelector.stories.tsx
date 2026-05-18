@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useMemo, useState } from 'react';
 
 import { createMockUsers } from '@/react-tools/test-mocks';
@@ -11,7 +11,7 @@ import { TeamMembership, TeamRole } from '../../types';
 import { TeamAssociationSelector } from './TeamAssociationSelector';
 
 const meta: Meta = {
-  title: 'teams/TeamAssociationSelector',
+  title: 'Components/Teams/TeamAssociationSelector',
   component: TeamAssociationSelector,
 };
 

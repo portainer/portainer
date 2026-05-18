@@ -1,6 +1,8 @@
 package registryutils
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -14,22 +16,45 @@ func isRegTokenValid(registry *portainer.Registry) (valid bool) {
 	return registry.AccessToken != "" && registry.AccessTokenExpiry > time.Now().Unix()
 }
 
-func doGetRegToken(tx dataservices.DataStoreTx, registry *portainer.Registry) error {
+func fetchRegToken(registry *portainer.Registry) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	ecrClient := ecr.NewService(registry.Username, registry.Password, registry.Ecr.Region)
-	accessToken, expiryAt, err := ecrClient.GetAuthorizationToken()
+	accessToken, expiryAt, err := ecrClient.GetAuthorizationToken(ctx)
 	if err != nil {
 		return err
 	}
-
 	registry.AccessToken = *accessToken
 	registry.AccessTokenExpiry = expiryAt.Unix()
+
+	return nil
+}
+
+func doGetRegToken(tx dataservices.DataStoreTx, registry *portainer.Registry) error {
+	if err := fetchRegToken(registry); err != nil {
+		return err
+	}
 
 	return tx.Registry().Update(registry.ID, registry)
 }
 
-func parseRegToken(registry *portainer.Registry) (username, password string, err error) {
-	return ecr.NewService(registry.Username, registry.Password, registry.Ecr.Region).
-		ParseAuthorizationToken(registry.AccessToken)
+// ValidateRegistriesECRTokens refreshes and persists ECR tokens for all registries that need it.
+// Must be called with a real DataStoreTx (not a top-level DataStore) to avoid write-lock contention.
+func ValidateRegistriesECRTokens(tx dataservices.DataStoreTx, registries []portainer.Registry) error {
+	for i := range registries {
+		reg := &registries[i]
+		if reg.Type != portainer.EcrRegistry {
+			continue
+		}
+		if isRegTokenValid(reg) {
+			continue
+		}
+		if err := doGetRegToken(tx, reg); err != nil {
+			return fmt.Errorf("ECR registry %q credentials are invalid or expired. Error: %w", reg.Name, err)
+		}
+	}
+
+	return nil
 }
 
 func EnsureRegTokenValid(tx dataservices.DataStoreTx, registry *portainer.Registry) error {
@@ -57,7 +82,15 @@ func GetRegEffectiveCredential(registry *portainer.Registry) (username, password
 	password = registry.Password
 
 	if registry.Type == portainer.EcrRegistry {
-		username, password, err = parseRegToken(registry)
+		// Fallback token refresh in case the upstream caller did not pre-validate the token.
+		if !isRegTokenValid(registry) {
+			if err := fetchRegToken(registry); err != nil {
+				return "", "", fmt.Errorf("ECR registry %q credentials are invalid or expired. Error: %w", registry.Name, err)
+			}
+		}
+
+		username, password, err = ecr.NewService(registry.Username, registry.Password, registry.Ecr.Region).
+			ParseAuthorizationToken(registry.AccessToken)
 	}
 
 	return

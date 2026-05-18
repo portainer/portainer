@@ -11,6 +11,7 @@ export interface Props {
   color?: Color;
   className?: string;
   childrenWrapperClassName?: string;
+  /** Whether the tip should be displayed inline or as a block. Defaults to inline. */
   inline?: boolean;
   children: ReactNode;
 }

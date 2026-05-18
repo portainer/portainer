@@ -67,8 +67,7 @@ export function ApplicationSettingsForm() {
   function handleSubmit(values: FormValues) {
     updateSettingsMutation.mutate(
       {
-        Id: user.Id,
-        UseCache: values.useCache,
+        useCache: values.useCache,
       },
       {
         onSuccess() {

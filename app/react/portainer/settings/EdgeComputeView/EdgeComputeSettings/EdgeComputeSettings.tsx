@@ -1,16 +1,19 @@
 import { Formik, Form } from 'formik';
-import { Laptop } from 'lucide-react';
+import { Laptop, Network } from 'lucide-react';
+import { useState } from 'react';
 
 import { Settings } from '@/react/portainer/settings/types';
 import { PortainerUrlField } from '@/react/portainer/common/PortainerUrlField';
 import { PortainerTunnelAddrField } from '@/react/portainer/common/PortainerTunnelAddrField';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { ConnectivityTestModal } from '@/react/edge/components/ConnectivityTestModal/ConnectivityTestModal';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
+import { Button } from '@@/buttons';
 
 import { validationSchema } from './EdgeComputeSettings.validation';
 import { FormValues } from './types';
@@ -21,6 +24,8 @@ interface Props {
 }
 
 export function EdgeComputeSettings({ settings, onSubmit }: Props) {
+  const [isConnectivityModalOpen, setIsConnectivityModalOpen] = useState(false);
+
   if (!settings) {
     return null;
   }
@@ -92,6 +97,28 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                     />
 
                     <PortainerTunnelAddrField fieldName="Edge.TunnelServerAddress" />
+
+                    <div className="form-group">
+                      <div className="col-sm-12">
+                        <Button
+                          color="default"
+                          icon={Network}
+                          onClick={() => setIsConnectivityModalOpen(true)}
+                          data-cy="edge-compute-test-connectivity-button"
+                          className="!ml-0"
+                        >
+                          Test connectivity
+                        </Button>
+                      </div>
+                    </div>
+
+                    {isConnectivityModalOpen && (
+                      <ConnectivityTestModal
+                        portainerUrl={values.EdgePortainerUrl}
+                        tunnelServerAddr={values.Edge.TunnelServerAddress}
+                        onDismiss={() => setIsConnectivityModalOpen(false)}
+                      />
+                    )}
                   </>
                 )}
 

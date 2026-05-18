@@ -22,7 +22,6 @@ import { TagSelector } from '@@/TagSelector';
 import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { Tooltip } from '@@/Tip/Tooltip';
-import { Badge } from '@@/Badge';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
@@ -99,7 +98,6 @@ export const ngModule = angular
     r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage', 'size'])
   )
   .component('terminalTooltip', r2a(TerminalTooltip, []))
-  .component('badge', r2a(Badge, ['type', 'className', 'data-cy']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
   .component(

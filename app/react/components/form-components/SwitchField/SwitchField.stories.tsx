@@ -1,10 +1,10 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { SwitchField } from './SwitchField';
 
 export default {
-  title: 'Components/Form/SwitchField',
+  title: 'Components/Forms/SwitchField',
 } as Meta;
 
 export function Example() {

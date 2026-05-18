@@ -11,6 +11,7 @@ angular.module('portainer.docker').component('hostOverview', {
     browseUrl: '@',
     hostFeaturesEnabled: '<',
     isAdmin: '<',
+    endpointId: '<',
   },
   transclude: true,
 });

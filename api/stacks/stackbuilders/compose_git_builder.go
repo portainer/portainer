@@ -33,14 +33,14 @@ func CreateComposeStackGitBuilder(securityContext *security.RestrictedRequestCon
 	}
 }
 
-func (b *ComposeStackGitBuilder) prepare(ctx context.Context, payload *StackPayload) error {
+func (b *ComposeStackGitBuilder) prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.Name = payload.Name
 	b.stack.Type = portainer.DockerComposeStack
 	b.stack.EntryPoint = payload.ComposeFile
 	b.stack.FromAppTemplate = payload.FromAppTemplate
 	b.stack.Env = payload.Env
 
-	return b.GitMethodStackBuilder.prepare(ctx, payload)
+	return b.GitMethodStackBuilder.prepare(ctx, payload, userID)
 }
 
 func (b *ComposeStackGitBuilder) deploy(ctx context.Context, endpoint *portainer.Endpoint) error {

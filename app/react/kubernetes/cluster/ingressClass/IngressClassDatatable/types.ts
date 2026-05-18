@@ -4,8 +4,7 @@ import {
 } from '@/react/components/datatables/types';
 
 export interface TableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings {}
+  extends SortableTableSettings, PaginationTableSettings {}
 
 export type SupportedIngControllerTypes =
   | 'nginx'
@@ -25,5 +24,4 @@ export interface IngressControllerClassMap {
 
 // Record<string, unknown> fixes type errors when using the type with a react datatable
 export interface IngressControllerClassMapRowData
-  extends Record<string, unknown>,
-    IngressControllerClassMap {}
+  extends Record<string, unknown>, IngressControllerClassMap {}

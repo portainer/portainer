@@ -148,6 +148,30 @@ func TestSummaryCounts(t *testing.T) {
 			},
 		},
 		{
+			name: "edge endpoint with unknown version and no check-in is not outdated",
+			endpoints: []testEndpoint{
+				{endpointType: portainer.EdgeAgentOnDockerEnvironment, status: portainer.EndpointStatusDown, groupID: 2, agentVersion: "", userTrusted: true, lastCheckInDate: 0},
+			},
+			expectedCounts: EnvironmentSummaryCountsResponse{
+				Total: 1, Up: 0, Down: 1, Outdated: 0, Unassigned: 0,
+				ByGroup:        []groupCount{{GroupID: 2, GroupName: "", Count: 1}},
+				ByPlatformType: platformCounts{Docker: 1},
+				ByHealth:       healthCounts{Down: 1},
+			},
+		},
+		{
+			name: "edge endpoint with unknown version but prior check-in is outdated",
+			endpoints: []testEndpoint{
+				{endpointType: portainer.EdgeAgentOnDockerEnvironment, status: portainer.EndpointStatusDown, groupID: 2, agentVersion: "", userTrusted: true, lastCheckInDate: time.Now().Add(-1 * time.Hour).Unix()},
+			},
+			expectedCounts: EnvironmentSummaryCountsResponse{
+				Total: 1, Up: 0, Down: 1, Outdated: 1, Unassigned: 0,
+				ByGroup:        []groupCount{{GroupID: 2, GroupName: "", Count: 1}},
+				ByPlatformType: platformCounts{Docker: 1},
+				ByHealth:       healthCounts{Down: 1, Outdated: 1},
+			},
+		},
+		{
 			name:      "no endpoints returns all zeros",
 			endpoints: []testEndpoint{},
 			expectedCounts: EnvironmentSummaryCountsResponse{
@@ -273,11 +297,13 @@ func TestResolveEndpointStatus(t *testing.T) {
 func TestIsOutdated(t *testing.T) {
 	currentVersion := portainer.APIVersion
 	tests := []struct {
-		name     string
-		version  string
-		expected bool
+		name            string
+		version         string
+		lastCheckInDate int64
+		expected        bool
 	}{
-		{name: "empty version is outdated", version: "", expected: true},
+		{name: "empty version with prior check-in is outdated (old agent style)", version: "", lastCheckInDate: time.Now().Unix(), expected: true},
+		{name: "empty version with no check-in is not outdated (never connected)", version: "", lastCheckInDate: 0, expected: false},
 		{name: "old version is outdated", version: "2.0.0", expected: true},
 		{name: "v-prefixed old version is outdated", version: "v2.0.0", expected: true},
 		{name: "current version is not outdated", version: currentVersion, expected: false},
@@ -285,7 +311,12 @@ func TestIsOutdated(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep := &portainer.Endpoint{Type: portainer.AgentOnDockerEnvironment}
+			// Empty-version logic only applies to edge endpoints; use EdgeAgentOnDocker for those cases.
+			epType := portainer.AgentOnDockerEnvironment
+			if tt.version == "" {
+				epType = portainer.EdgeAgentOnDockerEnvironment
+			}
+			ep := &portainer.Endpoint{Type: epType, LastCheckInDate: tt.lastCheckInDate}
 			ep.Agent.Version = tt.version
 			assert.Equal(t, tt.expected, isOutdated(ep))
 		})

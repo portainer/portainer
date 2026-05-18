@@ -37,7 +37,9 @@ func (s *stubBuilder) setGeneralInfo(_ *StackPayload, _ *portainer.Endpoint) {
 	}
 }
 
-func (s *stubBuilder) prepare(_ context.Context, _ *StackPayload) error { return nil }
+func (s *stubBuilder) prepare(_ context.Context, _ *StackPayload, _ portainer.UserID) error {
+	return nil
+}
 
 func (s *stubBuilder) saveStack() (*portainer.Stack, error) {
 	if s.saveErr != nil {
@@ -80,7 +82,7 @@ func TestBuild_SaveError_ErrUnauthorized_ReturnsInternalServerError(t *testing.T
 	t.Parallel()
 	builder := &stubBuilder{saveErr: httperrors.ErrUnauthorized}
 
-	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 
 	require.NotNil(t, herr)
 	assert.Equal(t, http.StatusInternalServerError, herr.StatusCode)
@@ -90,7 +92,7 @@ func TestBuild_SaveError_ReturnsInternalServerError(t *testing.T) {
 	t.Parallel()
 	builder := &stubBuilder{saveErr: errors.New("db error")}
 
-	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 
 	require.NotNil(t, herr)
 	assert.Equal(t, http.StatusInternalServerError, herr.StatusCode)
@@ -102,7 +104,7 @@ func TestBuild_SpawnAsync_DeploySuccess_UpdatesStackStatusToActive(t *testing.T)
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	updated := waitForStackStatus(t, store, stack.ID, portainer.StackStatusActive)
@@ -120,7 +122,7 @@ func TestBuild_SpawnAsync_DeployFailure_UpdatesStackStatusToError(t *testing.T) 
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack, deployErr: deployErr}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	updated := waitForStackStatus(t, store, stack.ID, portainer.StackStatusError)
@@ -139,7 +141,7 @@ func TestBuild_SpawnAsync_PostDeployHook_CalledOnSuccess(t *testing.T) {
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	waitForStackStatus(t, store, stack.ID, portainer.StackStatusActive)
@@ -153,7 +155,7 @@ func TestBuild_SpawnAsync_PostDeployHook_NotCalledOnDeployFailure(t *testing.T) 
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack, deployErr: errors.New("failed to deploy")}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{})
+	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	waitForStackStatus(t, store, stack.ID, portainer.StackStatusError)

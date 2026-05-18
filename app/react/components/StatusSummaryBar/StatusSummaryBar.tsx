@@ -15,6 +15,7 @@ interface Props<TValue> {
   onChange: (filter: TValue | null) => void;
   radioGroupName?: string;
   ariaLabel?: string;
+  isLoading?: boolean;
   'data-cy'?: string;
 }
 
@@ -25,6 +26,7 @@ export function StatusSummaryBar<TValue extends string = string>({
   onChange,
   radioGroupName = 'status-summary-filter',
   ariaLabel = 'Filter by status',
+  isLoading = false,
   'data-cy': dataCy = 'status-summary-bar',
 }: Props<TValue>) {
   const isAllSelected = !value || value === 'all' || value === 'custom';
@@ -47,6 +49,7 @@ export function StatusSummaryBar<TValue extends string = string>({
         isSelected={isAllSelected}
         onClick={() => onChange(null)}
         name={radioGroupName}
+        isLoading={isLoading}
         data-cy={`${dataCy}-total`}
       />
 

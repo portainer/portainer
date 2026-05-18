@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import {
@@ -7,7 +7,7 @@ import {
 } from './CustomTemplatesVariablesDefinitionField';
 
 export default {
-  title: 'Custom Templates/Variables Definition Field',
+  title: 'Components/Custom Templates/Variables Definition Field',
   component: CustomTemplatesVariablesDefinitionField,
   args: {},
 } as Meta<typeof CustomTemplatesVariablesDefinitionField>;

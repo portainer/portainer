@@ -33,7 +33,7 @@ func CreateSwarmStackGitBuilder(securityContext *security.RestrictedRequestConte
 	}
 }
 
-func (b *SwarmStackGitBuilder) prepare(ctx context.Context, payload *StackPayload) error {
+func (b *SwarmStackGitBuilder) prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.Name = payload.Name
 	b.stack.Type = portainer.DockerSwarmStack
 	b.stack.SwarmID = payload.SwarmID
@@ -41,7 +41,7 @@ func (b *SwarmStackGitBuilder) prepare(ctx context.Context, payload *StackPayloa
 	b.stack.FromAppTemplate = payload.FromAppTemplate
 	b.stack.Env = payload.Env
 
-	return b.GitMethodStackBuilder.prepare(ctx, payload)
+	return b.GitMethodStackBuilder.prepare(ctx, payload, userID)
 }
 
 // deploy creates deployment configuration for swarm stack

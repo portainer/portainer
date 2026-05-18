@@ -1,4 +1,4 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { Clock } from 'lucide-react';
 import { createColumnHelper, TableOptions } from '@tanstack/react-table';
 

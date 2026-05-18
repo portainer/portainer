@@ -1,9 +1,9 @@
 import { RawParams, useCurrentStateAndParams } from '@uirouter/react';
-import clsx from 'clsx';
 import { ReactNode } from 'react';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
+import { Tabs } from '@@/primitives/Tabs/Tabs';
 
 export interface Tab {
   name: ReactNode;
@@ -25,7 +25,6 @@ export function WidgetTabs({
   useContainer = true,
   ariaLabel = 'Section navigation',
 }: Props) {
-  // ensure that the selectedTab param is always valid
   const invalidQueryParamValue = tabs.some(
     (tab) => encodeURIComponent(tab.selectedTabParam) !== tab.selectedTabParam
   );
@@ -34,42 +33,21 @@ export function WidgetTabs({
   }
 
   const tabsComponent = (
-    <nav
-      aria-label={ariaLabel}
-      className={clsx(
-        'max-w-fit overflow-hidden rounded-xl',
-        'border border-solid border-[var(--border-widget)] bg-[var(--bg-widget-color)]'
-      )}
-    >
-      {/* additional div, so that the scrollbar doesn't overlap with rounded corners of the nav parent */}
-      <div className="flex items-center gap-1 overflow-x-auto p-1">
-        {tabs.map(({ name, icon }, index) => (
+    <Tabs.Container as="nav" aria-label={ariaLabel}>
+      {tabs.map(({ name, icon }, index) => (
+        <Tabs.Item key={index} asChild isActive={currentTabIndex === index}>
           <Link
             to="."
             params={{ tab: tabs[index].selectedTabParam }}
-            key={index}
-            className={clsx(
-              'inline-flex items-center gap-2 rounded-lg px-4 py-2',
-              'text-gray-7 hover:no-underline focus:no-underline th-highcontrast:text-white th-dark:text-gray-6',
-              'transition-colors duration-200',
-              {
-                'border-inherit !bg-graphite-50 !text-graphite-900 hover:text-graphite-900 th-highcontrast:!bg-white th-highcontrast:!text-black th-dark:!bg-graphite-600 th-dark:!text-white':
-                  currentTabIndex === index,
-              },
-              {
-                'bg-transparent hover:bg-graphite-50 hover:text-gray-7 th-highcontrast:hover:bg-white th-highcontrast:hover:text-black th-dark:hover:bg-graphite-600 th-dark:hover:text-gray-6':
-                  currentTabIndex !== index,
-              }
-            )}
             data-cy={`tab-${index}`}
             aria-current={currentTabIndex === index ? 'page' : undefined}
           >
             {icon && <Icon icon={icon} />}
             {name}
           </Link>
-        ))}
-      </div>
-    </nav>
+        </Tabs.Item>
+      ))}
+    </Tabs.Container>
   );
 
   if (useContainer) {

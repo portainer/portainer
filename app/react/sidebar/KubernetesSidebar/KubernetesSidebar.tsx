@@ -55,6 +55,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
       <SidebarItem
         to="kubernetes.applications"
         params={{ endpointId: environmentId }}
+        includePaths={['kubernetes.helm', 'kubernetes.helminstall']}
         icon={Box}
         label="Applications"
         data-cy="k8sSidebar-applications"

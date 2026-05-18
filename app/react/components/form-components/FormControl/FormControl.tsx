@@ -73,7 +73,7 @@ export function FormControl({
   );
 }
 
-function sizeClassLabel(size?: Size) {
+function sizeClassLabel(size: Size) {
   switch (size) {
     case 'large':
       return 'col-sm-5 col-lg-4';
@@ -83,12 +83,13 @@ function sizeClassLabel(size?: Size) {
       return 'col-sm-1';
     case 'vertical':
       return '';
+    case 'small':
     default:
       return 'col-sm-3 col-lg-2';
   }
 }
 
-function sizeClassChildren(size?: Size) {
+function sizeClassChildren(size: Size) {
   switch (size) {
     case 'large':
       return 'col-sm-7 col-lg-8';
@@ -98,6 +99,7 @@ function sizeClassChildren(size?: Size) {
       return 'col-sm-11';
     case 'vertical':
       return '';
+    case 'small':
     default:
       return 'col-sm-9 col-lg-10';
   }

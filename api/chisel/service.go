@@ -243,8 +243,9 @@ func (service *Service) startTunnelVerificationLoop() {
 	})
 }
 
-// checkTunnels finds the first tunnel that has not had any activity recently
-// and attempts to take a snapshot, then closes it and returns
+// checkTunnels finds tunnels that need snapshots and processes them one at a time.
+// For active tunnels missing an initial snapshot, it takes one without closing the tunnel.
+// For tunnels idle past activeTimeout, it snapshots and closes them.
 func (service *Service) checkTunnels() {
 	service.mu.RLock()
 
@@ -255,11 +256,31 @@ func (service *Service) checkTunnels() {
 			Float64("last_activity_seconds", elapsed.Seconds()).
 			Msg("environment tunnel monitoring")
 
+		tunnelPort := tunnel.Port
+
+		if !tunnel.HasSnapshot && elapsed < activeTimeout {
+			service.mu.RUnlock()
+
+			if endpointHasSnapshot(service.dataStore, endpointID) {
+				service.markSnapshotTaken(endpointID)
+
+				return
+			}
+
+			log.Debug().
+				Int("endpoint_id", int(endpointID)).
+				Msg("taking initial snapshot for active Edge environment")
+
+			if service.snapshotAndLog(endpointID, tunnelPort) {
+				service.markSnapshotTaken(endpointID)
+			}
+
+			return
+		}
+
 		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed < activeTimeout {
 			continue
 		}
-
-		tunnelPort := tunnel.Port
 
 		service.mu.RUnlock()
 
@@ -269,19 +290,35 @@ func (service *Service) checkTunnels() {
 			Float64("timeout_seconds", activeTimeout.Seconds()).
 			Msg("last activity timeout exceeded")
 
-		if err := service.snapshotEnvironment(endpointID, tunnelPort); err != nil {
-			log.Error().
-				Int("endpoint_id", int(endpointID)).
-				Err(err).
-				Msg("unable to snapshot Edge environment")
-		}
-
+		service.snapshotAndLog(endpointID, tunnelPort)
 		service.close(endpointID)
 
 		return
 	}
 
 	service.mu.RUnlock()
+}
+
+func (service *Service) snapshotAndLog(endpointID portainer.EndpointID, tunnelPort int) bool {
+	if err := service.snapshotEnvironment(endpointID, tunnelPort); err != nil {
+		log.Error().
+			Int("endpoint_id", int(endpointID)).
+			Err(err).
+			Msg("unable to snapshot Edge environment")
+
+		return false
+	}
+
+	return true
+}
+
+func (service *Service) markSnapshotTaken(endpointID portainer.EndpointID) {
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
+	if tun, ok := service.activeTunnels[endpointID]; ok {
+		tun.HasSnapshot = true
+	}
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {

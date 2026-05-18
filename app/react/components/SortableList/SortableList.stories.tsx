@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 
 import { DropdownOption } from '../DropdownMenu/DropdownMenu';
 
@@ -62,7 +62,7 @@ export function ServerSidePagination() {
   const allData = getData();
   const storageKey = 'fruits-veggies-latency-demo';
   const tableState = useSortableListState(storageKey, 'color');
-  const sortBy = tableState.sortBy?.id ?? 'color';
+  const sortBy = tableState.groupBy ?? tableState.sortBy?.id ?? 'color';
 
   const colorOptions = useGroupOptions(
     'color',

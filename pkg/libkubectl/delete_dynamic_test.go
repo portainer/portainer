@@ -1,6 +1,7 @@
 package libkubectl
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -213,7 +214,7 @@ data:
 	require.NoError(t, err, "Failed to create resource")
 
 	t.Cleanup(func() {
-		_, err = client.DeleteDynamic(t.Context(), validManifest)
+		_, err = client.DeleteDynamic(context.Background(), validManifest)
 		require.NoError(t, err, "Cleanup DeleteDynamic() failed")
 	})
 

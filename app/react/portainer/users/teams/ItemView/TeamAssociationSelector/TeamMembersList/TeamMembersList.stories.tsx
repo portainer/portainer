@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useMemo, useState } from 'react';
 
 import { UserContext } from '@/react/hooks/useUser';
@@ -10,7 +10,7 @@ import { TeamRole } from '@/react/portainer/users/teams/types';
 import { TeamMembersList } from './TeamMembersList';
 
 const meta: Meta = {
-  title: 'Teams/TeamAssociationSelector/TeamMembersList',
+  title: 'Components/Teams/TeamAssociationSelector/TeamMembersList',
   component: TeamMembersList,
 };
 

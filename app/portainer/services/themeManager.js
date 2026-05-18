@@ -1,7 +1,9 @@
+import { applyTheme } from '@/react/portainer/services/applyTheme';
+
 angular.module('portainer.app').service('ThemeManager', ThemeManager);
 
-/* @ngInject */
-export function ThemeManager(StateManager) {
+// @deprecated use applyTheme instead
+export function ThemeManager() {
   return {
     setTheme,
     autoTheme,
@@ -9,17 +11,11 @@ export function ThemeManager(StateManager) {
   };
 
   function setTheme(theme) {
-    if (!theme) {
-      document.documentElement.removeAttribute('theme');
-    } else {
-      document.documentElement.setAttribute('theme', theme);
-      StateManager.updateTheme(theme);
-    }
+    applyTheme(theme);
   }
 
   function autoTheme() {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';
-    this.setTheme(systemTheme);
+    applyTheme('auto');
   }
 
   function defaultTheme() {

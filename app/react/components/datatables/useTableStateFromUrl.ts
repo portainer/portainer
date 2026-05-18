@@ -7,6 +7,8 @@ type CoreUrlState = {
   search: string;
   sort: string;
   order: 'asc' | 'desc';
+  groupBy: string | null;
+  groupFilter: string | null;
   page: number;
   pageSize: number | null;
 };
@@ -16,6 +18,10 @@ type Extra = {
   setSearch(value: string): void;
   page: number;
   setPage(page: number): void;
+  groupBy: string | null;
+  setGroupBy(group: string | null): void;
+  groupFilter: string | null;
+  setGroupFilter(value: { group: string; groupValue: string | null }): void;
 };
 
 export function useTableStateFromUrl<
@@ -24,11 +30,13 @@ export function useTableStateFromUrl<
 >({
   localStorageKey,
   defaultSort = 'name',
+  defaultGroupBy,
   parseExtra,
   buildExtra,
 }: {
   localStorageKey: string;
   defaultSort?: string;
+  defaultGroupBy?: string;
   parseExtra?: (params: Record<string, string | undefined>) => TParsed;
   buildExtra?: (
     urlState: CoreUrlState & TParsed,
@@ -44,6 +52,8 @@ export function useTableStateFromUrl<
     search: params.search ?? '',
     sort: params.sort ?? defaultSort,
     order: (params.order === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc',
+    groupBy: params.groupBy ?? defaultGroupBy ?? null,
+    groupFilter: params.groupFilter ?? null,
     page: Math.max(0, parseIntOrDefault(params.page, 0)),
     pageSize: parsePositiveIntOrNull(params.pageSize),
     ...(parseExtra ? parseExtra(params) : ({} as TParsed)),
@@ -53,7 +63,7 @@ export function useTableStateFromUrl<
 
   const extra = buildExtra ? buildExtra(urlState, setUrlState) : ({} as TExtra);
 
-  const tableState = {
+  return {
     search: urlState.search,
     setSearch: (search: string) => setCoreState({ search, page: 0 }),
 
@@ -61,9 +71,37 @@ export function useTableStateFromUrl<
     setSortBy: (id, desc) =>
       setCoreState({
         sort: id ?? defaultSort,
+        groupBy: null,
+        groupFilter: null,
         order: desc ? 'desc' : 'asc',
         page: 0,
       }),
+
+    groupBy: urlState.groupBy,
+    setGroupBy: (group) =>
+      setCoreState({
+        groupBy: group,
+        groupFilter: null,
+        page: 0,
+      }),
+
+    groupFilter: urlState.groupFilter,
+    setGroupFilter: ({
+      group,
+      groupValue,
+    }: {
+      group: string;
+      groupValue: string | null;
+    }) => {
+      const isSameGroup = urlState.groupBy === group;
+      setCoreState({
+        sort: group,
+        order: isSameGroup && urlState.order === 'asc' ? 'desc' : 'asc',
+        groupBy: group,
+        groupFilter: groupValue,
+        page: 0,
+      });
+    },
 
     page: urlState.page,
     setPage: (page) => setCoreState({ page }),
@@ -76,8 +114,6 @@ export function useTableStateFromUrl<
 
     ...extra,
   } satisfies BasicTableSettings & TExtra & Extra;
-
-  return tableState;
 
   function setCoreState(partial: Partial<CoreUrlState>) {
     return setUrlState(partial as Partial<CoreUrlState & TParsed>);

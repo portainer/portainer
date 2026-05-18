@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/logs"
 
 	ldap "github.com/go-ldap/ldap/v3"
 	"github.com/pkg/errors"
@@ -73,7 +74,7 @@ func (Service) AuthenticateUser(username, password string, settings *portainer.L
 	if err != nil {
 		return err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	if !settings.AnonymousMode {
 		err = connection.Bind(settings.ReaderDN, settings.Password)
@@ -108,7 +109,7 @@ func (Service) GetUserGroups(username string, settings *portainer.LDAPSettings) 
 	if err != nil {
 		return nil, err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	if !settings.AnonymousMode {
 		err = connection.Bind(settings.ReaderDN, settings.Password)
@@ -133,7 +134,7 @@ func (Service) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	if !settings.AnonymousMode {
 		err = connection.Bind(settings.ReaderDN, settings.Password)
@@ -182,7 +183,7 @@ func (Service) SearchGroups(settings *portainer.LDAPSettings) ([]portainer.LDAPU
 	if err != nil {
 		return nil, err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	if !settings.AnonymousMode {
 		err = connection.Bind(settings.ReaderDN, settings.Password)
@@ -311,7 +312,7 @@ func (Service) TestConnectivity(settings *portainer.LDAPSettings) error {
 	if err != nil {
 		return err
 	}
-	defer connection.Close()
+	defer logs.CloseAndLogErr(connection)
 
 	if !settings.AnonymousMode {
 		err = connection.Bind(settings.ReaderDN, settings.Password)

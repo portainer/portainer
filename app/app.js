@@ -33,7 +33,5 @@ export function onStartupAngular($rootScope, $state, cfpLoadingBar, $transitions
     if (type && hasNoContentType) {
       jqXhr.setRequestHeader('Content-Type', 'application/json');
     }
-    const csrfCookie = window.cookieStore.get('_gorilla_csrf');
-    jqXhr.setRequestHeader('X-CSRF-Token', csrfCookie);
   });
 }

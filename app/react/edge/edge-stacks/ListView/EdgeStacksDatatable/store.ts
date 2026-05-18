@@ -8,7 +8,8 @@ import {
 } from '@@/datatables/types';
 
 export interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     SettableColumnsTableSettings,
     RefreshableTableSettings {}
 

@@ -45,8 +45,6 @@ func (b *StackBuilder) setGeneralInfo(_ *StackPayload, endpoint *portainer.Endpo
 	stackutils.PrepareStackStatusForDeployment(b.stack)
 }
 
-func (b *StackBuilder) prepare(_ context.Context, _ *StackPayload) error { return nil }
-
 func (b *StackBuilder) deploy(ctx context.Context, _ *portainer.Endpoint) error {
 	return b.deploymentConfiger.Deploy(ctx)
 }
@@ -83,6 +81,17 @@ func (b *StackBuilder) cleanUp() error {
 	return nil
 }
 
+func (b *StackBuilder) initCreatedBy(userID portainer.UserID) error {
+	return b.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		user, err := tx.User().Read(userID)
+		if err != nil {
+			return fmt.Errorf("failed to find stack author: %w", err)
+		}
+		b.stack.CreatedBy = user.Username
+		return nil
+	})
+}
+
 func (b *StackBuilder) storeStackFile(content []byte) error {
 	stackFolder := strconv.Itoa(int(b.stack.ID))
 	projectPath, err := b.fileService.StoreStackFileFromBytes(stackFolder, b.stack.EntryPoint, content)
@@ -102,7 +111,6 @@ func (b *StackBuilder) initComposeDeployment(secCtx *security.RestrictedRequestC
 	}
 
 	b.deploymentConfiger = config
-	b.stack.CreatedBy = config.GetUsername()
 
 	return nil
 }
@@ -114,7 +122,6 @@ func (b *StackBuilder) initSwarmDeployment(secCtx *security.RestrictedRequestCon
 	}
 
 	b.deploymentConfiger = config
-	b.stack.CreatedBy = config.GetUsername()
 
 	return nil
 }

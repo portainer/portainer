@@ -9,9 +9,7 @@ export interface AutomationTestingProps {
 
 declare module 'react' {
   interface HTMLAttributes<T>
-    extends AriaAttributes,
-      DOMAttributes<T>,
-      Partial<AutomationTestingProps> {
+    extends AriaAttributes, DOMAttributes<T>, Partial<AutomationTestingProps> {
     // keep AutomationTestingProps 'data-cy' optional because HTMLAttributes covers non interactive elements
   }
 }

@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { UIRouter, pushStateLocationPlugin } from '@uirouter/react';
 
 import { Breadcrumbs } from './Breadcrumbs';

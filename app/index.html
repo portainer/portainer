@@ -32,7 +32,7 @@
       id="page-wrapper"
       ng-class="{
         open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin', 'kubernetes.kubectlshell'].indexOf($state.current.name) === -1,
-        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.logout', 'kubernetes.kubectlshell'].indexOf($state.current.name) > -1 || applicationState.loading
+        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.logout', 'kubernetes.kubectlshell'].indexOf($state.current.name) > -1 || applicationState.loading,
       }"
       ng-cloak
     >

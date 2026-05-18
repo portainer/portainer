@@ -1,11 +1,11 @@
-import { StoryObj, Meta } from '@storybook/react';
+import { StoryObj, Meta } from '@storybook/react-webpack5';
 
 import { StatusType } from '../../types';
 
 import { DeploymentCounter } from './DeploymentCounter';
 
 const meta: Meta<typeof DeploymentCounter> = {
-  title: 'Edge/DeploymentCounter',
+  title: 'Components/Edge/DeploymentCounter',
   component: DeploymentCounter,
 };
 export default meta;

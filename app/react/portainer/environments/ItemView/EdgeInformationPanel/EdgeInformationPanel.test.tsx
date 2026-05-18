@@ -24,9 +24,35 @@ describe('EdgeInformationPanel', () => {
     expect(
       getByText(/This Edge environment is associated to an Edge environment/)
     ).toBeVisible();
-    expect(getByText('test-edge-key-123')).toBeVisible();
+    expect(
+      getByText(
+        'aHR0cDovL3Rlc3Qtc2VydmVyOjg5OTl8dGVzdC10dW5uZWw6ODAwMHx0ZXN0a2V5fDE'
+      )
+    ).toBeVisible();
+    expect(getByText('http://test-server:8999')).toBeVisible();
+    expect(getByText('test-tunnel:8000')).toBeVisible();
     expect(getByText('test-edge-id-456')).toBeVisible();
     expect(getByText('Disassociate')).toBeVisible();
+  });
+
+  it('should render empty addresses when edge key is invalid base64', () => {
+    const { getByText, queryByText } = renderComponent({
+      edgeKey: '!!!not-valid-base64!!!',
+    });
+
+    expect(getByText('!!!not-valid-base64!!!')).toBeVisible();
+    expect(queryByText('http://test-server:8999')).not.toBeInTheDocument();
+    expect(queryByText('test-tunnel:8000')).not.toBeInTheDocument();
+  });
+
+  it('should render empty tunnel address when edge key has no pipe separator', () => {
+    // valid base64 of a string with no | character
+    const { getByText, queryByText } = renderComponent({
+      edgeKey: btoa('http://test-server:8999'),
+    });
+
+    expect(getByText('http://test-server:8999')).toBeVisible();
+    expect(queryByText('test-tunnel:8000')).not.toBeInTheDocument();
   });
 
   it('should show confirmation modal on disassociate button click', async () => {
@@ -140,9 +166,13 @@ describe('EdgeInformationPanel', () => {
   });
 });
 
+// base64.RawStdEncoding of 'http://test-server:8999|test-tunnel:8000|testkey|1' (no padding, as produced by Go)
+const TEST_EDGE_KEY =
+  'aHR0cDovL3Rlc3Qtc2VydmVyOjg5OTl8dGVzdC10dW5uZWw6ODAwMHx0ZXN0a2V5fDE';
+
 function renderComponent({
   environmentId = 1,
-  edgeKey = 'test-edge-key-123',
+  edgeKey = TEST_EDGE_KEY,
   edgeId = 'test-edge-id-456',
   platformName = 'Docker',
   onSuccess = vi.fn(),

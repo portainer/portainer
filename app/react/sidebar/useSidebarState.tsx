@@ -77,9 +77,8 @@ function useSidebarStateLocal() {
     storageKey,
     true
   );
-  const [isOpen, setIsOpen, undoIsOpenChange] = useStateWithUndo(
-    initialState()
-  );
+  const [isOpen, setIsOpen, undoIsOpenChange] =
+    useStateWithUndo(initialState());
 
   const onResize = useMemo(
     () =>

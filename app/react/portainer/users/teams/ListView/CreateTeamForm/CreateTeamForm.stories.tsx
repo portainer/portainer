@@ -1,10 +1,10 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 
 import { CreateTeamForm } from './CreateTeamForm';
 import { mockExampleData } from './CreateTeamForm.mocks';
 
 const meta: Meta = {
-  title: 'teams/CreateTeamForm',
+  title: 'Components/Teams/CreateTeamForm',
   component: CreateTeamForm,
 };
 

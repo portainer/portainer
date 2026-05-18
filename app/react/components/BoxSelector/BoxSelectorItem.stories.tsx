@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { ReactNode } from 'react';
 import { Briefcase } from 'lucide-react';
 
@@ -12,7 +12,7 @@ import { BoxSelectorItem } from './BoxSelectorItem';
 import { BoxSelectorOption } from './types';
 
 const meta: Meta = {
-  title: 'BoxSelector/Item',
+  title: 'Components/BoxSelector/Item',
   args: {
     selected: false,
     description: 'description',

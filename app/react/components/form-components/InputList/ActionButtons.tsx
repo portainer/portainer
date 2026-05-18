@@ -19,8 +19,8 @@ interface InputListActionButtonsProps<T = DefaultType> {
   canUndoDelete?: boolean;
   item?: T;
   initialItemsCount?: number;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   onDelete: () => void;
   onToggleNeedsDeletion?: (index: number, item: CanUndoDeleteItem<T>) => void;
   'data-cy'?: string;
@@ -89,6 +89,8 @@ export function InputListActionButtons<T = DefaultType>({
               data-cy={`${dataCy}RemoveButton_${index}`}
               icon={Trash2Icon}
               disabled={disabled}
+              aria-label="Remove item"
+              title="Remove item"
             />
           )}
         </>

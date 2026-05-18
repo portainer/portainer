@@ -100,7 +100,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 	filteredEndpoints = security.FilterEndpoints(filteredEndpoints, endpointGroups, securityContext)
 
-	sortEnvironmentsByField(filteredEndpoints, endpointGroups, getSortKey(sortField), sortOrder == "desc")
+	sortEnvironmentsByField(filteredEndpoints, endpointGroups, getSortKey(sortField), sortOrder == "desc", settings)
 
 	filteredEndpointCount := len(filteredEndpoints)
 

@@ -2,50 +2,24 @@ package endpointutils
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/pkg/endpoints"
+
 	log "github.com/rs/zerolog/log"
 )
 
-// TODO: this file should be migrated to package/server-ce/pkg/endpoints
-
-// IsLocalEndpoint returns true if this is a local environment(endpoint)
-func IsLocalEndpoint(endpoint *portainer.Endpoint) bool {
-	return strings.HasPrefix(endpoint.URL, "unix://") ||
-		strings.HasPrefix(endpoint.URL, "npipe://") ||
-		endpoint.Type == portainer.KubernetesLocalEnvironment
-}
-
-// IsKubernetesEndpoint returns true if this is a kubernetes environment(endpoint)
-func IsKubernetesEndpoint(endpoint *portainer.Endpoint) bool {
-	return endpoint.Type == portainer.KubernetesLocalEnvironment ||
-		endpoint.Type == portainer.AgentOnKubernetesEnvironment ||
-		endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
-}
-
-// IsDockerEndpoint returns true if this is a docker environment(endpoint)
-func IsDockerEndpoint(endpoint *portainer.Endpoint) bool {
-	return endpoint.Type == portainer.DockerEnvironment ||
-		endpoint.Type == portainer.AgentOnDockerEnvironment ||
-		endpoint.Type == portainer.EdgeAgentOnDockerEnvironment
-}
-
-// IsEdgeEndpoint returns true if this is an Edge endpoint
-func IsEdgeEndpoint(endpoint *portainer.Endpoint) bool {
-	return endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
-}
-
-// IsAgentEndpoint returns true if this is an Agent endpoint
-func IsAgentEndpoint(endpoint *portainer.Endpoint) bool {
-	return endpoint.Type == portainer.AgentOnDockerEnvironment ||
-		endpoint.Type == portainer.EdgeAgentOnDockerEnvironment ||
-		endpoint.Type == portainer.AgentOnKubernetesEnvironment ||
-		endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
-}
+var (
+	IsLocalEndpoint      = endpoints.IsLocalEndpoint
+	IsKubernetesEndpoint = endpoints.IsKubernetesEndpoint
+	IsDockerEndpoint     = endpoints.IsDockerEndpoint
+	IsEdgeEndpoint       = endpoints.IsEdgeEndpoint
+	IsAgentEndpoint      = endpoints.IsAgentEndpoint
+	EndpointSet          = endpoints.EndpointSet
+)
 
 // EndpointPlatformType returns the type of the endpoint based on the environment and container engine
 func EndpointPlatformType(endpoint *portainer.Endpoint) portainer.PlatformType {
@@ -83,17 +57,6 @@ func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []portainer.E
 	}
 
 	return filteredEndpoints
-}
-
-// EndpointSet receives an environment(endpoint) array and returns a set
-func EndpointSet(endpointIDs []portainer.EndpointID) map[portainer.EndpointID]bool {
-	set := map[portainer.EndpointID]bool{}
-
-	for _, endpointID := range endpointIDs {
-		set[endpointID] = true
-	}
-
-	return set
 }
 
 func InitialIngressClassDetection(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint, factory *cli.ClientFactory) {

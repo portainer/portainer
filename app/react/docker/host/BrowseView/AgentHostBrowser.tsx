@@ -12,11 +12,10 @@ const settingsStore = createPersistedStore(tableKey, {
   id: 'Dir',
 });
 
-interface Props
-  extends Omit<
-    ComponentProps<typeof FilesTable>,
-    'isUploadAllowed' | 'tableState' | 'title'
-  > {
+interface Props extends Omit<
+  ComponentProps<typeof FilesTable>,
+  'isUploadAllowed' | 'tableState' | 'title'
+> {
   relativePath: string;
 }
 

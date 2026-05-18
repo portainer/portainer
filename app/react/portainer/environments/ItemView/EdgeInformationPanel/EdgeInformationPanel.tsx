@@ -26,6 +26,15 @@ export function EdgeInformationPanel({
 }: EdgeInformationPanelProps) {
   const disassociateMutation = useDisassociateEnvironment(environmentId);
 
+  let edgeServerAddress = '';
+  let edgeTunnelAddress = '';
+  try {
+    const decoded = atob(edgeKey + '='.repeat((4 - (edgeKey.length % 4)) % 4));
+    [edgeServerAddress = '', edgeTunnelAddress = ''] = decoded.split('|');
+  } catch {
+    // malformed edge key — leave addresses empty
+  }
+
   async function handleDisassociate() {
     const confirmed = await confirmDisassociate();
     if (confirmed) {
@@ -50,6 +59,12 @@ export function EdgeInformationPanel({
         </TextTip>
         <p>
           Edge key: <code>{edgeKey}</code>
+        </p>
+        <p>
+          Portainer API server: <code>{edgeServerAddress}</code>
+        </p>
+        <p>
+          Portainer tunnel address: <code>{edgeTunnelAddress}</code>
         </p>
         <p>
           Edge identifier: <code>{edgeId}</code>

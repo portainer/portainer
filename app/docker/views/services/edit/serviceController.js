@@ -553,13 +553,12 @@ angular.module('portainer.docker').controller('ServiceController', [
         Mode: (config.EndpointSpec && config.EndpointSpec.Mode) || 'vip',
         Ports: service.Ports,
       };
-      return service, config;
+      return config;
     }
 
     function rollbackService(service) {
       $scope.state.rollbackInProgress = true;
-      let config = {};
-      service, (config = buildChanges(service));
+      const config = buildChanges(service);
       ServiceService.update(service, config, 'previous')
         .then(function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {

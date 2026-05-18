@@ -5,8 +5,7 @@ import {
 import { SupportedIngControllerTypes } from '@/react/kubernetes/cluster/ingressClass/types';
 
 export interface TableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings {}
+  extends SortableTableSettings, PaginationTableSettings {}
 
 export interface Path {
   IngressName: string;

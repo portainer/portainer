@@ -9,6 +9,18 @@ import (
 type ResolvedAccess struct {
 	Role           *portainer.Role
 	Authorizations portainer.Authorizations
+	Source         AccessSource
+}
+
+// AccessSource captures which layers contributed to a resolved access decision.
+//
+//   - GroupID is set when access was granted via the user-group or team-group
+//     layer, OR (in EE) via a policy targeting the environment group.
+//   - TeamID  is set when access was granted via either of the team layers; the
+//     ID of the team whose membership matched.
+type AccessSource struct {
+	GroupID portainer.EndpointGroupID
+	TeamID  portainer.TeamID
 }
 
 // ResolverInput contains all the data needed to resolve user access to an endpoint.
@@ -22,15 +34,13 @@ type ResolverInput struct {
 	Roles           []portainer.Role
 }
 
-// ComputeBaseRole computes the user's role on an endpoint from base access settings.
+// ResolveUserEndpointAccess resolves a user's effective access to an endpoint.
 // It checks access in precedence order:
 //  1. User → Endpoint direct access
 //  2. User → Endpoint Group access (inherited)
 //  3. User's Teams → Endpoint access
 //  4. User's Teams → Endpoint Group access (inherited)
-//
-// Returns the first matching role, or nil if no access is configured.
-func ComputeBaseRole(input ResolverInput) *portainer.Role {
+func ResolveUserEndpointAccess(input ResolverInput) *ResolvedAccess {
 	group := input.EndpointGroup
 
 	// 1. Check user → endpoint direct access
@@ -39,7 +49,10 @@ func ComputeBaseRole(input ResolverInput) *portainer.Role {
 		input.Endpoint.UserAccessPolicies,
 		input.Roles,
 	); role != nil {
-		return role
+		return &ResolvedAccess{
+			Role:           role,
+			Authorizations: role.Authorizations,
+		}
 	}
 
 	// 2. Check user → endpoint group access (inherited)
@@ -48,45 +61,40 @@ func ComputeBaseRole(input ResolverInput) *portainer.Role {
 		group.UserAccessPolicies,
 		input.Roles,
 	); role != nil {
-		return role
+		return &ResolvedAccess{
+			Role:           role,
+			Authorizations: role.Authorizations,
+			Source:         AccessSource{GroupID: group.ID},
+		}
 	}
 
 	// 3. Check user's teams → endpoint access
-	if role := GetRoleFromTeamAccessPolicies(
+	if role, teamID := getTeamRoleWithSource(
 		input.UserMemberships,
 		input.Endpoint.TeamAccessPolicies,
 		input.Roles,
 	); role != nil {
-		return role
+		return &ResolvedAccess{
+			Role:           role,
+			Authorizations: role.Authorizations,
+			Source:         AccessSource{TeamID: teamID},
+		}
 	}
 
 	// 4. Check user's teams → endpoint group access (inherited)
-	if role := GetRoleFromTeamAccessPolicies(
+	if role, teamID := getTeamRoleWithSource(
 		input.UserMemberships,
 		group.TeamAccessPolicies,
 		input.Roles,
 	); role != nil {
-		return role
+		return &ResolvedAccess{
+			Role:           role,
+			Authorizations: role.Authorizations,
+			Source:         AccessSource{GroupID: group.ID, TeamID: teamID},
+		}
 	}
 
 	return nil
-}
-
-// ResolveUserEndpointAccess resolves a user's effective access to an endpoint.
-// In CE, this returns the base role computed from endpoint/group access settings.
-// EE extends this to also consider applied RBAC policies.
-//
-// Returns nil if the user has no access to the endpoint.
-func ResolveUserEndpointAccess(input ResolverInput) *ResolvedAccess {
-	role := ComputeBaseRole(input)
-	if role == nil {
-		return nil
-	}
-
-	return &ResolvedAccess{
-		Role:           role,
-		Authorizations: role.Authorizations,
-	}
 }
 
 // GetRoleFromUserAccessPolicies returns the role for a user from user access policies.
@@ -117,12 +125,24 @@ func GetRoleFromTeamAccessPolicies(
 	policies portainer.TeamAccessPolicies,
 	roles []portainer.Role,
 ) *portainer.Role {
+	role, _ := getTeamRoleWithSource(memberships, policies, roles)
+	return role
+}
+
+// getTeamRoleWithSource is GetRoleFromTeamAccessPolicies plus the matching team ID.
+func getTeamRoleWithSource(
+	memberships []portainer.TeamMembership,
+	policies portainer.TeamAccessPolicies,
+	roles []portainer.Role,
+) (*portainer.Role, portainer.TeamID) {
 	if policies == nil || len(memberships) == 0 {
-		return nil
+		return nil, 0
 	}
 
-	// Collect all roles from team memberships
-	var matchingRoles []*portainer.Role
+	var (
+		best       *portainer.Role
+		bestTeamID portainer.TeamID
+	)
 	for _, membership := range memberships {
 		policy, ok := policies[membership.TeamID]
 		if !ok {
@@ -130,17 +150,16 @@ func GetRoleFromTeamAccessPolicies(
 		}
 
 		role := FindRoleByID(policy.RoleID, roles)
-		if role != nil {
-			matchingRoles = append(matchingRoles, role)
+		if role == nil {
+			continue
+		}
+
+		if best == nil || role.Priority > best.Priority {
+			best = role
+			bestTeamID = membership.TeamID
 		}
 	}
-
-	if len(matchingRoles) == 0 {
-		return nil
-	}
-
-	// Return the role with highest priority
-	return GetHighestPriorityRole(matchingRoles)
+	return best, bestTeamID
 }
 
 // GetHighestPriorityRole returns the role with the highest priority from a slice.

@@ -147,6 +147,27 @@ func WithSettingsService(settings *portainer.Settings) datastoreOption {
 	}
 }
 
+type stubSSLSettingsService struct {
+	settings *portainer.SSLSettings
+}
+
+func (s *stubSSLSettingsService) BucketName() string { return "ssl" }
+
+func (s *stubSSLSettingsService) Settings() (*portainer.SSLSettings, error) {
+	return s.settings, nil
+}
+
+func (s *stubSSLSettingsService) UpdateSettings(settings *portainer.SSLSettings) error {
+	s.settings = settings
+	return nil
+}
+
+func WithSSLSettingsService(settings *portainer.SSLSettings) datastoreOption {
+	return func(d *testDatastore) {
+		d.sslSettings = &stubSSLSettingsService{settings: settings}
+	}
+}
+
 type stubUserService struct {
 	dataservices.UserService
 

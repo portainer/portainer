@@ -1,11 +1,11 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { FileUploadForm } from './FileUploadForm';
 
 export default {
   component: FileUploadForm,
-  title: 'Components/Form/FileUploadForm',
+  title: 'Components/Forms/FileUploadForm',
 } as Meta;
 
 interface Args {

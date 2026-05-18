@@ -1,11 +1,11 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { InputGroup } from '.';
 
 export default {
   component: InputGroup,
-  title: 'Components/Form/InputGroup',
+  title: 'Components/Forms/InputGroup',
 } as Meta;
 
 export { BasicExample, Addons, Sizing };

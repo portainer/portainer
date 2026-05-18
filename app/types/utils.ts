@@ -4,8 +4,8 @@
 export type PathToStringArray<T extends string | string[]> = T extends string[]
   ? T
   : T extends `${infer Head}.${infer Tail}`
-  ? [...PathToStringArray<Head>, ...PathToStringArray<Tail>]
-  : [T];
+    ? [...PathToStringArray<Head>, ...PathToStringArray<Tail>]
+    : [T];
 
 /**
  * VSCode helper to recursively pretty print the constructed types instead of

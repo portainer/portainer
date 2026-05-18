@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { GitBranch, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 import { useIsEdgeAdmin, useIsPureAdmin } from '@/react/hooks/useUser';
 import { useIsCurrentUserTeamLeader } from '@/portainer/users/queries';
@@ -14,6 +14,7 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 import { SidebarProvider, useSidebarState } from './useSidebarState';
 import { UpgradeBEBannerWrapper } from './UpgradeBEBanner';
+import { AppDeliverySidebar } from './AppDeliverySidebar';
 
 export function Sidebar() {
   return (
@@ -70,12 +71,7 @@ function InnerSidebar() {
 
             <EnvironmentSidebar />
 
-            <SidebarItem
-              to="portainer.workflows"
-              icon={GitBranch}
-              label="Workflows"
-              data-cy="portainerSidebar-workflows"
-            />
+            <AppDeliverySidebar isAdmin={isAdmin} />
 
             {isAdmin && <EdgeComputeSidebar />}
 

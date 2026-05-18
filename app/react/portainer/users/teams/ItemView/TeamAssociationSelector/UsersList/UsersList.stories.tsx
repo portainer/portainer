@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-webpack5';
 import { useMemo } from 'react';
 
 import { createMockUsers } from '@/react-tools/test-mocks';
@@ -9,7 +9,7 @@ import { UserViewModel } from '@/portainer/models/user';
 import { UsersList } from './UsersList';
 
 const meta: Meta = {
-  title: 'Teams/TeamAssociationSelector/UsersList',
+  title: 'Components/Teams/TeamAssociationSelector/UsersList',
   component: UsersList,
 };
 

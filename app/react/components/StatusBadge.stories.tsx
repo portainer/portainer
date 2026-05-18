@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Check } from 'lucide-react';
 
 import { StatusBadge } from './StatusBadge';
@@ -43,13 +43,6 @@ export const Danger: Story = {
   args: {
     color: 'danger',
     children: 'Danger',
-  },
-};
-
-export const WithAriaAttributes: Story = {
-  args: {
-    'aria-label': 'Badge with Aria Attributes',
-    children: 'With Aria Attributes',
   },
 };
 

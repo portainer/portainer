@@ -19,6 +19,7 @@ export function ButtonsLine({
   stack,
   environmentId,
   externalApp,
+  appStackId,
   appStackKind,
   app,
   name,
@@ -27,6 +28,7 @@ export function ButtonsLine({
   stack?: Stack;
   externalApp: boolean;
   environmentId: EnvironmentId;
+  appStackId?: number;
   appStackKind?: string;
   namespace: string;
   app?: Application;
@@ -34,7 +36,7 @@ export function ButtonsLine({
 }) {
   const appStackFileQuery = useAppStackFile(
     {
-      id: stack?.Id,
+      id: stack?.Id ?? appStackId,
       kind: appStackKind,
     },
     {
@@ -50,7 +52,7 @@ export function ButtonsLine({
     <div className="flex flex-wrap gap-2">
       <EditButtons
         isEdge={appStackKind === 'edge'}
-        stackId={stack?.Id}
+        stackId={stack?.Id ?? appStackId}
         externalApp={externalApp}
         stack={stack}
       />

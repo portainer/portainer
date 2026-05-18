@@ -4,12 +4,9 @@ import { ReactNode } from 'react';
 
 import { AutomationTestingProps } from '@/types';
 
-import {
-  SortOption,
-  GroupSortTableHeader,
-} from '../GroupSortTable/GroupSortTableHeader';
 import { DropdownOption } from '../DropdownMenu/DropdownMenu';
 
+import { SortOption, SortableListHeader } from './SortableListHeader';
 import { SortableGroup } from './SortableListGroup';
 import { SortableListBody } from './SortableListBody';
 import { SortableListCard } from './SortableListCard';
@@ -32,6 +29,7 @@ interface Props<T> extends AutomationTestingProps {
   showGroupHeaders?: boolean;
   emptyMessage?: string;
   searchPlaceholder?: string;
+  headerButtons?: ReactNode;
   actionButton?: ReactNode;
   isLoading?: boolean;
 }
@@ -48,30 +46,36 @@ export function SortableList<T>({
   showGroupHeaders = true,
   emptyMessage = 'No items found',
   searchPlaceholder,
+  headerButtons,
   actionButton,
   isLoading = false,
   'data-cy': dataCy,
 }: Props<T>) {
-  const activeSortKey = tableState.sortBy?.id ?? sortOptions[0]?.key ?? '';
+  const activeKey = getSortKey(
+    sortOptions,
+    tableState.groupBy ?? tableState.sortBy?.id ?? ''
+  );
 
   return (
     <SortableListCard>
-      <GroupSortTableHeader
-        sortBy={activeSortKey}
-        onSortChange={(key) => {
-          tableState.setSortBy(key, false);
+      <SortableListHeader
+        value={{
+          group: activeKey,
+          groupValue: tableState.groupFilter,
         }}
+        onChange={({ group, groupValue }) => {
+          tableState.setGroupFilter({
+            group,
+            groupValue,
+          });
+        }}
+        sortDesc={tableState.sortBy?.desc ?? false}
         searchTerm={tableState.search}
-        onSearchChange={(value) => {
-          tableState.setSearch(value);
-        }}
-        groupFilter={tableState.groupFilter}
-        onGroupFilterChange={(value) => {
-          tableState.setGroupFilter(value);
-        }}
+        onSearchChange={tableState.setSearch}
         groupOptions={groupOptions}
         sortOptions={sortOptions}
         searchPlaceholder={searchPlaceholder}
+        headerButtons={headerButtons}
         actionButton={actionButton}
         data-cy={`${dataCy}-header`}
       />
@@ -81,12 +85,13 @@ export function SortableList<T>({
           isLoading={isLoading}
           groups={groups}
           showGroupHeaders={
-            showGroupHeaders && (groupOptions?.[activeSortKey]?.length ?? 0) > 0
+            showGroupHeaders && (groupOptions?.[activeKey]?.length ?? 0) > 0
           }
           renderItem={renderItem}
           renderColumnHeaders={renderColumnHeaders}
           getItemKey={getItemKey}
           emptyMessage={emptyMessage}
+          data-cy={`${dataCy}-body`}
         />
       </div>
 
@@ -99,4 +104,16 @@ export function SortableList<T>({
       />
     </SortableListCard>
   );
+}
+
+function getSortKey(sortOptions: SortOption[], sortKey: string | undefined) {
+  if (!sortKey) {
+    return '';
+  }
+
+  const sortOption = sortOptions.find(
+    (opt) => opt.key.toLowerCase() === sortKey.toLowerCase()
+  );
+
+  return sortOption?.key ?? '';
 }

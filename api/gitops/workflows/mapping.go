@@ -3,6 +3,7 @@ package workflows
 import (
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/set"
 )
 
 // MapStackToWorkflow converts a stack to a Workflow. gitConfig is passed separately
@@ -49,8 +50,9 @@ func MapEdgeStackToWorkflow(es portainer.EdgeStack, gitConfig *gittypes.RepoConf
 		},
 		GitConfig: gitConfig,
 		Target: Target{
-			EdgeGroupIDs: es.EdgeGroups,
-			GroupStatus:  edgeStackTargetStatuses(es.EdgeGroups, statuses, groupEndpoints),
+			EdgeGroupIDs:        es.EdgeGroups,
+			GroupStatus:         edgeStackTargetStatuses(es.EdgeGroups, statuses, groupEndpoints),
+			ResolvedEndpointIDs: resolveEdgeGroupEndpoints(es.EdgeGroups, groupEndpoints),
 		},
 		CreationDate: es.CreationDate,
 		LastSyncDate: edgeStackLastSyncDate(statuses),
@@ -110,6 +112,17 @@ func isEdgeStackHealthyStatus(t portainer.EdgeStackStatusType) bool {
 		return true
 	}
 	return false
+}
+
+func resolveEdgeGroupEndpoints(groups []portainer.EdgeGroupID, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID) []portainer.EndpointID {
+	seen := set.Set[portainer.EndpointID]{}
+	for _, gid := range groups {
+		for _, epID := range groupEndpoints[gid] {
+			seen.Add(epID)
+
+		}
+	}
+	return seen.Keys()
 }
 
 func edgeStackTargetStatuses(

@@ -43,8 +43,9 @@ function getClusterIPUrls(services?: Application['Services']) {
       (service) =>
         (service.spec?.type === 'ClusterIP' &&
           service.spec?.ports?.map((port) => ({
-            url: `${getSchemeFromPort(port.port)}://${service?.spec
-              ?.clusterIP}:${port.port}`,
+            url: `${getSchemeFromPort(port.port)}://${
+              service?.spec?.clusterIP
+            }:${port.port}`,
             type: 'ClusterIP',
           }))) ||
         []

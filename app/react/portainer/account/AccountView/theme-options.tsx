@@ -27,4 +27,4 @@ export const options = [
     label: 'System Theme',
     value: 'auto',
   },
-];
+] as const;

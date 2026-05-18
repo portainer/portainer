@@ -31,7 +31,7 @@ function createWrappedForm() {
 // Default mock handlers
 function setupDefaultMocks() {
   server.use(
-    // Settings endpoint (for AMT check and intervals)
+    // Settings endpoint
     http.get('/api/settings', () =>
       HttpResponse.json({
         Edge: {
@@ -40,9 +40,6 @@ function setupDefaultMocks() {
           CommandInterval: 60,
         },
         EdgeAgentCheckinInterval: 5,
-        openAMTConfiguration: {
-          enabled: false,
-        },
       })
     ),
     // Groups endpoint

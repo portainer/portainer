@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { Laptop } from 'lucide-react';
+import { Laptop, Network } from 'lucide-react';
 
 import { generateKey } from '@/react/portainer/environments/environment.service/edge';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
@@ -8,12 +8,14 @@ import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { useSettings } from '@/react/portainer/settings/queries';
 import EdgeAgentStandardIcon from '@/react/edge/components/edge-agent-standard.svg?c';
 import EdgeAgentAsyncIcon from '@/react/edge/components/edge-agent-async.svg?c';
+import { ConnectivityTestModal } from '@/react/edge/components/ConnectivityTestModal/ConnectivityTestModal';
 
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { TextTip } from '@@/Tip/TextTip';
 import { BoxSelector } from '@@/BoxSelector';
 import { FormSection } from '@@/form-components/FormSection';
 import { CopyButton } from '@@/buttons';
+import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -140,6 +142,8 @@ function EdgeKeyInfo({
   tunnelUrl?: string;
   asyncMode: boolean;
 }) {
+  const [isConnectivityModalOpen, setIsConnectivityModalOpen] = useState(false);
+
   if (isLoading || !edgeKey) {
     return <div>Generating key for {url} ... </div>;
   }
@@ -169,6 +173,16 @@ function EdgeKeyInfo({
         asyncMode={asyncMode}
         showMetaFields
       >
+        <TextTip color="blue">
+          Portainer Server URL{' '}
+          {!asyncMode ? 'and tunnel server address are' : 'is'} set{' '}
+          <Link
+            to="portainer.settings.edgeCompute"
+            data-cy="server-url-portainer-edge-settings-link"
+          >
+            here
+          </Link>
+        </TextTip>
         <FormControl label="Portainer API server URL">
           <Input value={url} readOnly data-cy="edge-auto-create-url-input" />
         </FormControl>
@@ -183,17 +197,24 @@ function EdgeKeyInfo({
           </FormControl>
         )}
 
-        <TextTip color="blue">
-          Portainer Server URL{' '}
-          {!asyncMode ? 'and tunnel server address are' : 'is'} set{' '}
-          <Link
-            to="portainer.settings.edgeCompute"
-            data-cy="server-url-portainer-edge-settings-link"
-          >
-            here
-          </Link>
-        </TextTip>
+        <Button
+          color="default"
+          className="!ml-0 mb-8"
+          icon={Network}
+          onClick={() => setIsConnectivityModalOpen(true)}
+          data-cy="edge-auto-create-test-connectivity-button"
+        >
+          Test connectivity
+        </Button>
       </EdgeScriptForm>
+
+      {isConnectivityModalOpen && url && (
+        <ConnectivityTestModal
+          portainerUrl={url}
+          tunnelServerAddr={!asyncMode ? tunnelUrl : undefined}
+          onDismiss={() => setIsConnectivityModalOpen(false)}
+        />
+      )}
     </>
   );
 }

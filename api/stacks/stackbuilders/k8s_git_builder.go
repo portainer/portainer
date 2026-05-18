@@ -35,14 +35,12 @@ func CreateKubernetesStackGitBuilder(dataStore dataservices.DataStore,
 	}
 }
 
-func (b *KubernetesStackGitBuilder) prepare(ctx context.Context, payload *StackPayload) error {
+func (b *KubernetesStackGitBuilder) prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.Type = portainer.KubernetesStack
 	b.stack.Namespace = payload.Namespace
 	b.stack.Name = payload.StackName
 	b.stack.EntryPoint = payload.ManifestFile
-	b.stack.CreatedBy = b.user.Username
-
-	if err := b.GitMethodStackBuilder.prepare(ctx, payload); err != nil {
+	if err := b.GitMethodStackBuilder.prepare(ctx, payload, userID); err != nil {
 		return err
 	}
 

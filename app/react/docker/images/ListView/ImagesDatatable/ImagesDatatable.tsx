@@ -30,7 +30,8 @@ import { PruneButton } from './PruneButton';
 const tableKey = 'images';
 
 export interface TableSettings
-  extends BasicTableSettings,
+  extends
+    BasicTableSettings,
     RefreshableTableSettings,
     FilteredColumnsTableSettings {}
 

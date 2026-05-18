@@ -22,6 +22,8 @@ export const SortOptions = [
   'PlatformType',
   'LastCheckIn',
   'EdgeID',
+  'Health',
+  'Id',
 ] as const;
 export type SortType = (typeof SortOptions)[number];
 export function isSortType(value?: string): value is SortType {
@@ -30,6 +32,13 @@ export function isSortType(value?: string): value is SortType {
 
 export function getSortType(value?: string): SortType | undefined {
   return isSortType(value) ? value : undefined;
+}
+
+export function getSortTypeCaseInsensitive(
+  value?: string
+): SortType | undefined {
+  if (!value) return undefined;
+  return SortOptions.find((opt) => opt.toLowerCase() === value.toLowerCase());
 }
 
 export type Query = EnvironmentsQueryParams & {

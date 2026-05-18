@@ -27,19 +27,59 @@ import { createMockEnvironment } from '@/react-tools/test-mocks';
 import { EnvironmentList } from './EnvironmentList';
 
 // vi.hoisted ensures these are initialised before the vi.mock factory runs.
-const { mockUrlParams, mockStateServiceGo } = vi.hoisted(() => ({
-  mockUrlParams: {} as { groupBy?: string; filter?: string },
-  mockStateServiceGo: vi.fn(),
-}));
+// The store is reactive: stateService.go updates it and notifies React subscribers.
+const { mockUrlParamsStore, mockStateServiceGo } = vi.hoisted(() => {
+  let snapshot: Record<string, unknown> = {};
+  const listeners = new Set<() => void>();
+
+  function notify() {
+    listeners.forEach((l) => l());
+  }
+
+  return {
+    mockUrlParamsStore: {
+      subscribe: (listener: () => void) => {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+      getSnapshot: () => snapshot,
+      set: (params: Record<string, unknown>) => {
+        snapshot = { ...params };
+        notify();
+      },
+      reset: () => {
+        snapshot = {};
+        notify();
+      },
+    },
+    mockStateServiceGo: vi.fn(
+      (_route: string, params: Record<string, unknown>) => {
+        snapshot = { ...snapshot, ...params };
+        notify();
+      }
+    ),
+  };
+});
 
 vi.mock('@uirouter/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@uirouter/react')>();
   return {
     ...actual,
-    useCurrentStateAndParams: vi.fn(() => ({
-      params: mockUrlParams,
-      state: {},
-    })),
+    useCurrentStateAndParams: () => {
+      const [params, setParams] = useState(() =>
+        mockUrlParamsStore.getSnapshot()
+      );
+      useEffect(
+        () =>
+          mockUrlParamsStore.subscribe(() => {
+            setParams(mockUrlParamsStore.getSnapshot());
+          }),
+        []
+      );
+      return { params, state: {} };
+    },
     useRouter: vi.fn(() => ({ stateService: { go: mockStateServiceGo } })),
   };
 });
@@ -53,10 +93,7 @@ type MenuCtxType = {
 beforeEach(() => {
   sessionStorage.clear();
   localStorage.clear();
-  // Reset URL params and router spy between tests.
-  (Object.keys(mockUrlParams) as Array<keyof typeof mockUrlParams>).forEach(
-    (k) => delete mockUrlParams[k]
-  );
+  mockUrlParamsStore.reset();
   mockStateServiceGo.mockClear();
 });
 
@@ -190,38 +227,6 @@ test('renders environments returned by the API', async () => {
 
   await expect(findByText('prod-cluster')).resolves.toBeVisible();
   await expect(findByText('staging-cluster')).resolves.toBeVisible();
-});
-
-test('headerFilter "up" applies status filter to the API request', async () => {
-  let capturedParams: URLSearchParams | null = null;
-
-  server.use(
-    http.get('/api/endpoints', ({ request }) => {
-      capturedParams = new URL(request.url).searchParams;
-      return HttpResponse.json([], {
-        headers: {
-          'x-total-available': '0',
-          'x-total-count': '0',
-        },
-      });
-    })
-  );
-
-  const user = new UserViewModel({ Username: 'test', Role: 2 });
-  const Wrapped = withTestQueryProvider(
-    withUserProvider(
-      withTestRouter(() => (
-        <EnvironmentList onClickBrowse={vi.fn()} headerFilter="up" />
-      )),
-      user
-    )
-  );
-
-  render(<Wrapped />);
-
-  await screen.findByText('No environments available.');
-
-  expect(capturedParams!.getAll('status[]')).toContain('1');
 });
 
 test('sort buttons are rendered for each sort option', async () => {
@@ -451,7 +456,7 @@ test('Heartbeat filter shows only edge envs with an active heartbeat', async () 
 test('URL param groupBy=health applies Health sort to API request', async () => {
   let capturedParams: URLSearchParams | null = null;
 
-  mockUrlParams.groupBy = 'health';
+  mockUrlParamsStore.set({ groupBy: 'health' });
 
   await renderComponent(
     false,
@@ -467,15 +472,14 @@ test('URL param groupBy=health applies Health sort to API request', async () => 
   );
 
   await waitFor(() => {
-    expect(capturedParams?.get('sort')).toBe('Status');
+    expect(capturedParams?.get('sort')).toBe('Health');
   });
 });
 
-test('URL param groupBy=health&filter=up activates Up status filter in API request', async () => {
+test('URL param groupBy=health&groupFilter=up activates Up status filter in API request', async () => {
   let capturedParams: URLSearchParams | null = null;
 
-  mockUrlParams.groupBy = 'health';
-  mockUrlParams.filter = 'up';
+  mockUrlParamsStore.set({ groupBy: 'health', groupFilter: 'Up' });
 
   await renderComponent(
     false,
@@ -496,11 +500,10 @@ test('URL param groupBy=health&filter=up activates Up status filter in API reque
   });
 });
 
-test('URL param groupBy=platform&filter=docker activates Docker platform filter in API request', async () => {
+test('URL param groupBy=platform&groupFilter=docker activates Docker platform filter in API request', async () => {
   let capturedParams: URLSearchParams | null = null;
 
-  mockUrlParams.groupBy = 'platform';
-  mockUrlParams.filter = 'docker';
+  mockUrlParamsStore.set({ groupBy: 'platformtype', groupFilter: 'Docker' });
 
   await renderComponent(
     false,
@@ -521,11 +524,11 @@ test('URL param groupBy=platform&filter=docker activates Docker platform filter 
   });
 });
 
-test('URL param filter without groupBy is ignored (default Group sort used)', async () => {
+test('URL param groupFilter without groupBy is ignored (default Id sort used)', async () => {
   let capturedParams: URLSearchParams | null = null;
 
-  // filter present but no groupBy — the component should bail out early
-  mockUrlParams.filter = 'up';
+  // groupFilter present but no groupBy — the component should bail out early
+  mockUrlParamsStore.set({ groupFilter: 'up' });
 
   await renderComponent(
     false,
@@ -540,12 +543,12 @@ test('URL param filter without groupBy is ignored (default Group sort used)', as
     ]
   );
 
-  // status[] should not be sent; sort defaults to Group
+  // status[] should not be sent; sort defaults to Id (the Age sort key)
   await waitFor(() => {
     expect(capturedParams).not.toBeNull();
   });
   expect(capturedParams!.getAll('status[]')).toHaveLength(0);
-  expect(capturedParams!.get('sort')).toBe('Group');
+  expect(capturedParams!.get('sort')).toBe('Id');
 });
 
 test('selecting a sort/filter updates URL via stateService.go', async () => {
@@ -576,9 +579,9 @@ test('selecting a sort/filter updates URL via stateService.go', async () => {
 
   await waitFor(() => {
     expect(mockStateServiceGo).toHaveBeenCalledWith(
-      'portainer.home',
-      { groupBy: 'health', filter: 'up' },
-      { location: 'replace', inherit: true }
+      '.',
+      expect.objectContaining({ groupBy: 'Health', groupFilter: 'Up' }),
+      { reload: false }
     );
   });
 });

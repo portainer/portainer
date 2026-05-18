@@ -133,7 +133,7 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
         titleSize="sm"
         isFoldable
         defaultFolded={false}
-        className="[&>label]:mb-5"
+        className="mb-8"
       >
         <p className="text-muted mb-2 text-xs">
           These are legacy options that don&apos;t support edge features or

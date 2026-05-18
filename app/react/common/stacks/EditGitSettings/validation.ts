@@ -28,7 +28,8 @@ export function useValidationSchema(
         git: buildGitValidationSchema(
           gitCredentialsQuery.data || [],
           false,
-          isKubernetes ? 'manifest' : 'compose'
+          isKubernetes ? 'manifest' : 'compose',
+          true
         ),
 
         env: envVarValidation(),

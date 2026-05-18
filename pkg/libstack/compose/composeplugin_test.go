@@ -137,7 +137,6 @@ configs:
 	require.NoError(t, err)
 
 	require.False(t, containerExists(containerName))
-
 }
 
 func TestRun(t *testing.T) {
@@ -1133,6 +1132,23 @@ func Test_createProject(t *testing.T) {
 			expectedProject: expectedSimpleComposeProject("", map[string]string{"PORTAINER_WEB_FOLDER": "html-1"}),
 		},
 		{
+			name: "OS COMPOSE_ vars are passed to project",
+			filesToCreate: map[string]string{
+				"docker-compose.yml": testSimpleComposeConfig,
+			},
+			configFilepaths: []string{dir + "/docker-compose.yml"},
+			options: libstack.Options{
+				ProjectName: projectName,
+			},
+			osEnv: map[string]string{
+				"COMPOSE_PARALLEL_LIMIT": "4",
+				"other_var":              "something",
+			},
+			expectedProject: expectedSimpleComposeProject("", map[string]string{
+				"COMPOSE_PARALLEL_LIMIT": "4",
+			}),
+		},
+		{
 			name: "Env Vars in compose file, compose env file, env, os, and env_file",
 			filesToCreate: map[string]string{
 				"docker-compose.yml": `services:
@@ -1374,7 +1390,7 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 	"auths": {}
 }`
 	configPath := filesystem.JoinPaths(tmpDir, "config.json")
-	err := os.WriteFile(configPath, []byte(configJSON), 0644)
+	err := os.WriteFile(configPath, []byte(configJSON), 0o644)
 	require.NoError(t, err)
 
 	t.Run("withCli preserves credsStore when no registries provided", func(t *testing.T) {
@@ -1384,8 +1400,8 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 		var capturedCredsStore string
 		var capturedAuthConfigs map[string]configtypes.AuthConfig
 
-		err = withCli(t.Context(), libstack.Options{}, func(ctx context.Context, cli *command.DockerCli) error {
-			// Capture the state after withCli sets up credentials
+		err = libstack.WithCli(t.Context(), libstack.DockerCliOptions{}, func(ctx context.Context, cli *command.DockerCli) error {
+			// Capture the state after WithCli sets up credentials
 			capturedCredsStore = cli.ConfigFile().CredentialsStore
 			capturedAuthConfigs = cli.ConfigFile().AuthConfigs
 			return nil
@@ -1416,12 +1432,14 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 		var capturedCredsStore string
 		var capturedAuthConfigs map[string]configtypes.AuthConfig
 
-		err = withCli(t.Context(), libstack.Options{Registries: registries}, func(ctx context.Context, cli *command.DockerCli) error {
-			// Capture the state after withCli sets up credentials
-			capturedCredsStore = cli.ConfigFile().CredentialsStore
-			capturedAuthConfigs = cli.ConfigFile().AuthConfigs
-			return nil
-		})
+		err = libstack.WithCli(t.Context(),
+			libstack.DockerCliOptions{Registries: registries},
+			func(ctx context.Context, cli *command.DockerCli) error {
+				// Capture the state after WithCli sets up credentials
+				capturedCredsStore = cli.ConfigFile().CredentialsStore
+				capturedAuthConfigs = cli.ConfigFile().AuthConfigs
+				return nil
+			})
 		require.NoError(t, err)
 
 		// Verify the fix: credsStore should be empty when registries are provided
@@ -1434,6 +1452,100 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 		require.Equal(t, "testuser", capturedAuthConfigs["registry.example.com"].Username,
 			"custom registry username should match")
 	})
+}
+
+func TestGetImageNameOrDefault(t *testing.T) {
+	testCases := []struct {
+		name         string
+		service      types.ServiceConfig
+		projectName  string
+		expectedName string
+	}{
+		{
+			name:         "service with explicit image",
+			service:      types.ServiceConfig{Name: "web", Image: "nginx:latest"},
+			projectName:  "myproject",
+			expectedName: "nginx:latest",
+		},
+		{
+			name:         "service without image uses default",
+			service:      types.ServiceConfig{Name: "web", Image: ""},
+			projectName:  "myproject",
+			expectedName: "myproject-web",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			gotName := getImageNameOrDefault(tc.service, tc.projectName)
+			require.Equal(t, tc.expectedName, gotName)
+		})
+	}
+}
+
+func TestEncodeRegistryAuth(t *testing.T) {
+	testCases := []struct {
+		name               string
+		image              string
+		registries         []configtypes.AuthConfig
+		expectRegistryAuth string
+		expectError        string
+	}{
+		{
+			name:  "matching registry returns encoded auth",
+			image: "myregistry.example.com/myimage:latest",
+			registries: []configtypes.AuthConfig{
+				{ServerAddress: "myregistry.example.com", Username: "user", Password: "pass"},
+			},
+			expectRegistryAuth: "eyJ1c2VybmFtZSI6InVzZXIiLCJwYXNzd29yZCI6InBhc3MiLCJzZXJ2ZXJhZGRyZXNzIjoibXlyZWdpc3RyeS5leGFtcGxlLmNvbSJ9",
+		},
+		{
+			name:  "unknown registry returns empty string",
+			image: "myregistry.example.com/myimage:latest",
+			registries: []configtypes.AuthConfig{
+				{ServerAddress: "other.registry.com", Username: "user", Password: "pass"},
+			},
+			expectRegistryAuth: "",
+		},
+		{
+			name:  "docker.io image matches index server",
+			image: "alpine:latest",
+			registries: []configtypes.AuthConfig{
+				{ServerAddress: "https://index.docker.io/v1/", Username: "user", Password: "pass"},
+			},
+			expectRegistryAuth: "eyJ1c2VybmFtZSI6InVzZXIiLCJwYXNzd29yZCI6InBhc3MiLCJzZXJ2ZXJhZGRyZXNzIjoiaHR0cHM6Ly9pbmRleC5kb2NrZXIuaW8vdjEvIn0=",
+		},
+		{
+			name:               "invalid image reference returns error",
+			image:              "INVALID::IMAGE",
+			registries:         []configtypes.AuthConfig{},
+			expectRegistryAuth: "",
+			expectError:        `failed to parse image reference "INVALID::IMAGE": invalid reference format: repository name (library/INVALID) must be lowercase`,
+		},
+		{
+			name:  "multiple registries only matching one used",
+			image: "registry-b.example.com/image:latest",
+			registries: []configtypes.AuthConfig{
+				{ServerAddress: "registry-a.example.com", Username: "user-a", Password: "pass-a"},
+				{ServerAddress: "registry-b.example.com", Username: "user-b", Password: "pass-b"},
+			},
+			expectRegistryAuth: "eyJ1c2VybmFtZSI6InVzZXItYiIsInBhc3N3b3JkIjoicGFzcy1iIiwic2VydmVyYWRkcmVzcyI6InJlZ2lzdHJ5LWIuZXhhbXBsZS5jb20ifQ==",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			gotRegistryAuth, err := encodeRegistryAuth(tc.image, tc.registries)
+
+			if tc.expectError == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, tc.expectError)
+			}
+
+			require.Equal(t, tc.expectRegistryAuth, gotRegistryAuth)
+		})
+	}
 }
 
 func createMockComposeService(command.Cli, ...compose.Option) api.Compose {

@@ -1,4 +1,4 @@
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-webpack5';
 
 import {
   Environment,
@@ -11,7 +11,7 @@ import { EnvironmentItem } from './EnvironmentItem';
 
 export default {
   component: EnvironmentItem,
-  title: 'Home/EnvironmentList/EnvironmentItem',
+  title: 'Components/Home/EnvironmentList/EnvironmentItem',
 };
 
 interface Args {

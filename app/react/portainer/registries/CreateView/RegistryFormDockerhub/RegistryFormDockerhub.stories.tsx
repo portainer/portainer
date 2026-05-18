@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
@@ -9,7 +9,7 @@ import {
 
 const meta: Meta<typeof RegistryFormDockerhub> = {
   component: withTestQueryProvider(RegistryFormDockerhub),
-  title: 'Components/Form/RegistryFormDockerhub',
+  title: 'Components/Forms/RegistryFormDockerhub',
   argTypes: {
     isLoading: { control: 'boolean' },
     submitLabel: { control: 'text' },

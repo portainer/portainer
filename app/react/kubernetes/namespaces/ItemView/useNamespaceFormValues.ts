@@ -30,11 +30,10 @@ export function computeInitialValues({
   const memory = namespace.ResourceQuota?.spec?.hard?.['requests.memory'] ?? '';
   const cpu = namespace.ResourceQuota?.spec?.hard?.['requests.cpu'] ?? '';
 
-  const registriesUsed = registries?.filter(
-    (registry) =>
-      registry.RegistryAccesses?.[`${environmentId}`]?.Namespaces.includes(
-        namespaceName
-      )
+  const registriesUsed = registries?.filter((registry) =>
+    registry.RegistryAccesses?.[`${environmentId}`]?.Namespaces.includes(
+      namespaceName
+    )
   );
 
   return {

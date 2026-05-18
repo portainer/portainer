@@ -127,10 +127,13 @@
 
   <ldap-custom-admin-group
     class="block"
-    settings="$ctrl.settings"
-    on-search-click="($ctrl.onSearchAdminGroupsClick)"
+    ldap-settings="$ctrl.settings"
+    search-settings="$ctrl.settings.AdminGroupSearchSettings"
+    on-search-settings-change="($ctrl.onAdminGroupSearchSettingsChange)"
+    auto-populate="$ctrl.settings.AdminAutoPopulate"
+    on-auto-populate-change="($ctrl.onAutoPopulateChange)"
     selected-admin-groups="$ctrl.selectedAdminGroups"
-    default-admin-group-search-filter="'(objectClass=groupOfNames)'"
+    on-selected-admin-groups-change="($ctrl.onSelectedAdminGroupsChange)"
     limited-feature-id="$ctrl.limitedFeatureId"
     is-limited-feature-self-contained="true"
   ></ldap-custom-admin-group>

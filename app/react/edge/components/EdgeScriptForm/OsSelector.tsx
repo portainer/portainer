@@ -26,7 +26,7 @@ export function OsSelector({ onChange, value }: Props) {
               label: (
                 <>
                   <Icon icon={Linux} className="mr-1" />
-                  Linux
+                  Linux & Windows WSL
                 </>
               ),
             },
@@ -35,7 +35,7 @@ export function OsSelector({ onChange, value }: Props) {
               label: (
                 <>
                   <Icon icon={LayoutGrid} className="mr-1" />
-                  Windows
+                  Windows WCS
                 </>
               ),
             },

@@ -53,6 +53,8 @@ type settingsUpdatePayload struct {
 	EnforceEdgeID *bool `example:"false"`
 	// EdgePortainerURL is the URL that is exposed to edge agents
 	EdgePortainerURL *string `json:"EdgePortainerURL"`
+	// ForceSecureCookies forces the Secure attribute on auth cookies regardless of the detected scheme
+	ForceSecureCookies *bool `example:"false"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -202,6 +204,7 @@ func (handler *Handler) updateSettings(tx dataservices.DataStoreTx, payload sett
 	settings.TrustOnFirstConnect = *cmp.Or(payload.TrustOnFirstConnect, &settings.TrustOnFirstConnect)
 	settings.EnforceEdgeID = *cmp.Or(payload.EnforceEdgeID, &settings.EnforceEdgeID)
 	settings.EdgePortainerURL = *cmp.Or(payload.EdgePortainerURL, &settings.EdgePortainerURL)
+	settings.ForceSecureCookies = *cmp.Or(payload.ForceSecureCookies, &settings.ForceSecureCookies)
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		if err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval); err != nil {

@@ -166,7 +166,6 @@ export type Environment = {
   Kubernetes: KubernetesSettings;
   PublicURL?: string;
   UserTrusted?: boolean;
-  AMTDeviceGUID?: string;
   Edge: EnvironmentEdge;
   SecuritySettings: EnvironmentSecuritySettings;
   Gpus?: { name: string; value: string }[];

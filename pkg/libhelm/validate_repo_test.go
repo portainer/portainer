@@ -80,7 +80,7 @@ func TestValidateHelmRepositoryURL(t *testing.T) {
 	// Failure
 	fail = true
 
-	var failureURLs = []string{
+	failureURLs := []string{
 		"",
 		"!",
 		"oci://example.com",

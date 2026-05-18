@@ -123,15 +123,6 @@ func (d *stackDeployer) DeployRemoteSwarmStack(
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	if err := d.swarmStackManager.Login(ctx, registries, endpoint); err != nil {
-		log.Warn().Err(err).Msg("unable to login to registries for swarm stack deployment")
-	}
-	defer func() {
-		if err := d.swarmStackManager.Logout(ctx, endpoint); err != nil {
-			log.Warn().Err(err).Msg("unable to logout from registries after swarm stack deployment")
-		}
-	}()
-
 	return d.remoteStack(ctx, stack, endpoint, OperationSwarmDeploy, unpackerCmdBuilderOptions{
 		pullImage:     pullImage,
 		prune:         prune,
@@ -223,7 +214,6 @@ func (d *stackDeployer) remoteStack(ctx context.Context, stack *portainer.Stack,
 			fmt.Sprintf("%s:%s", targetSocketBindHost, targetSocketBindContainer),
 		},
 	}, nil, nil, fmt.Sprintf("portainer-unpacker-%d-%s-%d", stack.ID, stack.Name, librand.Intn(100)))
-
 	if err != nil {
 		return errors.Wrap(err, "unable to create unpacker container")
 	}

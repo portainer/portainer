@@ -14,17 +14,17 @@ import {
   PlatformType,
 } from '@/react/portainer/environments/types';
 
-import { GroupEntry } from '@@/GroupSortTable/GroupSortTable';
+import { DropdownOption } from '@@/DropdownMenu/DropdownMenu';
 
 export function useAvailableSortGroups(
   summaryQueryData: EnvironmentSummaryCounts | undefined
 ) {
-  return useMemo<Record<string, GroupEntry[]>>(
+  return useMemo<Record<string, DropdownOption[]>>(
     () => ({
       Group: summaryQueryData
         ? buildGroupEntries(summaryQueryData.byGroup ?? [])
         : [],
-      Platform: summaryQueryData
+      PlatformType: summaryQueryData
         ? buildPlatformEntries(summaryQueryData.byPlatformType ?? [])
         : [],
       Health: summaryQueryData
@@ -35,7 +35,7 @@ export function useAvailableSortGroups(
   );
 }
 
-function buildGroupEntries(byGroup: GroupCount[]): GroupEntry[] {
+function buildGroupEntries(byGroup: GroupCount[]): DropdownOption[] {
   return byGroup.map(({ groupName, groupID, count }) => ({
     key: groupID.toString(),
     label: groupName,
@@ -44,7 +44,9 @@ function buildGroupEntries(byGroup: GroupCount[]): GroupEntry[] {
   }));
 }
 
-function buildPlatformEntries(byPlatformType: PlatformCounts): GroupEntry[] {
+function buildPlatformEntries(
+  byPlatformType: PlatformCounts
+): DropdownOption[] {
   const categories: Array<{
     key: keyof PlatformCounts;
     platformType: PlatformType;
@@ -63,7 +65,7 @@ function buildPlatformEntries(byPlatformType: PlatformCounts): GroupEntry[] {
     .filter(({ count }) => count > 0);
 }
 
-function buildHealthEntries(byHealth: HealthCounts): GroupEntry[] {
+function buildHealthEntries(byHealth: HealthCounts): DropdownOption[] {
   const categories: Array<{ key: keyof HealthCounts; healthStatus: number }> = [
     { key: 'down', healthStatus: EnvironmentHealth.Down },
     { key: 'outdated', healthStatus: EnvironmentHealth.Outdated },

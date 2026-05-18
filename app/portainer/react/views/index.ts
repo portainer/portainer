@@ -10,7 +10,6 @@ import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeV
 import { BackupSettingsPanel } from '@/react/portainer/settings/SettingsView/BackupSettingsView/BackupSettingsPanel';
 import { SettingsView } from '@/react/portainer/settings/SettingsView/SettingsView';
 import { CreateHelmRepositoriesView } from '@/react/portainer/account/helm-repositories/CreateHelmRepositoryView';
-import { WorkflowsView } from '@/react/portainer/gitops/WorkflowsView/WorkflowsView';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -21,6 +20,7 @@ import { activityLogsModule } from './activity-logs';
 import { templatesModule } from './templates';
 import { usersModule } from './users';
 import { environmentsModule } from './environments';
+import { gitopsViewsModule } from './gitops';
 
 export const viewsModule = angular
   .module('portainer.app.react.views', [
@@ -33,6 +33,7 @@ export const viewsModule = angular
     templatesModule,
     usersModule,
     environmentsModule,
+    gitopsViewsModule,
   ])
   .component(
     'homeView',
@@ -67,8 +68,4 @@ export const viewsModule = angular
       withUIRouter(withReactQuery(withCurrentUser(CreateHelmRepositoriesView))),
       []
     )
-  )
-  .component(
-    'workflowsView',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(WorkflowsView))), [])
   ).name;

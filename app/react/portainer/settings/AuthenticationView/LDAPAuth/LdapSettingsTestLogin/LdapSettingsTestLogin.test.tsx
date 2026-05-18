@@ -6,6 +6,8 @@ import { describe, expect, test } from 'vitest';
 import { server, http } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
+import { LDAPSettings } from '../../../types';
+
 import { LdapSettingsTestLogin } from './LdapSettingsTestLogin';
 
 const mockSettings = {
@@ -20,7 +22,7 @@ const mockSettings = {
   SearchSettings: [],
   GroupSearchSettings: [],
   AutoCreateUsers: false,
-};
+} satisfies LDAPSettings;
 
 function renderComponent() {
   const Wrapped = withTestQueryProvider(LdapSettingsTestLogin);

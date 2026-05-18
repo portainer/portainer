@@ -31,8 +31,7 @@ import { useDeleteJobsMutation } from './queries/useDeleteJobsMutation';
 const storageKey = 'jobs';
 
 interface TableSettings
-  extends KubeTableSettings,
-    FilteredColumnsTableSettings {}
+  extends KubeTableSettings, FilteredColumnsTableSettings {}
 
 export function JobsDatatable() {
   const environmentId = useEnvironmentId();

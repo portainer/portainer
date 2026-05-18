@@ -20,9 +20,13 @@ type GitMethodStackBuilder struct {
 	scheduler  *scheduler.Scheduler
 }
 
-func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPayload) error {
+func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.AdditionalFiles = payload.AdditionalFiles
 	b.stack.AutoUpdate = payload.AutoUpdate
+
+	if err := b.initCreatedBy(userID); err != nil {
+		return err
+	}
 
 	var repoConfig gittypes.RepoConfig
 	if payload.Authentication {

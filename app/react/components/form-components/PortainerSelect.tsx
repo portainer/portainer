@@ -33,14 +33,14 @@ type Options<TValue> = OptionsOrGroups<
 >;
 
 interface SharedProps<TValue>
-  extends AutomationTestingProps,
-    Pick<AriaAttributes, 'aria-label'> {
+  extends AutomationTestingProps, Pick<AriaAttributes, 'aria-label'> {
   name?: string;
   inputId?: string;
   size?: 'sm' | 'md';
   placeholder?: string;
   disabled?: boolean;
   isClearable?: boolean;
+  /** Portals the dropdown to document.body, ensuring it renders above sticky footers and overlays. */
   bindToBody?: boolean;
   isLoading?: boolean;
   noOptionsMessage?: () => string;

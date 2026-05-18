@@ -4,8 +4,7 @@ import {
 } from '@@/datatables/types';
 
 export interface GitCredentialTableSettings
-  extends SortableTableSettings,
-    PaginationTableSettings {}
+  extends SortableTableSettings, PaginationTableSettings {}
 
 export enum AuthTypeOption {
   Basic = 0,

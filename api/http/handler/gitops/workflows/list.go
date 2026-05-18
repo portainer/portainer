@@ -10,13 +10,9 @@ import (
 
 	gocache "github.com/patrickmn/go-cache"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	svc "github.com/portainer/portainer/api/gitops/workflows"
-	"github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/http/utils/filters"
-	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -141,115 +137,7 @@ func (h *Handler) getWorkflows(ctx context.Context, key string, sc *security.Res
 }
 
 func (h *Handler) fetchWorkflows(ctx context.Context, sc *security.RestrictedRequestContext, endpointIDSet set.Set[portainer.EndpointID]) ([]svc.Workflow, error) {
-	var entries []portainer.Stack
-	var endpointMap map[portainer.EndpointID]portainer.Endpoint
-
-	err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-		stacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool {
-			return s.GitConfig != nil && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
-		})
-		if err != nil {
-			return err
-		}
-
-		endpointMap, err = buildEndpointMap(tx, stacks)
-		if err != nil {
-			return err
-		}
-
-		stacks, err = filterDockerStacksByAccess(tx, stacks, sc)
-		if err != nil {
-			return err
-		}
-
-		for i := range stacks {
-			s := stacks[i]
-
-			if ep, ok := endpointMap[s.EndpointID]; ok && !endpointMatchesStackType(ep, s.Type) {
-				continue
-			}
-			entries = append(entries, s)
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	accessMap, err := buildEndpointAccessMap(h.k8sFactory, sc, endpointMap)
-	if err != nil {
-		return nil, err
-	}
-
-	entries, err = filterK8SStacks(entries, endpointMap, h.k8sFactory, accessMap)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]svc.Workflow, 0, len(entries))
-	for _, s := range entries {
-		source, artifact := computeGitPhases(ctx, h.gitService, s.GitConfig)
-		items = append(items, svc.MapStackToWorkflow(s, s.GitConfig, source, artifact))
-	}
-
-	return items, nil
-}
-
-// lookup only if env is kube and either not edge or (edge + not async)
-func shouldPerformEnvLookup(endpoint *portainer.Endpoint) bool {
-	return endpointutils.IsKubernetesEndpoint(endpoint) &&
-		(!endpointutils.IsEdgeEndpoint(endpoint) ||
-			(endpointutils.IsEdgeEndpoint(endpoint) && !endpoint.Edge.AsyncMode))
-}
-
-func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.EndpointID]portainer.Endpoint, k8sFactory *cli.ClientFactory, accessMap map[portainer.EndpointID]endpointAccess) ([]portainer.Stack, error) {
-	k8sStacks, result := slicesx.Partition(items, func(s portainer.Stack) bool {
-		return s.Type == portainer.KubernetesStack
-	})
-
-	groupedByEnvId := slicesx.GroupBy(k8sStacks, func(s portainer.Stack) portainer.EndpointID {
-		return s.EndpointID
-	})
-
-	for envID, stacks := range groupedByEnvId {
-		ep, ok := endpointMap[envID]
-		if !ok || !shouldPerformEnvLookup(&ep) {
-			continue
-		}
-
-		kcl, err := k8sFactory.GetPrivilegedKubeClient(&ep)
-		if err != nil {
-			return nil, err
-		}
-
-		access := accessMap[envID]
-		kcl.SetIsKubeAdmin(access.isKubeAdmin)
-		kcl.SetClientNonAdminNamespaces(access.nonAdminNamespaces)
-
-		apps, err := kcl.GetApplications("", "")
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range stacks {
-			idx := slices.IndexFunc(apps, func(app kubernetes.K8sApplication) bool {
-				return app.StackKind != "edge" && app.StackID == strconv.Itoa(int(s.ID))
-			})
-			if idx == -1 {
-				// if we don't find a matching application (deployment/statefulset/daemonset) in the environment workloads
-				// this workflow (stack) wouldn't show in the Applications list, so we don't keep it
-				continue
-			}
-
-			app := apps[idx]
-
-			s.Name = app.Name
-			s.Namespace = app.ResourcePool
-
-			result = append(result, s)
-		}
-	}
-	return result, nil
+	return svc.FetchWorkflows(ctx, h.dataStore, h.gitService, h.k8sFactory, sc, endpointIDSet)
 }
 
 func cacheKey(sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) string {

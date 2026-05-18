@@ -23,13 +23,14 @@ interface Props {
   badge?: string | null;
   onClick?: () => void;
   className?: string;
+  'aria-pressed'?: boolean;
   'data-cy'?: string;
 }
 
 const menuListStyles =
-  'overflow-hidden rounded-lg ' +
+  'mt-1 overflow-hidden rounded-lg ' +
   'shadow-[0_6px_12px_rgba(0,0,0,0.18)] ' +
-  'border border-solid border-gray-4 th-dark:border-gray-8 ' +
+  '!border !border-solid !border-gray-5 th-dark:!border-gray-8 th-highcontrast:!border-gray-7 ' +
   'bg-white th-dark:bg-gray-iron-11 th-highcontrast:bg-black';
 
 const menuItemBase =
@@ -46,8 +47,8 @@ const menuItemUnselected =
   'th-highcontrast:text-white th-highcontrast:hover:bg-white th-highcontrast:hover:text-black th-highcontrast:[&[data-selected]]:!bg-white th-highcontrast:[&[data-selected]]:!text-black';
 
 const countBadge =
-  'ml-2 rounded-full px-1.5 py-0.5 text-xs font-normal ' +
-  'bg-gray-2 text-gray-9 ' +
+  'inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full px-1 text-xs font-normal ' +
+  'bg-gray-4 text-gray-9 ' +
   'th-dark:bg-gray-7 th-dark:text-gray-3 ' +
   'th-highcontrast:bg-blue-8 th-highcontrast:text-white';
 
@@ -59,6 +60,7 @@ export function DropdownMenu({
   badge,
   onClick,
   className,
+  'aria-pressed': ariaPressed,
   'data-cy': dataCy,
 }: Props) {
   return (
@@ -66,6 +68,7 @@ export function DropdownMenu({
       <ReachMenuButton
         className={clsx('group flex gap-1', className)}
         onClick={() => onClick?.()}
+        aria-pressed={ariaPressed}
         data-cy={dataCy}
       >
         {label}
@@ -96,6 +99,10 @@ export function DropdownMenu({
             >
               <span className="flex-1">All</span>
             </MenuItem>
+            <div
+              className="h-px bg-gray-4 th-highcontrast:bg-gray-7 th-dark:bg-gray-8"
+              role="separator"
+            />
             {options.map((option) => (
               <MenuItem
                 key={option.key}

@@ -68,7 +68,7 @@ export function UpgradeButton({
   const latestVersionAvailable = versions[0]?.Version ?? '';
   const isNewVersionAvailable = Boolean(
     latestVersionQuery?.data &&
-      semverCompare(latestVersionAvailable, latestVersionQuery?.data) === 1
+    semverCompare(latestVersionAvailable, latestVersionQuery?.data) === 1
   );
 
   const currentRepo = versions?.find(

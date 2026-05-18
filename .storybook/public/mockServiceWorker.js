@@ -1,8 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import { v4 as uuidv4 } from 'uuid';
-
 /**
  * Mock Service Worker.
  * @see https://github.com/mswjs/msw
@@ -111,7 +109,7 @@ addEventListener('fetch', function (event) {
     return;
   }
 
-  const requestId = uuidv4();
+  const requestId = crypto.randomUUID();
   event.respondWith(handleRequest(event, requestId, requestInterceptedAt));
 });
 

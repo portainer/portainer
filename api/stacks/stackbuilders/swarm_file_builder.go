@@ -27,13 +27,17 @@ func CreateSwarmStackFileBuilder(securityContext *security.RestrictedRequestCont
 	}
 }
 
-func (b *SwarmStackFileBuilder) prepare(_ context.Context, payload *StackPayload) error {
+func (b *SwarmStackFileBuilder) prepare(_ context.Context, payload *StackPayload, userID portainer.UserID) error {
 	b.stack.Name = payload.Name
 	b.stack.Type = portainer.DockerSwarmStack
 	b.stack.SwarmID = payload.SwarmID
 	b.stack.EntryPoint = filesystem.ComposeFileDefaultName
 	b.stack.Env = payload.Env
 	b.stack.FromAppTemplate = payload.FromAppTemplate
+
+	if err := b.initCreatedBy(userID); err != nil {
+		return err
+	}
 
 	return b.storeStackFile(payload.StackFileContent)
 }

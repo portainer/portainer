@@ -1,4 +1,4 @@
-<div class="col-sm-12" style="margin-bottom: 0px">
+<div class="col-sm-12 !mb-4">
   <div class="be-indicator-container limited-be">
     <div class="limited-be-link vertical-center"><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator></div>
     <div class="limited-be-content">
@@ -17,9 +17,7 @@
                 </por-select>
               </div>
             </div>
-            <div ng-if="$ctrl.selectedUserId">
-              <effective-access-viewer-datatable ng-if="$ctrl.selectedUserId" dataset="$ctrl.userRoles"> </effective-access-viewer-datatable>
-            </div>
+            <effective-access-viewer user-id="$ctrl.selectedUserId"></effective-access-viewer>
           </form>
         </rd-widget-body>
       </rd-widget>

@@ -9,9 +9,10 @@
 export type ToTuple<Union> = ToTupleRec<Union, []>;
 
 // Recursively build a tuple from a union
-type ToTupleRec<Union, Result extends any[]> = SpliceOne<Union> extends never
-  ? [ExtractOne<Union>, ...Result]
-  : ToTupleRec<SpliceOne<Union>, [ExtractOne<Union>, ...Result]>;
+type ToTupleRec<Union, Result extends any[]> =
+  SpliceOne<Union> extends never
+    ? [ExtractOne<Union>, ...Result]
+    : ToTupleRec<SpliceOne<Union>, [ExtractOne<Union>, ...Result]>;
 
 // Remove the first element of union
 type SpliceOne<Union> = Exclude<Union, ExtractOne<Union>>;
@@ -67,9 +68,8 @@ type ExtractParam<F> = F extends { (a: infer A): void } ? A : never;
  * ```
  *
  */
-type UnionToIntersection<U> = UnionToParam<U> extends (k: infer I) => void
-  ? I
-  : never;
+type UnionToIntersection<U> =
+  UnionToParam<U> extends (k: infer I) => void ? I : never;
 
 /**
  * Transform T to `(k: T) => void` (excluding never)

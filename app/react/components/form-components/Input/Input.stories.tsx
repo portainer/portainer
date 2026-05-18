@@ -1,10 +1,10 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-webpack5';
 import { useState } from 'react';
 
 import { Input } from './Input';
 
 export default {
-  title: 'Components/Form/Input',
+  title: 'Components/Forms/Input',
   args: {
     disabled: false,
   },

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -62,8 +63,12 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
+	var settings *portainer.Settings
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		settings, err = tx.Settings().Settings()
+		return err
+	}); err != nil {
 		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
@@ -113,5 +118,5 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	}
 
-	return handler.writeToken(w, user, false)
+	return handler.writeToken(w, r, user, false, settings.ForceSecureCookies)
 }

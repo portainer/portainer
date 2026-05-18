@@ -171,7 +171,8 @@ export async function validateGitForm(
 export function buildGitValidationSchema(
   gitCredentials: Array<GitCredential>,
   isCreatedFromCustomTemplate: boolean,
-  deployMethod: DeployMethod
+  deployMethod: DeployMethod,
+  isEdit = false
 ): SchemaOf<GitFormModel> {
   return object({
     RepositoryURL: string()
@@ -199,6 +200,6 @@ export function buildGitValidationSchema(
     AutoUpdate: autoUpdateValidation().nullable(),
     TLSSkipVerify: boolean().default(false),
   }).concat(
-    gitAuthValidation(gitCredentials, false, isCreatedFromCustomTemplate)
+    gitAuthValidation(gitCredentials, isEdit, isCreatedFromCustomTemplate)
   ) as SchemaOf<GitFormModel>;
 }

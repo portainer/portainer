@@ -399,81 +399,25 @@ func Test_apiKeyLookup(t *testing.T) {
 	})
 }
 
-func Test_ShouldSkipCSRFCheck(t *testing.T) {
+func Test_mwAuthenticateFirst_rejectsBothAPIKeyAndBearerToken(t *testing.T) {
 	t.Parallel()
-	tt := []struct {
-		name                     string
-		cookieValue              string
-		apiKey                   string
-		authHeader               string
-		isDockerDesktopExtension bool
-		expectedResult           bool
-		expectedError            bool
-	}{
-		{
-			name:                     "Should return false (not skip) when cookie is present",
-			cookieValue:              "test-cookie",
-			isDockerDesktopExtension: false,
-		},
-		{
-			name:                     "Should return true (skip) when cookie is present and docker desktop extension is true",
-			cookieValue:              "test-cookie",
-			isDockerDesktopExtension: true,
-			expectedResult:           true,
-		},
-		{
-			name:                     "Should return true (skip) when cookie is not present",
-			cookieValue:              "",
-			isDockerDesktopExtension: false,
-			expectedResult:           true,
-		},
-		{
-			name:                     "Should return true (skip) when api key is present",
-			cookieValue:              "",
-			apiKey:                   "test-api-key",
-			isDockerDesktopExtension: false,
-			expectedResult:           true,
-		},
-		{
-			name:                     "Should return true (skip) when auth header is present",
-			cookieValue:              "",
-			authHeader:               "test-auth-header",
-			isDockerDesktopExtension: false,
-			expectedResult:           true,
-		},
-		{
-			name:                     "Should return false (not skip) and error when both api key and auth header are present",
-			cookieValue:              "",
-			apiKey:                   "test-api-key",
-			authHeader:               "test-auth-header",
-			isDockerDesktopExtension: false,
-			expectedError:            true,
-		},
-	}
+	_, store := datastore.MustNewTestStore(t, true, true)
 
-	for _, test := range tt {
-		t.Run(test.name, func(t *testing.T) {
-			is := assert.New(t)
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
-			if test.cookieValue != "" {
-				req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: test.cookieValue})
-			}
-			if test.apiKey != "" {
-				req.Header.Set(apiKeyHeader, test.apiKey)
-			}
-			if test.authHeader != "" {
-				req.Header.Set(jwtTokenHeader, test.authHeader)
-			}
+	jwtService, err := jwt.NewService("1h", store)
+	require.NoError(t, err)
 
-			result, err := ShouldSkipCSRFCheck(req, test.isDockerDesktopExtension)
-			is.Equal(test.expectedResult, result)
-			if test.expectedError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
+	apiKeyService := apikey.NewAPIKeyService(nil, nil)
+	bouncer := NewRequestBouncer(t.Context(), store, jwtService, apiKeyService)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set(apiKeyHeader, "test-api-key")
+	req.Header.Set(jwtTokenHeader, "Bearer test-token")
+
+	rr := httptest.NewRecorder()
+	h := bouncer.mwAuthenticateFirst(nil, testHandler200)
+	h.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusUnauthorized, rr.Code)
 }
 
 func TestJWTRevocation(t *testing.T) {

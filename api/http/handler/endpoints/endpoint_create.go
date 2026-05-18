@@ -90,6 +90,10 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
 	payload.TLS = useTLS
 
+	if payload.TLS && payload.EndpointCreationType == edgeAgentEnvironment {
+		return errors.New("TLS is not supported for Edge Agent environments")
+	}
+
 	if payload.TLS {
 		skipTLSServerVerification, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLSSkipVerify", true)
 		payload.TLSSkipVerify = skipTLSServerVerification

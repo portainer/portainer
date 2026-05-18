@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	portainer "github.com/portainer/portainer/api"
 	zerolog "github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
@@ -24,6 +25,59 @@ func TestOptionParser(t *testing.T) {
 
 	require.False(t, *opts.HTTPDisabled)
 	require.True(t, *opts.EnableEdgeComputeFeatures)
+}
+
+func TestParseKubectlShellImageFlag(t *testing.T) {
+	tests := []struct {
+		name                         string
+		args                         []string
+		envVars                      map[string]string
+		expectedKubectlShellImageSet bool
+		expectedKubectlShellFlag     string
+	}{
+		{
+			name:                         "no flag, no env var",
+			expectedKubectlShellImageSet: false,
+			expectedKubectlShellFlag:     portainer.DefaultKubectlShellImage,
+		},
+		{
+			name:                         "explicit flag",
+			args:                         []string{"portainer", "--kubectl-shell-image=myimage:v2"},
+			expectedKubectlShellImageSet: true,
+			expectedKubectlShellFlag:     "myimage:v2",
+		},
+		{
+			name:                         "env var",
+			envVars:                      map[string]string{portainer.KubectlShellImageEnvVar: "myimage:v3"},
+			expectedKubectlShellImageSet: true,
+			expectedKubectlShellFlag:     "myimage:v3",
+		},
+		{
+			name:                         "both env var and flag set",
+			args:                         []string{"portainer", "--kubectl-shell-image=myimage:v2"},
+			envVars:                      map[string]string{portainer.KubectlShellImageEnvVar: "myimage:v3"},
+			expectedKubectlShellImageSet: true,
+			expectedKubectlShellFlag:     "myimage:v2",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.args == nil {
+				tc.args = []string{"portainer"}
+			}
+			setOsArgs(t, tc.args)
+
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+
+			flags, err := Service{}.ParseFlags("test-version")
+			require.NoError(t, err)
+			require.Equal(t, tc.expectedKubectlShellImageSet, flags.KubectlShellImageSet)
+			require.Equal(t, tc.expectedKubectlShellFlag, *flags.KubectlShellImage)
+		})
+	}
 }
 
 func TestParseTLSFlags(t *testing.T) {

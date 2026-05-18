@@ -9,8 +9,10 @@ import {
 } from './Datatable';
 import { DefaultType } from './types';
 
-interface Props<D extends DefaultType>
-  extends Omit<DatatableProps<D>, 'renderRow' | 'expandable'> {
+interface Props<D extends DefaultType> extends Omit<
+  DatatableProps<D>,
+  'renderRow' | 'expandable'
+> {
   renderSubRow(row: Row<D>): ReactNode;
   expandOnRowClick?: boolean;
 }

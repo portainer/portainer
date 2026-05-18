@@ -16,8 +16,7 @@ import { Icon } from '@@/Icon';
 import { Props as ButtonProps, ButtonWithRef } from './Button';
 
 export interface MenuButtonProps
-  extends Omit<ButtonProps, 'onClick'>,
-    AutomationTestingProps {
+  extends Omit<ButtonProps, 'onClick'>, AutomationTestingProps {
   items: Array<ReactNode>;
   menuClassName?: string;
   dropdownPosition?: 'left' | 'right';

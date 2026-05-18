@@ -96,7 +96,7 @@ describe('useParseSortGroupApiParams', () => {
   describe('Platform sort', () => {
     it('maps Docker to platformTypes=[Docker] and clears types', () => {
       const { result } = renderHook(() =>
-        useParseSortGroupApiParams('Docker', 'Platform', groups)
+        useParseSortGroupApiParams('Docker', 'PlatformType', groups)
       );
       expect(result.current).toEqual({
         types: [],
@@ -106,7 +106,7 @@ describe('useParseSortGroupApiParams', () => {
 
     it('returns empty platformTypes for unknown platforms', () => {
       const { result } = renderHook(() =>
-        useParseSortGroupApiParams('Unknown', 'Platform', groups)
+        useParseSortGroupApiParams('Unknown', 'PlatformType', groups)
       );
       expect(result.current).toEqual({
         types: [],

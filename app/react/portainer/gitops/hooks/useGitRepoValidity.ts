@@ -82,7 +82,7 @@ export function getGitValidityError(error: unknown, hasCreds: boolean) {
   if (!isAxiosError(error)) return undefined;
   const responseData = error.response?.data;
   const details = isDefaultResponse(responseData)
-    ? responseData.details ?? ''
+    ? (responseData.details ?? '')
     : '';
   if (
     !hasCreds &&

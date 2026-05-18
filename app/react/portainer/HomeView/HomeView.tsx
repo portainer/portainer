@@ -16,11 +16,7 @@ import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
 import { MotdPanel } from './MotdPanel';
 import { LicenseNodePanel } from './LicenseNodePanel';
 import { BackupFailedPanel } from './BackupFailedPanel';
-import {
-  EnvironmentHeader,
-  HeaderFilter,
-} from './EnvironmentHeader/EnvironmentHeader';
-import { useHomePageFilter } from './EnvironmentList/HomepageFilter';
+import { EnvironmentHeader } from './EnvironmentHeader/EnvironmentHeader';
 
 export function HomeView() {
   const { clear: clearStore } = useStore(environmentStore);
@@ -28,10 +24,6 @@ export function HomeView() {
   const { params } = useCurrentStateAndParams();
   const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] = useState(
     !!params.redirect
-  );
-  const [headerFilter, setHeaderFilter] = useHomePageFilter<HeaderFilter>(
-    'headerFilter',
-    'all'
   );
 
   const router = useRouter();
@@ -85,15 +77,8 @@ export function HomeView() {
         </div>
       ) : (
         <div className="mx-5 flex flex-col gap-6">
-          <EnvironmentHeader
-            activeFilter={headerFilter}
-            onFilterChange={setHeaderFilter}
-          />
-          <EnvironmentList
-            onClickBrowse={handleBrowseClick}
-            headerFilter={headerFilter}
-            onHeaderFilterChange={setHeaderFilter}
-          />
+          <EnvironmentHeader />
+          <EnvironmentList onClickBrowse={handleBrowseClick} />
         </div>
       )}
     </div>
