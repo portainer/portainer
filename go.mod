@@ -52,6 +52,7 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/slog-zerolog/v2 v2.9.1
 	github.com/segmentio/encoding v0.5.3
+	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	github.com/viney-shih/go-lock v1.1.1
@@ -299,7 +300,6 @@ require (
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/serialx/hashring v0.0.0-20200727003509-22c0c7ab6b1b // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
