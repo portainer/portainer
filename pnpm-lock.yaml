@@ -94,54 +94,6 @@ importers:
       '@tippyjs/react':
         specifier: ^4.2.6
         version: 4.2.6(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
-      '@types/angular':
-        specifier: ^1.8.3
-        version: 1.8.9
-      '@types/file-saver':
-        specifier: ^2.0.4
-        version: 2.0.7
-      '@types/filesize':
-        specifier: ^5.0.2
-        version: 5.0.2
-      '@types/filesize-parser':
-        specifier: ^1.5.1
-        version: 1.5.3
-      '@types/jquery':
-        specifier: ^3.5.10
-        version: 3.5.33
-      '@types/json-schema':
-        specifier: ^7.0.15
-        version: 7.0.15
-      '@types/lodash':
-        specifier: ^4.17.21
-        version: 4.17.21
-      '@types/mustache':
-        specifier: ^4.1.2
-        version: 4.2.6
-      '@types/qs':
-        specifier: ^6.9.17
-        version: 6.14.0
-      '@types/react':
-        specifier: ^17.0.37
-        version: 17.0.75
-      '@types/react-datetime-picker':
-        specifier: ^3.4.1
-        version: 3.4.1
-      '@types/react-dom':
-        specifier: ^17.0.11
-        version: 17.0.25
-      '@types/react-is':
-        specifier: ^17.0.3
-        version: 17.0.7
-      '@types/sanitize-html':
-        specifier: ^2.8.0
-        version: 2.16.0
-      '@types/toastr':
-        specifier: ^2.1.39
-        version: 2.1.43
-      '@types/uuid':
-        specifier: ^3.3.2
-        version: 3.4.13
       '@uirouter/angularjs':
         specifier: 1.0.11
         version: 1.0.11(angular@1.8.2)
@@ -452,12 +404,60 @@ importers:
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@9.3.4)
+      '@types/angular':
+        specifier: ^1.8.3
+        version: 1.8.9
+      '@types/file-saver':
+        specifier: ^2.0.4
+        version: 2.0.7
+      '@types/filesize':
+        specifier: ^5.0.2
+        version: 5.0.2
+      '@types/filesize-parser':
+        specifier: ^1.5.1
+        version: 1.5.3
+      '@types/jquery':
+        specifier: ^3.5.10
+        version: 3.5.33
+      '@types/json-schema':
+        specifier: ^7.0.15
+        version: 7.0.15
+      '@types/lodash':
+        specifier: ^4.17.21
+        version: 4.17.21
+      '@types/mustache':
+        specifier: ^4.1.2
+        version: 4.2.6
       '@types/node':
         specifier: ^25
         version: 25.0.3
       '@types/nprogress':
         specifier: ^0.2.0
         version: 0.2.3
+      '@types/qs':
+        specifier: ^6.9.17
+        version: 6.14.0
+      '@types/react':
+        specifier: ^17.0.37
+        version: 17.0.75
+      '@types/react-datetime-picker':
+        specifier: ^3.4.1
+        version: 3.4.1
+      '@types/react-dom':
+        specifier: ^17.0.11
+        version: 17.0.25
+      '@types/react-is':
+        specifier: ^17.0.3
+        version: 17.0.7
+      '@types/sanitize-html':
+        specifier: ^2.8.0
+        version: 2.16.0
+      '@types/toastr':
+        specifier: ^2.1.39
+        version: 2.1.43
+      '@types/uuid':
+        specifier: ^3.3.2
+        version: 3.4.13
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.58.2
         version: 8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.39.4)(typescript@6.0.2))(eslint@9.39.4)(typescript@6.0.2)
