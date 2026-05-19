@@ -20,8 +20,6 @@ const (
 	ClusterEtcdHealthyMetric                   = "portainer_edge_agent_etcd_healthy"
 	ClusterEtcdHealthValidMetric               = "portainer_edge_agent_etcd_health_valid"
 	ClusterAPIServerTLSCertExpirySecondsMetric = "portainer_edge_agent_apiserver_tls_cert_expiry_seconds"
-	ClusterControlPlaneHealthyMetric           = "portainer_edge_agent_control_plane_healthy"
-	ClusterControlPlaneHealthValidMetric       = "portainer_edge_agent_control_plane_health_valid"
 	ClusterAPIServerHealthyMetric              = "portainer_edge_agent_apiserver_healthy"
 )
 
