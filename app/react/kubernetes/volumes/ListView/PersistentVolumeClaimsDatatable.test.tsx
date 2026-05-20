@@ -9,6 +9,8 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { http, server } from '@/setup-tests/server';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
 import { usePersistentVolumeClaims } from '@/react/kubernetes/volumes/queries/usePersistentVolumeClaims';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
+import type { PortainerNamespace } from '@/react/kubernetes/namespaces/types';
 
 import { PersistentVolumeClaimsDatatable } from './PersistentVolumeClaimsDatatable';
 import type { PersistentVolumeClaim } from './types';
@@ -32,6 +34,10 @@ vi.mock(
     })),
   })
 );
+
+vi.mock('@/react/kubernetes/namespaces/queries/useNamespacesQuery', () => ({
+  useNamespacesQuery: vi.fn(),
+}));
 
 vi.mock('@/react/kubernetes/volumes/ListView/ResizeClaimEditForm', () => ({
   ResizeClaimEditForm: ({ claim }: { claim: PersistentVolumeClaim }) => (
@@ -84,6 +90,11 @@ const mockPVCs: PersistentVolumeClaim[] = [
   },
 ];
 
+const mockNamespaces = [
+  { Name: 'default', IsSystem: false },
+  { Name: 'kube-system', IsSystem: true },
+] as PortainerNamespace[];
+
 function renderComponent() {
   server.use(
     http.get('/api/endpoints/:endpointId', () =>
@@ -100,11 +111,19 @@ function renderComponent() {
 
 describe('PersistentVolumeClaimsDatatable', () => {
   beforeEach(() => {
+    localStorage.clear();
     mockUseEnvironmentId.mockReturnValue(3);
-    vi.mocked(usePersistentVolumeClaims).mockReturnValue({
-      data: mockPVCs,
+    vi.mocked(usePersistentVolumeClaims).mockImplementation(
+      (_envId, options) =>
+        ({
+          data: options?.select ? options.select(mockPVCs) : mockPVCs,
+          isLoading: false,
+        }) as ReturnType<typeof usePersistentVolumeClaims>
+    );
+    vi.mocked(useNamespacesQuery).mockReturnValue({
+      data: [],
       isLoading: false,
-    } as ReturnType<typeof usePersistentVolumeClaims>);
+    } as ReturnType<typeof useNamespacesQuery>);
   });
 
   it('renders the datatable with PVC names and title', async () => {
@@ -116,10 +135,15 @@ describe('PersistentVolumeClaimsDatatable', () => {
   });
 
   it('shows an empty table when there are no PVCs', async () => {
-    vi.mocked(usePersistentVolumeClaims).mockReturnValue({
-      data: [] as PersistentVolumeClaim[],
-      isLoading: false,
-    } as ReturnType<typeof usePersistentVolumeClaims>);
+    vi.mocked(usePersistentVolumeClaims).mockImplementation(
+      (_envId, options) =>
+        ({
+          data: options?.select
+            ? options.select([] as PersistentVolumeClaim[])
+            : [],
+          isLoading: false,
+        }) as ReturnType<typeof usePersistentVolumeClaims>
+    );
 
     renderComponent();
 
@@ -162,5 +186,33 @@ describe('PersistentVolumeClaimsDatatable', () => {
     await screen.findByText('test-pvc-1');
 
     expect(screen.queryByTestId('resize-form')).not.toBeInTheDocument();
+  });
+
+  it('hides system namespace PVCs by default', async () => {
+    vi.mocked(useNamespacesQuery).mockReturnValue({
+      data: mockNamespaces,
+      isLoading: false,
+    } as ReturnType<typeof useNamespacesQuery>);
+
+    renderComponent();
+
+    expect(await screen.findByText('test-pvc-1')).toBeVisible();
+    expect(screen.queryByText('test-pvc-2')).not.toBeInTheDocument();
+  });
+
+  it('shows system namespace PVCs when showSystemResources is enabled', async () => {
+    localStorage.setItem(
+      'portainer.datatable_settings_kube-volumes-pvc',
+      JSON.stringify({ state: { showSystemResources: true }, version: 1 })
+    );
+    vi.mocked(useNamespacesQuery).mockReturnValue({
+      data: mockNamespaces,
+      isLoading: false,
+    } as ReturnType<typeof useNamespacesQuery>);
+
+    renderComponent();
+
+    expect(await screen.findByText('test-pvc-1')).toBeVisible();
+    expect(screen.getByText('test-pvc-2')).toBeVisible();
   });
 });
