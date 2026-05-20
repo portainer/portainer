@@ -6,6 +6,8 @@ import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { usePersistentVolumeClaims } from '@/react/kubernetes/volumes/queries/usePersistentVolumeClaims';
 import { useDeletePersistentVolumeClaims } from '@/react/kubernetes/volumes/queries/useDeletePersistentVolumeClaims';
 import { ResizeClaimEditForm } from '@/react/kubernetes/volumes/ListView/ResizeClaimEditForm';
+import { isSystemNamespace } from '@/react/kubernetes/namespaces/queries/useIsSystemNamespace';
+import { useNamespacesQuery } from '@/react/kubernetes/namespaces/queries/useNamespacesQuery';
 
 import { refreshableSettings } from '@@/datatables/types';
 import { Datatable, TableSettingsMenu } from '@@/datatables';
@@ -43,9 +45,12 @@ export function PersistentVolumeClaimsDatatable() {
   );
 
   const envId = useEnvironmentId();
+  const namespacesQuery = useNamespacesQuery(envId);
+  const namespaces = namespacesQuery.data ?? [];
   const deleteClaimsMutation = useDeletePersistentVolumeClaims(envId);
   const claimsQuery = usePersistentVolumeClaims(envId, {
     refetchInterval: tableState.autoRefreshRate * 1000,
+    select: filterVolumeClaims,
   });
   const claims = claimsQuery.data ?? [];
   const columns = createPersistentVolumeClaimsColumns((claim) =>
@@ -98,4 +103,14 @@ export function PersistentVolumeClaimsDatatable() {
       )}
     </>
   );
+
+  function filterVolumeClaims(
+    claims: PersistentVolumeClaim[]
+  ): PersistentVolumeClaim[] {
+    return claims.filter(
+      (claim) =>
+        tableState.showSystemResources ||
+        !isSystemNamespace(claim.namespace, namespaces)
+    );
+  }
 }
