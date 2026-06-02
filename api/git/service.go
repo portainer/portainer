@@ -185,7 +185,19 @@ func (service *Service) LatestCommitID(
 		referenceName: referenceName,
 	}
 
-	return service.repoManager(options.baseOption).latestCommitID(context.TODO(), options)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	id, err := service.repoManager(options.baseOption).latestCommitID(ctx, options)
+	if err != nil {
+		if ctx.Err() == context.DeadlineExceeded {
+			log.Error().Str("url", repositoryURL).Msg("git fetch timed out after 1 minute")
+		}
+
+		return "", err
+	}
+
+	return id, nil
 }
 
 // ListRefs will list target repository's references without cloning the repository

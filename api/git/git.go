@@ -101,7 +101,7 @@ func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string
 		InsecureSkipTLS: opt.tlsSkipVerify,
 	}
 
-	refs, err := remote.List(listOptions)
+	refs, err := remote.ListContext(ctx, listOptions)
 	if err != nil {
 		if err.Error() == "authentication required" {
 			return "", gittypes.ErrAuthenticationFailure
