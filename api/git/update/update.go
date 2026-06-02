@@ -1,6 +1,7 @@
 package update
 
 import (
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -74,6 +75,11 @@ func UpdateGitObject(gitService portainer.GitService, objId string, gitConfig *g
 	}
 
 	if err := cloneGitRepository(gitService, cloneParams); err != nil {
+		if enableVersionFolder {
+			if removeErr := os.RemoveAll(toDir); removeErr != nil {
+				log.Warn().Err(removeErr).Str("dir", toDir).Msg("failed to remove partial clone directory")
+			}
+		}
 		return false, "", errors.WithMessagef(err, "failed to do a fresh clone of %v", objId)
 	}
 
