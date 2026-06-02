@@ -110,7 +110,8 @@
 }
 
 .portainer-selector-root.sm .portainer-selector__input-container {
-  height: 20px;
+  min-height: 20px;
+  height: auto;
   @apply text-xs;
 }
 
@@ -134,6 +135,8 @@
 
 .portainer-selector-root.sm .portainer-selector__single-value {
   @apply text-xs;
+  min-height: 20px;
+  line-height: 20px;
 }
 
 .portainer-selector-root.md .portainer-selector__single-value {
