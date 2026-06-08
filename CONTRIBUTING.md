@@ -147,7 +147,7 @@ When adding a new route to an existing handler use the following as a template (
 // @router /{id} [get]
 ```
 
-explanation about each line can be found (here)[https://github.com/swaggo/swag#api-operation]
+explanation about each line can be found [here](https://github.com/swaggo/swag#api-operation)
 
 After changing these annotations, regenerate the TypeScript API client and types — see [Generating API types](./README.md#generating-api-types).
 
