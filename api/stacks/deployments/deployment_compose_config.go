@@ -45,9 +45,7 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
-	if err := registryutils.ValidateRegistriesECRTokens(tx, filteredRegistries); err != nil {
-		return nil, err
-	}
+	registryutils.RefreshAndPersistECRTokens(tx, filteredRegistries)
 
 	config := &ComposeStackDeploymentConfig{
 		stack:          stack,
