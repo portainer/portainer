@@ -1,6 +1,8 @@
 package workflows
 
 import (
+	"slices"
+
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/set"
@@ -61,9 +63,9 @@ func MapEdgeStackToWorkflow(es portainer.EdgeStack, gitConfig *gittypes.RepoConf
 }
 
 func StackLastSyncDate(s portainer.Stack) int64 {
-	for i := len(s.DeploymentStatus) - 1; i >= 0; i-- {
-		if s.DeploymentStatus[i].Status == portainer.StackStatusActive {
-			return s.DeploymentStatus[i].Time
+	for _, ds := range slices.Backward(s.DeploymentStatus) {
+		if ds.Status == portainer.StackStatusActive {
+			return ds.Time
 		}
 	}
 	return 0
@@ -84,9 +86,9 @@ func edgeStackLastSyncDate(statuses []portainer.EdgeStackStatusForEnv) int64 {
 }
 
 func endpointLastSyncDate(epStatus portainer.EdgeStackStatusForEnv) int64 {
-	for i := len(epStatus.Status) - 1; i >= 0; i-- {
-		if isEdgeStackHealthyStatus(epStatus.Status[i].Type) {
-			return epStatus.Status[i].Time
+	for _, s := range slices.Backward(epStatus.Status) {
+		if isEdgeStackHealthyStatus(s.Type) {
+			return s.Time
 		}
 	}
 	return 0
@@ -113,18 +115,6 @@ func isEdgeStackHealthyStatus(t portainer.EdgeStackStatusType) bool {
 		return true
 	}
 	return false
-}
-
-// ArtifactsToSourceSet returns the set of all SourceIDs referenced by the given artifact-source mappings
-func ArtifactsToSourceSet(artifacts ...portainer.ArtifactSources) set.Set[portainer.SourceID] {
-	s := make(set.Set[portainer.SourceID])
-	for _, a := range artifacts {
-		for _, sid := range a.SourceIDs {
-			s.Add(sid)
-		}
-	}
-
-	return s
 }
 
 func resolveEdgeGroupEndpoints(groups []portainer.EdgeGroupID, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID) []portainer.EndpointID {

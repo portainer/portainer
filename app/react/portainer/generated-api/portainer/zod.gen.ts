@@ -151,21 +151,6 @@ export const zV1ListMeta = z.object({
   selfLink: z.string().optional(),
 });
 
-export const zV1Duration = z.object({
-  'time.Duration': z
-    .union([
-      z.literal(-9223372036854776000),
-      z.literal(9223372036854776000),
-      z.literal(1),
-      z.literal(1000),
-      z.literal(1000000),
-      z.literal(1000000000),
-      z.literal(60000000000),
-      z.literal(3600000000000),
-    ])
-    .optional(),
-});
-
 export const zV1OwnerReference = z.object({
   apiVersion: z.string().optional(),
   blockOwnerDeletion: z.boolean().optional(),
@@ -226,7 +211,7 @@ export const zV1Beta1PodMetrics = z.object({
   kind: z.string().optional(),
   metadata: zV1ObjectMeta.optional(),
   timestamp: z.string().optional(),
-  window: zV1Duration.optional(),
+  window: z.string().optional(),
 });
 
 export const zV1Beta1PodMetricsList = z.object({
@@ -242,7 +227,7 @@ export const zV1Beta1NodeMetrics = z.object({
   metadata: zV1ObjectMeta.optional(),
   timestamp: z.string().optional(),
   usage: zV1ResourceList.optional(),
-  window: zV1Duration.optional(),
+  window: z.string().optional(),
 });
 
 export const zV1Beta1NodeMetricsList = z.object({
@@ -1327,6 +1312,7 @@ export const zSettingsPublicSettingsResponse = z.object({
   OAuthLoginURI: z.string().optional(),
   OAuthLogoutURI: z.string().optional(),
   RequiredPasswordLength: z.int().optional(),
+  RequiresSetupToken: z.boolean().optional(),
   TeamSync: z.boolean().optional(),
 });
 
@@ -1637,7 +1623,7 @@ export const zPortainerWebhook = z.object({
 });
 
 export const zPortainerUserThemeSettings = z.object({
-  color: z.enum(['dark', 'light', 'highcontrast', 'auto']).optional(),
+  color: z.enum(['dark', 'light', 'highcontrast', 'auto', '']).optional(),
 });
 
 export const zPortainerUserRole = z.enum(PortainerUserRole);
@@ -1651,23 +1637,13 @@ export const zPortainerUserResourceAccess = z.object({
   UserId: z.int().optional(),
 });
 
-export const zPortainerAuthorizations = z.record(z.string(), z.boolean());
-
-export const zPortainerEndpointAuthorizations = z.record(
-  z.string(),
-  zPortainerAuthorizations
-);
-
 export const zPortainerUser = z.object({
-  EndpointAuthorizations: zPortainerEndpointAuthorizations.optional(),
-  Id: z.int().optional(),
-  PortainerAuthorizations: zPortainerAuthorizations.optional(),
-  Role: zPortainerUserRole.optional(),
+  Id: z.int(),
+  Role: zPortainerUserRole,
   ThemeSettings: zPortainerUserThemeSettings.optional(),
   TokenIssueAt: z.int().optional(),
   UseCache: z.boolean().optional(),
-  UserTheme: z.string().optional(),
-  Username: z.string().optional(),
+  Username: z.string(),
 });
 
 export const zPortainerTeamResourceAccess = z.object({
@@ -1884,6 +1860,8 @@ export const zPortainerSslSettings = z.object({
   keyPath: z.string().optional(),
   selfSigned: z.boolean().optional(),
 });
+
+export const zPortainerAuthorizations = z.record(z.string(), z.boolean());
 
 export const zPortainerRole = z.object({
   Authorizations: zPortainerAuthorizations.optional(),
@@ -2181,7 +2159,21 @@ export const zPortainerCustomTemplatePlatform = z.enum(
   PortainerCustomTemplatePlatform
 );
 
+export const zPortainerArtifact = z.object({
+  configFilePath: z.string().optional(),
+  configHash: z.string().optional(),
+  edgeStackId: z.int().optional(),
+  referenceName: z.string().optional(),
+  stackId: z.int().optional(),
+});
+
+export const zPortainerArtifactSources = z.object({
+  artifact: zPortainerArtifact.optional(),
+  sourceIds: z.array(z.int()).optional(),
+});
+
 export const zPortainerCustomTemplate = z.object({
+  ArtifactSources: zPortainerArtifactSources.optional(),
   CreatedByUserId: z.int().optional(),
   Description: z.string().optional(),
   EdgeTemplate: z.boolean().optional(),
@@ -3574,10 +3566,15 @@ export const zGetEndpointGroupsByIdPath = z.object({
   id: z.int(),
 });
 
+export const zGetEndpointGroupsByIdQuery = z.object({
+  size: z.boolean().optional(),
+});
+
 /**
  * Success
  */
-export const zGetEndpointGroupsByIdResponse = zPortainerEndpointGroup;
+export const zGetEndpointGroupsByIdResponse =
+  zEndpointgroupsEndpointGroupResponse;
 
 /**
  * EndpointGroup details
@@ -5286,6 +5283,10 @@ export const zResourceControlUpdateResponse = zPortainerResourceControl;
  */
 export const zRestoreBody = zBackupRestorePayload;
 
+export const zRestoreHeaders = z.object({
+  'X-Setup-Token': z.string().optional(),
+});
+
 /**
  * Success
  */
@@ -5996,6 +5997,10 @@ export const zUserAdminCheckResponse = z.void();
  * User details
  */
 export const zUserAdminInitBody = zUsersAdminInitPayload;
+
+export const zUserAdminInitHeaders = z.object({
+  'X-Setup-Token': z.string().optional(),
+});
 
 /**
  * Success

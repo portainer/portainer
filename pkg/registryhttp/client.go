@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/rs/zerolog/log"
 	"oras.land/oras-go/v2/registry/remote/retry"
@@ -15,8 +16,8 @@ import (
 func CreateClient(registry *portainer.Registry) (httpClient *http.Client, usePlainHttp bool, err error) {
 	switch registry.Type {
 	case portainer.AzureRegistry, portainer.EcrRegistry, portainer.GithubRegistry, portainer.GitlabRegistry, portainer.DockerHubRegistry:
-		// Cloud registries use the default retry client with built-in TLS
-		return retry.DefaultClient, false, nil
+		base := http.DefaultTransport.(*http.Transport).Clone()
+		return &http.Client{Transport: retry.NewTransport(ssrf.WrapTransport(base))}, false, nil
 	default:
 		// For all other registry types, use shared helper to build transport and scheme
 

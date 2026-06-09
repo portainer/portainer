@@ -11,6 +11,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
@@ -114,18 +115,19 @@ func Get(url string, timeout int) ([]byte, error) {
 // using the specified host and optional TLS configuration.
 // It uses a new Http.Client for each operation.
 func ExecutePingOperation(host string, tlsConfiguration portainer.TLSConfiguration) (bool, error) {
-	transport := &http.Transport{}
-
 	scheme := "http"
 
+	var transport *http.Transport
 	if tlsConfiguration.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(tlsConfiguration)
 		if err != nil {
 			return false, err
 		}
 
-		transport.TLSClientConfig = tlsConfig
 		scheme = "https"
+		transport = ssrf.WrapTransport(&http.Transport{TLSClientConfig: tlsConfig})
+	} else {
+		transport = ssrf.WrapTransport(&http.Transport{})
 	}
 
 	client := &http.Client{

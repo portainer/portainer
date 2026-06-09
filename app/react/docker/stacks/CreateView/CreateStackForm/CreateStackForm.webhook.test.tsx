@@ -10,7 +10,10 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
-import { createMockUsers } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockUsers,
+} from '@/react-tools/test-mocks';
 import { Role } from '@/portainer/users/types';
 
 import { mockFormValues } from './test-utils';
@@ -34,14 +37,13 @@ describe('CreateStackForm - Webhook ID Integration', () => {
 
     server.use(
       http.get('/api/endpoints/1', () =>
-        HttpResponse.json({
-          Id: 1,
-          Type: EnvironmentType.Docker,
-          ComposeSyntaxMaxVersion: '3',
-          ChangeWindow: {
-            Enabled: false,
-          },
-        })
+        HttpResponse.json(
+          createMockEnvironment({
+            Id: 1,
+            Type: EnvironmentType.Docker,
+            ComposeSyntaxMaxVersion: '3',
+          })
+        )
       )
     );
   });

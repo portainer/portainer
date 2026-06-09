@@ -104,7 +104,7 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to update source", err)
 	}
 
-	src.GitConfig = gittypes.SanitizeRepoConfig(src.GitConfig)
+	src.Git = gittypes.SanitizeRepoConfig(src.Git)
 
 	return response.JSON(w, src)
 }
@@ -119,7 +119,7 @@ func ApplyGitSourceChanges(src *portainer.Source, payload GitSourceUpdatePayload
 		src.Name = *payload.Name
 	}
 
-	gitConfig := src.GitConfig
+	gitConfig := src.Git
 	if gitConfig == nil {
 		gitConfig = &gittypes.RepoConfig{}
 	}
@@ -167,7 +167,7 @@ func ApplyGitSourceChanges(src *portainer.Source, payload GitSourceUpdatePayload
 	}
 
 	gitConfig.Authentication = auth
-	src.GitConfig = gitConfig
+	src.Git = gitConfig
 
 	return nil
 }

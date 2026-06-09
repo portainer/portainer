@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
+	"github.com/portainer/portainer/api/dataservices/customtemplate"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/edgegroup"
 	"github.com/portainer/portainer/api/dataservices/edgejob"
@@ -66,6 +67,7 @@ type (
 		edgeGroupService        *edgegroup.Service
 		TunnelServerService     *tunnelserver.Service
 		pendingActionsService   *pendingactions.Service
+		customTemplateService   *customtemplate.Service
 		sourceService           *source.Service
 		workflowService         *workflow.Service
 	}
@@ -98,6 +100,7 @@ type (
 		EdgeGroupService        *edgegroup.Service
 		TunnelServerService     *tunnelserver.Service
 		PendingActionsService   *pendingactions.Service
+		CustomTemplateService   *customtemplate.Service
 		SourceService           *source.Service
 		WorkflowService         *workflow.Service
 	}
@@ -132,6 +135,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		edgeGroupService:        parameters.EdgeGroupService,
 		TunnelServerService:     parameters.TunnelServerService,
 		pendingActionsService:   parameters.PendingActionsService,
+		customTemplateService:   parameters.CustomTemplateService,
 		sourceService:           parameters.SourceService,
 		workflowService:         parameters.WorkflowService,
 	}
@@ -268,7 +272,10 @@ func (m *Migrator) initMigrations() {
 
 	m.addMigrations("2.40.0", m.migrateRegistryAccessSASecrets_2_40_0)
 
-	m.addMigrations("2.43.0", m.migrateGitConfigToSources_2_43_0)
+	m.addMigrations("2.43.0",
+		m.migrateGitConfigToSources_2_43_0,
+		m.migrateCustomTemplateGitConfigToSources_2_43_0,
+	)
 
 	// WARNING: do not change migrations that have already been released!
 

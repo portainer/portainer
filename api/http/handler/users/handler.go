@@ -35,6 +35,7 @@ type Handler struct {
 	passwordStrengthChecker security.PasswordStrengthChecker
 	AdminCreationDone       chan<- struct{}
 	FileService             portainer.FileService
+	SetupToken              string
 }
 
 // NewHandler creates a handler to manage user operations.

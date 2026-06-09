@@ -14,12 +14,13 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/logs"
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
 
@@ -64,15 +65,13 @@ func NewAzureClient() *azureClient {
 }
 
 func newHttpClientForAzure(insecureSkipVerify bool) *http.Client {
-	httpsCli := &http.Client{
-		Transport: &http.Transport{
+	return &http.Client{
+		Transport: ssrf.WrapTransport(&http.Transport{
 			TLSClientConfig: crypto.CreateTLSConfiguration(insecureSkipVerify),
 			Proxy:           http.ProxyFromEnvironment,
-		},
+		}),
 		Timeout: 300 * time.Second,
 	}
-
-	return httpsCli
 }
 
 func (a *azureClient) Download(ctx context.Context, destination string, opt *git.CloneOptions) error {

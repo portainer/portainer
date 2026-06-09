@@ -58,11 +58,11 @@ func (h *Handler) sourceTestConnection(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError("Unable to apply source changes", err)
 	}
 
-	if src.GitConfig == nil {
+	if src.Git == nil {
 		return httperror.InternalServerError("Source has no git configuration", nil)
 	}
 
-	result := testSourceConnection(r.Context(), h.gitService, src.GitConfig)
+	result := testSourceConnection(r.Context(), h.gitService, src.Git)
 
 	return response.JSON(w, result)
 }

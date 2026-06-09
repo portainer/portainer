@@ -74,10 +74,7 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 	}
 
 	for i := range customTemplates {
-		customTemplate := &customTemplates[i]
-		if customTemplate.GitConfig != nil && customTemplate.GitConfig.Authentication != nil {
-			customTemplate.GitConfig.Authentication.Password = ""
-		}
+		populateGitConfig(handler.DataStore, &customTemplates[i])
 	}
 
 	return response.JSON(w, customTemplates)

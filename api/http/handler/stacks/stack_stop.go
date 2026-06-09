@@ -18,8 +18,8 @@ import (
 )
 
 // @id StackStop
-// @summary Stops a stopped Stack
-// @description Stops a stopped Stack.
+// @summary Stop a running Stack
+// @description Stop a running Stack.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth

@@ -121,7 +121,7 @@ func redeployWhenChangedSecondStage(
 	user *portainer.User,
 	endpoint *portainer.Endpoint,
 ) error {
-	gitSrc, artifact, err := workflows.GitSourceAndArtifactForStack(datastore, stack.WorkflowID, stack.ID)
+	gitSrc, file, err := workflows.GitSourceAndArtifactForStack(datastore, stack.WorkflowID, stack.ID)
 	if err != nil {
 		return errors.WithMessagef(err, "failed to load git config for stack %v", stack.ID)
 	}
@@ -130,7 +130,7 @@ func redeployWhenChangedSecondStage(
 		return nil
 	}
 
-	gitConfig := workflows.MergeSourceAndArtifact(gitSrc, artifact)
+	gitConfig := workflows.MergeSourceAndFile(gitSrc, file)
 
 	var gitCommitChangedOrForceUpdate bool
 
@@ -225,8 +225,8 @@ func redeployWhenChangedSecondStage(
 
 		newHash := gitConfig.ConfigHash
 
-		return workflows.UpdateArtifactForStack(tx, stack.WorkflowID, stack.ID, func(a *portainer.Artifact) {
-			a.ConfigHash = newHash
+		return workflows.UpdateArtifactFileForStack(tx, stack.WorkflowID, stack.ID, gitSrc.ID, func(a *portainer.ArtifactFile) {
+			a.Hash = newHash
 		})
 	}); err != nil {
 		return errors.WithMessagef(err, "failed to update the stack %v", stack.ID)

@@ -9,8 +9,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
-
-	"github.com/rs/zerolog/log"
 )
 
 // FetchWorkflows returns all GitOps workflows visible to the given user.
@@ -43,69 +41,35 @@ func FetchWorkflows(
 
 	// First pass: filter by endpoint/stack-type match and collect workflow IDs.
 	preFiltered := make([]portainer.Stack, 0, len(stacks))
-	workflowIDSet := make(map[portainer.WorkflowID]struct{}, len(stacks))
+	workflowIDSet := make(set.Set[portainer.WorkflowID], len(stacks))
 	for _, stack := range stacks {
 		if ep, ok := endpointMap[stack.EndpointID]; ok && !EndpointMatchesStackType(ep, stack.Type) {
 			continue
 		}
 		preFiltered = append(preFiltered, stack)
-		workflowIDSet[stack.WorkflowID] = struct{}{}
+		workflowIDSet.Add(stack.WorkflowID)
 	}
 
-	// Batch-load all needed workflows in one scan.
-	wfs, err := tx.Workflow().ReadAll(func(wf portainer.Workflow) bool {
-		_, ok := workflowIDSet[wf.ID]
-		return ok
-	})
+	workflowMap, sourceMap, err := LoadWorkflowAndSourceMaps(tx, workflowIDSet)
 	if err != nil {
 		return nil, err
-	}
-
-	workflowMap := make(map[portainer.WorkflowID]portainer.Workflow, len(wfs))
-	var allArtifacts []portainer.ArtifactSources
-	for _, wf := range wfs {
-		workflowMap[wf.ID] = wf
-		allArtifacts = append(allArtifacts, wf.Artifacts...)
-	}
-	sourceSet := ArtifactsToSourceSet(allArtifacts...)
-
-	// Batch-load all needed sources in one scan.
-	srcs, err := tx.Source().ReadAll(func(src portainer.Source) bool {
-		return sourceSet.Contains(src.ID)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	sourceMap := make(map[portainer.SourceID]portainer.Source, len(srcs))
-	for _, src := range srcs {
-		sourceMap[src.ID] = src
 	}
 
 	// Second pass: build filtered list using in-memory lookups.
 	var filtered []portainer.Stack
 	for _, stack := range preFiltered {
-		wf, ok := workflowMap[stack.WorkflowID]
-		if !ok {
-			log.Warn().Int("stackID", int(stack.ID)).Msg("workflow record missing for stack, skipping")
-			continue
-		}
+		wf := workflowMap[stack.WorkflowID]
 
 	outer:
 		for _, as := range wf.Artifacts {
-			if as.Artifact.StackID != stack.ID {
+			if as.StackID != stack.ID {
 				continue
 			}
 
-			for _, srcID := range as.SourceIDs {
-				src, ok := sourceMap[srcID]
-				if !ok {
-					log.Warn().Int("stackID", int(stack.ID)).Msg("source record missing for stack, skipping")
-					break outer
-				}
-
+			for _, f := range as.Files {
+				src := sourceMap[f.SourceID]
 				if src.Type == portainer.SourceTypeGit {
-					gitConfigs[stack.ID] = MergeSourceAndArtifact(&src, &as.Artifact)
+					gitConfigs[stack.ID] = MergeSourceAndFile(&src, &f)
 					break outer
 				}
 			}
@@ -169,28 +133,27 @@ func FetchSourceStats(
 		return nil, nil, err
 	}
 
-	workflowIDSet := make(map[portainer.WorkflowID]struct{}, len(allStacks))
+	workflowIDSet := make(set.Set[portainer.WorkflowID], len(allStacks))
 	preFiltered := make([]portainer.Stack, 0, len(allStacks))
 	for _, stack := range allStacks {
 		if ep, ok := endpointMap[stack.EndpointID]; ok && !EndpointMatchesStackType(ep, stack.Type) {
 			continue
 		}
 		preFiltered = append(preFiltered, stack)
-		workflowIDSet[stack.WorkflowID] = struct{}{}
+		workflowIDSet.Add(stack.WorkflowID)
 	}
 
-	wfs, err := tx.Workflow().ReadAll(func(wf portainer.Workflow) bool {
-		_, ok := workflowIDSet[wf.ID]
-		return ok
-	})
+	wfMap, err := LoadWorkflowMap(tx, workflowIDSet)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	wfSources := make(map[portainer.WorkflowID][]portainer.SourceID, len(wfs))
-	for _, wf := range wfs {
+	wfSources := make(map[portainer.WorkflowID][]portainer.SourceID, len(wfMap))
+	for id, wf := range wfMap {
 		for _, as := range wf.Artifacts {
-			wfSources[wf.ID] = append(wfSources[wf.ID], as.SourceIDs...)
+			for _, f := range as.Files {
+				wfSources[id] = append(wfSources[id], f.SourceID)
+			}
 		}
 	}
 

@@ -45,8 +45,8 @@ func TestGitSourceUpdate_Success(t *testing.T) {
 	err = json.NewDecoder(rr.Body).Decode(&src)
 	require.NoError(t, err)
 	require.Equal(t, "new-name", src.Name)
-	require.NotNil(t, src.GitConfig)
-	require.Equal(t, "https://github.com/org/new.git", src.GitConfig.URL)
+	require.NotNil(t, src.Git)
+	require.Equal(t, "https://github.com/org/new.git", src.Git.URL)
 }
 
 func TestGitSourceUpdate_PreservesAuthWhenNotProvided(t *testing.T) {
@@ -58,7 +58,7 @@ func TestGitSourceUpdate_PreservesAuthWhenNotProvided(t *testing.T) {
 		src := &portainer.Source{
 			Name: "auth-source",
 			Type: portainer.SourceTypeGit,
-			GitConfig: &gittypes.RepoConfig{
+			Git: &gittypes.RepoConfig{
 				URL: "https://github.com/org/repo.git",
 				Authentication: &gittypes.GitAuthentication{
 					Username: "alice",
@@ -92,10 +92,10 @@ func TestGitSourceUpdate_PreservesAuthWhenNotProvided(t *testing.T) {
 		stored, err = tx.Source().Read(srcID)
 		return err
 	}))
-	require.NotNil(t, stored.GitConfig)
-	require.NotNil(t, stored.GitConfig.Authentication)
-	require.Equal(t, "alice", stored.GitConfig.Authentication.Username)
-	require.Equal(t, "secret", stored.GitConfig.Authentication.Password)
+	require.NotNil(t, stored.Git)
+	require.NotNil(t, stored.Git.Authentication)
+	require.Equal(t, "alice", stored.Git.Authentication.Username)
+	require.Equal(t, "secret", stored.Git.Authentication.Password)
 }
 
 func TestGitSourceUpdate_ClearsAuthWhenRequested(t *testing.T) {
@@ -107,7 +107,7 @@ func TestGitSourceUpdate_ClearsAuthWhenRequested(t *testing.T) {
 		src := &portainer.Source{
 			Name: "auth-source",
 			Type: portainer.SourceTypeGit,
-			GitConfig: &gittypes.RepoConfig{
+			Git: &gittypes.RepoConfig{
 				URL: "https://github.com/org/repo.git",
 				Authentication: &gittypes.GitAuthentication{
 					Username: "alice",
@@ -141,8 +141,8 @@ func TestGitSourceUpdate_ClearsAuthWhenRequested(t *testing.T) {
 		stored, err = tx.Source().Read(srcID)
 		return err
 	}))
-	require.NotNil(t, stored.GitConfig)
-	require.Nil(t, stored.GitConfig.Authentication)
+	require.NotNil(t, stored.Git)
+	require.Nil(t, stored.Git.Authentication)
 }
 
 func TestGitSourceUpdate_ReplacesAuthWhenProvided(t *testing.T) {
@@ -154,7 +154,7 @@ func TestGitSourceUpdate_ReplacesAuthWhenProvided(t *testing.T) {
 		src := &portainer.Source{
 			Name: "auth-source",
 			Type: portainer.SourceTypeGit,
-			GitConfig: &gittypes.RepoConfig{
+			Git: &gittypes.RepoConfig{
 				URL: "https://github.com/org/repo.git",
 				Authentication: &gittypes.GitAuthentication{
 					Username: "alice",
@@ -191,10 +191,10 @@ func TestGitSourceUpdate_ReplacesAuthWhenProvided(t *testing.T) {
 		stored, err = tx.Source().Read(srcID)
 		return err
 	}))
-	require.NotNil(t, stored.GitConfig)
-	require.NotNil(t, stored.GitConfig.Authentication)
-	require.Equal(t, "bob", stored.GitConfig.Authentication.Username)
-	require.Equal(t, "new-secret", stored.GitConfig.Authentication.Password)
+	require.NotNil(t, stored.Git)
+	require.NotNil(t, stored.Git.Authentication)
+	require.Equal(t, "bob", stored.Git.Authentication.Username)
+	require.Equal(t, "new-secret", stored.Git.Authentication.Password)
 }
 
 func TestGitSourceUpdate_NotFound(t *testing.T) {
@@ -225,7 +225,7 @@ func TestGitSourceUpdate_ConflictOnDuplicateURL(t *testing.T) {
 		existing := &portainer.Source{
 			Name: "existing",
 			Type: portainer.SourceTypeGit,
-			GitConfig: &gittypes.RepoConfig{
+			Git: &gittypes.RepoConfig{
 				URL: "https://github.com/org/existing.git",
 			},
 		}

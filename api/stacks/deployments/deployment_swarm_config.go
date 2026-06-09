@@ -38,9 +38,7 @@ func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityCon
 
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
-	if err := registryutils.ValidateRegistriesECRTokens(tx, filteredRegistries); err != nil {
-		return nil, err
-	}
+	registryutils.RefreshAndPersistECRTokens(tx, filteredRegistries)
 
 	config := &SwarmStackDeploymentConfig{
 		stack:         stack,
@@ -71,6 +69,10 @@ func (config *SwarmStackDeploymentConfig) Deploy(ctx context.Context) error {
 		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService); err != nil {
 			return err
 		}
+	}
+
+	if err := stackutils.ValidateComposeURLs(ctx, config.stack, config.FileService); err != nil {
+		return err
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {

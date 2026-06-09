@@ -13,11 +13,11 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-var ErrSourceInUse = errors.New("source is used by one or more workflows")
+var ErrSourceInUse = errors.New("source is used by one or more workflows or custom templates")
 
 // @id GitOpsSourcesDelete
 // @summary Delete a source
-// @description Deletes an existing GitOps source. Returns 409 if the source is referenced by any workflow.
+// @description Deletes an existing GitOps source. Returns 409 if the source is referenced by any workflow or custom template.
 // @description **Access policy**: admin
 // @tags gitops
 // @security ApiKeyAuth
@@ -27,7 +27,7 @@ var ErrSourceInUse = errors.New("source is used by one or more workflows")
 // @failure 400 "Invalid request"
 // @failure 403 "Access denied"
 // @failure 404 "Source not found"
-// @failure 409 "Source is in use by one or more workflows"
+// @failure 409 "Source is in use by one or more workflows or custom templates"
 // @failure 500 "Server error"
 // @router /gitops/sources/{id} [delete]
 func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -49,18 +49,33 @@ func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperro
 		}
 
 		for _, wf := range workflows {
-			if slices.ContainsFunc(wf.Artifacts, func(as portainer.ArtifactSources) bool {
-				return slices.Contains(as.SourceIDs, portainer.SourceID(sourceID))
+			if slices.ContainsFunc(wf.Artifacts, func(as portainer.Artifact) bool {
+				return slices.ContainsFunc(as.Files, func(f portainer.ArtifactFile) bool {
+					return f.SourceID == portainer.SourceID(sourceID)
+				})
 			}) {
 				return ErrSourceInUse
 			}
+		}
+
+		templates, err := tx.CustomTemplate().ReadAll(func(t portainer.CustomTemplate) bool {
+			return t.Artifact != nil && slices.ContainsFunc(t.Artifact.Files, func(f portainer.ArtifactFile) bool {
+				return f.SourceID == portainer.SourceID(sourceID)
+			})
+		})
+		if err != nil {
+			return err
+		}
+
+		if len(templates) > 0 {
+			return ErrSourceInUse
 		}
 
 		return tx.Source().Delete(portainer.SourceID(sourceID))
 	}); h.dataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find a source with the specified identifier", err)
 	} else if errors.Is(err, ErrSourceInUse) {
-		return httperror.Conflict("Source is used by one or more workflows", err)
+		return httperror.Conflict("Source is used by one or more workflows or custom templates", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to delete source", err)
 	}

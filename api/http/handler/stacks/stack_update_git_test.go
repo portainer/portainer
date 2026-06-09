@@ -37,29 +37,29 @@ func TestStackUpdateGitWebhookUniqueness(t *testing.T) {
 	const stack2ID = portainer.StackID(457)
 
 	src1 := &portainer.Source{
-		Type:      portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
 	}
 	err = store.Source().Create(src1)
 	require.NoError(t, err)
 
-	wf1 := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-		Artifact:  portainer.Artifact{StackID: stack1ID},
-		SourceIDs: []portainer.SourceID{src1.ID},
+	wf1 := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stack1ID,
+		Files:   []portainer.ArtifactFile{{SourceID: src1.ID}},
 	}}}
 	err = store.Workflow().Create(wf1)
 	require.NoError(t, err)
 
 	src2 := &portainer.Source{
-		Type:      portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
 	}
 	err = store.Source().Create(src2)
 	require.NoError(t, err)
 
-	wf2 := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-		Artifact:  portainer.Artifact{StackID: stack2ID},
-		SourceIDs: []portainer.SourceID{src2.ID},
+	wf2 := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stack2ID,
+		Files:   []portainer.ArtifactFile{{SourceID: src2.ID}},
 	}}}
 	err = store.Workflow().Create(wf2)
 	require.NoError(t, err)

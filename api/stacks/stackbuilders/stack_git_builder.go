@@ -74,9 +74,9 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 		repoConfig.URL = gittypes.SanitizeURL(repoConfig.URL)
 
 		src, err := workflows.FindOrCreateGitSource(tx, &portainer.Source{
-			Name:      gittypes.RepoName(repoConfig.URL),
-			Type:      portainer.SourceTypeGit,
-			GitConfig: &repoConfig,
+			Name: gittypes.RepoName(repoConfig.URL),
+			Type: portainer.SourceTypeGit,
+			Git:  &repoConfig,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to find or create source: %w", err)
@@ -84,14 +84,14 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 
 		wf := &portainer.Workflow{
 			Name: b.stack.Name,
-			Artifacts: []portainer.ArtifactSources{{
-				Artifact: portainer.Artifact{
-					ReferenceName:  repoConfig.ReferenceName,
-					ConfigFilePath: repoConfig.ConfigFilePath,
-					ConfigHash:     repoConfig.ConfigHash,
-					StackID:        b.stack.ID,
-				},
-				SourceIDs: []portainer.SourceID{src.ID},
+			Artifacts: []portainer.Artifact{{
+				StackID: b.stack.ID,
+				Files: []portainer.ArtifactFile{{
+					SourceID: src.ID,
+					Path:     repoConfig.ConfigFilePath,
+					Ref:      repoConfig.ReferenceName,
+					Hash:     repoConfig.ConfigHash,
+				}},
 			}},
 		}
 		if err := tx.Workflow().Create(wf); err != nil {

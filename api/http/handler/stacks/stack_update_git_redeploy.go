@@ -236,8 +236,8 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 				return err
 			}
 
-			return workflows.UpdateArtifactForStack(tx, stack.WorkflowID, stack.ID, func(a *portainer.Artifact) {
-				a.ConfigHash = oldConfigHash
+			return workflows.UpdateArtifactFileForStack(tx, stack.WorkflowID, stack.ID, sourceID, func(a *portainer.ArtifactFile) {
+				a.Hash = oldConfigHash
 			})
 		}); err != nil {
 			log.Error().Err(err).Int("stack_id", int(stack.ID)).Msg("failed to revert config hash after failed redeploy")

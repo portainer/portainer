@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 type agentTransport struct {
@@ -24,9 +25,9 @@ func NewAgentTransport(signatureService portainer.DigitalSignatureService, token
 
 	transport := &agentTransport{
 		baseTransport: newBaseTransport(
-			&http.Transport{
+			ssrf.WrapTransport(&http.Transport{
 				TLSClientConfig: tlsConfig,
-			},
+			}),
 			tokenManager,
 			endpoint,
 			k8sClientFactory,

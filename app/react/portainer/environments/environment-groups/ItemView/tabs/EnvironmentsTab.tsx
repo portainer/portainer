@@ -44,7 +44,7 @@ export function EnvironmentsTab({
 
   return (
     <>
-      <div className="mx-4">
+      <div className="m-4">
         <Widget>
           <Widget.Body loading={groupQuery.isLoading}>
             {groupQuery.data && (

@@ -156,6 +156,7 @@ func singleAPIRequest(h *Handler, jwt string, expect string) error {
 
 func Test_customTemplateGitFetch(t *testing.T) {
 	t.Parallel()
+
 	is := assert.New(t)
 
 	_, store := datastore.MustNewTestStore(t, true, true)
@@ -172,12 +173,31 @@ func Test_customTemplateGitFetch(t *testing.T) {
 	dir, err := os.Getwd()
 	require.NoError(t, err, "error to get working directory")
 
-	template1 := &portainer.CustomTemplate{ID: 1, Title: "custom-template-1", ProjectPath: filesystem.JoinPaths(dir, "fixtures/custom_template_1"), GitConfig: &gittypes.RepoConfig{ConfigFilePath: "test-config-path.txt"}}
+	src := &portainer.Source{
+		ID:   1,
+		Type: portainer.SourceTypeGit,
+		Git: &gittypes.RepoConfig{
+			URL: "https://github.com/example/repo",
+		},
+	}
+	err = store.Source().Create(src)
+	require.NoError(t, err, "error creating source")
+
+	const configFilePath = "test-config-path.txt"
+
+	template1 := &portainer.CustomTemplate{
+		ID:          1,
+		Title:       "custom-template-1",
+		ProjectPath: filesystem.JoinPaths(dir, "fixtures/custom_template_1"),
+		Artifact: &portainer.Artifact{
+			Files: []portainer.ArtifactFile{{Path: configFilePath, SourceID: src.ID}},
+		},
+	}
 	err = store.CustomTemplateService.Create(template1)
 	require.NoError(t, err, "error creating custom template 1")
 
 	// prepare testing folder
-	err = prepareTestFolder(template1.ProjectPath, template1.GitConfig.ConfigFilePath)
+	err = prepareTestFolder(template1.ProjectPath, configFilePath)
 	require.NoError(t, err, "error creating testing folder")
 
 	defer func() {
@@ -192,7 +212,7 @@ func Test_customTemplateGitFetch(t *testing.T) {
 	requestBouncer := security.NewRequestBouncer(t.Context(), store, jwtService, nil)
 
 	gitService := &TestGitService{
-		targetFilePath: filesystem.JoinPaths(template1.ProjectPath, template1.GitConfig.ConfigFilePath),
+		targetFilePath: filesystem.JoinPaths(template1.ProjectPath, configFilePath),
 	}
 	fileService := &TestFileService{}
 
@@ -252,7 +272,7 @@ func Test_customTemplateGitFetch(t *testing.T) {
 
 	t.Run("restore git repository if it is failed to download the new git repository", func(t *testing.T) {
 		invalidGitService := &InvalidTestGitService{
-			targetFilePath: filesystem.JoinPaths(template1.ProjectPath, template1.GitConfig.ConfigFilePath),
+			targetFilePath: filesystem.JoinPaths(template1.ProjectPath, configFilePath),
 		}
 		h := NewHandler(requestBouncer, store, fileService, invalidGitService)
 
@@ -273,4 +293,74 @@ func Test_customTemplateGitFetch(t *testing.T) {
 		require.NoError(t, err, "failed to read target file")
 		assert.Equal(t, "gfedcba", string(fileContent))
 	})
+}
+
+func TestCustomTemplateGitFetch_NilArtifactReturnsBadRequest(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	template := &portainer.CustomTemplate{ID: 1, Title: "no-git-template"}
+	err := store.CustomTemplateService.Create(template)
+	require.NoError(t, err)
+
+	h := NewHandler(testhelpers.NewTestRequestBouncer(), store, &TestFileService{}, &TestGitService{})
+
+	req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBufferString("{}"))
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestCustomTemplateGitFetch_EmptySourceIDsReturnsBadRequest(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	template := &portainer.CustomTemplate{
+		ID:    1,
+		Title: "empty-source-ids",
+		Artifact: &portainer.Artifact{
+			Files: []portainer.ArtifactFile{},
+		},
+	}
+	err := store.CustomTemplateService.Create(template)
+	require.NoError(t, err)
+
+	h := NewHandler(testhelpers.NewTestRequestBouncer(), store, &TestFileService{}, &TestGitService{})
+
+	req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBufferString("{}"))
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestCustomTemplateGitFetch_SourceWithNilGitConfigReturnsInternalError(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	src := &portainer.Source{Type: portainer.SourceTypeGit}
+	err := store.Source().Create(src)
+	require.NoError(t, err)
+
+	template := &portainer.CustomTemplate{
+		ID:    1,
+		Title: "nil-git-config",
+		Artifact: &portainer.Artifact{
+			Files: []portainer.ArtifactFile{{SourceID: src.ID}},
+		},
+	}
+	err = store.CustomTemplateService.Create(template)
+	require.NoError(t, err)
+
+	h := NewHandler(testhelpers.NewTestRequestBouncer(), store, &TestFileService{}, &TestGitService{})
+
+	req := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", bytes.NewBufferString("{}"))
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusInternalServerError, rr.Code)
 }

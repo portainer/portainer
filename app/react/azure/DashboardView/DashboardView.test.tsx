@@ -4,6 +4,7 @@ import { render, within } from '@testing-library/react';
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
 import {
+  createMockEnvironment,
   createMockResourceGroups,
   createMockSubscriptions,
 } from '@/react-tools/test-mocks';
@@ -109,7 +110,9 @@ async function renderComponent(
   const user = new UserViewModel({ Username: 'user' });
 
   server.use(
-    http.get('/api/endpoints/1', () => HttpResponse.json({})),
+    http.get('/api/endpoints/1', () =>
+      HttpResponse.json(createMockEnvironment())
+    ),
 
     http.get('/api/endpoints/:endpointId/azure/subscriptions', () =>
       HttpResponse.json(createMockSubscriptions(subscriptionsCount), {

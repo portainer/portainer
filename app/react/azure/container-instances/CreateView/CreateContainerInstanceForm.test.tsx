@@ -7,6 +7,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server } from '@/setup-tests/server';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 
@@ -28,7 +29,11 @@ function renderComponent() {
 
 describe('CreateContainerInstanceForm', () => {
   beforeEach(() => {
-    server.use(http.get('/api/endpoints/5', () => HttpResponse.json({})));
+    server.use(
+      http.get('/api/endpoints/5', () =>
+        HttpResponse.json(createMockEnvironment())
+      )
+    );
   });
 
   // TODO: from R8S-730 - enable this test once it passes

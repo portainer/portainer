@@ -253,8 +253,11 @@ describe('EditGroupView', () => {
       // Wait for form to load
       await screen.findByLabelText(/Name/i);
 
-      // The Environments tab should be visible
-      expect(screen.getByText('Environments')).toBeVisible();
+      // The Environments tab should be visible — target by data-cy so we
+      // don't collide with the "Environments" stat block label in the header.
+      const environmentsTab = screen.getByTestId('tab-0');
+      expect(environmentsTab).toBeVisible();
+      expect(environmentsTab).toHaveTextContent(/Environments/i);
     });
   });
 
@@ -489,6 +492,56 @@ describe('EditGroupView', () => {
       await waitFor(() => {
         expect(requestBody).toHaveProperty('AssociatedEndpoints');
       });
+    });
+  });
+
+  describe('API request - size parameter', () => {
+    it('should request the group with size=true so TypeInfo is populated', async () => {
+      let capturedUrl: string | undefined;
+
+      server.use(
+        http.get('/api/endpoint_groups/2', ({ request }) => {
+          capturedUrl = request.url;
+          return HttpResponse.json(mockGroup);
+        }),
+        http.get('/api/tags', () => HttpResponse.json([])),
+        http.get('/api/endpoints', () =>
+          HttpResponse.json([], {
+            headers: {
+              'x-total-count': '0',
+              'x-total-available': '0',
+            },
+          })
+        )
+      );
+
+      const Wrapped = withTestQueryProvider(
+        withTestRouter(withUserProvider(EditGroupView))
+      );
+      render(<Wrapped />);
+
+      await screen.findByLabelText(/Name/i);
+
+      // size=true is required for TypeInfo (Docker/Kubernetes/Podman counts) to be
+      // included in the response. Without it, EnvironmentTypeBreakdown in GroupHeader
+      // shows nothing.
+      expect(new URL(capturedUrl!).searchParams.get('size')).toBe('true');
+    });
+
+    it('should show per-platform breakdown in GroupHeader when TypeInfo is returned', async () => {
+      const groupWithTypeInfo = createMockEnvironmentGroup({
+        Id: 2,
+        Name: 'Test Group',
+        Description: 'Test description',
+        TagIds: [1],
+        Total: 3,
+        TypeInfo: { Docker: 2, Kubernetes: 1, Podman: 0, Mixed: true },
+      });
+
+      renderEditGroupView({ groupData: groupWithTypeInfo });
+
+      expect(await screen.findByText('Docker')).toBeVisible();
+      expect(screen.getByText('Kubernetes')).toBeVisible();
     });
   });
 

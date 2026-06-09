@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 type edgeTransport struct {
@@ -21,7 +22,7 @@ func NewEdgeTransport(dataStore dataservices.DataStore, signatureService portain
 		reverseTunnelService: reverseTunnelService,
 		signatureService:     signatureService,
 		baseTransport: newBaseTransport(
-			&http.Transport{},
+			ssrf.WrapTransportInternal(&http.Transport{}),
 			tokenManager,
 			endpoint,
 			k8sClientFactory,

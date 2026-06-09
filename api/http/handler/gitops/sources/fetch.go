@@ -13,8 +13,10 @@ import (
 // FetchSourceWorkflows returns the workflows and stats for a single source.
 func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([]ce.Workflow, ce.SourceStats, error) {
 	wfs, err := tx.Workflow().ReadAll(func(wf portainer.Workflow) bool {
-		return slices.ContainsFunc(wf.Artifacts, func(artifact portainer.ArtifactSources) bool {
-			return slices.Contains(artifact.SourceIDs, src.ID)
+		return slices.ContainsFunc(wf.Artifacts, func(artifact portainer.Artifact) bool {
+			return slices.ContainsFunc(artifact.Files, func(f portainer.ArtifactFile) bool {
+				return f.SourceID == src.ID
+			})
 		})
 	})
 	if err != nil {
@@ -40,7 +42,7 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 	stats := ce.SourceStats{EndpointIDs: set.Set[portainer.EndpointID]{}}
 
 	for _, stacks := range stacks {
-		items = append(items, ce.MapStackToWorkflow(stacks, src.GitConfig, unknown, unknown))
+		items = append(items, ce.MapStackToWorkflow(stacks, src.Git, unknown, unknown))
 		stats.WorkflowCount++
 		if stacks.EndpointID != 0 {
 			stats.EndpointIDs.Add(stacks.EndpointID)

@@ -1,4 +1,5 @@
 import { endpointList } from '@api/sdk.gen';
+import { PortainerEndpoint } from '@api/types.gen';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 import {
@@ -170,10 +171,13 @@ export async function getAgentVersions() {
 
 export async function getEndpoint(id: EnvironmentId, excludeSnapshot = true) {
   try {
-    const { data: endpoint } = await axios.get<Environment>(buildUrl(id), {
-      params: { excludeSnapshot },
-    });
-    return endpoint;
+    const { data: endpoint } = await axios.get<PortainerEndpoint>(
+      buildUrl(id),
+      {
+        params: { excludeSnapshot },
+      }
+    );
+    return toEnvironment(endpoint);
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

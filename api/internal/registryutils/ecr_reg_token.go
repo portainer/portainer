@@ -38,9 +38,9 @@ func doGetRegToken(tx dataservices.DataStoreTx, registry *portainer.Registry) er
 	return tx.Registry().Update(registry.ID, registry)
 }
 
-// ValidateRegistriesECRTokens refreshes and persists ECR tokens for all registries that need it.
+// RefreshAndPersistECRTokens refreshes and persists ECR tokens for all registries that need it.
 // Must be called with a real DataStoreTx (not a top-level DataStore) to avoid write-lock contention.
-func ValidateRegistriesECRTokens(tx dataservices.DataStoreTx, registries []portainer.Registry) error {
+func RefreshAndPersistECRTokens(tx dataservices.DataStoreTx, registries []portainer.Registry) {
 	for i := range registries {
 		reg := &registries[i]
 		if reg.Type != portainer.EcrRegistry {
@@ -50,11 +50,12 @@ func ValidateRegistriesECRTokens(tx dataservices.DataStoreTx, registries []porta
 			continue
 		}
 		if err := doGetRegToken(tx, reg); err != nil {
-			return fmt.Errorf("ECR registry %q credentials are invalid or expired. Error: %w", reg.Name, err)
+			log.Warn().
+				Err(err).
+				Str("RegistryName", reg.Name).
+				Msg("Failed to get valid ECR registry token. Skip logging with this registry.")
 		}
 	}
-
-	return nil
 }
 
 func EnsureRegTokenValid(tx dataservices.DataStoreTx, registry *portainer.Registry) error {

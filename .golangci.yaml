@@ -5,6 +5,7 @@ run:
 linters:
   default: none
   enable:
+    - gocritic
     - bodyclose
     - copyloopvar
     - depguard
@@ -76,6 +77,13 @@ linters:
               desc: use github.com/Masterminds/semver/v3
             - pkg: github.com/hashicorp/go-version
               desc: use github.com/Masterminds/semver/v3
+    gocritic:
+      disable-all: true
+      enabled-checks:
+        - ruleguard
+      settings:
+        ruleguard:
+          rules: "./analysis/ssrf.go"
     forbidigo:
       forbid:
         - pattern: ^tls\.Config$
@@ -93,6 +101,11 @@ linters:
       - comments
       - common-false-positives
       - legacy
+    rules:
+      - path: pkg/libhttp/ssrf
+        linters:
+          - gocritic
+        text: ruleguard
     paths:
       - third_party$
       - builtin$

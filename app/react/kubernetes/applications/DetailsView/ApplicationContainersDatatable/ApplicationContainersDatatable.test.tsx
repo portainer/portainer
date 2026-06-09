@@ -214,15 +214,15 @@ describe('ApplicationContainersDatatable', () => {
     expect(await screen.findByText('No items.')).toBeVisible();
   });
 
-  it('expands a pod row to reveal its containers', async () => {
+  it('collapses a pod row to hide its containers', async () => {
     const user = userEvent.setup();
     renderComponent();
 
     await screen.findByText('test-pod-1');
 
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
+    await user.click(screen.getByRole('button', { name: 'Collapse' }));
 
-    expect(await screen.findByText('nginx')).toBeVisible();
+    expect(await screen.queryAllByText('nginx')).toStrictEqual([]);
   });
 
   it('shows the Init badge for init containers', async () => {
@@ -265,11 +265,9 @@ describe('ApplicationContainersDatatable', () => {
       )
     );
 
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByText('test-pod-1');
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
 
     expect(await screen.findByText('Init')).toBeVisible();
   });
@@ -310,11 +308,8 @@ describe('ApplicationContainersDatatable', () => {
       )
     );
 
-    const user = userEvent.setup();
     renderComponent();
-
     await screen.findByText('test-pod-1');
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
 
     expect(await screen.findByText('Sidecar')).toBeVisible();
   });
@@ -329,11 +324,9 @@ describe('ApplicationContainersDatatable', () => {
       )
     );
 
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByText('test-pod-1');
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
 
     expect(
       await screen.findByTestId('application-container-stats-nginx')
@@ -341,11 +334,9 @@ describe('ApplicationContainersDatatable', () => {
   });
 
   it('hides the stats link when server metrics is disabled', async () => {
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByText('test-pod-1');
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
 
     await screen.findByText('nginx');
     expect(
@@ -354,15 +345,23 @@ describe('ApplicationContainersDatatable', () => {
   });
 
   it('shows the logs link for a container that has started', async () => {
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByText('test-pod-1');
-    await user.click(screen.getByRole('button', { name: 'Expand' }));
 
     expect(
       await screen.findByTestId('application-container-logs-nginx')
     ).toBeVisible();
+  });
+
+  it('does not render a restart button', async () => {
+    renderComponent();
+
+    await screen.findByText('test-pod-1');
+
+    expect(
+      screen.queryByTestId('application-pod-restart-test-pod-1')
+    ).not.toBeInTheDocument();
   });
 
   it('calls the delete API after the user confirms deletion', async () => {

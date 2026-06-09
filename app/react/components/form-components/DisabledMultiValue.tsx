@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react';
-import { components, type GroupBase, type MultiValueProps } from 'react-select';
-import type { MultiValueRemoveProps } from 'react-select/dist/declarations/src/components/MultiValue';
+import {
+  components,
+  type GroupBase,
+  type MultiValueProps,
+  type MultiValueRemoveProps,
+} from 'react-select';
 
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 

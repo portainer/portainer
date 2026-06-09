@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/portainer/portainer/api/http/security/setuptoken"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
 	"github.com/stretchr/testify/assert"
@@ -124,6 +125,45 @@ func backup(t *testing.T, h *Handler, password string) []byte {
 	require.NoError(t, err)
 
 	return archive
+}
+
+func Test_restore_setupTokenGate(t *testing.T) {
+	t.Parallel()
+	datastore := testhelpers.NewDatastore(
+		testhelpers.WithUsers([]portainer.User{}),
+		testhelpers.WithEdgeJobs([]portainer.EdgeJob{}),
+	)
+	adminMonitor := adminmonitor.New(time.Hour, datastore)
+	h := NewHandler(
+		testhelpers.NewTestRequestBouncer(),
+		datastore,
+		offlinegate.NewOfflineGate(),
+		prepareFilestorePath(t),
+		func() {},
+		adminMonitor,
+	)
+	h.SetupToken = "secret-token"
+
+	t.Run("403 without token header", func(t *testing.T) {
+		err := h.restore(httptest.NewRecorder(), prepareMultipartRequest(t, "", []byte("x")))
+		require.Error(t, err)
+		assert.Equal(t, http.StatusForbidden, err.StatusCode)
+	})
+
+	t.Run("403 with wrong token", func(t *testing.T) {
+		r := prepareMultipartRequest(t, "", []byte("x"))
+		r.Header.Set(setuptoken.HeaderName, "wrong")
+		err := h.restore(httptest.NewRecorder(), r)
+		require.Error(t, err)
+		assert.Equal(t, http.StatusForbidden, err.StatusCode)
+	})
+
+	t.Run("passes gate with correct token", func(t *testing.T) {
+		archive := backup(t, h, "")
+		r := prepareMultipartRequest(t, "", archive)
+		r.Header.Set(setuptoken.HeaderName, "secret-token")
+		require.Nil(t, h.restore(httptest.NewRecorder(), r))
+	})
 }
 
 func prepareMultipartRequest(t *testing.T, password string, file []byte) *http.Request {

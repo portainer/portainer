@@ -68,11 +68,13 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 
 		}
 
-		if canEdit || hasAccess {
-			return nil
+		if !canEdit && !hasAccess {
+			return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 		}
 
-		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
+		populateGitConfig(tx, customTemplate)
+
+		return nil
 	})
 
 	return response.TxResponse(w, customTemplate, err)

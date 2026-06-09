@@ -11,10 +11,10 @@ import ReactSelect, {
   InputProps,
   OptionsOrGroups,
   Props as ReactSelectProps,
+  SelectInstance as ReactSelectType,
 } from 'react-select';
 import clsx from 'clsx';
 import { RefAttributes, useMemo, useCallback } from 'react';
-import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import './ReactSelect.css';
 import { AutomationTestingProps } from '@/types';

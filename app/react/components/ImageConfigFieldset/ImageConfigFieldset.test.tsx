@@ -5,6 +5,7 @@ import { render, fireEvent } from '@testing-library/react';
 
 import { http, server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { ImageConfigFieldset } from './ImageConfigFieldset';
 import { Values } from './types';
@@ -71,7 +72,9 @@ function renderComponent({
 } = {}) {
   server.use(
     http.get('/api/registries/:id', () => HttpResponse.json({})),
-    http.get('/api/endpoints/:id', () => HttpResponse.json({}))
+    http.get('/api/endpoints/:id', () =>
+      HttpResponse.json(createMockEnvironment())
+    )
   );
 
   const Wrapped = withTestQueryProvider(ImageConfigFieldset);

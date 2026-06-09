@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 	"oras.land/oras-go/v2/registry/remote/retry"
@@ -92,7 +94,7 @@ func NewHTTPClient(token string) *http.Client {
 	return &http.Client{
 		Transport: &tokenTransport{
 			token:     token,
-			transport: retry.NewTransport(&http.Transport{}), // Use ORAS retry transport for consistent rate limiting and error handling
+			transport: retry.NewTransport(ssrf.WrapTransport(&http.Transport{})), // Use ORAS retry transport for consistent rate limiting and error handling
 		},
 		Timeout: 1 * time.Minute,
 	}

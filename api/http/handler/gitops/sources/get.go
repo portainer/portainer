@@ -80,7 +80,7 @@ func (h *Handler) getSource(w http.ResponseWriter, r *http.Request) *httperror.H
 		return httperror.InternalServerError("Unable to retrieve source", err)
 	}
 
-	detail := BuildSourceDetail(h.buildSource(r.Context(), source, stats), source.GitConfig, sourceWfs)
+	detail := BuildSourceDetail(h.buildSource(r.Context(), source, stats), source.Git, sourceWfs)
 	return response.JSON(w, detail)
 }
 

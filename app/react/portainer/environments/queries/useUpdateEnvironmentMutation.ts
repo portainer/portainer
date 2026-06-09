@@ -1,17 +1,19 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
-import { EndpointsEndpointUpdatePayload } from '@api/types.gen';
+import {
+  EndpointsEndpointUpdatePayload,
+  PortainerEndpoint,
+} from '@api/types.gen';
 
 import { withError, withInvalidate } from '@/react-tools/react-query';
 import {
   EnvironmentId,
-  Environment,
   EnvironmentStatusMessage,
   KubernetesSettings,
 } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 
-import { buildUrl } from '../environment.service/utils';
+import { buildUrl, toEnvironment } from '../environment.service/utils';
 
 import { environmentQueryKeys } from './query-keys';
 
@@ -51,12 +53,9 @@ export async function updateEnvironment({
       payload.TLSKey
     );
 
-    const { data: endpoint } = await axios.put<Environment>(
-      buildUrl(id),
-      payload
-    );
+    const { data } = await axios.put<PortainerEndpoint>(buildUrl(id), payload);
 
-    return endpoint;
+    return toEnvironment(data);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update environment');
   }

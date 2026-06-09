@@ -65,6 +65,17 @@
               </div>
             </div>
             <!-- !confirm-password-input -->
+            <!-- setup-token-input -->
+            <div class="form-group" ng-if="requiresSetupToken">
+              <label for="setup_token" class="col-sm-4 control-label text-left">
+                Setup token
+                <portainer-tooltip message="'Find this token in the Portainer server logs'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" ng-model="formValues.SetupToken" id="setup_token" data-cy="init-adminSetupToken" />
+              </div>
+            </div>
+            <!-- !setup-token-input -->
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12 text-warning">
@@ -82,7 +93,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || form.$invalid || !formValues.Password || !formValues.ConfirmPassword ||  form.password.$viewValue !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || form.$invalid || !formValues.Password || !formValues.ConfirmPassword || form.password.$viewValue !== formValues.ConfirmPassword || (requiresSetupToken && !formValues.SetupToken)"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >
@@ -277,13 +288,24 @@
               </div>
             </div>
             <!-- !note -->
+            <!-- setup-token-input -->
+            <div class="form-group" ng-if="requiresSetupToken">
+              <label for="restore_setup_token" class="col-sm-3 control-label text-left">
+                Setup token
+                <portainer-tooltip message="'Find this token in the Portainer server logs (docker logs &lt;container&gt;).'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="formValues.SetupToken" id="restore_setup_token" data-cy="init-restoreSetupToken" />
+              </div>
+            </div>
+            <!-- !setup-token-input -->
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!formValues.BackupFile || state.backupInProgress"
+                  ng-disabled="!formValues.BackupFile || state.backupInProgress || (requiresSetupToken && !formValues.SetupToken)"
                   ng-click="uploadBackup()"
                   button-spinner="state.backupInProgress"
                   data-cy="init-restorePortainerButton"

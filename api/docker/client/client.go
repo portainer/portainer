@@ -11,6 +11,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/docker/docker/api/types/image"
@@ -184,17 +186,20 @@ func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error)
 }
 
 func httpClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*http.Client, error) {
-	transport := &NodeNameTransport{
-		Transport: &http.Transport{},
-	}
-
+	var transport *NodeNameTransport
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		transport.TLSClientConfig = tlsConfig
+		transport = &NodeNameTransport{
+			Transport: ssrf.WrapTransport(&http.Transport{TLSClientConfig: tlsConfig}),
+		}
+	} else {
+		transport = &NodeNameTransport{
+			Transport: ssrf.WrapTransport(&http.Transport{}),
+		}
 	}
 
 	clientTimeout := defaultDockerRequestTimeout

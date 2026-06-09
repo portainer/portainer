@@ -200,7 +200,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 	src := &portainer.Source{
 		Type: portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{
+		Git: &gittypes.RepoConfig{
 			URL:           "url",
 			ReferenceName: "ref",
 			ConfigHash:    "oldHash",
@@ -209,7 +209,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	err = store.Source().Create(src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{SourceIDs: []portainer.SourceID{src.ID}}}}
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
@@ -247,7 +247,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 
 	src := &portainer.Source{
 		Type: portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{
+		Git: &gittypes.RepoConfig{
 			URL:           "url",
 			ReferenceName: "ref",
 			ConfigHash:    "oldHash",
@@ -256,9 +256,9 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	err = store.Source().Create(src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-		Artifact:  portainer.Artifact{StackID: 1},
-		SourceIDs: []portainer.SourceID{src.ID},
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: 1,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
 	}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
@@ -290,7 +290,7 @@ func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservic
 
 	src := &portainer.Source{
 		Type: portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{
+		Git: &gittypes.RepoConfig{
 			URL:           "url",
 			ReferenceName: "ref",
 			ConfigHash:    "oldHash",
@@ -299,7 +299,7 @@ func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservic
 	err = store.Source().Create(src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{SourceIDs: []portainer.SourceID{src.ID}}}}
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 

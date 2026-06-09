@@ -23,7 +23,8 @@ export function EditGroupView() {
   const deleteMutation = useDeleteEnvironmentGroupMutation();
   const [addEnvsDrawerOpen, setAddEnvsDrawerOpen] = useState(false);
   const groupQuery = useGroup(
-    deleteMutation.isLoading || deleteMutation.isSuccess ? undefined : groupId
+    deleteMutation.isLoading || deleteMutation.isSuccess ? undefined : groupId,
+    { size: true }
   );
   const group = groupQuery.data;
   const groupName = group?.Name ?? 'Environment group';

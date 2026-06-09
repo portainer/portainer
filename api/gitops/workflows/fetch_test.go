@@ -23,12 +23,12 @@ func mustCreateGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *por
 
 	cfg := stack.GitConfig
 
-	src := &portainer.Source{Type: portainer.SourceTypeGit, GitConfig: cfg}
+	src := &portainer.Source{Type: portainer.SourceTypeGit, Git: cfg}
 	require.NoError(t, tx.Source().Create(src))
 
-	wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-		Artifact:  portainer.Artifact{StackID: stack.ID},
-		SourceIDs: []portainer.SourceID{src.ID},
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stack.ID,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
 	}}}
 	require.NoError(t, tx.Workflow().Create(wf))
 
@@ -228,7 +228,7 @@ func TestFetchSourceStats_TracksWorkflowCountAndEndpoints(t *testing.T) {
 		srcID = src.ID
 
 		for i := 1; i <= 2; i++ {
-			wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{SourceIDs: []portainer.SourceID{srcID}}}}
+			wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: srcID}}}}}
 			require.NoError(t, tx.Workflow().Create(wf))
 			require.NoError(t, tx.Stack().Create(&portainer.Stack{
 				ID:         portainer.StackID(i),

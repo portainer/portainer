@@ -47,17 +47,17 @@ func createGitStack(t *testing.T, tx dataservices.DataStoreTx, stack *portainer.
 	t.Helper()
 
 	if stack.GitConfig != nil {
-		src := &portainer.Source{GitConfig: stack.GitConfig, Type: portainer.SourceTypeGit}
+		src := &portainer.Source{Git: stack.GitConfig, Type: portainer.SourceTypeGit}
 		require.NoError(t, tx.Source().Create(src))
 
-		wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-			Artifact: portainer.Artifact{
-				StackID:        stack.ID,
-				ReferenceName:  stack.GitConfig.ReferenceName,
-				ConfigFilePath: stack.GitConfig.ConfigFilePath,
-				ConfigHash:     stack.GitConfig.ConfigHash,
-			},
-			SourceIDs: []portainer.SourceID{src.ID},
+		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+			StackID: stack.ID,
+			Files: []portainer.ArtifactFile{{
+				SourceID: src.ID,
+				Path:     stack.GitConfig.ConfigFilePath,
+				Ref:      stack.GitConfig.ReferenceName,
+				Hash:     stack.GitConfig.ConfigHash,
+			}},
 		}}}
 		require.NoError(t, tx.Workflow().Create(wf))
 

@@ -40,16 +40,16 @@ func TestStackFile_GitPendingRedeploy_Returns409(t *testing.T) {
 
 	src := &portainer.Source{
 		Type: portainer.SourceTypeGit,
-		GitConfig: &gittypes.RepoConfig{
+		Git: &gittypes.RepoConfig{
 			URL:            "https://github.com/portainer/portainer.git",
 			ConfigFilePath: "docker-compose.yml",
 		},
 	}
 	require.NoError(t, store.Source().Create(src))
 
-	wf := &portainer.Workflow{Artifacts: []portainer.ArtifactSources{{
-		Artifact:  portainer.Artifact{StackID: stackID},
-		SourceIDs: []portainer.SourceID{src.ID},
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stackID,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
 	}}}
 	require.NoError(t, store.Workflow().Create(wf))
 

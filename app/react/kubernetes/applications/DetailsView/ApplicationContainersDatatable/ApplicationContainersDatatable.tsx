@@ -130,6 +130,10 @@ export function ApplicationContainersDatatable() {
               />
             </TableSettingsMenu>
           )}
+          initialTableState={{
+            pagination: { pageIndex: 0, pageSize: 5 },
+            expanded: true,
+          }}
         />
       </div>
     </div>

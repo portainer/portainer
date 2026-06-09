@@ -22,7 +22,7 @@ func TestBuildGitSource_DerivesNameFromURL(t *testing.T) {
 
 	require.Equal(t, "my-repo", src.Name)
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
-	require.Nil(t, src.GitConfig.Authentication)
+	require.Nil(t, src.Git.Authentication)
 }
 
 func TestBuildGitSource_UsesExplicitName(t *testing.T) {
@@ -47,9 +47,9 @@ func TestBuildGitSource_WithAuthentication(t *testing.T) {
 		},
 	})
 
-	require.NotNil(t, src.GitConfig.Authentication)
-	require.Equal(t, "alice", src.GitConfig.Authentication.Username)
-	require.Equal(t, "secret", src.GitConfig.Authentication.Password)
+	require.NotNil(t, src.Git.Authentication)
+	require.Equal(t, "alice", src.Git.Authentication.Username)
+	require.Equal(t, "secret", src.Git.Authentication.Password)
 }
 
 func TestGitSourceCreatePayload_Validate_EmptyURL(t *testing.T) {
@@ -93,8 +93,8 @@ func TestGitSourceCreate_Success(t *testing.T) {
 	require.Equal(t, "my-source", src.Name)
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.NotZero(t, src.ID)
-	require.NotNil(t, src.GitConfig)
-	require.Equal(t, "https://github.com/org/repo.git", src.GitConfig.URL)
+	require.NotNil(t, src.Git)
+	require.Equal(t, "https://github.com/org/repo.git", src.Git.URL)
 }
 
 func TestGitSourceCreate_SanitizesCredentials(t *testing.T) {
@@ -124,10 +124,10 @@ func TestGitSourceCreate_SanitizesCredentials(t *testing.T) {
 	var src portainer.Source
 	err = json.NewDecoder(rr.Body).Decode(&src)
 	require.NoError(t, err)
-	require.NotNil(t, src.GitConfig)
-	require.NotNil(t, src.GitConfig.Authentication)
-	require.Equal(t, "alice", src.GitConfig.Authentication.Username)
-	require.Empty(t, src.GitConfig.Authentication.Password)
+	require.NotNil(t, src.Git)
+	require.NotNil(t, src.Git.Authentication)
+	require.Equal(t, "alice", src.Git.Authentication.Username)
+	require.Empty(t, src.Git.Authentication.Password)
 }
 
 func TestGitSourceCreate_MissingURL(t *testing.T) {

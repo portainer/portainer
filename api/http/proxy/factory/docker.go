@@ -8,8 +8,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/url"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/rs/zerolog/log"
 )
@@ -47,17 +49,6 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 	}
 
 	endpointURL.Scheme = "http"
-	httpTransport := &http.Transport{}
-
-	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-		config, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		httpTransport.TLSClientConfig = config
-		endpointURL.Scheme = "https"
-	}
 
 	transportParameters := &docker.TransportParameters{
 		Endpoint:             endpoint,
@@ -67,7 +58,27 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		DockerClientFactory:  factory.dockerClientFactory,
 	}
 
-	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport, factory.gitService, factory.snapshotService)
+	var innerTransport *http.Transport
+	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		endpointURL.Scheme = "https"
+
+		if endpointutils.IsEdgeEndpoint(endpoint) {
+			innerTransport = ssrf.WrapTransportInternal(&http.Transport{TLSClientConfig: tlsConfig})
+		} else {
+			innerTransport = ssrf.WrapTransport(&http.Transport{TLSClientConfig: tlsConfig})
+		}
+	} else if endpointutils.IsEdgeEndpoint(endpoint) {
+		innerTransport = ssrf.WrapTransportInternal(&http.Transport{})
+	} else {
+		innerTransport = ssrf.WrapTransport(&http.Transport{})
+	}
+
+	dockerTransport, err := docker.NewTransport(transportParameters, innerTransport, factory.gitService, factory.snapshotService)
 	if err != nil {
 		return nil, err
 	}

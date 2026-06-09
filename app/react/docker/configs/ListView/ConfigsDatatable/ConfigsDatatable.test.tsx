@@ -8,7 +8,10 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { server } from '@/setup-tests/server';
 import { Role, User } from '@/portainer/users/types';
-import { createMockUsers } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockUsers,
+} from '@/react-tools/test-mocks';
 
 import { ConfigsDatatable } from './ConfigsDatatable';
 
@@ -35,11 +38,13 @@ vi.mock('@@/Link', () => ({
 beforeEach(() => {
   server.use(
     http.get('/api/endpoints/1', () =>
-      HttpResponse.json({
-        Id: 1,
-        Name: 'test-environment',
-        Type: 1,
-      })
+      HttpResponse.json(
+        createMockEnvironment({
+          Id: 1,
+          Name: 'test-environment',
+          Type: 1,
+        })
+      )
     )
   );
 });

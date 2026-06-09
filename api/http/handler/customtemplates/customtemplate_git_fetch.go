@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -42,8 +43,28 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return httperror.InternalServerError("Unable to find a custom template with the specified identifier inside the database", err)
 	}
 
-	if customTemplate.GitConfig == nil {
-		return httperror.BadRequest("Git configuration does not exist in this custom template", err)
+	if customTemplate.Artifact == nil || len(customTemplate.Artifact.Files) == 0 {
+		return httperror.BadRequest("Git configuration does not exist in this custom template", nil)
+	}
+
+	file := customTemplate.Artifact.Files[0]
+
+	src, err := handler.DataStore.Source().Read(file.SourceID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve git source for custom template", err)
+	}
+
+	if src.Git == nil {
+		return httperror.InternalServerError("Source has no git configuration", nil)
+	}
+
+	gitConfig := &gittypes.RepoConfig{
+		URL:            src.Git.URL,
+		Authentication: src.Git.Authentication,
+		TLSSkipVerify:  src.Git.TLSSkipVerify,
+		ReferenceName:  file.Ref,
+		ConfigFilePath: file.Path,
+		ConfigHash:     file.Hash,
 	}
 
 	// If multiple users are trying to fetch the same custom template simultaneously, a lock needs to be added
@@ -68,7 +89,7 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		}
 	}()
 
-	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), *customTemplate.GitConfig, handler.GitService, func() string {
+	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), *gitConfig, handler.GitService, func() string {
 		return customTemplate.ProjectPath
 	})
 	if err != nil {
@@ -81,15 +102,15 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return httperror.InternalServerError("Failed to download git repository", err)
 	}
 
-	if customTemplate.GitConfig.ConfigHash != commitHash {
-		customTemplate.GitConfig.ConfigHash = commitHash
+	if customTemplate.Artifact.Files[0].Hash != commitHash {
+		customTemplate.Artifact.Files[0].Hash = commitHash
 
 		if err := handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate); err != nil {
 			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 		}
 	}
 
-	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, customTemplate.GitConfig.ConfigFilePath)
+	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, gitConfig.ConfigFilePath)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom template file from disk", err)
 	}

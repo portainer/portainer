@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/set"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -59,6 +60,10 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	var payload updateEdgeStackPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	if err := stackutils.ValidateEdgeStackComposeContent(r.Context(), payload.DeploymentType, []byte(payload.StackFileContent)); err != nil {
+		return httperror.BadRequest("Stack file contains a URL blocked by the SSRF policy", err)
 	}
 
 	var stack *portainer.EdgeStack

@@ -1008,6 +1008,7 @@ import {
   zGetApplicationsResourcesQuery,
   zGetApplicationsResourcesResponse,
   zGetEndpointGroupsByIdPath,
+  zGetEndpointGroupsByIdQuery,
   zGetEndpointGroupsByIdResponse,
   zGetKubernetesConfigMapPath,
   zGetKubernetesConfigMapResponse,
@@ -1189,6 +1190,7 @@ import {
   zRestartKubernetesPodPath,
   zRestartKubernetesPodResponse,
   zRestoreBody,
+  zRestoreHeaders,
   zRoleListResponse,
   zSetDefaultKubernetesStorageClassPath,
   zSetDefaultKubernetesStorageClassResponse,
@@ -1326,6 +1328,7 @@ import {
   zUploadTlsResponse,
   zUserAdminCheckResponse,
   zUserAdminInitBody,
+  zUserAdminInitHeaders,
   zUserAdminInitResponse,
   zUserCreateBody,
   zUserCreateResponse,
@@ -2859,7 +2862,7 @@ export const getEndpointGroupsById = <ThrowOnError extends boolean = true>(
         .object({
           body: z.never().optional(),
           path: zGetEndpointGroupsByIdPath,
-          query: z.never().optional(),
+          query: zGetEndpointGroupsByIdQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',
@@ -3875,7 +3878,7 @@ export const gitOpsSourcesList = <ThrowOnError extends boolean = true>(
 /**
  * Delete a source
  *
- * Deletes an existing GitOps source. Returns 409 if the source is referenced by any workflow.
+ * Deletes an existing GitOps source. Returns 409 if the source is referenced by any workflow or custom template.
  * **Access policy**: admin
  */
 export const gitOpsSourcesDelete = <ThrowOnError extends boolean = true>(
@@ -7524,7 +7527,7 @@ export const resourceControlUpdate = <ThrowOnError extends boolean = true>(
  * Triggers a system restore using provided backup file
  *
  * Triggers a system restore using provided backup file
- * **Access policy**: public
+ * **Access policy**: public (requires the X-Setup-Token header on an uninitialized instance unless --no-setup-token is set)
  */
 export const restore = <ThrowOnError extends boolean = true>(
   options: Options<RestoreData, ThrowOnError>
@@ -7538,6 +7541,7 @@ export const restore = <ThrowOnError extends boolean = true>(
       await z
         .object({
           body: zRestoreBody,
+          headers: zRestoreHeaders.optional(),
           path: z.never().optional(),
           query: z.never().optional(),
         })
@@ -8096,9 +8100,9 @@ export const stackStart = <ThrowOnError extends boolean = true>(
   });
 
 /**
- * Stops a stopped Stack
+ * Stop a running Stack
  *
- * Stops a stopped Stack.
+ * Stop a running Stack.
  * **Access policy**: authenticated
  */
 export const stackStop = <ThrowOnError extends boolean = true>(
@@ -9811,7 +9815,7 @@ export const userAdminCheck = <ThrowOnError extends boolean = true>(
  * Initialize administrator account
  *
  * Initialize the 'admin' user account.
- * **Access policy**: public
+ * **Access policy**: public (requires the X-Setup-Token header on an uninitialized instance unless --no-setup-token is set)
  */
 export const userAdminInit = <ThrowOnError extends boolean = true>(
   options: Options<UserAdminInitData, ThrowOnError>
@@ -9825,6 +9829,7 @@ export const userAdminInit = <ThrowOnError extends boolean = true>(
       await z
         .object({
           body: zUserAdminInitBody,
+          headers: zUserAdminInitHeaders.optional(),
           path: z.never().optional(),
           query: z.never().optional(),
         })

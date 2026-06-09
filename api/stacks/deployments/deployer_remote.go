@@ -169,13 +169,13 @@ func (d *stackDeployer) StopRemoteSwarmStack(ctx context.Context, stack *portain
 // * gather deployment logs and bubble them up
 func (d *stackDeployer) remoteStack(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, operation StackRemoteOperation, opts unpackerCmdBuilderOptions) error {
 	if stack.WorkflowID != 0 && opts.gitConfig == nil {
-		src, artifact, err := workflows.GitSourceAndArtifactForStack(d.dataStore, stack.WorkflowID, stack.ID)
+		src, file, err := workflows.GitSourceAndArtifactForStack(d.dataStore, stack.WorkflowID, stack.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to load git config for remote stack")
 		}
 
 		if src != nil {
-			opts.gitConfig = workflows.MergeSourceAndArtifact(src, artifact)
+			opts.gitConfig = workflows.MergeSourceAndFile(src, file)
 		}
 	}
 

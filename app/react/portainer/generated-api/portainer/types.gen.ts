@@ -263,18 +263,6 @@ export type V1ListMeta = {
   selfLink?: string;
 };
 
-export type V1Duration = {
-  'time.Duration'?:
-    | -9223372036854776000
-    | 9223372036854776000
-    | 1
-    | 1000
-    | 1000000
-    | 1000000000
-    | 60000000000
-    | 3600000000000;
-};
-
 export type V1OwnerReference = {
   /**
    * API version of the referent.
@@ -615,7 +603,7 @@ export type V1Beta1PodMetrics = {
    * collected from the interval [Timestamp-Window, Timestamp].
    */
   timestamp?: string;
-  window?: V1Duration;
+  window?: string;
 };
 
 export type V1Beta1NodeMetricsList = {
@@ -680,7 +668,7 @@ export type V1Beta1NodeMetrics = {
    * The memory usage is the memory working set.
    */
   usage?: V1ResourceList;
-  window?: V1Duration;
+  window?: string;
 };
 
 export type V1WindowsSecurityContextOptions = {
@@ -4568,6 +4556,10 @@ export type SettingsPublicSettingsResponse = {
    */
   RequiredPasswordLength?: number;
   /**
+   * Whether the setup wizard must send the X-Setup-Token header for admin init / restore
+   */
+  RequiresSetupToken?: boolean;
+  /**
    * Whether team sync is enabled
    */
   TeamSync?: boolean;
@@ -5320,7 +5312,7 @@ export type PortainerUserThemeSettings = {
   /**
    * Color represents the color theme of the UI
    */
-  color?: 'dark' | 'light' | 'highcontrast' | 'auto';
+  color?: 'dark' | 'light' | 'highcontrast' | 'auto' | '';
 };
 
 export const PortainerUserRole = {
@@ -5361,37 +5353,17 @@ export type PortainerResourceAccessLevel =
 
 export type PortainerUser = {
   /**
-   * Deprecated in DBVersion == 25
-   */
-  EndpointAuthorizations?: PortainerEndpointAuthorizations;
-  /**
    * User Identifier
    */
-  Id?: number;
-  /**
-   * Deprecated in DBVersion == 25
-   */
-  PortainerAuthorizations?: PortainerAuthorizations;
+  Id: number;
   /**
    * User role (1 for administrator account and 2 for regular account)
    */
-  Role?: PortainerUserRole;
+  Role: PortainerUserRole;
   ThemeSettings?: PortainerUserThemeSettings;
   TokenIssueAt?: number;
   UseCache?: boolean;
-  /**
-   * Deprecated
-   */
-  UserTheme?: string;
-  Username?: string;
-};
-
-export type PortainerAuthorizations = {
-  [key: string]: boolean;
-};
-
-export type PortainerEndpointAuthorizations = {
-  [key: string]: PortainerAuthorizations;
+  Username: string;
 };
 
 export type PortainerTeamResourceAccess = {
@@ -6020,6 +5992,10 @@ export type PortainerRole = {
   Priority?: number;
 };
 
+export type PortainerAuthorizations = {
+  [key: string]: boolean;
+};
+
 export type PortainerPerformanceMetrics = {
   CPUUsage?: number;
   DiskUsage?: number;
@@ -6638,6 +6614,7 @@ export type PortainerCustomTemplatePlatform =
   (typeof PortainerCustomTemplatePlatform)[keyof typeof PortainerCustomTemplatePlatform];
 
 export type PortainerCustomTemplate = {
+  ArtifactSources?: PortainerArtifactSources;
   /**
    * User identifier who created this template
    */
@@ -6693,6 +6670,19 @@ export type PortainerCustomTemplate = {
    */
   Type?: 1 | 2 | 3;
   Variables?: Array<PortainerCustomTemplateVariableDefinition>;
+};
+
+export type PortainerArtifact = {
+  configFilePath?: string;
+  configHash?: string;
+  edgeStackId?: number;
+  referenceName?: string;
+  stackId?: number;
+};
+
+export type PortainerArtifactSources = {
+  artifact?: PortainerArtifact;
+  sourceIds?: Array<number>;
 };
 
 export type MotdMotd = {
@@ -9733,7 +9723,12 @@ export type GetEndpointGroupsByIdData = {
      */
     id: number;
   };
-  query?: never;
+  query?: {
+    /**
+     * If true, include the number of environments and breakdown by type
+     */
+    size?: boolean;
+  };
   url: '/endpoint_groups/{id}';
 };
 
@@ -9756,7 +9751,7 @@ export type GetEndpointGroupsByIdResponses = {
   /**
    * Success
    */
-  200: PortainerEndpointGroup;
+  200: EndpointgroupsEndpointGroupResponse;
 };
 
 export type GetEndpointGroupsByIdResponse =
@@ -11201,7 +11196,7 @@ export type GitOpsSourcesDeleteErrors = {
    */
   404: unknown;
   /**
-   * Source is in use by one or more workflows
+   * Source is in use by one or more workflows or custom templates
    */
   409: unknown;
   /**
@@ -15837,6 +15832,12 @@ export type RestoreData = {
    * Restore request payload
    */
   body: BackupRestorePayload;
+  headers?: {
+    /**
+     * Setup token (required when instance is uninitialized and --no-setup-token is not set)
+     */
+    'X-Setup-Token'?: string;
+  };
   path?: never;
   query?: never;
   url: '/restore';
@@ -15847,6 +15848,10 @@ export type RestoreErrors = {
    * Invalid request
    */
   400: unknown;
+  /**
+   * Access denied - invalid or missing setup token
+   */
+  403: unknown;
   /**
    * Server error
    */
@@ -18374,6 +18379,12 @@ export type UserAdminInitData = {
    * User details
    */
   body: UsersAdminInitPayload;
+  headers?: {
+    /**
+     * Setup token (required when instance is uninitialized and --no-setup-token is not set)
+     */
+    'X-Setup-Token'?: string;
+  };
   path?: never;
   query?: never;
   url: '/users/admin/init';
@@ -18384,6 +18395,10 @@ export type UserAdminInitErrors = {
    * Invalid request
    */
   400: unknown;
+  /**
+   * Access denied - invalid or missing setup token
+   */
+  403: unknown;
   /**
    * Admin user already initialized
    */

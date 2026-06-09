@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import type { AriaAttributes } from 'react';
 import {
+  FilterOptionOption,
   GroupBase,
   OptionsOrGroups,
   SelectComponentsConfig,
 } from 'react-select';
 import _ from 'lodash';
-import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
 
 import { AutomationTestingProps } from '@/types';
 

@@ -13,18 +13,23 @@ export function useGroup<T = PortainerEndpointGroup>(
   {
     select,
     enabled = true,
+    size = false,
   }: {
     select?: (group: PortainerEndpointGroup | null) => T;
     enabled?: boolean;
+    size?: boolean;
   } = {}
 ) {
   return useQuery(
-    queryKeys.group(groupId),
+    queryKeys.group(groupId, size),
     async () => {
       if (groupId === undefined) {
         return null;
       }
-      const { data } = await getEndpointGroupsById({ path: { id: groupId } });
+      const { data } = await getEndpointGroupsById({
+        path: { id: groupId },
+        query: { size },
+      });
 
       return data;
     },

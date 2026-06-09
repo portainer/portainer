@@ -10,12 +10,12 @@ import (
 // loadGitConfigForStack reads the merged GitConfig (Source URL/auth/TLS + Artifact ref/path/hash)
 // and the SourceID for the given stack.
 func loadGitConfigForStack(tx dataservices.DataStoreTx, workflowID portainer.WorkflowID, stackID portainer.StackID) (*gittypes.RepoConfig, portainer.SourceID, error) {
-	src, artifact, err := workflows.GitSourceAndArtifactForStack(tx, workflowID, stackID)
+	src, file, err := workflows.GitSourceAndArtifactForStack(tx, workflowID, stackID)
 	if err != nil || src == nil {
 		return nil, 0, err
 	}
 
-	return workflows.MergeSourceAndArtifact(src, artifact), src.ID, nil
+	return workflows.MergeSourceAndFile(src, file), src.ID, nil
 }
 
 func saveStackGitConfig(tx dataservices.DataStoreTx, workflowID portainer.WorkflowID, stackID portainer.StackID, oldSourceID portainer.SourceID, cfg *gittypes.RepoConfig) error {

@@ -23,20 +23,20 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 	t.Helper()
 
 	src := &portainer.Source{
-		Name:      gittypes.RepoName(cfg.URL),
-		Type:      portainer.SourceTypeGit,
-		GitConfig: cfg,
+		Name: gittypes.RepoName(cfg.URL),
+		Type: portainer.SourceTypeGit,
+		Git:  cfg,
 	}
 	require.NoError(t, tx.Source().Create(src))
 
 	wf := &portainer.Workflow{
-		Artifacts: []portainer.ArtifactSources{{
-			Artifact: portainer.Artifact{
-				StackID:        stack.ID,
-				ReferenceName:  cfg.ReferenceName,
-				ConfigFilePath: cfg.ConfigFilePath,
-			},
-			SourceIDs: []portainer.SourceID{src.ID},
+		Artifacts: []portainer.Artifact{{
+			StackID: stack.ID,
+			Files: []portainer.ArtifactFile{{
+				SourceID: src.ID,
+				Path:     cfg.ConfigFilePath,
+				Ref:      cfg.ReferenceName,
+			}},
 		}},
 	}
 	require.NoError(t, tx.Workflow().Create(wf))

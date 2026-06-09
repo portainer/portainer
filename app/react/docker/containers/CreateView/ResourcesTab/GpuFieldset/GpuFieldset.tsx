@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { components, MultiValue } from 'react-select';
-import { MultiValueRemoveProps } from 'react-select/dist/declarations/src/components/MultiValue';
 import {
   ActionMeta,
+  components,
+  MultiValue,
+  MultiValueRemoveProps,
   OnChangeValue,
-} from 'react-select/dist/declarations/src/types';
-import { OptionProps } from 'react-select/dist/declarations/src/components/Option';
+  OptionProps,
+} from 'react-select';
 
 import { Select } from '@@/form-components/ReactSelect';
 import { Switch } from '@@/form-components/SwitchField/Switch';

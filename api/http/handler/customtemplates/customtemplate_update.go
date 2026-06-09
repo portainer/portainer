@@ -8,9 +8,11 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -84,7 +86,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid custom template description")
 	}
 
-	if !isValidNote(payload.Note) {
+	if !IsValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
@@ -96,7 +98,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	if err := validateVariablesDefinitions(payload.Variables); err != nil {
+	if err := ValidateVariablesDefinitions(payload.Variables); err != nil {
 		return err
 	}
 
@@ -218,8 +220,28 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 			return httperror.InternalServerError("Unable get latest commit id", fmt.Errorf("failed to fetch latest commit id of the template %v: %w", customTemplate.ID, err))
 		}
 
-		gitConfig.ConfigHash = commitHash
-		customTemplate.GitConfig = gitConfig
+		src, err := workflows.FindOrCreateGitSource(handler.DataStore, &portainer.Source{
+			Name: gittypes.RepoName(gitConfig.URL),
+			Type: portainer.SourceTypeGit,
+			Git: &gittypes.RepoConfig{
+				URL:            gitConfig.URL,
+				Authentication: gitConfig.Authentication,
+				TLSSkipVerify:  gitConfig.TLSSkipVerify,
+			},
+		})
+		if err != nil {
+			return httperror.InternalServerError("Unable to find or create git source", err)
+		}
+
+		customTemplate.Artifact = &portainer.Artifact{
+			Files: []portainer.ArtifactFile{{
+				SourceID: src.ID,
+				Path:     gitConfig.ConfigFilePath,
+				Ref:      gitConfig.ReferenceName,
+				Hash:     commitHash,
+			}},
+		}
+
 	} else {
 		templateFolder := strconv.Itoa(customTemplateID)
 		projectPath, err := handler.FileService.StoreCustomTemplateFileFromBytes(templateFolder, customTemplate.EntryPoint, []byte(payload.FileContent))
@@ -228,11 +250,18 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		}
 
 		customTemplate.ProjectPath = projectPath
+		customTemplate.Artifact = nil
 	}
 
-	if err := handler.DataStore.CustomTemplate().Update(customTemplate.ID, customTemplate); err != nil {
-		return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := tx.CustomTemplate().Update(customTemplate.ID, customTemplate); err != nil {
+			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
+		}
 
-	return response.JSON(w, customTemplate)
+		populateGitConfig(tx, customTemplate)
+
+		return nil
+	})
+
+	return response.TxResponse(w, customTemplate, err)
 }

@@ -1,16 +1,18 @@
-import { Layers, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { LayoutGrid, Plus, RefreshCw, Trash2 } from 'lucide-react';
 
-import { useTags } from '@/portainer/tags/queries';
-
-import { Button } from '@@/buttons';
 import { ResourceDetailHeader } from '@@/ResourceDetailHeader/ResourceDetailHeader';
-import { Badge } from '@@/Badge';
+import { ResourceStatBlock } from '@@/ResourceDetailHeader/ResourceStatBlock';
+import { ActionBarShell } from '@@/ResourceDetailHeader/ActionBarShell';
+import { ActionBarButton } from '@@/ResourceDetailHeader/ActionBarButton';
+import { HeaderStats } from '@@/ResourceDetailHeader/HeaderStats';
 
 import { EnvironmentGroup } from '../types';
+import { PlatformBadge } from '../components/PlatformBadge';
+import { EnvironmentTypeBreakdown } from '../components/EnvironmentTypeBreakdown';
 
 interface Props {
   group?: EnvironmentGroup;
-  isLoading: boolean;
+  isLoading?: boolean;
   onRefresh?: () => void;
   onAddEnvironments?: () => void;
   onDelete?: () => void;
@@ -23,50 +25,34 @@ export function GroupHeader({
   onAddEnvironments,
   onDelete,
 }: Props) {
-  const tagsQuery = useTags();
-
-  const tagBadges = group?.TagIds?.length
-    ? group.TagIds.map((tagId) => {
-        const tag = tagsQuery.data?.find((t) => t.ID === tagId);
-        return (
-          <Badge key={tagId} type="info" className="text-xs">
-            {tag?.Name ?? `Tag ${tagId}`}
-          </Badge>
-        );
-      })
-    : undefined;
-
   const actionBar = group ? (
-    <>
+    <ActionBarShell>
       <div className="flex items-center gap-3">
-        <Button
-          color="none"
+        <ActionBarButton
           icon={RefreshCw}
           onClick={() => onRefresh?.()}
           data-cy="group-header-refresh"
         >
           Refresh
-        </Button>
-        <Button
-          color="none"
+        </ActionBarButton>
+        <ActionBarButton
           icon={Plus}
           onClick={() => onAddEnvironments?.()}
           data-cy="group-header-add-environments"
         >
           Add environments
-        </Button>
+        </ActionBarButton>
       </div>
       <div className="flex items-center gap-1">
-        <Button
-          color="none"
+        <ActionBarButton
           icon={Trash2}
           onClick={() => onDelete?.()}
           data-cy="group-header-delete"
         >
           Delete
-        </Button>
+        </ActionBarButton>
       </div>
-    </>
+    </ActionBarShell>
   ) : undefined;
 
   return (
@@ -75,13 +61,25 @@ export function GroupHeader({
       errorMessage={
         !isLoading && !group ? 'Failed to load group details' : undefined
       }
-      icon={<Layers className="text-blue-9 th-dark:text-blue-3" />}
-      iconBackgroundClassName="bg-blue-3 th-dark:bg-blue-9"
+      icon={
+        <LayoutGrid className="!text-group-accent-8 th-dark:!text-group-accent-2" />
+      }
       subtitleLabel="Environment Group"
-      subtitleClassName="text-blue-9 th-dark:text-blue-5"
       title={group?.Name || ''}
-      badge={tagBadges ? <>{tagBadges}</> : undefined}
+      badge={group && <PlatformBadge group={group} />}
       description={group?.Description}
+      rightInfo={
+        group && (
+          <HeaderStats>
+            <ResourceStatBlock>
+              <ResourceStatBlock.Label>Environments</ResourceStatBlock.Label>
+              <ResourceStatBlock.Value>
+                <EnvironmentTypeBreakdown group={group} />
+              </ResourceStatBlock.Value>
+            </ResourceStatBlock>
+          </HeaderStats>
+        )
+      }
       actionBar={actionBar}
     />
   );

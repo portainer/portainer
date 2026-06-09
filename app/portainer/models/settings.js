@@ -32,6 +32,7 @@ export function PublicSettingsViewModel(settings) {
   this.Features = settings.Features;
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
   this.DefaultRegistry = settings.DefaultRegistry;
+  this.RequiresSetupToken = settings.RequiresSetupToken;
 }
 
 export function InternalAuthSettingsViewModel(data) {

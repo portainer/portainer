@@ -8,7 +8,11 @@ import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
-import { createMockUsers, createMockStack } from '@/react-tools/test-mocks';
+import {
+  createMockUsers,
+  createMockStack,
+  createMockEnvironment,
+} from '@/react-tools/test-mocks';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 import { Role } from '@/portainer/users/types';
 import { withTestRouter } from '@/react/test-utils/withRouter';
@@ -108,11 +112,13 @@ describe('initial loading', () => {
     server.use(
       http.get('/api/endpoints/:id', () => {
         envFetched = true;
-        return HttpResponse.json({
-          Id: 1,
-          Name: 'local',
-          Type: EnvironmentType.Docker,
-        });
+        return HttpResponse.json(
+          createMockEnvironment({
+            Id: 1,
+            Name: 'local',
+            Type: EnvironmentType.Docker,
+          })
+        );
       })
     );
 
@@ -402,11 +408,13 @@ function setupMswHandlers({
       if (!shouldReturnEnv) {
         return HttpResponse.json(null, { status: 404 });
       }
-      return HttpResponse.json({
-        Id: 1,
-        Name: 'local',
-        Type: envType,
-      });
+      return HttpResponse.json(
+        createMockEnvironment({
+          Id: 1,
+          Name: 'local',
+          Type: envType,
+        })
+      );
     }),
     http.get('https://raw.githubusercontent.com/*', () => {
       if (!shouldReturnSchema) {

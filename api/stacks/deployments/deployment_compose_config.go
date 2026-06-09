@@ -40,9 +40,7 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
-	if err := registryutils.ValidateRegistriesECRTokens(tx, filteredRegistries); err != nil {
-		return nil, err
-	}
+	registryutils.RefreshAndPersistECRTokens(tx, filteredRegistries)
 
 	config := &ComposeStackDeploymentConfig{
 		stack:          stack,
@@ -71,6 +69,10 @@ func (config *ComposeStackDeploymentConfig) Deploy(ctx context.Context) error {
 		if err := stackutils.ValidateStackFiles(config.stack, &config.endpoint.SecuritySettings, config.FileService); err != nil {
 			return err
 		}
+	}
+
+	if err := stackutils.ValidateComposeURLs(ctx, config.stack, config.FileService); err != nil {
+		return err
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {

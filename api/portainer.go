@@ -111,6 +111,10 @@ type (
 		KubectlShellImageSet      bool
 		PullLimitCheckDisabled    *bool
 		TrustedOrigins            *string
+		SSRFMode                  *string
+		SSRFAllowedHosts          *[]string
+		NoSetupToken              *bool
+		SetupToken                *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -150,6 +154,7 @@ type (
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
 		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
+		Artifact        *Artifact            `json:"artifact,omitempty"`
 		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
 		// EdgeTemplate indicates if this template purpose for Edge Stack
@@ -558,8 +563,9 @@ type (
 	}
 
 	PolicyChartSummary struct {
-		ChartName   string `json:"ChartName"`
-		Fingerprint string `json:"Fingerprint"`
+		ChartName   string   `json:"ChartName"`
+		Fingerprint string   `json:"Fingerprint"`
+		PolicyID    PolicyID `json:"PolicyID,omitempty"` // 0 when server hasn't populated the field
 	}
 
 	PolicyChartStatus struct {
@@ -581,17 +587,19 @@ type (
 	}
 
 	PolicyChartBundle struct {
-		PolicyChartSummary  `mapstructure:",squash"`
-		EncodedTgz          string             `json:"EncodedTgz"`
-		Namespace           string             `json:"Namespace"`
-		ReleaseName         string             `json:"ReleaseName,omitempty"`
+		PolicyChartSummary `mapstructure:",squash"`
+		EncodedTgz         string `json:"EncodedTgz"`
+		Namespace          string `json:"Namespace"`
+		ReleaseName        string `json:"ReleaseName,omitempty"`
+		// Base64 YAML kubectl-applied by the agent before Helm install when set (e.g. Gatekeeper gatekeeper-system namespace + PSA labels).
 		PreReleaseManifest  string             `json:"PreReleaseManifest,omitempty"`
 		EncodedValues       string             `json:"EncodedValues"`
 		PreInstallDeletions []ResourceDeletion `json:"PreInstallDeletions,omitempty"`
 		PreInstallAdoptions []ResourceAdoption `json:"PreInstallAdoptions,omitempty"`
+		// WaitForCRDs lists CRD names that must be registered in API discovery after
+		// this chart installs before the agent proceeds to the next chart.
+		WaitForCRDs []string `json:"WaitForCRDs,omitempty"`
 		// NoWait disables waiting for pods to be ready after install.
-		// Set to true for externally sourced charts whose startup timing cannot be controlled,
-		// to avoid leaving the release stuck in pending-install.
 		NoWait bool `json:"NoWait,omitempty"`
 	}
 
@@ -620,6 +628,45 @@ type (
 	RestoreSettingsBundle map[PolicyType]RestoreSettings
 
 	PolicyID int
+
+	// PolicyDesiredState is the per-policy desired state sent from server to agent
+	// in PollStatusResponse.PolicyStates (per-policy payload format).
+	PolicyDesiredState struct {
+		PolicyID    PolicyID `json:"policyID"`
+		Type        string   `json:"type"`        // e.g. "helm-k8s"
+		Fingerprint string   `json:"fingerprint"` // install-affecting only; restore manifest excluded
+		Config      []byte   `json:"config"`      // handler-specific config blob (e.g. HelmPolicyConfig JSON)
+	}
+
+	// PolicyStatesAsyncPayload is the value of an async "policyStates" command.
+	// States carries per-policy desired state; ChartBundles carries helm chart tarballs
+	// for policies that need installing (emitted only on mutation, never idle polls).
+	PolicyStatesAsyncPayload struct {
+		States        []PolicyDesiredState  `json:"states"`
+		ChartBundles  []PolicyChartBundle   `json:"chartBundles,omitempty"`
+		RestoreBundle RestoreSettingsBundle `json:"restoreBundle,omitempty"`
+	}
+
+	// PolicyActualState is the per-policy actual state reported by the agent
+	// via PUT /endpoints/{id}/edge/policies/statuses.
+	PolicyActualState struct {
+		PolicyID    PolicyID `json:"policyID"`
+		Type        string   `json:"type"`
+		Fingerprint string   `json:"fingerprint"`
+		Status      string   `json:"status"` // applying|applied|failed|removing
+		Message     string   `json:"message,omitempty"`
+	}
+
+	// HelmPolicyConfig is the Config payload for "helm-k8s" PolicyDesiredState entries.
+	// Bundles are not included in the poll response Config — they travel separately
+	// (sync: on-demand GetCharts; async: PolicyStatesCommandPayload.ChartBundles).
+	// RestoreSettings is helm-internal metadata and is intentionally NOT part of the
+	// fingerprint — see Fingerprint contract in reconcile-refactor-plan.md.
+	HelmPolicyConfig struct {
+		Charts          []PolicyChartSummary `json:"charts"`
+		Bundles         []PolicyChartBundle  `json:"bundles,omitempty"`
+		RestoreSettings *RestoreSettings     `json:"restoreSettings,omitempty"`
+	}
 
 	// PolicyType represents the type of policy
 	PolicyType string
@@ -1254,13 +1301,13 @@ type (
 
 	// Source represents a GitOps source that can be referenced by stacks or deployments.
 	Source struct {
-		ID         SourceID             `json:"id" example:"1"`
-		Name       string               `json:"name" example:"my-source"`
-		LastSync   int64                `json:"lastSync,omitempty" example:"1587399600"`
-		Type       SourceType           `json:"type" example:"1"`
-		GitConfig  *gittypes.RepoConfig `json:"gitConfig,omitempty"`
-		Registry   *Registry            `json:"registry,omitempty"`
-		HelmConfig *HelmConfig          `json:"helmConfig,omitempty"`
+		ID       SourceID             `json:"id" example:"1"`
+		Name     string               `json:"name" example:"my-source"`
+		LastSync int64                `json:"lastSync,omitempty" example:"1587399600"`
+		Type     SourceType           `json:"type" example:"1"`
+		Git      *gittypes.RepoConfig `json:"git,omitempty"`
+		Registry *Registry            `json:"registry,omitempty"`
+		Helm     *HelmConfig          `json:"helm,omitempty"`
 	}
 
 	// SourceID represents a source identifier
@@ -1489,11 +1536,11 @@ type (
 	// User represents a user account
 	User struct {
 		// User Identifier
-		ID       UserID `json:"Id" example:"1"`
-		Username string `json:"Username" example:"bob"`
+		ID       UserID `json:"Id" example:"1" validate:"required"`
+		Username string `json:"Username" example:"bob" validate:"required"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role          UserRole          `json:"Role" example:"1"`
+		Role          UserRole          `json:"Role" example:"1" validate:"required"`
 		TokenIssueAt  int64             `json:"TokenIssueAt" example:"1"`
 		ThemeSettings UserThemeSettings `json:"ThemeSettings"`
 		UseCache      bool              `json:"UseCache" example:"true"`
@@ -1501,11 +1548,11 @@ type (
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `json:"UserTheme,omitempty" example:"dark"`
+		UserTheme string `json:"UserTheme,omitempty" example:"dark" swaggerignore:"true"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations
+		PortainerAuthorizations Authorizations `swaggerignore:"true"`
 		// Deprecated in DBVersion == 25
-		EndpointAuthorizations EndpointAuthorizations
+		EndpointAuthorizations EndpointAuthorizations `swaggerignore:"true"`
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
@@ -1527,7 +1574,7 @@ type (
 	// UserThemeSettings represents the theme settings for a user
 	UserThemeSettings struct {
 		// Color represents the color theme of the UI
-		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto,"`
 	}
 
 	// Webhook represents a url webhook that can be used to update a service
@@ -1548,26 +1595,29 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
-	// Artifact represents a GitOps artifact produced by a source
+	// Artifact is one entry in a Workflow's artifact list, pairing target IDs with source files
 	Artifact struct {
-		StackID        StackID     `json:"stackId,omitempty"`
-		EdgeStackID    EdgeStackID `json:"edgeStackId,omitempty"`
-		ReferenceName  string      `json:"referenceName,omitempty" example:"refs/heads/main"`
-		ConfigFilePath string      `json:"configFilePath,omitempty" example:"portainer.yaml"`
-		ConfigHash     string      `json:"configHash,omitempty" example:"abc123"`
+		StackID     StackID           `json:"stackId,omitempty"`
+		EdgeStackID EdgeStackID       `json:"edgeStackId,omitempty"`
+		Files       []ArtifactFile    `json:"files,omitempty"`
+		EnvIDs      []EndpointID      `json:"envIds,omitempty"`
+		EnvGroups   []EndpointGroupID `json:"envGroups,omitempty"`
+		EdgeGroups  []EdgeGroupID     `json:"edgeGroups,omitempty"`
 	}
 
-	// ArtifactSources is one entry in a Workflow's ordered artifact-to-sources mapping
-	ArtifactSources struct {
-		Artifact  Artifact   `json:"artifact"`
-		SourceIDs []SourceID `json:"sourceIds,omitempty"`
+	// ArtifactFile represents one file within an artifact, tied to a specific source and location within it
+	ArtifactFile struct {
+		SourceID SourceID `json:"sourceId"`
+		Path     string   `json:"path,omitempty" example:"portainer.yaml"`
+		Ref      string   `json:"ref,omitempty" example:"refs/heads/main"`
+		Hash     string   `json:"hash,omitempty" example:"abc123"`
 	}
 
 	// Workflow represents a GitOps workflow
 	Workflow struct {
-		ID        WorkflowID        `json:"id" example:"1"`
-		Name      string            `json:"name,omitempty" example:"my-workflow"`
-		Artifacts []ArtifactSources `json:"artifacts,omitempty"`
+		ID        WorkflowID `json:"id" example:"1"`
+		Name      string     `json:"name,omitempty" example:"my-workflow"`
+		Artifacts []Artifact `json:"artifacts,omitempty"`
 	}
 
 	WorkflowID int
@@ -2051,6 +2101,10 @@ const (
 	CSPEnvVar = "CSP"
 	// CompactDBEnvVar is the environment variable used to enable/disable the startup compaction of the database
 	CompactDBEnvVar = "COMPACT_DB"
+	// NoSetupTokenEnvVar is the environment variable used to disable the setup token requirement on an uninitialized instance
+	NoSetupTokenEnvVar = "PORTAINER_NO_SETUP_TOKEN"
+	// SetupTokenEnvVar is the environment variable used to provide a custom setup token for admin initialization and restore on an uninitialized instance
+	SetupTokenEnvVar = "PORTAINER_SETUP_TOKEN"
 )
 
 // List of supported features
