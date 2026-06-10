@@ -50,6 +50,7 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	// endpoints
 	endpointRouter := kubeRouter.PathPrefix("/{id}").Subrouter()
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
+	endpointRouter.Use(middlewares.CheckEndpointAuthorization(bouncer))
 	endpointRouter.Use(h.kubeClientMiddleware)
 
 	endpointRouter.Handle("/applications", httperror.LoggerHandler(h.GetAllKubernetesApplications)).Methods(http.MethodGet)
