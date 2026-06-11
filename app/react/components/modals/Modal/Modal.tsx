@@ -1,9 +1,9 @@
-import { DialogContent, DialogOverlay } from '@reach/dialog';
-import clsx from 'clsx';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { createContext, PropsWithChildren, useContext } from 'react';
 
+import { cn } from '@/react/utils/cn';
+
 import { CloseButton } from './CloseButton';
-import styles from './Modal.module.css';
 
 const Context = createContext<boolean | null>(null);
 Context.displayName = 'ModalContext';
@@ -37,40 +37,66 @@ export function Modal({
 }: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
-      <DialogOverlay
-        isOpen
-        className={clsx(styles.overlay, 'flex items-center justify-center')}
-        onDismiss={onDismiss}
-        // When a Sheet is open and then a Modal opens, Radix DismissableLayer sets body.style.pointerEvents="none" for this modal overlay, so make it auto here.
-        // z-index ensures the modal renders above the base views and any Sheet (z-50).
-        style={{ zIndex: 60, pointerEvents: 'auto' }}
+      <DialogPrimitive.Root
+        open
+        onOpenChange={(open) => {
+          if (!open) onDismiss?.();
+        }}
       >
-        <DialogContent
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          className={clsx(
-            styles.modalDialog,
-            'max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] bg-transparent p-0',
-            {
-              'w-[450px]': size === 'md',
-              'w-[700px]': size === 'lg',
-              'w-[1000px]': size === 'xl',
-            },
-            dialogClassName
-          )}
-        >
-          <div
-            className={clsx(
-              styles.modalContent,
-              'relative overflow-y-auto rounded-lg p-5',
-              className
+        <DialogPrimitive.Portal>
+          {/* Overlay */}
+          <DialogPrimitive.Overlay
+            className={cn(
+              'fixed inset-0 z-[60]',
+              'bg-black/80',
+              'flex items-center justify-center',
+              // Animations
+              'data-[state=open]:animate-in data-[state=open]:fade-in-0',
+              'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
+              'duration-200'
             )}
+            // Radix DismissableLayer may set pointerEvents=none on body when Sheet is open — override
+            style={{ pointerEvents: 'auto' }}
           >
-            {children}
-            {onDismiss && <CloseButton onClose={onDismiss} />}
-          </div>
-        </DialogContent>
-      </DialogOverlay>
+            {/* Content */}
+            <DialogPrimitive.Content
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledBy}
+              className={cn(
+                'max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] bg-transparent p-0',
+                {
+                  'w-[450px]': size === 'md',
+                  'w-[700px]': size === 'lg',
+                  'w-[1000px]': size === 'xl',
+                },
+                // Animations
+                'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+                'duration-200',
+                dialogClassName
+              )}
+              // Prevent click-outside from propagating to overlay dismiss when clicking inside
+              onPointerDownOutside={(e) => {
+                if (!onDismiss) e.preventDefault();
+              }}
+            >
+              <div
+                className={cn(
+                  'relative overflow-y-auto rounded-lg p-5',
+                  'bg-[var(--bg-modal-content-color)]',
+                  'border border-black/20',
+                  'shadow-[0_5px_15px_rgb(0_0_0/50%)]',
+                  'th-highcontrast:border-[var(--border-widget)]',
+                  className
+                )}
+              >
+                {children}
+                {onDismiss && <CloseButton onClose={onDismiss} />}
+              </div>
+            </DialogPrimitive.Content>
+          </DialogPrimitive.Overlay>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </Context.Provider>
   );
 }

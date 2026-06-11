@@ -132,6 +132,7 @@
     "sanitize-html": "^2.17.0",
     "spinkit": "^2.0.1",
     "strip-ansi": "^6.0.0",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
     "tippy.js": "^6.3.7",
     "toastr": "^2.1.4",
