@@ -4,7 +4,7 @@ import { positionRight } from '@reach/popover';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { withInvalidate } from '@/react-tools/react-query';
+import { withError, withInvalidate } from '@/react-tools/react-query';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
@@ -118,5 +118,6 @@ function useDeleteImageListMutation() {
         )
       ),
     ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
+    ...withError('Unable to delete image'),
   });
 }
