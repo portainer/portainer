@@ -384,7 +384,7 @@ func encodeRegistryAuth(image string, registries []configtypes.AuthConfig) (stri
 	}
 
 	for _, r := range registries {
-		if r.ServerAddress == domain {
+		if strings.Contains(image, r.ServerAddress) {
 			encoded, err := registrytypes.EncodeAuthConfig(registrytypes.AuthConfig{
 				Username:      r.Username,
 				Password:      r.Password,
