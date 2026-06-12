@@ -383,24 +383,31 @@ func encodeRegistryAuth(image string, registries []configtypes.AuthConfig) (stri
 		domain = dockerregistry.IndexServer
 	}
 
+	specificity := 0
+	encoded, err := "", nil
+
 	for _, r := range registries {
-		if strings.Contains(image, r.ServerAddress) {
-			encoded, err := registrytypes.EncodeAuthConfig(registrytypes.AuthConfig{
-				Username:      r.Username,
-				Password:      r.Password,
-				ServerAddress: r.ServerAddress,
-				Auth:          r.Auth,
-				IdentityToken: r.IdentityToken,
-				RegistryToken: r.RegistryToken,
-			})
-			if err != nil {
-				return "", fmt.Errorf("failed to encode auth for registry %s: %w", domain, err)
+		if strings.HasPrefix(image, r.ServerAddress) {
+			matchSpecificity := len(r.ServerAddress)
+			if matchSpecificity > specificity {
+				specificity = matchSpecificity
+
+				encoded, err = registrytypes.EncodeAuthConfig(registrytypes.AuthConfig{
+					Username:      r.Username,
+					Password:      r.Password,
+					ServerAddress: r.ServerAddress,
+					Auth:          r.Auth,
+					IdentityToken: r.IdentityToken,
+					RegistryToken: r.RegistryToken,
+				})
+				if err != nil {
+					return "", fmt.Errorf("failed to encode auth for registry %s: %w", domain, err)
+				}
 			}
-			return encoded, nil
 		}
 	}
 
-	return "", nil
+	return encoded, nil
 }
 
 func deployServices(
