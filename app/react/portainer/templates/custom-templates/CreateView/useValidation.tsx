@@ -56,7 +56,8 @@ export function useValidation({
         }),
         Git: mixed().when('Method', {
           is: git.value,
-          then: () => buildGitValidationSchema(false, deployMethod),
+          then: () =>
+            buildGitValidationSchema(false, deployMethod, false, true),
         }),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),

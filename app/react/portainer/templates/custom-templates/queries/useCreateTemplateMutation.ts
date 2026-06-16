@@ -201,6 +201,8 @@ interface CustomTemplateFromGitRepositoryPayload {
   Platform: Platform;
   /** Type of created stack. Required. */
   Type: StackType;
+  /** References an existing Source for git credentials/URL. When set, inline URL and auth are ignored. */
+  SourceId?: number;
   /** URL of a Git repository hosting the Stack file. Required. */
   RepositoryURL: string;
   /** Reference name of a Git repository hosting the Stack file. */

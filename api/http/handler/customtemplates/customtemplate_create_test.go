@@ -12,6 +12,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 
 	"github.com/gorilla/mux"
@@ -1026,6 +1027,72 @@ func TestCustomTemplateCreate_FromRepository_Validation_InvalidType(t *testing.T
 		RepositoryURL: "https://github.com/example/repo",
 		Type:          0,
 		Platform:      portainer.CustomTemplatePlatformLinux,
+	}
+
+	r := createTemplateRequest(t, "repository", payload, 1, portainer.AdministratorRole)
+	rr := httptest.NewRecorder()
+
+	herr := handler.customTemplateCreate(rr, r)
+	require.NotNil(t, herr)
+	require.Equal(t, http.StatusInternalServerError, herr.StatusCode)
+}
+
+func TestCustomTemplateCreate_FromRepository_WithSourceID_Success(t *testing.T) {
+	t.Parallel()
+
+	handler, ds, _ := newTestHandler(t)
+	handler.GitService = &gitServiceCreatingFile{}
+
+	var srcID portainer.SourceID
+	require.NoError(t, ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{
+			Name: "example/repo",
+			Type: portainer.SourceTypeGit,
+			Git: &gittypes.RepoConfig{
+				URL: "https://github.com/example/repo",
+			},
+		}
+		err := tx.Source().Create(src)
+		require.NoError(t, err)
+		srcID = src.ID
+		return nil
+	}))
+
+	payload := customTemplateFromGitRepositoryPayload{
+		Title:       "Source Template",
+		Description: "Created from source ID",
+		SourceID:    srcID,
+		Type:        portainer.DockerComposeStack,
+		Platform:    portainer.CustomTemplatePlatformLinux,
+	}
+
+	r := createTemplateRequest(t, "repository", payload, 1, portainer.AdministratorRole)
+	rr := httptest.NewRecorder()
+
+	herr := handler.customTemplateCreate(rr, r)
+	require.Nil(t, herr)
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	var tmpl portainer.CustomTemplate
+	require.NoError(t, json.NewDecoder(rr.Body).Decode(&tmpl))
+	require.NotNil(t, tmpl.Artifact)
+	require.Len(t, tmpl.Artifact.Files, 1)
+	require.Equal(t, srcID, tmpl.Artifact.Files[0].SourceID)
+	require.Equal(t, "deadbeef123", tmpl.Artifact.Files[0].Hash)
+}
+
+func TestCustomTemplateCreate_FromRepository_WithSourceID_NonExistentSource(t *testing.T) {
+	t.Parallel()
+
+	handler, _, _ := newTestHandler(t)
+	handler.GitService = &gitServiceCreatingFile{}
+
+	payload := customTemplateFromGitRepositoryPayload{
+		Title:       "Source Template",
+		Description: "Created from non-existent source ID",
+		SourceID:    999,
+		Type:        portainer.DockerComposeStack,
+		Platform:    portainer.CustomTemplatePlatformLinux,
 	}
 
 	r := createTemplateRequest(t, "repository", payload, 1, portainer.AdministratorRole)

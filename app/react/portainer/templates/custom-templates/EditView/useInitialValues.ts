@@ -33,7 +33,12 @@ export function useInitialValues({
     Note: template.Note,
     Logo: template.Logo,
     Variables: template.Variables,
-    Git: template.GitConfig ? toGitFormModel(template.GitConfig) : undefined,
+    Git: template.GitConfig
+      ? {
+          ...toGitFormModel(template.GitConfig),
+          SourceId: template.artifact?.files?.[0]?.sourceId,
+        }
+      : undefined,
     AccessControl:
       !isEdge && template.ResourceControl
         ? parseAccessControlFormData(

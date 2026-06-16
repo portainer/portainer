@@ -8018,12 +8018,11 @@ export type CustomtemplatesCustomTemplateUpdatePayload = {
    */
   Platform?: 1 | 2;
   /**
-   * Use authentication to clone the Git repository
+   * Deprecated: use SourceID instead. Use authentication to clone the Git repository.
    */
   RepositoryAuthentication?: boolean;
   /**
-   * Password used in basic authentication or token used in token authentication.
-   * Required when RepositoryAuthentication is true
+   * Deprecated: use SourceID instead. Password used in basic authentication or token used in token authentication. Required when RepositoryAuthentication is true.
    */
   RepositoryPassword?: string;
   /**
@@ -8031,15 +8030,20 @@ export type CustomtemplatesCustomTemplateUpdatePayload = {
    */
   RepositoryReferenceName?: string;
   /**
-   * URL of a Git repository hosting the Stack file
+   * Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
    */
-  RepositoryURL: string;
+  RepositoryURL?: string;
   /**
-   * Username used in basic authentication. Required when RepositoryAuthentication is true
+   * Deprecated: use SourceID instead. Username used in basic authentication. Required when RepositoryAuthentication is true.
    */
   RepositoryUsername?: string;
   /**
-   * TLSSkipVerify skips SSL verification when cloning the Git repository
+   * SourceID references an existing Source for git credentials/URL.
+   * When set, the inline URL and authentication fields are ignored.
+   */
+  SourceID?: number;
+  /**
+   * Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
    */
   TLSSkipVerify?: boolean;
   /**
@@ -8088,11 +8092,11 @@ export type CustomtemplatesCustomTemplateFromGitRepositoryPayload = {
    */
   Platform?: 1 | 2;
   /**
-   * Use basic authentication to clone the Git repository
+   * Deprecated: use SourceID instead. Use basic authentication to clone the Git repository.
    */
   RepositoryAuthentication?: boolean;
   /**
-   * Password used in basic authentication. Required when RepositoryAuthentication is true.
+   * Deprecated: use SourceID instead. Password used in basic authentication. Required when RepositoryAuthentication is true.
    */
   RepositoryPassword?: string;
   /**
@@ -8100,15 +8104,20 @@ export type CustomtemplatesCustomTemplateFromGitRepositoryPayload = {
    */
   RepositoryReferenceName?: string;
   /**
-   * URL of a Git repository hosting the Stack file
+   * Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
    */
-  RepositoryURL: string;
+  RepositoryURL?: string;
   /**
-   * Username used in basic authentication. Required when RepositoryAuthentication is true.
+   * Deprecated: use SourceID instead. Username used in basic authentication. Required when RepositoryAuthentication is true.
    */
   RepositoryUsername?: string;
   /**
-   * TLSSkipVerify skips SSL verification when cloning the Git repository
+   * SourceID references an existing Source for git credentials/URL.
+   * When set, the inline URL and authentication fields are ignored.
+   */
+  SourceID: number;
+  /**
+   * Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
    */
   TLSSkipVerify?: boolean;
   /**

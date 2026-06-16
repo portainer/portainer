@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/sources"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -202,21 +203,24 @@ type customTemplateFromGitRepositoryPayload struct {
 	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
 
-	// URL of a Git repository hosting the Stack file
-	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// SourceID references an existing Source for git credentials/URL.
+	// When set, the inline URL and authentication fields are ignored.
+	SourceID portainer.SourceID `example:"1" validate:"required"`
+	// Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
+	RepositoryURL string `example:"https://github.com/openfaas/faas"`
 	// Reference name of a Git repository hosting the Stack file
 	RepositoryReferenceName string `example:"refs/heads/master"`
-	// Use basic authentication to clone the Git repository
+	// Deprecated: use SourceID instead. Use basic authentication to clone the Git repository.
 	RepositoryAuthentication bool `example:"true"`
-	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Username used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryUsername string `example:"myGitUsername"`
-	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
 	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
-	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	// Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
 	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
@@ -231,11 +235,13 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if len(payload.Description) == 0 {
 		return errors.New("Invalid custom template description")
 	}
-	if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
-	}
-	if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if payload.SourceID == 0 {
+		if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
+			return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		}
+		if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
+			return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		}
 	}
 	if len(payload.ComposeFilePathInRepository) == 0 {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -295,41 +301,45 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
 
-	gitConfig := &gittypes.RepoConfig{
-		URL:            payload.RepositoryURL,
-		ReferenceName:  payload.RepositoryReferenceName,
-		ConfigFilePath: payload.ComposeFilePathInRepository,
-		TLSSkipVerify:  payload.TLSSkipVerify,
-	}
-
-	if payload.RepositoryAuthentication {
-		gitConfig.Authentication = &gittypes.GitAuthentication{
-			Username: payload.RepositoryUsername,
-			Password: payload.RepositoryPassword,
-		}
-	}
-
-	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), *gitConfig, handler.GitService, getProjectPath)
-	if err != nil {
-		return nil, err
-	}
-
-	src, err := workflows.FindOrCreateGitSource(handler.DataStore, &portainer.Source{
-		Name: gittypes.RepoName(gitConfig.URL),
-		Type: portainer.SourceTypeGit,
-		Git: &gittypes.RepoConfig{
-			URL:            gitConfig.URL,
-			Authentication: gitConfig.Authentication,
-			TLSSkipVerify:  gitConfig.TLSSkipVerify,
-		},
+	gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, sources.RepoConfigInput{
+		SourceID:                 payload.SourceID,
+		ReferenceName:            payload.RepositoryReferenceName,
+		ConfigFilePath:           payload.ComposeFilePathInRepository,
+		RepositoryURL:            payload.RepositoryURL,
+		TLSSkipVerify:            payload.TLSSkipVerify,
+		RepositoryAuthentication: payload.RepositoryAuthentication,
+		Username:                 payload.RepositoryUsername,
+		Password:                 payload.RepositoryPassword,
 	})
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), gitConfig, handler.GitService, getProjectPath)
 	if err != nil {
 		return nil, err
+	}
+
+	sourceID := payload.SourceID
+	if sourceID == 0 {
+		src, err := workflows.FindOrCreateGitSource(handler.DataStore, &portainer.Source{
+			Name: gittypes.RepoName(gitConfig.URL),
+			Type: portainer.SourceTypeGit,
+			Git: &gittypes.RepoConfig{
+				URL:            gitConfig.URL,
+				Authentication: gitConfig.Authentication,
+				TLSSkipVerify:  gitConfig.TLSSkipVerify,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		sourceID = src.ID
 	}
 
 	customTemplate.Artifact = &portainer.Artifact{
 		Files: []portainer.ArtifactFile{{
-			SourceID: src.ID,
+			SourceID: sourceID,
 			Path:     gitConfig.ConfigFilePath,
 			Ref:      gitConfig.ReferenceName,
 			Hash:     commitHash,

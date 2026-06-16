@@ -96,6 +96,11 @@ export type CustomTemplate = {
   EdgeTemplate: boolean;
 
   EdgeSettings?: EdgeTemplateSettings;
+
+  /** Artifact stores the git source reference for git-backed templates. */
+  artifact?: {
+    files?: Array<{ sourceId?: number }>;
+  };
 };
 
 /**
