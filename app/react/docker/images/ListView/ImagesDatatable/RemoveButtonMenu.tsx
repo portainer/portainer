@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Authorized } from '@/react/hooks/useUser';
 import { withInvalidate } from '@/react-tools/react-query';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { notifySuccess } from '@/portainer/services/notifications';
+import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
 import { Button, ButtonGroup } from '@@/buttons';
@@ -113,9 +113,11 @@ function useDeleteImageListMutation() {
       imageIds: Array<string>;
     } & Omit<Parameters<typeof deleteImage>[0], 'imageId' | 'environmentId'>) =>
       processItemsInBatches(imageIds, (imageId) =>
-        deleteImage({ ...args, environmentId, imageId }).then(() =>
-          notifySuccess('Image successfully removed', imageId)
-        )
+        deleteImage({ ...args, environmentId, imageId })
+          .then(() => notifySuccess('Image successfully removed', imageId))
+          .catch((err) => {
+            notifyError('Failure', err as Error, `Unable to remove image ${imageId}`);
+          })
       ),
     ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
   });
