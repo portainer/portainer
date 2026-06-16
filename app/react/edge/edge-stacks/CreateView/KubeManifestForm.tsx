@@ -111,6 +111,7 @@ export function KubeManifestForm({
           baseWebhookUrl={baseEdgeStackWebhookUrl()}
           webhookId={webhookId}
           isAutoUpdateVisible={isBE}
+          isSourceSelectionVisible
         />
       )}
     </>

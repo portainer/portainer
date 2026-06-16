@@ -2922,8 +2922,9 @@ export const zEdgestacksEdgeStackFromGitRepositoryPayload = z.object({
   RepositoryAuthentication: z.boolean().optional(),
   RepositoryPassword: z.string().optional(),
   RepositoryReferenceName: z.string().optional(),
-  RepositoryURL: z.string(),
+  RepositoryURL: z.string().optional(),
   RepositoryUsername: z.string().optional(),
+  SourceID: z.int().optional(),
   TLSSkipVerify: z.boolean().optional(),
   UseManifestNamespaces: z.boolean().optional(),
 });

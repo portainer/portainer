@@ -7858,11 +7858,11 @@ export type EdgestacksEdgeStackFromGitRepositoryPayload = {
    */
   Registries?: Array<number>;
   /**
-   * Use basic authentication to clone the Git repository
+   * Deprecated: Use SourceID instead. Use basic authentication to clone the Git repository.
    */
   RepositoryAuthentication?: boolean;
   /**
-   * Password used in basic authentication. Required when RepositoryAuthentication is true.
+   * Deprecated: Use SourceID instead. Password used in basic authentication.
    */
   RepositoryPassword?: string;
   /**
@@ -7870,15 +7870,20 @@ export type EdgestacksEdgeStackFromGitRepositoryPayload = {
    */
   RepositoryReferenceName?: string;
   /**
-   * URL of a Git repository hosting the Stack file
+   * Deprecated: Use SourceID instead. URL of a Git repository hosting the Stack file.
    */
-  RepositoryURL: string;
+  RepositoryURL?: string;
   /**
-   * Username used in basic authentication. Required when RepositoryAuthentication is true.
+   * Deprecated: Use SourceID instead. Username used in basic authentication.
    */
   RepositoryUsername?: string;
   /**
-   * TLSSkipVerify skips SSL verification when cloning the Git repository
+   * SourceID references an existing Source for git credentials/URL.
+   * When set, the inline URL and authentication fields are ignored.
+   */
+  SourceID?: number;
+  /**
+   * Deprecated: Use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
    */
   TLSSkipVerify?: boolean;
   /**

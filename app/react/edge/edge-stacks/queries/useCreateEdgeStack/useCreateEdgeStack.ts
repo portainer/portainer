@@ -8,6 +8,7 @@ import {
   GitFormModel,
   RelativePathModel,
 } from '@/react/portainer/gitops/types';
+import { withError } from '@/react-tools/react-query';
 
 import { DeploymentType, StaggerConfig } from '../../types';
 
@@ -16,7 +17,10 @@ import { createStackFromFileContent } from './createStackFromFileContent';
 import { createStackFromGit } from './createStackFromGit';
 
 export function useCreateEdgeStack() {
-  return useMutation(createEdgeStack);
+  return useMutation({
+    mutationFn: createEdgeStack,
+    ...withError('unable to create edge stack'),
+  });
 }
 
 export type BasePayload = {
@@ -126,6 +130,7 @@ function createEdgeStackFromGit(
     retryDeploy: payload.retryDeploy,
     staggerConfig: payload.staggerConfig,
     useManifestNamespaces: payload.useManifestNamespaces,
+    sourceId: payload.git.SourceId,
     repositoryUrl: payload.git.RepositoryURL,
     repositoryReferenceName: payload.git.RepositoryReferenceName,
     filePathInRepository: payload.git.ComposeFilePathInRepository,

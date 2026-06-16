@@ -13,8 +13,10 @@ import { buildUrl } from '../buildUrl';
 export type GitRepositoryPayload = {
   /** Name of the stack */
   name: string;
+  /** ID of an existing git source to use for credentials/URL. When set, repositoryUrl and auth fields are ignored. */
+  sourceId?: number;
   /** URL of a Git repository hosting the Stack file */
-  repositoryUrl: string;
+  repositoryUrl?: string;
   /** Reference name of a Git repository hosting the Stack file */
   repositoryReferenceName?: string;
   /** Use basic authentication to clone the Git repository */

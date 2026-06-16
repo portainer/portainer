@@ -128,7 +128,9 @@ export function useValidation({
                   : 'manifest';
               return buildGitValidationSchema(
                 !!customTemplate,
-                deploymentMethod
+                deploymentMethod,
+                false,
+                true
               );
             },
           }) as SchemaOf<GitFormModel>,

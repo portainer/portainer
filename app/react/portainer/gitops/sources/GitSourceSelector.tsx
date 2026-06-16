@@ -8,13 +8,16 @@ export function GitSourceSelector({
   value,
   onChange,
   error,
+  readOnly = false,
 }: {
   value?: Source['id'];
-  onChange(source?: Source | null): void;
+  onChange?(source?: Source | null): void;
   error?: string;
+  readOnly?: boolean;
 }) {
   const sourcesQuery = useSources({ type: 'git' });
   const sources = sourcesQuery.data?.data ?? [];
+  const selectedSource = sources.find((s) => s.id === value);
 
   return (
     <div className="form-group">
@@ -22,7 +25,7 @@ export function GitSourceSelector({
         <FormControl label="Source" inputId="source-selector" errors={error}>
           <Select
             placeholder="Select a source"
-            value={sources.find((s) => s.id === value) ?? null}
+            value={selectedSource ?? null}
             options={sources}
             getOptionLabel={(s) => s.name}
             getOptionValue={(s) => String(s.id)}
@@ -32,6 +35,7 @@ export function GitSourceSelector({
             noOptionsMessage={() => 'No git sources available'}
             inputId="source-selector"
             data-cy="source-selector"
+            isDisabled={readOnly}
           />
         </FormControl>
       </div>

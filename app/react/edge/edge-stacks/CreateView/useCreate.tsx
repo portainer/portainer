@@ -4,7 +4,6 @@ import { TemplateViewModel } from '@/react/portainer/templates/app-templates/vie
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { transformAutoUpdateViewModel } from '@/react/portainer/gitops/AutoUpdateFieldset/utils';
-import { mutationOptions, withError } from '@/react-tools/react-query';
 
 import {
   BasePayload,
@@ -37,18 +36,12 @@ export function useCreate({
       getIsGitTemplate(template, templateType)
     );
 
-    mutation.mutate(
-      getPayload(method, values),
-      mutationOptions(
-        {
-          onSuccess: () => {
-            notifySuccess('Success', 'Edge stack created');
-            router.stateService.go('^');
-          },
-        },
-        withError('unable to create edge stack')
-      )
-    );
+    mutation.mutate(getPayload(method, values), {
+      onSuccess: () => {
+        notifySuccess('Success', 'Edge stack created');
+        router.stateService.go('^');
+      },
+    });
 
     function getPayload(
       method: 'string' | 'file' | 'git',
