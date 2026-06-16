@@ -19,6 +19,8 @@ export default class GitFormController {
 
   deployMethod?: DeployMethod;
 
+  isSourceSelectionVisible?: boolean;
+
   /* @ngInject */
   constructor($async: <T>(fn: () => Promise<T>) => Promise<T>) {
     this.$async = $async;
@@ -56,7 +58,8 @@ export default class GitFormController {
       this.errors = await validateGitForm(
         value,
         isCreatedFromCustomTemplate,
-        this.deployMethod
+        this.deployMethod,
+        this.isSourceSelectionVisible
       );
       if (this.errors && Object.keys(this.errors).length > 0) {
         this.gitForm?.$setValidity('gitForm', false, this.gitForm);

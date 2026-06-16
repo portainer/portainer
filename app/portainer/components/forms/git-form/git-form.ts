@@ -5,7 +5,7 @@ import controller from './git-form.controller';
 export const gitForm: IComponentOptions = {
   template: `
 <ng-form name="$ctrl.gitForm">
-  <react-git-form 
+  <react-git-form
     value="$ctrl.value"
     on-change="$ctrl.handleChange"
     environment-type="$ctrl.environmentType"
@@ -18,6 +18,7 @@ export const gitForm: IComponentOptions = {
     webhook-id="$ctrl.webhookId"
     webhooks-docs="$ctrl.webhooksDocs"
     created-from-custom-template-id="$ctrl.createdFromCustomTemplateId"
+    is-source-selection-visible="$ctrl.isSourceSelectionVisible"
     errors="$ctrl.errors">
   </react-git-form>
 </ng-form>`,
@@ -34,6 +35,7 @@ export const gitForm: IComponentOptions = {
     webhookId: '@',
     webhooksDocs: '@',
     createdFromCustomTemplateId: '<',
+    isSourceSelectionVisible: '<',
   },
   controller,
 };

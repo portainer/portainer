@@ -68,6 +68,7 @@ class KubernetesDeployController {
 
     this.formValues = {
       StackName: '',
+      SourceId: undefined,
       RepositoryURL: '',
       RepositoryReferenceName: '',
       RepositoryAuthentication: false,
@@ -308,13 +309,17 @@ class KubernetesDeployController {
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
-        payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
-        payload.RepositoryURL = this.formValues.RepositoryURL;
         payload.RepositoryReferenceName = this.formValues.RepositoryReferenceName;
-        payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
-        if (payload.RepositoryAuthentication) {
-          payload.RepositoryUsername = this.formValues.RepositoryUsername;
-          payload.RepositoryPassword = this.formValues.RepositoryPassword;
+        if (this.formValues.SourceId) {
+          payload.SourceId = this.formValues.SourceId;
+        } else {
+          payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
+          payload.RepositoryURL = this.formValues.RepositoryURL;
+          payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
+          if (payload.RepositoryAuthentication) {
+            payload.RepositoryUsername = this.formValues.RepositoryUsername;
+            payload.RepositoryPassword = this.formValues.RepositoryPassword;
+          }
         }
         payload.ManifestFile = this.formValues.ComposeFilePathInRepository;
         payload.AdditionalFiles = this.formValues.AdditionalFiles;

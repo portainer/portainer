@@ -76,6 +76,7 @@ export function ApplicationDetailsWidget() {
                       gitConfig={stack.GitConfig}
                       currentDeploymentInfo={stack.CurrentDeploymentInfo}
                       stackType="kubernetes"
+                      sourceId={stack.GitSourceId}
                     />
                   </div>
                 )}

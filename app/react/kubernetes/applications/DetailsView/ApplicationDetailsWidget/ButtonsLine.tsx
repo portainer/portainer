@@ -41,7 +41,7 @@ export function ButtonsLine({
     },
     {
       enabled:
-        stack &&
+        !!stack &&
         (!stack.GitConfig ||
           !isGitConfigDiverged(stack.GitConfig, stack.CurrentDeploymentInfo)),
     }

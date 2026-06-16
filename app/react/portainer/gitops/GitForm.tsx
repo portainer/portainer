@@ -175,10 +175,17 @@ export function GitForm({
 export async function validateGitForm(
   formValues: GitFormModel,
   isCreatedFromCustomTemplate: boolean,
-  deployMethod: DeployMethod = 'compose'
+  deployMethod: DeployMethod = 'compose',
+  isSourceSelection = false
 ) {
   return validateForm<GitFormModel>(
-    () => buildGitValidationSchema(isCreatedFromCustomTemplate, deployMethod),
+    () =>
+      buildGitValidationSchema(
+        isCreatedFromCustomTemplate,
+        deployMethod,
+        false,
+        isSourceSelection
+      ),
     formValues
   );
 }
