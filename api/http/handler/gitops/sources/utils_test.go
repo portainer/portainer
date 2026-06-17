@@ -69,12 +69,10 @@ func TestBuildConnectionInfo(t *testing.T) {
 	assert.Equal(t, connectionInfo{}, buildConnectionInfo(nil))
 
 	cfg := &gittypes.RepoConfig{
-		ConfigFilePath: "docker-compose.yml",
 		TLSSkipVerify:  true,
 		Authentication: &gittypes.GitAuthentication{Username: "user"},
 	}
 	got := buildConnectionInfo(cfg)
-	assert.Equal(t, "docker-compose.yml", got.ConfigFilePath)
 	assert.True(t, got.TLSSkipVerify)
 	require.NotNil(t, got.Authentication)
 	assert.Equal(t, "user", got.Authentication.Username)

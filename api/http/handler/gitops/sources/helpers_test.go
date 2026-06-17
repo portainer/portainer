@@ -25,7 +25,11 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 	src := &portainer.Source{
 		Name: gittypes.RepoName(cfg.URL),
 		Type: portainer.SourceTypeGit,
-		Git:  cfg,
+		Git: &gittypes.RepoConfig{
+			URL:            cfg.URL,
+			Authentication: cfg.Authentication,
+			TLSSkipVerify:  cfg.TLSSkipVerify,
+		},
 	}
 	require.NoError(t, tx.Source().Create(src))
 

@@ -17,7 +17,6 @@ type gitAuthInfo struct {
 }
 
 type connectionInfo struct {
-	ConfigFilePath string       `json:"configFilePath"`
 	TLSSkipVerify  bool         `json:"tlsSkipVerify"`
 	Authentication *gitAuthInfo `json:"authentication,omitempty"`
 }
@@ -102,7 +101,6 @@ func buildConnectionInfo(cfg *gittypes.RepoConfig) connectionInfo {
 		return connectionInfo{}
 	}
 	return connectionInfo{
-		ConfigFilePath: cfg.ConfigFilePath,
 		TLSSkipVerify:  cfg.TLSSkipVerify,
 		Authentication: buildGitAuthInfo(cfg.Authentication),
 	}

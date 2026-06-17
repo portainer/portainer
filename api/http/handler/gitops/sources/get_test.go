@@ -56,10 +56,11 @@ func TestGetSource_ReturnsDetail(t *testing.T) {
 	assert.Equal(t, srcID, detail.ID)
 	assert.Equal(t, "repo", detail.Name)
 	assert.Equal(t, 1, detail.UsedBy)
-	assert.Equal(t, "docker-compose.yml", detail.Connection.ConfigFilePath)
 	assert.True(t, detail.Connection.TLSSkipVerify)
 	require.Len(t, detail.Workflows, 1)
 	assert.Equal(t, "my-stack", detail.Workflows[0].Name)
+	require.NotNil(t, detail.Workflows[0].GitConfig)
+	assert.Equal(t, "docker-compose.yml", detail.Workflows[0].GitConfig.ConfigFilePath)
 }
 
 func TestGetSource_RedactsCredentials(t *testing.T) {

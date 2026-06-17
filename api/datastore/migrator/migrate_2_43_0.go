@@ -128,7 +128,11 @@ func (m *Migrator) migrateGitConfigToSources_2_43_0() error {
 				src := &portainer.Source{
 					Name: gittypes.RepoName(cfg.URL),
 					Type: portainer.SourceTypeGit,
-					Git:  cfg,
+					Git: &gittypes.RepoConfig{
+						URL:            cfg.URL,
+						Authentication: cfg.Authentication,
+						TLSSkipVerify:  cfg.TLSSkipVerify,
+					},
 				}
 				if err := m.sourceService.Tx(tx).Create(src); err != nil {
 					return fmt.Errorf("failed to create source for stack %d: %w", ls.ID, err)

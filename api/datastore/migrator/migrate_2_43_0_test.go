@@ -65,7 +65,8 @@ func TestMigrateGitConfigToSources_2_43_0_GitStackMigrated(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.Equal(t, gitStack.GitConfig.URL, src.Git.URL)
-	require.Equal(t, gitStack.GitConfig.ReferenceName, src.Git.ReferenceName)
+	require.Empty(t, src.Git.ReferenceName)
+	require.Equal(t, gitStack.GitConfig.ReferenceName, wf.Artifacts[0].Files[0].Ref)
 }
 
 func TestMigrateGitConfigToSources_2_43_0_NonGitStackUntouched(t *testing.T) {
