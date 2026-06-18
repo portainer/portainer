@@ -2,18 +2,24 @@ package git
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	gogitfs "github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // noSymlinkFS wraps a billy.Filesystem and rejects symlink creation to prevent
@@ -42,28 +48,35 @@ func NewGitClient(preserveGitDir bool) *gitClient {
 }
 
 func (c *gitClient) Download(ctx context.Context, dst string, opt *git.CloneOptions) error {
-	if c.preserveGitDirectory {
-		_, err := git.PlainCloneContext(ctx, dst, false, opt)
-		if err != nil {
-			if err.Error() == "authentication required" {
-				return gittypes.ErrAuthenticationFailure
-			}
-			return errors.Wrap(err, "failed to clone git repository")
-		}
-		return nil
+	resolved, err := filepath.EvalSymlinks(dst)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return errors.Wrap(err, "failed to resolve destination path")
+	}
+	if err == nil {
+		dst = resolved
 	}
 
-	// Memory storage avoids a macOS filesystem conflict where go-git's init
-	// creates dst/.git as a directory before checkout, causing EISDIR errors
-	// that mask ErrSymlinkDetected from noSymlinkFS.
 	wt := NewNoSymlinkFS(osfs.New(dst))
-	_, err := git.CloneContext(ctx, memory.NewStorage(), wt, opt)
+	dot := osfs.New(filesystem.JoinPaths(dst, ".git"))
+	storer := gogitfs.NewStorage(dot, cache.NewObjectLRU(0))
+
+	_, err = git.CloneContext(ctx, storer, wt, opt)
 	if err != nil {
 		if err.Error() == "authentication required" {
 			return gittypes.ErrAuthenticationFailure
 		}
+
 		return errors.Wrap(err, "failed to clone git repository")
 	}
+
+	if c.preserveGitDirectory {
+		return nil
+	}
+
+	if err := os.RemoveAll(filesystem.JoinPaths(dst, ".git")); err != nil {
+		log.Error().Err(err).Msg("failed to remove .git directory")
+	}
+
 	return nil
 }
 
