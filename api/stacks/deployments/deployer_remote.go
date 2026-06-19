@@ -28,9 +28,10 @@ import (
 )
 
 const (
-	defaultUnpackerImage       = "portainer/compose-unpacker:" + portainer.APIVersion
-	composeUnpackerImageEnvVar = "COMPOSE_UNPACKER_IMAGE"
-	composePathPrefix          = "portainer-compose-unpacker"
+	defaultUnpackerImage             = "portainer/compose-unpacker:" + portainer.APIVersion
+	composeUnpackerImageEnvVar       = "COMPOSE_UNPACKER_IMAGE"
+	composeUnpackerNetworkModeEnvVar = "COMPOSE_UNPACKER_NETWORK_MODE"
+	composePathPrefix                = "portainer-compose-unpacker"
 )
 
 type RemoteStackDeployer interface {
@@ -225,6 +226,7 @@ func (d *stackDeployer) remoteStack(ctx context.Context, stack *portainer.Stack,
 			fmt.Sprintf("%s:%s", composeDestination, composeDestination),
 			fmt.Sprintf("%s:%s", targetSocketBindHost, targetSocketBindContainer),
 		},
+		NetworkMode: container.NetworkMode(os.Getenv(composeUnpackerNetworkModeEnvVar)),
 	}, nil, nil, fmt.Sprintf("portainer-unpacker-%d-%s-%d", stack.ID, stack.Name, librand.Intn(100)))
 	if err != nil {
 		return errors.Wrap(err, "unable to create unpacker container")
