@@ -22,6 +22,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/slicesx"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
@@ -506,6 +507,11 @@ func (transport *Transport) updateDefaultGitBranch(request *http.Request) error 
 	}
 
 	repositoryURL := remote[:len(remote)-4]
+
+	if err := ssrf.CheckURL(request.Context(), repositoryURL); err != nil {
+		return err
+	}
+
 	latestCommitID, err := transport.gitService.LatestCommitID(
 		request.Context(),
 		repositoryURL,

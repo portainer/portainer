@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/edge"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/pkg/errors"
@@ -69,7 +70,6 @@ func (payload *edgeStackFromGitRepositoryPayload) Validate(r *http.Request) erro
 		if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
 			return httperrors.NewInvalidPayloadError("Invalid repository URL. Must correspond to a valid URL format")
 		}
-
 		if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
 			return httperrors.NewInvalidPayloadError("Invalid repository credentials. Password must be specified when authentication is enabled")
 		}
@@ -136,6 +136,10 @@ func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, tx dat
 	})
 	if httpErr != nil {
 		return nil, httpErr
+	}
+
+	if err := ssrf.CheckURL(r.Context(), repoConfig.URL); err != nil {
+		return nil, errors.Wrap(err, "repository URL blocked by SSRF policy")
 	}
 
 	stack.CreatedByUserId = fmt.Sprintf("%d", tokenData.ID)

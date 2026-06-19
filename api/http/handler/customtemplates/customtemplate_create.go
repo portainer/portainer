@@ -19,6 +19,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/rs/zerolog/log"
@@ -313,6 +314,10 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	})
 	if httpErr != nil {
 		return nil, httpErr
+	}
+
+	if err := ssrf.CheckURL(r.Context(), gitConfig.URL); err != nil {
+		return nil, err
 	}
 
 	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), gitConfig, handler.GitService, getProjectPath)

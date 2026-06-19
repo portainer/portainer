@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -41,6 +42,10 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.BadRequest("Bad request", errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo)))
 	}
 
+	if err := ssrf.CheckURL(r.Context(), repo); err != nil {
+		return httperror.BadRequest("Repository URL blocked by SSRF policy", err)
+	}
+
 	chart := r.URL.Query().Get("chart")
 	if chart == "" {
 		return httperror.BadRequest("Bad request", errors.New("missing `chart` query parameter"))
@@ -65,7 +70,8 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	}
 	result, err := handler.helmPackageManager.Show(showOptions)
 	if err != nil {
-		return httperror.InternalServerError("Unable to show chart", err)
+		log.Warn().Err(err).Str("repo", repo).Str("chart", chart).Msg("helm show failed")
+		return httperror.InternalServerError("Unable to show chart", errors.New("failed to retrieve Helm chart information"))
 	}
 
 	w.Header().Set("Content-Type", "text/plain")

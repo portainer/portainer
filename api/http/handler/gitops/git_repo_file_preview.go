@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 	"github.com/rs/zerolog/log"
 )
@@ -98,6 +99,10 @@ func (handler *Handler) gitOperationRepoFilePreview(w http.ResponseWriter, r *ht
 			password = src.Git.Authentication.Password
 		}
 		tlsSkipVerify = src.Git.TLSSkipVerify
+	}
+
+	if err := ssrf.CheckURL(r.Context(), repoURL); err != nil {
+		return httperror.BadRequest("Repository URL blocked by SSRF policy", err)
 	}
 
 	projectPath, err := handler.fileService.GetTemporaryPath()

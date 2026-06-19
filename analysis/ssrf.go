@@ -16,6 +16,18 @@ func unwrappedHTTPTransport(m dsl.Matcher) {
 	// Variable assigned a bare transport (cannot be tracked to a later WrapTransport call).
 	m.Match(`$_ := &http.Transport{$*_}`).
 		Report(`bare *http.Transport variable; use ssrf.WrapTransport(&http.Transport{...}) inline instead`)
+
+	// Field assignment of a bare transport (e.g. httpClient.Transport = &http.Transport{...}).
+	m.Match(`$_.Transport = &http.Transport{$*_}`).
+		Report(`bare *http.Transport field assignment; wrap with ssrf.WrapTransport() to enforce the SSRF protection policy`)
+}
+
+// helmGetterTransport flags getter.WithTransport calls that receive a bare *http.Transport.
+// Helm v4 installs its own transport and bypasses http.DefaultTransport, so the transport
+// passed here must be wrapped with ssrf.WrapTransport.
+func helmGetterTransport(m dsl.Matcher) {
+	m.Match(`getter.WithTransport(&http.Transport{$*_})`).
+		Report(`getter.WithTransport called with a bare *http.Transport; wrap with ssrf.WrapTransport() as Helm v4 bypasses http.DefaultTransport`)
 }
 
 // internalTransportMisuse flags calls to WrapTransportInternal outside the four proxy

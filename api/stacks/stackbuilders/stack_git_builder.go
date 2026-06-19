@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 type GitMethodStackBuilder struct {
@@ -76,6 +77,10 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 	getProjectPath := func() string {
 		stackFolder := fmt.Sprintf("%d", b.stack.ID)
 		return b.fileService.GetStackProjectPath(stackFolder)
+	}
+
+	if err := ssrf.CheckURL(ctx, repoConfig.URL); err != nil {
+		return fmt.Errorf("repository URL blocked by SSRF policy: %w", err)
 	}
 
 	commitHash, err := stackutils.DownloadGitRepository(ctx, repoConfig, b.gitService, getProjectPath)

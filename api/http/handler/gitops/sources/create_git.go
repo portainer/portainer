@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/validate"
 )
 
 // GitAuthenticationPayload holds authentication parameters for a git source
@@ -30,8 +31,8 @@ type GitSourceCreatePayload struct {
 
 // Validate implements the portainer.Validatable interface
 func (payload *GitSourceCreatePayload) Validate(_ *http.Request) error {
-	if strings.TrimSpace(payload.URL) == "" {
-		return errors.New("url is required")
+	if !validate.IsURL(payload.URL) {
+		return errors.New("invalid repository URL. Must correspond to a valid URL format")
 	}
 
 	return nil
