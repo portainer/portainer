@@ -3,12 +3,17 @@ package exec
 import (
 	"context"
 	"fmt"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/portainer/portainer/pkg/libstack/swarm"
 )
+
+// postDeployFailureCheckTimeout bounds how long Deploy waits for tasks to start or fail after being accepted by Swarm.
+const postDeployFailureCheckTimeout = 30 * time.Second
 
 // SwarmStackManager represents a service for managing stacks.
 type SwarmStackManager struct {
@@ -52,7 +57,7 @@ func (manager *SwarmStackManager) Deploy(
 		env = append(env, ev.Name+"="+ev.Value)
 	}
 
-	return manager.deployer.Deploy(context.TODO(), filePaths, swarm.DeployOptions{
+	if err := manager.deployer.Deploy(context.TODO(), filePaths, swarm.DeployOptions{
 		Options: swarm.Options{
 			ProjectName: stack.Name,
 			Host:        url,
@@ -62,7 +67,26 @@ func (manager *SwarmStackManager) Deploy(
 		},
 		RemoveOrphans: prune,
 		PullImage:     pullImage,
-	})
+	}); err != nil {
+		return err
+	}
+
+	// Swarm schedules and pulls images asynchronously, so check for early failures before reporting success.
+	waitCtx, cancel := context.WithTimeout(ctx, postDeployFailureCheckTimeout)
+	defer cancel()
+
+	result := manager.deployer.WaitForStatus(waitCtx, stack.Name, swarm.Options{
+		ProjectName: stack.Name,
+		Host:        url,
+		Env:         env,
+		WorkingDir:  stack.ProjectPath,
+		Registries:  portainerRegistriesToAuthConfigs(registries),
+	}, libstack.StatusRunning)
+	if result.Status == libstack.StatusError {
+		return fmt.Errorf("deployment failed: %s", result.ErrorMsg)
+	}
+
+	return nil
 }
 
 // Remove deletes all resources belonging to a Swarm stack.

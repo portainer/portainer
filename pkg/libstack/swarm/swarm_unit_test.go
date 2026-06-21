@@ -469,6 +469,7 @@ services:
 type mockAPIClient struct {
 	client.APIClient
 	serviceListFn   func(context.Context, swarm.ServiceListOptions) ([]swarm.Service, error)
+	taskListFn      func(context.Context, swarm.TaskListOptions) ([]swarm.Task, error)
 	serviceUpdateFn func(
 		context.Context,
 		string,
@@ -484,6 +485,14 @@ func (m *mockAPIClient) ServiceList(ctx context.Context, opts swarm.ServiceListO
 	}
 
 	return m.serviceListFn(ctx, opts)
+}
+
+func (m *mockAPIClient) TaskList(ctx context.Context, opts swarm.TaskListOptions) ([]swarm.Task, error) {
+	if m.taskListFn == nil {
+		return nil, nil
+	}
+
+	return m.taskListFn(ctx, opts)
 }
 
 func (m *mockAPIClient) ServiceUpdate(
@@ -559,6 +568,63 @@ func Test_deployServices_forceRecreate(t *testing.T) {
 			err := deployServices(context.Background(), mock, nil, services, namespace, false, tt.forceRecreate)
 			require.NoError(t, err)
 			require.Equal(t, tt.expectedForceUpdate, capturedForceUpdate)
+		})
+	}
+}
+
+func Test_getServiceStatus(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name           string
+		task           swarm.Task
+		expectedStatus libstack.Status
+		expectedErrMsg string
+	}{
+		{
+			name:           "running task reports running",
+			task:           swarm.Task{Status: swarm.TaskStatus{State: swarm.TaskStateRunning}},
+			expectedStatus: libstack.StatusRunning,
+		},
+		{
+			name:           "pending task reports starting",
+			task:           swarm.Task{Status: swarm.TaskStatus{State: swarm.TaskStatePending}},
+			expectedStatus: libstack.StatusStarting,
+		},
+		{
+			name:           "failed task reports error with message",
+			task:           swarm.Task{Status: swarm.TaskStatus{State: swarm.TaskStateFailed, Err: "task: non-zero exit (1)"}},
+			expectedStatus: libstack.StatusError,
+			expectedErrMsg: "task: non-zero exit (1)",
+		},
+		{
+			// Regression case for #13213: a rejected task must report an error, not "unknown".
+			name: "rejected task reports error with message",
+			task: swarm.Task{Status: swarm.TaskStatus{
+				State: swarm.TaskStateRejected,
+				Err:   "No such image: this-image-definitely-does-not-exist-xyz:latest",
+			}},
+			expectedStatus: libstack.StatusError,
+			expectedErrMsg: "No such image: this-image-definitely-does-not-exist-xyz:latest",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			mock := &mockAPIClient{
+				taskListFn: func(context.Context, swarm.TaskListOptions) ([]swarm.Task, error) {
+					return []swarm.Task{tt.task}, nil
+				},
+			}
+
+			svc := swarm.Service{ID: "svc-id-1", Spec: swarm.ServiceSpec{Annotations: swarm.Annotations{Name: "mystack_web"}}}
+
+			status, errMsg, err := getServiceStatus(context.Background(), mock, svc)
+			require.NoError(t, err)
+			require.Equal(t, tt.expectedStatus, status)
+			require.Equal(t, tt.expectedErrMsg, errMsg)
 		})
 	}
 }

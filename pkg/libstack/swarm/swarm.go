@@ -769,6 +769,8 @@ func (d *SwarmDeployer) WaitForStatus(
 					}
 
 					if errorMessage != "" {
+						// An error message means a service failed, so the result must reflect that.
+						waitResult.Status = libstack.StatusError
 						waitResult.ErrorMsg = errorMessage
 						return nil
 					}
@@ -860,7 +862,8 @@ func getServiceStatus(
 			return libstack.StatusStarting, "", nil
 		case swarm.TaskStateRemove:
 			return libstack.StatusRemoving, "", nil
-		case swarm.TaskStateFailed:
+		case swarm.TaskStateFailed, swarm.TaskStateRejected:
+			// Rejected means the task could never start (e.g. missing image, no disk space).
 			return libstack.StatusError, task.Status.Err, nil
 		default:
 			return libstack.StatusUnknown, "", nil
