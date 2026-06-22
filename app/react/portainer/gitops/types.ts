@@ -28,65 +28,53 @@ export interface RepoConfigResponse {
   TLSSkipVerify: boolean;
 }
 
-export type GitAuthModel = {
-  RepositoryAuthentication?: boolean;
-  RepositoryUsername?: string;
-  RepositoryPassword?: string;
-  RepositoryAuthorizationType?: AuthTypeOption;
-};
-
 export type DeployMethod = 'compose' | 'manifest' | 'helm';
 
-export interface GitFormModel extends GitAuthModel {
-  RepositoryURL: string;
-  RepositoryURLValid?: boolean;
+export interface GitFormModel {
+  SourceId?: number;
   ComposeFilePathInRepository?: string;
   RepositoryReferenceName?: string;
   AdditionalFiles?: string[];
-  TLSSkipVerify?: boolean;
   /**
    * Auto update
    *
    * if undefined, GitForm won't show the AutoUpdate fieldset
    */
   AutoUpdate?: AutoUpdateModel;
-  /** ID of an existing Source. When set, inline URL and credentials are ignored. */
-  SourceId?: number;
+
+  /** Used to create stacks from app templates */
+  RepositoryURL?: string;
 }
 
 export function getDefaultModel(
   autoUpdate: AutoUpdateModel = getDefaultAutoUpdateValues()
 ): GitFormModel {
   return {
-    RepositoryURL: '',
     ComposeFilePathInRepository: 'docker-compose.yml',
     RepositoryReferenceName: 'refs/heads/main',
-    RepositoryAuthentication: false,
-    TLSSkipVerify: false,
     AutoUpdate: autoUpdate,
+    SourceId: 0,
   };
 }
 
 export function toGitFormModel(
-  response?: RepoConfigResponse,
+  sourceId?: number,
+  response?: Omit<
+    RepoConfigResponse,
+    'URL' | 'TLSSkipVerify' | 'ConfigHash' | 'Authentication'
+  >,
   autoUpdate?: AutoUpdateModel
 ): GitFormModel {
   if (!response) {
     return getDefaultModel(autoUpdate);
   }
 
-  const { URL, ReferenceName, ConfigFilePath, Authentication, TLSSkipVerify } =
-    response;
+  const { ReferenceName, ConfigFilePath } = response;
 
   return {
-    RepositoryURL: URL,
     ComposeFilePathInRepository: ConfigFilePath,
     RepositoryReferenceName: ReferenceName,
-    RepositoryAuthentication: !!Authentication?.Username,
-    RepositoryUsername: Authentication?.Username,
-    RepositoryPassword: Authentication?.Password,
-    RepositoryAuthorizationType: Authentication?.AuthorizationType,
-    TLSSkipVerify,
     AutoUpdate: autoUpdate,
+    SourceId: sourceId,
   };
 }

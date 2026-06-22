@@ -15,7 +15,6 @@ const WrappedComponent = withUserProvider(GitForm);
 
 interface Args {
   isAdditionalFilesFieldVisible: boolean;
-  isAuthExplanationVisible: boolean;
   isDockerStandalone: boolean;
   deployMethod: DeployMethod;
   isForcePullVisible: boolean;
@@ -24,26 +23,20 @@ interface Args {
 export function Primary({
   deployMethod,
   isAdditionalFilesFieldVisible,
-  isAuthExplanationVisible,
   isDockerStandalone,
   isForcePullVisible,
 }: Args) {
   const initialValues: GitFormModel = {
-    RepositoryURL: '',
-    RepositoryURLValid: false,
-    RepositoryAuthentication: false,
-    RepositoryUsername: '',
-    RepositoryPassword: '',
+    SourceId: 0,
     AdditionalFiles: [],
     RepositoryReferenceName: '',
     ComposeFilePathInRepository: '',
-    TLSSkipVerify: false,
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={() => buildGitValidationSchema(false, 'compose')}
+      validationSchema={() => buildGitValidationSchema(deployMethod)}
       onSubmit={() => {}}
     >
       {({ values, errors, setValues }) => (
@@ -53,7 +46,6 @@ export function Primary({
             errors={errors}
             onChange={(value) => setValues({ ...values, ...value })}
             isAdditionalFilesFieldVisible={isAdditionalFilesFieldVisible}
-            isAuthExplanationVisible={isAuthExplanationVisible}
             isDockerStandalone={isDockerStandalone}
             isForcePullVisible={isForcePullVisible}
             deployMethod={deployMethod}
@@ -68,7 +60,6 @@ export function Primary({
 
 Primary.args = {
   isAdditionalFilesFieldVisible: true,
-  isAuthExplanationVisible: true,
   isAutoUpdateVisible: true,
   isDockerStandalone: true,
   isForcePullVisible: true,

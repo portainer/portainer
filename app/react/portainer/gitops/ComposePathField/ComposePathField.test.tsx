@@ -29,10 +29,8 @@ const defaultProps = {
   onChange: vi.fn(),
   isCompose: true,
   model: {
-    RepositoryURL: 'https://github.com/example/repo',
+    SourceId: 1,
     ComposeFilePathInRepository: 'docker-compose.yml',
-    RepositoryAuthentication: false,
-    TLSSkipVerify: false,
   } as GitFormModel,
   isDockerStandalone: false,
 };

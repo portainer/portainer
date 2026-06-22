@@ -196,12 +196,8 @@ function createSwarmStack({ method, payload }: SwarmCreatePayload) {
         repositoryUrl: payload.git.RepositoryURL,
         repositoryReferenceName: payload.git.RepositoryReferenceName,
         composeFile: payload.git.ComposeFilePathInRepository,
-        repositoryAuthentication: payload.git.RepositoryAuthentication,
-        repositoryUsername: payload.git.RepositoryUsername,
-        repositoryPassword: payload.git.RepositoryPassword,
         filesystemPath: payload.relativePathSettings?.FilesystemPath,
         supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
-        tlsSkipVerify: payload.git.TLSSkipVerify,
         sourceId: payload.git.SourceId,
         autoUpdate: transformAutoUpdateViewModel(
           payload.git.AutoUpdate,
@@ -247,12 +243,8 @@ function createStandaloneStack({ method, payload }: StandaloneCreatePayload) {
         repositoryUrl: payload.git.RepositoryURL,
         repositoryReferenceName: payload.git.RepositoryReferenceName,
         composeFile: payload.git.ComposeFilePathInRepository,
-        repositoryAuthentication: payload.git.RepositoryAuthentication,
-        repositoryUsername: payload.git.RepositoryUsername,
-        repositoryPassword: payload.git.RepositoryPassword,
         filesystemPath: payload.relativePathSettings?.FilesystemPath,
         supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
-        tlsSkipVerify: payload.git.TLSSkipVerify,
         sourceId: payload.git.SourceId,
         autoUpdate: transformAutoUpdateViewModel(
           payload.git.AutoUpdate,
@@ -294,14 +286,9 @@ function createKubernetesStack({ method, payload }: KubernetesCreatePayload) {
         stackName: payload.name,
 
         sourceId: payload.git.SourceId,
-        repositoryUrl: payload.git.RepositoryURL,
         repositoryReferenceName: payload.git.RepositoryReferenceName,
         manifestFile: payload.git.ComposeFilePathInRepository,
-        repositoryAuthentication: payload.git.RepositoryAuthentication,
-        repositoryUsername: payload.git.RepositoryUsername,
-        repositoryPassword: payload.git.RepositoryPassword,
 
-        tlsSkipVerify: payload.git.TLSSkipVerify,
         autoUpdate: transformAutoUpdateViewModel(
           payload.git.AutoUpdate,
           payload.webhook

@@ -126,12 +126,7 @@ export function useValidation({
                 values.deploymentType === DeploymentType.Compose
                   ? 'compose'
                   : 'manifest';
-              return buildGitValidationSchema(
-                !!customTemplate,
-                deploymentMethod,
-                false,
-                true
-              );
+              return buildGitValidationSchema(deploymentMethod);
             },
           }) as SchemaOf<GitFormModel>,
           relativePath: mixed().when('method', {

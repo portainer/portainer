@@ -47,18 +47,13 @@ const expectedCustomTemplatePayload = {
     UpdateFailureAction: 3,
   },
   useManifestNamespaces: false,
-  repositoryUrl: 'https://github.com/testA113/nginx-public',
-  repositoryUsername: '',
   repositoryReferenceName: 'refs/heads/main',
   filePathInRepository: 'docker/voting.yaml',
-  repositoryAuthentication: false,
-  repositoryPassword: '',
   filesystemPath: '/test',
   supportRelativePath: true,
   perDeviceConfigsGroupMatchType: 'file',
   perDeviceConfigsMatchType: 'file',
   perDeviceConfigsPath: 'test',
-  tlsSkipVerify: false,
   autoUpdate: null,
 };
 

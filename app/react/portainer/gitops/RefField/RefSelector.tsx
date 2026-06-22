@@ -1,43 +1,24 @@
-import { StackId } from '@/react/common/stacks/types';
 import { useGitRefs } from '@/react/portainer/gitops/queries/useGitRefs';
 
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
-import { getAuthentication } from '../utils';
-
-import { RefFieldModel } from './types';
-
 export function RefSelector({
-  model,
+  sourceId,
   value,
   onChange,
-  isUrlValid,
-  stackId,
-  createdFromCustomTemplateId,
   inputId,
 }: {
-  model: RefFieldModel;
+  sourceId?: number;
   value: string;
-  stackId?: StackId;
-  createdFromCustomTemplateId?: number;
   onChange: (value: string) => void;
-  isUrlValid?: boolean;
   inputId: string;
 }) {
-  const creds = getAuthentication(model);
-  const payload = {
-    repository: model.RepositoryURL,
-    stackId,
-    createdFromCustomTemplateId,
-    tlsSkipVerify: model.TLSSkipVerify,
-    sourceId: model.SourceId,
-    ...creds,
-  };
-
   const { data: refs } = useGitRefs<Array<{ label: string; value: string }>>(
-    payload,
     {
-      enabled: !!((model.RepositoryURL && isUrlValid) || model.SourceId),
+      sourceId: sourceId!,
+    },
+    {
+      enabled: !!sourceId,
       select: (refs) => {
         if (refs.length === 0) {
           return [{ value: 'refs/heads/main', label: 'refs/heads/main' }];

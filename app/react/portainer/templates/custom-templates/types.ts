@@ -103,6 +103,12 @@ export type CustomTemplate = {
   };
 };
 
+export function getTemplateSourceId(
+  template?: Pick<CustomTemplate, 'artifact'>
+) {
+  return template?.artifact?.files?.[0]?.sourceId;
+}
+
 /**
  * EdgeTemplateSettings represents the configuration of a custom template for Edge
  */

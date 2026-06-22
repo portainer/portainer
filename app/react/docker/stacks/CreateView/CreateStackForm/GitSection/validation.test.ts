@@ -7,16 +7,10 @@ describe('Git validation', () => {
 
     const validData: GitFormValues = {
       SourceId: 1,
-      RepositoryURL: 'https://github.com/user/repo',
       RepositoryReferenceName: 'refs/heads/main',
       ComposeFilePathInRepository: 'docker-compose.yml',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
-      TLSSkipVerify: false,
       AdditionalFiles: [],
       AutoUpdate: undefined,
-      RepositoryAuthorizationType: undefined,
       SupportRelativePath: false,
       FilesystemPath: '',
     };
@@ -24,11 +18,10 @@ describe('Git validation', () => {
     await expect(schema.validate(validData)).resolves.toBeDefined();
   });
 
-  it('should fail validation when repository URL is empty', async () => {
+  it('should fail validation when SourceId is missing', async () => {
     const schema = getGitValidationSchema();
 
     const invalidData = {
-      RepositoryURL: '',
       RepositoryReferenceName: 'refs/heads/main',
       ComposeFilePathInRepository: 'docker-compose.yml',
     };

@@ -96,13 +96,8 @@ describe('CreateStackForm - Webhook ID Integration', () => {
         method: 'repository',
         name: 'test-stack',
         git: {
-          RepositoryURL: 'https://github.com/test/repo',
           RepositoryReferenceName: 'main',
           ComposeFilePathInRepository: 'docker-compose.yml',
-          RepositoryAuthentication: false,
-          RepositoryUsername: '',
-          RepositoryPassword: '',
-          TLSSkipVerify: false,
           AdditionalFiles: [],
           AutoUpdate: {
             RepositoryAutomaticUpdates: true,
@@ -111,7 +106,6 @@ describe('CreateStackForm - Webhook ID Integration', () => {
             ForcePullImage: false,
             RepositoryAutomaticUpdatesForce: false,
           },
-          RepositoryAuthorizationType: undefined,
           SupportRelativePath: false,
           FilesystemPath: '',
         },

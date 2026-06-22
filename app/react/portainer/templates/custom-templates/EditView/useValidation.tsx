@@ -18,13 +18,11 @@ export function useValidation({
   templateId,
   viewType,
   deployMethod,
-  isSourceSelection,
 }: {
   isGit: boolean;
   templateId: CustomTemplate['Id'];
   viewType: TemplateViewType;
   deployMethod: DeployMethod;
-  isSourceSelection?: boolean;
 }) {
   const customTemplatesQuery = useCustomTemplates({
     params: {
@@ -47,14 +45,7 @@ export function useValidation({
           .default(StackType.DockerCompose),
         FileContent: string().required('Template is required.'),
 
-        Git: isGit
-          ? buildGitValidationSchema(
-              false,
-              deployMethod,
-              false,
-              isSourceSelection ?? false
-            )
-          : mixed(),
+        Git: isGit ? buildGitValidationSchema(deployMethod) : mixed(),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
       }).concat(
@@ -63,13 +54,6 @@ export function useValidation({
           currentTemplateId: templateId,
         })
       ),
-    [
-      customTemplatesQuery.data,
-      isGit,
-      isSourceSelection,
-      templateId,
-      viewType,
-      deployMethod,
-    ]
+    [customTemplatesQuery.data, isGit, templateId, viewType, deployMethod]
   );
 }

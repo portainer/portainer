@@ -16,7 +16,6 @@ interface Props {
   isCompose: boolean;
   model: GitFormModel;
   isDockerStandalone: boolean;
-  createdFromCustomTemplateId?: number;
 }
 
 export function ComposePathField({
@@ -26,7 +25,6 @@ export function ComposePathField({
   model,
   isDockerStandalone,
   errors,
-  createdFromCustomTemplateId,
 }: Props) {
   const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
 
@@ -77,7 +75,6 @@ export function ComposePathField({
               placeholder={isCompose ? 'docker-compose.yml' : 'manifest.yml'}
               model={model}
               inputId="stack_repository_path"
-              createdFromCustomTemplateId={createdFromCustomTemplateId}
             />
           ) : (
             <Input

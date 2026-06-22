@@ -59,10 +59,9 @@ function renderComponent({
   const values = mockFormValues({
     method: 'repository',
     git: {
-      RepositoryURL: '',
+      SourceId: 0,
       RepositoryReferenceName: 'refs/heads/main',
       ComposeFilePathInRepository: 'docker-compose.yml',
-      TLSSkipVerify: false,
       AdditionalFiles: [],
       AutoUpdate: undefined,
       SupportRelativePath: false,

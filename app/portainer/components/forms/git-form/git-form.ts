@@ -18,7 +18,6 @@ export const gitForm: IComponentOptions = {
     webhook-id="$ctrl.webhookId"
     webhooks-docs="$ctrl.webhooksDocs"
     created-from-custom-template-id="$ctrl.createdFromCustomTemplateId"
-    is-source-selection-visible="$ctrl.isSourceSelectionVisible"
     errors="$ctrl.errors">
   </react-git-form>
 </ng-form>`,
@@ -35,7 +34,6 @@ export const gitForm: IComponentOptions = {
     webhookId: '@',
     webhooksDocs: '@',
     createdFromCustomTemplateId: '<',
-    isSourceSelectionVisible: '<',
   },
   controller,
 };

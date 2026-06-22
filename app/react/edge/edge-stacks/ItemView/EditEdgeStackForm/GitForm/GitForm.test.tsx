@@ -48,6 +48,7 @@ describe('GitForm', () => {
         Password: '',
       },
     },
+    GitSourceId: 1,
     PrePullImage: false,
     RetryDeploy: false,
     RetryPeriod: 0,

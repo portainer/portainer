@@ -2,20 +2,11 @@ import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
 
 import { AutocompleteSelect } from '@@/form-components/AutocompleteSelect';
 
-import { getAuthentication } from '../utils';
 import { GitFormModel } from '../types';
 
 export type PathSelectorGitModel = Pick<
   GitFormModel,
-  | 'RepositoryAuthentication'
-  | 'RepositoryPassword'
-  | 'RepositoryUsername'
-  | 'RepositoryAuthorizationType'
-  | 'RepositoryURL'
-  | 'RepositoryReferenceName'
-  | 'TLSSkipVerify'
-  | 'RepositoryURLValid'
-  | 'SourceId'
+  'RepositoryReferenceName' | 'SourceId'
 >;
 
 export function PathSelector({
@@ -26,7 +17,6 @@ export function PathSelector({
   dirOnly,
   readOnly,
   inputId,
-  createdFromCustomTemplateId,
 }: {
   value: string;
   onChange(value: string): void;
@@ -35,24 +25,15 @@ export function PathSelector({
   dirOnly?: boolean;
   readOnly?: boolean;
   inputId: string;
-  createdFromCustomTemplateId?: number;
 }) {
-  const creds = getAuthentication(model);
   const payload = {
-    repository: model.RepositoryURL,
     keyword: value,
     reference: model.RepositoryReferenceName,
-    tlsSkipVerify: model.TLSSkipVerify,
     dirOnly,
-    createdFromCustomTemplateId,
     sourceId: model.SourceId,
-    ...creds,
   };
 
-  const enabled = Boolean(
-    ((model.RepositoryURL && model.RepositoryURLValid) || model.SourceId) &&
-    value
-  );
+  const enabled = !!(model.SourceId && value);
   const { data: searchResults } = useSearch(payload, enabled);
 
   return (

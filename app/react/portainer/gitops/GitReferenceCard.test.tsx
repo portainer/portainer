@@ -3,6 +3,7 @@ import { HttpResponse } from 'msw';
 
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server, http } from '@/setup-tests/server';
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { RepoConfigResponse } from './types';
 import { GitReferenceCard } from './GitReferenceCard';
@@ -22,14 +23,16 @@ const defaultGitConfig: RepoConfigResponse = {
 function renderCard(
   overrides: Partial<Parameters<typeof GitReferenceCard>[0]> = {}
 ) {
-  const Component = withTestQueryProvider(() => (
-    <GitReferenceCard
-      stackId={1}
-      gitConfig={defaultGitConfig}
-      stackType="docker"
-      {...overrides}
-    />
-  ));
+  const Component = withTestQueryProvider(
+    withTestRouter(() => (
+      <GitReferenceCard
+        gitConfig={defaultGitConfig}
+        stackType="docker"
+        sourceId={1}
+        {...overrides}
+      />
+    ))
+  );
   return render(<Component />);
 }
 

@@ -15,22 +15,14 @@ export type KubernetesGitRepositoryPayload = {
   /** When set, URL and auth are resolved from the stored Source record */
   sourceId?: number;
 
-  /** URL of a Git repository hosting the Stack file */
-  repositoryUrl: string;
   /** Reference name of a Git repository hosting the Stack file */
   repositoryReferenceName?: string;
-  /** Use basic authentication to clone the Git repository */
-  repositoryAuthentication?: boolean;
-  /** Username used in basic authentication. Required when RepositoryAuthentication is true. */
-  repositoryUsername?: string;
-  /** Password used in basic authentication. Required when RepositoryAuthentication is true. */
-  repositoryPassword?: string;
+
   /** Path to the Stack file inside the Git repository */
   manifestFile?: string;
 
   additionalFiles?: Array<string>;
-  /** TLSSkipVerify skips SSL verification when cloning the Git repository */
-  tlsSkipVerify?: boolean;
+
   /** Optional GitOps update configuration */
   autoUpdate?: AutoUpdateResponse | null;
   environmentId: EnvironmentId;

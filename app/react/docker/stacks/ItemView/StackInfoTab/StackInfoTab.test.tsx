@@ -158,6 +158,7 @@ describe('conditional form rendering', () => {
         ConfigHash: '',
         TLSSkipVerify: false,
       },
+      GitSourceId: 1,
       FromAppTemplate: false,
     });
     renderComponent({
@@ -266,6 +267,7 @@ describe('git and duplication form combination', () => {
         ConfigHash: '',
         TLSSkipVerify: false,
       },
+      GitSourceId: 1,
       FromAppTemplate: false,
     });
     renderComponent({

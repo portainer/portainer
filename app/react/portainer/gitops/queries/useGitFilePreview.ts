@@ -2,17 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 
-import { AuthTypeOption } from '../../account/git-credentials/types';
-import { omitPassword } from '../utils';
-
 export interface GitFilePreviewParams {
-  repository: string;
   targetFile: string;
   reference?: string;
-  username?: string;
-  password?: string;
-  authorizationType?: AuthTypeOption;
-  tlsSkipVerify?: boolean;
   /** When set, resolves URL and auth from the stored Source record */
   sourceId?: number;
 }
@@ -35,12 +27,9 @@ export function useGitFilePreview<TData = string>(
 ) {
   const { enabled = true, select } = options;
   return useQuery({
-    queryKey: ['gitops', 'file-preview', omitPassword(params)],
+    queryKey: ['gitops', 'file-preview', params],
     queryFn: () => getFilePreview(params),
-    enabled:
-      enabled &&
-      (!!params.repository || !!params.sourceId) &&
-      !!params.targetFile,
+    enabled: enabled && !!params.sourceId && !!params.targetFile,
     select,
     retry: false,
   });

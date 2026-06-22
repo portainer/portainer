@@ -41,7 +41,6 @@ export function EditForm({
     isGit,
     templateId: template.Id,
     deployMethod,
-    isSourceSelection: isGit,
   });
 
   const fileContentQuery = useCustomTemplateFile(template.Id);

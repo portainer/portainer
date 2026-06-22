@@ -4,20 +4,9 @@ import axios from '@/portainer/services/axios/axios';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { withError } from '@/react-tools/react-query';
 
-import { AuthTypeOption } from '../../account/git-credentials/types';
-import { omitPassword } from '../utils';
-
 interface RefsPayload {
-  repository: string;
-  username?: string;
-  password?: string;
-  authorizationType?: AuthTypeOption;
-  stackId?: number;
-  fromEdgeStack?: boolean;
-  createdFromCustomTemplateID?: number;
-  tlsSkipVerify?: boolean;
   force?: boolean;
-  sourceId?: number;
+  sourceId: number;
 }
 
 export function useGitRefs<T = string[]>(
@@ -39,7 +28,7 @@ export function useGitRefs<T = string[]>(
   } = {}
 ) {
   return useQuery({
-    queryKey: ['gitops', 'refs', omitPassword(payload)],
+    queryKey: ['gitops', 'refs', payload],
     queryFn: () => listRefs(payload),
     enabled: isBE && enabled,
     retry: false,

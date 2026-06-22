@@ -131,12 +131,8 @@ function createEdgeStackFromGit(
     staggerConfig: payload.staggerConfig,
     useManifestNamespaces: payload.useManifestNamespaces,
     sourceId: payload.git.SourceId,
-    repositoryUrl: payload.git.RepositoryURL,
     repositoryReferenceName: payload.git.RepositoryReferenceName,
     filePathInRepository: payload.git.ComposeFilePathInRepository,
-    repositoryAuthentication: payload.git.RepositoryAuthentication,
-    repositoryUsername: payload.git.RepositoryUsername,
-    repositoryPassword: payload.git.RepositoryPassword,
     filesystemPath: payload.relativePathSettings?.FilesystemPath,
     supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
     perDeviceConfigsGroupMatchType:
@@ -144,7 +140,6 @@ function createEdgeStackFromGit(
     perDeviceConfigsMatchType:
       payload.relativePathSettings?.PerDeviceConfigsMatchType,
     perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
-    tlsSkipVerify: payload.git.TLSSkipVerify,
     autoUpdate: payload.autoUpdate,
   });
 }

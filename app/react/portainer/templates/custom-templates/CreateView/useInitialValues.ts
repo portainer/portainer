@@ -48,15 +48,10 @@ export function useInitialValues({
     Logo: '',
     Variables: [],
     Git: {
-      RepositoryURL: '',
+      SourceId: 0,
       RepositoryReferenceName: '',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
       ComposeFilePathInRepository: initialFilePathInRepository,
       AdditionalFiles: [],
-      RepositoryURLValid: true,
-      TLSSkipVerify: false,
     },
     AccessControl: isEdge
       ? undefined

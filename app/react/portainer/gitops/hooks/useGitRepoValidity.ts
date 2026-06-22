@@ -1,57 +1,30 @@
 import { isAxiosError } from '@/portainer/services/axios/utils/isAxiosError';
 
 import { isDefaultResponse } from '../../services/axios/utils/parseAxiosError';
-import { AuthTypeOption } from '../../account/git-credentials/types';
 import { useGitRefs } from '../queries/useGitRefs';
 
-interface Creds {
-  username?: string;
-  password?: string;
-  authorizationType?: AuthTypeOption;
-}
-
 interface Params {
-  url: string;
-  creds?: Creds;
   force?: boolean;
-  tlsSkipVerify?: boolean;
-  createdFromCustomTemplateId?: number;
-  fromEdgeStack?: boolean;
-  stackId?: number;
-  /** When set, the refs check will use credentials from the stored Source record */
   sourceId?: number;
   enabled?: boolean;
   onSettled?(isValid?: boolean): void;
-  // run after onSettled, useful for clearing local flags like force
   onAfterSettle?(): void;
 }
 
 export function useGitRepoValidity({
-  url,
-  creds,
-  force,
-  tlsSkipVerify,
-  fromEdgeStack,
-  createdFromCustomTemplateId,
-  stackId,
   sourceId,
+  force,
   enabled,
   onSettled,
   onAfterSettle,
 }: Params) {
   const query = useGitRefs(
     {
-      repository: url,
-      ...creds,
-      tlsSkipVerify,
-      createdFromCustomTemplateID: createdFromCustomTemplateId,
-      stackId,
+      sourceId: sourceId!,
       force,
-      fromEdgeStack,
-      sourceId,
     },
     {
-      enabled: (!!url || !!sourceId) && enabled,
+      enabled: !!sourceId && enabled,
       select: () => true,
       suppressError: true,
       onSettled(isValid) {
@@ -65,9 +38,7 @@ export function useGitRepoValidity({
     }
   );
 
-  const hasCreds = !!(creds?.username && creds?.password) || !!sourceId;
-
-  const errorMessage = getGitValidityError(query.error, hasCreds);
+  const errorMessage = getGitValidityError(query.error, !!sourceId);
 
   const isChecking = query.isInitialLoading || query.isFetching;
 

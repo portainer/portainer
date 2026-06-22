@@ -8,7 +8,6 @@ import { withError } from '@/react-tools/react-query';
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
 import { AutoUpdateResponse } from '../types';
-import { AuthTypeOption } from '../../account/git-credentials/types';
 
 export interface GitStackPayload {
   env: Array<EnvVar>;
@@ -16,10 +15,6 @@ export interface GitStackPayload {
   RepositoryURL?: string;
   ConfigFilePath?: string;
   RepositoryReferenceName?: string;
-  RepositoryAuthentication?: boolean;
-  RepositoryUsername?: string;
-  RepositoryPassword?: string;
-  RepositoryAuthorizationType?: AuthTypeOption;
   AutoUpdate?: AutoUpdateResponse | null;
   TLSSkipVerify?: boolean;
   Registries?: number[];

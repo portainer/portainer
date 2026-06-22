@@ -11,7 +11,10 @@ import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { AccessControlForm } from '@/react/portainer/access-control';
 import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
 import { NameField } from '@/react/docker/stacks/common/NameField';
-import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
+import {
+  CustomTemplate,
+  getTemplateSourceId,
+} from '@/react/portainer/templates/custom-templates/types';
 import {
   isTemplateVariablesEnabled,
   renderTemplate,
@@ -195,7 +198,10 @@ export function DeployForm({
             payload: {
               name: values.name,
               environmentId,
-              git: toGitFormModel(template.GitConfig),
+              git: toGitFormModel(
+                getTemplateSourceId(template),
+                template.GitConfig
+              ),
               accessControl: values.accessControl,
             },
           }
@@ -206,7 +212,10 @@ export function DeployForm({
               name: values.name,
               environmentId,
               swarmId: swarmIdQuery.data || '',
-              git: toGitFormModel(template.GitConfig),
+              git: toGitFormModel(
+                getTemplateSourceId(template),
+                template.GitConfig
+              ),
               accessControl: values.accessControl,
             },
           };

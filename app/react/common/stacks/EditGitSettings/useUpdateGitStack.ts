@@ -29,13 +29,8 @@ export function useUpdateGitStack(stack: Stack) {
       );
 
       await updateGitStackSettings(stack.Id, stack.EndpointId, {
-        RepositoryURL: values.git.RepositoryURL,
         ConfigFilePath: values.git.ComposeFilePathInRepository,
         RepositoryReferenceName: values.git.RepositoryReferenceName,
-        RepositoryAuthentication: values.git.RepositoryAuthentication,
-        RepositoryUsername: values.git.RepositoryUsername,
-        RepositoryPassword: values.git.RepositoryPassword || undefined,
-        TLSSkipVerify: values.git.TLSSkipVerify,
         AutoUpdate: autoUpdate,
         AdditionalFiles: values.git.AdditionalFiles,
         env: values.env,
@@ -52,9 +47,6 @@ export function useUpdateGitStack(stack: Stack) {
           Env: values.env,
           Prune: values.prune,
           StackName: values.kube.name.trim() || undefined,
-          RepositoryAuthentication: values.git.RepositoryAuthentication,
-          RepositoryUsername: values.git.RepositoryUsername,
-          RepositoryPassword: values.git.RepositoryPassword || undefined,
           RepullImageAndRedeploy: repullImageAndRedeploy,
         });
         return { redeployAttempted: true, redeployFailed: false };

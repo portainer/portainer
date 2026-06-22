@@ -3,7 +3,7 @@ import { useCurrentUser, useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
-import { CustomTemplate } from '../types';
+import { CustomTemplate, getTemplateSourceId } from '../types';
 
 import { FormValues } from './types';
 
@@ -34,10 +34,7 @@ export function useInitialValues({
     Logo: template.Logo,
     Variables: template.Variables,
     Git: template.GitConfig
-      ? {
-          ...toGitFormModel(template.GitConfig),
-          SourceId: template.artifact?.files?.[0]?.sourceId,
-        }
+      ? toGitFormModel(getTemplateSourceId(template), template.GitConfig)
       : undefined,
     AccessControl:
       !isEdge && template.ResourceControl

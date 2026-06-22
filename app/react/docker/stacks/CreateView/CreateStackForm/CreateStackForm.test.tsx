@@ -325,7 +325,7 @@ describe('CreateStackForm', () => {
       expect(requestBody).toMatchObject(
         expect.objectContaining({
           name: 'test-stack',
-          repositoryUrl: 'https://github.com/test/repo',
+          sourceId: 1,
           repositoryReferenceName: 'refs/heads/main',
           composeFile: 'docker-compose.yml',
         })

@@ -24,19 +24,17 @@ import { Link } from '@@/Link';
 import { getGitValidityError } from './hooks/useGitRepoValidity';
 
 export function GitReferenceCard({
-  stackId,
   stackType,
   gitConfig,
   autoUpdate,
   currentDeploymentInfo,
   sourceId,
 }: {
-  stackId: number;
   stackType: 'docker' | 'helm' | 'edge' | 'edge-helm' | 'kubernetes';
   gitConfig: RepoConfigResponse;
   autoUpdate?: AutoUpdateResponse | null;
   currentDeploymentInfo?: StackDeploymentInfo | null;
-  sourceId?: number;
+  sourceId: number;
 }) {
   const hasDivergence = isGitConfigDiverged(gitConfig, currentDeploymentInfo);
 
@@ -47,16 +45,11 @@ export function GitReferenceCard({
   const commitId = deployed?.ConfigHash ?? gitConfig.ConfigHash;
   const sourceIdToShow = deployed?.SourceID ?? sourceId;
 
-  const fromEdgeStack = stackType === 'edge' || stackType === 'edge-helm';
-
   const refCheckQuery = useGitRefs(
     {
-      repository: url || '',
-      stackId,
-      fromEdgeStack,
       sourceId: sourceIdToShow,
     },
-    { enabled: !!url, suppressError: true }
+    { enabled: !!sourceIdToShow, suppressError: true }
   );
 
   const repoError = getGitValidityError(
@@ -76,15 +69,12 @@ export function GitReferenceCard({
   const enableFileCheck = stackType !== 'helm' && stackType !== 'edge-helm';
   const fileCheckQuery = useSearch(
     {
-      repository: url || '',
       keyword: configFilePath || '',
-      stackId,
-      fromEdgeStack,
       reference,
       sourceId: sourceIdToShow,
     },
     enableFileCheck &&
-      !!url &&
+      !!sourceIdToShow &&
       !!reference &&
       !!configFilePath &&
       !hasRepoError &&

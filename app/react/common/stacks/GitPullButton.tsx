@@ -46,12 +46,8 @@ export function GitPullButton({ stack }: { stack: Stack }) {
     mutation.mutate(
       {
         RepullImageAndRedeploy: result.repullImageAndRedeploy,
-        RepositoryAuthentication: !!stack.GitConfig?.Authentication,
         Env: stack.Env || [],
         Prune: stack.Option?.Prune,
-        RepositoryAuthorizationType:
-          stack.GitConfig?.Authentication?.AuthorizationType,
-        RepositoryUsername: stack.GitConfig?.Authentication?.Username,
       },
       {
         onSuccess: () => {

@@ -119,7 +119,6 @@ export function InnerForm({
               values.Type === StackType.Kubernetes ? 'manifest' : 'compose'
             }
             errors={typeof errors.Git === 'object' ? errors.Git : undefined}
-            isSourceSelectionVisible={!!values.Git.SourceId}
           />
           <div className="form-group">
             <div className="col-sm-12">

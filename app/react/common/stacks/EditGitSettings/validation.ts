@@ -9,8 +9,7 @@ import { envVarValidation } from '@@/form-components/EnvironmentVariablesFieldse
 import { FormValues } from './types';
 
 export function useValidationSchema(
-  stackType: StackType,
-  isSourceSelection: boolean
+  stackType: StackType
 ): SchemaOf<FormValues> {
   const isKubernetes = stackType === StackType.Kubernetes;
 
@@ -22,17 +21,12 @@ export function useValidationSchema(
               name: string().default(''),
             }).required()
           : object({ name: string().default('') }).optional(),
-        git: buildGitValidationSchema(
-          false,
-          isKubernetes ? 'manifest' : 'compose',
-          true,
-          isSourceSelection
-        ),
+        git: buildGitValidationSchema(isKubernetes ? 'manifest' : 'compose'),
 
         env: envVarValidation(),
         prune: boolean().default(false),
         redeployNow: boolean().default(false),
       }),
-    [isKubernetes, isSourceSelection]
+    [isKubernetes]
   );
 }

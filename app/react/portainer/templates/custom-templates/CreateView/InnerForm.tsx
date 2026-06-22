@@ -131,7 +131,6 @@ export function InnerForm({
             }))
           }
           errors={errors.Git}
-          isSourceSelectionVisible
         />
       )}
 
