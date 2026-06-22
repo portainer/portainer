@@ -8,6 +8,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
@@ -54,8 +55,15 @@ func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error 
 }
 
 func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 	if stack.WorkflowID != 0 {
-		gitConfig, sourceID, err := loadGitConfigForStack(tx, stack.WorkflowID, stack.ID)
+		gitConfig, sourceID, err := loadGitConfigForStack(tx, userContext, stack.WorkflowID, stack.ID)
 		if err != nil {
 			return httperror.InternalServerError("Unable to load git config for stack", err)
 		}
@@ -111,7 +119,7 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 			stack.AutoUpdate.JobID = jobID
 		}
 
-		if err := saveStackGitConfig(tx, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
+		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
 			return httperror.InternalServerError("Unable to update source git config", err)
 		}
 

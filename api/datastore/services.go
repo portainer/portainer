@@ -577,7 +577,7 @@ func (store *Store) Export(filename string) (err error) {
 		backup.SSLSettings = *settings
 	}
 
-	if s, err := store.Source().ReadAll(); err != nil {
+	if s, err := store.Source().ReadAll(source.InsecureNewAdminContext()); err != nil {
 		if !store.IsErrObjectNotFound(err) {
 			log.Error().Err(err).Msg("exporting Sources")
 		}
@@ -768,7 +768,7 @@ func (store *Store) Import(filename string) (err error) {
 	}
 
 	for _, v := range backup.Source {
-		if err := store.Source().Update(v.ID, &v); err != nil {
+		if err := store.Source().Update(source.InsecureNewAdminContext(), v.ID, &v); err != nil {
 			log.Warn().Err(err).Msg("failed to update the source in the database")
 		}
 	}

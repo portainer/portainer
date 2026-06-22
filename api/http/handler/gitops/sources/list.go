@@ -9,7 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	ceWorkflows "github.com/portainer/portainer/api/gitops/workflows"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/http/utils/filters"
 	"github.com/portainer/portainer/api/slicesx"
@@ -56,7 +56,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 	}
 
 	if status, _ := request.RetrieveQueryParameter(r, "status", true); status != "" {
-		s, err := ceWorkflows.ParseStatus(status)
+		s, err := workflows.ParseStatus(status)
 		if err != nil {
 			return httperror.BadRequest("Invalid status parameter", err)
 		}
@@ -111,11 +111,11 @@ func cacheKey(sc *security.RestrictedRequestContext) string {
 
 func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedRequestContext) ([]Source, error) {
 	var allSrcs []portainer.Source
-	var stats map[portainer.SourceID]ceWorkflows.SourceStats
+	var stats map[portainer.SourceID]workflows.SourceStats
 
 	if err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		allSrcs, stats, err = ceWorkflows.FetchSourceStats(tx, h.k8sFactory, sc)
+		allSrcs, stats, err = workflows.FetchSourceStats(tx, h.k8sFactory, sc)
 		return err
 	}); err != nil {
 		return nil, err
@@ -123,12 +123,12 @@ func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedReque
 
 	result := make([]Source, 0, len(allSrcs))
 	for _, src := range allSrcs {
-		s, accessible := stats[src.ID]
-		if !accessible && !sc.IsAdmin {
-			continue
+		stat, ok := stats[src.ID]
+		if !ok {
+			stat = workflows.SourceStats{}
 		}
 
-		result = append(result, h.buildSource(ctx, &src, s))
+		result = append(result, h.buildSource(ctx, &src, stat))
 	}
 
 	return result, nil

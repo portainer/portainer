@@ -15,7 +15,7 @@ export function TypeSelectStep() {
     <>
       <Widget.Title
         title="Select Source type"
-        subtitle="Choose the type of external source you want to connect to Portainer."
+        subtitle="Choose the type of external source you want to connect to Portainer. Currently only Git repositories can be connected. Support for Helm repositories, OCI registries, and S3 buckets is coming in a future release."
       />
       <Widget.Body>
         <BoxSelector

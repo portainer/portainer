@@ -97,7 +97,7 @@ func TestGitSourceCreate_Success(t *testing.T) {
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.NotZero(t, src.ID)
 	require.NotNil(t, src.Git)
-	require.Equal(t, "https://github.com/org/repo.git", src.Git.URL)
+	require.Equal(t, "https://github.com/org/repo", src.Git.URL)
 }
 
 func TestGitSourceCreate_SanitizesCredentials(t *testing.T) {

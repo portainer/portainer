@@ -7,6 +7,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	ce "github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
@@ -24,6 +25,7 @@ func buildWorkflowsReq(t *testing.T, userID portainer.UserID, role portainer.Use
 	ctx = security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
 		UserID:  userID,
 		IsAdmin: security.IsAdminRole(role),
+		User:    &portainer.User{ID: userID, Role: role},
 	})
 	return req.WithContext(ctx)
 }
@@ -48,7 +50,7 @@ func createGitStack(t *testing.T, tx dataservices.DataStoreTx, stack *portainer.
 
 	if stack.GitConfig != nil {
 		src := &portainer.Source{Git: stack.GitConfig, Type: portainer.SourceTypeGit}
-		require.NoError(t, tx.Source().Create(src))
+		require.NoError(t, tx.Source().Create(source.InsecureNewAdminContext(), src))
 
 		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
 			StackID: stack.ID,

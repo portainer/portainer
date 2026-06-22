@@ -81,7 +81,7 @@ func TestWorkflowsList_Pagination(t *testing.T) {
 			createGitStack(t, tx, &portainer.Stack{
 				ID:        portainer.StackID(i),
 				Name:      fmt.Sprintf("stack-%d", i),
-				GitConfig: gitConfig("https://github.com/x/y"),
+				GitConfig: gitConfig(fmt.Sprintf("https://github.com/x/y-%d", i)),
 			})
 		}
 

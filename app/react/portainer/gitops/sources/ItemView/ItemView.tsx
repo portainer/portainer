@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { GitCommit, PenBoxIcon, Settings } from 'lucide-react';
+import { GitCommit, PenBoxIcon, Settings, UsersIcon } from 'lucide-react';
 
 import { useIdParam } from '@/react/hooks/useIdParam';
+import { useCurrentUser } from '@/react/hooks/useUser';
 
 import { PageHeader } from '@@/PageHeader';
 import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
@@ -16,6 +17,7 @@ import { SettingsTab } from './SettingsTab/SettingsTab';
 import { WorkflowsTab } from './WorkflowsTab';
 import { SourceResourceHeader } from './SourceResourceHeader';
 import { CountDot } from './CountDot';
+import { AccessTab } from './AccessTab';
 
 const breadcrumbs = [
   { label: 'GitOps Sources', link: 'portainer.gitops.sources' },
@@ -59,9 +61,10 @@ export function ItemView() {
 }
 
 function PageContent({ source }: { source: SourceDetail }) {
-  const [isEditingSettings, setIsEditingSettings] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const { isPureAdmin } = useCurrentUser();
 
-  const tabs: Array<Tab> = useMemo(
+  const tabs: Array<Tab & { isEditable?: boolean }> = useMemo(
     () => [
       {
         name: 'Settings',
@@ -69,11 +72,12 @@ function PageContent({ source }: { source: SourceDetail }) {
         widget: (
           <SettingsTab
             source={source}
-            isEditing={isEditingSettings}
-            onEditingChange={setIsEditingSettings}
+            isEditing={isEditing}
+            onEditingChange={setIsEditing}
           />
         ),
         selectedTabParam: 'settings',
+        isEditable: true,
       },
       {
         name: (
@@ -86,11 +90,26 @@ function PageContent({ source }: { source: SourceDetail }) {
         widget: <WorkflowsTab workflows={source.workflows ?? []} />,
         selectedTabParam: 'workflows',
       },
+      {
+        name: 'Access',
+        icon: UsersIcon,
+        widget: (
+          <AccessTab
+            source={source}
+            isEditing={isEditing}
+            onEditingChange={setIsEditing}
+          />
+        ),
+        selectedTabParam: 'accessTab',
+        isEditable: isPureAdmin,
+      },
     ],
-    [isEditingSettings, source]
+    [isEditing, isPureAdmin, source]
   );
 
   const currentTabIndex = useCurrentTabIndex(tabs);
+  const isTabEditable = tabs[currentTabIndex]?.isEditable;
+
   return (
     <>
       <PageHeader
@@ -109,15 +128,15 @@ function PageContent({ source }: { source: SourceDetail }) {
             useContainer={false}
           />
           <div className="ml-auto">
-            {currentTabIndex === 0 &&
-              (isEditingSettings ? (
+            {isTabEditable &&
+              (isEditing ? (
                 <Badge type="info">Editing</Badge>
               ) : (
                 <Button
                   icon={PenBoxIcon}
                   color="light"
                   data-cy="edit-settings-button"
-                  onClick={() => setIsEditingSettings(true)}
+                  onClick={() => setIsEditing(true)}
                 >
                   Edit
                 </Button>

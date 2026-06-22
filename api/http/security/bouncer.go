@@ -58,6 +58,7 @@ type (
 		IsTeamLeader    bool
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
+		User            *portainer.User
 	}
 
 	// tokenLookup looks up a token in the request
@@ -274,7 +275,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
+		requestContext, err := newRestrictedContextRequest(bouncer.dataStore, tokenData.ID, tokenData.Role)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
@@ -535,15 +536,21 @@ func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+func newRestrictedContextRequest(tx dataservices.DataStoreTx, userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+	user, err := tx.User().Read(userID)
+	if err != nil {
+		return nil, err
+	}
+
 	if userRole == portainer.AdministratorRole {
 		return &RestrictedRequestContext{
 			IsAdmin: true,
 			UserID:  userID,
+			User:    user,
 		}, nil
 	}
 
-	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	memberships, err := tx.TeamMembership().TeamMembershipsByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -557,6 +564,7 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		UserID:          userID,
 		IsTeamLeader:    isTeamLeader,
 		UserMemberships: memberships,
+		User:            user,
 	}, nil
 }
 

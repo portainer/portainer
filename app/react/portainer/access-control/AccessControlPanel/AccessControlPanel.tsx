@@ -26,6 +26,7 @@ interface Props {
   environmentId: EnvironmentId;
   disableOwnershipChange?: boolean;
   onUpdateSuccess(): Promise<void>;
+  resourceName?: string;
 }
 
 export function AccessControlPanel({
@@ -35,6 +36,7 @@ export function AccessControlPanel({
   resourceId,
   environmentId,
   onUpdateSuccess,
+  resourceName = 'resource',
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
   const isAdminQuery = useIsEdgeAdmin();
@@ -62,6 +64,7 @@ export function AccessControlPanel({
     <TableContainer>
       <TableTitle label="Access control" icon={Eye} />
       <AccessControlPanelDetails
+        resourceName={resourceName}
         resourceType={resourceType}
         resourceControl={resourceControl}
         isAuthorisedToFetchUsers={isAdmin || isTeamLeader}

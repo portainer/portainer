@@ -76,7 +76,7 @@ func (config *ComposeStackDeploymentConfig) Deploy(ctx context.Context) error {
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {
-		return config.StackDeployer.DeployRemoteComposeStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
+		return config.StackDeployer.DeployRemoteComposeStack(ctx, config.user.ID, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
 	}
 
 	return config.StackDeployer.DeployComposeStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
@@ -89,7 +89,7 @@ func (config *ComposeStackDeploymentConfig) Undeploy(ctx context.Context) error 
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {
-		return config.StackDeployer.UndeployRemoteComposeStack(ctx, config.stack, config.endpoint)
+		return config.StackDeployer.UndeployRemoteComposeStack(ctx, config.user.ID, config.stack, config.endpoint)
 	}
 	return config.StackDeployer.UndeployComposeStack(ctx, config.stack, config.endpoint)
 }

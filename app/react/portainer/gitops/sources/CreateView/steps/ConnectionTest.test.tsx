@@ -5,6 +5,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@/setup-tests/server';
 import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 
 import { FormValues } from '../type';
 
@@ -33,6 +34,9 @@ function renderConnectionTest(gitValues: FormValues['git']) {
     name: 'test-source',
     type: 'git',
     git: gitValues,
+    authorizedTeams: [],
+    authorizedUsers: [],
+    ownership: ResourceControlOwnership.ADMINISTRATORS,
   };
 
   const Wrapped = withTestQueryProvider(ConnectionTest);

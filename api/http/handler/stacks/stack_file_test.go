@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -45,7 +46,7 @@ func TestStackFile_GitPendingRedeploy_Returns409(t *testing.T) {
 			ConfigFilePath: "docker-compose.yml",
 		},
 	}
-	require.NoError(t, store.Source().Create(src))
+	require.NoError(t, store.Source().Create(source.InsecureNewAdminContext(), src))
 
 	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
 		StackID: stackID,

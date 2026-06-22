@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -79,13 +81,17 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		stacks = authorization.FilterAuthorizedStacks(stacks, user.ID, userTeamIDs)
 	}
 
-	for i := range stacks {
-		if err := fillStackGitConfig(handler.DataStore, &stacks[i]); err != nil {
-			return httperror.InternalServerError("Unable to load git config for stack", err)
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		for i := range stacks {
+			if err := fillStackGitConfig(tx, userContext, &stacks[i]); err != nil {
+				return httperror.InternalServerError("Unable to load git config for stack", err)
+			}
 		}
-	}
+		return nil
+	})
 
-	return response.JSON(w, stacks)
+	return response.TxResponse(w, stacks, err)
 }
 
 // filterStacks refines a collection of Stack instances using specified criteria.

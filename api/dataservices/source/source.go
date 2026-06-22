@@ -10,7 +10,7 @@ const BucketName = "sources"
 
 // Service represents a service for managing GitOps source data.
 type Service struct {
-	dataservices.BaseDataService[portainer.Source, portainer.SourceID]
+	base dataservices.BaseDataService[portainer.Source, portainer.SourceID]
 }
 
 // NewService creates a new instance of a service.
@@ -21,7 +21,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}
 
 	return &Service{
-		BaseDataService: dataservices.BaseDataService[portainer.Source, portainer.SourceID]{
+		base: dataservices.BaseDataService[portainer.Source, portainer.SourceID]{
 			Bucket:     BucketName,
 			Connection: connection,
 		},
@@ -30,21 +30,77 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 	return ServiceTx{
-		BaseDataServiceTx: dataservices.BaseDataServiceTx[portainer.Source, portainer.SourceID]{
+		base: dataservices.BaseDataServiceTx[portainer.Source, portainer.SourceID]{
 			Bucket:     BucketName,
-			Connection: service.Connection,
+			Connection: service.base.Connection,
 			Tx:         tx,
 		},
 	}
 }
 
 // Create creates a new source.
-func (service *Service) Create(source *portainer.Source) error {
-	return service.Connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, any) {
-			source.ID = portainer.SourceID(id)
-			return int(source.ID), source
-		},
-	)
+func (service *Service) Create(context *userContext, source *portainer.Source) error {
+	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Create(context, source)
+	})
+}
+
+func (service *Service) Read(context *userContext, ID portainer.SourceID) (*portainer.Source, error) {
+	var result *portainer.Source
+
+	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		result, err = service.Tx(tx).Read(context, ID)
+		return err
+	})
+
+	return result, err
+}
+
+func (service *Service) Exists(context *userContext, ID portainer.SourceID) (bool, error) {
+	var result bool
+
+	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		result, err = service.Tx(tx).Exists(context, ID)
+		return err
+	})
+
+	return result, err
+}
+
+func (service *Service) ReadAll(context *userContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error) {
+	var result []portainer.Source
+
+	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
+		var err error
+		result, err = service.Tx(tx).ReadAll(context, predicates...)
+		return err
+	})
+
+	return result, err
+}
+
+func (service *Service) Update(context *userContext, ID portainer.SourceID, source *portainer.Source) error {
+	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Update(context, ID, source)
+	})
+}
+
+func (service *Service) Delete(context *userContext, ID portainer.SourceID) error {
+	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Delete(context, ID)
+	})
+}
+
+func (service *Service) FindOrCreateGitSource(context *userContext, source *portainer.Source) (*portainer.Source, error) {
+	var result *portainer.Source
+
+	err := service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		var err error
+		result, err = service.Tx(tx).FindOrCreateGitSource(context, source)
+		return err
+	})
+
+	return result, err
 }

@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -182,8 +183,10 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.IsComposeFormat = payload.IsComposeFormat
 	customTemplate.EdgeTemplate = payload.EdgeTemplate
 
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
 	if payload.SourceID != 0 || payload.RepositoryURL != "" {
-		gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, sources.RepoConfigInput{
+		gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, userContext, sources.RepoConfigInput{
 			SourceID:                 payload.SourceID,
 			ReferenceName:            payload.RepositoryReferenceName,
 			ConfigFilePath:           payload.ComposeFilePathInRepository,
@@ -231,7 +234,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 
 		sourceID := payload.SourceID
 		if sourceID == 0 {
-			src, err := workflows.FindOrCreateGitSource(handler.DataStore, &portainer.Source{
+			src, err := workflows.FindOrCreateGitSource(handler.DataStore, userContext, &portainer.Source{
 				Name: gittypes.RepoName(gitConfig.URL),
 				Type: portainer.SourceTypeGit,
 				Git: &gittypes.RepoConfig{
@@ -271,7 +274,8 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 			return httperror.InternalServerError("Unable to persist custom template changes inside the database", err)
 		}
 
-		populateGitConfig(tx, customTemplate)
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		populateGitConfig(tx, userContext, customTemplate)
 
 		return nil
 	})

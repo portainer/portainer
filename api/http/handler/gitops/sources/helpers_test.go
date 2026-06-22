@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
@@ -16,6 +17,8 @@ import (
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
+
+var adminUserContext = source.InsecureNewAdminContext()
 
 // createGitWorkflow creates a Source and Workflow for the given config and
 // wires them up by setting stack.WorkflowID before creating the stack.
@@ -31,7 +34,7 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 			TLSSkipVerify:  cfg.TLSSkipVerify,
 		},
 	}
-	require.NoError(t, tx.Source().Create(src))
+	require.NoError(t, tx.Source().Create(adminUserContext, src))
 
 	wf := &portainer.Workflow{
 		Artifacts: []portainer.Artifact{{
@@ -55,13 +58,19 @@ func newTestHandler(t *testing.T, store dataservices.DataStore) *Handler {
 	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil)
 }
 
+func adminRestrictedContext(userID portainer.UserID) *security.RestrictedRequestContext {
+	return &security.RestrictedRequestContext{
+		UserID:  userID,
+		IsAdmin: true,
+		User:    &portainer.User{ID: userID, Role: portainer.AdministratorRole},
+	}
+}
+
 func buildListReq(t *testing.T, userID portainer.UserID, query string) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, "/gitops/sources?"+query, nil)
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -69,9 +78,7 @@ func buildGetReq(t *testing.T, userID portainer.UserID, id string) *http.Request
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, "/gitops/sources/"+id, nil)
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -104,9 +111,7 @@ func buildCreateReq(t *testing.T, userID portainer.UserID, body []byte) *http.Re
 	req := httptest.NewRequest(http.MethodPost, "/gitops/sources/git", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -115,9 +120,7 @@ func buildUpdateReq(t *testing.T, userID portainer.UserID, id int, body []byte) 
 	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/gitops/sources/%d", id), bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -125,9 +128,7 @@ func buildDeleteReq(t *testing.T, userID portainer.UserID, id int) *http.Request
 	t.Helper()
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/gitops/sources/%d", id), nil)
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -135,9 +136,7 @@ func buildSummaryReq(t *testing.T, userID portainer.UserID) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, "/gitops/sources/summary", nil)
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -146,9 +145,7 @@ func buildUpdateReqWithRawID(t *testing.T, userID portainer.UserID, id string, b
 	req := httptest.NewRequest(http.MethodPut, "/gitops/sources/"+id, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
@@ -156,8 +153,6 @@ func buildDeleteReqWithRawID(t *testing.T, userID portainer.UserID, id string) *
 	t.Helper()
 	req := httptest.NewRequest(http.MethodDelete, "/gitops/sources/"+id, nil)
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
-		UserID: userID, IsAdmin: true,
-	}))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }

@@ -5,6 +5,10 @@ import { TypeSelectStep, validateTypeSelectStep } from './steps/TypeSelectStep';
 import { ConfigureStep, validateConfigureStep } from './steps/ConfigureStep';
 import { WizardStep, WizardProvider } from './WizardContext';
 import { CreateForm } from './CreateForm';
+import {
+  AccessControlStep,
+  validateAccessControlStep,
+} from './steps/AccessControlStep';
 
 const steps: WizardStep[] = [
   {
@@ -18,6 +22,12 @@ const steps: WizardStep[] = [
     label: 'Configure connection',
     component: ConfigureStep,
     validateStep: validateConfigureStep,
+  },
+  {
+    id: 'access',
+    label: 'Access control',
+    component: AccessControlStep,
+    validateStep: validateAccessControlStep,
   },
 ];
 

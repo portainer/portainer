@@ -192,7 +192,7 @@ func (handler *Handler) deleteStack(ctx context.Context, userID portainer.UserID
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.UndeployRemoteSwarmStack(ctx, stack, endpoint)
+			return handler.StackDeployer.UndeployRemoteSwarmStack(ctx, userID, stack, endpoint)
 		}
 
 		return handler.SwarmStackManager.Remove(ctx, stack, endpoint)
@@ -202,7 +202,7 @@ func (handler *Handler) deleteStack(ctx context.Context, userID portainer.UserID
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.UndeployRemoteComposeStack(ctx, stack, endpoint)
+			return handler.StackDeployer.UndeployRemoteComposeStack(ctx, userID, stack, endpoint)
 		}
 
 		return handler.StackDeployer.UndeployComposeStack(ctx, stack, endpoint)

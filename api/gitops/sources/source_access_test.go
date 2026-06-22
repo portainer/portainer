@@ -19,9 +19,9 @@ func TestValidateSourceForStack_ValidGitSource_ReturnsNil(t *testing.T) {
 		Type: portainer.SourceTypeGit,
 		Git:  &gittypes.RepoConfig{URL: "https://github.com/org/repo"},
 	}
-	require.NoError(t, store.Source().Create(src))
+	require.NoError(t, store.Source().Create(adminUserContext, src))
 
-	_, httpErr := ValidateGitSourceAccess(store, src.ID)
+	_, httpErr := ValidateGitSourceAccess(store, adminUserContext, src.ID)
 	assert.Nil(t, httpErr)
 }
 
@@ -29,21 +29,7 @@ func TestValidateSourceForStack_SourceNotFound_Returns404(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, false)
 
-	_, httpErr := ValidateGitSourceAccess(store, portainer.SourceID(999))
+	_, httpErr := ValidateGitSourceAccess(store, adminUserContext, portainer.SourceID(999))
 	require.NotNil(t, httpErr)
 	assert.Equal(t, http.StatusNotFound, httpErr.StatusCode)
-}
-
-func TestValidateSourceForStack_NonGitSource_Returns400(t *testing.T) {
-	t.Parallel()
-	_, store := datastore.MustNewTestStore(t, false, false)
-
-	src := &portainer.Source{
-		Type: portainer.SourceType(99), // not a git source
-	}
-	require.NoError(t, store.Source().Create(src))
-
-	_, httpErr := ValidateGitSourceAccess(store, src.ID)
-	require.NotNil(t, httpErr)
-	assert.Equal(t, http.StatusBadRequest, httpErr.StatusCode)
 }

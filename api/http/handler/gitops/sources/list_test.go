@@ -20,7 +20,7 @@ func TestSourcesList_GroupsByURLAndCredentials(t *testing.T) {
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		cfg := gitCfg("https://github.com/org/repo")
 		src := &portainer.Source{Name: "repo", Type: portainer.SourceTypeGit, Git: cfg}
-		require.NoError(t, tx.Source().Create(src))
+		require.NoError(t, tx.Source().Create(adminUserContext, src))
 
 		wfA := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 		require.NoError(t, tx.Workflow().Create(wfA))

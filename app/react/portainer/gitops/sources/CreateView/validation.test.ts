@@ -1,3 +1,6 @@
+import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
+
+import { FormValues } from './type';
 import { validateGitConnection, validationSchema } from './validation';
 
 const baseAuth = {
@@ -74,7 +77,10 @@ describe('validationSchema git.authentication', () => {
         ...validGitValues,
         authentication: { ...baseAuth, authEnabled: true },
       },
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(false);
   });
 
@@ -84,7 +90,10 @@ describe('validationSchema git.authentication', () => {
       name: 'src',
       type: 'git',
       git: validGitValues,
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(true);
   });
 
@@ -102,7 +111,10 @@ describe('validationSchema git.authentication', () => {
           password: 'secret',
         },
       },
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(true);
   });
 });
@@ -117,7 +129,10 @@ describe('validationSchema full git (requires connectionOk)', () => {
         ...validGitValues,
         connectionOk: false,
       },
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(false);
   });
 
@@ -127,7 +142,10 @@ describe('validationSchema full git (requires connectionOk)', () => {
       name: 'src',
       type: 'git',
       git: validGitValues,
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(true);
   });
 
@@ -137,7 +155,10 @@ describe('validationSchema full git (requires connectionOk)', () => {
       name: '',
       type: 'git',
       git: validGitValues,
-    });
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
     expect(result).toBe(false);
   });
 });

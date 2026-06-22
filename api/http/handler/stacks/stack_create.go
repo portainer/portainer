@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -126,16 +128,29 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
 	}
 
-	err = handler.DataStore.ResourceControl().Create(resourceControl)
-	if err != nil {
-		return httperror.InternalServerError("Unable to persist resource control inside the database", err)
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		err = tx.ResourceControl().Create(resourceControl)
+		if err != nil {
+			return httperror.InternalServerError("Unable to persist resource control inside the database", err)
+		}
+		stack.ResourceControl = resourceControl
 
-	stack.ResourceControl = resourceControl
+		user, err := tx.User().Read(userID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to read user", err)
+		}
 
-	if err := fillStackGitConfig(handler.DataStore, stack); err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
-	}
+		userMemberships, err := tx.TeamMembership().TeamMembershipsByUserID(userID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to read user's team memberships", err)
+		}
 
-	return response.JSON(w, stack)
+		userContext := source.NewUserContext(user, userMemberships)
+		if err := fillStackGitConfig(tx, userContext, stack); err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+		return nil
+	})
+
+	return response.TxResponse(w, stack, err)
 }

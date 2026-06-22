@@ -455,6 +455,9 @@ import type {
   GitOpsSourcesTestData,
   GitOpsSourcesTestErrors,
   GitOpsSourcesTestResponses,
+  GitOpsSourcesUpdateAccessData,
+  GitOpsSourcesUpdateAccessErrors,
+  GitOpsSourcesUpdateAccessResponses,
   GitOpsSourcesUpdateGitData,
   GitOpsSourcesUpdateGitErrors,
   GitOpsSourcesUpdateGitResponses,
@@ -2557,7 +2560,7 @@ export const gitOpsSourcesList = <ThrowOnError extends boolean = true>(
  * Delete a source
  *
  * Deletes an existing GitOps source. Returns 409 if the source is referenced by any workflow or custom template.
- * **Access policy**: admin
+ * **Access policy**: authenticated
  */
 export const gitOpsSourcesDelete = <ThrowOnError extends boolean = true>(
   options: Options<GitOpsSourcesDeleteData, ThrowOnError>
@@ -2602,7 +2605,7 @@ export const gitOpsSourceGet = <ThrowOnError extends boolean = true>(
  * Update a Git source
  *
  * Updates an existing GitOps source backed by a Git repository.
- * **Access policy**: administrator
+ * **Access policy**: authenticated
  */
 export const gitOpsSourcesUpdateGit = <ThrowOnError extends boolean = true>(
   options: Options<GitOpsSourcesUpdateGitData, ThrowOnError>
@@ -2626,10 +2629,37 @@ export const gitOpsSourcesUpdateGit = <ThrowOnError extends boolean = true>(
   });
 
 /**
+ * Update a GitOps source's access control
+ *
+ * Updates the access control settings for an existing GitOps source.
+ * **Access policy**: admin
+ */
+export const gitOpsSourcesUpdateAccess = <ThrowOnError extends boolean = true>(
+  options: Options<GitOpsSourcesUpdateAccessData, ThrowOnError>
+) =>
+  (options.client ?? client).put<
+    GitOpsSourcesUpdateAccessResponses,
+    GitOpsSourcesUpdateAccessErrors,
+    ThrowOnError
+  >({
+    responseType: 'json',
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/gitops/sources/{id}/access',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Test the connection of a stored source
  *
  * Tests connectivity for a GitOps source, applying optional overrides to the stored configuration.
- * **Access policy**: administrator
+ * **Access policy**: authenticated
  */
 export const gitOpsSourcesTestById = <ThrowOnError extends boolean = true>(
   options: Options<GitOpsSourcesTestByIdData, ThrowOnError>
@@ -2656,7 +2686,7 @@ export const gitOpsSourcesTestById = <ThrowOnError extends boolean = true>(
  * Create a Git source
  *
  * Creates a new GitOps source backed by a Git repository.
- * **Access policy**: administrator
+ * **Access policy**: authenticated
  */
 export const gitOpsSourcesCreateGit = <ThrowOnError extends boolean = true>(
   options: Options<GitOpsSourcesCreateGitData, ThrowOnError>
@@ -2706,7 +2736,7 @@ export const gitOpsSourcesSummary = <ThrowOnError extends boolean = true>(
  * Test a Git source connection
  *
  * Tests connectivity for Git connection details that have not been persisted yet.
- * **Access policy**: administrator
+ * **Access policy**: authenticated
  */
 export const gitOpsSourcesTest = <ThrowOnError extends boolean = true>(
   options: Options<GitOpsSourcesTestData, ThrowOnError>

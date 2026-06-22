@@ -30,9 +30,9 @@ func TestResolveRepoConfig_WithSourceID_ReturnsSourceConfig(t *testing.T) {
 			},
 		},
 	}
-	require.NoError(t, store.Source().Create(src))
+	require.NoError(t, store.Source().Create(adminUserContext, src))
 
-	cfg, httpErr := ResolveRepoConfig(store, RepoConfigInput{
+	cfg, httpErr := ResolveRepoConfig(store, adminUserContext, RepoConfigInput{
 		SourceID:       src.ID,
 		ReferenceName:  "refs/heads/main",
 		ConfigFilePath: "docker-compose.yml",
@@ -51,7 +51,7 @@ func TestResolveRepoConfig_WithInlineURL_ReturnsInlineConfig(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, false)
 
-	cfg, httpErr := ResolveRepoConfig(store, RepoConfigInput{
+	cfg, httpErr := ResolveRepoConfig(store, adminUserContext, RepoConfigInput{
 		ReferenceName:            "refs/heads/main",
 		ConfigFilePath:           "docker-compose.yml",
 		RepositoryURL:            "https://github.com/org/repo",

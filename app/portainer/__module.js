@@ -329,9 +329,6 @@ angular
             component: 'sourcesListView',
           },
         },
-        data: {
-          access: AccessHeaders.Admin,
-        },
       };
 
       var gitopsSourceDetail = {

@@ -8,6 +8,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -188,7 +189,8 @@ func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Req
 
 	deployGate.startDeploy()
 
-	if err := fillStackGitConfig(tx, stack); err != nil {
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+	if err := fillStackGitConfig(tx, userContext, stack); err != nil {
 		return nil, httperror.InternalServerError("Unable to load git config for stack", err)
 	}
 

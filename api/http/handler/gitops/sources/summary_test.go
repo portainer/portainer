@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	ceWorkflows "github.com/portainer/portainer/api/gitops/workflows"
 
 	"github.com/segmentio/encoding/json"
@@ -38,10 +40,9 @@ func TestSourcesSummary_CountsByStatus(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
 
-	// With nil gitService and nil GitConfig, all sources get StatusUnknown.
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		for _, name := range []string{"source-a", "source-b", "source-c"} {
-			err := tx.Source().Create(&portainer.Source{Name: name, Type: portainer.SourceTypeGit})
+		for idx, name := range []string{"source-a", "source-b", "source-c"} {
+			err := tx.Source().Create(adminUserContext, &portainer.Source{Name: name, Type: portainer.SourceTypeGit, Git: &gittypes.RepoConfig{URL: fmt.Sprintf("http://github.com/org/repo%d", idx)}})
 			require.NoError(t, err)
 		}
 

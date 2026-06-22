@@ -1,3 +1,8 @@
+import {
+  AccessControlFormData,
+  ResourceControlOwnership,
+} from '@/react/portainer/access-control/types';
+
 import { formValuesToCreatePayload, gitFormValuesToTestPayload } from './type';
 
 const baseGit = {
@@ -6,9 +11,16 @@ const baseGit = {
   connectionOk: false,
 };
 
+const baseUAC: AccessControlFormData = {
+  authorizedTeams: [],
+  authorizedUsers: [],
+  ownership: ResourceControlOwnership.ADMINISTRATORS,
+};
+
 describe('formValuesToCreatePayload', () => {
   it('populates authentication when authEnabled with username and password', () => {
     const payload = formValuesToCreatePayload({
+      ...baseUAC,
       name: 'my-source',
       type: 'git',
       git: {
@@ -29,6 +41,7 @@ describe('formValuesToCreatePayload', () => {
 
   it('omits authentication when authEnabled is false', () => {
     const payload = formValuesToCreatePayload({
+      ...baseUAC,
       name: 'my-source',
       type: 'git',
       git: {
@@ -42,6 +55,7 @@ describe('formValuesToCreatePayload', () => {
 
   it('omits authentication when authEnabled but username is missing', () => {
     const payload = formValuesToCreatePayload({
+      ...baseUAC,
       name: 'my-source',
       type: 'git',
       git: {
@@ -58,6 +72,7 @@ describe('formValuesToCreatePayload', () => {
 
   it('omits authentication when authEnabled but password is missing', () => {
     const payload = formValuesToCreatePayload({
+      ...baseUAC,
       name: 'my-source',
       type: 'git',
       git: {
@@ -74,6 +89,7 @@ describe('formValuesToCreatePayload', () => {
 
   it('does not include connectionOk in the create payload', () => {
     const payload = formValuesToCreatePayload({
+      ...baseUAC,
       name: 'my-source',
       type: 'git',
       git: {

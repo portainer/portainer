@@ -8,6 +8,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/sources"
@@ -87,13 +88,28 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.InternalServerError(msg, errors.New(msg))
 	}
 
-	gitConfig, sourceID, err := loadGitConfigForStack(handler.DataStore, stack.WorkflowID, stack.ID)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
-	if gitConfig == nil {
-		msg := "No Git config in the found stack source"
-		return httperror.InternalServerError(msg, errors.New(msg))
+
+	var gitConfig *gittypes.RepoConfig
+	var sourceID portainer.SourceID
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		gitConfig, sourceID, err = loadGitConfigForStack(tx, userContext, stack.WorkflowID, stack.ID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+
+		if gitConfig == nil {
+			msg := "No Git config in the found stack source"
+			return httperror.InternalServerError(msg, errors.New(msg))
+		}
+
+		return nil
+	}); err != nil {
+		return response.TxErrorResponse(err)
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" &&
@@ -124,11 +140,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	user, err := handler.DataStore.User().Read(securityContext.UserID)
@@ -193,8 +204,10 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		stack.Option = &portainer.StackOption{Prune: payload.Prune}
 	}
 
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
 	if payload.SourceID != 0 {
-		src, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, payload.SourceID)
+		src, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, userContext, payload.SourceID)
 		if httpErr != nil {
 			return httpErr
 		}
@@ -250,11 +263,12 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return err
 		}
-		if err := saveStackGitConfig(tx, stack.WorkflowID, stack.ID, sourceID, payload.SourceID, gitConfig); err != nil {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, payload.SourceID, gitConfig); err != nil {
 			return err
 		}
 		var err error
-		resp, err = newStackResponse(tx, stack)
+		resp, err = newStackResponse(tx, userContext, stack)
 		return err
 	}); err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)

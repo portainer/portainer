@@ -195,9 +195,20 @@ type (
 		BucketName() string
 	}
 
+	SourceServiceUserContext struct {
+		User            *portainer.User
+		UserMemberships []portainer.TeamMembership
+	}
+
 	// SourceService represents a service for managing GitOps source data
 	SourceService interface {
-		BaseCRUD[portainer.Source, portainer.SourceID]
+		Create(context *SourceServiceUserContext, source *portainer.Source) error
+		Read(context *SourceServiceUserContext, ID portainer.SourceID) (*portainer.Source, error)
+		Exists(context *SourceServiceUserContext, ID portainer.SourceID) (bool, error)
+		ReadAll(context *SourceServiceUserContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error)
+		Update(context *SourceServiceUserContext, ID portainer.SourceID, source *portainer.Source) error
+		Delete(context *SourceServiceUserContext, ID portainer.SourceID) error
+		FindOrCreateGitSource(context *SourceServiceUserContext, source *portainer.Source) (*portainer.Source, error)
 	}
 
 	// StackService represents a service for managing stack data

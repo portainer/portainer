@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
@@ -36,30 +37,23 @@ func TestStackUpdateGitWebhookUniqueness(t *testing.T) {
 	const stack1ID = portainer.StackID(456)
 	const stack2ID = portainer.StackID(457)
 
-	src1 := &portainer.Source{
+	sharedSrc := &portainer.Source{
 		Type: portainer.SourceTypeGit,
 		Git:  &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
 	}
-	err = store.Source().Create(src1)
+	err = store.Source().Create(source.InsecureNewAdminContext(), sharedSrc)
 	require.NoError(t, err)
 
 	wf1 := &portainer.Workflow{Artifacts: []portainer.Artifact{{
 		StackID: stack1ID,
-		Files:   []portainer.ArtifactFile{{SourceID: src1.ID}},
+		Files:   []portainer.ArtifactFile{{SourceID: sharedSrc.ID}},
 	}}}
 	err = store.Workflow().Create(wf1)
 	require.NoError(t, err)
 
-	src2 := &portainer.Source{
-		Type: portainer.SourceTypeGit,
-		Git:  &gittypes.RepoConfig{URL: "https://github.com/portainer/portainer.git"},
-	}
-	err = store.Source().Create(src2)
-	require.NoError(t, err)
-
 	wf2 := &portainer.Workflow{Artifacts: []portainer.Artifact{{
 		StackID: stack2ID,
-		Files:   []portainer.ArtifactFile{{SourceID: src2.ID}},
+		Files:   []portainer.ArtifactFile{{SourceID: sharedSrc.ID}},
 	}}}
 	err = store.Workflow().Create(wf2)
 	require.NoError(t, err)
@@ -99,7 +93,11 @@ func TestStackUpdateGitWebhookUniqueness(t *testing.T) {
 	url := "/stacks/" + strconv.Itoa(int(stack2.ID)) + "/git?endpointId=" + strconv.Itoa(int(endpoint.ID))
 	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(jsonPayload))
 
-	rrc := &security.RestrictedRequestContext{}
+	rrc := &security.RestrictedRequestContext{
+		IsAdmin: true,
+		UserID:  1,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}
 	req = req.WithContext(security.StoreRestrictedRequestContext(req, rrc))
 
 	rr := httptest.NewRecorder()

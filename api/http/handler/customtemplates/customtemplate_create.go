@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/sources"
@@ -32,9 +33,9 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	customTemplate, err := handler.createCustomTemplate(method, r)
@@ -42,16 +43,16 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
-	customTemplate.CreatedByUserID = tokenData.ID
+	customTemplate.CreatedByUserID = securityContext.UserID
 
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		return createCustomTemplateTx(tx, customTemplate, tokenData.ID)
+		return createCustomTemplateTx(tx, customTemplate, securityContext)
 	})
 
 	return response.TxResponse(w, customTemplate, err)
 }
 
-func createCustomTemplateTx(tx dataservices.DataStoreTx, customTemplate *portainer.CustomTemplate, userID portainer.UserID) error {
+func createCustomTemplateTx(tx dataservices.DataStoreTx, customTemplate *portainer.CustomTemplate, sc *security.RestrictedRequestContext) error {
 	existingTemplates, err := tx.CustomTemplate().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
@@ -67,14 +68,16 @@ func createCustomTemplateTx(tx dataservices.DataStoreTx, customTemplate *portain
 		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
-	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, userID)
+	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, sc.UserID)
 
 	if err := tx.ResourceControl().Create(resourceControl); err != nil {
 		return httperror.InternalServerError("Unable to persist resource control inside the database", err)
 	}
 
 	customTemplate.ResourceControl = resourceControl
-	populateGitConfig(tx, customTemplate)
+
+	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
+	populateGitConfig(tx, userContext, customTemplate)
 
 	return nil
 }
@@ -282,6 +285,11 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		return nil, err
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
 		ID:              portainer.CustomTemplateID(customTemplateID),
@@ -302,7 +310,9 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
 
-	gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, sources.RepoConfigInput{
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
+	gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, userContext, sources.RepoConfigInput{
 		SourceID:                 payload.SourceID,
 		ReferenceName:            payload.RepositoryReferenceName,
 		ConfigFilePath:           payload.ComposeFilePathInRepository,
@@ -327,7 +337,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	sourceID := payload.SourceID
 	if sourceID == 0 {
-		src, err := workflows.FindOrCreateGitSource(handler.DataStore, &portainer.Source{
+		src, err := workflows.FindOrCreateGitSource(handler.DataStore, userContext, &portainer.Source{
 			Name: gittypes.RepoName(gitConfig.URL),
 			Type: portainer.SourceTypeGit,
 			Git: &gittypes.RepoConfig{

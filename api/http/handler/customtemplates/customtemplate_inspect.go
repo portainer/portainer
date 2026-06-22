@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -70,7 +71,8 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 			return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 		}
 
-		populateGitConfig(tx, customTemplate)
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		populateGitConfig(tx, userContext, customTemplate)
 
 		return nil
 	})

@@ -23,6 +23,7 @@ func buildSummaryReq(t *testing.T, userID portainer.UserID, role portainer.UserR
 	ctx = security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
 		UserID:  userID,
 		IsAdmin: security.IsAdminRole(role),
+		User:    &portainer.User{ID: userID, Role: role},
 	})
 	return req.WithContext(ctx)
 }

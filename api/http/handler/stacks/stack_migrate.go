@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -172,11 +174,17 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		}
 	}
 
-	if err := fillStackGitConfig(handler.DataStore, stack); err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
-	}
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 
-	return response.JSON(w, stack)
+		if err := fillStackGitConfig(tx, userContext, stack); err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+
+		return nil
+	})
+
+	return response.TxResponse(w, stack, err)
 }
 
 func (handler *Handler) migrateStack(r *http.Request, stack *portainer.Stack, next *portainer.Endpoint) *httperror.HandlerError {

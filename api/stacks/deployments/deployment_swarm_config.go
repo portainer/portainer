@@ -76,7 +76,7 @@ func (config *SwarmStackDeploymentConfig) Deploy(ctx context.Context) error {
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {
-		return config.StackDeployer.DeployRemoteSwarmStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
+		return config.StackDeployer.DeployRemoteSwarmStack(ctx, config.user.ID, config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
 	}
 
 	return config.StackDeployer.DeploySwarmStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.pullImage)

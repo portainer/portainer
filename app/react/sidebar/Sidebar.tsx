@@ -71,7 +71,7 @@ function InnerSidebar() {
 
             <EnvironmentSidebar />
 
-            <AppDeliverySidebar isAdmin={isAdmin} />
+            <AppDeliverySidebar />
 
             {isAdmin && <EdgeComputeSidebar />}
 

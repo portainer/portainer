@@ -2,6 +2,7 @@ package sources
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/pkg/fips"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -23,14 +24,14 @@ type RepoConfigInput struct {
 }
 
 // ResolveRepoConfig builds a RepoConfig from either a SourceID or inline URL/auth fields.
-func ResolveRepoConfig(tx gitSourceStore, input RepoConfigInput) (gittypes.RepoConfig, *httperror.HandlerError) {
+func ResolveRepoConfig(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, input RepoConfigInput) (gittypes.RepoConfig, *httperror.HandlerError) {
 	cfg := gittypes.RepoConfig{
 		ReferenceName:  input.ReferenceName,
 		ConfigFilePath: input.ConfigFilePath,
 	}
 
 	if input.SourceID != 0 {
-		src, httpErr := ValidateGitSourceAccess(tx, input.SourceID)
+		src, httpErr := ValidateGitSourceAccess(tx, userContext, input.SourceID)
 		if httpErr != nil {
 			return gittypes.RepoConfig{}, httpErr
 		}

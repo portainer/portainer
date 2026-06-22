@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -91,7 +92,8 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		}
 	}
 
-	resp, err := newStackResponse(handler.DataStore, stack)
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+	resp, err := newStackResponse(handler.DataStore, userContext, stack)
 	if err != nil {
 		return httperror.InternalServerError("Unable to load git config for stack", err)
 	}

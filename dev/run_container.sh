@@ -19,4 +19,7 @@ docker run -d \
   -e CSP=false \
   --name portainer \
   portainer/base \
-  /app/portainer $PORTAINER_FLAGS
+  /app/portainer \
+  --log-level=DEBUG \
+  --no-setup-token \
+  $PORTAINER_FLAGS

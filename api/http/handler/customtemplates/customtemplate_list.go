@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/slicesx"
@@ -37,47 +39,54 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 
 	edge := retrieveEdgeParam(r)
 
-	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
-	}
-
-	resourceControls, err := handler.DataStore.ResourceControl().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
-	}
-
-	customTemplates = authorization.DecorateCustomTemplates(customTemplates, resourceControls)
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	if !securityContext.IsAdmin {
-		user, err := handler.DataStore.User().Read(securityContext.UserID)
+	var customTemplates []portainer.CustomTemplate
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		customTemplates, err = tx.CustomTemplate().ReadAll()
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
+			return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 		}
 
-		userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
+		resourceControls, err := tx.ResourceControl().ReadAll()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
+		}
 
-		customTemplates = authorization.FilterAuthorizedCustomTemplates(customTemplates, user, userTeamIDs)
-	}
+		customTemplates = authorization.DecorateCustomTemplates(customTemplates, resourceControls)
 
-	customTemplates = filterByType(customTemplates, templateTypes)
+		if !securityContext.IsAdmin {
+			user, err := tx.User().Read(securityContext.UserID)
+			if err != nil {
+				return httperror.InternalServerError("Unable to retrieve user information from the database", err)
+			}
 
-	if edge != nil {
-		customTemplates = slicesx.FilterInPlace(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
-			return customTemplate.EdgeTemplate == *edge
-		})
-	}
+			userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
 
-	for i := range customTemplates {
-		populateGitConfig(handler.DataStore, &customTemplates[i])
-	}
+			customTemplates = authorization.FilterAuthorizedCustomTemplates(customTemplates, user, userTeamIDs)
+		}
 
-	return response.JSON(w, customTemplates)
+		customTemplates = filterByType(customTemplates, templateTypes)
+
+		if edge != nil {
+			customTemplates = slicesx.FilterInPlace(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
+				return customTemplate.EdgeTemplate == *edge
+			})
+		}
+
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		for i := range customTemplates {
+			populateGitConfig(tx, userContext, &customTemplates[i])
+		}
+
+		return nil
+	})
+
+	return response.TxResponse(w, customTemplates, err)
 }
 
 func retrieveEdgeParam(r *http.Request) *bool {

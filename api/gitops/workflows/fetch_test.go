@@ -15,7 +15,11 @@ import (
 )
 
 func adminContext() *security.RestrictedRequestContext {
-	return &security.RestrictedRequestContext{IsAdmin: true, UserID: 1}
+	return &security.RestrictedRequestContext{
+		IsAdmin: true,
+		UserID:  1,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}
 }
 
 func mustCreateGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portainer.Stack) {
@@ -24,7 +28,7 @@ func mustCreateGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *por
 	cfg := stack.GitConfig
 
 	src := &portainer.Source{Type: portainer.SourceTypeGit, Git: cfg}
-	require.NoError(t, tx.Source().Create(src))
+	require.NoError(t, tx.Source().Create(adminUserContext, src))
 
 	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
 		StackID: stack.ID,
@@ -199,8 +203,8 @@ func TestFetchSourceStats_ReturnsAllSources(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, false, true)
 
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		require.NoError(t, tx.Source().Create(&portainer.Source{Name: "source-1", Type: portainer.SourceTypeGit}))
-		require.NoError(t, tx.Source().Create(&portainer.Source{Name: "source-2", Type: portainer.SourceTypeGit}))
+		require.NoError(t, tx.Source().Create(adminUserContext, &portainer.Source{Name: "source-1", Type: portainer.SourceTypeGit, Git: &gittypes.RepoConfig{URL: "http://github.com/org/repo1"}}))
+		require.NoError(t, tx.Source().Create(adminUserContext, &portainer.Source{Name: "source-2", Type: portainer.SourceTypeGit, Git: &gittypes.RepoConfig{URL: "http://github.com/org/repo2"}}))
 
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
 	}))
@@ -223,8 +227,8 @@ func TestFetchSourceStats_TracksWorkflowCountAndEndpoints(t *testing.T) {
 	var srcID portainer.SourceID
 
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		src := &portainer.Source{Name: "shared", Type: portainer.SourceTypeGit}
-		require.NoError(t, tx.Source().Create(src))
+		src := &portainer.Source{Name: "shared", Type: portainer.SourceTypeGit, Git: &gittypes.RepoConfig{URL: "http://github.com/org/repo"}}
+		require.NoError(t, tx.Source().Create(adminUserContext, src))
 		srcID = src.ID
 
 		for i := 1; i <= 2; i++ {
@@ -261,8 +265,8 @@ func TestFetchSourceStats_UnusedSourceHasZeroStats(t *testing.T) {
 	var unusedID portainer.SourceID
 
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		src := &portainer.Source{Name: "unused", Type: portainer.SourceTypeGit}
-		require.NoError(t, tx.Source().Create(src))
+		src := &portainer.Source{Name: "unused", Type: portainer.SourceTypeGit, Git: &gittypes.RepoConfig{URL: "http://github.com/org/repo"}}
+		require.NoError(t, tx.Source().Create(adminUserContext, src))
 		unusedID = src.ID
 
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})

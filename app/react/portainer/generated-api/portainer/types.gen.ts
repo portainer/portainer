@@ -4603,6 +4603,7 @@ export type SourcesSourceType =
   (typeof SourcesSourceType)[keyof typeof SourcesSourceType];
 
 export type SourcesSourceDetail = {
+  access?: SourcesSourceAccess;
   autoUpdate?: SourcesAutoUpdateInfo;
   connection: SourcesConnectionInfo;
   environments?: number;
@@ -4620,6 +4621,18 @@ export type SourcesSourceDetail = {
 export type SourcesAutoUpdateInfo = {
   fetchInterval?: string;
   mechanism?: string;
+};
+
+export type SourcesSourceAccess = {
+  public?: boolean;
+  teams?: Array<number>;
+  users?: Array<number>;
+};
+
+export type SourcesSourceAccessUpdatePayload = {
+  public?: boolean;
+  teams?: Array<number>;
+  users?: Array<number>;
 };
 
 export type SourcesSource = {
@@ -4648,10 +4661,14 @@ export type SourcesGitAuthenticationUpdatePayload = {
 };
 
 export type SourcesGitSourceCreatePayload = {
+  administratorsOnly?: boolean;
   authentication?: SourcesGitAuthenticationPayload;
   name?: string;
+  public?: boolean;
+  teamAccesses?: Array<number>;
   tlsSkipVerify?: boolean;
   url: string;
+  userAccesses?: Array<number>;
 };
 
 export type SourcesGitAuthenticationPayload = {
@@ -5860,13 +5877,18 @@ export type PortainerSourceType =
   (typeof PortainerSourceType)[keyof typeof PortainerSourceType];
 
 export type PortainerSource = {
+  administratorsOnly?: boolean;
   git?: GittypesRepoConfig;
   helm?: PortainerHelmConfig;
   id?: number;
   lastSync?: number;
   name?: string;
+  ownerID?: number;
+  public?: boolean;
   registry?: PortainerRegistry;
+  teamAccesses?: Array<number>;
   type?: PortainerSourceType;
+  userAccesses?: Array<number>;
 };
 
 export type PortainerRegistryManagementConfiguration = {
@@ -11483,6 +11505,50 @@ export type GitOpsSourcesUpdateGitResponses = {
 
 export type GitOpsSourcesUpdateGitResponse =
   GitOpsSourcesUpdateGitResponses[keyof GitOpsSourcesUpdateGitResponses];
+
+export type GitOpsSourcesUpdateAccessData = {
+  /**
+   * Source access control
+   */
+  body: SourcesSourceAccessUpdatePayload;
+  path: {
+    /**
+     * Source identifier
+     */
+    id: number;
+  };
+  query?: never;
+  url: '/gitops/sources/{id}/access';
+};
+
+export type GitOpsSourcesUpdateAccessErrors = {
+  /**
+   * Invalid request payload
+   */
+  400: unknown;
+  /**
+   * Access denied
+   */
+  403: unknown;
+  /**
+   * Source not found
+   */
+  404: unknown;
+  /**
+   * Server error
+   */
+  500: unknown;
+};
+
+export type GitOpsSourcesUpdateAccessResponses = {
+  /**
+   * OK
+   */
+  200: PortainerSource;
+};
+
+export type GitOpsSourcesUpdateAccessResponse =
+  GitOpsSourcesUpdateAccessResponses[keyof GitOpsSourcesUpdateAccessResponses];
 
 export type GitOpsSourcesTestByIdData = {
   /**

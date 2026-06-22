@@ -153,7 +153,7 @@ func TestCustomTemplateFile_GitTemplate(t *testing.T) {
 			Type: portainer.SourceTypeGit,
 			Git:  &gittypes.RepoConfig{URL: "https://github.com/example/repo"},
 		}
-		err := tx.Source().Create(src)
+		err := tx.Source().Create(adminUserContext, src)
 		require.NoError(t, err)
 
 		path, err := fs.StoreCustomTemplateFileFromBytes("10", configFilePath, []byte(templateContent))

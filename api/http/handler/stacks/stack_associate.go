@@ -7,6 +7,8 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -120,9 +122,13 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 
 	stack.ResourceControl = resourceControl
 
-	if err := fillStackGitConfig(handler.DataStore, stack); err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
-	}
+	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		if err := fillStackGitConfig(tx, userContext, stack); err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+		return nil
+	})
 
-	return response.JSON(w, stack)
+	return response.TxResponse(w, stack, err)
 }

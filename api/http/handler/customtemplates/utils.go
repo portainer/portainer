@@ -8,14 +8,14 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-func populateGitConfig(tx dataservices.DataStoreTx, template *portainer.CustomTemplate) {
+func populateGitConfig(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, template *portainer.CustomTemplate) {
 	if template.Artifact == nil || len(template.Artifact.Files) == 0 {
 		return
 	}
 
 	file := template.Artifact.Files[0]
 
-	src, err := tx.Source().Read(file.SourceID)
+	src, err := tx.Source().Read(userContext, file.SourceID)
 	if err != nil || src.Git == nil {
 		return
 	}

@@ -7,7 +7,10 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -49,9 +52,23 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 
 	file := customTemplate.Artifact.Files[0]
 
-	src, err := handler.DataStore.Source().Read(file.SourceID)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve git source for custom template", err)
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	var src *portainer.Source
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		src, err = tx.Source().Read(userContext, file.SourceID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve git source for custom template", err)
+		}
+		return nil
+	}); err != nil {
+		return response.TxErrorResponse(err)
 	}
 
 	if src.Git == nil {

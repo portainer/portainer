@@ -174,7 +174,7 @@ func TestInspectHandler_GitConfigPopulatedFromSource(t *testing.T) {
 				TLSSkipVerify: true,
 			},
 		}
-		err := tx.Source().Create(src)
+		err := tx.Source().Create(adminUserContext, src)
 		require.NoError(t, err)
 
 		srcID = src.ID
@@ -194,7 +194,7 @@ func TestInspectHandler_GitConfigPopulatedFromSource(t *testing.T) {
 
 	r := httptest.NewRequest(http.MethodGet, "/custom_templates/10", nil)
 	r = mux.SetURLVars(r, map[string]string{"id": "10"})
-	ctx := security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
+	ctx := security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true, User: &portainer.User{ID: 1, Role: portainer.AdministratorRole}})
 	r = r.WithContext(ctx)
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateInspect(rr, r)

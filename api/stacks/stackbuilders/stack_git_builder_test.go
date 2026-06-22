@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/workflows"
@@ -12,6 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var adminUserContext = source.InsecureNewAdminContext()
 
 // stubFileService satisfies portainer.FileService for git builder tests.
 type stubFileService struct {
@@ -25,7 +28,7 @@ func (s *stubFileService) GetStackProjectPath(stackIdentifier string) string {
 func newGitMethodBuilder(t *testing.T, commitHash string) *GitMethodStackBuilder {
 	t.Helper()
 	_, store := datastore.MustNewTestStore(t, false, false)
-	require.NoError(t, store.User().Create(&portainer.User{ID: 1, Username: "testuser"}))
+	require.NoError(t, store.User().Create(&portainer.User{ID: 1, Username: "testuser", Role: portainer.AdministratorRole}))
 	return &GitMethodStackBuilder{
 		StackBuilder: StackBuilder{
 			stack:       &portainer.Stack{},
@@ -52,7 +55,7 @@ func TestGitMethodStackBuilder_WithSourceID_ReferencesExistingSource(t *testing.
 			},
 		},
 	}
-	require.NoError(t, builder.dataStore.Source().Create(src))
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, src))
 
 	payload := &StackPayload{
 		RepositoryConfigPayload: RepositoryConfigPayload{
@@ -69,12 +72,12 @@ func TestGitMethodStackBuilder_WithSourceID_ReferencesExistingSource(t *testing.
 	assert.Equal(t, src.ID, referencedSourceID)
 
 	// Only one Source exists — no duplicate was created.
-	allSources, err := builder.dataStore.Source().ReadAll()
+	allSources, err := builder.dataStore.Source().ReadAll(adminUserContext)
 	require.NoError(t, err)
 	assert.Len(t, allSources, 1)
 
 	// The merged git config picks up the Source URL/auth.
-	readSrc, artifact, err := workflows.GitSourceAndArtifactForStack(builder.dataStore, builder.stack.WorkflowID, builder.stack.ID)
+	readSrc, artifact, err := workflows.GitSourceAndArtifactForStack(builder.dataStore, adminUserContext, builder.stack.WorkflowID, builder.stack.ID)
 	require.NoError(t, err)
 	merged := workflows.MergeSourceAndFile(readSrc, artifact)
 	assert.Equal(t, "https://github.com/org/private-repo", merged.URL)
@@ -114,7 +117,7 @@ func TestGitMethodStackBuilder_WithoutSourceID_InlinePathStillWorks(t *testing.T
 	require.NoError(t, err)
 
 	// A Source was created via the inline path.
-	allSources, err := builder.dataStore.Source().ReadAll()
+	allSources, err := builder.dataStore.Source().ReadAll(adminUserContext)
 	require.NoError(t, err)
 	assert.Len(t, allSources, 1)
 	assert.Equal(t, "https://github.com/org/public-repo", allSources[0].Git.URL)

@@ -7,6 +7,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -108,7 +109,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		stack.AutoUpdate.JobID = ""
 	}
 
-	stopErr := handler.stopStack(r.Context(), stack, endpoint)
+	stopErr := handler.stopStack(r.Context(), securityContext.UserID, stack, endpoint)
 	if stopErr != nil {
 		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			stackutils.UpdateStackStatusFromUndeploymentResult(stack, stopErr)
@@ -120,27 +121,29 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to stop stack", stopErr)
 	}
 
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		stackutils.UpdateStackStatusFromUndeploymentResult(stack, nil)
-		return tx.Stack().Update(stack.ID, stack)
-	}); err != nil {
-		return httperror.InternalServerError("Unable to update stack status", err)
-	}
+		if err := tx.Stack().Update(stack.ID, stack); err != nil {
+			return httperror.InternalServerError("Unable to update stack status", err)
+		}
 
-	if err := fillStackGitConfig(handler.DataStore, stack); err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
-	}
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		if err := fillStackGitConfig(tx, userContext, stack); err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+		return nil
+	})
 
-	return response.JSON(w, stack)
+	return response.TxResponse(w, stack, err)
 }
 
-func (handler *Handler) stopStack(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (handler *Handler) stopStack(ctx context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.StopRemoteComposeStack(ctx, stack, endpoint)
+			return handler.StackDeployer.StopRemoteComposeStack(ctx, userId, stack, endpoint)
 		}
 
 		return handler.StackDeployer.UndeployComposeStack(ctx, stack, endpoint)
@@ -148,7 +151,7 @@ func (handler *Handler) stopStack(ctx context.Context, stack *portainer.Stack, e
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.StopRemoteSwarmStack(ctx, stack, endpoint)
+			return handler.StackDeployer.StopRemoteSwarmStack(ctx, userId, stack, endpoint)
 		}
 
 		return handler.SwarmStackManager.Remove(ctx, stack, endpoint)

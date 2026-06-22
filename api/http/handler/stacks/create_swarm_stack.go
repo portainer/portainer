@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/sources"
 	"github.com/portainer/portainer/api/http/security"
@@ -218,15 +219,15 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		}
 	}
 
-	if payload.SourceID != 0 {
-		if _, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, payload.SourceID); httpErr != nil {
-			return httpErr
-		}
-	}
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
+	}
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+	if payload.SourceID != 0 {
+		if _, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, userContext, payload.SourceID); httpErr != nil {
+			return httpErr
+		}
 	}
 
 	stackPayload := createStackPayloadFromSwarmGitPayload(payload.Name,

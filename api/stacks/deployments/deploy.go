@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/agent"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
@@ -121,7 +122,17 @@ func redeployWhenChangedSecondStage(
 	user *portainer.User,
 	endpoint *portainer.Endpoint,
 ) error {
-	gitSrc, file, err := workflows.GitSourceAndArtifactForStack(datastore, stack.WorkflowID, stack.ID)
+	var teamMemberships []portainer.TeamMembership
+	if err := datastore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		teamMemberships, err = tx.TeamMembership().TeamMembershipsByUserID(user.ID)
+		return err
+	}); err != nil {
+		return err
+	}
+
+	userContext := source.NewUserContext(user, teamMemberships)
+	gitSrc, file, err := workflows.GitSourceAndArtifactForStack(datastore, userContext, stack.WorkflowID, stack.ID)
 	if err != nil {
 		return errors.WithMessagef(err, "failed to load git config for stack %v", stack.ID)
 	}
@@ -184,7 +195,7 @@ func redeployWhenChangedSecondStage(
 		switch stack.Type {
 		case portainer.DockerComposeStack:
 			if stackutils.IsRelativePathStack(stack) {
-				err = deployer.DeployRemoteComposeStack(ctx, stack, endpoint, registries, true, true, false)
+				err = deployer.DeployRemoteComposeStack(ctx, user.ID, stack, endpoint, registries, true, true, false)
 			} else {
 				err = deployer.DeployComposeStack(ctx, stack, endpoint, registries, true, true, false)
 			}
@@ -194,7 +205,7 @@ func redeployWhenChangedSecondStage(
 			}
 		case portainer.DockerSwarmStack:
 			if stackutils.IsRelativePathStack(stack) {
-				err = deployer.DeployRemoteSwarmStack(ctx, stack, endpoint, registries, true, true)
+				err = deployer.DeployRemoteSwarmStack(ctx, user.ID, stack, endpoint, registries, true, true)
 			} else {
 				err = deployer.DeploySwarmStack(ctx, stack, endpoint, registries, true, true)
 			}

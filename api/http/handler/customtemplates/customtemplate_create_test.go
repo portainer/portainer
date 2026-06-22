@@ -30,7 +30,14 @@ func createTemplateRequest(t *testing.T, method string, payload any, userID port
 	r.Header.Set("Content-Type", "application/json")
 	r = mux.SetURLVars(r, map[string]string{"method": method})
 
-	return r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: userID, Role: role}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: userID, Role: role})
+	r = r.WithContext(ctx)
+	ctx = security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  userID,
+		IsAdmin: role == portainer.AdministratorRole,
+		User:    &portainer.User{ID: userID, Role: role},
+	})
+	return r.WithContext(ctx)
 }
 
 func TestCustomTemplateCreate_FromFileContent_Success(t *testing.T) {
@@ -272,7 +279,13 @@ func TestCustomTemplateCreate_FromFileUpload_Success(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -461,7 +474,13 @@ func TestCustomTemplateCreate_FromFileUpload_MissingTitle(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -497,7 +516,13 @@ func TestCustomTemplateCreate_FromFileUpload_MissingDescription(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -530,7 +555,13 @@ func TestCustomTemplateCreate_FromFileUpload_MissingFile(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -569,7 +600,13 @@ func TestCustomTemplateCreate_FromFileUpload_InvalidType(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -608,7 +645,13 @@ func TestCustomTemplateCreate_FromFileUpload_InvalidPlatform(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -650,7 +693,13 @@ func TestCustomTemplateCreate_FromFileUpload_NoteWithImage(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -689,7 +738,13 @@ func TestCustomTemplateCreate_FromFileUpload_KubernetesIgnoresPlatform(t *testin
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -748,7 +803,13 @@ func TestCustomTemplateCreate_FromFileUpload_Variables(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -804,7 +865,13 @@ func TestCustomTemplateCreate_FromFileUpload_InvalidVariables(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/custom_templates/create/file", &body)
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 	r = mux.SetURLVars(r, map[string]string{"method": "file"})
-	r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole}))
+	ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+	r = r.WithContext(ctx)
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{
+		UserID:  1,
+		IsAdmin: true,
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+	}))
 
 	rr := httptest.NewRecorder()
 	herr := handler.customTemplateCreate(rr, r)
@@ -866,7 +933,7 @@ func TestCustomTemplateCreate_FromRepository_Success(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, stored.Artifact)
 
-		src, err := tx.Source().Read(stored.Artifact.Files[0].SourceID)
+		src, err := tx.Source().Read(adminUserContext, stored.Artifact.Files[0].SourceID)
 		require.NoError(t, err)
 		require.Equal(t, portainer.SourceTypeGit, src.Type)
 		require.Equal(t, "https://github.com/example/repo", src.Git.URL)
@@ -903,7 +970,7 @@ func TestCustomTemplateCreate_FromRepository_DeduplicatesSource(t *testing.T) {
 	require.Nil(t, herr)
 
 	err := ds.ViewTx(func(tx dataservices.DataStoreTx) error {
-		sources, err := tx.Source().ReadAll()
+		sources, err := tx.Source().ReadAll(adminUserContext)
 		require.NoError(t, err)
 		require.Len(t, sources, 1, "two templates with the same URL must share one Source")
 
@@ -1052,7 +1119,7 @@ func TestCustomTemplateCreate_FromRepository_WithSourceID_Success(t *testing.T) 
 				URL: "https://github.com/example/repo",
 			},
 		}
-		err := tx.Source().Create(src)
+		err := tx.Source().Create(adminUserContext, src)
 		require.NoError(t, err)
 		srcID = src.ID
 		return nil

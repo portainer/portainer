@@ -1223,7 +1223,14 @@ export const zSourcesAutoUpdateInfo = z.object({
   mechanism: z.string().optional(),
 });
 
+export const zSourcesSourceAccess = z.object({
+  public: z.boolean().optional(),
+  teams: z.array(z.int()).optional(),
+  users: z.array(z.int()).optional(),
+});
+
 export const zSourcesSourceDetail = z.object({
+  access: zSourcesSourceAccess.optional(),
   autoUpdate: zSourcesAutoUpdateInfo.optional(),
   connection: zSourcesConnectionInfo,
   environments: z.int().optional(),
@@ -1236,6 +1243,12 @@ export const zSourcesSourceDetail = z.object({
   url: z.string(),
   usedBy: z.int().optional(),
   workflows: z.array(zWorkflowsWorkflow).optional(),
+});
+
+export const zSourcesSourceAccessUpdatePayload = z.object({
+  public: z.boolean().optional(),
+  teams: z.array(z.int()).optional(),
+  users: z.array(z.int()).optional(),
 });
 
 export const zSourcesSource = z.object({
@@ -1269,10 +1282,14 @@ export const zSourcesGitAuthenticationPayload = z.object({
 });
 
 export const zSourcesGitSourceCreatePayload = z.object({
+  administratorsOnly: z.boolean().optional(),
   authentication: zSourcesGitAuthenticationPayload.optional(),
   name: z.string().optional(),
+  public: z.boolean().optional(),
+  teamAccesses: z.array(z.int()).optional(),
   tlsSkipVerify: z.boolean().optional(),
   url: z.string(),
+  userAccesses: z.array(z.int()).optional(),
 });
 
 export const zSourcesConnectionTestResult = z.object({
@@ -1817,13 +1834,18 @@ export const zPortainerHelmConfig = z.object({
 });
 
 export const zPortainerSource = z.object({
+  administratorsOnly: z.boolean().optional(),
   git: zGittypesRepoConfig.optional(),
   helm: zPortainerHelmConfig.optional(),
   id: z.int().optional(),
   lastSync: z.int().optional(),
   name: z.string().optional(),
+  ownerID: z.int().optional(),
+  public: z.boolean().optional(),
   registry: zPortainerRegistry.optional(),
+  teamAccesses: z.array(z.int()).optional(),
   type: zPortainerSourceType.optional(),
+  userAccesses: z.array(z.int()).optional(),
 });
 
 export const zPortainerEdge = z.object({
@@ -4086,6 +4108,20 @@ export const zGitOpsSourcesUpdateGitPath = z.object({
  * OK
  */
 export const zGitOpsSourcesUpdateGitResponse = zPortainerSource;
+
+/**
+ * Source access control
+ */
+export const zGitOpsSourcesUpdateAccessBody = zSourcesSourceAccessUpdatePayload;
+
+export const zGitOpsSourcesUpdateAccessPath = z.object({
+  id: z.int(),
+});
+
+/**
+ * OK
+ */
+export const zGitOpsSourcesUpdateAccessResponse = zPortainerSource;
 
 /**
  * Optional connection overrides; omitted fields fall back to stored values

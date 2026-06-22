@@ -19,7 +19,8 @@ interface Props {
   isPublicVisible?: boolean;
   errors?: FormikErrors<AccessControlFormData>;
   formNamespace?: string;
-  environmentId: EnvironmentId;
+  resourceName?: string;
+  environmentId?: EnvironmentId;
 }
 
 export function EditDetails({
@@ -28,6 +29,7 @@ export function EditDetails({
   isPublicVisible = false,
   errors,
   formNamespace,
+  resourceName = 'resource',
   environmentId,
 }: Props) {
   const { user, isPureAdmin } = useCurrentUser();
@@ -60,6 +62,7 @@ export function EditDetails({
         isAdmin={isPureAdmin}
         isPublicVisible={isPublicVisible}
         teams={teams}
+        resourceName={resourceName}
       />
 
       {values.ownership === ResourceControlOwnership.RESTRICTED && (

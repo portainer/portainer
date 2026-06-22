@@ -27,6 +27,14 @@ func updateTemplateRequest(t *testing.T, templateID string, payload any, ctx *se
 	r.Header.Set("Content-Type", "application/json")
 	r = mux.SetURLVars(r, map[string]string{"id": templateID})
 
+	if ctx.User == nil {
+		role := portainer.StandardUserRole
+		if ctx.IsAdmin {
+			role = portainer.AdministratorRole
+		}
+		ctx.User = &portainer.User{ID: ctx.UserID, Role: role}
+	}
+
 	return r.WithContext(security.StoreRestrictedRequestContext(r, ctx))
 }
 
@@ -476,7 +484,7 @@ func TestCustomTemplateUpdate_WithSourceID_Success(t *testing.T) {
 				URL: "https://github.com/example/repo",
 			},
 		}
-		err := tx.Source().Create(src)
+		err := tx.Source().Create(adminUserContext, src)
 		require.NoError(t, err)
 		srcID = src.ID
 		return nil
@@ -630,7 +638,7 @@ func TestCustomTemplateUpdate_GitRepository_Success(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, stored.Artifact)
 
-		src, err := tx.Source().Read(stored.Artifact.Files[0].SourceID)
+		src, err := tx.Source().Read(adminUserContext, stored.Artifact.Files[0].SourceID)
 		require.NoError(t, err)
 		require.Equal(t, portainer.SourceTypeGit, src.Type)
 		require.Equal(t, "https://github.com/example/repo", src.Git.URL)

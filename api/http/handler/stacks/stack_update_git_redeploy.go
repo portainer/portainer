@@ -8,7 +8,9 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/git"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -68,27 +70,41 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	stack, err := handler.DataStore.Stack().Read(portainer.StackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
-	}
-
-	if stack.WorkflowID == 0 {
-		return httperror.BadRequest("Stack is not created from git", errors.New("stack has no git workflow"))
-	}
-
-	gitConfig, sourceID, err := loadGitConfigForStack(handler.DataStore, stack.WorkflowID, stack.ID)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to load git config for stack", err)
-	}
-	if gitConfig == nil {
-		return httperror.BadRequest("Stack is not created from git", errors.New("stack source has no git config"))
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	if stack.Status == portainer.StackStatusDeploying {
-		return httperror.Conflict("Unable to update stack", errors.New("Stack deployment is already in progress"))
+	var stack *portainer.Stack
+	var gitConfig *gittypes.RepoConfig
+	var sourceID portainer.SourceID
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		stack, err = tx.Stack().Read(portainer.StackID(stackID))
+		if tx.IsErrObjectNotFound(err) {
+			return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
+		} else if err != nil {
+			return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
+		}
+
+		if stack.WorkflowID == 0 {
+			return httperror.BadRequest("Stack is not created from git", errors.New("stack has no git workflow"))
+		}
+
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		gitConfig, sourceID, err = loadGitConfigForStack(tx, userContext, stack.WorkflowID, stack.ID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+		if gitConfig == nil {
+			return httperror.BadRequest("Stack is not created from git", errors.New("stack source has no git config"))
+		}
+
+		if stack.Status == portainer.StackStatusDeploying {
+			return httperror.Conflict("Unable to update stack", errors.New("Stack deployment is already in progress"))
+		}
+		return nil
+	}); err != nil {
+		return response.TxErrorResponse(err)
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
@@ -111,11 +127,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	// Only check resource control when it is a DockerSwarmStack or a DockerComposeStack
@@ -254,11 +265,12 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return err
 		}
-		if err := saveStackGitConfig(tx, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
 			return err
 		}
 
-		return fillStackGitConfig(tx, stack)
+		return fillStackGitConfig(tx, userContext, stack)
 	}); err != nil {
 		deployGate.abortDeploy()
 

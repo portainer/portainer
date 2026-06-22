@@ -15,6 +15,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO: generate tests for UAC migrations
+
+var adminUserContext = source.InsecureNewAdminContext()
+
 func TestMigrateGitConfigToSources_2_43_0_GitStackMigrated(t *testing.T) {
 	t.Parallel()
 
@@ -61,7 +65,7 @@ func TestMigrateGitConfigToSources_2_43_0_GitStackMigrated(t *testing.T) {
 	require.Len(t, wf.Artifacts, 1)
 	require.Len(t, wf.Artifacts[0].Files, 1)
 
-	src, err := sourceSvc.Read(wf.Artifacts[0].Files[0].SourceID)
+	src, err := sourceSvc.Read(adminUserContext, wf.Artifacts[0].Files[0].SourceID)
 	require.NoError(t, err)
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.Equal(t, gitStack.GitConfig.URL, src.Git.URL)
@@ -105,7 +109,7 @@ func TestMigrateGitConfigToSources_2_43_0_NonGitStackUntouched(t *testing.T) {
 	require.Zero(t, result.WorkflowID)
 	require.Nil(t, result.GitConfig)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Empty(t, sources)
 
@@ -161,7 +165,7 @@ func TestMigrateGitConfigToSources_2_43_0_DuplicateSourcesDeduped(t *testing.T) 
 	err = m.migrateGitConfigToSources_2_43_0()
 	require.NoError(t, err)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Len(t, sources, 1, "two stacks with the same URL must share one Source")
 
@@ -215,7 +219,7 @@ func TestMigrateGitConfigToSources_2_43_0_Idempotent(t *testing.T) {
 	err = m.migrateGitConfigToSources_2_43_0()
 	require.NoError(t, err)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Len(t, sources, 1)
 
@@ -269,7 +273,7 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_GitTemplateMigrated(t *t
 	require.Equal(t, "docker-compose.yml", migrated.Artifact.Files[0].Path)
 	require.Equal(t, "abc123", migrated.Artifact.Files[0].Hash)
 
-	src, err := sourceSvc.Read(migrated.Artifact.Files[0].SourceID)
+	src, err := sourceSvc.Read(adminUserContext, migrated.Artifact.Files[0].SourceID)
 	require.NoError(t, err)
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.Equal(t, "https://github.com/example/repo", src.Git.URL)
@@ -308,7 +312,7 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_NonGitTemplateUntouched(
 	require.Nil(t, result.Artifact)
 	require.Nil(t, result.GitConfig)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Empty(t, sources)
 }
@@ -351,7 +355,7 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_AlreadyMigratedSkipped(t
 	err = m.migrateCustomTemplateGitConfigToSources_2_43_0()
 	require.NoError(t, err)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Empty(t, sources, "no new sources should be created for already-migrated templates")
 }
@@ -403,7 +407,7 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_DuplicateSourcesDeduped(
 	err = m.migrateCustomTemplateGitConfigToSources_2_43_0()
 	require.NoError(t, err)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Len(t, sources, 1, "two templates with the same URL must share one Source")
 
@@ -457,7 +461,7 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_Idempotent(t *testing.T)
 	err = m.migrateCustomTemplateGitConfigToSources_2_43_0()
 	require.NoError(t, err)
 
-	sources, err := sourceSvc.ReadAll()
+	sources, err := sourceSvc.ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Len(t, sources, 1)
 }

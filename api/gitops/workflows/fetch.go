@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -21,6 +22,8 @@ func FetchWorkflows(
 	endpointIDSet set.Set[portainer.EndpointID],
 ) ([]Workflow, error) {
 	gitConfigs := map[portainer.StackID]*gittypes.RepoConfig{}
+
+	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
 
 	stacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool {
 		return s.WorkflowID != 0 && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
@@ -50,7 +53,7 @@ func FetchWorkflows(
 		workflowIDSet.Add(stack.WorkflowID)
 	}
 
-	workflowMap, sourceMap, err := LoadWorkflowAndSourceMaps(tx, workflowIDSet)
+	workflowMap, sourceMap, err := LoadWorkflowAndSourceMaps(tx, userContext, workflowIDSet)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +116,9 @@ func FetchSourceStats(
 	k8sFactory *cli.ClientFactory,
 	sc *security.RestrictedRequestContext,
 ) ([]portainer.Source, map[portainer.SourceID]SourceStats, error) {
-	sources, err := tx.Source().ReadAll()
+	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
+
+	sources, err := tx.Source().ReadAll(userContext)
 	if err != nil {
 		return nil, nil, err
 	}
