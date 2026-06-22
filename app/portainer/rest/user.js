@@ -16,7 +16,17 @@ angular.module('portainer.app').factory('Users', [
         remove: { method: 'DELETE', params: { id: '@id' } },
         queryMemberships: { method: 'GET', isArray: true, params: { id: '@id', entity: 'memberships' } },
         checkAdminUser: { method: 'GET', params: { id: 'admin', entity: 'check' }, isArray: true, ignoreLoadingBar: true },
-        initAdminUser: { method: 'POST', params: { id: 'admin', entity: 'init' }, ignoreLoadingBar: true },
+        initAdminUser: {
+          method: 'POST',
+          params: { id: 'admin', entity: 'init' },
+          ignoreLoadingBar: true,
+          headers: { 'X-Setup-Token': (config) => config.data.setupToken },
+          transformRequest: (data) => {
+            // eslint-disable-next-line no-unused-vars
+            const { setupToken, ...payload } = data;
+            return angular.toJson(payload);
+          },
+        },
         getAccessTokens: { method: 'GET', params: { id: '@id', entity: 'tokens' }, isArray: true },
         deleteAccessToken: { url: `${API_ENDPOINT_USERS}/:id/tokens/:tokenId`, method: 'DELETE', params: { id: '@id', entityId: '@tokenId' } },
       }

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security/setuptoken"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -31,17 +32,23 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 // @id UserAdminInit
 // @summary Initialize administrator account
 // @description Initialize the 'admin' user account.
-// @description **Access policy**: public
+// @description **Access policy**: public (requires the X-Setup-Token header on an uninitialized instance unless --no-setup-token is set)
 // @tags users
 // @accept json
 // @produce json
+// @param X-Setup-Token header string false "Setup token (required when instance is uninitialized and --no-setup-token is not set)"
 // @param body body adminInitPayload true "User details"
 // @success 200 {object} portainer.User "Success"
 // @failure 400 "Invalid request"
+// @failure 403 "Access denied - invalid or missing setup token"
 // @failure 409 "Admin user already initialized"
 // @failure 500 "Server error"
 // @router /users/admin/init [post]
 func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	if err := setuptoken.Validate(r, handler.SetupToken); err != nil {
+		return err
+	}
+
 	var payload adminInitPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {

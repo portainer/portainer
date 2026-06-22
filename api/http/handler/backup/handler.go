@@ -22,6 +22,7 @@ type Handler struct {
 	filestorePath   string
 	shutdownTrigger context.CancelFunc
 	adminMonitor    *adminmonitor.Monitor
+	SetupToken      string
 }
 
 // NewHandler creates an new instance of backup handler

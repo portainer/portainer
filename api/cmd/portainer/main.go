@@ -29,6 +29,7 @@ import (
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security/setuptoken"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -228,6 +229,32 @@ func initSnapshotService(
 	}
 
 	return snapshotService, nil
+}
+
+func resolveSetupToken(tx dataservices.DataStoreTx, providedToken string) (string, error) {
+	admins, err := tx.User().UsersByRole(portainer.AdministratorRole)
+	if err != nil {
+		return "", err
+	}
+	if len(admins) > 0 {
+		return "", nil
+	}
+
+	if providedToken != "" {
+		log.Info().Msg("using custom setup token; admin initialization and backup restore require this token in the X-Setup-Token header")
+		return providedToken, nil
+	}
+
+	token, err := setuptoken.Generate()
+	if err != nil {
+		return "", err
+	}
+
+	log.Info().
+		Str("setup_token", token).
+		Msg("no administrator account configured; admin initialization and backup restore require this setup token in the X-Setup-Token header. Start with --no-setup-token to disable.")
+
+	return token, nil
 }
 
 func initStatus(instanceID string) *portainer.Status {
@@ -528,6 +555,17 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
+	setupToken := ""
+	if adminPasswordHash == "" && !*flags.NoSetupToken {
+		if err := dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var txErr error
+			setupToken, txErr = resolveSetupToken(tx, *flags.SetupToken)
+			return txErr
+		}); err != nil {
+			log.Fatal().Err(err).Msg("failed initializing setup token")
+		}
+	}
+
 	if err := reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService); err != nil {
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
@@ -617,6 +655,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		PlatformService:             platformService,
 		PullLimitCheckDisabled:      *flags.PullLimitCheckDisabled,
 		TrustedOrigins:              trustedOrigins,
+		SetupToken:                  setupToken,
 	}
 }
 

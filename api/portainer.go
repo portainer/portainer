@@ -144,6 +144,8 @@ type (
 		KubectlShellImageSet      bool
 		PullLimitCheckDisabled    *bool
 		TrustedOrigins            *string
+		NoSetupToken              *bool
+		SetupToken                *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -1943,6 +1945,10 @@ const (
 	CSPEnvVar = "CSP"
 	// CompactDBEnvVar is the environment variable used to enable/disable the startup compaction of the database
 	CompactDBEnvVar = "COMPACT_DB"
+	// NoSetupTokenEnvVar is the environment variable used to disable the setup token requirement on an uninitialized instance
+	NoSetupTokenEnvVar = "PORTAINER_NO_SETUP_TOKEN"
+	// SetupTokenEnvVar is the environment variable used to provide a custom setup token for admin initialization and restore on an uninitialized instance
+	SetupTokenEnvVar = "PORTAINER_SETUP_TOKEN"
 )
 
 // List of supported features

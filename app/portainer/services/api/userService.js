@@ -84,8 +84,8 @@ export function UserService($q, Users, TeamService) {
     return deferred.promise;
   };
 
-  service.initAdministrator = function (username, password) {
-    return Users.initAdminUser({ Username: username, Password: password }).$promise;
+  service.initAdministrator = function (username, password, setupToken) {
+    return Users.initAdminUser({ Username: username, Password: password, setupToken }).$promise;
   };
 
   service.administratorExists = function () {

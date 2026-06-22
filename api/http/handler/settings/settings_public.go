@@ -47,6 +47,8 @@ type publicSettingsResponse struct {
 	}
 
 	IsDockerDesktopExtension bool `json:"IsDockerDesktopExtension" example:"false"`
+	// Whether the setup wizard must send the X-Setup-Token header for admin init / restore
+	RequiresSetupToken bool `json:"RequiresSetupToken" example:"false"`
 }
 
 // @id SettingsPublic
@@ -65,6 +67,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 	}
 
 	publicSettings := generatePublicSettings(settings)
+	publicSettings.RequiresSetupToken = handler.SetupTokenRequired
 
 	return response.JSON(w, publicSettings)
 }

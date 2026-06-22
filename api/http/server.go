@@ -115,6 +115,7 @@ type Server struct {
 	PlatformService             platform.Service
 	PullLimitCheckDisabled      bool
 	TrustedOrigins              []string
+	SetupToken                  string
 }
 
 // Start starts the HTTP server
@@ -151,6 +152,7 @@ func (server *Server) Start() error {
 		server.ShutdownTrigger,
 		adminMonitor,
 	)
+	backupHandler.SetupToken = server.SetupToken
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -234,6 +236,7 @@ func (server *Server) Start() error {
 	settingsHandler.JWTService = server.JWTService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.SnapshotService = server.SnapshotService
+	settingsHandler.SetupTokenRequired = server.SetupToken != ""
 
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
@@ -286,6 +289,7 @@ func (server *Server) Start() error {
 	userHandler.CryptoService = server.CryptoService
 	userHandler.AdminCreationDone = server.AdminCreationDone
 	userHandler.FileService = server.FileService
+	userHandler.SetupToken = server.SetupToken
 
 	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore

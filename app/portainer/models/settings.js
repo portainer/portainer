@@ -34,6 +34,7 @@ export function PublicSettingsViewModel(settings) {
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
   this.DefaultRegistry = settings.DefaultRegistry;
   this.IsAMTEnabled = settings.IsAMTEnabled;
+  this.RequiresSetupToken = settings.RequiresSetupToken;
 }
 
 export function InternalAuthSettingsViewModel(data) {
