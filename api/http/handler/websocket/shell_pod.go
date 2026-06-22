@@ -21,6 +21,7 @@ import (
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
+// @failure 404 "Environment not found"
 // @failure 500 "Server error"
 // @router /websocket/kubernetes-shell [get]
 func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -36,9 +37,13 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment", err)
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return httperror.Forbidden("Permission denied to access environment", err)
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
