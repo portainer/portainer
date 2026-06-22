@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"io"
+	"slices"
 )
 
 type Nonce struct {
@@ -45,13 +46,9 @@ func (n *Nonce) Value() []byte {
 
 func (n *Nonce) Increment() error {
 	// Start incrementing from the least significant byte
-	for i := len(n.val) - 1; i >= 0; i-- {
-		// Increment the current byte
+	for i := range slices.Backward(n.val) {
 		n.val[i]++
-
-		// Check for overflow
 		if n.val[i] != 0 {
-			// No overflow, nonce is successfully incremented
 			return nil
 		}
 	}
