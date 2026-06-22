@@ -1,3 +1,4 @@
+import { AddButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/ReactSelect';
 
@@ -23,20 +24,30 @@ export function GitSourceSelector({
     <div className="form-group">
       <div className="col-sm-12">
         <FormControl label="Source" inputId="source-selector" errors={error}>
-          <Select
-            placeholder="Select a source"
-            value={selectedSource ?? null}
-            options={sources}
-            getOptionLabel={(s) => s.name}
-            getOptionValue={(s) => String(s.id)}
-            onChange={onChange}
-            isClearable
-            isLoading={sourcesQuery.isLoading}
-            noOptionsMessage={() => 'No git sources available'}
-            inputId="source-selector"
-            data-cy="source-selector"
-            isDisabled={readOnly}
-          />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <Select
+                placeholder="Select a source"
+                value={selectedSource ?? null}
+                options={sources}
+                getOptionLabel={(s) => s.name}
+                getOptionValue={(s) => String(s.id)}
+                onChange={onChange}
+                isClearable
+                isLoading={sourcesQuery.isLoading}
+                noOptionsMessage={() => 'No git sources available'}
+                inputId="source-selector"
+                data-cy="source-selector"
+                isDisabled={readOnly}
+              />
+            </div>
+            <AddButton
+              to="portainer.gitops.sources.new"
+              data-cy="create-source-button"
+            >
+              Create new source
+            </AddButton>
+          </div>
         </FormControl>
       </div>
     </div>
