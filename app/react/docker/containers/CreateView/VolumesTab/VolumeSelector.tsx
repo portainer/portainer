@@ -35,6 +35,11 @@ export function VolumeSelector({
     <Select
       placeholder="Select a volume"
       options={volumes}
+      getOptionLabel={(vol) =>
+        vol.Name !== 'auto'
+          ? `${truncate(vol.Name, 30)} - ${truncate(vol.Driver, 30)}`
+          : 'auto'
+      }
       getOptionValue={(vol) => vol.Name}
       isMulti={false}
       value={selectedValue}
