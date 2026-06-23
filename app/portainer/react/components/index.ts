@@ -51,9 +51,11 @@ import { usersModule } from './users';
 import { activityLogsModule } from './activity-logs';
 import { rbacModule } from './rbac';
 import { stacksModule } from './stacks';
+import { authModule } from './auth';
 
 export const ngModule = angular
   .module('portainer.app.react.components', [
+    authModule,
     accessControlModule,
     customTemplatesModule,
     environmentsModule,
