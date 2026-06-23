@@ -99,7 +99,12 @@ func CheckURL(ctx context.Context, rawURL string) error {
 		return nil
 	}
 
-	u, err := url.Parse(rawURL)
+	normalized := rawURL
+	if !strings.Contains(normalized, "://") && !strings.HasPrefix(normalized, "//") {
+		normalized = "//" + normalized
+	}
+
+	u, err := url.Parse(normalized)
 	if err != nil {
 		return fmt.Errorf("ssrf: invalid URL %q: %w", rawURL, err)
 	}

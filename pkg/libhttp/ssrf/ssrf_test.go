@@ -219,6 +219,40 @@ func TestCheckURL(t *testing.T) {
 			url:     "http://",
 			wantErr: false,
 		},
+		{
+			name:    "scheme-less IP:port SSRF disabled",
+			mode:    portainer.SSRFModeOff,
+			url:     "10.10.1.41:30775",
+			wantErr: false,
+		},
+		{
+			name:    "scheme-less IP:port blocked",
+			mode:    portainer.SSRFModeEnforce,
+			entries: []string{"8.8.8.0/24"},
+			url:     "10.10.1.41:30775",
+			wantErr: true,
+		},
+		{
+			name:    "scheme-less IP:port allowed by CIDR",
+			mode:    portainer.SSRFModeEnforce,
+			entries: []string{"10.10.1.0/24"},
+			url:     "10.10.1.41:30775",
+			wantErr: false,
+		},
+		{
+			name:    "git scheme IP blocked",
+			mode:    portainer.SSRFModeEnforce,
+			entries: []string{"8.8.8.0/24"},
+			url:     "git://10.10.1.41:9418/",
+			wantErr: true,
+		},
+		{
+			name:    "git scheme IP allowed by CIDR",
+			mode:    portainer.SSRFModeEnforce,
+			entries: []string{"10.10.1.0/24"},
+			url:     "git://10.10.1.41:9418/",
+			wantErr: false,
+		},
 	}
 
 	for _, tc := range tests {
