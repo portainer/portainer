@@ -39,7 +39,7 @@ var (
 	// DepComposeVersion is the version of the Docker Compose plugin shipped with the application.
 	DepComposeVersion string
 
-	// DepDockerVersion is the version of the Docker binary shipped with the application.
+	// DepDockerVersion is the version of the github.com/docker/docker Go module used by the application.
 	DepDockerVersion string
 
 	// DepKubectlVersion is the version of the Kubectl binary shipped with the application.

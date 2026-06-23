@@ -8,7 +8,6 @@ COPY --from=core /Windows/System32/netapi32.dll /Windows/System32/netapi32.dll
 
 USER ContainerAdministrator
 
-COPY dist/docker.exe /
 COPY dist/mustache-templates /mustache-templates/
 COPY dist/portainer.exe /
 COPY dist/public /public/

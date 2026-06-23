@@ -21,6 +21,7 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/google/go-cmp/cmp"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/libstack"
 	zerolog "github.com/rs/zerolog/log"
 
@@ -1394,7 +1395,6 @@ func Test_createProject(t *testing.T) {
 }
 
 func Test_CredentialsStore_Behavior(t *testing.T) {
-	ctx := context.Background()
 	// Create a temporary Docker config with a credsStore set (simulating Docker Desktop)
 	tmpDir := t.TempDir()
 
@@ -1403,8 +1403,8 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 	"credsStore": "test-store",
 	"auths": {}
 }`
-	configPath := filepath.Join(tmpDir, "config.json")
-	err := os.WriteFile(configPath, []byte(configJSON), 0644)
+	configPath := filesystem.JoinPaths(tmpDir, "config.json")
+	err := os.WriteFile(configPath, []byte(configJSON), 0o644)
 	require.NoError(t, err)
 
 	t.Run("withCli preserves credsStore when no registries provided", func(t *testing.T) {
@@ -1414,8 +1414,8 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 		var capturedCredsStore string
 		var capturedAuthConfigs map[string]configtypes.AuthConfig
 
-		err = withCli(ctx, libstack.Options{}, func(ctx context.Context, cli *command.DockerCli) error {
-			// Capture the state after withCli sets up credentials
+		err = libstack.WithCli(t.Context(), libstack.DockerCliOptions{}, func(ctx context.Context, cli *command.DockerCli) error {
+			// Capture the state after WithCli sets up credentials
 			capturedCredsStore = cli.ConfigFile().CredentialsStore
 			capturedAuthConfigs = cli.ConfigFile().AuthConfigs
 			return nil
@@ -1446,12 +1446,14 @@ func Test_CredentialsStore_Behavior(t *testing.T) {
 		var capturedCredsStore string
 		var capturedAuthConfigs map[string]configtypes.AuthConfig
 
-		err = withCli(ctx, libstack.Options{Registries: registries}, func(ctx context.Context, cli *command.DockerCli) error {
-			// Capture the state after withCli sets up credentials
-			capturedCredsStore = cli.ConfigFile().CredentialsStore
-			capturedAuthConfigs = cli.ConfigFile().AuthConfigs
-			return nil
-		})
+		err = libstack.WithCli(t.Context(),
+			libstack.DockerCliOptions{Registries: registries},
+			func(ctx context.Context, cli *command.DockerCli) error {
+				// Capture the state after WithCli sets up credentials
+				capturedCredsStore = cli.ConfigFile().CredentialsStore
+				capturedAuthConfigs = cli.ConfigFile().AuthConfigs
+				return nil
+			})
 		require.NoError(t, err)
 
 		// Verify the fix: credsStore should be empty when registries are provided

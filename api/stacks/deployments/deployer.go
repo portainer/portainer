@@ -4,13 +4,11 @@ import (
 	"context"
 	"sync"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	k "github.com/portainer/portainer/api/kubernetes"
-	"github.com/rs/zerolog/log"
-
-	"github.com/pkg/errors"
 )
 
 type BaseStackDeployer interface {
@@ -35,7 +33,8 @@ type stackDeployer struct {
 
 // NewStackDeployer inits a stackDeployer struct with a SwarmStackManager, a ComposeStackManager and a KubernetesDeployer
 func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStackManager portainer.ComposeStackManager,
-	kubernetesDeployer portainer.KubernetesDeployer, clientFactory *dockerclient.ClientFactory, dataStore dataservices.DataStore) *stackDeployer {
+	kubernetesDeployer portainer.KubernetesDeployer, clientFactory *dockerclient.ClientFactory, dataStore dataservices.DataStore,
+) *stackDeployer {
 	return &stackDeployer{
 		lock:                &sync.Mutex{},
 		swarmStackManager:   swarmStackManager,
@@ -45,20 +44,12 @@ func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStac
 		dataStore:           dataStore,
 	}
 }
+
 func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	if err := d.swarmStackManager.Login(registries, endpoint); err != nil {
-		log.Warn().Err(err).Msg("unable to login to registries for swarm stack deployment")
-	}
-	defer func() {
-		if err := d.swarmStackManager.Logout(endpoint); err != nil {
-			log.Warn().Err(err).Msg("unable to logout from registries after swarm stack deployment")
-		}
-	}()
-
-	return d.swarmStackManager.Deploy(stack, prune, pullImage, endpoint)
+	return d.swarmStackManager.Deploy(context.TODO(), stack, prune, pullImage, endpoint, registries)
 }
 
 func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error {

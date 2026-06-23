@@ -137,7 +137,7 @@ func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.En
 			return handler.StackDeployer.StopRemoteSwarmStack(stack, endpoint)
 		}
 
-		return handler.SwarmStackManager.Remove(stack, endpoint)
+		return handler.SwarmStackManager.Remove(context.TODO(), stack, endpoint)
 	}
 
 	return nil

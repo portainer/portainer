@@ -6,35 +6,25 @@ import (
 	"io"
 	"os"
 	"path"
-	"strings"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
-	"github.com/portainer/portainer/api/http/proxy/factory"
-	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/libstack"
-
-	"github.com/docker/cli/cli/config/types"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 // ComposeStackManager is a wrapper for docker-compose binary
 type ComposeStackManager struct {
 	deployer     libstack.Deployer
 	proxyManager *proxy.Manager
-	dataStore    dataservices.DataStore
 }
 
 // NewComposeStackManager returns a Compose stack manager
-func NewComposeStackManager(deployer libstack.Deployer, proxyManager *proxy.Manager, dataStore dataservices.DataStore) *ComposeStackManager {
+func NewComposeStackManager(deployer libstack.Deployer, proxyManager *proxy.Manager) *ComposeStackManager {
 	return &ComposeStackManager{
 		deployer:     deployer,
 		proxyManager: proxyManager,
-		dataStore:    dataStore,
 	}
 }
 
@@ -45,9 +35,9 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
 func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, options portainer.ComposeUpOptions) error {
-	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	url, proxy, err := fetchEndpointProxy(manager.proxyManager, endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch environment proxy")
+		return fmt.Errorf("failed to fetch environment proxy: %w", err)
 	}
 
 	if proxy != nil {
@@ -56,11 +46,11 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 
 	envFilePath, err := createEnvFile(stack)
 	if err != nil {
-		return errors.Wrap(err, "failed to create env file")
+		return fmt.Errorf("failed to create env file: %w", err)
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, true)
-	err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{
+	if err = manager.deployer.Deploy(ctx, filePaths, libstack.DeployOptions{
 		Options: libstack.Options{
 			WorkingDir:  stack.ProjectPath,
 			EnvFilePath: envFilePath,
@@ -70,15 +60,18 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		},
 		ForceRecreate:        options.ForceRecreate,
 		AbortOnContainerExit: options.AbortOnContainerExit,
-	})
-	return errors.Wrap(err, "failed to deploy a stack")
+		RemoveOrphans:        options.Prune,
+	}); err != nil {
+		return fmt.Errorf("failed to deploy a stack: %w", err)
+	}
+	return nil
 }
 
 // Run runs a one-off command on a service. Wraps `docker-compose run` command
 func (manager *ComposeStackManager) Run(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, serviceName string, options portainer.ComposeRunOptions) error {
-	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	url, proxy, err := fetchEndpointProxy(manager.proxyManager, endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch environment proxy")
+		return fmt.Errorf("failed to fetch environment proxy: %w", err)
 	}
 
 	if proxy != nil {
@@ -87,11 +80,11 @@ func (manager *ComposeStackManager) Run(ctx context.Context, stack *portainer.St
 
 	envFilePath, err := createEnvFile(stack)
 	if err != nil {
-		return errors.Wrap(err, "failed to create env file")
+		return fmt.Errorf("failed to create env file: %w", err)
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, true)
-	err = manager.deployer.Run(ctx, filePaths, serviceName, libstack.RunOptions{
+	if err = manager.deployer.Run(ctx, filePaths, serviceName, libstack.RunOptions{
 		Options: libstack.Options{
 			WorkingDir:  stack.ProjectPath,
 			EnvFilePath: envFilePath,
@@ -102,71 +95,63 @@ func (manager *ComposeStackManager) Run(ctx context.Context, stack *portainer.St
 		Remove:   options.Remove,
 		Args:     options.Args,
 		Detached: options.Detached,
-	})
-	return errors.Wrap(err, "failed to deploy a stack")
+	}); err != nil {
+		return fmt.Errorf("failed to deploy a stack: %w", err)
+	}
+	return nil
 }
 
 // Down stops and removes containers, networks, images, and volumes
 func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	url, proxy, err := fetchEndpointProxy(manager.proxyManager, endpoint)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch environment proxy: %w", err)
 	} else if proxy != nil {
 		defer proxy.Close()
 	}
 
-	err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.RemoveOptions{
+	if err = manager.deployer.Remove(ctx, stack.Name, nil, libstack.RemoveOptions{
 		Options: libstack.Options{
 			WorkingDir: "",
 			Host:       url,
 		},
-	})
-
-	return errors.Wrap(err, "failed to remove a stack")
+	}); err != nil {
+		return fmt.Errorf("failed to remove a stack: %w", err)
+	}
+	return nil
 }
 
 // Pull an image associated with a service defined in a docker-compose.yml or docker-stack.yml file,
 // but does not start containers based on those images.
 func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, options portainer.ComposeOptions) error {
-	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	url, proxy, err := fetchEndpointProxy(manager.proxyManager, endpoint)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch environment proxy: %w", err)
 	} else if proxy != nil {
 		defer proxy.Close()
 	}
 
 	envFilePath, err := createEnvFile(stack)
 	if err != nil {
-		return errors.Wrap(err, "failed to create env file")
+		return fmt.Errorf("failed to create env file: %w", err)
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack, true)
-	err = manager.deployer.Pull(ctx, filePaths, libstack.Options{
+	if err = manager.deployer.Pull(ctx, filePaths, libstack.Options{
 		WorkingDir:  stack.ProjectPath,
 		EnvFilePath: envFilePath,
 		Host:        url,
 		ProjectName: stack.Name,
 		Registries:  portainerRegistriesToAuthConfigs(options.Registries),
-	})
-	return errors.Wrap(err, "failed to pull images of the stack")
+	}); err != nil {
+		return fmt.Errorf("failed to pull images of the stack: %w", err)
+	}
+	return nil
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
 func (manager *ComposeStackManager) NormalizeStackName(name string) string {
-	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")
-}
-
-func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
-	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
-		return "", nil, nil
-	}
-
-	proxy, err := manager.proxyManager.CreateAgentProxyServer(endpoint)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return fmt.Sprintf("tcp://127.0.0.1:%d", proxy.Port), proxy, nil
+	return normalizeStackName(name)
 }
 
 // createEnvFile creates a file that would hold both "in-place" and default environment variables.
@@ -177,7 +162,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	}
 
 	envFilePath := path.Join(stack.ProjectPath, "stack.env")
-	envfile, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	envfile, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return "", err
 	}
@@ -227,46 +212,4 @@ func copyConfigEnvVars(w io.Writer, envs []portainer.Pair) error {
 	}
 
 	return nil
-}
-
-// portainerRegistriesToAuthConfigs converts registries to Docker auth configs.
-// Callers must ensure ECR tokens are valid before calling this function (e.g. via
-// registryutils.RefreshAndPersistECRTokens with a real DataStoreTx). This function
-// intentionally performs no DB writes to avoid write-lock contention when called inside
-// an active BoltDB write transaction.
-func portainerRegistriesToAuthConfigs(registries []portainer.Registry) []types.AuthConfig {
-	var authConfigs []types.AuthConfig
-
-	for _, r := range registries {
-		ac := types.AuthConfig{
-			Username:      r.Username,
-			Password:      r.Password,
-			ServerAddress: r.URL,
-		}
-
-		if r.Authentication {
-			var err error
-
-			ac.Username, ac.Password, err = getEffectiveRegUsernamePassword(&r)
-			if err != nil {
-				continue
-			}
-		}
-
-		authConfigs = append(authConfigs, ac)
-	}
-
-	return authConfigs
-}
-
-func getEffectiveRegUsernamePassword(registry *portainer.Registry) (string, string, error) {
-	username, password, err := registryutils.GetRegEffectiveCredential(registry)
-	if err != nil {
-		log.Warn().
-			Err(err).
-			Str("RegistryName", registry.Name).
-			Msg("Failed to get effective credential. Skip logging with this registry.")
-	}
-
-	return username, password, err
 }

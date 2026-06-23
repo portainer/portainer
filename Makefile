@@ -36,8 +36,8 @@ build-storybook: ## Build and serve the storybook files
 .PHONY: deps server-deps client-deps tidy
 deps: server-deps client-deps ## Download all client and server build dependancies
 
+## This is empty because the pipeline requires it but ce has no server deps
 server-deps: init-dist ## Download dependant server binaries
-	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
 client-deps: ## Install client dependencies
 	pnpm install

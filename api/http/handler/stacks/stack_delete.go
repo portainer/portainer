@@ -187,7 +187,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 			return handler.StackDeployer.UndeployRemoteSwarmStack(stack, endpoint)
 		}
 
-		return handler.SwarmStackManager.Remove(stack, endpoint)
+		return handler.SwarmStackManager.Remove(context.TODO(), stack, endpoint)
 	}
 
 	if stack.Type == portainer.DockerComposeStack {

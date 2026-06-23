@@ -10,7 +10,6 @@ LABEL org.opencontainers.image.title="Portainer" \
   com.docker.extension.publisher-url="https://www.portainer.io" \
   com.docker.extension.additional-urls="[{\"title\":\"Website\",\"url\":\"https://www.portainer.io?utm_campaign=DockerCon&utm_source=DockerDesktop\"},{\"title\":\"Documentation\",\"url\":\"https://docs.portainer.io\"},{\"title\":\"Support\",\"url\":\"https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA\"}]"
 
-COPY dist/docker /
 COPY dist/mustache-templates /mustache-templates/
 COPY dist/portainer /
 COPY dist/public /public/

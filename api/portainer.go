@@ -1584,7 +1584,6 @@ type (
 
 	// FileService represents a service for managing files
 	FileService interface {
-		GetDockerConfigPath() string
 		GetFileContent(trustedRootPath, filePath string) ([]byte, error)
 		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
@@ -1868,10 +1867,8 @@ type (
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
-		Login(registries []Registry, endpoint *Endpoint) error
-		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, pullImage bool, endpoint *Endpoint) error
-		Remove(stack *Stack, endpoint *Endpoint) error
+		Deploy(ctx context.Context, stack *Stack, prune bool, pullImage bool, endpoint *Endpoint, registries []Registry) error
+		Remove(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
 	}
 )

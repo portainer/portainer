@@ -54,6 +54,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 	"github.com/portainer/portainer/pkg/libstack/compose"
+	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/gofrs/uuid"
@@ -474,16 +475,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	reverseTunnelService.ProxyManager = proxyManager
 
-	dockerConfigPath := fileService.GetDockerConfigPath()
-
 	composeDeployer := compose.NewComposeDeployer()
 
-	composeStackManager := exec.NewComposeStackManager(composeDeployer, proxyManager, dataStore)
+	composeStackManager := exec.NewComposeStackManager(composeDeployer, proxyManager)
 
-	swarmStackManager, err := exec.NewSwarmStackManager(*flags.Assets, dockerConfigPath, signatureService, fileService, reverseTunnelService, dataStore)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed initializing swarm stack manager")
-	}
+	swarmStackManager := exec.NewSwarmStackManager(libswarm.NewSwarmDeployer(), proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, proxyManager)
 
