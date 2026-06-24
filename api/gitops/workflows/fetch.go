@@ -63,6 +63,7 @@ func FetchWorkflows(
 	for _, stack := range preFiltered {
 		wf := workflowMap[stack.WorkflowID]
 
+		hasAccessibleSource := false
 	outer:
 		for _, as := range wf.Artifacts {
 			if as.StackID != stack.ID {
@@ -70,12 +71,22 @@ func FetchWorkflows(
 			}
 
 			for _, f := range as.Files {
-				src := sourceMap[f.SourceID]
+				src, ok := sourceMap[f.SourceID]
+				if !ok {
+					continue
+				}
+
+				hasAccessibleSource = true
+
 				if src.Type == portainer.SourceTypeGit {
 					gitConfigs[stack.ID] = MergeSourceAndFile(&src, &f)
 					break outer
 				}
 			}
+		}
+
+		if stack.Type == portainer.KubernetesStack && !hasAccessibleSource {
+			continue
 		}
 
 		filtered = append(filtered, stack)
