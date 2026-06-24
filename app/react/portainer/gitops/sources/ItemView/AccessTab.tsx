@@ -35,7 +35,9 @@ interface Props {
 }
 
 export function AccessTab({ source, isEditing, onEditingChange }: Props) {
-  if (isEditing) {
+  const { isPureAdmin } = useCurrentUser();
+
+  if (isEditing && isPureAdmin) {
     return (
       <AccessForm source={source} onClose={() => onEditingChange(false)} />
     );
