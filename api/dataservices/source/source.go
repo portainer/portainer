@@ -39,13 +39,13 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 }
 
 // Create creates a new source.
-func (service *Service) Create(context *userContext, source *portainer.Source) error {
+func (service *Service) Create(context UserContext, source *portainer.Source) error {
 	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return service.Tx(tx).Create(context, source)
 	})
 }
 
-func (service *Service) Read(context *userContext, ID portainer.SourceID) (*portainer.Source, error) {
+func (service *Service) Read(context UserContext, ID portainer.SourceID) (*portainer.Source, error) {
 	var result *portainer.Source
 
 	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
@@ -57,7 +57,7 @@ func (service *Service) Read(context *userContext, ID portainer.SourceID) (*port
 	return result, err
 }
 
-func (service *Service) Exists(context *userContext, ID portainer.SourceID) (bool, error) {
+func (service *Service) Exists(context UserContext, ID portainer.SourceID) (bool, error) {
 	var result bool
 
 	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
@@ -69,7 +69,7 @@ func (service *Service) Exists(context *userContext, ID portainer.SourceID) (boo
 	return result, err
 }
 
-func (service *Service) ReadAll(context *userContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error) {
+func (service *Service) ReadAll(context UserContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error) {
 	var result []portainer.Source
 
 	err := service.base.Connection.ViewTx(func(tx portainer.Transaction) error {
@@ -81,19 +81,19 @@ func (service *Service) ReadAll(context *userContext, predicates ...func(portain
 	return result, err
 }
 
-func (service *Service) Update(context *userContext, ID portainer.SourceID, source *portainer.Source) error {
+func (service *Service) Update(context UserContext, ID portainer.SourceID, source *portainer.Source) error {
 	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return service.Tx(tx).Update(context, ID, source)
 	})
 }
 
-func (service *Service) Delete(context *userContext, ID portainer.SourceID) error {
+func (service *Service) Delete(context UserContext, ID portainer.SourceID) error {
 	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return service.Tx(tx).Delete(context, ID)
 	})
 }
 
-func (service *Service) FindOrCreateGitSource(context *userContext, source *portainer.Source) (*portainer.Source, error) {
+func (service *Service) FindOrCreateGitSource(context UserContext, source *portainer.Source) (*portainer.Source, error) {
 	var result *portainer.Source
 
 	err := service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {

@@ -6,9 +6,10 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 )
 
-func populateGitConfig(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, template *portainer.CustomTemplate) {
+func populateGitConfig(tx dataservices.DataStoreTx, userContext source.UserContext, template *portainer.CustomTemplate) {
 	if template.Artifact == nil || len(template.Artifact.Files) == 0 {
 		return
 	}

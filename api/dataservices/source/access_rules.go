@@ -16,8 +16,8 @@ var (
 	ErrDuplicateSource     = errors.New("a source with this URL and credentials already exists")
 )
 
-func validateUserContext(ctx *userContext) error {
-	if ctx == nil || ctx.User == nil {
+func validateUserContext(ctx UserContext) error {
+	if ctx == nil {
 		return ErrInvalidUserContext
 	}
 
@@ -31,7 +31,7 @@ const (
 	actionWrite actionType = "write"
 )
 
-func enforceUserPermissions(ctx *userContext, source *portainer.Source, action actionType) error {
+func enforceUserPermissions(ctx UserContext, source *portainer.Source, action actionType) error {
 	if action == actionRead && userCanReadSource(source, ctx) {
 		return nil
 	}
@@ -43,39 +43,36 @@ func enforceUserPermissions(ctx *userContext, source *portainer.Source, action a
 	return ErrNotEnoughPermission
 }
 
-func userCanWriteSource(source *portainer.Source, context *userContext) bool {
-	if source == nil || context == nil || context.User == nil {
+func userCanWriteSource(source *portainer.Source, context UserContext) bool {
+	if source == nil || context == nil {
 		return false
 	}
 
-	user := context.User
-
-	if user.Role == portainer.AdministratorRole {
+	if context.IsAdmin() {
 		return true
 	}
 
-	if source.OwnerID != 0 && source.OwnerID == user.ID && userCanReadSource(source, context) {
+	if source.OwnerID != 0 && source.OwnerID == context.ID() && userCanReadSource(source, context) {
 		return true
 	}
 
 	return false
 }
 
-func filterSources(sources []portainer.Source, context *userContext) []portainer.Source {
+func filterSources(sources []portainer.Source, context UserContext) []portainer.Source {
 	return slicesx.Filter(sources, func(s portainer.Source) bool {
 		return userCanReadSource(&s, context)
 	})
 }
 
-func userCanReadSource(source *portainer.Source, context *userContext) bool {
-	if source == nil || context == nil || context.User == nil {
+func userCanReadSource(source *portainer.Source, context UserContext) bool {
+	if source == nil || context == nil {
 		return false
 	}
 
-	user := context.User
-	userTeams := context.UserMemberships
+	userTeams := context.TeamMemberships()
 
-	if user.Role == portainer.AdministratorRole || source.Public {
+	if context.IsAdmin() || source.Public {
 		return true
 	}
 
@@ -83,7 +80,7 @@ func userCanReadSource(source *portainer.Source, context *userContext) bool {
 		return false
 	}
 
-	if slices.Contains(source.UserAccesses, user.ID) {
+	if slices.Contains(source.UserAccesses, context.ID()) {
 		return true
 	}
 

@@ -29,12 +29,12 @@ func sanitizeGitSource(source *portainer.Source) error {
 	return nil
 }
 
-func sanitizeAccesses(ctx *userContext, newValues *portainer.Source, previousValues *portainer.Source) error {
+func sanitizeAccesses(ctx UserContext, newValues *portainer.Source, previousValues *portainer.Source) error {
 	if newValues == nil {
 		return ErrInvalidSource
 	}
 
-	if ctx.User.Role == portainer.AdministratorRole {
+	if ctx.IsAdmin() {
 		if newValues.Public && newValues.AdministratorsOnly {
 			newValues.Public = false
 		}
@@ -62,13 +62,13 @@ func sanitizeAccesses(ctx *userContext, newValues *portainer.Source, previousVal
 	}
 
 	// Create flow
-	userAccesses := []portainer.UserID{ctx.User.ID}
+	userAccesses := []portainer.UserID{ctx.ID()}
 	if newValues.Public {
 		userAccesses = []portainer.UserID{}
 	}
 	newValues.UserAccesses = userAccesses
 	newValues.TeamAccesses = []portainer.TeamID{}
 	newValues.AdministratorsOnly = false
-	newValues.OwnerID = ctx.User.ID
+	newValues.OwnerID = ctx.ID()
 	return nil
 }

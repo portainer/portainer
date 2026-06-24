@@ -3,6 +3,7 @@ package stacks
 import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/workflows"
 )
@@ -15,7 +16,7 @@ type stackResponse struct {
 
 // loadGitConfigForStack reads the merged GitConfig (Source URL/auth/TLS + Artifact ref/path/hash)
 // and the SourceID for the given stack.
-func loadGitConfigForStack(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, workflowID portainer.WorkflowID, stackID portainer.StackID) (*gittypes.RepoConfig, portainer.SourceID, error) {
+func loadGitConfigForStack(tx dataservices.DataStoreTx, userContext source.UserContext, workflowID portainer.WorkflowID, stackID portainer.StackID) (*gittypes.RepoConfig, portainer.SourceID, error) {
 	src, file, err := workflows.GitSourceAndArtifactForStack(tx, userContext, workflowID, stackID)
 	if err != nil || src == nil {
 		return nil, 0, err
@@ -27,7 +28,7 @@ func loadGitConfigForStack(tx dataservices.DataStoreTx, userContext *dataservice
 // saveStackGitConfig persists the stack's git settings. When newSourceID is non-zero the stack's
 // artifact is repointed to that existing Source (selected by the caller) without modifying any
 // Source's git config; otherwise the target Source is derived from cfg.URL.
-func saveStackGitConfig(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, workflowID portainer.WorkflowID, stackID portainer.StackID, oldSourceID, newSourceID portainer.SourceID, cfg *gittypes.RepoConfig) error {
+func saveStackGitConfig(tx dataservices.DataStoreTx, userContext source.UserContext, workflowID portainer.WorkflowID, stackID portainer.StackID, oldSourceID, newSourceID portainer.SourceID, cfg *gittypes.RepoConfig) error {
 	matchArtifact := func(a portainer.Artifact) bool {
 		return a.StackID == stackID
 	}
@@ -45,7 +46,7 @@ func saveStackGitConfig(tx dataservices.DataStoreTx, userContext *dataservices.S
 }
 
 // newStackResponse fills stack.GitConfig and returns a response that also includes GitSourceId.
-func newStackResponse(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, stack *portainer.Stack) (*stackResponse, error) {
+func newStackResponse(tx dataservices.DataStoreTx, userContext source.UserContext, stack *portainer.Stack) (*stackResponse, error) {
 	if stack.WorkflowID == 0 {
 		return &stackResponse{Stack: *stack}, nil
 	}
@@ -61,7 +62,7 @@ func newStackResponse(tx dataservices.DataStoreTx, userContext *dataservices.Sou
 }
 
 // fillStackGitConfig populates stack.GitConfig from the merged Source+Artifact for backwards-compatible responses.
-func fillStackGitConfig(tx dataservices.DataStoreTx, userContext *dataservices.SourceServiceUserContext, stack *portainer.Stack) error {
+func fillStackGitConfig(tx dataservices.DataStoreTx, userContext source.UserContext, stack *portainer.Stack) error {
 	if stack.WorkflowID == 0 {
 		return nil
 	}

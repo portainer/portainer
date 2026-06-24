@@ -78,13 +78,13 @@ func TestInspectHandler(t *testing.T) {
 	}
 
 	t.Run("unknown id should get not found error", func(t *testing.T) {
-		_, r := test("0", &security.RestrictedRequestContext{UserID: 1})
+		_, r := test("0", &security.RestrictedRequestContext{UserID: 1, User: &portainer.User{ID: 1, Role: portainer.AdministratorRole}})
 		require.NotNil(t, r)
 		require.Equal(t, http.StatusNotFound, r.StatusCode)
 	})
 
 	t.Run("admin should access adminonly template", func(t *testing.T) {
-		rr, r := test("1", &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
+		rr, r := test("1", &security.RestrictedRequestContext{UserID: 1, IsAdmin: true, User: &portainer.User{ID: 1, Role: portainer.AdministratorRole}})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
 
@@ -94,13 +94,13 @@ func TestInspectHandler(t *testing.T) {
 	})
 
 	t.Run("std should not access adminonly template", func(t *testing.T) {
-		_, r := test("1", &security.RestrictedRequestContext{UserID: 2})
+		_, r := test("1", &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}})
 		require.NotNil(t, r)
 		require.Equal(t, http.StatusForbidden, r.StatusCode)
 	})
 
 	t.Run("std should access template via direct user access", func(t *testing.T) {
-		rr, r := test("2", &security.RestrictedRequestContext{UserID: 2})
+		rr, r := test("2", &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
 
@@ -110,7 +110,7 @@ func TestInspectHandler(t *testing.T) {
 	})
 
 	t.Run("std should access template via team access", func(t *testing.T) {
-		rr, r := test("2", &security.RestrictedRequestContext{UserID: 3, UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}}})
+		rr, r := test("2", &security.RestrictedRequestContext{UserID: 3, User: &portainer.User{ID: 3, Role: portainer.StandardUserRole}, UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}}})
 		require.Nil(t, r)
 		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
 
@@ -120,7 +120,7 @@ func TestInspectHandler(t *testing.T) {
 	})
 
 	t.Run("std should not access template without access", func(t *testing.T) {
-		_, r := test("2", &security.RestrictedRequestContext{UserID: 4})
+		_, r := test("2", &security.RestrictedRequestContext{UserID: 4, User: &portainer.User{ID: 4, Role: portainer.StandardUserRole}})
 		require.NotNil(t, r)
 		require.Equal(t, http.StatusForbidden, r.StatusCode)
 	})
@@ -152,7 +152,7 @@ func TestInspectHandler_CreatorDeniedWhenAdminOnly(t *testing.T) {
 
 	r := httptest.NewRequest(http.MethodGet, "/custom_templates/5", nil)
 	r = mux.SetURLVars(r, map[string]string{"id": "5"})
-	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{UserID: 2}))
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}}))
 	rr := httptest.NewRecorder()
 
 	herr := handler.customTemplateInspect(rr, r)

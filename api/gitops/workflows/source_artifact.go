@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/set"
 )
@@ -20,7 +21,7 @@ type gitSourceStore interface {
 // from the workflow identified by workflowID.
 // Source carries the shared fields (URL, auth, TLS); ArtifactFile carries the file-specific fields (ref, path, hash).
 // Returns nil, nil, nil when workflowID is 0 or no matching entry is found.
-func GitSourceAndArtifactForStack(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, workflowID portainer.WorkflowID, stackID portainer.StackID) (*portainer.Source, *portainer.ArtifactFile, error) {
+func GitSourceAndArtifactForStack(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, stackID portainer.StackID) (*portainer.Source, *portainer.ArtifactFile, error) {
 	if workflowID == 0 {
 		return nil, nil, nil
 	}
@@ -57,7 +58,7 @@ func GitSourceAndArtifactForStack(tx gitSourceStore, userContext *dataservices.S
 
 // GitSourceAndArtifactForEdgeStack returns the git Source and the ArtifactFile matching edgeStackID.
 // Returns nil, nil, nil when workflowID is 0 or no matching entry is found.
-func GitSourceAndArtifactForEdgeStack(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, workflowID portainer.WorkflowID, edgeStackID portainer.EdgeStackID) (*portainer.Source, *portainer.ArtifactFile, error) {
+func GitSourceAndArtifactForEdgeStack(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, edgeStackID portainer.EdgeStackID) (*portainer.Source, *portainer.ArtifactFile, error) {
 	if workflowID == 0 {
 		return nil, nil, nil
 	}
@@ -169,14 +170,14 @@ func UpdateArtifactFileForEdgeStack(tx gitSourceStore, workflowID portainer.Work
 // FindOrCreateGitSource returns an existing Source whose URL and authentication match cfg,
 // or creates a new one. Only URL, authentication, and TLSSkipVerify are stored on the Source;
 // per-stack fields (ReferenceName, ConfigFilePath, ConfigHash) belong in the Artifact.
-func FindOrCreateGitSource(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, src *portainer.Source) (*portainer.Source, error) {
+func FindOrCreateGitSource(tx gitSourceStore, userContext source.UserContext, src *portainer.Source) (*portainer.Source, error) {
 	return tx.Source().FindOrCreateGitSource(userContext, src)
 }
 
 // SaveWorkflowGitConfig persists URL/auth/TLS on the Source and ref/path/hash on the Artifact
 // matched by matchArtifact. When the URL changes, an existing or new Source is located via
 // FindOrCreateGitSource and the Workflow's SourceID is updated atomically alongside the Artifact fields.
-func SaveWorkflowGitConfig(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, workflowID portainer.WorkflowID, matchArtifact func(portainer.Artifact) bool, oldSourceID portainer.SourceID, cfg *gittypes.RepoConfig) error {
+func SaveWorkflowGitConfig(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, matchArtifact func(portainer.Artifact) bool, oldSourceID portainer.SourceID, cfg *gittypes.RepoConfig) error {
 	src, err := tx.Source().Read(userContext, oldSourceID)
 	if err != nil {
 		return fmt.Errorf("failed to read source: %w", err)
@@ -267,7 +268,7 @@ func LoadWorkflowMap(tx gitSourceStore, ids set.Set[portainer.WorkflowID]) (map[
 
 // LoadWorkflowAndSourceMaps fetches workflows by their IDs and the sources they reference,
 // collecting source IDs in a single pass over the workflows.
-func LoadWorkflowAndSourceMaps(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, ids set.Set[portainer.WorkflowID]) (map[portainer.WorkflowID]portainer.Workflow, map[portainer.SourceID]portainer.Source, error) {
+func LoadWorkflowAndSourceMaps(tx gitSourceStore, userContext source.UserContext, ids set.Set[portainer.WorkflowID]) (map[portainer.WorkflowID]portainer.Workflow, map[portainer.SourceID]portainer.Source, error) {
 	wfMap := make(map[portainer.WorkflowID]portainer.Workflow, len(ids))
 	sourceIDs := make(set.Set[portainer.SourceID])
 	for id := range ids {
@@ -293,7 +294,7 @@ func LoadWorkflowAndSourceMaps(tx gitSourceStore, userContext *dataservices.Sour
 
 // loadWorkflowSources collects all unique SourceIDs referenced by wf and returns them as a map.
 // This avoids reading the same Source record more than once when files share a SourceID.
-func loadWorkflowSources(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, wf *portainer.Workflow) (map[portainer.SourceID]portainer.Source, error) {
+func loadWorkflowSources(tx gitSourceStore, userContext source.UserContext, wf *portainer.Workflow) (map[portainer.SourceID]portainer.Source, error) {
 	ids := make(set.Set[portainer.SourceID])
 	for _, as := range wf.Artifacts {
 		for _, f := range as.Files {
@@ -305,7 +306,7 @@ func loadWorkflowSources(tx gitSourceStore, userContext *dataservices.SourceServ
 }
 
 // loadSourceMap fetches sources by their IDs and returns them keyed by ID.
-func loadSourceMap(tx gitSourceStore, userContext *dataservices.SourceServiceUserContext, ids set.Set[portainer.SourceID]) (map[portainer.SourceID]portainer.Source, error) {
+func loadSourceMap(tx gitSourceStore, userContext source.UserContext, ids set.Set[portainer.SourceID]) (map[portainer.SourceID]portainer.Source, error) {
 	sources, err := tx.Source().ReadAll(userContext, func(s portainer.Source) bool {
 		return ids.Contains(s.ID)
 	})

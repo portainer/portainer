@@ -32,7 +32,7 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 		return err
 	}
 
-	var userContext *dataservices.SourceServiceUserContext
+	var userContext source.UserContext
 	if err := b.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		user, err := tx.User().Read(userID)
 		if err != nil {

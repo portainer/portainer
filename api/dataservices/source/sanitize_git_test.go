@@ -12,7 +12,7 @@ type vFn func(new *portainer.Source, old *portainer.Source, err error)
 
 func testUAC(
 	t *testing.T,
-	userContext *userContext,
+	userContext UserContext,
 	new *portainer.Source,
 	old *portainer.Source,
 	validationFuncs ...vFn,

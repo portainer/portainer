@@ -11,7 +11,7 @@ type ServiceTx struct {
 }
 
 // Create creates a new source.
-func (service ServiceTx) Create(context *userContext, source *portainer.Source) error {
+func (service ServiceTx) Create(context UserContext, source *portainer.Source) error {
 	if err := validateUserContext(context); err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (service ServiceTx) Create(context *userContext, source *portainer.Source) 
 	)
 }
 
-func (service ServiceTx) Read(context *userContext, ID portainer.SourceID) (*portainer.Source, error) {
+func (service ServiceTx) Read(context UserContext, ID portainer.SourceID) (*portainer.Source, error) {
 	if err := validateUserContext(context); err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (service ServiceTx) Read(context *userContext, ID portainer.SourceID) (*por
 
 // Access is not enforced on this to avoid the cost of deserialize
 // Any user can scan the DB IDs using this method, so be mindful with usage of this func.
-func (service ServiceTx) Exists(context *userContext, ID portainer.SourceID) (bool, error) {
+func (service ServiceTx) Exists(context UserContext, ID portainer.SourceID) (bool, error) {
 	if err := validateUserContext(context); err != nil {
 		return false, err
 	}
@@ -69,7 +69,7 @@ func (service ServiceTx) Exists(context *userContext, ID portainer.SourceID) (bo
 }
 
 // ReadAll fetches all sources the user can access, matching predicates
-func (service ServiceTx) ReadAll(context *userContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error) {
+func (service ServiceTx) ReadAll(context UserContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error) {
 	if err := validateUserContext(context); err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (service ServiceTx) ReadAll(context *userContext, predicates ...func(portai
 
 // Update updates the source of id `ID` with the `source` content
 // It validates that the user has access to the source, and has enough permissions to perform the action
-func (service ServiceTx) Update(context *userContext, ID portainer.SourceID, source *portainer.Source) error {
+func (service ServiceTx) Update(context UserContext, ID portainer.SourceID, source *portainer.Source) error {
 	if err := validateUserContext(context); err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (service ServiceTx) Update(context *userContext, ID portainer.SourceID, sou
 
 // Delete deletes a source
 // It validates that the user has access to the source, and has enough permissions to perform the action
-func (service ServiceTx) Delete(context *userContext, ID portainer.SourceID) error {
+func (service ServiceTx) Delete(context UserContext, ID portainer.SourceID) error {
 	if err := validateUserContext(context); err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (service ServiceTx) Delete(context *userContext, ID portainer.SourceID) err
 // per-stack fields (ReferenceName, ConfigFilePath, ConfigHash) belong in the Artifact.
 // The function auto adds the user to an existing source if the user doesn't have access but provided a valid full
 // config (URL+Auth)
-func (service ServiceTx) FindOrCreateGitSource(context *userContext, src *portainer.Source) (*portainer.Source, error) {
+func (service ServiceTx) FindOrCreateGitSource(context UserContext, src *portainer.Source) (*portainer.Source, error) {
 	if err := validateUserContext(context); err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func (service ServiceTx) FindOrCreateGitSource(context *userContext, src *portai
 
 		// give user access to the first source if he doesn't have access
 		// to any of the sources that have the same url+auth
-		existing[0].UserAccesses = append(existing[0].UserAccesses, context.User.ID)
+		existing[0].UserAccesses = append(existing[0].UserAccesses, context.ID())
 		if err := service.base.Update(existing[0].ID, &existing[0]); err != nil {
 			return nil, err
 		}
