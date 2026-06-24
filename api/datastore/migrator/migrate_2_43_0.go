@@ -126,7 +126,21 @@ func (m *Migrator) migrateGitConfigToSources_2_43_0() error {
 		var newSrcID portainer.SourceID
 
 		if err := m.stackService.Connection.UpdateTx(func(tx portainer.Transaction) error {
-			users, teams, public, adminOnly, ownerId := GetValuesForUsersFromResourceOwnershipAndAccesses_2_43_0(ls.ResourceControl,
+			liveStack, err := m.stackService.Tx(tx).Read(portainer.StackID(ls.ID))
+			if err != nil {
+				return fmt.Errorf("failed to read stack %d: %w", ls.ID, err)
+			}
+
+			rc := ls.ResourceControl
+			if rc == nil {
+				rcID := fmt.Sprintf("%d_%s", liveStack.EndpointID, liveStack.Name)
+				rc, err = m.resourceControlService.Tx(tx).ResourceControlByResourceIDAndType(rcID, portainer.StackResourceControl)
+				if err != nil {
+					return fmt.Errorf("failed to read resource control for stack %d: %w", ls.ID, err)
+				}
+			}
+
+			users, teams, public, adminOnly, ownerId := GetValuesForUsersFromResourceOwnershipAndAccesses_2_43_0(rc,
 				func() (portainer.UserID, portainer.UserRole, error) {
 					user, err := m.userService.Tx(tx).UserByUsername(ls.CreatedBy)
 					if err != nil {
@@ -173,11 +187,6 @@ func (m *Migrator) migrateGitConfigToSources_2_43_0() error {
 				if err := m.sourceService.Tx(tx).Update(adminUserContext, srcID, src); err != nil {
 					return fmt.Errorf("failed to update source %d for stack %d: %w", srcID, ls.ID, err)
 				}
-			}
-
-			liveStack, err := m.stackService.Tx(tx).Read(portainer.StackID(ls.ID))
-			if err != nil {
-				return fmt.Errorf("failed to read stack %d: %w", ls.ID, err)
 			}
 
 			wf := &portainer.Workflow{

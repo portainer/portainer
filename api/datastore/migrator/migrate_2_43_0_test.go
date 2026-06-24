@@ -1,13 +1,17 @@
 package migrator
 
 import (
+	"fmt"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices/customtemplate"
+	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/dataservices/stack"
+	"github.com/portainer/portainer/api/dataservices/teammembership"
+	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/workflow"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/logs"
@@ -33,11 +37,14 @@ func TestMigrateGitConfigToSources_2_43_0_GitStackMigrated(t *testing.T) {
 	require.NoError(t, err)
 	workflowSvc, err := workflow.NewService(conn)
 	require.NoError(t, err)
+	rcSvc, err := resourcecontrol.NewService(conn)
+	require.NoError(t, err)
 
 	m := NewMigrator(&MigratorParameters{
-		StackService:    stackSvc,
-		SourceService:   sourceSvc,
-		WorkflowService: workflowSvc,
+		StackService:           stackSvc,
+		SourceService:          sourceSvc,
+		WorkflowService:        workflowSvc,
+		ResourceControlService: rcSvc,
 	})
 
 	gitStack := &portainer.Stack{
@@ -87,11 +94,14 @@ func TestMigrateGitConfigToSources_2_43_0_NonGitStackUntouched(t *testing.T) {
 	require.NoError(t, err)
 	workflowSvc, err := workflow.NewService(conn)
 	require.NoError(t, err)
+	rcSvc, err := resourcecontrol.NewService(conn)
+	require.NoError(t, err)
 
 	m := NewMigrator(&MigratorParameters{
-		StackService:    stackSvc,
-		SourceService:   sourceSvc,
-		WorkflowService: workflowSvc,
+		StackService:           stackSvc,
+		SourceService:          sourceSvc,
+		WorkflowService:        workflowSvc,
+		ResourceControlService: rcSvc,
 	})
 
 	plainStack := &portainer.Stack{
@@ -132,11 +142,14 @@ func TestMigrateGitConfigToSources_2_43_0_DuplicateSourcesDeduped(t *testing.T) 
 	require.NoError(t, err)
 	workflowSvc, err := workflow.NewService(conn)
 	require.NoError(t, err)
+	rcSvc, err := resourcecontrol.NewService(conn)
+	require.NoError(t, err)
 
 	m := NewMigrator(&MigratorParameters{
-		StackService:    stackSvc,
-		SourceService:   sourceSvc,
-		WorkflowService: workflowSvc,
+		StackService:           stackSvc,
+		SourceService:          sourceSvc,
+		WorkflowService:        workflowSvc,
+		ResourceControlService: rcSvc,
 	})
 
 	sharedURL := "https://github.com/example/shared-repo"
@@ -195,11 +208,14 @@ func TestMigrateGitConfigToSources_2_43_0_Idempotent(t *testing.T) {
 	require.NoError(t, err)
 	workflowSvc, err := workflow.NewService(conn)
 	require.NoError(t, err)
+	rcSvc, err := resourcecontrol.NewService(conn)
+	require.NoError(t, err)
 
 	m := NewMigrator(&MigratorParameters{
-		StackService:    stackSvc,
-		SourceService:   sourceSvc,
-		WorkflowService: workflowSvc,
+		StackService:           stackSvc,
+		SourceService:          sourceSvc,
+		WorkflowService:        workflowSvc,
+		ResourceControlService: rcSvc,
 	})
 
 	gitStack := &portainer.Stack{
@@ -422,6 +438,101 @@ func TestMigrateCustomTemplateGitConfigToSources_2_43_0_DuplicateSourcesDeduped(
 	require.NoError(t, err)
 	require.NotNil(t, migrated2.Artifact)
 	require.Equal(t, sharedSrcID, migrated2.Artifact.Files[0].SourceID)
+}
+
+// TestMigrateGitConfigToSources_2_43_0_StandardUserStackPreservesAccess is the regression
+// test for the bug where stacks owned by standard users became inaccessible after upgrading
+// to 2.43. ResourceControls are stored in a separate bucket and are never embedded in the
+// stack record, so the migration must look them up explicitly.
+func TestMigrateGitConfigToSources_2_43_0_StandardUserStackPreservesAccess(t *testing.T) {
+	t.Parallel()
+
+	conn := &boltdb.DbConnection{Path: t.TempDir()}
+	err := conn.Open()
+	require.NoError(t, err)
+	defer logs.CloseAndLogErr(conn)
+
+	stackSvc, err := stack.NewService(conn)
+	require.NoError(t, err)
+	sourceSvc, err := source.NewService(conn)
+	require.NoError(t, err)
+	workflowSvc, err := workflow.NewService(conn)
+	require.NoError(t, err)
+	rcSvc, err := resourcecontrol.NewService(conn)
+	require.NoError(t, err)
+	userSvc, err := user.NewService(conn)
+	require.NoError(t, err)
+	teamMembershipSvc, err := teammembership.NewService(conn)
+	require.NoError(t, err)
+
+	m := NewMigrator(&MigratorParameters{
+		StackService:           stackSvc,
+		SourceService:          sourceSvc,
+		WorkflowService:        workflowSvc,
+		ResourceControlService: rcSvc,
+		UserService:            userSvc,
+		TeamMembershipService:  teamMembershipSvc,
+	})
+
+	standardUser := &portainer.User{
+		Username: "standarduser",
+		Role:     portainer.StandardUserRole,
+	}
+	err = userSvc.Create(standardUser)
+	require.NoError(t, err)
+
+	const endpointID portainer.EndpointID = 1
+
+	gitStack := &portainer.Stack{
+		ID:         1,
+		Name:       "git-stack",
+		EndpointID: endpointID,
+		CreatedBy:  "standarduser",
+		GitConfig: &gittypes.RepoConfig{
+			URL:           "https://github.com/example/repo",
+			ReferenceName: "refs/heads/main",
+		},
+	}
+	err = conn.CreateObjectWithId(stack.BucketName, int(gitStack.ID), gitStack)
+	require.NoError(t, err)
+
+	// ResourceControls are stored separately from stacks; the stack record never embeds one.
+	// The migration must look up the RC by resource ID to avoid defaulting to adminOnly=true.
+	rc := &portainer.ResourceControl{
+		ResourceID: fmt.Sprintf("%d_%s", endpointID, gitStack.Name),
+		Type:       portainer.StackResourceControl,
+		UserAccesses: []portainer.UserResourceAccess{
+			{UserID: standardUser.ID, AccessLevel: portainer.ReadWriteAccessLevel},
+		},
+		AdministratorsOnly: false,
+		Public:             false,
+	}
+	err = rcSvc.Create(rc)
+	require.NoError(t, err)
+
+	err = m.migrateGitConfigToSources_2_43_0()
+	require.NoError(t, err)
+
+	migrated, err := stackSvc.Read(gitStack.ID)
+	require.NoError(t, err)
+	require.NotZero(t, migrated.WorkflowID)
+
+	wf, err := workflowSvc.Read(migrated.WorkflowID)
+	require.NoError(t, err)
+	require.Len(t, wf.Artifacts, 1)
+	require.Len(t, wf.Artifacts[0].Files, 1)
+
+	srcID := wf.Artifacts[0].Files[0].SourceID
+	src, err := sourceSvc.Read(adminUserContext, srcID)
+	require.NoError(t, err)
+	require.False(t, src.AdministratorsOnly, "source must not be admin-only after migrating a standard user's stack")
+	require.Contains(t, src.UserAccesses, standardUser.ID)
+
+	// The standard user must be able to read the source through the normal access filter
+	userCtx := source.NewUserContext(standardUser, nil)
+	userSrc, err := sourceSvc.Read(userCtx, srcID)
+	require.NoError(t, err)
+	require.Equal(t, srcID, userSrc.ID)
 }
 
 func TestMigrateCustomTemplateGitConfigToSources_2_43_0_Idempotent(t *testing.T) {
