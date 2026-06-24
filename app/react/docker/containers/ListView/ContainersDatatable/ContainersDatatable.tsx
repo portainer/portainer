@@ -97,7 +97,8 @@ export function ContainersDatatable({
             withColumnFilters(
               tableState.columnFilters,
               tableState.setColumnFilters
-            )
+            ),
+            (options) => ({ ...options, autoResetPageIndex: false })
           )}
         />
       </TableSettingsProvider>
