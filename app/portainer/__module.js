@@ -294,6 +294,19 @@ angular
         abstract: true,
       };
 
+      var logforge = {
+        name: 'portainer.logforge',
+        url: '/logforge',
+        views: {
+          'content@': {
+            component: 'logforgeView',
+          },
+        },
+        data: {
+          access: AccessHeaders.Restricted,
+        },
+      };
+
       var workflows = {
         name: 'portainer.gitops.workflows',
         url: '/workflows?search&sort&order&page&pageSize&status&type&platform&groupBy&groupFilter',
@@ -488,6 +501,7 @@ angular
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
+      $stateRegistryProvider.register(logforge);
       $stateRegistryProvider.register(gitopsBase);
       $stateRegistryProvider.register(workflows);
       $stateRegistryProvider.register(gitopsWorkflowDetail);

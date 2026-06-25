@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
+	"github.com/portainer/portainer/api/dataservices/logforge"
 	"github.com/portainer/portainer/api/dataservices/pendingactions"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
@@ -68,6 +69,7 @@ type Store struct {
 	ResourceControlService    *resourcecontrol.Service
 	RoleService               *role.Service
 	APIKeyRepositoryService   *apikeyrepository.Service
+	LogForgeService           *logforge.Service
 	ScheduleService           *schedule.Service
 	SettingsService           *settings.Service
 	SnapshotService           *snapshot.Service
@@ -245,6 +247,12 @@ func (store *Store) initServices() error {
 	}
 	store.APIKeyRepositoryService = apiKeyService
 
+	logForgeService, err := logforge.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.LogForgeService = logForgeService
+
 	versionService, err := version.NewService(store.connection)
 	if err != nil {
 		return err
@@ -352,6 +360,11 @@ func (store *Store) APIKeyRepository() dataservices.APIKeyRepository {
 	return store.APIKeyRepositoryService
 }
 
+// LogForge gives access to the LogForge data management layer
+func (store *Store) LogForge() dataservices.LogForgeService {
+	return store.LogForgeService
+}
+
 // Settings gives access to the Settings data management layer
 func (store *Store) Settings() dataservices.SettingsService {
 	return store.SettingsService
@@ -426,6 +439,7 @@ type storeExport struct {
 	EndpointRelation   []portainer.EndpointRelation   `json:"endpoint_relations,omitempty"`
 	Extensions         []portainer.Extension          `json:"extension,omitempty"`
 	HelmUserRepository []portainer.HelmUserRepository `json:"helm_user_repository,omitempty"`
+	LogForge           *portainer.LogForgeSettings    `json:"logforge,omitempty"`
 	Registry           []portainer.Registry           `json:"registries,omitempty"`
 	ResourceControl    []portainer.ResourceControl    `json:"resource_control,omitempty"`
 	Role               []portainer.Role               `json:"roles,omitempty"`
@@ -519,6 +533,14 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.HelmUserRepository = r
+	}
+
+	if settings, err := store.LogForge().Settings(); err != nil {
+		if !store.IsErrObjectNotFound(err) {
+			log.Error().Err(err).Msg("exporting LogForge settings")
+		}
+	} else {
+		backup.LogForge = settings
 	}
 
 	if r, err := store.Registry().ReadAll(); err != nil {
@@ -732,6 +754,12 @@ func (store *Store) Import(filename string) (err error) {
 	for _, v := range backup.HelmUserRepository {
 		if err := store.HelmUserRepository().Update(v.ID, &v); err != nil {
 			log.Warn().Err(err).Msg("failed to update the helm user repository in the database")
+		}
+	}
+
+	if backup.LogForge != nil && (backup.LogForge.Enabled || backup.LogForge.ApplianceURL != "" || backup.LogForge.ApplianceStackID != 0) {
+		if err := store.LogForge().UpdateSettings(backup.LogForge); err != nil {
+			log.Warn().Err(err).Msg("failed to update the LogForge settings in the database")
 		}
 	}
 

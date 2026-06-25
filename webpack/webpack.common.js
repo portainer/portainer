@@ -109,7 +109,7 @@ module.exports = {
     port: process.env.PORT || 8999,
     proxy: [
       {
-        context: ['/api'],
+        context: ['/api', '/logforge'],
         target: 'http://localhost:9000',
         ws: true,
       },
