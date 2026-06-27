@@ -466,6 +466,42 @@ services:
 	}
 }
 
+// Test_getConfig_envFileInSubdirectory is a regression test ensuring that a
+// relative env_file in a compose file located in a SUBDIRECTORY of the stack
+// resolves against the compose file's own directory, not the stack root. A
+// decoy stack.env at the stack root must be ignored in favour of the sibling
+// stack.env next to the compose file.
+func Test_getConfig_envFileInSubdirectory(t *testing.T) {
+	root := t.TempDir()
+
+	// Decoy env file at the stack root: must NOT be picked up.
+	require.NoError(t, os.WriteFile(filesystem.JoinPaths(root, "stack.env"), []byte("FOO=fromroot"), 0o644))
+
+	subDir := filesystem.JoinPaths(root, "sub")
+	require.NoError(t, os.MkdirAll(subDir, 0o755))
+
+	composePath := filesystem.JoinPaths(subDir, "docker-compose.yml")
+	require.NoError(t, os.WriteFile(composePath, []byte(`services:
+  web:
+    image: busybox
+    env_file:
+      - stack.env`), 0o644))
+
+	// Sibling env file next to the compose file: this is the one that must win.
+	require.NoError(t, os.WriteFile(filesystem.JoinPaths(subDir, "stack.env"), []byte("FOO=fromsub"), 0o644))
+
+	getStrPointer := func(s string) *string { return &s }
+
+	// workingDir is the stack ROOT, exactly as api/exec/swarm_stack.go passes it.
+	cfg, err := getConfig([]string{composePath}, root, nil)
+	require.NoError(t, err)
+	require.Len(t, cfg.Services, 1)
+
+	svc := cfg.Services[0]
+	require.Equal(t, composetypes.MappingWithEquals{"FOO": getStrPointer("fromsub")}, svc.Environment)
+	require.Equal(t, composetypes.StringList{filesystem.JoinPaths(subDir, "stack.env")}, svc.EnvFile)
+}
+
 type mockAPIClient struct {
 	client.APIClient
 	serviceListFn   func(context.Context, swarm.ServiceListOptions) ([]swarm.Service, error)

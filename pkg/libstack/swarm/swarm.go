@@ -651,6 +651,14 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 		return details, errors.New("at least one compose file must be specified")
 	}
 
+	// Relative env_file/file: paths inside a compose file are resolved against
+	// the directory containing that compose file, not the stack root. Callers
+	// (e.g. api/exec/swarm_stack.go) pass the stack root as workingDir, which is
+	// incorrect for compose files located in a subdirectory of the stack. Derive
+	// the working dir from the compose file's own directory to keep behavior
+	// symmetric with the standalone compose deployer.
+	workingDir = filepath.Dir(filePaths[0])
+
 	details.WorkingDir = workingDir
 
 	details.ConfigFiles = make([]composetypes.ConfigFile, 0, len(filePaths))
