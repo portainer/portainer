@@ -177,7 +177,13 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	repositoryUsername := ""
 	repositoryPassword := ""
+	if gitConfig.Authentication != nil {
+		repositoryUsername = gitConfig.Authentication.Username
+		repositoryPassword = gitConfig.Authentication.Password
+	}
+
 	if payload.RepositoryAuthentication {
+		repositoryUsername = cmp.Or(payload.RepositoryUsername, repositoryUsername)
 		repositoryPassword = payload.RepositoryPassword
 
 		// When the existing stack is using the custom username/password and the password is not updated,
@@ -185,7 +191,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		if repositoryPassword == "" && gitConfig.Authentication != nil {
 			repositoryPassword = gitConfig.Authentication.Password
 		}
-		repositoryUsername = payload.RepositoryUsername
 	}
 
 	cloneOptions := git.CloneOptions{
