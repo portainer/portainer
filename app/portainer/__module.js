@@ -297,6 +297,7 @@ angular
       var workflows = {
         name: 'portainer.gitops.workflows',
         url: '/workflows?search&sort&order&page&pageSize&status&type&platform&groupBy&groupFilter',
+        data: { docs: '/user/app-delivery/workflows' },
         params: {
           ...paginationParams(),
           sort: filterParam(),
@@ -317,6 +318,7 @@ angular
       var gitopsSources = {
         name: 'portainer.gitops.sources',
         url: '/sources?search&sort&order&page&pageSize&status&type',
+        data: { docs: '/user/app-delivery/sources' },
         params: {
           ...paginationParams(),
           sort: filterParam(),
