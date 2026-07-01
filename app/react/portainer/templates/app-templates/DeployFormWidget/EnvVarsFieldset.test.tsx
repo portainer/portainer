@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
@@ -7,6 +8,15 @@ import {
   getDefaultValues,
   envVarsFieldsetValidation,
 } from './EnvVarsFieldset';
+
+// Tippy renders tooltip content in a portal which is not accessible without
+// user interaction in jsdom. Mock Tooltip to render its message inline so
+// tests can assert on the message text.
+vi.mock('@@/Tip/Tooltip/Tooltip', () => ({
+  Tooltip: ({ message }: { message: ReactNode }) => (
+    <span data-cy="tooltip">{message}</span>
+  ),
+}));
 
 test('renders EnvVarsFieldset component', () => {
   const onChange = vi.fn();
@@ -32,6 +42,49 @@ test('renders EnvVarsFieldset component', () => {
     const inputElement = screen.getByDisplayValue(value[option.name]);
     expect(inputElement).toBeInTheDocument();
   });
+});
+
+test('renders the env var description as a tooltip', () => {
+  const onChange = vi.fn();
+  const options = [
+    {
+      name: 'VAR1',
+      label: 'Variable 1',
+      description: 'Helpful description for variable 1',
+      preset: false,
+    },
+  ];
+  const value = { VAR1: 'Value 1' };
+
+  render(
+    <EnvVarsFieldset
+      onChange={onChange}
+      options={options}
+      values={value}
+      errors={{}}
+    />
+  );
+
+  expect(
+    screen.getByText('Helpful description for variable 1')
+  ).toBeInTheDocument();
+});
+
+test('does not render a tooltip when the env var has no description', () => {
+  const onChange = vi.fn();
+  const options = [{ name: 'VAR1', label: 'Variable 1', preset: false }];
+  const value = { VAR1: 'Value 1' };
+
+  render(
+    <EnvVarsFieldset
+      onChange={onChange}
+      options={options}
+      values={value}
+      errors={{}}
+    />
+  );
+
+  expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument();
 });
 
 test('calls onChange when input value changes', async () => {
