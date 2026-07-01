@@ -2670,6 +2670,7 @@ const (
 	ChangeConfirmation PolicyType = "change-confirmation"
 	CleanupDocker      PolicyType = "cleanup-docker"
 	ObservabilityK8s   PolicyType = "observability-k8s"
+	NetworkSecurityK8s PolicyType = "network-security-k8s"
 )
 
 type HelmInstallStatus string
