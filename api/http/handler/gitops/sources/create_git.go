@@ -89,6 +89,8 @@ func (h *Handler) gitSourceCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to create source", err)
 	}
 
+	h.invalidateCache()
+
 	src.Git = gittypes.SanitizeGitSource(src.Git)
 
 	return response.JSONWithStatus(w, src, http.StatusCreated)

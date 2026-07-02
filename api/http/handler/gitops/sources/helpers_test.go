@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
+	gocache "github.com/patrickmn/go-cache"
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
@@ -50,6 +51,16 @@ func newTestHandler(t *testing.T, store dataservices.DataStore) *Handler {
 	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil)
 }
 
+// newTestHandlerNoCacheExpiry returns a handler whose source cache never expires,
+// so cache-invalidation tests can prove a write clears the cache rather than the
+// TTL simply elapsing between requests.
+func newTestHandlerNoCacheExpiry(t *testing.T, store dataservices.DataStore) *Handler {
+	t.Helper()
+	h := newTestHandler(t, store)
+	h.cache = gocache.New(gocache.NoExpiration, cacheCleanupInterval)
+	return h
+}
+
 func adminRestrictedContext(userID portainer.UserID) *security.RestrictedRequestContext {
 	return &security.RestrictedRequestContext{
 		UserID:  userID,
@@ -58,20 +69,25 @@ func adminRestrictedContext(userID portainer.UserID) *security.RestrictedRequest
 	}
 }
 
-func buildListReq(t *testing.T, userID portainer.UserID, query string) *http.Request {
-	t.Helper()
-	req := httptest.NewRequest(http.MethodGet, "/gitops/sources?"+query, nil)
+// withSecurityContext attaches the admin token data and restricted request
+// context for userID to req, mirroring what the auth middleware sets up in
+// production.
+func withSecurityContext(req *http.Request, userID portainer.UserID) *http.Request {
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
 	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
 	return req
 }
 
+func buildListReq(t *testing.T, userID portainer.UserID, query string) *http.Request {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodGet, "/gitops/sources?"+query, nil)
+	return withSecurityContext(req, userID)
+}
+
 func buildGetReq(t *testing.T, userID portainer.UserID, id string) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, "/gitops/sources/"+id, nil)
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func decodeSources(t *testing.T, rr *httptest.ResponseRecorder) []Source {
@@ -98,49 +114,37 @@ func buildCreateReq(t *testing.T, userID portainer.UserID, body []byte) *http.Re
 	t.Helper()
 	req := httptest.NewRequest(http.MethodPost, "/gitops/sources/git", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func buildUpdateReq(t *testing.T, userID portainer.UserID, id int, body []byte) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/gitops/sources/%d", id), bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func buildDeleteReq(t *testing.T, userID portainer.UserID, id int) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/gitops/sources/%d", id), nil)
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func buildSummaryReq(t *testing.T, userID portainer.UserID) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, "/gitops/sources/summary", nil)
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func buildUpdateReqWithRawID(t *testing.T, userID portainer.UserID, id string, body []byte) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodPut, "/gitops/sources/"+id, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }
 
 func buildDeleteReqWithRawID(t *testing.T, userID portainer.UserID, id string) *http.Request {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodDelete, "/gitops/sources/"+id, nil)
-	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
-	return req
+	return withSecurityContext(req, userID)
 }

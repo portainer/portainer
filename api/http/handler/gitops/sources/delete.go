@@ -91,5 +91,7 @@ func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to delete source", err)
 	}
 
+	h.invalidateCache()
+
 	return response.Empty(w)
 }

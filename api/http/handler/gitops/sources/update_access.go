@@ -73,6 +73,8 @@ func (h *Handler) gitSourceUpdateAccess(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to update source access", err)
 	}
 
+	h.invalidateCache()
+
 	return response.JSON(w, src)
 }
 

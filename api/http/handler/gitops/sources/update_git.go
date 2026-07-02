@@ -106,6 +106,8 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to update source", err)
 	}
 
+	h.invalidateCache()
+
 	src.Git = gittypes.SanitizeGitSource(src.Git)
 
 	return response.JSON(w, src)

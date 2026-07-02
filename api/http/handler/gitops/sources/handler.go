@@ -54,3 +54,9 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 
 	return h
 }
+
+// invalidateCache clears the cached source lists so the next read reflects
+// the latest datastore state. Called after any mutating operation.
+func (h *Handler) invalidateCache() {
+	h.cache.Flush()
+}
