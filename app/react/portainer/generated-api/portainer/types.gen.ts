@@ -4548,7 +4548,13 @@ export type StacksStackGitRedeployPayload = {
    * Force a pulling to current image with the original tag though the image is already the latest
    */
   PullImage?: boolean;
+  /**
+   * When true and RepositoryPassword is non-empty, stored credentials are replaced.
+   */
   RepositoryAuthentication?: boolean;
+  /**
+   * Non-empty value (with RepositoryAuthentication=true) replaces stored credentials; leave blank to keep them.
+   */
   RepositoryPassword?: string;
   RepositoryReferenceName?: string;
   RepositoryUsername?: string;
