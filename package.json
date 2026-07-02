@@ -152,7 +152,7 @@
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
-    "@hey-api/openapi-ts": "0.97.3",
+    "@hey-api/openapi-ts": "0.99.0",
     "@simbathesailor/use-what-changed": "^2.0.0",
     "@storybook/addon-docs": "10.4.2",
     "@storybook/addon-links": "10.4.2",

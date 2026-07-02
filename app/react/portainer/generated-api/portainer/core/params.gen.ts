@@ -62,7 +62,7 @@ type KeyMap = Map<
     }
 >;
 
-const buildKeyMap = (fields: FieldsConfig, map?: KeyMap): KeyMap => {
+function buildKeyMap(fields: FieldsConfig, map?: KeyMap): KeyMap {
   if (!map) {
     map = new Map();
   }
@@ -85,17 +85,18 @@ const buildKeyMap = (fields: FieldsConfig, map?: KeyMap): KeyMap => {
   }
 
   return map;
-};
+}
 
 interface Params {
-  body: unknown;
+  body?: unknown;
   headers: Record<string, unknown>;
   path: Record<string, unknown>;
   query: Record<string, unknown>;
 }
 
-const stripEmptySlots = (params: Params) => {
+function stripEmptySlots(params: Params): void {
   for (const [slot, value] of Object.entries(params)) {
+    if (slot === 'body') continue;
     if (
       value &&
       typeof value === 'object' &&
@@ -105,20 +106,28 @@ const stripEmptySlots = (params: Params) => {
       delete params[slot as Slot];
     }
   }
-};
+}
 
-export const buildClientParams = (
+export function buildClientParams(
   args: ReadonlyArray<unknown>,
   fields: FieldsConfig
-) => {
+): Params {
   const params: Params = {
-    body: Object.create(null),
     headers: Object.create(null),
     path: Object.create(null),
     query: Object.create(null),
   };
 
   const map = buildKeyMap(fields);
+
+  function writeSlot(slot: Slot, key: string, value: unknown): void {
+    let record = params[slot] as Record<string, unknown> | undefined;
+    if (record === undefined) {
+      record = Object.create(null) as Record<string, unknown>;
+      params[slot] = record;
+    }
+    record[key] = value;
+  }
 
   let config: FieldsConfig[number] | undefined;
 
@@ -136,7 +145,7 @@ export const buildClientParams = (
         const field = map.get(config.key)!;
         const name = field.map || config.key;
         if (field.in) {
-          (params[field.in] as Record<string, unknown>)[name] = arg;
+          writeSlot(field.in, name, arg);
         }
       } else {
         params.body = arg;
@@ -148,7 +157,7 @@ export const buildClientParams = (
         if (field) {
           if (field.in) {
             const name = field.map || key;
-            (params[field.in] as Record<string, unknown>)[name] = value;
+            writeSlot(field.in, name, value);
           } else {
             params[field.map] = value;
           }
@@ -159,13 +168,11 @@ export const buildClientParams = (
 
           if (extra) {
             const [prefix, slot] = extra;
-            (params[slot] as Record<string, unknown>)[
-              key.slice(prefix.length)
-            ] = value;
+            writeSlot(slot, key.slice(prefix.length), value);
           } else if ('allowExtra' in config && config.allowExtra) {
             for (const [slot, allowed] of Object.entries(config.allowExtra)) {
               if (allowed) {
-                (params[slot as Slot] as Record<string, unknown>)[key] = value;
+                writeSlot(slot as Slot, key, value);
                 break;
               }
             }
@@ -178,4 +185,4 @@ export const buildClientParams = (
   stripEmptySlots(params);
 
   return params;
-};
+}

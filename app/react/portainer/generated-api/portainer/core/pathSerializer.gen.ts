@@ -26,7 +26,9 @@ interface SerializePrimitiveParam extends SerializePrimitiveOptions {
   value: string;
 }
 
-export const separatorArrayExplode = (style: ArraySeparatorStyle) => {
+export const separatorArrayExplode = (
+  style: ArraySeparatorStyle
+): '.' | ';' | ',' | '&' => {
   switch (style) {
     case 'label':
       return '.';
@@ -39,7 +41,9 @@ export const separatorArrayExplode = (style: ArraySeparatorStyle) => {
   }
 };
 
-export const separatorArrayNoExplode = (style: ArraySeparatorStyle) => {
+export const separatorArrayNoExplode = (
+  style: ArraySeparatorStyle
+): ',' | '|' | '%20' => {
   switch (style) {
     case 'form':
       return ',';
@@ -52,7 +56,9 @@ export const separatorArrayNoExplode = (style: ArraySeparatorStyle) => {
   }
 };
 
-export const separatorObjectExplode = (style: ObjectSeparatorStyle) => {
+export const separatorObjectExplode = (
+  style: ObjectSeparatorStyle
+): '.' | ';' | ',' | '&' => {
   switch (style) {
     case 'label':
       return '.';
@@ -73,7 +79,7 @@ export const serializeArrayParam = ({
   value,
 }: SerializeOptions<ArraySeparatorStyle> & {
   value: unknown[];
-}) => {
+}): string => {
   if (!explode) {
     const joinedValues = (
       allowReserved ? value : value.map((v) => encodeURIComponent(v as string))
@@ -113,7 +119,7 @@ export const serializePrimitiveParam = ({
   allowReserved,
   name,
   value,
-}: SerializePrimitiveParam) => {
+}: SerializePrimitiveParam): string => {
   if (value === undefined || value === null) {
     return '';
   }
@@ -137,7 +143,7 @@ export const serializeObjectParam = ({
 }: SerializeOptions<ObjectSeparatorStyle> & {
   value: Record<string, unknown> | Date;
   valueOnly?: boolean;
-}) => {
+}): string => {
   if (value instanceof Date) {
     return valueOnly ? value.toISOString() : `${name}=${value.toISOString()}`;
   }
