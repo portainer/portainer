@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	tunnelCleanupInterval = 10 * time.Second
-	activeTimeout         = 4*time.Minute + 30*time.Second
-	pingTimeout           = 3 * time.Second
+	tunnelCleanupInterval   = 10 * time.Second
+	activeTimeout           = 4*time.Minute + 30*time.Second
+	pingTimeout             = 8 * time.Second
+	tunnelKeepAliveInterval = 25 * time.Second
 )
 
 // Service represents a service to manage the state of multiple reverse tunnels.
@@ -153,8 +154,9 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotService por
 	}
 
 	config := &chserver.Config{
-		Reverse: true,
-		KeyFile: privateKeyFile,
+		Reverse:   true,
+		KeyFile:   privateKeyFile,
+		KeepAlive: tunnelKeepAliveInterval,
 	}
 
 	chiselServer, err := chserver.NewServer(config)
