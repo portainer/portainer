@@ -786,14 +786,24 @@ func (d *SwarmDeployer) WaitForStatus(
 					serviceStatuses = append(serviceStatuses, svcStatus)
 				}
 
-				if aggregateStatus(serviceStatuses) == status {
+				aggregate := aggregateStatus(serviceStatuses)
+
+				if aggregate == status {
+					return nil
+				}
+
+				// A stack made up entirely of job services never reaches "running":
+				// mirror the compose deployer and treat "completed" as success.
+				if status == libstack.StatusRunning && aggregate == libstack.StatusCompleted {
+					waitResult.Status = libstack.StatusCompleted
+
 					return nil
 				}
 
 				log.Debug().
 					Str("project_name", projectName).
 					Str("required_status", string(status)).
-					Str("status", string(aggregateStatus(serviceStatuses))).
+					Str("status", string(aggregate)).
 					Msg("waiting for status")
 			}
 		})
@@ -831,6 +841,12 @@ func getServiceStatus(
 	})
 	if err != nil {
 		return "", "", fmt.Errorf("failed to list tasks for service %s: %w", svc.Spec.Name, err)
+	}
+
+	if svc.Spec.Mode.ReplicatedJob != nil || svc.Spec.Mode.GlobalJob != nil {
+		status, errorMessage := jobServiceStatus(svc, tasks)
+
+		return status, errorMessage, nil
 	}
 
 	expectedRunningTaskCount := 0
@@ -879,6 +895,74 @@ func getServiceStatus(
 	}
 
 	return libstack.StatusUnknown, "", nil
+}
+
+// jobServiceStatus derives the status of a replicated-job or global-job service
+// from its tasks. Only tasks belonging to the current job iteration are
+// considered: on re-deployment swarm increments JobStatus.JobIteration and
+// completed tasks from previous iterations linger in the task history.
+func jobServiceStatus(svc swarm.Service, tasks []swarm.Task) (libstack.Status, string) {
+	if svc.JobStatus != nil {
+		iteration := svc.JobStatus.JobIteration.Index
+
+		currentTasks := make([]swarm.Task, 0, len(tasks))
+		for _, task := range tasks {
+			if task.JobIteration != nil && task.JobIteration.Index == iteration {
+				currentTasks = append(currentTasks, task)
+			}
+		}
+
+		tasks = currentTasks
+	}
+
+	runningCount, completedCount := 0, 0
+
+	for _, task := range tasks {
+		switch task.Status.State {
+		case swarm.TaskStateFailed, swarm.TaskStateRejected:
+			// Consistent with regular services: any failed task reports an error.
+			return libstack.StatusError, task.Status.Err
+		case swarm.TaskStateRemove:
+			return libstack.StatusRemoving, ""
+		case swarm.TaskStateRunning:
+			runningCount++
+		case swarm.TaskStateComplete:
+			completedCount++
+		}
+	}
+
+	if completedCount >= expectedJobCompletions(svc, len(tasks)) {
+		return libstack.StatusCompleted, ""
+	}
+
+	if runningCount > 0 {
+		return libstack.StatusRunning, ""
+	}
+
+	return libstack.StatusStarting, ""
+}
+
+// expectedJobCompletions returns the number of completed tasks required for a
+// job service to be considered done.
+func expectedJobCompletions(svc swarm.Service, currentTaskCount int) int {
+	if replicatedJob := svc.Spec.Mode.ReplicatedJob; replicatedJob != nil {
+		if replicatedJob.TotalCompletions != nil {
+			return int(*replicatedJob.TotalCompletions)
+		}
+
+		// Per the Docker API, MaxConcurrent is used when TotalCompletions is unset.
+		if replicatedJob.MaxConcurrent != nil {
+			return int(*replicatedJob.MaxConcurrent)
+		}
+
+		return 1
+	}
+
+	// Global job: swarm creates all tasks for the current iteration up front,
+	// one per eligible node, so the current task count is the target. The
+	// eligible node count cannot be derived from NodeList because placement
+	// constraints restrict which nodes get a task.
+	return max(currentTaskCount, 1)
 }
 
 // waitOnTasks polls until all tasks belonging to the namespace reach a terminal state.

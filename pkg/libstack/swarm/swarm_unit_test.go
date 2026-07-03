@@ -628,3 +628,189 @@ func Test_getServiceStatus(t *testing.T) {
 		})
 	}
 }
+
+func Test_getServiceStatus_jobService(t *testing.T) {
+	t.Parallel()
+
+	// A completed job task must report "completed", proving the job branch is
+	// taken instead of the regular service logic (which would report "unknown").
+	mock := &mockAPIClient{
+		taskListFn: func(context.Context, swarm.TaskListOptions) ([]swarm.Task, error) {
+			return []swarm.Task{
+				{Status: swarm.TaskStatus{State: swarm.TaskStateComplete}},
+			}, nil
+		},
+	}
+
+	svc := swarm.Service{
+		ID: "svc-id-1",
+		Spec: swarm.ServiceSpec{
+			Annotations: swarm.Annotations{Name: "mystack_job"},
+			Mode:        swarm.ServiceMode{ReplicatedJob: &swarm.ReplicatedJob{}},
+		},
+	}
+
+	status, errMsg, err := getServiceStatus(context.Background(), mock, svc)
+	require.NoError(t, err)
+	require.Equal(t, libstack.StatusCompleted, status)
+	require.Empty(t, errMsg)
+}
+
+func Test_jobServiceStatus(t *testing.T) {
+	t.Parallel()
+
+	uint64Ptr := func(v uint64) *uint64 { return &v }
+	iteration := func(index uint64) *swarm.Version { return &swarm.Version{Index: index} }
+
+	replicatedJobSvc := func(totalCompletions, maxConcurrent *uint64, jobIteration uint64) swarm.Service {
+		return swarm.Service{
+			Spec: swarm.ServiceSpec{
+				Mode: swarm.ServiceMode{
+					ReplicatedJob: &swarm.ReplicatedJob{
+						MaxConcurrent:    maxConcurrent,
+						TotalCompletions: totalCompletions,
+					},
+				},
+			},
+			JobStatus: &swarm.JobStatus{JobIteration: swarm.Version{Index: jobIteration}},
+		}
+	}
+
+	globalJobSvc := func(jobIteration uint64) swarm.Service {
+		return swarm.Service{
+			Spec:      swarm.ServiceSpec{Mode: swarm.ServiceMode{GlobalJob: &swarm.GlobalJob{}}},
+			JobStatus: &swarm.JobStatus{JobIteration: swarm.Version{Index: jobIteration}},
+		}
+	}
+
+	task := func(state swarm.TaskState, jobIteration uint64, errMsg string) swarm.Task {
+		return swarm.Task{
+			Status:       swarm.TaskStatus{State: state, Err: errMsg},
+			JobIteration: iteration(jobIteration),
+		}
+	}
+
+	tests := []struct {
+		name           string
+		service        swarm.Service
+		tasks          []swarm.Task
+		expectedStatus libstack.Status
+		expectedErrMsg string
+	}{
+		{
+			name:    "replicated-job with all completions reports completed",
+			service: replicatedJobSvc(uint64Ptr(2), uint64Ptr(1), 0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+			},
+			expectedStatus: libstack.StatusCompleted,
+		},
+		{
+			name:    "replicated-job with a running task reports running",
+			service: replicatedJobSvc(uint64Ptr(2), uint64Ptr(1), 0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateRunning, 0, ""),
+			},
+			expectedStatus: libstack.StatusRunning,
+		},
+		{
+			name:    "replicated-job between task launches reports starting",
+			service: replicatedJobSvc(uint64Ptr(2), uint64Ptr(1), 0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+			},
+			expectedStatus: libstack.StatusStarting,
+		},
+		{
+			name:           "replicated-job without tasks reports starting",
+			service:        replicatedJobSvc(uint64Ptr(1), uint64Ptr(1), 0),
+			tasks:          []swarm.Task{},
+			expectedStatus: libstack.StatusStarting,
+		},
+		{
+			name:    "replicated-job with a failed task reports error with message",
+			service: replicatedJobSvc(uint64Ptr(1), uint64Ptr(1), 0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateFailed, 0, "task: non-zero exit (1)"),
+			},
+			expectedStatus: libstack.StatusError,
+			expectedErrMsg: "task: non-zero exit (1)",
+		},
+		{
+			name:    "replicated-job ignores completed tasks from previous iterations",
+			service: replicatedJobSvc(uint64Ptr(2), uint64Ptr(1), 10),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 5, ""),
+				task(swarm.TaskStateComplete, 5, ""),
+				task(swarm.TaskStatePending, 10, ""),
+			},
+			expectedStatus: libstack.StatusStarting,
+		},
+		{
+			name:    "replicated-job falls back to max concurrent when total completions is unset",
+			service: replicatedJobSvc(nil, uint64Ptr(3), 0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+			},
+			expectedStatus: libstack.StatusCompleted,
+		},
+		{
+			name:    "global-job with all tasks complete reports completed",
+			service: globalJobSvc(0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+			},
+			expectedStatus: libstack.StatusCompleted,
+		},
+		{
+			name:    "global-job with a running task reports running",
+			service: globalJobSvc(0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateComplete, 0, ""),
+				task(swarm.TaskStateRunning, 0, ""),
+			},
+			expectedStatus: libstack.StatusRunning,
+		},
+		{
+			name:           "global-job without tasks reports starting",
+			service:        globalJobSvc(0),
+			tasks:          []swarm.Task{},
+			expectedStatus: libstack.StatusStarting,
+		},
+		{
+			name:    "global-job with a rejected task reports error with message",
+			service: globalJobSvc(0),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateRejected, 0, "No such image: missing:latest"),
+			},
+			expectedStatus: libstack.StatusError,
+			expectedErrMsg: "No such image: missing:latest",
+		},
+		{
+			name:    "failed task from a previous iteration is ignored",
+			service: replicatedJobSvc(uint64Ptr(1), uint64Ptr(1), 10),
+			tasks: []swarm.Task{
+				task(swarm.TaskStateFailed, 5, "task: non-zero exit (1)"),
+				task(swarm.TaskStateComplete, 10, ""),
+			},
+			expectedStatus: libstack.StatusCompleted,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			status, errMsg := jobServiceStatus(tt.service, tt.tasks)
+			require.Equal(t, tt.expectedStatus, status)
+			require.Equal(t, tt.expectedErrMsg, errMsg)
+		})
+	}
+}
