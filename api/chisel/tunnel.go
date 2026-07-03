@@ -130,8 +130,6 @@ func (s *Service) TunnelAddr(endpoint *portainer.Endpoint) (string, error) {
 
 	for t0 := time.Now(); ; {
 		if time.Since(t0) > 2*checkinInterval {
-			s.close(endpoint.ID)
-
 			return "", errors.New("unable to open the tunnel")
 		}
 
