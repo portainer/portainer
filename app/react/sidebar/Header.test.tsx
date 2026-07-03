@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import { withTestRouter } from '@/react/test-utils/withRouter';
 
@@ -90,31 +89,6 @@ describe('Header', () => {
       'portainerSidebar-homeImage'
     ).parentElement;
     expect(logoContainer).not.toHaveClass('justify-center');
-  });
-
-  it('should toggle sidebar when toggle button is clicked', async () => {
-    const user = userEvent.setup();
-    const mockToggle = vi.fn();
-    renderComponent({}, { isOpen: true, toggle: mockToggle });
-
-    const toggleButton = screen.getByRole('button', { name: 'Toggle Sidebar' });
-    await user.click(toggleButton);
-
-    expect(mockToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('should show chevron left icon when sidebar is open', () => {
-    renderComponent();
-
-    const toggleButton = screen.getByRole('button', { name: 'Toggle Sidebar' });
-    expect(toggleButton).toBeInTheDocument();
-  });
-
-  it('should show chevron right icon when sidebar is closed', () => {
-    renderComponent({}, { isOpen: false, toggle: vi.fn() });
-
-    const toggleButton = screen.getByRole('button', { name: 'Toggle Sidebar' });
-    expect(toggleButton).toBeInTheDocument();
   });
 
   it('should use small logo when sidebar is closed', () => {

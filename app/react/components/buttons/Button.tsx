@@ -45,12 +45,13 @@ export interface Props<TasProps = unknown>
   props?: Omit<TasProps, keyof Props>;
 }
 
-export const ButtonWithRef = forwardRef<HTMLButtonElement, Omit<Props, 'mRef'>>(
-  (props, ref) => (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <Button {...props} mRef={ref} />
-  )
-);
+export const ButtonWithRef = forwardRef<
+  HTMLButtonElement,
+  PropsWithChildren<Omit<Props, 'mRef'>>
+>((props, ref) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} mRef={ref} />
+));
 
 ButtonWithRef.displayName = 'ButtonWithRef';
 

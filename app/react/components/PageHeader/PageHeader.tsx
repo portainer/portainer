@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react';
 
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
 
+import { VerticalSeparator } from '../VerticalSeparator';
 import { Button } from '../buttons';
 
 import { Breadcrumbs } from './Breadcrumbs';
@@ -11,6 +12,7 @@ import { Crumb } from './Breadcrumbs/Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
 import { PageTitle } from './PageTitle';
+import { SidebarToggleButton } from './SidebarToggleButton';
 
 interface Props {
   id?: string;
@@ -40,7 +42,11 @@ export function PageHeader({
   return (
     <>
       <HeaderContainer id={id}>
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <div className="flex min-w-0 items-center">
+          <SidebarToggleButton />
+          <VerticalSeparator />
+          <Breadcrumbs breadcrumbs={breadcrumbs} />
+        </div>
         <HeaderTitle />
       </HeaderContainer>
 
