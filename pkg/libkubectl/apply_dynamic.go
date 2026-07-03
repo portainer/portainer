@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -26,6 +27,12 @@ func (c *Client) ApplyDynamic(ctx context.Context, manifests []string) (string, 
 	restConfig, err := c.factory.ToRESTConfig()
 	if err != nil {
 		return "", fmt.Errorf("failed to create REST config: %w", err)
+	}
+
+	// Propagate context deadline to the HTTP client so discovery calls (which
+	// don't accept a context) still honour the caller's timeout.
+	if deadline, ok := ctx.Deadline(); ok {
+		restConfig.Timeout = time.Until(deadline)
 	}
 
 	// Create dynamic client
