@@ -79,6 +79,47 @@ func Test_aggregateStatus(t *testing.T) {
 	}
 }
 
+func Test_cliOptions(t *testing.T) {
+	t.Parallel()
+
+	registries := []configtypes.AuthConfig{
+		{ServerAddress: "registry.example.com", Username: "user", Password: "pass"},
+		{ServerAddress: dockerregistry.IndexServer, Username: "other"},
+	}
+
+	tests := []struct {
+		name       string
+		host       string
+		registries []configtypes.AuthConfig
+		expected   libstack.DockerCliOptions
+	}{
+		{
+			name:       "sets manager-operation header and passes through host and registries",
+			host:       "tcp://127.0.0.1:2377",
+			registries: registries,
+			expected: libstack.DockerCliOptions{
+				Host:       "tcp://127.0.0.1:2377",
+				Registries: registries,
+				Headers:    map[string]string{managerOperationHeader: "1"},
+			},
+		},
+		{
+			name: "empty host and nil registries still set the header",
+			expected: libstack.DockerCliOptions{
+				Headers: map[string]string{managerOperationHeader: "1"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			require.Equal(t, tt.expected, cliOptions(tt.host, tt.registries))
+		})
+	}
+}
+
 func Test_isTerminalState(t *testing.T) {
 	t.Parallel()
 
