@@ -1706,7 +1706,11 @@ export type PortainerArtifact = {
 export type PortainerArtifactFile = {
   hash?: string;
   path?: string;
+  pathError?: string;
+  pathStatus?: PortainerSourceStatus;
   ref?: string;
+  refError?: string;
+  refStatus?: PortainerSourceStatus;
   sourceId?: number;
 };
 
@@ -3013,10 +3017,30 @@ export type PortainerSource = {
   ownerID?: number;
   public?: boolean;
   registry?: PortainerRegistry;
+  status?: PortainerSourceStatus;
+  statusError?: string;
   teamAccesses?: Array<number>;
   type?: PortainerSourceType;
   userAccesses?: Array<number>;
 };
+
+export const PortainerSourceStatus = {
+  /**
+   * SourceStatusUnknown
+   */
+  SOURCE_STATUS_UNKNOWN: 0,
+  /**
+   * SourceStatusHealthy
+   */
+  SOURCE_STATUS_HEALTHY: 1,
+  /**
+   * SourceStatusError
+   */
+  SOURCE_STATUS_ERROR: 2,
+} as const;
+
+export type PortainerSourceStatus =
+  (typeof PortainerSourceStatus)[keyof typeof PortainerSourceStatus];
 
 export const PortainerSourceType = {
   /**

@@ -713,22 +713,6 @@ export const zPortainerAccessPolicy = z.object({
   RoleId: z.int(),
 });
 
-export const zPortainerArtifactFile = z.object({
-  hash: z.string().optional(),
-  path: z.string().optional(),
-  ref: z.string().optional(),
-  sourceId: z.int().optional(),
-});
-
-export const zPortainerArtifact = z.object({
-  edgeGroups: z.array(z.int()).optional(),
-  edgeStackId: z.int().optional(),
-  envGroups: z.array(z.int()).optional(),
-  envIds: z.array(z.int()).optional(),
-  files: z.array(zPortainerArtifactFile).optional(),
-  stackId: z.int().optional(),
-});
-
 export const zPortainerAuthenticationMethod = z.union([
   z.literal(0),
   z.literal(1),
@@ -1252,6 +1236,32 @@ export const zPortainerSslSettings = z.object({
   selfSigned: z.boolean().optional(),
 });
 
+export const zPortainerSourceStatus = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+]);
+
+export const zPortainerArtifactFile = z.object({
+  hash: z.string().optional(),
+  path: z.string().optional(),
+  pathError: z.string().optional(),
+  pathStatus: zPortainerSourceStatus.optional(),
+  ref: z.string().optional(),
+  refError: z.string().optional(),
+  refStatus: zPortainerSourceStatus.optional(),
+  sourceId: z.int().optional(),
+});
+
+export const zPortainerArtifact = z.object({
+  edgeGroups: z.array(z.int()).optional(),
+  edgeStackId: z.int().optional(),
+  envGroups: z.array(z.int()).optional(),
+  envIds: z.array(z.int()).optional(),
+  files: z.array(zPortainerArtifactFile).optional(),
+  stackId: z.int().optional(),
+});
+
 export const zPortainerSourceType = z.union([
   z.literal(0),
   z.literal(1),
@@ -1629,6 +1639,8 @@ export const zPortainerSource = z.object({
   ownerID: z.int().optional(),
   public: z.boolean().optional(),
   registry: zPortainerRegistry.optional(),
+  status: zPortainerSourceStatus.optional(),
+  statusError: z.string().optional(),
   teamAccesses: z.array(z.int()).optional(),
   type: zPortainerSourceType.optional(),
   userAccesses: z.array(z.int()).optional(),
