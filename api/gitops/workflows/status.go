@@ -2,6 +2,28 @@ package workflows
 
 import portainer "github.com/portainer/portainer/api"
 
+func SourceStatusToPhase(s portainer.SourceStatus, errMsg string) WorkflowPhaseStatus {
+	switch s {
+	case portainer.SourceStatusHealthy:
+		return WorkflowPhaseStatus{Status: StatusHealthy}
+	case portainer.SourceStatusError:
+		return WorkflowPhaseStatus{Status: StatusError, Error: errMsg}
+	default:
+		return WorkflowPhaseStatus{Status: StatusUnknown}
+	}
+}
+
+func WorkflowPhaseToStatus(p WorkflowPhaseStatus) (portainer.SourceStatus, string) {
+	switch p.Status {
+	case StatusHealthy:
+		return portainer.SourceStatusHealthy, ""
+	case StatusError:
+		return portainer.SourceStatusError, p.Error
+	default:
+		return portainer.SourceStatusUnknown, ""
+	}
+}
+
 func deriveStackTargetState(s portainer.Stack) WorkflowPhaseStatus {
 	if len(s.DeploymentStatus) == 0 {
 		return WorkflowPhaseStatus{Status: StatusHealthy}

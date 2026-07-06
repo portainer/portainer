@@ -2,6 +2,7 @@ package stackbuilders
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -84,6 +85,65 @@ func TestGitMethodStackBuilder_WithSourceID_ReferencesExistingSource(t *testing.
 	assert.Equal(t, "refs/heads/main", merged.ReferenceName)
 	require.NotNil(t, merged.Authentication)
 	assert.Equal(t, "git-user", merged.Authentication.Username)
+}
+
+func TestGitMethodStackBuilder_WithSourceID_PersistsHealthyStatusOnSuccess(t *testing.T) {
+	t.Parallel()
+	builder := newGitMethodBuilder(t, "abc123")
+	builder.stack.ID = 1
+
+	src := &portainer.Source{
+		Name: "my-repo",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://github.com/org/private-repo"},
+	}
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, src))
+
+	payload := &StackPayload{
+		RepositoryConfigPayload: RepositoryConfigPayload{
+			SourceID:      src.ID,
+			ReferenceName: "refs/heads/main",
+		},
+	}
+
+	err := builder.prepare(t.Context(), payload, portainer.UserID(1))
+	require.NoError(t, err)
+
+	updatedSrc, err := builder.dataStore.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	assert.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
+	assert.NotZero(t, updatedSrc.LastSync)
+}
+
+func TestGitMethodStackBuilder_WithSourceID_PersistsErrorStatusOnCloneFailure(t *testing.T) {
+	t.Parallel()
+	builder := newGitMethodBuilder(t, "abc123")
+	cloneErr := errors.New("failed to clone")
+	builder.gitService = testhelpers.NewGitService(cloneErr, "abc123")
+	builder.stack.ID = 1
+
+	src := &portainer.Source{
+		Name: "my-repo",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://github.com/org/private-repo"},
+	}
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, src))
+
+	payload := &StackPayload{
+		RepositoryConfigPayload: RepositoryConfigPayload{
+			SourceID:      src.ID,
+			ReferenceName: "refs/heads/main",
+		},
+	}
+
+	err := builder.prepare(t.Context(), payload, portainer.UserID(1))
+	require.Error(t, err)
+
+	updatedSrc, err := builder.dataStore.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	assert.Equal(t, portainer.SourceStatusError, updatedSrc.Status)
+	assert.Contains(t, updatedSrc.StatusError, cloneErr.Error())
+	assert.Zero(t, updatedSrc.LastSync)
 }
 
 func TestGitMethodStackBuilder_WithMissingSourceID_ReturnsError(t *testing.T) {

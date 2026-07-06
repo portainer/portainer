@@ -98,7 +98,7 @@ func (h *Handler) getSource(w http.ResponseWriter, r *http.Request) *httperror.H
 
 	access := BuildSourceAccess(source)
 
-	detail := BuildSourceDetail(h.buildSource(r.Context(), source, stats), source.Git, sourceWfs, access)
+	detail := BuildSourceDetail(h.buildSource(source, stats), source.Git, sourceWfs, access)
 	return response.JSON(w, detail)
 }
 

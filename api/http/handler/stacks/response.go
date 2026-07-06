@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/workflows"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // stackResponse extends a Stack response with the git source identifier.
@@ -43,6 +44,12 @@ func saveStackGitConfig(tx dataservices.DataStoreTx, userContext source.UserCont
 	}
 
 	return workflows.SaveWorkflowGitConfig(tx, userContext, workflowID, matchArtifact, oldSourceID, cfg)
+}
+
+func persistSourceSyncError(tx dataservices.DataStoreTx, securityContext *security.RestrictedRequestContext, sourceID portainer.SourceID, syncErr error) error {
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
+	return workflows.SaveSourceStatus(tx, userContext, sourceID, syncErr)
 }
 
 // newStackResponse fills stack.GitConfig and returns a response that also includes GitSourceId.

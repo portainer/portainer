@@ -78,13 +78,13 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	sourceID := portainer.SourceID(id)
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 
 	var src *portainer.Source
 
 	if err := h.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 
-		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 		if src, err = tx.Source().Read(userContext, sourceID); err != nil {
 			return err
 		}
@@ -92,6 +92,9 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 		if err := ApplyGitSourceChanges(src, payload); err != nil {
 			return err
 		}
+
+		src.Status = portainer.SourceStatusUnknown
+		src.StatusError = ""
 
 		return tx.Source().Update(userContext, src.ID, src)
 	}); h.dataStore.IsErrObjectNotFound(err) {
@@ -104,6 +107,10 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.Conflict("A source with this URL and credentials already exists", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to update source", err)
+	}
+
+	if src, err = h.testAndSaveSourceConnection(r.Context(), userContext, src); err != nil {
+		return httperror.InternalServerError("Unable to persist source status", err)
 	}
 
 	h.invalidateCache()

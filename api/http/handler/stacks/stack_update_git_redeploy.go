@@ -3,6 +3,7 @@ package stacks
 import (
 	"cmp"
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -190,6 +191,12 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	clean, err := git.CloneWithBackup(context.TODO(), handler.GitService, handler.FileService, cloneOptions)
 	if err != nil {
+		if persistErr := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return persistSourceSyncError(tx, securityContext, sourceID, err)
+		}); persistErr != nil {
+			return httperror.InternalServerError("Unable to clone git repository directory", fmt.Errorf("%w (and failed to persist status: %w)", err, persistErr))
+		}
+
 		return httperror.InternalServerError("Unable to clone git repository directory", err)
 	}
 
@@ -197,6 +204,12 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	newHash, err := handler.GitService.LatestCommitID(context.TODO(), gitConfig.URL, gitConfig.ReferenceName, auth.Username, auth.Password, gitConfig.TLSSkipVerify)
 	if err != nil {
+		if persistErr := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return persistSourceSyncError(tx, securityContext, sourceID, err)
+		}); persistErr != nil {
+			return httperror.InternalServerError("Unable get latest commit id", fmt.Errorf("%w (and failed to persist status: %w)", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID), persistErr))
+		}
+
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}
 
@@ -258,6 +271,10 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
+			return err
+		}
+
+		if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
 			return err
 		}
 

@@ -80,13 +80,18 @@ func (h *Handler) gitSourceCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
 	if err := h.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 		return tx.Source().Create(userContext, src)
 	}); errors.Is(err, source.ErrDuplicateSource) {
 		return httperror.Conflict("A source with this URL and credentials already exists", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to create source", err)
+	}
+
+	if src, err = h.testAndSaveSourceConnection(r.Context(), userContext, src); err != nil {
+		return httperror.InternalServerError("Unable to persist source status", err)
 	}
 
 	h.invalidateCache()

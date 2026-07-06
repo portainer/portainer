@@ -46,7 +46,7 @@ func TestAddSourceStats_NoOp(t *testing.T) {
 	t.Parallel()
 
 	result := make(map[portainer.SourceID]SourceStats)
-	addSourceStats(result, nil, nil, 0)
+	addSourceStats(result, nil, nil)
 
 	require.Empty(t, result)
 }
@@ -55,8 +55,8 @@ func TestAddSourceStats_AccumulatesWorkflowCount(t *testing.T) {
 	t.Parallel()
 
 	result := make(map[portainer.SourceID]SourceStats)
-	addSourceStats(result, []portainer.SourceID{1}, nil, 0)
-	addSourceStats(result, []portainer.SourceID{1}, nil, 0)
+	addSourceStats(result, []portainer.SourceID{1}, nil)
+	addSourceStats(result, []portainer.SourceID{1}, nil)
 
 	require.Equal(t, 2, result[1].WorkflowCount)
 }
@@ -65,8 +65,8 @@ func TestAddSourceStats_CollectsUniqueEndpointIDs(t *testing.T) {
 	t.Parallel()
 
 	result := make(map[portainer.SourceID]SourceStats)
-	addSourceStats(result, []portainer.SourceID{1}, []portainer.EndpointID{10, 20}, 0)
-	addSourceStats(result, []portainer.SourceID{1}, []portainer.EndpointID{20, 30}, 0)
+	addSourceStats(result, []portainer.SourceID{1}, []portainer.EndpointID{10, 20})
+	addSourceStats(result, []portainer.SourceID{1}, []portainer.EndpointID{20, 30})
 
 	require.Len(t, result[1].EndpointIDs, 3)
 	require.True(t, result[1].EndpointIDs[10])
@@ -74,22 +74,11 @@ func TestAddSourceStats_CollectsUniqueEndpointIDs(t *testing.T) {
 	require.True(t, result[1].EndpointIDs[30])
 }
 
-func TestAddSourceStats_MaxLastSync(t *testing.T) {
-	t.Parallel()
-
-	result := make(map[portainer.SourceID]SourceStats)
-	addSourceStats(result, []portainer.SourceID{1}, nil, 100)
-	addSourceStats(result, []portainer.SourceID{1}, nil, 500)
-	addSourceStats(result, []portainer.SourceID{1}, nil, 200)
-
-	require.Equal(t, int64(500), result[1].LastSync)
-}
-
 func TestAddSourceStats_MultipleSourceIDs(t *testing.T) {
 	t.Parallel()
 
 	result := make(map[portainer.SourceID]SourceStats)
-	addSourceStats(result, []portainer.SourceID{1, 2}, []portainer.EndpointID{10}, 100)
+	addSourceStats(result, []portainer.SourceID{1, 2}, []portainer.EndpointID{10})
 
 	require.Equal(t, 1, result[1].WorkflowCount)
 	require.Equal(t, 1, result[2].WorkflowCount)
@@ -115,7 +104,7 @@ func TestFetchWorkflows_ReturnsOnlyGitopsStacks(t *testing.T) {
 	var items []Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		items, err = FetchWorkflows(t.Context(), tx, nil, nil, adminContext(), nil)
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
 		return err
 	}))
 	require.Len(t, items, 1)
@@ -142,7 +131,7 @@ func TestFetchWorkflows_FiltersByEndpointID(t *testing.T) {
 	var items []Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		items, err = FetchWorkflows(t.Context(), tx, nil, nil, adminContext(), set.ToSet([]portainer.EndpointID{1, 2}))
+		items, err = FetchWorkflows(tx, nil, adminContext(), set.ToSet([]portainer.EndpointID{1, 2}))
 		return err
 	}))
 	require.Len(t, items, 2)
@@ -166,7 +155,7 @@ func TestFetchWorkflows_EmptyWhenNoGitopsStacks(t *testing.T) {
 	var items []Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		items, err = FetchWorkflows(t.Context(), tx, nil, nil, adminContext(), nil)
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
 		return err
 	}))
 	require.Empty(t, items)
@@ -192,7 +181,7 @@ func TestFetchWorkflows_NilEndpointSetReturnsAll(t *testing.T) {
 	var items []Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		items, err = FetchWorkflows(t.Context(), tx, nil, nil, adminContext(), nil)
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
 		return err
 	}))
 	require.Len(t, items, 3)

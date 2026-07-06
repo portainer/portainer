@@ -132,7 +132,7 @@ func (h *Handler) getWorkflows(ctx context.Context, key string, sc *security.Res
 	var result []svc.Workflow
 	err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		result, err = svc.FetchWorkflows(ctx, tx, h.gitService, h.k8sFactory, sc, set.ToSet(endpointIDs))
+		result, err = svc.FetchWorkflows(tx, h.k8sFactory, sc, set.ToSet(endpointIDs))
 		return err
 	})
 	if err != nil {

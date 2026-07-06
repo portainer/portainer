@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -130,4 +131,32 @@ func testSourceConnection(ctx context.Context, gitService portainer.GitService, 
 	}
 
 	return ConnectionTestResult{Success: true}
+}
+func (h *Handler) testAndSaveSourceConnection(ctx context.Context, userContext source.UserContext, src *portainer.Source) (*portainer.Source, error) {
+	if h.gitService == nil || src.Git == nil {
+		return src, nil
+	}
+
+	result := testSourceConnection(ctx, h.gitService, src.Git)
+
+	var checkErr error
+	if !result.Success {
+		checkErr = errors.New(result.Error)
+	}
+
+	var updated *portainer.Source
+	if err := h.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := workflows.SaveSourceStatus(tx, userContext, src.ID, checkErr); err != nil {
+			return err
+		}
+
+		var readErr error
+		updated, readErr = tx.Source().Read(userContext, src.ID)
+
+		return readErr
+	}); err != nil {
+		return nil, err
+	}
+
+	return updated, nil
 }

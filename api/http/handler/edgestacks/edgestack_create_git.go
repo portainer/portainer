@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -155,11 +156,11 @@ func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, tx dat
 	stack.CreatedBy = stackutils.SanitizeLabel(tokenData.Username)
 
 	return handler.edgeStacksService.PersistEdgeStack(tx, stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
-		return handler.storeManifestFromGitRepository(context.TODO(), tx, stackFolder, relatedEndpointIds, payload.DeploymentType, tokenData.ID, repoConfig)
+		return handler.storeManifestFromGitRepository(context.TODO(), tx, userContext, payload.SourceID, stackFolder, relatedEndpointIds, payload.DeploymentType, tokenData.ID, repoConfig)
 	})
 }
 
-func (handler *Handler) storeManifestFromGitRepository(ctx context.Context, tx dataservices.DataStoreTx, stackFolder string, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, currentUserID portainer.UserID, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
+func (handler *Handler) storeManifestFromGitRepository(ctx context.Context, tx dataservices.DataStoreTx, userContext source.UserContext, sourceID portainer.SourceID, stackFolder string, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, currentUserID portainer.UserID, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
 	if hasWrongType, err := hasWrongEnvironmentType(tx.Endpoint(), relatedEndpointIds, deploymentType); err != nil {
 		return "", "", "", fmt.Errorf("unable to check for existence of non fitting environments: %w", err)
 	} else if hasWrongType {
@@ -183,7 +184,15 @@ func (handler *Handler) storeManifestFromGitRepository(ctx context.Context, tx d
 		repositoryPassword,
 		repositoryConfig.TLSSkipVerify,
 	); err != nil {
+		if statusErr := workflows.SaveSourceStatus(tx, userContext, sourceID, err); statusErr != nil {
+			return "", "", "", fmt.Errorf("%w (and failed to persist status: %w)", err, statusErr)
+		}
+
 		return "", "", "", err
+	}
+
+	if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
+		return "", "", "", fmt.Errorf("failed to persist source sync status: %w", err)
 	}
 
 	if deploymentType == portainer.EdgeStackDeploymentCompose {

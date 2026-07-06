@@ -1329,12 +1329,16 @@ type (
 		Registry *Registry           `json:"registry,omitempty"`
 		Helm     *HelmConfig         `json:"helm,omitempty"`
 
-		Public             bool     `json:"public"`
-		AdministratorsOnly bool     `json:"administratorsOnly"`
-		UserAccesses       []UserID `json:"userAccesses"`
-		TeamAccesses       []TeamID `json:"teamAccesses"`
-		OwnerID            UserID   `json:"ownerID,omitempty"`
+		Public             bool         `json:"public"`
+		AdministratorsOnly bool         `json:"administratorsOnly"`
+		UserAccesses       []UserID     `json:"userAccesses"`
+		TeamAccesses       []TeamID     `json:"teamAccesses"`
+		OwnerID            UserID       `json:"ownerID,omitempty"`
+		Status             SourceStatus `json:"status,omitempty"`
+		StatusError        string       `json:"statusError,omitempty"`
 	}
+
+	SourceStatus int
 
 	// SourceID represents a source identifier
 	SourceID int
@@ -1633,10 +1637,14 @@ type (
 
 	// ArtifactFile represents one file within an artifact, tied to a specific source and location within it
 	ArtifactFile struct {
-		SourceID SourceID `json:"sourceId"`
-		Path     string   `json:"path,omitempty" example:"portainer.yaml"`
-		Ref      string   `json:"ref,omitempty" example:"refs/heads/main"`
-		Hash     string   `json:"hash,omitempty" example:"abc123"`
+		SourceID   SourceID     `json:"sourceId"`
+		Path       string       `json:"path,omitempty" example:"portainer.yaml"`
+		Ref        string       `json:"ref,omitempty" example:"refs/heads/main"`
+		Hash       string       `json:"hash,omitempty" example:"abc123"`
+		RefStatus  SourceStatus `json:"refStatus,omitempty"`
+		RefError   string       `json:"refError,omitempty"`
+		PathStatus SourceStatus `json:"pathStatus,omitempty"`
+		PathError  string       `json:"pathError,omitempty"`
 	}
 
 	// Workflow represents a GitOps workflow
@@ -2299,6 +2307,15 @@ const (
 	SourceTypeGit
 	SourceTypeRegistry
 	SourceTypeHelm
+)
+
+const (
+	// SourceStatusUnknown means the check has not been performed yet
+	SourceStatusUnknown SourceStatus = iota
+	// SourceStatusHealthy means the last check succeeded
+	SourceStatusHealthy
+	// SourceStatusError means the last check failed
+	SourceStatusError
 )
 
 const (

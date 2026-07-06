@@ -2,6 +2,7 @@ package workflows
 
 import (
 	"fmt"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -167,6 +168,78 @@ func UpdateArtifactFileForEdgeStack(tx gitSourceStore, workflowID portainer.Work
 	return nil
 }
 
+func UpdateSourceSyncStatus(tx gitSourceStore, userContext source.UserContext, sourceID portainer.SourceID, status portainer.SourceStatus, statusError string) error {
+	if sourceID == 0 {
+		return nil
+	}
+
+	src, err := tx.Source().Read(userContext, sourceID)
+	if err != nil {
+		return fmt.Errorf("failed to read source: %w", err)
+	}
+
+	src.Status = status
+	src.StatusError = statusError
+
+	if status == portainer.SourceStatusHealthy {
+		src.LastSync = time.Now().Unix()
+	}
+
+	return tx.Source().Update(userContext, src.ID, src)
+}
+
+func checkResultStatus(checkErr error) (portainer.SourceStatus, string) {
+	if checkErr != nil {
+		return portainer.SourceStatusError, checkErr.Error()
+	}
+
+	return portainer.SourceStatusHealthy, ""
+}
+
+func SaveSourceStatus(tx gitSourceStore, userContext source.UserContext, sourceID portainer.SourceID, checkErr error) error {
+	status, statusError := checkResultStatus(checkErr)
+
+	return UpdateSourceSyncStatus(tx, userContext, sourceID, status, statusError)
+}
+
+func SaveStackStatus(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, stackID portainer.StackID, sourceID portainer.SourceID, checkErr error) error {
+	if workflowID == 0 {
+		return nil
+	}
+
+	status, statusError := checkResultStatus(checkErr)
+
+	if err := UpdateArtifactFileForStack(tx, workflowID, stackID, sourceID, func(a *portainer.ArtifactFile) {
+		a.RefStatus = status
+		a.RefError = statusError
+		a.PathStatus = status
+		a.PathError = statusError
+	}); err != nil {
+		return err
+	}
+
+	return UpdateSourceSyncStatus(tx, userContext, sourceID, status, statusError)
+}
+
+func SaveEdgeStackStatus(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, edgeStackID portainer.EdgeStackID, sourceID portainer.SourceID, checkErr error) error {
+	if workflowID == 0 {
+		return nil
+	}
+
+	status, statusError := checkResultStatus(checkErr)
+
+	if err := UpdateArtifactFileForEdgeStack(tx, workflowID, edgeStackID, sourceID, func(a *portainer.ArtifactFile) {
+		a.RefStatus = status
+		a.RefError = statusError
+		a.PathStatus = status
+		a.PathError = statusError
+	}); err != nil {
+		return err
+	}
+
+	return UpdateSourceSyncStatus(tx, userContext, sourceID, status, statusError)
+}
+
 // FindOrCreateGitSource returns an existing Source whose URL and authentication match cfg,
 // or creates a new one. Only URL, authentication, and TLSSkipVerify are stored on the Source;
 // per-stack fields (ReferenceName, ConfigFilePath, ConfigHash) belong in the Artifact.
@@ -246,6 +319,10 @@ func SaveWorkflowArtifact(tx gitSourceStore, workflowID portainer.WorkflowID, ma
 			f.Ref = update.Ref
 			f.Path = update.Path
 			f.Hash = update.Hash
+			f.RefStatus = portainer.SourceStatusUnknown
+			f.RefError = ""
+			f.PathStatus = portainer.SourceStatusUnknown
+			f.PathError = ""
 
 			break
 		}

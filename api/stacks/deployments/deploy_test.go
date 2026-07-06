@@ -210,7 +210,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	err = store.Source().Create(adminUserContext, src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 1, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
@@ -224,6 +224,12 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(nil, "oldHash"))
 	require.NoError(t, err)
+
+	updatedSrc, err := store.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
+	require.Empty(t, updatedSrc.StatusError)
+	require.NotZero(t, updatedSrc.LastSync)
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
@@ -272,6 +278,12 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
 	require.Error(t, err)
 	require.ErrorIs(t, err, cloneErr, "should failed to clone but didn't, check test setup")
+
+	updatedSrc, err := store.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusError, updatedSrc.Status)
+	require.Contains(t, updatedSrc.StatusError, cloneErr.Error())
+	require.Zero(t, updatedSrc.LastSync)
 }
 
 func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservices.DataStore, portainer.StackID) {

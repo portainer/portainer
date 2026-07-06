@@ -71,9 +71,6 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 		if stacks.EndpointID != 0 {
 			stats.EndpointIDs.Add(stacks.EndpointID)
 		}
-		if lastSync := ce.StackLastSyncDate(stacks); lastSync > stats.LastSync {
-			stats.LastSync = lastSync
-		}
 	}
 
 	return items, stats, nil

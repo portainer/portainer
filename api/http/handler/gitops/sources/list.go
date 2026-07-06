@@ -128,7 +128,7 @@ func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedReque
 			stat = workflows.SourceStats{}
 		}
 
-		result = append(result, h.buildSource(ctx, &src, stat))
+		result = append(result, h.buildSource(&src, stat))
 	}
 
 	return result, nil

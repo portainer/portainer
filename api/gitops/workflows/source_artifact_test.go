@@ -985,6 +985,69 @@ func TestMergeSourceAndFile_ConfigHashComesFromFileNotSource(t *testing.T) {
 	require.Equal(t, "artifact-hash", cfg.ConfigHash)
 }
 
+func TestUpdateSourceSyncStatus_HealthyBumpsLastSyncAndClearsError(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var sourceID portainer.SourceID
+	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{
+			Type:        portainer.SourceTypeGit,
+			Git:         &gittypes.GitSource{URL: "https://example.com"},
+			Status:      portainer.SourceStatusError,
+			StatusError: "previous failure",
+		}
+		err := tx.Source().Create(adminUserContext, src)
+		require.NoError(t, err)
+		sourceID = src.ID
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	err = store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return UpdateSourceSyncStatus(tx, adminUserContext, sourceID, portainer.SourceStatusHealthy, "")
+	})
+	require.NoError(t, err)
+
+	src, err := store.Source().Read(adminUserContext, sourceID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusHealthy, src.Status)
+	require.Empty(t, src.StatusError)
+	require.NotZero(t, src.LastSync)
+}
+
+func TestUpdateSourceSyncStatus_ErrorPreservesPriorLastSync(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var sourceID portainer.SourceID
+	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{
+			Type:     portainer.SourceTypeGit,
+			Git:      &gittypes.GitSource{URL: "https://example.com"},
+			LastSync: 12345,
+		}
+		err := tx.Source().Create(adminUserContext, src)
+		require.NoError(t, err)
+		sourceID = src.ID
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	err = store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return UpdateSourceSyncStatus(tx, adminUserContext, sourceID, portainer.SourceStatusError, "git fetch failed")
+	})
+	require.NoError(t, err)
+
+	src, err := store.Source().Read(adminUserContext, sourceID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusError, src.Status)
+	require.Equal(t, "git fetch failed", src.StatusError)
+	require.Equal(t, int64(12345), src.LastSync)
+}
+
 func TestFindOrCreateGitSource_StripsEmbeddedCredentialsFromURL(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)

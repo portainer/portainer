@@ -104,6 +104,12 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 
 	commitHash, err := stackutils.DownloadGitRepository(ctx, repoConfig, b.gitService, getProjectPath)
 	if err != nil {
+		if txErr := b.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return workflows.SaveSourceStatus(tx, userContext, sourceID, err)
+		}); txErr != nil {
+			return fmt.Errorf("failed to download git repository: %w (and failed to persist status: %w)", err, txErr)
+		}
+
 		return fmt.Errorf("failed to download git repository: %w", err)
 	}
 
@@ -114,9 +120,11 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 
 	if err := b.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		file := portainer.ArtifactFile{
-			Path: repoConfig.ConfigFilePath,
-			Ref:  repoConfig.ReferenceName,
-			Hash: repoConfig.ConfigHash,
+			Path:       repoConfig.ConfigFilePath,
+			Ref:        repoConfig.ReferenceName,
+			Hash:       repoConfig.ConfigHash,
+			RefStatus:  portainer.SourceStatusHealthy,
+			PathStatus: portainer.SourceStatusHealthy,
 		}
 
 		if sourceID != 0 {
@@ -138,6 +146,10 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 			}
 
 			file.SourceID = src.ID
+		}
+
+		if err := workflows.SaveSourceStatus(tx, userContext, file.SourceID, nil); err != nil {
+			return fmt.Errorf("failed to persist source sync status: %w", err)
 		}
 
 		wf := &portainer.Workflow{

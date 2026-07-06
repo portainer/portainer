@@ -1,23 +1,13 @@
 package sources
 
 import (
-	"context"
-
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	ce "github.com/portainer/portainer/api/gitops/workflows"
 )
 
-func (h *Handler) buildSource(ctx context.Context, src *portainer.Source, stats ce.SourceStats) Source {
-	var status ce.Status
-	var sourceErr string
-	if src.Git != nil {
-		phase, _ := ce.ComputeGitPhasesForConfig(ctx, h.gitService, src.Git.ToRepoConfig())
-		status = phase.Status
-		sourceErr = phase.Error
-	} else {
-		status = ce.StatusUnknown
-	}
+func (h *Handler) buildSource(src *portainer.Source, stats ce.SourceStats) Source {
+	phase := ce.SourceStatusToPhase(src.Status, src.StatusError)
 
 	url := ""
 	if src.Git != nil {
@@ -29,11 +19,11 @@ func (h *Handler) buildSource(ctx context.Context, src *portainer.Source, stats 
 		Name:         src.Name,
 		Type:         sourceTypeString(src.Type),
 		URL:          url,
-		Status:       status,
-		Error:        sourceErr,
+		Status:       phase.Status,
+		Error:        phase.Error,
 		UsedBy:       stats.WorkflowCount,
 		Environments: len(stats.EndpointIDs),
-		LastSync:     stats.LastSync,
+		LastSync:     src.LastSync,
 	}
 }
 
