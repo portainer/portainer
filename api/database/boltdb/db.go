@@ -498,5 +498,6 @@ func (connection *DbConnection) boltOptions(readOnly bool) *bolt.Options {
 		FreelistType:    bolt.FreelistMapType,
 		NoFreelistSync:  true,
 		ReadOnly:        readOnly,
+		NoStatistics:    true,
 	}
 }

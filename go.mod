@@ -56,7 +56,7 @@ require (
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	github.com/viney-shih/go-lock v1.1.1
-	go.etcd.io/bbolt v1.4.3
+	go.etcd.io/bbolt v1.5.0
 	go.podman.io/image/v5 v5.37.0
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/crypto v0.52.0
