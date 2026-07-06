@@ -3,19 +3,23 @@ package kubernetes
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/rs/zerolog/log"
 )
 
-const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+var defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type tokenManager struct {
 	tokenCache *tokenCache
 	kubecli    portainer.KubeClient
 	dataStore  dataservices.DataStore
-	adminToken string
+
+	adminTokenMu       sync.Mutex
+	adminToken         string
+	adminTokenFromFile bool // true only for local (in-cluster) environments
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
@@ -36,12 +40,33 @@ func NewTokenManager(kubecli portainer.KubeClient, dataStore dataservices.DataSt
 		}
 
 		tokenManager.adminToken = string(token)
+		tokenManager.adminTokenFromFile = true
 	}
 
 	return tokenManager, nil
 }
 
+// GetAdminServiceAccountToken re-reads the projected token file on each call so kubelet
+// rotations are picked up, keeping the last-known-good value on a read error (issue #13150).
 func (manager *tokenManager) GetAdminServiceAccountToken() string {
+	manager.adminTokenMu.Lock()
+	defer manager.adminTokenMu.Unlock()
+
+	if !manager.adminTokenFromFile {
+		return manager.adminToken
+	}
+
+	token, err := os.ReadFile(defaultServiceAccountTokenFile)
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to re-read local admin service account token, using last known value")
+		return manager.adminToken
+	}
+
+	if len(token) == 0 {
+		return manager.adminToken
+	}
+
+	manager.adminToken = string(token)
 	return manager.adminToken
 }
 
