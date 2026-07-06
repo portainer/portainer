@@ -595,14 +595,16 @@ func (handler *Handler) logForgeAccessForRequest(r *http.Request) (logForgeAcces
 			continue
 		}
 
-		roleID := endpointAccessRoleID(tokenData.ID, securityContext.UserMemberships, &endpoint, &endpointGroup)
+		roleID := readOnlyRoleID
+		role := "read_only"
 		if securityContext.IsAdmin {
 			roleID = endpointAdminRoleID
+			role = "admin"
 		}
 		access.Endpoints = append(access.Endpoints, logForgeEndpointScope{
 			ID:     endpoint.ID,
 			Name:   endpoint.Name,
-			Role:   logForgeRole(roleID),
+			Role:   role,
 			RoleID: roleID,
 		})
 	}
@@ -630,60 +632,6 @@ func teamIDs(memberships []portainer.TeamMembership) []portainer.TeamID {
 	})
 
 	return ids
-}
-
-func endpointAccessRoleID(userID portainer.UserID, memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, group *portainer.EndpointGroup) portainer.RoleID {
-	roleID := portainer.RoleID(0)
-	apply := func(candidate portainer.RoleID) {
-		if rankRoleID(candidate) > rankRoleID(roleID) {
-			roleID = candidate
-		}
-	}
-
-	if policy, ok := endpoint.UserAccessPolicies[userID]; ok {
-		apply(policy.RoleID)
-	}
-	for _, membership := range memberships {
-		if policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]; ok {
-			apply(policy.RoleID)
-		}
-	}
-	if policy, ok := group.UserAccessPolicies[userID]; ok {
-		apply(policy.RoleID)
-	}
-	for _, membership := range memberships {
-		if policy, ok := group.TeamAccessPolicies[membership.TeamID]; ok {
-			apply(policy.RoleID)
-		}
-	}
-
-	return roleID
-}
-
-func rankRoleID(roleID portainer.RoleID) int {
-	switch roleID {
-	case endpointAdminRoleID:
-		return 4
-	case standardRoleID, operatorRoleID:
-		return 3
-	case helpdeskRoleID, readOnlyRoleID:
-		return 1
-	default:
-		return 0
-	}
-}
-
-func logForgeRole(roleID portainer.RoleID) string {
-	switch roleID {
-	case endpointAdminRoleID:
-		return "admin"
-	case standardRoleID, operatorRoleID:
-		return "write"
-	case helpdeskRoleID, readOnlyRoleID:
-		return "read_only"
-	default:
-		return "read_only"
-	}
 }
 
 type managedIdentityClaims struct {

@@ -216,8 +216,72 @@ func TestStatusIncludesLogForgeAccessScopes(t *testing.T) {
 	require.Equal(t, "alice", status.Access.Username)
 	require.Len(t, status.Access.Endpoints, 1)
 	require.Equal(t, endpoint.ID, status.Access.Endpoints[0].ID)
-	require.Equal(t, "write", status.Access.Endpoints[0].Role)
-	require.Equal(t, operatorRoleID, status.Access.Endpoints[0].RoleID)
+	require.Equal(t, "read_only", status.Access.Endpoints[0].Role)
+	require.Equal(t, readOnlyRoleID, status.Access.Endpoints[0].RoleID)
+}
+
+func TestStatusSanitizesNonAdminEndpointRolesToReadOnly(t *testing.T) {
+	testCases := []struct {
+		name   string
+		roleID portainer.RoleID
+	}{
+		{name: "standard", roleID: standardRoleID},
+		{name: "endpoint-admin", roleID: endpointAdminRoleID},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			handler := newTestHandler(t)
+			endpoint := createDockerEndpointWithUserAccess(t, handler, portainer.UserID(2), tc.roleID)
+
+			recorder := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodGet, "/logforge/status", nil)
+			request = withLogForgeUser(request, &portainer.TokenData{
+				ID:       2,
+				Username: "alice",
+				Role:     portainer.StandardUserRole,
+			}, &security.RestrictedRequestContext{UserID: 2})
+
+			handler.ServeHTTP(recorder, request)
+
+			require.Equal(t, http.StatusOK, recorder.Code)
+
+			var status statusResponse
+			require.NoError(t, json.Unmarshal(recorder.Body.Bytes(), &status))
+			require.True(t, status.Access.Allowed)
+			require.False(t, status.Access.IsAdmin)
+			require.Len(t, status.Access.Endpoints, 1)
+			require.Equal(t, endpoint.ID, status.Access.Endpoints[0].ID)
+			require.Equal(t, "read_only", status.Access.Endpoints[0].Role)
+			require.Equal(t, readOnlyRoleID, status.Access.Endpoints[0].RoleID)
+		})
+	}
+}
+
+func TestStatusIncludesAdminScopeForPortainerAdministrators(t *testing.T) {
+	handler := newTestHandler(t)
+	endpoint := createDockerEndpointWithUserAccess(t, handler, portainer.UserID(2), readOnlyRoleID)
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/logforge/status", nil)
+	request = withLogForgeUser(request, &portainer.TokenData{
+		ID:       1,
+		Username: "admin",
+		Role:     portainer.AdministratorRole,
+	}, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
+
+	handler.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+
+	var status statusResponse
+	require.NoError(t, json.Unmarshal(recorder.Body.Bytes(), &status))
+	require.True(t, status.Access.Allowed)
+	require.True(t, status.Access.IsAdmin)
+	require.Len(t, status.Access.Endpoints, 1)
+	require.Equal(t, endpoint.ID, status.Access.Endpoints[0].ID)
+	require.Equal(t, "admin", status.Access.Endpoints[0].Role)
+	require.Equal(t, endpointAdminRoleID, status.Access.Endpoints[0].RoleID)
 }
 
 func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
