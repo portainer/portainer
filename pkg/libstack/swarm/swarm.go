@@ -52,7 +52,6 @@ type Options struct {
 	ProjectName string
 	Host        string
 	Env         []string
-	WorkingDir  string
 	Registries  []configtypes.AuthConfig
 }
 
@@ -104,7 +103,7 @@ func (d *SwarmDeployer) Deploy(ctx context.Context, filePaths []string, options 
 
 // Validate loads and parses the compose file(s), returning an error if they are invalid.
 func (d *SwarmDeployer) Validate(_ context.Context, filePaths []string, options Options) error {
-	_, err := getConfig(filePaths, options.WorkingDir, options.Env)
+	_, err := getConfig(filePaths, options.Env)
 	return err
 }
 
@@ -186,7 +185,7 @@ func deployStack(ctx context.Context, dockerCLI *command.DockerCli, filePaths []
 		return errors.New(`this node is not a swarm manager. Use "docker swarm init" or "docker swarm join" to connect this node to swarm and try again`)
 	}
 
-	config, err := getConfig(filePaths, options.WorkingDir, options.Env)
+	config, err := getConfig(filePaths, options.Env)
 	if err != nil {
 		return fmt.Errorf("failed to load compose file: %w", err)
 	}
@@ -617,9 +616,9 @@ func isTerminalState(state swarm.TaskState) bool {
 	return taskStateOrdinal[state] > taskStateOrdinal[swarm.TaskStateRunning]
 }
 
-func getConfig(filePaths []string, workingDir string, env []string) (*composetypes.Config, error) {
+func getConfig(filePaths []string, env []string) (*composetypes.Config, error) {
 	// Load and parse the compose file(s).
-	configDetails, err := getConfigDetails(filePaths, workingDir, env)
+	configDetails, err := getConfigDetails(filePaths, env)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load compose file: %w", err)
 	}
@@ -660,14 +659,17 @@ func getConfig(filePaths []string, workingDir string, env []string) (*composetyp
 	return config, nil
 }
 
-func getConfigDetails(filePaths []string, workingDir string, env []string) (composetypes.ConfigDetails, error) {
+func getConfigDetails(filePaths []string, env []string) (composetypes.ConfigDetails, error) {
 	var details composetypes.ConfigDetails
 
 	if len(filePaths) == 0 {
 		return details, errors.New("at least one compose file must be specified")
 	}
 
-	details.WorkingDir = workingDir
+	// Resolve relative references against the compose file's own directory, matching
+	// Docker Compose semantics (the default project directory is the directory of the
+	// first compose file) and the compose (non-swarm) libstack deployer.
+	details.WorkingDir = filepath.Dir(filePaths[0])
 
 	details.ConfigFiles = make([]composetypes.ConfigFile, 0, len(filePaths))
 	for _, fp := range filePaths {
@@ -681,7 +683,7 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 			return details, err
 		}
 
-		resolveEnvFilePaths(config, workingDir)
+		resolveEnvFilePaths(config, filepath.Dir(fp))
 
 		details.ConfigFiles = append(details.ConfigFiles, composetypes.ConfigFile{
 			Filename: fp,
