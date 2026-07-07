@@ -27,8 +27,21 @@ func BuildEnvMap(stack *portainer.Stack) map[string]string {
 	}
 
 	for _, pair := range stack.Env {
-		env[pair.Name] = pair.Value
+		env[pair.Name] = UnquoteEnvValue(pair.Value)
 	}
 
 	return env
+}
+
+// UnquoteEnvValue removes a single matched pair of surrounding quotes from an env
+// var value, matching how docker compose reads env-file values.
+func UnquoteEnvValue(value string) string {
+	if len(value) >= 2 {
+		first, last := value[0], value[len(value)-1]
+		if (first == '"' && last == '"') || (first == '\'' && last == '\'') {
+			return value[1 : len(value)-1]
+		}
+	}
+
+	return value
 }
