@@ -49,7 +49,7 @@ func (manager *SwarmStackManager) Deploy(
 
 	env := make([]string, 0, len(stack.Env))
 	for _, ev := range stack.Env {
-		env = append(env, ev.Name+"="+ev.Value)
+		env = append(env, ev.Name+"="+stackutils.UnquoteEnvValue(ev.Value))
 	}
 
 	return manager.deployer.Deploy(context.TODO(), filePaths, swarm.DeployOptions{
