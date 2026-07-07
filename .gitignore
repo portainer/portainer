@@ -14,7 +14,6 @@ debug-storybook.log
 .eslintcache
 __debug_bin*
 
-api/docs
 .idea
 .env
 go.work.sum

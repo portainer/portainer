@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: './dist/docs/openapi.yaml',
+  input: './api/docs/openapi.yaml',
   output: {
     path: 'app/react/portainer/generated-api/portainer',
     clean: true,

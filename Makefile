@@ -119,22 +119,33 @@ dev-extension: build-server build-client ## Run the extension in development mod
 	make local -f build/docker-extension/Makefile
 
 ##@ Docs
-.PHONY: docs-build docs-validate docs-clean docs-validate-clean
-docs-build: init-dist ## Build docs
+.PHONY: docs-build docs-validate docs-sync-check docs-clean docs-validate-clean
+docs-build: ## Build docs
 	go mod download
-	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ --overridesFile .swaggo
+	mkdir -p api/docs
+	cd api && $(SWAG) init -o "./docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ --overridesFile .swaggo
 
 docs-validate: docs-build ## Validate docs
-	pnpm swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
-	pnpm swagger-cli validate dist/docs/openapi.yaml
+	pnpm swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
+	pnpm swagger-cli validate api/docs/openapi.yaml
+
+docs-sync-check: docs-build ## Check if committed API spec is in sync with Go annotations; fail if not
+	@if ! git diff --exit-code api/docs/swagger.yaml > /dev/null 2>&1; then \
+		echo ""; \
+		echo "ERROR: API spec is out of sync with Go annotations."; \
+		echo "Run 'make generate-api' in package/server-ce and commit the result."; \
+		echo ""; \
+		git diff --stat api/docs/swagger.yaml; \
+		exit 1; \
+	fi
 
 .PHONY: docs-serve
 docs-serve: docs-build ## Serve docs locally with Swagger UI on port 8080
 	docker run -p 8080:8080 \
 		-e SWAGGER_JSON=/foo/swagger.yaml \
-		-v $(PWD)/dist/docs:/foo \
+		-v $(PWD)/api/docs:/foo \
 		swaggerapi/swagger-ui
-		
+
 .PHONY: generate-api
 generate-api: docs-validate ## Generate API client and types from OpenAPI spec
 	pnpm generate-api
