@@ -32,7 +32,7 @@ func GitSourceAndArtifactForStack(tx gitSourceStore, userContext source.UserCont
 		return nil, nil, err
 	}
 
-	sourceMap, err := loadWorkflowSources(tx, userContext, wf)
+	sourceMap, err := LoadWorkflowSources(tx, userContext, wf)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +69,7 @@ func GitSourceAndArtifactForEdgeStack(tx gitSourceStore, userContext source.User
 		return nil, nil, err
 	}
 
-	sourceMap, err := loadWorkflowSources(tx, userContext, wf)
+	sourceMap, err := LoadWorkflowSources(tx, userContext, wf)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -373,9 +373,9 @@ func LoadWorkflowAndSourceMaps(tx gitSourceStore, userContext source.UserContext
 	return wfMap, srcMap, nil
 }
 
-// loadWorkflowSources collects all unique SourceIDs referenced by wf and returns them as a map.
+// LoadWorkflowSources collects all unique SourceIDs referenced by wf and returns them as a map.
 // This avoids reading the same Source record more than once when files share a SourceID.
-func loadWorkflowSources(tx gitSourceStore, userContext source.UserContext, wf *portainer.Workflow) (map[portainer.SourceID]portainer.Source, error) {
+func LoadWorkflowSources(tx gitSourceStore, userContext source.UserContext, wf *portainer.Workflow) (map[portainer.SourceID]portainer.Source, error) {
 	ids := make(set.Set[portainer.SourceID])
 	for _, as := range wf.Artifacts {
 		for _, f := range as.Files {

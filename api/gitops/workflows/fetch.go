@@ -30,12 +30,12 @@ func FetchWorkflows(
 		return nil, err
 	}
 
-	endpointMap, err := buildEndpointMap(tx, stacks)
+	endpointMap, err := BuildEndpointMap(tx, stacks)
 	if err != nil {
 		return nil, err
 	}
 
-	stacks, err = filterDockerStacksByAccess(tx, stacks, sc)
+	stacks, err = FilterDockerStacksByAccess(tx, stacks, sc)
 	if err != nil {
 		return nil, err
 	}
@@ -137,12 +137,12 @@ func FetchSourceStats(
 		return nil, nil, err
 	}
 
-	endpointMap, err := buildEndpointMap(tx, allStacks)
+	endpointMap, err := BuildEndpointMap(tx, allStacks)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	allStacks, err = filterDockerStacksByAccess(tx, allStacks, sc)
+	allStacks, err = FilterDockerStacksByAccess(tx, allStacks, sc)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -10,7 +10,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -324,7 +323,7 @@ func filterEndpointsByEdgeStack(endpoints []portainer.Endpoint, edgeStackId port
 			}
 
 			if edgeGroup.Dynamic {
-				endpointIDs, err := edgegroups.GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+				endpointIDs, err := endpointutils.GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 				if err != nil {
 					return errors.WithMessage(err, "Unable to retrieve environments and environment groups for Edge group")
 				}

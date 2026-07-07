@@ -20,6 +20,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// EndpointMatchesStackType reports whether ep is a valid target for stackType.
 func EndpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackType) bool {
 	switch stackType {
 	case portainer.DockerSwarmStack:
@@ -33,7 +34,9 @@ func EndpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackTy
 	}
 }
 
-func buildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (map[portainer.EndpointID]portainer.Endpoint, error) {
+// BuildEndpointMap reads and returns the endpoints backing stacks, keyed by endpoint ID, with
+// snapshot data filled in.
+func BuildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (map[portainer.EndpointID]portainer.Endpoint, error) {
 	ids := set.ToSet(slicesx.Map(stacks, func(s portainer.Stack) portainer.EndpointID { return s.EndpointID }))
 
 	endpoints, err := tx.Endpoint().ReadAll(func(ep portainer.Endpoint) bool { return ids[ep.ID] })
@@ -52,8 +55,8 @@ func buildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (ma
 	return m, nil
 }
 
-// filterDockerStacksByAccess filters stacks to only those the current user can access.
-func filterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
+// FilterDockerStacksByAccess filters stacks to only those the current user can access.
+func FilterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
 	if sc.IsAdmin {
 		return stacks, nil
 	}
@@ -79,9 +82,10 @@ func filterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.
 	return filtered, nil
 }
 
-func resolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, ep *portainer.Endpoint) (endpointAccess, error) {
+// ResolveKubeAccess determines sc's Kubernetes admin/namespace access on ep.
+func ResolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, ep *portainer.Endpoint) (endpointAccess, error) {
 	if sc.IsAdmin {
-		return endpointAccess{isKubeAdmin: true}, nil
+		return endpointAccess{IsKubeAdmin: true}, nil
 	}
 
 	pcli, err := k8sFactory.GetPrivilegedKubeClient(ep)
@@ -99,14 +103,16 @@ func resolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedReq
 		return endpointAccess{}, fmt.Errorf("unable to retrieve non-admin namespaces for endpoint %d: %w", ep.ID, err)
 	}
 
-	return endpointAccess{isKubeAdmin: false, nonAdminNamespaces: nonAdminNamespaces}, nil
+	return endpointAccess{IsKubeAdmin: false, NonAdminNamespaces: nonAdminNamespaces}, nil
 }
 
 type endpointAccess struct {
-	isKubeAdmin        bool
-	nonAdminNamespaces []string
+	IsKubeAdmin        bool
+	NonAdminNamespaces []string
 }
 
+// buildEndpointAccessMap resolves sc's Kubernetes access for every Kubernetes endpoint in
+// endpointMap, skipping (and logging) any endpoint whose access cannot be resolved.
 func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, endpointMap map[portainer.EndpointID]portainer.Endpoint) (map[portainer.EndpointID]endpointAccess, error) {
 	result := make(map[portainer.EndpointID]endpointAccess, len(endpointMap))
 
@@ -115,7 +121,7 @@ func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.Restrict
 			continue
 		}
 
-		access, err := resolveKubeAccess(k8sFactory, sc, &ep)
+		access, err := ResolveKubeAccess(k8sFactory, sc, &ep)
 		if err != nil {
 			log.Warn().Err(err).Str("context", "buildEndpointAccessMap").Int("endpoint_id", int(epID)).Msg("Failed to resolve kube access for endpoint, skipping")
 			continue
@@ -156,8 +162,8 @@ func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.Endpoint
 		}
 
 		access := accessMap[envID]
-		kcl.SetIsKubeAdmin(access.isKubeAdmin)
-		kcl.SetClientNonAdminNamespaces(access.nonAdminNamespaces)
+		kcl.SetIsKubeAdmin(access.IsKubeAdmin)
+		kcl.SetClientNonAdminNamespaces(access.NonAdminNamespaces)
 
 		apps, err := kcl.GetApplications("", "")
 		if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/sources"
 )
 
 type Status string
@@ -97,4 +98,26 @@ type StatusSummary struct {
 	Error   int `json:"error"`
 	Paused  int `json:"paused"`
 	Unknown int `json:"unknown"`
+}
+
+// ArtifactDetail describes one Artifact's backing Stack or EdgeStack.
+type ArtifactDetail struct {
+	ID           int                           `json:"id" validate:"required"`
+	Type         Type                          `json:"type" validate:"required"`
+	Name         string                        `json:"name" validate:"required"`
+	Platform     DeploymentPlatform            `json:"platform"`
+	AutoUpdate   *portainer.AutoUpdateSettings `json:"autoUpdate,omitempty"`
+	Target       Target                        `json:"target"`
+	Status       WorkflowStatusObject          `json:"status"`
+	Files        []ArtifactFileDetail          `json:"files"`
+	CreationDate int64                         `json:"creationDate"`
+	LastSyncDate int64                         `json:"lastSyncDate"`
+}
+
+// ArtifactFileDetail describe the representation of portainer.ArtifactFile used in API responses.
+type ArtifactFileDetail struct {
+	portainer.ArtifactFile
+
+	RefStatus  sources.Status `json:"refStatus,omitempty"`
+	PathStatus sources.Status `json:"pathStatus,omitempty"`
 }

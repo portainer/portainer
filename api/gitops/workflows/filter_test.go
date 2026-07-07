@@ -43,7 +43,7 @@ func TestFilterDockerStacksByAccess_KubeStacksPassThrough(t *testing.T) {
 	var result []portainer.Stack
 	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var txErr error
-		result, txErr = filterDockerStacksByAccess(tx, stacks, sc)
+		result, txErr = FilterDockerStacksByAccess(tx, stacks, sc)
 		return txErr
 	})
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestFilterDockerStacksByAccess_AdminGetsAll(t *testing.T) {
 		{ID: 2, Name: "docker-stack", Type: portainer.DockerComposeStack},
 	}
 
-	result, err := filterDockerStacksByAccess(nil, stacks, sc)
+	result, err := FilterDockerStacksByAccess(nil, stacks, sc)
 	require.NoError(t, err)
 	require.Len(t, result, 2)
 }
@@ -85,8 +85,8 @@ func TestBuildEndpointAccessMap_AdminIsKubeAdmin(t *testing.T) {
 	result, err := buildEndpointAccessMap(nil, sc, endpointMap)
 	require.NoError(t, err)
 	require.Len(t, result, 1)
-	require.True(t, result[1].isKubeAdmin)
-	require.Empty(t, result[1].nonAdminNamespaces)
+	require.True(t, result[1].IsKubeAdmin)
+	require.Empty(t, result[1].NonAdminNamespaces)
 }
 
 func TestFilterK8SStacks_IncludesMatchingStack(t *testing.T) {
@@ -122,7 +122,7 @@ func TestFilterK8SStacks_IncludesMatchingStack(t *testing.T) {
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {isKubeAdmin: true},
+		1: {IsKubeAdmin: true},
 	}
 
 	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
@@ -148,7 +148,7 @@ func TestFilterK8SStacks_ExcludesStackWhenNoMatchingDeployment(t *testing.T) {
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {isKubeAdmin: true},
+		1: {IsKubeAdmin: true},
 	}
 
 	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
@@ -189,7 +189,7 @@ func TestFilterK8SStacks_NonAdminWithNamespaceAccess(t *testing.T) {
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {isKubeAdmin: false, nonAdminNamespaces: []string{"ns1"}},
+		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{"ns1"}},
 	}
 
 	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
@@ -218,10 +218,10 @@ func TestResolveKubeAccess_NonAdminWithTeamMemberships(t *testing.T) {
 		},
 	}
 
-	access, err := resolveKubeAccess(factory, sc, ep)
+	access, err := ResolveKubeAccess(factory, sc, ep)
 	require.NoError(t, err)
-	require.False(t, access.isKubeAdmin)
-	require.Equal(t, []string{"default"}, access.nonAdminNamespaces)
+	require.False(t, access.IsKubeAdmin)
+	require.Equal(t, []string{"default"}, access.NonAdminNamespaces)
 }
 
 func TestResolveKubeAccess_NonAdmin(t *testing.T) {
@@ -241,10 +241,10 @@ func TestResolveKubeAccess_NonAdmin(t *testing.T) {
 		UserID:  1,
 	}
 
-	access, err := resolveKubeAccess(factory, sc, ep)
+	access, err := ResolveKubeAccess(factory, sc, ep)
 	require.NoError(t, err)
-	require.False(t, access.isKubeAdmin)
-	require.Equal(t, []string{"default"}, access.nonAdminNamespaces)
+	require.False(t, access.IsKubeAdmin)
+	require.Equal(t, []string{"default"}, access.NonAdminNamespaces)
 }
 
 func TestFilterK8SStacks_NonAdminWithoutNamespaceAccess(t *testing.T) {
@@ -280,7 +280,7 @@ func TestFilterK8SStacks_NonAdminWithoutNamespaceAccess(t *testing.T) {
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {isKubeAdmin: false, nonAdminNamespaces: []string{}},
+		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{}},
 	}
 
 	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)

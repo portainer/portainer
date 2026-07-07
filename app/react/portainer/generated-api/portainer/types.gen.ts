@@ -4408,6 +4408,23 @@ export const SourcesSourceType = {
 export type SourcesSourceType =
   (typeof SourcesSourceType)[keyof typeof SourcesSourceType];
 
+export const SourcesStatus = {
+  /**
+   * SourceStatusUnknown
+   */
+  SOURCE_STATUS_UNKNOWN: 'unknown',
+  /**
+   * SourceStatusHealthy
+   */
+  SOURCE_STATUS_HEALTHY: 'healthy',
+  /**
+   * SourceStatusError
+   */
+  SOURCE_STATUS_ERROR: 'error',
+} as const;
+
+export type SourcesStatus = (typeof SourcesStatus)[keyof typeof SourcesStatus];
+
 export type SourcesConnectionInfo = {
   authentication?: SourcesGitAuthInfo;
   tlsSkipVerify?: boolean;
@@ -8183,6 +8200,30 @@ export type WebhooksWebhookUpdatePayload = {
   RegistryID?: number;
 };
 
+export type WorkflowsArtifactDetail = {
+  autoUpdate?: PortainerAutoUpdateSettings;
+  creationDate?: number;
+  files?: Array<WorkflowsArtifactFileDetail>;
+  id: number;
+  lastSyncDate?: number;
+  name: string;
+  platform?: WorkflowsDeploymentPlatform;
+  status?: WorkflowsWorkflowStatusObject;
+  target?: WorkflowsTarget;
+  type: WorkflowsType;
+};
+
+export type WorkflowsArtifactFileDetail = {
+  hash?: string;
+  path?: string;
+  pathError?: string;
+  pathStatus?: SourcesStatus;
+  ref?: string;
+  refError?: string;
+  refStatus?: SourcesStatus;
+  sourceId?: number;
+};
+
 export const WorkflowsDeploymentPlatform = {
   /**
    * DeploymentPlatformDockerStandalone
@@ -8268,6 +8309,12 @@ export type WorkflowsWorkflow = {
   status: WorkflowsWorkflowStatusObject;
   target: WorkflowsTarget;
   type: WorkflowsType;
+};
+
+export type WorkflowsWorkflowDetail = {
+  artifacts?: Array<WorkflowsArtifactDetail>;
+  id: number;
+  name: string;
 };
 
 export type WorkflowsWorkflowPhaseStatus = {
@@ -11795,6 +11842,43 @@ export type GitOpsWorkflowsListResponses = {
 
 export type GitOpsWorkflowsListResponse =
   GitOpsWorkflowsListResponses[keyof GitOpsWorkflowsListResponses];
+
+export type GitOpsWorkflowGetData = {
+  body?: never;
+  path: {
+    /**
+     * Workflow identifier
+     */
+    id: number;
+  };
+  query?: never;
+  url: '/gitops/workflows/{id}';
+};
+
+export type GitOpsWorkflowGetErrors = {
+  /**
+   * Invalid request
+   */
+  400: unknown;
+  /**
+   * Workflow not found
+   */
+  404: unknown;
+  /**
+   * Server error
+   */
+  500: unknown;
+};
+
+export type GitOpsWorkflowGetResponses = {
+  /**
+   * OK
+   */
+  200: WorkflowsWorkflowDetail;
+};
+
+export type GitOpsWorkflowGetResponse =
+  GitOpsWorkflowGetResponses[keyof GitOpsWorkflowGetResponses];
 
 export type GitOpsWorkflowsSummaryData = {
   body?: never;

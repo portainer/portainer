@@ -37,6 +37,7 @@ func NewHandler(dataStore dataservices.DataStore, gitService portainer.GitServic
 
 	h.Handle("/gitops/workflows", httperror.LoggerHandler(h.list)).Methods(http.MethodGet)
 	h.Handle("/gitops/workflows/summary", httperror.LoggerHandler(h.summary)).Methods(http.MethodGet)
+	h.Handle("/gitops/workflows/{id}", httperror.LoggerHandler(h.get)).Methods(http.MethodGet)
 
 	return h
 }

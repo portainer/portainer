@@ -465,6 +465,9 @@ import type {
   GitOpsSourcesUpdateGitData,
   GitOpsSourcesUpdateGitErrors,
   GitOpsSourcesUpdateGitResponses,
+  GitOpsWorkflowGetData,
+  GitOpsWorkflowGetErrors,
+  GitOpsWorkflowGetResponses,
   GitOpsWorkflowsListData,
   GitOpsWorkflowsListErrors,
   GitOpsWorkflowsListResponses,
@@ -1122,6 +1125,8 @@ import {
   zGitOpsSourcesUpdateGitBody,
   zGitOpsSourcesUpdateGitPath,
   zGitOpsSourcesUpdateGitResponse,
+  zGitOpsWorkflowGetPath,
+  zGitOpsWorkflowGetResponse,
   zGitOpsWorkflowsListQuery,
   zGitOpsWorkflowsListResponse,
   zGitOpsWorkflowsSummaryResponse,
@@ -4452,6 +4457,44 @@ export const gitOpsWorkflowsList = <ThrowOnError extends boolean = true>(
       { name: 'Authorization', type: 'apiKey' },
     ],
     url: '/gitops/workflows',
+    ...options,
+  });
+
+/**
+ * Get a GitOps workflow by ID
+ *
+ * Returns the detail view of a single GitOps workflow, with one entry per backing
+ * stack or edge stack artifact.
+ * **Access policy**: authenticated
+ */
+export const gitOpsWorkflowGet = <ThrowOnError extends boolean = true>(
+  options: Options<GitOpsWorkflowGetData, ThrowOnError>
+): RequestResult<
+  GitOpsWorkflowGetResponses,
+  GitOpsWorkflowGetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GitOpsWorkflowGetResponses,
+    GitOpsWorkflowGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGitOpsWorkflowGetPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGitOpsWorkflowGetResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/gitops/workflows/{id}',
     ...options,
   });
 

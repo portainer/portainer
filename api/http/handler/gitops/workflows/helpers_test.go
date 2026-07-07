@@ -11,10 +11,15 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	ce "github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	fips.InitFIPS(false)
+}
 
 // buildWorkflowsReq creates an HTTP GET request with security context pre-populated.
 func buildWorkflowsReq(t *testing.T, userID portainer.UserID, role portainer.UserRole, query string) *http.Request {
