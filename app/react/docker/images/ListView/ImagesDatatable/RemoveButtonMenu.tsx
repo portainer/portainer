@@ -95,7 +95,10 @@ export function RemoveButtonMenu({
     }
 
     deleteImageListMutation.mutate({
-      imageIds: selectedItems.map((image) => image.id),
+      imageIds: selectedItems.map((image) => ({
+        id: image.id,
+        nodeName: image.nodeName,
+      })),
       force,
     });
   }
@@ -110,11 +113,11 @@ function useDeleteImageListMutation() {
       imageIds,
       ...args
     }: {
-      imageIds: Array<string>;
+      imageIds: Array<{ id: string; nodeName?: string }>;
     } & Omit<Parameters<typeof deleteImage>[0], 'imageId' | 'environmentId'>) =>
-      processItemsInBatches(imageIds, (imageId) =>
-        deleteImage({ ...args, environmentId, imageId }).then(() =>
-          notifySuccess('Image successfully removed', imageId)
+      processItemsInBatches(imageIds, ({ id, nodeName }) =>
+        deleteImage({ ...args, environmentId, imageId: id, nodeName }).then(() =>
+          notifySuccess('Image successfully removed', id)
         )
       ),
     ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
