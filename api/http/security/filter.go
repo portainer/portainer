@@ -2,6 +2,7 @@ package security
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/slicesx"
 )
 
 // FilterUserTeams filters teams based on user role.
@@ -11,19 +12,14 @@ func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) 
 		return teams
 	}
 
-	n := 0
+	memberOf := map[portainer.TeamID]bool{}
 	for _, membership := range context.UserMemberships {
-		for _, team := range teams {
-			if team.ID == membership.TeamID {
-				teams[n] = team
-				n++
-
-				break
-			}
-		}
+		memberOf[membership.TeamID] = true
 	}
 
-	return teams[:n]
+	return slicesx.FilterInPlace(teams, func(team portainer.Team) bool {
+		return memberOf[team.ID]
+	})
 }
 
 // FilterLeaderTeams filters teams based on user role.
