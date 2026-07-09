@@ -9,7 +9,6 @@ import { ActionBarShell } from '@@/ResourceDetailHeader/ActionBarShell';
 import { Button } from '@@/buttons';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
-import { Link } from '@@/Link';
 
 import { WorkflowDetail } from '../types';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -48,18 +47,18 @@ export function WorkflowResourceHeader({ workflow }: Props) {
       actionBar={
         <ActionBarShell>
           <div className="flex items-center gap-2">
-            <Button
-              as={Link}
-              props={{
-                to: 'portainer.gitops.workflows.item.edit',
-                params: { workflowId: workflow.id },
-              }}
-              icon={PenBoxIcon}
-              color="light"
-              data-cy="workflow-edit-button"
-            >
-              Edit
-            </Button>
+            <TooltipWithChildren message={COMING_SOON_MESSAGE}>
+              <span>
+                <Button
+                  icon={PenBoxIcon}
+                  color="light"
+                  disabled
+                  data-cy="workflow-edit-button"
+                >
+                  Edit
+                </Button>
+              </span>
+            </TooltipWithChildren>
             <TooltipWithChildren message={COMING_SOON_MESSAGE}>
               <span>
                 <Button

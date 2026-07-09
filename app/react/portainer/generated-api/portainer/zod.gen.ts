@@ -3374,6 +3374,7 @@ export const zWorkflowsWorkflow = z.object({
   lastSyncDate: z.int().optional(),
   name: z.string(),
   platform: zWorkflowsDeploymentPlatform,
+  sourceId: z.int().optional(),
   status: zWorkflowsWorkflowStatusObject,
   target: zWorkflowsTarget,
   type: zWorkflowsType,

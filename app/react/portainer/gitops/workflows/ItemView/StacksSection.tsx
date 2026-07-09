@@ -9,7 +9,7 @@ import { PlatformBadge } from '../../components/StatusBadge';
 import { TargetCell } from '../ListView/WorkflowSubRow/TargetCell';
 import { WorkflowArtifact } from '../types';
 import { Dot } from '../ListView/WorkflowSubRow/Block';
-import { getArtifactStackLink } from '../utils';
+import { getDeployedStackLink } from '../utils';
 
 interface Props {
   artifacts: WorkflowArtifact[];
@@ -34,7 +34,7 @@ export function StacksSection({ artifacts }: Props) {
 
 function StackRow({ artifact }: { artifact: WorkflowArtifact }) {
   const status = artifact.status.artifact.status;
-  const stackLink = getArtifactStackLink(artifact);
+  const stackLink = getDeployedStackLink(artifact);
 
   return (
     <li className="flex items-center gap-4 px-4 py-3">

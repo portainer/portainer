@@ -163,7 +163,7 @@ func TestMapEdgeStackToWorkflow_DockerPlatform(t *testing.T) {
 	}
 	cfg := &gittypes.RepoConfig{URL: "https://github.com/x/repo"}
 
-	w := MapEdgeStackToWorkflow(2, es, cfg, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{1: {10}}, WorkflowPhaseStatus{Status: StatusHealthy}, WorkflowPhaseStatus{Status: StatusHealthy})
+	w := MapEdgeStackToWorkflow(2, es, 7, cfg, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{1: {10}}, WorkflowPhaseStatus{Status: StatusHealthy}, WorkflowPhaseStatus{Status: StatusHealthy})
 
 	require.Equal(t, portainer.WorkflowID(2), w.ID)
 	require.Equal(t, es.Name, w.Name)
@@ -171,6 +171,7 @@ func TestMapEdgeStackToWorkflow_DockerPlatform(t *testing.T) {
 	require.Equal(t, DeploymentPlatformDockerStandalone, w.Platform)
 	require.Equal(t, es.CreationDate, w.CreationDate)
 	require.Equal(t, cfg, w.GitConfig)
+	require.Equal(t, portainer.SourceID(7), w.SourceID)
 	require.Equal(t, []portainer.EdgeGroupID{1}, w.Target.EdgeGroupIDs)
 }
 
@@ -184,7 +185,7 @@ func TestMapEdgeStackToWorkflow_KubernetesPlatform(t *testing.T) {
 		EdgeGroups:     []portainer.EdgeGroupID{1},
 	}
 
-	w := MapEdgeStackToWorkflow(1, es, nil, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{}, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
+	w := MapEdgeStackToWorkflow(1, es, 0, nil, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{}, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
 
 	require.Equal(t, DeploymentPlatformKubernetes, w.Platform)
 }
@@ -206,7 +207,7 @@ func TestMapEdgeStackToWorkflow_GroupStatusesAndResolvedEndpoints(t *testing.T) 
 		EdgeGroups: []portainer.EdgeGroupID{1, 2},
 	}
 
-	w := MapEdgeStackToWorkflow(5, es, nil, statuses, groupEndpoints, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
+	w := MapEdgeStackToWorkflow(5, es, 0, nil, statuses, groupEndpoints, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
 
 	require.Equal(t, StatusHealthy, w.Target.GroupStatus[1])
 	require.Equal(t, StatusError, w.Target.GroupStatus[2])

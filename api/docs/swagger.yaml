@@ -9648,6 +9648,8 @@ definitions:
         type: string
       platform:
         $ref: '#/definitions/workflows.DeploymentPlatform'
+      sourceId:
+        type: integer
       status:
         $ref: '#/definitions/workflows.WorkflowStatusObject'
       target:

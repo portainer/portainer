@@ -9,6 +9,7 @@ import { Link } from '@@/Link';
 
 import { Workflow, WorkflowTarget, WorkflowType } from '../../workflows/types';
 import { StatusBadge } from '../../components/StatusBadge';
+import { getWorkflowLink } from '../../workflows/utils';
 import { effectiveWorkflowStatus } from '../../workflows/status';
 
 interface Props {
@@ -51,11 +52,13 @@ function WorkflowsList({ workflows }: { workflows: Array<Workflow> }) {
 }
 
 function WorkflowCard({ item }: { item: Workflow }) {
+  const { to, params } = getWorkflowLink(item);
+
   return (
     <Link
       className="group flex items-center gap-3 p-4 text-inherit hover:bg-cyan-4/10 hover:text-current hover:!no-underline"
-      to="portainer.gitops.workflows.item"
-      params={{ id: item.id }}
+      to={to}
+      params={params}
       data-cy="workflow-item"
     >
       <div className="me-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-4 text-blue-7">

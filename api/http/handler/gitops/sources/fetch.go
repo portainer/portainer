@@ -66,7 +66,7 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 			cfg.ConfigFilePath = file.Path
 			cfg.ConfigHash = file.Hash
 		}
-		items = append(items, ce.MapStackToWorkflow(stack, cfg, unknown, unknown))
+		items = append(items, ce.MapStackToWorkflow(stack, src.ID, cfg, unknown, unknown))
 		stats.WorkflowCount++
 		if stack.EndpointID != 0 {
 			stats.EndpointIDs.Add(stack.EndpointID)

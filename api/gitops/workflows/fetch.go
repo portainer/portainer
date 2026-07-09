@@ -18,6 +18,7 @@ func FetchWorkflows(
 	endpointIDSet set.Set[portainer.EndpointID],
 ) ([]Workflow, error) {
 	gitConfigs := map[portainer.StackID]*gittypes.RepoConfig{}
+	sourceIDs := map[portainer.StackID]portainer.SourceID{}
 	sourcePhases := map[portainer.StackID]WorkflowPhaseStatus{}
 	artifactPhases := map[portainer.StackID]WorkflowPhaseStatus{}
 
@@ -78,6 +79,7 @@ func FetchWorkflows(
 
 				if src.Type == portainer.SourceTypeGit {
 					gitConfigs[stack.ID] = MergeSourceAndFile(&src, &f)
+					sourceIDs[stack.ID] = src.ID
 					sourcePhases[stack.ID] = SourceStatusToPhase(f.RefStatus, f.RefError)
 					artifactPhases[stack.ID] = SourceStatusToPhase(f.PathStatus, f.PathError)
 					break outer
@@ -106,7 +108,7 @@ func FetchWorkflows(
 	items := make([]Workflow, 0, len(stacks))
 	for _, stack := range stacks {
 		gitConfig := gitConfigs[stack.ID]
-		items = append(items, MapStackToWorkflow(stack, gitConfig, sourcePhases[stack.ID], artifactPhases[stack.ID]))
+		items = append(items, MapStackToWorkflow(stack, sourceIDs[stack.ID], gitConfig, sourcePhases[stack.ID], artifactPhases[stack.ID]))
 	}
 
 	return items, nil

@@ -33,7 +33,7 @@ func BuildGroupEndpoints(tx dataservices.DataStoreTx, groups []portainer.EdgeGro
 // MapStackToWorkflow converts a stack to a Workflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
 // source and artifact are the pre-computed git phase statuses from the caller.
-func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) Workflow {
+func MapStackToWorkflow(s portainer.Stack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) Workflow {
 	return Workflow{
 		ID:       s.WorkflowID,
 		Name:     s.Name,
@@ -44,6 +44,7 @@ func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, sourc
 			Artifact: artifact,
 			Target:   deriveStackTargetState(s),
 		},
+		SourceID:   sourceID,
 		GitConfig:  gitConfig,
 		AutoUpdate: s.AutoUpdate,
 		Target: Target{
@@ -58,7 +59,7 @@ func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, sourc
 // MapEdgeStackToWorkflow converts an edge stack to a Workflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
 // source and artifact are the pre-computed git phase statuses from the caller.
-func MapEdgeStackToWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
+func MapEdgeStackToWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
 	platform := DeploymentPlatformDockerStandalone
 	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		platform = DeploymentPlatformKubernetes
@@ -73,6 +74,7 @@ func MapEdgeStackToWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, g
 			Artifact: artifact,
 			Target:   deriveEdgeStackTargetState(statuses),
 		},
+		SourceID:  sourceID,
 		GitConfig: gitConfig,
 		Target: Target{
 			EdgeGroupIDs:        es.EdgeGroups,

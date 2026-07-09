@@ -36,17 +36,22 @@ async function getWorkflow(id: number): Promise<WorkflowDetail> {
     return {
       ...artifact,
       status: toArtifactStatusObj(artifact.status),
-      files:
-        artifact.files?.filter((f) => f.sourceId).map(toArtifactFile) ?? [],
+      files: (artifact.files ?? []).filter(hasSourceId).map(toArtifactFile),
     };
   }
 
-  function toArtifactFile(
+  function hasSourceId(
     file: WorkflowsArtifactFileDetail
+  ): file is WorkflowsArtifactFileDetail & { sourceId: number } {
+    return !!file.sourceId;
+  }
+
+  function toArtifactFile(
+    file: WorkflowsArtifactFileDetail & { sourceId: number }
   ): WorkflowArtifactFile {
     return {
       ...file,
-      sourceId: file.sourceId ?? 0,
+      sourceId: file.sourceId,
     };
   }
 

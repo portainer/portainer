@@ -8306,6 +8306,7 @@ export type WorkflowsWorkflow = {
   lastSyncDate?: number;
   name: string;
   platform: WorkflowsDeploymentPlatform;
+  sourceId?: number;
   status: WorkflowsWorkflowStatusObject;
   target: WorkflowsTarget;
   type: WorkflowsType;

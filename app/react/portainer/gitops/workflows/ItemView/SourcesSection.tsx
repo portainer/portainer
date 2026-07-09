@@ -52,13 +52,13 @@ function SourceRow({ query }: { query: WorkflowSourceQuery['query'] }) {
   }
 
   return (
-    <Link
-      to="portainer.gitops.sources.item"
-      params={{ sourceId: source.id }}
-      data-cy={`workflow-source-link-${source.id}`}
-      className="block px-4 py-3 no-underline hover:bg-gray-1 hover:no-underline th-dark:hover:bg-gray-10"
-    >
-      <li className="flex items-center gap-4">
+    <li>
+      <Link
+        to="portainer.gitops.sources.item"
+        params={{ sourceId: source.id }}
+        data-cy={`workflow-source-link-${source.id}`}
+        className="flex items-center gap-4 px-4 py-3 no-underline hover:bg-gray-1 hover:no-underline th-dark:hover:bg-gray-10"
+      >
         <StatusBadge status={source.status} />
         <div className="min-w-0 flex-1">
           <p className="m-0 truncate font-semibold text-gray-9 th-highcontrast:text-white th-dark:text-white">
@@ -68,7 +68,7 @@ function SourceRow({ query }: { query: WorkflowSourceQuery['query'] }) {
             {source.url}
           </p>
         </div>
-      </li>
-    </Link>
+      </Link>
+    </li>
   );
 }

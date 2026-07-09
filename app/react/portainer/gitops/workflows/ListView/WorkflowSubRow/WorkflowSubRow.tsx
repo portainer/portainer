@@ -1,7 +1,10 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
+import { Link } from '@@/Link';
+
 import { Workflow, WorkflowStatus } from '../../types';
+import { getDeployedStackLink, getSourceLink } from '../../utils';
 
 import { Block, Dot } from './Block';
 import { TargetCell } from './TargetCell';
@@ -22,6 +25,7 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
             <Td>
               {item.gitConfig && (
                 <SourceCell
+                  sourceId={item.sourceId}
                   name={item.name}
                   url={item.gitConfig.URL}
                   status={item.status.source.status}
@@ -31,6 +35,7 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
             <Td divider>
               {item.gitConfig && (
                 <ArtifactCell
+                  item={item}
                   path={item.gitConfig.ConfigFilePath}
                   status={item.status.artifact.status}
                 />
@@ -51,15 +56,17 @@ export function WorkflowSubRow({ item }: { item: Workflow }) {
 }
 
 function SourceCell({
+  sourceId,
   name,
   url,
   status,
 }: {
+  sourceId: number | undefined;
   name: string;
   url: string;
   status: WorkflowStatus;
 }) {
-  return (
+  const content = (
     <Block status={status} className="flex items-start gap-2">
       <Dot status={status} className="mt-1.5" />
       <div className="min-w-0">
@@ -72,22 +79,56 @@ function SourceCell({
       </div>
     </Block>
   );
+
+  if (sourceId === undefined) {
+    return content;
+  }
+
+  const sourceLink = getSourceLink(sourceId);
+  return (
+    <Link
+      to={sourceLink.to}
+      params={sourceLink.params}
+      data-cy={`workflow-source-link-${sourceId}`}
+      className="block no-underline hover:no-underline"
+    >
+      {content}
+    </Link>
+  );
 }
 
 function ArtifactCell({
+  item,
   path,
   status,
 }: {
+  item: Workflow;
   path: string;
   status: WorkflowStatus;
 }) {
-  return (
+  const content = (
     <Block status={status} className="flex items-center gap-2">
       <Dot status={status} />
       <span className="font-mono text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-4">
         {path}
       </span>
     </Block>
+  );
+
+  const stackLink = getDeployedStackLink(item);
+  if (!stackLink) {
+    return content;
+  }
+
+  return (
+    <Link
+      to={stackLink.to}
+      params={stackLink.params}
+      data-cy={`workflow-artifact-link-${item.id}`}
+      className="block no-underline hover:no-underline"
+    >
+      {content}
+    </Link>
   );
 }
 

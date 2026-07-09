@@ -85,6 +85,7 @@ type Workflow struct {
 	Type         Type                          `json:"type" validate:"required"`
 	Platform     DeploymentPlatform            `json:"platform" validate:"required"`
 	Status       WorkflowStatusObject          `json:"status" validate:"required"`
+	SourceID     portainer.SourceID            `json:"sourceId,omitempty"`
 	GitConfig    *gittypes.RepoConfig          `json:"gitConfig,omitempty"`
 	AutoUpdate   *portainer.AutoUpdateSettings `json:"autoUpdate,omitempty"`
 	Target       Target                        `json:"target" validate:"required"`

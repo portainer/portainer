@@ -43,6 +43,7 @@ export interface Workflow {
   type: WorkflowType;
   platform: DeploymentPlatform;
   status: WorkflowStatusObject;
+  sourceId?: number;
   gitConfig?: RepoConfigResponse;
   target: WorkflowTarget;
   creationDate: number;

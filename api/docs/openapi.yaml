@@ -21413,6 +21413,8 @@ components:
           type: string
         platform:
           $ref: "#/components/schemas/workflows.DeploymentPlatform"
+        sourceId:
+          type: integer
         status:
           $ref: "#/components/schemas/workflows.WorkflowStatusObject"
         target:
