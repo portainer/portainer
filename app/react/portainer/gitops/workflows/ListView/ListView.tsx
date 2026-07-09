@@ -8,12 +8,13 @@ import {
   SortOption,
 } from '@@/SortableList/SortableList';
 
-import { useWorkflows } from '../queries/useWorkflows';
-import { useWorkflowsSummary } from '../queries/useWorkflowsSummary';
+import { useWorkflows } from '../../queries/useWorkflows';
+import { useWorkflowsSummary } from '../../queries/useWorkflowsSummary';
+import { Workflow, WorkflowStatus } from '../types';
+import { effectiveWorkflowStatus } from '../status';
 
 import { WorkflowCard } from './WorkflowCard';
 import { useListState } from './useListState';
-import { effectiveWorkflowStatus, Workflow, WorkflowStatus } from './types';
 
 const STATUS_CONFIG: Array<{
   key: WorkflowStatus;
@@ -54,7 +55,7 @@ const GROUP_FIELD: Record<string, (item: Workflow) => string> = {
   platform: (item) => item.platform,
 };
 
-export function WorkflowsView() {
+export function ListView() {
   const tableState = useListState();
 
   const sortBy = tableState.sortBy?.id ?? 'name';

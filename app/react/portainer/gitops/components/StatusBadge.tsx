@@ -1,7 +1,11 @@
 import { Badge } from '@@/Badge';
 import { StatusDot } from '@@/primitives/StatusDot';
 
-import { WorkflowStatus, WorkflowType } from './types';
+import {
+  WorkflowStatus,
+  WorkflowType,
+  DeploymentPlatform,
+} from '../workflows/types';
 
 const BADGE_TYPE = {
   healthy: 'success',
@@ -33,4 +37,21 @@ const TYPE_LABELS: Record<WorkflowType, string> = {
 };
 export function TypeBadge({ type }: { type: WorkflowType }) {
   return <Badge type="muted">{TYPE_LABELS[type]}</Badge>;
+}
+
+const PLATFORM_LABELS: Record<DeploymentPlatform, string> = {
+  dockerStandalone: 'Docker Standalone',
+  dockerSwarm: 'Docker Swarm',
+  kubernetes: 'Kubernetes',
+};
+export function PlatformBadge({
+  platform,
+}: {
+  platform: DeploymentPlatform | undefined;
+}) {
+  return (
+    <Badge type="muted">
+      {platform ? PLATFORM_LABELS[platform] : 'Unknown'}
+    </Badge>
+  );
 }

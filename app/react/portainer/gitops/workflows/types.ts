@@ -1,3 +1,9 @@
+import {
+  WorkflowsArtifactDetail,
+  WorkflowsArtifactFileDetail,
+  WorkflowsWorkflowDetail,
+} from '@api/types.gen';
+
 import { RepoConfigResponse } from '@/react/portainer/gitops/types';
 
 export type WorkflowStatus =
@@ -28,6 +34,7 @@ export interface WorkflowTarget {
   namespace?: string;
   edgeGroupIds?: number[];
   groupStatus?: Record<number, WorkflowStatus>;
+  resolvedEndpointIds?: number[];
 }
 
 export interface Workflow {
@@ -42,21 +49,21 @@ export interface Workflow {
   lastSyncDate: number;
 }
 
-const STATUS_PRIORITY: Record<WorkflowStatus, number> = {
-  error: 4,
-  syncing: 3,
-  paused: 2,
-  healthy: 1,
-  unknown: 0,
+export interface WorkflowFileRef {
+  sourceId: number;
+  path: string;
+  ref: string;
+}
+
+export type WorkflowArtifact = Omit<WorkflowsArtifactDetail, 'status'> & {
+  status: WorkflowStatusObject;
+  files: Array<WorkflowArtifactFile>;
 };
 
-export function effectiveWorkflowStatus(item: Workflow): {
-  status: WorkflowStatus;
-  error?: string;
-} {
-  const phases = [item.status.source, item.status.artifact, item.status.target];
-  const winning = phases.reduce((best, phase) =>
-    STATUS_PRIORITY[phase.status] > STATUS_PRIORITY[best.status] ? phase : best
-  );
-  return { status: winning.status, error: winning.error };
-}
+export type WorkflowArtifactFile = WorkflowsArtifactFileDetail & {
+  sourceId: number;
+};
+
+export type WorkflowDetail = Omit<WorkflowsWorkflowDetail, 'artifacts'> & {
+  artifacts: WorkflowArtifact[];
+};

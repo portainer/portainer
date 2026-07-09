@@ -5,7 +5,7 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { StatusBadge } from '../../WorkflowsView/WorkflowBadges';
+import { StatusBadge } from '../../components/StatusBadge';
 import { Source, SOURCE_TYPES } from '../types';
 
 import { StatBlock } from './StatBlock';

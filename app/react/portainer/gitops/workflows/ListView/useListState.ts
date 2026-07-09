@@ -4,7 +4,7 @@ import {
   useTableStateFromUrl,
 } from '@@/datatables/useTableStateFromUrl';
 
-import { WorkflowStatus, WorkflowType, DeploymentPlatform } from './types';
+import { WorkflowStatus, WorkflowType, DeploymentPlatform } from '../types';
 
 const DEFAULT_SORT = 'name' as const;
 

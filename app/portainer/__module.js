@@ -315,6 +315,19 @@ angular
         },
       };
 
+      var gitopsWorkflowDetail = {
+        name: 'portainer.gitops.workflows.item',
+        url: '/:workflowId?tab',
+        params: {
+          tab: filterParam('overview'),
+        },
+        views: {
+          'content@': {
+            component: 'workflowItemView',
+          },
+        },
+      };
+
       var gitopsSources = {
         name: 'portainer.gitops.sources',
         url: '/sources?search&sort&order&page&pageSize&status&type',
@@ -477,6 +490,7 @@ angular
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(gitopsBase);
       $stateRegistryProvider.register(workflows);
+      $stateRegistryProvider.register(gitopsWorkflowDetail);
       $stateRegistryProvider.register(gitopsSources);
       $stateRegistryProvider.register(gitopsSourceDetail);
       $stateRegistryProvider.register(gitopsSourceCreate);

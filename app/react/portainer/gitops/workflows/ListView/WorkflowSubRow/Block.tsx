@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
-import { WorkflowStatus } from '../types';
+import { WorkflowStatus } from '../../types';
 
 const STATUS_DOT_CLASSES: Record<WorkflowStatus, string> = {
   healthy: 'bg-success-7 th-highcontrast:bg-success-3',

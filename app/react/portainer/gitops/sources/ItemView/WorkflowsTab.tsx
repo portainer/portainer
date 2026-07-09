@@ -7,13 +7,9 @@ import { Card } from '@@/primitives/Card';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import {
-  effectiveWorkflowStatus,
-  Workflow,
-  WorkflowTarget,
-  WorkflowType,
-} from '../../WorkflowsView/types';
-import { StatusBadge } from '../../WorkflowsView/WorkflowBadges';
+import { Workflow, WorkflowTarget, WorkflowType } from '../../workflows/types';
+import { StatusBadge } from '../../components/StatusBadge';
+import { effectiveWorkflowStatus } from '../../workflows/status';
 
 interface Props {
   workflows: Workflow[];

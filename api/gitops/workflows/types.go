@@ -80,7 +80,7 @@ type WorkflowStatusObject struct {
 }
 
 type Workflow struct {
-	ID           int                           `json:"id" validate:"required"`
+	ID           portainer.WorkflowID          `json:"id" validate:"required"`
 	Name         string                        `json:"name" validate:"required"`
 	Type         Type                          `json:"type" validate:"required"`
 	Platform     DeploymentPlatform            `json:"platform" validate:"required"`

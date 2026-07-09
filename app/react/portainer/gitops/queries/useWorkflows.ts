@@ -9,7 +9,7 @@ import {
   Workflow,
   WorkflowStatus,
   WorkflowType,
-} from '../WorkflowsView/types';
+} from '../workflows/types';
 
 import { workflowQueryKeys } from './query-keys';
 

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
-import { Workflow, WorkflowStatus } from '../types';
+import { Workflow, WorkflowStatus } from '../../types';
 
 import { Block, Dot } from './Block';
 import { TargetCell } from './TargetCell';

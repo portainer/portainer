@@ -7,12 +7,14 @@ import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { effectiveWorkflowStatus, Workflow, WorkflowType } from './types';
-import { StatusBadge, TypeBadge } from './WorkflowBadges';
+import { Workflow, WorkflowType } from '../types';
+import { StatusBadge, TypeBadge } from '../../components/StatusBadge';
+import { effectiveWorkflowStatus } from '../status';
+
 import { WorkflowSubRow } from './WorkflowSubRow/WorkflowSubRow';
 
 export function WorkflowCard({ item }: { item: Workflow }) {
-  const { to, params } = getStackLink(item);
+  const { to, params } = getWorkflowLink(item);
 
   const { status: effectiveStatus, error: errorMessage } =
     effectiveWorkflowStatus(item);
@@ -66,7 +68,7 @@ function SyncLabel({ type, date }: { type: WorkflowType; date: number }) {
   );
 }
 
-function getStackLink(item: Workflow): { to: string; params: object } {
+function getWorkflowLink(item: Workflow): { to: string; params: object } {
   if (item.type === 'edgeStack') {
     return { to: 'edge.stacks.edit', params: { stackId: item.id } };
   }

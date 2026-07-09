@@ -11,7 +11,7 @@ import { ResourceStatBlock } from '@@/ResourceDetailHeader/ResourceStatBlock';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 import { ActionBarShell } from '@@/ResourceDetailHeader/ActionBarShell';
 
-import { StatusBadge } from '../../WorkflowsView/WorkflowBadges';
+import { StatusBadge } from '../../components/StatusBadge';
 import { SOURCE_TYPES } from '../types';
 import { SourceDetail } from '../queries/useSource';
 import { useDeleteSourceMutation } from '../queries/useDeleteSourceMutation';

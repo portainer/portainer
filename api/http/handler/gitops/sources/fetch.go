@@ -59,17 +59,17 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 	items := make([]ce.Workflow, 0, len(stacks))
 	stats := ce.SourceStats{EndpointIDs: set.Set[portainer.EndpointID]{}}
 
-	for _, stacks := range stacks {
+	for _, stack := range stacks {
 		cfg := src.Git.ToRepoConfig()
-		if file, ok := artifactByStack[stacks.ID]; ok {
+		if file, ok := artifactByStack[stack.ID]; ok {
 			cfg.ReferenceName = file.Ref
 			cfg.ConfigFilePath = file.Path
 			cfg.ConfigHash = file.Hash
 		}
-		items = append(items, ce.MapStackToWorkflow(stacks, cfg, unknown, unknown))
+		items = append(items, ce.MapStackToWorkflow(stack, cfg, unknown, unknown))
 		stats.WorkflowCount++
-		if stacks.EndpointID != 0 {
-			stats.EndpointIDs.Add(stacks.EndpointID)
+		if stack.EndpointID != 0 {
+			stats.EndpointIDs.Add(stack.EndpointID)
 		}
 	}
 

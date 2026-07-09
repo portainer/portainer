@@ -11,7 +11,7 @@ import { useEdgeGroup } from '@/react/edge/edge-groups/queries/useEdgeGroup';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import { WorkflowStatus, WorkflowTarget, WorkflowType } from '../types';
+import { WorkflowStatus, WorkflowTarget, WorkflowType } from '../../types';
 
 import { Block, Dot } from './Block';
 
@@ -20,10 +20,14 @@ export function TargetCell({
   type,
   status,
 }: {
-  target: WorkflowTarget;
+  target: WorkflowTarget | undefined;
   type: WorkflowType;
   status: WorkflowStatus;
 }) {
+  if (!target) {
+    return null;
+  }
+
   if (type === 'edgeStack') {
     return (
       <div className="flex flex-col gap-1.5">

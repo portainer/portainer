@@ -27,7 +27,7 @@ import {
   WorkflowPhaseStatus,
   WorkflowStatus,
   WorkflowStatusObject,
-} from '../../WorkflowsView/types';
+} from '../../workflows/types';
 
 import { sourceQueryKeys } from './query-keys';
 
@@ -40,7 +40,22 @@ export type SourceDetail = Omit<SourcesSourceDetail, 'workflows' | 'usedBy'> & {
   usedBy: number;
 };
 
-async function getSource(id: Source['id']): Promise<SourceDetail> {
+export function sourceOptions(id: Source['id']) {
+  return {
+    queryKey: sourceQueryKeys.detail(id!),
+    queryFn: () => getSource(id!),
+    ...withError('Failed loading source'),
+  };
+}
+
+export function useSource(id: Source['id'] | undefined) {
+  return useQuery({
+    ...sourceOptions(id!),
+    enabled: !!id,
+  });
+}
+
+export async function getSource(id: Source['id']): Promise<SourceDetail> {
   const { data } = await gitOpsSourceGet({ path: { id } });
 
   return toSourceDetails(data);
@@ -123,13 +138,4 @@ async function getSource(id: Source['id']): Promise<SourceDetail> {
       AuthorizationType: auth.AuthorizationType as AuthTypeOption | undefined,
     };
   }
-}
-
-export function useSource(id: Source['id'] | undefined) {
-  return useQuery({
-    queryKey: sourceQueryKeys.detail(id!),
-    queryFn: () => getSource(id!),
-    enabled: !!id,
-    ...withError('Failed loading source'),
-  });
 }

@@ -35,7 +35,7 @@ func BuildGroupEndpoints(tx dataservices.DataStoreTx, groups []portainer.EdgeGro
 // source and artifact are the pre-computed git phase statuses from the caller.
 func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) Workflow {
 	return Workflow{
-		ID:       int(s.ID),
+		ID:       s.WorkflowID,
 		Name:     s.Name,
 		Type:     TypeStack,
 		Platform: platformFromStackType(s.Type),
@@ -58,13 +58,13 @@ func MapStackToWorkflow(s portainer.Stack, gitConfig *gittypes.RepoConfig, sourc
 // MapEdgeStackToWorkflow converts an edge stack to a Workflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
 // source and artifact are the pre-computed git phase statuses from the caller.
-func MapEdgeStackToWorkflow(es portainer.EdgeStack, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
+func MapEdgeStackToWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
 	platform := DeploymentPlatformDockerStandalone
 	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		platform = DeploymentPlatformKubernetes
 	}
 	return Workflow{
-		ID:       int(es.ID),
+		ID:       wfID,
 		Name:     es.Name,
 		Type:     TypeEdgeStack,
 		Platform: platform,
