@@ -91,7 +91,7 @@ function getNetwork(networkName: string): DockerNetwork {
         },
       ],
       Driver: 'default',
-      Options: null,
+      Options: undefined,
     },
     Id: '4c52a72e3772fdfb5823cf519b759e3f716e6d98cfb3bfef056e32c9c878329f',
     Internal: false,

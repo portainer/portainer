@@ -20,6 +20,10 @@ function AgentServiceFactory(Agent, AgentVersion1, HttpRequestHelper, Host, Stat
     return Host.info({ endpointId }).$promise;
   }
 
+  /**
+   * @deprecated
+   * useAgentNodes instead
+   */
   async function agents(endpointId) {
     const agentVersion = getAgentApiVersion();
     const service = agentVersion > 1 ? Agent : AgentVersion1;

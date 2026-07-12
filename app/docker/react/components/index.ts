@@ -16,7 +16,6 @@ import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolum
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
 import { SecretsDatatable } from '@/react/docker/secrets/ListView/SecretsDatatable';
 import { StacksDatatable } from '@/react/docker/stacks/ListView/StacksDatatable';
-import { NetworksDatatable } from '@/react/docker/networks/ListView/NetworksDatatable';
 import { HostDetailsPanel } from '@/react/docker/host/HostDetailsPanel/HostDetailsPanel';
 
 import { containersModule } from './containers';
@@ -37,14 +36,6 @@ const ngModule = angular
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
   .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
-  .component(
-    'networksDatatable',
-    r2a(withUIRouter(withCurrentUser(NetworksDatatable)), [
-      'dataset',
-      'onRefresh',
-      'onRemove',
-    ])
-  )
   .component(
     'gpusList',
     r2a(withControlledInput(GpusList), ['value', 'onChange'])

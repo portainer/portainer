@@ -251,8 +251,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/networks',
       views: {
         'content@': {
-          templateUrl: './views/networks/networks.html',
-          controller: 'NetworksController',
+          component: 'networksListView',
         },
       },
       data: {

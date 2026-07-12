@@ -1,10 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import {
-  mutationOptions,
-  withError,
-  withInvalidate,
-} from '@/react-tools/react-query';
+import { withError } from '@/react-tools/react-query';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 
@@ -17,14 +13,20 @@ import { queryKeys } from './queryKeys';
 export function useDeleteNetwork(environmentId: EnvironmentId) {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    ({ networkId, nodeName }: { networkId: NetworkId; nodeName?: string }) =>
-      deleteNetwork(environmentId, networkId, { nodeName }),
-    mutationOptions(
-      withInvalidate(queryClient, [queryKeys.base(environmentId)]),
-      withError('Unable to remove network')
-    )
-  );
+  return useMutation({
+    mutationFn: ({
+      networkId,
+      nodeName,
+    }: {
+      networkId: NetworkId;
+      nodeName?: string;
+    }) => deleteNetwork(environmentId, networkId, { nodeName }),
+    ...withError('Unable to remove network'),
+    onSuccess(_, { networkId }) {
+      queryClient.cancelQueries(queryKeys.item(environmentId, networkId));
+      return queryClient.invalidateQueries(queryKeys.base(environmentId));
+    },
+  });
 }
 
 /**
