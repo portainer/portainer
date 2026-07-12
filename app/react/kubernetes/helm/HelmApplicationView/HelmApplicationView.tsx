@@ -8,7 +8,7 @@ import { Authorized } from '@/react/hooks/useUser';
 import { useNamespaceAccessRedirect } from '@/react/kubernetes/namespaces/hooks/useNamespaceAccessRedirect';
 
 import { WidgetTitle, WidgetBody, Widget, Loading } from '@@/Widget';
-import { Card } from '@@/Card';
+import { Card } from '@@/primitives/Card';
 import { Alert } from '@@/Alert';
 
 import { HelmRelease } from '../types';
@@ -150,9 +150,11 @@ function HelmDetails({
     <>
       <HelmSummary release={release} />
       <div className="my-6 h-[1px] w-full bg-gray-5 th-highcontrast:bg-white th-dark:bg-gray-7" />
-      <Card className="bg-inherit">
-        <ReleaseTabs release={release} selectedRevision={selectedRevision} />
-      </Card>
+      <Card.Container variant="default">
+        <Card.Body>
+          <ReleaseTabs release={release} selectedRevision={selectedRevision} />
+        </Card.Body>
+      </Card.Container>
     </>
   );
 }
