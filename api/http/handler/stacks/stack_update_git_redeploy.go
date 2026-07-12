@@ -26,12 +26,14 @@ import (
 )
 
 type stackGitRedeployPayload struct {
-	RepositoryReferenceName  string
+	RepositoryReferenceName string
+	// When true and RepositoryPassword is non-empty, stored credentials are replaced.
 	RepositoryAuthentication bool
 	RepositoryUsername       string
-	RepositoryPassword       string
-	Env                      []portainer.Pair
-	Prune                    *bool
+	// Non-empty value (with RepositoryAuthentication=true) replaces stored credentials; leave blank to keep them.
+	RepositoryPassword string
+	Env                []portainer.Pair
+	Prune              *bool
 	// RepullImageAndRedeploy indicates whether to force repulling images and redeploying the stack
 	RepullImageAndRedeploy bool
 
@@ -175,25 +177,14 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		stack.Name = payload.StackName
 	}
 
-	repositoryUsername := ""
-	repositoryPassword := ""
-	if payload.RepositoryAuthentication {
-		repositoryPassword = payload.RepositoryPassword
-
-		// When the existing stack is using the custom username/password and the password is not updated,
-		// the stack should keep using the saved username/password
-		if repositoryPassword == "" && gitConfig.Authentication != nil {
-			repositoryPassword = gitConfig.Authentication.Password
-		}
-		repositoryUsername = payload.RepositoryUsername
-	}
+	auth := resolveGitAuthFromRedeployPayload(gitConfig, payload)
 
 	cloneOptions := git.CloneOptions{
 		ProjectPath:   stack.ProjectPath,
 		URL:           gitConfig.URL,
 		ReferenceName: gitConfig.ReferenceName,
-		Username:      repositoryUsername,
-		Password:      repositoryPassword,
+		Username:      auth.Username,
+		Password:      auth.Password,
 		TLSSkipVerify: gitConfig.TLSSkipVerify,
 	}
 
@@ -204,7 +195,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	defer clean()
 
-	newHash, err := handler.GitService.LatestCommitID(context.TODO(), gitConfig.URL, gitConfig.ReferenceName, repositoryUsername, repositoryPassword, gitConfig.TLSSkipVerify)
+	newHash, err := handler.GitService.LatestCommitID(context.TODO(), gitConfig.URL, gitConfig.ReferenceName, auth.Username, auth.Password, gitConfig.TLSSkipVerify)
 	if err != nil {
 		return httperror.InternalServerError("Unable get latest commit id", errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID))
 	}
@@ -280,6 +271,20 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	deployGate.startDeploy()
 
 	return response.JSON(w, stack)
+}
+
+func resolveGitAuthFromRedeployPayload(gitConfig *gittypes.RepoConfig, payload stackGitRedeployPayload) gittypes.GitAuthentication {
+	auth := gittypes.GitAuthentication{}
+	if gitConfig.Authentication != nil {
+		auth = *gitConfig.Authentication
+	}
+
+	// only overload source auth if provided
+	if payload.RepositoryAuthentication && payload.RepositoryPassword != "" {
+		auth.Username = payload.RepositoryUsername
+		auth.Password = payload.RepositoryPassword
+	}
+	return auth
 }
 
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint, gate *deployGate, postDeploy postDeployFunc) *httperror.HandlerError {
