@@ -61,6 +61,7 @@ func (manager *SwarmStackManager) Deploy(
 		ProjectName: stack.Name,
 		Host:        url,
 		Env:         env,
+		WorkingDir:  stack.ProjectPath,
 		Registries:  portainerRegistriesToAuthConfigs(registries),
 	}
 
