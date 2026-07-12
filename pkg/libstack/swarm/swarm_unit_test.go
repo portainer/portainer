@@ -272,6 +272,7 @@ func Test_getConfig(t *testing.T) {
 		name         string
 		composeFiles map[string]string
 		files        map[string]string
+		workingDir   string
 		env          []string
 		osEnv        map[string]string
 		expectedCfg  *composetypes.Config
@@ -285,6 +286,7 @@ services:
   web:
     image: nginx:latest`,
 			},
+			workingDir: dir,
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/valid.yml",
 				Version:  "3.13",
@@ -306,7 +308,16 @@ services:
 			composeFiles: map[string]string{
 				"invalid.yml": `not: valid: yaml: content`,
 			},
+			workingDir:  dir,
 			expectedErr: "failed to load compose file: yaml: mapping values are not allowed in this context",
+		},
+		{
+			name: "non-mapping content returns error",
+			composeFiles: map[string]string{
+				"notmapping.yml": "not valid yaml content",
+			},
+			workingDir:  dir,
+			expectedErr: "failed to load compose file: top-level object must be a mapping",
 		},
 		{
 			name:        "no file paths returns error",
@@ -320,6 +331,7 @@ services:
   web:
     command: echo hello`,
 			},
+			workingDir:  dir,
 			expectedErr: "invalid image reference for service web: no image specified",
 		},
 		{
@@ -334,6 +346,7 @@ services:
   worker:
     image: alpine:latest`,
 			},
+			workingDir: dir,
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/base.yml",
 				Version:  "3.13",
@@ -363,7 +376,8 @@ services:
   web:
     image: nginx:${TAG}`,
 			},
-			env: []string{"TAG=1.25"},
+			workingDir: dir,
+			env:        []string{"TAG=1.25"},
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/envvar.yml",
 				Version:  "3.13",
@@ -388,6 +402,7 @@ services:
   web:
     image: nginx:${PORTAINER_TAG}`,
 			},
+			workingDir: dir,
 			osEnv: map[string]string{
 				libstack.PortainerEnvVarsPrefix + "TAG": "1.25",
 			},
@@ -419,6 +434,7 @@ services:
 			files: map[string]string{
 				"stack.env": "A=junk",
 			},
+			workingDir: dir,
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/docker-compose.yaml",
 				Version:  "3.13",
@@ -450,6 +466,7 @@ services:
 			files: map[string]string{
 				"stack.env": "A=junk",
 			},
+			workingDir: dir,
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/docker-compose.yaml",
 				Version:  "3.13",
@@ -485,6 +502,7 @@ services:
 				"sub/stack.env": "A=junk",
 				"stack.env":     "A=not-this-one",
 			},
+			workingDir: dir,
 			expectedCfg: &composetypes.Config{
 				Filename: dir + "/sub/docker-compose.yaml",
 				Version:  "3.13",
@@ -498,6 +516,252 @@ services:
 						EnvFile: []string{dir + "/sub/stack.env"},
 					},
 				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			// A compose file in a sub-directory must be able to reach an env_file that lives
+			// outside that sub-directory (e.g. an edge-config directory above it) via a "../"
+			// relative path. The traversal has to be honored, not stripped.
+			name: "env_file with relative path traverses out of the compose file sub-directory",
+			composeFiles: map[string]string{
+				"sub/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ../edge-configs/prod/stack.env`,
+			},
+			files: map[string]string{
+				"edge-configs/prod/stack.env": "A=junk",
+				"sub/stack.env":               "A=not-this-one",
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/edge-configs/prod/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			// env_file declared as a single string (rather than a list) must also be resolved
+			// relative to the compose file directory.
+			name: "env_file declared as a single string is resolved against the compose file directory",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file: stack.env`,
+			},
+			files: map[string]string{
+				"stack.env": "A=junk",
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "env_file with relative path traverses two directories up",
+			composeFiles: map[string]string{
+				"sub/nested/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ../../edge-configs/prod/stack.env`,
+			},
+			files: map[string]string{
+				"edge-configs/prod/stack.env": "A=junk",
+				"sub/nested/stack.env":        "A=not-this-one",
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/nested/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/edge-configs/prod/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "env_file with ./ prefix is resolved against the compose file directory",
+			composeFiles: map[string]string{
+				"sub/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ./stack.env`,
+			},
+			files: map[string]string{
+				"sub/stack.env": "A=junk",
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/sub/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "env_file with ./ prefix is resolved against nested compose file directory",
+			composeFiles: map[string]string{
+				"sub1/sub2/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ./../edge-configs/prod/stack.env`,
+			},
+			files: map[string]string{
+				"sub1/edge-configs/prod/stack.env": "A=junk",
+				"sub1/sub2/stack.env":              "A=not-this-one",
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub1/sub2/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/sub1/edge-configs/prod/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "relative env_file with no working dir",
+			composeFiles: map[string]string{
+				"sub/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ../edge-configs/prod/stack.env`,
+			},
+			files: map[string]string{
+				"sub/edge-configs/prod/stack.env": "A=junk",
+			},
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("junk"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/sub/edge-configs/prod/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "relative nested env_file with no working dir",
+			composeFiles: map[string]string{
+				"sub1/sub2/docker-compose.yaml": `services:
+  configtest:
+    image: nginx:latest
+    env_file:
+      - ../edge-configs/prod/stack.env`,
+			},
+			files: map[string]string{
+				"sub1/edge-configs/prod/stack.env":      "A=junk",
+				"sub1/sub2/edge-configs/prod/stack.env": "A=this-one",
+			},
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub1/sub2/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name: "configtest",
+						Environment: composetypes.MappingWithEquals{
+							"A": getStrPointer("this-one"),
+						},
+						Image:   "nginx:latest",
+						EnvFile: []string{dir + "/sub1/sub2/edge-configs/prod/stack.env"},
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "no services in compose file",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `version: "3"`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{},
 				Networks: map[string]composetypes.NetworkConfig{},
 				Volumes:  map[string]composetypes.VolumeConfig{},
 				Secrets:  map[string]composetypes.SecretConfig{},
@@ -522,7 +786,7 @@ services:
 				t.Setenv(k, v)
 			}
 
-			cfg, err := getConfig(filePaths, tt.env)
+			cfg, err := getConfig(filePaths, tt.workingDir, tt.env)
 			if err != nil {
 				if tt.expectedErr == "" {
 					t.Fatalf("expected no error but got: %v", err)
@@ -533,6 +797,22 @@ services:
 			}
 		})
 	}
+}
+
+// Test_Validate is a smoke test for the public Validate method, which delegates to getConfig
+// (exhaustively covered by Test_getConfig). It only parses compose files, so no Docker is needed.
+func Test_Validate(t *testing.T) {
+	dir := t.TempDir()
+	deployer := NewSwarmDeployer()
+
+	validPath := filesystem.JoinPaths(dir, "valid.yml")
+	require.NoError(t, os.WriteFile(validPath, []byte("version: '3'\nservices:\n  web:\n    image: nginx:latest"), 0o644))
+	require.NoError(t, deployer.Validate(t.Context(), []string{validPath}, Options{WorkingDir: dir}))
+
+	invalidPath := filesystem.JoinPaths(dir, "invalid.yml")
+	require.NoError(t, os.WriteFile(invalidPath, []byte("not valid yaml content"), 0o644))
+	err := deployer.Validate(t.Context(), []string{invalidPath}, Options{WorkingDir: dir})
+	require.ErrorContains(t, err, "failed to load compose file: top-level object must be a mapping")
 }
 
 type mockAPIClient struct {

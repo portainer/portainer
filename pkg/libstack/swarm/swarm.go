@@ -52,6 +52,7 @@ type Options struct {
 	ProjectName string
 	Host        string
 	Env         []string
+	WorkingDir  string
 	Registries  []configtypes.AuthConfig
 }
 
@@ -103,7 +104,7 @@ func (d *SwarmDeployer) Deploy(ctx context.Context, filePaths []string, options 
 
 // Validate loads and parses the compose file(s), returning an error if they are invalid.
 func (d *SwarmDeployer) Validate(_ context.Context, filePaths []string, options Options) error {
-	_, err := getConfig(filePaths, options.Env)
+	_, err := getConfig(filePaths, options.WorkingDir, options.Env)
 	return err
 }
 
@@ -185,7 +186,7 @@ func deployStack(ctx context.Context, dockerCLI *command.DockerCli, filePaths []
 		return errors.New(`this node is not a swarm manager. Use "docker swarm init" or "docker swarm join" to connect this node to swarm and try again`)
 	}
 
-	config, err := getConfig(filePaths, options.Env)
+	config, err := getConfig(filePaths, options.WorkingDir, options.Env)
 	if err != nil {
 		return fmt.Errorf("failed to load compose file: %w", err)
 	}
@@ -616,9 +617,9 @@ func isTerminalState(state swarm.TaskState) bool {
 	return taskStateOrdinal[state] > taskStateOrdinal[swarm.TaskStateRunning]
 }
 
-func getConfig(filePaths []string, env []string) (*composetypes.Config, error) {
+func getConfig(filePaths []string, workingDir string, env []string) (*composetypes.Config, error) {
 	// Load and parse the compose file(s).
-	configDetails, err := getConfigDetails(filePaths, env)
+	configDetails, err := getConfigDetails(filePaths, workingDir, env)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load compose file: %w", err)
 	}
@@ -659,16 +660,13 @@ func getConfig(filePaths []string, env []string) (*composetypes.Config, error) {
 	return config, nil
 }
 
-func getConfigDetails(filePaths []string, env []string) (composetypes.ConfigDetails, error) {
+func getConfigDetails(filePaths []string, workingDir string, env []string) (composetypes.ConfigDetails, error) {
 	var details composetypes.ConfigDetails
 
 	if len(filePaths) == 0 {
 		return details, errors.New("at least one compose file must be specified")
 	}
 
-	// Resolve relative references against the compose file's own directory, matching
-	// Docker Compose semantics (the default project directory is the directory of the
-	// first compose file) and the compose (non-swarm) libstack deployer.
 	details.WorkingDir = filepath.Dir(filePaths[0])
 
 	details.ConfigFiles = make([]composetypes.ConfigFile, 0, len(filePaths))
@@ -683,7 +681,23 @@ func getConfigDetails(filePaths []string, env []string) (composetypes.ConfigDeta
 			return details, err
 		}
 
-		resolveEnvFilePaths(config, filepath.Dir(fp))
+		// env_file paths are authored relative to the compose file's directory, but are resolved
+		// under the git repo / project root (workingDir) so they can reference sibling directories
+		// within the root (e.g. an edge-config directory) while staying clamped to it. composeDirRel
+		// is the compose file's directory relative to that root. When no root is provided, fall back
+		// to resolving against the compose file's own directory.
+		composeDir := filepath.Dir(fp)
+		root := workingDir
+		var composeDirRel string
+		if root == "" {
+			root = composeDir
+		} else if rel, err := filepath.Rel(root, composeDir); err == nil {
+			composeDirRel = rel
+		} else {
+			root = composeDir
+		}
+
+		resolveEnvFilePaths(config, root, composeDirRel)
 
 		details.ConfigFiles = append(details.ConfigFiles, composetypes.ConfigFile{
 			Filename: fp,
@@ -714,7 +728,12 @@ func getConfigDetails(filePaths []string, env []string) (composetypes.ConfigDeta
 	return details, nil
 }
 
-func resolveEnvFilePaths(rawConfig map[string]any, workingDir string) {
+// resolveEnvFilePaths rewrites each service's relative env_file to an absolute path. Paths are
+// authored relative to the compose file's directory (composeDirRel, relative to root) and are
+// resolved under root via filesystem.JoinPaths. Because JoinPaths keeps the result clamped to root,
+// a "../" can traverse into a sibling directory within the root (e.g. an edge-config directory) but
+// can never escape above it.
+func resolveEnvFilePaths(rawConfig map[string]any, root, composeDirRel string) {
 	services, ok := rawConfig["services"].(map[string]any)
 	if !ok {
 		return
@@ -731,12 +750,12 @@ func resolveEnvFilePaths(rawConfig map[string]any, workingDir string) {
 		switch ef := envFileAny.(type) {
 		case string:
 			if !filepath.IsAbs(ef) {
-				svc["env_file"] = filesystem.JoinPaths(workingDir, ef)
+				svc["env_file"] = filesystem.JoinPaths(root, composeDirRel, ef)
 			}
 		case []any:
 			for i, v := range ef {
 				if s, ok := v.(string); ok && !filepath.IsAbs(s) {
-					ef[i] = filesystem.JoinPaths(workingDir, s)
+					ef[i] = filesystem.JoinPaths(root, composeDirRel, s)
 				}
 			}
 		}
