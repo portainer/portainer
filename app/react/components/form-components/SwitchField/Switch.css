@@ -8,8 +8,14 @@
   --switch-size: 12px;
 }
 
-.switch input {
-  display: none;
+/* Bring offscreen, but allow it to be focusable for accessibility */
+.switch input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 .switch i {
