@@ -669,6 +669,26 @@ type (
 		RestoreSettings *RestoreSettings     `json:"restoreSettings,omitempty"`
 	}
 
+	// ResourcePatchConfig is the Config payload for resource-patch-k8s PolicyDesiredState entries:
+	// a policy-agnostic set of field patches the agent applies authoritatively and reverses on detach.
+	ResourcePatchConfig struct {
+		Patches []ResourcePatchOperation `json:"patches"`
+	}
+
+	// ResourcePatchOperation is the patcher operation details for the agent to apply.
+	ResourcePatchOperation struct {
+		APIVersion       string                     `json:"apiVersion"`
+		Kind             string                     `json:"kind"`
+		Resource         string                     `json:"resource"`
+		Name             string                     `json:"name"`
+		Namespace        string                     `json:"namespace,omitempty"`
+		FieldPath        []string                   `json:"fieldPath"`
+		Values           map[string]json.RawMessage `json:"values"`
+		OwnedKeyPrefixes []string                   `json:"ownedKeyPrefixes"`
+		Exclusive        bool                       `json:"exclusive,omitempty"`
+		CreateIfMissing  bool                       `json:"createIfMissing,omitempty"`
+	}
+
 	// PolicyType represents the type of policy
 	PolicyType string
 )
@@ -2694,6 +2714,8 @@ const (
 	PodSecurityStandardsK8s PolicyType = "pod-security-standards-k8s"
 	NetworkSecurityK8s      PolicyType = "network-security-k8s"
 )
+
+const ResourcePatchAgentType = "resource-patch-k8s"
 
 type HelmInstallStatus string
 
