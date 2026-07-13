@@ -24,6 +24,7 @@ var allowedHeaders = map[string]struct{}{
 	"X-Portaineragent-Target":   {},
 	"X-Portainer-Volumename":    {},
 	"X-Registry-Auth":           {},
+	"X-Registry-Config":         {},
 	"X-Stream-Protocol-Version": {},
 	// WebSocket headers those are required for kubectl exec/attach/port-forward operations
 	"Sec-Websocket-Key":        {},
