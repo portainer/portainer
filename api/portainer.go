@@ -2120,6 +2120,8 @@ const (
 	AuthCookieKey = "portainer_api_key"
 	// PortainerCacheHeader is used to enabled FE caching for Kubernetes resources
 	PortainerCacheHeader = "X-Portainer-Cache"
+	// APIKeyHeader is the name of the header used for API key authentication
+	APIKeyHeader = "X-API-KEY"
 	// KubectlShellImageEnvVar is the environment variable used to override the default kubectl shell image
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
@@ -2141,6 +2143,8 @@ const (
 	NoSetupTokenEnvVar = "PORTAINER_NO_SETUP_TOKEN"
 	// SetupTokenEnvVar is the environment variable used to provide a custom setup token for admin initialization and restore on an uninitialized instance
 	SetupTokenEnvVar = "PORTAINER_SETUP_TOKEN"
+	// CSRFAllowNoOriginEnvVar is the environment variable used to allow unsafe cookie-authenticated requests that carry no Origin or Sec-Fetch-Site header, reverting the CSRF protection to fail open for such requests
+	CSRFAllowNoOriginEnvVar = "CSRF_ALLOW_NO_ORIGIN"
 )
 
 // List of supported features

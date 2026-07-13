@@ -20,7 +20,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const apiKeyHeader = "X-API-KEY"
+const apiKeyHeader = portainer.APIKeyHeader
 const jwtTokenHeader = "Authorization"
 
 type (
