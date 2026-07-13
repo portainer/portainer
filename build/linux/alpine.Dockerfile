@@ -1,4 +1,4 @@
-FROM alpine:3.23.4 AS production
+FROM alpine:3.24.1 AS production
 
 LABEL org.opencontainers.image.title="Portainer" \
     org.opencontainers.image.description="Docker container management made simple, with the world’s most popular GUI-based container management platform." \

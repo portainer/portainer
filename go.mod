@@ -71,7 +71,7 @@ require (
 	k8s.io/kubectl v0.35.1
 	k8s.io/kubelet v0.35.0
 	k8s.io/metrics v0.35.1
-	oras.land/oras-go/v2 v2.6.0
+	oras.land/oras-go/v2 v2.6.1
 	software.sslmate.com/src/go-pkcs12 v0.0.0-20210415151418-c5206de65a78
 )
 
@@ -124,7 +124,7 @@ require (
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/containerd/console v1.0.5 // indirect
 	github.com/containerd/containerd/api v1.10.0 // indirect
-	github.com/containerd/containerd/v2 v2.2.4 // indirect
+	github.com/containerd/containerd/v2 v2.2.5 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
