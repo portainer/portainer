@@ -34,7 +34,6 @@ import { Application, ApplicationRowData, ConfigKind } from './types';
 import { useColumns } from './useColumns';
 import { getPublishedUrls } from './PublishedPorts';
 import { SubRow } from './SubRow';
-import { HelmInsightsBox } from './HelmInsightsBox';
 
 export function ApplicationsDatatable({
   tableState,
@@ -139,9 +138,6 @@ export function ApplicationsDatatable({
             <SystemResourceDescription
               showSystemResources={tableState.showSystemResources}
             />
-            <div className="w-fit">
-              <HelmInsightsBox />
-            </div>
           </div>
         </div>
       }
