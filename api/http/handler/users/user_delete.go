@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/rs/zerolog/log"
 )
 
 // @id UserDelete
@@ -84,14 +87,24 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 }
 
 func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	err := handler.DataStore.User().Delete(user.ID)
-	if err != nil {
-		return httperror.InternalServerError("Unable to remove user from the database", err)
-	}
+	handler.cleanupUserK8sServiceAccounts(user.ID)
 
-	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByUserID(user.ID)
-	if err != nil {
-		return httperror.InternalServerError("Unable to remove user memberships from the database", err)
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := handler.AuthorizationService.RemoveUserAccessPolicies(tx, user.ID); err != nil {
+			return err
+		}
+
+		if err := tx.User().Delete(user.ID); err != nil {
+			return err
+		}
+
+		if err := tx.TeamMembership().DeleteTeamMembershipByUserID(user.ID); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return httperror.InternalServerError("Unable to remove user from the database", err)
 	}
 
 	// Remove all of the users persisted API keys
@@ -100,11 +113,40 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		return httperror.InternalServerError("Unable to retrieve user API keys from the database", err)
 	}
 	for _, k := range apiKeys {
-		err = handler.apiKeyService.DeleteAPIKey(k.ID)
-		if err != nil {
+		if err := handler.apiKeyService.DeleteAPIKey(k.ID); err != nil {
 			return httperror.InternalServerError("Unable to remove user API key from the database", err)
 		}
 	}
 
 	return response.Empty(w)
+}
+
+func (handler *Handler) cleanupUserK8sServiceAccounts(userID portainer.UserID) {
+	if handler.K8sClientFactory == nil {
+		return
+	}
+
+	var endpoints []portainer.Endpoint
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		endpoints, txErr = tx.Endpoint().ReadAll(func(e portainer.Endpoint) bool {
+			return endpointutils.IsKubernetesEndpoint(&e)
+		})
+		return txErr
+	}); err != nil {
+		log.Error().Err(err).Int("user_id", int(userID)).Msg("failed fetching K8s environments for user cleanup")
+		return
+	}
+
+	for i := range endpoints {
+		kubecli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(&endpoints[i])
+		if err != nil {
+			log.Error().Err(err).Int("environment_id", int(endpoints[i].ID)).Msg("failed getting kube client for environment")
+			continue
+		}
+
+		if err := kubecli.RemoveUserServiceAccount(int(userID)); err != nil {
+			log.Error().Err(err).Int("environment_id", int(endpoints[i].ID)).Msg("failed removing service account for user")
+		}
+	}
 }

@@ -159,6 +159,9 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.Kubernetes = *payload.Kubernetes
 	}
 
+	oldUserAccessPolicies := endpoint.UserAccessPolicies
+	oldTeamAccessPolicies := endpoint.TeamAccessPolicies
+
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
 		updateAuthorizations = true
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
@@ -274,6 +277,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 				log.Warn().Err(err).Msg("unable to schedule pending action to clean NAP with override policies")
 			}
 		}
+
+		handler.reconcileK8sServiceAccounts(endpoint, oldUserAccessPolicies, oldTeamAccessPolicies)
 	}
 
 	if err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint); err != nil {
@@ -293,6 +298,65 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, endpoint)
+}
+
+func (handler *Handler) reconcileK8sServiceAccounts(
+	endpoint *portainer.Endpoint,
+	oldUserPolicies portainer.UserAccessPolicies,
+	oldTeamPolicies portainer.TeamAccessPolicies,
+) {
+	if handler.K8sClientFactory == nil {
+		return
+	}
+
+	kubecli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(endpoint)
+	if err != nil {
+		log.Error().Err(err).Int("environment_id", int(endpoint.ID)).Msg("failed getting kube client for environment during SA reconcile")
+		return
+	}
+
+	// Collect all users who had access before (direct or via team).
+	affected := make(map[portainer.UserID]struct{})
+	for userID := range oldUserPolicies {
+		affected[userID] = struct{}{}
+	}
+	for teamID := range oldTeamPolicies {
+		memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByTeamID(teamID)
+		if err != nil {
+			log.Error().Err(err).Int("environment_id", int(endpoint.ID)).Int("team_id", int(teamID)).Msg("failed fetching memberships for team")
+			continue
+		}
+		for _, m := range memberships {
+			affected[m.UserID] = struct{}{}
+		}
+	}
+
+	for userID := range affected {
+		// Determine which of the user's teams still have access to this endpoint.
+		memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(userID)
+		if err != nil {
+			log.Error().Err(err).Int("user_id", int(userID)).Msg("failed fetching memberships for user")
+			continue
+		}
+		remainingTeamIDs := make([]int, 0)
+		for _, m := range memberships {
+			if _, ok := endpoint.TeamAccessPolicies[m.TeamID]; ok {
+				remainingTeamIDs = append(remainingTeamIDs, int(m.TeamID))
+			}
+		}
+
+		_, hasDirectAccess := endpoint.UserAccessPolicies[userID]
+		if !hasDirectAccess && len(remainingTeamIDs) == 0 {
+			if err := kubecli.RemoveUserServiceAccountBindings(int(userID)); err != nil {
+				log.Error().Err(err).Int("user_id", int(userID)).Int("environment_id", int(endpoint.ID)).Msg("failed removing SA bindings for user")
+			}
+			continue
+		}
+
+		if err := kubecli.SetupUserServiceAccount(int(userID), remainingTeamIDs, endpoint.Kubernetes.Configuration.RestrictDefaultNamespace); err != nil {
+			log.Error().Err(err).Int("user_id", int(userID)).Int("environment_id", int(endpoint.ID)).Msg("failed updating SA for user")
+		}
+	}
 }
 
 func shouldReloadTLSConfiguration(endpoint *portainer.Endpoint, payload *endpointUpdatePayload) bool {

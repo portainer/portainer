@@ -1984,6 +1984,8 @@ type (
 		RemoveImagePullSecretFromServiceAccount(namespace, serviceAccountName, secretName string) error
 		UpdateServiceAccountImagePullSecrets(namespace, name string, secretNames []string) error
 		SetupUserServiceAccount(int, []int, bool) error
+		RemoveUserServiceAccountBindings(userID int) error
+		RemoveUserServiceAccount(userID int) error
 		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 
