@@ -214,7 +214,6 @@ function InnerForm({
             })
           }
           baseWebhookUrl={baseEdgeStackWebhookUrl()}
-          errors={errors.autoUpdate}
         />
       </FormSection>
 

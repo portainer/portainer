@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -23,7 +24,7 @@ type Handler struct {
 	fileService portainer.FileService
 }
 
-func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService, k8sFactory *cli.ClientFactory) *Handler {
+func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService, k8sFactory *cli.ClientFactory, sourceScheduler *scheduling.SourceScheduler) *Handler {
 	h := &Handler{
 		Router:      mux.NewRouter(),
 		dataStore:   dataStore,
@@ -39,7 +40,7 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	workflowsHandler := workflows.NewHandler(dataStore, gitService, k8sFactory)
 	authenticatedRouter.PathPrefix("/gitops/workflows").Handler(workflowsHandler)
 
-	sourcesHandler := sources.NewHandler(bouncer, dataStore, gitService, k8sFactory)
+	sourcesHandler := sources.NewHandler(bouncer, dataStore, gitService, k8sFactory, sourceScheduler)
 	authenticatedRouter.PathPrefix("/gitops/sources").Handler(sourcesHandler)
 
 	return h

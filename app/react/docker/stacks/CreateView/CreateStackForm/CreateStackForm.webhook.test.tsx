@@ -101,8 +101,6 @@ describe('CreateStackForm - Webhook ID Integration', () => {
           AdditionalFiles: [],
           AutoUpdate: {
             RepositoryAutomaticUpdates: true,
-            RepositoryMechanism: 'Webhook',
-            RepositoryFetchInterval: '',
             ForcePullImage: false,
             RepositoryAutomaticUpdatesForce: false,
           },

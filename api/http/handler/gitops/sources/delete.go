@@ -13,6 +13,8 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/rs/zerolog/log"
 )
 
 var ErrSourceInUse = errors.New("source is used by one or more workflows or custom templates")
@@ -92,6 +94,10 @@ func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperro
 	}
 
 	h.invalidateCache()
+
+	if err := h.sourceScheduler.Reconcile(portainer.SourceID(sourceID)); err != nil {
+		log.Warn().Err(err).Int("source_id", sourceID).Msg("source scheduler reconcile failed after source deletion")
+	}
 
 	return response.Empty(w)
 }

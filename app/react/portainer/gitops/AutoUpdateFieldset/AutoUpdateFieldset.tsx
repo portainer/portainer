@@ -1,5 +1,3 @@
-import { FormikErrors } from 'formik';
-
 import { AutoUpdateModel } from '@/react/portainer/gitops/types';
 
 import { SwitchField } from '@@/form-components/SwitchField';
@@ -12,7 +10,6 @@ export function AutoUpdateFieldset({
   onChange,
   environmentType,
   isForcePullVisible = true,
-  errors,
   baseWebhookUrl,
   webhookId,
   webhooksDocs,
@@ -21,7 +18,6 @@ export function AutoUpdateFieldset({
   onChange: (value: AutoUpdateModel) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES';
   isForcePullVisible?: boolean;
-  errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
   webhookId: string;
   webhooksDocs?: string;
@@ -71,7 +67,6 @@ export function AutoUpdateFieldset({
           onChange={handleChange}
           environmentType={environmentType}
           showForcePullImage={isForcePullVisible}
-          errors={errors}
           webhookDocs={webhooksDocs}
         />
       )}

@@ -11,6 +11,10 @@ export function buildUpdatePayload(
     url: changed(values.url, initialValues.url),
     tlsSkipVerify: changed(values.tlsSkipVerify, initialValues.tlsSkipVerify),
     authentication: buildAuthenticationPayload(values, initialValues),
+    interval: changed(
+      values.pollingEnabled ? values.interval : '',
+      initialValues.interval
+    ),
   };
 }
 

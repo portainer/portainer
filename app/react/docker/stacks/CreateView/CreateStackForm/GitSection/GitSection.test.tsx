@@ -29,8 +29,6 @@ describe('GitSection', () => {
       initialValues: {
         AutoUpdate: {
           RepositoryAutomaticUpdates: true,
-          RepositoryMechanism: 'Interval' as const,
-          RepositoryFetchInterval: '5m',
           ForcePullImage: false,
           RepositoryAutomaticUpdatesForce: false,
         },

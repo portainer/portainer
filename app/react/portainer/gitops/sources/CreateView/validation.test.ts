@@ -12,6 +12,7 @@ const validGitValues = {
   tlsSkipVerify: false,
   connectionOk: true,
   authentication: baseAuth,
+  polling: { enabled: false, interval: '' },
 };
 
 describe('validateGitConnection (pick schema — no connectionOk)', () => {
@@ -110,6 +111,72 @@ describe('validationSchema git.authentication', () => {
           username: 'alice',
           password: 'secret',
         },
+      },
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
+    expect(result).toBe(true);
+  });
+});
+
+describe('validationSchema git.polling', () => {
+  it('fails when polling is enabled without an interval', async () => {
+    const schema = validationSchema();
+    const result = await schema.isValid({
+      name: 'src',
+      type: 'git',
+      git: {
+        ...validGitValues,
+        polling: { enabled: true, interval: '' },
+      },
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
+    expect(result).toBe(false);
+  });
+
+  it('fails when the interval is below the 1 minute minimum', async () => {
+    const schema = validationSchema();
+    const result = await schema.isValid({
+      name: 'src',
+      type: 'git',
+      git: {
+        ...validGitValues,
+        polling: { enabled: true, interval: '30s' },
+      },
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
+    expect(result).toBe(false);
+  });
+
+  it('passes when polling is enabled with a valid interval', async () => {
+    const schema = validationSchema();
+    const result = await schema.isValid({
+      name: 'src',
+      type: 'git',
+      git: {
+        ...validGitValues,
+        polling: { enabled: true, interval: '5m' },
+      },
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    } satisfies FormValues);
+    expect(result).toBe(true);
+  });
+
+  it('passes when polling is disabled regardless of interval', async () => {
+    const schema = validationSchema();
+    const result = await schema.isValid({
+      name: 'src',
+      type: 'git',
+      git: {
+        ...validGitValues,
+        polling: { enabled: false, interval: '' },
       },
       authorizedTeams: [],
       authorizedUsers: [],

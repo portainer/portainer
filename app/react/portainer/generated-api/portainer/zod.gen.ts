@@ -1634,6 +1634,7 @@ export const zPortainerSource = z.object({
   git: zGittypesGitSource.optional(),
   helm: zPortainerHelmConfig.optional(),
   id: z.int().optional(),
+  interval: z.string().optional(),
   lastSync: z.int().optional(),
   name: z.string().optional(),
   ownerID: z.int().optional(),
@@ -2048,6 +2049,7 @@ export const zSourcesGitAuthenticationUpdatePayload = z.object({
 export const zSourcesGitSourceCreatePayload = z.object({
   administratorsOnly: z.boolean().optional(),
   authentication: zSourcesGitAuthenticationPayload.optional(),
+  interval: z.string().optional(),
   name: z.string().optional(),
   public: z.boolean().optional(),
   teamAccesses: z.array(z.int()).optional(),
@@ -2058,6 +2060,7 @@ export const zSourcesGitSourceCreatePayload = z.object({
 
 export const zSourcesGitSourceUpdatePayload = z.object({
   authentication: zSourcesGitAuthenticationUpdatePayload.optional(),
+  interval: z.string().optional(),
   name: z.string().optional(),
   tlsSkipVerify: z.boolean().optional(),
   url: z.string().optional(),
@@ -3316,6 +3319,7 @@ export const zSourcesSource = z.object({
   environments: z.int().optional(),
   error: z.string().optional(),
   id: z.int(),
+  interval: z.string().optional(),
   lastSync: z.int().optional(),
   name: z.string(),
   status: zWorkflowsStatus,
@@ -3387,6 +3391,7 @@ export const zSourcesSourceDetail = z.object({
   environments: z.int().optional(),
   error: z.string().optional(),
   id: z.int(),
+  interval: z.string().optional(),
   lastSync: z.int().optional(),
   name: z.string(),
   status: zWorkflowsStatus,

@@ -64,6 +64,7 @@ func newStackResponse(tx dataservices.DataStoreTx, userContext source.UserContex
 	}
 
 	stack.GitConfig = gittypes.SanitizeRepoConfig(gitConfig)
+	fillAutoUpdateInterval(tx, userContext, stack)
 
 	return &stackResponse{Stack: *stack, GitSourceId: gitSourceID}, nil
 }
@@ -80,6 +81,23 @@ func fillStackGitConfig(tx dataservices.DataStoreTx, userContext source.UserCont
 	}
 
 	stack.GitConfig = gittypes.SanitizeRepoConfig(gitConfig)
+	fillAutoUpdateInterval(tx, userContext, stack)
 
 	return nil
+}
+
+// fillAutoUpdateInterval restores the deprecated AutoUpdate.Interval field on API responses
+// from the linked Source, so old API clients keep seeing polling intervals set through the GitOps
+// Sources UI.
+func fillAutoUpdateInterval(tx dataservices.DataStoreTx, userContext source.UserContext, stack *portainer.Stack) {
+	src, _, err := workflows.GitSourceAndArtifactForStack(tx, userContext, stack.WorkflowID, stack.ID)
+	if err != nil || src == nil || src.Interval == "" {
+		return
+	}
+
+	if stack.AutoUpdate == nil {
+		stack.AutoUpdate = &portainer.AutoUpdateSettings{}
+	}
+
+	stack.AutoUpdate.Interval = src.Interval
 }

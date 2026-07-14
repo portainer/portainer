@@ -2650,7 +2650,10 @@ definitions:
         example: false
         type: boolean
       Interval:
-        description: Auto update interval
+        description: |-
+          Auto update interval
+          Deprecated: polling interval now lives on the associated Source (Source.Interval).
+          Kept for DB backwards-compatibility only; new code must not read or write this field.
         example: 1m30s
         type: string
       JobID:
@@ -4179,6 +4182,9 @@ definitions:
       id:
         example: 1
         type: integer
+      interval:
+        example: 5m
+        type: string
       lastSync:
         example: 1587399600
         type: integer
@@ -5639,6 +5645,8 @@ definitions:
         type: boolean
       authentication:
         $ref: '#/definitions/sources.GitAuthenticationPayload'
+      interval:
+        type: string
       name:
         type: string
       public:
@@ -5663,6 +5671,8 @@ definitions:
     properties:
       authentication:
         $ref: '#/definitions/sources.GitAuthenticationUpdatePayload'
+      interval:
+        type: string
       name:
         type: string
       tlsSkipVerify:
@@ -5678,6 +5688,9 @@ definitions:
         type: string
       id:
         type: integer
+      interval:
+        example: 5m
+        type: string
       lastSync:
         type: integer
       name:
@@ -5737,6 +5750,9 @@ definitions:
         type: string
       id:
         type: integer
+      interval:
+        example: 5m
+        type: string
       lastSync:
         type: integer
       name:

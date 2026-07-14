@@ -250,7 +250,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		handler.DataStore,
 		handler.FileService,
 		handler.GitService,
-		handler.Scheduler,
+		handler.SourceScheduler,
 		handler.StackDeployer)
 
 	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, swarmStackBuilder, &stackPayload, endpoint, userID)

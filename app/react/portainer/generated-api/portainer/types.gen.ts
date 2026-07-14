@@ -1751,6 +1751,8 @@ export type PortainerAutoUpdateSettings = {
   ForceUpdate?: boolean;
   /**
    * Auto update interval
+   * Deprecated: polling interval now lives on the associated Source (Source.Interval).
+   * Kept for DB backwards-compatibility only; new code must not read or write this field.
    */
   Interval?: string;
   /**
@@ -3012,6 +3014,7 @@ export type PortainerSource = {
   git?: GittypesGitSource;
   helm?: PortainerHelmConfig;
   id?: number;
+  interval?: string;
   lastSync?: number;
   name?: string;
   ownerID?: number;
@@ -4335,6 +4338,7 @@ export type SourcesGitAuthenticationUpdatePayload = {
 export type SourcesGitSourceCreatePayload = {
   administratorsOnly?: boolean;
   authentication?: SourcesGitAuthenticationPayload;
+  interval?: string;
   name?: string;
   public?: boolean;
   teamAccesses?: Array<number>;
@@ -4345,6 +4349,7 @@ export type SourcesGitSourceCreatePayload = {
 
 export type SourcesGitSourceUpdatePayload = {
   authentication?: SourcesGitAuthenticationUpdatePayload;
+  interval?: string;
   name?: string;
   tlsSkipVerify?: boolean;
   url?: string;
@@ -4354,6 +4359,7 @@ export type SourcesSource = {
   environments?: number;
   error?: string;
   id: number;
+  interval?: string;
   lastSync?: number;
   name: string;
   status: WorkflowsStatus;
@@ -4381,6 +4387,7 @@ export type SourcesSourceDetail = {
   environments?: number;
   error?: string;
   id: number;
+  interval?: string;
   lastSync?: number;
   name: string;
   status: WorkflowsStatus;

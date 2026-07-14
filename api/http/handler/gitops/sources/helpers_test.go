@@ -48,7 +48,7 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 
 func newTestHandler(t *testing.T, store dataservices.DataStore) *Handler {
 	t.Helper()
-	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil)
+	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil, nil)
 }
 
 // newTestHandlerNoCacheExpiry returns a handler whose source cache never expires,

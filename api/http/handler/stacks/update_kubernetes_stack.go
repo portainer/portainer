@@ -71,11 +71,6 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 			return httperror.InternalServerError("Stack has no git config in source", errors.New("source has no git config"))
 		}
 
-		// Stop the autoupdate job if there is any
-		if stack.AutoUpdate != nil {
-			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-		}
-
 		var payload kubernetesGitStackUpdatePayload
 
 		if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
@@ -109,14 +104,6 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 			}
 		} else {
 			gitConfig.Authentication = nil
-		}
-
-		if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-			jobID, e := deployments.StartAutoupdate(context.TODO(), stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
-			if e != nil {
-				return e
-			}
-			stack.AutoUpdate.JobID = jobID
 		}
 
 		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {

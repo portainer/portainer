@@ -11,12 +11,12 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/consts"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/logs"
-	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -41,7 +41,7 @@ type Handler struct {
 	ComposeStackManager     portainer.ComposeStackManager
 	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
-	Scheduler               *scheduler.Scheduler
+	SourceScheduler         *scheduling.SourceScheduler
 	StackDeployer           deployments.StackDeployer
 }
 

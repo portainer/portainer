@@ -14,6 +14,8 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/portainer/portainer/pkg/validate"
+
+	"github.com/rs/zerolog/log"
 )
 
 // GitAuthenticationPayload holds authentication parameters for a git source
@@ -36,6 +38,7 @@ type GitSourceCreatePayload struct {
 	URL            string                    `json:"url" validate:"required"`
 	TLSSkipVerify  bool                      `json:"tlsSkipVerify"`
 	Authentication *GitAuthenticationPayload `json:"authentication"`
+	Interval       string                    `json:"interval"`
 }
 
 // Validate implements the portainer.Validatable interface
@@ -44,7 +47,7 @@ func (payload *GitSourceCreatePayload) Validate(_ *http.Request) error {
 		return errors.New("invalid repository URL. Must correspond to a valid URL format")
 	}
 
-	return nil
+	return validateInterval(payload.Interval)
 }
 
 // @id GitOpsSourcesCreateGit
@@ -96,6 +99,10 @@ func (h *Handler) gitSourceCreate(w http.ResponseWriter, r *http.Request) *httpe
 
 	h.invalidateCache()
 
+	if err := h.sourceScheduler.Reconcile(src.ID); err != nil {
+		log.Warn().Err(err).Int("source_id", int(src.ID)).Msg("source scheduler reconcile failed after source creation")
+	}
+
 	src.Git = gittypes.SanitizeGitSource(src.Git)
 
 	return response.JSONWithStatus(w, src, http.StatusCreated)
@@ -127,6 +134,7 @@ func BuildBaseGitSource(payload GitSourceCreatePayload) *portainer.Source {
 		TeamAccesses:       payload.TeamAccesses,
 		Public:             payload.Public,
 		AdministratorsOnly: payload.AdministratorsOnly,
+		Interval:           payload.Interval,
 	}
 }
 

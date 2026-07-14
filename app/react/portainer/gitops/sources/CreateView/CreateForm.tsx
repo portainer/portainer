@@ -31,6 +31,10 @@ export function CreateForm({ steps }: Props) {
       authentication: {
         authEnabled: true,
       },
+      polling: {
+        enabled: false,
+        interval: '',
+      },
       connectionOk: false,
     },
     authorizedTeams: [],

@@ -44,6 +44,10 @@ func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deploye
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
 	}
 
+	if stack.Status == portainer.StackStatusInactive {
+		return nil
+	}
+
 	// Webhook
 	if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != "" {
 		return redeployWhenChanged(ctx, stack, deployer, datastore, gitService, true)

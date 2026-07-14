@@ -219,7 +219,6 @@ type (
 		StacksByName(name string) ([]portainer.Stack, error)
 		GetNextIdentifier() int
 		StackByWebhookID(ID string) (*portainer.Stack, error)
-		RefreshableStacks() ([]portainer.Stack, error)
 	}
 
 	// TagService represents a service for managing tag data

@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -101,12 +100,6 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 
 	if stack.Status == portainer.StackStatusDeploying {
 		return httperror.Conflict("Stack deployment is in progress", errors.New("stack deployment is in progress"))
-	}
-
-	// stop scheduler updates of the stack before stopping
-	if stack.AutoUpdate != nil && stack.AutoUpdate.JobID != "" {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-		stack.AutoUpdate.JobID = ""
 	}
 
 	stopErr := handler.stopStack(r.Context(), securityContext.UserID, stack, endpoint)

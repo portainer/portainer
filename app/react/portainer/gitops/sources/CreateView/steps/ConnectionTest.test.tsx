@@ -18,6 +18,7 @@ const baseGitValues: FormValues['git'] = {
   authentication: {
     authEnabled: false,
   },
+  polling: { enabled: false, interval: '' },
 };
 
 const invalidGitValues: FormValues['git'] = {
@@ -27,6 +28,7 @@ const invalidGitValues: FormValues['git'] = {
   authentication: {
     authEnabled: false,
   },
+  polling: { enabled: false, interval: '' },
 };
 
 function renderConnectionTest(gitValues: FormValues['git']) {

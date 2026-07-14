@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/csrf"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -65,7 +66,6 @@ import (
 	motdservice "github.com/portainer/portainer/api/motd"
 	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/platform"
-	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 
@@ -104,7 +104,7 @@ type Server struct {
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelmtypes.HelmPackageManager
-	Scheduler                   *scheduler.Scheduler
+	SourceScheduler             *scheduling.SourceScheduler
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	UpgradeService              upgrade.Service
@@ -208,7 +208,7 @@ func (server *Server) Start(ctx context.Context) error {
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
-	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService, server.KubernetesClientFactory)
+	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService, server.KubernetesClientFactory, server.SourceScheduler)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -249,7 +249,7 @@ func (server *Server) Start(ctx context.Context) error {
 	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
-	stackHandler.Scheduler = server.Scheduler
+	stackHandler.SourceScheduler = server.SourceScheduler
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.StackDeployer = server.StackDeployer

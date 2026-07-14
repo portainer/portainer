@@ -8,6 +8,7 @@ import { formValuesToCreatePayload, gitFormValuesToTestPayload } from './type';
 const baseGit = {
   url: 'https://github.com/org/repo.git',
   tlsSkipVerify: false,
+  polling: { enabled: false, interval: '' },
   connectionOk: false,
 };
 
@@ -85,6 +86,36 @@ describe('formValuesToCreatePayload', () => {
     });
 
     expect(payload.git.authentication).toBeUndefined();
+  });
+
+  it('sends the interval when polling is enabled', () => {
+    const payload = formValuesToCreatePayload({
+      ...baseUAC,
+      name: 'my-source',
+      type: 'git',
+      git: {
+        ...baseGit,
+        authentication: { authEnabled: false },
+        polling: { enabled: true, interval: '5m' },
+      },
+    });
+
+    expect(payload.git.interval).toBe('5m');
+  });
+
+  it('sends an empty interval when polling is disabled', () => {
+    const payload = formValuesToCreatePayload({
+      ...baseUAC,
+      name: 'my-source',
+      type: 'git',
+      git: {
+        ...baseGit,
+        authentication: { authEnabled: false },
+        polling: { enabled: false, interval: '5m' },
+      },
+    });
+
+    expect(payload.git.interval).toBe('');
   });
 
   it('does not include connectionOk in the create payload', () => {

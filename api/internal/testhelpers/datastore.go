@@ -431,18 +431,6 @@ func (s *stubStacksService) StacksByEndpointID(endpointID portainer.EndpointID) 
 	return result, nil
 }
 
-func (s *stubStacksService) RefreshableStacks() ([]portainer.Stack, error) {
-	result := make([]portainer.Stack, 0)
-
-	for _, stack := range s.stacks {
-		if stack.AutoUpdate != nil {
-			result = append(result, stack)
-		}
-	}
-
-	return result, nil
-}
-
 func (s *stubStacksService) StackByName(name string) (*portainer.Stack, error) {
 	for _, stack := range s.stacks {
 		if stack.Name == name {

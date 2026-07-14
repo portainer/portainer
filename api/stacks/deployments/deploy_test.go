@@ -210,19 +210,19 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	err = store.Source().Create(adminUserContext, src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 1, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 2, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
 	err = store.Stack().Create(&portainer.Stack{
-		ID:          1,
+		ID:          2,
 		CreatedBy:   "admin",
 		ProjectPath: tmpDir,
 		WorkflowID:  wf.ID,
 	})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(nil, "oldHash"))
+	err = RedeployWhenChanged(t.Context(), 2, nil, store, testhelpers.NewGitService(nil, "oldHash"))
 	require.NoError(t, err)
 
 	updatedSrc, err := store.Source().Read(adminUserContext, src.ID)
@@ -262,20 +262,20 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	require.NoError(t, err, "failed to create source")
 
 	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
-		StackID: 1,
+		StackID: 3,
 		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
 	}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
 	err = store.Stack().Create(&portainer.Stack{
-		ID:         1,
+		ID:         3,
 		CreatedBy:  "admin",
 		WorkflowID: wf.ID,
 	})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
+	err = RedeployWhenChanged(t.Context(), 3, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
 	require.Error(t, err)
 	require.ErrorIs(t, err, cloneErr, "should failed to clone but didn't, check test setup")
 
@@ -286,7 +286,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	require.Zero(t, updatedSrc.LastSync)
 }
 
-func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservices.DataStore, portainer.StackID) {
+func setupRedeployStore(t *testing.T, stackType portainer.StackType, stackID portainer.StackID) (dataservices.DataStore, portainer.StackID) {
 	t.Helper()
 
 	_, store := datastore.MustNewTestStore(t, false, true)
@@ -312,8 +312,6 @@ func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservic
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
-	const stackID portainer.StackID = 1
-
 	err = store.Stack().Create(&portainer.Stack{
 		ID:          stackID,
 		EndpointID:  1,
@@ -330,7 +328,7 @@ func setupRedeployStore(t *testing.T, stackType portainer.StackType) (dataservic
 func Test_redeployWhenChanged_DockerComposeStack(t *testing.T) {
 	t.Parallel()
 
-	store, stackID := setupRedeployStore(t, portainer.DockerComposeStack)
+	store, stackID := setupRedeployStore(t, portainer.DockerComposeStack, 4)
 
 	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 	require.NoError(t, err)
@@ -339,7 +337,7 @@ func Test_redeployWhenChanged_DockerComposeStack(t *testing.T) {
 func Test_redeployWhenChanged_DockerSwarmStack(t *testing.T) {
 	t.Parallel()
 
-	store, stackID := setupRedeployStore(t, portainer.DockerSwarmStack)
+	store, stackID := setupRedeployStore(t, portainer.DockerSwarmStack, 5)
 
 	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 	require.NoError(t, err)
@@ -348,7 +346,7 @@ func Test_redeployWhenChanged_DockerSwarmStack(t *testing.T) {
 func Test_redeployWhenChanged_KubernetesStack(t *testing.T) {
 	t.Parallel()
 
-	store, stackID := setupRedeployStore(t, portainer.KubernetesStack)
+	store, stackID := setupRedeployStore(t, portainer.KubernetesStack, 6)
 
 	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 	require.NoError(t, err)

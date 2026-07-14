@@ -18,6 +18,10 @@ type GitFormValues = {
     password?: string;
   };
   tlsSkipVerify?: boolean;
+  polling: {
+    enabled: boolean;
+    interval: string;
+  };
   /** Mirrors the connection-test result; not sent in the create payload. */
   connectionOk: boolean;
 };
@@ -33,7 +37,7 @@ export type FormValues = AccessControlFormData & {
 export function formValuesToCreatePayload({
   name,
   type,
-  git: { authentication, tlsSkipVerify, url },
+  git: { authentication, tlsSkipVerify, url, polling },
   authorizedTeams,
   authorizedUsers,
   ownership,
@@ -49,6 +53,7 @@ export function formValuesToCreatePayload({
       public: ownership === ResourceControlOwnership.PUBLIC,
       teamAccesses: authorizedTeams,
       userAccesses: authorizedUsers,
+      interval: polling.enabled ? polling.interval : '',
     },
   };
 }

@@ -161,8 +161,6 @@ class KubernetesDeployController {
 
     function automaticUpdatesLabel(repositoryAutomaticUpdates, repositoryMechanism) {
       switch (repositoryAutomaticUpdates && repositoryMechanism) {
-        case RepositoryMechanismTypes.INTERVAL:
-          return 'polling';
         case RepositoryMechanismTypes.WEBHOOK:
           return 'webhook';
         default:

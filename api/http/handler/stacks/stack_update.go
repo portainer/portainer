@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -103,14 +104,33 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	var stack *portainer.Stack
+	var reconcileSourceID portainer.SourceID
 	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		preStack, err := tx.Stack().Read(portainer.StackID(stackID))
+		if err == nil && preStack.WorkflowID != 0 {
+			securityContext, scErr := security.RetrieveRestrictedRequestContext(r)
+			if scErr == nil {
+				uc := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+				if _, sid, err := loadGitConfigForStack(tx, uc, preStack.WorkflowID, preStack.ID); err == nil {
+					reconcileSourceID = sid
+				}
+			}
+		}
+
 		var httpErr *httperror.HandlerError
 		stack, httpErr = handler.updateStackInTx(tx, r, portainer.StackID(stackID), portainer.EndpointID(endpointID))
 		if httpErr != nil {
 			return httpErr
 		}
+
 		return nil
 	})
+	if err == nil {
+		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+			log.Warn().Err(err).Msg("source scheduler reconcile failed after stack update")
+		}
+	}
+
 	return response.TxResponse(w, stack, err)
 }
 
@@ -215,9 +235,7 @@ func (handler *Handler) updateAndDeployStack(tx dataservices.DataStoreTx, r *htt
 }
 
 func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
-	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.WorkflowID != 0 {
@@ -235,7 +253,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 	if stack.WorkflowID != 0 {
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
-		if err := tx.Workflow().Delete(oldWorkflowID); err != nil {
+		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
 			return httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}
@@ -298,9 +316,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 }
 
 func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
-	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.WorkflowID != 0 {
@@ -317,7 +333,7 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 	if stack.WorkflowID != 0 {
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
-		if err := tx.Workflow().Delete(oldWorkflowID); err != nil {
+		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
 			return httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}

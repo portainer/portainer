@@ -14,6 +14,8 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/portainer/portainer/pkg/validate"
+
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -26,6 +28,7 @@ type GitSourceUpdatePayload struct {
 	URL            *string                         `json:"url"`
 	TLSSkipVerify  *bool                           `json:"tlsSkipVerify"`
 	Authentication *GitAuthenticationUpdatePayload `json:"authentication"`
+	Interval       *string                         `json:"interval"`
 }
 
 type GitAuthenticationUpdatePayload struct {
@@ -37,6 +40,10 @@ type GitAuthenticationUpdatePayload struct {
 func (payload *GitSourceUpdatePayload) Validate(_ *http.Request) error {
 	if payload.URL != nil && !validate.IsURL(*payload.URL) {
 		return errors.New("invalid repository URL. Must correspond to a valid URL format")
+	}
+
+	if payload.Interval != nil {
+		return validateInterval(*payload.Interval)
 	}
 
 	return nil
@@ -115,6 +122,10 @@ func (h *Handler) gitSourceUpdate(w http.ResponseWriter, r *http.Request) *httpe
 
 	h.invalidateCache()
 
+	if err := h.sourceScheduler.Reconcile(src.ID); err != nil {
+		log.Warn().Err(err).Int("source_id", int(src.ID)).Msg("source scheduler reconcile failed after source update")
+	}
+
 	src.Git = gittypes.SanitizeGitSource(src.Git)
 
 	return response.JSON(w, src)
@@ -161,6 +172,10 @@ func ApplyBaseGitSourceChanges(src *portainer.Source, payload GitSourceUpdatePay
 
 	if payload.TLSSkipVerify != nil {
 		src.Git.TLSSkipVerify = *payload.TLSSkipVerify
+	}
+
+	if payload.Interval != nil {
+		src.Interval = *payload.Interval
 	}
 
 	return nil

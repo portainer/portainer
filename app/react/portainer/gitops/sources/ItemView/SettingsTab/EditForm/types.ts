@@ -1,5 +1,7 @@
 import { boolean as yupBoolean, object, string } from 'yup';
 
+import { intervalValidation } from '../../../components/IntervalField';
+
 export interface SettingsFormValues {
   name: string;
   url: string;
@@ -7,6 +9,8 @@ export interface SettingsFormValues {
   authEnabled: boolean;
   username: string;
   password: string;
+  pollingEnabled: boolean;
+  interval: string;
 }
 
 export const validationSchema = object({
@@ -20,4 +24,11 @@ export const validationSchema = object({
     otherwise: (schema) => schema.optional(),
   }),
   password: string().optional(),
+  pollingEnabled: yupBoolean().defined(),
+  interval: string()
+    .defined()
+    .when('pollingEnabled', {
+      is: true,
+      then: () => intervalValidation(),
+    }),
 });

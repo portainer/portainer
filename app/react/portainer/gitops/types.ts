@@ -6,7 +6,6 @@ import {
 } from './AutoUpdateFieldset/utils';
 
 export type {
-  AutoUpdateMechanism,
   AutoUpdateModel,
   AutoUpdateResponse,
 } from './AutoUpdateFieldset/utils';

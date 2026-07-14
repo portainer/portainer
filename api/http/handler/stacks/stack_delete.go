@@ -9,10 +9,11 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -113,24 +114,29 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
-	// stop scheduler updates of the stack before removal
-	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-	}
-
 	if err := handler.deleteStack(r.Context(), securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
+	var reconcileSourceID portainer.SourceID
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		if stack.WorkflowID != 0 {
-			if err := tx.Workflow().Delete(stack.WorkflowID); err != nil {
+			if _, sid, err := loadGitConfigForStack(tx, source.InsecureNewAdminContext(), stack.WorkflowID, stack.ID); err == nil {
+				reconcileSourceID = sid
+			}
+
+			if err := workflows.DeleteIfSingleArtifact(tx, stack.WorkflowID); err != nil {
 				return err
 			}
 		}
+
 		return tx.Stack().Delete(portainer.StackID(id))
 	}); err != nil {
 		return httperror.InternalServerError("Unable to remove the stack from the database", err)
+	}
+
+	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack deletion")
 	}
 
 	if resourceControl != nil {
@@ -328,11 +334,6 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 	for _, stack := range stacksToDelete {
 		log.Debug().Msgf("Trying to delete Kubernetes stack id `%d`", stack.ID)
 
-		// stop scheduler updates of the stack before removal
-		if stack.AutoUpdate != nil {
-			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-		}
-
 		err = handler.deleteStack(context.TODO(), securityContext.UserID, &stack, endpoint)
 		if err != nil {
 			log.Err(err).Msgf("Unable to delete Kubernetes stack `%d`", stack.ID)
@@ -341,18 +342,28 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 			continue
 		}
 
+		var reconcileSourceID portainer.SourceID
 		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			if stack.WorkflowID != 0 {
-				if err := tx.Workflow().Delete(stack.WorkflowID); err != nil {
+				if _, sid, err := loadGitConfigForStack(tx, source.InsecureNewAdminContext(), stack.WorkflowID, stack.ID); err == nil {
+					reconcileSourceID = sid
+				}
+
+				if err := workflows.DeleteIfSingleArtifact(tx, stack.WorkflowID); err != nil {
 					return err
 				}
 			}
+
 			return tx.Stack().Delete(stack.ID)
 		}); err != nil {
 			errs = errors.Join(errs, err)
 			log.Err(err).Int("stack_id", int(stack.ID)).Msg("unable to remove the stack from the database")
 
 			continue
+		}
+
+		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+			log.Warn().Err(err).Msg("source scheduler reconcile failed after Kubernetes stack deletion")
 		}
 
 		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {

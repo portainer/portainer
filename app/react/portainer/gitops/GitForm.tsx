@@ -96,7 +96,6 @@ export function GitForm({
           value={value.AutoUpdate}
           onChange={(value) => handleChange({ AutoUpdate: value })}
           isForcePullVisible={isForcePullVisible}
-          errors={errors.AutoUpdate as FormikErrors<GitFormModel['AutoUpdate']>}
           webhooksDocs={webhooksDocs}
         />
       )}

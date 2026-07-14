@@ -265,7 +265,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	k8sStackBuilder := stackbuilders.CreateKubernetesStackGitBuilder(handler.DataStore,
 		handler.FileService,
 		handler.GitService,
-		handler.Scheduler,
+		handler.SourceScheduler,
 		handler.StackDeployer,
 		handler.KubernetesDeployer,
 		user)

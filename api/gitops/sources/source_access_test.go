@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidateSourceForStack_ValidGitSource_ReturnsNil(t *testing.T) {
+func TestValidateSourceForStack_ValidGitSource_ReturnsNoError(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, false)
 

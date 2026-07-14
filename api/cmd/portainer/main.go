@@ -27,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
@@ -571,10 +572,15 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
 
-	scheduler := scheduler.NewScheduler(shutdownCtx)
+	sched := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
-	if err := deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService); err != nil {
-		log.Fatal().Err(err).Msg("failed to start stack scheduler")
+	sourceScheduler := scheduling.NewSourceScheduler(sched, dataStore, scheduling.Deployers{
+		Stack: func(ctx context.Context, stackID portainer.StackID) error {
+			return deployments.RedeployWhenChanged(ctx, stackID, stackDeployer, dataStore, gitService)
+		},
+	})
+	if err := sourceScheduler.ReconcileAll(); err != nil {
+		log.Fatal().Err(err).Msg("failed to start source scheduler")
 	}
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
@@ -649,7 +655,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		SSLService:                  sslService,
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
-		Scheduler:                   scheduler,
+		SourceScheduler:             sourceScheduler,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
 		UpgradeService:              upgradeService,

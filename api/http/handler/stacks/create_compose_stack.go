@@ -10,8 +10,8 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -59,19 +59,23 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(_ http.ResponseWriter, _ 
 		return err
 	}
 
-	// stop scheduler updates of the stack before removal
-	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
+	var reconcileSourceID portainer.SourceID
+	if stack.WorkflowID != 0 {
+		if _, sid, err := loadGitConfigForStack(handler.DataStore, source.InsecureNewAdminContext(), stack.WorkflowID, stack.ID); err == nil {
+			reconcileSourceID = sid
+		}
+
+		if err := workflows.DeleteIfSingleArtifact(handler.DataStore, stack.WorkflowID); err != nil {
+			return err
+		}
 	}
 
-	err = handler.DataStore.Stack().Delete(stack.ID)
-	if err != nil {
+	if err := handler.DataStore.Stack().Delete(stack.ID); err != nil {
 		return err
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
-		if err != nil {
+		if err := handler.DataStore.ResourceControl().Delete(resourceControl.ID); err != nil {
 			log.Error().
 				Str("stack", fmt.Sprintf("%+v", stack)).
 				Msg("unable to remove the associated resource control from the database for stack")
@@ -79,12 +83,15 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(_ http.ResponseWriter, _ 
 	}
 
 	if exists, _ := handler.FileService.FileExists(stack.ProjectPath); exists {
-		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
-		if err != nil {
+		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
 			log.Warn().
 				Str("stack", fmt.Sprintf("%+v", stack)).
 				Msg("unable to remove stack files from disk for stack")
 		}
+	}
+
+	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack duplicate cleanup")
 	}
 
 	return nil
@@ -311,7 +318,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		handler.DataStore,
 		handler.FileService,
 		handler.GitService,
-		handler.Scheduler,
+		handler.SourceScheduler,
 		handler.StackDeployer)
 
 	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)

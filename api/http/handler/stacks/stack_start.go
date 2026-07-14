@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -124,17 +123,6 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 	if !access {
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
-	}
-
-	if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-
-		jobID, e := deployments.StartAutoupdate(context.TODO(), stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
-		if e != nil {
-			return e
-		}
-
-		stack.AutoUpdate.JobID = jobID
 	}
 
 	if err := handler.startStack(context.TODO(), securityContext.UserID, stack, endpoint, securityContext); err != nil {

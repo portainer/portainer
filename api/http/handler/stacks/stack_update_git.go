@@ -14,13 +14,13 @@ import (
 	"github.com/portainer/portainer/api/gitops/sources"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type stackGitUpdatePayload struct {
@@ -167,11 +167,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
-	//stop the autoupdate job if there is any
-	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-	}
-
 	// Record the current git config as the deployment baseline if it was never set (legacy stacks).
 	if stack.CurrentDeploymentInfo == nil {
 		stack.CurrentDeploymentInfo = &portainer.StackDeploymentInfo{
@@ -250,12 +245,9 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-		if jobID, err := deployments.StartAutoupdate(context.TODO(), stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-			return err
-		} else {
-			stack.AutoUpdate.JobID = jobID
-		}
+	effectiveSourceID := sourceID
+	if payload.SourceID != 0 {
+		effectiveSourceID = payload.SourceID
 	}
 
 	var resp *stackResponse
@@ -263,15 +255,31 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return err
 		}
-		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
-		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, payload.SourceID, gitConfig); err != nil {
+
+		uc := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
+		if err := saveStackGitConfig(tx, uc, stack.WorkflowID, stack.ID, sourceID, payload.SourceID, gitConfig); err != nil {
 			return err
 		}
+
 		var err error
-		resp, err = newStackResponse(tx, userContext, stack)
+		resp, err = newStackResponse(tx, uc, stack)
+
 		return err
 	}); err != nil {
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
+	}
+
+	if err := handler.SourceScheduler.Reconcile(effectiveSourceID); err != nil {
+		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack git update")
+	}
+
+	// The stack may have just been repointed away from its previous source; reconcile it
+	// too so an orphaned source's polling job is stopped instead of running forever.
+	if sourceID != 0 && sourceID != effectiveSourceID {
+		if err := handler.SourceScheduler.Reconcile(sourceID); err != nil {
+			log.Warn().Err(err).Msg("source scheduler reconcile failed after stack git update")
+		}
 	}
 
 	return response.JSON(w, resp)

@@ -50,6 +50,8 @@ type (
 	// AutoUpdateSettings represents the git auto sync config for stack deployment
 	AutoUpdateSettings struct {
 		// Auto update interval
+		// Deprecated: polling interval now lives on the associated Source (Source.Interval).
+		// Kept for DB backwards-compatibility only; new code must not read or write this field.
 		Interval string `example:"1m30s"`
 		// A UUID generated from client
 		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
@@ -1356,6 +1358,7 @@ type (
 		OwnerID            UserID       `json:"ownerID,omitempty"`
 		Status             SourceStatus `json:"status,omitempty"`
 		StatusError        string       `json:"statusError,omitempty"`
+		Interval           string       `json:"interval,omitempty" example:"5m"`
 	}
 
 	SourceStatus int

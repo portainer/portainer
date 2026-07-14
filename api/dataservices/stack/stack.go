@@ -121,16 +121,3 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 
 	return nil, err
 }
-
-// RefreshableStacks returns stacks that are configured for a periodic update
-func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
-	stacks := make([]portainer.Stack, 0)
-
-	return stacks, service.Connection.GetAll(
-		BucketName,
-		&portainer.Stack{},
-		dataservices.FilterFn(&stacks, func(e portainer.Stack) bool {
-			return e.WorkflowID != 0 && e.AutoUpdate != nil && e.AutoUpdate.Interval != ""
-		}),
-	)
-}

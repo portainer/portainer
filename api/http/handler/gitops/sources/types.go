@@ -18,6 +18,7 @@ type Source struct {
 	UsedBy       int                `json:"usedBy"`
 	Environments int                `json:"environments"`
 	LastSync     int64              `json:"lastSync"`
+	Interval     string             `json:"interval,omitempty" example:"5m"`
 }
 
 type SourceType string
