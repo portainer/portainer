@@ -1,8 +1,13 @@
-import { WorkflowDetail } from '../types';
+import { Workflow } from '../types';
 
-export const mockWorkflowHealthy: WorkflowDetail = {
+export const mockWorkflowHealthy: Workflow = {
   id: 1,
   name: 'healthy-workflow',
+  status: {
+    source: { status: 'healthy' },
+    artifact: { status: 'healthy' },
+    target: { status: 'healthy' },
+  },
   artifacts: [
     {
       id: 101,
@@ -24,9 +29,17 @@ export const mockWorkflowHealthy: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowSourceError: WorkflowDetail = {
+export const mockWorkflowSourceError: Workflow = {
   id: 2,
   name: 'broken-source-stack',
+  status: {
+    source: {
+      status: 'error',
+      error: 'authentication failed: git clone error',
+    },
+    artifact: { status: 'unknown' },
+    target: { status: 'unknown' },
+  },
   artifacts: [
     {
       id: 102,
@@ -51,9 +64,17 @@ export const mockWorkflowSourceError: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowArtifactError: WorkflowDetail = {
+export const mockWorkflowArtifactError: Workflow = {
   id: 3,
   name: 'invalid-compose-stack',
+  status: {
+    source: { status: 'healthy' },
+    artifact: {
+      status: 'error',
+      error: 'invalid compose file: yaml: line 4: did not find expected key',
+    },
+    target: { status: 'unknown' },
+  },
   artifacts: [
     {
       id: 103,
@@ -77,9 +98,17 @@ export const mockWorkflowArtifactError: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowTargetError: WorkflowDetail = {
+export const mockWorkflowTargetError: Workflow = {
   id: 4,
   name: 'unreachable-endpoint-stack',
+  status: {
+    source: { status: 'healthy' },
+    artifact: { status: 'healthy' },
+    target: {
+      status: 'error',
+      error: 'failed to deploy stack to endpoint: connection refused',
+    },
+  },
   artifacts: [
     {
       id: 104,
@@ -104,9 +133,17 @@ export const mockWorkflowTargetError: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowEdgeMixed: WorkflowDetail = {
+export const mockWorkflowEdgeMixed: Workflow = {
   id: 5,
   name: 'edge-stack',
+  status: {
+    source: { status: 'healthy' },
+    artifact: { status: 'healthy' },
+    target: {
+      status: 'error',
+      error: 'one or more edge groups failed to sync',
+    },
+  },
   artifacts: [
     {
       id: 105,
@@ -135,9 +172,14 @@ export const mockWorkflowEdgeMixed: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowMultiArtifact: WorkflowDetail = {
+export const mockWorkflowMultiArtifact: Workflow = {
   id: 6,
   name: 'multi-artifact-workflow',
+  status: {
+    source: { status: 'healthy' },
+    artifact: { status: 'healthy' },
+    target: { status: 'syncing' },
+  },
   artifacts: [
     {
       id: 106,
@@ -184,13 +226,18 @@ export const mockWorkflowMultiArtifact: WorkflowDetail = {
   ],
 };
 
-export const mockWorkflowEmpty: WorkflowDetail = {
+export const mockWorkflowEmpty: Workflow = {
   id: 7,
   name: 'empty-workflow',
+  status: {
+    source: { status: 'unknown' },
+    artifact: { status: 'unknown' },
+    target: { status: 'unknown' },
+  },
   artifacts: [],
 };
 
-const mockWorkflows: Record<number, WorkflowDetail> = {
+const mockWorkflows: Record<number, Workflow> = {
   1: mockWorkflowHealthy,
   2: mockWorkflowSourceError,
   3: mockWorkflowArtifactError,
@@ -200,6 +247,6 @@ const mockWorkflows: Record<number, WorkflowDetail> = {
   7: mockWorkflowEmpty,
 };
 
-export function getWorkflowMock(id: number): WorkflowDetail | undefined {
+export function getWorkflowMock(id: number): Workflow | undefined {
   return mockWorkflows[id];
 }

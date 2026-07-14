@@ -30,11 +30,11 @@ func BuildGroupEndpoints(tx dataservices.DataStoreTx, groups []portainer.EdgeGro
 	return m, nil
 }
 
-// MapStackToWorkflow converts a stack to a Workflow. gitConfig is passed separately
+// MapStackToSourceWorkflow converts a stack to a SourceWorkflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
 // source and artifact are the pre-computed git phase statuses from the caller.
-func MapStackToWorkflow(s portainer.Stack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) Workflow {
-	return Workflow{
+func MapStackToSourceWorkflow(s portainer.Stack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) SourceWorkflow {
+	return SourceWorkflow{
 		ID:       s.WorkflowID,
 		Name:     s.Name,
 		Type:     TypeStack,
@@ -56,15 +56,15 @@ func MapStackToWorkflow(s portainer.Stack, sourceID portainer.SourceID, gitConfi
 	}
 }
 
-// MapEdgeStackToWorkflow converts an edge stack to a Workflow. gitConfig is passed separately
+// MapEdgeStackToSourceWorkflow converts an edge stack to a SourceWorkflow. gitConfig is passed separately
 // because EE embeds a different GitConfig type that shadows the CE field.
 // source and artifact are the pre-computed git phase statuses from the caller.
-func MapEdgeStackToWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) Workflow {
+func MapEdgeStackToSourceWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) SourceWorkflow {
 	platform := DeploymentPlatformDockerStandalone
 	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		platform = DeploymentPlatformKubernetes
 	}
-	return Workflow{
+	return SourceWorkflow{
 		ID:       wfID,
 		Name:     es.Name,
 		Type:     TypeEdgeStack,
@@ -225,6 +225,54 @@ func edgeStackTargetStatuses(
 		result[gid] = gStatus
 	}
 	return result
+}
+
+// BuildWorkflow assembles a Workflow from a domain workflow and its resolved, access-filtered
+// artifacts, aggregating the workflow-level status and dates across those artifacts.
+func BuildWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail) Workflow {
+	creation, lastSync := SummaryDates(artifacts)
+	return Workflow{
+		ID:           wf.ID,
+		Name:         workflowName(wf),
+		Status:       aggregateWorkflowStatus(artifacts),
+		Artifacts:    artifacts,
+		CreationDate: creation,
+		LastSyncDate: lastSync,
+	}
+}
+
+// workflowName returns the workflow's stored name, falling back to a placeholder when it has
+// none (e.g. a Kubernetes stack deployed without a stack name).
+func workflowName(wf portainer.Workflow) string {
+	if wf.Name != "" {
+		return wf.Name
+	}
+
+	return "Unnamed workflow"
+}
+
+// ShouldHideWorkflow reports whether a workflow must be hidden from the list: it had configured
+// artifacts but every one was filtered out (existence-hiding, mirroring the detail endpoint), or it
+// has no artifacts while an endpoint filter is active (an empty workflow cannot match an endpoint).
+func ShouldHideWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail, endpointIDSet set.Set[portainer.EndpointID]) bool {
+	if len(artifacts) > 0 {
+		return false
+	}
+	return len(wf.Artifacts) > 0 || len(endpointIDSet) > 0
+}
+
+// SummaryDates derives workflow-level dates from its artifacts: the earliest artifact creation
+// date and the most recent artifact sync date. Zero values are ignored.
+func SummaryDates(artifacts []ArtifactDetail) (creation, lastSync int64) {
+	for _, a := range artifacts {
+		if a.CreationDate != 0 && (creation == 0 || a.CreationDate < creation) {
+			creation = a.CreationDate
+		}
+		if a.LastSyncDate > lastSync {
+			lastSync = a.LastSyncDate
+		}
+	}
+	return creation, lastSync
 }
 
 func mapFilesToFileDetails(files []portainer.ArtifactFile) []ArtifactFileDetail {

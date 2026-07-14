@@ -4423,7 +4423,7 @@ export const gitOpsSourcesTest = <ThrowOnError extends boolean = true>(
 /**
  * List all GitOps workflows
  *
- * Returns a unified list of all stacks that have GitOps (GitConfig) configured.
+ * Returns a list of GitOps workflows, each with its aggregated status and the artifacts it contains.
  * **Access policy**: authenticated
  */
 export const gitOpsWorkflowsList = <ThrowOnError extends boolean = true>(

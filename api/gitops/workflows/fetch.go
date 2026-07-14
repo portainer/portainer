@@ -1,31 +1,95 @@
 package workflows
 
 import (
+	"slices"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
-	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
 )
 
-// FetchWorkflows returns all GitOps workflows visible to the given user.
+// FetchWorkflows returns all GitOps workflows visible to the given user
 func FetchWorkflows(
 	tx dataservices.DataStoreTx,
 	k8sFactory *cli.ClientFactory,
 	sc *security.RestrictedRequestContext,
 	endpointIDSet set.Set[portainer.EndpointID],
 ) ([]Workflow, error) {
-	gitConfigs := map[portainer.StackID]*gittypes.RepoConfig{}
-	sourceIDs := map[portainer.StackID]portainer.SourceID{}
-	sourcePhases := map[portainer.StackID]WorkflowPhaseStatus{}
-	artifactPhases := map[portainer.StackID]WorkflowPhaseStatus{}
-
 	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
 
+	allWorkflows, err := tx.Workflow().ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	stackIDSet := make(set.Set[portainer.StackID])
+	sourceIDSet := make(set.Set[portainer.SourceID])
+	for _, wf := range allWorkflows {
+		for _, a := range wf.Artifacts {
+			if a.StackID != 0 {
+				stackIDSet.Add(a.StackID)
+			}
+			for _, f := range a.Files {
+				sourceIDSet.Add(f.SourceID)
+			}
+		}
+	}
+
+	stackMap, err := loadAccessibleStackMap(tx, k8sFactory, sc, stackIDSet, endpointIDSet)
+	if err != nil {
+		return nil, err
+	}
+
+	sourceMap, err := LoadSourceMap(tx, userContext, sourceIDSet)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]Workflow, 0, len(allWorkflows))
+	for _, wf := range allWorkflows {
+		artifacts := make([]ArtifactDetail, 0, len(wf.Artifacts))
+		for _, a := range wf.Artifacts {
+			if a.StackID == 0 {
+				continue // edge-stack artifacts are resolved by the EE implementation
+			}
+
+			stack, ok := stackMap[a.StackID]
+			if !ok {
+				continue // filtered out by access control or endpoint scope
+			}
+
+			if stack.Type == portainer.KubernetesStack && !HasAccessibleSource(a.Files, sourceMap) {
+				continue
+			}
+
+			sourcePhase, artifactPhase := ArtifactPhases(a.Files, sourceMap)
+			artifacts = append(artifacts, MapStackToArtifactDetail(stack, a.Files, sourcePhase, artifactPhase))
+		}
+
+		if ShouldHideWorkflow(wf, artifacts, endpointIDSet) {
+			continue
+		}
+		items = append(items, BuildWorkflow(wf, artifacts))
+	}
+
+	return items, nil
+}
+
+// loadAccessibleStackMap batch-loads the stacks referenced by workflows, applies the same endpoint
+// scope, Docker UAC, and Kubernetes namespace RBAC filtering as the detail path, and returns the
+// accessible stacks keyed by ID.
+func loadAccessibleStackMap(
+	tx dataservices.DataStoreTx,
+	k8sFactory *cli.ClientFactory,
+	sc *security.RestrictedRequestContext,
+	stackIDSet set.Set[portainer.StackID],
+	endpointIDSet set.Set[portainer.EndpointID],
+) (map[portainer.StackID]portainer.Stack, error) {
 	stacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool {
-		return s.WorkflowID != 0 && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
+		return stackIDSet.Contains(s.ID) && (len(endpointIDSet) == 0 || endpointIDSet.Contains(s.EndpointID))
 	})
 	if err != nil {
 		return nil, err
@@ -41,77 +105,28 @@ func FetchWorkflows(
 		return nil, err
 	}
 
-	// First pass: filter by endpoint/stack-type match and collect workflow IDs.
-	preFiltered := make([]portainer.Stack, 0, len(stacks))
-	workflowIDSet := make(set.Set[portainer.WorkflowID], len(stacks))
-	for _, stack := range stacks {
-		if ep, ok := endpointMap[stack.EndpointID]; ok && !EndpointMatchesStackType(ep, stack.Type) {
-			continue
-		}
-		preFiltered = append(preFiltered, stack)
-		workflowIDSet.Add(stack.WorkflowID)
-	}
-
-	workflowMap, sourceMap, err := LoadWorkflowAndSourceMaps(tx, userContext, workflowIDSet)
-	if err != nil {
-		return nil, err
-	}
-
-	// Second pass: build filtered list using in-memory lookups.
-	var filtered []portainer.Stack
-	for _, stack := range preFiltered {
-		wf := workflowMap[stack.WorkflowID]
-
-		hasAccessibleSource := false
-	outer:
-		for _, as := range wf.Artifacts {
-			if as.StackID != stack.ID {
-				continue
-			}
-
-			for _, f := range as.Files {
-				src, ok := sourceMap[f.SourceID]
-				if !ok {
-					continue
-				}
-
-				hasAccessibleSource = true
-
-				if src.Type == portainer.SourceTypeGit {
-					gitConfigs[stack.ID] = MergeSourceAndFile(&src, &f)
-					sourceIDs[stack.ID] = src.ID
-					sourcePhases[stack.ID] = SourceStatusToPhase(f.RefStatus, f.RefError)
-					artifactPhases[stack.ID] = SourceStatusToPhase(f.PathStatus, f.PathError)
-					break outer
-				}
-			}
-		}
-
-		if stack.Type == portainer.KubernetesStack && !hasAccessibleSource {
-			continue
-		}
-
-		filtered = append(filtered, stack)
-	}
-	stacks = filtered
-
 	accessMap, err := buildEndpointAccessMap(k8sFactory, sc, endpointMap)
 	if err != nil {
 		return nil, err
 	}
 
-	stacks, err = filterK8SStacks(stacks, endpointMap, k8sFactory, accessMap)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]Workflow, 0, len(stacks))
+	result := make(map[portainer.StackID]portainer.Stack, len(stacks))
 	for _, stack := range stacks {
-		gitConfig := gitConfigs[stack.ID]
-		items = append(items, MapStackToWorkflow(stack, sourceIDs[stack.ID], gitConfig, sourcePhases[stack.ID], artifactPhases[stack.ID]))
+		if ep, ok := endpointMap[stack.EndpointID]; ok && !EndpointMatchesStackType(ep, stack.Type) {
+			continue
+		}
+
+		if stack.Type == portainer.KubernetesStack {
+			access := accessMap[stack.EndpointID]
+			if !access.IsKubeAdmin && !slices.Contains(access.NonAdminNamespaces, stack.Namespace) {
+				continue
+			}
+		}
+
+		result[stack.ID] = stack
 	}
 
-	return items, nil
+	return result, nil
 }
 
 // SourceStats holds aggregated statistics for a GitOps source.

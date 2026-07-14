@@ -1,9 +1,9 @@
 import {
   WorkflowStatus,
   WorkflowPhaseStatus,
-  Workflow,
+  WorkflowStatusObject,
   WorkflowArtifact,
-  WorkflowDetail,
+  Workflow,
 } from './types';
 
 const STATUS_PRIORITY: Record<WorkflowStatus, number> = {
@@ -25,32 +25,14 @@ export function worstPhaseStatus(
   );
 }
 
-export function effectiveWorkflowStatus(item: Workflow): WorkflowPhaseStatus {
+export function effectiveWorkflowStatus(item: {
+  status: WorkflowStatusObject;
+}): WorkflowPhaseStatus {
   return worstPhaseStatus([
     item.status.source,
     item.status.artifact,
     item.status.target,
   ]);
-}
-
-function effectiveArtifactStatus(
-  artifact: WorkflowArtifact
-): WorkflowPhaseStatus {
-  return worstPhaseStatus([
-    artifact.status.source,
-    artifact.status.artifact,
-    artifact.status.target,
-  ]);
-}
-
-export function effectiveWorkflowDetailStatus(
-  workflow: WorkflowDetail
-): WorkflowPhaseStatus {
-  if (workflow.artifacts.length === 0) {
-    return { status: 'unknown' };
-  }
-
-  return worstPhaseStatus(workflow.artifacts.map(effectiveArtifactStatus));
 }
 
 export type TargetRollupTone = 'success' | 'danger' | 'warning' | 'muted';
@@ -78,7 +60,7 @@ export function computeArtifactTargetCount(artifact: WorkflowArtifact): number {
   return artifactTargetStatuses(artifact).length;
 }
 
-export function computeTargetRollup(workflow: WorkflowDetail): TargetRollup {
+export function computeTargetRollup(workflow: Workflow): TargetRollup {
   if (workflow.artifacts.length === 0) {
     return { synced: 0, total: 0, tone: 'muted' };
   }

@@ -57,7 +57,7 @@ func createGitStack(t *testing.T, tx dataservices.DataStoreTx, stack *portainer.
 		src := &portainer.Source{Git: &gittypes.GitSource{URL: stack.GitConfig.URL, Authentication: stack.GitConfig.Authentication, TLSSkipVerify: stack.GitConfig.TLSSkipVerify}, Type: portainer.SourceTypeGit}
 		require.NoError(t, tx.Source().Create(source.InsecureNewAdminContext(), src))
 
-		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		wf := &portainer.Workflow{Name: stack.Name, Artifacts: []portainer.Artifact{{
 			StackID: stack.ID,
 			Files: []portainer.ArtifactFile{{
 				SourceID: src.ID,

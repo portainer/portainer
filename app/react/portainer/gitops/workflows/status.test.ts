@@ -7,7 +7,11 @@ import {
   mockWorkflowMultiArtifact,
   mockWorkflowEmpty,
 } from './test-utils/workflow.mock';
-import { Workflow, WorkflowPhaseStatus, WorkflowStatus } from './types';
+import {
+  WorkflowPhaseStatus,
+  WorkflowStatus,
+  WorkflowStatusObject,
+} from './types';
 import {
   effectiveWorkflowStatus,
   worstPhaseStatus,
@@ -22,65 +26,65 @@ describe('effectiveWorkflowStatus', () => {
       'paused',
       'healthy',
       'unknown',
-    ])('all phases %s → %s', (status) => {
-      const item = makeWorkflow(
-        makePhase(status),
-        makePhase(status),
-        makePhase(status)
+    ])('all phases %s → %s', (statusType) => {
+      const status = makeWorkflowStatus(
+        makePhase(statusType),
+        makePhase(statusType),
+        makePhase(statusType)
       );
-      expect(effectiveWorkflowStatus(item).status).toBe(status);
+      expect(effectiveWorkflowStatus({ status }).status).toBe(statusType);
     });
   });
 
   describe('priority order', () => {
     it('error beats syncing and healthy', () => {
-      const item = makeWorkflow(
+      const status = makeWorkflowStatus(
         makePhase('error'),
         makePhase('syncing'),
         makePhase('healthy')
       );
-      expect(effectiveWorkflowStatus(item).status).toBe('error');
+      expect(effectiveWorkflowStatus({ status }).status).toBe('error');
     });
 
     it('syncing beats paused and healthy', () => {
-      const item = makeWorkflow(
+      const status = makeWorkflowStatus(
         makePhase('paused'),
         makePhase('syncing'),
         makePhase('healthy')
       );
-      expect(effectiveWorkflowStatus(item).status).toBe('syncing');
+      expect(effectiveWorkflowStatus({ status }).status).toBe('syncing');
     });
 
     it('paused beats healthy and unknown', () => {
-      const item = makeWorkflow(
+      const status = makeWorkflowStatus(
         makePhase('healthy'),
         makePhase('unknown'),
         makePhase('paused')
       );
-      expect(effectiveWorkflowStatus(item).status).toBe('paused');
+      expect(effectiveWorkflowStatus({ status }).status).toBe('paused');
     });
   });
 
   describe('error message', () => {
     it('includes error from the winning phase', () => {
-      const item = makeWorkflow(
+      const status = makeWorkflowStatus(
         makePhase('error', 'git clone failed'),
         makePhase('healthy'),
         makePhase('healthy')
       );
-      expect(effectiveWorkflowStatus(item)).toEqual({
+      expect(effectiveWorkflowStatus({ status })).toEqual({
         status: 'error',
         error: 'git clone failed',
       });
     });
 
     it('no error when winning phase has no error', () => {
-      const item = makeWorkflow(
+      const status = makeWorkflowStatus(
         makePhase('syncing'),
         makePhase('healthy'),
         makePhase('healthy')
       );
-      expect(effectiveWorkflowStatus(item).error).toBeUndefined();
+      expect(effectiveWorkflowStatus({ status }).error).toBeUndefined();
     });
   });
 });
@@ -157,21 +161,12 @@ describe('computeTargetRollup', () => {
   });
 });
 
-function makeWorkflow(
+function makeWorkflowStatus(
   source: WorkflowPhaseStatus,
   artifact: WorkflowPhaseStatus,
   target: WorkflowPhaseStatus
-): Workflow {
-  return {
-    id: 1,
-    name: 'test',
-    type: 'stack',
-    platform: 'dockerStandalone',
-    status: { source, artifact, target },
-    target: { endpointId: 1 },
-    creationDate: 0,
-    lastSyncDate: 0,
-  };
+): WorkflowStatusObject {
+  return { source, artifact, target };
 }
 
 function makePhase(

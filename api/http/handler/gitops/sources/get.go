@@ -38,10 +38,10 @@ type SourceAccess struct {
 // SourceDetail extends Source with connection settings and linked workflows.
 type SourceDetail struct {
 	Source
-	Connection connectionInfo       `json:"connection" validate:"required"`
-	AutoUpdate *AutoUpdateInfo      `json:"autoUpdate,omitempty"`
-	Workflows  []workflows.Workflow `json:"workflows"`
-	Access     SourceAccess         `json:"access"`
+	Connection connectionInfo             `json:"connection" validate:"required"`
+	AutoUpdate *AutoUpdateInfo            `json:"autoUpdate,omitempty"`
+	Workflows  []workflows.SourceWorkflow `json:"workflows"`
+	Access     SourceAccess               `json:"access"`
 }
 
 // @id GitOpsSourceGet
@@ -73,7 +73,7 @@ func (h *Handler) getSource(w http.ResponseWriter, r *http.Request) *httperror.H
 	sourceID := portainer.SourceID(srcID)
 
 	var source *portainer.Source
-	var sourceWfs []workflows.Workflow
+	var sourceWfs []workflows.SourceWorkflow
 	var stats workflows.SourceStats
 
 	err = h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
@@ -102,7 +102,7 @@ func (h *Handler) getSource(w http.ResponseWriter, r *http.Request) *httperror.H
 	return response.JSON(w, detail)
 }
 
-func BuildSourceDetail(baseSource Source, cfg *gittypes.GitSource, sourceWfs []workflows.Workflow, access SourceAccess) SourceDetail {
+func BuildSourceDetail(baseSource Source, cfg *gittypes.GitSource, sourceWfs []workflows.SourceWorkflow, access SourceAccess) SourceDetail {
 	var autoUpdate *AutoUpdateInfo
 	if len(sourceWfs) > 0 {
 		autoUpdate = BuildAutoUpdateInfo(sourceWfs[0].AutoUpdate)

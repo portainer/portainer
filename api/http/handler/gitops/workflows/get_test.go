@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/workflows"
 
 	"github.com/portainer/portainer/api/http/security"
 
@@ -34,10 +35,10 @@ func buildWorkflowGetReq(t *testing.T, userID portainer.UserID, role portainer.U
 	return req.WithContext(ctx)
 }
 
-func decodeWorkflowDetail(t *testing.T, rr *httptest.ResponseRecorder) WorkflowDetail {
+func decodeWorkflow(t *testing.T, rr *httptest.ResponseRecorder) workflows.Workflow {
 	t.Helper()
 	require.Equal(t, http.StatusOK, rr.Code, "unexpected status: %s", rr.Body.String())
-	var detail WorkflowDetail
+	var detail workflows.Workflow
 	require.NoError(t, json.NewDecoder(rr.Body).Decode(&detail))
 	return detail
 }
@@ -69,8 +70,8 @@ func TestWorkflowGet_MultiFileStackArtifact(t *testing.T) {
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowGetReq(t, 1, portainer.AdministratorRole, strconv.Itoa(int(wfID))))
 
-	detail := decodeWorkflowDetail(t, rr)
-	assert.Equal(t, int(wfID), detail.ID)
+	detail := decodeWorkflow(t, rr)
+	assert.Equal(t, wfID, detail.ID)
 	require.Len(t, detail.Artifacts, 1)
 	assert.Equal(t, "gitops-stack", detail.Artifacts[0].Name)
 	assert.Len(t, detail.Artifacts[0].Files, 2)
@@ -92,7 +93,7 @@ func TestWorkflowGet_ZeroArtifactWorkflowReturnsEmptyArray(t *testing.T) {
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, buildWorkflowGetReq(t, 1, portainer.AdministratorRole, strconv.Itoa(int(wfID))))
 
-	detail := decodeWorkflowDetail(t, rr)
+	detail := decodeWorkflow(t, rr)
 	assert.Equal(t, "empty-workflow", detail.Name)
 	assert.Empty(t, detail.Artifacts)
 }

@@ -1,10 +1,8 @@
 import {
   WorkflowsArtifactDetail,
   WorkflowsArtifactFileDetail,
-  WorkflowsWorkflowDetail,
+  WorkflowsWorkflow,
 } from '@api/types.gen';
-
-import { RepoConfigResponse } from '@/react/portainer/gitops/types';
 
 export type WorkflowStatus =
   | 'healthy'
@@ -37,19 +35,6 @@ export interface WorkflowTarget {
   resolvedEndpointIds?: number[];
 }
 
-export interface Workflow {
-  id: number;
-  name: string;
-  type: WorkflowType;
-  platform: DeploymentPlatform;
-  status: WorkflowStatusObject;
-  sourceId?: number;
-  gitConfig?: RepoConfigResponse;
-  target: WorkflowTarget;
-  creationDate: number;
-  lastSyncDate: number;
-}
-
 export interface WorkflowFileRef {
   sourceId: number;
   path: string;
@@ -65,6 +50,7 @@ export type WorkflowArtifactFile = WorkflowsArtifactFileDetail & {
   sourceId: number;
 };
 
-export type WorkflowDetail = Omit<WorkflowsWorkflowDetail, 'artifacts'> & {
+export type Workflow = Omit<WorkflowsWorkflow, 'artifacts' | 'status'> & {
+  status: WorkflowStatusObject;
   artifacts: WorkflowArtifact[];
 };

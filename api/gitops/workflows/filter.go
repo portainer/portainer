@@ -20,6 +20,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// HasAccessibleSource reports whether any of the artifact's files has a source visible in
+// sourceMap.
+func HasAccessibleSource(files []portainer.ArtifactFile, sourceMap map[portainer.SourceID]portainer.Source) bool {
+	return slicesx.Some(files, func(f portainer.ArtifactFile) bool {
+		_, ok := sourceMap[f.SourceID]
+		return ok
+	})
+}
+
 // EndpointMatchesStackType reports whether ep is a valid target for stackType.
 func EndpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackType) bool {
 	switch stackType {

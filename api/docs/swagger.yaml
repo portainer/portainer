@@ -5767,7 +5767,7 @@ definitions:
         type: integer
       workflows:
         items:
-          $ref: '#/definitions/workflows.Workflow'
+          $ref: '#/definitions/workflows.SourceWorkflow'
         type: array
     required:
     - connection
@@ -9594,6 +9594,38 @@ definitions:
     - DeploymentPlatformDockerStandalone
     - DeploymentPlatformDockerSwarm
     - DeploymentPlatformKubernetes
+  workflows.SourceWorkflow:
+    properties:
+      autoUpdate:
+        $ref: '#/definitions/portainer.AutoUpdateSettings'
+      creationDate:
+        type: integer
+      gitConfig:
+        $ref: '#/definitions/gittypes.RepoConfig'
+      id:
+        type: integer
+      lastSyncDate:
+        type: integer
+      name:
+        type: string
+      platform:
+        $ref: '#/definitions/workflows.DeploymentPlatform'
+      sourceId:
+        type: integer
+      status:
+        $ref: '#/definitions/workflows.WorkflowStatusObject'
+      target:
+        $ref: '#/definitions/workflows.Target'
+      type:
+        $ref: '#/definitions/workflows.Type'
+    required:
+    - id
+    - name
+    - platform
+    - status
+    - target
+    - type
+    type: object
   workflows.Status:
     enum:
     - healthy
@@ -9650,49 +9682,24 @@ definitions:
     - TypeEdgeStack
   workflows.Workflow:
     properties:
-      autoUpdate:
-        $ref: '#/definitions/portainer.AutoUpdateSettings'
+      artifacts:
+        items:
+          $ref: '#/definitions/workflows.ArtifactDetail'
+        type: array
       creationDate:
         type: integer
-      gitConfig:
-        $ref: '#/definitions/gittypes.RepoConfig'
       id:
         type: integer
       lastSyncDate:
         type: integer
       name:
         type: string
-      platform:
-        $ref: '#/definitions/workflows.DeploymentPlatform'
-      sourceId:
-        type: integer
       status:
         $ref: '#/definitions/workflows.WorkflowStatusObject'
-      target:
-        $ref: '#/definitions/workflows.Target'
-      type:
-        $ref: '#/definitions/workflows.Type'
     required:
     - id
     - name
-    - platform
     - status
-    - target
-    - type
-    type: object
-  workflows.WorkflowDetail:
-    properties:
-      artifacts:
-        items:
-          $ref: '#/definitions/workflows.ArtifactDetail'
-        type: array
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    - name
     type: object
   workflows.WorkflowPhaseStatus:
     properties:
@@ -13029,19 +13036,27 @@ paths:
   /gitops/workflows:
     get:
       description: |-
-        Returns a unified list of all stacks that have GitOps (GitConfig) configured.
+        Returns a list of GitOps workflows, each with its aggregated status and the artifacts it contains.
         **Access policy**: authenticated
       operationId: GitOpsWorkflowsList
       parameters:
-      - description: Search term (matches name or repository URL)
+      - description: Search term (matches workflow name)
         in: query
         name: search
         type: string
-      - description: 'Sort field: name | type | status | creationDate | lastSyncDate'
+      - description: Sort field
+        enum:
+        - name
+        - status
+        - creationDate
+        - lastSyncDate
         in: query
         name: sort
         type: string
-      - description: 'Sort order: asc or desc'
+      - description: Sort order
+        enum:
+        - asc
+        - desc
         in: query
         name: order
         type: string
@@ -13060,15 +13075,27 @@ paths:
           type: integer
         name: endpointIds
         type: array
-      - description: 'Filter by status: healthy | syncing | error | paused | unknown'
+      - description: Filter by status
+        enum:
+        - healthy
+        - syncing
+        - error
+        - paused
+        - unknown
         in: query
         name: status
         type: string
-      - description: 'Filter by type: stack'
+      - description: Keep workflows that have at least one artifact of this type
+        enum:
+        - stack
         in: query
         name: type
         type: string
-      - description: 'Filter by platform: dockerStandalone | dockerSwarm | kubernetes'
+      - description: Keep workflows that have at least one artifact on this platform
+        enum:
+        - dockerStandalone
+        - dockerSwarm
+        - kubernetes
         in: query
         name: platform
         type: string
@@ -13081,6 +13108,8 @@ paths:
             items:
               $ref: '#/definitions/workflows.Workflow'
             type: array
+        "400":
+          description: Invalid request
         "500":
           description: Server error
       security:
@@ -13108,7 +13137,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/workflows.WorkflowDetail'
+            $ref: '#/definitions/workflows.Workflow'
         "400":
           description: Invalid request
         "404":

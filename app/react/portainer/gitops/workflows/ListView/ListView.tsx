@@ -7,14 +7,15 @@ import {
   SortableGroup,
   SortOption,
 } from '@@/SortableList/SortableList';
+import { asEnum } from '@@/datatables/useTableStateFromUrl';
 
-import { useWorkflows } from '../../queries/useWorkflows';
+import { useWorkflows } from '../queries/useWorkflows';
 import { useWorkflowsSummary } from '../../queries/useWorkflowsSummary';
 import { Workflow, WorkflowStatus } from '../types';
 import { effectiveWorkflowStatus } from '../status';
 
 import { WorkflowCard } from './WorkflowCard';
-import { useListState } from './useListState';
+import { useListState, SORT_KEYS } from './useListState';
 
 const STATUS_CONFIG: Array<{
   key: WorkflowStatus;
@@ -31,28 +32,17 @@ const STATUS_CONFIG: Array<{
 const SORT_OPTIONS: SortOption[] = [
   { key: 'name', label: 'Name' },
   { key: 'status', label: 'Status', grouped: true },
-  { key: 'type', label: 'Type', grouped: true },
-  { key: 'platform', label: 'Platform', grouped: true },
   { key: 'lastSyncDate', label: 'Last sync' },
 ];
 
+const SORT_KEY_SET = new Set(SORT_KEYS);
+
 const GROUP_OPTIONS: Record<string, Array<{ key: string; label: string }>> = {
   status: STATUS_CONFIG,
-  type: [
-    { key: 'stack', label: 'Stack' },
-    { key: 'edgeStack', label: 'Edge Stack' },
-  ],
-  platform: [
-    { key: 'dockerStandalone', label: 'Docker Standalone' },
-    { key: 'dockerSwarm', label: 'Docker Swarm' },
-    { key: 'kubernetes', label: 'Kubernetes' },
-  ],
 };
 
 const GROUP_FIELD: Record<string, (item: Workflow) => string> = {
-  status: (item: Workflow) => effectiveWorkflowStatus(item).status,
-  type: (item) => item.type,
-  platform: (item) => item.platform,
+  status: (item) => effectiveWorkflowStatus(item).status,
 };
 
 export function ListView() {
@@ -62,13 +52,11 @@ export function ListView() {
 
   const workflowsQuery = useWorkflows({
     search: tableState.search || undefined,
-    sort: sortBy,
+    sort: asEnum(sortBy, SORT_KEY_SET) ?? 'name',
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     start: tableState.page * tableState.pageSize,
     limit: tableState.pageSize,
     status: tableState.status ?? undefined,
-    type: tableState.type ?? undefined,
-    platform: tableState.platform ?? undefined,
   });
 
   const summaryQuery = useWorkflowsSummary();
@@ -118,7 +106,7 @@ export function ListView() {
           groups={groups}
           totalCount={totalCount}
           isLoading={workflowsQuery.isLoading}
-          getItemKey={(item) => `${item.type}-${item.id}`}
+          getItemKey={(item) => `workflow-${item.id}`}
           showGroupHeaders
           emptyMessage="No workflows found"
           searchPlaceholder="Search"

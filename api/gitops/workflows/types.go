@@ -79,7 +79,8 @@ type WorkflowStatusObject struct {
 	Target   WorkflowPhaseStatus `json:"target"`
 }
 
-type Workflow struct {
+// SourceWorkflow is the per-stack/edge-stack workflow shape embedded in a source's detail response.
+type SourceWorkflow struct {
 	ID           portainer.WorkflowID          `json:"id" validate:"required"`
 	Name         string                        `json:"name" validate:"required"`
 	Type         Type                          `json:"type" validate:"required"`
@@ -91,6 +92,16 @@ type Workflow struct {
 	Target       Target                        `json:"target" validate:"required"`
 	CreationDate int64                         `json:"creationDate"`
 	LastSyncDate int64                         `json:"lastSyncDate"`
+}
+
+// Workflow is the API representation of a workflow, used by both the list and detail endpoints.
+type Workflow struct {
+	ID           portainer.WorkflowID `json:"id" validate:"required"`
+	Name         string               `json:"name" validate:"required"`
+	Status       WorkflowStatusObject `json:"status" validate:"required"`
+	Artifacts    []ArtifactDetail     `json:"artifacts"`
+	CreationDate int64                `json:"creationDate"`
+	LastSyncDate int64                `json:"lastSyncDate"`
 }
 
 type StatusSummary struct {

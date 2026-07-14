@@ -1,8 +1,8 @@
 import { StackType } from '@/react/common/stacks/types';
 
-import { DeploymentPlatform, Workflow, WorkflowType } from './types';
+import { DeploymentPlatform, WorkflowType } from './types';
 
-export function getWorkflowLink(item: Workflow): {
+export function getWorkflowLink(item: { id: number }): {
   to: string;
   params: object;
 } {

@@ -9,7 +9,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { UserViewModel } from '@/portainer/models/user';
 
-import { WorkflowDetail } from '../types';
+import { Workflow } from '../types';
 import {
   mockWorkflowHealthy,
   mockWorkflowEmpty,
@@ -78,7 +78,7 @@ describe('ItemView', () => {
   });
 });
 
-function renderComponent(workflow: WorkflowDetail = mockWorkflowHealthy) {
+function renderComponent(workflow: Workflow = mockWorkflowHealthy) {
   useCurrentStateAndParams.mockReturnValue({
     params: { workflowId: workflow.id },
   });

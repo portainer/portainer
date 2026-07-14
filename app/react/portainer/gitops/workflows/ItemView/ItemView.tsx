@@ -6,7 +6,7 @@ import { Alert } from '@@/Alert';
 import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { useWorkflow } from '../queries/useWorkflow';
-import { WorkflowDetail } from '../types';
+import { Workflow } from '../types';
 
 import { WorkflowResourceHeader } from './WorkflowResourceHeader';
 import { OverviewTab } from './OverviewTab';
@@ -52,7 +52,7 @@ export function ItemView() {
   return <PageContent workflow={workflow} />;
 }
 
-function PageContent({ workflow }: { workflow: WorkflowDetail }) {
+function PageContent({ workflow }: { workflow: Workflow }) {
   const workflowTabs: Tab[] = [
     {
       name: 'Overview',

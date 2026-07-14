@@ -1,11 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
-  type SourcesGitAuthInfo,
-  type SourcesConnectionInfo,
   type SourcesAutoUpdateInfo,
   type SourcesSourceDetail,
-  WorkflowsWorkflow,
+  WorkflowsSourceWorkflow,
   WorkflowsWorkflowStatusObject,
   WorkflowsStatus,
   WorkflowsWorkflowPhaseStatus,
@@ -23,20 +21,27 @@ import { AuthTypeOption } from '@/react/portainer/account/git-credentials/types'
 
 import { Source } from '../types';
 import {
-  Workflow,
   WorkflowPhaseStatus,
   WorkflowStatus,
   WorkflowStatusObject,
+  WorkflowTarget,
 } from '../../workflows/types';
 
 import { sourceQueryKeys } from './query-keys';
 
-export type GitAuthInfo = SourcesGitAuthInfo;
-export type ConnectionInfo = SourcesConnectionInfo;
 export type AutoUpdateInfo = SourcesAutoUpdateInfo;
 
+export type SourceWorkflow = WorkflowsSourceWorkflow & {
+  status: WorkflowStatusObject;
+  sourceId?: number;
+  gitConfig?: RepoConfigResponse;
+  target: WorkflowTarget;
+  creationDate: number;
+  lastSyncDate: number;
+};
+
 export type SourceDetail = Omit<SourcesSourceDetail, 'workflows' | 'usedBy'> & {
-  workflows: Array<Workflow>;
+  workflows: Array<SourceWorkflow>;
   usedBy: number;
 };
 
@@ -67,7 +72,7 @@ export async function getSource(id: Source['id']): Promise<SourceDetail> {
       usedBy: source.usedBy ?? 0,
     };
 
-    function toWorkflow(workflow: WorkflowsWorkflow): Workflow {
+    function toWorkflow(workflow: WorkflowsSourceWorkflow): SourceWorkflow {
       return {
         ...workflow,
         creationDate: workflow.creationDate ?? 0,

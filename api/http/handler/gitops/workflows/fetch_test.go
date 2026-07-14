@@ -64,7 +64,7 @@ func TestFetchWorkflowByID_SingleStackArtifact(t *testing.T) {
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
 	}))
 
-	var detail *WorkflowDetail
+	var detail *ce.Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, nil, adminContext(), wfID)
@@ -92,7 +92,7 @@ func TestFetchWorkflowByID_EdgeStackArtifact_Admin(t *testing.T) {
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
 	}))
 
-	var detail *WorkflowDetail
+	var detail *ce.Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, nil, adminContext(), wfID)
@@ -126,7 +126,7 @@ func TestFetchWorkflowByID_EdgeStackArtifactFilteredForNonAdmin_SiblingStackSurv
 		return tx.User().Create(&portainer.User{ID: 2, Role: portainer.StandardUserRole})
 	}))
 
-	var detail *WorkflowDetail
+	var detail *ce.Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, nil, nonAdminContext(), wfID)
@@ -184,7 +184,7 @@ func TestFetchWorkflowByID_K8sStackWithAccessibleSourceIsReturned(t *testing.T) 
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
 	}))
 
-	var detail *WorkflowDetail
+	var detail *ce.Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, nil, adminContext(), wfID)
@@ -208,7 +208,7 @@ func TestFetchWorkflowByID_ZeroArtifactsIsNotAnError(t *testing.T) {
 		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
 	}))
 
-	var detail *WorkflowDetail
+	var detail *ce.Workflow
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, nil, adminContext(), wfID)

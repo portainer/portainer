@@ -114,19 +114,47 @@ func endpointWorkflowStatus(epStatus portainer.EdgeStackStatusForEnv) (Status, s
 	}
 }
 
-// EffectiveStatus returns the highest-priority status across all three phases of a workflow.
-func EffectiveStatus(w Workflow) Status {
-	s := w.Status.Target.Status
-	if statusPriority(w.Status.Source.Status) > statusPriority(s) {
-		s = w.Status.Source.Status
+// effectiveStatusOf returns the highest-priority status across the three phases of a status object.
+func effectiveStatusOf(s WorkflowStatusObject) Status {
+	effective := s.Target.Status
+	if statusPriority(s.Source.Status) > statusPriority(effective) {
+		effective = s.Source.Status
 	}
-	if statusPriority(w.Status.Artifact.Status) > statusPriority(s) {
-		s = w.Status.Artifact.Status
+	if statusPriority(s.Artifact.Status) > statusPriority(effective) {
+		effective = s.Artifact.Status
 	}
-	return s
+	return effective
 }
 
-// CountByStatus counts workflows per effective status and returns a StatusSummary.
+// EffectiveStatus returns the highest-priority status across the three aggregate phases of a
+// workflow.
+func EffectiveStatus(w Workflow) Status {
+	return effectiveStatusOf(w.Status)
+}
+
+// aggregateWorkflowStatus folds each phase (source, artifact, target) worst-wins across all of a
+// workflow's artifacts. A workflow with no artifacts yields an all-unknown status object.
+func aggregateWorkflowStatus(artifacts []ArtifactDetail) WorkflowStatusObject {
+	agg := WorkflowStatusObject{
+		Source:   WorkflowPhaseStatus{Status: StatusUnknown},
+		Artifact: WorkflowPhaseStatus{Status: StatusUnknown},
+		Target:   WorkflowPhaseStatus{Status: StatusUnknown},
+	}
+	for _, a := range artifacts {
+		if statusPriority(a.Status.Source.Status) > statusPriority(agg.Source.Status) {
+			agg.Source = a.Status.Source
+		}
+		if statusPriority(a.Status.Artifact.Status) > statusPriority(agg.Artifact.Status) {
+			agg.Artifact = a.Status.Artifact
+		}
+		if statusPriority(a.Status.Target.Status) > statusPriority(agg.Target.Status) {
+			agg.Target = a.Status.Target
+		}
+	}
+	return agg
+}
+
+// CountByStatus counts workflows per effective aggregate status.
 func CountByStatus(workflows []Workflow) StatusSummary {
 	var s StatusSummary
 	for _, w := range workflows {

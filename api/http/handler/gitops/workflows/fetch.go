@@ -34,7 +34,7 @@ func fetchWorkflowByID(
 	k8sFactory *cli.ClientFactory,
 	sc *security.RestrictedRequestContext,
 	workflowID portainer.WorkflowID,
-) (*WorkflowDetail, error) {
+) (*svc.Workflow, error) {
 	wf, err := tx.Workflow().Read(workflowID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrNotFound, err)
@@ -65,11 +65,8 @@ func fetchWorkflowByID(
 		return nil, ErrNotFound
 	}
 
-	return &WorkflowDetail{
-		ID:        int(wf.ID),
-		Name:      wf.Name,
-		Artifacts: artifacts,
-	}, nil
+	result := svc.BuildWorkflow(*wf, artifacts)
+	return &result, nil
 }
 
 // fetchArtifactDetail resolves a single Artifact to its backing Stack or EdgeStack.
@@ -170,7 +167,7 @@ func checkStackAccessible(
 		return ErrResourceNotAccessible
 	}
 
-	if (!access.IsKubeAdmin && !slices.Contains(access.NonAdminNamespaces, stack.Namespace)) || !HasAccessibleSource(artifact.Files, sourceMap) {
+	if (!access.IsKubeAdmin && !slices.Contains(access.NonAdminNamespaces, stack.Namespace)) || !svc.HasAccessibleSource(artifact.Files, sourceMap) {
 		return ErrResourceNotAccessible
 	}
 
@@ -207,13 +204,4 @@ func fetchEdgeStackArtifact(
 
 	detail := svc.MapEdgeStackToArtifactDetail(edgeStack, artifact.Files, statuses, groupEndpoints, sourcePhase, artifactPhase)
 	return &detail, nil
-}
-
-// HasAccessibleSource reports whether any of the artifact's files has a source visible in
-// sourceMap.
-func HasAccessibleSource(files []portainer.ArtifactFile, sourceMap map[portainer.SourceID]portainer.Source) bool {
-	return slices.ContainsFunc(files, func(f portainer.ArtifactFile) bool {
-		_, ok := sourceMap[f.SourceID]
-		return ok
-	})
 }

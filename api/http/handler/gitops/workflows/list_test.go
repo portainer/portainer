@@ -39,9 +39,10 @@ func TestWorkflowsList_GitConfigFilter(t *testing.T) {
 	items := decodeWorkflows(t, rr)
 	require.Len(t, items, 1)
 	assert.Equal(t, "gitops-stack", items[0].Name)
-	assert.Equal(t, ce.TypeStack, items[0].Type)
-	assert.Equal(t, "https://github.com/example/repo", items[0].GitConfig.URL)
-	assert.Equal(t, "docker-compose.yml", items[0].GitConfig.ConfigFilePath)
+	require.Len(t, items[0].Artifacts, 1)
+	assert.Equal(t, ce.TypeStack, items[0].Artifacts[0].Type)
+	require.Len(t, items[0].Artifacts[0].Files, 1)
+	assert.Equal(t, "docker-compose.yml", items[0].Artifacts[0].Files[0].Path)
 }
 
 func TestWorkflowsList_EndpointIDsFilter(t *testing.T) {
@@ -123,18 +124,18 @@ func TestWorkflowsList_Search(t *testing.T) {
 	assert.Equal(t, "alpha", items[0].Name)
 }
 
-func TestWorkflowsList_SearchByURL(t *testing.T) {
+func TestWorkflowsList_SearchMatchesNameOnly(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
 
 	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		createGitStack(t, tx, &portainer.Stack{
-			ID: 1, Name: "stack-org1",
-			GitConfig: gitConfig("https://github.com/org1/repo"),
+			ID: 1, Name: "alpha",
+			GitConfig: gitConfig("https://github.com/needle/repo"),
 		})
 		createGitStack(t, tx, &portainer.Stack{
-			ID: 2, Name: "stack-org2",
-			GitConfig: gitConfig("https://github.com/org2/repo"),
+			ID: 2, Name: "beta",
+			GitConfig: gitConfig("https://github.com/other/repo"),
 		})
 
 		require.NoError(t, tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
@@ -142,12 +143,18 @@ func TestWorkflowsList_SearchByURL(t *testing.T) {
 	}))
 
 	h := NewHandler(store, nil, nil)
-	rr := httptest.NewRecorder()
-	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=org1"))
 
+	// Searching by a term that only appears in the git URL must not match — search is name-only.
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=needle"))
+	require.Empty(t, decodeWorkflows(t, rr))
+
+	// Searching by name matches.
+	rr = httptest.NewRecorder()
+	h.ServeHTTP(rr, buildWorkflowsReq(t, 1, portainer.AdministratorRole, "search=alpha"))
 	items := decodeWorkflows(t, rr)
 	require.Len(t, items, 1)
-	assert.Equal(t, "stack-org1", items[0].Name)
+	assert.Equal(t, "alpha", items[0].Name)
 }
 
 func TestWorkflowsList_Sort(t *testing.T) {
@@ -356,7 +363,7 @@ func TestWorkflowsList_InvalidFilterParams(t *testing.T) {
 	}
 }
 
-func TestWorkflowsList_RedactsCredentials(t *testing.T) {
+func TestWorkflowsList_DoesNotLeakCredentials(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
 
@@ -377,8 +384,6 @@ func TestWorkflowsList_RedactsCredentials(t *testing.T) {
 
 	items := decodeWorkflows(t, rr)
 	require.Len(t, items, 1)
-	require.NotNil(t, items[0].GitConfig)
-	require.NotNil(t, items[0].GitConfig.Authentication)
-	assert.Equal(t, "user", items[0].GitConfig.Authentication.Username)
-	assert.Empty(t, items[0].GitConfig.Authentication.Password)
+	// Source credentials must never be part of the workflow summary payload.
+	assert.NotContains(t, rr.Body.String(), "s3cr3t")
 }

@@ -30,7 +30,7 @@ func mustCreateGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *por
 	src := &portainer.Source{Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: cfg.URL, Authentication: cfg.Authentication, TLSSkipVerify: cfg.TLSSkipVerify}}
 	require.NoError(t, tx.Source().Create(adminUserContext, src))
 
-	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+	wf := &portainer.Workflow{Name: stack.Name, Artifacts: []portainer.Artifact{{
 		StackID: stack.ID,
 		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
 	}}}
@@ -185,6 +185,109 @@ func TestFetchWorkflows_NilEndpointSetReturnsAll(t *testing.T) {
 		return err
 	}))
 	require.Len(t, items, 3)
+}
+
+func TestFetchWorkflows_GroupsMultipleArtifactsUnderOneWorkflow(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "https://github.com/x/repo"}}
+		require.NoError(t, tx.Source().Create(adminUserContext, src))
+
+		wf := &portainer.Workflow{Name: "multi", Artifacts: []portainer.Artifact{
+			{StackID: 1, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+			{StackID: 2, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		}}
+		require.NoError(t, tx.Workflow().Create(wf))
+
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{ID: 1, Name: "stack-a", WorkflowID: wf.ID}))
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{ID: 2, Name: "stack-b", WorkflowID: wf.ID}))
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	var items []Workflow
+	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
+		return err
+	}))
+
+	require.Len(t, items, 1)
+	require.Equal(t, "multi", items[0].Name)
+	require.Len(t, items[0].Artifacts, 2)
+
+	names := []string{items[0].Artifacts[0].Name, items[0].Artifacts[1].Name}
+	require.Contains(t, names, "stack-a")
+	require.Contains(t, names, "stack-b")
+}
+
+func TestFetchWorkflows_ShowsWorkflowWithNoArtifacts(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.Workflow().Create(&portainer.Workflow{Name: "empty"}))
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	var items []Workflow
+	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
+		return err
+	}))
+
+	require.Len(t, items, 1)
+	require.Equal(t, "empty", items[0].Name)
+	require.Empty(t, items[0].Artifacts)
+}
+
+func TestFetchWorkflows_HidesWorkflowWhenAllArtifactsFiltered(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		// A workflow whose only artifact references a stack that does not exist:
+		// the artifact is filtered out, so the workflow must be hidden.
+		wf := &portainer.Workflow{Name: "dangling", Artifacts: []portainer.Artifact{
+			{StackID: 999, Files: []portainer.ArtifactFile{{SourceID: 1}}},
+		}}
+		require.NoError(t, tx.Workflow().Create(wf))
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	var items []Workflow
+	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		items, err = FetchWorkflows(tx, nil, adminContext(), nil)
+		return err
+	}))
+
+	require.Empty(t, items)
+}
+
+func TestFetchWorkflows_HidesEmptyWorkflowWhenEndpointFilterActive(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		require.NoError(t, tx.Workflow().Create(&portainer.Workflow{Name: "empty"}))
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	var items []Workflow
+	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		items, err = FetchWorkflows(tx, nil, adminContext(), set.ToSet([]portainer.EndpointID{1}))
+		return err
+	}))
+
+	require.Empty(t, items)
 }
 
 func TestFetchSourceStats_ReturnsAllSources(t *testing.T) {

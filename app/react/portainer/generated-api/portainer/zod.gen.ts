@@ -3370,7 +3370,7 @@ export const zWorkflowsArtifactDetail = z.object({
   type: zWorkflowsType,
 });
 
-export const zWorkflowsWorkflow = z.object({
+export const zWorkflowsSourceWorkflow = z.object({
   autoUpdate: zPortainerAutoUpdateSettings.optional(),
   creationDate: z.int().optional(),
   gitConfig: zGittypesRepoConfig.optional(),
@@ -3398,13 +3398,16 @@ export const zSourcesSourceDetail = z.object({
   type: zSourcesSourceType,
   url: z.string(),
   usedBy: z.int().optional(),
-  workflows: z.array(zWorkflowsWorkflow).optional(),
+  workflows: z.array(zWorkflowsSourceWorkflow).optional(),
 });
 
-export const zWorkflowsWorkflowDetail = z.object({
+export const zWorkflowsWorkflow = z.object({
   artifacts: z.array(zWorkflowsArtifactDetail).optional(),
+  creationDate: z.int().optional(),
   id: z.int(),
+  lastSyncDate: z.int().optional(),
   name: z.string(),
+  status: zWorkflowsWorkflowStatusObject,
 });
 
 /**
@@ -4442,14 +4445,18 @@ export const zGitOpsSourcesTestResponse = zSourcesConnectionTestResult;
 
 export const zGitOpsWorkflowsListQuery = z.object({
   search: z.string().optional(),
-  sort: z.string().optional(),
-  order: z.string().optional(),
+  sort: z.enum(['name', 'status', 'creationDate', 'lastSyncDate']).optional(),
+  order: z.enum(['asc', 'desc']).optional(),
   start: z.int().optional(),
   limit: z.int().optional(),
   endpointIds: z.array(z.int()).optional(),
-  status: z.string().optional(),
-  type: z.string().optional(),
-  platform: z.string().optional(),
+  status: z
+    .enum(['healthy', 'syncing', 'error', 'paused', 'unknown'])
+    .optional(),
+  type: z.enum(['stack']).optional(),
+  platform: z
+    .enum(['dockerStandalone', 'dockerSwarm', 'kubernetes'])
+    .optional(),
 });
 
 /**
@@ -4464,7 +4471,7 @@ export const zGitOpsWorkflowGetPath = z.object({
 /**
  * OK
  */
-export const zGitOpsWorkflowGetResponse = zWorkflowsWorkflowDetail;
+export const zGitOpsWorkflowGetResponse = zWorkflowsWorkflow;
 
 /**
  * OK

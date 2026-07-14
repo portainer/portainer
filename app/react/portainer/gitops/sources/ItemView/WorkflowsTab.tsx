@@ -7,13 +7,14 @@ import { Card } from '@@/primitives/Card';
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 
-import { Workflow, WorkflowTarget, WorkflowType } from '../../workflows/types';
+import { WorkflowTarget, WorkflowType } from '../../workflows/types';
 import { StatusBadge } from '../../components/StatusBadge';
 import { getWorkflowLink } from '../../workflows/utils';
 import { effectiveWorkflowStatus } from '../../workflows/status';
+import { SourceWorkflow } from '../queries/useSource';
 
 interface Props {
-  workflows: Workflow[];
+  workflows: SourceWorkflow[];
 }
 
 export function WorkflowsTab({ workflows }: Props) {
@@ -41,7 +42,7 @@ export function WorkflowsTab({ workflows }: Props) {
   );
 }
 
-function WorkflowsList({ workflows }: { workflows: Array<Workflow> }) {
+function WorkflowsList({ workflows }: { workflows: Array<SourceWorkflow> }) {
   return (
     <div className="space-y-2">
       {workflows.map((wf) => (
@@ -51,7 +52,7 @@ function WorkflowsList({ workflows }: { workflows: Array<Workflow> }) {
   );
 }
 
-function WorkflowCard({ item }: { item: Workflow }) {
+function WorkflowCard({ item }: { item: SourceWorkflow }) {
   const { to, params } = getWorkflowLink(item);
 
   return (

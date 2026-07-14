@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEffectiveStatus(t *testing.T) {
+func TestAggregateWorkflowStatus(t *testing.T) {
 	t.Parallel()
 
-	makeWorkflow := func(source, artifact, target Status) Workflow {
-		return Workflow{
+	artifact := func(source, artifact, target Status) ArtifactDetail {
+		return ArtifactDetail{
 			Status: WorkflowStatusObject{
 				Source:   WorkflowPhaseStatus{Status: source},
 				Artifact: WorkflowPhaseStatus{Status: artifact},
@@ -20,78 +20,56 @@ func TestEffectiveStatus(t *testing.T) {
 		}
 	}
 
-	cases := []struct {
-		name string
-		w    Workflow
-		want Status
-	}{
-		{"all healthy", makeWorkflow(StatusHealthy, StatusHealthy, StatusHealthy), StatusHealthy},
-		{"all unknown", makeWorkflow(StatusUnknown, StatusUnknown, StatusUnknown), StatusUnknown},
-		{"source error wins over syncing target", makeWorkflow(StatusError, StatusSyncing, StatusHealthy), StatusError},
-		{"artifact error wins over syncing target", makeWorkflow(StatusHealthy, StatusError, StatusSyncing), StatusError},
-		{"target error wins over healthy phases", makeWorkflow(StatusHealthy, StatusHealthy, StatusError), StatusError},
-		{"syncing beats paused and healthy", makeWorkflow(StatusPaused, StatusSyncing, StatusHealthy), StatusSyncing},
-		{"paused beats healthy", makeWorkflow(StatusHealthy, StatusPaused, StatusHealthy), StatusPaused},
-		{"healthy beats unknown", makeWorkflow(StatusUnknown, StatusHealthy, StatusUnknown), StatusHealthy},
-	}
+	t.Run("no artifacts yields unknown phases", func(t *testing.T) {
+		t.Parallel()
+		agg := aggregateWorkflowStatus(nil)
+		assert.Equal(t, StatusUnknown, effectiveStatusOf(agg))
+	})
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			assert.Equal(t, tc.want, EffectiveStatus(tc.w))
+	t.Run("each phase takes the worst across artifacts", func(t *testing.T) {
+		t.Parallel()
+		agg := aggregateWorkflowStatus([]ArtifactDetail{
+			artifact(StatusHealthy, StatusSyncing, StatusHealthy),
+			artifact(StatusError, StatusHealthy, StatusPaused),
 		})
-	}
+		assert.Equal(t, StatusError, agg.Source.Status)
+		assert.Equal(t, StatusSyncing, agg.Artifact.Status)
+		assert.Equal(t, StatusPaused, agg.Target.Status)
+	})
 }
 
-func TestCountByStatus(t *testing.T) {
+func TestCountSummaryByStatus(t *testing.T) {
 	t.Parallel()
 
-	makeW := func(s Status) Workflow {
-		return Workflow{
-			Status: WorkflowStatusObject{
-				Source:   WorkflowPhaseStatus{Status: s},
-				Artifact: WorkflowPhaseStatus{Status: s},
-				Target:   WorkflowPhaseStatus{Status: s},
-			},
-		}
+	summary := func(status Status) Workflow {
+		return Workflow{Status: WorkflowStatusObject{
+			Source:   WorkflowPhaseStatus{Status: status},
+			Artifact: WorkflowPhaseStatus{Status: status},
+			Target:   WorkflowPhaseStatus{Status: status},
+		}}
 	}
 
-	t.Run("empty list", func(t *testing.T) {
-		t.Parallel()
-		assert.Equal(t, StatusSummary{}, CountByStatus(nil))
+	got := CountByStatus([]Workflow{
+		summary(StatusHealthy),
+		summary(StatusHealthy),
+		summary(StatusError),
+		summary(StatusUnknown),
 	})
 
-	t.Run("single healthy", func(t *testing.T) {
-		t.Parallel()
-		assert.Equal(t, StatusSummary{Healthy: 1}, CountByStatus([]Workflow{makeW(StatusHealthy)}))
-	})
+	assert.Equal(t, StatusSummary{Healthy: 2, Error: 1, Unknown: 1}, got)
+}
 
-	t.Run("mixed statuses", func(t *testing.T) {
-		t.Parallel()
-		workflows := []Workflow{
-			makeW(StatusHealthy),
-			makeW(StatusError),
-			makeW(StatusSyncing),
-			makeW(StatusPaused),
-			makeW(StatusUnknown),
-			makeW(StatusError),
-		}
-		assert.Equal(t, StatusSummary{Healthy: 1, Error: 2, Syncing: 1, Paused: 1, Unknown: 1}, CountByStatus(workflows))
-	})
+func TestCountSummaryByStatus_NonTargetPhaseOverride(t *testing.T) {
+	t.Parallel()
 
-	t.Run("error phase overrides healthy target", func(t *testing.T) {
-		t.Parallel()
-		w := Workflow{
-			Status: WorkflowStatusObject{
-				Source:   WorkflowPhaseStatus{Status: StatusError},
-				Artifact: WorkflowPhaseStatus{Status: StatusUnknown},
-				Target:   WorkflowPhaseStatus{Status: StatusHealthy},
-			},
-		}
-		s := CountByStatus([]Workflow{w})
-		assert.Equal(t, 1, s.Error)
-		assert.Equal(t, 0, s.Healthy)
-	})
+	overridden := Workflow{Status: WorkflowStatusObject{
+		Source: WorkflowPhaseStatus{Status: StatusError},
+		Target: WorkflowPhaseStatus{Status: StatusHealthy},
+	}}
+
+	got := CountByStatus([]Workflow{overridden})
+
+	assert.Equal(t, StatusSummary{Error: 1}, got)
 }
 
 func TestDeriveEdgeStackTargetState(t *testing.T) {

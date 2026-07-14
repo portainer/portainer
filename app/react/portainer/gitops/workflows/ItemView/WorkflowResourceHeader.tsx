@@ -10,18 +10,18 @@ import { Button } from '@@/buttons';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
-import { WorkflowDetail } from '../types';
+import { Workflow } from '../types';
 import { StatusBadge } from '../../components/StatusBadge';
-import { computeTargetRollup, effectiveWorkflowDetailStatus } from '../status';
+import { computeTargetRollup, effectiveWorkflowStatus } from '../status';
 
 const COMING_SOON_MESSAGE = 'Coming soon';
 
 interface Props {
-  workflow: WorkflowDetail;
+  workflow: Workflow;
 }
 
 export function WorkflowResourceHeader({ workflow }: Props) {
-  const status = effectiveWorkflowDetailStatus(workflow);
+  const status = effectiveWorkflowStatus(workflow);
   const rollup = computeTargetRollup(workflow);
 
   return (

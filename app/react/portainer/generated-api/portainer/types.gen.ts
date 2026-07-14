@@ -4394,7 +4394,7 @@ export type SourcesSourceDetail = {
   type: SourcesSourceType;
   url: string;
   usedBy?: number;
-  workflows?: Array<WorkflowsWorkflow>;
+  workflows?: Array<WorkflowsSourceWorkflow>;
 };
 
 export const SourcesSourceType = {
@@ -8249,6 +8249,20 @@ export const WorkflowsDeploymentPlatform = {
 export type WorkflowsDeploymentPlatform =
   (typeof WorkflowsDeploymentPlatform)[keyof typeof WorkflowsDeploymentPlatform];
 
+export type WorkflowsSourceWorkflow = {
+  autoUpdate?: PortainerAutoUpdateSettings;
+  creationDate?: number;
+  gitConfig?: GittypesRepoConfig;
+  id: number;
+  lastSyncDate?: number;
+  name: string;
+  platform: WorkflowsDeploymentPlatform;
+  sourceId?: number;
+  status: WorkflowsWorkflowStatusObject;
+  target: WorkflowsTarget;
+  type: WorkflowsType;
+};
+
 export const WorkflowsStatus = {
   /**
    * StatusHealthy
@@ -8306,23 +8320,12 @@ export const WorkflowsType = {
 export type WorkflowsType = (typeof WorkflowsType)[keyof typeof WorkflowsType];
 
 export type WorkflowsWorkflow = {
-  autoUpdate?: PortainerAutoUpdateSettings;
+  artifacts?: Array<WorkflowsArtifactDetail>;
   creationDate?: number;
-  gitConfig?: GittypesRepoConfig;
   id: number;
   lastSyncDate?: number;
   name: string;
-  platform: WorkflowsDeploymentPlatform;
-  sourceId?: number;
   status: WorkflowsWorkflowStatusObject;
-  target: WorkflowsTarget;
-  type: WorkflowsType;
-};
-
-export type WorkflowsWorkflowDetail = {
-  artifacts?: Array<WorkflowsArtifactDetail>;
-  id: number;
-  name: string;
 };
 
 export type WorkflowsWorkflowPhaseStatus = {
@@ -11795,17 +11798,17 @@ export type GitOpsWorkflowsListData = {
   path?: never;
   query?: {
     /**
-     * Search term (matches name or repository URL)
+     * Search term (matches workflow name)
      */
     search?: string;
     /**
-     * Sort field: name | type | status | creationDate | lastSyncDate
+     * Sort field
      */
-    sort?: string;
+    sort?: 'name' | 'status' | 'creationDate' | 'lastSyncDate';
     /**
-     * Sort order: asc or desc
+     * Sort order
      */
-    order?: string;
+    order?: 'asc' | 'desc';
     /**
      * Pagination start index
      */
@@ -11819,22 +11822,26 @@ export type GitOpsWorkflowsListData = {
      */
     endpointIds?: Array<number>;
     /**
-     * Filter by status: healthy | syncing | error | paused | unknown
+     * Filter by status
      */
-    status?: string;
+    status?: 'healthy' | 'syncing' | 'error' | 'paused' | 'unknown';
     /**
-     * Filter by type: stack
+     * Keep workflows that have at least one artifact of this type
      */
-    type?: string;
+    type?: 'stack';
     /**
-     * Filter by platform: dockerStandalone | dockerSwarm | kubernetes
+     * Keep workflows that have at least one artifact on this platform
      */
-    platform?: string;
+    platform?: 'dockerStandalone' | 'dockerSwarm' | 'kubernetes';
   };
   url: '/gitops/workflows';
 };
 
 export type GitOpsWorkflowsListErrors = {
+  /**
+   * Invalid request
+   */
+  400: unknown;
   /**
    * Server error
    */
@@ -11882,7 +11889,7 @@ export type GitOpsWorkflowGetResponses = {
   /**
    * OK
    */
-  200: WorkflowsWorkflowDetail;
+  200: WorkflowsWorkflow;
 };
 
 export type GitOpsWorkflowGetResponse =

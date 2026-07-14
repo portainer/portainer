@@ -16,7 +16,7 @@ func TestRedactWorkflowCredentials(t *testing.T) {
 
 	t.Run("clears password and preserves username", func(t *testing.T) {
 		t.Parallel()
-		wfs := []ce.Workflow{{GitConfig: &gittypes.RepoConfig{
+		wfs := []ce.SourceWorkflow{{GitConfig: &gittypes.RepoConfig{
 			Authentication: &gittypes.GitAuthentication{Username: "user", Password: "s3cr3t"},
 		}}}
 		got := redactWorkflowCredentials(wfs)
@@ -27,7 +27,7 @@ func TestRedactWorkflowCredentials(t *testing.T) {
 
 	t.Run("does not mutate the original slice", func(t *testing.T) {
 		t.Parallel()
-		wfs := []ce.Workflow{{GitConfig: &gittypes.RepoConfig{
+		wfs := []ce.SourceWorkflow{{GitConfig: &gittypes.RepoConfig{
 			Authentication: &gittypes.GitAuthentication{Password: "s3cr3t"},
 		}}}
 		_ = redactWorkflowCredentials(wfs)
@@ -36,12 +36,12 @@ func TestRedactWorkflowCredentials(t *testing.T) {
 
 	t.Run("nil GitConfig is safe", func(t *testing.T) {
 		t.Parallel()
-		assert.NotPanics(t, func() { redactWorkflowCredentials([]ce.Workflow{{}}) })
+		assert.NotPanics(t, func() { redactWorkflowCredentials([]ce.SourceWorkflow{{}}) })
 	})
 
 	t.Run("nil Authentication is safe", func(t *testing.T) {
 		t.Parallel()
-		wfs := []ce.Workflow{{GitConfig: &gittypes.RepoConfig{}}}
+		wfs := []ce.SourceWorkflow{{GitConfig: &gittypes.RepoConfig{}}}
 		assert.NotPanics(t, func() { redactWorkflowCredentials(wfs) })
 	})
 }

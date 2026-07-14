@@ -13,13 +13,6 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
-// WorkflowDetail is the response for GET /gitops/workflows/{id}
-type WorkflowDetail struct {
-	ID        int                  `json:"id" validate:"required"`
-	Name      string               `json:"name" validate:"required"`
-	Artifacts []svc.ArtifactDetail `json:"artifacts,omitempty"`
-}
-
 // @id GitOpsWorkflowGet
 // @summary Get a GitOps workflow by ID
 // @description Returns the detail view of a single GitOps workflow, with one entry per backing
@@ -30,7 +23,7 @@ type WorkflowDetail struct {
 // @security jwt
 // @produce json
 // @param id path int true "Workflow identifier"
-// @success 200 {object} WorkflowDetail
+// @success 200 {object} svc.Workflow
 // @failure 400 "Invalid request"
 // @failure 404 "Workflow not found"
 // @failure 500 "Server error"
@@ -46,7 +39,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) *httperror.Handler
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	var detail *WorkflowDetail
+	var detail *svc.Workflow
 	err = h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		detail, err = fetchWorkflowByID(tx, h.k8sFactory, securityContext, portainer.WorkflowID(id))

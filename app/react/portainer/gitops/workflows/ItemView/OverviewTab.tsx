@@ -4,7 +4,7 @@ import { Card } from '@@/primitives/Card';
 import { Icon } from '@@/Icon';
 
 import { useWorkflowSources } from '../queries/useWorkflowSources';
-import { WorkflowDetail } from '../types';
+import { Workflow } from '../types';
 
 import { StacksSection } from './StacksSection';
 import { TargetsSection } from './TargetsSection';
@@ -12,7 +12,7 @@ import { FilesSection } from './FilesSection';
 import { SourcesSection } from './SourcesSection';
 
 interface Props {
-  workflow: WorkflowDetail;
+  workflow: Workflow;
 }
 
 export function OverviewTab({ workflow }: Props) {

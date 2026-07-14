@@ -1,14 +1,14 @@
 import { AlertTriangle, GitCommit, WatchIcon } from 'lucide-react';
 import moment from 'moment';
 
-import { StackType } from '@/react/common/stacks/types';
-
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { Workflow, WorkflowType } from '../types';
-import { StatusBadge, TypeBadge } from '../../components/StatusBadge';
+import { StatusBadge } from '../../components/StatusBadge';
+import { useWorkflowSources } from '../queries/useWorkflowSources';
+import { getWorkflowLink } from '../utils';
+import { Workflow } from '../types';
 import { effectiveWorkflowStatus } from '../status';
 
 import { WorkflowSubRow } from './WorkflowSubRow/WorkflowSubRow';
@@ -18,6 +18,9 @@ export function WorkflowCard({ item }: { item: Workflow }) {
 
   const { status: effectiveStatus, error: errorMessage } =
     effectiveWorkflowStatus(item);
+
+  const sources = useWorkflowSources(item.artifacts);
+  const showArtifactHeaders = item.artifacts.length > 1;
 
   return (
     <SortableListItem>
@@ -37,11 +40,19 @@ export function WorkflowCard({ item }: { item: Workflow }) {
                 {item.name}
               </Link>
               <StatusBadge status={effectiveStatus} />
-              <TypeBadge type={item.type} />
             </div>
-            <SyncLabel type={item.type} date={item.lastSyncDate} />
+            <SyncLabel date={item.lastSyncDate} />
           </div>
-          <WorkflowSubRow item={item} />
+          <div className="space-y-3">
+            {item.artifacts.map((artifact) => (
+              <WorkflowSubRow
+                key={`${artifact.type}_${artifact.id}`}
+                artifact={artifact}
+                sources={sources}
+                showHeader={showArtifactHeaders}
+              />
+            ))}
+          </div>
           {errorMessage && (
             <div className="mt-2.5 flex items-center gap-1.5 text-xs text-error-8">
               <Icon icon={AlertTriangle} size="sm" className="shrink-0" />
@@ -54,48 +65,13 @@ export function WorkflowCard({ item }: { item: Workflow }) {
   );
 }
 
-function SyncLabel({ type, date }: { type: WorkflowType; date: number }) {
+function SyncLabel({ date }: { date: number | undefined }) {
   const syncLabel = date ? moment.unix(date).fromNow() : '-';
-  const syncTitle = type === 'edgeStack' ? 'Oldest sync' : 'Last sync';
 
   return (
     <div className="flex items-center gap-1.5 text-xs text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-3">
       <Icon icon={WatchIcon} size="xs" />
-      <span>
-        {syncTitle}: {syncLabel}
-      </span>
+      <span>Last sync: {syncLabel}</span>
     </div>
   );
-}
-
-function getWorkflowLink(item: Workflow): { to: string; params: object } {
-  if (item.type === 'edgeStack') {
-    return { to: 'edge.stacks.edit', params: { stackId: item.id } };
-  }
-  if (item.platform === 'kubernetes') {
-    return {
-      to: 'kubernetes.applications.application',
-      params: {
-        endpointId: item.target.endpointId,
-        namespace: item.target.namespace,
-        name: item.name,
-      },
-    };
-  }
-
-  const type =
-    item.platform === 'dockerSwarm'
-      ? StackType.DockerSwarm
-      : StackType.DockerCompose;
-
-  return {
-    to: 'docker.stacks.stack',
-    params: {
-      endpointId: item.target.endpointId,
-      name: item.name,
-      id: item.id,
-      type,
-      regular: true,
-    },
-  };
 }

@@ -347,32 +347,6 @@ func LoadWorkflowMap(tx gitSourceStore, ids set.Set[portainer.WorkflowID]) (map[
 	return result, nil
 }
 
-// LoadWorkflowAndSourceMaps fetches workflows by their IDs and the sources they reference,
-// collecting source IDs in a single pass over the workflows.
-func LoadWorkflowAndSourceMaps(tx gitSourceStore, userContext source.UserContext, ids set.Set[portainer.WorkflowID]) (map[portainer.WorkflowID]portainer.Workflow, map[portainer.SourceID]portainer.Source, error) {
-	wfMap := make(map[portainer.WorkflowID]portainer.Workflow, len(ids))
-	sourceIDs := make(set.Set[portainer.SourceID])
-	for id := range ids {
-		wf, err := tx.Workflow().Read(id)
-		if err != nil {
-			return nil, nil, err
-		}
-		wfMap[id] = *wf
-		for _, as := range wf.Artifacts {
-			for _, f := range as.Files {
-				sourceIDs.Add(f.SourceID)
-			}
-		}
-	}
-
-	srcMap, err := loadSourceMap(tx, userContext, sourceIDs)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return wfMap, srcMap, nil
-}
-
 // LoadWorkflowSources collects all unique SourceIDs referenced by wf and returns them as a map.
 // This avoids reading the same Source record more than once when files share a SourceID.
 func LoadWorkflowSources(tx gitSourceStore, userContext source.UserContext, wf *portainer.Workflow) (map[portainer.SourceID]portainer.Source, error) {
@@ -383,11 +357,11 @@ func LoadWorkflowSources(tx gitSourceStore, userContext source.UserContext, wf *
 		}
 	}
 
-	return loadSourceMap(tx, userContext, ids)
+	return LoadSourceMap(tx, userContext, ids)
 }
 
-// loadSourceMap fetches sources by their IDs and returns them keyed by ID.
-func loadSourceMap(tx gitSourceStore, userContext source.UserContext, ids set.Set[portainer.SourceID]) (map[portainer.SourceID]portainer.Source, error) {
+// LoadSourceMap fetches sources by their IDs and returns them keyed by ID.
+func LoadSourceMap(tx gitSourceStore, userContext source.UserContext, ids set.Set[portainer.SourceID]) (map[portainer.SourceID]portainer.Source, error) {
 	sources, err := tx.Source().ReadAll(userContext, func(s portainer.Source) bool {
 		return ids.Contains(s.ID)
 	})

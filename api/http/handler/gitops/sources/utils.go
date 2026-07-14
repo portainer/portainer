@@ -50,8 +50,8 @@ func (h *Handler) buildSource(src *portainer.Source, stats ce.SourceStats) Sourc
 	}
 }
 
-func redactWorkflowCredentials(wfs []ce.Workflow) []ce.Workflow {
-	redacted := make([]ce.Workflow, len(wfs))
+func redactWorkflowCredentials(wfs []ce.SourceWorkflow) []ce.SourceWorkflow {
+	redacted := make([]ce.SourceWorkflow, len(wfs))
 	for i, wf := range wfs {
 		redacted[i] = wf
 		if wf.GitConfig != nil && wf.GitConfig.Authentication != nil {
