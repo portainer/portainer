@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -373,7 +374,7 @@ func (factory *ClientFactory) CreateRemoteMetricsClient(endpoint *portainer.Endp
 }
 
 func buildLocalConfig() (*rest.Config, error) {
-	config, err := rest.InClusterConfig()
+	config, err := buildLocalRestConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -382,6 +383,17 @@ func buildLocalConfig() (*rest.Config, error) {
 	config.Burst = defaultKubeClientBurst
 
 	return config, nil
+}
+
+// buildLocalRestConfig returns the in-cluster config, or a config built from
+// the kubeconfig at DEV_KUBECONFIG_PATH so developers can run the server
+// locally against a local cluster (same convention as the agent).
+func buildLocalRestConfig() (*rest.Config, error) {
+	if devKubeConfigPath := os.Getenv("DEV_KUBECONFIG_PATH"); devKubeConfigPath != "" {
+		return clientcmd.BuildConfigFromFlags("", devKubeConfigPath)
+	}
+
+	return rest.InClusterConfig()
 }
 
 func (factory *ClientFactory) MigrateEndpointIngresses(e *portainer.Endpoint, datastore dataservices.DataStore, cli *KubeClient) error {
