@@ -239,10 +239,12 @@ func deployStack(ctx context.Context, dockerCLI *command.DockerCli, filePaths []
 		return err
 	}
 
+	registries := normalizeRegistryServerAddresses(options.Registries)
+
 	return deployServices(
 		ctx,
 		dockerCLI.Client(),
-		options.Registries,
+		registries,
 		services,
 		namespace,
 		options.PullImage,
@@ -394,6 +396,23 @@ func createConfigs(ctx context.Context, apiClient client.APIClient, configs []sw
 	}
 
 	return nil
+}
+
+// normalizeRegistryServerAddresses returns a copy of registries with each ServerAddress
+// rewritten so it matches the domain encodeRegistryAuth resolves for docker.io images
+// (dockerregistry.IndexServer).
+func normalizeRegistryServerAddresses(registries []configtypes.AuthConfig) []configtypes.AuthConfig {
+	normalized := make([]configtypes.AuthConfig, len(registries))
+
+	for i, r := range registries {
+		if r.ServerAddress == "" || r.ServerAddress == dockerregistry.DefaultNamespace {
+			r.ServerAddress = dockerregistry.IndexServer
+		}
+
+		normalized[i] = r
+	}
+
+	return normalized
 }
 
 // encodeRegistryAuth finds the registry credentials for the given image and returns
