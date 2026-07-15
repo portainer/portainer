@@ -25,7 +25,7 @@ Each commit message should include a **type**, a **scope** and a **subject**:
  <type>(<scope>): <subject>
 ```
 
-Lines should not exceed 100 characters. This allows the message to be easier to read on GitHub as well as in various git tools and produces a nice, neat commit log ie:
+Lines should not exceed 72 characters. This allows the message to be easier to read on GitHub as well as in various git tools and produces a nice, neat commit log ie:
 
 ```
  #271 feat(containers): add exposed ports in the containers view
@@ -52,6 +52,8 @@ Must be one of the following:
 The scope could be anything specifying place of the commit change. For example `networks`,
 `containers`, `images` etc...
 You can use the **area** label tag associated on the issue here (for `area/containers` use `containers` as a scope...)
+
+Prefer a single canonical scope per domain to avoid drift, e.g. `kubernetes` (not `k8s`/`kube`), `stacks` (not `stack`), `edgestacks` (not `edgestack`/`edge/stacks`).
 
 ### Subject
 
