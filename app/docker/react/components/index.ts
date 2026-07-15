@@ -6,11 +6,7 @@ import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DockerfileDetails } from '@/react/docker/images/ItemView/DockerfileDetails';
-import { HealthStatus } from '@/react/docker/containers/ItemView/HealthStatus';
 import { GpusList } from '@/react/docker/host/SetupView/GpusList';
-import { InsightsBox } from '@/react/components/InsightsBox';
-import { BetaAlert } from '@/react/portainer/environments/update-schedules/common/BetaAlert';
-import { EventsDatatable } from '@/react/docker/events/EventsDatatables';
 import { AgentHostBrowser } from '@/react/docker/host/BrowseView/AgentHostBrowser';
 import { AgentVolumeBrowser } from '@/react/docker/volumes/BrowseView/AgentVolumeBrowser';
 import { ProcessesDatatable } from '@/react/docker/containers/StatsView/ProcessesDatatable';
@@ -35,22 +31,10 @@ const ngModule = angular
     templatesModule,
   ])
   .component('dockerfileDetails', r2a(DockerfileDetails, ['image']))
-  .component('dockerHealthStatus', r2a(HealthStatus, ['health']))
   .component(
     'gpusList',
     r2a(withControlledInput(GpusList), ['value', 'onChange'])
   )
-  .component(
-    'insightsBox',
-    r2a(InsightsBox, [
-      'header',
-      'content',
-      'insightCloseId',
-      'type',
-      'className',
-    ])
-  )
-  .component('betaAlert', r2a(BetaAlert, ['className', 'message', 'isHtml']))
   .component(
     'agentHostBrowserReact',
     r2a(withUIRouter(withCurrentUser(AgentHostBrowser)), [
@@ -84,7 +68,6 @@ const ngModule = angular
     'dockerContainerProcessesDatatable',
     r2a(withUIRouter(withReactQuery(withCurrentUser(ProcessesDatatable))), [])
   )
-  .component('dockerEventsDatatable', r2a(EventsDatatable, ['dataset']))
   .component(
     'dockerSecretsDatatable',
     r2a(withUIRouter(withCurrentUser(SecretsDatatable)), [

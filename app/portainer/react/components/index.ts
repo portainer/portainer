@@ -11,32 +11,21 @@ import { withControlledInput } from '@/react-tools/withControlledInput';
 import {
   EnvironmentVariablesFieldset,
   EnvironmentVariablesPanel,
-  StackEnvironmentVariablesPanel,
   envVarValidation,
 } from '@@/form-components/EnvironmentVariablesFieldset';
 import { Icon } from '@@/Icon';
 import { ReactQueryDevtoolsWrapper } from '@@/ReactQueryDevtoolsWrapper';
 import { PageHeader } from '@@/PageHeader';
-import { TagSelector } from '@@/TagSelector';
 import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
-import { DashboardItem } from '@@/DashboardItem';
-import { SearchBar } from '@@/datatables/SearchBar';
-import { FallbackImage } from '@@/FallbackImage';
-import { BadgeIcon } from '@@/BadgeIcon';
-import { TeamsSelector } from '@@/TeamsSelector';
 import { TerminalTooltip } from '@@/TerminalTooltip';
 import { Terminal } from '@@/Terminal/Terminal';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
-import { Slider } from '@@/form-components/Slider';
-import { TagButton } from '@@/TagButton';
 import { BETeaserButton } from '@@/BETeaserButton';
 import { CodeEditor } from '@@/CodeEditor';
-import { HelpLink } from '@@/HelpLink';
 import { TextTip } from '@@/Tip/TextTip';
-import { InlineLoader } from '@@/InlineLoader/InlineLoader';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -69,15 +58,6 @@ export const ngModule = angular
     stacksModule,
   ])
   .component(
-    'tagSelector',
-    r2a(withUIRouter(withReactQuery(TagSelector)), [
-      'allowCreate',
-      'onChange',
-      'value',
-      'errors',
-    ])
-  )
-  .component(
     'beTeaserButton',
     r2a(BETeaserButton, [
       'featureId',
@@ -89,11 +69,6 @@ export const ngModule = angular
       'data-cy',
     ])
   )
-  .component(
-    'tagButton',
-    r2a(TagButton, ['value', 'label', 'title', 'onRemove'])
-  )
-
   .component(
     'portainerTooltip',
     r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage', 'size'])
@@ -130,63 +105,10 @@ export const ngModule = angular
       'showTitle',
     ])
   )
-  .component(
-    'fallbackImage',
-    r2a(FallbackImage, ['src', 'fallbackIcon', 'alt', 'className'])
-  )
   .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size', 'spin']))
   .component(
     'reactQueryDevTools',
     r2a(withReactQuery(ReactQueryDevtoolsWrapper), [])
-  )
-  .component(
-    'helpLink',
-    r2a(withUIRouter(withReactQuery(HelpLink)), [
-      'docLink',
-      'target',
-      'children',
-    ])
-  )
-  .component(
-    'dashboardItem',
-    r2a(DashboardItem, [
-      'icon',
-      'type',
-      'value',
-      'to',
-      'params',
-      'children',
-      'pluralType',
-      'isLoading',
-      'isRefetching',
-      'data-cy',
-      'iconClass',
-    ])
-  )
-  .component(
-    'datatableSearchbar',
-    r2a(SearchBar, [
-      'data-cy',
-      'onChange',
-      'value',
-      'placeholder',
-      'children',
-      'className',
-    ])
-  )
-  .component('badgeIcon', r2a(BadgeIcon, ['icon', 'size', 'iconClass']))
-  .component(
-    'teamsSelector',
-    r2a(TeamsSelector, [
-      'onChange',
-      'value',
-      'dataCy',
-      'inputId',
-      'name',
-      'placeholder',
-      'teams',
-      'disabled',
-    ])
   )
   .component(
     'porSelect',
@@ -211,19 +133,6 @@ export const ngModule = angular
       'loadingMessage',
       'getOptionValue',
       'onBlur',
-    ])
-  )
-  .component(
-    'porSlider',
-    r2a(Slider, [
-      'min',
-      'max',
-      'step',
-      'value',
-      'onChange',
-      'visibleTooltip',
-      'dataCy',
-      'disabled',
     ])
   )
   .component(
@@ -257,10 +166,6 @@ export const ngModule = angular
       'childrenWrapperClassName',
     ])
   )
-  .component(
-    'inlineLoader',
-    r2a(InlineLoader, ['children', 'className', 'size'])
-  )
   .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []))
   .component(
     'shellTerminal',
@@ -288,19 +193,5 @@ withFormValidation(
   withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
   'environmentVariablesPanel',
   ['explanation', 'showHelpMessage', 'isFoldable'],
-  envVarValidation
-);
-
-withFormValidation(
-  ngModule,
-  withUIRouter(
-    withReactQuery(
-      withControlledInput(StackEnvironmentVariablesPanel, {
-        values: 'onChange',
-      })
-    )
-  ),
-  'stackEnvironmentVariablesPanel',
-  ['showHelpMessage', 'isFoldable'],
   envVarValidation
 );

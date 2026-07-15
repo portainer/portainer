@@ -1,7 +1,6 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import { CustomTemplatesVariablesDefinitionField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { CustomTemplatesVariablesField } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { withControlledInput } from '@/react-tools/withControlledInput';
 
@@ -18,15 +17,6 @@ export const ngModule = angular
       'errors',
     ])
   )
-  .component('customTemplatesVariablesField', VariablesFieldAngular)
-  .component(
-    'customTemplatesVariablesDefinitionField',
-    r2a(withControlledInput(CustomTemplatesVariablesDefinitionField), [
-      'onChange',
-      'value',
-      'errors',
-      'isVariablesNamesFromParent',
-    ])
-  );
+  .component('customTemplatesVariablesField', VariablesFieldAngular);
 
 export const customTemplatesModule = ngModule.name;

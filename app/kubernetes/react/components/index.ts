@@ -1,19 +1,11 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import { IngressClassDatatableAngular } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable/IngressClassDatatableAngular';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
-import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
 import { KubeServicesForm } from '@/react/kubernetes/applications/CreateView/application-services/KubeServicesForm';
 import { kubeServicesValidation } from '@/react/kubernetes/applications/CreateView/application-services/kubeServicesValidation';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
-import {
-  ApplicationSummaryWidget,
-  ApplicationDetailsWidget,
-  ApplicationEventsDatatable,
-} from '@/react/kubernetes/applications/DetailsView';
-import { ApplicationContainersDatatable } from '@/react/kubernetes/applications/DetailsView/ApplicationContainersDatatable';
 import {
   PlacementFormSection,
   placementValidation,
@@ -22,7 +14,6 @@ import { ApplicationSummarySection } from '@/react/kubernetes/applications/compo
 import { withFormValidation } from '@/react-tools/withFormValidation';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { YAMLInspector } from '@/react/kubernetes/components/YAMLInspector';
-import { NodesDatatable } from '@/react/kubernetes/cluster/HomeView/NodesDatatable';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
 import { StackNameLabelInsight } from '@/react/kubernetes/DeployView/StackName/StackNameLabelInsight';
 import { SecretsFormSection } from '@/react/kubernetes/applications/components/ConfigurationsFormSection/SecretsFormSection';
@@ -59,33 +50,17 @@ import { EnvironmentVariablesFormSection } from '@/react/kubernetes/applications
 import { kubeEnvVarValidationSchema } from '@/react/kubernetes/applications/components/EnvironmentVariablesFormSection/kubeEnvVarValidationSchema';
 import { IntegratedAppsDatatable } from '@/react/kubernetes/components/IntegratedAppsDatatable/IntegratedAppsDatatable';
 import { K8sRegistryAccessNotice } from '@/react/kubernetes/components/K8sRegistryAccessNotice';
-import { HelmTemplates } from '@/react/kubernetes/helm/HelmTemplates/HelmTemplates';
-import { SecretDetailsTable } from '@/react/kubernetes/configs/secrets/ItemView/SecretDetailsTable';
 import { KubernetesSummaryView } from '@/react/kubernetes/summary/KubernetesSummaryView';
 import { SecretItemTabsWidget } from '@/react/kubernetes/configs/secrets/ItemView/SecretItemTabsWidget';
 
-import { namespacesModule } from './namespaces';
 import { clusterManagementModule } from './clusterManagement';
 import { registriesModule } from './registries';
 
 export const ngModule = angular
   .module('portainer.kubernetes.react.components', [
-    namespacesModule,
     clusterManagementModule,
     registriesModule,
   ])
-  .component(
-    'ingressClassDatatable',
-    r2a(IngressClassDatatableAngular, [
-      'onChangeControllers',
-      'description',
-      'ingressControllers',
-      'initialIngressControllers',
-      'allowNoneIngressClass',
-      'isLoading',
-      'view',
-    ])
-  )
   .component(
     'namespacesSelector',
     r2a(NamespacesSelector, [
@@ -98,22 +73,6 @@ export const ngModule = angular
       'value',
       'allowSelectAll',
     ])
-  )
-  .component(
-    'namespaceAccessUsersSelector',
-    r2a(NamespaceAccessUsersSelector, [
-      'inputId',
-      'onChange',
-      'options',
-      'value',
-      'dataCy',
-      'placeholder',
-      'name',
-    ])
-  )
-  .component(
-    'kubeNodesDatatable',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(NodesDatatable))), [])
   )
   .component(
     'accessPolicyFormSection',
@@ -167,36 +126,6 @@ export const ngModule = angular
     ])
   )
   .component(
-    'applicationSummaryWidget',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(ApplicationSummaryWidget))),
-      []
-    )
-  )
-  .component(
-    'applicationContainersDatatable',
-    r2a(
-      withUIRouter(
-        withReactQuery(withCurrentUser(ApplicationContainersDatatable))
-      ),
-      []
-    )
-  )
-  .component(
-    'applicationDetailsWidget',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(ApplicationDetailsWidget))),
-      []
-    )
-  )
-  .component(
-    'applicationEventsDatatable',
-    r2a(
-      withUIRouter(withReactQuery(withCurrentUser(ApplicationEventsDatatable))),
-      []
-    )
-  )
-  .component(
     'applicationSummarySection',
     r2a(
       withUIRouter(withReactQuery(withCurrentUser(ApplicationSummarySection))),
@@ -212,24 +141,6 @@ export const ngModule = angular
       'tableKey',
       'tableTitle',
       'dataCy',
-    ])
-  )
-  .component(
-    'helmTemplatesView',
-    r2a(withUIRouter(withCurrentUser(HelmTemplates)), [
-      'onSelectHelmChart',
-      'namespace',
-      'name',
-    ])
-  )
-  .component(
-    'secretDetailsTable',
-    r2a(withUIRouter(withCurrentUser(withReactQuery(SecretDetailsTable))), [
-      'name',
-      'namespace',
-      'secretTypeLabel',
-      'isSystem',
-      'registryId',
     ])
   )
   .component(
