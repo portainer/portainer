@@ -256,6 +256,63 @@ func Test_encodeRegistryAuth(t *testing.T) {
 	}
 }
 
+func Test_normalizeRegistryServerAddresses(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name             string
+		registries       []configtypes.AuthConfig
+		expectedReturned []configtypes.AuthConfig
+	}{
+		{
+			name:             "empty ServerAddress is normalized to IndexServer",
+			registries:       []configtypes.AuthConfig{{ServerAddress: "", Username: "user"}},
+			expectedReturned: []configtypes.AuthConfig{{ServerAddress: dockerregistry.IndexServer, Username: "user"}},
+		},
+		{
+			name:             "docker.io default namespace is normalized to IndexServer",
+			registries:       []configtypes.AuthConfig{{ServerAddress: dockerregistry.DefaultNamespace, Username: "user"}},
+			expectedReturned: []configtypes.AuthConfig{{ServerAddress: dockerregistry.IndexServer, Username: "user"}},
+		},
+		{
+			name:             "custom registry address is left untouched",
+			registries:       []configtypes.AuthConfig{{ServerAddress: "registry.example.com", Username: "user"}},
+			expectedReturned: []configtypes.AuthConfig{{ServerAddress: "registry.example.com", Username: "user"}},
+		},
+		{
+			name:             "IndexServer address is left untouched",
+			registries:       []configtypes.AuthConfig{{ServerAddress: dockerregistry.IndexServer, Username: "user"}},
+			expectedReturned: []configtypes.AuthConfig{{ServerAddress: dockerregistry.IndexServer, Username: "user"}},
+		},
+		{
+			name: "mix of registries normalizes only the matching ones",
+			registries: []configtypes.AuthConfig{
+				{ServerAddress: "", Username: "empty"},
+				{ServerAddress: dockerregistry.DefaultNamespace, Username: "default-namespace"},
+				{ServerAddress: "registry.example.com", Username: "custom"},
+			},
+			expectedReturned: []configtypes.AuthConfig{
+				{ServerAddress: dockerregistry.IndexServer, Username: "empty"},
+				{ServerAddress: dockerregistry.IndexServer, Username: "default-namespace"},
+				{ServerAddress: "registry.example.com", Username: "custom"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			original := slices.Clone(tt.registries)
+
+			got := normalizeRegistryServerAddresses(tt.registries)
+
+			require.Equal(t, tt.expectedReturned, got)
+			require.Equal(t, original, tt.registries, "input slice must not be mutated")
+		})
+	}
+}
+
 func Test_getConfig(t *testing.T) {
 	dir := t.TempDir()
 
