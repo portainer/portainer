@@ -18966,15 +18966,17 @@ paths:
     get:
       consumes:
       - application/json
-      description: '**Access policy**: authenticated'
+      description: |-
+        **Access policy**: authenticated
+        `repo` may be omitted when `chart` is a self-contained "oci://host/path" reference.
       operationId: HelmShow
       parameters:
-      - description: Helm repository URL
+      - description: Helm repository URL (required unless chart is a self-contained
+          oci:// reference)
         in: query
         name: repo
-        required: true
         type: string
-      - description: Chart name
+      - description: Chart name, or a self-contained oci:// chart reference
         in: query
         name: chart
         required: true

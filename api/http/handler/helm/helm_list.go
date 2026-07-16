@@ -38,7 +38,7 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 		KubernetesClusterAccess: clusterAccess,
 	}
 
-	// optional namespace.  The library defaults to "default"
+	// optional namespace; when omitted the library lists across all namespaces
 	namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
 	if namespace != "" {
 		listOpts.Namespace = namespace

@@ -9,6 +9,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestIsSelfContainedOCIChartRef(t *testing.T) {
+	assert.True(t, isSelfContainedOCIChartRef("oci://ghcr.io/portainer/charts/portainer-run"))
+	assert.False(t, isSelfContainedOCIChartRef("ingress-nginx"))
+	assert.False(t, isSelfContainedOCIChartRef(""))
+}
+
 func Test_Show(t *testing.T) {
 	t.Parallel()
 	test.EnsureIntegrationTest(t)
@@ -51,6 +57,19 @@ func Test_Show(t *testing.T) {
 		values, err := hspm.Show(showOpts)
 
 		require.NoError(t, err, "should not return error when not in k8s environment")
+		is.NotEmpty(values, "should return non-empty values")
+	})
+
+	t.Run("show chart values for a self-contained OCI ref with no repo or registry", func(t *testing.T) {
+		// Mirrors how Portainer addon charts are resolved: a bare "oci://host/path"
+		// reference with no separate Repo/Registry, same as Install/Upgrade already accept.
+		showOpts := options.ShowOptions{
+			Chart:        "oci://ghcr.io/portainer/charts/portal-template",
+			OutputFormat: options.ShowValues,
+		}
+		values, err := hspm.Show(showOpts)
+
+		require.NoError(t, err, "a self-contained oci:// chart ref must not require a separate repo or registry")
 		is.NotEmpty(values, "should return non-empty values")
 	})
 

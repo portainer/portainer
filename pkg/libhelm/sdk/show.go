@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm/cache"
@@ -12,10 +13,18 @@ import (
 
 var errRequiredShowOptions = errors.New("chart, output format and either repo or registry are required")
 
+// isSelfContainedOCIChartRef reports whether chart is a complete "oci://host/path"
+// reference that needs no separate repo or registry to be located (e.g. Portainer
+// addon charts, which are resolved from a bare oci:// ref with no Repo/Registry).
+func isSelfContainedOCIChartRef(chart string) bool {
+	return strings.HasPrefix(chart, "oci://")
+}
+
 // Show implements the HelmPackageManager interface by using the Helm SDK to show chart information.
 // It supports showing chart values, readme, and chart details based on the provided ShowOptions.
 func (hspm *HelmSDKPackageManager) Show(showOpts options.ShowOptions) ([]byte, error) {
-	if showOpts.Chart == "" || (showOpts.Repo == "" && IsHTTPRepository(showOpts.Registry)) || showOpts.OutputFormat == "" {
+	missingSource := showOpts.Repo == "" && IsHTTPRepository(showOpts.Registry) && !isSelfContainedOCIChartRef(showOpts.Chart)
+	if showOpts.Chart == "" || missingSource || showOpts.OutputFormat == "" {
 		log.Error().
 			Str("context", "HelmClient").
 			Str("chart", showOpts.Chart).

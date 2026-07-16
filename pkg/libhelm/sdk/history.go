@@ -20,7 +20,7 @@ func (hspm *HelmSDKPackageManager) GetHistory(historyOptions options.HistoryOpti
 		Msg("Get Helm history")
 
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, historyOptions.Namespace, historyOptions.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(historyOptions.Namespace), historyOptions.KubernetesClusterAccess)
 
 	if err != nil {
 		log.Error().
