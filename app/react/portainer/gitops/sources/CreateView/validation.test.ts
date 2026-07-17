@@ -184,6 +184,22 @@ describe('validationSchema git.polling', () => {
     } satisfies FormValues);
     expect(result).toBe(true);
   });
+
+  it('passes when polling is disabled and interval is undefined, as Formik casts an empty string to undefined before validating', async () => {
+    const schema = validationSchema();
+    const result = await schema.isValid({
+      name: 'src',
+      type: 'git',
+      git: {
+        ...validGitValues,
+        polling: { enabled: false, interval: undefined },
+      },
+      authorizedTeams: [],
+      authorizedUsers: [],
+      ownership: ResourceControlOwnership.ADMINISTRATORS,
+    });
+    expect(result).toBe(true);
+  });
 });
 
 describe('validationSchema full git (requires connectionOk)', () => {

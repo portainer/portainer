@@ -26,7 +26,7 @@ export const validationSchema = object({
   password: string().optional(),
   pollingEnabled: yupBoolean().defined(),
   interval: string()
-    .defined()
+    .default('')
     .when('pollingEnabled', {
       is: true,
       then: () => intervalValidation(),
