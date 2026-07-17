@@ -10032,6 +10032,7 @@ export const helmRepoSearch = <ThrowOnError extends boolean = true>(
  * Show Helm Chart Information
  *
  * **Access policy**: authenticated
+ * `repo` may be omitted when `chart` is a self-contained "oci://host/path" reference.
  */
 export const helmShow = <ThrowOnError extends boolean = true>(
   options: Options<HelmShowData, ThrowOnError>

@@ -18121,11 +18121,11 @@ export type HelmShowData = {
   };
   query: {
     /**
-     * Helm repository URL
+     * Helm repository URL (required unless chart is a self-contained oci:// reference)
      */
-    repo: string;
+    repo?: string;
     /**
-     * Chart name
+     * Chart name, or a self-contained oci:// chart reference
      */
     chart: string;
     /**

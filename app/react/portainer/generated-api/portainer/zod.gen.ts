@@ -6176,7 +6176,7 @@ export const zHelmShowPath = z.object({
 });
 
 export const zHelmShowQuery = z.object({
-  repo: z.string(),
+  repo: z.string().optional(),
   chart: z.string(),
   version: z.string().optional(),
 });

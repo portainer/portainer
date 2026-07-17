@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	gittypes "github.com/portainer/portainer/api/git/types"
 
@@ -446,6 +447,59 @@ func TestFindOrCreateGitSource_DifferentAuthCreatesNewSource(t *testing.T) {
 	sources, err := store.Source().ReadAll(adminUserContext)
 	require.NoError(t, err)
 	require.Len(t, sources, 2)
+}
+
+func TestFindOrCreateGitSource_AutoGrantLetsStandardUserReadAdminOnlySource(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	standardUserContext := source.NewUserContext(&portainer.User{ID: 2, Role: portainer.StandardUserRole}, []portainer.TeamMembership{})
+
+	makeSource := func(ctx source.UserContext) func(tx dataservices.DataStoreTx) (*portainer.Source, error) {
+		return func(tx dataservices.DataStoreTx) (*portainer.Source, error) {
+			return FindOrCreateGitSource(tx, ctx, &portainer.Source{
+				Type: portainer.SourceTypeGit,
+				Git: &gittypes.GitSource{
+					URL:            "https://github.com/example/repo",
+					Authentication: &gittypes.GitAuthentication{Username: "alice", Password: "secret"},
+				},
+			})
+		}
+	}
+
+	// An admin creating a source without explicit accesses defaults it to
+	// AdministratorsOnly.
+	var sourceID portainer.SourceID
+	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		s, err := makeSource(adminUserContext)(tx)
+		if err != nil {
+			return err
+		}
+		sourceID = s.ID
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	created, err := store.Source().Read(adminUserContext, sourceID)
+	require.NoError(t, err)
+	require.True(t, created.AdministratorsOnly)
+
+	// A standard user supplying the same URL+auth is auto-granted access to the
+	// existing source and must be able to read it afterwards (the stack builder
+	// reads it back in the same transaction to persist sync status).
+	err = store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		s, err := makeSource(standardUserContext)(tx)
+		if err != nil {
+			return err
+		}
+		require.Equal(t, sourceID, s.ID)
+
+		_, err = tx.Source().Read(standardUserContext, s.ID)
+
+		return err
+	})
+	require.NoError(t, err)
 }
 
 func TestSaveWorkflowGitConfig_UpdatesFileAndSourceWhenURLUnchanged(t *testing.T) {
