@@ -18543,8 +18543,8 @@ paths:
   /team_memberships:
     get:
       description: |-
-        List team memberships. Access is only available to administrators and team leaders.
-        **Access policy**: administrator
+        List team memberships. Access is only available to administrators and team leaders. Team leaders only see memberships of teams they lead.
+        **Access policy**: administrator or team leader
       operationId: TeamMembershipList
       produces:
       - application/json
@@ -18571,8 +18571,8 @@ paths:
       consumes:
       - application/json
       description: |-
-        Create a new team memberships. Access is only available to administrators leaders of the associated team.
-        **Access policy**: administrator
+        Create a new team memberships. Access is only available to administrators or leaders of the associated team.
+        **Access policy**: administrator or leaders of the associated team
       operationId: TeamMembershipCreate
       parameters:
       - description: Team membership details
@@ -18605,8 +18605,8 @@ paths:
   /team_memberships/{id}:
     delete:
       description: |-
-        Remove a team membership. Access is only available to administrators leaders of the associated team.
-        **Access policy**: administrator
+        Remove a team membership. Access is only available to administrators or leaders of the associated team.
+        **Access policy**: administrator or leaders of the associated team
       operationId: TeamMembershipDelete
       parameters:
       - description: TeamMembership identifier

@@ -9203,9 +9203,9 @@ paths:
     get:
       description: >-
         List team memberships. Access is only available to administrators and
-        team leaders.
+        team leaders. Team leaders only see memberships of teams they lead.
 
-        **Access policy**: administrator
+        **Access policy**: administrator or team leader
       operationId: TeamMembershipList
       responses:
         "200":
@@ -9231,9 +9231,9 @@ paths:
     post:
       description: >-
         Create a new team memberships. Access is only available to
-        administrators leaders of the associated team.
+        administrators or leaders of the associated team.
 
-        **Access policy**: administrator
+        **Access policy**: administrator or leaders of the associated team
       operationId: TeamMembershipCreate
       requestBody:
         content:
@@ -9266,10 +9266,10 @@ paths:
   "/team_memberships/{id}":
     delete:
       description: >-
-        Remove a team membership. Access is only available to administrators
+        Remove a team membership. Access is only available to administrators or
         leaders of the associated team.
 
-        **Access policy**: administrator
+        **Access policy**: administrator or leaders of the associated team
       operationId: TeamMembershipDelete
       parameters:
         - description: TeamMembership identifier

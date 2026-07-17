@@ -36,8 +36,8 @@ func (payload *teamMembershipCreatePayload) Validate(r *http.Request) error {
 
 // @id TeamMembershipCreate
 // @summary Create a new team membership
-// @description Create a new team memberships. Access is only available to administrators leaders of the associated team.
-// @description **Access policy**: administrator
+// @description Create a new team memberships. Access is only available to administrators or leaders of the associated team.
+// @description **Access policy**: administrator or leaders of the associated team
 // @tags team_memberships
 // @security ApiKeyAuth
 // @security jwt
