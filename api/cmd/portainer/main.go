@@ -252,9 +252,7 @@ func resolveSetupToken(tx dataservices.DataStoreTx, providedToken string) (strin
 		return "", err
 	}
 
-	log.Info().
-		Str("setup_token", token).
-		Msg("no administrator account configured; admin initialization and backup restore require this setup token in the X-Setup-Token header. Start with --no-setup-token to disable.")
+	setuptoken.LogToken(token)
 
 	return token, nil
 }

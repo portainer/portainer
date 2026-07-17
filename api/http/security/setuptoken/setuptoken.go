@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/rs/zerolog/log"
 )
 
 // HeaderName is the HTTP header that carries the setup token.
@@ -29,6 +30,22 @@ func Generate() (string, error) {
 	}
 
 	return hex.EncodeToString(b), nil
+}
+
+// LogToken prints the generated setup token on its own line, padded with blank
+// lines, so operators can spot it and copy it cleanly from the startup logs.
+// See https://linear.app/portainer/issue/R8S-1161.
+func LogToken(token string) {
+	banner := "=========================="
+	log.Info().Msgf(
+		"\n\n"+banner+"\n\n"+
+			"setup_token=%s\n\n"+
+			"Paste it into the setup screen, "+
+			"or send it in the %s header.\n"+
+			"Start with --no-setup-token to disable.\n\n"+
+			banner,
+		token, HeaderName,
+	)
 }
 
 // Validate checks that the request carries the expected setup token in the
