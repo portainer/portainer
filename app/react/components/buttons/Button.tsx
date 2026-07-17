@@ -112,12 +112,14 @@ function getIconSize(size: Size) {
 
 function sizeClass(size?: Size) {
   switch (size) {
-    case 'large':
-      return 'btn-lg';
-    case 'medium':
-      return 'btn-md';
     case 'xsmall':
       return 'btn-xs';
+    case 'medium':
+      return 'btn-md';
+    case 'large':
+      return 'btn-lg';
+    case 'small':
+    case undefined:
     default:
       return 'btn-sm';
   }

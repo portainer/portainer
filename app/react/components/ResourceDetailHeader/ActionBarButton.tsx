@@ -1,17 +1,17 @@
-import { ComponentProps } from 'react';
+import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-import { Button } from '@@/buttons';
+import { Button, ButtonProps } from '@@/buttons';
 
-type Props = Omit<ComponentProps<typeof Button>, 'size'>;
+type Props<TasProps> = Omit<ButtonProps<TasProps>, 'size'>;
 
-export function ActionBarButton({
+export function ActionBarButton<TasProps = unknown>({
   className,
   color = 'none',
   ...props
-}: Props) {
+}: PropsWithChildren<Props<TasProps>>) {
   return (
-    <Button
+    <Button<TasProps>
       color={color}
       size="small"
       className={clsx(
