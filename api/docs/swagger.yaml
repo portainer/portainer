@@ -2342,6 +2342,47 @@ definitions:
       storageClass:
         $ref: '#/definitions/kubernetes.K8sStorageClass'
     type: object
+  kubernetes.KubernetesCreateNamespaceResponse:
+    properties:
+      apiVersion:
+        description: |-
+          APIVersion defines the versioned schema of this representation of an object.
+          Servers should convert recognized schemas to the latest internal value, and
+          may reject unrecognized values.
+          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+          +optional
+        type: string
+      kind:
+        description: |-
+          Kind is a string value representing the REST resource this object represents.
+          Servers may infer this from the endpoint the client submits requests to.
+          Cannot be updated.
+          In CamelCase.
+          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+          +optional
+        type: string
+      metadata:
+        allOf:
+        - $ref: '#/definitions/v1.ObjectMeta'
+        description: |-
+          Standard object's metadata.
+          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+          +optional
+      spec:
+        allOf:
+        - $ref: '#/definitions/v1.NamespaceSpec'
+        description: |-
+          Spec defines the behavior of the Namespace.
+          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+          +optional
+      status:
+        allOf:
+        - $ref: '#/definitions/v1.NamespaceStatus'
+        description: |-
+          Status describes the current status of a Namespace.
+          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+          +optional
+    type: object
   kubernetes.KubernetesNodeResponse:
     properties:
       apiVersion:
@@ -5914,6 +5955,11 @@ definitions:
     required:
     - Name
     type: object
+  stacks.createKubernetesStackResponse:
+    properties:
+      Output:
+        type: string
+    type: object
   stacks.kubernetesGitDeploymentPayload:
     properties:
       AdditionalFiles:
@@ -7449,6 +7495,12 @@ definitions:
           +required
         type: string
     type: object
+  v1.FinalizerName:
+    enum:
+    - kubernetes
+    type: string
+    x-enum-varnames:
+    - FinalizerKubernetes
   v1.GRPCAction:
     properties:
       port:
@@ -7720,6 +7772,18 @@ definitions:
     x-enum-varnames:
     - NamespaceActive
     - NamespaceTerminating
+  v1.NamespaceSpec:
+    properties:
+      finalizers:
+        description: |-
+          Finalizers is an opaque list of values that must be empty to permanently remove object from storage.
+          More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
+          +optional
+          +listType=atomic
+        items:
+          $ref: '#/definitions/v1.FinalizerName'
+        type: array
+    type: object
   v1.NamespaceStatus:
     properties:
       conditions:
@@ -14326,8 +14390,10 @@ paths:
       - kubernetes
   /kubernetes/{id}/namespaces:
     delete:
+      consumes:
+      - application/json
       description: |-
-        Delete a kubernetes namespace within the given environment.
+        Delete one or more kubernetes namespaces within the given environment.
         **Access policy**: Authenticated user.
       operationId: DeleteKubernetesNamespace
       parameters:
@@ -14336,6 +14402,14 @@ paths:
         name: id
         required: true
         type: integer
+      - description: List of namespace names to delete
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
       responses:
         "200":
           description: Success
@@ -14351,7 +14425,7 @@ paths:
       security:
       - ApiKeyAuth: []
         jwt: []
-      summary: Delete a kubernetes namespace
+      summary: Delete kubernetes namespaces
       tags:
       - kubernetes
     get:
@@ -14369,13 +14443,11 @@ paths:
           of the Namespace information. Default is false
         in: query
         name: withResourceQuota
-        required: true
         type: boolean
       - description: When set to true, include the unhealthy events information as
           part of the Namespace information. Default is false
         in: query
         name: withUnhealthyEvents
-        required: true
         type: boolean
       produces:
       - application/json
@@ -14433,7 +14505,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/portainer.K8sNamespaceInfo'
+            $ref: '#/definitions/kubernetes.KubernetesCreateNamespaceResponse'
         "400":
           description: Invalid request payload, such as missing required fields or
             fields not meeting validation criteria.
@@ -14529,7 +14601,6 @@ paths:
           of the Namespace information. Default is false
         in: query
         name: withResourceQuota
-        required: true
         type: boolean
       produces:
       - application/json
@@ -17952,7 +18023,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/portainer.Stack'
+            $ref: '#/definitions/stacks.createKubernetesStackResponse'
         "400":
           description: Invalid request
         "409":
@@ -17990,7 +18061,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/portainer.Stack'
+            $ref: '#/definitions/stacks.createKubernetesStackResponse'
         "400":
           description: Invalid request
         "500":
@@ -18026,7 +18097,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/portainer.Stack'
+            $ref: '#/definitions/stacks.createKubernetesStackResponse'
         "400":
           description: Invalid request
         "500":

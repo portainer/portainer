@@ -1479,6 +1479,44 @@ export type KubernetesK8sVolumeInfo = {
   storageClass?: KubernetesK8sStorageClass;
 };
 
+export type KubernetesKubernetesCreateNamespaceResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Spec defines the behavior of the Namespace.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  spec?: V1NamespaceSpec;
+  /**
+   * Status describes the current status of a Namespace.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  status?: V1NamespaceStatus;
+};
+
 export type KubernetesKubernetesNodeResponse = {
   /**
    * APIVersion defines the versioned schema of this representation of an object.
@@ -4525,6 +4563,10 @@ export type StacksComposeStackFromGitRepositoryPayload = {
   TLSSkipVerify?: boolean;
 };
 
+export type StacksCreateKubernetesStackResponse = {
+  Output?: string;
+};
+
 export type StacksKubernetesGitDeploymentPayload = {
   AdditionalFiles?: Array<string>;
   AutoUpdate?: PortainerAutoUpdateSettings;
@@ -5845,6 +5887,16 @@ export type V1FileKeySelector = {
   volumeName?: string;
 };
 
+export const V1FinalizerName = {
+  /**
+   * FinalizerKubernetes
+   */
+  FINALIZER_KUBERNETES: 'kubernetes',
+} as const;
+
+export type V1FinalizerName =
+  (typeof V1FinalizerName)[keyof typeof V1FinalizerName];
+
 export type V1GrpcAction = {
   /**
    * Port number of the gRPC service. Number must be in the range 1 to 65535.
@@ -6134,6 +6186,16 @@ export const V1NamespacePhase = {
 
 export type V1NamespacePhase =
   (typeof V1NamespacePhase)[keyof typeof V1NamespacePhase];
+
+export type V1NamespaceSpec = {
+  /**
+   * Finalizers is an opaque list of values that must be empty to permanently remove object from storage.
+   * More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
+   * +optional
+   * +listType=atomic
+   */
+  finalizers?: Array<V1FinalizerName>;
+};
 
 export type V1NamespaceStatus = {
   /**
@@ -13123,7 +13185,10 @@ export type GetKubernetesMetricsForPodResponse =
   GetKubernetesMetricsForPodResponses[keyof GetKubernetesMetricsForPodResponses];
 
 export type DeleteKubernetesNamespaceData = {
-  body?: never;
+  /**
+   * List of namespace names to delete
+   */
+  body: Array<string>;
   path: {
     /**
      * Environment identifier
@@ -13167,15 +13232,15 @@ export type GetKubernetesNamespacesData = {
      */
     id: number;
   };
-  query: {
+  query?: {
     /**
      * When set to true, include the resource quota information as part of the Namespace information. Default is false
      */
-    withResourceQuota: boolean;
+    withResourceQuota?: boolean;
     /**
      * When set to true, include the unhealthy events information as part of the Namespace information. Default is false
      */
-    withUnhealthyEvents: boolean;
+    withUnhealthyEvents?: boolean;
   };
   url: '/kubernetes/{id}/namespaces';
 };
@@ -13255,7 +13320,7 @@ export type CreateKubernetesNamespaceResponses = {
   /**
    * Success
    */
-  200: PortainerK8sNamespaceInfo;
+  200: KubernetesKubernetesCreateNamespaceResponse;
 };
 
 export type CreateKubernetesNamespaceResponse =
@@ -13325,11 +13390,11 @@ export type GetKubernetesNamespaceData = {
      */
     namespace: string;
   };
-  query: {
+  query?: {
     /**
      * When set to true, include the resource quota information as part of the Namespace information. Default is false
      */
-    withResourceQuota: boolean;
+    withResourceQuota?: boolean;
   };
   url: '/kubernetes/{id}/namespaces/{namespace}';
 };
@@ -17021,7 +17086,7 @@ export type StackCreateKubernetesGitResponses = {
   /**
    * OK
    */
-  200: PortainerStack;
+  200: StacksCreateKubernetesStackResponse;
 };
 
 export type StackCreateKubernetesGitResponse =
@@ -17057,7 +17122,7 @@ export type StackCreateKubernetesFileResponses = {
   /**
    * OK
    */
-  200: PortainerStack;
+  200: StacksCreateKubernetesStackResponse;
 };
 
 export type StackCreateKubernetesFileResponse =
@@ -17093,7 +17158,7 @@ export type StackCreateKubernetesUrlResponses = {
   /**
    * OK
    */
-  200: PortainerStack;
+  200: StacksCreateKubernetesStackResponse;
 };
 
 export type StackCreateKubernetesUrlResponse =

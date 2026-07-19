@@ -4839,7 +4839,7 @@ paths:
   "/kubernetes/{id}/namespaces":
     delete:
       description: |-
-        Delete a kubernetes namespace within the given environment.
+        Delete one or more kubernetes namespaces within the given environment.
         **Access policy**: Authenticated user.
       operationId: DeleteKubernetesNamespace
       parameters:
@@ -4849,6 +4849,15 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        description: List of namespace names to delete
+        required: true
       responses:
         "200":
           description: Success
@@ -4866,7 +4875,7 @@ paths:
       security:
         - ApiKeyAuth: []
           jwt: []
-      summary: Delete a kubernetes namespace
+      summary: Delete kubernetes namespaces
       tags:
         - kubernetes
     get:
@@ -4889,14 +4898,12 @@ paths:
             the Namespace information. Default is false
           in: query
           name: withResourceQuota
-          required: true
           schema:
             type: boolean
         - description: When set to true, include the unhealthy events information as part
             of the Namespace information. Default is false
           in: query
           name: withUnhealthyEvents
-          required: true
           schema:
             type: boolean
       responses:
@@ -4956,7 +4963,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.K8sNamespaceInfo"
+                $ref: "#/components/schemas/kubernetes.KubernetesCreateNamespaceResponse"
         "400":
           description: Invalid request payload, such as missing required fields or fields
             not meeting validation criteria.
@@ -5054,7 +5061,6 @@ paths:
             the Namespace information. Default is false
           in: query
           name: withResourceQuota
-          required: true
           schema:
             type: boolean
       responses:
@@ -8589,7 +8595,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "409":
@@ -8630,7 +8636,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "500":
@@ -8669,7 +8675,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "500":
@@ -13240,6 +13246,64 @@ components:
         storageClass:
           $ref: "#/components/schemas/kubernetes.K8sStorageClass"
       type: object
+    kubernetes.KubernetesCreateNamespaceResponse:
+      properties:
+        apiVersion:
+          description: >-
+            APIVersion defines the versioned schema of this representation of an
+            object.
+
+            Servers should convert recognized schemas to the latest internal value, and
+
+            may reject unrecognized values.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+            +optional
+          type: string
+        kind:
+          description: >-
+            Kind is a string value representing the REST resource this object
+            represents.
+
+            Servers may infer this from the endpoint the client submits requests to.
+
+            Cannot be updated.
+
+            In CamelCase.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+            +optional
+          type: string
+        metadata:
+          allOf:
+            - $ref: "#/components/schemas/v1.ObjectMeta"
+          description: >-
+            Standard object's metadata.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+
+            +optional
+        spec:
+          allOf:
+            - $ref: "#/components/schemas/v1.NamespaceSpec"
+          description: >-
+            Spec defines the behavior of the Namespace.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+            +optional
+        status:
+          allOf:
+            - $ref: "#/components/schemas/v1.NamespaceStatus"
+          description: >-
+            Status describes the current status of a Namespace.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+            +optional
+      type: object
     kubernetes.KubernetesNodeResponse:
       properties:
         apiVersion:
@@ -16889,6 +16953,11 @@ components:
       required:
         - Name
       type: object
+    stacks.createKubernetesStackResponse:
+      properties:
+        Output:
+          type: string
+      type: object
     stacks.kubernetesGitDeploymentPayload:
       properties:
         AdditionalFiles:
@@ -18699,6 +18768,12 @@ components:
             +required
           type: string
       type: object
+    v1.FinalizerName:
+      enum:
+        - kubernetes
+      type: string
+      x-enum-varnames:
+        - FinalizerKubernetes
     v1.GRPCAction:
       properties:
         port:
@@ -19042,6 +19117,22 @@ components:
       x-enum-varnames:
         - NamespaceActive
         - NamespaceTerminating
+    v1.NamespaceSpec:
+      properties:
+        finalizers:
+          description: >-
+            Finalizers is an opaque list of values that must be empty to
+            permanently remove object from storage.
+
+            More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
+
+            +optional
+
+            +listType=atomic
+          items:
+            $ref: "#/components/schemas/v1.FinalizerName"
+          type: array
+      type: object
     v1.NamespaceStatus:
       properties:
         conditions:

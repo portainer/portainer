@@ -834,6 +834,7 @@ import {
   zDeleteKubernetesIngressesBody,
   zDeleteKubernetesIngressesPath,
   zDeleteKubernetesIngressesResponse,
+  zDeleteKubernetesNamespaceBody,
   zDeleteKubernetesNamespacePath,
   zDeleteKubernetesNamespaceResponse,
   zDeleteKubernetesPersistentVolumeClaimsBody,
@@ -5534,9 +5535,9 @@ export const getKubernetesMetricsForPod = <ThrowOnError extends boolean = true>(
   });
 
 /**
- * Delete a kubernetes namespace
+ * Delete kubernetes namespaces
  *
- * Delete a kubernetes namespace within the given environment.
+ * Delete one or more kubernetes namespaces within the given environment.
  * **Access policy**: Authenticated user.
  */
 export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
@@ -5554,7 +5555,7 @@ export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
     requestValidator: async (data) =>
       await z
         .object({
-          body: z.never().optional(),
+          body: zDeleteKubernetesNamespaceBody,
           path: zDeleteKubernetesNamespacePath,
           query: z.never().optional(),
         })
@@ -5567,6 +5568,10 @@ export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
     ],
     url: '/kubernetes/{id}/namespaces',
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5592,7 +5597,7 @@ export const getKubernetesNamespaces = <ThrowOnError extends boolean = true>(
         .object({
           body: z.never().optional(),
           path: zGetKubernetesNamespacesPath,
-          query: zGetKubernetesNamespacesQuery,
+          query: zGetKubernetesNamespacesQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',
@@ -5713,7 +5718,7 @@ export const getKubernetesNamespace = <ThrowOnError extends boolean = true>(
         .object({
           body: z.never().optional(),
           path: zGetKubernetesNamespacePath,
-          query: zGetKubernetesNamespaceQuery,
+          query: zGetKubernetesNamespaceQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',

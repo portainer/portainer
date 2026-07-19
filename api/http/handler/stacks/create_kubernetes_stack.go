@@ -149,7 +149,7 @@ type createKubernetesStackResponse struct {
 // @produce json
 // @param body body kubernetesStringDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
-// @success 200 {object} portainer.Stack
+// @success 200 {object} createKubernetesStackResponse
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /stacks/create/kubernetes/string [post]
@@ -207,7 +207,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 // @produce json
 // @param body body kubernetesGitDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
-// @success 200 {object} portainer.Stack
+// @success 200 {object} createKubernetesStackResponse
 // @failure 400 "Invalid request"
 // @failure 409 "Stack name or webhook ID already exists"
 // @failure 500 "Server error"
@@ -289,7 +289,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 // @produce json
 // @param body body kubernetesManifestURLDeploymentPayload true "stack config"
 // @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
-// @success 200 {object} portainer.Stack
+// @success 200 {object} createKubernetesStackResponse
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /stacks/create/kubernetes/url [post]
