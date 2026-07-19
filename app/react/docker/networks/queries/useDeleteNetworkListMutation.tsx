@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { notifySuccess } from '@/portainer/services/notifications';
-import { withError, withInvalidate } from '@/react-tools/react-query';
+import { notifyError, notifySuccess } from '@/portainer/services/notifications';
+import { withInvalidate } from '@/react-tools/react-query';
 
 import { queryKeys } from './queryKeys';
 import { deleteNetwork } from './useDeleteNetworkMutation';
@@ -16,14 +16,16 @@ export function useDeleteNetworkListMutation() {
     mutationFn: ({
       networks,
     }: {
-      networks: Array<{ nodeName?: string; id: string }>;
+      networks: Array<{ nodeName?: string; id: string; name: string }>;
     }) =>
-      processItemsInBatches(networks, ({ id, nodeName }) =>
-        deleteNetwork(environmentId, id, { nodeName }).then(() =>
-          notifySuccess('Network successfully removed', id)
-        )
-      ),
+      processItemsInBatches(networks, async ({ id, name, nodeName }) => {
+        try {
+          await deleteNetwork(environmentId, id, { nodeName });
+          notifySuccess('Network successfully removed', name);
+        } catch (err) {
+          notifyError(`Unable to remove network ${name}`, err);
+        }
+      }),
     ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
-    ...withError('Failed to remove networks'),
   });
 }

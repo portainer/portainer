@@ -6,9 +6,14 @@ import { isAxiosError } from '@/portainer/services/axios/utils/isAxiosError';
 
 import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
 
-export function useApiVersion(environmentId: EnvironmentId) {
-  return useQuery(['environment', environmentId, 'agent', 'ping'], () =>
-    getApiVersion(environmentId)
+export function useApiVersion(
+  environmentId: EnvironmentId,
+  { enabled = true }: { enabled?: boolean } = {}
+) {
+  return useQuery(
+    ['environment', environmentId, 'agent', 'api-version'],
+    () => getApiVersion(environmentId),
+    { enabled }
   );
 }
 

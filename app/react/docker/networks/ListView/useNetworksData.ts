@@ -45,13 +45,15 @@ export function useNetworksData(autoRefreshRate?: number) {
     }
   );
   const isSwarmAgent = useIsSwarmAgent();
-  const apiVersionQuery = useApiVersion(environmentId);
+  const apiVersionQuery = useApiVersion(environmentId, {
+    enabled: isSwarmAgent,
+  });
   const agentsQuery = useAgentNodes(environmentId, apiVersionQuery.data || 1, {
     enabled: isSwarmAgent,
   });
 
   if (!networksQuery.data) {
-    return { isLoading: true };
+    return { isLoading: networksQuery.isLoading };
   }
 
   const networks = groupSwarmNetworksManagerNodesFirst(
@@ -82,8 +84,7 @@ export function groupSwarmNetworksManagerNodesFirst(
   const groupedSwarmNetworks = Array.from(swarmNetworksById.values()).map(
     (group) => {
       const [item, ...rest] = _.sortBy(group, getRole);
-      item.Subs = rest;
-      return item;
+      return { ...item, Subs: rest };
     }
   );
 

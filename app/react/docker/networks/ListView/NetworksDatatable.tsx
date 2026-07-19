@@ -36,7 +36,9 @@ const settingsStore = createPersistedStore<TableSettings>(
 );
 
 interface Props {
-  onRemove(selectedItems: Array<{ nodeName?: string; id: string }>): void;
+  onRemove(
+    selectedItems: Array<{ nodeName?: string; id: string; name: string }>
+  ): void;
 }
 
 export function NetworksDatatable({ onRemove }: Props) {
@@ -45,7 +47,7 @@ export function NetworksDatatable({ onRemove }: Props) {
   const environmentId = useEnvironmentId();
   const isSwarm = useIsSwarm(environmentId);
 
-  const datasetQuery = useNetworksData(settings.autoRefreshRate);
+  const datasetQuery = useNetworksData(settings.autoRefreshRate * 1000);
   const columns = useColumns(isSwarm);
 
   const dataset = datasetQuery.data;
@@ -84,7 +86,11 @@ export function NetworksDatatable({ onRemove }: Props) {
               confirmMessage="Do you want to remove the selected network(s)?"
               onConfirmed={() =>
                 onRemove(
-                  selectedRows.map((n) => ({ id: n.Id, nodeName: n.NodeName }))
+                  selectedRows.map((n) => ({
+                    id: n.Id,
+                    name: n.Name,
+                    nodeName: n.NodeName,
+                  }))
                 )
               }
             />

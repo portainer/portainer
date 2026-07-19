@@ -3,6 +3,7 @@ import { IPAMConfig, Network } from 'docker-types';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
+import { withError } from '@/react-tools/react-query';
 
 import { withFiltersQueryParam } from '../../proxy/queries/utils';
 import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
@@ -43,6 +44,7 @@ export function useNetworks<T = Array<DockerNetwork>>(
       select,
 
       refetchInterval: autoRefreshRate ?? false,
+      ...withError('Unable to retrieve networks'),
     }
   );
 }
@@ -130,6 +132,7 @@ function toDockerNetwork(req: NetworkListResponseItem): DockerNetwork {
 
   function toIpamConfig(req: IPAMConfig): IPConfig {
     return {
+      ...req,
       Subnet: req.Subnet ?? '',
       Gateway: req.Gateway ?? '',
     };

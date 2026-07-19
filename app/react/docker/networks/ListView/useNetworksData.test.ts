@@ -61,6 +61,20 @@ describe('groupSwarmNetworksManagerNodesFirst', () => {
 
     expect(result.map((n) => n.Id)).toEqual(['net1', 'net2']);
   });
+
+  it('should not mutate the input networks', () => {
+    const manager = createNetwork({ Id: 'net1', NodeName: 'node-manager' });
+    const worker = createNetwork({ Id: 'net1', NodeName: 'node-worker' });
+    const agents = [
+      createAgent({ NodeName: 'node-manager', NodeRole: 'manager' }),
+      createAgent({ NodeName: 'node-worker', NodeRole: 'worker' }),
+    ];
+
+    groupSwarmNetworksManagerNodesFirst([worker, manager], agents);
+
+    expect(manager.Subs).toEqual([]);
+    expect(worker.Subs).toEqual([]);
+  });
 });
 
 function createNetwork(
