@@ -20,10 +20,12 @@ import { ItemView } from './ItemView';
 const useCurrentStateAndParams = vi.fn(() => ({
   params: { workflowId: 1 },
 }));
+const go = vi.fn();
 
 vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
   ...(await importOriginal()),
   useCurrentStateAndParams: () => useCurrentStateAndParams(),
+  useRouter: () => ({ stateService: { go } }),
 }));
 
 // Avoid ui-router relative/unregistered state resolution in tests, same as WidgetTabs.test.tsx
@@ -79,6 +81,7 @@ describe('ItemView', () => {
 });
 
 function renderComponent(workflow: Workflow = mockWorkflowHealthy) {
+  go.mockClear();
   useCurrentStateAndParams.mockReturnValue({
     params: { workflowId: workflow.id },
   });

@@ -56,12 +56,10 @@ function validateGit(): SchemaOf<FormValues['git']> {
     tlsSkipVerify: bool(),
     polling: object({
       enabled: bool().required().default(false),
-      interval: string()
-        .default('')
-        .when('enabled', {
-          is: true,
-          then: intervalValidation(),
-        }),
+      interval: string().default('').when('enabled', {
+        is: true,
+        then: intervalValidation(),
+      }),
     }),
     connectionOk: bool()
       .oneOf([true], 'The connection test must succeed before continuing.')
