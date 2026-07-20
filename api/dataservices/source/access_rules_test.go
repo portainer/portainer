@@ -15,13 +15,12 @@ func Test_UserCanReadSource_AdministratorsOnly(t *testing.T) {
 	adminOnly := &portainer.Source{AdministratorsOnly: true}
 	require.False(t, userCanReadSource(adminOnly, standardUser))
 
-	// An explicit UserAccesses entry (the FindOrCreateGitSource auto-grant) wins
-	// over AdministratorsOnly.
+	// AdministratorsOnly is a hard enforcement: no user or team access overrides
+	// it. Sharing a source with a non-admin requires demoting the flag, as the
+	// FindOrCreateGitSource auto-grant does.
 	granted := &portainer.Source{AdministratorsOnly: true, UserAccesses: []portainer.UserID{2}}
-	require.True(t, userCanReadSource(granted, standardUser))
-	require.False(t, userCanReadSource(granted, teamMember))
+	require.False(t, userCanReadSource(granted, standardUser))
 
-	// Team accesses do not override AdministratorsOnly — only user grants do.
 	teamGranted := &portainer.Source{AdministratorsOnly: true, TeamAccesses: []portainer.TeamID{7}}
 	require.False(t, userCanReadSource(teamGranted, teamMember))
 }

@@ -1,6 +1,8 @@
 package source
 
 import (
+	"slices"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -174,7 +176,12 @@ func (service ServiceTx) FindOrCreateGitSource(context UserContext, src *portain
 
 		// give user access to the first source if he doesn't have access
 		// to any of the sources that have the same url+auth
-		existing[0].UserAccesses = append(existing[0].UserAccesses, context.ID())
+		if !slices.Contains(existing[0].UserAccesses, context.ID()) {
+			existing[0].UserAccesses = append(existing[0].UserAccesses, context.ID())
+		}
+		// AdministratorsOnly is a hard enforcement that would defeat the grant, and
+		// a source shared with a non-admin is factually no longer admins-only.
+		existing[0].AdministratorsOnly = false
 		if err := service.base.Update(existing[0].ID, &existing[0]); err != nil {
 			return nil, err
 		}

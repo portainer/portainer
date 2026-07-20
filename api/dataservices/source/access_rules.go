@@ -76,15 +76,12 @@ func userCanReadSource(source *portainer.Source, context UserContext) bool {
 		return true
 	}
 
-	// An explicit user grant wins over AdministratorsOnly: sanitizeAccesses clears
-	// UserAccesses whenever an admin marks a source admins-only, so an entry here
-	// can only come from the deliberate auto-grant in FindOrCreateGitSource.
-	if slices.Contains(source.UserAccesses, context.ID()) {
-		return true
-	}
-
 	if source.AdministratorsOnly {
 		return false
+	}
+
+	if slices.Contains(source.UserAccesses, context.ID()) {
+		return true
 	}
 
 	if len(userTeams) == 0 || len(source.TeamAccesses) == 0 {
