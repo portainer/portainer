@@ -101,13 +101,13 @@ func Test_cliOptions(t *testing.T) {
 			expected: libstack.DockerCliOptions{
 				Host:       "tcp://127.0.0.1:2377",
 				Registries: registries,
-				Headers:    map[string]string{managerOperationHeader: "1"},
+				Headers:    map[string]string{ManagerOperationHeader: "1"},
 			},
 		},
 		{
 			name: "empty host and nil registries still set the header",
 			expected: libstack.DockerCliOptions{
-				Headers: map[string]string{managerOperationHeader: "1"},
+				Headers: map[string]string{ManagerOperationHeader: "1"},
 			},
 		},
 	}

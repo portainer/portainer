@@ -32,10 +32,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// managerOperationHeader forces the Portainer agent to route requests to a swarm
+// ManagerOperationHeader forces the Portainer agent to route requests to a swarm
 // manager node. Swarm-scoped operations (e.g. network create/remove) fail on worker
 // nodes without it. This constant is originally defined in the agent, see package/agent/README.md.
-const managerOperationHeader = "X-PortainerAgent-ManagerOperation"
+const ManagerOperationHeader = "X-PortainerAgent-ManagerOperation"
 
 // cliOptions builds the Docker CLI options for swarm operations, always setting the
 // manager-operation header so requests proxied through an agent target a manager node.
@@ -43,7 +43,7 @@ func cliOptions(host string, registries []configtypes.AuthConfig) libstack.Docke
 	return libstack.DockerCliOptions{
 		Host:       host,
 		Registries: registries,
-		Headers:    map[string]string{managerOperationHeader: "1"},
+		Headers:    map[string]string{ManagerOperationHeader: "1"},
 	}
 }
 
