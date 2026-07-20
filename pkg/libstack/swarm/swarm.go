@@ -716,7 +716,7 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 			root = composeDir
 		}
 
-		resolveEnvFilePaths(config, root, composeDirRel)
+		resolveRelativePaths(config, root, composeDirRel)
 
 		details.ConfigFiles = append(details.ConfigFiles, composetypes.ConfigFile{
 			Filename: fp,
@@ -745,6 +745,15 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 	}
 
 	return details, nil
+}
+
+// resolveRelativePaths rewrites the on-disk paths a compose file references (service env_file
+// entries and secret/config file entries) to absolute paths clamped under root, so that a relative
+// "../" can reach a sibling directory within the project root but can never escape above it.
+func resolveRelativePaths(rawConfig map[string]any, root, composeDirRel string) {
+	resolveEnvFilePaths(rawConfig, root, composeDirRel)
+	resolveFileObjectPaths(rawConfig, "secrets", root, composeDirRel)
+	resolveFileObjectPaths(rawConfig, "configs", root, composeDirRel)
 }
 
 // resolveEnvFilePaths rewrites each service's relative env_file to an absolute path. Paths are
@@ -777,6 +786,30 @@ func resolveEnvFilePaths(rawConfig map[string]any, root, composeDirRel string) {
 					ef[i] = filesystem.JoinPaths(root, composeDirRel, s)
 				}
 			}
+		}
+	}
+}
+
+// resolveFileObjectPaths rewrites relative file entries under a top-level section (secrets or
+// configs) to absolute paths clamped under root via filesystem.JoinPaths, using the same semantics
+// as resolveEnvFilePaths. External and driver-based secrets/configs carry no file key and are
+// skipped. Unlike env_file, the file field is always a single string.
+func resolveFileObjectPaths(rawConfig map[string]any, section, root, composeDirRel string) {
+	objs, ok := rawConfig[section].(map[string]any)
+	if !ok {
+		return
+	}
+	for _, objAny := range objs {
+		obj, ok := objAny.(map[string]any)
+		if !ok {
+			continue
+		}
+		fileAny, ok := obj["file"]
+		if !ok {
+			continue
+		}
+		if s, ok := fileAny.(string); ok && !filepath.IsAbs(s) {
+			obj["file"] = filesystem.JoinPaths(root, composeDirRel, s)
 		}
 	}
 }
