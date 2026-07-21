@@ -29,7 +29,7 @@ function toArtifact(artifact: WorkflowsArtifactDetail): WorkflowArtifact {
   };
 }
 
-function toStatusObject(
+export function toStatusObject(
   statusObj: WorkflowsWorkflowStatusObject | undefined
 ): WorkflowStatusObject {
   return {

@@ -16,7 +16,7 @@ import { SourceDetail, useSource } from '../queries/useSource';
 import { SettingsTab } from './SettingsTab/SettingsTab';
 import { WorkflowsTab } from './WorkflowsTab';
 import { SourceResourceHeader } from './SourceResourceHeader';
-import { CountDot } from './CountDot';
+import { WorkflowsCountDot } from './WorkflowsCountDot';
 import { AccessTab } from './AccessTab';
 
 const breadcrumbs = [
@@ -43,7 +43,6 @@ export function ItemView() {
 
   if (!source || sourceQuery.isError) {
     const error = sourceQuery.error;
-
     return (
       <>
         <PageHeader breadcrumbs={breadcrumbs} />
@@ -82,12 +81,11 @@ function PageContent({ source }: { source: SourceDetail }) {
       {
         name: (
           <>
-            Workflows{' '}
-            <CountDot value={source.workflows?.length ?? 0} type="workflow" />
+            Workflows <WorkflowsCountDot sourceId={source.id} />
           </>
         ),
         icon: GitCommit,
-        widget: <WorkflowsTab workflows={source.workflows ?? []} />,
+        widget: <WorkflowsTab sourceId={source.id} />,
         selectedTabParam: 'workflows',
       },
       {

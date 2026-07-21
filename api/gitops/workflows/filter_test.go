@@ -10,8 +10,6 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
-	appsv1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/stretchr/testify/assert"
@@ -89,113 +87,50 @@ func TestBuildEndpointAccessMap_AdminIsKubeAdmin(t *testing.T) {
 	require.Empty(t, result[1].NonAdminNamespaces)
 }
 
-func TestFilterK8SStacks_IncludesMatchingStack(t *testing.T) {
+func TestFilterK8SStacks_AdminIncludesAllK8SStacks(t *testing.T) {
 	t.Parallel()
 
-	fakeKubeClient := kfake.NewSimpleClientset()
-
-	deployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "my-app",
-			Namespace: "default",
-			Labels: map[string]string{
-				"io.portainer.kubernetes.application.stackid": "1",
-			},
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": "my-app"}},
-		},
-	}
-
-	_, err := fakeKubeClient.AppsV1().Deployments("default").Create(t.Context(), deployment, metav1.CreateOptions{})
-	require.NoError(t, err)
-
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
-
-	endpointMap := map[portainer.EndpointID]portainer.Endpoint{
-		1: {ID: 1, Type: portainer.KubernetesLocalEnvironment},
-	}
-
 	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Type: portainer.KubernetesStack},
+		{ID: 1, Name: "stack-name", EndpointID: 1, Namespace: "default", Type: portainer.KubernetesStack},
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
 		1: {IsKubeAdmin: true},
 	}
 
-	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
-	require.NoError(t, err)
+	result := filterK8SStacks(stacks, accessMap)
 	require.Len(t, result, 1)
-	assert.Equal(t, "my-app", result[0].Name)
+	assert.Equal(t, "stack-name", result[0].Name)
 	assert.Equal(t, "default", result[0].Namespace)
 }
 
-func TestFilterK8SStacks_ExcludesStackWhenNoMatchingDeployment(t *testing.T) {
+func TestFilterK8SStacks_DockerStacksPassThrough(t *testing.T) {
 	t.Parallel()
 
-	fakeKubeClient := kfake.NewSimpleClientset()
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
-
-	endpointMap := map[portainer.EndpointID]portainer.Endpoint{
-		1: {ID: 1, Type: portainer.KubernetesLocalEnvironment},
-	}
-
 	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Type: portainer.KubernetesStack},
+		{ID: 1, Name: "docker-stack", EndpointID: 1, Type: portainer.DockerComposeStack},
 	}
 
-	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {IsKubeAdmin: true},
-	}
-
-	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
-	require.NoError(t, err)
-	require.Empty(t, result)
+	// No access is resolved for the endpoint; Docker stacks must still pass through.
+	result := filterK8SStacks(stacks, map[portainer.EndpointID]endpointAccess{})
+	require.Len(t, result, 1)
+	assert.Equal(t, "docker-stack", result[0].Name)
 }
 
 func TestFilterK8SStacks_NonAdminWithNamespaceAccess(t *testing.T) {
 	t.Parallel()
 
-	fakeKubeClient := kfake.NewSimpleClientset()
-
-	deployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "my-app",
-			Namespace: "ns1",
-			Labels: map[string]string{
-				"io.portainer.kubernetes.application.stackid": "1",
-			},
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": "my-app"}},
-		},
-	}
-
-	_, err := fakeKubeClient.AppsV1().Deployments("ns1").Create(t.Context(), deployment, metav1.CreateOptions{})
-	require.NoError(t, err)
-
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
-
-	endpointMap := map[portainer.EndpointID]portainer.Endpoint{
-		1: {ID: 1, Type: portainer.KubernetesLocalEnvironment},
-	}
-
 	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Type: portainer.KubernetesStack},
+		{ID: 1, Name: "stack-name", EndpointID: 1, Namespace: "ns1", Type: portainer.KubernetesStack},
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
 		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{"ns1"}},
 	}
 
-	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
-	require.NoError(t, err)
+	result := filterK8SStacks(stacks, accessMap)
 	require.Len(t, result, 1)
-	assert.Equal(t, "my-app", result[0].Name)
+	assert.Equal(t, "stack-name", result[0].Name)
 }
 
 func TestResolveKubeAccess_NonAdminWithTeamMemberships(t *testing.T) {
@@ -250,40 +185,14 @@ func TestResolveKubeAccess_NonAdmin(t *testing.T) {
 func TestFilterK8SStacks_NonAdminWithoutNamespaceAccess(t *testing.T) {
 	t.Parallel()
 
-	fakeKubeClient := kfake.NewSimpleClientset()
-
-	deployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "my-app",
-			Namespace: "ns1",
-			Labels: map[string]string{
-				"io.portainer.kubernetes.application.stackid": "1",
-			},
-		},
-		Spec: appsv1.DeploymentSpec{
-			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": "my-app"}},
-		},
-	}
-
-	_, err := fakeKubeClient.AppsV1().Deployments("ns1").Create(t.Context(), deployment, metav1.CreateOptions{})
-	require.NoError(t, err)
-
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
-
-	endpointMap := map[portainer.EndpointID]portainer.Endpoint{
-		1: {ID: 1, Type: portainer.KubernetesLocalEnvironment},
-	}
-
 	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Type: portainer.KubernetesStack},
+		{ID: 1, Name: "stack-name", EndpointID: 1, Namespace: "ns1", Type: portainer.KubernetesStack},
 	}
 
 	accessMap := map[portainer.EndpointID]endpointAccess{
 		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{}},
 	}
 
-	result, err := filterK8SStacks(stacks, endpointMap, factory, accessMap)
-	require.NoError(t, err)
+	result := filterK8SStacks(stacks, accessMap)
 	require.Empty(t, result)
 }

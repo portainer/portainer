@@ -7,18 +7,16 @@ import (
 	"github.com/portainer/portainer/api/gitops/workflows"
 )
 
-// Source represents a unique git repository used as a GitOps source across one or more workflows.
-type Source struct {
-	ID           portainer.SourceID `json:"id" validate:"required"`
-	Name         string             `json:"name" validate:"required"`
-	Type         SourceType         `json:"type" validate:"required"`
-	URL          string             `json:"url" validate:"required"`
-	Status       workflows.Status   `json:"status" validate:"required"`
-	Error        string             `json:"error,omitempty"`
-	UsedBy       int                `json:"usedBy"`
-	Environments int                `json:"environments"`
-	LastSync     int64              `json:"lastSync"`
-	Interval     string             `json:"interval,omitempty" example:"5m"`
+// SourceBase holds the source fields available without a workflow/stack stats scan.
+type SourceBase struct {
+	ID       portainer.SourceID `json:"id" validate:"required"`
+	Name     string             `json:"name" validate:"required"`
+	Type     SourceType         `json:"type" validate:"required"`
+	URL      string             `json:"url" validate:"required"`
+	Status   workflows.Status   `json:"status" validate:"required"`
+	Error    string             `json:"error,omitempty"`
+	LastSync int64              `json:"lastSync"`
+	Interval string             `json:"interval,omitempty" example:"5m"`
 }
 
 type SourceType string

@@ -2,7 +2,6 @@ import { SourceDetail } from '../../queries/useSource';
 
 import { ConnectionDetailsWidget } from './ConnectionDetailsWidget';
 import { AuthWidget } from './AuthWidget';
-import { AutoUpdateWidget } from './AutoUpdateWidget';
 import { PollingWidget } from './PollingWidget';
 import { SyncStatusWidget } from './SyncStatusWidget';
 import { SettingsForm } from './EditForm/SettingsForm';
@@ -25,7 +24,6 @@ export function SettingsTab({ source, isEditing, onEditingChange }: Props) {
       <ConnectionDetailsWidget source={source} />
       <AuthWidget auth={source?.connection.authentication} />
       <PollingWidget interval={source.interval} />
-      <AutoUpdateWidget autoUpdate={source.autoUpdate} />
       <SyncStatusWidget source={source} />
     </>
   );

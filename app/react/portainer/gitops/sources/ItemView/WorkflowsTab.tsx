@@ -11,34 +11,82 @@ import { WorkflowTarget, WorkflowType } from '../../workflows/types';
 import { StatusBadge } from '../../components/StatusBadge';
 import { getWorkflowLink } from '../../workflows/utils';
 import { effectiveWorkflowStatus } from '../../workflows/status';
-import { SourceWorkflow } from '../queries/useSource';
+import {
+  SourceWorkflow,
+  useSourceWorkflows,
+} from '../queries/useSourceWorkflows';
+import { Source } from '../types';
 
 interface Props {
-  workflows: SourceWorkflow[];
+  sourceId: Source['id'];
 }
 
-export function WorkflowsTab({ workflows }: Props) {
+export function WorkflowsTab({ sourceId }: Props) {
+  const workflowsQuery = useSourceWorkflows(sourceId);
+  const workflows = workflowsQuery.data;
+
   return (
     <Card.Container>
       <Card.Header
         icon={GitCommitIcon}
         title="Workflows"
-        subtitle={`${addPlural(
-          workflows.length,
-          'workflow'
-        )} using this source`}
+        subtitle={
+          workflows
+            ? `${addPlural(workflows.length, 'workflow')} using this source`
+            : undefined
+        }
       />
 
-      {workflows.length === 0 ? (
-        <Card.Body>
-          <p className="text-muted text-sm">
-            No workflows are using this source.
-          </p>
-        </Card.Body>
-      ) : (
-        <WorkflowsList workflows={workflows} />
-      )}
+      <WorkflowsBody
+        workflows={workflows}
+        isLoading={workflowsQuery.isLoading}
+      />
     </Card.Container>
+  );
+}
+
+function WorkflowsBody({
+  workflows,
+  isLoading,
+}: {
+  workflows: Array<SourceWorkflow> | undefined;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return <WorkflowsSkeleton />;
+  }
+
+  if (!workflows) {
+    return (
+      <Card.Body>
+        <p className="text-muted text-sm">Unable to load workflows.</p>
+      </Card.Body>
+    );
+  }
+
+  if (workflows.length === 0) {
+    return (
+      <Card.Body>
+        <p className="text-muted text-sm">
+          No workflows are using this source.
+        </p>
+      </Card.Body>
+    );
+  }
+
+  return <WorkflowsList workflows={workflows} />;
+}
+
+function WorkflowsSkeleton() {
+  return (
+    <div className="space-y-2 p-4">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className="h-16 animate-pulse rounded-lg bg-gray-3 th-dark:bg-gray-8"
+        />
+      ))}
+    </div>
   );
 }
 
@@ -73,9 +121,11 @@ function WorkflowCard({ item }: { item: SourceWorkflow }) {
           <StatusBadge status={effectiveWorkflowStatus(item).status} />
         </div>
         <div className="flex items-center gap-3">
-          <code className="bg-transparent p-0">
-            {item.gitConfig?.ConfigFilePath}
-          </code>
+          {item.gitConfig?.ConfigFilePath && (
+            <code className="bg-transparent p-0">
+              {item.gitConfig.ConfigFilePath}
+            </code>
+          )}
           <span>
             Last sync:{' '}
             {item.lastSyncDate

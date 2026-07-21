@@ -9,6 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/http/utils/filters"
@@ -19,6 +20,13 @@ import (
 
 	gocache "github.com/patrickmn/go-cache"
 )
+
+// Source is the list item response for a GitOps source
+type Source struct {
+	SourceBase
+	UsedBy       int `json:"usedBy"`
+	Environments int `json:"environments"`
+}
 
 // @id GitOpsSourcesList
 // @summary List all GitOps sources
@@ -114,8 +122,16 @@ func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedReque
 	var stats map[portainer.SourceID]workflows.SourceStats
 
 	if err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-		var err error
-		allSrcs, stats, err = workflows.FetchSourceStats(tx, h.k8sFactory, sc)
+		userContext := source.NewUserContext(sc.User, sc.UserMemberships)
+
+		sources, err := tx.Source().ReadAll(userContext)
+		if err != nil {
+			return err
+		}
+
+		allSrcs = sources
+
+		stats, err = workflows.FetchSourceStats(tx, h.k8sFactory, sc)
 		return err
 	}); err != nil {
 		return nil, err

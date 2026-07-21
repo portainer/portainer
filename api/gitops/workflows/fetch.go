@@ -1,8 +1,6 @@
 package workflows
 
 import (
-	"slices"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
@@ -116,11 +114,8 @@ func loadAccessibleStackMap(
 			continue
 		}
 
-		if stack.Type == portainer.KubernetesStack {
-			access := accessMap[stack.EndpointID]
-			if !access.IsKubeAdmin && !slices.Contains(access.NonAdminNamespaces, stack.Namespace) {
-				continue
-			}
+		if !isK8SNamespaceAccessible(stack, accessMap) {
+			continue
 		}
 
 		result[stack.ID] = stack
@@ -135,33 +130,27 @@ type SourceStats struct {
 	EndpointIDs   set.Set[portainer.EndpointID]
 }
 
-// FetchSourceStats returns all sources and per-source stats for sources accessible to the given user.
-// It applies the same access control as FetchWorkflows but skips git phase checks.
+// FetchSourceStats returns per-source stats for sources accessible to the given user.
+// It applies the same access control as FetchWorkflows
 func FetchSourceStats(
 	tx dataservices.DataStoreTx,
 	k8sFactory *cli.ClientFactory,
 	sc *security.RestrictedRequestContext,
-) ([]portainer.Source, map[portainer.SourceID]SourceStats, error) {
-	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
-
-	sources, err := tx.Source().ReadAll(userContext)
-	if err != nil {
-		return nil, nil, err
-	}
+) (map[portainer.SourceID]SourceStats, error) {
 
 	allStacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool { return s.WorkflowID != 0 })
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	endpointMap, err := BuildEndpointMap(tx, allStacks)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	allStacks, err = FilterDockerStacksByAccess(tx, allStacks, sc)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	workflowIDSet := make(set.Set[portainer.WorkflowID], len(allStacks))
@@ -176,7 +165,7 @@ func FetchSourceStats(
 
 	wfMap, err := LoadWorkflowMap(tx, workflowIDSet)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	wfSources := make(map[portainer.WorkflowID][]portainer.SourceID, len(wfMap))
@@ -197,13 +186,10 @@ func FetchSourceStats(
 
 	accessMap, err := buildEndpointAccessMap(k8sFactory, sc, endpointMap)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	stacks, err := filterK8SStacks(preFiltered, endpointMap, k8sFactory, accessMap)
-	if err != nil {
-		return nil, nil, err
-	}
+	stacks := filterK8SStacks(preFiltered, accessMap)
 
 	stats := make(map[portainer.SourceID]SourceStats)
 
@@ -215,7 +201,7 @@ func FetchSourceStats(
 		addSourceStats(stats, stackSourceIDs[stack.ID], epIDs)
 	}
 
-	return sources, stats, nil
+	return stats, nil
 }
 
 func addSourceStats(result map[portainer.SourceID]SourceStats, srcIDs []portainer.SourceID, epIDs []portainer.EndpointID) {

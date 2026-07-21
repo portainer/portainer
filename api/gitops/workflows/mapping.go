@@ -6,7 +6,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/gitops/sources"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/set"
@@ -30,22 +29,29 @@ func BuildGroupEndpoints(tx dataservices.DataStoreTx, groups []portainer.EdgeGro
 	return m, nil
 }
 
-// MapStackToSourceWorkflow converts a stack to a SourceWorkflow. gitConfig is passed separately
-// because EE embeds a different GitConfig type that shadows the CE field.
-// source and artifact are the pre-computed git phase statuses from the caller.
-func MapStackToSourceWorkflow(s portainer.Stack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, source, artifact WorkflowPhaseStatus) SourceWorkflow {
-	return SourceWorkflow{
-		ID:       s.WorkflowID,
-		Name:     s.Name,
+// WorkflowMappingFields holds the fields shared between ArtifactDetail and the sources handler package's Workflow type.
+type WorkflowMappingFields struct {
+	Type         Type                          `json:"type" validate:"required"`
+	Name         string                        `json:"name" validate:"required"`
+	Platform     DeploymentPlatform            `json:"platform"`
+	Status       WorkflowStatusObject          `json:"status"`
+	AutoUpdate   *portainer.AutoUpdateSettings `json:"autoUpdate,omitempty"`
+	Target       Target                        `json:"target"`
+	CreationDate int64                         `json:"creationDate"`
+	LastSyncDate int64                         `json:"lastSyncDate"`
+}
+
+// DeriveStackWorkflowFields computes the shared WorkflowMappingFields for a Stack-backed deployment.
+func DeriveStackWorkflowFields(s portainer.Stack, source, artifact WorkflowPhaseStatus) WorkflowMappingFields {
+	return WorkflowMappingFields{
 		Type:     TypeStack,
+		Name:     s.Name,
 		Platform: platformFromStackType(s.Type),
 		Status: WorkflowStatusObject{
 			Source:   source,
 			Artifact: artifact,
 			Target:   deriveStackTargetState(s),
 		},
-		SourceID:   sourceID,
-		GitConfig:  gitConfig,
 		AutoUpdate: s.AutoUpdate,
 		Target: Target{
 			EndpointID: s.EndpointID,
@@ -56,26 +62,21 @@ func MapStackToSourceWorkflow(s portainer.Stack, sourceID portainer.SourceID, gi
 	}
 }
 
-// MapEdgeStackToSourceWorkflow converts an edge stack to a SourceWorkflow. gitConfig is passed separately
-// because EE embeds a different GitConfig type that shadows the CE field.
-// source and artifact are the pre-computed git phase statuses from the caller.
-func MapEdgeStackToSourceWorkflow(wfID portainer.WorkflowID, es portainer.EdgeStack, sourceID portainer.SourceID, gitConfig *gittypes.RepoConfig, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) SourceWorkflow {
+// DeriveEdgeStackWorkflowFields computes the shared WorkflowMappingFields for an EdgeStack-backed deployment.
+func DeriveEdgeStackWorkflowFields(es portainer.EdgeStack, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) WorkflowMappingFields {
 	platform := DeploymentPlatformDockerStandalone
 	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
 		platform = DeploymentPlatformKubernetes
 	}
-	return SourceWorkflow{
-		ID:       wfID,
-		Name:     es.Name,
+	return WorkflowMappingFields{
 		Type:     TypeEdgeStack,
+		Name:     es.Name,
 		Platform: platform,
 		Status: WorkflowStatusObject{
 			Source:   source,
 			Artifact: artifact,
 			Target:   deriveEdgeStackTargetState(statuses),
 		},
-		SourceID:  sourceID,
-		GitConfig: gitConfig,
 		Target: Target{
 			EdgeGroupIDs:        es.EdgeGroups,
 			GroupStatus:         edgeStackTargetStatuses(es.EdgeGroups, statuses, groupEndpoints),
@@ -86,55 +87,21 @@ func MapEdgeStackToSourceWorkflow(wfID portainer.WorkflowID, es portainer.EdgeSt
 	}
 }
 
-// MapStackToArtifactDetail converts a stack to an ArtifactDetail. source and artifact are the
-// pre-computed git phase statuses from the caller; files are the artifact's resolved file refs.
+// MapStackToArtifactDetail converts a stack to an ArtifactDetail.
 func MapStackToArtifactDetail(stack portainer.Stack, files []portainer.ArtifactFile, source, artifact WorkflowPhaseStatus) ArtifactDetail {
 	return ArtifactDetail{
-		ID:       int(stack.ID),
-		Type:     TypeStack,
-		Name:     stack.Name,
-		Platform: platformFromStackType(stack.Type),
-		Status: WorkflowStatusObject{
-			Source:   source,
-			Artifact: artifact,
-			Target:   deriveStackTargetState(stack),
-		},
-		AutoUpdate: stack.AutoUpdate,
-		Target: Target{
-			EndpointID: stack.EndpointID,
-			Namespace:  stack.Namespace,
-		},
-		Files:        mapFilesToFileDetails(files),
-		CreationDate: stack.CreationDate,
-		LastSyncDate: StackLastSyncDate(stack),
+		ID:                    int(stack.ID),
+		WorkflowMappingFields: DeriveStackWorkflowFields(stack, source, artifact),
+		Files:                 mapFilesToFileDetails(files),
 	}
 }
 
-// MapEdgeStackToArtifactDetail converts an edge stack to an ArtifactDetail. source and artifact are
-// the pre-computed git phase statuses from the caller; files are the artifact's resolved file refs.
+// MapEdgeStackToArtifactDetail converts an edge stack to an ArtifactDetail.
 func MapEdgeStackToArtifactDetail(es portainer.EdgeStack, files []portainer.ArtifactFile, statuses []portainer.EdgeStackStatusForEnv, groupEndpoints map[portainer.EdgeGroupID][]portainer.EndpointID, source, artifact WorkflowPhaseStatus) ArtifactDetail {
-	platform := DeploymentPlatformDockerStandalone
-	if es.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
-		platform = DeploymentPlatformKubernetes
-	}
 	return ArtifactDetail{
-		ID:       int(es.ID),
-		Type:     TypeEdgeStack,
-		Name:     es.Name,
-		Platform: platform,
-		Status: WorkflowStatusObject{
-			Source:   source,
-			Artifact: artifact,
-			Target:   deriveEdgeStackTargetState(statuses),
-		},
-		Target: Target{
-			EdgeGroupIDs:        es.EdgeGroups,
-			GroupStatus:         edgeStackTargetStatuses(es.EdgeGroups, statuses, groupEndpoints),
-			ResolvedEndpointIDs: resolveEdgeGroupEndpoints(es.EdgeGroups, groupEndpoints),
-		},
-		Files:        mapFilesToFileDetails(files),
-		CreationDate: es.CreationDate,
-		LastSyncDate: edgeStackLastSyncDate(statuses),
+		ID:                    int(es.ID),
+		WorkflowMappingFields: DeriveEdgeStackWorkflowFields(es, statuses, groupEndpoints, source, artifact),
+		Files:                 mapFilesToFileDetails(files),
 	}
 }
 
@@ -227,8 +194,7 @@ func edgeStackTargetStatuses(
 	return result
 }
 
-// BuildWorkflow assembles a Workflow from a domain workflow and its resolved, access-filtered
-// artifacts, aggregating the workflow-level status and dates across those artifacts.
+// BuildWorkflow assembles a Workflow from a domain workflow and its resolved, access-filtered artifacts.
 func BuildWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail) Workflow {
 	creation, lastSync := SummaryDates(artifacts)
 	return Workflow{
@@ -241,8 +207,7 @@ func BuildWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail) Workflow {
 	}
 }
 
-// workflowName returns the workflow's stored name, falling back to a placeholder when it has
-// none (e.g. a Kubernetes stack deployed without a stack name).
+// workflowName returns the workflow's stored name, falling back to a placeholder when it has none.
 func workflowName(wf portainer.Workflow) string {
 	if wf.Name != "" {
 		return wf.Name
@@ -251,9 +216,7 @@ func workflowName(wf portainer.Workflow) string {
 	return "Unnamed workflow"
 }
 
-// ShouldHideWorkflow reports whether a workflow must be hidden from the list: it had configured
-// artifacts but every one was filtered out (existence-hiding, mirroring the detail endpoint), or it
-// has no artifacts while an endpoint filter is active (an empty workflow cannot match an endpoint).
+// ShouldHideWorkflow reports whether a workflow must be hidden from the list (all artifacts filtered out, or none exist while an endpoint filter is active).
 func ShouldHideWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail, endpointIDSet set.Set[portainer.EndpointID]) bool {
 	if len(artifacts) > 0 {
 		return false
@@ -261,8 +224,7 @@ func ShouldHideWorkflow(wf portainer.Workflow, artifacts []ArtifactDetail, endpo
 	return len(wf.Artifacts) > 0 || len(endpointIDSet) > 0
 }
 
-// SummaryDates derives workflow-level dates from its artifacts: the earliest artifact creation
-// date and the most recent artifact sync date. Zero values are ignored.
+// SummaryDates derives the earliest creation date and most recent sync date across artifacts, ignoring zero values.
 func SummaryDates(artifacts []ArtifactDetail) (creation, lastSync int64) {
 	for _, a := range artifacts {
 		if a.CreationDate != 0 && (creation == 0 || a.CreationDate < creation) {

@@ -2026,11 +2026,6 @@ export const zSettingsSettingsUpdatePayload = z.object({
   UserSessionTimeout: z.string().optional(),
 });
 
-export const zSourcesAutoUpdateInfo = z.object({
-  fetchInterval: z.string().optional(),
-  mechanism: z.string().optional(),
-});
-
 export const zSourcesConnectionTestResult = z.object({
   error: z.string().optional(),
   success: z.boolean().optional(),
@@ -3346,6 +3341,19 @@ export const zSourcesSource = z.object({
   usedBy: z.int().optional(),
 });
 
+export const zSourcesSourceDetail = z.object({
+  access: zSourcesSourceAccess.optional(),
+  connection: zSourcesConnectionInfo,
+  error: z.string().optional(),
+  id: z.int(),
+  interval: z.string().optional(),
+  lastSync: z.int().optional(),
+  name: z.string(),
+  status: zWorkflowsStatus,
+  type: zSourcesSourceType,
+  url: z.string(),
+});
+
 export const zWorkflowsStatusSummary = z.object({
   error: z.int().optional(),
   healthy: z.int().optional(),
@@ -3375,21 +3383,7 @@ export const zWorkflowsWorkflowStatusObject = z.object({
   target: zWorkflowsWorkflowPhaseStatus.optional(),
 });
 
-export const zWorkflowsArtifactDetail = z.object({
-  autoUpdate: zPortainerAutoUpdateSettings.optional(),
-  creationDate: z.int().optional(),
-  files: z.array(zWorkflowsArtifactFileDetail).optional(),
-  id: z.int(),
-  lastSyncDate: z.int().optional(),
-  name: z.string(),
-  platform: zWorkflowsDeploymentPlatform.optional(),
-  status: zWorkflowsWorkflowStatusObject.optional(),
-  target: zWorkflowsTarget.optional(),
-  type: zWorkflowsType,
-});
-
-export const zWorkflowsSourceWorkflow = z.object({
-  autoUpdate: zPortainerAutoUpdateSettings.optional(),
+export const zSourcesWorkflow = z.object({
   creationDate: z.int().optional(),
   gitConfig: zGittypesRepoConfig.optional(),
   id: z.int(),
@@ -3402,21 +3396,17 @@ export const zWorkflowsSourceWorkflow = z.object({
   type: zWorkflowsType,
 });
 
-export const zSourcesSourceDetail = z.object({
-  access: zSourcesSourceAccess.optional(),
-  autoUpdate: zSourcesAutoUpdateInfo.optional(),
-  connection: zSourcesConnectionInfo,
-  environments: z.int().optional(),
-  error: z.string().optional(),
+export const zWorkflowsArtifactDetail = z.object({
+  autoUpdate: zPortainerAutoUpdateSettings.optional(),
+  creationDate: z.int().optional(),
+  files: z.array(zWorkflowsArtifactFileDetail).optional(),
   id: z.int(),
-  interval: z.string().optional(),
-  lastSync: z.int().optional(),
+  lastSyncDate: z.int().optional(),
   name: z.string(),
-  status: zWorkflowsStatus,
-  type: zSourcesSourceType,
-  url: z.string(),
-  usedBy: z.int().optional(),
-  workflows: z.array(zWorkflowsSourceWorkflow).optional(),
+  platform: zWorkflowsDeploymentPlatform.optional(),
+  status: zWorkflowsWorkflowStatusObject.optional(),
+  target: zWorkflowsTarget.optional(),
+  type: zWorkflowsType,
 });
 
 export const zWorkflowsWorkflow = z.object({
@@ -4435,6 +4425,15 @@ export const zGitOpsSourcesTestByIdPath = z.object({
  * Connection test result
  */
 export const zGitOpsSourcesTestByIdResponse = zSourcesConnectionTestResult;
+
+export const zGitOpsSourceWorkflowsListPath = z.object({
+  id: z.int(),
+});
+
+/**
+ * OK
+ */
+export const zGitOpsSourceWorkflowsListResponse = z.array(zSourcesWorkflow);
 
 /**
  * Git source details

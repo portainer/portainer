@@ -45,6 +45,7 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	authenticatedRouter.Handle("", httperror.LoggerHandler(h.list)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/summary", httperror.LoggerHandler(h.summary)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/{id}", httperror.LoggerHandler(h.getSource)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/{id}/workflows", httperror.LoggerHandler(h.listSourceWorkflows)).Methods(http.MethodGet)
 	authenticatedRouter.Handle("/git", httperror.LoggerHandler(h.gitSourceCreate)).Methods(http.MethodPost)
 	authenticatedRouter.Handle("/test", httperror.LoggerHandler(h.gitSourceTest)).Methods(http.MethodPost)
 	authenticatedRouter.Handle("/{id}", httperror.LoggerHandler(h.gitSourceUpdate)).Methods(http.MethodPut)

@@ -290,28 +290,6 @@ func TestFetchWorkflows_HidesEmptyWorkflowWhenEndpointFilterActive(t *testing.T)
 	require.Empty(t, items)
 }
 
-func TestFetchSourceStats_ReturnsAllSources(t *testing.T) {
-	t.Parallel()
-	_, store := datastore.MustNewTestStore(t, false, true)
-
-	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		require.NoError(t, tx.Source().Create(adminUserContext, &portainer.Source{Name: "source-1", Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "http://github.com/org/repo1"}}))
-		require.NoError(t, tx.Source().Create(adminUserContext, &portainer.Source{Name: "source-2", Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "http://github.com/org/repo2"}}))
-
-		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
-	}))
-
-	var sources []portainer.Source
-	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
-		var err error
-		sources, _, err = FetchSourceStats(tx, nil, adminContext())
-
-		return err
-	}))
-
-	require.Len(t, sources, 2)
-}
-
 func TestFetchSourceStats_TracksWorkflowCountAndEndpoints(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
@@ -340,7 +318,7 @@ func TestFetchSourceStats_TracksWorkflowCountAndEndpoints(t *testing.T) {
 	var stats map[portainer.SourceID]SourceStats
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		_, stats, err = FetchSourceStats(tx, nil, adminContext())
+		stats, err = FetchSourceStats(tx, nil, adminContext())
 
 		return err
 	}))
@@ -367,7 +345,7 @@ func TestFetchSourceStats_UnusedSourceHasZeroStats(t *testing.T) {
 	var stats map[portainer.SourceID]SourceStats
 	require.NoError(t, store.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
-		_, stats, err = FetchSourceStats(tx, nil, adminContext())
+		stats, err = FetchSourceStats(tx, nil, adminContext())
 
 		return err
 	}))

@@ -465,6 +465,9 @@ import type {
   GitOpsSourcesUpdateGitData,
   GitOpsSourcesUpdateGitErrors,
   GitOpsSourcesUpdateGitResponses,
+  GitOpsSourceWorkflowsListData,
+  GitOpsSourceWorkflowsListErrors,
+  GitOpsSourceWorkflowsListResponses,
   GitOpsWorkflowGetData,
   GitOpsWorkflowGetErrors,
   GitOpsWorkflowGetResponses,
@@ -1126,6 +1129,8 @@ import {
   zGitOpsSourcesUpdateGitBody,
   zGitOpsSourcesUpdateGitPath,
   zGitOpsSourcesUpdateGitResponse,
+  zGitOpsSourceWorkflowsListPath,
+  zGitOpsSourceWorkflowsListResponse,
   zGitOpsWorkflowGetPath,
   zGitOpsWorkflowGetResponse,
   zGitOpsWorkflowsListQuery,
@@ -4145,7 +4150,7 @@ export const gitOpsSourcesDelete = <ThrowOnError extends boolean = true>(
 /**
  * Get a GitOps source by ID
  *
- * Returns a single GitOps source with its connection settings and linked workflows.
+ * Returns a single GitOps source with its connection settings and access rules.
  * **Access policy**: authenticated
  */
 export const gitOpsSourceGet = <ThrowOnError extends boolean = true>(
@@ -4300,6 +4305,43 @@ export const gitOpsSourcesTestById = <ThrowOnError extends boolean = true>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * List the workflows using a GitOps source
+ *
+ * Returns the workflows (stacks or edge stacks) currently deployed from this source.
+ * **Access policy**: authenticated
+ */
+export const gitOpsSourceWorkflowsList = <ThrowOnError extends boolean = true>(
+  options: Options<GitOpsSourceWorkflowsListData, ThrowOnError>
+): RequestResult<
+  GitOpsSourceWorkflowsListResponses,
+  GitOpsSourceWorkflowsListErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GitOpsSourceWorkflowsListResponses,
+    GitOpsSourceWorkflowsListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGitOpsSourceWorkflowsListPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGitOpsSourceWorkflowsListResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/gitops/sources/{id}/workflows',
+    ...options,
   });
 
 /**
