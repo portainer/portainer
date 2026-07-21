@@ -42,6 +42,7 @@ type (
 		Host        string `json:"Host"`
 		ServiceName string `json:"ServiceName"`
 		Port        int    `json:"Port"`
+		PortName    string `json:"PortName,omitempty"`
 		Path        string `json:"Path"`
 		PathType    string `json:"PathType"`
 		HasService  bool   `json:"HasService"`
