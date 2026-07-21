@@ -157,7 +157,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 
 	newName := stack.Name
 	stack.Name = oldName
-	if err := handler.deleteStack(context.TODO(), securityContext.UserID, stack, endpoint); err != nil {
+	if err := handler.teardownService.RemoveResources(context.TODO(), securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
 

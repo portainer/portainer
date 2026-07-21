@@ -33,7 +33,7 @@ func TestStackFile_GitPendingRedeploy_Returns409(t *testing.T) {
 	fileService, err := filesystem.NewService(tempDir, "")
 	require.NoError(t, err)
 
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.FileService = fileService
 	handler.DataStore = store
 
@@ -90,7 +90,7 @@ func TestStackFile_MatchingGitSettings_ReturnsFileContent(t *testing.T) {
 	fileService, err := filesystem.NewService(tempDir, "")
 	require.NoError(t, err)
 
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.FileService = fileService
 	handler.DataStore = store
 

@@ -27,7 +27,7 @@ func TestHandler_webhookInvoke(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	h := NewHandler(testhelpers.NewTestRequestBouncer())
+	h := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	h.DataStore = store
 
 	t.Run("invalid uuid results in http.StatusBadRequest", func(t *testing.T) {

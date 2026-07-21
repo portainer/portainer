@@ -446,7 +446,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 
 	signatureService := initDigitalSignatureService()
 
-	edgeStacksService := edgestacks.NewService(dataStore)
+	edgeStacksService := edgestacks.NewService(dataStore, fileService)
 
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.TLSCert, *flags.TLSKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {

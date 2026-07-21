@@ -40,7 +40,7 @@ func stackStartRequest(stackID portainer.StackID, endpointID portainer.EndpointI
 func newStackStartHandler(t *testing.T) (*Handler, *datastore.Store) {
 	t.Helper()
 	_, store := datastore.MustNewTestStore(t, true, false)
-	h := NewHandler(testhelpers.NewTestRequestBouncer())
+	h := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	h.DataStore = store
 	return h, store
 }

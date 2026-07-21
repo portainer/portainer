@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/api/stacks/teardown"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/docker/docker/api/types"
@@ -43,6 +44,7 @@ type Handler struct {
 	KubernetesClientFactory *cli.ClientFactory
 	SourceScheduler         *scheduling.SourceScheduler
 	StackDeployer           deployments.StackDeployer
+	teardownService         teardown.Service
 }
 
 func stackExistsError(name string) *httperror.HandlerError {
@@ -52,12 +54,13 @@ func stackExistsError(name string) *httperror.HandlerError {
 }
 
 // NewHandler creates a handler to manage stack operations.
-func NewHandler(bouncer security.BouncerService) *Handler {
+func NewHandler(bouncer security.BouncerService, teardownService teardown.Service) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
+		teardownService:    teardownService,
 	}
 
 	h.Handle("/stacks/create/{type}/{method}",

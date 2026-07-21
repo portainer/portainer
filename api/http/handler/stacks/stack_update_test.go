@@ -246,7 +246,7 @@ func TestStackUpdate(t *testing.T) {
 	require.NoError(t, err, "error storing stack file")
 
 	// Create handler
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.DataStore = store
 	handler.FileService = fileService
 	handler.StackDeployer = testhelpers.NewTestStackDeployer()
@@ -366,7 +366,7 @@ func setupUpdateStackInTxTest[T testUpdateStackPayload](t *testing.T, stack *por
 	require.NoError(t, err, "error storing stack file")
 
 	// Create handler
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.DataStore = store
 	handler.FileService = fileService
 	handler.StackDeployer = testhelpers.NewTestStackDeployer()
