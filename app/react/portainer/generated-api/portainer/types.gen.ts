@@ -812,6 +812,7 @@ export type GitopsRepositoryFilePreviewPayload = {
 
 export type GittypesGitAuthentication = {
   AuthorizationType?: number;
+  GitCredentialID?: number;
   Password?: string;
   Provider?: number;
   Username?: string;

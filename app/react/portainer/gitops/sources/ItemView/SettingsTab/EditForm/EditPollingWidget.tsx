@@ -28,11 +28,13 @@ export function EditPollingWidget() {
           data-cy="source-polling-switch"
         />
         {values.pollingEnabled && (
-          <IntervalField
-            value={values.interval}
-            onChange={(value) => setFieldValue('interval', value)}
-            errors={errors.interval}
-          />
+          <div className="mt-4 mb-0">
+            <IntervalField
+              value={values.interval}
+              onChange={(value) => setFieldValue('interval', value)}
+              errors={errors.interval}
+            />
+          </div>
         )}
       </Card.Body>
     </Card.Container>

@@ -247,6 +247,7 @@ export const zGitopsRepositoryFilePreviewPayload = z.object({
 
 export const zGittypesGitAuthentication = z.object({
   AuthorizationType: z.int().optional(),
+  GitCredentialID: z.int().optional(),
   Password: z.string().optional(),
   Provider: z.int().optional(),
   Username: z.string().optional(),

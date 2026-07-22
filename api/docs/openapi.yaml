@@ -12246,6 +12246,9 @@ components:
       properties:
         AuthorizationType:
           type: integer
+        GitCredentialID:
+          example: 0
+          type: integer
         Password:
           type: string
         Provider:
