@@ -1235,6 +1235,7 @@ export type KubernetesK8sIngressPath = {
   Path?: string;
   PathType?: string;
   Port?: number;
+  PortName?: string;
   ServiceName?: string;
 };
 

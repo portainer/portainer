@@ -169,7 +169,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		handler.FileService,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -321,7 +321,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		handler.SourceScheduler,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -407,7 +407,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		handler.FileService,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}

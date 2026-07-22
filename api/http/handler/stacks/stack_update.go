@@ -105,7 +105,9 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 	var stack *portainer.Stack
 	var reconcileSourceID portainer.SourceID
-	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+	var deploymentConfig deployments.StackDeploymentConfiger
+	var postDeploy postDeployFunc
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		preStack, err := tx.Stack().Read(portainer.StackID(stackID))
 		if err == nil && preStack.WorkflowID != 0 {
 			securityContext, scErr := security.RetrieveRestrictedRequestContext(r)
@@ -118,32 +120,50 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		}
 
 		var httpErr *httperror.HandlerError
-		stack, httpErr = handler.updateStackInTx(tx, r, portainer.StackID(stackID), portainer.EndpointID(endpointID))
+		stack, deploymentConfig, postDeploy, httpErr = handler.updateStackInTx(tx, r, portainer.StackID(stackID), portainer.EndpointID(endpointID))
 		if httpErr != nil {
 			return httpErr
 		}
 
 		return nil
-	})
-	if err == nil {
+	}); err != nil {
+		return response.TxResponse(w, stack, err)
+	}
+
+	if deploymentConfig == nil {
+		return response.JSON(w, stack)
+	}
+
+	if stack.Type == portainer.KubernetesStack {
+		if httpErr := handler.stackDeployInline(stack, deploymentConfig, postDeploy); httpErr != nil {
+			return httpErr
+		}
+
 		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
 			log.Warn().Err(err).Msg("source scheduler reconcile failed after stack update")
 		}
+		return response.JSON(w, stack)
 	}
 
-	return response.TxResponse(w, stack, err)
+	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack update")
+	}
+
+	go stackDeploy(handler.DataStore, stack.ID, deploymentConfig, postDeploy)
+
+	return response.JSON(w, stack)
 }
 
-func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Request, stackID portainer.StackID, endpointID portainer.EndpointID) (*portainer.Stack, *httperror.HandlerError) {
+func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Request, stackID portainer.StackID, endpointID portainer.EndpointID) (*portainer.Stack, deployments.StackDeploymentConfiger, postDeployFunc, *httperror.HandlerError) {
 	stack, err := tx.Stack().Read(stackID)
 	if tx.IsErrObjectNotFound(err) {
-		return nil, httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
+		return nil, nil, nil, httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
-		return nil, httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
 	if stack.Status == portainer.StackStatusDeploying {
-		return nil, httperror.Conflict("Unable to update stack", errors.New("Stack deployment is already in progress"))
+		return nil, nil, nil, httperror.Conflict("Unable to update stack", errors.New("Stack deployment is already in progress"))
 	}
 
 	if endpointID != 0 && endpointID != stack.EndpointID {
@@ -152,89 +172,89 @@ func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Req
 
 	endpoint, err := tx.Endpoint().Endpoint(stack.EndpointID)
 	if tx.IsErrObjectNotFound(err) {
-		return nil, httperror.NotFound("Unable to find the environment associated to the stack inside the database", err)
+		return nil, nil, nil, httperror.NotFound("Unable to find the environment associated to the stack inside the database", err)
 	} else if err != nil {
-		return nil, httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
-		return nil, httperror.Forbidden("Permission denied to access environment", err)
+		return nil, nil, nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	//only check resource control when it is a DockerSwarmStack or a DockerComposeStack
 	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
 		resourceControl, err := tx.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 		if err != nil {
-			return nil, httperror.InternalServerError("Unable to retrieve a resource control associated to the stack", err)
+			return nil, nil, nil, httperror.InternalServerError("Unable to retrieve a resource control associated to the stack", err)
 		}
 
 		if access, err := handler.userCanAccessStack(securityContext, resourceControl); err != nil {
-			return nil, httperror.InternalServerError("Unable to verify user authorizations to validate stack access", err)
+			return nil, nil, nil, httperror.InternalServerError("Unable to verify user authorizations to validate stack access", err)
 		} else if !access {
-			return nil, httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
+			return nil, nil, nil, httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 		}
 	}
 
 	if canManage, err := handler.userCanManageStacks(securityContext, endpoint); err != nil {
-		return nil, httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	} else if !canManage {
 		errMsg := "Stack editing is disabled for non-admin users"
 
-		return nil, httperror.Forbidden(errMsg, errors.New(errMsg))
+		return nil, nil, nil, httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
-	deployGate := newDeployGate()
-	if err := handler.updateAndDeployStack(tx, r, stack, endpoint, deployGate); err != nil {
-		return nil, err
+	deploymentConfig, postDeploy, httpErr := handler.updateAndDeployStack(tx, r, stack, endpoint)
+	if httpErr != nil {
+		return nil, nil, nil, httpErr
 	}
 
 	user, err := tx.User().Read(securityContext.UserID)
 	if err != nil {
-		return nil, httperror.BadRequest("Cannot find context user", errors.Wrap(err, "failed to fetch the user"))
+		return nil, nil, nil, httperror.BadRequest("Cannot find context user", errors.Wrap(err, "failed to fetch the user"))
 	}
 
 	stack.UpdatedBy = user.Username
 	stack.UpdateDate = time.Now().Unix()
+
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
 	stackutils.PrepareStackStatusForDeployment(stack)
 
 	if err := tx.Stack().Update(stack.ID, stack); err != nil {
-		deployGate.abortDeploy()
-		return nil, httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
-	deployGate.startDeploy()
-
-	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 	if err := fillStackGitConfig(tx, userContext, stack); err != nil {
-		return nil, httperror.InternalServerError("Unable to load git config for stack", err)
+		return nil, nil, nil, httperror.InternalServerError("Unable to load git config for stack", err)
 	}
 
-	return stack, nil
+	return stack, deploymentConfig, postDeploy, nil
 }
 
-func (handler *Handler) updateAndDeployStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
+func (handler *Handler) updateAndDeployStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (deployments.StackDeploymentConfiger, postDeployFunc, *httperror.HandlerError) {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
-		return handler.updateSwarmStack(tx, r, stack, endpoint, gate)
+		return handler.updateSwarmStack(tx, r, stack, endpoint)
 	case portainer.DockerComposeStack:
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
-		return handler.updateComposeStack(tx, r, stack, endpoint, gate)
+		return handler.updateComposeStack(tx, r, stack, endpoint)
 	case portainer.KubernetesStack:
-		return handler.updateKubernetesStack(tx, r, stack, endpoint, gate)
+		return handler.updateKubernetesStack(tx, r, stack, endpoint)
 	}
 
-	return httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
+	return nil, nil, httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
 }
 
-func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
+func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (deployments.StackDeploymentConfiger, postDeployFunc, *httperror.HandlerError) {
+	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
 		stack.AutoUpdate = nil
 	}
@@ -244,7 +264,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 
 	var payload updateComposeStackPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return nil, nil, httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.RepullImageAndRedeploy = payload.RepullImageAndRedeploy || payload.PullImage
@@ -254,7 +274,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
 		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
-			return httperror.InternalServerError("Unable to remove git workflow records from database", err)
+			return nil, nil, httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}
 
@@ -264,13 +284,13 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
+		return nil, nil, httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 	}
 
 	// Create compose deployment config
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return nil, nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	composeDeploymentConfig, err := deployments.CreateComposeStackDeploymentConfigTx(tx, securityContext,
@@ -286,7 +306,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return httperror.InternalServerError(err.Error(), err)
+		return nil, nil, httperror.InternalServerError(err.Error(), err)
 	}
 
 	if stack.Option != nil {
@@ -310,12 +330,11 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 		}
 	}
 
-	go stackDeploy(handler.DataStore, stack.ID, composeDeploymentConfig, gate, postDeploy)
-
-	return nil
+	return composeDeploymentConfig, postDeploy, nil
 }
 
-func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
+func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (deployments.StackDeploymentConfiger, postDeployFunc, *httperror.HandlerError) {
+	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
 		stack.AutoUpdate = nil
 	}
@@ -325,7 +344,7 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 
 	var payload updateSwarmStackPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return nil, nil, httperror.BadRequest("Invalid request payload", err)
 	}
 	payload.RepullImageAndRedeploy = payload.RepullImageAndRedeploy || payload.PullImage
 	stack.Env = payload.Env
@@ -334,7 +353,7 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
 		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
-			return httperror.InternalServerError("Unable to remove git workflow records from database", err)
+			return nil, nil, httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}
 
@@ -344,13 +363,13 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
+		return nil, nil, httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 	}
 
 	// Create swarm deployment config
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return nil, nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	swarmDeploymentConfig, err := deployments.CreateSwarmStackDeploymentConfigTx(tx, securityContext,
@@ -365,7 +384,7 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return httperror.InternalServerError(err.Error(), err)
+		return nil, nil, httperror.InternalServerError(err.Error(), err)
 	}
 
 	if stack.Option != nil {
@@ -389,16 +408,10 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 		}
 	}
 
-	go stackDeploy(handler.DataStore, stack.ID, swarmDeploymentConfig, gate, postDeploy)
-
-	return nil
+	return swarmDeploymentConfig, postDeploy, nil
 }
 
-func stackDeploy(dataStore dataservices.DataStore, stackID portainer.StackID, stackDeploymentConfig deployments.StackDeploymentConfiger, gate *deployGate, postDeploy postDeployFunc) {
-	// Wait until stack update payload is persisted
-	if !gate.wait() {
-		return
-	}
+func stackDeploy(dataStore dataservices.DataStore, stackID portainer.StackID, stackDeploymentConfig deployments.StackDeploymentConfiger, postDeploy postDeployFunc) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
@@ -463,4 +476,45 @@ func stackDeploy(dataStore dataservices.DataStore, stackID portainer.StackID, st
 	if postDeploy != nil {
 		postDeploy(ctx, deployErr)
 	}
+}
+
+// stackDeployInline must be called with no transaction held, and with the stack's status already
+// transitioned to Deploying and persisted (see updateStackInTx's Kubernetes branch).
+func (handler *Handler) stackDeployInline(stack *portainer.Stack, stackDeploymentConfig deployments.StackDeploymentConfiger, postDeploy postDeployFunc) *httperror.HandlerError {
+	deployCtx, cancel := context.WithTimeout(context.Background(), stackutils.InlineDeployTimeout)
+	defer cancel()
+
+	if deployErr := stackDeploymentConfig.Deploy(deployCtx); deployErr != nil {
+		stackutils.UpdateStackStatusFromDeploymentResult(stack, deployErr)
+
+		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.Stack().Update(stack.ID, stack)
+		}); err != nil {
+			log.Error().Err(err).
+				AnErr("deploy_error", deployErr).
+				Int("stack_id", int(stack.ID)).
+				Str("context", "stackDeployInline").
+				Msg("Failed to persist stack deployment status after failed inline deploy")
+		}
+
+		if postDeploy != nil {
+			postDeploy(deployCtx, deployErr)
+		}
+
+		return httperror.InternalServerError("Failed to deploy stack", deployErr)
+	}
+
+	stackutils.UpdateStackStatusFromDeploymentResult(stack, nil)
+
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return tx.Stack().Update(stack.ID, stack)
+	}); err != nil {
+		return httperror.InternalServerError("Failed to persist stack deployment status", err)
+	}
+
+	if postDeploy != nil {
+		postDeploy(deployCtx, nil)
+	}
+
+	return nil
 }

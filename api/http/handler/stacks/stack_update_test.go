@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/fips"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -40,7 +41,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		// Execute updateStackInTx within a successful transaction
 		err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+			_, _, _, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 			if handlerErr != nil {
 				return handlerErr
 			}
@@ -70,7 +71,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		// Execute updateStackInTx within a transaction that we force to fail
 		err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			updatedStack, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+			updatedStack, _, _, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 			if handlerErr != nil {
 				return handlerErr
 			}
@@ -109,7 +110,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, 9999, setup.endpoint.ID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, 9999, setup.endpoint.ID)
 			return handlerErr
 		})
 
@@ -132,7 +133,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
 			return nil
 		})
 
@@ -162,7 +163,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
 			return nil
 		})
 
@@ -187,7 +188,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
 			return nil
 		})
 
@@ -422,8 +423,11 @@ func Test_updateSwarmStack_Prune(t *testing.T) {
 	deployer := testhelpers.NewTestStackDeployer()
 	setup.handler.StackDeployer = deployer
 
+	var deploymentConfig deployments.StackDeploymentConfiger
+	var postDeploy postDeployFunc
 	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		var handlerErr *httperror.HandlerError
+		_, deploymentConfig, postDeploy, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 		if handlerErr != nil {
 			return handlerErr
 		}
@@ -436,7 +440,8 @@ func Test_updateSwarmStack_Prune(t *testing.T) {
 	require.NotNil(t, stored.Option, "stack.Option should not be nil")
 	assert.True(t, stored.Option.Prune, "stack.Option.Prune should be persisted as true")
 
-	// Deploy runs asynchronously; wait for the goroutine to call the deployer
+	go stackDeploy(setup.store, setup.stack.ID, deploymentConfig, postDeploy)
+
 	require.Eventually(t, func() bool {
 		return deployer.DeploySwarmCallCount == 1
 	}, 5*time.Second, 10*time.Millisecond, "DeploySwarmStack should be called exactly once")
@@ -461,8 +466,11 @@ func Test_updateComposeStack_Prune(t *testing.T) {
 	deployer := testhelpers.NewTestStackDeployer()
 	setup.handler.StackDeployer = deployer
 
+	var deploymentConfig deployments.StackDeploymentConfiger
+	var postDeploy postDeployFunc
 	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		var handlerErr *httperror.HandlerError
+		_, deploymentConfig, postDeploy, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 		if handlerErr != nil {
 			return handlerErr
 		}
@@ -475,7 +483,8 @@ func Test_updateComposeStack_Prune(t *testing.T) {
 	require.NotNil(t, stored.Option, "stack.Option should not be nil")
 	assert.True(t, stored.Option.Prune, "stack.Option.Prune should be persisted as true")
 
-	// Deploy runs asynchronously; wait for the goroutine to call the deployer
+	go stackDeploy(setup.store, setup.stack.ID, deploymentConfig, postDeploy)
+
 	require.Eventually(t, func() bool {
 		return deployer.DeployComposeCallCount == 1
 	}, 5*time.Second, 10*time.Millisecond, "DeployComposeStack should be called exactly once")

@@ -28,7 +28,7 @@ export function EditPollingWidget() {
           data-cy="source-polling-switch"
         />
         {values.pollingEnabled && (
-          <div className="mt-4 mb-0">
+          <div className="mb-0 mt-4">
             <IntervalField
               value={values.interval}
               onChange={(value) => setFieldValue('interval', value)}

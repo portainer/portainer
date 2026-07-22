@@ -12873,6 +12873,8 @@ components:
           type: string
         Port:
           type: integer
+        PortName:
+          type: string
         ServiceName:
           type: string
       type: object

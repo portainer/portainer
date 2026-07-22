@@ -231,7 +231,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	stack.UpdatedBy = user.Username
 	stack.UpdateDate = time.Now().Unix()
-	stackutils.PrepareStackStatusForDeployment(stack)
 
 	postDeploy := func(ctx context.Context, deployErr error) {
 		if deployErr == nil {
@@ -260,11 +259,23 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	deployGate := newDeployGate()
-	if err := handler.deployStack(r, stack, payload.RepullImageAndRedeploy, endpoint, deployGate, postDeploy); err != nil {
-		return err
+	stackutils.PrepareStackStatusForDeployment(stack)
+
+	deploymentConfig, httpErr := handler.deployStack(r, stack, payload.RepullImageAndRedeploy, endpoint)
+	if httpErr != nil {
+		return httpErr
 	}
 
+	if stack.Type == portainer.KubernetesStack {
+		// Inline deployment workflow for Kubernetes stacks
+		if err := handler.deployKubernetesStackInline(deploymentConfig, stack, securityContext, gitConfig, sourceID, postDeploy); err != nil {
+			return err
+		}
+
+		return response.JSON(w, stack)
+	}
+
+	// Async deployment workflow for Swarm and Compose stacks
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return err
@@ -280,69 +291,54 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 		return fillStackGitConfig(tx, userContext, stack)
 	}); err != nil {
-		deployGate.abortDeploy()
-
 		return httperror.InternalServerError("Unable to persist the stack changes inside the database", errors.Wrap(err, "failed to update the stack"))
 	}
 
-	deployGate.startDeploy()
+	if deploymentConfig != nil {
+		go stackDeploy(handler.DataStore, stack.ID, deploymentConfig, postDeploy)
+	}
 
 	return response.JSON(w, stack)
 }
 
-func resolveGitAuthFromRedeployPayload(gitConfig *gittypes.RepoConfig, payload stackGitRedeployPayload) gittypes.GitAuthentication {
-	auth := gittypes.GitAuthentication{}
-	if gitConfig.Authentication != nil {
-		auth = *gitConfig.Authentication
-	}
-
-	// only overload source auth if provided
-	if payload.RepositoryAuthentication && payload.RepositoryPassword != "" {
-		auth.Username = payload.RepositoryUsername
-		auth.Password = payload.RepositoryPassword
-	}
-	return auth
-}
-
-func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint, gate *deployGate, postDeploy postDeployFunc) *httperror.HandlerError {
-	var deploymentConfiger deployments.StackDeploymentConfiger
-
+// deployStack builds the deployment config without deploying; the caller deploys it (sync for
+// Kubernetes, async for Swarm/Compose).
+func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint) (deployments.StackDeploymentConfiger, *httperror.HandlerError) {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
-		// Create swarm deployment config
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve info from request context", err)
+			return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
 		prune := stack.Option != nil && stack.Option.Prune
 
-		deploymentConfiger, err = deployments.CreateSwarmStackDeploymentConfigTx(handler.DataStore, securityContext, stack, endpoint, handler.FileService, handler.StackDeployer, prune, pullImage)
+		deploymentConfiger, err := deployments.CreateSwarmStackDeploymentConfigTx(handler.DataStore, securityContext, stack, endpoint, handler.FileService, handler.StackDeployer, prune, pullImage)
 		if err != nil {
-			return httperror.InternalServerError(err.Error(), err)
+			return nil, httperror.InternalServerError(err.Error(), err)
 		}
+
+		return deploymentConfiger, nil
 
 	case portainer.DockerComposeStack:
-		// Create compose deployment config
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve info from request context", err)
+			return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
 		prune := stack.Option != nil && stack.Option.Prune
 
-		deploymentConfiger, err = deployments.CreateComposeStackDeploymentConfigTx(handler.DataStore, securityContext, stack, endpoint, handler.FileService, handler.StackDeployer, prune, pullImage, true)
+		deploymentConfiger, err := deployments.CreateComposeStackDeploymentConfigTx(handler.DataStore, securityContext, stack, endpoint, handler.FileService, handler.StackDeployer, prune, pullImage, true)
 		if err != nil {
-			return httperror.InternalServerError(err.Error(), err)
+			return nil, httperror.InternalServerError(err.Error(), err)
 		}
 
-	case portainer.KubernetesStack:
-		handler.stackCreationMutex.Lock()
-		defer handler.stackCreationMutex.Unlock()
+		return deploymentConfiger, nil
 
+	case portainer.KubernetesStack:
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
-			return httperror.BadRequest("Failed to retrieve user token data", err)
+			return nil, httperror.BadRequest("Failed to retrieve user token data", err)
 		}
 
 		user := &portainer.User{
@@ -357,13 +353,66 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 			Kind:      "git",
 		}
 
-		deploymentConfiger = deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabel, user, endpoint)
-
-	default:
-		return httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
+		return deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabel, user, endpoint), nil
 	}
 
-	go stackDeploy(handler.DataStore, stack.ID, deploymentConfiger, gate, postDeploy)
+	return nil, httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
+}
+
+// deployKubernetesStackInline deploys an already-built Kubernetes deployment config synchronously
+// and returns any deploy failure to the caller, instead of the goroutine used for Swarm/Compose.
+func (handler *Handler) deployKubernetesStackInline(deploymentConfiger deployments.StackDeploymentConfiger, stack *portainer.Stack, securityContext *security.RestrictedRequestContext, gitConfig *gittypes.RepoConfig, sourceID portainer.SourceID, postDeploy postDeployFunc) *httperror.HandlerError {
+	handler.stackCreationMutex.Lock()
+	defer handler.stackCreationMutex.Unlock()
+
+	deployCtx, cancel := context.WithTimeout(context.Background(), stackutils.InlineDeployTimeout)
+	defer cancel()
+
+	if err := deploymentConfiger.Deploy(deployCtx); err != nil {
+		if postDeploy != nil {
+			postDeploy(deployCtx, err)
+		}
+
+		return httperror.InternalServerError("Failed to deploy stack", err)
+	}
+
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stackutils.UpdateStackStatusFromDeploymentResult(stack, nil)
+		if err := tx.Stack().Update(stack.ID, stack); err != nil {
+			return err
+		}
+
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
+			return err
+		}
+
+		if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
+			return err
+		}
+
+		return fillStackGitConfig(tx, userContext, stack)
+	}); err != nil {
+		return httperror.InternalServerError("Unable to persist the stack changes inside the database", errors.Wrap(err, "failed to update the stack"))
+	}
+
+	if postDeploy != nil {
+		postDeploy(deployCtx, nil)
+	}
 
 	return nil
+}
+
+func resolveGitAuthFromRedeployPayload(gitConfig *gittypes.RepoConfig, payload stackGitRedeployPayload) gittypes.GitAuthentication {
+	auth := gittypes.GitAuthentication{}
+	if gitConfig.Authentication != nil {
+		auth = *gitConfig.Authentication
+	}
+
+	// only overload source auth if provided
+	if payload.RepositoryAuthentication && payload.RepositoryPassword != "" {
+		auth.Username = payload.RepositoryUsername
+		auth.Password = payload.RepositoryPassword
+	}
+	return auth
 }

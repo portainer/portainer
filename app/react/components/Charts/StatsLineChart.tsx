@@ -51,7 +51,7 @@ export function StatsLineChart({
             width={75}
           />
           <Tooltip
-            formatter={(value) =>
+            formatter={(value: unknown) =>
               yAxisFormatter(typeof value === 'number' ? value : 0)
             }
             isAnimationActive={false}

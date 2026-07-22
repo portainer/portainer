@@ -440,6 +440,7 @@ export const zKubernetesK8sIngressPath = z.object({
   Path: z.string().optional(),
   PathType: z.string().optional(),
   Port: z.int().optional(),
+  PortName: z.string().optional(),
   ServiceName: z.string().optional(),
 });
 

@@ -190,6 +190,8 @@ func redeployWhenChangedSecondStage(
 		return errors.WithMessagef(err, "failed to set the deploying status for stack %v", stack.ID)
 	}
 
+	previousDeploymentInfo := stack.CurrentDeploymentInfo
+
 	stack.CurrentDeploymentInfo = &portainer.StackDeploymentInfo{
 		RepositoryURL:   gitConfig.URL,
 		ReferenceName:   gitConfig.ReferenceName,
@@ -242,6 +244,9 @@ func redeployWhenChangedSecondStage(
 	}
 
 	deployErr := redeployStack(stack)
+	if deployErr != nil {
+		stack.CurrentDeploymentInfo = previousDeploymentInfo
+	}
 
 	if err := datastore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		stack.UpdateDate = time.Now().Unix()
@@ -249,6 +254,10 @@ func redeployWhenChangedSecondStage(
 		stackutils.UpdateStackStatusFromDeploymentResult(stack, deployErr)
 		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return err
+		}
+
+		if deployErr != nil {
+			return nil
 		}
 
 		newHash := gitConfig.ConfigHash
