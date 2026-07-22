@@ -28,8 +28,12 @@ export default class LdapUserSearchItemController {
   }
 
   removeGroup(index) {
-    this.groups.splice(index, 1);
-    this.onGroupsChange(this.groups);
+    // Invoked from the React GroupDnBuilder, i.e. outside Angular's digest, so
+    // wrap the mutation in $evalAsync to trigger a re-render of the ng-repeat.
+    this.$scope.$evalAsync(() => {
+      this.groups = this.groups.toSpliced(index, 1);
+      this.onGroupsChange(this.groups);
+    });
   }
 
   addGroup() {

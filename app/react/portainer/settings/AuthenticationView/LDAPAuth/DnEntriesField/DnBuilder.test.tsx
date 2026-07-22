@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
+import { useState } from 'react';
 
 import { DnBuilder } from './DnBuilder';
 
@@ -56,5 +57,25 @@ describe('DnBuilder', () => {
 
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByRole('textbox')).toHaveValue('admins');
+  });
+
+  it('keeps the entry row visible after clearing all characters', async () => {
+    const user = userEvent.setup();
+    const suffix = 'dc=example,dc=com';
+
+    function Wrapper() {
+      const [value, setValue] = useState('ou=Users,dc=example,dc=com');
+      return <DnBuilder value={value} suffix={suffix} onChange={setValue} />;
+    }
+
+    render(<Wrapper />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+
+    // The row must remain (an empty value is a valid in-progress state), even
+    // though the DN string it round-trips through cannot represent it.
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveValue('');
   });
 });

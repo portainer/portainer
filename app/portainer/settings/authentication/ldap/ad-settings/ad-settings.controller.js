@@ -29,7 +29,17 @@ export default class AdSettingsController {
   parseDomainName(account) {
     this.domainName = '';
 
-    if (!account || !account.includes('@')) {
+    if (!account) {
+      return;
+    }
+
+    // Service account entered as a distinguished name (e.g. cn=reader,dc=portainer,dc=io)
+    if (!account.includes('@')) {
+      this.domainSuffix = account
+        .split(',')
+        .map((part) => part.trim())
+        .filter((part) => part.toLowerCase().startsWith('dc='))
+        .join(',');
       return;
     }
 

@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
-import { parseDN, buildDN, DnEntry } from './ldap-dn-utils';
+import {
+  parseDN,
+  buildDN,
+  validateDnEntryValue,
+  DnEntry,
+} from './ldap-dn-utils';
 
 describe('parseDN', () => {
   it('should parse DN with OU entries', () => {
@@ -79,6 +84,25 @@ describe('parseDN', () => {
       { type: 'ou', value: 'dept_2' },
     ]);
   });
+
+  it('should preserve special characters in values', () => {
+    const result = parseDN(
+      'ou=R&D (Eng.),ou=Sales+Mktg,dc=example,dc=com',
+      'dc=example,dc=com'
+    );
+
+    expect(result).toEqual([
+      { type: 'ou', value: 'R&D (Eng.)' },
+      { type: 'ou', value: 'Sales+Mktg' },
+    ]);
+  });
+
+  it('should round-trip values containing special characters', () => {
+    const dn = 'ou=R&D (Eng.),dc=example,dc=com';
+    const suffix = 'dc=example,dc=com';
+
+    expect(buildDN(parseDN(dn, suffix), suffix)).toBe(dn);
+  });
 });
 
 describe('buildDN', () => {
@@ -150,5 +174,65 @@ describe('buildDN', () => {
     const result = buildDN([], '');
 
     expect(result).toBe('');
+  });
+});
+
+describe('validateDnEntryValue', () => {
+  it('should accept an empty value', () => {
+    expect(validateDnEntryValue('')).toBeUndefined();
+  });
+
+  it('should accept values with allowed characters', () => {
+    expect(validateDnEntryValue('R&D (Eng.)')).toBeUndefined();
+    expect(validateDnEntryValue('Sales_Team 01')).toBeUndefined();
+  });
+
+  it('should accept an equals sign (escaped only in the type, not the value)', () => {
+    expect(validateDnEntryValue('a=b')).toBeUndefined();
+  });
+
+  it('should accept non-ASCII characters', () => {
+    expect(validateDnEntryValue('Café Müller')).toBeUndefined();
+  });
+
+  it('should accept an interior number sign', () => {
+    expect(validateDnEntryValue('Team#1')).toBeUndefined();
+  });
+
+  it('should reject each reserved character', () => {
+    expect(validateDnEntryValue('a"b')).toContain('"');
+    expect(validateDnEntryValue('a+b')).toContain('+');
+    expect(validateDnEntryValue('a,b')).toContain(',');
+    expect(validateDnEntryValue('a;b')).toContain(';');
+    expect(validateDnEntryValue('a<b')).toContain('<');
+    expect(validateDnEntryValue('a>b')).toContain('>');
+    expect(validateDnEntryValue('a\\b')).toContain('\\');
+  });
+
+  it('should list every reserved character it finds', () => {
+    expect(validateDnEntryValue('a,b+c')).toBe(
+      'These characters are not allowed in a DN entry value: + ,'
+    );
+  });
+
+  it('should reject a leading space or number sign', () => {
+    expect(validateDnEntryValue(' Users')).toBe(
+      'A DN entry value cannot start with a space or "#".'
+    );
+    expect(validateDnEntryValue('#Users')).toBe(
+      'A DN entry value cannot start with a space or "#".'
+    );
+  });
+
+  it('should reject a trailing space', () => {
+    expect(validateDnEntryValue('Users ')).toBe(
+      'A DN entry value cannot end with a space.'
+    );
+  });
+
+  it('should reject control characters', () => {
+    expect(validateDnEntryValue('a\tb')).toBe(
+      'A DN entry value cannot contain control characters.'
+    );
   });
 });
