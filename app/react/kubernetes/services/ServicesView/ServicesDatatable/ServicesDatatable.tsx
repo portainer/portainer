@@ -54,7 +54,7 @@ export function ServicesDatatable() {
   const { data: services, ...servicesQuery } = useClusterServices(
     environmentId,
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
       withApplications: true,
       select: (services) =>
         services?.filter(

@@ -39,10 +39,10 @@ export function SecretsDatatable() {
 
   const environmentId = useEnvironmentId();
   const namespacesQuery = useNamespacesQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const secretsQuery = useSecretsForCluster(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
     select: (secrets) =>
       secrets.filter(
         (secret) =>

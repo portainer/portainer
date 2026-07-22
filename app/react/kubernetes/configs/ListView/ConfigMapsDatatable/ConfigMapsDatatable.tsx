@@ -38,10 +38,10 @@ export function ConfigMapsDatatable() {
 
   const environmentId = useEnvironmentId();
   const namespacesQuery = useNamespacesQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const configMapsQuery = useConfigMapsForCluster(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
     select: (configMaps) =>
       configMaps.filter(
         (configmap) =>

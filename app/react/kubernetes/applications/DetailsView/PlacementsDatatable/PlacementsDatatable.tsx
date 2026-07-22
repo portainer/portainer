@@ -59,7 +59,7 @@ export function PlacementsDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={tableState.setAutoRefreshRate}
           />
         </TableSettingsMenu>

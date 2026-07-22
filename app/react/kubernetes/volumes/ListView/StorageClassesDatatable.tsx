@@ -42,7 +42,7 @@ export function StorageClassesDatatable() {
   const deleteStorageClassesMutation = useDeleteStorageClasses(envId);
   const setDefaultStorageClassMutation = useSetDefaultStorageClass(envId);
   const storageClassesQuery = useStorageClasses(envId, {
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
   });
   const storageClasses = storageClassesQuery.data ?? [];
 
@@ -78,7 +78,7 @@ export function StorageClassesDatatable() {
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

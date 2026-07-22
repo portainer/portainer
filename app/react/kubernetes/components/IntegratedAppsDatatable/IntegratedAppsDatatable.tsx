@@ -37,7 +37,7 @@ export function IntegratedAppsDatatable({
       ...refreshableSettings(set),
     })
   );
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  useRepeater(tableState.autoRefreshRateMS, onRefresh);
 
   return (
     <Datatable
@@ -51,7 +51,7 @@ export function IntegratedAppsDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={tableState.setAutoRefreshRate}
           />
         </TableSettingsMenu>

@@ -63,7 +63,7 @@ export function ServicesDatatable({
   const apiVersion = useApiVersion(environmentId);
   const tableState = useTableState(store, tableKey);
   const columns = useColumns(isStackColumnVisible);
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  useRepeater(tableState.autoRefreshRateMS, onRefresh);
 
   return (
     <ExpandableDatatable

@@ -51,7 +51,7 @@ export function ContainersDatatable({
   const tableState = useTableState(settingsStore, storageKey);
 
   const containersQuery = useContainers(environment.Id, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
 
   return (

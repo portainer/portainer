@@ -52,7 +52,7 @@ export function SecretsDatatable({
   onRefresh(): Promise<void>;
 }) {
   const tableState = useTableState(store, storageKey);
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  useRepeater(tableState.autoRefreshRateMS, onRefresh);
 
   const hasWriteAccessQuery = useAuthorizations([
     'DockerSecretCreate',
@@ -77,7 +77,7 @@ export function SecretsDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

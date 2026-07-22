@@ -19,6 +19,6 @@ export function createStore(
 ) {
   return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
     ...hiddenColumnsSettings(set, initialHiddenColumns),
-    ...refreshableSettings(set, 10),
+    ...refreshableSettings(set, 10_000),
   }));
 }

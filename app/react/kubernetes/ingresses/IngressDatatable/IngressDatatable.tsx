@@ -41,7 +41,7 @@ export function IngressDatatable() {
   );
   const namespacesQuery = useNamespacesQuery(environmentId);
   const { data: ingresses, ...ingressesQuery } = useIngresses(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
     withServices: true,
   });
 

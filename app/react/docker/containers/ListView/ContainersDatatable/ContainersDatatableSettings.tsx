@@ -29,7 +29,7 @@ export function ContainersDatatableSettings({
 
       {isRefreshVisible && (
         <TableSettingsMenuAutoRefresh
-          value={settings.autoRefreshRate}
+          value={settings.autoRefreshRateMS}
           onChange={(value) => settings.setAutoRefreshRate(value)}
         />
       )}

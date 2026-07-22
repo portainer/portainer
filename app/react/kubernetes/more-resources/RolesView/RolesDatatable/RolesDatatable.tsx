@@ -43,10 +43,10 @@ export function RolesDatatable() {
     })
   );
   const rolesQuery = useRoles(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const roleBindingsQuery = useRoleBindings(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const roleRowData = useRoleRowData(rolesQuery.data, roleBindingsQuery.data);
 
