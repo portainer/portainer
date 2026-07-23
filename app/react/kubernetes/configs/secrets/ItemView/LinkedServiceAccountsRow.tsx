@@ -80,6 +80,7 @@ export function LinkedServiceAccountsRow({
 
   return (
     <DetailsRow
+      ariaLabel="Linked service accounts"
       label={
         <span className="flex items-center">
           Linked service accounts

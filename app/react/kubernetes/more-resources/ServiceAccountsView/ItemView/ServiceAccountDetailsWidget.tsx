@@ -48,6 +48,7 @@ export function ServiceAccountDetailsWidget({ namespace, name }: Props) {
                   : '-'}
               </DetailsRow>
               <DetailsRow
+                ariaLabel="Automount token"
                 label={
                   <>
                     Automount token
