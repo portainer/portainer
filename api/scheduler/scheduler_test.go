@@ -40,6 +40,29 @@ func Test_ScheduledJobRuns(t *testing.T) {
 	})
 }
 
+func Test_ScheduledCronJobRuns(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		s := NewScheduler(t.Context())
+		defer requireNoShutdownErr(t, s.Shutdown)
+
+		ctx, cancel := context.WithTimeout(t.Context(), 61*time.Second)
+
+		var workDone bool
+		_, err := s.StartJob("* * * * *", func() error {
+			workDone = true
+
+			cancel()
+
+			return nil
+		})
+		require.NoError(t, err)
+
+		<-ctx.Done()
+		assert.True(t, workDone, "cron job should have run")
+	})
+}
+
 func Test_JobCanBeStopped(t *testing.T) {
 	t.Parallel()
 	synctest.Test(t, func(t *testing.T) {
@@ -63,6 +86,16 @@ func Test_JobCanBeStopped(t *testing.T) {
 		<-ctx.Done()
 		assert.False(t, workDone, "job shouldn't had a chance to run")
 	})
+}
+
+func Test_StartJob_RejectsInvalidCronExpression(t *testing.T) {
+	t.Parallel()
+
+	s := NewScheduler(t.Context())
+	defer requireNoShutdownErr(t, s.Shutdown)
+
+	_, err := s.StartJob("invalid", func() error { return nil })
+	require.Error(t, err)
 }
 
 func Test_JobShouldStop_UponPermError(t *testing.T) {

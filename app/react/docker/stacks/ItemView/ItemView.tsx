@@ -15,6 +15,7 @@ import { useUpdateStackResourcesOnDeployment } from '@/react/docker/stacks/ItemV
 import { PageHeader } from '@@/PageHeader';
 
 import { StackDetails } from './StackDetails';
+import { StackRestartSchedule } from './StackInfoTab/StackRestartSchedule';
 import { StackServicesDatatable } from './StackServicesDatatable';
 
 export function ItemView() {
@@ -56,6 +57,15 @@ export function ItemView() {
     }
   }, [isExternal, isOrphaned, isOrphanedRunning, stackType]);
 
+  const showRestartSchedule =
+    !!stack &&
+    stack.Type !== StackType.Kubernetes &&
+    !isExternal &&
+    !isOrphaned &&
+    !isOrphanedRunning;
+
+  const showFooterPanels = (stack && !isOrphaned) || showRestartSchedule;
+
   return (
     <>
       <PageHeader
@@ -70,26 +80,32 @@ export function ItemView() {
         stackName={stackName}
         stack={stack}
       />
-      {(!isOrphaned || isOrphanedRunning) && (
-        <>
-          {stackType === StackType.DockerCompose && (
-            <StackContainersDatatable stackName={stackName} />
+      {((!isOrphaned || isOrphanedRunning) || showFooterPanels) && (
+        <div className="space-y-4 pb-4 [&>*]:block">
+          {!isOrphaned || isOrphanedRunning ? (
+            <>
+              {stackType === StackType.DockerCompose && (
+                <StackContainersDatatable stackName={stackName} />
+              )}
+              {stackType === StackType.DockerSwarm && (
+                <StackServicesDatatable name={stackName} />
+              )}
+            </>
+          ) : null}
+
+          {stack && !isOrphaned && (
+            <AccessControlPanel
+              environmentId={stack.EndpointId}
+              resourceId={`${stack.EndpointId}_${stack.Name}`}
+              resourceControl={resourceControl}
+              resourceType={ResourceControlType.Stack}
+              onUpdateSuccess={() =>
+                queryClient.invalidateQueries(queryKeys.stack(stackId))
+              }
+            />
           )}
-          {stackType === StackType.DockerSwarm && (
-            <StackServicesDatatable name={stackName} />
-          )}
-        </>
-      )}
-      {stack && !isOrphaned && (
-        <AccessControlPanel
-          environmentId={stack.EndpointId}
-          resourceId={`${stack.EndpointId}_${stack.Name}`}
-          resourceControl={resourceControl}
-          resourceType={ResourceControlType.Stack}
-          onUpdateSuccess={() =>
-            queryClient.invalidateQueries(queryKeys.stack(stackId))
-          }
-        />
+          {showRestartSchedule && <StackRestartSchedule stack={stack} />}
+        </div>
       )}
     </>
   );

@@ -63,6 +63,14 @@ type (
 		ForcePullImage bool `example:"false"`
 	}
 
+	// StackRestartSchedule represents a cron-based restart schedule for a stack.
+	StackRestartSchedule struct {
+		// Cron expression interpreted in the Portainer server's local timezone.
+		CronExpression string `example:"0 2 * * *"`
+		// PullImages forces image re-pulling before the scheduled redeploy.
+		PullImages bool `example:"false"`
+	}
+
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment(endpoint).
 	AzureCredentials struct {
@@ -1305,6 +1313,8 @@ type (
 		AdditionalFiles []string `json:"AdditionalFiles"`
 		// The GitOps update settings of a git stack
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
+		// The optional cron-based restart schedule for Docker stacks.
+		RestartSchedule *StackRestartSchedule `json:"RestartSchedule,omitempty"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
 		// GitConfig is the git repository configuration for git-backed stacks.

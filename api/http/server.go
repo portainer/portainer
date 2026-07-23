@@ -67,6 +67,7 @@ import (
 	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/platform"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	stackscheduling "github.com/portainer/portainer/api/stacks/scheduling"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 
 	"github.com/rs/zerolog/log"
@@ -105,6 +106,7 @@ type Server struct {
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelmtypes.HelmPackageManager
 	SourceScheduler             *scheduling.SourceScheduler
+	StackScheduler              *stackscheduling.StackScheduler
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	UpgradeService              upgrade.Service
@@ -250,6 +252,7 @@ func (server *Server) Start(ctx context.Context) error {
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 	stackHandler.SourceScheduler = server.SourceScheduler
+	stackHandler.StackScheduler = server.StackScheduler
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.StackDeployer = server.StackDeployer

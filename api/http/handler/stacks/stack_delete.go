@@ -138,6 +138,9 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
 		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack deletion")
 	}
+	if err := handler.StackScheduler.Reconcile(portainer.StackID(id)); err != nil {
+		log.Warn().Err(err).Int("stack_id", id).Msg("stack scheduler reconcile failed after stack deletion")
+	}
 
 	if resourceControl != nil {
 		if err := handler.DataStore.ResourceControl().Delete(resourceControl.ID); err != nil {

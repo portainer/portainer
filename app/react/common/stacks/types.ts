@@ -63,6 +63,11 @@ export interface StackDeploymentInfo {
   SourceID?: number;
 }
 
+export interface StackRestartSchedule {
+  CronExpression: string;
+  PullImages?: boolean;
+}
+
 export interface Stack {
   Id: number;
   Name: string;
@@ -81,6 +86,7 @@ export interface Stack {
   UpdatedBy: string;
   AdditionalFiles?: string[] | null;
   AutoUpdate?: AutoUpdateResponse | null;
+  RestartSchedule?: StackRestartSchedule | null;
   Option?: {
     Prune: boolean;
     Force: boolean;

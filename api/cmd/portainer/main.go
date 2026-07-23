@@ -50,6 +50,7 @@ import (
 	"github.com/portainer/portainer/api/platform"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	stackscheduling "github.com/portainer/portainer/api/stacks/scheduling"
 	"github.com/portainer/portainer/pkg/build"
 	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/fips"
@@ -580,6 +581,11 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 	if err := sourceScheduler.ReconcileAll(); err != nil {
 		log.Fatal().Err(err).Msg("failed to start source scheduler")
 	}
+	stackRestarter := stackscheduling.NewStackRestarter(dataStore, gitService, stackDeployer, swarmStackManager, composeStackManager)
+	stackScheduler := stackscheduling.NewStackScheduler(sched, dataStore, stackRestarter.Restart)
+	if err := stackScheduler.ReconcileAll(); err != nil {
+		log.Fatal().Err(err).Msg("failed to start stack scheduler")
+	}
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
@@ -654,6 +660,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
 		SourceScheduler:             sourceScheduler,
+		StackScheduler:              stackScheduler,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
 		UpgradeService:              upgradeService,
