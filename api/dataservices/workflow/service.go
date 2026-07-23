@@ -36,11 +36,7 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 }
 
 func (service *Service) Create(workflow *portainer.Workflow) error {
-	return service.Connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, any) {
-			workflow.ID = portainer.WorkflowID(id)
-			return int(workflow.ID), workflow
-		},
-	)
+	return service.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).Create(workflow)
+	})
 }
