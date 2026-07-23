@@ -114,7 +114,7 @@ export function DashboardView() {
             isLoading={volumesCountQuery.isInitialLoading}
             isRefetching={volumesCountQuery.isRefetching}
             icon={Database}
-            to="kubernetes.volumes.index"
+            to="kubernetes.volumes"
             type="Volume"
             data-cy="dashboard-volume"
           />

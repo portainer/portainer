@@ -96,7 +96,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
       />
 
       <SidebarItem
-        to="kubernetes.volumes.index"
+        to="kubernetes.volumes"
         params={{ endpointId: environmentId }}
         icon={Database}
         label="Volumes"
