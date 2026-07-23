@@ -189,6 +189,7 @@ func initUpgradeClient(actionConfig *action.Configuration, upgradeOpts options.I
 		upgradeClient.WaitStrategy = kube.HookOnlyStrategy
 	}
 	upgradeClient.TakeOwnership = upgradeOpts.TakeOwnership // Equivalent to --take-ownership flag
+	upgradeClient.MaxHistory = upgradeOpts.MaxHistory
 	err := configureChartPathOptions(&upgradeClient.ChartPathOptions, upgradeOpts.Version, upgradeOpts.Repo, upgradeOpts.Registry)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to configure chart path options for helm release upgrade")
