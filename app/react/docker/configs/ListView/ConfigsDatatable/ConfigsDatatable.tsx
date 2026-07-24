@@ -23,7 +23,7 @@ export function ConfigsDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
 
   const configListQuery = useConfigsList(environmentId, {
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
     select: (configs) => configs.map((c) => new ConfigViewModel(c)),
   });
 
@@ -48,7 +48,7 @@ export function ConfigsDatatable() {
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

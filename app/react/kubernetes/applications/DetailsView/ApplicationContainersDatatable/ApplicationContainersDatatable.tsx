@@ -45,7 +45,7 @@ export function ApplicationContainersDatatable() {
     name,
     resourceType,
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     }
   );
   const podsQuery = useApplicationPods(
@@ -54,7 +54,7 @@ export function ApplicationContainersDatatable() {
     name,
     applicationQuery.data,
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     }
   );
   const versionQuery = useKubernetesVersion(environmentId);
@@ -125,7 +125,7 @@ export function ApplicationContainersDatatable() {
           renderTableSettings={() => (
             <TableSettingsMenu>
               <TableSettingsMenuAutoRefresh
-                value={tableState.autoRefreshRate}
+                value={tableState.autoRefreshRateMS}
                 onChange={(value) => tableState.setAutoRefreshRate(value)}
               />
             </TableSettingsMenu>

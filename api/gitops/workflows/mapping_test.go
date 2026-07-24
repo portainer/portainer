@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	gittypes "github.com/portainer/portainer/api/git/types"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -149,69 +148,6 @@ func TestEdgeStackTargetStatuses(t *testing.T) {
 		assert.Equal(t, StatusHealthy, result[portainer.EdgeGroupID(10)])
 		assert.Equal(t, StatusError, result[portainer.EdgeGroupID(20)])
 	})
-}
-
-func TestMapEdgeStackToSourceWorkflow_DockerPlatform(t *testing.T) {
-	t.Parallel()
-
-	es := portainer.EdgeStack{
-		ID:             1,
-		Name:           "docker-edge",
-		DeploymentType: portainer.EdgeStackDeploymentCompose,
-		EdgeGroups:     []portainer.EdgeGroupID{1},
-		CreationDate:   1587399600,
-	}
-	cfg := &gittypes.RepoConfig{URL: "https://github.com/x/repo"}
-
-	w := MapEdgeStackToSourceWorkflow(2, es, 7, cfg, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{1: {10}}, WorkflowPhaseStatus{Status: StatusHealthy}, WorkflowPhaseStatus{Status: StatusHealthy})
-
-	require.Equal(t, portainer.WorkflowID(2), w.ID)
-	require.Equal(t, es.Name, w.Name)
-	require.Equal(t, TypeEdgeStack, w.Type)
-	require.Equal(t, DeploymentPlatformDockerStandalone, w.Platform)
-	require.Equal(t, es.CreationDate, w.CreationDate)
-	require.Equal(t, cfg, w.GitConfig)
-	require.Equal(t, portainer.SourceID(7), w.SourceID)
-	require.Equal(t, []portainer.EdgeGroupID{1}, w.Target.EdgeGroupIDs)
-}
-
-func TestMapEdgeStackToSourceWorkflow_KubernetesPlatform(t *testing.T) {
-	t.Parallel()
-
-	es := portainer.EdgeStack{
-		ID:             2,
-		Name:           "kube-edge",
-		DeploymentType: portainer.EdgeStackDeploymentKubernetes,
-		EdgeGroups:     []portainer.EdgeGroupID{1},
-	}
-
-	w := MapEdgeStackToSourceWorkflow(1, es, 0, nil, nil, map[portainer.EdgeGroupID][]portainer.EndpointID{}, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
-
-	require.Equal(t, DeploymentPlatformKubernetes, w.Platform)
-}
-
-func TestMapEdgeStackToSourceWorkflow_GroupStatusesAndResolvedEndpoints(t *testing.T) {
-	t.Parallel()
-
-	statuses := []portainer.EdgeStackStatusForEnv{
-		{EndpointID: 10, Status: []portainer.EdgeStackDeploymentStatus{{Type: portainer.EdgeStackStatusRunning}}},
-		{EndpointID: 20, Status: []portainer.EdgeStackDeploymentStatus{{Type: portainer.EdgeStackStatusError, Error: "boom"}}},
-	}
-	groupEndpoints := map[portainer.EdgeGroupID][]portainer.EndpointID{
-		1: {10},
-		2: {20},
-	}
-	es := portainer.EdgeStack{
-		ID:         3,
-		Name:       "multi-group",
-		EdgeGroups: []portainer.EdgeGroupID{1, 2},
-	}
-
-	w := MapEdgeStackToSourceWorkflow(5, es, 0, nil, statuses, groupEndpoints, WorkflowPhaseStatus{Status: StatusUnknown}, WorkflowPhaseStatus{Status: StatusUnknown})
-
-	require.Equal(t, StatusHealthy, w.Target.GroupStatus[1])
-	require.Equal(t, StatusError, w.Target.GroupStatus[2])
-	require.Len(t, w.Target.ResolvedEndpointIDs, 2)
 }
 
 func TestBuildWorkflow_NameFallback(t *testing.T) {

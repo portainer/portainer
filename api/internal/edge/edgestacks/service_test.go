@@ -25,7 +25,7 @@ func Test_updateEndpointRelation_successfulRuns(t *testing.T) {
 
 	dataStore := testhelpers.NewDatastore(testhelpers.WithEndpointRelations(endpointRelations))
 
-	service := NewService(dataStore)
+	service := NewService(dataStore, nil)
 
 	err := service.updateEndpointRelations(dataStore, edgeStackID, relatedIds)
 	require.NoError(t, err, "updateEndpointRelations should not fail")

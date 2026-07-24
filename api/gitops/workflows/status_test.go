@@ -12,10 +12,12 @@ func TestAggregateWorkflowStatus(t *testing.T) {
 
 	artifact := func(source, artifact, target Status) ArtifactDetail {
 		return ArtifactDetail{
-			Status: WorkflowStatusObject{
-				Source:   WorkflowPhaseStatus{Status: source},
-				Artifact: WorkflowPhaseStatus{Status: artifact},
-				Target:   WorkflowPhaseStatus{Status: target},
+			WorkflowMappingFields: WorkflowMappingFields{
+				Status: WorkflowStatusObject{
+					Source:   WorkflowPhaseStatus{Status: source},
+					Artifact: WorkflowPhaseStatus{Status: artifact},
+					Target:   WorkflowPhaseStatus{Status: target},
+				},
 			},
 		}
 	}

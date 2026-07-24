@@ -465,6 +465,9 @@ import type {
   GitOpsSourcesUpdateGitData,
   GitOpsSourcesUpdateGitErrors,
   GitOpsSourcesUpdateGitResponses,
+  GitOpsSourceWorkflowsListData,
+  GitOpsSourceWorkflowsListErrors,
+  GitOpsSourceWorkflowsListResponses,
   GitOpsWorkflowGetData,
   GitOpsWorkflowGetErrors,
   GitOpsWorkflowGetResponses,
@@ -834,6 +837,7 @@ import {
   zDeleteKubernetesIngressesBody,
   zDeleteKubernetesIngressesPath,
   zDeleteKubernetesIngressesResponse,
+  zDeleteKubernetesNamespaceBody,
   zDeleteKubernetesNamespacePath,
   zDeleteKubernetesNamespaceResponse,
   zDeleteKubernetesPersistentVolumeClaimsBody,
@@ -1125,6 +1129,8 @@ import {
   zGitOpsSourcesUpdateGitBody,
   zGitOpsSourcesUpdateGitPath,
   zGitOpsSourcesUpdateGitResponse,
+  zGitOpsSourceWorkflowsListPath,
+  zGitOpsSourceWorkflowsListResponse,
   zGitOpsWorkflowGetPath,
   zGitOpsWorkflowGetResponse,
   zGitOpsWorkflowsListQuery,
@@ -4144,7 +4150,7 @@ export const gitOpsSourcesDelete = <ThrowOnError extends boolean = true>(
 /**
  * Get a GitOps source by ID
  *
- * Returns a single GitOps source with its connection settings and linked workflows.
+ * Returns a single GitOps source with its connection settings and access rules.
  * **Access policy**: authenticated
  */
 export const gitOpsSourceGet = <ThrowOnError extends boolean = true>(
@@ -4299,6 +4305,43 @@ export const gitOpsSourcesTestById = <ThrowOnError extends boolean = true>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * List the workflows using a GitOps source
+ *
+ * Returns the workflows (stacks or edge stacks) currently deployed from this source.
+ * **Access policy**: authenticated
+ */
+export const gitOpsSourceWorkflowsList = <ThrowOnError extends boolean = true>(
+  options: Options<GitOpsSourceWorkflowsListData, ThrowOnError>
+): RequestResult<
+  GitOpsSourceWorkflowsListResponses,
+  GitOpsSourceWorkflowsListErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GitOpsSourceWorkflowsListResponses,
+    GitOpsSourceWorkflowsListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGitOpsSourceWorkflowsListPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGitOpsSourceWorkflowsListResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/gitops/sources/{id}/workflows',
+    ...options,
   });
 
 /**
@@ -5534,9 +5577,9 @@ export const getKubernetesMetricsForPod = <ThrowOnError extends boolean = true>(
   });
 
 /**
- * Delete a kubernetes namespace
+ * Delete kubernetes namespaces
  *
- * Delete a kubernetes namespace within the given environment.
+ * Delete one or more kubernetes namespaces within the given environment.
  * **Access policy**: Authenticated user.
  */
 export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
@@ -5554,7 +5597,7 @@ export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
     requestValidator: async (data) =>
       await z
         .object({
-          body: z.never().optional(),
+          body: zDeleteKubernetesNamespaceBody,
           path: zDeleteKubernetesNamespacePath,
           query: z.never().optional(),
         })
@@ -5567,6 +5610,10 @@ export const deleteKubernetesNamespace = <ThrowOnError extends boolean = true>(
     ],
     url: '/kubernetes/{id}/namespaces',
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5592,7 +5639,7 @@ export const getKubernetesNamespaces = <ThrowOnError extends boolean = true>(
         .object({
           body: z.never().optional(),
           path: zGetKubernetesNamespacesPath,
-          query: zGetKubernetesNamespacesQuery,
+          query: zGetKubernetesNamespacesQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',
@@ -5713,7 +5760,7 @@ export const getKubernetesNamespace = <ThrowOnError extends boolean = true>(
         .object({
           body: z.never().optional(),
           path: zGetKubernetesNamespacePath,
-          query: zGetKubernetesNamespaceQuery,
+          query: zGetKubernetesNamespaceQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',

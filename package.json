@@ -87,7 +87,7 @@
     "buffer": "^6.0.3",
     "c8": "^9.1.0",
     "chardet": "^1.4.0",
-    "chart.js": "^2.9.4",
+    "recharts": "^3.8.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^1.1.1",
     "codemirror": "^6.0.1",
@@ -259,7 +259,12 @@
       "@types/node": "^25",
       "ngtemplate-loader>loader-utils": "^1.4.2",
       "braces": "^3.0.3",
-      "shell-quote": "^1.8.4"
+      "shell-quote": "^1.8.4",
+      "recharts>@reduxjs/toolkit": "^1.9.7",
+      "recharts>react-redux": "^8.1.3",
+      "recharts>redux": "^4.2.1",
+      "recharts>react": "^16.8.x",
+      "recharts>react-dom": "^16.8.x"
     },
     "configDependencies": {
       "@pnpm/plugin-types-fixer": "0.1.0+sha512-bLww63gRHi7siYTqFJb5qNdcXadU0jv20Et6z5AryMZ7FlLolbEJOrXLpg8+amQZNHHNW1dfFUBGVw/9ezQbFg=="

@@ -17,13 +17,15 @@ import (
 
 // Service represents a service for managing edge stacks.
 type Service struct {
-	dataStore dataservices.DataStore
+	dataStore   dataservices.DataStore
+	fileService portainer.FileService
 }
 
 // NewService returns a new instance of a service.
-func NewService(dataStore dataservices.DataStore) *Service {
+func NewService(dataStore dataservices.DataStore, fileService portainer.FileService) *Service {
 	return &Service{
-		dataStore: dataStore,
+		dataStore:   dataStore,
+		fileService: fileService,
 	}
 }
 
@@ -142,28 +144,39 @@ func (service *Service) updateEndpointRelations(tx dataservices.DataStoreTx, edg
 	return nil
 }
 
-// DeleteEdgeStack deletes the edge stack from the database and its relations
-func (service *Service) DeleteEdgeStack(tx dataservices.DataStoreTx, edgeStackID portainer.EdgeStackID, relatedEdgeGroupsIds []portainer.EdgeGroupID) error {
+// DeleteRecords detaches the edge stack from its environments and deletes
+// its DB records.
+func (service *Service) DeleteRecords(tx dataservices.DataStoreTx, edgeStack *portainer.EdgeStack) error {
 	relationConfig, err := edge.FetchEndpointRelationsConfig(tx)
 	if err != nil {
-		return errors.WithMessage(err, "Unable to retrieve environments relations config from database")
+		return fmt.Errorf("Unable to retrieve environments relations config from database: %w", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(relatedEdgeGroupsIds, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
-		return errors.WithMessage(err, "Unable to retrieve edge stack related environments from database")
+		return fmt.Errorf("Unable to retrieve edge stack related environments from database: %w", err)
 	}
 
-	if err := tx.EndpointRelation().RemoveEndpointRelationsForEdgeStack(relatedEndpointIds, edgeStackID); err != nil {
-		return errors.WithMessage(err, "unable to remove environment relation in database")
+	if err := tx.EndpointRelation().RemoveEndpointRelationsForEdgeStack(relatedEndpointIds, edgeStack.ID); err != nil {
+		return fmt.Errorf("unable to remove environment relation in database: %w", err)
 	}
 
-	if err := tx.EdgeStack().DeleteEdgeStack(edgeStackID); err != nil {
-		return errors.WithMessage(err, "Unable to remove the edge stack from the database")
+	if err := tx.EdgeStack().DeleteEdgeStack(edgeStack.ID); err != nil {
+		return fmt.Errorf("Unable to remove the edge stack from the database: %w", err)
 	}
 
-	if err := tx.EdgeStackStatus().DeleteAll(edgeStackID); err != nil {
-		return errors.WithMessage(err, "unable to remove edge stack statuses from the database")
+	if err := tx.EdgeStackStatus().DeleteAll(edgeStack.ID); err != nil {
+		return fmt.Errorf("unable to remove edge stack statuses from the database: %w", err)
+	}
+
+	return nil
+}
+
+// CleanupAfterDelete cleans up the leftover resources after deleting and edge stack
+func (service *Service) CleanupAfterDelete(edgeStackID portainer.EdgeStackID) error {
+	stackFolder := service.fileService.GetEdgeStackProjectPath(strconv.Itoa(int(edgeStackID)))
+	if err := service.fileService.RemoveDirectory(stackFolder); err != nil {
+		return fmt.Errorf("unable to remove edge stack project folder: %w", err)
 	}
 
 	return nil

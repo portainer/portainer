@@ -106,6 +106,20 @@ func decodeSourceDetail(t *testing.T, rr *httptest.ResponseRecorder) SourceDetai
 	return item
 }
 
+func buildGetWorkflowsReq(t *testing.T, userID portainer.UserID, id string) *http.Request {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodGet, "/gitops/sources/"+id+"/workflows", nil)
+	return withSecurityContext(req, userID)
+}
+
+func decodeSourceWorkflows(t *testing.T, rr *httptest.ResponseRecorder) []Workflow {
+	t.Helper()
+	require.Equal(t, http.StatusOK, rr.Code, "unexpected status: %s", rr.Body.String())
+	var items []Workflow
+	require.NoError(t, json.NewDecoder(rr.Body).Decode(&items))
+	return items
+}
+
 func gitCfg(url string) *gittypes.GitSource {
 	return &gittypes.GitSource{URL: url}
 }

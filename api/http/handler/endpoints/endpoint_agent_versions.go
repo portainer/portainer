@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/set"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -41,7 +42,7 @@ func (handler *Handler) agentVersions(w http.ResponseWriter, r *http.Request) *h
 
 	agentVersions := set.Set[string]{}
 	for _, endpoint := range filteredEndpoints {
-		if endpoint.Agent.Version != "" {
+		if endpointutils.IsAgentEndpoint(&endpoint) && endpoint.Agent.Version != "" {
 			agentVersions[endpoint.Agent.Version] = true
 		}
 	}

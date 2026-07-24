@@ -247,6 +247,7 @@ export const zGitopsRepositoryFilePreviewPayload = z.object({
 
 export const zGittypesGitAuthentication = z.object({
   AuthorizationType: z.int().optional(),
+  GitCredentialID: z.int().optional(),
   Password: z.string().optional(),
   Provider: z.int().optional(),
   Username: z.string().optional(),
@@ -439,6 +440,7 @@ export const zKubernetesK8sIngressPath = z.object({
   Path: z.string().optional(),
   PathType: z.string().optional(),
   Port: z.int().optional(),
+  PortName: z.string().optional(),
   ServiceName: z.string().optional(),
 });
 
@@ -2026,11 +2028,6 @@ export const zSettingsSettingsUpdatePayload = z.object({
   UserSessionTimeout: z.string().optional(),
 });
 
-export const zSourcesAutoUpdateInfo = z.object({
-  fetchInterval: z.string().optional(),
-  mechanism: z.string().optional(),
-});
-
 export const zSourcesConnectionTestResult = z.object({
   error: z.string().optional(),
   success: z.boolean().optional(),
@@ -2118,6 +2115,10 @@ export const zStacksComposeStackFromGitRepositoryPayload = z.object({
   RepositoryUsername: z.string().optional(),
   SourceID: z.int().optional(),
   TLSSkipVerify: z.boolean().optional(),
+});
+
+export const zStacksCreateKubernetesStackResponse = z.object({
+  Output: z.string().optional(),
 });
 
 export const zStacksKubernetesGitDeploymentPayload = z.object({
@@ -2511,6 +2512,8 @@ export const zV1FileKeySelector = z.object({
   volumeName: z.string().optional(),
 });
 
+export const zV1FinalizerName = z.enum(['kubernetes']);
+
 export const zV1GrpcAction = z.object({
   port: z.int().optional(),
   service: z.string().optional(),
@@ -2558,6 +2561,10 @@ export const zV1NamespaceCondition = z.object({
 });
 
 export const zV1NamespacePhase = z.enum(['Active', 'Terminating']);
+
+export const zV1NamespaceSpec = z.object({
+  finalizers: z.array(zV1FinalizerName).optional(),
+});
 
 export const zV1NamespaceStatus = z.object({
   conditions: z.array(zV1NamespaceCondition).optional(),
@@ -2673,6 +2680,14 @@ export const zV1ObjectMeta = z.object({
   resourceVersion: z.string().optional(),
   selfLink: z.string().optional(),
   uid: z.string().optional(),
+});
+
+export const zKubernetesKubernetesCreateNamespaceResponse = z.object({
+  apiVersion: z.string().optional(),
+  kind: z.string().optional(),
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1NamespaceSpec.optional(),
+  status: zV1NamespaceStatus.optional(),
 });
 
 export const zV1PersistentVolumeAccessMode = z.enum([
@@ -3328,6 +3343,19 @@ export const zSourcesSource = z.object({
   usedBy: z.int().optional(),
 });
 
+export const zSourcesSourceDetail = z.object({
+  access: zSourcesSourceAccess.optional(),
+  connection: zSourcesConnectionInfo,
+  error: z.string().optional(),
+  id: z.int(),
+  interval: z.string().optional(),
+  lastSync: z.int().optional(),
+  name: z.string(),
+  status: zWorkflowsStatus,
+  type: zSourcesSourceType,
+  url: z.string(),
+});
+
 export const zWorkflowsStatusSummary = z.object({
   error: z.int().optional(),
   healthy: z.int().optional(),
@@ -3357,21 +3385,7 @@ export const zWorkflowsWorkflowStatusObject = z.object({
   target: zWorkflowsWorkflowPhaseStatus.optional(),
 });
 
-export const zWorkflowsArtifactDetail = z.object({
-  autoUpdate: zPortainerAutoUpdateSettings.optional(),
-  creationDate: z.int().optional(),
-  files: z.array(zWorkflowsArtifactFileDetail).optional(),
-  id: z.int(),
-  lastSyncDate: z.int().optional(),
-  name: z.string(),
-  platform: zWorkflowsDeploymentPlatform.optional(),
-  status: zWorkflowsWorkflowStatusObject.optional(),
-  target: zWorkflowsTarget.optional(),
-  type: zWorkflowsType,
-});
-
-export const zWorkflowsSourceWorkflow = z.object({
-  autoUpdate: zPortainerAutoUpdateSettings.optional(),
+export const zSourcesWorkflow = z.object({
   creationDate: z.int().optional(),
   gitConfig: zGittypesRepoConfig.optional(),
   id: z.int(),
@@ -3384,21 +3398,17 @@ export const zWorkflowsSourceWorkflow = z.object({
   type: zWorkflowsType,
 });
 
-export const zSourcesSourceDetail = z.object({
-  access: zSourcesSourceAccess.optional(),
-  autoUpdate: zSourcesAutoUpdateInfo.optional(),
-  connection: zSourcesConnectionInfo,
-  environments: z.int().optional(),
-  error: z.string().optional(),
+export const zWorkflowsArtifactDetail = z.object({
+  autoUpdate: zPortainerAutoUpdateSettings.optional(),
+  creationDate: z.int().optional(),
+  files: z.array(zWorkflowsArtifactFileDetail).optional(),
   id: z.int(),
-  interval: z.string().optional(),
-  lastSync: z.int().optional(),
+  lastSyncDate: z.int().optional(),
   name: z.string(),
-  status: zWorkflowsStatus,
-  type: zSourcesSourceType,
-  url: z.string(),
-  usedBy: z.int().optional(),
-  workflows: z.array(zWorkflowsSourceWorkflow).optional(),
+  platform: zWorkflowsDeploymentPlatform.optional(),
+  status: zWorkflowsWorkflowStatusObject.optional(),
+  target: zWorkflowsTarget.optional(),
+  type: zWorkflowsType,
 });
 
 export const zWorkflowsWorkflow = z.object({
@@ -4418,6 +4428,15 @@ export const zGitOpsSourcesTestByIdPath = z.object({
  */
 export const zGitOpsSourcesTestByIdResponse = zSourcesConnectionTestResult;
 
+export const zGitOpsSourceWorkflowsListPath = z.object({
+  id: z.int(),
+});
+
+/**
+ * OK
+ */
+export const zGitOpsSourceWorkflowsListResponse = z.array(zSourcesWorkflow);
+
 /**
  * Git source details
  */
@@ -4796,6 +4815,11 @@ export const zGetKubernetesMetricsForPodPath = z.object({
  */
 export const zGetKubernetesMetricsForPodResponse = zV1Beta1PodMetrics;
 
+/**
+ * List of namespace names to delete
+ */
+export const zDeleteKubernetesNamespaceBody = z.array(z.string());
+
 export const zDeleteKubernetesNamespacePath = z.object({
   id: z.int(),
 });
@@ -4810,8 +4834,8 @@ export const zGetKubernetesNamespacesPath = z.object({
 });
 
 export const zGetKubernetesNamespacesQuery = z.object({
-  withResourceQuota: z.boolean(),
-  withUnhealthyEvents: z.boolean(),
+  withResourceQuota: z.boolean().optional(),
+  withUnhealthyEvents: z.boolean().optional(),
 });
 
 /**
@@ -4833,7 +4857,8 @@ export const zCreateKubernetesNamespacePath = z.object({
 /**
  * Success
  */
-export const zCreateKubernetesNamespaceResponse = zPortainerK8sNamespaceInfo;
+export const zCreateKubernetesNamespaceResponse =
+  zKubernetesKubernetesCreateNamespaceResponse;
 
 /**
  * Namespace details
@@ -4858,7 +4883,7 @@ export const zGetKubernetesNamespacePath = z.object({
 });
 
 export const zGetKubernetesNamespaceQuery = z.object({
-  withResourceQuota: z.boolean(),
+  withResourceQuota: z.boolean().optional(),
 });
 
 /**
@@ -5855,7 +5880,8 @@ export const zStackCreateKubernetesGitQuery = z.object({
 /**
  * OK
  */
-export const zStackCreateKubernetesGitResponse = zPortainerStack;
+export const zStackCreateKubernetesGitResponse =
+  zStacksCreateKubernetesStackResponse;
 
 /**
  * stack config
@@ -5870,7 +5896,8 @@ export const zStackCreateKubernetesFileQuery = z.object({
 /**
  * OK
  */
-export const zStackCreateKubernetesFileResponse = zPortainerStack;
+export const zStackCreateKubernetesFileResponse =
+  zStacksCreateKubernetesStackResponse;
 
 /**
  * stack config
@@ -5885,7 +5912,8 @@ export const zStackCreateKubernetesUrlQuery = z.object({
 /**
  * OK
  */
-export const zStackCreateKubernetesUrlResponse = zPortainerStack;
+export const zStackCreateKubernetesUrlResponse =
+  zStacksCreateKubernetesStackResponse;
 
 export const zStackCreateDockerStandaloneFileBody = z.object({
   Name: z.string(),

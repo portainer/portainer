@@ -3208,8 +3208,8 @@ paths:
         - gitops
     get:
       description: >-
-        Returns a single GitOps source with its connection settings and linked
-        workflows.
+        Returns a single GitOps source with its connection settings and access
+        rules.
 
         **Access policy**: authenticated
       operationId: GitOpsSourceGet
@@ -3365,6 +3365,44 @@ paths:
         - ApiKeyAuth: []
         - jwt: []
       summary: Test the connection of a stored source
+      tags:
+        - gitops
+  "/gitops/sources/{id}/workflows":
+    get:
+      description: >-
+        Returns the workflows (stacks or edge stacks) currently deployed from
+        this source.
+
+        **Access policy**: authenticated
+      operationId: GitOpsSourceWorkflowsList
+      parameters:
+        - description: Source identifier
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/sources.Workflow"
+                type: array
+        "400":
+          description: Invalid request
+        "403":
+          description: Access denied
+        "404":
+          description: Source not found
+        "500":
+          description: Server error
+      security:
+        - ApiKeyAuth: []
+        - jwt: []
+      summary: List the workflows using a GitOps source
       tags:
         - gitops
   /gitops/sources/git:
@@ -4839,7 +4877,7 @@ paths:
   "/kubernetes/{id}/namespaces":
     delete:
       description: |-
-        Delete a kubernetes namespace within the given environment.
+        Delete one or more kubernetes namespaces within the given environment.
         **Access policy**: Authenticated user.
       operationId: DeleteKubernetesNamespace
       parameters:
@@ -4849,6 +4887,15 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        description: List of namespace names to delete
+        required: true
       responses:
         "200":
           description: Success
@@ -4866,7 +4913,7 @@ paths:
       security:
         - ApiKeyAuth: []
           jwt: []
-      summary: Delete a kubernetes namespace
+      summary: Delete kubernetes namespaces
       tags:
         - kubernetes
     get:
@@ -4889,14 +4936,12 @@ paths:
             the Namespace information. Default is false
           in: query
           name: withResourceQuota
-          required: true
           schema:
             type: boolean
         - description: When set to true, include the unhealthy events information as part
             of the Namespace information. Default is false
           in: query
           name: withUnhealthyEvents
-          required: true
           schema:
             type: boolean
       responses:
@@ -4956,7 +5001,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.K8sNamespaceInfo"
+                $ref: "#/components/schemas/kubernetes.KubernetesCreateNamespaceResponse"
         "400":
           description: Invalid request payload, such as missing required fields or fields
             not meeting validation criteria.
@@ -5054,7 +5099,6 @@ paths:
             the Namespace information. Default is false
           in: query
           name: withResourceQuota
-          required: true
           schema:
             type: boolean
       responses:
@@ -8589,7 +8633,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "409":
@@ -8630,7 +8674,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "500":
@@ -8669,7 +8713,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/portainer.Stack"
+                $ref: "#/components/schemas/stacks.createKubernetesStackResponse"
         "400":
           description: Invalid request
         "500":
@@ -12202,6 +12246,9 @@ components:
       properties:
         AuthorizationType:
           type: integer
+        GitCredentialID:
+          example: 0
+          type: integer
         Password:
           type: string
         Provider:
@@ -12826,6 +12873,8 @@ components:
           type: string
         Port:
           type: integer
+        PortName:
+          type: string
         ServiceName:
           type: string
       type: object
@@ -13239,6 +13288,64 @@ components:
           $ref: "#/components/schemas/kubernetes.K8sPersistentVolumeClaim"
         storageClass:
           $ref: "#/components/schemas/kubernetes.K8sStorageClass"
+      type: object
+    kubernetes.KubernetesCreateNamespaceResponse:
+      properties:
+        apiVersion:
+          description: >-
+            APIVersion defines the versioned schema of this representation of an
+            object.
+
+            Servers should convert recognized schemas to the latest internal value, and
+
+            may reject unrecognized values.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+            +optional
+          type: string
+        kind:
+          description: >-
+            Kind is a string value representing the REST resource this object
+            represents.
+
+            Servers may infer this from the endpoint the client submits requests to.
+
+            Cannot be updated.
+
+            In CamelCase.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+            +optional
+          type: string
+        metadata:
+          allOf:
+            - $ref: "#/components/schemas/v1.ObjectMeta"
+          description: >-
+            Standard object's metadata.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+
+            +optional
+        spec:
+          allOf:
+            - $ref: "#/components/schemas/v1.NamespaceSpec"
+          description: >-
+            Spec defines the behavior of the Namespace.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+            +optional
+        status:
+          allOf:
+            - $ref: "#/components/schemas/v1.NamespaceStatus"
+          description: >-
+            Status describes the current status of a Namespace.
+
+            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+            +optional
       type: object
     kubernetes.KubernetesNodeResponse:
       properties:
@@ -16583,13 +16690,6 @@ components:
           example: 5m
           type: string
       type: object
-    sources.AutoUpdateInfo:
-      properties:
-        fetchInterval:
-          type: string
-        mechanism:
-          type: string
-      type: object
     sources.ConnectionTestResult:
       properties:
         error:
@@ -16713,12 +16813,8 @@ components:
       properties:
         access:
           $ref: "#/components/schemas/sources.SourceAccess"
-        autoUpdate:
-          $ref: "#/components/schemas/sources.AutoUpdateInfo"
         connection:
           $ref: "#/components/schemas/sources.connectionInfo"
-        environments:
-          type: integer
         error:
           type: string
         id:
@@ -16736,12 +16832,6 @@ components:
           $ref: "#/components/schemas/sources.SourceType"
         url:
           type: string
-        usedBy:
-          type: integer
-        workflows:
-          items:
-            $ref: "#/components/schemas/workflows.SourceWorkflow"
-          type: array
       required:
         - connection
         - id
@@ -16770,6 +16860,36 @@ components:
         - SourceStatusUnknown
         - SourceStatusHealthy
         - SourceStatusError
+    sources.Workflow:
+      properties:
+        creationDate:
+          type: integer
+        gitConfig:
+          $ref: "#/components/schemas/gittypes.RepoConfig"
+        id:
+          type: integer
+        lastSyncDate:
+          type: integer
+        name:
+          type: string
+        platform:
+          $ref: "#/components/schemas/workflows.DeploymentPlatform"
+        sourceId:
+          type: integer
+        status:
+          $ref: "#/components/schemas/workflows.WorkflowStatusObject"
+        target:
+          $ref: "#/components/schemas/workflows.Target"
+        type:
+          $ref: "#/components/schemas/workflows.Type"
+      required:
+        - id
+        - name
+        - platform
+        - status
+        - target
+        - type
+      type: object
     sources.connectionInfo:
       properties:
         authentication:
@@ -16888,6 +17008,11 @@ components:
           type: boolean
       required:
         - Name
+      type: object
+    stacks.createKubernetesStackResponse:
+      properties:
+        Output:
+          type: string
       type: object
     stacks.kubernetesGitDeploymentPayload:
       properties:
@@ -18699,6 +18824,12 @@ components:
             +required
           type: string
       type: object
+    v1.FinalizerName:
+      enum:
+        - kubernetes
+      type: string
+      x-enum-varnames:
+        - FinalizerKubernetes
     v1.GRPCAction:
       properties:
         port:
@@ -19042,6 +19173,22 @@ components:
       x-enum-varnames:
         - NamespaceActive
         - NamespaceTerminating
+    v1.NamespaceSpec:
+      properties:
+        finalizers:
+          description: >-
+            Finalizers is an opaque list of values that must be empty to
+            permanently remove object from storage.
+
+            More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
+
+            +optional
+
+            +listType=atomic
+          items:
+            $ref: "#/components/schemas/v1.FinalizerName"
+          type: array
+      type: object
     v1.NamespaceStatus:
       properties:
         conditions:
@@ -21386,38 +21533,6 @@ components:
         - DeploymentPlatformDockerStandalone
         - DeploymentPlatformDockerSwarm
         - DeploymentPlatformKubernetes
-    workflows.SourceWorkflow:
-      properties:
-        autoUpdate:
-          $ref: "#/components/schemas/portainer.AutoUpdateSettings"
-        creationDate:
-          type: integer
-        gitConfig:
-          $ref: "#/components/schemas/gittypes.RepoConfig"
-        id:
-          type: integer
-        lastSyncDate:
-          type: integer
-        name:
-          type: string
-        platform:
-          $ref: "#/components/schemas/workflows.DeploymentPlatform"
-        sourceId:
-          type: integer
-        status:
-          $ref: "#/components/schemas/workflows.WorkflowStatusObject"
-        target:
-          $ref: "#/components/schemas/workflows.Target"
-        type:
-          $ref: "#/components/schemas/workflows.Type"
-      required:
-        - id
-        - name
-        - platform
-        - status
-        - target
-        - type
-      type: object
     workflows.Status:
       enum:
         - healthy

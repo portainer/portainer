@@ -27,6 +27,10 @@ type InstallOptions struct {
 	KubernetesClusterAccess *KubernetesClusterAccess
 	TakeOwnership           bool
 	CreateNamespace         bool
+	// MaxHistory caps the number of old revisions Helm keeps for this release
+	// on upgrade (0, the zero value, means unlimited history, matching Helm's
+	// own default).
+	MaxHistory int
 
 	// GitOps related options
 	AutoUpdate *portainer.AutoUpdateSettings

@@ -42,7 +42,7 @@ export function RoleBindingsDatatable() {
     })
   );
   const roleBindingsQuery = useRoleBindings(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const filteredRoleBindings = useMemo(
     () =>

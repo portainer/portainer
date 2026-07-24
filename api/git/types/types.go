@@ -132,4 +132,5 @@ type GitAuthentication struct {
 	Password          string
 	Provider          GitProvider           `json:",omitempty"`
 	AuthorizationType GitCredentialAuthType `json:",omitempty"`
+	GitCredentialID   int                   `json:",omitempty" example:"0"`
 }

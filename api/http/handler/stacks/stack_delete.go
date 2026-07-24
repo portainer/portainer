@@ -3,14 +3,12 @@ package stacks
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
-	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -114,7 +112,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
-	if err := handler.deleteStack(r.Context(), securityContext.UserID, stack, endpoint); err != nil {
+	if err := handler.teardownService.RemoveResources(r.Context(), securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
@@ -130,9 +128,13 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 			}
 		}
 
-		return tx.Stack().Delete(portainer.StackID(id))
+		return handler.teardownService.DeleteRecords(tx, stack)
 	}); err != nil {
 		return httperror.InternalServerError("Unable to remove the stack from the database", err)
+	}
+
+	if err := handler.teardownService.RemoveFiles(stack); err != nil {
+		log.Warn().Err(err).Int("stack_id", int(stack.ID)).Msg("unable to remove stack files after stack deletion")
 	}
 
 	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
@@ -140,16 +142,6 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 	if err := handler.StackScheduler.Reconcile(portainer.StackID(id)); err != nil {
 		log.Warn().Err(err).Int("stack_id", id).Msg("stack scheduler reconcile failed after stack deletion")
-	}
-
-	if resourceControl != nil {
-		if err := handler.DataStore.ResourceControl().Delete(resourceControl.ID); err != nil {
-			return httperror.InternalServerError("Unable to remove the associated resource control from the database", err)
-		}
-	}
-
-	if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
-		log.Warn().Err(err).Msg("Unable to remove stack files from disk")
 	}
 
 	return response.Empty(w)
@@ -189,53 +181,11 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		Type: portainer.DockerSwarmStack,
 	}
 
-	if err := handler.deleteStack(context.TODO(), securityContext.UserID, stack, endpoint); err != nil {
+	if err := handler.teardownService.RemoveResources(context.TODO(), securityContext.UserID, stack, endpoint); err != nil {
 		return httperror.InternalServerError("Unable to delete stack", err)
 	}
 
 	return response.Empty(w)
-}
-
-func (handler *Handler) deleteStack(ctx context.Context, userID portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	if stack.Type == portainer.DockerSwarmStack {
-		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
-
-		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.UndeployRemoteSwarmStack(ctx, userID, stack, endpoint)
-		}
-
-		return handler.SwarmStackManager.Remove(ctx, stack, endpoint)
-	}
-
-	if stack.Type == portainer.DockerComposeStack {
-		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
-
-		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.UndeployRemoteComposeStack(ctx, userID, stack, endpoint)
-		}
-
-		return handler.StackDeployer.UndeployComposeStack(ctx, stack, endpoint)
-	}
-
-	if stack.Type == portainer.KubernetesStack {
-		manifestFiles := stackutils.GetStackFilePaths(stack, true)
-
-		out, err := handler.KubernetesDeployer.Remove(ctx, userID, endpoint, manifestFiles, stack.Namespace)
-		if err != nil {
-			for _, manifest := range manifestFiles {
-				if exists, fileExistsErr := filesystem.FileExists(manifest); fileExistsErr != nil || !exists {
-					// If removal has failed and one of the manifest files is missing,
-					// we can consider this stack as removed
-					log.Warn().Err(fileExistsErr).Msgf("failed to find manifest %s, but stack deletion will continue", manifest)
-					return nil
-				}
-			}
-			return fmt.Errorf("failed to remove kubernetes resources: %q. Error: %w", out, err)
-		}
-		return nil
-	}
-
-	return fmt.Errorf("unsupported stack type: %v", stack.Type)
 }
 
 // @id StackDeleteKubernetesByName
@@ -337,8 +287,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 	for _, stack := range stacksToDelete {
 		log.Debug().Msgf("Trying to delete Kubernetes stack id `%d`", stack.ID)
 
-		err = handler.deleteStack(context.TODO(), securityContext.UserID, &stack, endpoint)
-		if err != nil {
+		if err := handler.teardownService.RemoveResources(context.TODO(), securityContext.UserID, &stack, endpoint); err != nil {
 			log.Err(err).Msgf("Unable to delete Kubernetes stack `%d`", stack.ID)
 			errs = errors.Join(errs, err)
 
@@ -357,7 +306,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 				}
 			}
 
-			return tx.Stack().Delete(stack.ID)
+			return handler.teardownService.DeleteRecords(tx, &stack)
 		}); err != nil {
 			errs = errors.Join(errs, err)
 			log.Err(err).Int("stack_id", int(stack.ID)).Msg("unable to remove the stack from the database")
@@ -365,13 +314,12 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 			continue
 		}
 
-		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
-			log.Warn().Err(err).Msg("source scheduler reconcile failed after Kubernetes stack deletion")
+		if err := handler.teardownService.RemoveFiles(&stack); err != nil {
+			log.Warn().Err(err).Int("stack_id", int(stack.ID)).Msg("unable to remove stack files after stack deletion")
 		}
 
-		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
-			errs = errors.Join(errs, err)
-			log.Warn().Err(err).Msg("Unable to remove stack files from disk")
+		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+			log.Warn().Err(err).Msg("source scheduler reconcile failed after Kubernetes stack deletion")
 		}
 
 		log.Debug().Msgf("Kubernetes stack `%d` deleted", stack.ID)

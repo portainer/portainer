@@ -8,9 +8,12 @@ import { Icon } from '@@/Icon';
 import styles from './TableSettingsMenuAutoRefresh.module.css';
 
 interface Props {
-  onChange(value: number): void;
+  onChange(valueMS: number): void;
   value: number;
 }
+
+const SECOND_MS = 1000;
+const DEFAULT_REFRESH_RATE_MS = 10 * SECOND_MS;
 
 export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
   const [isCheckVisible, setIsCheckVisible] = useState(false);
@@ -24,7 +27,9 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
         data-cy="settings-auto-refresh"
         label="Auto refresh"
         checked={isEnabled}
-        onChange={(e) => onChange(e.target.checked ? 10 : 0)}
+        onChange={(e) =>
+          onChange(e.target.checked ? DEFAULT_REFRESH_RATE_MS : 0)
+        }
       />
 
       {isEnabled && (
@@ -37,11 +42,11 @@ export function TableSettingsMenuAutoRefresh({ onChange, value }: Props) {
             value={value}
             onChange={(e) => handleChange(e.target.value)}
           >
-            <option value={10}>10s</option>
-            <option value={30}>30s</option>
-            <option value={60}>1min</option>
-            <option value={120}>2min</option>
-            <option value={300}>5min</option>
+            <option value={10 * SECOND_MS}>10s</option>
+            <option value={30 * SECOND_MS}>30s</option>
+            <option value={60 * SECOND_MS}>1min</option>
+            <option value={120 * SECOND_MS}>2min</option>
+            <option value={300 * SECOND_MS}>5min</option>
           </select>
           <span
             className={clsx(

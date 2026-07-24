@@ -101,13 +101,13 @@ func Test_cliOptions(t *testing.T) {
 			expected: libstack.DockerCliOptions{
 				Host:       "tcp://127.0.0.1:2377",
 				Registries: registries,
-				Headers:    map[string]string{managerOperationHeader: "1"},
+				Headers:    map[string]string{ManagerOperationHeader: "1"},
 			},
 		},
 		{
 			name: "empty host and nil registries still set the header",
 			expected: libstack.DockerCliOptions{
-				Headers: map[string]string{managerOperationHeader: "1"},
+				Headers: map[string]string{ManagerOperationHeader: "1"},
 			},
 		},
 	}
@@ -807,6 +807,213 @@ services:
 				Volumes:  map[string]composetypes.VolumeConfig{},
 				Secrets:  map[string]composetypes.SecretConfig{},
 				Configs:  map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "secret file with relative path is resolved against the compose file directory",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    file: secret.txt`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {File: dir + "/secret.txt"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "config file with relative path is resolved against the compose file directory",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+configs:
+  app_config:
+    file: app.conf`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets:  map[string]composetypes.SecretConfig{},
+				Configs: map[string]composetypes.ConfigObjConfig{
+					"app_config": {File: dir + "/app.conf"},
+				},
+			},
+		},
+		{
+			// A compose file in a sub-directory must be able to reach a secret file that lives
+			// outside that sub-directory (e.g. an edge-config directory above it) via a "../"
+			// relative path. The traversal has to be honored, not stripped.
+			name: "secret file with relative path traverses out of the compose file sub-directory",
+			composeFiles: map[string]string{
+				"sub/docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    file: ../edge-configs/prod/secret.txt`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {File: dir + "/edge-configs/prod/secret.txt"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			// A "../" traversal that would escape the working dir must be clamped to it, so a
+			// malicious compose file cannot reference files outside the project directory.
+			name: "secret file with relative path traversing outside the working dir is clamped",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    file: ../../../etc/passwd`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {File: dir + "/etc/passwd"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "secret file with absolute path is left unchanged",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    file: /etc/portainer/secret.txt`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {File: "/etc/portainer/secret.txt"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "external secret has no file and is left unchanged",
+			composeFiles: map[string]string{
+				"docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    external: true`,
+			},
+			workingDir: dir,
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {External: composetypes.External{External: true}, Name: "app_secret"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
+			},
+		},
+		{
+			name: "relative secret file with no working dir is resolved against the compose file directory",
+			composeFiles: map[string]string{
+				"sub/docker-compose.yaml": `services:
+  web:
+    image: nginx:latest
+secrets:
+  app_secret:
+    file: secret.txt`,
+			},
+			expectedCfg: &composetypes.Config{
+				Filename: dir + "/sub/docker-compose.yaml",
+				Version:  "3.13",
+				Services: composetypes.Services{
+					composetypes.ServiceConfig{
+						Name:        "web",
+						Environment: composetypes.MappingWithEquals{},
+						Image:       "nginx:latest",
+					},
+				},
+				Networks: map[string]composetypes.NetworkConfig{},
+				Volumes:  map[string]composetypes.VolumeConfig{},
+				Secrets: map[string]composetypes.SecretConfig{
+					"app_secret": {File: dir + "/sub/secret.txt"},
+				},
+				Configs: map[string]composetypes.ConfigObjConfig{},
 			},
 		},
 		{

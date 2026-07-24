@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
@@ -6,10 +7,11 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { Select, Input } from '@@/form-components/Input';
 import { Widget, WidgetBody } from '@@/Widget';
 import { Button } from '@@/buttons';
+import { FormError } from '@@/form-components/FormError';
 import { useInputList } from '@@/form-components/InputList/useInputList';
 import { InputListActionButtons } from '@@/form-components/InputList/ActionButtons';
 
-import { DnEntry } from './ldap-dn-utils';
+import { DnEntry, validateDnEntryValue } from './ldap-dn-utils';
 
 const typeOptions = [
   { label: 'OU Name', value: 'ou' },
@@ -98,28 +100,53 @@ interface DnEntryItemProps {
 }
 
 function DnEntryItem({ item, onChange, disabled, readOnly }: DnEntryItemProps) {
+  // Keep the raw text the user typed locally so an invalid value (e.g. one
+  // containing a comma) stays visible alongside the warning instead of being
+  // dropped by the DN parse/build round-trip. Only valid values propagate up.
+  const [value, setValue] = useState(item.value);
+
+  // Re-sync when the entry value changes externally (e.g. reorder, suffix
+  // change) using React's adjust-state-during-render pattern.
+  const [lastItemValue, setLastItemValue] = useState(item.value);
+  if (item.value !== lastItemValue) {
+    setLastItemValue(item.value);
+    setValue(item.value);
+  }
+
+  const error = validateDnEntryValue(value);
+
+  function handleValueChange(newValue: string) {
+    setValue(newValue);
+    if (!validateDnEntryValue(newValue)) {
+      onChange({ ...item, value: newValue });
+    }
+  }
+
   return (
-    <div className="flex w-full gap-2">
-      <div className="w-1/3">
-        <Select
-          options={typeOptions}
-          value={item.type}
-          onChange={(e) =>
-            onChange({ ...item, type: e.target.value as 'ou' | 'cn' })
-          }
-          disabled={disabled}
-          data-cy="ldap-dn-builder-select"
-        />
+    <div className="flex w-full flex-col gap-1">
+      <div className="flex w-full gap-2">
+        <div className="w-1/3">
+          <Select
+            options={typeOptions}
+            value={item.type}
+            onChange={(e) =>
+              onChange({ ...item, type: e.target.value as 'ou' | 'cn' })
+            }
+            disabled={disabled}
+            data-cy="ldap-dn-builder-select"
+          />
+        </div>
+        <div className="w-5/12">
+          <Input
+            value={value}
+            onChange={(e) => handleValueChange(e.target.value)}
+            disabled={disabled}
+            readOnly={readOnly}
+            data-cy="ldap-dn-builder-input"
+          />
+        </div>
       </div>
-      <div className="w-5/12">
-        <Input
-          value={item.value}
-          onChange={(e) => onChange({ ...item, value: e.target.value })}
-          disabled={disabled}
-          readOnly={readOnly}
-          data-cy="ldap-dn-builder-input"
-        />
-      </div>
+      {error && <FormError>{error}</FormError>}
     </div>
   );
 }

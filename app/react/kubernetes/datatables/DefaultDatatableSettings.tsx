@@ -30,7 +30,7 @@ export function DefaultDatatableSettings({
       />
 
       <TableSettingsMenuAutoRefresh
-        value={settings.autoRefreshRate}
+        value={settings.autoRefreshRateMS}
         onChange={handleRefreshRateChange}
       />
     </>

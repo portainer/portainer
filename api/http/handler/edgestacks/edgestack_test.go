@@ -50,7 +50,7 @@ func setupHandler(t *testing.T) (*Handler, string) {
 	handler := NewHandler(
 		security.NewRequestBouncer(t.Context(), store, jwtService, apiKeyService),
 		store,
-		edgestacks.NewService(store),
+		edgestacks.NewService(store, fs),
 	)
 
 	handler.FileService = fs

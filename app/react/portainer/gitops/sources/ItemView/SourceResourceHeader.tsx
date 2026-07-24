@@ -1,4 +1,4 @@
-import { GitBranch, GitCommitIcon, ClockIcon } from 'lucide-react';
+import { GitBranch, GitCommitIcon, ClockIcon, Loader2 } from 'lucide-react';
 import moment from 'moment';
 import { useRouter } from '@uirouter/react';
 
@@ -15,6 +15,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { SOURCE_TYPES } from '../types';
 import { SourceDetail } from '../queries/useSource';
 import { useDeleteSourceMutation } from '../queries/useDeleteSourceMutation';
+import { useSourceWorkflows } from '../queries/useSourceWorkflows';
 
 import { TestConnectionButton } from './TestConnectionButton';
 
@@ -28,6 +29,9 @@ export function SourceResourceHeader({ source }: Props) {
   const lastSyncLabel = source.lastSync
     ? moment.unix(source.lastSync).fromNow()
     : '-';
+  const workflowsQuery = useSourceWorkflows(source.id);
+  const workflowsCount = workflowsQuery.data?.length;
+  const hasWorkflows = workflowsCount === undefined || workflowsCount > 0;
 
   return (
     <ResourceDetailHeader
@@ -49,7 +53,11 @@ export function SourceResourceHeader({ source }: Props) {
               Workflows
             </ResourceStatBlock.Label>
             <ResourceStatBlock.Value align="center" size="base">
-              {source.usedBy ?? '-'}
+              <WorkflowsStatValue
+                count={workflowsCount}
+                isLoading={workflowsQuery.isLoading}
+                isError={workflowsQuery.isError}
+              />
             </ResourceStatBlock.Value>
           </ResourceStatBlock>
           <ResourceStatBlock>
@@ -72,13 +80,31 @@ export function SourceResourceHeader({ source }: Props) {
           <div className="ml-auto">
             <SourceDeleteButton
               sourceId={source.id}
-              hasWorkflows={source.usedBy > 0}
+              hasWorkflows={hasWorkflows}
             />
           </div>
         </ActionBarShell>
       }
     />
   );
+}
+
+function WorkflowsStatValue({
+  count,
+  isLoading,
+  isError,
+}: {
+  count: number | undefined;
+  isLoading: boolean;
+  isError: boolean;
+}) {
+  if (isLoading) {
+    return <Icon icon={Loader2} className="animate-spin-slow" />;
+  }
+  if (isError) {
+    return <>-</>;
+  }
+  return <>{count}</>;
 }
 
 function SourceDeleteButton({

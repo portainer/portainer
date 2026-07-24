@@ -20,12 +20,13 @@ type stackBuildProcess interface {
 	prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error
 	saveStack() (*portainer.Stack, error)
 	deploy(ctx context.Context, endpoint *portainer.Endpoint) error
+	cleanUp() error
 	// postDeploy runs after a successful deployment: for git builders it enables
 	// auto-update; for other builders it is a no-op.
 	postDeploy(ctx context.Context, stack *portainer.Stack) error
 }
 
-// Build executes the stack build process. It returns the created stack and any
+// BuildAndAsyncDeploy executes the stack build process. It returns the created stack and any
 // error encountered during the process. The returned error is of type
 // *httperror.HandlerError, which could be an InternalServerError depending on
 // the error encountered during the stack build process.
@@ -33,8 +34,10 @@ type stackBuildProcess interface {
 // The stack is saved to DB with Status=Deploying and returned immediately.
 // Deployment runs in a background goroutine. The caller must poll
 // GET /stacks/{id} to track completion.
-func Build(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
+func BuildAndAsyncDeploy(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
 	builder.setGeneralInfo(payload, endpoint)
+
+	defer func() { _ = builder.cleanUp() }()
 
 	if err := builder.prepare(ctx, payload, userID); err != nil {
 		return nil, httperror.InternalServerError("Failed to prepare stack", err)
@@ -46,6 +49,56 @@ func Build(ctx context.Context, dataStore dataservices.DataStore, builder stackB
 	}
 
 	go deploy(dataStore, builder, stack.ID, endpoint)
+
+	return stack, nil
+}
+
+// BuildAndDeploy is like BuildAndAsyncDeploy, but deploys inline and returns any deploy failure to
+// the caller.
+//
+// The async wrapper hid real failures: an apply that errors before even reaching the cluster
+// (e.g. a missing namespace) only recorded its error on the stack, in the background
+// (BE-13174). The Applications List reads live from the cluster rather than from stack records, so
+// surfacing it there would mean reworking that list's data source - and its delete and other
+// actions - to understand stack records too. Deploying inline and returning the error is the
+// simpler, safer fix.
+//
+// Separately, Kubernetes doesn't need Portainer's own async wrapper: kubectl apply returns as soon
+// as the API server accepts the manifest, and the cluster reconciles it asynchronously on its own.
+// Swarm and Compose deploys can run long (image pulls, etc.), so they keep using
+// BuildAndAsyncDeploy.
+func BuildAndDeploy(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
+	builder.setGeneralInfo(payload, endpoint)
+
+	defer func() { _ = builder.cleanUp() }()
+
+	if err := builder.prepare(ctx, payload, userID); err != nil {
+		return nil, httperror.InternalServerError("Failed to prepare stack", err)
+	}
+
+	// Not tied to ctx: canceling on client disconnect could orphan cluster resources with no stack record.
+	deployCtx, cancel := context.WithTimeout(context.Background(), stackutils.InlineDeployTimeout)
+	defer cancel()
+
+	if err := builder.deploy(deployCtx, endpoint); err != nil {
+		return nil, httperror.InternalServerError("Failed to deploy stack", err)
+	}
+
+	stack, err := builder.saveStack()
+	if err != nil {
+		return nil, httperror.InternalServerError("Failed to save stack", err)
+	}
+
+	if err := dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stackutils.UpdateStackStatusFromDeploymentResult(stack, nil)
+		return tx.Stack().Update(stack.ID, stack)
+	}); err != nil {
+		return stack, httperror.InternalServerError("Failed to persist stack deployment status", err)
+	}
+
+	if err := builder.postDeploy(ctx, stack); err != nil {
+		return stack, httperror.InternalServerError("Failed to run post-deployment hook", err)
+	}
 
 	return stack, nil
 }

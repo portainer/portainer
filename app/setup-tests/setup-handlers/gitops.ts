@@ -27,4 +27,5 @@ export const gitopsHandlers = [
       connection: {},
     });
   }),
+  http.get('/api/gitops/sources/:id/workflows', () => HttpResponse.json([])),
 ];

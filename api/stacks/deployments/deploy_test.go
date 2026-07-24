@@ -308,7 +308,7 @@ func setupRedeployStore(t *testing.T, stackType portainer.StackType, stackID por
 	err = store.Source().Create(adminUserContext, src)
 	require.NoError(t, err, "failed to create source")
 
-	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: stackID, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 	err = store.Workflow().Create(wf)
 	require.NoError(t, err, "failed to create workflow")
 
@@ -350,6 +350,42 @@ func Test_redeployWhenChanged_KubernetesStack(t *testing.T) {
 
 	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
 	require.NoError(t, err)
+}
+
+type failingDeployer struct {
+	noopDeployer
+	deployErr error
+}
+
+func (f failingDeployer) DeployKubernetesStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
+	return f.deployErr
+}
+
+func Test_redeployWhenChanged_KubernetesStack_DeployFailure_DoesNotAdvanceArtifactHash(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.KubernetesStack, 7)
+	deployErr := errors.New("failed to apply resources")
+
+	err := RedeployWhenChanged(t.Context(), stackID, failingDeployer{deployErr: deployErr}, store, testhelpers.NewGitService(nil, "newHash"))
+	require.NoError(t, err, "a failed deploy is recorded on the stack, not returned as a scheduler error")
+
+	var updated *portainer.Stack
+	err = store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var rerr error
+		updated, rerr = tx.Stack().Read(stackID)
+		return rerr
+	})
+	require.NoError(t, err)
+	assert.Equal(t, portainer.StackStatusError, updated.Status)
+	assert.Nil(t, updated.CurrentDeploymentInfo, "CurrentDeploymentInfo should stay at its pre-attempt value (nil here) since nothing was actually deployed")
+
+	workflows, err := store.Workflow().ReadAll()
+	require.NoError(t, err)
+	require.Len(t, workflows, 1)
+	require.Len(t, workflows[0].Artifacts, 1)
+	require.Len(t, workflows[0].Artifacts[0].Files, 1)
+	assert.Empty(t, workflows[0].Artifacts[0].Files[0].Hash, "artifact hash should stay at its old value (empty, in this fixture) since the deploy failed - the UI's git banner reads this field")
 }
 
 func Test_getUserRegistries(t *testing.T) {

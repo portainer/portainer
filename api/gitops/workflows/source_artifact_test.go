@@ -487,7 +487,9 @@ func TestFindOrCreateGitSource_AutoGrantLetsStandardUserReadAdminOnlySource(t *t
 
 	// A standard user supplying the same URL+auth is auto-granted access to the
 	// existing source and must be able to read it afterwards (the stack builder
-	// reads it back in the same transaction to persist sync status).
+	// reads it back in the same transaction to persist sync status). The grant
+	// demotes AdministratorsOnly, which is a hard enforcement and would
+	// otherwise defeat the granted access.
 	err = store.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		s, err := makeSource(standardUserContext)(tx)
 		if err != nil {
@@ -500,6 +502,11 @@ func TestFindOrCreateGitSource_AutoGrantLetsStandardUserReadAdminOnlySource(t *t
 		return err
 	})
 	require.NoError(t, err)
+
+	shared, err := store.Source().Read(standardUserContext, sourceID)
+	require.NoError(t, err)
+	require.False(t, shared.AdministratorsOnly)
+	require.Equal(t, []portainer.UserID{2}, shared.UserAccesses)
 }
 
 func TestSaveWorkflowGitConfig_UpdatesFileAndSourceWhenURLUnchanged(t *testing.T) {

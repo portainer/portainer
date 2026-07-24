@@ -78,7 +78,7 @@ func TestStackUpdateGitWebhookUniqueness(t *testing.T) {
 	err = store.Stack().Create(&stack2)
 	require.NoError(t, err)
 
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.DataStore = store
 
 	payload := &stackGitUpdatePayload{

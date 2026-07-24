@@ -47,7 +47,7 @@ export function NetworksDatatable({ onRemove }: Props) {
   const environmentId = useEnvironmentId();
   const isSwarm = useIsSwarm(environmentId);
 
-  const datasetQuery = useNetworksData(settings.autoRefreshRate * 1000);
+  const datasetQuery = useNetworksData(settings.autoRefreshRateMS);
   const columns = useColumns(isSwarm);
 
   const dataset = datasetQuery.data;
@@ -106,7 +106,7 @@ export function NetworksDatatable({ onRemove }: Props) {
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
             onChange={settings.setAutoRefreshRate}
-            value={settings.autoRefreshRate}
+            value={settings.autoRefreshRateMS}
           />
         </TableSettingsMenu>
       )}

@@ -6,6 +6,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+// InlineDeployTimeout bounds a synchronous, inline stack deploy.
+const InlineDeployTimeout = time.Minute
+
 // PrepareStackStatusForDeployment transitions a stack into the deploying state before a deployment begins.
 // It saves the current status in DeploymentStartStatus so that pre-deployment actions can be determined
 // (e.g. whether to undeploy before redeploying), sets Status to StackStatusDeploying, and resets the

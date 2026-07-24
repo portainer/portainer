@@ -131,7 +131,7 @@ function renderComponent() {
         namespace: '',
         setNamespace: () => {},
         showSystemResources: false,
-        autoRefreshRate: 0,
+        autoRefreshRateMS: 0,
         setAutoRefreshRate: () => {},
         setShowSystemResources: () => {},
         sortBy: { id: 'Name', desc: false },

@@ -54,27 +54,27 @@ func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error 
 	return nil
 }
 
-func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gate *deployGate) *httperror.HandlerError {
+func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (deployments.StackDeploymentConfiger, postDeployFunc, *httperror.HandlerError) {
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return nil, nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 	if stack.WorkflowID != 0 {
 		gitConfig, sourceID, err := loadGitConfigForStack(tx, userContext, stack.WorkflowID, stack.ID)
 		if err != nil {
-			return httperror.InternalServerError("Unable to load git config for stack", err)
+			return nil, nil, httperror.InternalServerError("Unable to load git config for stack", err)
 		}
 		if gitConfig == nil {
-			return httperror.InternalServerError("Stack has no git config in source", errors.New("source has no git config"))
+			return nil, nil, httperror.InternalServerError("Stack has no git config in source", errors.New("source has no git config"))
 		}
 
 		var payload kubernetesGitStackUpdatePayload
 
 		if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-			return httperror.BadRequest("Invalid request payload", err)
+			return nil, nil, httperror.BadRequest("Invalid request payload", err)
 		}
 
 		gitConfig.ReferenceName = payload.RepositoryReferenceName
@@ -100,40 +100,40 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 				gitConfig.Authentication.Password,
 				gitConfig.TLSSkipVerify,
 			); err != nil {
-				return httperror.InternalServerError("Unable to fetch git repository", err)
+				return nil, nil, httperror.InternalServerError("Unable to fetch git repository", err)
 			}
 		} else {
 			gitConfig.Authentication = nil
 		}
 
 		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
-			return httperror.InternalServerError("Unable to update source git config", err)
+			return nil, nil, httperror.InternalServerError("Unable to update source git config", err)
 		}
 
-		return nil
+		return nil, nil, nil
 	}
 
 	var payload kubernetesFileStackUpdatePayload
 
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
+		return nil, nil, httperror.BadRequest("Invalid request payload", err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return httperror.BadRequest("Failed to retrieve user token data", err)
+		return nil, nil, httperror.BadRequest("Failed to retrieve user token data", err)
 	}
 
 	tempFileDir, _ := os.MkdirTemp("", "kub_file_content")
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
-		return httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
+		return nil, nil, httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
 	}
 
 	if payload.StackName != stack.Name {
 		stack.Name = payload.StackName
 		if err := handler.DataStore.Stack().Update(stack.ID, stack); err != nil {
-			return httperror.InternalServerError("Failed to update stack name", err)
+			return nil, nil, httperror.InternalServerError("Failed to update stack name", err)
 		}
 	}
 
@@ -169,7 +169,7 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return httperror.InternalServerError("Unable to persist Kubernetes Manifest file on disk", err)
+		return nil, nil, httperror.InternalServerError("Unable to persist Kubernetes Manifest file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
@@ -187,7 +187,5 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 		}
 	}
 
-	go stackDeploy(handler.DataStore, copyStack.ID, k8sDeploymentConfig, gate, postDeploy)
-
-	return nil
+	return k8sDeploymentConfig, postDeploy, nil
 }

@@ -68,6 +68,7 @@ import (
 	"github.com/portainer/portainer/api/platform"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	stackscheduling "github.com/portainer/portainer/api/stacks/scheduling"
+	"github.com/portainer/portainer/api/stacks/teardown"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 
 	"github.com/rs/zerolog/log"
@@ -244,7 +245,8 @@ func (server *Server) Start(ctx context.Context) error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	var stackHandler = stacks.NewHandler(requestBouncer)
+	teardownService := teardown.NewService(server.FileService, server.SwarmStackManager, server.ComposeStackManager, server.StackDeployer, server.KubernetesDeployer)
+	var stackHandler = stacks.NewHandler(requestBouncer, teardownService)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.FileService = server.FileService

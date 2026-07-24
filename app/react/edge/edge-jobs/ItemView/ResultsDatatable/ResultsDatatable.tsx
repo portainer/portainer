@@ -30,7 +30,7 @@ export function ResultsDatatable({ jobId }: { jobId: EdgeJob['Id'] }) {
         return 5000;
       }
 
-      return tableState.autoRefreshRate * 1000;
+      return tableState.autoRefreshRateMS;
     },
   });
 

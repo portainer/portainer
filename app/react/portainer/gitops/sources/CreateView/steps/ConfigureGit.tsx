@@ -59,11 +59,13 @@ export function ConfigureGit() {
       />
 
       {values.git.polling.enabled && (
-        <IntervalField
-          value={values.git.polling.interval}
-          onChange={(value) => setFieldValue('git.polling.interval', value)}
-          errors={errors.git?.polling?.interval}
-        />
+        <div className="mb-0 mt-4">
+          <IntervalField
+            value={values.git.polling.interval}
+            onChange={(value) => setFieldValue('git.polling.interval', value)}
+            errors={errors.git?.polling?.interval}
+          />
+        </div>
       )}
 
       <ConnectionTest />

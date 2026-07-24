@@ -59,6 +59,10 @@ func (s *stubBuilder) postDeploy(_ context.Context, _ *portainer.Stack) error {
 	return nil
 }
 
+func (s *stubBuilder) cleanUp() error {
+	return nil
+}
+
 // Helpers
 
 func waitForStackStatus(t *testing.T, store *datastore.Store, id portainer.StackID, wantStatus portainer.StackStatus) *portainer.Stack {
@@ -78,33 +82,33 @@ func waitForStackStatus(t *testing.T, store *datastore.Store, id portainer.Stack
 
 // Tests
 
-func TestBuild_SaveError_ErrUnauthorized_ReturnsInternalServerError(t *testing.T) {
+func TestBuildAndAsyncDeploy_SaveError_ErrUnauthorized_ReturnsInternalServerError(t *testing.T) {
 	t.Parallel()
 	builder := &stubBuilder{saveErr: httperrors.ErrUnauthorized}
 
-	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 
 	require.NotNil(t, herr)
 	assert.Equal(t, http.StatusInternalServerError, herr.StatusCode)
 }
 
-func TestBuild_SaveError_ReturnsInternalServerError(t *testing.T) {
+func TestBuildAndAsyncDeploy_SaveError_ReturnsInternalServerError(t *testing.T) {
 	t.Parallel()
 	builder := &stubBuilder{saveErr: errors.New("db error")}
 
-	_, herr := Build(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), nil, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 
 	require.NotNil(t, herr)
 	assert.Equal(t, http.StatusInternalServerError, herr.StatusCode)
 }
 
-func TestBuild_SpawnAsync_DeploySuccess_UpdatesStackStatusToActive(t *testing.T) {
+func TestBuildAndAsyncDeploy_SpawnAsync_DeploySuccess_UpdatesStackStatusToActive(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, true, false)
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	updated := waitForStackStatus(t, store, stack.ID, portainer.StackStatusActive)
@@ -115,14 +119,14 @@ func TestBuild_SpawnAsync_DeploySuccess_UpdatesStackStatusToActive(t *testing.T)
 	assert.Equal(t, portainer.StackStatusActive, updated.DeploymentStatus[1].Status)
 }
 
-func TestBuild_SpawnAsync_DeployFailure_UpdatesStackStatusToError(t *testing.T) {
+func TestBuildAndAsyncDeploy_SpawnAsync_DeployFailure_UpdatesStackStatusToError(t *testing.T) {
 	t.Parallel()
 	deployErr := errors.New("failed to pull image nginx:999")
 	_, store := datastore.MustNewTestStore(t, true, false)
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack, deployErr: deployErr}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	updated := waitForStackStatus(t, store, stack.ID, portainer.StackStatusError)
@@ -135,13 +139,13 @@ func TestBuild_SpawnAsync_DeployFailure_UpdatesStackStatusToError(t *testing.T) 
 	assert.Equal(t, deployErr.Error(), lastEntry.Message)
 }
 
-func TestBuild_SpawnAsync_PostDeployHook_CalledOnSuccess(t *testing.T) {
+func TestBuildAndAsyncDeploy_SpawnAsync_PostDeployHook_CalledOnSuccess(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, true, false)
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	waitForStackStatus(t, store, stack.ID, portainer.StackStatusActive)
@@ -149,16 +153,73 @@ func TestBuild_SpawnAsync_PostDeployHook_CalledOnSuccess(t *testing.T) {
 	require.Eventually(t, builder.hookCalled.Load, 5*time.Second, 10*time.Millisecond, "post-deploy hook should be called after a successful deployment")
 }
 
-func TestBuild_SpawnAsync_PostDeployHook_NotCalledOnDeployFailure(t *testing.T) {
+func TestBuildAndAsyncDeploy_SpawnAsync_PostDeployHook_NotCalledOnDeployFailure(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, true, false)
 	stack := &portainer.Stack{ID: 1}
 	builder := &stubBuilder{store: store, savedStack: stack, deployErr: errors.New("failed to deploy")}
 
-	_, herr := Build(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	_, herr := BuildAndAsyncDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
 	require.Nil(t, herr)
 
 	waitForStackStatus(t, store, stack.ID, portainer.StackStatusError)
 
 	require.False(t, builder.hookCalled.Load(), "post-deploy hook should not be called after a failed deployment")
+}
+
+func TestBuildAndDeploy_DeployFailure_ReturnsErrorWithoutPersistingStack(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, true, false)
+	stack := &portainer.Stack{ID: 1}
+	deployErr := errors.New("failed to apply resources")
+	builder := &stubBuilder{store: store, savedStack: stack, deployErr: deployErr}
+
+	_, herr := BuildAndDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+
+	require.NotNil(t, herr)
+	assert.Equal(t, http.StatusInternalServerError, herr.StatusCode)
+
+	_, err := store.Stack().Read(stack.ID)
+	require.Error(t, err, "a stack that failed to deploy should never be persisted")
+}
+
+func TestBuildAndDeploy_DeploySuccess_PersistsActiveStatusSynchronously(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, true, false)
+	stack := &portainer.Stack{ID: 1}
+	builder := &stubBuilder{store: store, savedStack: stack}
+
+	_, herr := BuildAndDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	require.Nil(t, herr)
+
+	updated, err := store.Stack().Read(stack.ID)
+	require.NoError(t, err)
+	assert.Equal(t, portainer.StackStatusActive, updated.Status)
+	require.Len(t, updated.DeploymentStatus, 2)
+	assert.Equal(t, portainer.StackStatusDeploying, updated.DeploymentStatus[0].Status)
+	assert.Equal(t, portainer.StackStatusActive, updated.DeploymentStatus[1].Status)
+}
+
+func TestBuildAndDeploy_PostDeployHook_CalledOnSuccess(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, true, false)
+	stack := &portainer.Stack{ID: 1}
+	builder := &stubBuilder{store: store, savedStack: stack}
+
+	_, herr := BuildAndDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	require.Nil(t, herr)
+
+	assert.True(t, builder.hookCalled.Load(), "post-deploy hook should be called after a successful deployment")
+}
+
+func TestBuildAndDeploy_PostDeployHook_NotCalledOnDeployFailure(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, true, false)
+	stack := &portainer.Stack{ID: 1}
+	builder := &stubBuilder{store: store, savedStack: stack, deployErr: errors.New("failed to deploy")}
+
+	_, herr := BuildAndDeploy(t.Context(), store, builder, &StackPayload{}, &portainer.Endpoint{}, 0)
+	require.NotNil(t, herr)
+
+	assert.False(t, builder.hookCalled.Load(), "post-deploy hook should not be called after a failed deployment")
 }

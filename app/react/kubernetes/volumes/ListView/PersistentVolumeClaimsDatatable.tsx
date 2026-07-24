@@ -49,7 +49,7 @@ export function PersistentVolumeClaimsDatatable() {
   const namespaces = namespacesQuery.data ?? [];
   const deleteClaimsMutation = useDeletePersistentVolumeClaims(envId);
   const claimsQuery = usePersistentVolumeClaims(envId, {
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
     select: filterVolumeClaims,
   });
   const claims = claimsQuery.data ?? [];
