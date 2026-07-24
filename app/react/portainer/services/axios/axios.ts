@@ -125,13 +125,17 @@ export function agentInterceptor(config: InternalAxiosRequestConfig) {
 axios.interceptors.request.use(dockerMaxAPIVersionInterceptor);
 axios.interceptors.request.use(agentInterceptor);
 
+let isRedirectingToLogout = false;
+
 axios.interceptors.response.use(undefined, (error) => {
   if (
     error.response?.status === 401 &&
     !error.config.url.includes('/v2/') && // docker proxy through agent
     !error.config.url.includes('/api/v4/') && // gitlab proxy
+    !isRedirectingToLogout &&
     isTransitionRequiresAuthentication()
   ) {
+    isRedirectingToLogout = true;
     // eslint-disable-next-line no-console
     console.error('Unauthorized request, logging out');
     window.location.hash = '/logout';
