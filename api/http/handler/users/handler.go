@@ -8,6 +8,8 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
@@ -36,6 +38,8 @@ type Handler struct {
 	AdminCreationDone       chan<- struct{}
 	FileService             portainer.FileService
 	SetupToken              string
+	AuthorizationService    *authorization.Service
+	K8sClientFactory        *cli.ClientFactory
 }
 
 // NewHandler creates a handler to manage user operations.

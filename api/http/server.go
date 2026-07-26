@@ -265,6 +265,7 @@ func (server *Server) Start() error {
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.DataStore = server.DataStore
+	teamHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
@@ -290,6 +291,8 @@ func (server *Server) Start() error {
 	userHandler.AdminCreationDone = server.AdminCreationDone
 	userHandler.FileService = server.FileService
 	userHandler.SetupToken = server.SetupToken
+	userHandler.AuthorizationService = server.AuthorizationService
+	userHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore

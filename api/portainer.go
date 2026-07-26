@@ -1793,6 +1793,8 @@ type (
 		GetServiceAccounts(namespace string) ([]models.K8sServiceAccount, error)
 		DeleteServiceAccounts(reqs models.K8sServiceAccountDeleteRequests) error
 		SetupUserServiceAccount(int, []int, bool) error
+		RemoveUserServiceAccountBindings(userID int) error
+		RemoveUserServiceAccount(userID int) error
 		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 

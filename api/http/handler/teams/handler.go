@@ -5,6 +5,7 @@ import (
 
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
@@ -13,7 +14,8 @@ import (
 // Handler is the HTTP handler used to handle team operations.
 type Handler struct {
 	*mux.Router
-	DataStore dataservices.DataStore
+	DataStore        dataservices.DataStore
+	K8sClientFactory *cli.ClientFactory
 }
 
 // NewHandler creates a handler to manage team operations.
