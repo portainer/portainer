@@ -16,7 +16,7 @@ require (
 	github.com/aws/smithy-go v1.24.2
 	github.com/cbroglie/mustache v1.4.0
 	github.com/compose-spec/compose-go/v2 v2.9.1
-	github.com/containerd/containerd v1.7.32
+	github.com/containerd/containerd v1.7.33
 	github.com/containerd/errdefs v1.0.0
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/distribution/reference v0.6.0
@@ -129,7 +129,7 @@ require (
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/containerd/console v1.0.5 // indirect
 	github.com/containerd/containerd/api v1.10.0 // indirect
-	github.com/containerd/containerd/v2 v2.2.4 // indirect
+	github.com/containerd/containerd/v2 v2.2.5 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
