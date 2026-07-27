@@ -97,8 +97,6 @@ func (h *Handler) gitSourceCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.InternalServerError("Unable to persist source status", err)
 	}
 
-	h.invalidateCache()
-
 	if err := h.sourceScheduler.Reconcile(src.ID); err != nil {
 		log.Warn().Err(err).Int("source_id", int(src.ID)).Msg("source scheduler reconcile failed after source creation")
 	}

@@ -3,11 +3,8 @@ package workflows
 import (
 	"cmp"
 	"net/http"
-	"slices"
-	"strconv"
 	"strings"
 
-	gocache "github.com/patrickmn/go-cache"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	svc "github.com/portainer/portainer/api/gitops/workflows"
@@ -54,9 +51,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	key := cacheKey(securityContext, endpointIDs)
-
-	items, err := h.getWorkflows(key, securityContext, endpointIDs)
+	items, err := h.getWorkflows(securityContext, endpointIDs)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve workflows", err)
 	}
@@ -111,11 +106,7 @@ func hasArtifactMatching(w svc.Workflow, pred func(svc.ArtifactDetail) bool) boo
 	return slicesx.Some(w.Artifacts, pred)
 }
 
-func (h *Handler) getWorkflows(key string, sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) ([]svc.Workflow, error) {
-	if cached, ok := h.cache.Get(key); ok {
-		return slices.Clone(cached.([]svc.Workflow)), nil
-	}
-
+func (h *Handler) getWorkflows(sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) ([]svc.Workflow, error) {
 	var result []svc.Workflow
 	err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
@@ -125,23 +116,6 @@ func (h *Handler) getWorkflows(key string, sc *security.RestrictedRequestContext
 	if err != nil {
 		return nil, err
 	}
-	h.cache.Set(key, result, gocache.DefaultExpiration)
 
-	return slices.Clone(result), nil
-}
-
-func cacheKey(sc *security.RestrictedRequestContext, endpointIDs []portainer.EndpointID) string {
-	ids := make([]string, len(endpointIDs))
-	for i, id := range endpointIDs {
-		ids[i] = strconv.Itoa(int(id))
-	}
-	slices.Sort(ids)
-
-	teamIDs := make([]string, len(sc.UserMemberships))
-	for i, membership := range sc.UserMemberships {
-		teamIDs[i] = strconv.Itoa(int(membership.TeamID))
-	}
-	slices.Sort(teamIDs)
-
-	return strconv.Itoa(int(sc.UserID)) + ":" + strconv.FormatBool(sc.IsAdmin) + ":" + strings.Join(ids, ",") + ":" + strings.Join(teamIDs, ",")
+	return result, nil
 }

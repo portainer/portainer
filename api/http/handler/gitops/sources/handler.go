@@ -2,9 +2,7 @@ package sources
 
 import (
 	"net/http"
-	"time"
 
-	gocache "github.com/patrickmn/go-cache"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/gitops/scheduling"
@@ -15,17 +13,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	cacheTTL             = 30 * time.Second
-	cacheCleanupInterval = 10 * time.Minute
-)
-
 // Handler is the HTTP handler for the GitOps sources API.
 type Handler struct {
 	*mux.Router
 	dataStore       dataservices.DataStore
 	gitService      portainer.GitService
-	cache           *gocache.Cache
 	k8sFactory      *cli.ClientFactory
 	sourceScheduler *scheduling.SourceScheduler
 }
@@ -35,7 +27,6 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 		Router:          mux.NewRouter(),
 		dataStore:       dataStore,
 		gitService:      gitService,
-		cache:           gocache.New(cacheTTL, cacheCleanupInterval),
 		k8sFactory:      k8sFactory,
 		sourceScheduler: sourceScheduler,
 	}
@@ -57,10 +48,4 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	adminRouter.Handle("/{id}/access", httperror.LoggerHandler(h.gitSourceUpdateAccess)).Methods(http.MethodPut)
 
 	return h
-}
-
-// invalidateCache clears the cached source lists so the next read reflects
-// the latest datastore state. Called after any mutating operation.
-func (h *Handler) invalidateCache() {
-	h.cache.Flush()
 }

@@ -3,8 +3,6 @@ package sources
 import (
 	"context"
 	"net/http"
-	"slices"
-	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -17,8 +15,6 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
-
-	gocache "github.com/patrickmn/go-cache"
 )
 
 // Source is the list item response for a GitOps source
@@ -56,9 +52,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	key := cacheKey(securityContext)
-
-	sources, err := h.getSources(r.Context(), key, securityContext)
+	sources, err := h.fetchSources(r.Context(), securityContext)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve sources", err)
 	}
@@ -92,29 +86,6 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 
 	filters.ApplyFilterResultsHeaders(&w, results)
 	return response.JSON(w, results.Items)
-}
-
-func (h *Handler) getSources(ctx context.Context, key string, sc *security.RestrictedRequestContext) ([]Source, error) {
-	if cached, ok := h.cache.Get(key); ok {
-		return slices.Clone(cached.([]Source)), nil
-	}
-
-	result, err := h.fetchSources(ctx, sc)
-	if err != nil {
-		return nil, err
-	}
-	h.cache.Set(key, result, gocache.DefaultExpiration)
-	return slices.Clone(result), nil
-}
-
-func cacheKey(sc *security.RestrictedRequestContext) string {
-	teamIDs := make([]string, len(sc.UserMemberships))
-	for i, membership := range sc.UserMemberships {
-		teamIDs[i] = strconv.Itoa(int(membership.TeamID))
-	}
-	slices.Sort(teamIDs)
-
-	return strconv.Itoa(int(sc.UserID)) + ":" + strconv.FormatBool(sc.IsAdmin) + ":" + strings.Join(teamIDs, ",")
 }
 
 func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedRequestContext) ([]Source, error) {

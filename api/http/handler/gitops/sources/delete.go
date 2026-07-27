@@ -93,8 +93,6 @@ func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to delete source", err)
 	}
 
-	h.invalidateCache()
-
 	if err := h.sourceScheduler.Reconcile(portainer.SourceID(sourceID)); err != nil {
 		log.Warn().Err(err).Int("source_id", sourceID).Msg("source scheduler reconcile failed after source deletion")
 	}

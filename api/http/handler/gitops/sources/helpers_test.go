@@ -14,7 +14,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 
-	gocache "github.com/patrickmn/go-cache"
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
@@ -49,16 +48,6 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 func newTestHandler(t *testing.T, store dataservices.DataStore) *Handler {
 	t.Helper()
 	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil, nil)
-}
-
-// newTestHandlerNoCacheExpiry returns a handler whose source cache never expires,
-// so cache-invalidation tests can prove a write clears the cache rather than the
-// TTL simply elapsing between requests.
-func newTestHandlerNoCacheExpiry(t *testing.T, store dataservices.DataStore) *Handler {
-	t.Helper()
-	h := newTestHandler(t, store)
-	h.cache = gocache.New(gocache.NoExpiration, cacheCleanupInterval)
-	return h
 }
 
 func adminRestrictedContext(userID portainer.UserID) *security.RestrictedRequestContext {
