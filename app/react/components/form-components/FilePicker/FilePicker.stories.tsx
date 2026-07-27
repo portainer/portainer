@@ -130,6 +130,13 @@ const REPO_NODES: FileNode[] = [
   { name: 'tsconfig.json' },
 ];
 
+const HUGE_REPO_NODES: FileNode[] = Array.from({ length: 100 }, (_, dir) => ({
+  name: `service-${dir}`,
+  children: Array.from({ length: 100 }, (_, file) => ({
+    name: `config-${file}.yml`,
+  })),
+}));
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 export const Skeleton: StoryObj<{ loading: boolean }> = {
@@ -213,6 +220,32 @@ export const Default: Story = {
   onChange={setValue}
   exampleExpressions={['*.yml', '*.yaml', '*.ts', 'src/**', 'deploy/**']}
 />`,
+      },
+    },
+  },
+};
+
+// ─── Huge repo (BE-13263) ──────────────────────────────────────────────────────
+
+export const HugeRepo: Story = {
+  args: {
+    files: HUGE_REPO_NODES,
+    exampleExpressions: ['*.yml'],
+  },
+  render: (args) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <div className="flex flex-col gap-2 p-2">
+        <FilePicker {...args} value={value} onChange={setValue} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Repro for BE-13263: 10,000 files, all matching `*.yml`. Click the `*.yml` chip (or type it into the filter bar) to render the full 10,000-row match list and see how the dropdown behaves at that scale.',
       },
     },
   },

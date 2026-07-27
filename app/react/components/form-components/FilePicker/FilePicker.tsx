@@ -135,7 +135,7 @@ export function FilePicker({
           No matching files
         </p>
       ) : (
-        <ul className="px-1">
+        <ul className="h-full w-full overflow-y-auto px-1">
           {paths.map((path) => (
             <li key={path} className="flex h-8 list-none items-center px-3">
               <span className="truncate font-mono text-[13px] text-gray-11 th-highcontrast:text-white th-dark:text-white">
