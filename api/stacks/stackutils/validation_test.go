@@ -154,6 +154,68 @@ services:
 	require.NoError(t, err)
 }
 
+// TestValidateStackFiles_QuotedEnvVar guards against a regression where quoted
+// numeric env var values (e.g. API_PORT="8005") failed validation while the
+// actual deployment (which parses env vars through an env file) accepted them.
+func TestValidateStackFiles_QuotedEnvVar(t *testing.T) {
+	t.Parallel()
+	fileContent := []byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    ports:
+      - "${API_PORT}:8005"
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+		Env:         []portainer.Pair{{Name: "API_PORT", Value: `"8005"`}},
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	securitySettings := &portainer.EndpointSecuritySettings{}
+	err := ValidateStackFiles(stack, securitySettings, fileService)
+	require.NoError(t, err)
+}
+
+// TestValidateStackFiles_InvalidStackEnv guards against a regression where a
+// BuildEnvMap parse error (e.g. an unterminated quoted value) was silently
+// swallowed instead of being surfaced to the caller.
+func TestValidateStackFiles_InvalidStackEnv(t *testing.T) {
+	t.Parallel()
+	fileContent := []byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    ports:
+      - "${API_PORT}:8005"
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+		Env:         []portainer.Pair{{Name: "API_PORT", Value: `"unterminated`}},
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	securitySettings := &portainer.EndpointSecuritySettings{}
+	err := ValidateStackFiles(stack, securitySettings, fileService)
+	require.ErrorContains(t, err, "failed to build stack environment variables")
+}
+
 func TestValidateStackFiles_OSEnvVar(t *testing.T) {
 	t.Setenv("HOST_PORT", "3000")
 
@@ -431,6 +493,29 @@ services:
 
 	err := ValidateComposeURLs(t.Context(), stack, fileService)
 	require.NoError(t, err)
+}
+
+func TestValidateComposeURLs_InvalidStackEnv(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, []string{"example.com"})
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+		Env:         []portainer.Pair{{Name: "API_PORT", Value: `"unterminated`}},
+	}
+
+	fileService := mockFileService{
+		fileContent: []byte(`
+version: "3"
+services:
+  web:
+    image: nginx
+`),
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.ErrorContains(t, err, "failed to build stack environment variables")
 }
 
 func TestValidateComposeURLs_DockerHubImageAllowed(t *testing.T) {

@@ -79,7 +79,11 @@ func ValidateComposeURLs(ctx context.Context, stack *portainer.Stack, fileServic
 		return nil
 	}
 
-	env := BuildEnvMap(stack)
+	env, err := BuildEnvMap(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to build stack environment variables")
+	}
+
 	workingDir := filesystem.JoinPaths(stack.ProjectPath, path.Dir(stack.EntryPoint))
 
 	for _, file := range GetStackFilePaths(stack, false) {
@@ -163,7 +167,11 @@ func extractImageRegistry(imageRef string) string {
 }
 
 func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService) error {
-	env := BuildEnvMap(stack)
+	env, err := BuildEnvMap(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to build stack environment variables")
+	}
+
 	workingDir := filesystem.JoinPaths(stack.ProjectPath, path.Dir(stack.EntryPoint))
 
 	for _, file := range GetStackFilePaths(stack, false) {
