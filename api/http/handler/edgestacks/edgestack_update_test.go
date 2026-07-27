@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -9,11 +10,33 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/roar"
 
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
+
+var errForcedClearFailure = errors.New("forced clear failure")
+
+// errClearEdgeStackStatusService forces Clear to fail so that error-propagation
+// paths in handleChangeEdgeGroups can be exercised without a live DB failure.
+type errClearEdgeStackStatusService struct {
+	dataservices.EdgeStackStatusService
+}
+
+func (errClearEdgeStackStatusService) Clear(portainer.EdgeStackID, []portainer.EndpointID) error {
+	return errForcedClearFailure
+}
+
+type errClearDataStoreTx struct {
+	dataservices.DataStoreTx
+}
+
+func (errClearDataStoreTx) EdgeStackStatus() dataservices.EdgeStackStatusService {
+	return errClearEdgeStackStatusService{}
+}
 
 // Update
 func TestUpdateAndInspect(t *testing.T) {
@@ -101,6 +124,91 @@ func TestUpdateAndInspect(t *testing.T) {
 	if !reflect.DeepEqual(updatedStack.EdgeGroups, payload.EdgeGroups) {
 		t.Fatalf("expected EdgeGroups to be equal")
 	}
+}
+
+// TestUpdateEdgeGroupsClearsStaleStatusOnReassignment reproduces BE-13141: an
+// endpoint that is removed from an edge stack's edge groups and later
+// re-added must not keep showing the status from its previous deployment.
+func TestUpdateEdgeGroupsClearsStaleStatusOnReassignment(t *testing.T) {
+	t.Parallel()
+	handler, rawAPIKey := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	staleStatus := &portainer.EdgeStackStatusForEnv{
+		EndpointID: endpoint.ID,
+		Status: []portainer.EdgeStackDeploymentStatus{
+			{Time: 1, Type: portainer.EdgeStackStatusError, Error: "boom"},
+		},
+	}
+
+	err := handler.DataStore.EdgeStackStatus().Create(edgeStack.ID, endpoint.ID, staleStatus)
+	require.NoError(t, err)
+
+	emptyEdgeGroup := portainer.EdgeGroup{
+		ID:   2,
+		Name: "EdgeGroup 2",
+	}
+
+	err = handler.DataStore.EdgeGroup().Create(&emptyEdgeGroup)
+	require.NoError(t, err)
+
+	// Reassign the stack away from the endpoint's group.
+	updateEdgeStackRequest(t, handler, rawAPIKey, edgeStack.ID, updateEdgeStackPayload{
+		StackFileContent: "update-test",
+		EdgeGroups:       []portainer.EdgeGroupID{emptyEdgeGroup.ID},
+		DeploymentType:   portainer.EdgeStackDeploymentCompose,
+	})
+
+	// Re-assign the stack back to the endpoint's original group.
+	updateEdgeStackRequest(t, handler, rawAPIKey, edgeStack.ID, updateEdgeStackPayload{
+		StackFileContent: "update-test",
+		EdgeGroups:       edgeStack.EdgeGroups,
+		DeploymentType:   portainer.EdgeStackDeploymentCompose,
+	})
+
+	status, err := handler.DataStore.EdgeStackStatus().Read(edgeStack.ID, endpoint.ID)
+	require.NoError(t, err)
+	require.Empty(t, status.Status)
+}
+
+// TestHandleChangeEdgeGroupsPropagatesClearError ensures a failure to clear
+// the stale Edge stack status aborts the edge groups change instead of being
+// silently ignored.
+func TestHandleChangeEdgeGroupsPropagatesClearError(t *testing.T) {
+	t.Parallel()
+	handler, _ := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		relationConfig, err := edge.FetchEndpointRelationsConfig(tx)
+		require.NoError(t, err)
+
+		_, _, err = handler.handleChangeEdgeGroups(errClearDataStoreTx{DataStoreTx: tx}, &edgeStack, edgeStack.EdgeGroups, nil, relationConfig)
+
+		return err
+	})
+	require.ErrorIs(t, err, errForcedClearFailure)
+}
+
+func updateEdgeStackRequest(t *testing.T, handler *Handler, rawAPIKey string, edgeStackID portainer.EdgeStackID, payload updateEdgeStackPayload) {
+	t.Helper()
+
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/edge_stacks/%d", edgeStackID), r)
+	require.NoError(t, err)
+
+	req.Header.Add("x-api-key", rawAPIKey)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestUpdateWithInvalidEdgeGroups(t *testing.T) {

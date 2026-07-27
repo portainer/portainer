@@ -158,6 +158,10 @@ func (handler *Handler) handleChangeEdgeGroups(tx dataservices.DataStoreTx, edge
 		if err := tx.EndpointRelation().AddEndpointRelationsForEdgeStack(relatedEnvironmentsToAdd.Keys(), edgeStack); err != nil {
 			return nil, nil, errors.WithMessage(err, "Unable to add edge stack relations to the database")
 		}
+
+		if err := tx.EdgeStackStatus().Clear(edgeStack.ID, relatedEnvironmentsToAdd.Keys()); err != nil {
+			return nil, nil, errors.WithMessage(err, "Unable to clear edge stack status for the newly related environments")
+		}
 	}
 
 	return newRelatedEnvironmentIDs, relatedEnvironmentsToAdd, nil
