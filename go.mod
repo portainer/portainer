@@ -71,7 +71,7 @@ require (
 	k8s.io/client-go v0.35.3
 	k8s.io/kubectl v0.35.1
 	k8s.io/metrics v0.35.1
-	oras.land/oras-go/v2 v2.6.0
+	oras.land/oras-go/v2 v2.6.1
 	sigs.k8s.io/gateway-api v1.5.1
 )
 
