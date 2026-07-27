@@ -32,9 +32,9 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find the environment associated to the stack inside the database", err)
+		return httperror.NotFound("Unable to find the environment in the database", err)
 	} else if err != nil {
-		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
+		return httperror.InternalServerError("Unable to find the environment in the database", err)
 	}
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
