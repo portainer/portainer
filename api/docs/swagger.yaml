@@ -9841,7 +9841,7 @@ info:
     name: zlib
     url: https://github.com/portainer/portainer/blob/develop/LICENSE
   title: PortainerCE API
-  version: 2.43.0
+  version: 2.44.0
 paths:
   /auth:
     post:

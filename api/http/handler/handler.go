@@ -79,7 +79,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.43.0
+// @version 2.44.0
 // @description.markdown
 // @x-tagGroups [{"name":"Access Control","tags":["auth","roles","team_memberships","teams","users"]},{"name":"Administration","tags":["backup","ldap","motd","settings","status","system","ssl","upload"]},{"name":"Docker","tags":["templates","custom_templates","docker","registries","resource_controls","stacks","webhooks","websocket"]},{"name":"Edge Compute","tags":["edge_agent","edge_groups","edge_jobs","edge","edge_stacks"]},{"name":"Environment Management","tags":["endpoint_groups","endpoints","tags"]},{"name":"GitOps","tags":["gitops"]},{"name":"Kubernetes","tags":["helm","kubernetes"]}]
 // @termsOfService
