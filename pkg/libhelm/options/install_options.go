@@ -17,6 +17,9 @@ type InstallOptions struct {
 	// Values contains inline Helm values merged with the chart defaults.
 	// If both are provided, entries in Values override those from ValuesFile.
 	Values map[string]any
+	// ResetValues resets to chart defaults before applying Values on upgrade
+	// (Helm's --reset-values), so omitted keys revert rather than persist.
+	ResetValues bool
 	// ValuesFile is a path to a YAML file with Helm values to apply.
 	// File values are applied first; Values take precedence on conflicts.
 	ValuesFile              string
