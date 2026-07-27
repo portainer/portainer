@@ -396,6 +396,71 @@ func setupUpdateStackInTxTest[T testUpdateStackPayload](t *testing.T, stack *por
 	}
 }
 
+// Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack covers a double-submit race: a
+// concurrent request (e.g. a second click before the update button disables) already deleted the
+// stack's shared Workflow record before this request's transaction runs. The stack update must
+// still succeed rather than failing to detach the stack from its now-gone Workflow.
+func Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack(t *testing.T) {
+	t.Parallel()
+	fips.InitFIPS(false)
+
+	payload := &updateComposeStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	}
+	stack := &portainer.Stack{
+		ID:         1,
+		Name:       "test-stack-workflow-gone",
+		EntryPoint: "docker-compose.yml",
+		Type:       portainer.DockerComposeStack,
+		WorkflowID: 999,
+	}
+	setup := setupUpdateStackInTxTest(t, stack, payload)
+
+	var handlerErr *httperror.HandlerError
+	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		return nil
+	})
+	require.NoError(t, err)
+	require.Nil(t, handlerErr, "stack update should succeed even though its Workflow was already gone")
+
+	stored, err := setup.store.Stack().Read(setup.stack.ID)
+	require.NoError(t, err)
+	assert.Zero(t, stored.WorkflowID, "stack should be detached from the now-gone Workflow")
+}
+
+// Test_updateSwarmStack_WorkflowAlreadyDeleted_StillUpdatesStack mirrors
+// Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack for Swarm stacks.
+func Test_updateSwarmStack_WorkflowAlreadyDeleted_StillUpdatesStack(t *testing.T) {
+	t.Parallel()
+	fips.InitFIPS(false)
+
+	payload := &updateSwarmStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	}
+	stack := &portainer.Stack{
+		ID:         1,
+		Name:       "test-stack-workflow-gone",
+		EntryPoint: "docker-compose.yml",
+		Type:       portainer.DockerSwarmStack,
+		WorkflowID: 999,
+	}
+	setup := setupUpdateStackInTxTest(t, stack, payload)
+	setup.handler.SwarmStackManager = swarmStackManager{}
+
+	var handlerErr *httperror.HandlerError
+	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		return nil
+	})
+	require.NoError(t, err)
+	require.Nil(t, handlerErr, "stack update should succeed even though its Workflow was already gone")
+
+	stored, err := setup.store.Stack().Read(setup.stack.ID)
+	require.NoError(t, err)
+	assert.Zero(t, stored.WorkflowID, "stack should be detached from the now-gone Workflow")
+}
+
 type swarmStackManager struct {
 	portainer.SwarmStackManager
 }

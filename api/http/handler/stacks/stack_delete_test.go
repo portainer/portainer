@@ -71,6 +71,30 @@ func TestStackDelete_WorkflowSingleArtifact_DeletesWorkflowRecord(t *testing.T) 
 	assert.True(t, store.IsErrObjectNotFound(err))
 }
 
+// TestStackDelete_WorkflowAlreadyDeleted_StillDeletesStack covers a double-submit race: a
+// concurrent request (e.g. a second click before the delete button disables) already deleted the
+// shared Workflow record before this request's transaction runs. The stack must still be deleted
+// rather than getting permanently stuck with a dangling WorkflowID, which would break every
+// endpoint that resolves git config across all stacks.
+func TestStackDelete_WorkflowAlreadyDeleted_StillDeletesStack(t *testing.T) {
+	t.Parallel()
+	h, store, _ := newStackDeleteHandler(t)
+	_, err := mockCreateUser(store)
+	require.NoError(t, err)
+	endpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+	stack := &portainer.Stack{ID: 1, EndpointID: endpoint.ID, Type: portainer.DockerComposeStack, Name: "test-stack", WorkflowID: 999}
+	require.NoError(t, store.Stack().Create(stack))
+
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, stackDeleteRequest(stack.ID, endpoint.ID))
+
+	require.Equal(t, http.StatusNoContent, w.Code)
+
+	_, err = store.Stack().Read(stack.ID)
+	assert.True(t, store.IsErrObjectNotFound(err), "stack should be deleted even though its Workflow was already gone")
+}
+
 // The workflow deletion and the stack record deletion must commit atomically.
 // If record deletion fails, the workflow deletion must roll back too.
 func TestStackDelete_RecordDeletionFails_WorkflowDeletionRollsBack(t *testing.T) {
@@ -302,6 +326,28 @@ func TestStackDeleteKubernetesByName_WorkflowSingleArtifact_DeletesWorkflowRecor
 	require.Equal(t, http.StatusNoContent, w.Code)
 	_, err = store.Workflow().Read(workflow.ID)
 	assert.True(t, store.IsErrObjectNotFound(err))
+}
+
+// TestStackDeleteKubernetesByName_WorkflowAlreadyDeleted_StillDeletesStack mirrors
+// TestStackDelete_WorkflowAlreadyDeleted_StillDeletesStack for the Kubernetes-by-name delete path.
+func TestStackDeleteKubernetesByName_WorkflowAlreadyDeleted_StillDeletesStack(t *testing.T) {
+	t.Parallel()
+	h, store, _ := newStackDeleteHandler(t)
+	_, err := mockCreateUser(store)
+	require.NoError(t, err)
+	endpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+
+	stack := &portainer.Stack{ID: 1, EndpointID: endpoint.ID, Type: portainer.KubernetesStack, Name: "app", Namespace: "ns1", WorkflowID: 999}
+	require.NoError(t, store.Stack().Create(stack))
+
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, stackDeleteKubernetesByNameRequest("app", "ns1", endpoint.ID))
+
+	require.Equal(t, http.StatusNoContent, w.Code)
+
+	_, err = store.Stack().Read(stack.ID)
+	assert.True(t, store.IsErrObjectNotFound(err), "stack should be deleted even though its Workflow was already gone")
 }
 
 type stubTeardown struct {

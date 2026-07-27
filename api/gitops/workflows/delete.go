@@ -18,7 +18,9 @@ func DeleteIfSingleArtifact(tx workflowDeleteStore, workflowID portainer.Workflo
 	}
 
 	wf, err := tx.Workflow().Read(workflowID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
