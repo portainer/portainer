@@ -3370,6 +3370,10 @@ export type PortainerTag = {
 
 export type PortainerTeam = {
   /**
+   * Whether members of this team are denied access to Portainer itself (EE only)
+   */
+  DenyPortainerAccess?: boolean;
+  /**
    * Team Identifier
    */
   Id?: number;

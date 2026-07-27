@@ -4543,6 +4543,11 @@ definitions:
     type: object
   portainer.Team:
     properties:
+      DenyPortainerAccess:
+        description: Whether members of this team are denied access to Portainer itself
+          (EE only)
+        example: false
+        type: boolean
       Id:
         description: Team Identifier
         example: 1

@@ -1398,6 +1398,8 @@ type (
 		ID TeamID `json:"Id" example:"1"`
 		// Team name
 		Name string `json:"Name" example:"developers"`
+		// Whether members of this team are denied access to Portainer itself (EE only)
+		DenyPortainerAccess bool `json:"DenyPortainerAccess" example:"false"`
 	}
 
 	// TeamAccessPolicies represent the association of an access policy and a team

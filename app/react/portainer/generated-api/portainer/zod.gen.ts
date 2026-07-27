@@ -1414,6 +1414,7 @@ export const zPortainerTag = z.object({
 });
 
 export const zPortainerTeam = z.object({
+  DenyPortainerAccess: z.boolean().optional(),
   Id: z.int().optional(),
   Name: z.string().optional(),
 });
