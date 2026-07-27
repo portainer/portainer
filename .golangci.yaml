@@ -83,7 +83,7 @@ linters:
         - ruleguard
       settings:
         ruleguard:
-          rules: './analysis/ssrf.go,./analysis/git.go'
+          rules: './analysis/ssrf.go,./analysis/git.go,./analysis/transaction.go'
     forbidigo:
       forbid:
         - pattern: ^tls\.Config$

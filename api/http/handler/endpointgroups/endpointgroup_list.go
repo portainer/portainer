@@ -95,7 +95,7 @@ func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request
 	var handlerErr *httperror.HandlerError
 	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var txErr error
-		endpointGroups, txErr = handler.DataStore.EndpointGroup().ReadAll()
+		endpointGroups, txErr = tx.EndpointGroup().ReadAll()
 		if txErr != nil {
 			handlerErr = httperror.InternalServerError("Unable to retrieve environment groups from the database", txErr)
 			return handlerErr
