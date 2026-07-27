@@ -18,6 +18,17 @@ import { onStartupAngular } from './app';
 import { configApp } from './config';
 import { constantsModule } from './ng-constants';
 
+const RESIZE_OBSERVER_LOOP_ERROR_MESSAGES = ['ResizeObserver loop completed with undelivered notifications.', 'ResizeObserver loop limit exceeded'];
+
+// Portaled dropdowns (e.g. react-select with bindToBody) can resize their menu on
+// every keystroke, which trips this benign browser warning; it never indicates
+// an actual app error, so it's silenced here rather than alarming users.
+window.addEventListener('error', (event) => {
+  if (RESIZE_OBSERVER_LOOP_ERROR_MESSAGES.includes(event.message)) {
+    event.stopImmediatePropagation();
+  }
+});
+
 // http://localhost:49000 is a docker extension specific url (see /build/docker-extension/docker-compose.yml)
 if (window.origin == 'http://localhost:49000') {
   // we are loading the app from a local file as in docker extension
