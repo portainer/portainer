@@ -5,6 +5,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 
 	"github.com/rs/zerolog/log"
@@ -38,6 +39,9 @@ func (m *Migrator) backfillSourceInterval_2_44_0() error {
 	intervalByStack := make(map[portainer.StackID]string, len(referencedStackIDs))
 	for stackID := range referencedStackIDs {
 		s, err := m.stackService.Read(stackID)
+		if dataservices.IsErrObjectNotFound(err) {
+			continue
+		}
 		if err != nil {
 			return fmt.Errorf("failed to read stack %d: %w", stackID, err)
 		}
@@ -107,6 +111,9 @@ func (m *Migrator) backfillSourceIntervalForGroup_2_44_0(tx portainer.Transactio
 
 func (m *Migrator) clearAutoUpdateInterval_2_44_0(tx portainer.Transaction, stackID portainer.StackID) error {
 	s, err := m.stackService.Tx(tx).Read(stackID)
+	if dataservices.IsErrObjectNotFound(err) {
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("failed to read stack %d: %w", stackID, err)
 	}
