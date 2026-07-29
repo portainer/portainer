@@ -2,6 +2,7 @@ package source
 
 import (
 	"slices"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -114,6 +115,31 @@ func (service ServiceTx) Update(context UserContext, ID portainer.SourceID, sour
 
 	if err := enforceUniqueGitSource(service, source); err != nil {
 		return err
+	}
+
+	return service.base.Update(ID, source)
+}
+
+// UpdateSyncStatus updates only the status fields (Status, StatusError, LastSync) of a source.
+func (service ServiceTx) UpdateSyncStatus(context UserContext, ID portainer.SourceID, status portainer.SourceStatus, statusError string) error {
+	if err := validateUserContext(context); err != nil {
+		return err
+	}
+
+	source, err := service.base.Read(ID)
+	if err != nil {
+		return err
+	}
+
+	if err := enforceUserPermissions(context, source, actionRead); err != nil {
+		return err
+	}
+
+	source.Status = status
+	source.StatusError = statusError
+
+	if status == portainer.SourceStatusHealthy {
+		source.LastSync = time.Now().Unix()
 	}
 
 	return service.base.Update(ID, source)

@@ -115,6 +115,48 @@ func TestGitMethodStackBuilder_WithSourceID_PersistsHealthyStatusOnSuccess(t *te
 	assert.NotZero(t, updatedSrc.LastSync)
 }
 
+func TestGitMethodStackBuilder_StandardUserWithReadAccessCanDeployFromAdminSource(t *testing.T) {
+	t.Parallel()
+	builder := newGitMethodBuilder(t, "abc123")
+
+	standardUser := &portainer.User{Username: "standarduser", Role: portainer.StandardUserRole}
+	require.NoError(t, builder.dataStore.User().Create(standardUser))
+
+	publicSrc := &portainer.Source{
+		Name:   "public-repo",
+		Type:   portainer.SourceTypeGit,
+		Git:    &gittypes.GitSource{URL: "https://github.com/org/public-repo"},
+		Public: true,
+	}
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, publicSrc))
+
+	restrictedSrc := &portainer.Source{
+		Name:         "restricted-repo",
+		Type:         portainer.SourceTypeGit,
+		Git:          &gittypes.GitSource{URL: "https://github.com/org/restricted-repo"},
+		UserAccesses: []portainer.UserID{standardUser.ID},
+	}
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, restrictedSrc))
+
+	for i, src := range []*portainer.Source{publicSrc, restrictedSrc} {
+		builder.stack.ID = portainer.StackID(10 + i)
+		payload := &StackPayload{
+			RepositoryConfigPayload: RepositoryConfigPayload{
+				SourceID:      src.ID,
+				ReferenceName: "refs/heads/main",
+			},
+		}
+
+		err := builder.prepare(t.Context(), payload, standardUser.ID)
+		require.NoError(t, err)
+
+		updatedSrc, err := builder.dataStore.Source().Read(adminUserContext, src.ID)
+		require.NoError(t, err)
+		assert.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
+		assert.NotZero(t, updatedSrc.LastSync)
+	}
+}
+
 func TestGitMethodStackBuilder_WithSourceID_PersistsErrorStatusOnCloneFailure(t *testing.T) {
 	t.Parallel()
 	builder := newGitMethodBuilder(t, "abc123")

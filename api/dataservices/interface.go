@@ -208,6 +208,7 @@ type (
 		Exists(context SourceServiceUserContext, ID portainer.SourceID) (bool, error)
 		ReadAll(context SourceServiceUserContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error)
 		Update(context SourceServiceUserContext, ID portainer.SourceID, source *portainer.Source) error
+		UpdateSyncStatus(context SourceServiceUserContext, ID portainer.SourceID, status portainer.SourceStatus, statusError string) error
 		Delete(context SourceServiceUserContext, ID portainer.SourceID) error
 		FindOrCreateGitSource(context SourceServiceUserContext, source *portainer.Source) (*portainer.Source, error)
 	}
