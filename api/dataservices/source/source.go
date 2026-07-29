@@ -87,6 +87,12 @@ func (service *Service) Update(context UserContext, ID portainer.SourceID, sourc
 	})
 }
 
+func (service *Service) UpdateSyncStatus(context UserContext, ID portainer.SourceID, status portainer.SourceStatus, statusError string) error {
+	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
+		return service.Tx(tx).UpdateSyncStatus(context, ID, status, statusError)
+	})
+}
+
 func (service *Service) Delete(context UserContext, ID portainer.SourceID) error {
 	return service.base.Connection.UpdateTx(func(tx portainer.Transaction) error {
 		return service.Tx(tx).Delete(context, ID)

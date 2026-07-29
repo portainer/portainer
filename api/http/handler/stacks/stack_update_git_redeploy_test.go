@@ -254,4 +254,40 @@ func TestDeployKubernetesStackInline(t *testing.T) {
 		require.True(t, postDeployCalled, "postDeploy should be called on failure too, consistent with the file-based inline deploy path")
 		require.ErrorIs(t, postDeployErr, deployErr)
 	})
+
+	t.Run("non-owner standard user with granted access can redeploy", func(t *testing.T) {
+		t.Parallel()
+
+		handler, stack, gitConfig, sourceID, _ := setupDeployKubernetesStackInlineTest(t, nil, portainer.StackStatusActive)
+
+		standardUser := &portainer.User{Username: "standarduser", Role: portainer.StandardUserRole}
+		require.NoError(t, handler.DataStore.User().Create(standardUser))
+
+		adminUserContext := source.InsecureNewAdminContext()
+		src, err := handler.DataStore.Source().Read(adminUserContext, sourceID)
+		require.NoError(t, err)
+		// AdministratorsOnly is a hard enforcement that defeats a UserAccesses grant, so it
+		// must be cleared for the grant below to actually take effect.
+		src.AdministratorsOnly = false
+		src.UserAccesses = []portainer.UserID{standardUser.ID}
+		require.NoError(t, handler.DataStore.Source().Update(adminUserContext, src.ID, src))
+
+		standardSecurityContext := &security.RestrictedRequestContext{
+			IsAdmin: false,
+			UserID:  standardUser.ID,
+			User:    standardUser,
+		}
+
+		req := mockDeployKubernetesStackInlineRequest()
+		stackutils.PrepareStackStatusForDeployment(stack)
+		deploymentConfig, httpErr := handler.deployStack(req, stack, false, &portainer.Endpoint{})
+		require.Nil(t, httpErr)
+
+		httpErr = handler.deployKubernetesStackInline(deploymentConfig, stack, standardSecurityContext, gitConfig, sourceID, nil)
+		require.Nil(t, httpErr)
+
+		updatedSrc, err := handler.DataStore.Source().Read(adminUserContext, sourceID)
+		require.NoError(t, err)
+		require.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
+	})
 }

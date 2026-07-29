@@ -2,7 +2,6 @@ package workflows
 
 import (
 	"fmt"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -173,19 +172,7 @@ func UpdateSourceSyncStatus(tx gitSourceStore, userContext source.UserContext, s
 		return nil
 	}
 
-	src, err := tx.Source().Read(userContext, sourceID)
-	if err != nil {
-		return fmt.Errorf("failed to read source: %w", err)
-	}
-
-	src.Status = status
-	src.StatusError = statusError
-
-	if status == portainer.SourceStatusHealthy {
-		src.LastSync = time.Now().Unix()
-	}
-
-	return tx.Source().Update(userContext, src.ID, src)
+	return tx.Source().UpdateSyncStatus(userContext, sourceID, status, statusError)
 }
 
 func checkResultStatus(checkErr error) (portainer.SourceStatus, string) {
@@ -277,7 +264,7 @@ func SaveWorkflowGitConfig(tx gitSourceStore, userContext source.UserContext, wo
 		}
 
 		newSourceID = newSrc.ID
-	} else {
+	} else if !gitAuthEqual(cfg.Authentication, src.Git.Authentication) || cfg.TLSSkipVerify != src.Git.TLSSkipVerify {
 		src.Git.Authentication = cfg.Authentication
 		src.Git.TLSSkipVerify = cfg.TLSSkipVerify
 
@@ -292,6 +279,14 @@ func SaveWorkflowGitConfig(tx gitSourceStore, userContext source.UserContext, wo
 		Path:     cfg.ConfigFilePath,
 		Hash:     cfg.ConfigHash,
 	})
+}
+
+func gitAuthEqual(a, b *gittypes.GitAuthentication) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+
+	return *a == *b
 }
 
 // SaveWorkflowArtifact replaces the ArtifactFile referencing oldSourceID on the Artifact matched by
