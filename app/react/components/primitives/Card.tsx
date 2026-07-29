@@ -1,12 +1,21 @@
 import clsx from 'clsx';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import {
+  ComponentType,
+  createContext,
+  PropsWithChildren,
+  ReactNode,
+  useContext,
+  useMemo,
+} from 'react';
+
+import { useId } from '@/react/hooks/useId';
 
 import { Icon } from '@@/Icon';
 
 const cardContainer = cva(
   [
-    'overflow-hidden border border-solid border-gray-5',
+    'border border-solid border-gray-5',
     'th-highcontrast:border-white',
     'th-dark:border-legacy-grey-3',
   ],
@@ -38,6 +47,16 @@ export type CardVariant = NonNullable<
   VariantProps<typeof cardContainer>['variant']
 >;
 
+interface CardContextValue {
+  variant: CardVariant;
+  titleId: string | undefined;
+}
+
+const CardContext = createContext<CardContextValue>({
+  variant: 'default',
+  titleId: undefined,
+});
+
 /**
  * Low-level card surface. Compose with `Card.Header` for a titled section and `Card.Body` for
  * padded content. Use `variant="filled"` for a gray background.
@@ -67,13 +86,23 @@ function CardContainer({
   variant,
   'aria-label': ariaLabel,
 }: PropsWithChildren<CardContainerProps>) {
+  const generatedId = useId();
+  const titleId = ariaLabel ? undefined : `card-title-${generatedId}`;
+  const contextValue = useMemo(
+    () => ({ variant: variant ?? 'default', titleId }),
+    [variant, titleId]
+  );
+
   return (
-    <section
-      aria-label={ariaLabel}
-      className={cardContainer({ variant, shadow, className })}
-    >
-      {children}
-    </section>
+    <CardContext.Provider value={contextValue}>
+      <section
+        aria-label={ariaLabel}
+        aria-labelledby={titleId}
+        className={cardContainer({ variant, shadow, className })}
+      >
+        {children}
+      </section>
+    </CardContext.Provider>
   );
 }
 
@@ -93,10 +122,13 @@ interface CardHeaderProps {
 }
 
 function CardHeader({ title, subtitle, icon, actions }: CardHeaderProps) {
+  const { variant, titleId } = useContext(CardContext);
+
   return (
     <div
       className={clsx(
         'min-h-14 flex items-center justify-between gap-4 px-4 py-3.5',
+        variant === 'filled' ? 'rounded-t-lg' : 'rounded-t-xl',
         'border-0 border-b border-solid border-gray-5 bg-gray-iron-2',
         'th-dark:border-legacy-grey-3 th-dark:bg-gray-iron-10',
         'th-highcontrast:border-white th-highcontrast:bg-gray-warm-10'
@@ -111,7 +143,10 @@ function CardHeader({ title, subtitle, icon, actions }: CardHeaderProps) {
               className="shrink-0 opacity-70 th-highcontrast:text-white th-dark:text-gray-3"
             />
           )}
-          <span className="text-sm font-extrabold leading-tight tracking-wide text-gray-9 th-highcontrast:text-white th-dark:text-gray-4">
+          <span
+            id={titleId}
+            className="text-sm font-extrabold leading-tight tracking-wide text-gray-9 th-highcontrast:text-white th-dark:text-gray-4"
+          >
             {title}
           </span>
         </div>
