@@ -67,6 +67,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const swarmStackStatusCheckInterval = time.Minute
+
 func initCLI() *portainer.CLIFlags {
 	cliService := cli.Service{}
 
@@ -580,6 +582,10 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 	if err := sourceScheduler.ReconcileAll(); err != nil {
 		log.Fatal().Err(err).Msg("failed to start source scheduler")
 	}
+
+	sched.StartJobEvery(swarmStackStatusCheckInterval, func() error {
+		return deployments.ReconcileSwarmStackStatus(shutdownCtx, dataStore, swarmStackManager)
+	})
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {

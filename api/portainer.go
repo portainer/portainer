@@ -2086,6 +2086,7 @@ type (
 		Deploy(ctx context.Context, stack *Stack, prune bool, pullImage bool, endpoint *Endpoint, registries []Registry) error
 		Remove(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
+		CheckRunningStatus(ctx context.Context, stack *Stack, endpoint *Endpoint) (bool, error)
 	}
 )
 

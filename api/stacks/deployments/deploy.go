@@ -276,6 +276,70 @@ func redeployWhenChangedSecondStage(
 	return nil
 }
 
+type erroredSwarmStack struct {
+	stack    portainer.Stack
+	endpoint *portainer.Endpoint
+}
+
+// ReconcileSwarmStackStatus flips errored Swarm stacks back to active once their live services recover.
+func ReconcileSwarmStackStatus(ctx context.Context, datastore dataservices.DataStore, swarmStackManager portainer.SwarmStackManager) error {
+	var erroredStacks []erroredSwarmStack
+
+	if err := datastore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		stacks, err := tx.Stack().ReadAll(func(stack portainer.Stack) bool {
+			return stack.Type == portainer.DockerSwarmStack && stack.Status == portainer.StackStatusError
+		})
+		if err != nil {
+			return err
+		}
+
+		for _, stack := range stacks {
+			endpoint, err := tx.Endpoint().Endpoint(stack.EndpointID)
+			if err != nil {
+				log.Warn().Err(err).Int("stack_id", int(stack.ID)).Msg("Failed to find the environment for stack status check")
+				continue
+			}
+
+			erroredStacks = append(erroredStacks, erroredSwarmStack{stack: stack, endpoint: endpoint})
+		}
+
+		return nil
+	}); err != nil {
+		return errors.WithMessage(err, "failed to list errored swarm stacks")
+	}
+
+	for _, es := range erroredStacks {
+		running, err := swarmStackManager.CheckRunningStatus(ctx, &es.stack, es.endpoint)
+		if err != nil {
+			log.Warn().Err(err).Int("stack_id", int(es.stack.ID)).Msg("Failed to check swarm stack status")
+			continue
+		}
+
+		if !running {
+			continue
+		}
+
+		if err := datastore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			current, err := tx.Stack().Read(es.stack.ID)
+			if err != nil {
+				return err
+			}
+
+			if current.Status != portainer.StackStatusError {
+				return nil
+			}
+
+			stackutils.UpdateStackStatusFromDeploymentResult(current, nil)
+
+			return tx.Stack().Update(current.ID, current)
+		}); err != nil {
+			log.Error().Err(err).Int("stack_id", int(es.stack.ID)).Msg("Failed to update stack status after recovery")
+		}
+	}
+
+	return nil
+}
+
 func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, endpointID portainer.EndpointID) ([]portainer.Registry, error) {
 	registries, err := datastore.Registry().ReadAll()
 	if err != nil {
