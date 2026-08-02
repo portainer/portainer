@@ -184,11 +184,7 @@ func (handler *Handler) storeManifestFromGitRepository(ctx context.Context, tx d
 		repositoryPassword,
 		repositoryConfig.TLSSkipVerify,
 	); err != nil {
-		if statusErr := workflows.SaveSourceStatus(tx, userContext, sourceID, err); statusErr != nil {
-			return "", "", "", fmt.Errorf("%w (and failed to persist status: %w)", err, statusErr)
-		}
-
-		return "", "", "", err
+		return "", "", "", NewGitSyncSourceError(sourceID, "Failed cloning repository", err)
 	}
 
 	if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
