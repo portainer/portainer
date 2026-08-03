@@ -1,5 +1,5 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
+import { useIsSwarmManager } from '@/react/docker/proxy/queries/useInfo';
 import { StackType } from '@/react/common/stacks/types';
 import { ContainerEngine } from '@/react/portainer/environments/types';
 
@@ -13,10 +13,11 @@ import { CreateForm } from './CreateForm';
 export function CreateView() {
   const viewType = useViewType();
   const environmentId = useEnvironmentId(false);
-  const isSwarm = useIsSwarm(environmentId, {
+  // A worker defaults to a compose template; only a manager defaults to swarm.
+  const isSwarmManager = useIsSwarmManager(environmentId, {
     enabled: viewType === ContainerEngine.Docker,
   });
-  const defaultType = getDefaultType(viewType, isSwarm);
+  const defaultType = getDefaultType(viewType, isSwarmManager);
 
   return (
     <div>
