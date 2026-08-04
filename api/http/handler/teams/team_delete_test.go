@@ -60,7 +60,7 @@ func TestTeamDelete_removesTeamFromEndpointAccessPolicies(t *testing.T) {
 		assert.False(t, stillPresent, "deleted team must be removed from endpoint TeamAccessPolicies")
 	})
 
-	t.Run("team with member has both team and user policies removed", func(t *testing.T) {
+	t.Run("team member's direct user access policy survives team deletion", func(t *testing.T) {
 		t.Parallel()
 
 		_, store := datastore.MustNewTestStore(t, true, true)
@@ -102,7 +102,7 @@ func TestTeamDelete_removesTeamFromEndpointAccessPolicies(t *testing.T) {
 		assert.False(t, teamStillPresent, "deleted team must be removed from endpoint TeamAccessPolicies")
 
 		_, userStillPresent := updated.UserAccessPolicies[user.ID]
-		assert.False(t, userStillPresent, "team member must be removed from endpoint UserAccessPolicies")
+		assert.True(t, userStillPresent, "team member's own direct access policy must survive team deletion")
 	})
 
 	t.Run("team member in another team retains user access policy", func(t *testing.T) {

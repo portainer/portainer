@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/edge"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
@@ -68,8 +69,16 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	// WARNING: this variable must not be mutated
 	edgeStack := s.(*portainer.EdgeStack)
 
-	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
-	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
+	var relation *portainer.EndpointRelation
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		relation, txErr = tx.EndpointRelation().EndpointRelation(endpoint.ID)
+		if txErr != nil && !tx.IsErrObjectNotFound(txErr) {
+			return txErr
+		}
+
+		return nil
+	}); err != nil {
 		return httperror.InternalServerError("Unable to retrieve relation object from the database", fmt.Errorf("%w. Environment ID: %d", err, endpoint.ID))
 	}
 
