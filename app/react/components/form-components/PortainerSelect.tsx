@@ -252,7 +252,7 @@ export function MultiSelect<TValue = string>({
       noOptionsMessage={noOptionsMessage}
       loadingMessage={loadingMessage}
       formatCreateLabel={formatCreateLabel}
-      onCreateOption={onCreateOption}
+      onCreateOption={handleCreateOption}
       inputValue={inputValue}
       onInputChange={(textInput) => setInputValue(textInput)}
       onBlur={handleBlur}
@@ -262,6 +262,15 @@ export function MultiSelect<TValue = string>({
     />
   );
 
+  // Selecting the "create" menu option calls onCreateOption directly,
+  // bypassing the onChange handler above, so inputValue is cleared here
+  // instead — otherwise the stale text would trigger a second, duplicate
+  // creation from handleBlur below once the select loses focus.
+  function handleCreateOption(input: string) {
+    setInputValue('');
+    onCreateOption?.(input);
+  }
+
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
     onBlur?.(e);
     const trimmed = inputValue.trim();
@@ -270,11 +279,10 @@ export function MultiSelect<TValue = string>({
       return;
     }
     if (onCreateOption && isCreatable) {
-      onCreateOption(trimmed);
+      handleCreateOption(trimmed);
     } else {
       onChange([...value, trimmed as TValue]);
     }
-    setInputValue('');
   }
 }
 

@@ -16,6 +16,8 @@ vi.mock('@uirouter/react', async (importOriginal) => ({
   })),
 }));
 
+vi.mock('recharts');
+
 const minimalStats = {
   read: '2024-01-01T00:00:01Z',
   preread: '2024-01-01T00:00:00Z',
@@ -59,6 +61,9 @@ function addBaseHandlers() {
     ),
     http.get('/api/endpoints/1/docker/containers/container1/top', () =>
       HttpResponse.json({ Processes: [], Titles: [] })
+    ),
+    http.get('/api/endpoints/1/docker/containers/container1/stats', () =>
+      HttpResponse.json(minimalStats)
     )
   );
 }

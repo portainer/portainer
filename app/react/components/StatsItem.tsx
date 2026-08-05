@@ -84,19 +84,23 @@ export function ContainerStats({
   running,
   stopped,
 }: ContainerStatsProps) {
-  const actualTotal = total || running + stopped;
+  const safeRunning = running || 0;
+  const safeStopped = stopped || 0;
+  const actualTotal = total || safeRunning + safeStopped;
   return (
     <StatsItem title="CONTAINERS" icon={Hexagon}>
       <div className="flex w-full flex-col">
         <div>
-          <span className="text-base font-bold leading-none">{running}</span>
+          <span className="text-base font-bold leading-none">
+            {safeRunning}
+          </span>
           <span> / {actualTotal}</span>
         </div>
         <progress
           className="h-[4px] w-auto rounded bg-gray-4 th-dark:bg-white/10"
-          value={running}
+          value={safeRunning}
           max={Math.max(actualTotal, 1)}
-          aria-label={`${running} of ${actualTotal} containers running`}
+          aria-label={`${safeRunning} of ${actualTotal} containers running`}
         />
       </div>
     </StatsItem>

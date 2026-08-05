@@ -15,6 +15,8 @@ vi.mock('@uirouter/react', async (importOriginal) => ({
   })),
 }));
 
+vi.mock('recharts');
+
 const nodeMetricsSuccess = {
   metadata: { creationTimestamp: '2024-01-01T00:00:00Z' },
   usage: { cpu: '250m', memory: '512Mi' },

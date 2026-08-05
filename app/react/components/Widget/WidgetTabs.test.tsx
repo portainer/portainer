@@ -3,6 +3,8 @@ import { Layers } from 'lucide-react';
 import { ReactNode } from 'react';
 import { vi } from 'vitest';
 
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
+
 import { findSelectedTabIndex, Tab, WidgetTabs } from './WidgetTabs';
 
 // Mock Link component to avoid ui-router relative state resolution in tests
@@ -122,6 +124,8 @@ describe('WidgetTabs', () => {
 
   describe('error handling', () => {
     it('throws an error when any tab has an invalid URL-encodable param value', () => {
+      const restoreConsole = suppressConsoleLogs();
+
       // Tabs with characters that change when URL-encoded
       const invalidTabs: Tab[] = [
         {
@@ -135,6 +139,8 @@ describe('WidgetTabs', () => {
       expect(() =>
         renderWidgetTabs({ tabs: invalidTabs, currentTabIndex: 1 })
       ).toThrow('Invalid query param value for tab');
+
+      restoreConsole();
     });
   });
 

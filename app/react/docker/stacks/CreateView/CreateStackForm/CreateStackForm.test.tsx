@@ -9,6 +9,7 @@ import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { CreateStackForm } from './CreateStackForm';
 
@@ -334,10 +335,7 @@ describe('CreateStackForm', () => {
   });
 
   it('should handle API error gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const restoreConsole = suppressConsoleLogs();
 
     const mutationError = vi.fn();
     const errorMessage = 'test - failed to create stack';
@@ -380,7 +378,6 @@ describe('CreateStackForm', () => {
       );
     });
 
-    consoleErrorSpy.mockRestore();
-    consoleLogSpy.mockRestore();
+    restoreConsole();
   });
 });

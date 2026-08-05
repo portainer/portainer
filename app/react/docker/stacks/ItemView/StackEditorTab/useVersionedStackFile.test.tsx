@@ -306,8 +306,13 @@ describe('useVersionedStackFile', () => {
   });
 
   describe('error handling', () => {
-    const restoreConsole = suppressConsoleLogs();
-    afterAll(restoreConsole);
+    let restoreConsole: () => void;
+    beforeEach(() => {
+      restoreConsole = suppressConsoleLogs();
+    });
+    afterEach(() => {
+      restoreConsole();
+    });
 
     it('should handle API errors gracefully', async () => {
       server.use(

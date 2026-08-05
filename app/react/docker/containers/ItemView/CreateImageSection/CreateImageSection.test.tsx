@@ -8,6 +8,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
 import { createMockUser } from '@/react-tools/test-mocks';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { CreateImageSection } from './CreateImageSection';
 
@@ -174,9 +175,7 @@ describe('CreateImageSection', () => {
 
     it('should handle API error', async () => {
       const onMutationError = vi.fn();
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const restoreConsole = suppressConsoleLogs();
 
       server.use(
         http.post('/api/endpoints/:endpointId/docker/commit', () =>
@@ -209,7 +208,7 @@ describe('CreateImageSection', () => {
         { timeout: 3000 }
       );
 
-      consoleErrorSpy.mockRestore();
+      restoreConsole();
     });
 
     it('should show loading state during creation', async () => {

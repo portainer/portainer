@@ -5,6 +5,7 @@ import { HttpResponse, http } from 'msw';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { PruneButton } from './PruneButton';
 
@@ -423,6 +424,14 @@ describe('PruneButton', () => {
   });
 
   describe('Error Handling', () => {
+    let restoreConsole: () => void;
+    beforeEach(() => {
+      restoreConsole = suppressConsoleLogs();
+    });
+    afterEach(() => {
+      restoreConsole();
+    });
+
     it('should show error notification on API failure', async () => {
       mockConfirmPruneImages.mockResolvedValue({
         pruneAll: false,

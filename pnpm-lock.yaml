@@ -627,6 +627,9 @@ importers:
       vitest:
         specifier: ^4.1.8
         version: 4.1.8(@types/node@25.0.3)(@vitest/coverage-v8@4.1.8)(jsdom@24.1.3)(msw@2.14.6(@types/node@25.0.3)(typescript@6.0.2))(vite@8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2))
+      vitest-fail-on-console:
+        specifier: ^0.9.0
+        version: 0.9.0(vite@8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2))(vitest@4.1.8)
       webpack:
         specifier: ^5.107.2
         version: 5.107.2(@swc/core@1.15.11)(cssnano@8.0.1(postcss@8.5.15))(esbuild@0.27.3)(postcss@8.5.15)(webpack-cli@6.0.1)
@@ -4305,6 +4308,10 @@ packages:
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
+
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   character-entities-html4@2.1.0:
     resolution: {integrity: sha512-1v7fgQRj6hnSwFpq1Eu0ynr/CDEw0rXo2B61qXrLNdHZmPKgb7fqS1a2JwF0rISo9q77jDI8VMEHoApn8qDoZA==}
@@ -8635,6 +8642,12 @@ packages:
       yaml:
         optional: true
 
+  vitest-fail-on-console@0.9.0:
+    resolution: {integrity: sha512-GgoS9gSy3ctwGVgFhY6NaAaRE5ve9EmgN9iDpqtEG1Z7Z9Y8x/4GzDrhky5+050Hy0FnndoM/mpmqsmGWywFZw==}
+    peerDependencies:
+      vite: '>=4.5.2'
+      vitest: '>=0.26.2'
+
   vitest@4.1.8:
     resolution: {integrity: sha512-flY6ScbCIt9HThs+C5HS7jvGOB560DJtk/Z15IQROTA6zEy49Nh8T/dofWTQL+n3vswqn87sbJNiuqw1SDp5Ig==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -12929,6 +12942,8 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+
+  chalk@5.6.2: {}
 
   character-entities-html4@2.1.0: {}
 
@@ -17695,6 +17710,12 @@ snapshots:
       less: 4.4.2
       terser: 5.44.1
       yaml: 1.10.2
+
+  vitest-fail-on-console@0.9.0(vite@8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2))(vitest@4.1.8):
+    dependencies:
+      chalk: 5.6.2
+      vite: 8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2)
+      vitest: 4.1.8(@types/node@25.0.3)(@vitest/coverage-v8@4.1.8)(jsdom@24.1.3)(msw@2.14.6(@types/node@25.0.3)(typescript@6.0.2))(vite@8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2))
 
   vitest@4.1.8(@types/node@25.0.3)(@vitest/coverage-v8@4.1.8)(jsdom@24.1.3)(msw@2.14.6(@types/node@25.0.3)(typescript@6.0.2))(vite@8.0.16(@types/node@25.0.3)(esbuild@0.27.3)(jiti@2.7.0)(less@4.4.2)(terser@5.44.1)(yaml@1.10.2)):
     dependencies:

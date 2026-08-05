@@ -1,17 +1,9 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import { StatsLineChart } from './StatsLineChart';
 import type { SeriesConfig } from './StatsLineChart';
 
-vi.mock('recharts', async (importOriginal) => {
-  const original = await importOriginal<typeof import('recharts')>();
-  return {
-    ...original,
-    ResponsiveContainer: ({ children }: { children: React.ReactElement }) =>
-      React.cloneElement(children, { width: 800, height: 300 }),
-  };
-});
+vi.mock('recharts');
 
 function yAxisFormatter(value: number): string {
   return `${value}%`;

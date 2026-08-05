@@ -45,24 +45,27 @@ export function CreateGroupView() {
     </>
   );
 
-  async function handleSubmit(
+  function handleSubmit(
     values: GroupFormValues,
     { resetForm }: FormikHelpers<GroupFormValues>
-  ) {
-    await createMutation.mutateAsync(
-      {
-        name: values.name,
-        description: values.description,
-        tagIds: values.tagIds,
-        associatedEnvironments: values.associatedEnvironments,
-      },
-      {
-        onSuccess: () => {
-          resetForm();
-          notifySuccess('Success', 'Group successfully created');
-          router.stateService.go('portainer.groups');
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      createMutation.mutate(
+        {
+          name: values.name,
+          description: values.description,
+          tagIds: values.tagIds,
+          associatedEnvironments: values.associatedEnvironments,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            resetForm();
+            notifySuccess('Success', 'Group successfully created');
+            router.stateService.go('portainer.groups');
+          },
+          onSettled: () => resolve(),
+        }
+      );
+    });
   }
 }

@@ -262,9 +262,13 @@ describe('EditGroupView', () => {
   });
 
   describe('Error state', () => {
-    // Suppress console logs for error state tests
-    const restoreConsole = suppressConsoleLogs();
-    afterAll(restoreConsole);
+    let restoreConsole: () => void;
+    beforeEach(() => {
+      restoreConsole = suppressConsoleLogs();
+    });
+    afterEach(() => {
+      restoreConsole();
+    });
 
     it('should show error Alert when group fetch fails', async () => {
       renderEditGroupView({ groupData: null });
@@ -557,6 +561,9 @@ describe('EditGroupView', () => {
     });
 
     it('should hide the delete button when group data is missing', async () => {
+      // when groupData is null - handler returns 404 and logs an error
+      const restoreLog = suppressConsoleLogs();
+
       renderEditGroupView({ groupData: null });
 
       // Wait for the header error state to appear
@@ -567,6 +574,8 @@ describe('EditGroupView', () => {
       expect(
         screen.queryByRole('button', { name: /Delete/i })
       ).not.toBeInTheDocument();
+
+      restoreLog();
     });
 
     it('should have correct data-cy attribute', async () => {

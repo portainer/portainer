@@ -8,6 +8,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { CreateGroupView } from './CreateGroupView';
 
@@ -225,9 +226,7 @@ describe('CreateGroupView', () => {
 
   describe('Error handling', () => {
     it('should handle API error gracefully', async () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const restoreConsole = suppressConsoleLogs();
 
       const mutationError = vi.fn();
       const errorMessage = 'Failed to create group';
@@ -255,7 +254,7 @@ describe('CreateGroupView', () => {
         expect(mutationError).toHaveBeenCalled();
       });
 
-      consoleErrorSpy.mockRestore();
+      restoreConsole();
     });
   });
 
@@ -365,7 +364,8 @@ describe('CreateGroupView', () => {
 
       // Environment now appears in the associated list — select its row checkbox and remove it
       await screen.findByText('removable-env');
-      const assocCheckboxes = screen.getAllByRole('checkbox');
+      const assocTable = screen.getByTestId('group-associatedEndpoints');
+      const assocCheckboxes = within(assocTable).getAllByRole('checkbox');
       await user.click(assocCheckboxes[assocCheckboxes.length - 1]);
       const removeBtn = await screen.findByTestId('remove-environments-button');
       await waitFor(() => expect(removeBtn).toBeEnabled());

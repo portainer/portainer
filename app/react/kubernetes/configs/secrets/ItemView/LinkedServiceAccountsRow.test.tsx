@@ -68,12 +68,16 @@ type RowProps = React.ComponentProps<typeof LinkedServiceAccountsRow>;
 
 function renderRow(props: Partial<RowProps> = {}) {
   return render(
-    <LinkedServiceAccountsRowWithQuery
-      secretName="my-secret"
-      namespace="default"
-      isSystem={false}
-      {...props}
-    />
+    <table>
+      <tbody>
+        <LinkedServiceAccountsRowWithQuery
+          secretName="my-secret"
+          namespace="default"
+          isSystem={false}
+          {...props}
+        />
+      </tbody>
+    </table>
   );
 }
 

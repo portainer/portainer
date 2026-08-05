@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
@@ -192,11 +192,11 @@ describe('AssociatedEnvironmentsSelector', () => {
       await screen.findByText('Add environments');
       await screen.findByText('new-env');
 
-      // Select the available env — find the drawer's checkboxes
-      // The drawer table has its own checkboxes after the main table ones
-      const allCheckboxes = screen.getAllByRole('checkbox');
-      // Last checkbox belongs to the drawer table row
-      await user.click(allCheckboxes[allCheckboxes.length - 1]);
+      // Select the available env — scope to the drawer table to avoid duplicates
+      const drawerTable = screen.getByTestId('add-environments-drawer-table');
+      const drawerCheckboxes = within(drawerTable).getAllByRole('checkbox');
+      // [0] = select-all header, [1] = first row
+      await user.click(drawerCheckboxes[1]);
 
       // Click the Add button in the drawer footer
       const confirmAddBtn = screen.getByTestId(

@@ -96,7 +96,11 @@ export function PersistentVolumeClaimsDatatable() {
       />
 
       {editResizeClaim && (
-        <Modal onDismiss={() => setEditResizeClaim(null)} size="md">
+        <Modal
+          onDismiss={() => setEditResizeClaim(null)}
+          size="md"
+          aria-label="Resize Persistent Volume Claim"
+        >
           <ResizeClaimEditForm
             claim={editResizeClaim}
             onDismiss={() => setEditResizeClaim(null)}

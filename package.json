@@ -237,6 +237,7 @@
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^4.1.8",
+    "vitest-fail-on-console": "^0.9.0",
     "webpack": "^5.107.2",
     "webpack-build-notifier": "^3.1.0",
     "webpack-bundle-analyzer": "^5.2.0",

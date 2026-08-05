@@ -14,7 +14,13 @@ import { Datatable } from '@@/datatables';
 import { useTableStateWithoutStorage } from '@@/datatables/useTableState';
 import { withControlledSelected } from '@@/datatables/extend-options/withControlledSelected';
 import { TableRow } from '@@/datatables/TableRow';
-import { Sheet, SheetContent, SheetClose, SheetHeader } from '@@/Sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetClose,
+  SheetHeader,
+  SheetDescription,
+} from '@@/Sheet';
 import { Button, LoadingButton } from '@@/buttons';
 
 import { EnvironmentTableData } from './types';
@@ -119,6 +125,9 @@ export function AddEnvironmentsDrawer({
       <SheetContent className="flex flex-col !p-0">
         <div className="flex-1 overflow-auto p-4">
           <SheetHeader title="Add environments" />
+          <SheetDescription className="sr-only">
+            Select environments to add to this group.
+          </SheetDescription>
           <Datatable<EnvironmentTableData>
             title="Available environments"
             columns={columns}

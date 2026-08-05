@@ -35,7 +35,6 @@ export interface GroupFormValues {
 
 interface Props {
   initialValues: GroupFormValues;
-  /** Should return a Promise that resolves when navigation happens (to keep isSubmitting true) */
   onSubmit: (
     values: GroupFormValues,
     helpers: FormikHelpers<GroupFormValues>

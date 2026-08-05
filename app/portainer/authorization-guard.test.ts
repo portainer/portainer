@@ -5,9 +5,18 @@ import {
 } from '@uirouter/angularjs';
 
 import { get, keyBuilder } from '@/react/hooks/useLocalStorage';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { checkAuthorizations } from './authorization-guard';
 import { IAuthenticationService } from './services/types';
+
+let restoreConsole: () => void;
+beforeEach(() => {
+  restoreConsole = suppressConsoleLogs();
+});
+afterEach(() => {
+  restoreConsole();
+});
 
 describe('checkAuthorizations', () => {
   let authService = {

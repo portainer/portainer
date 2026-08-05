@@ -11,6 +11,7 @@ import {
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { DashboardView } from './DashboardView';
 
@@ -76,7 +77,7 @@ test('should correctly show total number of resource groups across multiple subs
 });
 
 test("when only subscriptions fail to load, don't show the dashboard", async () => {
-  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const restoreConsole = suppressConsoleLogs();
 
   const { queryByLabelText } = await renderComponent(
     1,
@@ -86,10 +87,11 @@ test("when only subscriptions fail to load, don't show the dashboard", async () 
   );
   expect(queryByLabelText('Subscription')).not.toBeInTheDocument();
   expect(queryByLabelText('Resource group')).not.toBeInTheDocument();
+  restoreConsole();
 });
 
 test('when only resource groups fail to load, still show the subscriptions', async () => {
-  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const restoreConsole = suppressConsoleLogs();
 
   const { queryByLabelText, findByLabelText } = await renderComponent(
     1,
@@ -99,6 +101,7 @@ test('when only resource groups fail to load, still show the subscriptions', asy
   );
   await expect(findByLabelText('Subscription')).resolves.toBeInTheDocument();
   expect(queryByLabelText('Resource group')).not.toBeInTheDocument();
+  restoreConsole();
 });
 
 async function renderComponent(

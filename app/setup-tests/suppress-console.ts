@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { vi } from 'vitest';
 
 /**
@@ -40,25 +39,17 @@ import { vi } from 'vitest';
  * @returns A cleanup function to restore the original console methods
  */
 export function suppressConsoleLogs() {
-  const originalError = console.error;
-  const originalWarn = console.warn;
-  const originalInfo = console.info;
-  const originalLog = console.log;
+  // Use vi.spyOn so the mocks integrate with vitest's mock system
+  // (compatible with vitest-fail-on-console and vi.restoreAllMocks)
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-  // Suppress all console output
-  // Tests expect errors so no need to show them in the output
-  console.error = vi.fn();
-  console.warn = vi.fn();
-  console.info = vi.fn();
-  console.log = vi.fn();
-
-  // Return cleanup function to restore original console methods
   return () => {
-    console.error = originalError;
-    console.warn = originalWarn;
-    console.info = originalInfo;
-    console.log = originalLog;
+    errorSpy.mockRestore();
+    warnSpy.mockRestore();
+    infoSpy.mockRestore();
+    logSpy.mockRestore();
   };
 }
-
-/* eslint-enable no-console */

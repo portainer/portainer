@@ -5,6 +5,7 @@ import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { DockerNetwork } from '../types';
 
@@ -52,7 +53,11 @@ test('Non system networks should have a delete button', async () => {
 });
 
 async function renderComponent(isAdmin: boolean, network: DockerNetwork) {
-  server.use(http.get('/api/endpoints/1', () => HttpResponse.json({})));
+  server.use(
+    http.get('/api/endpoints/1', () =>
+      HttpResponse.json(createMockEnvironment())
+    )
+  );
 
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 

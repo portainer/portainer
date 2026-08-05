@@ -68,13 +68,17 @@ type RowProps = React.ComponentProps<typeof ImagePullSecretsRow>;
 
 function renderRow(props: Partial<RowProps> = {}) {
   return render(
-    <ImagePullSecretsRowWithQuery
-      namespace="default"
-      name="my-sa"
-      imagePullSecrets={[]}
-      isSystem={false}
-      {...props}
-    />
+    <table>
+      <tbody>
+        <ImagePullSecretsRowWithQuery
+          namespace="default"
+          name="my-sa"
+          imagePullSecrets={[]}
+          isSystem={false}
+          {...props}
+        />
+      </tbody>
+    </table>
   );
 }
 
