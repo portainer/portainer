@@ -35,7 +35,7 @@ func (handler *Handler) deleteKubernetesPod(w http.ResponseWriter, r *http.Reque
 		return httpErr
 	}
 
-	cli, httpErr := handler.prepareKubeClient(r)
+	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
 		log.Error().Err(httpErr).Str("context", "DeleteKubernetesPod").Str("namespace", namespace).Str("name", name).Msg("Unable to get a Kubernetes client for the user")
 		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
@@ -84,7 +84,7 @@ func (handler *Handler) restartKubernetesPod(w http.ResponseWriter, r *http.Requ
 		return httpErr
 	}
 
-	cli, httpErr := handler.prepareKubeClient(r)
+	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
 		log.Error().Err(httpErr).Str("context", "RestartKubernetesPod").Str("namespace", namespace).Str("name", name).Msg("Unable to get a Kubernetes client for the user")
 		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
