@@ -77,6 +77,8 @@ linters:
               desc: use github.com/Masterminds/semver/v3
             - pkg: github.com/hashicorp/go-version
               desc: use github.com/Masterminds/semver/v3
+            - pkg: github.com/orcaman/concurrent-map
+              desc: use sync.Map instead
     gocritic:
       disable-all: true
       enabled-checks:
