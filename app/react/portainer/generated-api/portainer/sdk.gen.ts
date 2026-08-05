@@ -874,6 +874,7 @@ import {
   zDockerImagesListPath,
   zDockerImagesListQuery,
   zDockerImagesListResponse,
+  zDrainNodeBody,
   zDrainNodePath,
   zDrainNodeResponse,
   zEdgeGroupCreateBody,
@@ -6709,7 +6710,7 @@ export const drainNode = <ThrowOnError extends boolean = true>(
     requestValidator: async (data) =>
       await z
         .object({
-          body: z.never().optional(),
+          body: zDrainNodeBody.optional(),
           path: zDrainNodePath,
           query: z.never().optional(),
         })
@@ -6722,6 +6723,10 @@ export const drainNode = <ThrowOnError extends boolean = true>(
     ],
     url: '/kubernetes/{id}/nodes/{name}/drain',
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

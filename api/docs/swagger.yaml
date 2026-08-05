@@ -2486,6 +2486,38 @@ definitions:
       describe:
         type: string
     type: object
+  kubernetes.drainNodePayload:
+    properties:
+      DeleteEmptyDirData:
+        description: DeleteEmptyDirData allows eviction of pods using emptyDir volumes,
+          whose data is lost once the pod is deleted.
+        example: true
+        type: boolean
+      DisableEviction:
+        description: DisableEviction forces the use of direct pod deletion instead
+          of the eviction API, ignoring any configured PodDisruptionBudgets.
+        example: false
+        type: boolean
+      Force:
+        description: Force allows deletion of standalone pods not managed by a controller.
+        example: false
+        type: boolean
+      GracePeriodSeconds:
+        description: GracePeriodSeconds overrides each pod's termination grace period.
+          -1 uses the pod's own grace period.
+        example: -1
+        type: integer
+      IgnoreDaemonSets:
+        description: IgnoreDaemonSets skips DaemonSet-managed pods, which would otherwise
+          block the drain.
+        example: true
+        type: boolean
+      TimeoutSeconds:
+        description: TimeoutSeconds is the overall time to wait for the drain to complete.
+          Defaults to 60 when omitted.
+        example: 60
+        type: integer
+    type: object
   kubernetes.kubernetesVersionResponse:
     properties:
       buildDate:
@@ -15802,6 +15834,12 @@ paths:
         name: name
         required: true
         type: string
+      - description: Drain options, matching kubectl drain flags. Defaults are applied
+          to any omitted field.
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/kubernetes.drainNodePayload'
       responses:
         "204":
           description: Success

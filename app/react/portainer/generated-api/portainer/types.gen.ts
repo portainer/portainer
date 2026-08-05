@@ -1594,6 +1594,33 @@ export type KubernetesDescribeResourceResponse = {
   describe?: string;
 };
 
+export type KubernetesDrainNodePayload = {
+  /**
+   * DeleteEmptyDirData allows eviction of pods using emptyDir volumes, whose data is lost once the pod is deleted.
+   */
+  DeleteEmptyDirData?: boolean;
+  /**
+   * DisableEviction forces the use of direct pod deletion instead of the eviction API, ignoring any configured PodDisruptionBudgets.
+   */
+  DisableEviction?: boolean;
+  /**
+   * Force allows deletion of standalone pods not managed by a controller.
+   */
+  Force?: boolean;
+  /**
+   * GracePeriodSeconds overrides each pod's termination grace period. -1 uses the pod's own grace period.
+   */
+  GracePeriodSeconds?: number;
+  /**
+   * IgnoreDaemonSets skips DaemonSet-managed pods, which would otherwise block the drain.
+   */
+  IgnoreDaemonSets?: boolean;
+  /**
+   * TimeoutSeconds is the overall time to wait for the drain to complete. Defaults to 60 when omitted.
+   */
+  TimeoutSeconds?: number;
+};
+
 export type KubernetesKubernetesVersionResponse = {
   buildDate?: string;
   compiler?: string;
@@ -14633,7 +14660,10 @@ export type GetKubernetesNodesResponse =
   GetKubernetesNodesResponses[keyof GetKubernetesNodesResponses];
 
 export type DrainNodeData = {
-  body?: never;
+  /**
+   * Drain options, matching kubectl drain flags. Defaults are applied to any omitted field.
+   */
+  body?: KubernetesDrainNodePayload;
   path: {
     /**
      * Environment(Endpoint) identifier

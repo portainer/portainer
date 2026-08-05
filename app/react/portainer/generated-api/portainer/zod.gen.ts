@@ -657,6 +657,15 @@ export const zKubernetesDescribeResourceResponse = z.object({
   describe: z.string().optional(),
 });
 
+export const zKubernetesDrainNodePayload = z.object({
+  DeleteEmptyDirData: z.boolean().optional(),
+  DisableEviction: z.boolean().optional(),
+  Force: z.boolean().optional(),
+  GracePeriodSeconds: z.int().optional(),
+  IgnoreDaemonSets: z.boolean().optional(),
+  TimeoutSeconds: z.int().optional(),
+});
+
 export const zKubernetesKubernetesVersionResponse = z.object({
   buildDate: z.string().optional(),
   compiler: z.string().optional(),
@@ -5194,6 +5203,11 @@ export const zGetKubernetesNodesPath = z.object({
 export const zGetKubernetesNodesResponse = z.array(
   zKubernetesKubernetesNodeResponse
 );
+
+/**
+ * Drain options, matching kubectl drain flags. Defaults are applied to any omitted field.
+ */
+export const zDrainNodeBody = zKubernetesDrainNodePayload;
 
 export const zDrainNodePath = z.object({
   id: z.int(),

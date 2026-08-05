@@ -1,5 +1,8 @@
 import { KubernetesPortainerNodeDrainLabel } from '../nodeUtils';
-import { NodeFormValues } from '../NodeView/NodeDetails/types';
+import {
+  NodeFormValues,
+  defaultDrainOptions,
+} from '../NodeView/NodeDetails/types';
 
 import { buildSpec, buildLabels } from './useUpdateNodeMutation';
 
@@ -11,6 +14,7 @@ function createTestFormValues(
     availability: 'Active',
     labels: [],
     taints: [],
+    drainOptions: defaultDrainOptions,
     ...overrides,
   };
 }

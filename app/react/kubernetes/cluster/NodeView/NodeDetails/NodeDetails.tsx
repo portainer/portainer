@@ -25,7 +25,7 @@ import { NodeLabels } from './NodeLabels';
 import { NodeSummary } from './NodeSummary';
 import { NodeTaints } from './NodeTaints';
 import { NodeResourceReservation } from './NodeResourceReservation';
-import { NodeFormValues } from './types';
+import { NodeFormValues, defaultDrainOptions } from './types';
 import { createLabel, createTaint } from './nodeFormUtils';
 import { createValidationSchema } from './validation';
 
@@ -130,7 +130,7 @@ export function NodeDetails({ nodeName, environmentId }: Props) {
       node,
     });
     if (values.availability === 'Drain') {
-      await drainNodeMutation.mutateAsync();
+      await drainNodeMutation.mutateAsync(values.drainOptions);
     }
     notifySuccess('Success', 'Node updated successfully');
 
@@ -176,6 +176,10 @@ function NodeDetailsForm({
         error={errors.availability}
         onChangeAvailability={(availability) => {
           setFieldValue('availability', availability);
+        }}
+        drainOptions={values.drainOptions}
+        onChangeDrainOptions={(drainOptions) => {
+          setFieldValue('drainOptions', drainOptions);
         }}
         hasNodeWriteAccess={hasNodeWriteAccess}
       />
@@ -237,5 +241,6 @@ function getNodeFormValues(node: Node): NodeFormValues {
     availability,
     labels,
     taints,
+    drainOptions: defaultDrainOptions,
   };
 }
