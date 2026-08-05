@@ -2,6 +2,7 @@ package system
 
 import (
 	"net/http"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -12,6 +13,7 @@ import (
 
 type status struct {
 	*portainer.Status
+	CurrentTime string `json:"CurrentTime"`
 }
 
 // @id systemStatus
@@ -24,7 +26,8 @@ type status struct {
 // @router /system/status [get]
 func (handler *Handler) systemStatus(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	return response.JSON(w, &status{
-		Status: handler.status,
+		Status:      handler.status,
+		CurrentTime: time.Now().Format(time.RFC3339),
 	})
 }
 

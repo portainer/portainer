@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	stackscheduling "github.com/portainer/portainer/api/stacks/scheduling"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/api/stacks/teardown"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -43,6 +44,7 @@ type Handler struct {
 	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
 	SourceScheduler         *scheduling.SourceScheduler
+	StackScheduler          *stackscheduling.StackScheduler
 	StackDeployer           deployments.StackDeployer
 	teardownService         teardown.Service
 }
@@ -89,6 +91,8 @@ func NewHandler(bouncer security.BouncerService, teardownService teardown.Servic
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackStart))).Methods(http.MethodPost)
 	h.Handle("/stacks/{id}/stop",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackStop))).Methods(http.MethodPost)
+	h.Handle("/stacks/{id}/restart/schedule",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackRestartScheduleUpdate))).Methods(http.MethodPut)
 	h.Handle("/stacks/webhooks/{webhookID}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInvoke))).Methods(http.MethodPost)
 

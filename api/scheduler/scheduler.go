@@ -98,10 +98,26 @@ func (s *Scheduler) StopJob(jobID string) error {
 	return nil
 }
 
+// StartJob schedules a new cron job.
+// Returns job id that could be used to stop the given job.
+// When job run returns an error, that job won't be run again.
+func (s *Scheduler) StartJob(cronExpression string, job func() error) (string, error) {
+	schedule, err := cron.ParseStandard(cronExpression)
+	if err != nil {
+		return "", errors.Wrapf(err, "invalid cron expression %q", cronExpression)
+	}
+
+	return s.startJob(schedule, job), nil
+}
+
 // StartJobEvery schedules a new periodic job with a given duration.
 // Returns job id that could be used to stop the given job.
 // When job run returns an error, that job won't be run again.
 func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) string {
+	return s.startJob(cron.Every(duration), job)
+}
+
+func (s *Scheduler) startJob(schedule cron.Schedule, job func() error) string {
 	entryID := new(cron.EntryID)
 
 	cancelFn := func() {
@@ -134,7 +150,7 @@ func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) stri
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	*entryID = s.crontab.Schedule(cron.Every(duration), jobFn)
+	*entryID = s.crontab.Schedule(schedule, jobFn)
 	s.activeJobs[*entryID] = cancelFn
 
 	return strconv.Itoa(int(*entryID))

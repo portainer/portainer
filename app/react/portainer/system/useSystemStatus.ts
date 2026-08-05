@@ -13,13 +13,15 @@ export interface StatusResponse {
   Edition: string;
   Version: string;
   InstanceID: string;
+  CurrentTime?: string;
 }
 
 export async function getSystemStatus() {
   try {
-    const { data } = await axios.get<StatusResponse>(buildUrl('status'));
+    const { data, headers } = await axios.get<StatusResponse>(buildUrl('status'));
 
     data.Edition = isBE ? 'Business Edition' : 'Community Edition';
+    data.CurrentTime = data.CurrentTime || headers.date;
 
     return data;
   } catch (error) {
