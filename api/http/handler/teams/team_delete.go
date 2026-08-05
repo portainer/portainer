@@ -57,7 +57,7 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		return handler.removeTeamAccessPolicies(tx, portainer.TeamID(teamID), memberships)
+		return handler.removeTeamAccessPolicies(tx, portainer.TeamID(teamID))
 	}); err != nil {
 		return httperror.InternalServerError("Unable to clean-up team access policies", err)
 	}
@@ -70,7 +70,7 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 	return response.Empty(w)
 }
 
-func (handler *Handler) removeTeamAccessPolicies(tx dataservices.DataStoreTx, teamID portainer.TeamID, memberships []portainer.TeamMembership) error {
+func (handler *Handler) removeTeamAccessPolicies(tx dataservices.DataStoreTx, teamID portainer.TeamID) error {
 	endpoints, err := tx.Endpoint().Endpoints()
 	if err != nil {
 		return err
@@ -82,22 +82,6 @@ func (handler *Handler) removeTeamAccessPolicies(tx dataservices.DataStoreTx, te
 		}
 
 		delete(ep.TeamAccessPolicies, teamID)
-		for _, m := range memberships {
-			otherMemberships, err := tx.TeamMembership().TeamMembershipsByUserID(m.UserID)
-			if err != nil {
-				return err
-			}
-			hasOtherTeamAccess := false
-			for _, om := range otherMemberships {
-				if _, ok := ep.TeamAccessPolicies[om.TeamID]; ok {
-					hasOtherTeamAccess = true
-					break
-				}
-			}
-			if !hasOtherTeamAccess {
-				delete(ep.UserAccessPolicies, m.UserID)
-			}
-		}
 		if err := tx.Endpoint().UpdateEndpoint(ep.ID, ep); err != nil {
 			return err
 		}
