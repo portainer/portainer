@@ -33,6 +33,18 @@ func int64n(max int64, fips bool) int64 {
 	return i.Int64()
 }
 
+const alphanumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+// String returns a random alphanumeric string of length n.
+func String(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = alphanumericChars[int64n(int64(len(alphanumericChars)), true)]
+	}
+
+	return string(b)
+}
+
 func Float64() float64 {
 	return randomFloat64(fips.FIPSMode())
 }

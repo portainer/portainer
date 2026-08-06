@@ -16,7 +16,6 @@ import (
 	"github.com/portainer/portainer/pkg/libcrypto"
 	"github.com/portainer/portainer/pkg/librand"
 
-	"github.com/dchest/uniuri"
 	"github.com/rs/zerolog/log"
 )
 
@@ -223,8 +222,8 @@ func randomInt(min, max int) int {
 }
 
 func generateRandomCredentials() (string, string) {
-	username := uniuri.NewLen(8)
-	password := uniuri.NewLen(8)
+	username := librand.String(8)
+	password := librand.String(8)
 
 	return username, password
 }

@@ -1,9 +1,12 @@
 package librand
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/portainer/portainer/pkg/fips"
+
+	"github.com/stretchr/testify/require"
 )
 
 func init() {
@@ -46,6 +49,23 @@ func TestInternalIntn(t *testing.T) {
 				t.Fatalf("random number %d wasn't within interval", i)
 			}
 		})
+	}
+}
+
+func TestString(t *testing.T) {
+	t.Parallel()
+
+	const iterations = 1000
+
+	seen := make(map[string]bool, iterations)
+	for range iterations {
+		s := String(16)
+
+		require.Len(t, s, 16)
+		require.Empty(t, strings.Trim(s, alphanumericChars))
+		require.False(t, seen[s])
+
+		seen[s] = true
 	}
 }
 

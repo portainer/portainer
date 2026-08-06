@@ -18,7 +18,6 @@ require (
 	github.com/compose-spec/compose-go/v2 v2.9.1
 	github.com/containerd/containerd v1.7.33
 	github.com/containerd/errdefs v1.0.0
-	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/distribution/reference v0.6.0
 	github.com/docker/cli v28.5.1+incompatible
 	github.com/docker/compose/v2 v2.40.3
