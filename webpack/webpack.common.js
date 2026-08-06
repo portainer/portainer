@@ -111,6 +111,7 @@ module.exports = {
       {
         context: ['/api'],
         target: 'http://localhost:9000',
+        ws: true,
       },
     ],
     open: true,
