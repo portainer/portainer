@@ -1149,6 +1149,30 @@ export type KubernetesK8sConfigurationOwnerResource = {
   ResourceKind?: string;
 };
 
+export type KubernetesK8sContainer = {
+  args?: Array<string>;
+  command?: Array<string>;
+  env?: Array<KubernetesK8sEnvVar>;
+  /**
+   * EnvFromSecrets names secrets whose keys are all exposed as environment
+   * variables.
+   */
+  envFromSecrets?: Array<string>;
+  image?: string;
+  imagePullPolicy?: string;
+  name?: string;
+  ports?: Array<KubernetesK8sContainerPort>;
+  resources?: KubernetesK8sResourceRequirements;
+  volumeMounts?: Array<KubernetesK8sVolumeMount>;
+  workingDir?: string;
+};
+
+export type KubernetesK8sContainerPort = {
+  containerPort?: number;
+  name?: string;
+  protocol?: string;
+};
+
 export type KubernetesK8sCronJob = {
   Command?: string;
   Id?: string;
@@ -1175,6 +1199,48 @@ export type KubernetesK8sDashboard = {
   volumesCount?: number;
 };
 
+export type KubernetesK8sDeploymentPatchRequest = {
+  annotations?: {
+    [key: string]: string;
+  };
+  podAnnotations?: {
+    [key: string]: string;
+  };
+};
+
+export type KubernetesK8sDeploymentRollbackRequest = {
+  revision?: number;
+};
+
+export type KubernetesK8sDeploymentScaleRequest = {
+  replicas?: number;
+};
+
+export type KubernetesK8sDeploymentWriteRequest = {
+  annotations?: {
+    [key: string]: string;
+  };
+  labels?: {
+    [key: string]: string;
+  };
+  name?: string;
+  pod?: KubernetesK8sPodTemplate;
+  replicas?: number;
+  /**
+   * Selector matches the pods this deployment owns. It is immutable once the
+   * deployment exists, so it is only read on create.
+   */
+  selector?: {
+    [key: string]: string;
+  };
+};
+
+export type KubernetesK8sEnvVar = {
+  name?: string;
+  secretRef?: KubernetesK8sSecretKeyRef;
+  value?: string;
+};
+
 export type KubernetesK8sEvent = {
   count?: number;
   eventTime?: string;
@@ -1195,6 +1261,15 @@ export type KubernetesK8sEventInvolvedObject = {
   name?: string;
   namespace?: string;
   uid?: string;
+};
+
+export type KubernetesK8sIngressClass = {
+  Annotations?: {
+    [key: string]: string;
+  };
+  Controller?: string;
+  IsDefault?: boolean;
+  Name?: string;
 };
 
 export type KubernetesK8sIngressController = {
@@ -1326,10 +1401,49 @@ export type KubernetesK8sPersistentVolumeClaim = {
   volumeName?: string;
 };
 
+export type KubernetesK8sPersistentVolumeClaimCreateRequest = {
+  accessModes?: Array<V1PersistentVolumeAccessMode>;
+  annotations?: {
+    [key: string]: string;
+  };
+  labels?: {
+    [key: string]: string;
+  };
+  name?: string;
+  storage?: string;
+  storageClass?: string;
+  volumeMode?: V1PersistentVolumeMode;
+};
+
+export type KubernetesK8sPodTemplate = {
+  annotations?: {
+    [key: string]: string;
+  };
+  containers?: Array<KubernetesK8sContainer>;
+  labels?: {
+    [key: string]: string;
+  };
+  volumes?: Array<KubernetesK8sPodVolume>;
+};
+
+export type KubernetesK8sPodVolume = {
+  claimName?: string;
+  name?: string;
+};
+
 export type KubernetesK8sResourceQuota = {
   cpu?: string;
   enabled?: boolean;
   memory?: string;
+};
+
+export type KubernetesK8sResourceRequirements = {
+  limits?: {
+    [key: string]: string;
+  };
+  requests?: {
+    [key: string]: string;
+  };
 };
 
 export type KubernetesK8sRole = {
@@ -1381,6 +1495,11 @@ export type KubernetesK8sSecret = {
   Namespace?: string;
   SecretType?: string;
   UID?: string;
+};
+
+export type KubernetesK8sSecretKeyRef = {
+  key?: string;
+  name?: string;
 };
 
 export type KubernetesK8sServiceAccount = {
@@ -1481,6 +1600,13 @@ export type KubernetesK8sVolumeInfo = {
   storageClass?: KubernetesK8sStorageClass;
 };
 
+export type KubernetesK8sVolumeMount = {
+  mountPath?: string;
+  name?: string;
+  readOnly?: boolean;
+  subPath?: string;
+};
+
 export type KubernetesKubernetesCreateNamespaceResponse = {
   /**
    * APIVersion defines the versioned schema of this representation of an object.
@@ -1517,6 +1643,71 @@ export type KubernetesKubernetesCreateNamespaceResponse = {
    * +optional
    */
   status?: V1NamespaceStatus;
+};
+
+export type KubernetesKubernetesDeploymentListResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Items is the list of Deployments.
+   */
+  items?: Array<V1Deployment>;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard list metadata.
+   * +optional
+   */
+  metadata?: V1ListMeta;
+};
+
+export type KubernetesKubernetesDeploymentResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Specification of the desired behavior of the Deployment.
+   * +optional
+   */
+  spec?: V1DeploymentSpec;
+  /**
+   * Most recently observed status of the Deployment.
+   * +optional
+   */
+  status?: V1DeploymentStatus;
 };
 
 export type KubernetesKubernetesNodeResponse = {
@@ -1557,6 +1748,99 @@ export type KubernetesKubernetesNodeResponse = {
    * +optional
    */
   status?: V1NodeStatus;
+};
+
+export type KubernetesKubernetesPodListResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * List of pods.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+   */
+  items?: Array<V1Pod>;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard list metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  metadata?: V1ListMeta;
+};
+
+export type KubernetesKubernetesReplicaSetListResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * List of ReplicaSets.
+   * More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset
+   */
+  items?: Array<V1ReplicaSet>;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard list metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  metadata?: V1ListMeta;
+};
+
+export type KubernetesKubernetesResourceQuotaListResponse = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Items is a list of ResourceQuota objects.
+   * More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
+   */
+  items?: Array<V1ResourceQuota>;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard list metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  metadata?: V1ListMeta;
 };
 
 export type KubernetesMetadata = {
@@ -5177,6 +5461,55 @@ export type UsersUserUpdatePayload = {
   Username: string;
 };
 
+export type V1AwsElasticBlockStoreVolumeSource = {
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   * TODO: how do we prevent errors in the filesystem from compromising the machine
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * partition is the partition in the volume that you want to mount.
+   * If omitted, the default is to mount by volume name.
+   * Examples: For volume /dev/sda1, you specify the partition as "1".
+   * Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
+   * +optional
+   */
+  partition?: number;
+  /**
+   * readOnly value true will force the readOnly setting in VolumeMounts.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * volumeID is unique ID of the persistent disk resource in AWS (Amazon EBS volume).
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   */
+  volumeID?: string;
+};
+
+export type V1Affinity = {
+  /**
+   * Describes node affinity scheduling rules for the pod.
+   * +optional
+   */
+  nodeAffinity?: V1NodeAffinity;
+  /**
+   * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+   * +optional
+   */
+  podAffinity?: V1PodAffinity;
+  /**
+   * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+   * +optional
+   */
+  podAntiAffinity?: V1PodAntiAffinity;
+};
+
 export type V1AppArmorProfile = {
   /**
    * localhostProfile indicates a profile loaded on the node that should be used.
@@ -5224,6 +5557,96 @@ export type V1AttachedVolume = {
    * Name of the attached volume
    */
   name?: string;
+};
+
+export const V1AzureDataDiskCachingMode = {
+  /**
+   * AzureDataDiskCachingNone
+   */
+  AZURE_DATA_DISK_CACHING_NONE: 'None',
+  /**
+   * AzureDataDiskCachingReadOnly
+   */
+  AZURE_DATA_DISK_CACHING_READ_ONLY: 'ReadOnly',
+  /**
+   * AzureDataDiskCachingReadWrite
+   */
+  AZURE_DATA_DISK_CACHING_READ_WRITE: 'ReadWrite',
+} as const;
+
+export type V1AzureDataDiskCachingMode =
+  (typeof V1AzureDataDiskCachingMode)[keyof typeof V1AzureDataDiskCachingMode];
+
+export const V1AzureDataDiskKind = {
+  /**
+   * AzureSharedBlobDisk
+   */
+  AZURE_SHARED_BLOB_DISK: 'Shared',
+  /**
+   * AzureDedicatedBlobDisk
+   */
+  AZURE_DEDICATED_BLOB_DISK: 'Dedicated',
+  /**
+   * AzureManagedDisk
+   */
+  AZURE_MANAGED_DISK: 'Managed',
+} as const;
+
+export type V1AzureDataDiskKind =
+  (typeof V1AzureDataDiskKind)[keyof typeof V1AzureDataDiskKind];
+
+export type V1AzureDiskVolumeSource = {
+  /**
+   * cachingMode is the Host Caching mode: None, Read Only, Read Write.
+   * +optional
+   * +default=ref(AzureDataDiskCachingReadWrite)
+   */
+  cachingMode?: V1AzureDataDiskCachingMode;
+  /**
+   * diskName is the Name of the data disk in the blob storage
+   */
+  diskName?: string;
+  /**
+   * diskURI is the URI of data disk in the blob storage
+   */
+  diskURI?: string;
+  /**
+   * fsType is Filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * +optional
+   * +default="ext4"
+   */
+  fsType?: string;
+  /**
+   * kind expected values are Shared: multiple blob disks per storage account  Dedicated: single blob disk per storage account  Managed: azure managed data disk (only in managed availability set). defaults to shared
+   * +default=ref(AzureSharedBlobDisk)
+   */
+  kind?: V1AzureDataDiskKind;
+  /**
+   * readOnly Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   * +default=false
+   */
+  readOnly?: boolean;
+};
+
+export type V1AzureFileVolumeSource = {
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretName is the  name of secret that contains Azure Storage Account Name and Key
+   */
+  secretName?: string;
+  /**
+   * shareName is the azure share Name
+   */
+  shareName?: string;
 };
 
 export type V1CsiPersistentVolumeSource = {
@@ -5304,6 +5727,44 @@ export type V1CsiPersistentVolumeSource = {
   volumeHandle?: string;
 };
 
+export type V1CsiVolumeSource = {
+  /**
+   * driver is the name of the CSI driver that handles this volume.
+   * Consult with your admin for the correct name as registered in the cluster.
+   */
+  driver?: string;
+  /**
+   * fsType to mount. Ex. "ext4", "xfs", "ntfs".
+   * If not provided, the empty value is passed to the associated CSI driver
+   * which will determine the default filesystem to apply.
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * nodePublishSecretRef is a reference to the secret object containing
+   * sensitive information to pass to the CSI driver to complete the CSI
+   * NodePublishVolume and NodeUnpublishVolume calls.
+   * This field is optional, and  may be empty if no secret is required. If the
+   * secret object contains more than one secret, all secret references are passed.
+   * +optional
+   */
+  nodePublishSecretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * readOnly specifies a read-only configuration for the volume.
+   * Defaults to false (read/write).
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * volumeAttributes stores driver-specific properties that are passed to the CSI
+   * driver. Consult your driver's documentation for supported values.
+   * +optional
+   */
+  volumeAttributes?: {
+    [key: string]: string;
+  };
+};
+
 export type V1Capabilities = {
   /**
    * Added capabilities
@@ -5317,6 +5778,111 @@ export type V1Capabilities = {
    * +listType=atomic
    */
   drop?: Array<string>;
+};
+
+export type V1CephFsVolumeSource = {
+  /**
+   * monitors is Required: Monitors is a collection of Ceph monitors
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   * +listType=atomic
+   */
+  monitors?: Array<string>;
+  /**
+   * path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
+   * +optional
+   */
+  path?: string;
+  /**
+   * readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   * +optional
+   */
+  secretFile?: string;
+  /**
+   * secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * user is optional: User is the rados user name, default is admin
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   * +optional
+   */
+  user?: string;
+};
+
+export type V1CinderVolumeSource = {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef is optional: points to a secret object containing parameters used to connect
+   * to OpenStack.
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * volumeID used to identify the volume in cinder.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   */
+  volumeID?: string;
+};
+
+export type V1ClusterTrustBundleProjection = {
+  /**
+   * Select all ClusterTrustBundles that match this label selector.  Only has
+   * effect if signerName is set.  Mutually-exclusive with name.  If unset,
+   * interpreted as "match nothing".  If set but empty, interpreted as "match
+   * everything".
+   * +optional
+   */
+  labelSelector?: V1LabelSelector;
+  /**
+   * Select a single ClusterTrustBundle by object name.  Mutually-exclusive
+   * with signerName and labelSelector.
+   * +optional
+   */
+  name?: string;
+  /**
+   * If true, don't block pod startup if the referenced ClusterTrustBundle(s)
+   * aren't available.  If using name, then the named ClusterTrustBundle is
+   * allowed not to exist.  If using signerName, then the combination of
+   * signerName and labelSelector is allowed to match zero
+   * ClusterTrustBundles.
+   * +optional
+   */
+  optional?: boolean;
+  /**
+   * Relative path from the volume root to write the bundle.
+   */
+  path?: string;
+  /**
+   * Select all ClusterTrustBundles that match this signer name.
+   * Mutually-exclusive with name.  The contents of all selected
+   * ClusterTrustBundles will be unified and deduplicated.
+   * +optional
+   */
+  signerName?: string;
 };
 
 export type V1ConfigMapEnvSource = {
@@ -5391,6 +5957,81 @@ export type V1ConfigMapNodeConfigSource = {
    * +optional
    */
   uid?: string;
+};
+
+export type V1ConfigMapProjection = {
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * ConfigMap will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the ConfigMap,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1KeyToPath>;
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   * +optional
+   * +default=""
+   * +kubebuilder:default=""
+   * TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+   */
+  name?: string;
+  /**
+   * optional specify whether the ConfigMap or its keys must be defined
+   * +optional
+   */
+  optional?: boolean;
+};
+
+export type V1ConfigMapVolumeSource = {
+  /**
+   * defaultMode is optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  defaultMode?: number;
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * ConfigMap will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the ConfigMap,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1KeyToPath>;
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   * +optional
+   * +default=""
+   * +kubebuilder:default=""
+   * TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+   */
+  name?: string;
+  /**
+   * optional specify whether the ConfigMap or its keys must be defined
+   * +optional
+   */
+  optional?: boolean;
 };
 
 export type V1Container = {
@@ -5646,6 +6287,21 @@ export type V1Container = {
   workingDir?: string;
 };
 
+export type V1ContainerExtendedResourceRequest = {
+  /**
+   * The name of the container requesting resources.
+   */
+  containerName?: string;
+  /**
+   * The name of the request in the special ResourceClaim which corresponds to the extended resource.
+   */
+  requestName?: string;
+  /**
+   * The name of the extended resource in that container which gets backed by DRA.
+   */
+  resourceName?: string;
+};
+
 export type V1ContainerImage = {
   /**
    * Names by which this image is known.
@@ -5789,11 +6445,535 @@ export const V1ContainerRestartRuleOnExitCodesOperator = {
 export type V1ContainerRestartRuleOnExitCodesOperator =
   (typeof V1ContainerRestartRuleOnExitCodesOperator)[keyof typeof V1ContainerRestartRuleOnExitCodesOperator];
 
+export type V1ContainerState = {
+  /**
+   * Details about a running container
+   * +optional
+   */
+  running?: V1ContainerStateRunning;
+  /**
+   * Details about a terminated container
+   * +optional
+   */
+  terminated?: V1ContainerStateTerminated;
+  /**
+   * Details about a waiting container
+   * +optional
+   */
+  waiting?: V1ContainerStateWaiting;
+};
+
+export type V1ContainerStateRunning = {
+  /**
+   * Time at which the container was last (re-)started
+   * +optional
+   */
+  startedAt?: string;
+};
+
+export type V1ContainerStateTerminated = {
+  /**
+   * Container's ID in the format '<type>://<container_id>'
+   * +optional
+   */
+  containerID?: string;
+  /**
+   * Exit status from the last termination of the container
+   */
+  exitCode?: number;
+  /**
+   * Time at which the container last terminated
+   * +optional
+   */
+  finishedAt?: string;
+  /**
+   * Message regarding the last termination of the container
+   * +optional
+   */
+  message?: string;
+  /**
+   * (brief) reason from the last termination of the container
+   * +optional
+   */
+  reason?: string;
+  /**
+   * Signal from the last termination of the container
+   * +optional
+   */
+  signal?: number;
+  /**
+   * Time at which previous execution of the container started
+   * +optional
+   */
+  startedAt?: string;
+};
+
+export type V1ContainerStateWaiting = {
+  /**
+   * Message regarding why the container is not yet running.
+   * +optional
+   */
+  message?: string;
+  /**
+   * (brief) reason the container is not yet running.
+   * +optional
+   */
+  reason?: string;
+};
+
+export type V1ContainerStatus = {
+  /**
+   * AllocatedResources represents the compute resources allocated for this container by the
+   * node. Kubelet sets this value to Container.Resources.Requests upon successful pod admission
+   * and after successfully admitting desired pod resize.
+   * +featureGate=InPlacePodVerticalScalingAllocatedStatus
+   * +optional
+   */
+  allocatedResources?: V1ResourceList;
+  /**
+   * AllocatedResourcesStatus represents the status of various resources
+   * allocated for this Pod.
+   * +featureGate=ResourceHealthStatus
+   * +optional
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  allocatedResourcesStatus?: Array<V1ResourceStatus>;
+  /**
+   * ContainerID is the ID of the container in the format '<type>://<container_id>'.
+   * Where type is a container runtime identifier, returned from Version call of CRI API
+   * (for example "containerd").
+   * +optional
+   */
+  containerID?: string;
+  /**
+   * Image is the name of container image that the container is running.
+   * The container image may not match the image used in the PodSpec,
+   * as it may have been resolved by the runtime.
+   * More info: https://kubernetes.io/docs/concepts/containers/images.
+   */
+  image?: string;
+  /**
+   * ImageID is the image ID of the container's image. The image ID may not
+   * match the image ID of the image used in the PodSpec, as it may have been
+   * resolved by the runtime.
+   */
+  imageID?: string;
+  /**
+   * LastTerminationState holds the last termination state of the container to
+   * help debug container crashes and restarts. This field is not
+   * populated if the container is still running and RestartCount is 0.
+   * +optional
+   */
+  lastState?: V1ContainerState;
+  /**
+   * Name is a DNS_LABEL representing the unique name of the container.
+   * Each container in a pod must have a unique name across all container types.
+   * Cannot be updated.
+   */
+  name?: string;
+  /**
+   * Ready specifies whether the container is currently passing its readiness check.
+   * The value will change as readiness probes keep executing. If no readiness
+   * probes are specified, this field defaults to true once the container is
+   * fully started (see Started field).
+   *
+   * The value is typically used to determine whether a container is ready to
+   * accept traffic.
+   */
+  ready?: boolean;
+  /**
+   * Resources represents the compute resource requests and limits that have been successfully
+   * enacted on the running container after it has been started or has been successfully resized.
+   * +featureGate=InPlacePodVerticalScaling
+   * +optional
+   */
+  resources?: V1ResourceRequirements;
+  /**
+   * RestartCount holds the number of times the container has been restarted.
+   * Kubelet makes an effort to always increment the value, but there
+   * are cases when the state may be lost due to node restarts and then the value
+   * may be reset to 0. The value is never negative.
+   */
+  restartCount?: number;
+  /**
+   * Started indicates whether the container has finished its postStart lifecycle hook
+   * and passed its startup probe.
+   * Initialized as false, becomes true after startupProbe is considered
+   * successful. Resets to false when the container is restarted, or if kubelet
+   * loses state temporarily. In both cases, startup probes will run again.
+   * Is always true when no startupProbe is defined and container is running and
+   * has passed the postStart lifecycle hook. The null value must be treated the
+   * same as false.
+   * +optional
+   */
+  started?: boolean;
+  /**
+   * State holds details about the container's current condition.
+   * +optional
+   */
+  state?: V1ContainerState;
+  /**
+   * StopSignal reports the effective stop signal for this container
+   * +featureGate=ContainerStopSignals
+   * +optional
+   */
+  stopSignal?: V1Signal;
+  /**
+   * User represents user identity information initially attached to the first process of the container
+   * +featureGate=SupplementalGroupsPolicy
+   * +optional
+   */
+  user?: V1ContainerUser;
+  /**
+   * Status of volume mounts.
+   * +optional
+   * +patchMergeKey=mountPath
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=mountPath
+   */
+  volumeMounts?: Array<V1VolumeMountStatus>;
+};
+
+export type V1ContainerUser = {
+  /**
+   * Linux holds user identity information initially attached to the first process of the containers in Linux.
+   * Note that the actual running identity can be changed if the process has enough privilege to do so.
+   * +optional
+   */
+  linux?: V1LinuxContainerUser;
+};
+
+export const V1DnsPolicy = {
+  /**
+   * DNSClusterFirstWithHostNet
+   */
+  DNS_CLUSTER_FIRST_WITH_HOST_NET: 'ClusterFirstWithHostNet',
+  /**
+   * DNSClusterFirst
+   */
+  DNS_CLUSTER_FIRST: 'ClusterFirst',
+  /**
+   * DNSDefault
+   */
+  DNS_DEFAULT: 'Default',
+  /**
+   * DNSNone
+   */
+  DNS_NONE: 'None',
+} as const;
+
+export type V1DnsPolicy = (typeof V1DnsPolicy)[keyof typeof V1DnsPolicy];
+
 export type V1DaemonEndpoint = {
   /**
    * Port number of the given endpoint.
    */
   Port?: number;
+};
+
+export type V1Deployment = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Specification of the desired behavior of the Deployment.
+   * +optional
+   */
+  spec?: V1DeploymentSpec;
+  /**
+   * Most recently observed status of the Deployment.
+   * +optional
+   */
+  status?: V1DeploymentStatus;
+};
+
+export type V1DeploymentCondition = {
+  /**
+   * Last time the condition transitioned from one status to another.
+   */
+  lastTransitionTime?: string;
+  /**
+   * The last time this condition was updated.
+   */
+  lastUpdateTime?: string;
+  /**
+   * A human readable message indicating details about the transition.
+   */
+  message?: string;
+  /**
+   * The reason for the condition's last transition.
+   */
+  reason?: string;
+  /**
+   * Status of the condition, one of True, False, Unknown.
+   */
+  status?: K8sIoApiCoreV1ConditionStatus;
+  /**
+   * Type of deployment condition.
+   */
+  type?: V1DeploymentConditionType;
+};
+
+export const V1DeploymentConditionType = {
+  /**
+   * DeploymentAvailable
+   */
+  DEPLOYMENT_AVAILABLE: 'Available',
+  /**
+   * DeploymentProgressing
+   */
+  DEPLOYMENT_PROGRESSING: 'Progressing',
+  /**
+   * DeploymentReplicaFailure
+   */
+  DEPLOYMENT_REPLICA_FAILURE: 'ReplicaFailure',
+} as const;
+
+export type V1DeploymentConditionType =
+  (typeof V1DeploymentConditionType)[keyof typeof V1DeploymentConditionType];
+
+export type V1DeploymentSpec = {
+  /**
+   * Minimum number of seconds for which a newly created pod should be ready
+   * without any of its container crashing, for it to be considered available.
+   * Defaults to 0 (pod will be considered available as soon as it is ready)
+   * +optional
+   */
+  minReadySeconds?: number;
+  /**
+   * Indicates that the deployment is paused.
+   * +optional
+   */
+  paused?: boolean;
+  /**
+   * The maximum time in seconds for a deployment to make progress before it
+   * is considered to be failed. The deployment controller will continue to
+   * process failed deployments and a condition with a ProgressDeadlineExceeded
+   * reason will be surfaced in the deployment status. Note that progress will
+   * not be estimated during the time a deployment is paused. Defaults to 600s.
+   */
+  progressDeadlineSeconds?: number;
+  /**
+   * Number of desired pods. This is a pointer to distinguish between explicit
+   * zero and not specified. Defaults to 1.
+   * +optional
+   */
+  replicas?: number;
+  /**
+   * The number of old ReplicaSets to retain to allow rollback.
+   * This is a pointer to distinguish between explicit zero and not specified.
+   * Defaults to 10.
+   * +optional
+   */
+  revisionHistoryLimit?: number;
+  /**
+   * Label selector for pods. Existing ReplicaSets whose pods are
+   * selected by this will be the ones affected by this deployment.
+   * It must match the pod template's labels.
+   */
+  selector?: V1LabelSelector;
+  /**
+   * The deployment strategy to use to replace existing pods with new ones.
+   * +optional
+   * +patchStrategy=retainKeys
+   */
+  strategy?: V1DeploymentStrategy;
+  /**
+   * Template describes the pods that will be created.
+   * The only allowed template.spec.restartPolicy value is "Always".
+   */
+  template?: V1PodTemplateSpec;
+};
+
+export type V1DeploymentStatus = {
+  /**
+   * Total number of available non-terminating pods (ready for at least minReadySeconds) targeted by this deployment.
+   * +optional
+   */
+  availableReplicas?: number;
+  /**
+   * Count of hash collisions for the Deployment. The Deployment controller uses this
+   * field as a collision avoidance mechanism when it needs to create the name for the
+   * newest ReplicaSet.
+   * +optional
+   */
+  collisionCount?: number;
+  /**
+   * Represents the latest available observations of a deployment's current state.
+   * +patchMergeKey=type
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=type
+   */
+  conditions?: Array<V1DeploymentCondition>;
+  /**
+   * The generation observed by the deployment controller.
+   * +optional
+   */
+  observedGeneration?: number;
+  /**
+   * Total number of non-terminating pods targeted by this Deployment with a Ready Condition.
+   * +optional
+   */
+  readyReplicas?: number;
+  /**
+   * Total number of non-terminating pods targeted by this deployment (their labels match the selector).
+   * +optional
+   */
+  replicas?: number;
+  /**
+   * Total number of terminating pods targeted by this deployment. Terminating pods have a non-null
+   * .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.
+   *
+   * This is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).
+   * +optional
+   */
+  terminatingReplicas?: number;
+  /**
+   * Total number of unavailable pods targeted by this deployment. This is the total number of
+   * pods that are still required for the deployment to have 100% available capacity. They may
+   * either be pods that are running but not yet available or pods that still have not been created.
+   * +optional
+   */
+  unavailableReplicas?: number;
+  /**
+   * Total number of non-terminating pods targeted by this deployment that have the desired template spec.
+   * +optional
+   */
+  updatedReplicas?: number;
+};
+
+export type V1DeploymentStrategy = {
+  /**
+   * Rolling update config params. Present only if DeploymentStrategyType =
+   * RollingUpdate.
+   * ---
+   * TODO: Update this to follow our convention for oneOf, whatever we decide it
+   * to be.
+   * +optional
+   */
+  rollingUpdate?: V1RollingUpdateDeployment;
+  /**
+   * Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
+   * +optional
+   */
+  type?: V1DeploymentStrategyType;
+};
+
+export const V1DeploymentStrategyType = {
+  /**
+   * RecreateDeploymentStrategyType
+   */
+  RECREATE_DEPLOYMENT_STRATEGY_TYPE: 'Recreate' /**
+   * RollingUpdateDeploymentStrategyType
+   */,
+  ROLLING_UPDATE_DEPLOYMENT_STRATEGY_TYPE: 'RollingUpdate',
+} as const;
+
+export type V1DeploymentStrategyType =
+  (typeof V1DeploymentStrategyType)[keyof typeof V1DeploymentStrategyType];
+
+export type V1DownwardApiProjection = {
+  /**
+   * Items is a list of DownwardAPIVolume file
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1DownwardApiVolumeFile>;
+};
+
+export type V1DownwardApiVolumeFile = {
+  /**
+   * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+   * +optional
+   */
+  fieldRef?: V1ObjectFieldSelector;
+  /**
+   * Optional: mode bits used to set permissions on this file, must be an octal value
+   * between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  mode?: number;
+  /**
+   * Required: Path is  the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'
+   */
+  path?: string;
+  /**
+   * Selects a resource of the container: only resources limits and requests
+   * (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+   * +optional
+   */
+  resourceFieldRef?: V1ResourceFieldSelector;
+};
+
+export type V1DownwardApiVolumeSource = {
+  /**
+   * Optional: mode bits to use on created files by default. Must be a
+   * Optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  defaultMode?: number;
+  /**
+   * Items is a list of downward API volume file
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1DownwardApiVolumeFile>;
+};
+
+export type V1EmptyDirVolumeSource = {
+  /**
+   * medium represents what type of storage medium should back this directory.
+   * The default is "" which means to use the node's default medium.
+   * Must be an empty string (default) or Memory.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   * +optional
+   */
+  medium?: V1StorageMedium;
+  /**
+   * sizeLimit is the total amount of local storage required for this EmptyDir volume.
+   * The size limit is also applicable for memory medium.
+   * The maximum usage on memory medium EmptyDir would be the minimum value between
+   * the SizeLimit specified here and the sum of memory limits of all containers in a pod.
+   * The default is nil which means that the limit is undefined.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   * +optional
+   */
+  sizeLimit?: ResourceQuantity;
 };
 
 export type V1EnvFromSource = {
@@ -5874,6 +7054,250 @@ export type V1EnvVarSource = {
   secretKeyRef?: V1SecretKeySelector;
 };
 
+export type V1EphemeralContainer = {
+  /**
+   * Arguments to the entrypoint.
+   * The image's CMD is used if this is not provided.
+   * Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
+   * cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+   * to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+   * produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+   * of whether the variable exists or not. Cannot be updated.
+   * More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+   * +optional
+   * +listType=atomic
+   */
+  args?: Array<string>;
+  /**
+   * Entrypoint array. Not executed within a shell.
+   * The image's ENTRYPOINT is used if this is not provided.
+   * Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
+   * cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+   * to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+   * produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+   * of whether the variable exists or not. Cannot be updated.
+   * More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+   * +optional
+   * +listType=atomic
+   */
+  command?: Array<string>;
+  /**
+   * List of environment variables to set in the container.
+   * Cannot be updated.
+   * +optional
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  env?: Array<V1EnvVar>;
+  /**
+   * List of sources to populate environment variables in the container.
+   * The keys defined within a source may consist of any printable ASCII characters except '='.
+   * When a key exists in multiple
+   * sources, the value associated with the last source will take precedence.
+   * Values defined by an Env with a duplicate key will take precedence.
+   * Cannot be updated.
+   * +optional
+   * +listType=atomic
+   */
+  envFrom?: Array<V1EnvFromSource>;
+  /**
+   * Container image name.
+   * More info: https://kubernetes.io/docs/concepts/containers/images
+   */
+  image?: string;
+  /**
+   * Image pull policy.
+   * One of Always, Never, IfNotPresent.
+   * Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+   * Cannot be updated.
+   * More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
+   * +optional
+   */
+  imagePullPolicy?: V1PullPolicy;
+  /**
+   * Lifecycle is not allowed for ephemeral containers.
+   * +optional
+   */
+  lifecycle?: V1Lifecycle;
+  /**
+   * Probes are not allowed for ephemeral containers.
+   * +optional
+   */
+  livenessProbe?: V1Probe;
+  /**
+   * Name of the ephemeral container specified as a DNS_LABEL.
+   * This name must be unique among all containers, init containers and ephemeral containers.
+   */
+  name?: string;
+  /**
+   * Ports are not allowed for ephemeral containers.
+   * +optional
+   * +patchMergeKey=containerPort
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=containerPort
+   * +listMapKey=protocol
+   */
+  ports?: Array<V1ContainerPort>;
+  /**
+   * Probes are not allowed for ephemeral containers.
+   * +optional
+   */
+  readinessProbe?: V1Probe;
+  /**
+   * Resources resize policy for the container.
+   * +featureGate=InPlacePodVerticalScaling
+   * +optional
+   * +listType=atomic
+   */
+  resizePolicy?: Array<V1ContainerResizePolicy>;
+  /**
+   * Resources are not allowed for ephemeral containers. Ephemeral containers use spare resources
+   * already allocated to the pod.
+   * +optional
+   */
+  resources?: V1ResourceRequirements;
+  /**
+   * Restart policy for the container to manage the restart behavior of each
+   * container within a pod.
+   * You cannot set this field on ephemeral containers.
+   * +optional
+   */
+  restartPolicy?: V1ContainerRestartPolicy;
+  /**
+   * Represents a list of rules to be checked to determine if the
+   * container should be restarted on exit. You cannot set this field on
+   * ephemeral containers.
+   * +featureGate=ContainerRestartRules
+   * +optional
+   * +listType=atomic
+   */
+  restartPolicyRules?: Array<V1ContainerRestartRule>;
+  /**
+   * Optional: SecurityContext defines the security options the ephemeral container should be run with.
+   * If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
+   * +optional
+   */
+  securityContext?: V1SecurityContext;
+  /**
+   * Probes are not allowed for ephemeral containers.
+   * +optional
+   */
+  startupProbe?: V1Probe;
+  /**
+   * Whether this container should allocate a buffer for stdin in the container runtime. If this
+   * is not set, reads from stdin in the container will always result in EOF.
+   * Default is false.
+   * +optional
+   */
+  stdin?: boolean;
+  /**
+   * Whether the container runtime should close the stdin channel after it has been opened by
+   * a single attach. When stdin is true the stdin stream will remain open across multiple attach
+   * sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the
+   * first client attaches to stdin, and then remains open and accepts data until the client disconnects,
+   * at which time stdin is closed and remains closed until the container is restarted. If this
+   * flag is false, a container processes that reads from stdin will never receive an EOF.
+   * Default is false
+   * +optional
+   */
+  stdinOnce?: boolean;
+  /**
+   * If set, the name of the container from PodSpec that this ephemeral container targets.
+   * The ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.
+   * If not set then the ephemeral container uses the namespaces configured in the Pod spec.
+   *
+   * The container runtime must implement support for this feature. If the runtime does not
+   * support namespace targeting then the result of setting this field is undefined.
+   * +optional
+   */
+  targetContainerName?: string;
+  /**
+   * Optional: Path at which the file to which the container's termination message
+   * will be written is mounted into the container's filesystem.
+   * Message written is intended to be brief final status, such as an assertion failure message.
+   * Will be truncated by the node if greater than 4096 bytes. The total message length across
+   * all containers will be limited to 12kb.
+   * Defaults to /dev/termination-log.
+   * Cannot be updated.
+   * +optional
+   */
+  terminationMessagePath?: string;
+  /**
+   * Indicate how the termination message should be populated. File will use the contents of
+   * terminationMessagePath to populate the container status message on both success and failure.
+   * FallbackToLogsOnError will use the last chunk of container log output if the termination
+   * message file is empty and the container exited with an error.
+   * The log output is limited to 2048 bytes or 80 lines, whichever is smaller.
+   * Defaults to File.
+   * Cannot be updated.
+   * +optional
+   */
+  terminationMessagePolicy?: V1TerminationMessagePolicy;
+  /**
+   * Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
+   * Default is false.
+   * +optional
+   */
+  tty?: boolean;
+  /**
+   * volumeDevices is the list of block devices to be used by the container.
+   * +patchMergeKey=devicePath
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=devicePath
+   * +optional
+   */
+  volumeDevices?: Array<V1VolumeDevice>;
+  /**
+   * Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers.
+   * Cannot be updated.
+   * +optional
+   * +patchMergeKey=mountPath
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=mountPath
+   */
+  volumeMounts?: Array<V1VolumeMount>;
+  /**
+   * Container's working directory.
+   * If not specified, the container runtime's default will be used, which
+   * might be configured in the container image.
+   * Cannot be updated.
+   * +optional
+   */
+  workingDir?: string;
+};
+
+export type V1EphemeralVolumeSource = {
+  /**
+   * Will be used to create a stand-alone PVC to provision the volume.
+   * The pod in which this EphemeralVolumeSource is embedded will be the
+   * owner of the PVC, i.e. the PVC will be deleted together with the
+   * pod.  The name of the PVC will be `<pod name>-<volume name>` where
+   * `<volume name>` is the name from the `PodSpec.Volumes` array
+   * entry. Pod validation will reject the pod if the concatenated name
+   * is not valid for a PVC (for example, too long).
+   *
+   * An existing PVC with that name that is not owned by the pod
+   * will *not* be used for the pod to avoid using an unrelated
+   * volume by mistake. Starting the pod is then blocked until
+   * the unrelated PVC is removed. If such a pre-created PVC is
+   * meant to be used by the pod, the PVC has to updated with an
+   * owner reference to the pod once the pod exists. Normally
+   * this should not be necessary, but it may be useful when
+   * manually reconstructing a broken cluster.
+   *
+   * This field is read-only and no changes will be made by Kubernetes
+   * to the PVC after it has been created.
+   *
+   * Required, must not be nil.
+   */
+  volumeClaimTemplate?: V1PersistentVolumeClaimTemplate;
+};
+
 export type V1ExecAction = {
   /**
    * Command is the command line to execute inside the container, the working directory for the
@@ -5885,6 +7309,41 @@ export type V1ExecAction = {
    * +listType=atomic
    */
   command?: Array<string>;
+};
+
+export type V1FcVolumeSource = {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * TODO: how do we prevent errors in the filesystem from compromising the machine
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * lun is Optional: FC target lun number
+   * +optional
+   */
+  lun?: number;
+  /**
+   * readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * targetWWNs is Optional: FC target worldwide names (WWNs)
+   * +optional
+   * +listType=atomic
+   */
+  targetWWNs?: Array<string>;
+  /**
+   * wwids Optional: FC volume world wide identifiers (wwids)
+   * Either wwids or combination of targetWWNs and lun must be set, but not both simultaneously.
+   * +optional
+   * +listType=atomic
+   */
+  wwids?: Array<string>;
 };
 
 export type V1FieldsV1 = {
@@ -5934,6 +7393,89 @@ export const V1FinalizerName = {
 export type V1FinalizerName =
   (typeof V1FinalizerName)[keyof typeof V1FinalizerName];
 
+export type V1FlexVolumeSource = {
+  /**
+   * driver is the name of the driver to use for this volume.
+   */
+  driver?: string;
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". The default filesystem depends on FlexVolume script.
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * options is Optional: this field holds extra command options if any.
+   * +optional
+   */
+  options?: {
+    [key: string]: string;
+  };
+  /**
+   * readOnly is Optional: defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef is Optional: secretRef is reference to the secret object containing
+   * sensitive information to pass to the plugin scripts. This may be
+   * empty if no secret object is specified. If the secret object
+   * contains more than one secret, all secrets are passed to the plugin
+   * scripts.
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+};
+
+export type V1FlockerVolumeSource = {
+  /**
+   * datasetName is Name of the dataset stored as metadata -> name on the dataset for Flocker
+   * should be considered as deprecated
+   * +optional
+   */
+  datasetName?: string;
+  /**
+   * datasetUUID is the UUID of the dataset. This is unique identifier of a Flocker dataset
+   * +optional
+   */
+  datasetUUID?: string;
+};
+
+export type V1GcePersistentDiskVolumeSource = {
+  /**
+   * fsType is filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   * TODO: how do we prevent errors in the filesystem from compromising the machine
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * partition is the partition in the volume that you want to mount.
+   * If omitted, the default is to mount by volume name.
+   * Examples: For volume /dev/sda1, you specify the partition as "1".
+   * Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   * +optional
+   */
+  partition?: number;
+  /**
+   * pdName is unique name of the PD resource in GCE. Used to identify the disk in GCE.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   */
+  pdName?: string;
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   * +optional
+   */
+  readOnly?: boolean;
+};
+
 export type V1GrpcAction = {
   /**
    * Port number of the gRPC service. Number must be in the range 1 to 65535.
@@ -5948,6 +7490,45 @@ export type V1GrpcAction = {
    * +default=""
    */
   service?: string;
+};
+
+export type V1GitRepoVolumeSource = {
+  /**
+   * directory is the target directory name.
+   * Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the
+   * git repository.  Otherwise, if specified, the volume will contain the git repository in
+   * the subdirectory with the given name.
+   * +optional
+   */
+  directory?: string;
+  /**
+   * repository is the URL
+   */
+  repository?: string;
+  /**
+   * revision is the commit hash for the specified revision.
+   * +optional
+   */
+  revision?: string;
+};
+
+export type V1GlusterfsVolumeSource = {
+  /**
+   * endpoints is the endpoint name that details Glusterfs topology.
+   */
+  endpoints?: string;
+  /**
+   * path is the Glusterfs volume path.
+   * More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+   */
+  path?: string;
+  /**
+   * readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
+   * Defaults to false.
+   * More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+   * +optional
+   */
+  readOnly?: boolean;
 };
 
 export type V1HttpGetAction = {
@@ -5980,6 +7561,255 @@ export type V1HttpGetAction = {
    * +optional
    */
   scheme?: V1UriScheme;
+};
+
+export type V1HostAlias = {
+  /**
+   * Hostnames for the above IP address.
+   * +listType=atomic
+   */
+  hostnames?: Array<string>;
+  /**
+   * IP address of the host file entry.
+   * +required
+   */
+  ip?: string;
+};
+
+export type V1HostIp = {
+  /**
+   * IP is the IP address assigned to the host
+   * +required
+   */
+  ip?: string;
+};
+
+export const V1HostPathType = {
+  /**
+   * HostPathUnset
+   */
+  HOST_PATH_UNSET: '',
+  /**
+   * HostPathDirectoryOrCreate
+   */
+  HOST_PATH_DIRECTORY_OR_CREATE: 'DirectoryOrCreate',
+  /**
+   * HostPathDirectory
+   */
+  HOST_PATH_DIRECTORY: 'Directory',
+  /**
+   * HostPathFileOrCreate
+   */
+  HOST_PATH_FILE_OR_CREATE: 'FileOrCreate',
+  /**
+   * HostPathFile
+   */
+  HOST_PATH_FILE: 'File',
+  /**
+   * HostPathSocket
+   */
+  HOST_PATH_SOCKET: 'Socket',
+  /**
+   * HostPathCharDev
+   */
+  HOST_PATH_CHAR_DEV: 'CharDevice',
+  /**
+   * HostPathBlockDev
+   */
+  HOST_PATH_BLOCK_DEV: 'BlockDevice',
+} as const;
+
+export type V1HostPathType =
+  (typeof V1HostPathType)[keyof typeof V1HostPathType];
+
+export type V1HostPathVolumeSource = {
+  /**
+   * path of the directory on the host.
+   * If the path is a symlink, it will follow the link to the real path.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   */
+  path?: string;
+  /**
+   * type for HostPath Volume
+   * Defaults to ""
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   * +optional
+   */
+  type?: V1HostPathType;
+};
+
+export type V1IscsiVolumeSource = {
+  /**
+   * chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
+   * +optional
+   */
+  chapAuthDiscovery?: boolean;
+  /**
+   * chapAuthSession defines whether support iSCSI Session CHAP authentication
+   * +optional
+   */
+  chapAuthSession?: boolean;
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
+   * TODO: how do we prevent errors in the filesystem from compromising the machine
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * initiatorName is the custom iSCSI Initiator Name.
+   * If initiatorName is specified with iscsiInterface simultaneously, new iSCSI interface
+   * <target portal>:<volume name> will be created for the connection.
+   * +optional
+   */
+  initiatorName?: string;
+  /**
+   * iqn is the target iSCSI Qualified Name.
+   */
+  iqn?: string;
+  /**
+   * iscsiInterface is the interface Name that uses an iSCSI transport.
+   * Defaults to 'default' (tcp).
+   * +optional
+   * +default="default"
+   */
+  iscsiInterface?: string;
+  /**
+   * lun represents iSCSI Target Lun number.
+   */
+  lun?: number;
+  /**
+   * portals is the iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
+   * is other than default (typically TCP ports 860 and 3260).
+   * +optional
+   * +listType=atomic
+   */
+  portals?: Array<string>;
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef is the CHAP Secret for iSCSI target and initiator authentication
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * targetPortal is iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
+   * is other than default (typically TCP ports 860 and 3260).
+   */
+  targetPortal?: string;
+};
+
+export type V1ImageVolumeSource = {
+  /**
+   * Policy for pulling OCI objects. Possible values are:
+   * Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+   * Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+   * IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+   * Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+   * +optional
+   */
+  pullPolicy?: V1PullPolicy;
+  /**
+   * Required: Image or artifact reference to be used.
+   * Behaves in the same way as pod.spec.containers[*].image.
+   * Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+   * More info: https://kubernetes.io/docs/concepts/containers/images
+   * This field is optional to allow higher level config management to default or override
+   * container images in workload controllers like Deployments and StatefulSets.
+   * +optional
+   */
+  reference?: string;
+};
+
+export type V1KeyToPath = {
+  /**
+   * key is the key to project.
+   */
+  key?: string;
+  /**
+   * mode is Optional: mode bits used to set permissions on this file.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  mode?: number;
+  /**
+   * path is the relative path of the file to map the key to.
+   * May not be an absolute path.
+   * May not contain the path element '..'.
+   * May not start with the string '..'.
+   */
+  path?: string;
+};
+
+export type V1LabelSelector = {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   * +optional
+   * +listType=atomic
+   */
+  matchExpressions?: Array<V1LabelSelectorRequirement>;
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   * +optional
+   */
+  matchLabels?: {
+    [key: string]: string;
+  };
+};
+
+export const V1LabelSelectorOperator = {
+  /**
+   * LabelSelectorOpIn
+   */
+  LABEL_SELECTOR_OP_IN: 'In',
+  /**
+   * LabelSelectorOpNotIn
+   */
+  LABEL_SELECTOR_OP_NOT_IN: 'NotIn',
+  /**
+   * LabelSelectorOpExists
+   */
+  LABEL_SELECTOR_OP_EXISTS: 'Exists',
+  /**
+   * LabelSelectorOpDoesNotExist
+   */
+  LABEL_SELECTOR_OP_DOES_NOT_EXIST: 'DoesNotExist',
+} as const;
+
+export type V1LabelSelectorOperator =
+  (typeof V1LabelSelectorOperator)[keyof typeof V1LabelSelectorOperator];
+
+export type V1LabelSelectorRequirement = {
+  /**
+   * key is the label key that the selector applies to.
+   */
+  key?: string;
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   */
+  operator?: V1LabelSelectorOperator;
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   * +optional
+   * +listType=atomic
+   */
+  values?: Array<string>;
 };
 
 export type V1Lifecycle = {
@@ -6036,6 +7866,23 @@ export type V1LifecycleHandler = {
    * +optional
    */
   tcpSocket?: V1TcpSocketAction;
+};
+
+export type V1LinuxContainerUser = {
+  /**
+   * GID is the primary gid initially attached to the first process in the container
+   */
+  gid?: number;
+  /**
+   * SupplementalGroups are the supplemental groups initially attached to the first process in the container
+   * +optional
+   * +listType=atomic
+   */
+  supplementalGroups?: Array<number>;
+  /**
+   * UID is the primary uid initially attached to the first process in the container
+   */
+  uid?: number;
 };
 
 export type V1ListMeta = {
@@ -6157,6 +8004,26 @@ export const V1MountPropagationMode = {
 
 export type V1MountPropagationMode =
   (typeof V1MountPropagationMode)[keyof typeof V1MountPropagationMode];
+
+export type V1NfsVolumeSource = {
+  /**
+   * path that is exported by the NFS server.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   */
+  path?: string;
+  /**
+   * readOnly here will force the NFS export to be mounted with read-only permissions.
+   * Defaults to false.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * server is the hostname or IP address of the NFS server.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   */
+  server?: string;
+};
 
 export type V1NamespaceCondition = {
   /**
@@ -6288,6 +8155,32 @@ export const V1NodeAddressType = {
 
 export type V1NodeAddressType =
   (typeof V1NodeAddressType)[keyof typeof V1NodeAddressType];
+
+export type V1NodeAffinity = {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and adding
+   * "weight" to the sum if the node matches the corresponding matchExpressions; the
+   * node(s) with the highest sum are the most preferred.
+   * +optional
+   * +listType=atomic
+   */
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<V1PreferredSchedulingTerm>;
+  /**
+   * If the affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to an update), the system
+   * may or may not try to eventually evict the pod from its node.
+   * +optional
+   */
+  requiredDuringSchedulingIgnoredDuringExecution?: V1NodeSelector;
+};
 
 export type V1NodeCondition = {
   /**
@@ -6423,6 +8316,19 @@ export type V1NodeFeatures = {
   supplementalGroupsPolicy?: boolean;
 };
 
+export const V1NodeInclusionPolicy = {
+  /**
+   * NodeInclusionPolicyIgnore
+   */
+  NODE_INCLUSION_POLICY_IGNORE: 'Ignore' /**
+   * NodeInclusionPolicyHonor
+   */,
+  NODE_INCLUSION_POLICY_HONOR: 'Honor',
+} as const;
+
+export type V1NodeInclusionPolicy =
+  (typeof V1NodeInclusionPolicy)[keyof typeof V1NodeInclusionPolicy];
+
 export const V1NodePhase = {
   /**
    * NodePending
@@ -6466,6 +8372,81 @@ export type V1NodeRuntimeHandlerFeatures = {
    * +optional
    */
   userNamespaces?: boolean;
+};
+
+export type V1NodeSelector = {
+  /**
+   * Required. A list of node selector terms. The terms are ORed.
+   * +listType=atomic
+   */
+  nodeSelectorTerms?: Array<V1NodeSelectorTerm>;
+};
+
+export const V1NodeSelectorOperator = {
+  /**
+   * NodeSelectorOpIn
+   */
+  NODE_SELECTOR_OP_IN: 'In',
+  /**
+   * NodeSelectorOpNotIn
+   */
+  NODE_SELECTOR_OP_NOT_IN: 'NotIn',
+  /**
+   * NodeSelectorOpExists
+   */
+  NODE_SELECTOR_OP_EXISTS: 'Exists',
+  /**
+   * NodeSelectorOpDoesNotExist
+   */
+  NODE_SELECTOR_OP_DOES_NOT_EXIST: 'DoesNotExist',
+  /**
+   * NodeSelectorOpGt
+   */
+  NODE_SELECTOR_OP_GT: 'Gt',
+  /**
+   * NodeSelectorOpLt
+   */
+  NODE_SELECTOR_OP_LT: 'Lt',
+} as const;
+
+export type V1NodeSelectorOperator =
+  (typeof V1NodeSelectorOperator)[keyof typeof V1NodeSelectorOperator];
+
+export type V1NodeSelectorRequirement = {
+  /**
+   * The label key that the selector applies to.
+   */
+  key?: string;
+  /**
+   * Represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+   */
+  operator?: V1NodeSelectorOperator;
+  /**
+   * An array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. If the operator is Gt or Lt, the values
+   * array must have a single element, which will be interpreted as an integer.
+   * This array is replaced during a strategic merge patch.
+   * +optional
+   * +listType=atomic
+   */
+  values?: Array<string>;
+};
+
+export type V1NodeSelectorTerm = {
+  /**
+   * A list of node selector requirements by node's labels.
+   * +optional
+   * +listType=atomic
+   */
+  matchExpressions?: Array<V1NodeSelectorRequirement>;
+  /**
+   * A list of node selector requirements by node's fields.
+   * +optional
+   * +listType=atomic
+   */
+  matchFields?: Array<V1NodeSelectorRequirement>;
 };
 
 export type V1NodeSpec = {
@@ -6675,6 +8656,18 @@ export type V1NodeSystemInfo = {
    */
   systemUUID?: string;
 };
+
+export const V1OsName = {
+  /**
+   * Linux
+   */
+  LINUX: 'linux' /**
+   * Windows
+   */,
+  WINDOWS: 'windows',
+} as const;
+
+export type V1OsName = (typeof V1OsName)[keyof typeof V1OsName];
 
 export type V1ObjectFieldSelector = {
   /**
@@ -6950,6 +8943,133 @@ export const V1PersistentVolumeClaimPhase = {
 export type V1PersistentVolumeClaimPhase =
   (typeof V1PersistentVolumeClaimPhase)[keyof typeof V1PersistentVolumeClaimPhase];
 
+export type V1PersistentVolumeClaimSpec = {
+  /**
+   * accessModes contains the desired access modes the volume should have.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
+   * +optional
+   * +listType=atomic
+   */
+  accessModes?: Array<V1PersistentVolumeAccessMode>;
+  /**
+   * dataSource field can be used to specify either:
+   * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
+   * * An existing PVC (PersistentVolumeClaim)
+   * If the provisioner or an external controller can support the specified data source,
+   * it will create a new volume based on the contents of the specified data source.
+   * When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+   * and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+   * If the namespace is specified, then dataSourceRef will not be copied to dataSource.
+   * +optional
+   */
+  dataSource?: V1TypedLocalObjectReference;
+  /**
+   * dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
+   * volume is desired. This may be any object from a non-empty API group (non
+   * core object) or a PersistentVolumeClaim object.
+   * When this field is specified, volume binding will only succeed if the type of
+   * the specified object matches some installed volume populator or dynamic
+   * provisioner.
+   * This field will replace the functionality of the dataSource field and as such
+   * if both fields are non-empty, they must have the same value. For backwards
+   * compatibility, when namespace isn't specified in dataSourceRef,
+   * both fields (dataSource and dataSourceRef) will be set to the same
+   * value automatically if one of them is empty and the other is non-empty.
+   * When namespace is specified in dataSourceRef,
+   * dataSource isn't set to the same value and must be empty.
+   * There are three important differences between dataSource and dataSourceRef:
+   * * While dataSource only allows two specific types of objects, dataSourceRef
+   * allows any non-core object, as well as PersistentVolumeClaim objects.
+   * * While dataSource ignores disallowed values (dropping them), dataSourceRef
+   * preserves all values, and generates an error if a disallowed value is
+   * specified.
+   * * While dataSource only allows local objects, dataSourceRef allows objects
+   * in any namespaces.
+   * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+   * (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   * +optional
+   */
+  dataSourceRef?: V1TypedObjectReference;
+  /**
+   * resources represents the minimum resources the volume should have.
+   * Users are allowed to specify resource requirements
+   * that are lower than previous value but must still be higher than capacity recorded in the
+   * status field of the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
+   * +optional
+   */
+  resources?: V1VolumeResourceRequirements;
+  /**
+   * selector is a label query over volumes to consider for binding.
+   * +optional
+   */
+  selector?: V1LabelSelector;
+  /**
+   * storageClassName is the name of the StorageClass required by the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
+   * +optional
+   */
+  storageClassName?: string;
+  /**
+   * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
+   * If specified, the CSI driver will create or update the volume with the attributes defined
+   * in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
+   * it can be changed after the claim is created. An empty string or nil value indicates that no
+   * VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+   * this field can be reset to its previous value (including nil) to cancel the modification.
+   * If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
+   * set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
+   * exists.
+   * More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
+   * +featureGate=VolumeAttributesClass
+   * +optional
+   */
+  volumeAttributesClassName?: string;
+  /**
+   * volumeMode defines what type of volume is required by the claim.
+   * Value of Filesystem is implied when not included in claim spec.
+   * +optional
+   */
+  volumeMode?: V1PersistentVolumeMode;
+  /**
+   * volumeName is the binding reference to the PersistentVolume backing this claim.
+   * +optional
+   */
+  volumeName?: string;
+};
+
+export type V1PersistentVolumeClaimTemplate = {
+  /**
+   * May contain labels and annotations that will be copied into the PVC
+   * when creating it. No other fields are allowed and will be rejected during
+   * validation.
+   *
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * The specification for the PersistentVolumeClaim. The entire content is
+   * copied unchanged into the PVC that gets created from this
+   * template. The same fields as in a PersistentVolumeClaim
+   * are also valid here.
+   */
+  spec?: V1PersistentVolumeClaimSpec;
+};
+
+export type V1PersistentVolumeClaimVolumeSource = {
+  /**
+   * claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   */
+  claimName?: string;
+  /**
+   * readOnly Will force the ReadOnly setting in VolumeMounts.
+   * Default false.
+   * +optional
+   */
+  readOnly?: boolean;
+};
+
 export const V1PersistentVolumeMode = {
   /**
    * PersistentVolumeBlock
@@ -7006,6 +9126,1426 @@ export const V1PersistentVolumeReclaimPolicy = {
 
 export type V1PersistentVolumeReclaimPolicy =
   (typeof V1PersistentVolumeReclaimPolicy)[keyof typeof V1PersistentVolumeReclaimPolicy];
+
+export type V1PhotonPersistentDiskVolumeSource = {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   */
+  fsType?: string;
+  /**
+   * pdID is the ID that identifies Photon Controller persistent disk
+   */
+  pdID?: string;
+};
+
+export type V1Pod = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Specification of the desired behavior of the pod.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  spec?: V1PodSpec;
+  /**
+   * Most recently observed status of the pod.
+   * This data may not be up to date.
+   * Populated by the system.
+   * Read-only.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  status?: V1PodStatus;
+};
+
+export type V1PodAffinity = {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and adding
+   * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+   * node(s) with the highest sum are the most preferred.
+   * +optional
+   * +listType=atomic
+   */
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<V1WeightedPodAffinityTerm>;
+  /**
+   * If the affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to a pod label update), the
+   * system may or may not try to eventually evict the pod from its node.
+   * When there are multiple elements, the lists of nodes corresponding to each
+   * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+   * +optional
+   * +listType=atomic
+   */
+  requiredDuringSchedulingIgnoredDuringExecution?: Array<V1PodAffinityTerm>;
+};
+
+export type V1PodAffinityTerm = {
+  /**
+   * A label query over a set of resources, in this case pods.
+   * If it's null, this PodAffinityTerm matches with no Pods.
+   * +optional
+   */
+  labelSelector?: V1LabelSelector;
+  /**
+   * MatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+   * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * +listType=atomic
+   * +optional
+   */
+  matchLabelKeys?: Array<string>;
+  /**
+   * MismatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+   * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * +listType=atomic
+   * +optional
+   */
+  mismatchLabelKeys?: Array<string>;
+  /**
+   * A label query over the set of namespaces that the term applies to.
+   * The term is applied to the union of the namespaces selected by this field
+   * and the ones listed in the namespaces field.
+   * null selector and null or empty namespaces list means "this pod's namespace".
+   * An empty selector ({}) matches all namespaces.
+   * +optional
+   */
+  namespaceSelector?: V1LabelSelector;
+  /**
+   * namespaces specifies a static list of namespace names that the term applies to.
+   * The term is applied to the union of the namespaces listed in this field
+   * and the ones selected by namespaceSelector.
+   * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+   * +optional
+   * +listType=atomic
+   */
+  namespaces?: Array<string>;
+  /**
+   * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+   * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+   * whose value of the label with key topologyKey matches that of any node on which any of the
+   * selected pods is running.
+   * Empty topologyKey is not allowed.
+   */
+  topologyKey?: string;
+};
+
+export type V1PodAntiAffinity = {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the anti-affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling anti-affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and subtracting
+   * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
+   * node(s) with the highest sum are the most preferred.
+   * +optional
+   * +listType=atomic
+   */
+  preferredDuringSchedulingIgnoredDuringExecution?: Array<V1WeightedPodAffinityTerm>;
+  /**
+   * If the anti-affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the anti-affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to a pod label update), the
+   * system may or may not try to eventually evict the pod from its node.
+   * When there are multiple elements, the lists of nodes corresponding to each
+   * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+   * +optional
+   * +listType=atomic
+   */
+  requiredDuringSchedulingIgnoredDuringExecution?: Array<V1PodAffinityTerm>;
+};
+
+export type V1PodCertificateProjection = {
+  /**
+   * Write the certificate chain at this path in the projected volume.
+   *
+   * Most applications should use credentialBundlePath.  When using keyPath
+   * and certificateChainPath, your application needs to check that the key
+   * and leaf certificate are consistent, because it is possible to read the
+   * files mid-rotation.
+   *
+   * +optional
+   */
+  certificateChainPath?: string;
+  /**
+   * Write the credential bundle at this path in the projected volume.
+   *
+   * The credential bundle is a single file that contains multiple PEM blocks.
+   * The first PEM block is a PRIVATE KEY block, containing a PKCS#8 private
+   * key.
+   *
+   * The remaining blocks are CERTIFICATE blocks, containing the issued
+   * certificate chain from the signer (leaf and any intermediates).
+   *
+   * Using credentialBundlePath lets your Pod's application code make a single
+   * atomic read that retrieves a consistent key and certificate chain.  If you
+   * project them to separate files, your application code will need to
+   * additionally check that the leaf certificate was issued to the key.
+   *
+   * +optional
+   */
+  credentialBundlePath?: string;
+  /**
+   * Write the key at this path in the projected volume.
+   *
+   * Most applications should use credentialBundlePath.  When using keyPath
+   * and certificateChainPath, your application needs to check that the key
+   * and leaf certificate are consistent, because it is possible to read the
+   * files mid-rotation.
+   *
+   * +optional
+   */
+  keyPath?: string;
+  /**
+   * The type of keypair Kubelet will generate for the pod.
+   *
+   * Valid values are "RSA3072", "RSA4096", "ECDSAP256", "ECDSAP384",
+   * "ECDSAP521", and "ED25519".
+   *
+   * +required
+   */
+  keyType?: string;
+  /**
+   * maxExpirationSeconds is the maximum lifetime permitted for the
+   * certificate.
+   *
+   * Kubelet copies this value verbatim into the PodCertificateRequests it
+   * generates for this projection.
+   *
+   * If omitted, kube-apiserver will set it to 86400(24 hours). kube-apiserver
+   * will reject values shorter than 3600 (1 hour).  The maximum allowable
+   * value is 7862400 (91 days).
+   *
+   * The signer implementation is then free to issue a certificate with any
+   * lifetime *shorter* than MaxExpirationSeconds, but no shorter than 3600
+   * seconds (1 hour).  This constraint is enforced by kube-apiserver.
+   * `kubernetes.io` signers will never issue certificates with a lifetime
+   * longer than 24 hours.
+   *
+   * +optional
+   */
+  maxExpirationSeconds?: number;
+  /**
+   * Kubelet's generated CSRs will be addressed to this signer.
+   *
+   * +required
+   */
+  signerName?: string;
+  /**
+   * userAnnotations allow pod authors to pass additional information to
+   * the signer implementation.  Kubernetes does not restrict or validate this
+   * metadata in any way.
+   *
+   * These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+   * the PodCertificateRequest objects that Kubelet creates.
+   *
+   * Entries are subject to the same validation as object metadata annotations,
+   * with the addition that all keys must be domain-prefixed. No restrictions
+   * are placed on values, except an overall size limitation on the entire field.
+   *
+   * Signers should document the keys and values they support. Signers should
+   * deny requests that contain keys they do not recognize.
+   */
+  userAnnotations?: {
+    [key: string]: string;
+  };
+};
+
+export type V1PodCondition = {
+  /**
+   * Last time we probed the condition.
+   * +optional
+   */
+  lastProbeTime?: string;
+  /**
+   * Last time the condition transitioned from one status to another.
+   * +optional
+   */
+  lastTransitionTime?: string;
+  /**
+   * Human-readable message indicating details about last transition.
+   * +optional
+   */
+  message?: string;
+  /**
+   * If set, this represents the .metadata.generation that the pod condition was set based upon.
+   * The PodObservedGenerationTracking feature gate must be enabled to use this field.
+   * +featureGate=PodObservedGenerationTracking
+   * +optional
+   */
+  observedGeneration?: number;
+  /**
+   * Unique, one-word, CamelCase reason for the condition's last transition.
+   * +optional
+   */
+  reason?: string;
+  /**
+   * Status is the status of the condition.
+   * Can be True, False, Unknown.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
+   */
+  status?: K8sIoApiCoreV1ConditionStatus;
+  /**
+   * Type is the type of the condition.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
+   */
+  type?: V1PodConditionType;
+};
+
+export const V1PodConditionType = {
+  /**
+   * ContainersReady
+   */
+  CONTAINERS_READY: 'ContainersReady',
+  /**
+   * PodInitialized
+   */
+  POD_INITIALIZED: 'Initialized',
+  /**
+   * PodReady
+   */
+  POD_READY: 'Ready',
+  /**
+   * PodScheduled
+   */
+  POD_SCHEDULED: 'PodScheduled',
+  /**
+   * DisruptionTarget
+   */
+  DISRUPTION_TARGET: 'DisruptionTarget',
+  /**
+   * PodReadyToStartContainers
+   */
+  POD_READY_TO_START_CONTAINERS: 'PodReadyToStartContainers',
+  /**
+   * PodResizePending
+   */
+  POD_RESIZE_PENDING: 'PodResizePending',
+  /**
+   * PodResizeInProgress
+   */
+  POD_RESIZE_IN_PROGRESS: 'PodResizeInProgress',
+  /**
+   * AllContainersRestarting
+   */
+  ALL_CONTAINERS_RESTARTING: 'AllContainersRestarting',
+} as const;
+
+export type V1PodConditionType =
+  (typeof V1PodConditionType)[keyof typeof V1PodConditionType];
+
+export type V1PodDnsConfig = {
+  /**
+   * A list of DNS name server IP addresses.
+   * This will be appended to the base nameservers generated from DNSPolicy.
+   * Duplicated nameservers will be removed.
+   * +optional
+   * +listType=atomic
+   */
+  nameservers?: Array<string>;
+  /**
+   * A list of DNS resolver options.
+   * This will be merged with the base options generated from DNSPolicy.
+   * Duplicated entries will be removed. Resolution options given in Options
+   * will override those that appear in the base DNSPolicy.
+   * +optional
+   * +listType=atomic
+   */
+  options?: Array<V1PodDnsConfigOption>;
+  /**
+   * A list of DNS search domains for host-name lookup.
+   * This will be appended to the base search paths generated from DNSPolicy.
+   * Duplicated search paths will be removed.
+   * +optional
+   * +listType=atomic
+   */
+  searches?: Array<string>;
+};
+
+export type V1PodDnsConfigOption = {
+  /**
+   * Name is this DNS resolver option's name.
+   * Required.
+   */
+  name?: string;
+  /**
+   * Value is this DNS resolver option's value.
+   * +optional
+   */
+  value?: string;
+};
+
+export type V1PodExtendedResourceClaimStatus = {
+  /**
+   * RequestMappings identifies the mapping of <container, extended resource backed by DRA> to  device request
+   * in the generated ResourceClaim.
+   * +listType=atomic
+   */
+  requestMappings?: Array<V1ContainerExtendedResourceRequest>;
+  /**
+   * ResourceClaimName is the name of the ResourceClaim that was
+   * generated for the Pod in the namespace of the Pod.
+   */
+  resourceClaimName?: string;
+};
+
+export const V1PodFsGroupChangePolicy = {
+  /**
+   * FSGroupChangeOnRootMismatch
+   */
+  FS_GROUP_CHANGE_ON_ROOT_MISMATCH: 'OnRootMismatch' /**
+   * FSGroupChangeAlways
+   */,
+  FS_GROUP_CHANGE_ALWAYS: 'Always',
+} as const;
+
+export type V1PodFsGroupChangePolicy =
+  (typeof V1PodFsGroupChangePolicy)[keyof typeof V1PodFsGroupChangePolicy];
+
+export type V1PodIp = {
+  /**
+   * IP is the IP address assigned to the pod
+   * +required
+   */
+  ip?: string;
+};
+
+export type V1PodOs = {
+  /**
+   * Name is the name of the operating system. The currently supported values are linux and windows.
+   * Additional value may be defined in future and can be one of:
+   * https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration
+   * Clients should expect to handle additional values and treat unrecognized values in this field as os: null
+   */
+  name?: V1OsName;
+};
+
+export const V1PodPhase = {
+  /**
+   * PodPending
+   */
+  POD_PENDING: 'Pending',
+  /**
+   * PodRunning
+   */
+  POD_RUNNING: 'Running',
+  /**
+   * PodSucceeded
+   */
+  POD_SUCCEEDED: 'Succeeded',
+  /**
+   * PodFailed
+   */
+  POD_FAILED: 'Failed',
+  /**
+   * PodUnknown
+   */
+  POD_UNKNOWN: 'Unknown',
+} as const;
+
+export type V1PodPhase = (typeof V1PodPhase)[keyof typeof V1PodPhase];
+
+export const V1PodQosClass = {
+  /**
+   * PodQOSGuaranteed
+   */
+  POD_QOS_GUARANTEED: 'Guaranteed',
+  /**
+   * PodQOSBurstable
+   */
+  POD_QOS_BURSTABLE: 'Burstable',
+  /**
+   * PodQOSBestEffort
+   */
+  POD_QOS_BEST_EFFORT: 'BestEffort',
+} as const;
+
+export type V1PodQosClass = (typeof V1PodQosClass)[keyof typeof V1PodQosClass];
+
+export type V1PodReadinessGate = {
+  /**
+   * ConditionType refers to a condition in the pod's condition list with matching type.
+   */
+  conditionType?: V1PodConditionType;
+};
+
+export const V1PodResizeStatus = {
+  /**
+   * PodResizeStatusInProgress
+   */
+  POD_RESIZE_STATUS_IN_PROGRESS: 'InProgress',
+  /**
+   * PodResizeStatusDeferred
+   */
+  POD_RESIZE_STATUS_DEFERRED: 'Deferred',
+  /**
+   * PodResizeStatusInfeasible
+   */
+  POD_RESIZE_STATUS_INFEASIBLE: 'Infeasible',
+} as const;
+
+export type V1PodResizeStatus =
+  (typeof V1PodResizeStatus)[keyof typeof V1PodResizeStatus];
+
+export type V1PodResourceClaim = {
+  /**
+   * Name uniquely identifies this resource claim inside the pod.
+   * This must be a DNS_LABEL.
+   */
+  name?: string;
+  /**
+   * ResourceClaimName is the name of a ResourceClaim object in the same
+   * namespace as this pod.
+   *
+   * Exactly one of ResourceClaimName and ResourceClaimTemplateName must
+   * be set.
+   */
+  resourceClaimName?: string;
+  /**
+   * ResourceClaimTemplateName is the name of a ResourceClaimTemplate
+   * object in the same namespace as this pod.
+   *
+   * The template will be used to create a new ResourceClaim, which will
+   * be bound to this pod. When this pod is deleted, the ResourceClaim
+   * will also be deleted. The pod name and resource name, along with a
+   * generated component, will be used to form a unique name for the
+   * ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
+   *
+   * This field is immutable and no changes will be made to the
+   * corresponding ResourceClaim by the control plane after creating the
+   * ResourceClaim.
+   *
+   * Exactly one of ResourceClaimName and ResourceClaimTemplateName must
+   * be set.
+   */
+  resourceClaimTemplateName?: string;
+};
+
+export type V1PodResourceClaimStatus = {
+  /**
+   * Name uniquely identifies this resource claim inside the pod.
+   * This must match the name of an entry in pod.spec.resourceClaims,
+   * which implies that the string must be a DNS_LABEL.
+   */
+  name?: string;
+  /**
+   * ResourceClaimName is the name of the ResourceClaim that was
+   * generated for the Pod in the namespace of the Pod. If this is
+   * unset, then generating a ResourceClaim was not necessary. The
+   * pod.spec.resourceClaims entry can be ignored in this case.
+   *
+   * +optional
+   */
+  resourceClaimName?: string;
+};
+
+export const V1PodSeLinuxChangePolicy = {
+  /**
+   * SELinuxChangePolicyRecursive
+   */
+  SE_LINUX_CHANGE_POLICY_RECURSIVE: 'Recursive' /**
+   * SELinuxChangePolicyMountOption
+   */,
+  SE_LINUX_CHANGE_POLICY_MOUNT_OPTION: 'MountOption',
+} as const;
+
+export type V1PodSeLinuxChangePolicy =
+  (typeof V1PodSeLinuxChangePolicy)[keyof typeof V1PodSeLinuxChangePolicy];
+
+export type V1PodSchedulingGate = {
+  /**
+   * Name of the scheduling gate.
+   * Each scheduling gate must have a unique name field.
+   */
+  name?: string;
+};
+
+export type V1PodSecurityContext = {
+  /**
+   * appArmorProfile is the AppArmor options to use by the containers in this pod.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  appArmorProfile?: V1AppArmorProfile;
+  /**
+   * A special supplemental group that applies to all containers in a pod.
+   * Some volume types allow the Kubelet to change the ownership of that volume
+   * to be owned by the pod:
+   *
+   * 1. The owning GID will be the FSGroup
+   * 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+   * 3. The permission bits are OR'd with rw-rw----
+   *
+   * If unset, the Kubelet will not modify the ownership and permissions of any volume.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  fsGroup?: number;
+  /**
+   * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+   * before being exposed inside Pod. This field will only apply to
+   * volume types which support fsGroup based ownership(and permissions).
+   * It will have no effect on ephemeral volume types such as: secret, configmaps
+   * and emptydir.
+   * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  fsGroupChangePolicy?: V1PodFsGroupChangePolicy;
+  /**
+   * The GID to run the entrypoint of the container process.
+   * Uses runtime default if unset.
+   * May also be set in SecurityContext.  If set in both SecurityContext and
+   * PodSecurityContext, the value specified in SecurityContext takes precedence
+   * for that container.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  runAsGroup?: number;
+  /**
+   * Indicates that the container must run as a non-root user.
+   * If true, the Kubelet will validate the image at runtime to ensure that it
+   * does not run as UID 0 (root) and fail to start the container if it does.
+   * If unset or false, no such validation will be performed.
+   * May also be set in SecurityContext.  If set in both SecurityContext and
+   * PodSecurityContext, the value specified in SecurityContext takes precedence.
+   * +optional
+   */
+  runAsNonRoot?: boolean;
+  /**
+   * The UID to run the entrypoint of the container process.
+   * Defaults to user specified in image metadata if unspecified.
+   * May also be set in SecurityContext.  If set in both SecurityContext and
+   * PodSecurityContext, the value specified in SecurityContext takes precedence
+   * for that container.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  runAsUser?: number;
+  /**
+   * seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod.
+   * It has no effect on nodes that do not support SELinux or to volumes does not support SELinux.
+   * Valid values are "MountOption" and "Recursive".
+   *
+   * "Recursive" means relabeling of all files on all Pod volumes by the container runtime.
+   * This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
+   *
+   * "MountOption" mounts all eligible Pod volumes with `-o context` mount option.
+   * This requires all Pods that share the same volume to use the same SELinux label.
+   * It is not possible to share the same volume among privileged and unprivileged Pods.
+   * Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes
+   * whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their
+   * CSIDriver instance. Other volumes are always re-labelled recursively.
+   * "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
+   *
+   * If not specified and SELinuxMount feature gate is enabled, "MountOption" is used.
+   * If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes
+   * and "Recursive" for all other volumes.
+   *
+   * This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
+   *
+   * All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +featureGate=SELinuxChangePolicy
+   * +optional
+   */
+  seLinuxChangePolicy?: V1PodSeLinuxChangePolicy;
+  /**
+   * The SELinux context to be applied to all containers.
+   * If unspecified, the container runtime will allocate a random SELinux context for each
+   * container.  May also be set in SecurityContext.  If set in
+   * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+   * takes precedence for that container.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  seLinuxOptions?: V1SeLinuxOptions;
+  /**
+   * The seccomp options to use by the containers in this pod.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   */
+  seccompProfile?: V1SeccompProfile;
+  /**
+   * A list of groups applied to the first process run in each container, in
+   * addition to the container's primary GID and fsGroup (if specified).  If
+   * the SupplementalGroupsPolicy feature is enabled, the
+   * supplementalGroupsPolicy field determines whether these are in addition
+   * to or instead of any group memberships defined in the container image.
+   * If unspecified, no additional groups are added, though group memberships
+   * defined in the container image may still be used, depending on the
+   * supplementalGroupsPolicy field.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   * +listType=atomic
+   */
+  supplementalGroups?: Array<number>;
+  /**
+   * Defines how supplemental groups of the first container processes are calculated.
+   * Valid values are "Merge" and "Strict". If not specified, "Merge" is used.
+   * (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled
+   * and the container runtime must implement support for this feature.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * TODO: update the default value to "Merge" when spec.os.name is not windows in v1.34
+   * +featureGate=SupplementalGroupsPolicy
+   * +optional
+   */
+  supplementalGroupsPolicy?: V1SupplementalGroupsPolicy;
+  /**
+   * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+   * sysctls (by the container runtime) might fail to launch.
+   * Note that this field cannot be set when spec.os.name is windows.
+   * +optional
+   * +listType=atomic
+   */
+  sysctls?: Array<V1Sysctl>;
+  /**
+   * The Windows specific settings applied to all containers.
+   * If unspecified, the options within a container's SecurityContext will be used.
+   * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+   * Note that this field cannot be set when spec.os.name is linux.
+   * +optional
+   */
+  windowsOptions?: V1WindowsSecurityContextOptions;
+};
+
+export type V1PodSpec = {
+  /**
+   * Optional duration in seconds the pod may be active on the node relative to
+   * StartTime before the system will actively try to mark it failed and kill associated containers.
+   * Value must be a positive integer.
+   * +optional
+   */
+  activeDeadlineSeconds?: number;
+  /**
+   * If specified, the pod's scheduling constraints
+   * +optional
+   */
+  affinity?: V1Affinity;
+  /**
+   * AutomountServiceAccountToken indicates whether a service account token should be automatically mounted.
+   * +optional
+   */
+  automountServiceAccountToken?: boolean;
+  /**
+   * List of containers belonging to the pod.
+   * Containers cannot currently be added or removed.
+   * There must be at least one container in a Pod.
+   * Cannot be updated.
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  containers?: Array<V1Container>;
+  /**
+   * Specifies the DNS parameters of a pod.
+   * Parameters specified here will be merged to the generated DNS
+   * configuration based on DNSPolicy.
+   * +optional
+   */
+  dnsConfig?: V1PodDnsConfig;
+  /**
+   * Set DNS policy for the pod.
+   * Defaults to "ClusterFirst".
+   * Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'.
+   * DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy.
+   * To have DNS options set along with hostNetwork, you have to specify DNS policy
+   * explicitly to 'ClusterFirstWithHostNet'.
+   * +optional
+   */
+  dnsPolicy?: V1DnsPolicy;
+  /**
+   * EnableServiceLinks indicates whether information about services should be injected into pod's
+   * environment variables, matching the syntax of Docker links.
+   * Optional: Defaults to true.
+   * +optional
+   */
+  enableServiceLinks?: boolean;
+  /**
+   * List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing
+   * pod to perform user-initiated actions such as debugging. This list cannot be specified when
+   * creating a pod, and it cannot be modified by updating the pod spec. In order to add an
+   * ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
+   * +optional
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  ephemeralContainers?: Array<V1EphemeralContainer>;
+  /**
+   * HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts
+   * file if specified.
+   * +optional
+   * +patchMergeKey=ip
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=ip
+   */
+  hostAliases?: Array<V1HostAlias>;
+  /**
+   * Use the host's ipc namespace.
+   * Optional: Default to false.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  hostIPC?: boolean;
+  /**
+   * Host networking requested for this pod. Use the host's network namespace.
+   * When using HostNetwork you should specify ports so the scheduler is aware.
+   * When `hostNetwork` is true, specified `hostPort` fields in port definitions must match `containerPort`,
+   * and unspecified `hostPort` fields in port definitions are defaulted to match `containerPort`.
+   * Default to false.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  hostNetwork?: boolean;
+  /**
+   * Use the host's pid namespace.
+   * Optional: Default to false.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  hostPID?: boolean;
+  /**
+   * Use the host's user namespace.
+   * Optional: Default to true.
+   * If set to true or not present, the pod will be run in the host user namespace, useful
+   * for when the pod needs a feature only available to the host user namespace, such as
+   * loading a kernel module with CAP_SYS_MODULE.
+   * When set to false, a new userns is created for the pod. Setting false is useful for
+   * mitigating container breakout vulnerabilities even allowing users to run their
+   * containers as root without actually having root privileges on the host.
+   * This field is alpha-level and is only honored by servers that enable the UserNamespacesSupport feature.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  hostUsers?: boolean;
+  /**
+   * Specifies the hostname of the Pod
+   * If not specified, the pod's hostname will be set to a system-defined value.
+   * +optional
+   */
+  hostname?: string;
+  /**
+   * HostnameOverride specifies an explicit override for the pod's hostname as perceived by the pod.
+   * This field only specifies the pod's hostname and does not affect its DNS records.
+   * When this field is set to a non-empty string:
+   * - It takes precedence over the values set in `hostname` and `subdomain`.
+   * - The Pod's hostname will be set to this value.
+   * - `setHostnameAsFQDN` must be nil or set to false.
+   * - `hostNetwork` must be set to false.
+   *
+   * This field must be a valid DNS subdomain as defined in RFC 1123 and contain at most 64 characters.
+   * Requires the HostnameOverride feature gate to be enabled.
+   *
+   * +featureGate=HostnameOverride
+   * +optional
+   */
+  hostnameOverride?: string;
+  /**
+   * ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
+   * If specified, these secrets will be passed to individual puller implementations for them to use.
+   * More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
+   * +optional
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  imagePullSecrets?: Array<K8sIoApiCoreV1LocalObjectReference>;
+  /**
+   * List of initialization containers belonging to the pod.
+   * Init containers are executed in order prior to containers being started. If any
+   * init container fails, the pod is considered to have failed and is handled according
+   * to its restartPolicy. The name for an init container or normal container must be
+   * unique among all containers.
+   * Init containers may not have Lifecycle actions, Readiness probes, Liveness probes, or Startup probes.
+   * The resourceRequirements of an init container are taken into account during scheduling
+   * by finding the highest request/limit for each resource type, and then using the max of
+   * that value or the sum of the normal containers. Limits are applied to init containers
+   * in a similar fashion.
+   * Init containers cannot currently be added or removed.
+   * Cannot be updated.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   */
+  initContainers?: Array<V1Container>;
+  /**
+   * NodeName indicates in which node this pod is scheduled.
+   * If empty, this pod is a candidate for scheduling by the scheduler defined in schedulerName.
+   * Once this field is set, the kubelet for this node becomes responsible for the lifecycle of this pod.
+   * This field should not be used to express a desire for the pod to be scheduled on a specific node.
+   * https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodename
+   * +optional
+   */
+  nodeName?: string;
+  /**
+   * NodeSelector is a selector which must be true for the pod to fit on a node.
+   * Selector which must match a node's labels for the pod to be scheduled on that node.
+   * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+   * +optional
+   * +mapType=atomic
+   */
+  nodeSelector?: {
+    [key: string]: string;
+  };
+  /**
+   * Specifies the OS of the containers in the pod.
+   * Some pod and container fields are restricted if this is set.
+   *
+   * If the OS field is set to linux, the following fields must be unset:
+   * -securityContext.windowsOptions
+   *
+   * If the OS field is set to windows, following fields must be unset:
+   * - spec.hostPID
+   * - spec.hostIPC
+   * - spec.hostUsers
+   * - spec.resources
+   * - spec.securityContext.appArmorProfile
+   * - spec.securityContext.seLinuxOptions
+   * - spec.securityContext.seccompProfile
+   * - spec.securityContext.fsGroup
+   * - spec.securityContext.fsGroupChangePolicy
+   * - spec.securityContext.sysctls
+   * - spec.shareProcessNamespace
+   * - spec.securityContext.runAsUser
+   * - spec.securityContext.runAsGroup
+   * - spec.securityContext.supplementalGroups
+   * - spec.securityContext.supplementalGroupsPolicy
+   * - spec.containers[*].securityContext.appArmorProfile
+   * - spec.containers[*].securityContext.seLinuxOptions
+   * - spec.containers[*].securityContext.seccompProfile
+   * - spec.containers[*].securityContext.capabilities
+   * - spec.containers[*].securityContext.readOnlyRootFilesystem
+   * - spec.containers[*].securityContext.privileged
+   * - spec.containers[*].securityContext.allowPrivilegeEscalation
+   * - spec.containers[*].securityContext.procMount
+   * - spec.containers[*].securityContext.runAsUser
+   * - spec.containers[*].securityContext.runAsGroup
+   * +optional
+   */
+  os?: V1PodOs;
+  /**
+   * Overhead represents the resource overhead associated with running a pod for a given RuntimeClass.
+   * This field will be autopopulated at admission time by the RuntimeClass admission controller. If
+   * the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests.
+   * The RuntimeClass admission controller will reject Pod create requests which have the overhead already
+   * set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value
+   * defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
+   * More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
+   * +optional
+   */
+  overhead?: V1ResourceList;
+  /**
+   * PreemptionPolicy is the Policy for preempting pods with lower priority.
+   * One of Never, PreemptLowerPriority.
+   * Defaults to PreemptLowerPriority if unset.
+   * +optional
+   */
+  preemptionPolicy?: V1PreemptionPolicy;
+  /**
+   * The priority value. Various system components use this field to find the
+   * priority of the pod. When Priority Admission Controller is enabled, it
+   * prevents users from setting this field. The admission controller populates
+   * this field from PriorityClassName.
+   * The higher the value, the higher the priority.
+   * +optional
+   */
+  priority?: number;
+  /**
+   * If specified, indicates the pod's priority. "system-node-critical" and
+   * "system-cluster-critical" are two special keywords which indicate the
+   * highest priorities with the former being the highest priority. Any other
+   * name must be defined by creating a PriorityClass object with that name.
+   * If not specified, the pod priority will be default or zero if there is no
+   * default.
+   * +optional
+   */
+  priorityClassName?: string;
+  /**
+   * If specified, all readiness gates will be evaluated for pod readiness.
+   * A pod is ready when all its containers are ready AND
+   * all conditions specified in the readiness gates have status equal to "True"
+   * More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
+   * +optional
+   * +listType=atomic
+   */
+  readinessGates?: Array<V1PodReadinessGate>;
+  /**
+   * ResourceClaims defines which ResourceClaims must be allocated
+   * and reserved before the Pod is allowed to start. The resources
+   * will be made available to those containers which consume them
+   * by name.
+   *
+   * This is a stable field but requires that the
+   * DynamicResourceAllocation feature gate is enabled.
+   *
+   * This field is immutable.
+   *
+   * +patchMergeKey=name
+   * +patchStrategy=merge,retainKeys
+   * +listType=map
+   * +listMapKey=name
+   * +featureGate=DynamicResourceAllocation
+   * +optional
+   */
+  resourceClaims?: Array<V1PodResourceClaim>;
+  /**
+   * Resources is the total amount of CPU and Memory resources required by all
+   * containers in the pod. It supports specifying Requests and Limits for
+   * "cpu", "memory" and "hugepages-" resource names only. ResourceClaims are not supported.
+   *
+   * This field enables fine-grained control over resource allocation for the
+   * entire pod, allowing resource sharing among containers in a pod.
+   * TODO: For beta graduation, expand this comment with a detailed explanation.
+   *
+   * This is an alpha field and requires enabling the PodLevelResources feature
+   * gate.
+   *
+   * +featureGate=PodLevelResources
+   * +optional
+   */
+  resources?: V1ResourceRequirements;
+  /**
+   * Restart policy for all containers within the pod.
+   * One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted.
+   * Default to Always.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
+   * +optional
+   */
+  restartPolicy?: V1RestartPolicy;
+  /**
+   * RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used
+   * to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run.
+   * If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an
+   * empty definition that uses the default runtime handler.
+   * More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class
+   * +optional
+   */
+  runtimeClassName?: string;
+  /**
+   * If specified, the pod will be dispatched by specified scheduler.
+   * If not specified, the pod will be dispatched by default scheduler.
+   * +optional
+   */
+  schedulerName?: string;
+  /**
+   * SchedulingGates is an opaque list of values that if specified will block scheduling the pod.
+   * If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the
+   * scheduler will not attempt to schedule the pod.
+   *
+   * SchedulingGates can only be set at pod creation time, and be removed only afterwards.
+   *
+   * +patchMergeKey=name
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=name
+   * +optional
+   */
+  schedulingGates?: Array<V1PodSchedulingGate>;
+  /**
+   * SecurityContext holds pod-level security attributes and common container settings.
+   * Optional: Defaults to empty.  See type description for default values of each field.
+   * +optional
+   */
+  securityContext?: V1PodSecurityContext;
+  /**
+   * DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
+   * Deprecated: Use serviceAccountName instead.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  serviceAccount?: string;
+  /**
+   * ServiceAccountName is the name of the ServiceAccount to use to run this pod.
+   * More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+   * +optional
+   */
+  serviceAccountName?: string;
+  /**
+   * If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default).
+   * In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname).
+   * In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN.
+   * If a pod does not have FQDN, this has no effect.
+   * Default to false.
+   * +optional
+   */
+  setHostnameAsFQDN?: boolean;
+  /**
+   * Share a single process namespace between all of the containers in a pod.
+   * When this is set containers will be able to view and signal processes from other containers
+   * in the same pod, and the first process in each container will not be assigned PID 1.
+   * HostPID and ShareProcessNamespace cannot both be set.
+   * Optional: Default to false.
+   * +k8s:conversion-gen=false
+   * +optional
+   */
+  shareProcessNamespace?: boolean;
+  /**
+   * If specified, the fully qualified Pod hostname will be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>".
+   * If not specified, the pod will not have a domainname at all.
+   * +optional
+   */
+  subdomain?: string;
+  /**
+   * Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request.
+   * Value must be non-negative integer. The value zero indicates stop immediately via
+   * the kill signal (no opportunity to shut down).
+   * If this value is nil, the default grace period will be used instead.
+   * The grace period is the duration in seconds after the processes running in the pod are sent
+   * a termination signal and the time when the processes are forcibly halted with a kill signal.
+   * Set this value longer than the expected cleanup time for your process.
+   * Defaults to 30 seconds.
+   * +optional
+   */
+  terminationGracePeriodSeconds?: number;
+  /**
+   * If specified, the pod's tolerations.
+   * +optional
+   * +listType=atomic
+   */
+  tolerations?: Array<V1Toleration>;
+  /**
+   * TopologySpreadConstraints describes how a group of pods ought to spread across topology
+   * domains. Scheduler will schedule pods in a way which abides by the constraints.
+   * All topologySpreadConstraints are ANDed.
+   * +optional
+   * +patchMergeKey=topologyKey
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=topologyKey
+   * +listMapKey=whenUnsatisfiable
+   */
+  topologySpreadConstraints?: Array<V1TopologySpreadConstraint>;
+  /**
+   * List of volumes that can be mounted by containers belonging to the pod.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes
+   * +optional
+   * +patchMergeKey=name
+   * +patchStrategy=merge,retainKeys
+   * +listType=map
+   * +listMapKey=name
+   */
+  volumes?: Array<V1Volume>;
+  /**
+   * WorkloadRef provides a reference to the Workload object that this Pod belongs to.
+   * This field is used by the scheduler to identify the PodGroup and apply the
+   * correct group scheduling policies. The Workload object referenced
+   * by this field may not exist at the time the Pod is created.
+   * This field is immutable, but a Workload object with the same name
+   * may be recreated with different policies. Doing this during pod scheduling
+   * may result in the placement not conforming to the expected policies.
+   *
+   * +featureGate=GenericWorkload
+   * +optional
+   */
+  workloadRef?: V1WorkloadReference;
+};
+
+export type V1PodStatus = {
+  /**
+   * AllocatedResources is the total requests allocated for this pod by the node.
+   * If pod-level requests are not set, this will be the total requests aggregated
+   * across containers in the pod.
+   * +featureGate=InPlacePodLevelResourcesVerticalScaling
+   * +optional
+   */
+  allocatedResources?: V1ResourceList;
+  /**
+   * Current service state of pod.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
+   * +optional
+   * +patchMergeKey=type
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=type
+   */
+  conditions?: Array<V1PodCondition>;
+  /**
+   * Statuses of containers in this pod.
+   * Each container in the pod should have at most one status in this list,
+   * and all statuses should be for containers in the pod.
+   * However this is not enforced.
+   * If a status for a non-existent container is present in the list, or the list has duplicate names,
+   * the behavior of various Kubernetes components is not defined and those statuses might be
+   * ignored.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+   * +optional
+   * +listType=atomic
+   */
+  containerStatuses?: Array<V1ContainerStatus>;
+  /**
+   * Statuses for any ephemeral containers that have run in this pod.
+   * Each ephemeral container in the pod should have at most one status in this list,
+   * and all statuses should be for containers in the pod.
+   * However this is not enforced.
+   * If a status for a non-existent container is present in the list, or the list has duplicate names,
+   * the behavior of various Kubernetes components is not defined and those statuses might be
+   * ignored.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+   * +optional
+   * +listType=atomic
+   */
+  ephemeralContainerStatuses?: Array<V1ContainerStatus>;
+  /**
+   * Status of extended resource claim backed by DRA.
+   * +featureGate=DRAExtendedResource
+   * +optional
+   */
+  extendedResourceClaimStatus?: V1PodExtendedResourceClaimStatus;
+  /**
+   * hostIP holds the IP address of the host to which the pod is assigned. Empty if the pod has not started yet.
+   * A pod can be assigned to a node that has a problem in kubelet which in turns mean that HostIP will
+   * not be updated even if there is a node is assigned to pod
+   * +optional
+   */
+  hostIP?: string;
+  /**
+   * hostIPs holds the IP addresses allocated to the host. If this field is specified, the first entry must
+   * match the hostIP field. This list is empty if the pod has not started yet.
+   * A pod can be assigned to a node that has a problem in kubelet which in turns means that HostIPs will
+   * not be updated even if there is a node is assigned to this pod.
+   * +optional
+   * +patchStrategy=merge
+   * +patchMergeKey=ip
+   * +listType=atomic
+   */
+  hostIPs?: Array<V1HostIp>;
+  /**
+   * Statuses of init containers in this pod. The most recent successful non-restartable
+   * init container will have ready = true, the most recently started container will have
+   * startTime set.
+   * Each init container in the pod should have at most one status in this list,
+   * and all statuses should be for containers in the pod.
+   * However this is not enforced.
+   * If a status for a non-existent container is present in the list, or the list has duplicate names,
+   * the behavior of various Kubernetes components is not defined and those statuses might be
+   * ignored.
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
+   * +listType=atomic
+   */
+  initContainerStatuses?: Array<V1ContainerStatus>;
+  /**
+   * A human readable message indicating details about why the pod is in this condition.
+   * +optional
+   */
+  message?: string;
+  /**
+   * nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be
+   * scheduled right away as preemption victims receive their graceful termination periods.
+   * This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide
+   * to place the pod elsewhere if other nodes become available sooner. Scheduler may also decide to
+   * give the resources on this node to a higher priority pod that is created after preemption.
+   * As a result, this field may be different than PodSpec.nodeName when the pod is
+   * scheduled.
+   * +optional
+   */
+  nominatedNodeName?: string;
+  /**
+   * If set, this represents the .metadata.generation that the pod status was set based upon.
+   * The PodObservedGenerationTracking feature gate must be enabled to use this field.
+   * +featureGate=PodObservedGenerationTracking
+   * +optional
+   */
+  observedGeneration?: number;
+  /**
+   * The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.
+   * The conditions array, the reason and message fields, and the individual container status
+   * arrays contain more detail about the pod's status.
+   * There are five possible phase values:
+   *
+   * Pending: The pod has been accepted by the Kubernetes system, but one or more of the
+   * container images has not been created. This includes time before being scheduled as
+   * well as time spent downloading images over the network, which could take a while.
+   * Running: The pod has been bound to a node, and all of the containers have been created.
+   * At least one container is still running, or is in the process of starting or restarting.
+   * Succeeded: All containers in the pod have terminated in success, and will not be restarted.
+   * Failed: All containers in the pod have terminated, and at least one container has
+   * terminated in failure. The container either exited with non-zero status or was terminated
+   * by the system.
+   * Unknown: For some reason the state of the pod could not be obtained, typically due to an
+   * error in communicating with the host of the pod.
+   *
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
+   * +optional
+   */
+  phase?: V1PodPhase;
+  /**
+   * podIP address allocated to the pod. Routable at least within the cluster.
+   * Empty if not yet allocated.
+   * +optional
+   */
+  podIP?: string;
+  /**
+   * podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must
+   * match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list
+   * is empty if no IPs have been allocated yet.
+   * +optional
+   * +patchStrategy=merge
+   * +patchMergeKey=ip
+   * +listType=map
+   * +listMapKey=ip
+   */
+  podIPs?: Array<V1PodIp>;
+  /**
+   * The Quality of Service (QOS) classification assigned to the pod based on resource requirements
+   * See PodQOSClass type for available QOS classes
+   * More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
+   * +optional
+   */
+  qosClass?: V1PodQosClass;
+  /**
+   * A brief CamelCase message indicating details about why the pod is in this state.
+   * e.g. 'Evicted'
+   * +optional
+   */
+  reason?: string;
+  /**
+   * Status of resources resize desired for pod's containers.
+   * It is empty if no resources resize is pending.
+   * Any changes to container resources will automatically set this to "Proposed"
+   * Deprecated: Resize status is moved to two pod conditions PodResizePending and PodResizeInProgress.
+   * PodResizePending will track states where the spec has been resized, but the Kubelet has not yet allocated the resources.
+   * PodResizeInProgress will track in-progress resizes, and should be present whenever allocated resources != acknowledged resources.
+   * +featureGate=InPlacePodVerticalScaling
+   * +optional
+   */
+  resize?: V1PodResizeStatus;
+  /**
+   * Status of resource claims.
+   * +patchMergeKey=name
+   * +patchStrategy=merge,retainKeys
+   * +listType=map
+   * +listMapKey=name
+   * +featureGate=DynamicResourceAllocation
+   * +optional
+   */
+  resourceClaimStatuses?: Array<V1PodResourceClaimStatus>;
+  /**
+   * Resources represents the compute resource requests and limits that have been
+   * applied at the pod level if pod-level requests or limits are set in
+   * PodSpec.Resources
+   * +featureGate=InPlacePodLevelResourcesVerticalScaling
+   * +optional
+   */
+  resources?: V1ResourceRequirements;
+  /**
+   * RFC 3339 date and time at which the object was acknowledged by the Kubelet.
+   * This is before the Kubelet pulled the container image(s) for the pod.
+   * +optional
+   */
+  startTime?: string;
+};
+
+export type V1PodTemplateSpec = {
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Specification of the desired behavior of the pod.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  spec?: V1PodSpec;
+};
+
+export type V1PortworxVolumeSource = {
+  /**
+   * fSType represents the filesystem type to mount
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs". Implicitly inferred to be "ext4" if unspecified.
+   */
+  fsType?: string;
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * volumeID uniquely identifies a Portworx volume
+   */
+  volumeID?: string;
+};
+
+export const V1PreemptionPolicy = {
+  /**
+   * PreemptLowerPriority
+   */
+  PREEMPT_LOWER_PRIORITY: 'PreemptLowerPriority' /**
+   * PreemptNever
+   */,
+  PREEMPT_NEVER: 'Never',
+} as const;
+
+export type V1PreemptionPolicy =
+  (typeof V1PreemptionPolicy)[keyof typeof V1PreemptionPolicy];
+
+export type V1PreferredSchedulingTerm = {
+  /**
+   * A node selector term, associated with the corresponding weight.
+   */
+  preference?: V1NodeSelectorTerm;
+  /**
+   * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+   */
+  weight?: number;
+};
 
 export type V1Probe = {
   /**
@@ -7088,6 +10628,26 @@ export const V1ProcMountType = {
 export type V1ProcMountType =
   (typeof V1ProcMountType)[keyof typeof V1ProcMountType];
 
+export type V1ProjectedVolumeSource = {
+  /**
+   * defaultMode are the mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  defaultMode?: number;
+  /**
+   * sources is the list of volume projections. Each entry in this list
+   * handles one source.
+   * +optional
+   * +listType=atomic
+   */
+  sources?: Array<V1VolumeProjection>;
+};
+
 export const V1Protocol = {
   /**
    * ProtocolTCP
@@ -7122,6 +10682,105 @@ export const V1PullPolicy = {
 
 export type V1PullPolicy = (typeof V1PullPolicy)[keyof typeof V1PullPolicy];
 
+export type V1QuobyteVolumeSource = {
+  /**
+   * group to map volume access to
+   * Default is no group
+   * +optional
+   */
+  group?: string;
+  /**
+   * readOnly here will force the Quobyte volume to be mounted with read-only permissions.
+   * Defaults to false.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * registry represents a single or multiple Quobyte Registry services
+   * specified as a string as host:port pair (multiple entries are separated with commas)
+   * which acts as the central registry for volumes
+   */
+  registry?: string;
+  /**
+   * tenant owning the given Quobyte volume in the Backend
+   * Used with dynamically provisioned Quobyte volumes, value is set by the plugin
+   * +optional
+   */
+  tenant?: string;
+  /**
+   * user to map volume access to
+   * Defaults to serivceaccount user
+   * +optional
+   */
+  user?: string;
+  /**
+   * volume is a string that references an already created Quobyte volume by name.
+   */
+  volume?: string;
+};
+
+export type V1RbdVolumeSource = {
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
+   * TODO: how do we prevent errors in the filesystem from compromising the machine
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * image is the rados image name.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   */
+  image?: string;
+  /**
+   * keyring is the path to key ring for RBDUser.
+   * Default is /etc/ceph/keyring.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +optional
+   * +default="/etc/ceph/keyring"
+   */
+  keyring?: string;
+  /**
+   * monitors is a collection of Ceph monitors.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +listType=atomic
+   */
+  monitors?: Array<string>;
+  /**
+   * pool is the rados pool name.
+   * Default is rbd.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +optional
+   * +default="rbd"
+   */
+  pool?: string;
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef is name of the authentication secret for RBDUser. If provided
+   * overrides keyring.
+   * Default is nil.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * user is the rados user name.
+   * Default is admin.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   * +optional
+   * +default="admin"
+   */
+  user?: string;
+};
+
 export const V1RecursiveReadOnlyMode = {
   /**
    * RecursiveReadOnlyDisabled
@@ -7140,6 +10799,162 @@ export const V1RecursiveReadOnlyMode = {
 export type V1RecursiveReadOnlyMode =
   (typeof V1RecursiveReadOnlyMode)[keyof typeof V1RecursiveReadOnlyMode];
 
+export type V1ReplicaSet = {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * +optional
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * +optional
+   */
+  kind?: string;
+  /**
+   * If the Labels of a ReplicaSet are empty, they are defaulted to
+   * be the same as the Pod(s) that the ReplicaSet manages.
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   * +optional
+   */
+  metadata?: V1ObjectMeta;
+  /**
+   * Spec defines the specification of the desired behavior of the ReplicaSet.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  spec?: V1ReplicaSetSpec;
+  /**
+   * Status is the most recently observed status of the ReplicaSet.
+   * This data may be out of date by some window of time.
+   * Populated by the system.
+   * Read-only.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+   * +optional
+   */
+  status?: V1ReplicaSetStatus;
+};
+
+export type V1ReplicaSetCondition = {
+  /**
+   * The last time the condition transitioned from one status to another.
+   * +optional
+   */
+  lastTransitionTime?: string;
+  /**
+   * A human readable message indicating details about the transition.
+   * +optional
+   */
+  message?: string;
+  /**
+   * The reason for the condition's last transition.
+   * +optional
+   */
+  reason?: string;
+  /**
+   * Status of the condition, one of True, False, Unknown.
+   */
+  status?: K8sIoApiCoreV1ConditionStatus;
+  /**
+   * Type of replica set condition.
+   */
+  type?: V1ReplicaSetConditionType;
+};
+
+export const V1ReplicaSetConditionType = {
+  /**
+   * ReplicaSetReplicaFailure
+   */
+  REPLICA_SET_REPLICA_FAILURE: 'ReplicaFailure',
+} as const;
+
+export type V1ReplicaSetConditionType =
+  (typeof V1ReplicaSetConditionType)[keyof typeof V1ReplicaSetConditionType];
+
+export type V1ReplicaSetSpec = {
+  /**
+   * Minimum number of seconds for which a newly created pod should be ready
+   * without any of its container crashing, for it to be considered available.
+   * Defaults to 0 (pod will be considered available as soon as it is ready)
+   * +optional
+   */
+  minReadySeconds?: number;
+  /**
+   * Replicas is the number of desired pods.
+   * This is a pointer to distinguish between explicit zero and unspecified.
+   * Defaults to 1.
+   * More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset
+   * +optional
+   */
+  replicas?: number;
+  /**
+   * Selector is a label query over pods that should match the replica count.
+   * Label keys and values that must match in order to be controlled by this replica set.
+   * It must match the pod template's labels.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
+   */
+  selector?: V1LabelSelector;
+  /**
+   * Template is the object that describes the pod that will be created if
+   * insufficient replicas are detected.
+   * More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/#pod-template
+   * +optional
+   */
+  template?: V1PodTemplateSpec;
+};
+
+export type V1ReplicaSetStatus = {
+  /**
+   * The number of available non-terminating pods (ready for at least minReadySeconds) for this replica set.
+   * +optional
+   */
+  availableReplicas?: number;
+  /**
+   * Represents the latest available observations of a replica set's current state.
+   * +optional
+   * +patchMergeKey=type
+   * +patchStrategy=merge
+   * +listType=map
+   * +listMapKey=type
+   */
+  conditions?: Array<V1ReplicaSetCondition>;
+  /**
+   * The number of non-terminating pods that have labels matching the labels of the pod template of the replicaset.
+   * +optional
+   */
+  fullyLabeledReplicas?: number;
+  /**
+   * ObservedGeneration reflects the generation of the most recently observed ReplicaSet.
+   * +optional
+   */
+  observedGeneration?: number;
+  /**
+   * The number of non-terminating pods targeted by this ReplicaSet with a Ready Condition.
+   * +optional
+   */
+  readyReplicas?: number;
+  /**
+   * Replicas is the most recently observed number of non-terminating pods.
+   * More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset
+   */
+  replicas?: number;
+  /**
+   * The number of terminating pods for this replica set. Terminating pods have a non-null .metadata.deletionTimestamp
+   * and have not yet reached the Failed or Succeeded .status.phase.
+   *
+   * This is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).
+   * +optional
+   */
+  terminatingReplicas?: number;
+};
+
 export type V1ResourceFieldSelector = {
   /**
    * Container name: required for volumes, optional for env vars
@@ -7156,6 +10971,44 @@ export type V1ResourceFieldSelector = {
    */
   resource?: string;
 };
+
+export type V1ResourceHealth = {
+  /**
+   * Health of the resource.
+   * can be one of:
+   * - Healthy: operates as normal
+   * - Unhealthy: reported unhealthy. We consider this a temporary health issue
+   * since we do not have a mechanism today to distinguish
+   * temporary and permanent issues.
+   * - Unknown: The status cannot be determined.
+   * For example, Device Plugin got unregistered and hasn't been re-registered since.
+   *
+   * In future we may want to introduce the PermanentlyUnhealthy Status.
+   */
+  health?: V1ResourceHealthStatus;
+  /**
+   * ResourceID is the unique identifier of the resource. See the ResourceID type for more information.
+   */
+  resourceID?: string;
+};
+
+export const V1ResourceHealthStatus = {
+  /**
+   * ResourceHealthStatusHealthy
+   */
+  RESOURCE_HEALTH_STATUS_HEALTHY: 'Healthy',
+  /**
+   * ResourceHealthStatusUnhealthy
+   */
+  RESOURCE_HEALTH_STATUS_UNHEALTHY: 'Unhealthy',
+  /**
+   * ResourceHealthStatusUnknown
+   */
+  RESOURCE_HEALTH_STATUS_UNKNOWN: 'Unknown',
+} as const;
+
+export type V1ResourceHealthStatus =
+  (typeof V1ResourceHealthStatus)[keyof typeof V1ResourceHealthStatus];
 
 export type V1ResourceList = {
   [key: string]: ResourceQuantity;
@@ -7402,6 +11255,43 @@ export const V1ResourceResizeRestartPolicy = {
 export type V1ResourceResizeRestartPolicy =
   (typeof V1ResourceResizeRestartPolicy)[keyof typeof V1ResourceResizeRestartPolicy];
 
+export type V1ResourceStatus = {
+  /**
+   * Name of the resource. Must be unique within the pod and in case of non-DRA resource, match one of the resources from the pod spec.
+   * For DRA resources, the value must be "claim:<claim_name>/<request>".
+   * When this status is reported about a container, the "claim_name" and "request" must match one of the claims of this container.
+   * +required
+   */
+  name?: V1ResourceName;
+  /**
+   * List of unique resources health. Each element in the list contains an unique resource ID and its health.
+   * At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node.
+   * If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share.
+   * See ResourceID type definition for a specific format it has in various use cases.
+   * +listType=map
+   * +listMapKey=resourceID
+   */
+  resources?: Array<V1ResourceHealth>;
+};
+
+export const V1RestartPolicy = {
+  /**
+   * RestartPolicyAlways
+   */
+  RESTART_POLICY_ALWAYS: 'Always',
+  /**
+   * RestartPolicyOnFailure
+   */
+  RESTART_POLICY_ON_FAILURE: 'OnFailure',
+  /**
+   * RestartPolicyNever
+   */
+  RESTART_POLICY_NEVER: 'Never',
+} as const;
+
+export type V1RestartPolicy =
+  (typeof V1RestartPolicy)[keyof typeof V1RestartPolicy];
+
 export type V1RoleRef = {
   /**
    * APIGroup is the group for the resource being referenced
@@ -7417,6 +11307,38 @@ export type V1RoleRef = {
    * +k8s:required
    */
   name?: string;
+};
+
+export type V1RollingUpdateDeployment = {
+  /**
+   * The maximum number of pods that can be scheduled above the desired number of
+   * pods.
+   * Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
+   * This can not be 0 if MaxUnavailable is 0.
+   * Absolute number is calculated from percentage by rounding up.
+   * Defaults to 25%.
+   * Example: when this is set to 30%, the new ReplicaSet can be scaled up immediately when
+   * the rolling update starts, such that the total number of old and new pods do not exceed
+   * 130% of desired pods. Once old pods have been killed,
+   * new ReplicaSet can be scaled up further, ensuring that total number of pods running
+   * at any time during the update is at most 130% of desired pods.
+   * +optional
+   */
+  maxSurge?: IntstrIntOrString;
+  /**
+   * The maximum number of pods that can be unavailable during the update.
+   * Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
+   * Absolute number is calculated from percentage by rounding down.
+   * This can not be 0 if MaxSurge is 0.
+   * Defaults to 25%.
+   * Example: when this is set to 30%, the old ReplicaSet can be scaled down to 70% of desired pods
+   * immediately when the rolling update starts. Once new pods are ready, old ReplicaSet
+   * can be scaled down further, followed by scaling up the new ReplicaSet, ensuring
+   * that the total number of pods available at all times during the update is at
+   * least 70% of desired pods.
+   * +optional
+   */
+  maxUnavailable?: IntstrIntOrString;
 };
 
 export type V1SeLinuxOptions = {
@@ -7440,6 +11362,64 @@ export type V1SeLinuxOptions = {
    * +optional
    */
   user?: string;
+};
+
+export type V1ScaleIoVolumeSource = {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs".
+   * Default is "xfs".
+   * +optional
+   * +default="xfs"
+   */
+  fsType?: string;
+  /**
+   * gateway is the host address of the ScaleIO API Gateway.
+   */
+  gateway?: string;
+  /**
+   * protectionDomain is the name of the ScaleIO Protection Domain for the configured storage.
+   * +optional
+   */
+  protectionDomain?: string;
+  /**
+   * readOnly Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef references to the secret for ScaleIO user and other
+   * sensitive information. If this is not provided, Login operation will fail.
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * sslEnabled Flag enable/disable SSL communication with Gateway, default false
+   * +optional
+   */
+  sslEnabled?: boolean;
+  /**
+   * storageMode indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
+   * Default is ThinProvisioned.
+   * +optional
+   * +default="ThinProvisioned"
+   */
+  storageMode?: string;
+  /**
+   * storagePool is the ScaleIO Storage Pool associated with the protection domain.
+   * +optional
+   */
+  storagePool?: string;
+  /**
+   * system is the name of the storage system as configured in ScaleIO.
+   */
+  system?: string;
+  /**
+   * volumeName is the name of a volume already created in the ScaleIO system
+   * that is associated with this volume source.
+   */
+  volumeName?: string;
 };
 
 export type V1ScopeSelector = {
@@ -7577,6 +11557,38 @@ export type V1SecretKeySelector = {
   optional?: boolean;
 };
 
+export type V1SecretProjection = {
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * Secret will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the Secret,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1KeyToPath>;
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   * +optional
+   * +default=""
+   * +kubebuilder:default=""
+   * TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+   */
+  name?: string;
+  /**
+   * optional field specify whether the Secret or its key must be defined
+   * +optional
+   */
+  optional?: boolean;
+};
+
 export type V1SecretReference = {
   /**
    * name is unique within a namespace to reference a secret resource.
@@ -7588,6 +11600,43 @@ export type V1SecretReference = {
    * +optional
    */
   namespace?: string;
+};
+
+export type V1SecretVolumeSource = {
+  /**
+   * defaultMode is Optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values
+   * for mode bits. Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   * +optional
+   */
+  defaultMode?: number;
+  /**
+   * items If unspecified, each key-value pair in the Data field of the referenced
+   * Secret will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the Secret,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   * +optional
+   * +listType=atomic
+   */
+  items?: Array<V1KeyToPath>;
+  /**
+   * optional field specify whether the Secret or its keys must be defined
+   * +optional
+   */
+  optional?: boolean;
+  /**
+   * secretName is the name of the secret in the pod's namespace to use.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+   * +optional
+   */
+  secretName?: string;
 };
 
 export type V1SecurityContext = {
@@ -7693,6 +11742,32 @@ export type V1SecurityContext = {
    * +optional
    */
   windowsOptions?: V1WindowsSecurityContextOptions;
+};
+
+export type V1ServiceAccountTokenProjection = {
+  /**
+   * audience is the intended audience of the token. A recipient of a token
+   * must identify itself with an identifier specified in the audience of the
+   * token, and otherwise should reject the token. The audience defaults to the
+   * identifier of the apiserver.
+   * +optional
+   */
+  audience?: string;
+  /**
+   * expirationSeconds is the requested duration of validity of the service
+   * account token. As the token approaches expiration, the kubelet volume
+   * plugin will proactively rotate the service account token. The kubelet will
+   * start trying to rotate the token if the token is older than 80 percent of
+   * its time to live or if the token is older than 24 hours.Defaults to 1 hour
+   * and must be at least 10 minutes.
+   * +optional
+   */
+  expirationSeconds?: number;
+  /**
+   * path is the path relative to the mount point of the file to project the
+   * token into.
+   */
+  path?: string;
 };
 
 export const V1Signal = {
@@ -7967,6 +12042,97 @@ export type V1SleepAction = {
   seconds?: number;
 };
 
+export const V1StorageMedium = {
+  /**
+   * StorageMediumDefault
+   *
+   * use whatever the default is for the node, assume anything we don't explicitly handle is this
+   */
+  STORAGE_MEDIUM_DEFAULT: '',
+  /**
+   * StorageMediumMemory
+   *
+   * use memory (e.g. tmpfs on linux)
+   */
+  STORAGE_MEDIUM_MEMORY: 'Memory',
+  /**
+   * StorageMediumHugePages
+   *
+   * use hugepages
+   */
+  STORAGE_MEDIUM_HUGE_PAGES: 'HugePages',
+  /**
+   * StorageMediumHugePagesPrefix
+   *
+   * prefix for full medium notation HugePages-<size>
+   */
+  STORAGE_MEDIUM_HUGE_PAGES_PREFIX: 'HugePages-',
+} as const;
+
+export type V1StorageMedium =
+  (typeof V1StorageMedium)[keyof typeof V1StorageMedium];
+
+export type V1StorageOsVolumeSource = {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * secretRef specifies the secret to use for obtaining the StorageOS API
+   * credentials.  If not specified, default values will be attempted.
+   * +optional
+   */
+  secretRef?: K8sIoApiCoreV1LocalObjectReference;
+  /**
+   * volumeName is the human-readable name of the StorageOS volume.  Volume
+   * names are only unique within a namespace.
+   */
+  volumeName?: string;
+  /**
+   * volumeNamespace specifies the scope of the volume within StorageOS.  If no
+   * namespace is specified then the Pod's namespace will be used.  This allows the
+   * Kubernetes name scoping to be mirrored within StorageOS for tighter integration.
+   * Set VolumeName to any name to override the default behaviour.
+   * Set to "default" if you are not using namespaces within StorageOS.
+   * Namespaces that do not pre-exist within StorageOS will be created.
+   * +optional
+   */
+  volumeNamespace?: string;
+};
+
+export const V1SupplementalGroupsPolicy = {
+  /**
+   * SupplementalGroupsPolicyMerge
+   */
+  SUPPLEMENTAL_GROUPS_POLICY_MERGE: 'Merge' /**
+   * SupplementalGroupsPolicyStrict
+   */,
+  SUPPLEMENTAL_GROUPS_POLICY_STRICT: 'Strict',
+} as const;
+
+export type V1SupplementalGroupsPolicy =
+  (typeof V1SupplementalGroupsPolicy)[keyof typeof V1SupplementalGroupsPolicy];
+
+export type V1Sysctl = {
+  /**
+   * Name of a property to set
+   */
+  name?: string;
+  /**
+   * Value of a property to set
+   */
+  value?: string;
+};
+
 export type V1TcpSocketAction = {
   /**
    * Optional: Host name to connect to, defaults to the pod IP.
@@ -8034,6 +12200,242 @@ export const V1TerminationMessagePolicy = {
 export type V1TerminationMessagePolicy =
   (typeof V1TerminationMessagePolicy)[keyof typeof V1TerminationMessagePolicy];
 
+export type V1Toleration = {
+  /**
+   * Effect indicates the taint effect to match. Empty means match all taint effects.
+   * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+   * +optional
+   */
+  effect?: V1TaintEffect;
+  /**
+   * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+   * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+   * +optional
+   */
+  key?: string;
+  /**
+   * Operator represents a key's relationship to the value.
+   * Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
+   * Exists is equivalent to wildcard for value, so that a pod can
+   * tolerate all taints of a particular category.
+   * Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
+   * +optional
+   */
+  operator?: V1TolerationOperator;
+  /**
+   * TolerationSeconds represents the period of time the toleration (which must be
+   * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+   * it is not set, which means tolerate the taint forever (do not evict). Zero and
+   * negative values will be treated as 0 (evict immediately) by the system.
+   * +optional
+   */
+  tolerationSeconds?: number;
+  /**
+   * Value is the taint value the toleration matches to.
+   * If the operator is Exists, the value should be empty, otherwise just a regular string.
+   * +optional
+   */
+  value?: string;
+};
+
+export const V1TolerationOperator = {
+  /**
+   * TolerationOpExists
+   */
+  TOLERATION_OP_EXISTS: 'Exists',
+  /**
+   * TolerationOpEqual
+   */
+  TOLERATION_OP_EQUAL: 'Equal',
+  /**
+   * TolerationOpLt
+   */
+  TOLERATION_OP_LT: 'Lt',
+  /**
+   * TolerationOpGt
+   */
+  TOLERATION_OP_GT: 'Gt',
+} as const;
+
+export type V1TolerationOperator =
+  (typeof V1TolerationOperator)[keyof typeof V1TolerationOperator];
+
+export type V1TopologySpreadConstraint = {
+  /**
+   * LabelSelector is used to find matching pods.
+   * Pods that match this label selector are counted to determine the number of pods
+   * in their corresponding topology domain.
+   * +optional
+   */
+  labelSelector?: V1LabelSelector;
+  /**
+   * MatchLabelKeys is a set of pod label keys to select the pods over which
+   * spreading will be calculated. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are ANDed with labelSelector
+   * to select the group of existing pods over which spreading will be calculated
+   * for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.
+   * MatchLabelKeys cannot be set when LabelSelector isn't set.
+   * Keys that don't exist in the incoming pod labels will
+   * be ignored. A null or empty list means only match against labelSelector.
+   *
+   * This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
+   * +listType=atomic
+   * +optional
+   */
+  matchLabelKeys?: Array<string>;
+  /**
+   * MaxSkew describes the degree to which pods may be unevenly distributed.
+   * When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+   * between the number of matching pods in the target topology and the global minimum.
+   * The global minimum is the minimum number of matching pods in an eligible domain
+   * or zero if the number of eligible domains is less than MinDomains.
+   * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+   * labelSelector spread as 2/2/1:
+   * In this case, the global minimum is 1.
+   * +-------+-------+-------+
+   * | zone1 | zone2 | zone3 |
+   * +-------+-------+-------+
+   * |  P P  |  P P  |   P   |
+   * +-------+-------+-------+
+   * - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 2/2/2;
+   * scheduling it onto zone1(zone2) would make the ActualSkew(3-1) on zone1(zone2)
+   * violate MaxSkew(1).
+   * - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+   * When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
+   * to topologies that satisfy it.
+   * It's a required field. Default value is 1 and 0 is not allowed.
+   */
+  maxSkew?: number;
+  /**
+   * MinDomains indicates a minimum number of eligible domains.
+   * When the number of eligible domains with matching topology keys is less than minDomains,
+   * Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
+   * And when the number of eligible domains with matching topology keys equals or greater than minDomains,
+   * this value has no effect on scheduling.
+   * As a result, when the number of eligible domains is less than minDomains,
+   * scheduler won't schedule more than maxSkew Pods to those domains.
+   * If value is nil, the constraint behaves as if MinDomains is equal to 1.
+   * Valid values are integers greater than 0.
+   * When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
+   *
+   * For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same
+   * labelSelector spread as 2/2/2:
+   * +-------+-------+-------+
+   * | zone1 | zone2 | zone3 |
+   * +-------+-------+-------+
+   * |  P P  |  P P  |  P P  |
+   * +-------+-------+-------+
+   * The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0.
+   * In this situation, new pod with the same labelSelector cannot be scheduled,
+   * because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
+   * it will violate MaxSkew.
+   * +optional
+   */
+  minDomains?: number;
+  /**
+   * NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
+   * when calculating pod topology spread skew. Options are:
+   * - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
+   * - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
+   *
+   * If this value is nil, the behavior is equivalent to the Honor policy.
+   * +optional
+   */
+  nodeAffinityPolicy?: V1NodeInclusionPolicy;
+  /**
+   * NodeTaintsPolicy indicates how we will treat node taints when calculating
+   * pod topology spread skew. Options are:
+   * - Honor: nodes without taints, along with tainted nodes for which the incoming pod
+   * has a toleration, are included.
+   * - Ignore: node taints are ignored. All nodes are included.
+   *
+   * If this value is nil, the behavior is equivalent to the Ignore policy.
+   * +optional
+   */
+  nodeTaintsPolicy?: V1NodeInclusionPolicy;
+  /**
+   * TopologyKey is the key of node labels. Nodes that have a label with this key
+   * and identical values are considered to be in the same topology.
+   * We consider each <key, value> as a "bucket", and try to put balanced number
+   * of pods into each bucket.
+   * We define a domain as a particular instance of a topology.
+   * Also, we define an eligible domain as a domain whose nodes meet the requirements of
+   * nodeAffinityPolicy and nodeTaintsPolicy.
+   * e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
+   * And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
+   * It's a required field.
+   */
+  topologyKey?: string;
+  /**
+   * WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+   * the spread constraint.
+   * - DoNotSchedule (default) tells the scheduler not to schedule it.
+   * - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+   * but giving higher precedence to topologies that would help reduce the
+   * skew.
+   * A constraint is considered "Unsatisfiable" for an incoming pod
+   * if and only if every possible node assignment for that pod would violate
+   * "MaxSkew" on some topology.
+   * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+   * labelSelector spread as 3/1/1:
+   * +-------+-------+-------+
+   * | zone1 | zone2 | zone3 |
+   * +-------+-------+-------+
+   * | P P P |   P   |   P   |
+   * +-------+-------+-------+
+   * If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled
+   * to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies
+   * MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler
+   * won't make it *more* imbalanced.
+   * It's a required field.
+   */
+  whenUnsatisfiable?: V1UnsatisfiableConstraintAction;
+};
+
+export type V1TypedLocalObjectReference = {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   * +optional
+   */
+  apiGroup?: string;
+  /**
+   * Kind is the type of resource being referenced
+   */
+  kind?: string;
+  /**
+   * Name is the name of resource being referenced
+   */
+  name?: string;
+};
+
+export type V1TypedObjectReference = {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   * +optional
+   */
+  apiGroup?: string;
+  /**
+   * Kind is the type of resource being referenced
+   */
+  kind?: string;
+  /**
+   * Name is the name of resource being referenced
+   */
+  name?: string;
+  /**
+   * Namespace is the namespace of resource being referenced
+   * Note that when a namespace is specified, a gateway.networking.k8s.io/ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.
+   * (Alpha) This field requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   * +featureGate=CrossNamespaceVolumeDataSource
+   * +optional
+   */
+  namespace?: string;
+};
+
 export const V1UriScheme = {
   /**
    * URISchemeHTTP
@@ -8045,6 +12447,261 @@ export const V1UriScheme = {
 } as const;
 
 export type V1UriScheme = (typeof V1UriScheme)[keyof typeof V1UriScheme];
+
+export const V1UnsatisfiableConstraintAction = {
+  /**
+   * DoNotSchedule
+   */
+  DO_NOT_SCHEDULE: 'DoNotSchedule' /**
+   * ScheduleAnyway
+   */,
+  SCHEDULE_ANYWAY: 'ScheduleAnyway',
+} as const;
+
+export type V1UnsatisfiableConstraintAction =
+  (typeof V1UnsatisfiableConstraintAction)[keyof typeof V1UnsatisfiableConstraintAction];
+
+export type V1Volume = {
+  /**
+   * awsElasticBlockStore represents an AWS Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree
+   * awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   * +optional
+   */
+  awsElasticBlockStore?: V1AwsElasticBlockStoreVolumeSource;
+  /**
+   * azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+   * Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type
+   * are redirected to the disk.csi.azure.com CSI driver.
+   * +optional
+   */
+  azureDisk?: V1AzureDiskVolumeSource;
+  /**
+   * azureFile represents an Azure File Service mount on the host and bind mount to the pod.
+   * Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type
+   * are redirected to the file.csi.azure.com CSI driver.
+   * +optional
+   */
+  azureFile?: V1AzureFileVolumeSource;
+  /**
+   * cephFS represents a Ceph FS mount on the host that shares a pod's lifetime.
+   * Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+   * +optional
+   */
+  cephfs?: V1CephFsVolumeSource;
+  /**
+   * cinder represents a cinder volume attached and mounted on kubelets host machine.
+   * Deprecated: Cinder is deprecated. All operations for the in-tree cinder type
+   * are redirected to the cinder.csi.openstack.org CSI driver.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   * +optional
+   */
+  cinder?: V1CinderVolumeSource;
+  /**
+   * configMap represents a configMap that should populate this volume
+   * +optional
+   */
+  configMap?: V1ConfigMapVolumeSource;
+  /**
+   * csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+   * +optional
+   */
+  csi?: V1CsiVolumeSource;
+  /**
+   * downwardAPI represents downward API about the pod that should populate this volume
+   * +optional
+   */
+  downwardAPI?: V1DownwardApiVolumeSource;
+  /**
+   * emptyDir represents a temporary directory that shares a pod's lifetime.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   * +optional
+   */
+  emptyDir?: V1EmptyDirVolumeSource;
+  /**
+   * ephemeral represents a volume that is handled by a cluster storage driver.
+   * The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
+   * and deleted when the pod is removed.
+   *
+   * Use this if:
+   * a) the volume is only needed while the pod runs,
+   * b) features of normal volumes like restoring from snapshot or capacity
+   * tracking are needed,
+   * c) the storage driver is specified through a storage class, and
+   * d) the storage driver supports dynamic volume provisioning through
+   * a PersistentVolumeClaim (see EphemeralVolumeSource for more
+   * information on the connection between this volume type
+   * and PersistentVolumeClaim).
+   *
+   * Use PersistentVolumeClaim or one of the vendor-specific
+   * APIs for volumes that persist for longer than the lifecycle
+   * of an individual pod.
+   *
+   * Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to
+   * be used that way - see the documentation of the driver for
+   * more information.
+   *
+   * A pod can use both types of ephemeral volumes and
+   * persistent volumes at the same time.
+   *
+   * +optional
+   */
+  ephemeral?: V1EphemeralVolumeSource;
+  /**
+   * fc represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
+   * +optional
+   */
+  fc?: V1FcVolumeSource;
+  /**
+   * flexVolume represents a generic volume resource that is
+   * provisioned/attached using an exec based plugin.
+   * Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+   * +optional
+   */
+  flexVolume?: V1FlexVolumeSource;
+  /**
+   * flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running.
+   * Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+   * +optional
+   */
+  flocker?: V1FlockerVolumeSource;
+  /**
+   * gcePersistentDisk represents a GCE Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree
+   * gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   * +optional
+   */
+  gcePersistentDisk?: V1GcePersistentDiskVolumeSource;
+  /**
+   * gitRepo represents a git repository at a particular revision.
+   * Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an
+   * EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir
+   * into the Pod's container.
+   * +optional
+   */
+  gitRepo?: V1GitRepoVolumeSource;
+  /**
+   * glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
+   * Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported.
+   * +optional
+   */
+  glusterfs?: V1GlusterfsVolumeSource;
+  /**
+   * hostPath represents a pre-existing file or directory on the host
+   * machine that is directly exposed to the container. This is generally
+   * used for system agents or other privileged things that are allowed
+   * to see the host machine. Most containers will NOT need this.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   * ---
+   * TODO(jonesdl) We need to restrict who can use host directory mounts and who can/can not
+   * mount host directories as read/write.
+   * +optional
+   */
+  hostPath?: V1HostPathVolumeSource;
+  /**
+   * image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine.
+   * The volume is resolved at pod startup depending on which PullPolicy value is provided:
+   *
+   * - Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+   * - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+   * - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+   *
+   * The volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation.
+   * A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
+   * The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
+   * The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
+   * The volume will be mounted read-only (ro) and non-executable files (noexec).
+   * Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
+   * The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
+   * +featureGate=ImageVolume
+   * +optional
+   */
+  image?: V1ImageVolumeSource;
+  /**
+   * iscsi represents an ISCSI Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes/#iscsi
+   * +optional
+   */
+  iscsi?: V1IscsiVolumeSource;
+  /**
+   * name of the volume.
+   * Must be a DNS_LABEL and unique within the pod.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   */
+  name?: string;
+  /**
+   * nfs represents an NFS mount on the host that shares a pod's lifetime
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   * +optional
+   */
+  nfs?: V1NfsVolumeSource;
+  /**
+   * persistentVolumeClaimVolumeSource represents a reference to a
+   * PersistentVolumeClaim in the same namespace.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   * +optional
+   */
+  persistentVolumeClaim?: V1PersistentVolumeClaimVolumeSource;
+  /**
+   * photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine.
+   * Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+   */
+  photonPersistentDisk?: V1PhotonPersistentDiskVolumeSource;
+  /**
+   * portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
+   * Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
+   * are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
+   * is on.
+   * +optional
+   */
+  portworxVolume?: V1PortworxVolumeSource;
+  /**
+   * projected items for all in one resources secrets, configmaps, and downward API
+   */
+  projected?: V1ProjectedVolumeSource;
+  /**
+   * quobyte represents a Quobyte mount on the host that shares a pod's lifetime.
+   * Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+   * +optional
+   */
+  quobyte?: V1QuobyteVolumeSource;
+  /**
+   * rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
+   * Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported.
+   * +optional
+   */
+  rbd?: V1RbdVolumeSource;
+  /**
+   * scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
+   * Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+   * +optional
+   */
+  scaleIO?: V1ScaleIoVolumeSource;
+  /**
+   * secret represents a secret that should populate this volume.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+   * +optional
+   */
+  secret?: V1SecretVolumeSource;
+  /**
+   * storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
+   * Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+   * +optional
+   */
+  storageos?: V1StorageOsVolumeSource;
+  /**
+   * vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine.
+   * Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type
+   * are redirected to the csi.vsphere.vmware.com CSI driver.
+   * +optional
+   */
+  vsphereVolume?: V1VsphereVirtualDiskVolumeSource;
+};
 
 export type V1VolumeDevice = {
   /**
@@ -8119,6 +12776,164 @@ export type V1VolumeMount = {
   subPathExpr?: string;
 };
 
+export type V1VolumeMountStatus = {
+  /**
+   * MountPath corresponds to the original VolumeMount.
+   */
+  mountPath?: string;
+  /**
+   * Name corresponds to the name of the original VolumeMount.
+   */
+  name?: string;
+  /**
+   * ReadOnly corresponds to the original VolumeMount.
+   * +optional
+   */
+  readOnly?: boolean;
+  /**
+   * RecursiveReadOnly must be set to Disabled, Enabled, or unspecified (for non-readonly mounts).
+   * An IfPossible value in the original VolumeMount must be translated to Disabled or Enabled,
+   * depending on the mount result.
+   * +optional
+   */
+  recursiveReadOnly?: V1RecursiveReadOnlyMode;
+};
+
+export type V1VolumeProjection = {
+  /**
+   * ClusterTrustBundle allows a pod to access the `.spec.trustBundle` field
+   * of ClusterTrustBundle objects in an auto-updating file.
+   *
+   * Alpha, gated by the ClusterTrustBundleProjection feature gate.
+   *
+   * ClusterTrustBundle objects can either be selected by name, or by the
+   * combination of signer name and a label selector.
+   *
+   * Kubelet performs aggressive normalization of the PEM contents written
+   * into the pod filesystem.  Esoteric PEM features such as inter-block
+   * comments and block headers are stripped.  Certificates are deduplicated.
+   * The ordering of certificates within the file is arbitrary, and Kubelet
+   * may change the order over time.
+   *
+   * +featureGate=ClusterTrustBundleProjection
+   * +optional
+   */
+  clusterTrustBundle?: V1ClusterTrustBundleProjection;
+  /**
+   * configMap information about the configMap data to project
+   * +optional
+   */
+  configMap?: V1ConfigMapProjection;
+  /**
+   * downwardAPI information about the downwardAPI data to project
+   * +optional
+   */
+  downwardAPI?: V1DownwardApiProjection;
+  /**
+   * Projects an auto-rotating credential bundle (private key and certificate
+   * chain) that the pod can use either as a TLS client or server.
+   *
+   * Kubelet generates a private key and uses it to send a
+   * PodCertificateRequest to the named signer.  Once the signer approves the
+   * request and issues a certificate chain, Kubelet writes the key and
+   * certificate chain to the pod filesystem.  The pod does not start until
+   * certificates have been issued for each podCertificate projected volume
+   * source in its spec.
+   *
+   * Kubelet will begin trying to rotate the certificate at the time indicated
+   * by the signer using the PodCertificateRequest.Status.BeginRefreshAt
+   * timestamp.
+   *
+   * Kubelet can write a single file, indicated by the credentialBundlePath
+   * field, or separate files, indicated by the keyPath and
+   * certificateChainPath fields.
+   *
+   * The credential bundle is a single file in PEM format.  The first PEM
+   * entry is the private key (in PKCS#8 format), and the remaining PEM
+   * entries are the certificate chain issued by the signer (typically,
+   * signers will return their certificate chain in leaf-to-root order).
+   *
+   * Prefer using the credential bundle format, since your application code
+   * can read it atomically.  If you use keyPath and certificateChainPath,
+   * your application must make two separate file reads. If these coincide
+   * with a certificate rotation, it is possible that the private key and leaf
+   * certificate you read may not correspond to each other.  Your application
+   * will need to check for this condition, and re-read until they are
+   * consistent.
+   *
+   * The named signer controls chooses the format of the certificate it
+   * issues; consult the signer implementation's documentation to learn how to
+   * use the certificates it issues.
+   *
+   * +featureGate=PodCertificateProjection
+   * +optional
+   */
+  podCertificate?: V1PodCertificateProjection;
+  /**
+   * secret information about the secret data to project
+   * +optional
+   */
+  secret?: V1SecretProjection;
+  /**
+   * serviceAccountToken is information about the serviceAccountToken data to project
+   * +optional
+   */
+  serviceAccountToken?: V1ServiceAccountTokenProjection;
+};
+
+export type V1VolumeResourceRequirements = {
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   * +optional
+   */
+  limits?: V1ResourceList;
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   * +optional
+   */
+  requests?: V1ResourceList;
+};
+
+export type V1VsphereVirtualDiskVolumeSource = {
+  /**
+   * fsType is filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * +optional
+   */
+  fsType?: string;
+  /**
+   * storagePolicyID is the storage Policy Based Management (SPBM) profile ID associated with the StoragePolicyName.
+   * +optional
+   */
+  storagePolicyID?: string;
+  /**
+   * storagePolicyName is the storage Policy Based Management (SPBM) profile name.
+   * +optional
+   */
+  storagePolicyName?: string;
+  /**
+   * volumePath is the path that identifies vSphere volume vmdk
+   */
+  volumePath?: string;
+};
+
+export type V1WeightedPodAffinityTerm = {
+  /**
+   * Required. A pod affinity term, associated with the corresponding weight.
+   */
+  podAffinityTerm?: V1PodAffinityTerm;
+  /**
+   * weight associated with matching the corresponding podAffinityTerm,
+   * in the range 1-100.
+   */
+  weight?: number;
+};
+
 export type V1WindowsSecurityContextOptions = {
   /**
    * GMSACredentialSpec is where the GMSA admission webhook
@@ -8148,6 +12963,37 @@ export type V1WindowsSecurityContextOptions = {
    * +optional
    */
   runAsUserName?: string;
+};
+
+export type V1WorkloadReference = {
+  /**
+   * Name defines the name of the Workload object this Pod belongs to.
+   * Workload must be in the same namespace as the Pod.
+   * If it doesn't match any existing Workload, the Pod will remain unschedulable
+   * until a Workload object is created and observed by the kube-scheduler.
+   * It must be a DNS subdomain.
+   *
+   * +required
+   */
+  name?: string;
+  /**
+   * PodGroup is the name of the PodGroup within the Workload that this Pod
+   * belongs to. If it doesn't match any existing PodGroup within the Workload,
+   * the Pod will remain unschedulable until the Workload object is recreated
+   * and observed by the kube-scheduler. It must be a DNS label.
+   *
+   * +required
+   */
+  podGroup?: string;
+  /**
+   * PodGroupReplicaKey specifies the replica key of the PodGroup to which this
+   * Pod belongs. It is used to distinguish pods belonging to different replicas
+   * of the same pod group. The pod group policy is applied separately to each replica.
+   * When set, it must be a DNS label.
+   *
+   * +optional
+   */
+  podGroupReplicaKey?: string;
 };
 
 export type V1Beta1ContainerMetrics = {
@@ -8423,6 +13269,9 @@ export type WorkflowsWorkflowStatusObject = {
   source?: WorkflowsWorkflowPhaseStatus;
   target?: WorkflowsWorkflowPhaseStatus;
 };
+
+export type KubernetesK8sDeploymentWriteRequest2 =
+  KubernetesK8sDeploymentWriteRequest;
 
 /**
  * Ingress controllers
@@ -12551,6 +17400,52 @@ export type GetKubernetesDashboardResponses = {
 export type GetKubernetesDashboardResponse =
   GetKubernetesDashboardResponses[keyof GetKubernetesDashboardResponses];
 
+export type GetAllKubernetesDeploymentsData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+  };
+  query?: {
+    /**
+     * Kubernetes label selector to filter the deployments
+     */
+    labelSelector?: string;
+    /**
+     * Kubernetes field selector to filter the deployments
+     */
+    fieldSelector?: string;
+  };
+  url: '/kubernetes/{id}/deployments';
+};
+
+export type GetAllKubernetesDeploymentsErrors = {
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the deployments.
+   */
+  500: unknown;
+};
+
+export type GetAllKubernetesDeploymentsResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentListResponse;
+};
+
+export type GetAllKubernetesDeploymentsResponse =
+  GetAllKubernetesDeploymentsResponses[keyof GetAllKubernetesDeploymentsResponses];
+
 export type DescribeResourceData = {
   body?: never;
   path: {
@@ -12654,6 +17549,43 @@ export type GetAllKubernetesEventsResponses = {
 
 export type GetAllKubernetesEventsResponse =
   GetAllKubernetesEventsResponses[keyof GetAllKubernetesEventsResponses];
+
+export type GetKubernetesIngressClassesData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/ingressclasses';
+};
+
+export type GetKubernetesIngressClassesErrors = {
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the ingress classes.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesIngressClassesResponses = {
+  /**
+   * Success
+   */
+  200: Array<KubernetesK8sIngressClass>;
+};
+
+export type GetKubernetesIngressClassesResponse =
+  GetKubernetesIngressClassesResponses[keyof GetKubernetesIngressClassesResponses];
 
 export type GetAllKubernetesIngressControllersData = {
   body?: never;
@@ -13601,6 +18533,442 @@ export type GetKubernetesConfigMapResponses = {
 export type GetKubernetesConfigMapResponse =
   GetKubernetesConfigMapResponses[keyof GetKubernetesConfigMapResponses];
 
+export type GetKubernetesDeploymentsForNamespaceData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: {
+    /**
+     * Kubernetes label selector to filter the deployments
+     */
+    labelSelector?: string;
+    /**
+     * Kubernetes field selector to filter the deployments
+     */
+    fieldSelector?: string;
+  };
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments';
+};
+
+export type GetKubernetesDeploymentsForNamespaceErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the deployments within the specified namespace.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesDeploymentsForNamespaceResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentListResponse;
+};
+
+export type GetKubernetesDeploymentsForNamespaceResponse =
+  GetKubernetesDeploymentsForNamespaceResponses[keyof GetKubernetesDeploymentsForNamespaceResponses];
+
+export type CreateKubernetesDeploymentData = {
+  /**
+   * Deployment definition
+   */
+  body: KubernetesK8sDeploymentWriteRequest2;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments';
+};
+
+export type CreateKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * A deployment with the same name already exists in the namespace.
+   */
+  409: unknown;
+  /**
+   * Server error occurred while attempting to create the deployment.
+   */
+  500: unknown;
+};
+
+export type CreateKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type CreateKubernetesDeploymentResponse =
+  CreateKubernetesDeploymentResponses[keyof CreateKubernetesDeploymentResponses];
+
+export type DeleteKubernetesDeploymentData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}';
+};
+
+export type DeleteKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment to delete.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to delete the deployment.
+   */
+  500: unknown;
+};
+
+export type DeleteKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  204: void;
+};
+
+export type DeleteKubernetesDeploymentResponse =
+  DeleteKubernetesDeploymentResponses[keyof DeleteKubernetesDeploymentResponses];
+
+export type GetKubernetesDeploymentData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}';
+};
+
+export type GetKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the deployment.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type GetKubernetesDeploymentResponse =
+  GetKubernetesDeploymentResponses[keyof GetKubernetesDeploymentResponses];
+
+export type PatchKubernetesDeploymentData = {
+  /**
+   * Annotations to apply
+   */
+  body: KubernetesK8sDeploymentPatchRequest;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}';
+};
+
+export type PatchKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment to annotate.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to annotate the deployment.
+   */
+  500: unknown;
+};
+
+export type PatchKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type PatchKubernetesDeploymentResponse =
+  PatchKubernetesDeploymentResponses[keyof PatchKubernetesDeploymentResponses];
+
+export type UpdateKubernetesDeploymentData = {
+  /**
+   * Deployment definition
+   */
+  body: KubernetesK8sDeploymentWriteRequest2;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}';
+};
+
+export type UpdateKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields, fields not meeting validation criteria, or a payload name that does not match the route.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment to update.
+   */
+  404: unknown;
+  /**
+   * The deployment was modified concurrently.
+   */
+  409: unknown;
+  /**
+   * Server error occurred while attempting to update the deployment.
+   */
+  500: unknown;
+};
+
+export type UpdateKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type UpdateKubernetesDeploymentResponse =
+  UpdateKubernetesDeploymentResponses[keyof UpdateKubernetesDeploymentResponses];
+
+export type RollbackKubernetesDeploymentData = {
+  /**
+   * Revision to roll back to
+   */
+  body: KubernetesK8sDeploymentRollbackRequest;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}/rollback';
+};
+
+export type RollbackKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment, or the requested revision is not part of its rollout history.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to roll the deployment back.
+   */
+  500: unknown;
+};
+
+export type RollbackKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type RollbackKubernetesDeploymentResponse =
+  RollbackKubernetesDeploymentResponses[keyof RollbackKubernetesDeploymentResponses];
+
+export type ScaleKubernetesDeploymentData = {
+  /**
+   * Desired replica count
+   */
+  body: KubernetesK8sDeploymentScaleRequest;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Deployment name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}/scale';
+};
+
+export type ScaleKubernetesDeploymentErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment to scale.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to scale the deployment.
+   */
+  500: unknown;
+};
+
+export type ScaleKubernetesDeploymentResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesDeploymentResponse;
+};
+
+export type ScaleKubernetesDeploymentResponse =
+  ScaleKubernetesDeploymentResponses[keyof ScaleKubernetesDeploymentResponses];
+
 export type GetKubernetesEventsForNamespaceData = {
   body?: never;
   path: {
@@ -14003,6 +19371,58 @@ export type GetKubernetesPersistentVolumeClaimsInNamespaceResponses = {
 export type GetKubernetesPersistentVolumeClaimsInNamespaceResponse =
   GetKubernetesPersistentVolumeClaimsInNamespaceResponses[keyof GetKubernetesPersistentVolumeClaimsInNamespaceResponses];
 
+export type CreateKubernetesPersistentVolumeClaimData = {
+  /**
+   * PersistentVolumeClaim definition
+   */
+  body: KubernetesK8sPersistentVolumeClaimCreateRequest;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/persistent_volume_claims';
+};
+
+export type CreateKubernetesPersistentVolumeClaimErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or a storage size that is not a valid quantity.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * A persistent volume claim with the same name already exists in the namespace.
+   */
+  409: unknown;
+  /**
+   * Server error occurred while attempting to create the persistent volume claim.
+   */
+  500: unknown;
+};
+
+export type CreateKubernetesPersistentVolumeClaimResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesK8sPersistentVolumeClaim;
+};
+
+export type CreateKubernetesPersistentVolumeClaimResponse =
+  CreateKubernetesPersistentVolumeClaimResponses[keyof CreateKubernetesPersistentVolumeClaimResponses];
+
 export type GetKubernetesPersistentVolumeClaimData = {
   body?: never;
   path: {
@@ -14051,6 +19471,60 @@ export type GetKubernetesPersistentVolumeClaimResponses = {
 
 export type GetKubernetesPersistentVolumeClaimResponse =
   GetKubernetesPersistentVolumeClaimResponses[keyof GetKubernetesPersistentVolumeClaimResponses];
+
+export type GetKubernetesPodsForNamespaceData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: {
+    /**
+     * Kubernetes label selector to filter the pods (e.g. app=nginx)
+     */
+    labelSelector?: string;
+    /**
+     * Kubernetes field selector to filter the pods (e.g. status.phase=Running)
+     */
+    fieldSelector?: string;
+  };
+  url: '/kubernetes/{id}/namespaces/{namespace}/pods';
+};
+
+export type GetKubernetesPodsForNamespaceErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the pods within the specified namespace.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesPodsForNamespaceResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesPodListResponse;
+};
+
+export type GetKubernetesPodsForNamespaceResponse =
+  GetKubernetesPodsForNamespaceResponses[keyof GetKubernetesPodsForNamespaceResponses];
 
 export type DeleteKubernetesPodData = {
   body?: never;
@@ -14104,6 +19578,80 @@ export type DeleteKubernetesPodResponses = {
 
 export type DeleteKubernetesPodResponse =
   DeleteKubernetesPodResponses[keyof DeleteKubernetesPodResponses];
+
+export type GetKubernetesPodLogsData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+    /**
+     * Pod name
+     */
+    name: string;
+  };
+  query?: {
+    /**
+     * Container name (required when the pod has multiple containers)
+     */
+    container?: string;
+    /**
+     * Number of lines from the end of the logs to return
+     */
+    tailLines?: number;
+    /**
+     * Only return logs newer than this many seconds
+     */
+    sinceSeconds?: number;
+    /**
+     * Prefix each log line with an RFC3339 timestamp
+     */
+    timestamps?: boolean;
+    /**
+     * Return the logs of the previous terminated container instance
+     */
+    previous?: boolean;
+    /**
+     * Stream new log lines as they are produced until the client disconnects
+     */
+    follow?: boolean;
+  };
+  url: '/kubernetes/{id}/namespaces/{namespace}/pods/{name}/log';
+};
+
+export type GetKubernetesPodLogsErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the pod logs.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesPodLogsResponses = {
+  /**
+   * Success
+   */
+  200: string;
+};
+
+export type GetKubernetesPodLogsResponse =
+  GetKubernetesPodLogsResponses[keyof GetKubernetesPodLogsResponses];
 
 export type RestartKubernetesPodData = {
   body?: never;
@@ -14161,6 +19709,113 @@ export type RestartKubernetesPodResponses = {
 
 export type RestartKubernetesPodResponse =
   RestartKubernetesPodResponses[keyof RestartKubernetesPodResponses];
+
+export type GetKubernetesReplicaSetsData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: {
+    /**
+     * Only return replica sets owned by this deployment
+     */
+    deployment?: string;
+    /**
+     * Kubernetes label selector to filter the replica sets
+     */
+    labelSelector?: string;
+    /**
+     * Kubernetes field selector to filter the replica sets
+     */
+    fieldSelector?: string;
+  };
+  url: '/kubernetes/{id}/namespaces/{namespace}/replicasets';
+};
+
+export type GetKubernetesReplicaSetsErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the deployment given in the deployment query parameter.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the replica sets within the specified namespace.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesReplicaSetsResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesReplicaSetListResponse;
+};
+
+export type GetKubernetesReplicaSetsResponse =
+  GetKubernetesReplicaSetsResponses[keyof GetKubernetesReplicaSetsResponses];
+
+export type GetKubernetesResourceQuotasData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/resource_quotas';
+};
+
+export type GetKubernetesResourceQuotasErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the resource quotas within the specified namespace.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesResourceQuotasResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesResourceQuotaListResponse;
+};
+
+export type GetKubernetesResourceQuotasResponse =
+  GetKubernetesResourceQuotasResponses[keyof GetKubernetesResourceQuotasResponses];
 
 export type GetKubernetesSecretData = {
   body?: never;
@@ -15033,6 +20688,52 @@ export type UpdateKubernetesPersistentVolumeReclaimPolicyResponses = {
 
 export type UpdateKubernetesPersistentVolumeReclaimPolicyResponse =
   UpdateKubernetesPersistentVolumeReclaimPolicyResponses[keyof UpdateKubernetesPersistentVolumeReclaimPolicyResponses];
+
+export type GetAllKubernetesPodsData = {
+  body?: never;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+  };
+  query?: {
+    /**
+     * Kubernetes label selector to filter the pods (e.g. app=nginx)
+     */
+    labelSelector?: string;
+    /**
+     * Kubernetes field selector to filter the pods (e.g. status.phase=Running)
+     */
+    fieldSelector?: string;
+  };
+  url: '/kubernetes/{id}/pods';
+};
+
+export type GetAllKubernetesPodsErrors = {
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the pods.
+   */
+  500: unknown;
+};
+
+export type GetAllKubernetesPodsResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesKubernetesPodListResponse;
+};
+
+export type GetAllKubernetesPodsResponse =
+  GetAllKubernetesPodsResponses[keyof GetAllKubernetesPodsResponses];
 
 export type GetKubernetesRbacStatusData = {
   body?: never;

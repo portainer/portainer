@@ -3,7 +3,10 @@ package cli
 import (
 	"context"
 	"errors"
+	"io"
 	"testing"
+
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -60,6 +63,136 @@ func TestDeletePod(t *testing.T) {
 		err := kcl.DeletePod("default", "my-pod")
 		require.Error(t, err)
 		assert.True(t, k8serrors.IsNotFound(err))
+	})
+}
+
+func TestGetPods(t *testing.T) {
+	t.Parallel()
+
+	newPod := func(name, namespace string) *v1.Pod {
+		return &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace}}
+	}
+
+	t.Run("admin gets all pods across namespaces", func(t *testing.T) {
+		t.Parallel()
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(
+			newPod("pod-a", "ns-a"),
+			newPod("pod-b", "ns-b"),
+		)}
+		kcl.SetIsKubeAdmin(true)
+
+		pods, err := kcl.GetPods("", models.K8sResourceListOptions{})
+		require.NoError(t, err)
+		assert.Len(t, pods, 2)
+	})
+
+	t.Run("admin scoped to a single namespace gets only that namespace's pods", func(t *testing.T) {
+		t.Parallel()
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(
+			newPod("pod-a", "ns-a"),
+			newPod("pod-b", "ns-b"),
+		)}
+		kcl.SetIsKubeAdmin(true)
+
+		pods, err := kcl.GetPods("ns-a", models.K8sResourceListOptions{})
+		require.NoError(t, err)
+		require.Len(t, pods, 1)
+		assert.Equal(t, "pod-a", pods[0].Name)
+	})
+
+	t.Run("labelSelector narrows results to matching pods", func(t *testing.T) {
+		t.Parallel()
+		web := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod-web", Namespace: "ns-a", Labels: map[string]string{"app": "web"}}}
+		db := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod-db", Namespace: "ns-a", Labels: map[string]string{"app": "db"}}}
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(web, db)}
+		kcl.SetIsKubeAdmin(true)
+
+		pods, err := kcl.GetPods("ns-a", models.K8sResourceListOptions{LabelSelector: "app=web"})
+		require.NoError(t, err)
+		require.Len(t, pods, 1)
+		assert.Equal(t, "pod-web", pods[0].Name)
+	})
+
+	t.Run("non-admin with no accessible namespaces gets no pods", func(t *testing.T) {
+		t.Parallel()
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(newPod("pod-a", "ns-a"))}
+		kcl.SetIsKubeAdmin(false)
+
+		pods, err := kcl.GetPods("", models.K8sResourceListOptions{})
+		require.NoError(t, err)
+		assert.Empty(t, pods)
+	})
+
+	t.Run("non-admin gets only pods in accessible namespaces", func(t *testing.T) {
+		t.Parallel()
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(
+			newPod("pod-a", "ns-a"),
+			newPod("pod-b", "ns-b"),
+			newPod("pod-c", "ns-c"),
+		)}
+		kcl.SetIsKubeAdmin(false)
+		kcl.SetClientNonAdminNamespaces([]string{"ns-a", "ns-c"})
+
+		pods, err := kcl.GetPods("", models.K8sResourceListOptions{})
+		require.NoError(t, err)
+		require.Len(t, pods, 2)
+		assert.ElementsMatch(t, []string{"pod-a", "pod-c"}, []string{pods[0].Name, pods[1].Name})
+	})
+
+	t.Run("non-admin never sees system namespace pods even when granted access", func(t *testing.T) {
+		t.Parallel()
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(
+			newPod("pod-a", "ns-a"),
+			newPod("kube-pod", "kube-system"),
+		)}
+		kcl.SetIsKubeAdmin(false)
+		kcl.SetClientNonAdminNamespaces([]string{"ns-a", "kube-system"})
+
+		pods, err := kcl.GetPods("", models.K8sResourceListOptions{})
+		require.NoError(t, err)
+		require.Len(t, pods, 1)
+		assert.Equal(t, "pod-a", pods[0].Name)
+	})
+}
+
+func TestGetPodLogsStream(t *testing.T) {
+	t.Parallel()
+
+	readAll := func(t *testing.T, rc io.ReadCloser) string {
+		t.Helper()
+		defer func() { _ = rc.Close() }()
+		data, err := io.ReadAll(rc)
+		require.NoError(t, err)
+		return string(data)
+	}
+
+	t.Run("returns the pod logs stream", func(t *testing.T) {
+		t.Parallel()
+		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "my-pod", Namespace: "default"}}
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(pod)}
+
+		stream, err := kcl.GetPodLogsStream(t.Context(), "default", "my-pod", v1.PodLogOptions{})
+		require.NoError(t, err)
+		assert.Equal(t, "fake logs", readAll(t, stream))
+	})
+
+	t.Run("passes options through without error", func(t *testing.T) {
+		t.Parallel()
+		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "my-pod", Namespace: "default"}}
+		kcl := &KubeClient{cli: kfake.NewSimpleClientset(pod)}
+
+		tail := int64(10)
+		since := int64(60)
+		stream, err := kcl.GetPodLogsStream(t.Context(), "default", "my-pod", v1.PodLogOptions{
+			Container:    "app",
+			TailLines:    &tail,
+			SinceSeconds: &since,
+			Timestamps:   true,
+			Previous:     true,
+			Follow:       true,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, "fake logs", readAll(t, stream))
 	})
 }
 

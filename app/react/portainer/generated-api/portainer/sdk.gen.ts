@@ -18,12 +18,18 @@ import type {
   BackupData,
   BackupErrors,
   BackupResponses,
+  CreateKubernetesDeploymentData,
+  CreateKubernetesDeploymentErrors,
+  CreateKubernetesDeploymentResponses,
   CreateKubernetesIngressData,
   CreateKubernetesIngressErrors,
   CreateKubernetesIngressResponses,
   CreateKubernetesNamespaceData,
   CreateKubernetesNamespaceErrors,
   CreateKubernetesNamespaceResponses,
+  CreateKubernetesPersistentVolumeClaimData,
+  CreateKubernetesPersistentVolumeClaimErrors,
+  CreateKubernetesPersistentVolumeClaimResponses,
   CreateKubernetesServiceData,
   CreateKubernetesServiceErrors,
   CreateKubernetesServiceResponses,
@@ -69,6 +75,9 @@ import type {
   DeleteJobsData,
   DeleteJobsErrors,
   DeleteJobsResponses,
+  DeleteKubernetesDeploymentData,
+  DeleteKubernetesDeploymentErrors,
+  DeleteKubernetesDeploymentResponses,
   DeleteKubernetesIngressesData,
   DeleteKubernetesIngressesErrors,
   DeleteKubernetesIngressesResponses,
@@ -282,6 +291,9 @@ import type {
   GetAllKubernetesConfigMapsData,
   GetAllKubernetesConfigMapsErrors,
   GetAllKubernetesConfigMapsResponses,
+  GetAllKubernetesDeploymentsData,
+  GetAllKubernetesDeploymentsErrors,
+  GetAllKubernetesDeploymentsResponses,
   GetAllKubernetesEventsData,
   GetAllKubernetesEventsErrors,
   GetAllKubernetesEventsResponses,
@@ -297,6 +309,9 @@ import type {
   GetAllKubernetesPersistentVolumesData,
   GetAllKubernetesPersistentVolumesErrors,
   GetAllKubernetesPersistentVolumesResponses,
+  GetAllKubernetesPodsData,
+  GetAllKubernetesPodsErrors,
+  GetAllKubernetesPodsResponses,
   GetAllKubernetesServicesCountData,
   GetAllKubernetesServicesCountErrors,
   GetAllKubernetesServicesCountResponses,
@@ -327,9 +342,18 @@ import type {
   GetKubernetesDashboardData,
   GetKubernetesDashboardErrors,
   GetKubernetesDashboardResponses,
+  GetKubernetesDeploymentData,
+  GetKubernetesDeploymentErrors,
+  GetKubernetesDeploymentResponses,
+  GetKubernetesDeploymentsForNamespaceData,
+  GetKubernetesDeploymentsForNamespaceErrors,
+  GetKubernetesDeploymentsForNamespaceResponses,
   GetKubernetesEventsForNamespaceData,
   GetKubernetesEventsForNamespaceErrors,
   GetKubernetesEventsForNamespaceResponses,
+  GetKubernetesIngressClassesData,
+  GetKubernetesIngressClassesErrors,
+  GetKubernetesIngressClassesResponses,
   GetKubernetesIngressControllersByNamespaceData,
   GetKubernetesIngressControllersByNamespaceErrors,
   GetKubernetesIngressControllersByNamespaceResponses,
@@ -378,9 +402,21 @@ import type {
   GetKubernetesPersistentVolumeData,
   GetKubernetesPersistentVolumeErrors,
   GetKubernetesPersistentVolumeResponses,
+  GetKubernetesPodLogsData,
+  GetKubernetesPodLogsErrors,
+  GetKubernetesPodLogsResponses,
+  GetKubernetesPodsForNamespaceData,
+  GetKubernetesPodsForNamespaceErrors,
+  GetKubernetesPodsForNamespaceResponses,
   GetKubernetesRbacStatusData,
   GetKubernetesRbacStatusErrors,
   GetKubernetesRbacStatusResponses,
+  GetKubernetesReplicaSetsData,
+  GetKubernetesReplicaSetsErrors,
+  GetKubernetesReplicaSetsResponses,
+  GetKubernetesResourceQuotasData,
+  GetKubernetesResourceQuotasErrors,
+  GetKubernetesResourceQuotasResponses,
   GetKubernetesRoleBindingsData,
   GetKubernetesRoleBindingsErrors,
   GetKubernetesRoleBindingsResponses,
@@ -521,6 +557,9 @@ import type {
   LogoutResponses,
   MotdData,
   MotdResponses,
+  PatchKubernetesDeploymentData,
+  PatchKubernetesDeploymentErrors,
+  PatchKubernetesDeploymentResponses,
   PostEndpointGroupsData,
   PostEndpointGroupsErrors,
   PostEndpointGroupsResponses,
@@ -578,6 +617,12 @@ import type {
   RoleListData,
   RoleListErrors,
   RoleListResponses,
+  RollbackKubernetesDeploymentData,
+  RollbackKubernetesDeploymentErrors,
+  RollbackKubernetesDeploymentResponses,
+  ScaleKubernetesDeploymentData,
+  ScaleKubernetesDeploymentErrors,
+  ScaleKubernetesDeploymentResponses,
   SetDefaultKubernetesStorageClassData,
   SetDefaultKubernetesStorageClassErrors,
   SetDefaultKubernetesStorageClassResponses,
@@ -716,6 +761,9 @@ import type {
   TemplateListData,
   TemplateListErrors,
   TemplateListResponses,
+  UpdateKubernetesDeploymentData,
+  UpdateKubernetesDeploymentErrors,
+  UpdateKubernetesDeploymentResponses,
   UpdateKubernetesIngressControllersByNamespaceData,
   UpdateKubernetesIngressControllersByNamespaceErrors,
   UpdateKubernetesIngressControllersByNamespaceResponses,
@@ -793,12 +841,18 @@ import {
   zAuthenticateUserBody,
   zAuthenticateUserResponse,
   zBackupBody,
+  zCreateKubernetesDeploymentBody,
+  zCreateKubernetesDeploymentPath,
+  zCreateKubernetesDeploymentResponse,
   zCreateKubernetesIngressBody,
   zCreateKubernetesIngressPath,
   zCreateKubernetesIngressResponse,
   zCreateKubernetesNamespaceBody,
   zCreateKubernetesNamespacePath,
   zCreateKubernetesNamespaceResponse,
+  zCreateKubernetesPersistentVolumeClaimBody,
+  zCreateKubernetesPersistentVolumeClaimPath,
+  zCreateKubernetesPersistentVolumeClaimResponse,
   zCreateKubernetesServiceBody,
   zCreateKubernetesServicePath,
   zCreateKubernetesServiceResponse,
@@ -834,6 +888,8 @@ import {
   zDeleteJobsBody,
   zDeleteJobsPath,
   zDeleteJobsResponse,
+  zDeleteKubernetesDeploymentPath,
+  zDeleteKubernetesDeploymentResponse,
   zDeleteKubernetesIngressesBody,
   zDeleteKubernetesIngressesPath,
   zDeleteKubernetesIngressesResponse,
@@ -999,6 +1055,9 @@ import {
   zGetAllKubernetesConfigMapsPath,
   zGetAllKubernetesConfigMapsQuery,
   zGetAllKubernetesConfigMapsResponse,
+  zGetAllKubernetesDeploymentsPath,
+  zGetAllKubernetesDeploymentsQuery,
+  zGetAllKubernetesDeploymentsResponse,
   zGetAllKubernetesEventsPath,
   zGetAllKubernetesEventsQuery,
   zGetAllKubernetesEventsResponse,
@@ -1011,6 +1070,9 @@ import {
   zGetAllKubernetesPersistentVolumeClaimsResponse,
   zGetAllKubernetesPersistentVolumesPath,
   zGetAllKubernetesPersistentVolumesResponse,
+  zGetAllKubernetesPodsPath,
+  zGetAllKubernetesPodsQuery,
+  zGetAllKubernetesPodsResponse,
   zGetAllKubernetesServicesCountPath,
   zGetAllKubernetesServicesCountResponse,
   zGetAllKubernetesStorageClassesPath,
@@ -1033,9 +1095,16 @@ import {
   zGetKubernetesCronJobsResponse,
   zGetKubernetesDashboardPath,
   zGetKubernetesDashboardResponse,
+  zGetKubernetesDeploymentPath,
+  zGetKubernetesDeploymentResponse,
+  zGetKubernetesDeploymentsForNamespacePath,
+  zGetKubernetesDeploymentsForNamespaceQuery,
+  zGetKubernetesDeploymentsForNamespaceResponse,
   zGetKubernetesEventsForNamespacePath,
   zGetKubernetesEventsForNamespaceQuery,
   zGetKubernetesEventsForNamespaceResponse,
+  zGetKubernetesIngressClassesPath,
+  zGetKubernetesIngressClassesResponse,
   zGetKubernetesIngressControllersByNamespacePath,
   zGetKubernetesIngressControllersByNamespaceResponse,
   zGetKubernetesIngressPath,
@@ -1071,8 +1140,19 @@ import {
   zGetKubernetesPersistentVolumeClaimsInNamespaceResponse,
   zGetKubernetesPersistentVolumePath,
   zGetKubernetesPersistentVolumeResponse,
+  zGetKubernetesPodLogsPath,
+  zGetKubernetesPodLogsQuery,
+  zGetKubernetesPodLogsResponse,
+  zGetKubernetesPodsForNamespacePath,
+  zGetKubernetesPodsForNamespaceQuery,
+  zGetKubernetesPodsForNamespaceResponse,
   zGetKubernetesRbacStatusPath,
   zGetKubernetesRbacStatusResponse,
+  zGetKubernetesReplicaSetsPath,
+  zGetKubernetesReplicaSetsQuery,
+  zGetKubernetesReplicaSetsResponse,
+  zGetKubernetesResourceQuotasPath,
+  zGetKubernetesResourceQuotasResponse,
   zGetKubernetesRoleBindingsPath,
   zGetKubernetesRoleBindingsResponse,
   zGetKubernetesRolesPath,
@@ -1175,6 +1255,9 @@ import {
   zLdapCheckResponse,
   zLogoutResponse,
   zMotdResponse,
+  zPatchKubernetesDeploymentBody,
+  zPatchKubernetesDeploymentPath,
+  zPatchKubernetesDeploymentResponse,
   zPostEndpointGroupsBody,
   zPostEndpointGroupsResponse,
   zPostEndpointsByIdDockerV2BrowsePutBody,
@@ -1217,6 +1300,12 @@ import {
   zRestoreBody,
   zRestoreHeaders,
   zRoleListResponse,
+  zRollbackKubernetesDeploymentBody,
+  zRollbackKubernetesDeploymentPath,
+  zRollbackKubernetesDeploymentResponse,
+  zScaleKubernetesDeploymentBody,
+  zScaleKubernetesDeploymentPath,
+  zScaleKubernetesDeploymentResponse,
   zSetDefaultKubernetesStorageClassPath,
   zSetDefaultKubernetesStorageClassResponse,
   zSettingsInspectResponse,
@@ -1324,6 +1413,9 @@ import {
   zTemplateFilePath,
   zTemplateFileResponse,
   zTemplateListResponse,
+  zUpdateKubernetesDeploymentBody,
+  zUpdateKubernetesDeploymentPath,
+  zUpdateKubernetesDeploymentResponse,
   zUpdateKubernetesIngressBody,
   zUpdateKubernetesIngressControllersBody,
   zUpdateKubernetesIngressControllersByNamespaceBody,
@@ -5002,6 +5094,45 @@ export const getKubernetesDashboard = <ThrowOnError extends boolean = true>(
   });
 
 /**
+ * Get Kubernetes deployments
+ *
+ * Get the list of Kubernetes deployments across all namespaces the user can access.
+ * **Access policy**: Authenticated user.
+ */
+export const getAllKubernetesDeployments = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<GetAllKubernetesDeploymentsData, ThrowOnError>
+): RequestResult<
+  GetAllKubernetesDeploymentsResponses,
+  GetAllKubernetesDeploymentsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetAllKubernetesDeploymentsResponses,
+    GetAllKubernetesDeploymentsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetAllKubernetesDeploymentsPath,
+          query: zGetAllKubernetesDeploymentsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetAllKubernetesDeploymentsResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/deployments',
+    ...options,
+  });
+
+/**
  * Get a description of a kubernetes resource
  *
  * Get a description of a kubernetes resource.
@@ -5072,6 +5203,46 @@ export const getAllKubernetesEvents = <ThrowOnError extends boolean = true>(
       { name: 'Authorization', type: 'apiKey' },
     ],
     url: '/kubernetes/{id}/events',
+    ...options,
+  });
+
+/**
+ * Get Kubernetes ingress classes
+ *
+ * Get the list of Kubernetes ingress classes (cluster-scoped), as read
+ * models, distinct from the ingress controllers returned by /ingresscontrollers.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesIngressClasses = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<GetKubernetesIngressClassesData, ThrowOnError>
+): RequestResult<
+  GetKubernetesIngressClassesResponses,
+  GetKubernetesIngressClassesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesIngressClassesResponses,
+    GetKubernetesIngressClassesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesIngressClassesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesIngressClassesResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/ingressclasses',
     ...options,
   });
 
@@ -5854,6 +6025,338 @@ export const getKubernetesConfigMap = <ThrowOnError extends boolean = true>(
   });
 
 /**
+ * Get Kubernetes deployments within a namespace
+ *
+ * Get the list of Kubernetes deployments in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesDeploymentsForNamespace = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<GetKubernetesDeploymentsForNamespaceData, ThrowOnError>
+): RequestResult<
+  GetKubernetesDeploymentsForNamespaceResponses,
+  GetKubernetesDeploymentsForNamespaceErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesDeploymentsForNamespaceResponses,
+    GetKubernetesDeploymentsForNamespaceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesDeploymentsForNamespacePath,
+          query: zGetKubernetesDeploymentsForNamespaceQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesDeploymentsForNamespaceResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments',
+    ...options,
+  });
+
+/**
+ * Create a Kubernetes deployment
+ *
+ * Create a deployment in the given namespace. The namespace comes from the
+ * route, and the payload models the fields the deployment forms drive.
+ * **Access policy**: Authenticated user.
+ */
+export const createKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<CreateKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  CreateKubernetesDeploymentResponses,
+  CreateKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateKubernetesDeploymentResponses,
+    CreateKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateKubernetesDeploymentBody,
+          path: zCreateKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zCreateKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a Kubernetes deployment
+ *
+ * Delete a deployment in the given namespace. The replica sets and pods it
+ * owns are garbage collected by the cluster.
+ * **Access policy**: Authenticated user.
+ */
+export const deleteKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<DeleteKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  DeleteKubernetesDeploymentResponses,
+  DeleteKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteKubernetesDeploymentResponses,
+    DeleteKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}',
+    ...options,
+  });
+
+/**
+ * Get a Kubernetes deployment
+ *
+ * Get a Kubernetes deployment in the given namespace. The response is
+ * trimmed of server-managed and heavy fields (managed fields,
+ * last-applied-config annotation) while preserving the full pod template,
+ * spec and resourceVersion so an edit form can be reconstructed from the
+ * live cluster and the workload subsequently updated.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<GetKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  GetKubernetesDeploymentResponses,
+  GetKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesDeploymentResponses,
+    GetKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}',
+    ...options,
+  });
+
+/**
+ * Annotate a Kubernetes deployment
+ *
+ * Add or overwrite annotations on a deployment and on the pods it creates.
+ * Annotations the payload does not name are kept. Changing a pod annotation
+ * rolls the workload, which is how a rollout restart is triggered.
+ * **Access policy**: Authenticated user.
+ */
+export const patchKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<PatchKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  PatchKubernetesDeploymentResponses,
+  PatchKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    PatchKubernetesDeploymentResponses,
+    PatchKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPatchKubernetesDeploymentBody,
+          path: zPatchKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zPatchKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Update a Kubernetes deployment
+ *
+ * Update a deployment in the given namespace. The payload is merged onto the
+ * live deployment: fields it does not model, such as the update strategy or
+ * the pod affinity rules, are preserved, and a field left out leaves the live
+ * value untouched. The selector is immutable and is ignored.
+ * **Access policy**: Authenticated user.
+ */
+export const updateKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<UpdateKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  UpdateKubernetesDeploymentResponses,
+  UpdateKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateKubernetesDeploymentResponses,
+    UpdateKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateKubernetesDeploymentBody,
+          path: zUpdateKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zUpdateKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Roll a Kubernetes deployment back
+ *
+ * Roll a deployment back to an earlier revision by replaying the pod template
+ * the corresponding replica set recorded. A revision of 0, or an omitted one,
+ * selects the revision immediately before the current.
+ * **Access policy**: Authenticated user.
+ */
+export const rollbackKubernetesDeployment = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<RollbackKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  RollbackKubernetesDeploymentResponses,
+  RollbackKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RollbackKubernetesDeploymentResponses,
+    RollbackKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRollbackKubernetesDeploymentBody,
+          path: zRollbackKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zRollbackKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}/rollback',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Scale a Kubernetes deployment
+ *
+ * Set the desired replica count of a deployment in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const scaleKubernetesDeployment = <ThrowOnError extends boolean = true>(
+  options: Options<ScaleKubernetesDeploymentData, ThrowOnError>
+): RequestResult<
+  ScaleKubernetesDeploymentResponses,
+  ScaleKubernetesDeploymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    ScaleKubernetesDeploymentResponses,
+    ScaleKubernetesDeploymentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zScaleKubernetesDeploymentBody,
+          path: zScaleKubernetesDeploymentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zScaleKubernetesDeploymentResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/deployments/{name}/scale',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Gets kubernetes events for namespace
  *
  * Get events by optional query param resourceId for a given namespace.
@@ -6179,6 +6682,51 @@ export const getKubernetesPersistentVolumeClaimsInNamespace = <
   });
 
 /**
+ * Create a PersistentVolumeClaim
+ *
+ * Create a PersistentVolumeClaim in the given namespace. The access mode
+ * defaults to ReadWriteOnce and an omitted storage class leaves the choice to
+ * the cluster default.
+ * **Access policy**: Authenticated user.
+ */
+export const createKubernetesPersistentVolumeClaim = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<CreateKubernetesPersistentVolumeClaimData, ThrowOnError>
+): RequestResult<
+  CreateKubernetesPersistentVolumeClaimResponses,
+  CreateKubernetesPersistentVolumeClaimErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateKubernetesPersistentVolumeClaimResponses,
+    CreateKubernetesPersistentVolumeClaimErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateKubernetesPersistentVolumeClaimBody,
+          path: zCreateKubernetesPersistentVolumeClaimPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zCreateKubernetesPersistentVolumeClaimResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/persistent_volume_claims',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get a specific PersistentVolumeClaim
  *
  * Get a PersistentVolumeClaim by name within a namespace.
@@ -6214,6 +6762,45 @@ export const getKubernetesPersistentVolumeClaim = <
       { name: 'Authorization', type: 'apiKey' },
     ],
     url: '/kubernetes/{id}/namespaces/{namespace}/persistent_volume_claims/{name}',
+    ...options,
+  });
+
+/**
+ * Get Kubernetes pods within a namespace
+ *
+ * Get the list of Kubernetes pods in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesPodsForNamespace = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<GetKubernetesPodsForNamespaceData, ThrowOnError>
+): RequestResult<
+  GetKubernetesPodsForNamespaceResponses,
+  GetKubernetesPodsForNamespaceErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesPodsForNamespaceResponses,
+    GetKubernetesPodsForNamespaceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesPodsForNamespacePath,
+          query: zGetKubernetesPodsForNamespaceQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesPodsForNamespaceResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/pods',
     ...options,
   });
 
@@ -6256,6 +6843,46 @@ export const deleteKubernetesPod = <ThrowOnError extends boolean = true>(
   });
 
 /**
+ * Get logs for a Kubernetes pod
+ *
+ * Stream the logs for a pod in the given namespace as text/plain. When
+ * follow is set the response stays open and emits new log lines until the
+ * client disconnects. When the pod has more than one container, the
+ * container query parameter is required.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesPodLogs = <ThrowOnError extends boolean = true>(
+  options: Options<GetKubernetesPodLogsData, ThrowOnError>
+): RequestResult<
+  GetKubernetesPodLogsResponses,
+  GetKubernetesPodLogsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesPodLogsResponses,
+    GetKubernetesPodLogsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesPodLogsPath,
+          query: zGetKubernetesPodLogsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'text',
+    responseValidator: async (data) =>
+      await zGetKubernetesPodLogsResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/pods/{name}/log',
+    ...options,
+  });
+
+/**
  * Restart all containers in a Kubernetes pod
  *
  * Restart all containers in a single Kubernetes pod in place using
@@ -6291,6 +6918,84 @@ export const restartKubernetesPod = <ThrowOnError extends boolean = true>(
       { name: 'Authorization', type: 'apiKey' },
     ],
     url: '/kubernetes/{id}/namespaces/{namespace}/pods/{name}/restart',
+    ...options,
+  });
+
+/**
+ * Get Kubernetes replica sets within a namespace
+ *
+ * Get the list of Kubernetes replica sets in the given namespace, optionally
+ * restricted to those owned by a given deployment. This backs the deployment
+ * revisions view. The response uses the Kubernetes list shape ({items: [...]}).
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesReplicaSets = <ThrowOnError extends boolean = true>(
+  options: Options<GetKubernetesReplicaSetsData, ThrowOnError>
+): RequestResult<
+  GetKubernetesReplicaSetsResponses,
+  GetKubernetesReplicaSetsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesReplicaSetsResponses,
+    GetKubernetesReplicaSetsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesReplicaSetsPath,
+          query: zGetKubernetesReplicaSetsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesReplicaSetsResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/replicasets',
+    ...options,
+  });
+
+/**
+ * Get Kubernetes resource quotas within a namespace
+ *
+ * Get the list of Kubernetes resource quotas in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesResourceQuotas = <
+  ThrowOnError extends boolean = true,
+>(
+  options: Options<GetKubernetesResourceQuotasData, ThrowOnError>
+): RequestResult<
+  GetKubernetesResourceQuotasResponses,
+  GetKubernetesResourceQuotasErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesResourceQuotasResponses,
+    GetKubernetesResourceQuotasErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesResourceQuotasPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesResourceQuotasResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/resource_quotas',
     ...options,
   });
 
@@ -7054,6 +7759,43 @@ export const updateKubernetesPersistentVolumeReclaimPolicy = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Kubernetes pods
+ *
+ * Get the list of Kubernetes pods across all namespaces the user can access.
+ * **Access policy**: Authenticated user.
+ */
+export const getAllKubernetesPods = <ThrowOnError extends boolean = true>(
+  options: Options<GetAllKubernetesPodsData, ThrowOnError>
+): RequestResult<
+  GetAllKubernetesPodsResponses,
+  GetAllKubernetesPodsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetAllKubernetesPodsResponses,
+    GetAllKubernetesPodsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetAllKubernetesPodsPath,
+          query: zGetAllKubernetesPodsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetAllKubernetesPodsResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/pods',
+    ...options,
   });
 
 /**

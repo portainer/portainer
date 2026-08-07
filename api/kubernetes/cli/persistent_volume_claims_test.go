@@ -3,11 +3,13 @@ package cli
 import (
 	"testing"
 
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kfake "k8s.io/client-go/kubernetes/fake"
@@ -374,5 +376,74 @@ func TestCombineClaimsWithApplications(t *testing.T) {
 		result, err := k.CombineClaimsWithApplications(pvcs)
 		require.NoError(t, err)
 		assert.Empty(t, result[0].OwningApplications)
+	})
+}
+
+func TestCreatePersistentVolumeClaim(t *testing.T) {
+	t.Parallel()
+
+	t.Run("creates the claim with the requested storage and class", func(t *testing.T) {
+		t.Parallel()
+		k := NewTestKubeClient(kfake.NewClientset())
+		storageClass := "fast"
+
+		created, err := k.CreatePersistentVolumeClaim("default", models.K8sPersistentVolumeClaimCreateRequest{
+			Name:         "web-data",
+			Storage:      "1Gi",
+			StorageClass: storageClass,
+			Labels:       map[string]string{"app": "web"},
+		})
+		require.NoError(t, err)
+		assert.Equal(t, "web-data", created.Name)
+		assert.Equal(t, "1Gi", created.StorageRequest)
+
+		stored, err := k.cli.CoreV1().PersistentVolumeClaims("default").Get(t.Context(), "web-data", metav1.GetOptions{})
+		require.NoError(t, err)
+		assert.Equal(t, resource.MustParse("1Gi"), stored.Spec.Resources.Requests[corev1.ResourceStorage])
+		require.NotNil(t, stored.Spec.StorageClassName)
+		assert.Equal(t, storageClass, *stored.Spec.StorageClassName)
+		assert.Equal(t, map[string]string{"app": "web"}, stored.Labels)
+	})
+
+	t.Run("defaults the access mode and leaves the storage class to the cluster", func(t *testing.T) {
+		t.Parallel()
+		k := NewTestKubeClient(kfake.NewClientset())
+
+		_, err := k.CreatePersistentVolumeClaim("default", models.K8sPersistentVolumeClaimCreateRequest{
+			Name:    "web-data",
+			Storage: "1Gi",
+		})
+		require.NoError(t, err)
+
+		stored, err := k.cli.CoreV1().PersistentVolumeClaims("default").Get(t.Context(), "web-data", metav1.GetOptions{})
+		require.NoError(t, err)
+		assert.Equal(t, []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce}, stored.Spec.AccessModes)
+		assert.Nil(t, stored.Spec.StorageClassName, "an empty class must stay unset so the default applies")
+	})
+
+	t.Run("rejects a storage size that is not a quantity", func(t *testing.T) {
+		t.Parallel()
+		k := NewTestKubeClient(kfake.NewClientset())
+
+		_, err := k.CreatePersistentVolumeClaim("default", models.K8sPersistentVolumeClaimCreateRequest{
+			Name:    "web-data",
+			Storage: "1 gigabyte",
+		})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, resource.ErrFormatWrong)
+	})
+
+	t.Run("reports a conflict when the claim already exists", func(t *testing.T) {
+		t.Parallel()
+		k := NewTestKubeClient(kfake.NewClientset(&corev1.PersistentVolumeClaim{
+			ObjectMeta: metav1.ObjectMeta{Name: "web-data", Namespace: "default"},
+		}))
+
+		_, err := k.CreatePersistentVolumeClaim("default", models.K8sPersistentVolumeClaimCreateRequest{
+			Name:    "web-data",
+			Storage: "1Gi",
+		})
+		require.Error(t, err)
+		assert.True(t, k8serrors.IsAlreadyExists(err), "expected an already exists error, got %v", err)
 	})
 }

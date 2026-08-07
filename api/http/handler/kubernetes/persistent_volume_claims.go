@@ -8,6 +8,7 @@ import (
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/rs/zerolog/log"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -234,4 +235,58 @@ func (handler *Handler) resizeKubernetesPersistentVolumeClaim(w http.ResponseWri
 	}
 
 	return response.Empty(w)
+}
+
+// @id CreateKubernetesPersistentVolumeClaim
+// @summary Create a PersistentVolumeClaim
+// @description Create a PersistentVolumeClaim in the given namespace. The access mode
+// @description defaults to ReadWriteOnce and an omitted storage class leaves the choice to
+// @description the cluster default.
+// @description **Access policy**: Authenticated user.
+// @tags kubernetes
+// @security ApiKeyAuth || jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment(Endpoint) identifier"
+// @param namespace path string true "Namespace"
+// @param body body models.K8sPersistentVolumeClaimCreateRequest true "PersistentVolumeClaim definition"
+// @success 200 {object} models.K8sPersistentVolumeClaim "Success"
+// @failure 400 "Invalid request payload, such as missing required fields or a storage size that is not a valid quantity."
+// @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
+// @failure 409 "A persistent volume claim with the same name already exists in the namespace."
+// @failure 500 "Server error occurred while attempting to create the persistent volume claim."
+// @router /kubernetes/{id}/namespaces/{namespace}/persistent_volume_claims [post]
+func (handler *Handler) createKubernetesPersistentVolumeClaim(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
+	if err != nil {
+		log.Error().Err(err).Str("context", "CreateKubernetesPersistentVolumeClaim").Msg("Unable to retrieve namespace route variable")
+		return httperror.BadRequest("Unable to retrieve namespace route variable", err)
+	}
+
+	var payload models.K8sPersistentVolumeClaimCreateRequest
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		log.Error().Err(err).Str("context", "CreateKubernetesPersistentVolumeClaim").Str("namespace", namespace).Msg("Unable to decode and validate the request payload")
+		return httperror.BadRequest("Unable to decode and validate the request payload", err)
+	}
+
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		log.Error().Err(httpErr).Str("context", "CreateKubernetesPersistentVolumeClaim").Str("namespace", namespace).Str("name", payload.Name).Msg("Unable to get a Kubernetes client for the user")
+		return httperror.InternalServerError("Unable to get a Kubernetes client for the user", httpErr)
+	}
+
+	claim, err := cli.CreatePersistentVolumeClaim(namespace, payload)
+	if err != nil {
+		// An unparsable storage size is caught before the cluster is called, so it is the
+		// payload that is at fault rather than the cluster.
+		if errors.Is(err, resource.ErrFormatWrong) {
+			log.Error().Err(err).Str("context", "CreateKubernetesPersistentVolumeClaim").Str("namespace", namespace).Str("name", payload.Name).Msg("Invalid storage size in the request payload")
+			return httperror.BadRequest("Invalid storage size in the request payload", err)
+		}
+
+		return writeErrorResponse(err, "CreateKubernetesPersistentVolumeClaim", namespace, payload.Name, "create the persistent volume claim")
+	}
+
+	return response.JSON(w, claim)
 }

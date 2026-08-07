@@ -90,6 +90,20 @@ type (
 		Name          string                               `json:"name"`
 		ReclaimPolicy corev1.PersistentVolumeReclaimPolicy `json:"reclaimPolicy"`
 	}
+
+	// K8sPersistentVolumeClaimCreateRequest represents a request to create a PVC. The
+	// namespace comes from the request route rather than the payload, and the storage
+	// class is left to the cluster default when empty. AccessModes defaults to
+	// ReadWriteOnce, the only mode a single-writer workload needs.
+	K8sPersistentVolumeClaimCreateRequest struct {
+		Name         string                              `json:"name"`
+		Storage      string                              `json:"storage"`
+		StorageClass string                              `json:"storageClass,omitempty"`
+		AccessModes  []corev1.PersistentVolumeAccessMode `json:"accessModes,omitempty"`
+		VolumeMode   *corev1.PersistentVolumeMode        `json:"volumeMode,omitempty"`
+		Labels       map[string]string                   `json:"labels,omitempty"`
+		Annotations  map[string]string                   `json:"annotations,omitempty"`
+	}
 )
 
 func (r K8sPVDeleteRequest) Validate(_ *http.Request) error {
@@ -141,5 +155,19 @@ func (r *K8sPVReclaimPolicyRequest) Validate(_ *http.Request) error {
 		return errors.New("missing reclaim policy from the request payload")
 	}
 
+	return nil
+}
+
+func (r *K8sPersistentVolumeClaimCreateRequest) Validate(_ *http.Request) error {
+	if r.Name == "" {
+		return errors.New("missing PVC name from the request payload")
+	}
+
+	if r.Storage == "" {
+		return errors.New("missing storage size from the request payload")
+	}
+
+	// The quantity notation is checked by the Kubernetes API, which reports the offending
+	// value precisely.
 	return nil
 }

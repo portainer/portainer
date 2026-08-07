@@ -21,6 +21,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/segmentio/encoding/json"
 	"golang.org/x/oauth2"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/client-go/tools/remotecommand"
@@ -1924,6 +1925,7 @@ type (
 		HasStackName(namespace string, stackName string) (bool, error)
 
 		// Ingress
+		GetIngressClasses() ([]models.K8sIngressClass, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
 		GetIngress(namespace, ingressName string) (models.K8sIngressInfo, error)
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
@@ -1956,10 +1958,28 @@ type (
 		GetMaxResourceLimits(skipNamespace string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
 
 		// Pod
+		GetPods(namespace string, opts models.K8sResourceListOptions) ([]corev1.Pod, error)
+		GetPodLogsStream(ctx context.Context, namespace, podName string, opts corev1.PodLogOptions) (io.ReadCloser, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		DeletePod(namespace, name string) error
 		RestartPod(namespace, name string) error
 		SupportsPodRestart(ctx context.Context) (bool, error)
+
+		// ReplicaSet
+		GetReplicaSets(namespace, ownerDeployment string, opts models.K8sResourceListOptions) ([]appsv1.ReplicaSet, error)
+
+		// Deployment
+		GetDeployment(namespace, name string) (*appsv1.Deployment, error)
+		GetDeployments(namespace string, opts models.K8sResourceListOptions) ([]appsv1.Deployment, error)
+		CreateDeployment(namespace string, request models.K8sDeploymentWriteRequest) (*appsv1.Deployment, error)
+		UpdateDeployment(namespace string, request models.K8sDeploymentWriteRequest) (*appsv1.Deployment, error)
+		ScaleDeployment(namespace, name string, replicas int32) (*appsv1.Deployment, error)
+		PatchDeployment(namespace, name string, request models.K8sDeploymentPatchRequest) (*appsv1.Deployment, error)
+		RolloutUndo(namespace, name string, revision int64) (*appsv1.Deployment, error)
+		DeleteDeployment(namespace, name string) error
+
+		// ResourceQuota
+		GetResourceQuotas(namespace string) (*[]corev1.ResourceQuota, error)
 
 		// RBAC
 		IsRBACEnabled() (bool, error)
@@ -2027,6 +2047,7 @@ type (
 		// PersistentVolumeClaim
 		GetPersistentVolumeClaims(namespace string) ([]models.K8sPersistentVolumeClaim, error)
 		GetPersistentVolumeClaim(namespace, name string) (*models.K8sPersistentVolumeClaim, error)
+		CreatePersistentVolumeClaim(namespace string, request models.K8sPersistentVolumeClaimCreateRequest) (*models.K8sPersistentVolumeClaim, error)
 		DeletePersistentVolumeClaims(reqs models.K8sVolumeDeleteRequests) error
 		ResizePersistentVolumeClaim(namespace, name, newSize string) error
 	}

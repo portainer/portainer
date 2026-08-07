@@ -149,3 +149,31 @@ func TestCombineIngressesWithServices_ScopesLookupByNamespace(t *testing.T) {
 	assert.True(t, result[0].Paths[0].HasService)
 	assert.Equal(t, 8080, result[0].Paths[0].Port)
 }
+
+func TestGetIngressClasses(t *testing.T) {
+	t.Parallel()
+	kcl := &KubeClient{cli: kfake.NewSimpleClientset(
+		&netv1.IngressClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        "nginx",
+				Annotations: map[string]string{"ingressclass.kubernetes.io/is-default-class": "true"},
+			},
+			Spec: netv1.IngressClassSpec{Controller: "k8s.io/ingress-nginx"},
+		},
+		&netv1.IngressClass{ObjectMeta: metav1.ObjectMeta{Name: "traefik"}},
+	)}
+
+	classes, err := kcl.GetIngressClasses()
+	require.NoError(t, err)
+	require.Len(t, classes, 2)
+
+	byName := map[string]models.K8sIngressClass{}
+	for _, c := range classes {
+		byName[c.Name] = c
+	}
+	require.Contains(t, byName, "nginx")
+	require.Contains(t, byName, "traefik")
+	assert.Equal(t, "k8s.io/ingress-nginx", byName["nginx"].Controller)
+	assert.True(t, byName["nginx"].IsDefault, "default-class annotation maps to IsDefault")
+	assert.False(t, byName["traefik"].IsDefault)
+}

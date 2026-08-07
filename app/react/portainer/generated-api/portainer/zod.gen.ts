@@ -382,6 +382,12 @@ export const zKubernetesK8sConfigMap = z.object({
   UID: z.string().optional(),
 });
 
+export const zKubernetesK8sContainerPort = z.object({
+  containerPort: z.int().optional(),
+  name: z.string().optional(),
+  protocol: z.string().optional(),
+});
+
 export const zKubernetesK8sCronJobDeleteRequests = z.record(
   z.string(),
   z.array(z.string())
@@ -395,6 +401,19 @@ export const zKubernetesK8sDashboard = z.object({
   secretsCount: z.int().optional(),
   servicesCount: z.int().optional(),
   volumesCount: z.int().optional(),
+});
+
+export const zKubernetesK8sDeploymentPatchRequest = z.object({
+  annotations: z.record(z.string(), z.string()).optional(),
+  podAnnotations: z.record(z.string(), z.string()).optional(),
+});
+
+export const zKubernetesK8sDeploymentRollbackRequest = z.object({
+  revision: z.int().optional(),
+});
+
+export const zKubernetesK8sDeploymentScaleRequest = z.object({
+  replicas: z.int().optional(),
 });
 
 export const zKubernetesK8sEventInvolvedObject = z.object({
@@ -417,6 +436,13 @@ export const zKubernetesK8sEvent = z.object({
   reason: z.string().optional(),
   type: z.string().optional(),
   uid: z.string().optional(),
+});
+
+export const zKubernetesK8sIngressClass = z.object({
+  Annotations: z.record(z.string(), z.string()).optional(),
+  Controller: z.string().optional(),
+  IsDefault: z.boolean().optional(),
+  Name: z.string().optional(),
 });
 
 export const zKubernetesK8sIngressController = z.object({
@@ -474,6 +500,11 @@ export const zKubernetesK8sPvcResizeRequest = z.object({
   newSize: z.string().optional(),
 });
 
+export const zKubernetesK8sPodVolume = z.object({
+  claimName: z.string().optional(),
+  name: z.string().optional(),
+});
+
 export const zKubernetesK8sResourceQuota = z.object({
   cpu: z.string().optional(),
   enabled: z.boolean().optional(),
@@ -485,6 +516,11 @@ export const zKubernetesK8sNamespaceDetails = z.object({
   Name: z.string().optional(),
   Owner: z.string().optional(),
   ResourceQuota: zKubernetesK8sResourceQuota.optional(),
+});
+
+export const zKubernetesK8sResourceRequirements = z.object({
+  limits: z.record(z.string(), z.string()).optional(),
+  requests: z.record(z.string(), z.string()).optional(),
 });
 
 export const zKubernetesK8sRole = z.object({
@@ -520,6 +556,17 @@ export const zKubernetesK8sSecret = z.object({
   Namespace: z.string().optional(),
   SecretType: z.string().optional(),
   UID: z.string().optional(),
+});
+
+export const zKubernetesK8sSecretKeyRef = z.object({
+  key: z.string().optional(),
+  name: z.string().optional(),
+});
+
+export const zKubernetesK8sEnvVar = z.object({
+  name: z.string().optional(),
+  secretRef: zKubernetesK8sSecretKeyRef.optional(),
+  value: z.string().optional(),
 });
 
 export const zKubernetesK8sServiceAccount = z.object({
@@ -565,6 +612,43 @@ export const zKubernetesK8sServicePort = z.object({
 export const zKubernetesK8sVolumeDeleteRequest = z.object({
   name: z.string().optional(),
   namespace: z.string().optional(),
+});
+
+export const zKubernetesK8sVolumeMount = z.object({
+  mountPath: z.string().optional(),
+  name: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  subPath: z.string().optional(),
+});
+
+export const zKubernetesK8sContainer = z.object({
+  args: z.array(z.string()).optional(),
+  command: z.array(z.string()).optional(),
+  env: z.array(zKubernetesK8sEnvVar).optional(),
+  envFromSecrets: z.array(z.string()).optional(),
+  image: z.string().optional(),
+  imagePullPolicy: z.string().optional(),
+  name: z.string().optional(),
+  ports: z.array(zKubernetesK8sContainerPort).optional(),
+  resources: zKubernetesK8sResourceRequirements.optional(),
+  volumeMounts: z.array(zKubernetesK8sVolumeMount).optional(),
+  workingDir: z.string().optional(),
+});
+
+export const zKubernetesK8sPodTemplate = z.object({
+  annotations: z.record(z.string(), z.string()).optional(),
+  containers: z.array(zKubernetesK8sContainer).optional(),
+  labels: z.record(z.string(), z.string()).optional(),
+  volumes: z.array(zKubernetesK8sPodVolume).optional(),
+});
+
+export const zKubernetesK8sDeploymentWriteRequest = z.object({
+  annotations: z.record(z.string(), z.string()).optional(),
+  labels: z.record(z.string(), z.string()).optional(),
+  name: z.string().optional(),
+  pod: zKubernetesK8sPodTemplate.optional(),
+  replicas: z.int().optional(),
+  selector: z.record(z.string(), z.string()).optional(),
 });
 
 export const zKubernetesMetadata = z.object({
@@ -2434,6 +2518,13 @@ export const zUsersUserUpdatePayload = z.object({
   Username: z.string(),
 });
 
+export const zV1AwsElasticBlockStoreVolumeSource = z.object({
+  fsType: z.string().optional(),
+  partition: z.int().optional(),
+  readOnly: z.boolean().optional(),
+  volumeID: z.string().optional(),
+});
+
 export const zV1AppArmorProfileType = z.enum([
   'Unconfined',
   'RuntimeDefault',
@@ -2450,9 +2541,56 @@ export const zV1AttachedVolume = z.object({
   name: z.string().optional(),
 });
 
+export const zV1AzureDataDiskCachingMode = z.enum([
+  'None',
+  'ReadOnly',
+  'ReadWrite',
+]);
+
+export const zV1AzureDataDiskKind = z.enum(['Shared', 'Dedicated', 'Managed']);
+
+export const zV1AzureDiskVolumeSource = z.object({
+  cachingMode: zV1AzureDataDiskCachingMode.optional(),
+  diskName: z.string().optional(),
+  diskURI: z.string().optional(),
+  fsType: z.string().optional(),
+  kind: zV1AzureDataDiskKind.optional(),
+  readOnly: z.boolean().optional(),
+});
+
+export const zV1AzureFileVolumeSource = z.object({
+  readOnly: z.boolean().optional(),
+  secretName: z.string().optional(),
+  shareName: z.string().optional(),
+});
+
+export const zV1CsiVolumeSource = z.object({
+  driver: z.string().optional(),
+  fsType: z.string().optional(),
+  nodePublishSecretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  readOnly: z.boolean().optional(),
+  volumeAttributes: z.record(z.string(), z.string()).optional(),
+});
+
 export const zV1Capabilities = z.object({
   add: z.array(z.string()).optional(),
   drop: z.array(z.string()).optional(),
+});
+
+export const zV1CephFsVolumeSource = z.object({
+  monitors: z.array(z.string()).optional(),
+  path: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  secretFile: z.string().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  user: z.string().optional(),
+});
+
+export const zV1CinderVolumeSource = z.object({
+  fsType: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  volumeID: z.string().optional(),
 });
 
 export const zV1ConfigMapEnvSource = z.object({
@@ -2472,6 +2610,12 @@ export const zV1ConfigMapNodeConfigSource = z.object({
   namespace: z.string().optional(),
   resourceVersion: z.string().optional(),
   uid: z.string().optional(),
+});
+
+export const zV1ContainerExtendedResourceRequest = z.object({
+  containerName: z.string().optional(),
+  requestName: z.string().optional(),
+  resourceName: z.string().optional(),
 });
 
 export const zV1ContainerImage = z.object({
@@ -2505,12 +2649,81 @@ export const zV1ContainerRestartRule = z.object({
   exitCodes: zV1ContainerRestartRuleOnExitCodes.optional(),
 });
 
+export const zV1ContainerStateRunning = z.object({
+  startedAt: z.string().optional(),
+});
+
+export const zV1ContainerStateTerminated = z.object({
+  containerID: z.string().optional(),
+  exitCode: z.int().optional(),
+  finishedAt: z.string().optional(),
+  message: z.string().optional(),
+  reason: z.string().optional(),
+  signal: z.int().optional(),
+  startedAt: z.string().optional(),
+});
+
+export const zV1ContainerStateWaiting = z.object({
+  message: z.string().optional(),
+  reason: z.string().optional(),
+});
+
+export const zV1ContainerState = z.object({
+  running: zV1ContainerStateRunning.optional(),
+  terminated: zV1ContainerStateTerminated.optional(),
+  waiting: zV1ContainerStateWaiting.optional(),
+});
+
+export const zV1DnsPolicy = z.enum([
+  'ClusterFirstWithHostNet',
+  'ClusterFirst',
+  'Default',
+  'None',
+]);
+
 export const zV1DaemonEndpoint = z.object({
   Port: z.int().optional(),
 });
 
+export const zV1DeploymentConditionType = z.enum([
+  'Available',
+  'Progressing',
+  'ReplicaFailure',
+]);
+
+export const zV1DeploymentCondition = z.object({
+  lastTransitionTime: z.string().optional(),
+  lastUpdateTime: z.string().optional(),
+  message: z.string().optional(),
+  reason: z.string().optional(),
+  status: zK8sIoApiCoreV1ConditionStatus.optional(),
+  type: zV1DeploymentConditionType.optional(),
+});
+
+export const zV1DeploymentStatus = z.object({
+  availableReplicas: z.int().optional(),
+  collisionCount: z.int().optional(),
+  conditions: z.array(zV1DeploymentCondition).optional(),
+  observedGeneration: z.int().optional(),
+  readyReplicas: z.int().optional(),
+  replicas: z.int().optional(),
+  terminatingReplicas: z.int().optional(),
+  unavailableReplicas: z.int().optional(),
+  updatedReplicas: z.int().optional(),
+});
+
+export const zV1DeploymentStrategyType = z.enum(['Recreate', 'RollingUpdate']);
+
 export const zV1ExecAction = z.object({
   command: z.array(z.string()).optional(),
+});
+
+export const zV1FcVolumeSource = z.object({
+  fsType: z.string().optional(),
+  lun: z.int().optional(),
+  readOnly: z.boolean().optional(),
+  targetWWNs: z.array(z.string()).optional(),
+  wwids: z.array(z.string()).optional(),
 });
 
 export const zV1FieldsV1 = z.record(z.string(), z.unknown());
@@ -2524,9 +2737,135 @@ export const zV1FileKeySelector = z.object({
 
 export const zV1FinalizerName = z.enum(['kubernetes']);
 
+export const zV1FlexVolumeSource = z.object({
+  driver: z.string().optional(),
+  fsType: z.string().optional(),
+  options: z.record(z.string(), z.string()).optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+});
+
+export const zV1FlockerVolumeSource = z.object({
+  datasetName: z.string().optional(),
+  datasetUUID: z.string().optional(),
+});
+
+export const zV1GcePersistentDiskVolumeSource = z.object({
+  fsType: z.string().optional(),
+  partition: z.int().optional(),
+  pdName: z.string().optional(),
+  readOnly: z.boolean().optional(),
+});
+
 export const zV1GrpcAction = z.object({
   port: z.int().optional(),
   service: z.string().optional(),
+});
+
+export const zV1GitRepoVolumeSource = z.object({
+  directory: z.string().optional(),
+  repository: z.string().optional(),
+  revision: z.string().optional(),
+});
+
+export const zV1GlusterfsVolumeSource = z.object({
+  endpoints: z.string().optional(),
+  path: z.string().optional(),
+  readOnly: z.boolean().optional(),
+});
+
+export const zV1HostAlias = z.object({
+  hostnames: z.array(z.string()).optional(),
+  ip: z.string().optional(),
+});
+
+export const zV1HostIp = z.object({
+  ip: z.string().optional(),
+});
+
+export const zV1HostPathType = z.enum([
+  '',
+  'DirectoryOrCreate',
+  'Directory',
+  'FileOrCreate',
+  'File',
+  'Socket',
+  'CharDevice',
+  'BlockDevice',
+]);
+
+export const zV1HostPathVolumeSource = z.object({
+  path: z.string().optional(),
+  type: zV1HostPathType.optional(),
+});
+
+export const zV1IscsiVolumeSource = z.object({
+  chapAuthDiscovery: z.boolean().optional(),
+  chapAuthSession: z.boolean().optional(),
+  fsType: z.string().optional(),
+  initiatorName: z.string().optional(),
+  iqn: z.string().optional(),
+  iscsiInterface: z.string().optional(),
+  lun: z.int().optional(),
+  portals: z.array(z.string()).optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  targetPortal: z.string().optional(),
+});
+
+export const zV1KeyToPath = z.object({
+  key: z.string().optional(),
+  mode: z.int().optional(),
+  path: z.string().optional(),
+});
+
+export const zV1ConfigMapProjection = z.object({
+  items: z.array(zV1KeyToPath).optional(),
+  name: z.string().optional(),
+  optional: z.boolean().optional(),
+});
+
+export const zV1ConfigMapVolumeSource = z.object({
+  defaultMode: z.int().optional(),
+  items: z.array(zV1KeyToPath).optional(),
+  name: z.string().optional(),
+  optional: z.boolean().optional(),
+});
+
+export const zV1LabelSelectorOperator = z.enum([
+  'In',
+  'NotIn',
+  'Exists',
+  'DoesNotExist',
+]);
+
+export const zV1LabelSelectorRequirement = z.object({
+  key: z.string().optional(),
+  operator: zV1LabelSelectorOperator.optional(),
+  values: z.array(z.string()).optional(),
+});
+
+export const zV1LabelSelector = z.object({
+  matchExpressions: z.array(zV1LabelSelectorRequirement).optional(),
+  matchLabels: z.record(z.string(), z.string()).optional(),
+});
+
+export const zV1ClusterTrustBundleProjection = z.object({
+  labelSelector: zV1LabelSelector.optional(),
+  name: z.string().optional(),
+  optional: z.boolean().optional(),
+  path: z.string().optional(),
+  signerName: z.string().optional(),
+});
+
+export const zV1LinuxContainerUser = z.object({
+  gid: z.int().optional(),
+  supplementalGroups: z.array(z.int()).optional(),
+  uid: z.int().optional(),
+});
+
+export const zV1ContainerUser = z.object({
+  linux: zV1LinuxContainerUser.optional(),
 });
 
 export const zV1ListMeta = z.object({
@@ -2553,6 +2892,12 @@ export const zV1MountPropagationMode = z.enum([
   'HostToContainer',
   'Bidirectional',
 ]);
+
+export const zV1NfsVolumeSource = z.object({
+  path: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  server: z.string().optional(),
+});
 
 export const zV1NamespaceConditionType = z.enum([
   'NamespaceDeletionDiscoveryFailure',
@@ -2630,6 +2975,8 @@ export const zV1NodeFeatures = z.object({
   supplementalGroupsPolicy: z.boolean().optional(),
 });
 
+export const zV1NodeInclusionPolicy = z.enum(['Ignore', 'Honor']);
+
 export const zV1NodePhase = z.enum(['Pending', 'Running', 'Terminated']);
 
 export const zV1NodeRuntimeHandlerFeatures = z.object({
@@ -2640,6 +2987,30 @@ export const zV1NodeRuntimeHandlerFeatures = z.object({
 export const zV1NodeRuntimeHandler = z.object({
   features: zV1NodeRuntimeHandlerFeatures.optional(),
   name: z.string().optional(),
+});
+
+export const zV1NodeSelectorOperator = z.enum([
+  'In',
+  'NotIn',
+  'Exists',
+  'DoesNotExist',
+  'Gt',
+  'Lt',
+]);
+
+export const zV1NodeSelectorRequirement = z.object({
+  key: z.string().optional(),
+  operator: zV1NodeSelectorOperator.optional(),
+  values: z.array(z.string()).optional(),
+});
+
+export const zV1NodeSelectorTerm = z.object({
+  matchExpressions: z.array(zV1NodeSelectorRequirement).optional(),
+  matchFields: z.array(zV1NodeSelectorRequirement).optional(),
+});
+
+export const zV1NodeSelector = z.object({
+  nodeSelectorTerms: z.array(zV1NodeSelectorTerm).optional(),
 });
 
 export const zV1NodeSwapStatus = z.object({
@@ -2659,6 +3030,8 @@ export const zV1NodeSystemInfo = z.object({
   swap: zV1NodeSwapStatus.optional(),
   systemUUID: z.string().optional(),
 });
+
+export const zV1OsName = z.enum(['linux', 'windows']);
 
 export const zV1ObjectFieldSelector = z.object({
   apiVersion: z.string().optional(),
@@ -2713,7 +3086,22 @@ export const zV1PersistentVolumeClaimPhase = z.enum([
   'Lost',
 ]);
 
+export const zV1PersistentVolumeClaimVolumeSource = z.object({
+  claimName: z.string().optional(),
+  readOnly: z.boolean().optional(),
+});
+
 export const zV1PersistentVolumeMode = z.enum(['Block', 'Filesystem']);
+
+export const zKubernetesK8sPersistentVolumeClaimCreateRequest = z.object({
+  accessModes: z.array(zV1PersistentVolumeAccessMode).optional(),
+  annotations: z.record(z.string(), z.string()).optional(),
+  labels: z.record(z.string(), z.string()).optional(),
+  name: z.string().optional(),
+  storage: z.string().optional(),
+  storageClass: z.string().optional(),
+  volumeMode: zV1PersistentVolumeMode.optional(),
+});
 
 export const zV1PersistentVolumePhase = z.enum([
   'Pending',
@@ -2747,6 +3135,135 @@ export const zKubernetesK8sStorageClass = z.object({
   reclaimPolicy: zV1PersistentVolumeReclaimPolicy.optional(),
 });
 
+export const zV1PhotonPersistentDiskVolumeSource = z.object({
+  fsType: z.string().optional(),
+  pdID: z.string().optional(),
+});
+
+export const zV1PodAffinityTerm = z.object({
+  labelSelector: zV1LabelSelector.optional(),
+  matchLabelKeys: z.array(z.string()).optional(),
+  mismatchLabelKeys: z.array(z.string()).optional(),
+  namespaceSelector: zV1LabelSelector.optional(),
+  namespaces: z.array(z.string()).optional(),
+  topologyKey: z.string().optional(),
+});
+
+export const zV1PodCertificateProjection = z.object({
+  certificateChainPath: z.string().optional(),
+  credentialBundlePath: z.string().optional(),
+  keyPath: z.string().optional(),
+  keyType: z.string().optional(),
+  maxExpirationSeconds: z.int().optional(),
+  signerName: z.string().optional(),
+  userAnnotations: z.record(z.string(), z.string()).optional(),
+});
+
+export const zV1PodConditionType = z.enum([
+  'ContainersReady',
+  'Initialized',
+  'Ready',
+  'PodScheduled',
+  'DisruptionTarget',
+  'PodReadyToStartContainers',
+  'PodResizePending',
+  'PodResizeInProgress',
+  'AllContainersRestarting',
+]);
+
+export const zV1PodCondition = z.object({
+  lastProbeTime: z.string().optional(),
+  lastTransitionTime: z.string().optional(),
+  message: z.string().optional(),
+  observedGeneration: z.int().optional(),
+  reason: z.string().optional(),
+  status: zK8sIoApiCoreV1ConditionStatus.optional(),
+  type: zV1PodConditionType.optional(),
+});
+
+export const zV1PodDnsConfigOption = z.object({
+  name: z.string().optional(),
+  value: z.string().optional(),
+});
+
+export const zV1PodDnsConfig = z.object({
+  nameservers: z.array(z.string()).optional(),
+  options: z.array(zV1PodDnsConfigOption).optional(),
+  searches: z.array(z.string()).optional(),
+});
+
+export const zV1PodExtendedResourceClaimStatus = z.object({
+  requestMappings: z.array(zV1ContainerExtendedResourceRequest).optional(),
+  resourceClaimName: z.string().optional(),
+});
+
+export const zV1PodFsGroupChangePolicy = z.enum(['OnRootMismatch', 'Always']);
+
+export const zV1PodIp = z.object({
+  ip: z.string().optional(),
+});
+
+export const zV1PodOs = z.object({
+  name: zV1OsName.optional(),
+});
+
+export const zV1PodPhase = z.enum([
+  'Pending',
+  'Running',
+  'Succeeded',
+  'Failed',
+  'Unknown',
+]);
+
+export const zV1PodQosClass = z.enum(['Guaranteed', 'Burstable', 'BestEffort']);
+
+export const zV1PodReadinessGate = z.object({
+  conditionType: zV1PodConditionType.optional(),
+});
+
+export const zV1PodResizeStatus = z.enum([
+  'InProgress',
+  'Deferred',
+  'Infeasible',
+]);
+
+export const zV1PodResourceClaim = z.object({
+  name: z.string().optional(),
+  resourceClaimName: z.string().optional(),
+  resourceClaimTemplateName: z.string().optional(),
+});
+
+export const zV1PodResourceClaimStatus = z.object({
+  name: z.string().optional(),
+  resourceClaimName: z.string().optional(),
+});
+
+export const zV1PodSeLinuxChangePolicy = z.enum(['Recursive', 'MountOption']);
+
+export const zV1PodSchedulingGate = z.object({
+  name: z.string().optional(),
+});
+
+export const zV1PortworxVolumeSource = z.object({
+  fsType: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  volumeID: z.string().optional(),
+});
+
+export const zV1PreemptionPolicy = z.enum(['PreemptLowerPriority', 'Never']);
+
+export const zV1PreferredSchedulingTerm = z.object({
+  preference: zV1NodeSelectorTerm.optional(),
+  weight: z.int().optional(),
+});
+
+export const zV1NodeAffinity = z.object({
+  preferredDuringSchedulingIgnoredDuringExecution: z
+    .array(zV1PreferredSchedulingTerm)
+    .optional(),
+  requiredDuringSchedulingIgnoredDuringExecution: zV1NodeSelector.optional(),
+});
+
 export const zV1ProcMountType = z.enum(['Default', 'Unmasked']);
 
 export const zV1Protocol = z.enum(['TCP', 'UDP', 'SCTP']);
@@ -2761,16 +3278,88 @@ export const zV1ContainerPort = z.object({
 
 export const zV1PullPolicy = z.enum(['Always', 'Never', 'IfNotPresent']);
 
+export const zV1ImageVolumeSource = z.object({
+  pullPolicy: zV1PullPolicy.optional(),
+  reference: z.string().optional(),
+});
+
+export const zV1QuobyteVolumeSource = z.object({
+  group: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  registry: z.string().optional(),
+  tenant: z.string().optional(),
+  user: z.string().optional(),
+  volume: z.string().optional(),
+});
+
+export const zV1RbdVolumeSource = z.object({
+  fsType: z.string().optional(),
+  image: z.string().optional(),
+  keyring: z.string().optional(),
+  monitors: z.array(z.string()).optional(),
+  pool: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  user: z.string().optional(),
+});
+
 export const zV1RecursiveReadOnlyMode = z.enum([
   'Disabled',
   'IfPossible',
   'Enabled',
 ]);
 
+export const zV1ReplicaSetConditionType = z.enum(['ReplicaFailure']);
+
+export const zV1ReplicaSetCondition = z.object({
+  lastTransitionTime: z.string().optional(),
+  message: z.string().optional(),
+  reason: z.string().optional(),
+  status: zK8sIoApiCoreV1ConditionStatus.optional(),
+  type: zV1ReplicaSetConditionType.optional(),
+});
+
+export const zV1ReplicaSetStatus = z.object({
+  availableReplicas: z.int().optional(),
+  conditions: z.array(zV1ReplicaSetCondition).optional(),
+  fullyLabeledReplicas: z.int().optional(),
+  observedGeneration: z.int().optional(),
+  readyReplicas: z.int().optional(),
+  replicas: z.int().optional(),
+  terminatingReplicas: z.int().optional(),
+});
+
 export const zV1ResourceFieldSelector = z.object({
   containerName: z.string().optional(),
   divisor: zResourceQuantity.optional(),
   resource: z.string().optional(),
+});
+
+export const zV1DownwardApiVolumeFile = z.object({
+  fieldRef: zV1ObjectFieldSelector.optional(),
+  mode: z.int().optional(),
+  path: z.string().optional(),
+  resourceFieldRef: zV1ResourceFieldSelector.optional(),
+});
+
+export const zV1DownwardApiProjection = z.object({
+  items: z.array(zV1DownwardApiVolumeFile).optional(),
+});
+
+export const zV1DownwardApiVolumeSource = z.object({
+  defaultMode: z.int().optional(),
+  items: z.array(zV1DownwardApiVolumeFile).optional(),
+});
+
+export const zV1ResourceHealthStatus = z.enum([
+  'Healthy',
+  'Unhealthy',
+  'Unknown',
+]);
+
+export const zV1ResourceHealth = z.object({
+  health: zV1ResourceHealthStatus.optional(),
+  resourceID: z.string().optional(),
 });
 
 export const zV1ResourceList = z.record(z.string(), zResourceQuantity);
@@ -2865,6 +3454,13 @@ export const zV1ContainerResizePolicy = z.object({
   restartPolicy: zV1ResourceResizeRestartPolicy.optional(),
 });
 
+export const zV1ResourceStatus = z.object({
+  name: zV1ResourceName.optional(),
+  resources: z.array(zV1ResourceHealth).optional(),
+});
+
+export const zV1RestartPolicy = z.enum(['Always', 'OnFailure', 'Never']);
+
 export const zV1RoleRef = z.object({
   apiGroup: z.string().optional(),
   kind: z.string().optional(),
@@ -2891,11 +3487,34 @@ export const zKubernetesK8sRoleBinding = z.object({
   uid: z.string().optional(),
 });
 
+export const zV1RollingUpdateDeployment = z.object({
+  maxSurge: zIntstrIntOrString.optional(),
+  maxUnavailable: zIntstrIntOrString.optional(),
+});
+
+export const zV1DeploymentStrategy = z.object({
+  rollingUpdate: zV1RollingUpdateDeployment.optional(),
+  type: zV1DeploymentStrategyType.optional(),
+});
+
 export const zV1SeLinuxOptions = z.object({
   level: z.string().optional(),
   role: z.string().optional(),
   type: z.string().optional(),
   user: z.string().optional(),
+});
+
+export const zV1ScaleIoVolumeSource = z.object({
+  fsType: z.string().optional(),
+  gateway: z.string().optional(),
+  protectionDomain: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  sslEnabled: z.boolean().optional(),
+  storageMode: z.string().optional(),
+  storagePool: z.string().optional(),
+  system: z.string().optional(),
+  volumeName: z.string().optional(),
 });
 
 export const zV1ScopeSelectorOperator = z.enum([
@@ -2927,6 +3546,13 @@ export const zV1ResourceQuota = z.object({
   metadata: zV1ObjectMeta.optional(),
   spec: zV1ResourceQuotaSpec.optional(),
   status: zV1ResourceQuotaStatus.optional(),
+});
+
+export const zKubernetesKubernetesResourceQuotaListResponse = z.object({
+  apiVersion: z.string().optional(),
+  items: z.array(zV1ResourceQuota).optional(),
+  kind: z.string().optional(),
+  metadata: zV1ListMeta.optional(),
 });
 
 export const zPortainerK8sNamespaceInfo = z.object({
@@ -2984,6 +3610,12 @@ export const zV1EnvVar = z.object({
   valueFrom: zV1EnvVarSource.optional(),
 });
 
+export const zV1SecretProjection = z.object({
+  items: z.array(zV1KeyToPath).optional(),
+  name: z.string().optional(),
+  optional: z.boolean().optional(),
+});
+
 export const zV1SecretReference = z.object({
   name: z.string().optional(),
   namespace: z.string().optional(),
@@ -3022,6 +3654,19 @@ export const zKubernetesK8sVolumeInfo = z.object({
   persistentVolume: zKubernetesK8sPersistentVolume.optional(),
   persistentVolumeClaim: zKubernetesK8sPersistentVolumeClaim.optional(),
   storageClass: zKubernetesK8sStorageClass.optional(),
+});
+
+export const zV1SecretVolumeSource = z.object({
+  defaultMode: z.int().optional(),
+  items: z.array(zV1KeyToPath).optional(),
+  optional: z.boolean().optional(),
+  secretName: z.string().optional(),
+});
+
+export const zV1ServiceAccountTokenProjection = z.object({
+  audience: z.string().optional(),
+  expirationSeconds: z.int().optional(),
+  path: z.string().optional(),
 });
 
 export const zV1Signal = z.enum([
@@ -3096,6 +3741,33 @@ export const zV1SleepAction = z.object({
   seconds: z.int().optional(),
 });
 
+export const zV1StorageMedium = z.enum([
+  '',
+  'Memory',
+  'HugePages',
+  'HugePages-',
+]);
+
+export const zV1EmptyDirVolumeSource = z.object({
+  medium: zV1StorageMedium.optional(),
+  sizeLimit: zResourceQuantity.optional(),
+});
+
+export const zV1StorageOsVolumeSource = z.object({
+  fsType: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  secretRef: zK8sIoApiCoreV1LocalObjectReference.optional(),
+  volumeName: z.string().optional(),
+  volumeNamespace: z.string().optional(),
+});
+
+export const zV1SupplementalGroupsPolicy = z.enum(['Merge', 'Strict']);
+
+export const zV1Sysctl = z.object({
+  name: z.string().optional(),
+  value: z.string().optional(),
+});
+
 export const zV1TcpSocketAction = z.object({
   host: z.string().optional(),
   port: zIntstrIntOrString.optional(),
@@ -3137,6 +3809,29 @@ export const zV1TerminationMessagePolicy = z.enum([
   'FallbackToLogsOnError',
 ]);
 
+export const zV1TolerationOperator = z.enum(['Exists', 'Equal', 'Lt', 'Gt']);
+
+export const zV1Toleration = z.object({
+  effect: zV1TaintEffect.optional(),
+  key: z.string().optional(),
+  operator: zV1TolerationOperator.optional(),
+  tolerationSeconds: z.int().optional(),
+  value: z.string().optional(),
+});
+
+export const zV1TypedLocalObjectReference = z.object({
+  apiGroup: z.string().optional(),
+  kind: z.string().optional(),
+  name: z.string().optional(),
+});
+
+export const zV1TypedObjectReference = z.object({
+  apiGroup: z.string().optional(),
+  kind: z.string().optional(),
+  name: z.string().optional(),
+  namespace: z.string().optional(),
+});
+
 export const zV1UriScheme = z.enum(['HTTP', 'HTTPS']);
 
 export const zV1HttpGetAction = z.object({
@@ -3173,6 +3868,22 @@ export const zV1Probe = z.object({
   timeoutSeconds: z.int().optional(),
 });
 
+export const zV1UnsatisfiableConstraintAction = z.enum([
+  'DoNotSchedule',
+  'ScheduleAnyway',
+]);
+
+export const zV1TopologySpreadConstraint = z.object({
+  labelSelector: zV1LabelSelector.optional(),
+  matchLabelKeys: z.array(z.string()).optional(),
+  maxSkew: z.int().optional(),
+  minDomains: z.int().optional(),
+  nodeAffinityPolicy: zV1NodeInclusionPolicy.optional(),
+  nodeTaintsPolicy: zV1NodeInclusionPolicy.optional(),
+  topologyKey: z.string().optional(),
+  whenUnsatisfiable: zV1UnsatisfiableConstraintAction.optional(),
+});
+
 export const zV1VolumeDevice = z.object({
   devicePath: z.string().optional(),
   name: z.string().optional(),
@@ -3188,11 +3899,185 @@ export const zV1VolumeMount = z.object({
   subPathExpr: z.string().optional(),
 });
 
+export const zV1VolumeMountStatus = z.object({
+  mountPath: z.string().optional(),
+  name: z.string().optional(),
+  readOnly: z.boolean().optional(),
+  recursiveReadOnly: zV1RecursiveReadOnlyMode.optional(),
+});
+
+export const zV1ContainerStatus = z.object({
+  allocatedResources: zV1ResourceList.optional(),
+  allocatedResourcesStatus: z.array(zV1ResourceStatus).optional(),
+  containerID: z.string().optional(),
+  image: z.string().optional(),
+  imageID: z.string().optional(),
+  lastState: zV1ContainerState.optional(),
+  name: z.string().optional(),
+  ready: z.boolean().optional(),
+  resources: zV1ResourceRequirements.optional(),
+  restartCount: z.int().optional(),
+  started: z.boolean().optional(),
+  state: zV1ContainerState.optional(),
+  stopSignal: zV1Signal.optional(),
+  user: zV1ContainerUser.optional(),
+  volumeMounts: z.array(zV1VolumeMountStatus).optional(),
+});
+
+export const zV1PodStatus = z.object({
+  allocatedResources: zV1ResourceList.optional(),
+  conditions: z.array(zV1PodCondition).optional(),
+  containerStatuses: z.array(zV1ContainerStatus).optional(),
+  ephemeralContainerStatuses: z.array(zV1ContainerStatus).optional(),
+  extendedResourceClaimStatus: zV1PodExtendedResourceClaimStatus.optional(),
+  hostIP: z.string().optional(),
+  hostIPs: z.array(zV1HostIp).optional(),
+  initContainerStatuses: z.array(zV1ContainerStatus).optional(),
+  message: z.string().optional(),
+  nominatedNodeName: z.string().optional(),
+  observedGeneration: z.int().optional(),
+  phase: zV1PodPhase.optional(),
+  podIP: z.string().optional(),
+  podIPs: z.array(zV1PodIp).optional(),
+  qosClass: zV1PodQosClass.optional(),
+  reason: z.string().optional(),
+  resize: zV1PodResizeStatus.optional(),
+  resourceClaimStatuses: z.array(zV1PodResourceClaimStatus).optional(),
+  resources: zV1ResourceRequirements.optional(),
+  startTime: z.string().optional(),
+});
+
+export const zV1VolumeProjection = z.object({
+  clusterTrustBundle: zV1ClusterTrustBundleProjection.optional(),
+  configMap: zV1ConfigMapProjection.optional(),
+  downwardAPI: zV1DownwardApiProjection.optional(),
+  podCertificate: zV1PodCertificateProjection.optional(),
+  secret: zV1SecretProjection.optional(),
+  serviceAccountToken: zV1ServiceAccountTokenProjection.optional(),
+});
+
+export const zV1ProjectedVolumeSource = z.object({
+  defaultMode: z.int().optional(),
+  sources: z.array(zV1VolumeProjection).optional(),
+});
+
+export const zV1VolumeResourceRequirements = z.object({
+  limits: zV1ResourceList.optional(),
+  requests: zV1ResourceList.optional(),
+});
+
+export const zV1PersistentVolumeClaimSpec = z.object({
+  accessModes: z.array(zV1PersistentVolumeAccessMode).optional(),
+  dataSource: zV1TypedLocalObjectReference.optional(),
+  dataSourceRef: zV1TypedObjectReference.optional(),
+  resources: zV1VolumeResourceRequirements.optional(),
+  selector: zV1LabelSelector.optional(),
+  storageClassName: z.string().optional(),
+  volumeAttributesClassName: z.string().optional(),
+  volumeMode: zV1PersistentVolumeMode.optional(),
+  volumeName: z.string().optional(),
+});
+
+export const zV1PersistentVolumeClaimTemplate = z.object({
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1PersistentVolumeClaimSpec.optional(),
+});
+
+export const zV1EphemeralVolumeSource = z.object({
+  volumeClaimTemplate: zV1PersistentVolumeClaimTemplate.optional(),
+});
+
+export const zV1VsphereVirtualDiskVolumeSource = z.object({
+  fsType: z.string().optional(),
+  storagePolicyID: z.string().optional(),
+  storagePolicyName: z.string().optional(),
+  volumePath: z.string().optional(),
+});
+
+export const zV1Volume = z.object({
+  awsElasticBlockStore: zV1AwsElasticBlockStoreVolumeSource.optional(),
+  azureDisk: zV1AzureDiskVolumeSource.optional(),
+  azureFile: zV1AzureFileVolumeSource.optional(),
+  cephfs: zV1CephFsVolumeSource.optional(),
+  cinder: zV1CinderVolumeSource.optional(),
+  configMap: zV1ConfigMapVolumeSource.optional(),
+  csi: zV1CsiVolumeSource.optional(),
+  downwardAPI: zV1DownwardApiVolumeSource.optional(),
+  emptyDir: zV1EmptyDirVolumeSource.optional(),
+  ephemeral: zV1EphemeralVolumeSource.optional(),
+  fc: zV1FcVolumeSource.optional(),
+  flexVolume: zV1FlexVolumeSource.optional(),
+  flocker: zV1FlockerVolumeSource.optional(),
+  gcePersistentDisk: zV1GcePersistentDiskVolumeSource.optional(),
+  gitRepo: zV1GitRepoVolumeSource.optional(),
+  glusterfs: zV1GlusterfsVolumeSource.optional(),
+  hostPath: zV1HostPathVolumeSource.optional(),
+  image: zV1ImageVolumeSource.optional(),
+  iscsi: zV1IscsiVolumeSource.optional(),
+  name: z.string().optional(),
+  nfs: zV1NfsVolumeSource.optional(),
+  persistentVolumeClaim: zV1PersistentVolumeClaimVolumeSource.optional(),
+  photonPersistentDisk: zV1PhotonPersistentDiskVolumeSource.optional(),
+  portworxVolume: zV1PortworxVolumeSource.optional(),
+  projected: zV1ProjectedVolumeSource.optional(),
+  quobyte: zV1QuobyteVolumeSource.optional(),
+  rbd: zV1RbdVolumeSource.optional(),
+  scaleIO: zV1ScaleIoVolumeSource.optional(),
+  secret: zV1SecretVolumeSource.optional(),
+  storageos: zV1StorageOsVolumeSource.optional(),
+  vsphereVolume: zV1VsphereVirtualDiskVolumeSource.optional(),
+});
+
+export const zV1WeightedPodAffinityTerm = z.object({
+  podAffinityTerm: zV1PodAffinityTerm.optional(),
+  weight: z.int().optional(),
+});
+
+export const zV1PodAffinity = z.object({
+  preferredDuringSchedulingIgnoredDuringExecution: z
+    .array(zV1WeightedPodAffinityTerm)
+    .optional(),
+  requiredDuringSchedulingIgnoredDuringExecution: z
+    .array(zV1PodAffinityTerm)
+    .optional(),
+});
+
+export const zV1PodAntiAffinity = z.object({
+  preferredDuringSchedulingIgnoredDuringExecution: z
+    .array(zV1WeightedPodAffinityTerm)
+    .optional(),
+  requiredDuringSchedulingIgnoredDuringExecution: z
+    .array(zV1PodAffinityTerm)
+    .optional(),
+});
+
+export const zV1Affinity = z.object({
+  nodeAffinity: zV1NodeAffinity.optional(),
+  podAffinity: zV1PodAffinity.optional(),
+  podAntiAffinity: zV1PodAntiAffinity.optional(),
+});
+
 export const zV1WindowsSecurityContextOptions = z.object({
   gmsaCredentialSpec: z.string().optional(),
   gmsaCredentialSpecName: z.string().optional(),
   hostProcess: z.boolean().optional(),
   runAsUserName: z.string().optional(),
+});
+
+export const zV1PodSecurityContext = z.object({
+  appArmorProfile: zV1AppArmorProfile.optional(),
+  fsGroup: z.int().optional(),
+  fsGroupChangePolicy: zV1PodFsGroupChangePolicy.optional(),
+  runAsGroup: z.int().optional(),
+  runAsNonRoot: z.boolean().optional(),
+  runAsUser: z.int().optional(),
+  seLinuxChangePolicy: zV1PodSeLinuxChangePolicy.optional(),
+  seLinuxOptions: zV1SeLinuxOptions.optional(),
+  seccompProfile: zV1SeccompProfile.optional(),
+  supplementalGroups: z.array(z.int()).optional(),
+  supplementalGroupsPolicy: zV1SupplementalGroupsPolicy.optional(),
+  sysctls: z.array(zV1Sysctl).optional(),
+  windowsOptions: zV1WindowsSecurityContextOptions.optional(),
 });
 
 export const zV1SecurityContext = z.object({
@@ -3265,6 +4150,162 @@ export const zKubernetesK8sCronJob = z.object({
   Schedule: z.string().optional(),
   Suspend: z.boolean().optional(),
   Timezone: z.string().optional(),
+});
+
+export const zV1EphemeralContainer = z.object({
+  args: z.array(z.string()).optional(),
+  command: z.array(z.string()).optional(),
+  env: z.array(zV1EnvVar).optional(),
+  envFrom: z.array(zV1EnvFromSource).optional(),
+  image: z.string().optional(),
+  imagePullPolicy: zV1PullPolicy.optional(),
+  lifecycle: zV1Lifecycle.optional(),
+  livenessProbe: zV1Probe.optional(),
+  name: z.string().optional(),
+  ports: z.array(zV1ContainerPort).optional(),
+  readinessProbe: zV1Probe.optional(),
+  resizePolicy: z.array(zV1ContainerResizePolicy).optional(),
+  resources: zV1ResourceRequirements.optional(),
+  restartPolicy: zV1ContainerRestartPolicy.optional(),
+  restartPolicyRules: z.array(zV1ContainerRestartRule).optional(),
+  securityContext: zV1SecurityContext.optional(),
+  startupProbe: zV1Probe.optional(),
+  stdin: z.boolean().optional(),
+  stdinOnce: z.boolean().optional(),
+  targetContainerName: z.string().optional(),
+  terminationMessagePath: z.string().optional(),
+  terminationMessagePolicy: zV1TerminationMessagePolicy.optional(),
+  tty: z.boolean().optional(),
+  volumeDevices: z.array(zV1VolumeDevice).optional(),
+  volumeMounts: z.array(zV1VolumeMount).optional(),
+  workingDir: z.string().optional(),
+});
+
+export const zV1WorkloadReference = z.object({
+  name: z.string().optional(),
+  podGroup: z.string().optional(),
+  podGroupReplicaKey: z.string().optional(),
+});
+
+export const zV1PodSpec = z.object({
+  activeDeadlineSeconds: z.int().optional(),
+  affinity: zV1Affinity.optional(),
+  automountServiceAccountToken: z.boolean().optional(),
+  containers: z.array(zV1Container).optional(),
+  dnsConfig: zV1PodDnsConfig.optional(),
+  dnsPolicy: zV1DnsPolicy.optional(),
+  enableServiceLinks: z.boolean().optional(),
+  ephemeralContainers: z.array(zV1EphemeralContainer).optional(),
+  hostAliases: z.array(zV1HostAlias).optional(),
+  hostIPC: z.boolean().optional(),
+  hostNetwork: z.boolean().optional(),
+  hostPID: z.boolean().optional(),
+  hostUsers: z.boolean().optional(),
+  hostname: z.string().optional(),
+  hostnameOverride: z.string().optional(),
+  imagePullSecrets: z.array(zK8sIoApiCoreV1LocalObjectReference).optional(),
+  initContainers: z.array(zV1Container).optional(),
+  nodeName: z.string().optional(),
+  nodeSelector: z.record(z.string(), z.string()).optional(),
+  os: zV1PodOs.optional(),
+  overhead: zV1ResourceList.optional(),
+  preemptionPolicy: zV1PreemptionPolicy.optional(),
+  priority: z.int().optional(),
+  priorityClassName: z.string().optional(),
+  readinessGates: z.array(zV1PodReadinessGate).optional(),
+  resourceClaims: z.array(zV1PodResourceClaim).optional(),
+  resources: zV1ResourceRequirements.optional(),
+  restartPolicy: zV1RestartPolicy.optional(),
+  runtimeClassName: z.string().optional(),
+  schedulerName: z.string().optional(),
+  schedulingGates: z.array(zV1PodSchedulingGate).optional(),
+  securityContext: zV1PodSecurityContext.optional(),
+  serviceAccount: z.string().optional(),
+  serviceAccountName: z.string().optional(),
+  setHostnameAsFQDN: z.boolean().optional(),
+  shareProcessNamespace: z.boolean().optional(),
+  subdomain: z.string().optional(),
+  terminationGracePeriodSeconds: z.int().optional(),
+  tolerations: z.array(zV1Toleration).optional(),
+  topologySpreadConstraints: z.array(zV1TopologySpreadConstraint).optional(),
+  volumes: z.array(zV1Volume).optional(),
+  workloadRef: zV1WorkloadReference.optional(),
+});
+
+export const zV1Pod = z.object({
+  apiVersion: z.string().optional(),
+  kind: z.string().optional(),
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1PodSpec.optional(),
+  status: zV1PodStatus.optional(),
+});
+
+export const zKubernetesKubernetesPodListResponse = z.object({
+  apiVersion: z.string().optional(),
+  items: z.array(zV1Pod).optional(),
+  kind: z.string().optional(),
+  metadata: zV1ListMeta.optional(),
+});
+
+export const zV1PodTemplateSpec = z.object({
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1PodSpec.optional(),
+});
+
+export const zV1DeploymentSpec = z.object({
+  minReadySeconds: z.int().optional(),
+  paused: z.boolean().optional(),
+  progressDeadlineSeconds: z.int().optional(),
+  replicas: z.int().optional(),
+  revisionHistoryLimit: z.int().optional(),
+  selector: zV1LabelSelector.optional(),
+  strategy: zV1DeploymentStrategy.optional(),
+  template: zV1PodTemplateSpec.optional(),
+});
+
+export const zKubernetesKubernetesDeploymentResponse = z.object({
+  apiVersion: z.string().optional(),
+  kind: z.string().optional(),
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1DeploymentSpec.optional(),
+  status: zV1DeploymentStatus.optional(),
+});
+
+export const zV1Deployment = z.object({
+  apiVersion: z.string().optional(),
+  kind: z.string().optional(),
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1DeploymentSpec.optional(),
+  status: zV1DeploymentStatus.optional(),
+});
+
+export const zKubernetesKubernetesDeploymentListResponse = z.object({
+  apiVersion: z.string().optional(),
+  items: z.array(zV1Deployment).optional(),
+  kind: z.string().optional(),
+  metadata: zV1ListMeta.optional(),
+});
+
+export const zV1ReplicaSetSpec = z.object({
+  minReadySeconds: z.int().optional(),
+  replicas: z.int().optional(),
+  selector: zV1LabelSelector.optional(),
+  template: zV1PodTemplateSpec.optional(),
+});
+
+export const zV1ReplicaSet = z.object({
+  apiVersion: z.string().optional(),
+  kind: z.string().optional(),
+  metadata: zV1ObjectMeta.optional(),
+  spec: zV1ReplicaSetSpec.optional(),
+  status: zV1ReplicaSetStatus.optional(),
+});
+
+export const zKubernetesKubernetesReplicaSetListResponse = z.object({
+  apiVersion: z.string().optional(),
+  items: z.array(zV1ReplicaSet).optional(),
+  kind: z.string().optional(),
+  metadata: zV1ListMeta.optional(),
 });
 
 export const zV1Beta1ContainerMetrics = z.object({
@@ -3429,6 +4470,9 @@ export const zWorkflowsWorkflow = z.object({
   name: z.string(),
   status: zWorkflowsWorkflowStatusObject,
 });
+
+export const zKubernetesK8sDeploymentWriteRequest2 =
+  zKubernetesK8sDeploymentWriteRequest;
 
 /**
  * Ingress controllers
@@ -4638,6 +5682,21 @@ export const zGetKubernetesDashboardPath = z.object({
  */
 export const zGetKubernetesDashboardResponse = z.array(zKubernetesK8sDashboard);
 
+export const zGetAllKubernetesDeploymentsPath = z.object({
+  id: z.int(),
+});
+
+export const zGetAllKubernetesDeploymentsQuery = z.object({
+  labelSelector: z.string().optional(),
+  fieldSelector: z.string().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetAllKubernetesDeploymentsResponse =
+  zKubernetesKubernetesDeploymentListResponse;
+
 export const zDescribeResourcePath = z.object({
   id: z.int(),
 });
@@ -4665,6 +5724,17 @@ export const zGetAllKubernetesEventsQuery = z.object({
  * Success
  */
 export const zGetAllKubernetesEventsResponse = z.array(zKubernetesK8sEvent);
+
+export const zGetKubernetesIngressClassesPath = z.object({
+  id: z.int(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesIngressClassesResponse = z.array(
+  zKubernetesK8sIngressClass
+);
 
 export const zGetAllKubernetesIngressControllersPath = z.object({
   id: z.int(),
@@ -4927,6 +5997,134 @@ export const zGetKubernetesConfigMapPath = z.object({
  */
 export const zGetKubernetesConfigMapResponse = zKubernetesK8sConfigMap;
 
+export const zGetKubernetesDeploymentsForNamespacePath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+export const zGetKubernetesDeploymentsForNamespaceQuery = z.object({
+  labelSelector: z.string().optional(),
+  fieldSelector: z.string().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesDeploymentsForNamespaceResponse =
+  zKubernetesKubernetesDeploymentListResponse;
+
+/**
+ * Deployment definition
+ */
+export const zCreateKubernetesDeploymentBody =
+  zKubernetesK8sDeploymentWriteRequest2;
+
+export const zCreateKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zCreateKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
+export const zDeleteKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zDeleteKubernetesDeploymentResponse = z.void();
+
+export const zGetKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
+/**
+ * Annotations to apply
+ */
+export const zPatchKubernetesDeploymentBody =
+  zKubernetesK8sDeploymentPatchRequest;
+
+export const zPatchKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zPatchKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
+/**
+ * Deployment definition
+ */
+export const zUpdateKubernetesDeploymentBody =
+  zKubernetesK8sDeploymentWriteRequest2;
+
+export const zUpdateKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zUpdateKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
+/**
+ * Revision to roll back to
+ */
+export const zRollbackKubernetesDeploymentBody =
+  zKubernetesK8sDeploymentRollbackRequest;
+
+export const zRollbackKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zRollbackKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
+/**
+ * Desired replica count
+ */
+export const zScaleKubernetesDeploymentBody =
+  zKubernetesK8sDeploymentScaleRequest;
+
+export const zScaleKubernetesDeploymentPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zScaleKubernetesDeploymentResponse =
+  zKubernetesKubernetesDeploymentResponse;
+
 export const zGetKubernetesEventsForNamespacePath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5035,6 +6233,23 @@ export const zGetKubernetesPersistentVolumeClaimsInNamespaceResponse = z.array(
   zKubernetesK8sPersistentVolumeClaim
 );
 
+/**
+ * PersistentVolumeClaim definition
+ */
+export const zCreateKubernetesPersistentVolumeClaimBody =
+  zKubernetesK8sPersistentVolumeClaimCreateRequest;
+
+export const zCreateKubernetesPersistentVolumeClaimPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zCreateKubernetesPersistentVolumeClaimResponse =
+  zKubernetesK8sPersistentVolumeClaim;
+
 export const zGetKubernetesPersistentVolumeClaimPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5047,6 +6262,22 @@ export const zGetKubernetesPersistentVolumeClaimPath = z.object({
 export const zGetKubernetesPersistentVolumeClaimResponse =
   zKubernetesK8sPersistentVolumeClaim;
 
+export const zGetKubernetesPodsForNamespacePath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+export const zGetKubernetesPodsForNamespaceQuery = z.object({
+  labelSelector: z.string().optional(),
+  fieldSelector: z.string().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesPodsForNamespaceResponse =
+  zKubernetesKubernetesPodListResponse;
+
 export const zDeleteKubernetesPodPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5058,6 +6289,26 @@ export const zDeleteKubernetesPodPath = z.object({
  */
 export const zDeleteKubernetesPodResponse = z.void();
 
+export const zGetKubernetesPodLogsPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  name: z.string(),
+});
+
+export const zGetKubernetesPodLogsQuery = z.object({
+  container: z.string().optional(),
+  tailLines: z.int().optional(),
+  sinceSeconds: z.int().optional(),
+  timestamps: z.boolean().optional(),
+  previous: z.boolean().optional(),
+  follow: z.boolean().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesPodLogsResponse = z.string();
+
 export const zRestartKubernetesPodPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5068,6 +6319,34 @@ export const zRestartKubernetesPodPath = z.object({
  * Success
  */
 export const zRestartKubernetesPodResponse = z.void();
+
+export const zGetKubernetesReplicaSetsPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+export const zGetKubernetesReplicaSetsQuery = z.object({
+  deployment: z.string().optional(),
+  labelSelector: z.string().optional(),
+  fieldSelector: z.string().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesReplicaSetsResponse =
+  zKubernetesKubernetesReplicaSetListResponse;
+
+export const zGetKubernetesResourceQuotasPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesResourceQuotasResponse =
+  zKubernetesKubernetesResourceQuotaListResponse;
 
 export const zGetKubernetesSecretPath = z.object({
   id: z.int(),
@@ -5320,6 +6599,21 @@ export const zUpdateKubernetesPersistentVolumeReclaimPolicyPath = z.object({
  * Success
  */
 export const zUpdateKubernetesPersistentVolumeReclaimPolicyResponse = z.void();
+
+export const zGetAllKubernetesPodsPath = z.object({
+  id: z.int(),
+});
+
+export const zGetAllKubernetesPodsQuery = z.object({
+  labelSelector: z.string().optional(),
+  fieldSelector: z.string().optional(),
+});
+
+/**
+ * Success
+ */
+export const zGetAllKubernetesPodsResponse =
+  zKubernetesKubernetesPodListResponse;
 
 export const zGetKubernetesRbacStatusPath = z.object({
   id: z.int(),

@@ -43,6 +43,50 @@ func (kcl *KubeClient) GetPersistentVolumeClaim(namespace, name string) (*models
 	return &result, nil
 }
 
+// CreatePersistentVolumeClaim creates a PVC in the given namespace. The access mode
+// defaults to ReadWriteOnce and an empty storage class leaves the choice to the cluster
+// default.
+func (kcl *KubeClient) CreatePersistentVolumeClaim(namespace string, request models.K8sPersistentVolumeClaimCreateRequest) (*models.K8sPersistentVolumeClaim, error) {
+	storage, err := resource.ParseQuantity(request.Storage)
+	if err != nil {
+		return nil, fmt.Errorf("invalid storage size %q. Error: %w", request.Storage, err)
+	}
+
+	accessModes := request.AccessModes
+	if len(accessModes) == 0 {
+		accessModes = []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce}
+	}
+
+	claim := &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        request.Name,
+			Namespace:   namespace,
+			Labels:      request.Labels,
+			Annotations: request.Annotations,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: accessModes,
+			Resources: corev1.VolumeResourceRequirements{
+				Requests: corev1.ResourceList{corev1.ResourceStorage: storage},
+			},
+			VolumeMode: request.VolumeMode,
+		},
+	}
+
+	if request.StorageClass != "" {
+		claim.Spec.StorageClassName = &request.StorageClass
+	}
+
+	created, err := kcl.cli.CoreV1().PersistentVolumeClaims(namespace).Create(context.Background(), claim, metav1.CreateOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	result := parsePersistentVolumeClaimDetail(created)
+
+	return &result, nil
+}
+
 // DeletePersistentVolumeClaims deletes the specified PVCs.
 func (kcl *KubeClient) DeletePersistentVolumeClaims(reqs models.K8sVolumeDeleteRequests) error {
 	for _, req := range reqs {
