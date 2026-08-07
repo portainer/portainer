@@ -74,7 +74,7 @@ func (handler *Handler) persistWorkflowGitSyncFailure(userContext source.UserCon
 	if persistErr := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return workflows.SaveEdgeStackStatus(tx, userContext, syncErr.WorkflowID, syncErr.EdgeStackID, syncErr.SourceID, syncErr.Cause)
 	}); persistErr != nil {
-		log.Warn().Err(persistErr).Msg("failed to persist git sync status after a failed edge stack operation")
+		log.Warn().Str("context", "GitSyncFailure").Err(persistErr).Msg("Failed to persist git sync status after a failed edge stack operation")
 	}
 }
 
@@ -82,6 +82,6 @@ func (handler *Handler) persistSourceGitSyncFailure(userContext source.UserConte
 	if persistErr := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		return workflows.SaveSourceStatus(tx, userContext, syncErr.SourceID, syncErr.Cause)
 	}); persistErr != nil {
-		log.Warn().Err(persistErr).Msg("failed to persist git sync status after a failed edge stack operation")
+		log.Warn().Str("context", "GitSyncFailure").Err(persistErr).Msg("Failed to persist git sync status after a failed edge stack operation")
 	}
 }
