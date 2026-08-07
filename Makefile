@@ -109,11 +109,12 @@ dev-extension: build-server build-client ## Run the extension in development mod
 .PHONY: docs-build docs-validate docs-clean docs-validate-clean
 docs-build: init-dist ## Build docs
 	go mod download -x
-	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
+	mkdir -p api/docs
+	cd api && $(SWAG) init -o "./docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
 
 docs-validate: docs-build ## Validate docs
-	pnpm swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
-	pnpm swagger-cli validate dist/docs/openapi.yaml
+	pnpm swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
+	pnpm swagger-cli validate api/docs/openapi.yaml
 
 ##@ Helpers
 .PHONY: help
