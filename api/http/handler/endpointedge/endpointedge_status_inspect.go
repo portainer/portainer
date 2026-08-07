@@ -323,9 +323,7 @@ func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statu
 
 func (handler *Handler) respondFromCache(w http.ResponseWriter, r *http.Request, endpointID portainer.EndpointID) bool {
 	inmHeader := r.Header.Get("If-None-Match")
-	etags := strings.Split(inmHeader, ",")
-
-	if len(inmHeader) == 0 || etags[0] == "" {
+	if inmHeader == "" {
 		return false
 	}
 
@@ -334,7 +332,7 @@ func (handler *Handler) respondFromCache(w http.ResponseWriter, r *http.Request,
 		return false
 	}
 
-	for _, etag := range etags {
+	for etag := range strings.SplitSeq(inmHeader, ",") {
 		if !bytes.Equal([]byte(etag), cachedETag) {
 			continue
 		}
