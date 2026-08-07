@@ -707,7 +707,7 @@ paths:
         "204":
           description: No Content
         "409":
-          description: Edge group is in use by an Edge stack or Edge job
+          description: Edge group is in use by an Edge stack, Edge job or Workflow
         "500":
           description: Server error
         "503":

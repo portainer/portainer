@@ -13946,7 +13946,7 @@ export type EdgeGroupDeleteData = {
 
 export type EdgeGroupDeleteErrors = {
   /**
-   * Edge group is in use by an Edge stack or Edge job
+   * Edge group is in use by an Edge stack, Edge job or Workflow
    */
   409: unknown;
   /**

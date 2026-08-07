@@ -3,6 +3,7 @@ package endpoints
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -234,6 +235,30 @@ func (handler *Handler) deleteEndpoint(tx dataservices.DataStoreTx, endpointID p
 				if err := tx.EdgeJob().Update(edgeJob.ID, edgeJob); err != nil {
 					log.Warn().Err(err).Msg("Unable to update edge job")
 				}
+			}
+		}
+	}
+
+	workflows, err := tx.Workflow().ReadAll()
+	if err != nil {
+		log.Warn().Err(err).Msg("Unable to retrieve workflows from the database")
+	}
+
+	for i := range workflows {
+		wf := &workflows[i]
+		changed := false
+
+		for j := range wf.Artifacts {
+			artifact := &wf.Artifacts[j]
+			if idx := slices.Index(artifact.EnvIDs, endpoint.ID); idx != -1 {
+				artifact.EnvIDs = slices.Delete(artifact.EnvIDs, idx, idx+1)
+				changed = true
+			}
+		}
+
+		if changed {
+			if err := tx.Workflow().Update(wf.ID, wf); err != nil {
+				log.Warn().Err(err).Msg("Unable to update workflow")
 			}
 		}
 	}
