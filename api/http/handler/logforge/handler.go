@@ -38,8 +38,8 @@ import (
 )
 
 const (
-	defaultImage            = "logforge/unicron:latest"
-	defaultRemoteAgentImage = "logforge/unicron-agent:latest"
+	defaultImage            = "logforge/unicron:portainer-integration"
+	defaultRemoteAgentImage = "logforge/unicron-agent:portainer-integration"
 	defaultStackName        = "logforge-unicron"
 	defaultContainerName    = "logforge-unicron-appliance"
 	defaultVolumeName       = "logforge-unicron-data"
@@ -354,7 +354,7 @@ func (handler *Handler) installManagedStack(r *http.Request, payload *installPay
 
 	stackPayload := stackbuilders.StackPayload{
 		Name:             stackName,
-		StackFileContent: []byte(renderManagedCompose(payload, instanceID, serviceKeySHA256(serviceKey))),
+		StackFileContent: []byte(renderManagedCompose(payload, stackName, instanceID, serviceKeySHA256(serviceKey))),
 		FromAppTemplate:  false,
 	}
 
@@ -365,7 +365,7 @@ func (handler *Handler) installManagedStack(r *http.Request, payload *installPay
 		handler.StackDeployer,
 	)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, builder, &stackPayload, endpoint, tokenData.ID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, builder, &stackPayload, endpoint, tokenData.ID)
 	if httpErr != nil {
 		return nil, nil, httpErr
 	}
@@ -476,11 +476,35 @@ func (handler *Handler) newUIProxy(target *url.URL, serviceKey string, hostHeade
 		} else {
 			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
 		}
+		if strings.HasSuffix(req.URL.Path, "/__manifest") {
+			query := req.URL.Query()
+			if paths := query.Get("paths"); paths != "" {
+				query.Set("paths", buildUpstreamManifestPaths(target.Path, paths))
+				req.URL.RawQuery = query.Encode()
+			}
+		}
 		req.Host = valueOrDefault(hostHeader, target.Host)
+		// The browser is talking to Portainer, but the upstream enforces a
+		// same-origin policy against its own public origin. Present the request as
+		// originating from the appliance so HTTP mutations and Socket.IO
+		// handshakes are checked against the same authority as req.Host.
+		upstreamOrigin := target.Scheme + "://" + req.Host
+		if req.Header.Get("Origin") != "" {
+			req.Header.Set("Origin", upstreamOrigin)
+		}
+		if req.Header.Get("Referer") != "" {
+			req.Header.Set("Referer", upstreamOrigin+"/")
+		}
+		req.Header.Set("X-Forwarded-Proto", target.Scheme)
+		req.Header.Set("X-Forwarded-Host", req.Host)
 
 		req.Header.Del("Authorization")
 		req.Header.Del("X-API-KEY")
 		req.Header.Del("Cookie")
+		// The proxy rewrites LogForge's /unicron base path in HTML, CSS, and
+		// JavaScript responses. Request identity encoding so those response
+		// bodies are always available to ModifyResponse as plain bytes.
+		req.Header.Set("Accept-Encoding", "identity")
 		req.Header.Del(serviceKeyHeader)
 		req.Header.Del(managedByHeader)
 		req.Header.Del(managedIdentityHeader)
@@ -635,15 +659,22 @@ func teamIDs(memberships []portainer.TeamMembership) []portainer.TeamID {
 }
 
 type managedIdentityClaims struct {
-	Issuer    string                  `json:"iss"`
-	Subject   string                  `json:"sub"`
-	UserID    portainer.UserID        `json:"user_id"`
-	Username  string                  `json:"username,omitempty"`
-	IsAdmin   bool                    `json:"is_admin"`
-	TeamIDs   []portainer.TeamID      `json:"team_ids,omitempty"`
-	Endpoints []logForgeEndpointScope `json:"endpoints"`
-	IssuedAt  int64                   `json:"iat"`
-	ExpiresAt int64                   `json:"exp"`
+	Issuer    string                         `json:"iss"`
+	Subject   string                         `json:"sub"`
+	UserID    portainer.UserID               `json:"user_id"`
+	Username  string                         `json:"username,omitempty"`
+	IsAdmin   bool                           `json:"is_admin"`
+	TeamIDs   []portainer.TeamID             `json:"team_ids,omitempty"`
+	Endpoints []managedIdentityEndpointScope `json:"endpoints"`
+	IssuedAt  int64                          `json:"iat"`
+	ExpiresAt int64                          `json:"exp"`
+}
+
+type managedIdentityEndpointScope struct {
+	ID     portainer.EndpointID `json:"id"`
+	Name   string               `json:"name"`
+	Role   string               `json:"role"`
+	RoleID portainer.RoleID     `json:"role_id,omitempty"`
 }
 
 func signedManagedIdentity(access logForgeAccess, serviceKey string) (string, string) {
@@ -659,7 +690,7 @@ func signedManagedIdentity(access logForgeAccess, serviceKey string) (string, st
 		Username:  access.Username,
 		IsAdmin:   access.IsAdmin,
 		TeamIDs:   access.TeamIDs,
-		Endpoints: access.Endpoints,
+		Endpoints: managedIdentityEndpoints(access.Endpoints),
 		IssuedAt:  now.Unix(),
 		ExpiresAt: now.Add(managedIdentityTTL).Unix(),
 	}
@@ -675,6 +706,20 @@ func signedManagedIdentity(access logForgeAccess, serviceKey string) (string, st
 	signature := base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 
 	return identity, signature
+}
+
+func managedIdentityEndpoints(endpoints []logForgeEndpointScope) []managedIdentityEndpointScope {
+	claims := make([]managedIdentityEndpointScope, 0, len(endpoints))
+	for _, endpoint := range endpoints {
+		claims = append(claims, managedIdentityEndpointScope{
+			ID:     endpoint.ID,
+			Name:   endpoint.Name,
+			Role:   endpoint.Role,
+			RoleID: endpoint.RoleID,
+		})
+	}
+
+	return claims
 }
 
 func (handler *Handler) currentSettings() (*portainer.LogForgeSettings, error) {
@@ -801,7 +846,7 @@ func (handler *Handler) stackNameExists(endpointID portainer.EndpointID, stackNa
 	return false, nil
 }
 
-func renderManagedCompose(payload *installPayload, instanceID string, serviceKeyVerifier string) string {
+func renderManagedCompose(payload *installPayload, stackName string, instanceID string, serviceKeyVerifier string) string {
 	image := valueOrDefault(payload.Image, defaultImage)
 	httpsPort := valueOrDefaultInt(payload.HTTPSPort, defaultHTTPSPort)
 	mtlsPort := valueOrDefaultInt(payload.MTLSPort, defaultMTLSPort)
@@ -851,11 +896,16 @@ func renderManagedCompose(payload *installPayload, instanceID string, serviceKey
       UNICRON_CENTRAL_FQDN: %s
       UNICRON_PUBLIC_CENTRAL_PORT: "%d"
       UNICRON_PUBLIC_CENTRAL_MTLS_PORT: "%d"
+      LOCAL_AGENT_DOCKER_NETWORK: %s_default
       UNICRON_APPLIANCE_CONTAINER_NAME: %s
       PORTAINER_INSTANCE_ID: %s
       TMPDIR: /run/pyinstaller
       CENTRAL_ADMIN_RECOVERY_OVERRIDE: "false"
       REMOTE_AGENT_IMAGE: %s
+    networks:
+      default:
+        aliases:
+          - unicron.central
     volumes:
       - %s:/var/lib/unicron
     healthcheck:
@@ -868,7 +918,7 @@ func renderManagedCompose(payload *installPayload, instanceID string, serviceKey
 volumes:
   %s:
     name: %s
-`, image, defaultContainerName, centralFQDN, httpsPort, mtlsPort, managedIdentityHeader, managedSignatureHeader, serviceKeyHeader, serviceKeyVerifier, centralFQDN, httpsPort, mtlsPort, defaultContainerName, portainerInstanceID, remoteAgentImage, defaultVolumeName, defaultVolumeName, defaultVolumeName)
+`, image, defaultContainerName, centralFQDN, httpsPort, mtlsPort, managedIdentityHeader, managedSignatureHeader, serviceKeyHeader, serviceKeyVerifier, centralFQDN, httpsPort, mtlsPort, stackName, defaultContainerName, portainerInstanceID, remoteAgentImage, defaultVolumeName, defaultVolumeName, defaultVolumeName)
 }
 
 func serviceKeySHA256(serviceKey string) string {
@@ -968,10 +1018,7 @@ func appendUnicronPath(raw string, suffix string) (string, error) {
 }
 
 func buildUpstreamPath(targetPath string, requestPath string) string {
-	basePath := strings.TrimRight(targetPath, "/")
-	if !strings.HasSuffix(basePath, "/unicron") {
-		basePath += "/unicron"
-	}
+	basePath := upstreamBasePath(targetPath)
 
 	rest := strings.TrimPrefix(requestPath, "/logforge/ui")
 	if rest == "" {
@@ -979,6 +1026,37 @@ func buildUpstreamPath(targetPath string, requestPath string) string {
 	}
 
 	return singleJoiningSlash(basePath, rest)
+}
+
+func buildUpstreamManifestPaths(targetPath string, rawPaths string) string {
+	basePath := upstreamBasePath(targetPath)
+	proxyBasePath := strings.TrimRight(browserProxyPath, "/")
+	paths := strings.Split(rawPaths, ",")
+	for index, path := range paths {
+		path = strings.TrimSpace(path)
+		if path == basePath || strings.HasPrefix(path, basePath+"/") {
+			paths[index] = path
+			continue
+		}
+		if path == proxyBasePath {
+			paths[index] = basePath
+			continue
+		}
+		if strings.HasPrefix(path, proxyBasePath+"/") {
+			paths[index] = basePath + strings.TrimPrefix(path, proxyBasePath)
+			continue
+		}
+		paths[index] = singleJoiningSlash(basePath, path)
+	}
+	return strings.Join(paths, ",")
+}
+
+func upstreamBasePath(targetPath string) string {
+	basePath := strings.TrimRight(targetPath, "/")
+	if !strings.HasSuffix(basePath, "/unicron") {
+		basePath += "/unicron"
+	}
+	return basePath
 }
 
 func singleJoiningSlash(a, b string) string {

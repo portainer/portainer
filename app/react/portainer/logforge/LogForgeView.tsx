@@ -50,7 +50,7 @@ const embeddedUIFrameStyle = {
 export function LogForgeView() {
   const [mode, setMode] = useState<SetupMode>('register');
   const [applianceUrl, setApplianceUrl] = useState('');
-  const [image, setImage] = useState('logforge/unicron:latest');
+  const [image, setImage] = useState('logforge/unicron:portainer-integration');
   const [stackName, setStackName] = useState('logforge-unicron');
   const [centralFQDN, setCentralFQDN] = useState('logforge.local');
   const [httpsPort, setHTTPSPort] = useState(9444);

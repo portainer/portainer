@@ -89,7 +89,7 @@ test('submits a managed install payload for a Docker environment', async () => {
     }
   );
   fireEvent.change(getByDataCy<HTMLInputElement>(container, 'logforge-image'), {
-    target: { value: 'logforge/unicron:latest' },
+    target: { value: 'logforge/unicron:portainer-integration' },
   });
   fireEvent.change(
     getByDataCy<HTMLInputElement>(container, 'logforge-central-fqdn'),
@@ -122,7 +122,7 @@ test('submits a managed install payload for a Docker environment', async () => {
     {
       EndpointId: 1,
       ApplianceUrl: 'https://172.17.0.1:19444',
-      Image: 'logforge/unicron:latest',
+      Image: 'logforge/unicron:portainer-integration',
       StackName: 'logforge-hardening',
       CentralFQDN: 'localhost',
       HTTPSPort: 19444,

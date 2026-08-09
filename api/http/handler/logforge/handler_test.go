@@ -87,20 +87,30 @@ func TestUIProxyInjectsServiceKeyAndRewritesUnicronPaths(t *testing.T) {
 	var upstreamServiceKey string
 	var upstreamAuthorization string
 	var upstreamCookie string
+	var upstreamAcceptEncoding string
 	var upstreamHost string
 	var upstreamManagedBy string
 	var upstreamManagedIdentity string
 	var upstreamManagedSignature string
+	var upstreamOrigin string
+	var upstreamReferer string
+	var upstreamForwardedProto string
+	var upstreamForwardedHost string
 
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/unicron/assets/app.js", r.URL.Path)
 		upstreamServiceKey = r.Header.Get(serviceKeyHeader)
 		upstreamAuthorization = r.Header.Get("Authorization")
 		upstreamCookie = r.Header.Get("Cookie")
+		upstreamAcceptEncoding = r.Header.Get("Accept-Encoding")
 		upstreamHost = r.Host
 		upstreamManagedBy = r.Header.Get(managedByHeader)
 		upstreamManagedIdentity = r.Header.Get(managedIdentityHeader)
 		upstreamManagedSignature = r.Header.Get(managedSignatureHeader)
+		upstreamOrigin = r.Header.Get("Origin")
+		upstreamReferer = r.Header.Get("Referer")
+		upstreamForwardedProto = r.Header.Get("X-Forwarded-Proto")
+		upstreamForwardedHost = r.Header.Get("X-Forwarded-Host")
 
 		w.Header().Set("Content-Type", "application/javascript")
 		_, _ = w.Write([]byte(`window.fetch("/unicron/api/logs");`))
@@ -121,6 +131,9 @@ func TestUIProxyInjectsServiceKeyAndRewritesUnicronPaths(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/logforge/ui/assets/app.js", nil)
 	request.Header.Set("Authorization", "Bearer browser-token")
 	request.Header.Set("Cookie", "portainer=browser-cookie")
+	request.Header.Set("Accept-Encoding", "gzip, br")
+	request.Header.Set("Origin", "http://localhost:19001")
+	request.Header.Set("Referer", "http://localhost:19001/#!/logforge")
 	request.Header.Set(serviceKeyHeader, "browser-supplied-key")
 	request.Header.Set(managedByHeader, "browser")
 	request.Header.Set(managedIdentityHeader, "browser-identity")
@@ -138,9 +151,14 @@ func TestUIProxyInjectsServiceKeyAndRewritesUnicronPaths(t *testing.T) {
 	require.Equal(t, "logforge.example.test", upstreamHost)
 	require.Empty(t, upstreamAuthorization)
 	require.Empty(t, upstreamCookie)
+	require.Equal(t, "identity", upstreamAcceptEncoding)
 	require.Equal(t, "portainer", upstreamManagedBy)
 	require.NotEmpty(t, upstreamManagedIdentity)
 	require.NotEmpty(t, upstreamManagedSignature)
+	require.Equal(t, "http://logforge.example.test", upstreamOrigin)
+	require.Equal(t, "http://logforge.example.test/", upstreamReferer)
+	require.Equal(t, "http", upstreamForwardedProto)
+	require.Equal(t, "logforge.example.test", upstreamForwardedHost)
 	require.Contains(t, recorder.Body.String(), `"/logforge/ui/api/logs"`)
 	require.NotContains(t, recorder.Body.String(), `"/unicron/api/logs"`)
 
@@ -165,6 +183,10 @@ func TestUIProxyInjectsServiceKeyAndRewritesUnicronPaths(t *testing.T) {
 	require.Equal(t, "read_only", claims.Endpoints[0].Role)
 	require.Equal(t, readOnlyRoleID, claims.Endpoints[0].RoleID)
 	require.Greater(t, claims.ExpiresAt, claims.IssuedAt)
+	require.Contains(t, string(payload), `"id":`)
+	require.Contains(t, string(payload), `"role_id":`)
+	require.NotContains(t, string(payload), `"Id":`)
+	require.NotContains(t, string(payload), `"RoleId":`)
 }
 
 func TestUIProxyRejectsUsersWithoutDockerEndpointAccess(t *testing.T) {
@@ -190,6 +212,44 @@ func TestUIProxyRejectsUsersWithoutDockerEndpointAccess(t *testing.T) {
 	handler.ServeHTTP(recorder, request)
 
 	require.Equal(t, http.StatusForbidden, recorder.Code)
+}
+
+func TestUIProxyRewritesManifestDiscoveryPaths(t *testing.T) {
+	var upstreamPaths string
+	var upstreamVersion string
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, "/unicron/__manifest", r.URL.Path)
+		upstreamPaths = r.URL.Query().Get("paths")
+		upstreamVersion = r.URL.Query().Get("version")
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"routes/alerting/_layout":{"path":"alerting"}}`))
+	}))
+	t.Cleanup(upstream.Close)
+
+	handler := newTestHandler(t)
+	require.NoError(t, handler.DataStore.LogForge().UpdateSettings(&portainer.LogForgeSettings{
+		Enabled:          true,
+		ApplianceURL:     upstream.URL,
+		BrowserProxyPath: browserProxyPath,
+		ServiceKey:       "secret-service-key",
+	}))
+	createDockerEndpointWithUserAccess(t, handler, portainer.UserID(2), readOnlyRoleID)
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/logforge/ui/__manifest?paths=%2Flogforge%2Fui%2Falerting%2C%2Flogforge%2Fui%2Fnotifications&version=route-version", nil)
+	request = withLogForgeUser(request, &portainer.TokenData{
+		ID:       2,
+		Username: "alice",
+		Role:     portainer.StandardUserRole,
+	}, &security.RestrictedRequestContext{UserID: 2})
+
+	handler.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+	require.Equal(t, "/unicron/alerting,/unicron/notifications", upstreamPaths)
+	require.Equal(t, "route-version", upstreamVersion)
+	require.Contains(t, recorder.Body.String(), `"path":"alerting"`)
 }
 
 func TestStatusIncludesLogForgeAccessScopes(t *testing.T) {
@@ -293,6 +353,7 @@ func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
 			MTLSPort:         8450,
 			RemoteAgentImage: "example/unicron-agent:test",
 		},
+		"custom-logforge",
 		"instance-1",
 		"abcdef",
 	)
@@ -308,9 +369,18 @@ func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
 	require.Contains(t, compose, "UNICRON_MANAGED_SERVICE_KEY_SHA256: abcdef")
 	require.Contains(t, compose, "PORTAINER_INSTANCE_ID: instance-1")
 	require.Contains(t, compose, "REMOTE_AGENT_IMAGE: example/unicron-agent:test")
+	require.Contains(t, compose, "LOCAL_AGENT_DOCKER_NETWORK: custom-logforge_default")
+	require.Contains(t, compose, "- unicron.central")
 	require.Contains(t, compose, `"9449:443"`)
 	require.Contains(t, compose, `"8450:8443"`)
 	require.NotContains(t, compose, "/var/run/docker.sock")
+}
+
+func TestManagedComposeUsesPortainerIntegrationImagesByDefault(t *testing.T) {
+	compose := renderManagedCompose(&installPayload{}, "logforge", "instance-1", "abcdef")
+
+	require.Contains(t, compose, "image: logforge/unicron:portainer-integration")
+	require.Contains(t, compose, "REMOTE_AGENT_IMAGE: logforge/unicron-agent:portainer-integration")
 }
 
 func TestManagedInstallDerivesHostHeaderFromCentralFQDN(t *testing.T) {
