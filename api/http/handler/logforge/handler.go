@@ -857,6 +857,7 @@ func renderManagedCompose(payload *installPayload, stackName string, instanceID 
 	return fmt.Sprintf(`services:
   unicron:
     image: %s
+    pull_policy: always
     container_name: %s
     restart: unless-stopped
     read_only: true

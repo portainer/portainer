@@ -359,6 +359,7 @@ func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
 	)
 
 	require.Contains(t, compose, "image: example/unicron:test")
+	require.Contains(t, compose, "pull_policy: always")
 	require.Contains(t, compose, "UNICRON_MANAGED_BY: portainer")
 	require.Contains(t, compose, `UNICRON_SELF_UPDATE_ENABLED: "false"`)
 	require.Contains(t, compose, `UNICRON_MANAGED_EXTERNAL_AUTH_ENABLED: "true"`)
