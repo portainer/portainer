@@ -521,9 +521,9 @@ func (handler *Handler) newUIProxy(target *url.URL, serviceKey string, hostHeade
 		req.Header.Del("Authorization")
 		req.Header.Del("X-API-KEY")
 		req.Header.Del("Cookie")
-		// The proxy rewrites LogForge's /unicron base path in HTML, CSS, and
-		// JavaScript responses. Request identity encoding so those response
-		// bodies are always available to ModifyResponse as plain bytes.
+		// The proxy rewrites LogForge's /unicron base path in browser assets and
+		// route manifests. Request identity encoding so those response bodies are
+		// always available to ModifyResponse as plain bytes.
 		req.Header.Set("Accept-Encoding", "identity")
 		req.Header.Del(serviceKeyHeader)
 		req.Header.Del(managedByHeader)
@@ -552,8 +552,7 @@ func rewriteProxyResponse(resp *http.Response) error {
 		resp.Header.Set("Location", strings.ReplaceAll(location, "/unicron", browserProxyPath[:len(browserProxyPath)-1]))
 	}
 
-	contentType := resp.Header.Get("Content-Type")
-	if !shouldRewriteContent(contentType) || resp.Body == nil {
+	if !shouldRewriteResponseBody(resp) {
 		return nil
 	}
 
@@ -573,12 +572,26 @@ func rewriteProxyResponse(resp *http.Response) error {
 	return nil
 }
 
+func shouldRewriteResponseBody(resp *http.Response) bool {
+	if resp.Body == nil {
+		return false
+	}
+
+	contentType := strings.ToLower(resp.Header.Get("Content-Type"))
+	if strings.Contains(contentType, "application/json") {
+		return resp.Request != nil &&
+			resp.Request.URL != nil &&
+			strings.HasSuffix(resp.Request.URL.Path, "/__manifest")
+	}
+
+	return shouldRewriteContent(contentType)
+}
+
 func shouldRewriteContent(contentType string) bool {
 	contentType = strings.ToLower(contentType)
 	return strings.Contains(contentType, "text/html") ||
 		strings.Contains(contentType, "text/css") ||
 		strings.Contains(contentType, "javascript") ||
-		strings.Contains(contentType, "application/json") ||
 		strings.Contains(contentType, "application/manifest+json") ||
 		strings.Contains(contentType, "text/plain")
 }
