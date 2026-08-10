@@ -279,7 +279,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 	if snapshotError != nil {
 		log.Debug().
 			Str("endpoint", endpoint.Name).
-			Str("URL", endpoint.URL).Err(err).
+			Str("URL", endpoint.URL).Err(snapshotError).
 			Msg("background schedule error (environment snapshot), unable to create snapshot")
 
 		latestEndpointReference.Status = portainer.EndpointStatusDown
