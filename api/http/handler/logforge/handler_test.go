@@ -264,6 +264,48 @@ func TestUIProxyRejectsUsersWithoutDockerEndpointAccess(t *testing.T) {
 	require.Equal(t, http.StatusForbidden, recorder.Code)
 }
 
+func TestUIProxyPreservesAgentEnrollmentResponse(t *testing.T) {
+	const enrollmentResponse = `{
+		"agent_name":"portainer-local",
+		"central_url":"https://unicron.central/unicron",
+		"docker_run_command":"docker run -e CENTRAL_WS_URL=wss://unicron.central:8443/unicron/api/agent/ws logforge/unicron-agent:portainer-integration"
+	}`
+
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, "/unicron/api/agent/enroll", r.URL.Path)
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(enrollmentResponse))
+	}))
+	t.Cleanup(upstream.Close)
+
+	handler := newTestHandler(t)
+	require.NoError(t, handler.DataStore.LogForge().UpdateSettings(&portainer.LogForgeSettings{
+		Enabled:          true,
+		ApplianceURL:     upstream.URL,
+		BrowserProxyPath: browserProxyPath,
+		ServiceKey:       "secret-service-key",
+	}))
+	createDockerEndpointWithUserAccess(t, handler, portainer.UserID(2), readOnlyRoleID)
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/logforge/ui/api/agent/enroll", bytes.NewReader([]byte(`{"agent_name":"portainer-local"}`)))
+	request.Header.Set("Content-Type", "application/json")
+	request = withLogForgeUser(request, &portainer.TokenData{
+		ID:       2,
+		Username: "alice",
+		Role:     portainer.StandardUserRole,
+	}, &security.RestrictedRequestContext{UserID: 2})
+
+	handler.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+	require.JSONEq(t, enrollmentResponse, recorder.Body.String())
+	require.Contains(t, recorder.Body.String(), "wss://unicron.central:8443/unicron/api/agent/ws")
+	require.NotContains(t, recorder.Body.String(), "/logforge/ui/api/agent/ws")
+}
+
 func TestUIProxyRewritesManifestDiscoveryPaths(t *testing.T) {
 	var upstreamPaths string
 	var upstreamVersion string
@@ -273,7 +315,7 @@ func TestUIProxyRewritesManifestDiscoveryPaths(t *testing.T) {
 		upstreamVersion = r.URL.Query().Get("version")
 
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"routes/alerting/_layout":{"path":"alerting"}}`))
+		_, _ = w.Write([]byte(`{"basename":"/unicron/","routes/alerting/_layout":{"path":"alerting"}}`))
 	}))
 	t.Cleanup(upstream.Close)
 
@@ -299,6 +341,7 @@ func TestUIProxyRewritesManifestDiscoveryPaths(t *testing.T) {
 	require.Equal(t, http.StatusOK, recorder.Code)
 	require.Equal(t, "/unicron/alerting,/unicron/notifications", upstreamPaths)
 	require.Equal(t, "route-version", upstreamVersion)
+	require.Contains(t, recorder.Body.String(), `"basename":"/logforge/ui/"`)
 	require.Contains(t, recorder.Body.String(), `"path":"alerting"`)
 }
 
