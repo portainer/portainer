@@ -2,18 +2,21 @@ package logforge
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/stretchr/testify/require"
 )
@@ -53,7 +56,7 @@ func TestInstallRegistersExternalAppliance(t *testing.T) {
 	handler := newTestHandler(t)
 	handler.httpClient = healthServer.Client()
 
-	payload := []byte(`{"ApplianceUrl":"` + healthServer.URL + `/unicron/","ApplianceHostHeader":"logforge.example.test"}`)
+	payload := []byte(`{"ApplianceUrl":"` + healthServer.URL + `/unicron/","ApplianceHostHeader":"logforge.example.test","TLSSkipVerify":true}`)
 	recorder := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPost, "/logforge/install", bytes.NewReader(payload))
 	request.Header.Set("Content-Type", "application/json")
@@ -71,6 +74,7 @@ func TestInstallRegistersExternalAppliance(t *testing.T) {
 	require.Equal(t, "healthy", status.Health.Status)
 	require.Equal(t, "0.1.0", status.Health.Version)
 	require.Equal(t, "logforge.example.test", status.ApplianceHostHeader)
+	require.True(t, status.TLSSkipVerify)
 	require.True(t, status.ManagedAuthReady)
 	require.NotEmpty(t, status.ServiceKeyPrefix)
 	require.NotContains(t, recorder.Body.String(), `"ServiceKey":`)
@@ -81,6 +85,52 @@ func TestInstallRegistersExternalAppliance(t *testing.T) {
 	require.Equal(t, settings.ServiceKey, healthServiceKey)
 	require.Equal(t, "logforge.example.test", healthHost)
 	require.Equal(t, status.ServiceKeyPrefix, settings.ServiceKeyPrefix)
+	require.True(t, settings.TLSSkipVerify)
+}
+
+func TestHealthChecksVerifyTLSUnlessExplicitlySkipped(t *testing.T) {
+	upstream := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, "/unicron/api/health", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
+	}))
+	t.Cleanup(upstream.Close)
+
+	handler := newTestHandler(t)
+	settings := &portainer.LogForgeSettings{
+		Enabled:      true,
+		ApplianceURL: upstream.URL,
+	}
+
+	health := handler.checkHealth(context.Background(), settings)
+	require.Equal(t, "unhealthy", health.Status)
+
+	settings.TLSSkipVerify = true
+	health = handler.checkHealth(context.Background(), settings)
+	require.Equal(t, "healthy", health.Status)
+}
+
+func TestUIProxyVerifiesTLSUnlessExplicitlySkipped(t *testing.T) {
+	upstream := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		_, _ = w.Write([]byte("ok"))
+	}))
+	t.Cleanup(upstream.Close)
+
+	target, err := url.Parse(upstream.URL)
+	require.NoError(t, err)
+	handler := newTestHandler(t)
+	access := logForgeAccess{Allowed: true}
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/logforge/ui/", nil)
+	handler.newUIProxy(target, "service-key", "", false, access).ServeHTTP(recorder, request)
+	require.Equal(t, http.StatusBadGateway, recorder.Code)
+
+	recorder = httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, "/logforge/ui/", nil)
+	handler.newUIProxy(target, "service-key", "", true, access).ServeHTTP(recorder, request)
+	require.Equal(t, http.StatusOK, recorder.Code)
 }
 
 func TestUIProxyInjectsServiceKeyAndRewritesUnicronPaths(t *testing.T) {
@@ -344,6 +394,36 @@ func TestStatusIncludesAdminScopeForPortainerAdministrators(t *testing.T) {
 	require.Equal(t, endpointAdminRoleID, status.Access.Endpoints[0].RoleID)
 }
 
+func TestLogForgeAccessIsCachedPerAuthenticatedToken(t *testing.T) {
+	handler := newTestHandler(t)
+	endpoint := createDockerEndpointWithUserAccess(t, handler, portainer.UserID(2), readOnlyRoleID)
+
+	requestForToken := func(token string) *http.Request {
+		request := httptest.NewRequest(http.MethodGet, "/logforge/ui/", nil)
+		return withLogForgeUser(request, &portainer.TokenData{
+			ID:       2,
+			Username: "alice",
+			Role:     portainer.StandardUserRole,
+			Token:    token,
+		}, &security.RestrictedRequestContext{UserID: 2})
+	}
+
+	access, err := handler.logForgeAccessForRequest(requestForToken("token-1"))
+	require.NoError(t, err)
+	require.Equal(t, "local-docker", access.Endpoints[0].Name)
+
+	endpoint.Name = "renamed-docker"
+	require.NoError(t, handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint))
+
+	access, err = handler.logForgeAccessForRequest(requestForToken("token-1"))
+	require.NoError(t, err)
+	require.Equal(t, "local-docker", access.Endpoints[0].Name)
+
+	access, err = handler.logForgeAccessForRequest(requestForToken("token-2"))
+	require.NoError(t, err)
+	require.Equal(t, "renamed-docker", access.Endpoints[0].Name)
+}
+
 func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
 	compose := renderManagedCompose(
 		&installPayload{
@@ -394,8 +474,15 @@ func TestManagedInstallDerivesHostHeaderFromCentralFQDN(t *testing.T) {
 	require.Equal(t, "localhost", hostHeader)
 }
 
+func TestManagedInstallUsesTrustedSelfSignedTLS(t *testing.T) {
+	require.True(t, tlsSkipVerifyForPayload(&installPayload{EndpointID: 1}))
+	require.False(t, tlsSkipVerifyForPayload(&installPayload{}))
+	require.True(t, tlsSkipVerifyForPayload(&installPayload{TLSSkipVerify: true}))
+}
+
 func newTestHandler(t *testing.T) *Handler {
 	t.Helper()
+	fips.InitFIPS(false)
 
 	_, store := datastore.MustNewTestStore(t, true, true)
 	require.NoError(t, store.Version().UpdateInstanceID("instance-1"))

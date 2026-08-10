@@ -6,7 +6,6 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -18,9 +17,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	portainercrypto "github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -52,6 +53,7 @@ const (
 	managedIdentityHeader   = "X-LogForge-Managed-Identity"
 	managedSignatureHeader  = "X-LogForge-Managed-Identity-Signature"
 	managedIdentityTTL      = 5 * time.Minute
+	logForgeAccessCacheTTL  = 30 * time.Second
 	endpointAdminRoleID     = portainer.RoleID(1)
 	helpdeskRoleID          = portainer.RoleID(2)
 	standardRoleID          = portainer.RoleID(3)
@@ -68,6 +70,8 @@ type Handler struct {
 	ComposeStackManager portainer.ComposeStackManager
 	StackDeployer       deployments.StackDeployer
 	httpClient          *http.Client
+	accessCacheMu       sync.Mutex
+	accessCache         map[logForgeAccessCacheKey]logForgeAccessCacheEntry
 }
 
 // NewHandler creates a handler to manage LogForge integration operations.
@@ -75,12 +79,8 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
-		httpClient: &http.Client{
-			Timeout: 5 * time.Second,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // LogForge appliance uses a local self-signed certificate by default.
-			},
-		},
+		httpClient:     &http.Client{Timeout: 5 * time.Second},
+		accessCache:    map[logForgeAccessCacheKey]logForgeAccessCacheEntry{},
 	}
 
 	h.Handle("/logforge/status",
@@ -106,6 +106,7 @@ type statusResponse struct {
 	ApplianceEndpointID  portainer.EndpointID `json:"ApplianceEndpointId,omitempty"`
 	ApplianceURL         string               `json:"ApplianceUrl,omitempty"`
 	ApplianceHostHeader  string               `json:"ApplianceHostHeader,omitempty"`
+	TLSSkipVerify        bool                 `json:"TLSSkipVerify"`
 	BrowserProxyPath     string               `json:"BrowserProxyPath"`
 	ApplianceImage       string               `json:"ApplianceImage,omitempty"`
 	StackName            string               `json:"StackName,omitempty"`
@@ -151,10 +152,22 @@ type logForgeEndpointScope struct {
 	RoleID portainer.RoleID     `json:"RoleId,omitempty"`
 }
 
+type logForgeAccessCacheKey struct {
+	userID    portainer.UserID
+	role      portainer.UserRole
+	tokenHash [sha256.Size]byte
+}
+
+type logForgeAccessCacheEntry struct {
+	access    logForgeAccess
+	expiresAt time.Time
+}
+
 type installPayload struct {
 	EndpointID          portainer.EndpointID `json:"EndpointId,omitempty"`
 	ApplianceURL        string               `json:"ApplianceUrl,omitempty"`
 	ApplianceHostHeader string               `json:"ApplianceHostHeader,omitempty"`
+	TLSSkipVerify       bool                 `json:"TLSSkipVerify"`
 	Image               string               `json:"Image,omitempty"`
 	StackName           string               `json:"StackName,omitempty"`
 	CentralFQDN         string               `json:"CentralFQDN,omitempty"`
@@ -210,6 +223,10 @@ func (payload *installPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+func tlsSkipVerifyForPayload(payload *installPayload) bool {
+	return payload.EndpointID != 0 || payload.TLSSkipVerify
+}
+
 type uninstallPayload struct {
 	RemoveManagedStack bool `json:"RemoveManagedStack"`
 }
@@ -258,6 +275,7 @@ func (handler *Handler) installOrRegister(w http.ResponseWriter, r *http.Request
 	settings.BrowserProxyPath = browserProxyPath
 	settings.ApplianceImage = valueOrDefault(payload.Image, defaultImage)
 	settings.ApplianceHostHeader = applianceHostHeader(payload)
+	settings.TLSSkipVerify = tlsSkipVerifyForPayload(payload)
 
 	if payload.EndpointID != 0 {
 		stack, endpoint, httpErr := handler.installManagedStack(r, payload, instanceID, settings.ServiceKey)
@@ -456,16 +474,18 @@ func (handler *Handler) proxyUI(w http.ResponseWriter, r *http.Request) *httperr
 		return httperror.Forbidden("Permission denied to access LogForge", errors.New("no Docker environment access"))
 	}
 
-	proxy := handler.newUIProxy(target, settings.ServiceKey, settings.ApplianceHostHeader, access)
+	proxy := handler.newUIProxy(target, settings.ServiceKey, settings.ApplianceHostHeader, settings.TLSSkipVerify, access)
 	proxy.ServeHTTP(w, r)
 	return nil
 }
 
-func (handler *Handler) newUIProxy(target *url.URL, serviceKey string, hostHeader string, access logForgeAccess) *httputil.ReverseProxy {
+func (handler *Handler) newUIProxy(target *url.URL, serviceKey string, hostHeader string, tlsSkipVerify bool, access logForgeAccess) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	proxy := httputil.NewSingleHostReverseProxy(target)
-	proxy.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	if tlsSkipVerify {
+		transport := http.DefaultTransport.(*http.Transport).Clone()
+		transport.TLSClientConfig = portainercrypto.CreateTLSConfiguration(true)
+		proxy.Transport = transport
 	}
 	proxy.Director = func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
@@ -569,6 +589,39 @@ func (handler *Handler) logForgeAccessForRequest(r *http.Request) (logForgeAcces
 		return logForgeAccess{}, nil
 	}
 
+	cacheKey := logForgeAccessCacheKey{
+		userID:    tokenData.ID,
+		role:      tokenData.Role,
+		tokenHash: sha256.Sum256([]byte(tokenData.Token)),
+	}
+	now := time.Now()
+
+	handler.accessCacheMu.Lock()
+	defer handler.accessCacheMu.Unlock()
+
+	if cached, ok := handler.accessCache[cacheKey]; ok && now.Before(cached.expiresAt) {
+		return cached.access, nil
+	}
+
+	access, err := handler.resolveLogForgeAccessForRequest(r, tokenData)
+	if err != nil {
+		return logForgeAccess{}, err
+	}
+
+	for key, cached := range handler.accessCache {
+		if !now.Before(cached.expiresAt) {
+			delete(handler.accessCache, key)
+		}
+	}
+	handler.accessCache[cacheKey] = logForgeAccessCacheEntry{
+		access:    access,
+		expiresAt: now.Add(logForgeAccessCacheTTL),
+	}
+
+	return access, nil
+}
+
+func (handler *Handler) resolveLogForgeAccessForRequest(r *http.Request, tokenData *portainer.TokenData) (logForgeAccess, error) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		securityContext = &security.RestrictedRequestContext{
@@ -753,6 +806,7 @@ func (handler *Handler) buildStatus(r *http.Request, settings *portainer.LogForg
 		ApplianceEndpointID:  settings.ApplianceEndpointID,
 		ApplianceURL:         settings.ApplianceURL,
 		ApplianceHostHeader:  settings.ApplianceHostHeader,
+		TLSSkipVerify:        settings.TLSSkipVerify,
 		BrowserProxyPath:     valueOrDefault(settings.BrowserProxyPath, browserProxyPath),
 		ApplianceImage:       settings.ApplianceImage,
 		StackName:            settings.StackName,
@@ -802,7 +856,7 @@ func (handler *Handler) checkHealth(ctx context.Context, settings *portainer.Log
 		req.Host = settings.ApplianceHostHeader
 	}
 
-	resp, err := handler.httpClient.Do(req)
+	resp, err := handler.httpClientForSettings(settings).Do(req)
 	if err != nil {
 		return healthStatus{Status: "unhealthy", Message: err.Error(), CheckedAt: checkedAt}
 	}
@@ -829,6 +883,22 @@ func (handler *Handler) checkHealth(ctx context.Context, settings *portainer.Log
 		health.Version = extractJSONValue(message, "version")
 	}
 	return health
+}
+
+func (handler *Handler) httpClientForSettings(settings *portainer.LogForgeSettings) *http.Client {
+	if !settings.TLSSkipVerify {
+		return handler.httpClient
+	}
+
+	client := *handler.httpClient
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if baseTransport, ok := handler.httpClient.Transport.(*http.Transport); ok {
+		transport = baseTransport.Clone()
+	}
+	transport.TLSClientConfig = portainercrypto.CreateTLSConfiguration(true)
+	client.Transport = transport
+
+	return &client
 }
 
 func (handler *Handler) stackNameExists(endpointID portainer.EndpointID, stackName string) (bool, error) {

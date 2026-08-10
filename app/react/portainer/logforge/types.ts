@@ -38,6 +38,7 @@ export interface LogForgeStatus {
   ApplianceEndpointId?: EnvironmentId;
   ApplianceUrl?: string;
   ApplianceHostHeader?: string;
+  TLSSkipVerify: boolean;
   BrowserProxyPath: string;
   ApplianceImage?: string;
   StackName?: string;
@@ -56,6 +57,7 @@ export interface LogForgeInstallPayload {
   EndpointId?: EnvironmentId;
   ApplianceUrl?: string;
   ApplianceHostHeader?: string;
+  TLSSkipVerify?: boolean;
   Image?: string;
   StackName?: string;
   CentralFQDN?: string;

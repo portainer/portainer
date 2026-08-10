@@ -61,10 +61,17 @@ test('submits an external appliance registration payload', async () => {
     }
   );
 
+  await user.click(
+    screen.getByRole('checkbox', { name: 'Skip TLS verification' })
+  );
+
   await user.click(screen.getByRole('button', { name: 'Register LogForge' }));
 
   expect(installMutate).toHaveBeenCalledWith(
-    { ApplianceUrl: 'https://logforge.example.com' },
+    {
+      ApplianceUrl: 'https://logforge.example.com',
+      TLSSkipVerify: true,
+    },
     expect.objectContaining({ onSuccess: expect.any(Function) })
   );
 });
@@ -237,6 +244,18 @@ test('does not show setup controls to non-admin users before LogForge is configu
   ).toBeInTheDocument();
 });
 
+test('formats multi-part health statuses for display', () => {
+  setStatus(
+    createStatus({
+      Health: { Status: 'waiting_for_agent' },
+    })
+  );
+
+  renderComponent();
+
+  expect(screen.getByText('waiting for agent')).toBeInTheDocument();
+});
+
 function renderComponent(role = 1) {
   const user = new UserViewModel({ Username: 'admin', Role: role });
   const Routed = withTestRouter(LogForgeView);
@@ -251,6 +270,7 @@ function createStatus(overrides: Partial<LogForgeStatus> = {}): LogForgeStatus {
   return {
     Enabled: false,
     Managed: false,
+    TLSSkipVerify: false,
     BrowserProxyPath: '/logforge/ui/',
     ManagedAuthReady: true,
     Access: {

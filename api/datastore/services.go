@@ -540,6 +540,8 @@ func (store *Store) Export(filename string) (err error) {
 			log.Error().Err(err).Msg("exporting LogForge settings")
 		}
 	} else {
+		// Keep the service key so a restored Portainer remains in sync with the
+		// appliance's stored key hash. Backup archives can be password-encrypted.
 		backup.LogForge = settings
 	}
 

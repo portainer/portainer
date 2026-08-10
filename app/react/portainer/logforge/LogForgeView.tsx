@@ -22,6 +22,7 @@ import { Badge, BadgeType } from '@@/Badge';
 import { Button, LoadingButton } from '@@/buttons';
 import { confirmDelete } from '@@/modals/confirm';
 import { PageHeader } from '@@/PageHeader';
+import { SwitchField } from '@@/form-components/SwitchField';
 import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import {
@@ -56,6 +57,7 @@ export function LogForgeView() {
   const [httpsPort, setHTTPSPort] = useState(9444);
   const [mtlsPort, setMTLSPort] = useState(8443);
   const [selectedEndpointId, setSelectedEndpointId] = useState('');
+  const [tlsSkipVerify, setTLSSkipVerify] = useState(false);
   const [showEmbeddedUI, setShowEmbeddedUI] = useState(false);
 
   const isAdmin = useIsPureAdmin();
@@ -144,6 +146,8 @@ export function LogForgeView() {
                 setMTLSPort={setMTLSPort}
                 selectedEndpointId={selectedEndpointId}
                 setSelectedEndpointId={setSelectedEndpointId}
+                tlsSkipVerify={tlsSkipVerify}
+                setTLSSkipVerify={setTLSSkipVerify}
                 dockerEnvironments={dockerEnvironments}
                 isEnvironmentLoading={environmentList.isLoading}
                 isSubmitting={installMutation.isLoading}
@@ -164,6 +168,7 @@ export function LogForgeView() {
       mode === 'register'
         ? {
             ApplianceUrl: applianceUrl.trim(),
+            TLSSkipVerify: tlsSkipVerify,
           }
         : {
             EndpointId: Number(selectedEndpointId),
@@ -257,6 +262,10 @@ function StatusWidget({
               <StatusField
                 label="Managed auth"
                 value={status.ManagedAuthReady ? 'Ready' : 'Not ready'}
+              />
+              <StatusField
+                label="TLS verification"
+                value={status.TLSSkipVerify ? 'Skipped' : 'Enabled'}
               />
               <StatusField
                 label="Stack"
@@ -423,6 +432,8 @@ interface SetupWidgetProps {
   setMTLSPort(value: number): void;
   selectedEndpointId: string;
   setSelectedEndpointId(value: string): void;
+  tlsSkipVerify: boolean;
+  setTLSSkipVerify(value: boolean): void;
   dockerEnvironments: Array<{ Id: number; Name: string }>;
   isEnvironmentLoading: boolean;
   isSubmitting: boolean;
@@ -447,6 +458,8 @@ function SetupWidget({
   setMTLSPort,
   selectedEndpointId,
   setSelectedEndpointId,
+  tlsSkipVerify,
+  setTLSSkipVerify,
   dockerEnvironments,
   isEnvironmentLoading,
   isSubmitting,
@@ -564,6 +577,18 @@ function SetupWidget({
             />
           </FormRow>
 
+          {mode === 'register' && (
+            <SwitchField
+              label="Skip TLS verification"
+              labelClass="col-sm-3 col-lg-2"
+              name="logforge-tls-skip-verify"
+              checked={tlsSkipVerify}
+              onChange={setTLSSkipVerify}
+              tooltip="Enable only for an explicitly trusted appliance that uses a self-signed certificate."
+              data-cy="logforge-tls-skip-verify"
+            />
+          )}
+
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
@@ -619,7 +644,7 @@ function HealthBadge({ status }: { status: string }) {
 
   return (
     <Badge type={type} data-cy="logforge-health-badge">
-      {status.replace('_', ' ')}
+      {status.replaceAll('_', ' ')}
     </Badge>
   );
 }

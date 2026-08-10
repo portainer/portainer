@@ -1245,6 +1245,7 @@ type (
 		ApplianceEndpointID EndpointID `json:"ApplianceEndpointId,omitempty"`
 		ApplianceURL        string     `json:"ApplianceUrl,omitempty"`
 		ApplianceHostHeader string     `json:"ApplianceHostHeader,omitempty"`
+		TLSSkipVerify       bool       `json:"TLSSkipVerify"`
 		BrowserProxyPath    string     `json:"BrowserProxyPath,omitempty"`
 		ApplianceImage      string     `json:"ApplianceImage,omitempty"`
 		StackName           string     `json:"StackName,omitempty"`
