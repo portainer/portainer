@@ -8,11 +8,10 @@ import {
 
 export function kubernetesErrorParser(axiosError: AxiosError) {
   const responseStatus = axiosError.response?.data as Status;
-  const { message } = responseStatus;
-  if (message) {
+  if (responseStatus?.message) {
     return {
-      error: new Error(message),
-      details: message,
+      error: new Error(responseStatus.message),
+      details: responseStatus.message,
     };
   }
   return defaultErrorParser(axiosError);
