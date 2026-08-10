@@ -132,7 +132,7 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 
 	if payload.StackName != stack.Name {
 		stack.Name = payload.StackName
-		if err := handler.DataStore.Stack().Update(stack.ID, stack); err != nil {
+		if err := tx.Stack().Update(stack.ID, stack); err != nil {
 			return nil, nil, httperror.InternalServerError("Failed to update stack name", err)
 		}
 	}
@@ -142,7 +142,7 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 	// otherwise return nil
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
-		if err := registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, stack.Namespace); err != nil {
+		if err := registryutils.RefreshEcrSecret(tx, cli, endpoint, stack.Namespace); err != nil {
 			log.Warn().Err(err).Msg("failed to refresh ECR registry secret")
 		}
 	}

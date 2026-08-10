@@ -156,4 +156,31 @@ func TestStackUpdate_KubernetesFileContent(t *testing.T) {
 		require.Equal(t, portainer.StackStatusDeploying, updated.DeploymentStatus[0].Status)
 		require.Equal(t, portainer.StackStatusError, updated.DeploymentStatus[1].Status)
 	})
+
+	t.Run("renaming the stack persists the new name through the transaction", func(t *testing.T) {
+		t.Parallel()
+
+		handler, stack, endpoint := setupStackUpdateKubernetesTest(t, nil)
+
+		payload := kubernetesFileStackUpdatePayload{
+			StackFileContent: kubernetesFileStackUpdatedTestManifest,
+			StackName:        "renamed-k8s-file-stack",
+		}
+		jsonPayload, err := json.Marshal(payload)
+		require.NoError(t, err)
+
+		req := mockUpdateKubernetesStackFileContentRequest(stack.ID, endpoint.ID, jsonPayload)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
+
+		var updated *portainer.Stack
+		require.NoError(t, handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var err error
+			updated, err = tx.Stack().Read(stack.ID)
+			return err
+		}))
+		require.Equal(t, "renamed-k8s-file-stack", updated.Name)
+	})
 }

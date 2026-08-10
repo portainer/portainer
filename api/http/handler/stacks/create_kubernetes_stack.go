@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/sources"
@@ -181,7 +182,9 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	// otherwise return nil
 	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
 	if err == nil {
-		if err := registryutils.RefreshEcrSecret(cli, endpoint, handler.DataStore, payload.Namespace); err != nil {
+		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return registryutils.RefreshEcrSecret(tx, cli, endpoint, payload.Namespace)
+		}); err != nil {
 			return httperror.InternalServerError("Unable to refresh ECR registry secret", err)
 		}
 	}

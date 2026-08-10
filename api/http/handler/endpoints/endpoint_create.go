@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -360,7 +361,7 @@ func (handler *Handler) createAzureEndpoint(tx dataservices.DataStoreTx, payload
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := tx.Endpoint().GetNextIdentifier()
 
 	portainerHost, err := edge.ParseHostForEdge(payload.URL)
 	if err != nil {
@@ -397,7 +398,7 @@ func (handler *Handler) createEdgeAgentEndpoint(tx dataservices.DataStoreTx, pay
 		UserTrusted:         true,
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
+	settings, err := tx.Settings().Settings()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
@@ -527,7 +528,13 @@ func (handler *Handler) createTLSSecuredEndpoint(tx dataservices.DataStoreTx, pa
 }
 
 func (handler *Handler) snapshotAndPersistEndpoint(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) *httperror.HandlerError {
-	if err := handler.SnapshotService.SnapshotEndpoint(endpoint); err != nil {
+	// HACK: this bypasses the interface to avoid a deadlock and an import cycle
+	snapshotService, ok := handler.SnapshotService.(*snapshot.Service)
+	if !ok {
+		return httperror.InternalServerError("Unable to use a concrete instance of the snapshot service", errors.New("unable to use a concrete instance of the snapshot service"))
+	}
+
+	if err := snapshotService.SnapshotEndpointTx(tx, endpoint); err != nil {
 		if (endpoint.Type == portainer.AgentOnDockerEnvironment && strings.Contains(err.Error(), "Invalid request signature")) ||
 			(endpoint.Type == portainer.AgentOnKubernetesEnvironment && strings.Contains(err.Error(), "unknown")) {
 			err = errors.New("agent already paired with another Portainer instance")
