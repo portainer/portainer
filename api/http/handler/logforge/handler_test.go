@@ -12,6 +12,8 @@ import (
 	"net/url"
 	"testing"
 
+	composeloader "github.com/compose-spec/compose-go/v2/loader"
+	composetypes "github.com/compose-spec/compose-go/v2/types"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
@@ -494,6 +496,7 @@ func TestManagedComposeUsesPortainerManagedMode(t *testing.T) {
 	require.Contains(t, compose, "PORTAINER_INSTANCE_ID: instance-1")
 	require.Contains(t, compose, "REMOTE_AGENT_IMAGE: example/unicron-agent:test")
 	require.Contains(t, compose, "LOCAL_AGENT_DOCKER_NETWORK: custom-logforge_default")
+	require.Contains(t, compose, `"logs.example.test": "127.0.0.1"`)
 	require.Contains(t, compose, "- unicron.central")
 	require.Contains(t, compose, `"9449:443"`)
 	require.Contains(t, compose, `"8450:8443"`)
@@ -505,6 +508,35 @@ func TestManagedComposeUsesPortainerIntegrationImagesByDefault(t *testing.T) {
 
 	require.Contains(t, compose, "image: logforge/unicron:portainer-integration")
 	require.Contains(t, compose, "REMOTE_AGENT_IMAGE: logforge/unicron-agent:portainer-integration")
+}
+
+func TestManagedComposeUsesValidDeduplicatedExtraHostsMapping(t *testing.T) {
+	compose := renderManagedCompose(
+		&installPayload{CentralFQDN: "unicron.central"},
+		"logforge",
+		"instance-1",
+		"abcdef",
+	)
+
+	require.Contains(t, compose, "    extra_hosts:\n      \"unicron-stepca\": \"127.0.0.1\"")
+	require.NotContains(t, compose, "    extra_hosts:\n      - ")
+
+	project, err := composeloader.LoadWithContext(t.Context(), composetypes.ConfigDetails{
+		WorkingDir: t.TempDir(),
+		ConfigFiles: []composetypes.ConfigFile{{
+			Filename: "compose.yaml",
+			Content:  []byte(compose),
+		}},
+		Environment: map[string]string{},
+	}, func(options *composeloader.Options) {
+		options.SetProjectName("logforge", true)
+	})
+	require.NoError(t, err)
+	require.Equal(t, composetypes.HostsList{
+		"unicron-stepca":    []string{"127.0.0.1"},
+		"unicron-stepca-ra": []string{"127.0.0.1"},
+		"unicron.central":   []string{"127.0.0.1"},
+	}, project.Services["unicron"].ExtraHosts)
 }
 
 func TestManagedInstallDerivesHostHeaderFromCentralFQDN(t *testing.T) {

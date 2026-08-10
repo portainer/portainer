@@ -934,6 +934,7 @@ func renderManagedCompose(payload *installPayload, stackName string, instanceID 
 	httpsPort := valueOrDefaultInt(payload.HTTPSPort, defaultHTTPSPort)
 	mtlsPort := valueOrDefaultInt(payload.MTLSPort, defaultMTLSPort)
 	centralFQDN := valueOrDefault(payload.CentralFQDN, defaultCentralFQDN)
+	extraHosts := renderManagedExtraHosts(centralFQDN)
 	remoteAgentImage := valueOrDefault(payload.RemoteAgentImage, defaultRemoteAgentImage)
 	portainerInstanceID := valueOrDefault(instanceID, "portainer")
 
@@ -961,10 +962,7 @@ func renderManagedCompose(payload *installPayload, stackName string, instanceID 
     security_opt:
       - no-new-privileges:true
     extra_hosts:
-      - unicron-stepca:127.0.0.1
-      - unicron-stepca-ra:127.0.0.1
-      - unicron.central:127.0.0.1
-      - %s:127.0.0.1
+%s
     ports:
       - "%d:443"
       - "%d:8443"
@@ -1002,7 +1000,27 @@ func renderManagedCompose(payload *installPayload, stackName string, instanceID 
 volumes:
   %s:
     name: %s
-`, image, defaultContainerName, centralFQDN, httpsPort, mtlsPort, managedIdentityHeader, managedSignatureHeader, serviceKeyHeader, serviceKeyVerifier, centralFQDN, httpsPort, mtlsPort, stackName, defaultContainerName, portainerInstanceID, remoteAgentImage, defaultVolumeName, defaultVolumeName, defaultVolumeName)
+`, image, defaultContainerName, extraHosts, httpsPort, mtlsPort, managedIdentityHeader, managedSignatureHeader, serviceKeyHeader, serviceKeyVerifier, centralFQDN, httpsPort, mtlsPort, stackName, defaultContainerName, portainerInstanceID, remoteAgentImage, defaultVolumeName, defaultVolumeName, defaultVolumeName)
+}
+
+func renderManagedExtraHosts(centralFQDN string) string {
+	hosts := []string{"unicron-stepca", "unicron-stepca-ra", "unicron.central"}
+	for _, host := range hosts {
+		if strings.EqualFold(host, centralFQDN) {
+			centralFQDN = ""
+			break
+		}
+	}
+	if centralFQDN != "" {
+		hosts = append(hosts, centralFQDN)
+	}
+
+	var result strings.Builder
+	for _, host := range hosts {
+		fmt.Fprintf(&result, "      %q: %q\n", host, "127.0.0.1")
+	}
+
+	return strings.TrimSuffix(result.String(), "\n")
 }
 
 func serviceKeySHA256(serviceKey string) string {
