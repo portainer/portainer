@@ -5673,6 +5673,43 @@ export const getKubernetesMetricsForNode = <
   });
 
 /**
+ * Get live metrics for a pod
+ *
+ * Get live metrics for the specified pod.
+ * **Access policy**: Authenticated user.
+ */
+export const getKubernetesMetricsForPod = <ThrowOnError extends boolean = true>(
+  options: Options<GetKubernetesMetricsForPodData, ThrowOnError>
+): RequestResult<
+  GetKubernetesMetricsForPodResponses,
+  GetKubernetesMetricsForPodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetKubernetesMetricsForPodResponses,
+    GetKubernetesMetricsForPodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetKubernetesMetricsForPodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zGetKubernetesMetricsForPodResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/metrics/pods/{namespace}/{name}',
+    ...options,
+  });
+
+/**
  * Get a list of pods with their live metrics
  *
  * Get a list of pods with their live metrics for the specified namespace.
@@ -5707,44 +5744,7 @@ export const getKubernetesMetricsForAllPods = <
       { name: 'X-API-KEY', type: 'apiKey' },
       { name: 'Authorization', type: 'apiKey' },
     ],
-    url: '/kubernetes/{id}/metrics/pods/{namespace}',
-    ...options,
-  });
-
-/**
- * Get live metrics for a pod
- *
- * Get live metrics for the specified pod.
- * **Access policy**: Authenticated user.
- */
-export const getKubernetesMetricsForPod = <ThrowOnError extends boolean = true>(
-  options: Options<GetKubernetesMetricsForPodData, ThrowOnError>
-): RequestResult<
-  GetKubernetesMetricsForPodResponses,
-  GetKubernetesMetricsForPodErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    GetKubernetesMetricsForPodResponses,
-    GetKubernetesMetricsForPodErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          path: zGetKubernetesMetricsForPodPath,
-          query: z.never().optional(),
-        })
-        .parseAsync(data),
-    responseType: 'json',
-    responseValidator: async (data) =>
-      await zGetKubernetesMetricsForPodResponse.parseAsync(data),
-    security: [
-      { name: 'X-API-KEY', type: 'apiKey' },
-      { name: 'Authorization', type: 'apiKey' },
-    ],
-    url: '/kubernetes/{id}/metrics/pods/{namespace}/{name}',
+    url: '/kubernetes/{id}/metrics/pods/namespace/{namespace}',
     ...options,
   });
 

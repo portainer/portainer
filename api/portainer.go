@@ -25,6 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/client-go/tools/remotecommand"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 type (
@@ -1886,6 +1887,7 @@ type (
 		SetIsKubeAdmin(isKubeAdmin bool)
 		GetClientNonAdminNamespaces() []string
 		SetClientNonAdminNamespaces([]string)
+		GetMetricsClient() metricsv.Interface
 		NamespaceAccessPoliciesDeleteNamespace(ns string) error
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -2016,7 +2018,7 @@ type (
 
 		// Service
 		GetServices(namespace string) ([]models.K8sServiceInfo, error)
-		CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error)
+		CombineServicesWithApplications(namespace string, services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error)
 		CreateService(namespace string, info models.K8sServiceInfo) error
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		UpdateService(namespace string, info models.K8sServiceInfo) error

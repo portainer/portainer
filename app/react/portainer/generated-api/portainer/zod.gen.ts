@@ -5874,16 +5874,6 @@ export const zGetKubernetesMetricsForNodePath = z.object({
  */
 export const zGetKubernetesMetricsForNodeResponse = zV1Beta1NodeMetrics;
 
-export const zGetKubernetesMetricsForAllPodsPath = z.object({
-  id: z.int(),
-  namespace: z.string(),
-});
-
-/**
- * Success
- */
-export const zGetKubernetesMetricsForAllPodsResponse = zV1Beta1PodMetricsList;
-
 export const zGetKubernetesMetricsForPodPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5894,6 +5884,16 @@ export const zGetKubernetesMetricsForPodPath = z.object({
  * Success
  */
 export const zGetKubernetesMetricsForPodResponse = zV1Beta1PodMetrics;
+
+export const zGetKubernetesMetricsForAllPodsPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zGetKubernetesMetricsForAllPodsResponse = zV1Beta1PodMetricsList;
 
 /**
  * List of namespace names to delete

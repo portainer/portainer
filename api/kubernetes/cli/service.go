@@ -176,10 +176,10 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 // if replicasets are found, it updates the owner reference to deployment
 // it then combines the service with the application
 // finally, it returns a list of K8sServiceInfo objects
-func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
+func (kcl *KubeClient) CombineServicesWithApplications(namespace string, services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
 	if containsServiceWithSelector(services) {
 		updatedServices := make([]models.K8sServiceInfo, len(services))
-		portainerApplicationResources, err := kcl.fetchAllApplicationsListResources("", metav1.ListOptions{})
+		portainerApplicationResources, err := kcl.fetchAllApplicationsListResources(namespace, metav1.ListOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}

@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"k8s.io/client-go/kubernetes"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 // NewTestClientFactory creates a ClientFactory with a pre-seeded KubeClient for
@@ -24,4 +25,13 @@ func NewTestKubeClient(clientset kubernetes.Interface) *KubeClient {
 		instanceID:  "test",
 		isKubeAdmin: true,
 	}
+}
+
+// NewTestKubeClientWithMetrics creates a KubeClient backed by the provided
+// kubernetes and metrics interfaces. Intended for use in tests that exercise
+// GetMetricsClient.
+func NewTestKubeClientWithMetrics(clientset kubernetes.Interface, metricsClientset metricsv.Interface) *KubeClient {
+	kcl := NewTestKubeClient(clientset)
+	kcl.metricsCli = metricsClientset
+	return kcl
 }

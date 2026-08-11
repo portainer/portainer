@@ -70,14 +70,25 @@ func (handler *Handler) getKubernetesServiceAccount(w http.ResponseWriter, r *ht
 		return httperror.BadRequest("Invalid name", err)
 	}
 
-	cli, httpErr := handler.prepareKubeClient(r)
+	cli, httpErr := handler.getProxyKubeClient(r)
 	if httpErr != nil {
-		return httperror.InternalServerError("Unable to prepare kube client", httpErr)
+		return httpErr
 	}
 
 	sa, err := cli.GetServiceAccount(namespace, name)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve service account", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesServiceAccount").Str("namespace", namespace).Str("name", name).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("unauthorized access to the service account. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesServiceAccount").Str("namespace", namespace).Str("name", name).Msg("Service account not found")
+			return httperror.NotFound("service account not found. Error: ", err)
+		}
+
+		log.Error().Err(err).Str("context", "GetKubernetesServiceAccount").Str("namespace", namespace).Str("name", name).Msg("Unable to retrieve service account")
+		return httperror.InternalServerError("unable to retrieve service account. Error: ", err)
 	}
 
 	return response.JSON(w, sa)

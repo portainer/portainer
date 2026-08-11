@@ -45,6 +45,7 @@ type (
 	KubeClient struct {
 		cli                kubernetes.Interface
 		gatewayCLI         gatewaycliv1.GatewayV1Interface
+		metricsCli         metricsv.Interface
 		instanceID         string
 		mu                 sync.Mutex
 		isKubeAdmin        bool
@@ -197,13 +198,25 @@ func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, k
 		return nil, fmt.Errorf("failed to create gateway clientset for the given config: %w", err)
 	}
 
+	metricsCli, err := metricsv.NewForConfigAndClient(clientConfig, httpClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create metrics clientset for the given config: %w", err)
+	}
+
 	return &KubeClient{
 		cli:                cli,
 		gatewayCLI:         gatewayCLI,
+		metricsCli:         metricsCli,
 		instanceID:         factory.instanceID,
 		isKubeAdmin:        IsKubeAdmin,
 		nonAdminNamespaces: NonAdminNamespaces,
 	}, nil
+}
+
+// GetMetricsClient returns the metrics clientset scoped to this KubeClient's credentials.
+// It is nil for privileged clients that are not built from a user kubeconfig.
+func (kcl *KubeClient) GetMetricsClient() metricsv.Interface {
+	return kcl.metricsCli
 }
 
 func (factory *ClientFactory) createCachedPrivilegedKubeClient(endpoint *portainer.Endpoint) (*KubeClient, error) {

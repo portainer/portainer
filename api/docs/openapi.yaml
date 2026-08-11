@@ -4874,49 +4874,6 @@ paths:
       summary: Get live metrics for a node
       tags:
         - kubernetes
-  "/kubernetes/{id}/metrics/pods/{namespace}":
-    get:
-      description: |-
-        Get a list of pods with their live metrics for the specified namespace.
-        **Access policy**: Authenticated user.
-      operationId: GetKubernetesMetricsForAllPods
-      parameters:
-        - description: Environment identifier
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-        - description: Namespace
-          in: path
-          name: namespace
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/v1beta1.PodMetricsList"
-        "400":
-          description: Invalid request payload, such as missing required fields or fields
-            not meeting validation criteria.
-        "401":
-          description: Unauthorized access - the user is not authenticated or does not
-            have the necessary permissions. Ensure that you have provided a
-            valid API key or JWT token, and that you have the required
-            permissions.
-        "500":
-          description: Server error occurred while attempting to retrieve the list of pods
-            with their live metrics.
-      security:
-        - ApiKeyAuth: []
-          jwt: []
-      summary: Get a list of pods with their live metrics
-      tags:
-        - kubernetes
   "/kubernetes/{id}/metrics/pods/{namespace}/{name}":
     get:
       description: |-
@@ -4964,6 +4921,53 @@ paths:
         - ApiKeyAuth: []
           jwt: []
       summary: Get live metrics for a pod
+      tags:
+        - kubernetes
+  "/kubernetes/{id}/metrics/pods/namespace/{namespace}":
+    get:
+      description: |-
+        Get a list of pods with their live metrics for the specified namespace.
+        **Access policy**: Authenticated user.
+      operationId: GetKubernetesMetricsForAllPods
+      parameters:
+        - description: Environment identifier
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Namespace
+          in: path
+          name: namespace
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1beta1.PodMetricsList"
+        "400":
+          description: Invalid request payload, such as missing required fields or fields
+            not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does not
+            have the necessary permissions. Ensure that you have provided a
+            valid API key or JWT token, and that you have the required
+            permissions.
+        "403":
+          description: Permission denied - the user is authenticated but is not authorized
+            to access pod metrics in the specified namespace. Check your user
+            roles and permissions.
+        "500":
+          description: Server error occurred while attempting to retrieve the list of pods
+            with their live metrics.
+      security:
+        - ApiKeyAuth: []
+          jwt: []
+      summary: Get a list of pods with their live metrics
       tags:
         - kubernetes
   "/kubernetes/{id}/namespaces":

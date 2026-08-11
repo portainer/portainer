@@ -18094,47 +18094,6 @@ export type GetKubernetesMetricsForNodeResponses = {
 export type GetKubernetesMetricsForNodeResponse =
   GetKubernetesMetricsForNodeResponses[keyof GetKubernetesMetricsForNodeResponses];
 
-export type GetKubernetesMetricsForAllPodsData = {
-  body?: never;
-  path: {
-    /**
-     * Environment identifier
-     */
-    id: number;
-    /**
-     * Namespace
-     */
-    namespace: string;
-  };
-  query?: never;
-  url: '/kubernetes/{id}/metrics/pods/{namespace}';
-};
-
-export type GetKubernetesMetricsForAllPodsErrors = {
-  /**
-   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
-   */
-  400: unknown;
-  /**
-   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
-   */
-  401: unknown;
-  /**
-   * Server error occurred while attempting to retrieve the list of pods with their live metrics.
-   */
-  500: unknown;
-};
-
-export type GetKubernetesMetricsForAllPodsResponses = {
-  /**
-   * Success
-   */
-  200: V1Beta1PodMetricsList;
-};
-
-export type GetKubernetesMetricsForAllPodsResponse =
-  GetKubernetesMetricsForAllPodsResponses[keyof GetKubernetesMetricsForAllPodsResponses];
-
 export type GetKubernetesMetricsForPodData = {
   body?: never;
   path: {
@@ -18179,6 +18138,51 @@ export type GetKubernetesMetricsForPodResponses = {
 
 export type GetKubernetesMetricsForPodResponse =
   GetKubernetesMetricsForPodResponses[keyof GetKubernetesMetricsForPodResponses];
+
+export type GetKubernetesMetricsForAllPodsData = {
+  body?: never;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * Namespace
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/metrics/pods/namespace/{namespace}';
+};
+
+export type GetKubernetesMetricsForAllPodsErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but is not authorized to access pod metrics in the specified namespace. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Server error occurred while attempting to retrieve the list of pods with their live metrics.
+   */
+  500: unknown;
+};
+
+export type GetKubernetesMetricsForAllPodsResponses = {
+  /**
+   * Success
+   */
+  200: V1Beta1PodMetricsList;
+};
+
+export type GetKubernetesMetricsForAllPodsResponse =
+  GetKubernetesMetricsForAllPodsResponses[keyof GetKubernetesMetricsForAllPodsResponses];
 
 export type DeleteKubernetesNamespaceData = {
   /**
