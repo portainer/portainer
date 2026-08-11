@@ -25,6 +25,9 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules/', 'app/setup-tests/global-setup.js'],
     },
+    // The default includes package.json, which made `--changed` run the whole suite for
+    // any edit to it. Dependency changes move pnpm-lock.yaml, so key off that instead.
+    forceRerunTriggers: ['**/pnpm-lock.yaml', '**/{vitest,vite}.config.*'],
     bail: 2,
     include: ['./app/**/*.test.ts', './app/**/*.test.tsx'],
     env: {

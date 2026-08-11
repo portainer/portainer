@@ -22,6 +22,7 @@
     "build": "webpack",
     "format": "prettier --log-level warn --write  \"**/*.{js,css,html,jsx,tsx,ts}\"",
     "lint": "eslint --cache --fix \"./**/*.{js,jsx,ts,tsx}\"",
+    "lint:ci": "eslint --cache \"./**/*.{js,jsx,ts,tsx}\"",
     "test": "vitest run",
     "sb": "pnpm run storybook",
     "storybook": "storybook dev -p 6006",
