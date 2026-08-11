@@ -80,6 +80,13 @@ func buildOperation(request *http.Request) error {
 			return ErrUploadedFilesNotFound
 		}
 
+		form := request.MultipartForm
+		defer func() {
+			if err := form.RemoveAll(); err != nil {
+				log.Warn().Err(err).Msg("failed to remove temporary multipart files")
+			}
+		}()
+
 		tfb := archive.NewTarFileInBuffer()
 		defer func() {
 			if err := tfb.Close(); err != nil {
@@ -87,7 +94,7 @@ func buildOperation(request *http.Request) error {
 			}
 		}()
 
-		for k := range request.MultipartForm.File {
+		for k := range form.File {
 			f, hdr, err := request.FormFile(k)
 			if err != nil {
 				return err
