@@ -360,6 +360,13 @@ export const zKubernetesK8sClusterRole = z.object({
   uid: z.string().optional(),
 });
 
+export const zKubernetesK8sConfigMapWriteRequest = z.object({
+  Annotations: z.record(z.string(), z.string()).optional(),
+  Data: z.record(z.string(), z.string()).optional(),
+  Labels: z.record(z.string(), z.string()).optional(),
+  Name: z.string().optional(),
+});
+
 export const zKubernetesK8sConfigurationOwnerResource = z.object({
   Id: z.string().optional(),
   Name: z.string().optional(),
@@ -567,6 +574,14 @@ export const zKubernetesK8sEnvVar = z.object({
   name: z.string().optional(),
   secretRef: zKubernetesK8sSecretKeyRef.optional(),
   value: z.string().optional(),
+});
+
+export const zKubernetesK8sSecretWriteRequest = z.object({
+  Annotations: z.record(z.string(), z.string()).optional(),
+  Data: z.record(z.string(), z.string()).optional(),
+  Labels: z.record(z.string(), z.string()).optional(),
+  Name: z.string().optional(),
+  SecretType: z.string().optional(),
 });
 
 export const zKubernetesK8sServiceAccount = z.object({
@@ -4486,7 +4501,13 @@ export const zEndpointsEndpointDeleteBatchPayload2 =
 
 export const zKubernetesK8sNamespaceDetails2 = zKubernetesK8sNamespaceDetails;
 
+export const zKubernetesK8sConfigMapWriteRequest2 =
+  zKubernetesK8sConfigMapWriteRequest;
+
 export const zKubernetesK8sIngressInfo2 = zKubernetesK8sIngressInfo;
+
+export const zKubernetesK8sSecretWriteRequest2 =
+  zKubernetesK8sSecretWriteRequest;
 
 export const zKubernetesK8sServiceInfo2 = zKubernetesK8sServiceInfo;
 
@@ -5986,6 +6007,33 @@ export const zUpdateKubernetesNamespacePath = z.object({
  */
 export const zUpdateKubernetesNamespaceResponse = zPortainerK8sNamespaceInfo;
 
+/**
+ * ConfigMap definition
+ */
+export const zCreateKubernetesConfigMapBody =
+  zKubernetesK8sConfigMapWriteRequest2;
+
+export const zCreateKubernetesConfigMapPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zCreateKubernetesConfigMapResponse = zKubernetesK8sConfigMap;
+
+export const zDeleteKubernetesConfigMapPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  configmap: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zDeleteKubernetesConfigMapResponse = z.void();
+
 export const zGetKubernetesConfigMapPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -5996,6 +6044,23 @@ export const zGetKubernetesConfigMapPath = z.object({
  * Success
  */
 export const zGetKubernetesConfigMapResponse = zKubernetesK8sConfigMap;
+
+/**
+ * ConfigMap definition
+ */
+export const zUpdateKubernetesConfigMapBody =
+  zKubernetesK8sConfigMapWriteRequest2;
+
+export const zUpdateKubernetesConfigMapPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  configmap: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zUpdateKubernetesConfigMapResponse = zKubernetesK8sConfigMap;
 
 export const zGetKubernetesDeploymentsForNamespacePath = z.object({
   id: z.int(),
@@ -6348,6 +6413,32 @@ export const zGetKubernetesResourceQuotasPath = z.object({
 export const zGetKubernetesResourceQuotasResponse =
   zKubernetesKubernetesResourceQuotaListResponse;
 
+/**
+ * Secret definition
+ */
+export const zCreateKubernetesSecretBody = zKubernetesK8sSecretWriteRequest2;
+
+export const zCreateKubernetesSecretPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zCreateKubernetesSecretResponse = zKubernetesK8sSecret;
+
+export const zDeleteKubernetesSecretPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  secret: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zDeleteKubernetesSecretResponse = z.void();
+
 export const zGetKubernetesSecretPath = z.object({
   id: z.int(),
   namespace: z.string(),
@@ -6358,6 +6449,22 @@ export const zGetKubernetesSecretPath = z.object({
  * Success
  */
 export const zGetKubernetesSecretResponse = zKubernetesK8sSecret;
+
+/**
+ * Secret definition
+ */
+export const zUpdateKubernetesSecretBody = zKubernetesK8sSecretWriteRequest2;
+
+export const zUpdateKubernetesSecretPath = z.object({
+  id: z.int(),
+  namespace: z.string(),
+  secret: z.string(),
+});
+
+/**
+ * Success
+ */
+export const zUpdateKubernetesSecretResponse = zKubernetesK8sSecret;
 
 export const zGetKubernetesServiceAccountPath = z.object({
   id: z.int(),

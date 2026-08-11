@@ -1904,6 +1904,9 @@ type (
 
 		// ConfigMap
 		GetConfigMap(namespace, configMapName string) (models.K8sConfigMap, error)
+		CreateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error)
+		UpdateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error)
+		DeleteConfigMap(namespace, name string) error
 		CombineConfigMapWithApplications(configMap models.K8sConfigMap) (models.K8sConfigMap, error)
 
 		// CronJob
@@ -2001,6 +2004,9 @@ type (
 		// Secret
 		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetSecret(namespace string, secretName string) (models.K8sSecret, error)
+		CreateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error)
+		UpdateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error)
+		DeleteSecret(namespace, name string) error
 		CombineSecretWithApplications(secret models.K8sSecret) (models.K8sSecret, error)
 
 		// ServiceAccount

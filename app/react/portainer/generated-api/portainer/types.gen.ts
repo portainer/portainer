@@ -1143,6 +1143,19 @@ export type KubernetesK8sConfigMap = {
   UID?: string;
 };
 
+export type KubernetesK8sConfigMapWriteRequest = {
+  Annotations?: {
+    [key: string]: string;
+  };
+  Data?: {
+    [key: string]: string;
+  };
+  Labels?: {
+    [key: string]: string;
+  };
+  Name?: string;
+};
+
 export type KubernetesK8sConfigurationOwnerResource = {
   Id?: string;
   Name?: string;
@@ -1500,6 +1513,20 @@ export type KubernetesK8sSecret = {
 export type KubernetesK8sSecretKeyRef = {
   key?: string;
   name?: string;
+};
+
+export type KubernetesK8sSecretWriteRequest = {
+  Annotations?: {
+    [key: string]: string;
+  };
+  Data?: {
+    [key: string]: string;
+  };
+  Labels?: {
+    [key: string]: string;
+  };
+  Name?: string;
+  SecretType?: string;
 };
 
 export type KubernetesK8sServiceAccount = {
@@ -13284,7 +13311,12 @@ export type EndpointsEndpointDeleteBatchPayload2 =
 
 export type KubernetesK8sNamespaceDetails2 = KubernetesK8sNamespaceDetails;
 
+export type KubernetesK8sConfigMapWriteRequest2 =
+  KubernetesK8sConfigMapWriteRequest;
+
 export type KubernetesK8sIngressInfo2 = KubernetesK8sIngressInfo;
+
+export type KubernetesK8sSecretWriteRequest2 = KubernetesK8sSecretWriteRequest;
 
 export type KubernetesK8sServiceInfo2 = KubernetesK8sServiceInfo;
 
@@ -18484,6 +18516,111 @@ export type UpdateKubernetesNamespaceResponses = {
 export type UpdateKubernetesNamespaceResponse =
   UpdateKubernetesNamespaceResponses[keyof UpdateKubernetesNamespaceResponses];
 
+export type CreateKubernetesConfigMapData = {
+  /**
+   * ConfigMap definition
+   */
+  body: KubernetesK8sConfigMapWriteRequest2;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the configmap is created
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/configmaps';
+};
+
+export type CreateKubernetesConfigMapErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * A configmap with the same name already exists in the namespace.
+   */
+  409: unknown;
+  /**
+   * Server error occurred while attempting to create the configmap.
+   */
+  500: unknown;
+};
+
+export type CreateKubernetesConfigMapResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesK8sConfigMap;
+};
+
+export type CreateKubernetesConfigMapResponse =
+  CreateKubernetesConfigMapResponses[keyof CreateKubernetesConfigMapResponses];
+
+export type DeleteKubernetesConfigMapData = {
+  body?: never;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the configmap is located
+     */
+    namespace: string;
+    /**
+     * The configmap name to delete
+     */
+    configmap: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}';
+};
+
+export type DeleteKubernetesConfigMapErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the configmap to delete.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to delete the configmap.
+   */
+  500: unknown;
+};
+
+export type DeleteKubernetesConfigMapResponses = {
+  /**
+   * Success
+   */
+  204: void;
+};
+
+export type DeleteKubernetesConfigMapResponse =
+  DeleteKubernetesConfigMapResponses[keyof DeleteKubernetesConfigMapResponses];
+
 export type GetKubernetesConfigMapData = {
   body?: never;
   path: {
@@ -18536,6 +18673,62 @@ export type GetKubernetesConfigMapResponses = {
 
 export type GetKubernetesConfigMapResponse =
   GetKubernetesConfigMapResponses[keyof GetKubernetesConfigMapResponses];
+
+export type UpdateKubernetesConfigMapData = {
+  /**
+   * ConfigMap definition
+   */
+  body: KubernetesK8sConfigMapWriteRequest2;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the configmap is located
+     */
+    namespace: string;
+    /**
+     * The configmap name to update
+     */
+    configmap: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}';
+};
+
+export type UpdateKubernetesConfigMapErrors = {
+  /**
+   * Invalid request payload, such as missing required fields, fields not meeting validation criteria, or a payload name that does not match the route.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the configmap to update.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to update the configmap.
+   */
+  500: unknown;
+};
+
+export type UpdateKubernetesConfigMapResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesK8sConfigMap;
+};
+
+export type UpdateKubernetesConfigMapResponse =
+  UpdateKubernetesConfigMapResponses[keyof UpdateKubernetesConfigMapResponses];
 
 export type GetKubernetesDeploymentsForNamespaceData = {
   body?: never;
@@ -19821,6 +20014,111 @@ export type GetKubernetesResourceQuotasResponses = {
 export type GetKubernetesResourceQuotasResponse =
   GetKubernetesResourceQuotasResponses[keyof GetKubernetesResourceQuotasResponses];
 
+export type CreateKubernetesSecretData = {
+  /**
+   * Secret definition
+   */
+  body: KubernetesK8sSecretWriteRequest2;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the secret is created
+     */
+    namespace: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/secrets';
+};
+
+export type CreateKubernetesSecretErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * A secret with the same name already exists in the namespace.
+   */
+  409: unknown;
+  /**
+   * Server error occurred while attempting to create the secret.
+   */
+  500: unknown;
+};
+
+export type CreateKubernetesSecretResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesK8sSecret;
+};
+
+export type CreateKubernetesSecretResponse =
+  CreateKubernetesSecretResponses[keyof CreateKubernetesSecretResponses];
+
+export type DeleteKubernetesSecretData = {
+  body?: never;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the secret is located
+     */
+    namespace: string;
+    /**
+     * The secret name to delete
+     */
+    secret: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/secrets/{secret}';
+};
+
+export type DeleteKubernetesSecretErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the secret to delete.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to delete the secret.
+   */
+  500: unknown;
+};
+
+export type DeleteKubernetesSecretResponses = {
+  /**
+   * Success
+   */
+  204: void;
+};
+
+export type DeleteKubernetesSecretResponse =
+  DeleteKubernetesSecretResponses[keyof DeleteKubernetesSecretResponses];
+
 export type GetKubernetesSecretData = {
   body?: never;
   path: {
@@ -19873,6 +20171,62 @@ export type GetKubernetesSecretResponses = {
 
 export type GetKubernetesSecretResponse =
   GetKubernetesSecretResponses[keyof GetKubernetesSecretResponses];
+
+export type UpdateKubernetesSecretData = {
+  /**
+   * Secret definition
+   */
+  body: KubernetesK8sSecretWriteRequest2;
+  path: {
+    /**
+     * Environment identifier
+     */
+    id: number;
+    /**
+     * The namespace name where the secret is located
+     */
+    namespace: string;
+    /**
+     * The secret name to update
+     */
+    secret: string;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/namespaces/{namespace}/secrets/{secret}';
+};
+
+export type UpdateKubernetesSecretErrors = {
+  /**
+   * Invalid request payload, such as missing required fields, fields not meeting validation criteria, or a payload name that does not match the route.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find the secret to update.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to update the secret.
+   */
+  500: unknown;
+};
+
+export type UpdateKubernetesSecretResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesK8sSecret;
+};
+
+export type UpdateKubernetesSecretResponse =
+  UpdateKubernetesSecretResponses[keyof UpdateKubernetesSecretResponses];
 
 export type GetKubernetesServiceAccountData = {
   body?: never;

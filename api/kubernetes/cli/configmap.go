@@ -77,6 +77,60 @@ func (kcl *KubeClient) GetConfigMap(namespace, configMapName string) (models.K8s
 	return parseConfigMap(configMap, true), nil
 }
 
+// CreateConfigMap creates a config map in the given namespace. The returned config map
+// carries metadata only: the caller already holds the data it just wrote, so it is not
+// echoed back.
+func (kcl *KubeClient) CreateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error) {
+	configMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        request.Name,
+			Namespace:   namespace,
+			Labels:      request.Labels,
+			Annotations: request.Annotations,
+		},
+		Data: request.Data,
+	}
+
+	created, err := kcl.cli.CoreV1().ConfigMaps(namespace).Create(context.Background(), configMap, metav1.CreateOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(created, false), nil
+}
+
+// UpdateConfigMap updates an existing config map in the given namespace. The live
+// config map is read first so that fields the payload does not model, such as binary
+// data, survive the update.
+func (kcl *KubeClient) UpdateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error) {
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(namespace).Get(context.Background(), request.Name, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	if request.Data != nil {
+		configMap.Data = request.Data
+	}
+	if request.Labels != nil {
+		configMap.Labels = request.Labels
+	}
+	if request.Annotations != nil {
+		configMap.Annotations = request.Annotations
+	}
+
+	updated, err := kcl.cli.CoreV1().ConfigMaps(namespace).Update(context.Background(), configMap, metav1.UpdateOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(updated, false), nil
+}
+
+// DeleteConfigMap deletes the named config map in the given namespace.
+func (kcl *KubeClient) DeleteConfigMap(namespace, name string) error {
+	return kcl.cli.CoreV1().ConfigMaps(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+}
+
 // parseConfigMap parses a k8s ConfigMap object into a K8sConfigMap struct.
 // for get operation, withData will be set to true.
 // otherwise, only metadata will be parsed.

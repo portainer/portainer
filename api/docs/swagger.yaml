@@ -1770,6 +1770,23 @@ definitions:
       UID:
         type: string
     type: object
+  kubernetes.K8sConfigMapWriteRequest:
+    properties:
+      Annotations:
+        additionalProperties:
+          type: string
+        type: object
+      Data:
+        additionalProperties:
+          type: string
+        type: object
+      Labels:
+        additionalProperties:
+          type: string
+        type: object
+      Name:
+        type: string
+    type: object
   kubernetes.K8sConfigurationOwnerResource:
     properties:
       Id:
@@ -2365,6 +2382,25 @@ definitions:
       key:
         type: string
       name:
+        type: string
+    type: object
+  kubernetes.K8sSecretWriteRequest:
+    properties:
+      Annotations:
+        additionalProperties:
+          type: string
+        type: object
+      Data:
+        additionalProperties:
+          type: string
+        type: object
+      Labels:
+        additionalProperties:
+          type: string
+        type: object
+      Name:
+        type: string
+      SecretType:
         type: string
     type: object
   kubernetes.K8sServiceAccount:
@@ -19814,7 +19850,108 @@ paths:
       summary: Update a namespace
       tags:
       - kubernetes
+  /kubernetes/{id}/namespaces/{namespace}/configmaps:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a ConfigMap in the given namespace. The response carries the
+        created ConfigMap's metadata only, not its data.
+        **Access policy**: Authenticated user.
+      operationId: CreateKubernetesConfigMap
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the configmap is created
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: ConfigMap definition
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/kubernetes.K8sConfigMapWriteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/kubernetes.K8sConfigMap'
+        "400":
+          description: Invalid request payload, such as missing required fields or
+            fields not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "409":
+          description: A configmap with the same name already exists in the namespace.
+        "500":
+          description: Server error occurred while attempting to create the configmap.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Create a ConfigMap
+      tags:
+      - kubernetes
   /kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}:
+    delete:
+      description: |-
+        Delete a ConfigMap in the given namespace.
+        **Access policy**: Authenticated user.
+      operationId: DeleteKubernetesConfigMap
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the configmap is located
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: The configmap name to delete
+        in: path
+        name: configmap
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid request payload, such as missing required fields or
+            fields not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "404":
+          description: Unable to find the configmap to delete.
+        "500":
+          description: Server error occurred while attempting to delete the configmap.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Delete a ConfigMap
+      tags:
+      - kubernetes
     get:
       description: |-
         Get a ConfigMap by name for a given namespace.
@@ -19864,6 +20001,66 @@ paths:
       - ApiKeyAuth: []
         jwt: []
       summary: Get a ConfigMap
+      tags:
+      - kubernetes
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Update a ConfigMap in the given namespace. A nil field leaves the live
+        value untouched, so an empty map clears it, and binary data is preserved.
+        The response carries the updated ConfigMap's metadata only.
+        **Access policy**: Authenticated user.
+      operationId: UpdateKubernetesConfigMap
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the configmap is located
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: The configmap name to update
+        in: path
+        name: configmap
+        required: true
+        type: string
+      - description: ConfigMap definition
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/kubernetes.K8sConfigMapWriteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/kubernetes.K8sConfigMap'
+        "400":
+          description: Invalid request payload, such as missing required fields, fields
+            not meeting validation criteria, or a payload name that does not match
+            the route.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "404":
+          description: Unable to find the configmap to update.
+        "500":
+          description: Server error occurred while attempting to update the configmap.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Update a ConfigMap
       tags:
       - kubernetes
   /kubernetes/{id}/namespaces/{namespace}/deployments:
@@ -21147,7 +21344,109 @@ paths:
       summary: Get Kubernetes resource quotas within a namespace
       tags:
       - kubernetes
+  /kubernetes/{id}/namespaces/{namespace}/secrets:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a Secret in the given namespace. Data values are sent as plain
+        strings and encoded server-side. The response carries the created
+        Secret's metadata only, not its data.
+        **Access policy**: Authenticated user.
+      operationId: CreateKubernetesSecret
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the secret is created
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: Secret definition
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/kubernetes.K8sSecretWriteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/kubernetes.K8sSecret'
+        "400":
+          description: Invalid request payload, such as missing required fields or
+            fields not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "409":
+          description: A secret with the same name already exists in the namespace.
+        "500":
+          description: Server error occurred while attempting to create the secret.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Create a Secret
+      tags:
+      - kubernetes
   /kubernetes/{id}/namespaces/{namespace}/secrets/{secret}:
+    delete:
+      description: |-
+        Delete a Secret in the given namespace.
+        **Access policy**: Authenticated user.
+      operationId: DeleteKubernetesSecret
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the secret is located
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: The secret name to delete
+        in: path
+        name: secret
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid request payload, such as missing required fields or
+            fields not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "404":
+          description: Unable to find the secret to delete.
+        "500":
+          description: Server error occurred while attempting to delete the secret.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Delete a Secret
+      tags:
+      - kubernetes
     get:
       description: |-
         Get a Secret by name for a given namespace.
@@ -21196,6 +21495,66 @@ paths:
       - ApiKeyAuth: []
         jwt: []
       summary: Get a Secret
+      tags:
+      - kubernetes
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Update a Secret in the given namespace. A nil field leaves the live value
+        untouched, so an empty map clears it, and the secret type cannot be
+        changed. The response carries the updated Secret's metadata only.
+        **Access policy**: Authenticated user.
+      operationId: UpdateKubernetesSecret
+      parameters:
+      - description: Environment identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The namespace name where the secret is located
+        in: path
+        name: namespace
+        required: true
+        type: string
+      - description: The secret name to update
+        in: path
+        name: secret
+        required: true
+        type: string
+      - description: Secret definition
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/kubernetes.K8sSecretWriteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/kubernetes.K8sSecret'
+        "400":
+          description: Invalid request payload, such as missing required fields, fields
+            not meeting validation criteria, or a payload name that does not match
+            the route.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does
+            not have the necessary permissions. Ensure that you have provided a valid
+            API key or JWT token, and that you have the required permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not
+            have the necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "404":
+          description: Unable to find the secret to update.
+        "500":
+          description: Server error occurred while attempting to update the secret.
+      security:
+      - ApiKeyAuth: []
+        jwt: []
+      summary: Update a Secret
       tags:
       - kubernetes
   /kubernetes/{id}/namespaces/{namespace}/service_accounts/{name}:

@@ -18,6 +18,9 @@ import type {
   BackupData,
   BackupErrors,
   BackupResponses,
+  CreateKubernetesConfigMapData,
+  CreateKubernetesConfigMapErrors,
+  CreateKubernetesConfigMapResponses,
   CreateKubernetesDeploymentData,
   CreateKubernetesDeploymentErrors,
   CreateKubernetesDeploymentResponses,
@@ -30,6 +33,9 @@ import type {
   CreateKubernetesPersistentVolumeClaimData,
   CreateKubernetesPersistentVolumeClaimErrors,
   CreateKubernetesPersistentVolumeClaimResponses,
+  CreateKubernetesSecretData,
+  CreateKubernetesSecretErrors,
+  CreateKubernetesSecretResponses,
   CreateKubernetesServiceData,
   CreateKubernetesServiceErrors,
   CreateKubernetesServiceResponses,
@@ -75,6 +81,9 @@ import type {
   DeleteJobsData,
   DeleteJobsErrors,
   DeleteJobsResponses,
+  DeleteKubernetesConfigMapData,
+  DeleteKubernetesConfigMapErrors,
+  DeleteKubernetesConfigMapResponses,
   DeleteKubernetesDeploymentData,
   DeleteKubernetesDeploymentErrors,
   DeleteKubernetesDeploymentResponses,
@@ -93,6 +102,9 @@ import type {
   DeleteKubernetesPodData,
   DeleteKubernetesPodErrors,
   DeleteKubernetesPodResponses,
+  DeleteKubernetesSecretData,
+  DeleteKubernetesSecretErrors,
+  DeleteKubernetesSecretResponses,
   DeleteKubernetesServicesData,
   DeleteKubernetesServicesErrors,
   DeleteKubernetesServicesResponses,
@@ -761,6 +773,9 @@ import type {
   TemplateListData,
   TemplateListErrors,
   TemplateListResponses,
+  UpdateKubernetesConfigMapData,
+  UpdateKubernetesConfigMapErrors,
+  UpdateKubernetesConfigMapResponses,
   UpdateKubernetesDeploymentData,
   UpdateKubernetesDeploymentErrors,
   UpdateKubernetesDeploymentResponses,
@@ -782,6 +797,9 @@ import type {
   UpdateKubernetesPersistentVolumeReclaimPolicyData,
   UpdateKubernetesPersistentVolumeReclaimPolicyErrors,
   UpdateKubernetesPersistentVolumeReclaimPolicyResponses,
+  UpdateKubernetesSecretData,
+  UpdateKubernetesSecretErrors,
+  UpdateKubernetesSecretResponses,
   UpdateKubernetesServiceAccountImagePullSecretsData,
   UpdateKubernetesServiceAccountImagePullSecretsErrors,
   UpdateKubernetesServiceAccountImagePullSecretsResponses,
@@ -841,6 +859,9 @@ import {
   zAuthenticateUserBody,
   zAuthenticateUserResponse,
   zBackupBody,
+  zCreateKubernetesConfigMapBody,
+  zCreateKubernetesConfigMapPath,
+  zCreateKubernetesConfigMapResponse,
   zCreateKubernetesDeploymentBody,
   zCreateKubernetesDeploymentPath,
   zCreateKubernetesDeploymentResponse,
@@ -853,6 +874,9 @@ import {
   zCreateKubernetesPersistentVolumeClaimBody,
   zCreateKubernetesPersistentVolumeClaimPath,
   zCreateKubernetesPersistentVolumeClaimResponse,
+  zCreateKubernetesSecretBody,
+  zCreateKubernetesSecretPath,
+  zCreateKubernetesSecretResponse,
   zCreateKubernetesServiceBody,
   zCreateKubernetesServicePath,
   zCreateKubernetesServiceResponse,
@@ -888,6 +912,8 @@ import {
   zDeleteJobsBody,
   zDeleteJobsPath,
   zDeleteJobsResponse,
+  zDeleteKubernetesConfigMapPath,
+  zDeleteKubernetesConfigMapResponse,
   zDeleteKubernetesDeploymentPath,
   zDeleteKubernetesDeploymentResponse,
   zDeleteKubernetesIngressesBody,
@@ -904,6 +930,8 @@ import {
   zDeleteKubernetesPersistentVolumesResponse,
   zDeleteKubernetesPodPath,
   zDeleteKubernetesPodResponse,
+  zDeleteKubernetesSecretPath,
+  zDeleteKubernetesSecretResponse,
   zDeleteKubernetesServicesBody,
   zDeleteKubernetesServicesPath,
   zDeleteKubernetesServicesResponse,
@@ -1413,6 +1441,9 @@ import {
   zTemplateFilePath,
   zTemplateFileResponse,
   zTemplateListResponse,
+  zUpdateKubernetesConfigMapBody,
+  zUpdateKubernetesConfigMapPath,
+  zUpdateKubernetesConfigMapResponse,
   zUpdateKubernetesDeploymentBody,
   zUpdateKubernetesDeploymentPath,
   zUpdateKubernetesDeploymentResponse,
@@ -1434,6 +1465,9 @@ import {
   zUpdateKubernetesPersistentVolumeReclaimPolicyBody,
   zUpdateKubernetesPersistentVolumeReclaimPolicyPath,
   zUpdateKubernetesPersistentVolumeReclaimPolicyResponse,
+  zUpdateKubernetesSecretBody,
+  zUpdateKubernetesSecretPath,
+  zUpdateKubernetesSecretResponse,
   zUpdateKubernetesServiceAccountImagePullSecretsBody,
   zUpdateKubernetesServiceAccountImagePullSecretsPath,
   zUpdateKubernetesServiceAccountImagePullSecretsResponse,
@@ -5988,6 +6022,84 @@ export const updateKubernetesNamespace = <ThrowOnError extends boolean = true>(
   });
 
 /**
+ * Create a ConfigMap
+ *
+ * Create a ConfigMap in the given namespace. The response carries the
+ * created ConfigMap's metadata only, not its data.
+ * **Access policy**: Authenticated user.
+ */
+export const createKubernetesConfigMap = <ThrowOnError extends boolean = true>(
+  options: Options<CreateKubernetesConfigMapData, ThrowOnError>
+): RequestResult<
+  CreateKubernetesConfigMapResponses,
+  CreateKubernetesConfigMapErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateKubernetesConfigMapResponses,
+    CreateKubernetesConfigMapErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateKubernetesConfigMapBody,
+          path: zCreateKubernetesConfigMapPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zCreateKubernetesConfigMapResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/configmaps',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a ConfigMap
+ *
+ * Delete a ConfigMap in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const deleteKubernetesConfigMap = <ThrowOnError extends boolean = true>(
+  options: Options<DeleteKubernetesConfigMapData, ThrowOnError>
+): RequestResult<
+  DeleteKubernetesConfigMapResponses,
+  DeleteKubernetesConfigMapErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteKubernetesConfigMapResponses,
+    DeleteKubernetesConfigMapErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteKubernetesConfigMapPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteKubernetesConfigMapResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}',
+    ...options,
+  });
+
+/**
  * Get a ConfigMap
  *
  * Get a ConfigMap by name for a given namespace.
@@ -6022,6 +6134,49 @@ export const getKubernetesConfigMap = <ThrowOnError extends boolean = true>(
     ],
     url: '/kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}',
     ...options,
+  });
+
+/**
+ * Update a ConfigMap
+ *
+ * Update a ConfigMap in the given namespace. A nil field leaves the live
+ * value untouched, so an empty map clears it, and binary data is preserved.
+ * The response carries the updated ConfigMap's metadata only.
+ * **Access policy**: Authenticated user.
+ */
+export const updateKubernetesConfigMap = <ThrowOnError extends boolean = true>(
+  options: Options<UpdateKubernetesConfigMapData, ThrowOnError>
+): RequestResult<
+  UpdateKubernetesConfigMapResponses,
+  UpdateKubernetesConfigMapErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateKubernetesConfigMapResponses,
+    UpdateKubernetesConfigMapErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateKubernetesConfigMapBody,
+          path: zUpdateKubernetesConfigMapPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zUpdateKubernetesConfigMapResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/configmaps/{configmap}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -7000,6 +7155,85 @@ export const getKubernetesResourceQuotas = <
   });
 
 /**
+ * Create a Secret
+ *
+ * Create a Secret in the given namespace. Data values are sent as plain
+ * strings and encoded server-side. The response carries the created
+ * Secret's metadata only, not its data.
+ * **Access policy**: Authenticated user.
+ */
+export const createKubernetesSecret = <ThrowOnError extends boolean = true>(
+  options: Options<CreateKubernetesSecretData, ThrowOnError>
+): RequestResult<
+  CreateKubernetesSecretResponses,
+  CreateKubernetesSecretErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateKubernetesSecretResponses,
+    CreateKubernetesSecretErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateKubernetesSecretBody,
+          path: zCreateKubernetesSecretPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zCreateKubernetesSecretResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/secrets',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a Secret
+ *
+ * Delete a Secret in the given namespace.
+ * **Access policy**: Authenticated user.
+ */
+export const deleteKubernetesSecret = <ThrowOnError extends boolean = true>(
+  options: Options<DeleteKubernetesSecretData, ThrowOnError>
+): RequestResult<
+  DeleteKubernetesSecretResponses,
+  DeleteKubernetesSecretErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteKubernetesSecretResponses,
+    DeleteKubernetesSecretErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteKubernetesSecretPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteKubernetesSecretResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/secrets/{secret}',
+    ...options,
+  });
+
+/**
  * Get a Secret
  *
  * Get a Secret by name for a given namespace.
@@ -7034,6 +7268,49 @@ export const getKubernetesSecret = <ThrowOnError extends boolean = true>(
     ],
     url: '/kubernetes/{id}/namespaces/{namespace}/secrets/{secret}',
     ...options,
+  });
+
+/**
+ * Update a Secret
+ *
+ * Update a Secret in the given namespace. A nil field leaves the live value
+ * untouched, so an empty map clears it, and the secret type cannot be
+ * changed. The response carries the updated Secret's metadata only.
+ * **Access policy**: Authenticated user.
+ */
+export const updateKubernetesSecret = <ThrowOnError extends boolean = true>(
+  options: Options<UpdateKubernetesSecretData, ThrowOnError>
+): RequestResult<
+  UpdateKubernetesSecretResponses,
+  UpdateKubernetesSecretErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateKubernetesSecretResponses,
+    UpdateKubernetesSecretErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateKubernetesSecretBody,
+          path: zUpdateKubernetesSecretPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zUpdateKubernetesSecretResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/namespaces/{namespace}/secrets/{secret}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
