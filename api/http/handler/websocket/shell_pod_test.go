@@ -3,12 +3,14 @@ package websocket
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -73,6 +75,44 @@ func TestWebsocketShellPodExec_allowsAuthorizedEndpoint(t *testing.T) {
 	assert.Panics(t, func() {
 		_ = handler.websocketShellPodExec(httptest.NewRecorder(), req)
 	})
+}
+
+// TestSetPodExecTarget_overridesCallerSuppliedParams asserts the shell path stamps the
+// server-owned shell pod coordinates over any caller-supplied namespace/podName/containerName/
+// command, so the agent's first-occurrence read cannot be redirected at another pod (C9S-353).
+func TestSetPodExecTarget_overridesCallerSuppliedParams(t *testing.T) {
+	u, err := url.Parse("/websocket/kubernetes-shell?endpointId=2&namespace=victim-ns&podName=victim&containerName=victim&command=cat+%2Fsecret")
+	require.NoError(t, err)
+
+	shellPod := &portainer.KubernetesShellPod{
+		Namespace:        "portainer",
+		PodName:          "portainer-pod-kubectl-shell-abc123",
+		ContainerName:    "kubectl-shell-container",
+		ShellExecCommand: "env TERM=xterm-256color /bin/bash",
+	}
+
+	setPodExecTarget(u, shellPod)
+
+	q := u.Query()
+	assert.Equal(t, []string{shellPod.Namespace}, q["namespace"])
+	assert.Equal(t, []string{shellPod.PodName}, q["podName"])
+	assert.Equal(t, []string{shellPod.ContainerName}, q["containerName"])
+	assert.Equal(t, []string{shellPod.ShellExecCommand}, q["command"])
+	assert.Equal(t, "2", q.Get("endpointId"))
+
+	// The agent reads these with request.RetrieveQueryParameter (first occurrence); it must
+	// now see the server's values, not the caller's.
+	req := httptest.NewRequest(http.MethodGet, "/websocket/pod?"+u.RawQuery, nil)
+	for name, want := range map[string]string{
+		"namespace":     shellPod.Namespace,
+		"podName":       shellPod.PodName,
+		"containerName": shellPod.ContainerName,
+		"command":       shellPod.ShellExecCommand,
+	} {
+		got, err := request.RetrieveQueryParameter(req, name, false)
+		require.NoError(t, err)
+		assert.Equalf(t, want, got, "agent read of %q must be the server value", name)
+	}
 }
 
 // TestWebsocketShellPodExec_allowsAuthorizedNonAdmin asserts a non-admin granted environment
