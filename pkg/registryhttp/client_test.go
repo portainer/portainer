@@ -15,6 +15,11 @@ func init() {
 	fips.InitFIPS(false)
 }
 
+func isRetryTransport(t *http.Client) bool {
+	_, ok := t.Transport.(*retry.Transport)
+	return ok
+}
+
 func TestCreateClient(t *testing.T) {
 	tests := []struct {
 		name                 string
@@ -101,8 +106,7 @@ func TestCreateClient(t *testing.T) {
 			// Verify client type based on registry configuration
 			switch tt.registry.Type {
 			case portainer.AzureRegistry, portainer.EcrRegistry, portainer.GithubRegistry, portainer.GitlabRegistry:
-				// Cloud registries should use the default retry client
-				assert.Equal(t, retry.DefaultClient, client)
+				assert.True(t, isRetryTransport(client), "Cloud registries should use a retry transport")
 			}
 		})
 	}
@@ -131,7 +135,7 @@ func TestCreateClient_CloudRegistries(t *testing.T) {
 			require.NoError(t, err)
 			assert.NotNil(t, client)
 			assert.False(t, usePlainHTTP, "Cloud registries should use HTTPS")
-			assert.Equal(t, retry.DefaultClient, client, "Cloud registries should use default retry client")
+			assert.True(t, isRetryTransport(client), "Cloud registries should use a retry transport")
 		})
 	}
 }

@@ -5,6 +5,7 @@ run:
 linters:
   default: none
   enable:
+    - gocritic
     - bodyclose
     - copyloopvar
     - depguard
@@ -56,6 +57,13 @@ linters:
               desc: github.com/cosi-project/runtime is not allowed because of FIPS mode
             - pkg: gopkg.in/yaml.v3
               desc: use go.yaml.in/yaml/v3 instead
+    gocritic:
+      disable-all: true
+      enabled-checks:
+        - ruleguard
+      settings:
+        ruleguard:
+          rules: "./analysis/ssrf.go"
     forbidigo:
       forbid:
         - pattern: ^tls\.Config$
@@ -73,6 +81,14 @@ linters:
       - comments
       - common-false-positives
       - legacy
+    rules:
+      - path: pkg/libhttp/ssrf
+        linters:
+          - gocritic
+        text: ruleguard
+      - path: pkg/libhttp/ssrf/builder\.go
+        linters:
+          - forbidigo
     paths:
       - third_party$
       - builtin$

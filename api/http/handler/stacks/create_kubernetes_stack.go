@@ -15,6 +15,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/pkg/errors"
@@ -114,6 +115,10 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
 	if len(payload.ManifestURL) == 0 || !validate.IsURL(payload.ManifestURL) {
 		return errors.New("Invalid manifest URL")
+	}
+
+	if err := ssrf.CheckURL(r.Context(), payload.ManifestURL); err != nil {
+		return err
 	}
 
 	return nil

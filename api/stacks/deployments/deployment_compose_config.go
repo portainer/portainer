@@ -1,6 +1,7 @@
 package deployments
 
 import (
+	"context"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
@@ -86,6 +87,10 @@ func (config *ComposeStackDeploymentConfig) Deploy() error {
 		if err := stackutils.ValidateStackFiles(config.stack, securitySettings, config.FileService); err != nil {
 			return err
 		}
+	}
+
+	if err := stackutils.ValidateComposeURLs(context.Background(), config.stack, config.FileService); err != nil {
+		return err
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {

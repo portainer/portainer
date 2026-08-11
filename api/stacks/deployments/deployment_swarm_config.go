@@ -1,6 +1,7 @@
 package deployments
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -85,6 +86,10 @@ func (config *SwarmStackDeploymentConfig) Deploy() error {
 		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService); err != nil {
 			return err
 		}
+	}
+
+	if err := stackutils.ValidateComposeURLs(context.Background(), config.stack, config.FileService); err != nil {
+		return err
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {

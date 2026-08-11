@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/pkg/libhelm/options"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/liboras"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
@@ -216,13 +217,15 @@ func downloadRepoIndexFromHttpRepo(repoURLString string, repoSettings *cli.EnvSe
 		Str("repo_name", repoName).
 		Msg("Creating chart repository object")
 
+	ssrfTransport := ssrf.NewTransport(nil)
+
 	// Create chart repository object
 	rep, err := repo.NewChartRepository(
 		&repo.Entry{
 			Name: repoName,
 			URL:  repoURLString,
 		},
-		getter.All(repoSettings),
+		getter.All(repoSettings, getter.WithTransport(ssrfTransport)),
 	)
 	if err != nil {
 		log.Error().

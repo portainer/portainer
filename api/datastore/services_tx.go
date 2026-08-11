@@ -14,6 +14,10 @@ func (tx *StoreTx) IsErrObjectNotFound(err error) bool {
 	return tx.store.IsErrObjectNotFound(err)
 }
 
+func (tx *StoreTx) AllowList() dataservices.AllowListService {
+	return tx.store.AllowListService.Tx(tx.tx)
+}
+
 func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService {
 	return tx.store.CustomTemplateService.Tx(tx.tx)
 }

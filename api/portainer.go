@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"time"
 
@@ -1147,6 +1148,21 @@ type (
 
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
 	SnapshotJob struct{}
+
+	// AllowList holds the list of permitted outbound proxy destinations.
+	AllowList struct {
+		ID      AllowListKey `json:"Id"`
+		Mode    SSRFMode     `json:"Mode"`
+		Entries []string     `json:"Entries"`
+	}
+
+	// ParsedAllowList holds the three parsed forms of allow list entries.
+	ParsedAllowList struct {
+		Mode  SSRFMode
+		Nets  []*net.IPNet
+		Hosts map[string]bool
+		Wilds []string // stored as ".foo.com" ("*." prefix stripped)
+	}
 
 	// SoftwareEdition represents an edition of Portainer
 	SoftwareEdition int
@@ -2490,3 +2506,17 @@ func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
 		AllowStackManagementForRegularUsers: true,
 	}
 }
+
+type AllowListKey int
+
+const (
+	AllowListSSRF AllowListKey = iota
+)
+
+type SSRFMode int
+
+const (
+	SSRFModeOff SSRFMode = iota
+	SSRFModeAudit
+	SSRFModeEnforce
+)

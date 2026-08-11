@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
@@ -43,6 +44,10 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 	_, err := url.ParseRequestURI(repo)
 	if err != nil {
 		return httperror.BadRequest("Bad request", errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo)))
+	}
+
+	if err := ssrf.CheckURL(r.Context(), repo); err != nil {
+		return httperror.BadRequest("Repository URL blocked by SSRF policy", err)
 	}
 
 	searchOpts := options.SearchRepoOptions{

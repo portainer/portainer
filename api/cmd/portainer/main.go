@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
+	nethttp "net/http"
 	"os"
 	"path"
 	"strings"
@@ -53,10 +54,15 @@ import (
 	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhelm"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/libstack/compose"
 	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
 	"github.com/portainer/portainer/pkg/validate"
 
+	gogitclient "github.com/go-git/go-git/v5/plumbing/transport/client"
+	gogitraw "github.com/go-git/go-git/v5/plumbing/transport/git"
+	gogithttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	gogitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/gofrs/uuid"
 	"github.com/rs/zerolog/log"
 )
@@ -408,6 +414,19 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	if !checkDBSchemaServerVersionMatch(dataStore, portainer.APIVersion, int(portainer.Edition)) {
 		log.Fatal().Msg("The database schema version does not align with the server version. Please consider reverting to the previous server version or addressing the database migration issue.")
 	}
+
+	if err := ssrf.Configure(dataStore.AllowList()); err != nil {
+		log.Fatal().Err(err).Msg("failed initializing ssrf service")
+	}
+
+	if !ssrf.WrapDefaultTransport() {
+		log.Fatal().Msg("failed to wrap default HTTP transport with SSRF protection")
+	}
+
+	gogithttp.DefaultClient = gogithttp.NewClient(&nethttp.Client{Transport: nethttp.DefaultTransport})
+	gogitclient.InstallProtocol("git", git.NewSSRFGitTransport(gogitraw.DefaultClient))
+	gogitclient.InstallProtocol("ssh", git.NewSSRFGitTransport(gogitssh.DefaultClient))
+	gogitclient.InstallProtocol("file", nil)
 
 	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {

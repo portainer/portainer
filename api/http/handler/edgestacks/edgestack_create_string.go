@@ -93,6 +93,10 @@ func (handler *Handler) createEdgeStackFromFileContent(r *http.Request, tx datas
 		return stack, nil
 	}
 
+	if err := stackutils.ValidateEdgeStackComposeContent(r.Context(), payload.DeploymentType, []byte(payload.StackFileContent)); err != nil {
+		return nil, httperrors.NewInvalidPayloadError(err.Error())
+	}
+
 	return handler.edgeStacksService.PersistEdgeStack(tx, stack, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
 		return handler.storeFileContent(tx, stackFolder, payload.DeploymentType, relatedEndpointIds, []byte(payload.StackFileContent))
 	})

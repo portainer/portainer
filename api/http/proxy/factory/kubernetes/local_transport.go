@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 type localTransport struct {
@@ -22,9 +23,7 @@ func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint,
 
 	transport := &localTransport{
 		baseTransport: newBaseTransport(
-			&http.Transport{
-				TLSClientConfig: config,
-			},
+			ssrf.NewInternalTransport(config),
 			tokenManager,
 			endpoint,
 			k8sClientFactory,

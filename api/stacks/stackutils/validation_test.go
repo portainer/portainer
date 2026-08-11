@@ -1,13 +1,49 @@
 package stackutils
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
 	"github.com/stretchr/testify/require"
 )
+
+// staticAllowListService is a minimal ssrf.AllowListService for testing SSRF-gated
+// validation without touching the real datastore.
+type staticAllowListService struct {
+	parsed portainer.ParsedAllowList
+}
+
+func (s *staticAllowListService) ReadParsed(id portainer.AllowListKey) (*portainer.ParsedAllowList, error) {
+	return &s.parsed, nil
+}
+
+func configureSSRF(t *testing.T, mode portainer.SSRFMode, entries []string) {
+	t.Helper()
+
+	parsed := ssrf.ParseAllowedHosts(entries)
+	parsed.Mode = mode
+
+	err := ssrf.Configure(&staticAllowListService{parsed: parsed})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		err := ssrf.Configure(&staticAllowListService{parsed: portainer.ParsedAllowList{Mode: portainer.SSRFModeOff}})
+		require.NoError(t, err)
+	})
+}
+
+type errorFileService struct {
+	portainer.FileService
+}
+
+func (errorFileService) GetFileContent(trustedRootPath, filePath string) ([]byte, error) {
+	return nil, errors.New("file read failed")
+}
 
 func TestIsValidStackFile_DefaultPortEnvSubstitution(t *testing.T) {
 	yamlContent := []byte(`
@@ -263,4 +299,192 @@ services:
 	}
 	err := ValidateStackFiles(stack, securitySettings, fileService)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+}
+
+func TestValidateComposeURLs_SSRFDisabled(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeOff, nil)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := errorFileService{}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.NoError(t, err)
+}
+
+func TestValidateComposeURLs_FileServiceError(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := errorFileService{}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.ErrorContains(t, err, "failed to get stack file content")
+}
+
+func TestValidateComposeURLs_BuildContextBlocked(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	fileContent := []byte(`
+version: "3"
+services:
+  api:
+    build:
+      context: http://169.254.169.254/build
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.ErrorContains(t, err, "stack file contains a URL blocked by the SSRF policy")
+}
+
+func TestValidateComposeURLs_ImageRegistryAllowed(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, []string{"registry.example.com"})
+
+	fileContent := []byte(`
+version: "3"
+services:
+  api:
+    image: registry.example.com/team/api:latest
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.NoError(t, err)
+}
+
+func TestValidateComposeURLs_ImageRegistryBlocked(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	fileContent := []byte(`
+version: "3"
+services:
+  api:
+    image: registry.internal.example/team/api:latest
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	err := ValidateComposeURLs(t.Context(), stack, fileService)
+	require.ErrorContains(t, err, "stack file contains a URL blocked by the SSRF policy")
+}
+
+func TestValidateEdgeStackComposeContent_SSRFDisabled(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeOff, nil)
+
+	content := []byte(`
+version: "3"
+services:
+  api:
+    build:
+      context: http://169.254.169.254/build
+`)
+
+	err := ValidateEdgeStackComposeContent(t.Context(), portainer.EdgeStackDeploymentCompose, content)
+	require.NoError(t, err)
+}
+
+func TestValidateEdgeStackComposeContent_NonComposeDeploymentSkipsCheck(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	content := []byte(`
+version: "3"
+services:
+  api:
+    build:
+      context: http://169.254.169.254/build
+`)
+
+	err := ValidateEdgeStackComposeContent(t.Context(), portainer.EdgeStackDeploymentKubernetes, content)
+	require.NoError(t, err)
+}
+
+func TestValidateEdgeStackComposeContent_BuildContextBlocked(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	content := []byte(`
+version: "3"
+services:
+  api:
+    build:
+      context: http://169.254.169.254/build
+`)
+
+	err := ValidateEdgeStackComposeContent(t.Context(), portainer.EdgeStackDeploymentCompose, content)
+	require.ErrorContains(t, err, "stack file contains a URL blocked by the SSRF policy")
+}
+
+func TestValidateEdgeStackComposeContent_NoBlockedURLs(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	content := []byte(`
+version: "3"
+services:
+  api:
+    image: nginx
+`)
+
+	err := ValidateEdgeStackComposeContent(t.Context(), portainer.EdgeStackDeploymentCompose, content)
+	require.NoError(t, err)
+}
+
+func TestValidateEdgeStackComposeContent_InvalidComposeFile(t *testing.T) {
+	configureSSRF(t, portainer.SSRFModeEnforce, nil)
+
+	content := []byte("not: [valid: yaml")
+
+	err := ValidateEdgeStackComposeContent(t.Context(), portainer.EdgeStackDeploymentCompose, content)
+	require.Error(t, err)
+}
+
+func TestExtractImageRegistry(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]string{
+		"nginx":                        "",
+		"library/nginx":                "",
+		"nginx@sha256:abcd1234":        "",
+		"myregistry.example.com/nginx": "myregistry.example.com",
+		"quay.io/coreos/etcd":          "quay.io",
+		"localhost:5000/nginx":         "localhost:5000",
+		"localhost/nginx":              "localhost",
+		"myregistry.example.com/nginx@sha256:abcd1234": "myregistry.example.com",
+	}
+
+	for imageRef, expected := range cases {
+		require.Equal(t, expected, extractImageRegistry(imageRef), "imageRef=%s", imageRef)
+	}
 }

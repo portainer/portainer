@@ -12,7 +12,6 @@ import (
 )
 
 func TestWithPanicLoggerRecoversAndLogsRegularPanic(t *testing.T) {
-	t.Parallel()
 	buf := &bytes.Buffer{}
 	log.Logger = zerolog.New(buf)
 
@@ -30,7 +29,6 @@ func TestWithPanicLoggerRecoversAndLogsRegularPanic(t *testing.T) {
 }
 
 func TestWithPanicLoggerRePanicsErrAbortHandler(t *testing.T) {
-	t.Parallel()
 	buf := &bytes.Buffer{}
 	log.Logger = zerolog.New(buf)
 

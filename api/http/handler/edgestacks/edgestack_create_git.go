@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/edge"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/pkg/errors"
@@ -132,6 +133,10 @@ func (handler *Handler) createEdgeStackFromGitRepository(r *http.Request, tx dat
 			Password:          payload.RepositoryPassword,
 			AuthorizationType: payload.RepositoryAuthorizationType,
 		}
+	}
+
+	if err := ssrf.CheckURL(r.Context(), repoConfig.URL); err != nil {
+		return nil, errors.Wrap(err, "repository URL blocked by SSRF policy")
 	}
 
 	stack.CreatedByUserId = fmt.Sprintf("%d", tokenData.ID)

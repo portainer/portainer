@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -39,6 +40,10 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	_, err := url.ParseRequestURI(repo)
 	if err != nil {
 		return httperror.BadRequest("Bad request", errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo)))
+	}
+
+	if err := ssrf.CheckURL(r.Context(), repo); err != nil {
+		return httperror.BadRequest("Repository URL blocked by SSRF policy", err)
 	}
 
 	chart := r.URL.Query().Get("chart")
