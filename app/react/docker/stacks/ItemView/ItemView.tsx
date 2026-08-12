@@ -70,27 +70,29 @@ export function ItemView() {
         stackName={stackName}
         stack={stack}
       />
-      {(!isOrphaned || isOrphanedRunning) && (
-        <>
-          {stackType === StackType.DockerCompose && (
-            <StackContainersDatatable stackName={stackName} />
-          )}
-          {stackType === StackType.DockerSwarm && (
-            <StackServicesDatatable name={stackName} />
-          )}
-        </>
-      )}
-      {stack && !isOrphaned && (
-        <AccessControlPanel
-          environmentId={stack.EndpointId}
-          resourceId={`${stack.EndpointId}_${stack.Name}`}
-          resourceControl={resourceControl}
-          resourceType={ResourceControlType.Stack}
-          onUpdateSuccess={() =>
-            queryClient.invalidateQueries(queryKeys.stack(stackId))
-          }
-        />
-      )}
+      <div className="space-y-4">
+        {(!isOrphaned || isOrphanedRunning) && (
+          <>
+            {stackType === StackType.DockerCompose && (
+              <StackContainersDatatable stackName={stackName} />
+            )}
+            {stackType === StackType.DockerSwarm && (
+              <StackServicesDatatable name={stackName} />
+            )}
+          </>
+        )}
+        {stack && !isOrphaned && (
+          <AccessControlPanel
+            environmentId={stack.EndpointId}
+            resourceId={`${stack.EndpointId}_${stack.Name}`}
+            resourceControl={resourceControl}
+            resourceType={ResourceControlType.Stack}
+            onUpdateSuccess={() =>
+              queryClient.invalidateQueries(queryKeys.stack(stackId))
+            }
+          />
+        )}
+      </div>
     </>
   );
 }
