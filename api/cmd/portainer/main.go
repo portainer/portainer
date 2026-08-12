@@ -275,6 +275,8 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	settings.SnapshotInterval = cmp.Or(*flags.SnapshotInterval, settings.SnapshotInterval)
 	settings.LogoURL = cmp.Or(*flags.Logo, settings.LogoURL)
 	settings.EnableEdgeComputeFeatures = cmp.Or(*flags.EnableEdgeComputeFeatures, settings.EnableEdgeComputeFeatures)
+	settings.EdgePortainerURL = cmp.Or(*flags.EdgePortainerURL, settings.EdgePortainerURL)
+	settings.TrustOnFirstConnect = cmp.Or(*flags.EdgeTrustOnFirstConnect, settings.TrustOnFirstConnect)
 	settings.TemplatesURL = cmp.Or(*flags.Templates, settings.TemplatesURL)
 
 	if flags.KubectlShellImageSet {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/rs/zerolog/log"
@@ -33,7 +34,7 @@ func CLIFlags() *portainer.CLIFlags {
 		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		EndpointURL:               kingpin.Flag("host", "Environment URL").Short('H').String(),
 		FeatureFlags:              kingpin.Flag("feat", "List of feature flags").Envar(portainer.FeatureFlagEnvVar).Strings(),
-		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
+		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Envar(portainer.EdgeComputeEnvVar).Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
 		TLSSkipVerify:             kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
 		HTTPDisabled:              kingpin.Flag("http-disabled", "Serve portainer only on https").Default(defaultHTTPDisabled).Bool(),
@@ -58,6 +59,8 @@ func CLIFlags() *portainer.CLIFlags {
 		CompactDB:                 kingpin.Flag("compact-db", "Enable database compaction on startup").Envar(portainer.CompactDBEnvVar).Default("false").Bool(),
 		NoSetupToken:              kingpin.Flag("no-setup-token", "Disable the setup token requirement for admin initialization and restore on an uninitialized instance").Envar(portainer.NoSetupTokenEnvVar).Bool(),
 		SetupToken:                kingpin.Flag("setup-token", "Set a custom setup token for admin initialization and restore on an uninitialized instance (overrides auto-generation)").Envar(portainer.SetupTokenEnvVar).String(),
+		EdgePortainerURL:          kingpin.Flag("edge-portainer-url", "HTTPS URL that edge agents connect back to, e.g. https://edge.example.com:9443. Use a hostname distinct from the web UI when edge mTLS is enabled.").Envar(portainer.EdgePortainerURLEnvVar).String(),
+		EdgeTrustOnFirstConnect:   kingpin.Flag("edge-trust-on-first-connect", "Auto-trust edge agents on first connect (disables the waiting room).").Envar(portainer.EdgeTrustOnFirstConnectEnvVar).Bool(),
 	}
 }
 
@@ -173,7 +176,20 @@ func (Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return ErrAdminPassExcludeAdminPassFile
 	}
 
+	if err := ValidateEdgePortainerURL(*flags.EdgePortainerURL); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func ValidateEdgePortainerURL(edgeURL string) error {
+	if edgeURL == "" {
+		return nil
+	}
+
+	_, err := edge.ParseHostForEdge(edgeURL)
+	return err
 }
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {

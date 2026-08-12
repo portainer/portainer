@@ -118,6 +118,8 @@ type (
 		TrustedOrigins            *string
 		NoSetupToken              *bool
 		SetupToken                *string
+		EdgePortainerURL          *string
+		EdgeTrustOnFirstConnect   *bool
 	}
 
 	// CustomTemplateVariableDefinition
@@ -2202,6 +2204,12 @@ const (
 	SetupTokenEnvVar = "PORTAINER_SETUP_TOKEN"
 	// CSRFAllowNoOriginEnvVar is the environment variable used to allow unsafe cookie-authenticated requests that carry no Origin or Sec-Fetch-Site header, reverting the CSRF protection to fail open for such requests
 	CSRFAllowNoOriginEnvVar = "CSRF_ALLOW_NO_ORIGIN"
+	// EdgeComputeEnvVar is the environment variable used to enable Edge Compute features
+	EdgeComputeEnvVar = "EDGE_COMPUTE"
+	// EdgePortainerURLEnvVar is the environment variable used to set the URL that edge agents connect back to
+	EdgePortainerURLEnvVar = "EDGE_PORTAINER_URL"
+	// EdgeTrustOnFirstConnectEnvVar is the environment variable used to auto-trust edge agents on first connect
+	EdgeTrustOnFirstConnectEnvVar = "EDGE_TRUST_ON_FIRST_CONNECT"
 )
 
 // List of supported features

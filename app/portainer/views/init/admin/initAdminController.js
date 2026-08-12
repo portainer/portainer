@@ -65,11 +65,17 @@ angular.module('portainer.app').controller('InitAdminController', [
           return getEnvironments({ limit: 100 });
         })
         .then(function success(data) {
-          if (data.value.length === 0) {
-            $state.go('portainer.wizard');
-          } else {
-            $state.go('portainer.home');
+          if (data.value.length !== 0) {
+            return $state.go('portainer.home');
           }
+
+          // On a fresh install (no environments yet), offer the edge compute setup
+          // step before the environment wizard — unless edge compute was already
+          // configured headlessly via the startup CLI flags, in which case skip
+          // straight to the wizard. The step forwards to the wizard on submit/skip.
+          return SettingsService.settings().then(function (settings) {
+            return $state.go(settings.EnableEdgeComputeFeatures ? 'portainer.wizard' : 'portainer.init.edge');
+          });
         })
         .catch(function error(err) {
           if (!handleError(err)) {

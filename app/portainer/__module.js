@@ -392,6 +392,16 @@ angular
         },
       };
 
+      const initEdge = {
+        name: 'portainer.init.edge',
+        url: '/edge',
+        views: {
+          'content@': {
+            component: 'initEdgeView',
+          },
+        },
+      };
+
       var settings = {
         name: 'portainer.settings',
         url: '/settings',
@@ -496,6 +506,7 @@ angular
       $stateRegistryProvider.register(gitopsSourceCreate);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
+      $stateRegistryProvider.register(initEdge);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
       $stateRegistryProvider.register(settingsEdgeCompute);

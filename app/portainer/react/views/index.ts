@@ -7,6 +7,7 @@ import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { CreateUserAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
 import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeView/EdgeComputeSettingsView';
+import { InitEdgeView } from '@/react/portainer/init/InitEdgeView/InitEdgeView';
 import { SettingsView } from '@/react/portainer/settings/SettingsView/SettingsView';
 import { CreateHelmRepositoriesView } from '@/react/portainer/account/helm-repositories/CreateHelmRepositoryView';
 
@@ -51,6 +52,10 @@ export const viewsModule = angular
       withUIRouter(withReactQuery(withCurrentUser(EdgeComputeSettingsView))),
       ['onSubmit', 'settings']
     )
+  )
+  .component(
+    'initEdgeView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(InitEdgeView))), [])
   )
   .component(
     'settingsView',

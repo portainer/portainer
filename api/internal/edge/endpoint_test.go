@@ -1,10 +1,11 @@
-package edge
+package edge_test
 
 import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/roar"
 
 	"github.com/stretchr/testify/require"
@@ -51,7 +52,7 @@ func TestEndpointInEdgeGroup(t *testing.T) {
 
 	// Related endpoint in a static edge group
 
-	inEdgeGroup, _, err := EndpointInEdgeGroup(store, endpoint, edgeGroupID, endpointGroups)
+	inEdgeGroup, _, err := edge.EndpointInEdgeGroup(store, endpoint, edgeGroupID, endpointGroups)
 	require.NoError(t, err)
 	require.True(t, inEdgeGroup)
 
@@ -65,19 +66,19 @@ func TestEndpointInEdgeGroup(t *testing.T) {
 		GroupID:     0,
 	}
 
-	inEdgeGroup, _, err = EndpointInEdgeGroup(store, unrelatedEndpoint, edgeGroupID, endpointGroups)
+	inEdgeGroup, _, err = edge.EndpointInEdgeGroup(store, unrelatedEndpoint, edgeGroupID, endpointGroups)
 	require.NoError(t, err)
 	require.False(t, inEdgeGroup)
 
 	// Untrusted endpoint
 
-	inEdgeGroup, _, err = EndpointInEdgeGroup(store, untrustedEndpoint, edgeGroupID, endpointGroups)
+	inEdgeGroup, _, err = edge.EndpointInEdgeGroup(store, untrustedEndpoint, edgeGroupID, endpointGroups)
 	require.NoError(t, err)
 	require.False(t, inEdgeGroup)
 
 	// Non-edge endpoint
 
-	inEdgeGroup, _, err = EndpointInEdgeGroup(store, nonEdgeEndpoint, edgeGroupID, endpointGroups)
+	inEdgeGroup, _, err = edge.EndpointInEdgeGroup(store, nonEdgeEndpoint, edgeGroupID, endpointGroups)
 	require.NoError(t, err)
 	require.False(t, inEdgeGroup)
 }

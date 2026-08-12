@@ -1,4 +1,4 @@
-package edge
+package edge_test
 
 import (
 	"testing"
