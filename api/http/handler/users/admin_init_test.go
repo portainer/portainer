@@ -20,7 +20,7 @@ import (
 func newAdminInitHandler(t *testing.T) *Handler {
 	t.Helper()
 	_, store := datastore.MustNewTestStore(t, true, false)
-	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour, nil)
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	h := NewHandler(testhelpers.NewTestRequestBouncer(), rateLimiter, apiKeyService, mockPasswordStrengthChecker{})
 	h.DataStore = store

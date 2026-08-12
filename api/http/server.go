@@ -126,7 +126,7 @@ func (server *Server) Start(ctx context.Context) error {
 		requestBouncer.DisableCSP()
 	}
 
-	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour, nil)
 	offlineGate := offlinegate.NewOfflineGate()
 
 	passwordStrengthChecker := security.NewPasswordStrengthChecker(server.DataStore.Settings())

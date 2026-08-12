@@ -33,7 +33,7 @@ func newTestHandler(t *testing.T, store *datastore.Store) (*Handler, *jwt.Servic
 
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	requestBouncer := security.NewRequestBouncer(t.Context(), store, jwtService, apiKeyService)
-	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour, nil)
 	passwordChecker := security.NewPasswordStrengthChecker(store.SettingsService)
 
 	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, passwordChecker)
