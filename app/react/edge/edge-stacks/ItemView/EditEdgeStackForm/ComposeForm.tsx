@@ -30,7 +30,7 @@ export function ComposeForm({
           <p>
             Portainer no longer supports{' '}
             <a
-              href="https://docs.docker.com/compose/compose-file/"
+              href="https://docs.docker.com/reference/compose-file/"
               target="_blank"
               rel="noreferrer"
             >
@@ -76,7 +76,7 @@ export function ComposeForm({
         <div>
           You can get more information about Compose file format in the{' '}
           <a
-            href="https://docs.docker.com/compose/compose-file/"
+            href="https://docs.docker.com/reference/compose-file/"
             target="_blank"
             rel="noreferrer"
           >

@@ -53,7 +53,7 @@ export function ComposePathField({
               To enable rebuilding of an image if already present on Docker
               standalone environments, include
               <code>pull_policy: build</code> in your compose file as per{' '}
-              <a href="https://docs.docker.com/compose/compose-file/#pull_policy">
+              <a href="https://docs.docker.com/reference/compose-file/services/#pull_policy">
                 Docker documentation
               </a>
               .

@@ -49,7 +49,7 @@ export function RegistryFormDockerhub({
                 For information on how to generate a DockerHub Access Token,
                 follow the{' '}
                 <a
-                  href="https://docs.docker.com/docker-hub/access-tokens/"
+                  href="https://docs.docker.com/security/access-tokens/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

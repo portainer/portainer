@@ -138,7 +138,7 @@ test('should display dockerhub guide link', () => {
   const link = screen.getByRole('link', { name: /dockerhub guide/ });
   expect(link).toHaveAttribute(
     'href',
-    'https://docs.docker.com/docker-hub/access-tokens/'
+    'https://docs.docker.com/security/access-tokens/'
   );
   expect(link).toHaveAttribute('target', '_blank');
 });

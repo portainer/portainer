@@ -112,7 +112,7 @@ describe('initial rendering', () => {
     });
     expect(link).toHaveAttribute(
       'href',
-      'https://docs.docker.com/compose/compose-file/'
+      'https://docs.docker.com/reference/compose-file/'
     );
     expect(link).toHaveAttribute('target', '_blank');
   });

@@ -92,7 +92,7 @@ export function StackEditorTabInner({
         <span className="col-sm-12 text-muted small">
           You can get more information about Compose file format in the{' '}
           <a
-            href="https://docs.docker.com/compose/compose-file/"
+            href="https://docs.docker.com/reference/compose-file/"
             target="_blank"
             rel="noreferrer"
           >

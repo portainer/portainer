@@ -91,7 +91,7 @@ describe('ComposePathField', () => {
       screen.getByRole('link', { name: 'Docker documentation' })
     ).toHaveAttribute(
       'href',
-      'https://docs.docker.com/compose/compose-file/#pull_policy'
+      'https://docs.docker.com/reference/compose-file/services/#pull_policy'
     );
   });
 
