@@ -317,10 +317,7 @@ angular
 
       var gitopsWorkflowDetail = {
         name: 'portainer.gitops.workflows.item',
-        url: '/:workflowId?tab',
-        params: {
-          tab: filterParam('overview'),
-        },
+        url: '/:workflowId',
         views: {
           'content@': {
             component: 'workflowItemView',

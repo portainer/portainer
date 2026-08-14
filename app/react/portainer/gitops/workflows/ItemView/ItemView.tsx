@@ -3,7 +3,6 @@ import { useIdParam } from '@/react/hooks/useIdParam';
 import { PageHeader } from '@@/PageHeader';
 import { ResourceDetailHeaderSkeleton } from '@@/ResourceDetailHeader/ResourceDetailHeaderSkeleton';
 import { Alert } from '@@/Alert';
-import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
 import { useWorkflow } from '../queries/useWorkflow';
 import { Workflow } from '../types';
@@ -53,15 +52,6 @@ export function ItemView() {
 }
 
 function PageContent({ workflow }: { workflow: Workflow }) {
-  const workflowTabs: Tab[] = [
-    {
-      name: 'Overview',
-      selectedTabParam: 'overview',
-      widget: <OverviewTab workflow={workflow} />,
-    },
-  ];
-  const currentTabIndex = useCurrentTabIndex(workflowTabs);
-
   return (
     <>
       <PageHeader
@@ -73,8 +63,7 @@ function PageContent({ workflow }: { workflow: Workflow }) {
       />
       <div className="mx-4 space-y-4 pb-4">
         <WorkflowResourceHeader workflow={workflow} />
-        <WidgetTabs tabs={workflowTabs} currentTabIndex={currentTabIndex} />
-        {workflowTabs[currentTabIndex].widget}
+        <OverviewTab workflow={workflow} />
       </div>
     </>
   );
