@@ -44,7 +44,7 @@ export function Header({ logo: customLogo }: Props) {
               'portainer business'
             ) : (
               <a
-                href="https://www.portainer.io/install-BE-now"
+                href="https://www.portainer.io/install"
                 className={clsx(
                   'hover:underline',
                   'text-blue-6 hover:text-blue-8',

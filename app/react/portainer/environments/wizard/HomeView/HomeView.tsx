@@ -47,11 +47,11 @@ export function HomeView() {
                       Please ensure your environment is correctly exposed. For
                       help with installation visit{' '}
                       <a
-                        href="https://documentation.portainer.io/quickstart/"
+                        href="https://docs.portainer.io/start/intro"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        https://documentation.portainer.io/quickstart
+                        https://docs.portainer.io/start/intro
                       </a>
                     </p>
                   )}

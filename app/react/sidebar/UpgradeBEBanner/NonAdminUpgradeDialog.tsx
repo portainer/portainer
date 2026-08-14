@@ -32,7 +32,7 @@ export function NonAdminUpgradeDialog({
           </Button>
 
           <a
-            href="https://www.portainer.io/take-5"
+            href="https://www.portainer.io/take-3"
             target="_blank"
             rel="noreferrer"
             className="no-link w-2/3"
