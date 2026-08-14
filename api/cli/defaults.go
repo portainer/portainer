@@ -20,4 +20,6 @@ const (
 	defaultBaseURL                = "/"
 	defaultSecretKeyName          = "portainer"
 	defaultPullLimitCheckDisabled = "false"
+	defaultMaxBatchSize           = "1000"
+	defaultMaxBatchDelay          = "20ms"
 )

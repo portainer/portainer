@@ -32,6 +32,8 @@ type Connection interface {
 	Close() error
 
 	UpdateTx(fn func(Transaction) error) error
+	UpdateTxBatch(fn func(Transaction) error) error
+	BatchingEnabled() bool
 	ViewTx(fn func(Transaction) error) error
 
 	// write the db contents to filename as json (the schema needs defining)
