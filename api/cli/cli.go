@@ -8,6 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
 
 	"github.com/alecthomas/kingpin/v2"
@@ -119,7 +120,7 @@ func (Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 			panic(err)
 		}
 
-		*flags.Assets = filepath.Join(filepath.Dir(ex), *flags.Assets)
+		*flags.Assets = filesystem.JoinPaths(filepath.Dir(ex), *flags.Assets)
 	}
 
 	// If the user didn't provide a tls flag remove the defaults to match previous behaviour

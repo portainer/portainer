@@ -10,6 +10,4 @@ linters:
       forbid:
         - pattern: ^dataservices.DataStore.(EdgeGroup|EdgeJob|EdgeStack|EndpointRelation|Endpoint|GitCredential|Registry|ResourceControl|Role|Settings|Snapshot|SSLSettings|Stack|Tag|User)$
           msg: Use a transaction instead
-        - pattern: ^(filepath|path)\.Join$
-          msg: Use filesystem.JoinPaths() from github.com/portainer/portainer/api/filesystem to prevent path traversal attacks
       analyze-types: true

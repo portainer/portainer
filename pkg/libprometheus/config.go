@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 const configTemplate = `# Prometheus configuration.
@@ -79,7 +80,7 @@ func WritePrometheusConfig(dataDir string, options PrometheusConfigOptions) erro
 		alertingSection,
 	)
 
-	return os.WriteFile(filepath.Join(dataDir, "config.yaml"), []byte(content), 0o600)
+	return os.WriteFile(filesystem.JoinPaths(dataDir, "config.yaml"), []byte(content), 0o600)
 }
 
 // parseTarget splits a full URL into its scheme, path, and host:port components

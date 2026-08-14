@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -143,7 +143,7 @@ func (store *Store) encryptDB() error {
 	log.Info().Msg("encrypting database")
 
 	// export file path for backup
-	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+	exportFilename := filepath.Clean(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
 	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
 

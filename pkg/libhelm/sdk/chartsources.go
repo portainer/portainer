@@ -30,11 +30,11 @@ package sdk
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/libhelm/cache"
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/registryhttp"
@@ -125,7 +125,7 @@ func authenticateChartSource(actionConfig *action.Configuration, reg *portainer.
 			return nil
 		}
 		// Use a non-existent path so Helm initializes an empty credentials store
-		noCredsPath := filepath.Join(os.TempDir(), "portainer-helm-registry-no-creds")
+		noCredsPath := filesystem.JoinPaths(os.TempDir(), "portainer-helm-registry-no-creds")
 		defaultClient, err := registry.NewClient(
 			registry.ClientOptCredentialsFile(noCredsPath),
 		)

@@ -2,7 +2,8 @@ package storybook
 
 import (
 	"net/http"
-	"path"
+
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 // Handler represents an HTTP API handler for managing static files.
@@ -13,7 +14,7 @@ type Handler struct {
 // NewHandler creates a handler to serve static files.
 func NewHandler(assetsPath string) *Handler {
 	h := &Handler{
-		http.FileServer(http.Dir(path.Join(assetsPath, "storybook"))),
+		http.FileServer(http.Dir(filesystem.JoinPaths(assetsPath, "storybook"))),
 	}
 	return h
 }

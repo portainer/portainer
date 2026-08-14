@@ -351,7 +351,7 @@ func dbSecretPath(keyFilenameFlag string) string {
 	if path.IsAbs(keyFilenameFlag) {
 		return keyFilenameFlag
 	}
-	return path.Join("/run/secrets", keyFilenameFlag)
+	return filesystem.JoinPaths("/run/secrets", keyFilenameFlag)
 }
 
 func loadEncryptionSecretKey(keyfilename string) []byte {

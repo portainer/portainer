@@ -22,7 +22,7 @@ type DirEntry struct {
 func FilterDirForEntryFile(dirEntries []DirEntry, entryFile string) []DirEntry {
 	var filteredDirEntries []DirEntry
 
-	dotEnvFile := filepath.Join(filepath.Dir(entryFile), ".env")
+	dotEnvFile := JoinPaths(filepath.Dir(entryFile), ".env")
 	filters := []string{entryFile, dotEnvFile}
 
 	for _, dirEntry := range dirEntries {
@@ -118,7 +118,7 @@ func LoadDir(dir string) ([]DirEntry, error) {
 // PersistDir writes the provided array of files and folders back to the given directory.
 func PersistDir(dir string, dirEntries []DirEntry) error {
 	for _, dirEntry := range dirEntries {
-		path := filepath.Join(dir, dirEntry.Name)
+		path := JoinPaths(dir, dirEntry.Name)
 
 		if dirEntry.IsFile {
 			// Create the directory path if it doesn't exist

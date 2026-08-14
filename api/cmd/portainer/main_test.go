@@ -187,7 +187,7 @@ func TestDBSecretPath(t *testing.T) {
 		{keyFilenameFlag: "/tmp/secret.txt", expected: "/tmp/secret.txt"},
 		{keyFilenameFlag: "/run/secrets/secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "./secret.txt", expected: "/run/secrets/secret.txt"},
-		{keyFilenameFlag: "../secret.txt", expected: "/run/secret.txt"},
+		{keyFilenameFlag: "../secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "foo/bar/secret.txt", expected: "/run/secrets/foo/bar/secret.txt"},
 	}
 

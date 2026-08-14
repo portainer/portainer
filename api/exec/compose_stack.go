@@ -8,6 +8,7 @@ import (
 	"path"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -161,7 +162,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 		return "", nil
 	}
 
-	envFilePath := path.Join(stack.ProjectPath, "stack.env")
+	envFilePath := filesystem.JoinPaths(stack.ProjectPath, "stack.env")
 	envfile, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return "", err
@@ -169,7 +170,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	defer logs.CloseAndLogErr(envfile)
 
 	// Copy from default .env file
-	defaultEnvPath := path.Join(stack.ProjectPath, path.Dir(stack.EntryPoint), ".env")
+	defaultEnvPath := filesystem.JoinPaths(stack.ProjectPath, path.Dir(stack.EntryPoint), ".env")
 	if err := copyDefaultEnvFile(envfile, defaultEnvPath); err != nil {
 		return "", err
 	}

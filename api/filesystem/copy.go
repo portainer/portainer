@@ -21,7 +21,7 @@ func CopyPath(path string, toDir string) error {
 	}
 
 	if !info.IsDir() {
-		destination := filepath.Join(toDir, info.Name())
+		destination := JoinPaths(toDir, info.Name())
 		return copyFile(path, destination)
 	}
 
@@ -40,9 +40,9 @@ func CopyDir(fromDir, toDir string, keepParent bool) error {
 		}
 		var destination string
 		if keepParent {
-			destination = filepath.Join(toDir, strings.TrimPrefix(path, parentDirectory))
+			destination = JoinPaths(toDir, strings.TrimPrefix(path, parentDirectory))
 		} else {
-			destination = filepath.Join(toDir, strings.TrimPrefix(path, cleanedSourcePath))
+			destination = JoinPaths(toDir, strings.TrimPrefix(path, cleanedSourcePath))
 		}
 
 		if destination == "" {

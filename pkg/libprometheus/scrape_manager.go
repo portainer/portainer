@@ -2,9 +2,9 @@ package libprometheus
 
 import (
 	"fmt"
-	"path/filepath"
 	"time"
 
+	"github.com/portainer/portainer/api/filesystem"
 	prometheusreg "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/config"
@@ -17,7 +17,7 @@ import (
 // LoadPrometheusConfig reads and parses dataDir/config.yaml using the
 // standard Prometheus config loader.
 func LoadPrometheusConfig(dataDir string) (*config.Config, error) {
-	path := filepath.Join(dataDir, "config.yaml")
+	path := filesystem.JoinPaths(dataDir, "config.yaml")
 	cfg, err := config.LoadFile(path, false, NewZerologSlogger())
 	if err != nil {
 		return nil, fmt.Errorf("load prometheus config %q: %w", path, err)

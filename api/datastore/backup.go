@@ -3,9 +3,9 @@ package datastore
 import (
 	"fmt"
 	"os"
-	"path"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/rs/zerolog/log"
 )
 
@@ -83,7 +83,7 @@ func (store *Store) RestoreFromFile(backupFilename string) error {
 }
 
 func (store *Store) createBackupPath() error {
-	backupDir := path.Join(store.connection.GetStorePath(), "backups")
+	backupDir := filesystem.JoinPaths(store.connection.GetStorePath(), "backups")
 	if exists, _ := store.fileService.FileExists(backupDir); !exists {
 		if err := os.MkdirAll(backupDir, 0o700); err != nil {
 			return fmt.Errorf("unable to create backup folder: %w", err)
@@ -94,7 +94,7 @@ func (store *Store) createBackupPath() error {
 }
 
 func (store *Store) backupFilename() string {
-	return path.Join(store.connection.GetStorePath(), "backups", store.connection.GetDatabaseFileName()+".bak")
+	return filesystem.JoinPaths(store.connection.GetStorePath(), "backups", store.connection.GetDatabaseFileName()+".bak")
 }
 
 func (store *Store) databasePath() string {
