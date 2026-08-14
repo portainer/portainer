@@ -25,7 +25,7 @@ type stubBuilder struct {
 	hookCalled atomic.Bool
 }
 
-func (s *stubBuilder) setGeneralInfo(_ *StackPayload, _ *portainer.Endpoint) {
+func (s *stubBuilder) setGeneralInfo(_ *portainer.Endpoint) {
 	if s.savedStack == nil {
 		return
 	}

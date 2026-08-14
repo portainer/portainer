@@ -35,7 +35,7 @@ func CreateStackBuilder(dataStore dataservices.DataStore, fileService portainer.
 	}
 }
 
-func (b *StackBuilder) setGeneralInfo(_ *StackPayload, endpoint *portainer.Endpoint) {
+func (b *StackBuilder) setGeneralInfo(endpoint *portainer.Endpoint) {
 	b.endpoint = endpoint
 	stackID := b.dataStore.Stack().GetNextIdentifier()
 	b.stack.ID = portainer.StackID(stackID)

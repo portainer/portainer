@@ -14,7 +14,7 @@ import (
 
 // stackBuildProcess is the common interface shared by all stack build methods.
 type stackBuildProcess interface {
-	setGeneralInfo(payload *StackPayload, endpoint *portainer.Endpoint)
+	setGeneralInfo(endpoint *portainer.Endpoint)
 	// prepare handles all pre-save steps: sets type-specific metadata, stores
 	// files on disk, or clones the git repository.
 	prepare(ctx context.Context, payload *StackPayload, userID portainer.UserID) error
@@ -35,7 +35,7 @@ type stackBuildProcess interface {
 // Deployment runs in a background goroutine. The caller must poll
 // GET /stacks/{id} to track completion.
 func BuildAndAsyncDeploy(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
-	builder.setGeneralInfo(payload, endpoint)
+	builder.setGeneralInfo(endpoint)
 
 	defer func() { _ = builder.cleanUp() }()
 
@@ -68,7 +68,7 @@ func BuildAndAsyncDeploy(ctx context.Context, dataStore dataservices.DataStore, 
 // Swarm and Compose deploys can run long (image pulls, etc.), so they keep using
 // BuildAndAsyncDeploy.
 func BuildAndDeploy(ctx context.Context, dataStore dataservices.DataStore, builder stackBuildProcess, payload *StackPayload, endpoint *portainer.Endpoint, userID portainer.UserID) (*portainer.Stack, *httperror.HandlerError) {
-	builder.setGeneralInfo(payload, endpoint)
+	builder.setGeneralInfo(endpoint)
 
 	defer func() { _ = builder.cleanUp() }()
 
