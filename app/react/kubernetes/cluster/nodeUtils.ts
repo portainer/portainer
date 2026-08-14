@@ -235,6 +235,7 @@ export function isSystemLabel(labelKey: string): boolean {
     labelKey.startsWith('kubernetes.io') ||
     labelKey === 'node-role.kubernetes.io/master' ||
     labelKey.startsWith('node-role.kubernetes.io/control-plane') ||
-    labelKey.startsWith('node.kubernetes.io')
+    labelKey.startsWith('node.kubernetes.io') ||
+    labelKey === KubernetesPortainerNodeDrainLabel
   );
 }

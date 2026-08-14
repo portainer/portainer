@@ -130,7 +130,9 @@ export function buildLabels(
 
 function getSystemLabels(originalLabels: Record<string, string>) {
   return Object.fromEntries(
-    Object.entries(originalLabels).filter(([key]) => isSystemLabel(key))
+    Object.entries(originalLabels).filter(
+      ([key]) => isSystemLabel(key) && key !== KubernetesPortainerNodeDrainLabel
+    )
   );
 }
 

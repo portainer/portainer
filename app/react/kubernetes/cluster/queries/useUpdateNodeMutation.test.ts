@@ -1,4 +1,4 @@
-import { KubernetesPortainerNodeDrainLabel } from '../nodeUtils';
+import { isSystemLabel, KubernetesPortainerNodeDrainLabel } from '../nodeUtils';
 import {
   NodeFormValues,
   defaultDrainOptions,
@@ -49,6 +49,52 @@ describe('Node availability states', () => {
     );
 
     expect(drainResult[KubernetesPortainerNodeDrainLabel]).toBe('');
+    expect(pauseResult[KubernetesPortainerNodeDrainLabel]).toBeUndefined();
+  });
+
+  it('should treat the drain label as a system label', () => {
+    expect(isSystemLabel(KubernetesPortainerNodeDrainLabel)).toBe(true);
+  });
+
+  it('should keep the drain label while draining, even if the form tries to delete it', () => {
+    const originalLabels = { [KubernetesPortainerNodeDrainLabel]: '' };
+
+    const result = buildLabels(
+      createTestFormValues({
+        availability: 'Drain',
+        labels: [
+          {
+            key: KubernetesPortainerNodeDrainLabel,
+            value: '',
+            isNew: false,
+            isChanged: false,
+            isSystem: true,
+            needsDeletion: true,
+          },
+        ],
+      }),
+      originalLabels
+    );
+
+    expect(result[KubernetesPortainerNodeDrainLabel]).toBe('');
+  });
+
+  it('should remove the drain label when availability changes away from Drain', () => {
+    const originalLabels = {
+      'kubernetes.io/hostname': 'test-node',
+      [KubernetesPortainerNodeDrainLabel]: '',
+    };
+
+    const activeResult = buildLabels(
+      createTestFormValues({ availability: 'Active' }),
+      originalLabels
+    );
+    const pauseResult = buildLabels(
+      createTestFormValues({ availability: 'Pause' }),
+      originalLabels
+    );
+
+    expect(activeResult[KubernetesPortainerNodeDrainLabel]).toBeUndefined();
     expect(pauseResult[KubernetesPortainerNodeDrainLabel]).toBeUndefined();
   });
 });
