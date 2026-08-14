@@ -10,9 +10,23 @@ type workflowDeleteStore interface {
 	Workflow() dataservices.WorkflowService
 }
 
-// DeleteIfSingleArtifact deletes the workflow identified by workflowID, but only when it has a
-// single artifact.
-func DeleteIfSingleArtifact(tx workflowDeleteStore, workflowID portainer.WorkflowID) error {
+// DetachStackArtifact removes the artifact referencing stackID from the workflow identified by
+// workflowID, deleting the workflow entirely once no artifacts remain.
+func DetachStackArtifact(tx workflowDeleteStore, workflowID portainer.WorkflowID, stackID portainer.StackID) error {
+	return detachArtifact(tx, workflowID, func(a portainer.Artifact) bool {
+		return a.StackID == stackID
+	})
+}
+
+// DetachEdgeStackArtifact removes the artifact referencing edgeStackID from the workflow identified
+// by workflowID, deleting the workflow entirely once no artifacts remain.
+func DetachEdgeStackArtifact(tx workflowDeleteStore, workflowID portainer.WorkflowID, edgeStackID portainer.EdgeStackID) error {
+	return detachArtifact(tx, workflowID, func(a portainer.Artifact) bool {
+		return a.EdgeStackID == edgeStackID
+	})
+}
+
+func detachArtifact(tx workflowDeleteStore, workflowID portainer.WorkflowID, match func(portainer.Artifact) bool) error {
 	if workflowID == 0 {
 		return nil
 	}
@@ -24,9 +38,18 @@ func DeleteIfSingleArtifact(tx workflowDeleteStore, workflowID portainer.Workflo
 		return err
 	}
 
-	if len(wf.Artifacts) > 1 {
-		return nil
+	remaining := make([]portainer.Artifact, 0, len(wf.Artifacts))
+	for _, a := range wf.Artifacts {
+		if !match(a) {
+			remaining = append(remaining, a)
+		}
 	}
 
-	return tx.Workflow().Delete(workflowID)
+	if len(remaining) == 0 {
+		return tx.Workflow().Delete(workflowID)
+	}
+
+	wf.Artifacts = remaining
+
+	return tx.Workflow().Update(workflowID, wf)
 }

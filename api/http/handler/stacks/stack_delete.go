@@ -123,7 +123,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 				reconcileSourceID = sid
 			}
 
-			if err := workflows.DeleteIfSingleArtifact(tx, stack.WorkflowID); err != nil {
+			if err := workflows.DetachStackArtifact(tx, stack.WorkflowID, stack.ID); err != nil {
 				return err
 			}
 		}
@@ -298,7 +298,7 @@ func (handler *Handler) stackDeleteKubernetesByName(w http.ResponseWriter, r *ht
 					reconcileSourceID = sid
 				}
 
-				if err := workflows.DeleteIfSingleArtifact(tx, stack.WorkflowID); err != nil {
+				if err := workflows.DetachStackArtifact(tx, stack.WorkflowID, stack.ID); err != nil {
 					return err
 				}
 			}

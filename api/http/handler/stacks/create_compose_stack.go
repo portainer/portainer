@@ -65,7 +65,7 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(_ http.ResponseWriter, _ 
 			reconcileSourceID = sid
 		}
 
-		if err := workflows.DeleteIfSingleArtifact(handler.DataStore, stack.WorkflowID); err != nil {
+		if err := workflows.DetachStackArtifact(handler.DataStore, stack.WorkflowID, stack.ID); err != nil {
 			return err
 		}
 	}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/gitops/workflows"
 )
 
 func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Request, namespace string) (*http.Response, error) {
@@ -54,6 +55,12 @@ func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Requ
 
 	for _, s := range stacks {
 		if s.Namespace == namespace && s.EndpointID == transport.endpoint.ID {
+			if s.WorkflowID != 0 {
+				if err := workflows.DetachStackArtifact(transport.dataStore, s.WorkflowID, s.ID); err != nil {
+					return nil, err
+				}
+			}
+
 			if err := transport.dataStore.Stack().Delete(s.ID); err != nil {
 				return nil, err
 			}

@@ -63,7 +63,11 @@ func TestSourceDelete_InUse(t *testing.T) {
 		require.NoError(t, err)
 		srcID = src.ID
 
-		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+		stack := &portainer.Stack{ID: 1, Name: "in-use-stack"}
+		err = tx.Stack().Create(stack)
+		require.NoError(t, err)
+
+		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: stack.ID, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
 		err = tx.Workflow().Create(wf)
 		require.NoError(t, err)
 
@@ -75,6 +79,101 @@ func TestSourceDelete_InUse(t *testing.T) {
 	h.ServeHTTP(rr, buildDeleteReq(t, 1, int(srcID)))
 
 	require.Equal(t, http.StatusConflict, rr.Code)
+}
+
+// TestSourceDelete_OrphanedArtifactDoesNotBlock covers BE-13300: a workflow artifact whose
+// backing stack was deleted through a path that skipped workflow cleanup must not block deletion
+// of the source it still references.
+func TestSourceDelete_OrphanedArtifactDoesNotBlock(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var srcID portainer.SourceID
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{Name: "orphaned", Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "http://github.com/org/repo"}}
+		err := tx.Source().Create(adminUserContext, src)
+		require.NoError(t, err)
+		srcID = src.ID
+
+		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 999, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+		err = tx.Workflow().Create(wf)
+		require.NoError(t, err)
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	h := newTestHandler(t, store)
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, buildDeleteReq(t, 1, int(srcID)))
+
+	require.Equal(t, http.StatusNoContent, rr.Code)
+}
+
+// TestSourceDelete_InUseByEdgeStack covers BE-13300: a workflow artifact backed by a live edge
+// stack must block source deletion, exercising the edge stack existence check alongside the
+// stack one.
+func TestSourceDelete_InUseByEdgeStack(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var srcID portainer.SourceID
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{Name: "in-use-edge", Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "http://github.com/org/repo"}}
+		err := tx.Source().Create(adminUserContext, src)
+		require.NoError(t, err)
+		srcID = src.ID
+
+		edgeStack := &portainer.EdgeStack{ID: 1, Name: "in-use-edgestack"}
+		err = tx.EdgeStack().Create(edgeStack.ID, edgeStack)
+		require.NoError(t, err)
+
+		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{
+			// Does not reference this source: must be skipped rather than block deletion.
+			{StackID: 1, Files: []portainer.ArtifactFile{{SourceID: 999}}},
+			{EdgeStackID: edgeStack.ID, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		}}
+		err = tx.Workflow().Create(wf)
+		require.NoError(t, err)
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	h := newTestHandler(t, store)
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, buildDeleteReq(t, 1, int(srcID)))
+
+	require.Equal(t, http.StatusConflict, rr.Code)
+}
+
+// TestSourceDelete_OrphanedEdgeStackArtifactDoesNotBlock covers BE-13300: a workflow artifact
+// whose backing edge stack was deleted through a path that skipped workflow cleanup must not
+// block deletion of the source it still references.
+func TestSourceDelete_OrphanedEdgeStackArtifactDoesNotBlock(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var srcID portainer.SourceID
+	require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		src := &portainer.Source{Name: "orphaned-edge", Type: portainer.SourceTypeGit, Git: &gittypes.GitSource{URL: "http://github.com/org/repo"}}
+		err := tx.Source().Create(adminUserContext, src)
+		require.NoError(t, err)
+		srcID = src.ID
+
+		wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{EdgeStackID: 999, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+		err = tx.Workflow().Create(wf)
+		require.NoError(t, err)
+
+		return tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole})
+	}))
+
+	h := newTestHandler(t, store)
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, buildDeleteReq(t, 1, int(srcID)))
+
+	require.Equal(t, http.StatusNoContent, rr.Code)
 }
 
 func TestSourceDelete_NonNumericID(t *testing.T) {

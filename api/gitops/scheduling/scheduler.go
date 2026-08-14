@@ -9,14 +9,18 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/scheduler"
 
 	"github.com/rs/zerolog/log"
 )
 
 type Deployers struct {
-	Stack     func(ctx context.Context, stackID portainer.StackID) error
-	EdgeStack func(ctx context.Context, edgeStackID portainer.EdgeStackID) error
+	Stack       func(ctx context.Context, stackID portainer.StackID) error
+	StackExists func(stackID portainer.StackID) (bool, error)
+
+	EdgeStack       func(ctx context.Context, edgeStackID portainer.EdgeStackID) error
+	EdgeStackExists func(edgeStackID portainer.EdgeStackID) (bool, error)
 }
 
 type dataStore interface {
@@ -151,18 +155,31 @@ func (s *SourceScheduler) stopLocked(sourceID portainer.SourceID) {
 
 // tick runs one poll of a source: it redeploys every artifact that references the source.
 // Individual deploy failures are logged and do not abort the remaining work; each deployer
-// persists the resulting source and artifact status itself.
+// persists the resulting source and artifact status itself. Artifacts whose backing stack or
+// edge stack no longer exists (e.g. deleted through a path that didn't clean up the workflow) are
+// skipped rather than deployed against a nonexistent target.
 func (s *SourceScheduler) tick(ctx context.Context, sourceID portainer.SourceID) error {
-	workflows, err := s.dataStore.Workflow().ReadAll(func(wf portainer.Workflow) bool {
+	matchingWorkflows, err := s.dataStore.Workflow().ReadAll(func(wf portainer.Workflow) bool {
 		return workflowReferencesSource(wf, sourceID)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to read workflows for source %d: %w", sourceID, err)
 	}
 
-	for _, wf := range workflows {
+	for _, wf := range matchingWorkflows {
 		for _, a := range wf.Artifacts {
 			if !artifactReferencesSource(a, sourceID) {
+				continue
+			}
+
+			exists, err := s.artifactBackingExists(a)
+			if err != nil {
+				log.Warn().Err(err).Msg("source poll: failed to check artifact backing existence")
+
+				continue
+			}
+
+			if !exists {
 				continue
 			}
 
@@ -187,15 +204,51 @@ func (s *SourceScheduler) deployArtifact(ctx context.Context, a portainer.Artifa
 	}
 }
 
+// sourceReferenced reports whether any workflow artifact referencing sourceID still has a live
+// backing stack or edge stack. An artifact left dangling by a delete path that skipped workflow
+// cleanup no longer counts, so a fully-orphaned source's poll job gets stopped.
 func (s *SourceScheduler) sourceReferenced(sourceID portainer.SourceID) (bool, error) {
-	workflows, err := s.dataStore.Workflow().ReadAll(func(wf portainer.Workflow) bool {
+	matchingWorkflows, err := s.dataStore.Workflow().ReadAll(func(wf portainer.Workflow) bool {
 		return workflowReferencesSource(wf, sourceID)
 	})
 	if err != nil {
 		return false, fmt.Errorf("failed to read workflows for source %d: %w", sourceID, err)
 	}
 
-	return len(workflows) > 0, nil
+	for _, wf := range matchingWorkflows {
+		for _, a := range wf.Artifacts {
+			if !artifactReferencesSource(a, sourceID) {
+				continue
+			}
+
+			exists, err := s.artifactBackingExists(a)
+			if err != nil {
+				return false, err
+			}
+
+			if exists {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// artifactBackingExists reports whether a's target stack or edge stack still exists, via the
+// existence checks supplied in Deployers. An unset check assumes the target exists.
+func (s *SourceScheduler) artifactBackingExists(a portainer.Artifact) (bool, error) {
+	stackExists := func(portainer.StackID) (bool, error) { return true, nil }
+	if s.deployers.StackExists != nil {
+		stackExists = s.deployers.StackExists
+	}
+
+	edgeStackExists := func(portainer.EdgeStackID) (bool, error) { return true, nil }
+	if s.deployers.EdgeStackExists != nil {
+		edgeStackExists = s.deployers.EdgeStackExists
+	}
+
+	return workflows.ArtifactBackingExists(a, stackExists, edgeStackExists)
 }
 
 func workflowReferencesSource(wf portainer.Workflow, sourceID portainer.SourceID) bool {

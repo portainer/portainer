@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -54,18 +55,37 @@ func (h *Handler) sourceDelete(w http.ResponseWriter, r *http.Request) *httperro
 			return dserrors.ErrObjectNotFound
 		}
 
-		workflows, err := tx.Workflow().ReadAll()
+		allWorkflows, err := tx.Workflow().ReadAll()
 		if err != nil {
 			return err
 		}
 
-		for _, wf := range workflows {
-			if slices.ContainsFunc(wf.Artifacts, func(as portainer.Artifact) bool {
-				return slices.ContainsFunc(as.Files, func(f portainer.ArtifactFile) bool {
+		for _, wf := range allWorkflows {
+			for _, a := range wf.Artifacts {
+				if !slices.ContainsFunc(a.Files, func(f portainer.ArtifactFile) bool {
 					return f.SourceID == portainer.SourceID(sourceID)
-				})
-			}) {
-				return ErrSourceInUse
+				}) {
+					continue
+				}
+
+				exists, err := workflows.ArtifactBackingExists(a,
+					tx.Stack().Exists,
+					func(edgeStackID portainer.EdgeStackID) (bool, error) {
+						_, err := tx.EdgeStack().EdgeStack(edgeStackID)
+						if dataservices.IsErrObjectNotFound(err) {
+							return false, nil
+						}
+
+						return err == nil, err
+					},
+				)
+				if err != nil {
+					return err
+				}
+
+				if exists {
+					return ErrSourceInUse
+				}
 			}
 		}
 

@@ -273,7 +273,7 @@ func (handler *Handler) updateComposeStack(tx dataservices.DataStoreTx, r *http.
 	if stack.WorkflowID != 0 {
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
-		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
+		if err := workflows.DetachStackArtifact(tx, oldWorkflowID, stack.ID); err != nil {
 			return nil, nil, httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}
@@ -352,7 +352,7 @@ func (handler *Handler) updateSwarmStack(tx dataservices.DataStoreTx, r *http.Re
 	if stack.WorkflowID != 0 {
 		oldWorkflowID := stack.WorkflowID
 		stack.WorkflowID = 0
-		if err := workflows.DeleteIfSingleArtifact(tx, oldWorkflowID); err != nil {
+		if err := workflows.DetachStackArtifact(tx, oldWorkflowID, stack.ID); err != nil {
 			return nil, nil, httperror.InternalServerError("Unable to remove git workflow records from database", err)
 		}
 	}

@@ -2,6 +2,7 @@ package scheduling
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"testing"
 
@@ -98,6 +99,226 @@ func TestSourceScheduler_TickDeploysAllReferencingArtifacts(t *testing.T) {
 
 	require.ElementsMatch(t, []portainer.StackID{11, 22}, stacks)
 	require.ElementsMatch(t, []portainer.EdgeStackID{33}, edgeStacks)
+}
+
+// TestSourceScheduler_TickSkipsArtifactWithMissingBacking covers BE-13300: a stack that was
+// deleted through a path that skipped workflow cleanup leaves a dangling Artifact behind. tick
+// must not attempt to deploy it (that's the source of the "stack redeploy failed: object not
+// found" log spam).
+func TestSourceScheduler_TickSkipsArtifactWithMissingBacking(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	sysCtx := source.InsecureNewAdminContext()
+
+	src := &portainer.Source{
+		Name: "shared",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://example.com/repo.git"},
+	}
+	err := store.Source().Create(sysCtx, src)
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-orphan",
+		Artifacts: []portainer.Artifact{
+			{StackID: 999, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-live",
+		Artifacts: []portainer.Artifact{
+			{StackID: 11, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	var mu sync.Mutex
+	var stacks []portainer.StackID
+
+	sched := scheduler.NewScheduler(t.Context())
+	poller := NewSourceScheduler(sched, store, Deployers{
+		Stack: func(_ context.Context, id portainer.StackID) error {
+			mu.Lock()
+			defer mu.Unlock()
+			stacks = append(stacks, id)
+
+			return nil
+		},
+		StackExists: func(id portainer.StackID) (bool, error) {
+			return id != 999, nil
+		},
+	})
+
+	err = poller.tick(t.Context(), src.ID)
+	require.NoError(t, err)
+
+	require.ElementsMatch(t, []portainer.StackID{11}, stacks)
+}
+
+// TestSourceScheduler_ReconcileStopsWhenOnlyOrphanedArtifactsReference covers BE-13300: once
+// every artifact referencing a source has a dangling StackID/EdgeStackID, the source's poll job
+// must be stopped rather than kept alive forever.
+// TestSourceScheduler_TickLogsAndContinuesWhenBackingCheckErrors covers the case where the
+// existence check itself fails (as opposed to reporting the target missing): the artifact must be
+// skipped, and other artifacts in the same tick must still be deployed.
+func TestSourceScheduler_TickLogsAndContinuesWhenBackingCheckErrors(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	sysCtx := source.InsecureNewAdminContext()
+
+	src := &portainer.Source{
+		Name: "shared",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://example.com/repo.git"},
+	}
+	err := store.Source().Create(sysCtx, src)
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-erroring",
+		Artifacts: []portainer.Artifact{
+			{StackID: 13, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-live",
+		Artifacts: []portainer.Artifact{
+			{StackID: 11, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	var mu sync.Mutex
+	var stacks []portainer.StackID
+
+	sched := scheduler.NewScheduler(t.Context())
+	poller := NewSourceScheduler(sched, store, Deployers{
+		Stack: func(_ context.Context, id portainer.StackID) error {
+			mu.Lock()
+			defer mu.Unlock()
+			stacks = append(stacks, id)
+
+			return nil
+		},
+		StackExists: func(id portainer.StackID) (bool, error) {
+			if id == 13 {
+				return false, errors.New("boom")
+			}
+
+			return true, nil
+		},
+	})
+
+	err = poller.tick(t.Context(), src.ID)
+	require.NoError(t, err)
+
+	require.ElementsMatch(t, []portainer.StackID{11}, stacks)
+}
+
+// TestSourceScheduler_SourceReferencedPropagatesBackingCheckError covers sourceReferenced's error
+// path: a failure checking one artifact's backing target must abort the reference check rather
+// than being treated as "not referenced".
+func TestSourceScheduler_SourceReferencedPropagatesBackingCheckError(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	sysCtx := source.InsecureNewAdminContext()
+
+	src := &portainer.Source{
+		Name: "shared",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://example.com/repo.git"},
+	}
+	err := store.Source().Create(sysCtx, src)
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-erroring",
+		Artifacts: []portainer.Artifact{
+			{StackID: 13, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	wantErr := errors.New("boom")
+
+	sched := scheduler.NewScheduler(t.Context())
+	poller := NewSourceScheduler(sched, store, Deployers{
+		StackExists: func(portainer.StackID) (bool, error) {
+			return false, wantErr
+		},
+	})
+
+	_, err = poller.sourceReferenced(src.ID)
+	require.ErrorIs(t, err, wantErr)
+}
+
+// TestSourceScheduler_ArtifactBackingExistsUsesEdgeStackExistsOverride covers
+// artifactBackingExists's EdgeStackExists override: when it is supplied, it must be used instead
+// of the default assume-exists closure.
+func TestSourceScheduler_ArtifactBackingExistsUsesEdgeStackExistsOverride(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	sched := scheduler.NewScheduler(t.Context())
+	poller := NewSourceScheduler(sched, store, Deployers{
+		EdgeStackExists: func(id portainer.EdgeStackID) (bool, error) {
+			return id != 999, nil
+		},
+	})
+
+	exists, err := poller.artifactBackingExists(portainer.Artifact{EdgeStackID: 999})
+	require.NoError(t, err)
+	require.False(t, exists)
+}
+
+func TestSourceScheduler_ReconcileStopsWhenOnlyOrphanedArtifactsReference(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	sysCtx := source.InsecureNewAdminContext()
+
+	src := &portainer.Source{
+		Name:     "orphaned",
+		Type:     portainer.SourceTypeGit,
+		Git:      &gittypes.GitSource{URL: "https://example.com/repo.git"},
+		Interval: "1h",
+	}
+	err := store.Source().Create(sysCtx, src)
+	require.NoError(t, err)
+
+	err = store.Workflow().Create(&portainer.Workflow{
+		Name: "wf-orphan",
+		Artifacts: []portainer.Artifact{
+			{StackID: 999, Files: []portainer.ArtifactFile{{SourceID: src.ID}}},
+		},
+	})
+	require.NoError(t, err)
+
+	sched := scheduler.NewScheduler(t.Context())
+	poller := NewSourceScheduler(sched, store, Deployers{
+		Stack: func(_ context.Context, _ portainer.StackID) error { return nil },
+		StackExists: func(id portainer.StackID) (bool, error) {
+			return id != 999, nil
+		},
+	})
+
+	err = poller.ReconcileAll()
+	require.NoError(t, err)
+
+	_, ok := poller.jobs[src.ID]
+	require.False(t, ok)
 }
 
 func TestSourceScheduler_ReconcileStartsRestartsAndStops(t *testing.T) {

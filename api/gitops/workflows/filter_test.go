@@ -1,6 +1,7 @@
 package workflows
 
 import (
+	"errors"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -15,6 +16,66 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestArtifactBackingExists_StackExists(t *testing.T) {
+	t.Parallel()
+
+	exists, err := ArtifactBackingExists(
+		portainer.Artifact{StackID: 1},
+		func(portainer.StackID) (bool, error) { return true, nil },
+		func(portainer.EdgeStackID) (bool, error) { return false, nil },
+	)
+	require.NoError(t, err)
+	require.True(t, exists)
+}
+
+func TestArtifactBackingExists_StackMissing(t *testing.T) {
+	t.Parallel()
+
+	exists, err := ArtifactBackingExists(
+		portainer.Artifact{StackID: 999},
+		func(portainer.StackID) (bool, error) { return false, nil },
+		func(portainer.EdgeStackID) (bool, error) { return true, nil },
+	)
+	require.NoError(t, err)
+	require.False(t, exists)
+}
+
+func TestArtifactBackingExists_EdgeStackExists(t *testing.T) {
+	t.Parallel()
+
+	exists, err := ArtifactBackingExists(
+		portainer.Artifact{EdgeStackID: 1},
+		func(portainer.StackID) (bool, error) { return false, nil },
+		func(portainer.EdgeStackID) (bool, error) { return true, nil },
+	)
+	require.NoError(t, err)
+	require.True(t, exists)
+}
+
+func TestArtifactBackingExists_NeitherIDSet(t *testing.T) {
+	t.Parallel()
+
+	exists, err := ArtifactBackingExists(
+		portainer.Artifact{},
+		func(portainer.StackID) (bool, error) { return true, nil },
+		func(portainer.EdgeStackID) (bool, error) { return true, nil },
+	)
+	require.NoError(t, err)
+	require.False(t, exists)
+}
+
+func TestArtifactBackingExists_PropagatesError(t *testing.T) {
+	t.Parallel()
+
+	wantErr := errors.New("boom")
+	_, err := ArtifactBackingExists(
+		portainer.Artifact{StackID: 1},
+		func(portainer.StackID) (bool, error) { return false, wantErr },
+		func(portainer.EdgeStackID) (bool, error) { return true, nil },
+	)
+	require.ErrorIs(t, err, wantErr)
+}
 
 func TestFilterDockerStacksByAccess_KubeStacksPassThrough(t *testing.T) {
 	t.Parallel()
