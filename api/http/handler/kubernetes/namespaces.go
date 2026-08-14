@@ -195,13 +195,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 
 	namespace, err := cli.CreateNamespace(payload)
 	if err != nil {
-		if k8serrors.IsAlreadyExists(err) {
-			log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("The namespace already exists")
-			return httperror.Conflict(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, the namespace %s already exists. Error: ", namespaceName), err)
-		}
-
-		log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to create the namespace")
-		return httperror.InternalServerError("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: "+namespaceName, err)
+		return writeErrorResponse(err, "CreateKubernetesNamespace", "", namespaceName, "create the namespace")
 	}
 
 	return response.JSON(w, namespace)
@@ -294,7 +288,7 @@ func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http
 
 	namespace, err := cli.UpdateNamespace(payload)
 	if err != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the UpdateKubernetesNamespace operation for the namespace %s, unable to update the Kubernetes namespace. Error: ", namespaceName), err)
+		return writeErrorResponse(err, "UpdateKubernetesNamespace", "", namespaceName, "update the namespace")
 	}
 
 	return response.JSON(w, namespace)

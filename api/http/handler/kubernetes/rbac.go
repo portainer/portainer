@@ -6,6 +6,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // @id GetKubernetesRBACStatus
@@ -31,6 +32,11 @@ func (handler *Handler) getKubernetesRBACStatus(w http.ResponseWriter, r *http.R
 
 	isRBACEnabled, err := cli.IsRBACEnabled()
 	if err != nil {
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesRBACStatus").Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
 		log.Error().Err(err).Str("context", "GetKubernetesRBACStatus").Msg("Failed to check RBAC status")
 		return httperror.InternalServerError("Failed to check RBAC status", err)
 	}

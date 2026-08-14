@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // @id GetKubernetesSecret
@@ -48,6 +49,16 @@ func (handler *Handler) getKubernetesSecret(w http.ResponseWriter, r *http.Reque
 
 	secret, err := cli.GetSecret(namespace, secretName)
 	if err != nil {
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Str("secret", secretName).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
+		if k8serrors.IsNotFound(err) {
+			log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Str("secret", secretName).Msg("Unable to find the secret")
+			return httperror.NotFound("unable to find the secret. Error: ", err)
+		}
+
 		log.Error().Err(err).Str("context", "GetKubernetesSecret").Str("namespace", namespace).Str("secret", secretName).Msg("Unable to get secret")
 		return httperror.InternalServerError("unable to get secret. Error: ", err)
 	}
