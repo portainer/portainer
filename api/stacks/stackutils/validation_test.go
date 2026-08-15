@@ -1,14 +1,48 @@
 package stackutils
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
+	"github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
+
+func newVolumeInspectClient(t *testing.T, name string, vol volume.Volume) *client.Client {
+	t.Helper()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodHead && r.URL.Path == "/_ping" {
+			w.Header().Add("Api-Version", "1.51")
+			_, _ = w.Write([]byte{})
+
+			return
+		}
+
+		if r.URL.Path == "/v1.51/volumes/"+name {
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(vol)
+
+			return
+		}
+
+		http.NotFound(w, r)
+	}))
+	t.Cleanup(srv.Close)
+
+	cli, err := client.NewClientWithOpts(client.WithHost(srv.URL), client.WithHTTPClient(http.DefaultClient), client.WithVersion("1.51"))
+	require.NoError(t, err)
+
+	return cli
+}
 
 func TestIsValidStackFile_DefaultPortEnvSubstitution(t *testing.T) {
 	t.Parallel()
@@ -150,7 +184,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService)
+	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.NoError(t, err)
 }
 
@@ -181,7 +215,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService)
+	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.NoError(t, err)
 }
 
@@ -212,7 +246,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService)
+	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.ErrorContains(t, err, "failed to build stack environment variables")
 }
 
@@ -239,7 +273,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService)
+	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.NoError(t, err)
 }
 
@@ -270,7 +304,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService)
+	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.NoError(t, err)
 }
 
@@ -301,7 +335,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService)
+	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.NoError(t, err)
 }
 
@@ -330,8 +364,154 @@ services:
 	securitySettings := &portainer.EndpointSecuritySettings{
 		AllowBindMountsForRegularUsers: false,
 	}
-	err := ValidateStackFiles(stack, securitySettings, fileService)
+	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+}
+
+func TestIsValidStackFile_VolumeBindMountRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const forbidden = "bind-mount disabled for non administrator users"
+
+	f := func(yamlContent []byte, stackName string, dockerClient *client.Client, wantErrSubstring string) {
+		t.Helper()
+
+		securitySettings := &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}
+		err := IsValidStackFile(StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: securitySettings,
+			StackName:        stackName,
+			DockerClient:     dockerClient,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a top-level named volume using the local driver's bind-mount trick is rejected
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /etc
+`), "", nil, forbidden)
+
+	// a top-level named volume mounting a real filesystem type via a device is rejected
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: ext4
+      device: /dev/sda1
+`), "", nil, forbidden)
+
+	// service-level volume "type: BIND" match is case-insensitive
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - type: BIND
+        source: /host/path
+        target: /container/path
+`), "", nil, forbidden)
+
+	// an external volume that is actually bind-backed is rejected
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data:
+    external: true
+`), "mystack", newVolumeInspectClient(t, "data", volume.Volume{
+		Name:    "data",
+		Driver:  "local",
+		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
+	}), forbidden)
+
+	// a non-external volume that reuses an existing bind-backed volume is rejected
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data: {}
+`), "mystack", newVolumeInspectClient(t, "mystack_data", volume.Volume{
+		Name:    "mystack_data",
+		Driver:  "local",
+		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
+	}), forbidden)
+
+	// with no Docker client, the existing-volume check is skipped and the stack is valid
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data: {}
+`), "mystack", nil, "")
+
+	// an explicit "name:" override resolves to the overridden Docker-side name
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - data:/var/lib/data
+
+volumes:
+  data:
+    name: custom-volume-name
+`), "mystack", newVolumeInspectClient(t, "custom-volume-name", volume.Volume{
+		Name:    "custom-volume-name",
+		Driver:  "local",
+		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
+	}), forbidden)
 }
 
 func TestExtractImageRegistry(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	portainer "github.com/portainer/portainer/api"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 )
 
 type TestStackDeployer struct {
@@ -14,6 +15,10 @@ type TestStackDeployer struct {
 
 func NewTestStackDeployer() *TestStackDeployer {
 	return &TestStackDeployer{}
+}
+
+func (d *TestStackDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return nil
 }
 
 func (d *TestStackDeployer) DeployComposeStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, forcePullImage, forceRecreate bool) error {

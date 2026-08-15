@@ -6,13 +6,16 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/logs"
 
 	"github.com/docker/docker/client"
 	"github.com/segmentio/encoding/json"
@@ -29,6 +32,88 @@ var (
 	ErrContainerCapabilitiesForbidden = errors.New("forbidden to use container capabilities")
 	ErrBindMountsForbidden            = errors.New("forbidden to use bind mounts")
 )
+
+type PartialMount struct {
+	Type          string `json:"Type"`
+	Source        string `json:"Source"`
+	VolumeOptions *struct {
+		DriverConfig *struct {
+			Name    string            `json:"Name"`
+			Options map[string]string `json:"Options"`
+		} `json:"DriverConfig"`
+	} `json:"VolumeOptions"`
+}
+
+func referencedVolumeNames(binds []string, mounts []PartialMount) []string {
+	var names []string
+
+	for _, bind := range binds {
+		if docker.IsBindPath(bind) {
+			continue
+		}
+
+		source, _, _ := strings.Cut(bind, ":")
+		if source != "" {
+			names = append(names, source)
+		}
+	}
+
+	for _, mount := range mounts {
+		if mount.Source == "" || strings.EqualFold(mount.Type, "bind") {
+			continue
+		}
+
+		names = append(names, mount.Source)
+	}
+
+	return names
+}
+
+func CheckContainerBindMountRestrictions(ctx context.Context, binds, volumesFrom []string, mounts []PartialMount, getClient func() (*client.Client, error)) error {
+	if len(volumesFrom) > 0 {
+		return ErrBindMountsForbidden
+	}
+
+	if slices.ContainsFunc(binds, docker.IsBindPath) {
+		return ErrBindMountsForbidden
+	}
+
+	for _, mount := range mounts {
+		descriptor := docker.MountDescriptor{Type: mount.Type}
+		if mount.VolumeOptions != nil && mount.VolumeOptions.DriverConfig != nil {
+			descriptor.Driver = mount.VolumeOptions.DriverConfig.Name
+			descriptor.DriverOpts = mount.VolumeOptions.DriverConfig.Options
+		}
+
+		if docker.IsBindMount(descriptor) {
+			return ErrBindMountsForbidden
+		}
+	}
+
+	referencedVolumes := referencedVolumeNames(binds, mounts)
+	if len(referencedVolumes) == 0 {
+		return nil
+	}
+
+	cli, err := getClient()
+	if err != nil {
+		return err
+	}
+	defer logs.CloseAndLogErr(cli)
+
+	for _, name := range referencedVolumes {
+		isBind, err := docker.InspectVolumeIsBindMount(ctx, cli, name)
+		if err != nil {
+			return err
+		}
+
+		if isBind {
+			return ErrBindMountsForbidden
+		}
+	}
+
+	return nil
+}
 
 func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID portainer.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	container, err := dockerClient.ContainerInspect(context.Background(), containerID)
@@ -180,9 +265,8 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			CapAdd      []string       `json:"CapAdd"`
 			CapDrop     []string       `json:"CapDrop"`
 			Binds       []string       `json:"Binds"`
-			Mounts      []struct {
-				Type string `json:"Type"`
-			} `json:"Mounts"`
+			VolumesFrom []string       `json:"VolumesFrom"`
+			Mounts      []PartialMount `json:"Mounts"`
 		} `json:"HostConfig"`
 	}
 
@@ -241,19 +325,19 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, ErrContainerCapabilitiesForbidden
 		}
 
-		if !securitySettings.AllowBindMountsForRegularUsers && len(partialContainer.HostConfig.Binds) > 0 {
-			for _, bind := range partialContainer.HostConfig.Binds {
-				if strings.HasPrefix(bind, "/") {
-					return forbiddenResponse, ErrBindMountsForbidden
-				}
-			}
-		}
+		if !securitySettings.AllowBindMountsForRegularUsers {
+			getClient := func() (*client.Client, error) {
+				agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
 
-		if !securitySettings.AllowBindMountsForRegularUsers && len(partialContainer.HostConfig.Mounts) > 0 {
-			for _, mount := range partialContainer.HostConfig.Mounts {
-				if mount.Type == "bind" {
-					return forbiddenResponse, ErrBindMountsForbidden
+				return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+			}
+
+			if err := CheckContainerBindMountRestrictions(request.Context(), partialContainer.HostConfig.Binds, partialContainer.HostConfig.VolumesFrom, partialContainer.HostConfig.Mounts, getClient); err != nil {
+				if errors.Is(err, ErrBindMountsForbidden) {
+					return forbiddenResponse, err
 				}
+
+				return nil, err
 			}
 		}
 

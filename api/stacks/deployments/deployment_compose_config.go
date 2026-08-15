@@ -8,8 +8,10 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
+	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -66,7 +68,19 @@ func (config *ComposeStackDeploymentConfig) Deploy(ctx context.Context) error {
 
 	isAdminOrEndpointAdmin := stackutils.UserIsAdminOrEndpointAdmin(config.user)
 	if !isAdminOrEndpointAdmin && config.endpoint != nil {
-		if err := stackutils.ValidateStackFiles(config.stack, &config.endpoint.SecuritySettings, config.FileService); err != nil {
+		var dockerClient *client.Client
+
+		if factory := config.StackDeployer.GetDockerClientFactory(); factory != nil {
+			var err error
+
+			dockerClient, err = factory.CreateClient(config.endpoint, "", nil)
+			if err != nil {
+				return err
+			}
+			defer logs.CloseAndLogErr(dockerClient)
+		}
+
+		if err := stackutils.ValidateStackFiles(config.stack, &config.endpoint.SecuritySettings, config.FileService, dockerClient); err != nil {
 			return err
 		}
 	}

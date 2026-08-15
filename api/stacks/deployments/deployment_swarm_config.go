@@ -10,7 +10,10 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/docker/docker/client"
 )
 
 type SwarmStackDeploymentConfig struct {
@@ -66,7 +69,19 @@ func (config *SwarmStackDeploymentConfig) Deploy(ctx context.Context) error {
 	settings := &config.endpoint.SecuritySettings
 
 	if !isAdminOrEndpointAdmin {
-		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService); err != nil {
+		var dockerClient *client.Client
+
+		if factory := config.StackDeployer.GetDockerClientFactory(); factory != nil {
+			var err error
+
+			dockerClient, err = factory.CreateClient(config.endpoint, "", nil)
+			if err != nil {
+				return err
+			}
+			defer logs.CloseAndLogErr(dockerClient)
+		}
+
+		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService, dockerClient); err != nil {
 			return err
 		}
 	}

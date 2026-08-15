@@ -7,11 +7,13 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	composeloader "github.com/compose-spec/compose-go/v2/loader"
 	composetypes "github.com/compose-spec/compose-go/v2/types"
+	dockerclient "github.com/docker/docker/client"
 	"github.com/pkg/errors"
 )
 
@@ -20,6 +22,8 @@ type StackFileValidationConfig struct {
 	SecuritySettings *portainer.EndpointSecuritySettings
 	Env              map[string]string
 	WorkingDir       string
+	StackName        string
+	DockerClient     *dockerclient.Client
 }
 
 func IsValidStackFile(config StackFileValidationConfig) error {
@@ -29,15 +33,40 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 		WorkingDir:  config.WorkingDir,
 	}
 
-	composeConfig, err := composeloader.LoadWithContext(context.Background(), composeConfigDetails, composeloader.WithSkipValidation)
+	setProjectName := func(o *composeloader.Options) {
+		o.SetProjectName(config.StackName, config.StackName != "")
+	}
+
+	composeConfig, err := composeloader.LoadWithContext(context.Background(), composeConfigDetails, composeloader.WithSkipValidation, setProjectName)
 	if err != nil {
 		return err
+	}
+
+	if !config.SecuritySettings.AllowBindMountsForRegularUsers {
+		for volumeKey, volumeConfig := range composeConfig.Volumes {
+			if docker.IsBindMount(docker.MountDescriptor{Driver: volumeConfig.Driver, DriverOpts: volumeConfig.DriverOpts}) {
+				return fmt.Errorf("volume %q: bind-mount disabled for non administrator users", volumeKey)
+			}
+
+			if config.DockerClient == nil {
+				continue
+			}
+
+			isBind, err := docker.InspectVolumeIsBindMount(context.Background(), config.DockerClient, volumeConfig.Name)
+			if err != nil {
+				return err
+			}
+
+			if isBind {
+				return fmt.Errorf("volume %q: bind-mount disabled for non administrator users", volumeKey)
+			}
+		}
 	}
 
 	for _, service := range composeConfig.Services {
 		if !config.SecuritySettings.AllowBindMountsForRegularUsers {
 			for _, volume := range service.Volumes {
-				if volume.Type == "bind" {
+				if strings.EqualFold(volume.Type, "bind") {
 					return errors.New("bind-mount disabled for non administrator users")
 				}
 			}
@@ -166,7 +195,7 @@ func extractImageRegistry(imageRef string) string {
 	return ""
 }
 
-func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService) error {
+func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService, dockerClient *dockerclient.Client) error {
 	env, err := BuildEnvMap(stack)
 	if err != nil {
 		return errors.Wrap(err, "failed to build stack environment variables")
@@ -185,6 +214,8 @@ func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.Endp
 			SecuritySettings: securitySettings,
 			Env:              env,
 			WorkingDir:       workingDir,
+			StackName:        stack.Name,
+			DockerClient:     dockerClient,
 		}); err != nil {
 			return errors.Wrap(err, "stack config file is invalid")
 		}

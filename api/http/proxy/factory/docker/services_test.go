@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"path"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
 )
@@ -25,6 +27,7 @@ type serviceCreationFixtures struct {
 	stdUser    portainer.User
 	adminUser  portainer.User
 	endpointID portainer.EndpointID
+	volumes    map[string]volume.Volume
 }
 
 func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
@@ -32,10 +35,27 @@ func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
 
 	const serviceID = "some-service-id"
 
+	f := &serviceCreationFixtures{
+		volumes: map[string]volume.Volume{},
+	}
+
 	dockerSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodHead && r.URL.Path == "/_ping" {
 			w.Header().Add("Api-Version", serviceCreationAPIVersion)
 			_, _ = w.Write([]byte{})
+
+			return
+		}
+
+		if r.Method == http.MethodGet {
+			if vol, ok := f.volumes[path.Base(r.URL.Path)]; ok {
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(vol)
+
+				return
+			}
+
+			http.NotFound(w, r)
 
 			return
 		}
@@ -61,13 +81,11 @@ func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
 
 	_, store := datastore.MustNewTestStore(t, true, false)
 
-	f := &serviceCreationFixtures{
-		dockerSrv:  dockerSrv,
-		ds:         store,
-		stdUser:    portainer.User{ID: 1, Username: "std", Role: portainer.StandardUserRole},
-		adminUser:  portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole},
-		endpointID: portainer.EndpointID(1),
-	}
+	f.dockerSrv = dockerSrv
+	f.ds = store
+	f.stdUser = portainer.User{ID: 1, Username: "std", Role: portainer.StandardUserRole}
+	f.adminUser = portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
+	f.endpointID = portainer.EndpointID(1)
 
 	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		err := tx.User().Create(&f.stdUser)
@@ -101,10 +119,14 @@ func (f *serviceCreationFixtures) setSecuritySettings(t *testing.T, settings por
 
 func (f *serviceCreationFixtures) newTransport() *Transport {
 	return &Transport{
-		endpoint:      &portainer.Endpoint{ID: f.endpointID},
+		endpoint:      &portainer.Endpoint{ID: f.endpointID, URL: f.dockerSrv.URL},
 		dataStore:     f.ds,
 		HTTPTransport: &http.Transport{},
 	}
+}
+
+func (f *serviceCreationFixtures) setVolume(name string, vol volume.Volume) {
+	f.volumes[name] = vol
 }
 
 func (f *serviceCreationFixtures) newRequest(t *testing.T, spec swarm.ServiceSpec, user portainer.User) *http.Request {
@@ -641,4 +663,67 @@ func TestDecorateServiceUpdateOperation_VolumeWithBindDriverOptionForbidden(t *t
 
 	err = resp.Body.Close()
 	require.NoError(t, err)
+}
+
+func TestDecorateServiceCreationOperation_BindMountRestrictions(t *testing.T) {
+	t.Parallel()
+
+	f := func(mounts []mount.Mount, volumes map[string]volume.Volume, wantForbidden bool) {
+		t.Helper()
+
+		fx := newServiceCreationFixtures(t)
+		fx.setSecuritySettings(t, restrictiveSettings)
+
+		for name, vol := range volumes {
+			fx.setVolume(name, vol)
+		}
+
+		spec := swarm.ServiceSpec{
+			TaskTemplate: swarm.TaskSpec{
+				ContainerSpec: &swarm.ContainerSpec{Mounts: mounts},
+			},
+		}
+
+		resp, err := fx.newTransport().decorateServiceCreationOperation(fx.newRequest(t, spec, fx.stdUser))
+		require.NotNil(t, resp)
+
+		if wantForbidden {
+			require.ErrorIs(t, err, ErrBindMountsForbidden)
+			require.Equal(t, http.StatusForbidden, resp.StatusCode)
+		} else {
+			require.NoError(t, err)
+			require.Equal(t, http.StatusCreated, resp.StatusCode)
+		}
+
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// local driver's bind-mount trick is forbidden
+	f([]mount.Mount{{
+		Type: mount.TypeVolume,
+		VolumeOptions: &mount.VolumeOptions{
+			DriverConfig: &mount.Driver{Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"}},
+		},
+	}}, nil, true)
+
+	// a real filesystem type mounted via a device is forbidden
+	f([]mount.Mount{{
+		Type: mount.TypeVolume,
+		VolumeOptions: &mount.VolumeOptions{
+			DriverConfig: &mount.Driver{Options: map[string]string{"type": "ext4", "device": "/dev/sda1"}},
+		},
+	}}, nil, true)
+
+	// bind Type match is case-insensitive
+	f([]mount.Mount{{Type: "BIND"}}, nil, true)
+
+	// referencing an existing volume that is actually bind-backed is forbidden
+	f([]mount.Mount{{Type: mount.TypeVolume, Source: "evilvol"}}, map[string]volume.Volume{
+		"evilvol": {Name: "evilvol", Driver: "local", Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"}},
+	}, true)
+
+	// referencing an existing normal volume is allowed
+	f([]mount.Mount{{Type: mount.TypeVolume, Source: "normalvol"}}, map[string]volume.Volume{
+		"normalvol": {Name: "normalvol", Driver: "local"},
+	}, false)
 }

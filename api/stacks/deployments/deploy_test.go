@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/pkg/fips"
@@ -81,6 +82,10 @@ vJUUCFYm8+9p6gTVOcoMit+eGSwa81PCPEs1TnU1PV/PaDFeUhn/mg==
 var adminUserContext = source.InsecureNewAdminContext()
 
 type noopDeployer struct{}
+
+func (s noopDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return nil
+}
 
 // without unpacker
 func (s noopDeployer) DeploySwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
