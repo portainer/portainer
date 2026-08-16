@@ -1974,6 +1974,39 @@ export type KubernetesKubernetesVersionResponse = {
   supportsPodRestart?: boolean;
 };
 
+export type KubernetesManifestDryRunPayload = {
+  /**
+   * The manifests to validate. Each entry may hold several YAML documents separated by "---".
+   */
+  manifests?: Array<string>;
+  /**
+   * The namespace applied to namespaced resources that do not declare one. A resource declaring a different namespace is rejected.
+   */
+  namespace?: string;
+};
+
+export type KubernetesManifestDryRunResponse = {
+  results?: Array<KubernetesManifestDryRunResult>;
+};
+
+export type KubernetesManifestDryRunResult = {
+  /**
+   * The zero-based position of the document among the non-empty documents of all manifests. It identifies a document rejected before its resource could be named, such as malformed YAML.
+   */
+  documentIndex?: number;
+  kind?: string;
+  /**
+   * The reason the resource was rejected. Empty when the resource passed.
+   */
+  message?: string;
+  name?: string;
+  namespace?: string;
+  /**
+   * Either "pass" or "fail".
+   */
+  status?: string;
+};
+
 export type KubernetesNamespacesToggleSystemPayload = {
   /**
    * Toggle the system state of this namespace to true or false
@@ -17956,6 +17989,54 @@ export type DeleteJobsResponses = {
 };
 
 export type DeleteJobsResponse = DeleteJobsResponses[keyof DeleteJobsResponses];
+
+export type DryRunKubernetesManifestsData = {
+  /**
+   * The manifests to validate
+   */
+  body: KubernetesManifestDryRunPayload;
+  path: {
+    /**
+     * Environment(Endpoint) identifier
+     */
+    id: number;
+  };
+  query?: never;
+  url: '/kubernetes/{id}/manifests/dry_run';
+};
+
+export type DryRunKubernetesManifestsErrors = {
+  /**
+   * Invalid request payload, such as missing required fields or fields not meeting validation criteria.
+   */
+  400: unknown;
+  /**
+   * Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions.
+   */
+  401: unknown;
+  /**
+   * Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions.
+   */
+  403: unknown;
+  /**
+   * Unable to find an environment with the specified identifier.
+   */
+  404: unknown;
+  /**
+   * Server error occurred while attempting to validate the manifests.
+   */
+  500: unknown;
+};
+
+export type DryRunKubernetesManifestsResponses = {
+  /**
+   * Success
+   */
+  200: KubernetesManifestDryRunResponse;
+};
+
+export type DryRunKubernetesManifestsResponse =
+  DryRunKubernetesManifestsResponses[keyof DryRunKubernetesManifestsResponses];
 
 export type GetKubernetesMaxResourceLimitsData = {
   body?: never;

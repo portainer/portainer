@@ -68,13 +68,14 @@ func (c *Client) DeleteDynamic(ctx context.Context, manifests []string) (string,
 		}
 
 		// Split by document separator if multiple resources in one manifest
-		for resource := range strings.SplitSeq(content, "\n---\n") {
-			resource = strings.TrimSpace(resource)
-			if resource == "" {
-				continue
-			}
+		documents, err := splitManifestDocuments(content)
+		if err != nil {
+			errs = errors.Join(errs, err)
+			continue
+		}
 
-			result, err := c.deleteResource(ctx, dynamicClient, mapper, []byte(resource))
+		for _, document := range documents {
+			result, err := c.deleteResource(ctx, dynamicClient, mapper, []byte(document))
 			if err != nil {
 				errs = errors.Join(errs, err)
 				continue

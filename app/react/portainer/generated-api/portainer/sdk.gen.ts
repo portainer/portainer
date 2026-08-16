@@ -138,6 +138,9 @@ import type {
   DrainNodeData,
   DrainNodeErrors,
   DrainNodeResponses,
+  DryRunKubernetesManifestsData,
+  DryRunKubernetesManifestsErrors,
+  DryRunKubernetesManifestsResponses,
   EdgeGroupCreateData,
   EdgeGroupCreateErrors,
   EdgeGroupCreateResponses,
@@ -961,6 +964,9 @@ import {
   zDrainNodeBody,
   zDrainNodePath,
   zDrainNodeResponse,
+  zDryRunKubernetesManifestsBody,
+  zDryRunKubernetesManifestsPath,
+  zDryRunKubernetesManifestsResponse,
   zEdgeGroupCreateBody,
   zEdgeGroupCreateResponse,
   zEdgeGroupDeletePath,
@@ -5545,6 +5551,50 @@ export const deleteJobs = <ThrowOnError extends boolean = true>(
       { name: 'Authorization', type: 'apiKey' },
     ],
     url: '/kubernetes/{id}/jobs/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Validate Kubernetes manifests without applying them
+ *
+ * Validate Kubernetes manifests against the cluster with a server-side dry-run apply, without persisting anything.
+ * Each resource is reported on its own, so a rejected resource does not hide the outcome of the others.
+ * The dry-run runs with the permissions of the requesting user, so it also surfaces missing permissions.
+ * A resource living in a namespace created by another manifest of the same request is reported as failed, because the dry-run never persists that namespace.
+ * **Access policy**: authenticated
+ */
+export const dryRunKubernetesManifests = <ThrowOnError extends boolean = true>(
+  options: Options<DryRunKubernetesManifestsData, ThrowOnError>
+): RequestResult<
+  DryRunKubernetesManifestsResponses,
+  DryRunKubernetesManifestsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DryRunKubernetesManifestsResponses,
+    DryRunKubernetesManifestsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDryRunKubernetesManifestsBody,
+          path: zDryRunKubernetesManifestsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) =>
+      await zDryRunKubernetesManifestsResponse.parseAsync(data),
+    security: [
+      { name: 'X-API-KEY', type: 'apiKey' },
+      { name: 'Authorization', type: 'apiKey' },
+    ],
+    url: '/kubernetes/{id}/manifests/dry_run',
     ...options,
     headers: {
       'Content-Type': 'application/json',

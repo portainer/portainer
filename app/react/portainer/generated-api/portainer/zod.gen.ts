@@ -782,6 +782,24 @@ export const zKubernetesKubernetesVersionResponse = z.object({
   supportsPodRestart: z.boolean().optional(),
 });
 
+export const zKubernetesManifestDryRunPayload = z.object({
+  manifests: z.array(z.string()).optional(),
+  namespace: z.string().optional(),
+});
+
+export const zKubernetesManifestDryRunResult = z.object({
+  documentIndex: z.int().optional(),
+  kind: z.string().optional(),
+  message: z.string().optional(),
+  name: z.string().optional(),
+  namespace: z.string().optional(),
+  status: z.string().optional(),
+});
+
+export const zKubernetesManifestDryRunResponse = z.object({
+  results: z.array(zKubernetesManifestDryRunResult).optional(),
+});
+
 export const zKubernetesNamespacesToggleSystemPayload = z.object({
   System: z.boolean().optional(),
 });
@@ -5852,6 +5870,21 @@ export const zDeleteJobsPath = z.object({
  * Success
  */
 export const zDeleteJobsResponse = z.void();
+
+/**
+ * The manifests to validate
+ */
+export const zDryRunKubernetesManifestsBody = zKubernetesManifestDryRunPayload;
+
+export const zDryRunKubernetesManifestsPath = z.object({
+  id: z.int(),
+});
+
+/**
+ * Success
+ */
+export const zDryRunKubernetesManifestsResponse =
+  zKubernetesManifestDryRunResponse;
 
 export const zGetKubernetesMaxResourceLimitsPath = z.object({
   id: z.int(),

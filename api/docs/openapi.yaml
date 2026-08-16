@@ -4703,6 +4703,63 @@ paths:
       summary: Delete Jobs
       tags:
         - kubernetes
+  "/kubernetes/{id}/manifests/dry_run":
+    post:
+      description: >-
+        Validate Kubernetes manifests against the cluster with a server-side
+        dry-run apply, without persisting anything.
+
+        Each resource is reported on its own, so a rejected resource does not hide the outcome of the others.
+
+        The dry-run runs with the permissions of the requesting user, so it also surfaces missing permissions.
+
+        A resource living in a namespace created by another manifest of the same request is reported as failed, because the dry-run never persists that namespace.
+
+        **Access policy**: authenticated
+      operationId: DryRunKubernetesManifests
+      parameters:
+        - description: Environment(Endpoint) identifier
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/kubernetes.manifestDryRunPayload"
+        description: The manifests to validate
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/kubernetes.manifestDryRunResponse"
+        "400":
+          description: Invalid request payload, such as missing required fields or fields
+            not meeting validation criteria.
+        "401":
+          description: Unauthorized access - the user is not authenticated or does not
+            have the necessary permissions. Ensure that you have provided a
+            valid API key or JWT token, and that you have the required
+            permissions.
+        "403":
+          description: Permission denied - the user is authenticated but does not have the
+            necessary permissions to access the requested resource or perform
+            the specified operation. Check your user roles and permissions.
+        "404":
+          description: Unable to find an environment with the specified identifier.
+        "500":
+          description: Server error occurred while attempting to validate the manifests.
+      security:
+        - ApiKeyAuth: []
+          jwt: []
+      summary: Validate Kubernetes manifests without applying them
+      tags:
+        - kubernetes
   "/kubernetes/{id}/max_resource_limits":
     get:
       description: >-
@@ -15311,6 +15368,58 @@ components:
 
             is preferred over a raw Kubernetes-version comparison.
           type: boolean
+      type: object
+    kubernetes.manifestDryRunPayload:
+      properties:
+        manifests:
+          description: The manifests to validate. Each entry may hold several YAML
+            documents separated by "---".
+          example:
+            - |-
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: app-config
+          items:
+            type: string
+          type: array
+        namespace:
+          description: The namespace applied to namespaced resources that do not declare
+            one. A resource declaring a different namespace is rejected.
+          example: default
+          type: string
+      type: object
+    kubernetes.manifestDryRunResponse:
+      properties:
+        results:
+          items:
+            $ref: "#/components/schemas/kubernetes.manifestDryRunResult"
+          type: array
+      type: object
+    kubernetes.manifestDryRunResult:
+      properties:
+        documentIndex:
+          description: The zero-based position of the document among the non-empty
+            documents of all manifests. It identifies a document rejected before
+            its resource could be named, such as malformed YAML.
+          example: 0
+          type: integer
+        kind:
+          example: ConfigMap
+          type: string
+        message:
+          description: The reason the resource was rejected. Empty when the resource passed.
+          type: string
+        name:
+          example: app-config
+          type: string
+        namespace:
+          example: default
+          type: string
+        status:
+          description: Either "pass" or "fail".
+          example: pass
+          type: string
       type: object
     kubernetes.namespacesToggleSystemPayload:
       properties:
