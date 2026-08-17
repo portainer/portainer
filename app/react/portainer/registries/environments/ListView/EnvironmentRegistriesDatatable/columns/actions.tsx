@@ -1,7 +1,7 @@
 import { CellContext } from '@tanstack/react-table';
 import { Users } from 'lucide-react';
 
-import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
+import { useAuthorizations } from '@/react/hooks/useUser';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { DecoratedRegistry } from '@/react/portainer/registries/ListView/RegistriesDatatable/types';
 import { RegistryTypes } from '@/react/portainer/registries/types/registry';
@@ -20,13 +20,13 @@ function Cell({
   row: { original: item },
 }: CellContext<DecoratedRegistry, unknown>) {
   const environmentId = useEnvironmentId();
-  const hasUpdateAccessAuthorizations = useAuthorizations(
+  const { authorized: canUpdateAccess } = useAuthorizations(
     ['PortainerRegistryUpdateAccess'],
     environmentId,
     true
   );
   const canManageAccess =
-    item.Type !== RegistryTypes.ANONYMOUS && hasUpdateAccessAuthorizations;
+    item.Type !== RegistryTypes.ANONYMOUS && canUpdateAccess;
 
   if (!item.Id) {
     return null;
@@ -35,20 +35,18 @@ function Cell({
   return (
     <>
       {canManageAccess && (
-        <Authorized authorizations="PortainerRegistryUpdateAccess">
-          <Button
-            color="link"
-            icon={Users}
-            as={Link}
-            props={{
-              to: '.access',
-              params: { id: item.Id },
-            }}
-            data-cy={`registry-manage-access-button-${item.Name}`}
-          >
-            Manage access
-          </Button>
-        </Authorized>
+        <Button
+          color="link"
+          icon={Users}
+          as={Link}
+          props={{
+            to: '.access',
+            params: { id: item.Id },
+          }}
+          data-cy={`registry-manage-access-button-${item.Name}`}
+        >
+          Manage access
+        </Button>
       )}
       <BrowseButton registry={item} environmentId={environmentId} />
     </>

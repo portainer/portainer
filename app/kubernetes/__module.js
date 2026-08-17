@@ -4,6 +4,7 @@ import { updateAxiosAdapter } from '@/react/portainer/services/axios/axios';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { cache } from '@/react/portainer/services/axios/axios';
 import { CACHE_REFRESH_EVENT, CACHE_DURATION } from '../portainer/services/http-request.helper';
+import { AccessHeaders } from '../portainer/authorization-guard';
 
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
@@ -660,6 +661,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesRegistryAccessView',
         },
+      },
+      data: {
+        access: AccessHeaders.Admin,
       },
     };
 
