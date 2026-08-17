@@ -37,25 +37,10 @@ export function PublishedPorts({ item }: { item: Application }) {
   );
 }
 
-function getClusterIPUrls(services?: Application['Services']) {
-  return (
-    services?.flatMap(
-      (service) =>
-        (service.spec?.type === 'ClusterIP' &&
-          service.spec?.ports?.map((port) => ({
-            url: `${getSchemeFromPort(port.port)}://${
-              service?.spec?.clusterIP
-            }:${port.port}`,
-            type: 'ClusterIP',
-          }))) ||
-        []
-    ) || []
-  );
-}
-
-function getNodePortUrls(services?: Application['Services']) {
-  return (
-    services?.flatMap(
+export function getPublishedUrls(item: Application) {
+  // Get URLs from clusterIP and nodePort services
+  const publishedUrls =
+    item.Services?.flatMap(
       (service) =>
         (service.spec?.type === 'NodePort' &&
           service.spec?.ports?.map((port) => ({
@@ -65,17 +50,7 @@ function getNodePortUrls(services?: Application['Services']) {
             type: 'NodePort',
           }))) ||
         []
-    ) || []
-  );
-}
-
-export function getPublishedUrls(item: Application) {
-  // Get URLs from clusterIP and nodePort services
-  const clusterIPs = getClusterIPUrls(item.Services);
-  const nodePortUrls = getNodePortUrls(item.Services);
-
-  // combine all urls
-  const publishedUrls = [...clusterIPs, ...nodePortUrls];
+    ) || [];
 
   return publishedUrls.length > 0 ? publishedUrls : [];
 }
