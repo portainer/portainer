@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
+import KubernetesResourceQuotaHelper from '@/kubernetes/helpers/resourceQuotaHelper';
 import KubernetesEventHelper from '@/kubernetes/helpers/eventHelper';
 import { KubernetesStorageClassAccessPolicies } from '@/kubernetes/models/storage-class/models';
 import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
@@ -59,6 +60,14 @@ class KubernetesVolumeController {
 
   isUsed() {
     return isVolumeUsed(this.volume);
+  }
+
+  /**
+   * Manifests may express storage in binary units (Gi, Mi, Ti) or decimal units (G, M, T).
+   * Parse using whichever base the suffix actually indicates, rather than assuming decimal.
+   */
+  parseStorageToBytes(storage) {
+    return filesizeParser(storage, { base: storage.includes('i') ? 2 : 10 });
   }
 
   onChangeSize() {
@@ -122,9 +131,10 @@ class KubernetesVolumeController {
       volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
       this.volume = volume;
       this.oldVolume = angular.copy(volume);
-      this.state.volumeSize = parseInt(volume.PersistentVolumeClaim.Storage.slice(0, -2), 10);
-      this.state.volumeSizeUnit = volume.PersistentVolumeClaim.Storage.slice(-2);
-      this.state.oldVolumeSize = filesizeParser(volume.PersistentVolumeClaim.Storage, { base: 10 });
+      this.state.oldVolumeSize = this.parseStorageToBytes(volume.PersistentVolumeClaim.Storage);
+      const { size, sizeUnit } = KubernetesResourceQuotaHelper.formatBytes(this.state.oldVolumeSize);
+      this.state.volumeSize = size;
+      this.state.volumeSizeUnit = sizeUnit;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve volume');
     }

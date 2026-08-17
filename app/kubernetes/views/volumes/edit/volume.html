@@ -32,8 +32,8 @@
                 <table class="table">
                   <tbody>
                     <tr>
-                      <td>Name</td>
-                      <td data-cy="k8sVolDetail-volName">
+                      <td class="w-1/3">Name</td>
+                      <td class="w-2/3" data-cy="k8sVolDetail-volName">
                         {{ ctrl.volume.PersistentVolumeClaim.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
                         <span class="label label-warning image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && !ctrl.isUsed()">unused</span>
@@ -79,7 +79,7 @@
                     <tr>
                       <td>size</td>
                       <td ng-if="!ctrl.state.increaseSize">
-                        {{ ctrl.volume.PersistentVolumeClaim.Storage }}
+                        {{ ctrl.state.volumeSize }} {{ ctrl.state.volumeSizeUnit }}
                         <button
                           type="button"
                           class="btn btn-sm btn-primary"
