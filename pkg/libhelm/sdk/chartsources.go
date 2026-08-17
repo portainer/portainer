@@ -168,7 +168,7 @@ func authenticateChartSource(actionConfig *action.Configuration, reg *portainer.
 	// 4. Credential files add complexity without solving the core rate limiting issue
 
 	// Try to get cached registry client (registry ID-based key)
-	if cachedClient, found := cache.GetCachedRegistryClientByID(reg.ID); found {
+	if cachedClient, found := getCachedRegistryClient(reg); found {
 		log.Debug().
 			Int("registry_id", int(reg.ID)).
 			Str("registry_url", reg.URL).
@@ -197,7 +197,7 @@ func authenticateChartSource(actionConfig *action.Configuration, reg *portainer.
 	}
 
 	// Cache the client if login was successful (registry ID-based key)
-	if registryClient != nil {
+	if registryClient != nil && isStoredRegistry(reg) {
 		cache.SetCachedRegistryClientByID(reg.ID, registryClient)
 		log.Debug().
 			Int("registry_id", int(reg.ID)).
@@ -251,7 +251,7 @@ func createOCIRegistryClient(portainerRegistry *portainer.Registry) (*registry.C
 	}
 
 	// Check cache first using registry ID-based key
-	if cachedClient, found := cache.GetCachedRegistryClientByID(portainerRegistry.ID); found {
+	if cachedClient, found := getCachedRegistryClient(portainerRegistry); found {
 		return cachedClient, nil
 	}
 
@@ -320,9 +320,30 @@ func createOCIRegistryClient(portainerRegistry *portainer.Registry) (*registry.C
 			Msg("Created unauthenticated OCI registry client")
 	}
 
-	cache.SetCachedRegistryClientByID(portainerRegistry.ID, registryClient)
+	if isStoredRegistry(portainerRegistry) {
+		cache.SetCachedRegistryClientByID(portainerRegistry.ID, registryClient)
+	}
 
 	return registryClient, nil
+}
+
+// isStoredRegistry reports whether a registry is one Portainer has stored, and
+// so whether its client may be cached. A caller can also describe a registry
+// inline, without storing it — the addon catalog does, to carry the TLS settings
+// of the host its charts are mirrored to. Such a registry has no id, so caching
+// it would file every one of them under the same key and hand one host's client,
+// with its TLS settings, to the next.
+func isStoredRegistry(reg *portainer.Registry) bool {
+	return reg != nil && reg.ID != 0
+}
+
+// getCachedRegistryClient returns the cached client for a stored registry.
+func getCachedRegistryClient(reg *portainer.Registry) (*registry.Client, bool) {
+	if !isStoredRegistry(reg) {
+		return nil, false
+	}
+
+	return cache.GetCachedRegistryClientByID(reg.ID)
 }
 
 // validateRegistryCredentials validates registry authentication settings
