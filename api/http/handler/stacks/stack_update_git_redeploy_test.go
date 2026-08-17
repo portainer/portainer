@@ -112,7 +112,7 @@ func TestResolveGitAuthFromRedeployPayload(t *testing.T) {
 func setupDeployKubernetesStackInlineTest(t *testing.T, deployErr error, initialStatus portainer.StackStatus) (*Handler, *portainer.Stack, *gittypes.RepoConfig, portainer.SourceID, *security.RestrictedRequestContext) {
 	t.Helper()
 
-	var manifest = `apiVersion: v1
+	manifest := `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-config
@@ -120,7 +120,7 @@ metadata:
 data:
   key: value
 `
-	var configHash = "testhash"
+	configHash := "testhash"
 	tempDir := t.TempDir()
 	require.NoError(t, os.WriteFile(filesystem.JoinPaths(tempDir, "manifest.yml"), []byte(manifest), 0o644))
 
@@ -261,7 +261,9 @@ func TestDeployKubernetesStackInline(t *testing.T) {
 		handler, stack, gitConfig, sourceID, _ := setupDeployKubernetesStackInlineTest(t, nil, portainer.StackStatusActive)
 
 		standardUser := &portainer.User{Username: "standarduser", Role: portainer.StandardUserRole}
-		require.NoError(t, handler.DataStore.User().Create(standardUser))
+		require.NoError(t, handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.User().Create(standardUser)
+		}))
 
 		adminUserContext := source.InsecureNewAdminContext()
 		src, err := handler.DataStore.Source().Read(adminUserContext, sourceID)
