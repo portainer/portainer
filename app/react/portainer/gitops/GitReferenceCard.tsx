@@ -92,7 +92,7 @@ export function GitReferenceCard({
       fileCheckQuery.isError ||
       (fileCheckQuery.isFetched && !foundFile));
 
-  const { Interval: autoUpdateInterval, Webhook: webhook } = autoUpdate || {};
+  const { Webhook: webhook } = autoUpdate || {};
   const webhookUrl = webhook ? `${baseStackWebhookUrl()}/${webhook}` : '';
 
   const isRefLoading = refCheckQuery.isFetching;
@@ -189,19 +189,8 @@ export function GitReferenceCard({
               data-cy="git-commit"
             />
           )}
-          <LineItem
-            label="Auto-update"
-            value={autoUpdate ? 'On' : 'Off'}
-            title="auto-update"
-            data-cy="git-auto-update"
-          />
-          {!!autoUpdateInterval && (
-            <LineItem
-              label="Interval"
-              value={autoUpdateInterval}
-              title="auto-update-interval"
-              data-cy="git-interval"
-            />
+          {!!sourceIdToShow && (
+            <AutoUpdateIntervalLineItem sourceId={sourceIdToShow} />
           )}
           {!!webhook && (
             <LineItem
@@ -263,6 +252,24 @@ function SourceLineItem({ sourceId }: { sourceId: number }) {
       isError={sourceQuery.isError || (!sourceQuery.isLoading && !sourceName)}
       isValid={!!sourceName}
       data-cy="git-source"
+    />
+  );
+}
+
+function AutoUpdateIntervalLineItem({ sourceId }: { sourceId: number }) {
+  const sourceQuery = useSource(sourceId);
+  const pollingInterval = sourceQuery.data?.interval;
+
+  if (!pollingInterval) {
+    return null;
+  }
+
+  return (
+    <LineItem
+      label="Polling"
+      value={pollingInterval}
+      title="polling-interval"
+      data-cy="git-polling-interval"
     />
   );
 }
