@@ -9,12 +9,44 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { http, server } from '@/setup-tests/server';
 import { createMockEnvironment } from '@/react-tools/test-mocks';
 
-import { PodKubernetesInstanceLabel, PodManagedByLabel } from '../../constants';
+import {
+  HelmReleaseNameAnnotation,
+  HelmReleaseNamespaceAnnotation,
+  PodKubernetesInstanceLabel,
+  PodManagedByLabel,
+} from '../../constants';
 
 import { ApplicationsDatatable } from './ApplicationsDatatable';
 
 const mockUseCurrentStateAndParams = vi.fn();
 const mockUseEnvironmentId = vi.fn();
+const mockUseApplications = vi.fn();
+
+function helmApp(id: string, namespace: string, releaseName: string) {
+  return {
+    Id: id,
+    Name: `app${id}`,
+    CreationDate: '2021-10-01T00:00:00Z',
+    ResourcePool: namespace,
+    Image: 'image1',
+    ApplicationType: 'Pod',
+    Kind: 'Pod',
+    DeploymentType: 'Replicated',
+    Status: 'status1',
+    TotalPodsCount: 1,
+    RunningPodsCount: 1,
+    Metadata: {
+      labels: {
+        [PodKubernetesInstanceLabel]: releaseName,
+        [PodManagedByLabel]: 'Helm',
+      },
+      annotations: {
+        [HelmReleaseNameAnnotation]: releaseName,
+        [HelmReleaseNamespaceAnnotation]: namespace,
+      },
+    },
+  };
+}
 
 vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
   ...(await importOriginal()),
@@ -26,68 +58,7 @@ vi.mock('@/react/hooks/useEnvironmentId', () => ({
 }));
 
 vi.mock('@/react/kubernetes/applications/queries/useApplications', () => ({
-  useApplications: () => ({
-    data: [
-      {
-        Id: '1',
-        Name: 'app1',
-        CreationDate: '2021-10-01T00:00:00Z',
-        ResourcePool: 'namespace1',
-        Image: 'image1',
-        ApplicationType: 'Pod',
-        Kind: 'Pod',
-        DeploymentType: 'Replicated',
-        Status: 'status1',
-        TotalPodsCount: 1,
-        RunningPodsCount: 1,
-        Metadata: {
-          labels: {
-            [PodKubernetesInstanceLabel]: 'helm-release-1',
-            [PodManagedByLabel]: 'Helm',
-          },
-        },
-      },
-      {
-        Id: '2',
-        Name: 'app2',
-        CreationDate: '2021-10-01T00:00:00Z',
-        ResourcePool: 'namespace1',
-        Image: 'image1',
-        ApplicationType: 'Pod',
-        Kind: 'Pod',
-        DeploymentType: 'Replicated',
-        Status: 'status1',
-        TotalPodsCount: 1,
-        RunningPodsCount: 1,
-        Metadata: {
-          labels: {
-            [PodKubernetesInstanceLabel]: 'helm-release-1',
-            [PodManagedByLabel]: 'Helm',
-          },
-        },
-      },
-      {
-        Id: '3',
-        Name: 'app3',
-        CreationDate: '2021-10-01T00:00:00Z',
-        ResourcePool: 'namespace2',
-        Image: 'image1',
-        ApplicationType: 'Pod',
-        Kind: 'Pod',
-        DeploymentType: 'Replicated',
-        Status: 'status1',
-        TotalPodsCount: 1,
-        RunningPodsCount: 1,
-        Metadata: {
-          labels: {
-            [PodKubernetesInstanceLabel]: 'helm-release-1',
-            [PodManagedByLabel]: 'Helm',
-          },
-        },
-      },
-    ],
-    isLoading: false,
-  }),
+  useApplications: () => mockUseApplications(),
 }));
 
 vi.mock('@@/Link', () => ({
@@ -149,9 +120,17 @@ describe('ApplicationsDatatable', () => {
     mockUseCurrentStateAndParams.mockReturnValue({
       params: {},
     });
+    mockUseApplications.mockReturnValue({
+      data: [
+        helmApp('1', 'namespace1', 'helm-release-1'),
+        helmApp('2', 'namespace1', 'helm-release-1'),
+        helmApp('3', 'namespace2', 'helm-release-1'),
+      ],
+      isLoading: false,
+    });
   });
 
-  it('should group helm apps by namespace and instance label', async () => {
+  it('should group helm apps by release namespace and release name', async () => {
     renderComponent();
 
     const helmReleases = await screen.findAllByText('helm-release-1');
@@ -166,5 +145,33 @@ describe('ApplicationsDatatable', () => {
     });
     expect(namespace1Cells.length).toBeGreaterThan(0);
     expect(namespace2Cells.length).toBeGreaterThan(0);
+  });
+
+  it('should not group workloads that only carry the chart labels', async () => {
+    // a `helm template` / `--dry-run` manifest applied with kubectl renders the chart's
+    // managed-by and instance labels, but Helm never stamps the meta.helm.sh annotations
+    const rendered = helmApp('1', 'namespace1', 'helm-release-1');
+    mockUseApplications.mockReturnValue({
+      data: [{ ...rendered, Metadata: { labels: rendered.Metadata.labels } }],
+      isLoading: false,
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('app1')).toBeInTheDocument();
+    expect(screen.queryByText('helm-release-1')).not.toBeInTheDocument();
+  });
+
+  it('should handle workloads with no labels or annotations', async () => {
+    // the API sends null rather than an empty object for a workload with neither
+    const app = helmApp('1', 'namespace1', 'helm-release-1');
+    mockUseApplications.mockReturnValue({
+      data: [{ ...app, Metadata: { labels: null, annotations: null } }],
+      isLoading: false,
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('app1')).toBeInTheDocument();
   });
 });

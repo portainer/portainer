@@ -22,7 +22,7 @@ import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
 import {
   HelmReleaseNameAnnotation,
-  PodKubernetesInstanceLabel,
+  HelmReleaseNamespaceAnnotation,
   PodManagedByLabel,
 } from '../../constants';
 import { useApplications } from '../../queries/useApplications';
@@ -160,44 +160,42 @@ function useApplicationsRowData(
 }
 
 function separateHelmApps(applications: Application[]): ApplicationRowData[] {
-  const [helmApps, nonHelmApps] = partition(
-    applications,
-    (app) =>
-      app.Metadata?.labels &&
-      (app.Metadata.annotations?.[HelmReleaseNameAnnotation] ||
-        app.Metadata.labels[PodKubernetesInstanceLabel]) &&
-      app.Metadata.labels[PodManagedByLabel] === 'Helm'
-  );
+  const [helmApps, nonHelmApps] = partition(applications, isHelmManaged);
 
   const groupedHelmApps: Record<string, Application[]> = groupBy(
     helmApps,
     (app) =>
-      `${app.ResourcePool}/${
-        // Prioritize the official Helm annotation over the instance label
-        // meta.helm.sh/release-name is the authoritative source for Helm release names
-        app.Metadata?.annotations?.[HelmReleaseNameAnnotation] ??
-        app.Metadata?.labels[PodKubernetesInstanceLabel] ??
-        ''
+      `${app.Metadata?.annotations?.[HelmReleaseNamespaceAnnotation]}/${
+        app.Metadata?.annotations?.[HelmReleaseNameAnnotation]
       }`
   );
 
-  // build the helm apps row data from the grouped helm apps
-  const helmAppsRowData = Object.entries(groupedHelmApps).reduce<
-    ApplicationRowData[]
-  >((helmApps, [groupKey, apps]) => {
-    const instanceLabel = groupKey.split('/')[1];
-    const helmApp = buildHelmAppRowData(instanceLabel, apps);
-    return [...helmApps, helmApp];
-  }, []);
+  const helmAppsRowData =
+    Object.values(groupedHelmApps).map(buildHelmAppRowData);
 
   return [...helmAppsRowData, ...nonHelmApps];
 }
 
-function buildHelmAppRowData(
-  appName: string,
-  apps: Application[]
-): ApplicationRowData {
-  const id = `${apps[0].ResourcePool}-${appName
+// Helm only stamps the meta.helm.sh annotations when it applies a release to the cluster, so
+// requiring them excludes manifests rendered by `helm template` / `helm install --dry-run` and
+// applied with kubectl. Those still carry the chart's managed-by and instance labels but have
+// no release behind them, and treating them as Helm apps sends deletes through `helm uninstall`.
+// labels and annotations are typed as always present but the API sends null for either, so keep
+// the optional chaining below.
+function isHelmManaged(app: Application) {
+  return (
+    app.Metadata?.labels?.[PodManagedByLabel] === 'Helm' &&
+    !!app.Metadata.annotations?.[HelmReleaseNameAnnotation] &&
+    !!app.Metadata.annotations?.[HelmReleaseNamespaceAnnotation]
+  );
+}
+
+function buildHelmAppRowData(apps: Application[]): ApplicationRowData {
+  const annotations = apps[0].Metadata?.annotations;
+  const appName = annotations?.[HelmReleaseNameAnnotation] ?? '';
+  const releaseNamespace =
+    annotations?.[HelmReleaseNamespaceAnnotation] ?? apps[0].ResourcePool;
+  const id = `${releaseNamespace}-${appName
     .toLowerCase()
     .replaceAll(' ', '-')}`;
   const { earliestCreationDate, runningPods, totalPods } = apps.reduce(
@@ -220,6 +218,7 @@ function buildHelmAppRowData(
     Name: appName,
     Id: id,
     KubernetesApplications: apps,
+    HelmReleaseNamespace: releaseNamespace,
     ApplicationType: KubernetesApplicationTypes.Helm,
     Status: runningPods < totalPods ? 'Not ready' : 'Ready',
     CreationDate: earliestCreationDate,

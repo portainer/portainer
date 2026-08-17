@@ -27,7 +27,10 @@ function Cell({
         <Link
           data-cy="application-helm-link"
           to="kubernetes.helm"
-          params={{ name: item.Name, namespace: item.ResourcePool }}
+          params={{
+            name: item.Name,
+            namespace: item.HelmReleaseNamespace ?? item.ResourcePool,
+          }}
         >
           {item.Name}
         </Link>

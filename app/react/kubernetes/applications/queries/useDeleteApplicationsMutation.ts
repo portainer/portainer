@@ -229,7 +229,7 @@ async function deleteApplication(
       await uninstallHelmApplication(
         environmentId,
         application.Name,
-        application.ResourcePool
+        application.HelmReleaseNamespace ?? application.ResourcePool
       );
       break;
     default:
