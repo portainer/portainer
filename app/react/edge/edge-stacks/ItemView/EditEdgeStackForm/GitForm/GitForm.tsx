@@ -262,25 +262,27 @@ function InnerForm({
       />
 
       <FormSection title="Actions">
-        <LoadingButton
-          disabled={dirty || !isValid || isLoading}
-          data-cy="pull-and-update-stack-button"
-          isLoading={isUpdateVersion && isLoading}
-          loadingText="updating stack..."
-        >
-          Pull and update stack
-        </LoadingButton>
+        <div className="flex items-center gap-2">
+          <LoadingButton
+            disabled={dirty || !isValid || isLoading}
+            data-cy="pull-and-update-stack-button"
+            isLoading={isUpdateVersion && isLoading}
+            loadingText="updating stack..."
+          >
+            Pull and update stack
+          </LoadingButton>
 
-        <LoadingButton
-          type="button"
-          disabled={!dirty || !isValid || isLoading}
-          isLoading={!isUpdateVersion && isLoading}
-          loadingText="updating settings..."
-          onClick={onUpdateSettingsClick}
-          data-cy="edge-stack-update-settings-button"
-        >
-          Update settings
-        </LoadingButton>
+          <LoadingButton
+            type="button"
+            disabled={!dirty || !isValid || isLoading}
+            isLoading={!isUpdateVersion && isLoading}
+            loadingText="updating settings..."
+            onClick={onUpdateSettingsClick}
+            data-cy="edge-stack-update-settings-button"
+          >
+            Update settings
+          </LoadingButton>
+        </div>
       </FormSection>
     </Form>
   );
