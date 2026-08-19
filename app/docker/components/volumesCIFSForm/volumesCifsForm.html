@@ -1,0 +1,97 @@
+<!-- CIFS-settings -->
+<div ng-show="$ctrl.data.useCIFS">
+  <ng-form class="form-horizontal" name="cifsInformationForm">
+    <div class="col-sm-12 form-section-title"> CIFS Settings </div>
+    <!-- address-input -->
+    <div class="form-group col-md-12">
+      <label for="cifs_address" class="col-sm-2 col-md-1 control-label required text-left">Address</label>
+      <div class="col-sm-10 col-md-11">
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.data.serverAddress"
+          name="cifs_address"
+          placeholder="e.g. my.cifs-server.com OR xxx.xxx.xxx.xxx"
+          required
+          data-cy="cifs-address-input"
+        />
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.cifs_address.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_address.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !address-input -->
+    <!-- mount-point-input -->
+    <div class="form-group col-md-12">
+      <label for="cifs_share" class="col-sm-2 col-md-1 control-label required text-left">Share</label>
+      <div class="col-sm-10 col-md-11">
+        <input type="text" class="form-control" ng-model="$ctrl.data.share" name="cifs_share" placeholder="e.g. /myshare" required data-cy="cifs-share-input" />
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.cifs_share.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_share.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !mount-point-input -->
+    <!-- version-input -->
+    <div class="form-group col-md-12">
+      <label for="cifs_version" class="col-sm-2 col-md-1 control-label text-left">CIFS Version</label>
+      <div class="col-sm-10 col-md-11">
+        <select
+          class="form-control"
+          ng-model="$ctrl.data.version"
+          name="cifs_version"
+          ng-options="version for version in $ctrl.data.versions"
+          required
+          data-cy="cifs-version-select"
+        ></select>
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.cifs_version.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_version.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !version-input -->
+    <!-- username -->
+    <div class="form-group col-md-12">
+      <label for="cifs_username" class="col-sm-2 col-md-1 control-label required text-left">Username</label>
+      <div class="col-sm-10 col-md-11">
+        <input type="text" class="form-control" ng-model="$ctrl.data.username" name="cifs_username" required data-cy="cifs-username-input" />
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.cifs_username.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_username.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !username -->
+    <!-- password -->
+    <div class="form-group col-md-12">
+      <label for="cifs_password" class="col-sm-2 col-md-1 control-label text-left">Password</label>
+      <div class="col-sm-10 col-md-11">
+        <input type="text" class="form-control" ng-model="$ctrl.data.password" name="cifs_password" required data-cy="cifs-password-input" />
+      </div>
+    </div>
+    <div class="form-group col-md-12" ng-show="cifsInformationForm.password.$invalid">
+      <div class="small text-warning">
+        <div ng-messages="cifsInformationForm.cifs_password.$error">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !password -->
+  </ng-form>
+</div>
+<!-- !CIFS-settings -->

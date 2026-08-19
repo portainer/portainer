@@ -1,0 +1,1000 @@
+package docker
+
+import (
+	"bytes"
+	"context"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"path"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/slicesx"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
+	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/swarm"
+	dockerclient "github.com/docker/docker/client"
+	"github.com/rs/zerolog/log"
+	"github.com/segmentio/encoding/json"
+)
+
+var apiVersionRe = regexp.MustCompile(`^/v[0-9.]+(/|$)`)
+
+type (
+	// Transport is a custom transport for Docker API reverse proxy. It allows
+	// interception of requests and rewriting of responses.
+	Transport struct {
+		HTTPTransport        *http.Transport
+		endpoint             *portainer.Endpoint
+		dataStore            dataservices.DataStore
+		signatureService     portainer.DigitalSignatureService
+		reverseTunnelService portainer.ReverseTunnelService
+		dockerClientFactory  *client.ClientFactory
+		gitService           portainer.GitService
+		snapshotService      portainer.SnapshotService
+		dockerID             string
+		mu                   sync.Mutex
+	}
+
+	// TransportParameters is used to create a new Transport
+	TransportParameters struct {
+		Endpoint             *portainer.Endpoint
+		DataStore            dataservices.DataStore
+		SignatureService     portainer.DigitalSignatureService
+		ReverseTunnelService portainer.ReverseTunnelService
+		DockerClientFactory  *client.ClientFactory
+	}
+
+	restrictedDockerOperationContext struct {
+		isAdmin          bool
+		userID           portainer.UserID
+		userTeamIDs      []portainer.TeamID
+		resourceControls []portainer.ResourceControl
+	}
+
+	operationExecutor struct {
+		operationContext *restrictedDockerOperationContext
+		labelBlackList   []portainer.Pair
+	}
+
+	restrictedOperationRequest func(*http.Response, *operationExecutor) error
+	operationRequest           func(*http.Request) error
+)
+
+// NewTransport returns a pointer to a new Transport instance.
+func NewTransport(parameters *TransportParameters, httpTransport *http.Transport, gitService portainer.GitService, snapshotService portainer.SnapshotService) (*Transport, error) {
+	transport := &Transport{
+		endpoint:             parameters.Endpoint,
+		dataStore:            parameters.DataStore,
+		signatureService:     parameters.SignatureService,
+		reverseTunnelService: parameters.ReverseTunnelService,
+		dockerClientFactory:  parameters.DockerClientFactory,
+		HTTPTransport:        httpTransport,
+		gitService:           gitService,
+		snapshotService:      snapshotService,
+	}
+
+	return transport, nil
+}
+
+// RoundTrip is the implementation of the http.RoundTripper interface
+func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
+	return transport.ProxyDockerRequest(request)
+}
+
+var prefixProxyFuncMap = map[string]func(*Transport, *http.Request, string) (*http.Response, error){
+	"build":      (*Transport).proxyBuildRequest,
+	"configs":    (*Transport).proxyConfigRequest,
+	"containers": (*Transport).proxyContainerRequest,
+	"exec":       (*Transport).proxyExecRequest,
+	"images":     (*Transport).proxyImageRequest,
+	"networks":   (*Transport).proxyNetworkRequest,
+	"nodes":      (*Transport).proxyNodeRequest,
+	"secrets":    (*Transport).proxySecretRequest,
+	"services":   (*Transport).proxyServiceRequest,
+	"swarm":      (*Transport).proxySwarmRequest,
+	"tasks":      (*Transport).proxyTaskRequest,
+	"v2":         (*Transport).proxyAgentRequest,
+	"volumes":    (*Transport).proxyVolumeRequest,
+}
+
+type route struct {
+	method  string
+	pattern *regexp.Regexp
+}
+
+var adminOnlyRoutes = []route{
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/enable$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/disable$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/pull$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/push$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/upgrade$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/.+/set$`)},
+	{http.MethodPost, regexp.MustCompile(`^/plugins/create$`)},
+	{http.MethodDelete, regexp.MustCompile(`^/plugins/.+$`)},
+}
+
+func isAdminOnlyRoute(method string, path string) bool {
+	return slicesx.Some(adminOnlyRoutes, func(r route) bool {
+		return method == r.method && r.pattern.MatchString(path)
+	})
+}
+
+// ProxyDockerRequest intercepts a Docker API request and apply logic based
+// on the requested operation.
+func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
+	// A percent-encoded path separator lets a request dodge the operation authorization.
+	// Docker API paths never need encoded separators, so reject them outright.
+	if ContainsEncodedSeparator(request.URL.EscapedPath()) {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	unversionedPath := TrimDockerVersion(request.URL.Path)
+
+	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
+		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+	}
+
+	// from    : /containers/{id}/json
+	// trim to : containers/{id}/json
+	// pick    : [ containers, {id}, json ][0]
+	// prefix  : containers
+	prefix := strings.Split(strings.TrimPrefix(unversionedPath, "/"), "/")[0]
+
+	if proxyFunc := prefixProxyFuncMap[prefix]; proxyFunc != nil {
+		return proxyFunc(transport, request, unversionedPath)
+	}
+
+	if isAdminOnlyRoute(request.Method, unversionedPath) {
+		return transport.administratorOperation(request)
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func (transport *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
+	response, err := transport.HTTPTransport.RoundTrip(request)
+
+	if transport.endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
+		return response, err
+	}
+
+	if err == nil {
+		transport.reverseTunnelService.UpdateLastActivity(transport.endpoint.ID)
+	}
+
+	return response, err
+}
+
+func (transport *Transport) proxyAgentRequest(r *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := strings.TrimPrefix(unversionedPath, "/v2")
+
+	switch {
+	case strings.HasPrefix(requestPath, "/browse"):
+		// Host file browser request
+		volumeIDParameter, found := r.URL.Query()["volumeID"]
+		if !found || len(volumeIDParameter) < 1 {
+			return transport.administratorOperation(r)
+		}
+
+		volumeName := volumeIDParameter[0]
+
+		resourceID, err := transport.getVolumeResourceID(volumeName)
+		if err != nil {
+			return nil, err
+		}
+
+		// Volume browser request
+		return transport.restrictedResourceOperation(r, resourceID, volumeName, portainer.VolumeResourceControl, true)
+	case strings.HasPrefix(requestPath, "/dockerhub"):
+		requestPath, registryIdString := path.Split(r.URL.Path)
+
+		registryID, err := strconv.Atoi(registryIdString)
+		if err != nil {
+			return nil, fmt.Errorf("missing registry id: %w", err)
+		}
+
+		r.URL.Path = strings.TrimSuffix(requestPath, "/")
+
+		registry := &portainer.Registry{
+			Type: portainer.DockerHubRegistry,
+		}
+
+		if registryID != 0 {
+			registry, err = transport.dataStore.Registry().Read(portainer.RegistryID(registryID))
+			if err != nil {
+				return nil, fmt.Errorf("failed fetching registry: %w", err)
+			}
+		}
+
+		if registry.Type != portainer.DockerHubRegistry {
+			return nil, errors.New("Invalid registry type")
+		}
+
+		newBody, err := json.Marshal(registry)
+		if err != nil {
+			return nil, err
+		}
+
+		r.Method = http.MethodPost
+
+		r.Body = io.NopCloser(bytes.NewReader(newBody))
+		r.ContentLength = int64(len(newBody))
+	}
+
+	return transport.executeDockerRequest(r)
+}
+
+func (transport *Transport) proxyConfigRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/configs/create":
+		return transport.decorateGenericResourceCreationOperation(request, configObjectIdentifier, portainer.ConfigResourceControl)
+
+	case "/configs":
+		return transport.rewriteOperation(request, transport.configListOperation)
+
+	default:
+		// Assume /configs/{id}
+		configID := path.Base(requestPath)
+
+		switch request.Method {
+		case http.MethodGet:
+			return transport.rewriteOperation(request, transport.configInspectOperation)
+		case http.MethodDelete:
+			return transport.executeGenericResourceDeletionOperation(request, configID, configID, portainer.ConfigResourceControl)
+		}
+
+		return transport.restrictedResourceOperation(request, configID, configID, portainer.ConfigResourceControl, false)
+	}
+}
+
+func (transport *Transport) proxyContainerRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/containers/create":
+		return transport.decorateContainerCreationOperation(request, containerObjectIdentifier, portainer.ContainerResourceControl)
+
+	case "/containers/prune":
+		return transport.administratorOperation(request)
+
+	case "/containers/json":
+		return transport.rewriteOperationWithLabelFiltering(request, transport.containerListOperation)
+
+	default:
+		// This section assumes /containers/**
+		if match, _ := path.Match("/containers/*/*", requestPath); match {
+			// Handle /containers/{id}/{action} requests
+			containerID := path.Base(path.Dir(requestPath))
+			action := path.Base(requestPath)
+
+			if action == "json" {
+				return transport.rewriteOperation(request, transport.containerInspectOperation)
+			}
+
+			if action == "update" {
+				return transport.decorateContainerUpdateOperation(request, containerID)
+			}
+
+			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
+		} else if match, _ := path.Match("/containers/*", requestPath); match {
+			// Handle /containers/{id} requests
+			containerID := path.Base(requestPath)
+
+			if request.Method == http.MethodDelete {
+				return transport.executeGenericResourceDeletionOperation(request, containerID, containerID, portainer.ContainerResourceControl)
+			}
+
+			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
+		} else if match, _ := path.Match("/containers/*/attach/ws", requestPath); match {
+			containerID := path.Base(path.Dir(path.Dir(requestPath)))
+
+			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
+		}
+
+		return transport.executeDockerRequest(request)
+	}
+}
+
+func (transport *Transport) proxyExecRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	execID := path.Base(path.Dir(unversionedPath))
+
+	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer logs.CloseAndLogErr(client)
+
+	execInspect, err := client.ContainerExecInspect(request.Context(), execID)
+	if err != nil {
+		return nil, err
+	}
+
+	return transport.restrictedResourceOperation(request, execInspect.ContainerID, execInspect.ContainerID, portainer.ContainerResourceControl, false)
+}
+
+func (transport *Transport) proxyServiceRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/services/create":
+		return transport.decorateServiceCreationOperation(request)
+
+	case "/services":
+		return transport.rewriteOperation(request, transport.serviceListOperation)
+
+	default:
+		// This section assumes /services/**
+		if match, _ := path.Match("/services/*/*", requestPath); match {
+			// Handle /services/{id}/{action} requests
+			serviceID := path.Base(path.Dir(requestPath))
+			action := path.Base(requestPath)
+
+			if action == "update" {
+				return transport.decorateServiceUpdateOperation(request, serviceID)
+			}
+
+			if err := transport.decorateRegistryAuthenticationHeader(request); err != nil {
+				return nil, err
+			}
+
+			return transport.restrictedResourceOperation(request, serviceID, serviceID, portainer.ServiceResourceControl, false)
+		} else if match, _ := path.Match("/services/*", requestPath); match {
+			// Handle /services/{id} requests
+			serviceID := path.Base(requestPath)
+
+			switch request.Method {
+			case http.MethodGet:
+				return transport.rewriteOperation(request, transport.serviceInspectOperation)
+			case http.MethodDelete:
+				return transport.executeGenericResourceDeletionOperation(request, serviceID, serviceID, portainer.ServiceResourceControl)
+			}
+
+			return transport.restrictedResourceOperation(request, serviceID, serviceID, portainer.ServiceResourceControl, false)
+		}
+
+		return transport.executeDockerRequest(request)
+	}
+}
+
+func (transport *Transport) proxyVolumeRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/volumes/create":
+		return transport.decorateVolumeResourceCreationOperation(request, portainer.VolumeResourceControl)
+
+	case "/volumes/prune":
+		return transport.administratorOperation(request)
+
+	case "/volumes":
+		return transport.rewriteOperation(request, transport.volumeListOperation)
+
+	default:
+		// Assume /volumes/{name}
+		return transport.restrictedVolumeOperation(requestPath, request)
+	}
+}
+
+func match(requestPath string, pattern string) bool {
+	ok, err := path.Match(pattern, requestPath)
+	return err == nil && ok
+}
+
+func (transport *Transport) proxyNetworkRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch {
+	case requestPath == "/networks/create":
+		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
+
+	case requestPath == "/networks":
+		return transport.rewriteOperation(request, transport.networkListOperation)
+
+	case request.Method == http.MethodPost && match(requestPath, "/networks/*/connect"),
+		request.Method == http.MethodPost && match(requestPath, "/networks/*/disconnect"):
+
+		networkID := path.Base(path.Dir(requestPath))
+		return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+
+	case request.Method == http.MethodGet && match(requestPath, "/networks/*"):
+		return transport.rewriteOperation(request, transport.networkInspectOperation)
+
+	case request.Method == http.MethodDelete && match(requestPath, "/networks/*"):
+		networkID := path.Base(requestPath)
+		return transport.executeGenericResourceDeletionOperation(request, networkID, networkID, portainer.NetworkResourceControl)
+	}
+
+	// Assume /networks/{id}
+	networkID := path.Base(requestPath)
+	return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+}
+
+func (transport *Transport) proxySecretRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/secrets/create":
+		return transport.decorateGenericResourceCreationOperation(request, secretObjectIdentifier, portainer.SecretResourceControl)
+
+	case "/secrets":
+		return transport.rewriteOperation(request, transport.secretListOperation)
+
+	default:
+		// Assume /secrets/{id}
+		secretID := path.Base(requestPath)
+
+		switch request.Method {
+		case http.MethodGet:
+			return transport.rewriteOperation(request, transport.secretInspectOperation)
+		case http.MethodDelete:
+			return transport.executeGenericResourceDeletionOperation(request, secretID, secretID, portainer.SecretResourceControl)
+		}
+
+		return transport.restrictedResourceOperation(request, secretID, secretID, portainer.SecretResourceControl, false)
+	}
+}
+
+func (transport *Transport) proxyNodeRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	// Assume /nodes/{id}
+	if path.Base(requestPath) != "nodes" {
+		return transport.administratorOperation(request)
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func (transport *Transport) proxySwarmRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/swarm":
+		return transport.rewriteOperation(request, swarmInspectOperation)
+	default:
+		// Assume /swarm/{action}
+		return transport.administratorOperation(request)
+	}
+}
+
+func (transport *Transport) proxyTaskRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/tasks":
+		return transport.rewriteOperation(request, transport.taskListOperation)
+	default:
+		// Assume /tasks/{id}
+		return transport.executeDockerRequest(request)
+	}
+}
+
+func (transport *Transport) proxyBuildRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	if unversionedPath == "/build/prune" {
+		return transport.administratorOperation(request)
+	}
+
+	if err := transport.updateDefaultGitBranch(request); err != nil {
+		return nil, err
+	}
+
+	return transport.interceptAndRewriteRequest(request, buildOperation)
+}
+
+func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
+	remote := request.URL.Query().Get("remote")
+	if !strings.HasSuffix(remote, ".git") {
+		return nil
+	}
+
+	repositoryURL := remote[:len(remote)-4]
+
+	if err := ssrf.CheckURL(request.Context(), repositoryURL); err != nil {
+		return err
+	}
+
+	latestCommitID, err := transport.gitService.LatestCommitID(
+		request.Context(),
+		repositoryURL,
+		"",
+		"",
+		"",
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	newRemote := fmt.Sprintf("%s#%s", remote, latestCommitID)
+
+	q := request.URL.Query()
+	q.Set("remote", newRemote)
+	request.URL.RawQuery = q.Encode()
+
+	return nil
+}
+
+func (transport *Transport) proxyImageRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
+	requestPath := unversionedPath
+
+	switch requestPath {
+	case "/images/create":
+		return transport.replaceRegistryAuthenticationHeader(request)
+	case "/images/prune":
+		return transport.administratorOperation(request)
+	default:
+		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
+			return transport.replaceRegistryAuthenticationHeader(request)
+		}
+
+		return transport.executeDockerRequest(request)
+	}
+}
+
+func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Request) (*http.Response, error) {
+	if err := transport.decorateRegistryAuthenticationHeader(request); err != nil {
+		return nil, err
+	}
+
+	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl)
+}
+
+func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.Request) error {
+	accessContext, err := transport.createRegistryAccessContext(request)
+	if err != nil {
+		return err
+	}
+
+	originalHeader := request.Header.Get("X-Registry-Auth")
+
+	if originalHeader == "" {
+		return nil
+	}
+
+	decodedHeaderData, err := base64.StdEncoding.DecodeString(originalHeader)
+	if err != nil {
+		return err
+	}
+
+	var originalHeaderData portainerRegistryAuthenticationHeader
+	if err := json.Unmarshal(decodedHeaderData, &originalHeaderData); err != nil {
+		return err
+	}
+
+	// Delete header and exist function without error if Front End
+	// passes empty json. This is to restore original behavior which
+	// never originally passed this header
+	if string(decodedHeaderData) == "{}" {
+		request.Header.Del("X-Registry-Auth")
+
+		return nil
+	}
+
+	// Only set X-Registry-Auth if registryId is defined
+	if originalHeaderData.RegistryId == nil {
+		return nil
+	}
+
+	authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, *originalHeaderData.RegistryId, accessContext)
+	if err != nil {
+		return err
+	}
+
+	headerData, err := json.Marshal(authenticationHeader)
+	if err != nil {
+		return err
+	}
+
+	request.Header.Set("X-Registry-Auth", base64.URLEncoding.EncodeToString(headerData))
+
+	return nil
+}
+
+func (transport *Transport) restrictedResourceOperation(request *http.Request, resourceID string, dockerResourceID string, resourceType portainer.ResourceControlType, volumeBrowseRestrictionCheck bool) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return transport.executeDockerRequest(request)
+	}
+
+	if volumeBrowseRestrictionCheck {
+		securitySettings, err := transport.fetchEndpointSecuritySettings()
+		if err != nil {
+			return nil, err
+		}
+
+		if !securitySettings.AllowVolumeBrowserForRegularUsers {
+			return utils.WriteAccessDeniedResponse()
+		}
+	}
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	userTeamIDs := authorization.TeamIDs(teamMemberships)
+
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl != nil {
+		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+			return utils.WriteAccessDeniedResponse()
+		}
+		return transport.executeDockerRequest(request)
+	}
+
+	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer logs.CloseAndLogErr(client)
+
+	// the resourceID may be the resource name (as it's a valid proxy call to use the name and not the UUID)
+	// so get the real resource ID and retry with it
+	resourceID, err = getDockerResourceUUID(client, resourceType, resourceID)
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControl = authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl != nil {
+		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+			return utils.WriteAccessDeniedResponse()
+		}
+		return transport.executeDockerRequest(request)
+	}
+
+	// If we still can't find the RC by provided ID or "real" (docker-extracted) ID
+	// it means this resource was created outside of portainer,
+	// is part of a Docker service or part of a Docker Swarm/Compose stack.
+	if dockerResourceID == "" {
+		dockerResourceID = resourceID
+	}
+	inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(client, dockerResourceID, resourceType, resourceControls)
+	if err != nil {
+		return nil, err
+	}
+
+	if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func getDockerResourceUUID(client *dockerclient.Client, resourceType portainer.ResourceControlType, resourceId string) (string, error) {
+	switch resourceType {
+	case portainer.NetworkResourceControl:
+		network, err := client.NetworkInspect(context.Background(), resourceId, network.InspectOptions{})
+		if err != nil {
+			return "", err
+		}
+		return network.ID, nil
+
+	case portainer.ContainerResourceControl:
+		container, err := client.ContainerInspect(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return container.ID, nil
+
+	case portainer.VolumeResourceControl:
+		// volumes don't have an UUID and their UACresourceID has a particular construct that makes them unique
+		// e.g. fmt.Sprintf("%s_%s", volumeName, dockerID)
+		// see transport.getVolumeResourceID() / FetchDockerID()
+		// FetchDockerID fetches info.Swarm.Cluster.ID if environment(endpoint) is swarm and info.ID otherwise
+		// So: return empty ID but without error
+		return "", nil
+
+	case portainer.ServiceResourceControl:
+		service, _, err := client.ServiceInspectWithRaw(context.Background(), resourceId, swarm.ServiceInspectOptions{})
+		if err != nil {
+			return "", err
+		}
+		return service.ID, nil
+
+	case portainer.ConfigResourceControl:
+		config, _, err := client.ConfigInspectWithRaw(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return config.ID, nil
+
+	case portainer.SecretResourceControl:
+		secret, _, err := client.SecretInspectWithRaw(context.Background(), resourceId)
+		if err != nil {
+			return "", err
+		}
+		return secret.ID, nil
+
+	}
+	return "", fmt.Errorf("Unknown resource type %v", resourceType)
+}
+
+// rewriteOperationWithLabelFiltering will create a new operation context with data that will be used
+// to decorate the original request's response as well as retrieve all the black listed labels
+// to filter the resources.
+func (transport *Transport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+	operationContext, err := transport.createOperationContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := transport.dataStore.Settings().Settings()
+	if err != nil {
+		return nil, err
+	}
+
+	executor := &operationExecutor{
+		operationContext: operationContext,
+		labelBlackList:   settings.BlackListedLabels,
+	}
+
+	return transport.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+// rewriteOperation will create a new operation context with data that will be used
+// to decorate the original request's response.
+func (transport *Transport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+	operationContext, err := transport.createOperationContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	executor := &operationExecutor{
+		operationContext: operationContext,
+	}
+
+	return transport.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+func (transport *Transport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
+	if err := operation(request); err != nil {
+		return nil, err
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+// decorateGenericResourceCreationResponse extracts the response as a JSON object, extracts the resource identifier from that object based
+// on the resourceIdentifierAttribute parameter then generate a new resource control associated to that resource
+// with a random token and rewrites the response by decorating the original response with a ResourceControl object.
+// The generic Docker API response format is JSON object:
+// https://docs.docker.com/engine/api/v1.37/#operation/ContainerCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/NetworkCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/VolumeCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/ServiceCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/SecretCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/ConfigCreate
+func (transport *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
+	responseObject, err := utils.GetResponseAsJSONObject(response)
+	if err != nil {
+		return err
+	}
+
+	if responseObject[resourceIdentifierAttribute] == nil {
+		log.Error().Msg("missing identifier in Docker resource creation response")
+
+		return errors.New("missing identifier in Docker resource creation response")
+	}
+
+	resourceID := responseObject[resourceIdentifierAttribute].(string)
+
+	resourceControl, err := transport.createPrivateResourceControl(resourceID, resourceType, userID)
+	if err != nil {
+		return err
+	}
+
+	responseObject = decorateObject(responseObject, resourceControl)
+
+	return utils.RewriteResponse(response, responseObject, response.StatusCode)
+}
+
+func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+
+	return response, err
+}
+
+func (transport *Transport) executeGenericResourceDeletionOperation(request *http.Request, resourceIdentifierAttribute string, volumeName string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	response, err := transport.restrictedResourceOperation(request, resourceIdentifierAttribute, volumeName, resourceType, false)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode != http.StatusNoContent && response.StatusCode != http.StatusOK {
+		return response, nil
+	}
+
+	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
+	if dataservices.IsErrObjectNotFound(err) {
+		return response, nil
+	} else if err != nil {
+		return response, err
+	}
+
+	if resourceControl != nil {
+		err = transport.dataStore.ResourceControl().Delete(resourceControl.ID)
+	}
+
+	return response, err
+}
+
+func (transport *Transport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusOK {
+		err = operation(response, executor)
+	}
+
+	return response, err
+}
+
+// administratorOperation ensures that the user has administrator privileges
+// before executing the original request.
+func (transport *Transport) administratorOperation(request *http.Request) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func (transport *Transport) createRegistryAccessContext(request *http.Request) (*registryAccessContext, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	accessContext := &registryAccessContext{
+		isAdmin:    true,
+		endpointID: transport.endpoint.ID,
+	}
+
+	user, err := transport.dataStore.User().Read(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+	accessContext.user = user
+
+	registries, err := transport.dataStore.Registry().ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	accessContext.registries = registries
+
+	if user.Role == portainer.AdministratorRole {
+		return accessContext, nil
+	}
+
+	accessContext.isAdmin = false
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	accessContext.teamMemberships = teamMemberships
+
+	return accessContext, nil
+}
+
+func (transport *Transport) createOperationContext(request *http.Request) (*restrictedDockerOperationContext, error) {
+	var err error
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	operationContext := &restrictedDockerOperationContext{
+		isAdmin:          true,
+		userID:           tokenData.ID,
+		resourceControls: resourceControls,
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return operationContext, nil
+	}
+
+	operationContext.isAdmin = false
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	operationContext.userTeamIDs = authorization.TeamIDs(teamMemberships)
+
+	return operationContext, nil
+}
+
+func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return false, err
+	}
+
+	return tokenData.Role == portainer.AdministratorRole, nil
+}
+
+func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.EndpointSecuritySettings, error) {
+	endpoint, err := transport.dataStore.Endpoint().Endpoint(transport.endpoint.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &endpoint.SecuritySettings, nil
+}
+
+func ContainsEncodedSeparator(escapedPath string) bool {
+	lower := strings.ToLower(escapedPath)
+	return strings.Contains(lower, "%2f") || strings.Contains(lower, "%5c")
+}
+
+func TrimDockerVersion(urlPath string) string {
+	cleanedPath := path.Clean(urlPath)
+
+	if strings.HasPrefix(cleanedPath, "/v2/") ||
+		strings.HasPrefix(cleanedPath, "v2/") ||
+		strings.HasPrefix(cleanedPath, "/v1/") ||
+		strings.HasPrefix(cleanedPath, "v1/") {
+		return cleanedPath
+	}
+
+	return apiVersionRe.ReplaceAllString(cleanedPath, "/")
+}

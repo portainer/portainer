@@ -1,0 +1,329 @@
+<div class="page-wrapper">
+  <!-- simple box -->
+  <div class="simple-box container">
+    <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+      <!-- simple box logo -->
+      <div class="row">
+        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
+        <div ng-if="!ctrl.logo">
+          <img src="~@/assets/images/logo_alt.svg" class="simple-box-logo hidden th-highcontrast:!block th-dark:!block" alt="Portainer" />
+          <img src="~@/assets/images/logo_alt_black.svg" class="simple-box-logo block th-highcontrast:hidden th-dark:hidden" alt="Portainer" />
+        </div>
+      </div>
+      <!-- !simple box logo -->
+      <!-- init password panel -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- toggle -->
+          <div>
+            <a ng-click="togglePanel()" class="vertical-center">
+              <span>
+                <pr-icon icon="'chevron-down'" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+              </span>
+              <span class="form-section-title">New Portainer installation</span>
+            </a>
+          </div>
+          <!-- !toggle -->
+
+          <!-- init password form -->
+          <form name="form" class="simple-box-form form-horizontal padding-top" ng-if="state.showInitPassword">
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted"> Please create the initial administrator user. </span>
+              </div>
+            </div>
+            <!-- !note -->
+            <!-- username-input -->
+            <div class="form-group">
+              <label for="username" class="col-sm-4 control-label text-left"> Username </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="username" ng-model="formValues.Username" placeholder="e.g. admin" data-cy="init-username" />
+              </div>
+            </div>
+            <!-- !username-input -->
+            <!-- new-password-input -->
+            <div class="form-group">
+              <label for="password" class="col-sm-4 control-label text-left">Password</label>
+              <div class="col-sm-8">
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" name="password" ng-minlength="requiredPasswordLength" auto-focus />
+              </div>
+            </div>
+            <!-- !new-password-input -->
+            <!-- confirm-password-input -->
+            <div class="form-group">
+              <label for="confirm_password" class="col-sm-4 control-label text-left">Confirm password</label>
+              <div class="col-sm-8">
+                <div class="input-group">
+                  <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" />
+                  <span class="input-group-addon !rounded-r-[5px]">
+                    <pr-icon ng-if="form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword" icon="'check'" mode="'success'"></pr-icon>
+                    <pr-icon ng-if="form.password.$viewValue === '' || form.password.$viewValue !== formValues.ConfirmPassword" icon="'x'" mode="'danger'"></pr-icon>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- !confirm-password-input -->
+            <!-- setup-token-input -->
+            <div class="form-group" ng-if="requiresSetupToken">
+              <label for="setup_token" class="col-sm-4 control-label text-left">
+                Setup token
+                <portainer-tooltip message="'Find this token in the Portainer server logs'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" ng-model="formValues.SetupToken" id="setup_token" data-cy="init-adminSetupToken" />
+                <setup-token-text-tip></setup-token-text-tip>
+              </div>
+            </div>
+            <!-- !setup-token-input -->
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-12 text-warning">
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                  <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
+                  <pr-icon mode="'success'" icon="'check'" ng-if="form.password.$valid && formValues.Password"></pr-icon>
+                </p>
+              </div>
+            </div>
+            <!-- !note -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="state.actionInProgress || form.$invalid || !formValues.Password || !formValues.ConfirmPassword || form.password.$viewValue !== formValues.ConfirmPassword || (requiresSetupToken && !formValues.SetupToken)"
+                  ng-click="createAdminUser()"
+                  button-spinner="state.actionInProgress"
+                >
+                  <span ng-hide="state.actionInProgress">Create user</span>
+                  <span ng-show="state.actionInProgress">Creating user...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+          <!-- !init password form -->
+        </div>
+      </div>
+      <!-- !init password panel -->
+
+      <!-- restore backup panel -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- toggle -->
+          <div>
+            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup" class="vertical-center">
+              <span
+                ><pr-icon icon="'chevron-down'" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
+              ></span>
+              <span class="form-section-title">Restore Portainer from backup</span>
+            </a>
+          </div>
+          <!-- !toggle -->
+
+          <!-- restore form -->
+          <form class="simple-box-form form-horizontal padding-top" ng-if="state.showRestorePortainer">
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-9">
+                <span class="small text-muted">
+                  This will restore the Portainer metadata which contains information about the environments, stacks and applications, as well as the configured users.
+                </span>
+              </div>
+            </div>
+            <!-- !note -->
+
+            <box-selector slim="true" options="restoreOptions" value="formValues.restoreFormType" on-change="(onChangeRestoreType)" radio-name="'restore-type'"></box-selector>
+
+            <div ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.FILE">
+              <!-- note -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small text-muted"> You can upload a backup file from your computer. </span>
+                </div>
+              </div>
+              <!-- !note -->
+              <!-- select-file-input -->
+              <div class="form-group">
+                <div class="col-sm-12 vertical-center">
+                  <button
+                    class="btn btn-sm btn-primary"
+                    ngf-select
+                    accept=".gz,.encrypted"
+                    ngf-accept="'application/x-tar,application/x-gzip'"
+                    ng-model="formValues.BackupFile"
+                    auto-focus
+                    data-cy="init-selectBackupFileButton"
+                    >Select file</button
+                  >
+                  <span class="space-left vertical-center">
+                    {{ formValues.BackupFile.name }}
+                    <pr-icon icon="'x-circle'" class-name="'icon-danger'" ng-if="!formValues.BackupFile"></pr-icon>
+                  </span>
+                </div>
+              </div>
+              <!-- password-input -->
+              <div class="form-group">
+                <label for="password" class="col-sm-3 control-label text-left">
+                  Password
+                  <portainer-tooltip
+                    message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
+                  ></portainer-tooltip>
+                </label>
+                <div class="col-sm-4">
+                  <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
+                </div>
+              </div>
+              <!-- !password-input -->
+            </div>
+            <!-- !select-file-input -->
+            <div class="limited-be-content" ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.S3">
+              <!-- Access key id  -->
+              <div class="form-group">
+                <label for="access_key_id" class="col-sm-3 control-label text-left">Access key ID</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="access_key_id" name="access_key_id" ng-model="formValues.AccessKeyId" required data-cy="init-accessKeyIdInput" />
+                </div>
+              </div>
+              <!-- !Access key id  -->
+              <!-- Secret access key -->
+              <div class="form-group">
+                <label for="secret_access_key" class="col-sm-3 control-label text-left">Secret access key</label>
+                <div class="col-sm-9">
+                  <input
+                    type="password"
+                    data-cy="init-secretAccessKeyInput"
+                    class="form-control"
+                    id="secret_access_key"
+                    name="secret_access_key"
+                    ng-model="formValues.SecretAccessKey"
+                    required
+                  />
+                </div>
+              </div>
+              <!-- !Secret access key -->
+              <!-- Region -->
+              <div class="form-group">
+                <label for="backup-s3-region" class="col-sm-3 control-label text-left">Region</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    data-cy="init-s3RegionInput"
+                    class="form-control"
+                    placeholder="default region is us-east-1 if left empty"
+                    id="backup-s3-region"
+                    name="backup-s3-region"
+                    ng-model="formValues.Region"
+                  />
+                </div>
+              </div>
+              <!-- !Region -->
+              <!-- Bucket name -->
+              <div class="form-group">
+                <label for="bucket_name" class="col-sm-3 control-label text-left">Bucket name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="bucket_name" name="bucket_name" ng-model="formValues.BucketName" required data-cy="init-bucketNameInput" />
+                </div>
+              </div>
+              <!-- !Bucket name -->
+              <!-- S3 Compatible Host -->
+              <div class="form-group">
+                <label for="s3-compatible-host" class="col-sm-3 control-label text-left">
+                  S3 Compatible Host
+                  <portainer-tooltip message="'Hostname of a S3 service'"></portainer-tooltip>
+                </label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    data-cy="init-s3CompatibleHostInput"
+                    class="form-control"
+                    id="s3-compatible-host"
+                    name="s3-compatible-host"
+                    ng-model="formValues.S3CompatibleHost"
+                    placeholder="leave empty for AWS S3"
+                  />
+                </div>
+              </div>
+              <!-- !S3 Compatible Host -->
+              <!-- Filename -->
+              <div class="form-group">
+                <label for="backup-s3-filename" class="col-sm-3 control-label text-left">Filename</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    data-cy="init-backupFilenameInput"
+                    class="form-control"
+                    id="backup-s3-filename"
+                    name="backup-s3-filename"
+                    ng-model="formValues.Filename"
+                    required
+                  />
+                </div>
+              </div>
+              <!-- !Filename -->
+              <!-- password-input -->
+              <div class="form-group">
+                <label for="password" class="col-sm-3 control-label text-left">
+                  Password
+                  <portainer-tooltip
+                    message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
+                  ></portainer-tooltip>
+                </label>
+                <div class="col-sm-4">
+                  <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
+                </div>
+              </div>
+              <!-- !password-input -->
+            </div>
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted"> You are about to restore Portainer from this backup. </span>
+              </div>
+              <div class="col-sm-12">
+                <span class="small text-muted"> After restoring has completed, please log in as a user that was known by the Portainer that was restored. </span>
+              </div>
+            </div>
+            <!-- !note -->
+            <!-- setup-token-input -->
+            <div class="form-group" ng-if="requiresSetupToken">
+              <label for="restore_setup_token" class="col-sm-3 control-label text-left">
+                Setup token
+                <portainer-tooltip message="'Find this token in the Portainer server logs (docker logs &lt;container&gt;).'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="formValues.SetupToken" id="restore_setup_token" data-cy="init-restoreSetupToken" />
+                <setup-token-text-tip></setup-token-text-tip>
+              </div>
+            </div>
+            <!-- !setup-token-input -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!formValues.BackupFile || state.backupInProgress || (requiresSetupToken && !formValues.SetupToken)"
+                  ng-click="uploadBackup()"
+                  button-spinner="state.backupInProgress"
+                  data-cy="init-restorePortainerButton"
+                >
+                  <span ng-hide="state.backupInProgress">Restore Portainer</span>
+                  <span ng-show="state.backupInProgress">Restoring Portainer...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+          <!-- !restore backup form -->
+        </div>
+      </div>
+      <!-- !restore backup panel -->
+    </div>
+  </div>
+  <!-- !simple box -->
+</div>

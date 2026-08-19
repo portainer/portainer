@@ -1,0 +1,64 @@
+:global(#page-wrapper) {
+  padding-left: var(--sidebar-closed-width);
+  transition: all 0.4s ease 0s;
+}
+
+@media only screen and (min-width: 561px) {
+  :global(#page-wrapper.open) {
+    padding-left: var(--sidebar-width);
+  }
+}
+@media only screen and (max-width: 560px) {
+  :global(#page-wrapper.open) {
+    padding-left: var(--sidebar-closed-width);
+  }
+}
+
+:global(#page-wrapper) {
+  --sidebar-width: 300px;
+  /* 32px for collapsed items + 20px padding on each side */
+  --sidebar-closed-width: 72px;
+}
+
+:global(#page-wrapper.open) .root {
+  width: var(--sidebar-width);
+}
+
+.root {
+  width: var(--sidebar-closed-width);
+  height: 100%;
+
+  position: fixed;
+  left: 0;
+
+  z-index: 10;
+  transition: all 0.4s ease 0s;
+}
+
+.nav {
+  background-color: var(--bg-sidebar-color);
+}
+
+.root ul {
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* make the scrollbar track background transparent */
+.nav-list-container::-webkit-scrollbar {
+  @apply !h-4 !w-4 bg-transparent;
+}
+
+.nav-list-container::-webkit-scrollbar-thumb {
+  @apply !rounded-full !bg-gray-3/40 hover:!bg-gray-3/50 th-dark:!bg-gray-3/40 th-dark:hover:!bg-gray-3/50;
+  /* adding this border gives some gap between the right edge of the box and the scrollbar thumb for webkit browsers,
+  while giving right no right gap from the scrollbar to the box edge for non-webkit browsers (firefox) */
+  @apply !border-4 !border-solid !border-transparent bg-clip-content;
+}
+
+.nav-list-container::-webkit-scrollbar-track {
+  @apply !bg-transparent;
+}

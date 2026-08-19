@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/orgs/portainer/discussions/new?category=help
+    about: Ask us a question about Portainer usage or deployment.
+  - name: Idea or Feature Request
+    url: https://github.com/orgs/portainer/discussions/new?category=ideas
+    about: Suggest an idea or feature/enhancement that should be added in Portainer.
+  - name: Portainer Business Edition - Get 3 Nodes Free
+    url: https://www.portainer.io/take-3
+    about: Portainer Business Edition has more features, more support and you can now get 3 nodes free for as long as you want.

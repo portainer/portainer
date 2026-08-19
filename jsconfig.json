@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "allowSyntheticDefaultImports": false,
+    "module": "commonjs"
+  },
+
+  "extends": "./tsconfig.json"
+}

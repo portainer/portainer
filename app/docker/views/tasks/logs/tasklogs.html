@@ -1,0 +1,27 @@
+<page-header
+  title="'Task details'"
+  breadcrumbs="[
+    { label:'Services', link:'docker.services' },
+    { 
+      label:service.Name,
+      link:'docker.services.service', 
+      linkParams:{ id: service.Id }
+    }, 
+    { 
+      label:task.Id,
+      link:'docker.tasks.task', 
+      linkParams:{ id: task.Id }
+    },
+    'Logs']"
+>
+</page-header>
+
+<log-viewer
+  data="logs"
+  ng-if="logs"
+  log-collection-change="changeLogCollection"
+  display-timestamps="state.displayTimestamps"
+  line-count="state.lineCount"
+  since-timestamp="state.sinceTimestamp"
+  resource-name="task.Id"
+></log-viewer>

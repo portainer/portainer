@@ -1,0 +1,40 @@
+.root {
+  padding-top: 50px;
+}
+
+.root :global .rc-slider .rc-slider-handle-dragging {
+  @apply border-2 border-blue-8;
+}
+
+.root :global .rc-slider-dot {
+  display: none;
+}
+
+.root :global .rc-slider-handle {
+  @apply border-2 border-blue-8;
+  width: 24px;
+  height: 24px;
+  margin-top: -8px;
+  border-radius: 16px;
+  opacity: 1;
+  background-color: #ffffff;
+}
+
+.root :global .rc-slider-track {
+  @apply bg-blue-8;
+  height: 8px;
+}
+
+.root :global .rc-slider-rail {
+  height: 8px;
+}
+
+.root :global .rc-slider-mark {
+  top: -28px;
+}
+
+.root :global .rc-slider-mark-text {
+  font-size: 14px;
+  color: var(--text-body-color);
+  user-select: none;
+}

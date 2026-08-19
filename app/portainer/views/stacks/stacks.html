@@ -1,0 +1,9 @@
+<page-header title="'Stacks list'" breadcrumbs="['Stacks']" reload="true"> </page-header>
+
+<docker-stacks-datatable
+  ng-if="stacks"
+  dataset="stacks"
+  is-image-notification-enabled="enableImageNotification"
+  on-remove="(removeAction)"
+  on-refresh="(getStacks)"
+></docker-stacks-datatable>

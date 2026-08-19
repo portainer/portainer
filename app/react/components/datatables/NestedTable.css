@@ -1,0 +1,22 @@
+.inner-datatable .widget {
+  border: 0 !important;
+}
+
+.inner-datatable {
+  @apply rounded-md border border-solid border-gray-5 th-dark:border-gray-9;
+  overflow: hidden;
+}
+
+.inner-datatable table thead {
+  border-top: none !important;
+}
+
+.inner-datatable tr > th:first-child,
+.inner-datatable tr > td:first-child {
+  padding-left: 20px;
+}
+
+.inner-datatable tr > th:last-child,
+.inner-datatable tr > td:last-child {
+  padding-right: 20px;
+}

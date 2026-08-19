@@ -1,0 +1,211 @@
+package cli
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	models "github.com/portainer/portainer/api/http/models/kubernetes"
+	"github.com/rs/zerolog/log"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+// GetConfigMaps gets all the ConfigMaps for a given namespace in a k8s endpoint.
+// if the user is an admin, all configMaps in the current k8s environment(endpoint) are fetched using the fetchConfigMaps function.
+// otherwise, namespaces the non-admin user has access to will be used to filter the configMaps based on the allowed namespaces.
+func (kcl *KubeClient) GetConfigMaps(namespace string) ([]models.K8sConfigMap, error) {
+	if kcl.GetIsKubeAdmin() {
+		return kcl.fetchConfigMaps(namespace)
+	}
+
+	return kcl.fetchConfigMapsForNonAdmin(namespace)
+}
+
+// fetchConfigMapsForNonAdmin fetches the configMaps in the namespaces the user has access to.
+// This function is called when the user is not an admin.
+func (kcl *KubeClient) fetchConfigMapsForNonAdmin(namespace string) ([]models.K8sConfigMap, error) {
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
+
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching configMaps for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
+		return nil, nil
+	}
+
+	configMaps, err := kcl.fetchConfigMaps(namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
+	results := make([]models.K8sConfigMap, 0)
+	for _, configMap := range configMaps {
+		if _, ok := nonAdminNamespaceSet[configMap.Namespace]; ok {
+			results = append(results, configMap)
+		}
+	}
+
+	return results, nil
+}
+
+// fetchConfigMaps gets all the ConfigMaps for a given namespace in a k8s endpoint.
+// the result is a list of config maps parsed into a K8sConfigMap struct.
+func (kcl *KubeClient) fetchConfigMaps(namespace string) ([]models.K8sConfigMap, error) {
+	configMaps, err := kcl.cli.CoreV1().ConfigMaps(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	results := []models.K8sConfigMap{}
+	for _, configMap := range configMaps.Items {
+		results = append(results, parseConfigMap(&configMap, false))
+	}
+
+	return results, nil
+}
+
+func (kcl *KubeClient) GetConfigMap(namespace, configMapName string) (models.K8sConfigMap, error) {
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(namespace).Get(context.Background(), configMapName, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(configMap, true), nil
+}
+
+// CreateConfigMap creates a config map in the given namespace. The returned config map
+// carries metadata only: the caller already holds the data it just wrote, so it is not
+// echoed back.
+func (kcl *KubeClient) CreateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error) {
+	configMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        request.Name,
+			Namespace:   namespace,
+			Labels:      request.Labels,
+			Annotations: request.Annotations,
+		},
+		Data: request.Data,
+	}
+
+	created, err := kcl.cli.CoreV1().ConfigMaps(namespace).Create(context.Background(), configMap, metav1.CreateOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(created, false), nil
+}
+
+// UpdateConfigMap updates an existing config map in the given namespace. The live
+// config map is read first so that fields the payload does not model, such as binary
+// data, survive the update.
+func (kcl *KubeClient) UpdateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error) {
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(namespace).Get(context.Background(), request.Name, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	if request.Data != nil {
+		configMap.Data = request.Data
+	}
+	if request.Labels != nil {
+		configMap.Labels = request.Labels
+	}
+	if request.Annotations != nil {
+		configMap.Annotations = request.Annotations
+	}
+
+	updated, err := kcl.cli.CoreV1().ConfigMaps(namespace).Update(context.Background(), configMap, metav1.UpdateOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, err
+	}
+
+	return parseConfigMap(updated, false), nil
+}
+
+// DeleteConfigMap deletes the named config map in the given namespace.
+func (kcl *KubeClient) DeleteConfigMap(namespace, name string) error {
+	return kcl.cli.CoreV1().ConfigMaps(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+}
+
+// parseConfigMap parses a k8s ConfigMap object into a K8sConfigMap struct.
+// for get operation, withData will be set to true.
+// otherwise, only metadata will be parsed.
+func parseConfigMap(configMap *corev1.ConfigMap, withData bool) models.K8sConfigMap {
+	result := models.K8sConfigMap{
+		K8sConfiguration: models.K8sConfiguration{
+			UID:                  string(configMap.UID),
+			Name:                 configMap.Name,
+			Namespace:            configMap.Namespace,
+			CreationDate:         configMap.CreationTimestamp.Time.UTC().Format(time.RFC3339),
+			Annotations:          configMap.Annotations,
+			Labels:               configMap.Labels,
+			ConfigurationOwner:   configMap.Labels[labelPortainerKubeConfigOwner],
+			ConfigurationOwnerId: configMap.Labels[labelPortainerKubeConfigOwnerId],
+		},
+	}
+
+	if withData {
+		result.Data = configMap.Data
+	}
+
+	return result
+}
+
+// SetConfigMapsIsUsed combines the config maps with the applications that use them.
+// the function fetches all the pods and replica sets in the cluster and checks if the config map is used by any of the pods.
+// if the config map is used by a pod, the application that uses the pod is added to the config map.
+// otherwise, the config map is returned as is.
+func (kcl *KubeClient) SetConfigMapsIsUsed(configMaps *[]models.K8sConfigMap) error {
+	portainerApplicationResources, err := kcl.fetchAllApplicationsListResources("", metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("an error occurred during the SetConfigMapsIsUsed operation, unable to fetch Portainer application resources. Error: %w", err)
+	}
+
+	for i := range *configMaps {
+		configMap := &(*configMaps)[i]
+
+		for _, pod := range portainerApplicationResources.Pods {
+			if isPodUsingConfigMap(&pod, *configMap) {
+				configMap.IsUsed = true
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// CombineConfigMapWithApplications combines the config map with the applications that use it.
+// the function fetches all the pods in the cluster and checks if the config map is used by any of the pods.
+// it needs to check if the pods are owned by a replica set to determine if the pod is part of a deployment.
+func (kcl *KubeClient) CombineConfigMapWithApplications(configMap models.K8sConfigMap) (models.K8sConfigMap, error) {
+	pods, err := kcl.cli.CoreV1().Pods(configMap.Namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get pods. Error: %w", err)
+	}
+
+	replicaSetsItems := []appsv1.ReplicaSet{}
+	if containsReplicaSetOwnerReference(pods) {
+		replicaSets, err := kcl.cli.AppsV1().ReplicaSets(configMap.Namespace).List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get replica sets. Error: %w", err)
+		}
+		replicaSetsItems = replicaSets.Items
+	}
+
+	applicationConfigurationOwners, err := kcl.GetApplicationConfigurationOwnersFromConfigMap(configMap, pods.Items, replicaSetsItems)
+	if err != nil {
+		return models.K8sConfigMap{}, fmt.Errorf("an error occurred during the CombineConfigMapWithApplications operation, unable to get applications from config map. Error: %w", err)
+	}
+
+	if len(applicationConfigurationOwners) > 0 {
+		configMap.ConfigurationOwnerResources = applicationConfigurationOwners
+		configMap.IsUsed = true
+	}
+
+	return configMap, nil
+}

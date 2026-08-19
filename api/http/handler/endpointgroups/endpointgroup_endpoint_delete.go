@@ -1,0 +1,73 @@
+package endpointgroups
+
+import (
+	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+)
+
+// @id EndpointGroupDeleteEndpoint
+// @summary Removes environment(endpoint) from an environment(endpoint) group
+// @description **Access policy**: administrator
+// @tags endpoint_groups
+// @security ApiKeyAuth
+// @security jwt
+// @param id path int true "EndpointGroup identifier"
+// @param endpointId path int true "Environment(Endpoint) identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
+// @router /endpoint_groups/{id}/endpoints/{endpointId} [delete]
+func (handler *Handler) endpointGroupDeleteEndpoint(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest("Invalid environment group identifier route variable", err)
+	}
+
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "endpointId")
+	if err != nil {
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
+	}
+
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return handler.removeEndpoint(tx, portainer.EndpointGroupID(endpointGroupID), portainer.EndpointID(endpointID))
+	})
+
+	return response.TxEmptyResponse(w, err)
+}
+
+func (handler *Handler) removeEndpoint(tx dataservices.DataStoreTx, endpointGroupID portainer.EndpointGroupID, endpointID portainer.EndpointID) error {
+	ok, err := tx.EndpointGroup().Exists(endpointGroupID)
+	if !ok {
+		return httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", dserrors.ErrObjectNotFound)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find an environment group with the specified identifier inside the database", err)
+	}
+
+	endpoint, err := tx.Endpoint().Endpoint(endpointID)
+	if tx.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
+	}
+
+	endpoint.GroupID = portainer.EndpointGroupID(1)
+
+	err = tx.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to persist environment changes inside the database", err)
+	}
+
+	err = handler.updateEndpointRelations(tx, endpoint, nil)
+	if err != nil {
+		return httperror.InternalServerError("Unable to persist environment relations changes inside the database", err)
+	}
+
+	return nil
+}

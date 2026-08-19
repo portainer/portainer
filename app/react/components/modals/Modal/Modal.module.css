@@ -1,0 +1,21 @@
+.overlay[data-reach-dialog-overlay] {
+  background: hsla(0, 0%, 0%, 0.8);
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.modal-content {
+  background-color: var(--bg-modal-content-color);
+
+  border: 1px solid rgba(0, 0, 0, 0.2);
+
+  box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
+}
+
+[theme='highcontrast'] .modal-content {
+  border: 1px solid var(--border-widget);
+}

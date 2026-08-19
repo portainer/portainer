@@ -1,0 +1,52 @@
+<page-header title="'User authentication logs'" breadcrumbs="['User authentication logs']" reload="true"> </page-header>
+
+<div class="mx-4">
+  <div class="be-indicator-container limited-be">
+    <div class="limited-be-link vertical-center m-4"><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator></div>
+    <!-- 15px matches the padding for col-sm-12 for the widget and table -->
+    <div class="limited-be-content !p-0 !pt-[15px]">
+      <div class="row">
+        <div class="col-sm-12">
+          <rd-widget>
+            <rd-widget-body>
+              <div class="form-horizontal">
+                <div class="form-group">
+                  <label for="dateRangeInput" class="col-sm-2 control-label text-left">Date range</label>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control" disabled />
+                  </div>
+                </div>
+              </div>
+              <p class="text-muted small vertical-center">
+                <pr-icon icon="'info'" class-name="'icon icon-sm icon-primary'"></pr-icon>
+                Portainer user authentication logs have a maximum retention of 7 days.
+              </p>
+              <div>
+                <button type="button" class="btn btn-sm btn-primary" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled
+                  ><pr-icon icon="'download'" class-name="'icon icon-sm'"></pr-icon>Export as CSV
+                </button>
+              </div>
+            </rd-widget-body>
+          </rd-widget>
+        </div>
+      </div>
+      <authentication-logs-table
+        dataset="$ctrl.state.logs"
+        keyword="$ctrl.state.keyword"
+        sort="$ctrl.state.sort"
+        limit="$ctrl.state.limit"
+        context-filter="$ctrl.state.contextFilter"
+        type-filter="$ctrl.state.typeFilter"
+        total-items="$ctrl.state.totalItems"
+        current-page="$ctrl.state.currentPage"
+        feature="{{:: $ctrl.limitedFeature}}"
+        on-change-context-filter="($ctrl.onChangeContextFilter)"
+        on-change-type-filter="($ctrl.onChangeTypeFilter)"
+        on-change-keyword="($ctrl.onChangeKeyword)"
+        on-change-sort="($ctrl.onChangeSort)"
+        on-change-limit="($ctrl.onChangeLimit)"
+        on-change-page="($ctrl.onChangePage)"
+      ></authentication-logs-table>
+    </div>
+  </div>
+</div>

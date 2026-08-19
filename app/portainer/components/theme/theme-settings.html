@@ -1,0 +1,10 @@
+<div class="mt-6">
+  <rd-widget>
+    <rd-widget-header icon="sliders" title-text="User theme"></rd-widget-header>
+    <rd-widget-body>
+      <form class="form-horizontal">
+        <box-selector radio-name="'theme'" value="$ctrl.state.themeColor" options="$ctrl.state.availableThemes" on-change="($ctrl.setThemeColor)"></box-selector>
+      </form>
+    </rd-widget-body>
+  </rd-widget>
+</div>

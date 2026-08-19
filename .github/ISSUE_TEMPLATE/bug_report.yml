@@ -1,0 +1,183 @@
+name: Bug Report
+description: Create a report to help us improve.
+labels: kind/bug,bug/need-confirmation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Welcome!
+
+        The issue tracker is for reporting bugs. If you have an [idea for a new feature](https://github.com/orgs/portainer/discussions/categories/ideas) or a [general question about Portainer](https://github.com/orgs/portainer/discussions/categories/help) please post in our [GitHub Discussions](https://github.com/orgs/portainer/discussions).
+
+        You can also ask for help in our [community Slack channel](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA).
+
+        Please note that we only provide support for current versions of Portainer. You can find a list of supported versions in our [lifecycle policy](https://docs.portainer.io/start/lifecycle).
+
+        **DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS**.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before you start please confirm the following.
+      options:
+        - label: Yes, I've searched similar issues on [GitHub](https://github.com/portainer/portainer/issues).
+          required: true
+        - label: Yes, I've checked whether this issue is covered in the Portainer [documentation](https://docs.portainer.io).
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # About your issue
+
+        Tell us a bit about the issue you're having.
+
+        How to write a good bug report:
+
+        - Respect the issue template as much as possible.
+        - Summarize the issue so that we understand what is going wrong.
+        - Describe what you would have expected to have happened, and what actually happened instead.
+        - Provide easy to follow steps to reproduce the issue. 
+        - Remain clear and concise.
+        - Format your messages to help the reader focus on what matters and understand the structure of your message, use [Markdown syntax](https://help.github.com/articles/github-flavored-markdown).
+
+  - type: textarea
+    attributes:
+      label: Problem Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: A clear and concise description of what actually happens.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please be as detailed as possible when providing steps to reproduce.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Portainer logs or screenshots
+      description: Provide Portainer container logs or any screenshots related to the issue.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        # About your environment
+
+        Tell us a bit about your Portainer environment.
+
+  - type: dropdown
+    attributes:
+      label: Portainer version
+      description: We only provide support for current versions of Portainer as per the lifecycle policy linked above. If you are on an older version of Portainer we recommend [updating first](https://docs.portainer.io/start/upgrade) in case your bug has already been fixed.
+      multiple: false
+      options:
+        - '2.44.0'
+        - '2.43.0'
+        - '2.42.0'
+        - '2.41.1'
+        - '2.41.0'
+        - '2.40.0'
+        - '2.39.6'
+        - '2.39.5'
+        - '2.39.4'
+        - '2.39.3'
+        - '2.39.2'
+        - '2.39.1'
+        - '2.39.0'
+        - '2.38.1'
+        - '2.38.0'
+        - '2.37.0'
+        - '2.36.0'
+        - '2.35.0'
+        - '2.34.0'
+        - '2.33.8'
+        - '2.33.7'
+        - '2.33.6'
+        - '2.33.5'
+        - '2.33.4'
+        - '2.33.3'
+        - '2.33.2'
+        - '2.33.1'
+        - '2.33.0'
+
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Portainer Edition
+      multiple: false
+      options:
+        - 'Business Edition (BE/EE) with 5NF / 3NF license'
+        - 'Business Edition (BE/EE) with Home & Student license'
+        - 'Business Edition (BE/EE) with Starter license'
+        - 'Business Edition (BE/EE) with Professional or Enterprise license'
+        - 'Community Edition (CE)'
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Platform and Version
+      description: |
+        Enter your container management platform (Docker | Swarm | Kubernetes) along with the version. 
+        Example: Docker 24.0.3 | Docker Swarm 24.0.3 | Kubernetes 1.26
+        You can find our supported platforms [in our documentation](https://docs.portainer.io/start/requirements-and-prerequisites).
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: OS and Architecture
+      description: |
+        Enter your Operating System, Version and Architecture. Example: Ubuntu 22.04, AMD64 | Raspbian OS, ARM64
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Browser
+      description: |
+        Enter your browser and version. Example: Google Chrome 114.0
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: What command did you use to deploy Portainer?
+      description: |
+        Example: `docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest`
+        If you deployed Portainer using a compose file or manifest you can provide this here as well.
+      render: bash
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Any additional information about your environment, the bug, or anything else you think might be helpful.
+    validations:
+      required: false

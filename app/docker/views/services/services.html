@@ -1,0 +1,10 @@
+<page-header title="'Service list'" breadcrumbs="['Services']" reload="true"> </page-header>
+
+<docker-services-datatable
+  dataset="services"
+  title-icon="shuffle"
+  on-refresh="(getServices)"
+  is-add-action-visible="true"
+  is-stack-column-visible="true"
+  table-key="'services'"
+></docker-services-datatable>

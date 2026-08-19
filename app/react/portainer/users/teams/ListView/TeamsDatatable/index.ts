@@ -1,0 +1,1 @@
+export { TeamsDatatable } from './TeamsDatatable';

@@ -1,0 +1,1 @@
+export { BadgeIcon } from './BadgeIcon';

@@ -1,0 +1,47 @@
+import { Meta, StoryFn } from '@storybook/react-webpack5';
+import { useMemo } from 'react';
+
+import { UserContext } from '@/react/hooks/useUser';
+import { UserViewModel } from '@/portainer/models/user';
+
+import { HeaderContainer } from './HeaderContainer';
+import { Breadcrumbs } from './Breadcrumbs';
+import { HeaderTitle } from './HeaderTitle';
+import { PageTitle } from './PageTitle';
+
+export default {
+  component: HeaderContainer,
+  title: 'Components/PageHeader/HeaderContainer',
+} as Meta;
+
+interface StoryProps {
+  title: string;
+}
+
+function Template({ title }: StoryProps) {
+  const state = useMemo(
+    () => ({ user: new UserViewModel({ Username: 'test' }) }),
+    []
+  );
+
+  return (
+    <UserContext.Provider value={state}>
+      <HeaderContainer>
+        <Breadcrumbs
+          breadcrumbs={[
+            { link: 'example', label: 'crumb1' },
+            { label: 'crumb2' },
+          ]}
+        />
+
+        <HeaderTitle />
+      </HeaderContainer>
+      <PageTitle title={title} />
+    </UserContext.Provider>
+  );
+}
+
+export const Primary: StoryFn<StoryProps> = Template.bind({});
+Primary.args = {
+  title: 'Container details',
+};

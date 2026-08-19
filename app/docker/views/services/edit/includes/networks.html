@@ -1,0 +1,71 @@
+<div id="service-network-specs">
+  <rd-widget>
+    <rd-widget-header icon="list" title-text="Networks">
+      <div class="nopadding" authorization="DockerServiceUpdate">
+        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating"> <pr-icon icon="'plus'"></pr-icon> network </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="!service.Networks || service.Networks.length === 0">
+      <p>This service is not connected to any networks.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.Networks && service.Networks.length > 0" classes="no-padding">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>IP address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="network in service.Networks">
+            <td>
+              <select
+                ng-if="network.Editable"
+                class="form-control !h-[30px] !rounded !text-[13px]"
+                ng-model="network.Id"
+                ng-change="updateNetwork(service)"
+                ng-options="net.Id as net.Name for net in filterNetworks(swarmNetworks, network)"
+                disable-authorization="DockerServiceUpdate"
+                style="width: initial; min-width: 50%"
+                data-cy="network-selector_{{ network.Name }}"
+              >
+                <option disabled value="" selected>Select a network</option>
+              </select>
+              <span ng-if="!network.Editable">{{ network.Name }}</span>
+            </td>
+            <td>
+              <a ui-sref="docker.networks.network({id: network.Id})">{{ network.Id }}</a>
+            </td>
+            <td> {{ network.Addr }} </td>
+            <td ng-if="network.Editable" authorization="DockerServiceUpdate">
+              <span class="input-group-btn">
+                <button class="btn btn-sm btn-dangerlight" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
+                  <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                </button>
+              </span>
+            </td>
+            <td ng-if="!network.Editable"></td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer authorization="DockerServiceUpdate">
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="isUpdating || !hasChanges(service, ['Networks'])" ng-click="updateService(service)">
+            Apply changes
+          </button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <pr-icon icon="'chevron-down'"></pr-icon>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['Networks'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

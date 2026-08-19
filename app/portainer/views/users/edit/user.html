@@ -1,0 +1,86 @@
+<page-header title="'User details'" breadcrumbs="[{label:'Users', link:'portainer.users'}, formValues.username]" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="user" title-text="User details"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" style="margin-top: 15px">
+          <div class="form-group">
+            <label for="username_field" class="col-sm-2 control-label required text-left">Username</label>
+            <div class="col-sm-8">
+              <input class="form-control" ng-model="formValues.username" id="username_field" />
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="isAdmin">
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-3 col-lg-2 control-label text-left'"
+                checked="formValues.Administrator"
+                label="'Administrator'"
+                tooltip="'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
+                on-change="(handleAdministratorChange)"
+              ></por-switch-field>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4">
+              <button class="btn btn-primary btn-sm" ng-disabled="!isSubmitEnabled()" ng-click="updateUser()">Save</button>
+              <button class="btn btn-danger btn-sm vertical-center" ng-disabled="isDeleteDisabled()" ng-click="deleteUser()">
+                <pr-icon icon="'trash-2'" size="'sm'" class="vertical-center"></pr-icon>Delete this user
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="AuthenticationMethod === 1">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="lock" title-text="Change user password"></rd-widget-header>
+      <rd-widget-body>
+        <form name="form" class="form-horizontal" style="margin-top: 15px">
+          <!-- new-password-input -->
+          <div class="form-group">
+            <label for="new_password" class="col-sm-2 control-label required text-left">New password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" name="new_password" ng-minlength="requiredPasswordLength" />
+            </div>
+          </div>
+          <!-- !new-password-input -->
+          <!-- confirm-password-input -->
+          <div class="form-group">
+            <label for="confirm_password" class="col-sm-2 control-label required text-left">Confirm password</label>
+            <div class="col-sm-8">
+              <div class="input-group">
+                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
+                <span class="input-group-addon">
+                  <pr-icon icon="'check'" class="icon-success" ng-if="form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword"></pr-icon>
+                  <pr-icon icon="'x'" class="icon-danger" ng-if="!(form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword)"></pr-icon>
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- !confirm-password-input -->
+          <password-check-hint password-valid="form.new_password.$valid && formValues.newPassword"></password-check-hint>
+          <div class="form-group">
+            <div class="col-sm-2">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="form.new_password.$viewValue === '' || form.$invalid || !formValues.newPassword || !formValues.confirmPassword || form.new_password.$viewValue !== formValues.confirmPassword"
+                ng-click="updatePassword()"
+                >Update password</button
+              >
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

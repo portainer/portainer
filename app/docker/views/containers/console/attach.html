@@ -1,0 +1,58 @@
+<page-header
+  title="'Container console'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    {
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container',
+      linkParams: { id: container.Id },
+    }, 'Console']"
+>
+</page-header>
+
+<div class="row" ng-init="autoconnectAttachView()" ng-show="loaded">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="terminal" title-text="Attach"></rd-widget-header>
+      <rd-widget-body>
+        <div class="small text-warning" ng-if="!container.Config.OpenStdin">
+          <p>
+            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+            The interactive-flag is not set. You might not be able to use the console properly.
+          </p>
+        </div>
+
+        <div class="small text-warning" ng-if="!container.Config.Tty">
+          <p>
+            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+            The TTY-flag is not set. You might not be able to use the console properly.
+          </p>
+        </div>
+
+        <div class="small text-warning" ng-hide="container.State.Running">
+          <p>
+            <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+            The container is not running.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-disabled="state === states.connecting || !container.State.Running"
+          ng-click="state == states.disconnected ? connectAttach() : disconnect()"
+        >
+          <span ng-show="state === states.disconnected">Attach to Container</span>
+          <span ng-show="state === states.connected">Detach</span>
+          <span ng-show="state === states.connecting">Attaching...</span>
+        </button>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <shell-terminal url="shellUrl" connect="shellConnect" on-state-change="(onShellStateChange)" on-resize="(onShellResize)"></shell-terminal>
+  </div>
+</div>

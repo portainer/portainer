@@ -1,0 +1,216 @@
+package edgestacks
+
+import (
+	"bytes"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/roar"
+
+	"github.com/segmentio/encoding/json"
+	"github.com/stretchr/testify/require"
+)
+
+// Create
+func TestCreateAndInspect(t *testing.T) {
+	t.Parallel()
+	handler, rawAPIKey := setupHandler(t)
+
+	// Create Endpoint, EdgeGroup and EndpointRelation
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeGroup := portainer.EdgeGroup{
+		ID:           1,
+		Name:         "EdgeGroup 1",
+		Dynamic:      false,
+		TagIDs:       nil,
+		EndpointIDs:  roar.FromSlice([]portainer.EndpointID{endpoint.ID}),
+		PartialMatch: false,
+	}
+
+	err := handler.DataStore.EdgeGroup().Create(&edgeGroup)
+	require.NoError(t, err)
+
+	endpointRelation := portainer.EndpointRelation{
+		EndpointID: endpoint.ID,
+		EdgeStacks: map[portainer.EdgeStackID]bool{},
+	}
+
+	err = handler.DataStore.EndpointRelation().Create(&endpointRelation)
+	require.NoError(t, err)
+
+	payload := edgeStackFromStringPayload{
+		Name:             "test-stack",
+		StackFileContent: "stack content",
+		EdgeGroups:       []portainer.EdgeGroupID{1},
+		DeploymentType:   portainer.EdgeStackDeploymentCompose,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := bytes.NewBuffer(jsonPayload)
+
+	// Create EdgeStack
+	req, err := http.NewRequest(http.MethodPost, "/edge_stacks/create/string", r)
+	require.NoError(t, err)
+
+	req.Header.Add("x-api-key", rawAPIKey)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
+	}
+
+	data := portainer.EdgeStack{}
+	err = json.NewDecoder(rec.Body).Decode(&data)
+	require.NoError(t, err)
+
+	// Inspect
+	req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("/edge_stacks/%d", data.ID), nil)
+	require.NoError(t, err)
+
+	req.Header.Add("x-api-key", rawAPIKey)
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected a %d response, found: %d", http.StatusOK, rec.Code)
+	}
+
+	data = portainer.EdgeStack{}
+	err = json.NewDecoder(rec.Body).Decode(&data)
+	require.NoError(t, err)
+
+	if payload.Name != data.Name {
+		t.Fatalf("expected EdgeStack Name %s, found %s", payload.Name, data.Name)
+	}
+}
+
+func TestCreateWithInvalidPayload(t *testing.T) {
+	t.Parallel()
+	handler, rawAPIKey := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	cases := []struct {
+		Name               string
+		Payload            any
+		ExpectedStatusCode int
+		Method             string
+	}{
+		{
+			Name:               "Invalid method parameter",
+			Payload:            edgeStackFromStringPayload{},
+			Method:             "invalid",
+			ExpectedStatusCode: 400,
+		},
+
+		{
+			Name:               "Empty edgeStackFromStringPayload with string method",
+			Payload:            edgeStackFromStringPayload{},
+			Method:             "string",
+			ExpectedStatusCode: 400,
+		},
+		{
+			Name:               "Empty edgeStackFromStringPayload with repository method",
+			Payload:            edgeStackFromStringPayload{},
+			Method:             "repository",
+			ExpectedStatusCode: 400,
+		},
+		{
+			Name:               "Empty edgeStackFromStringPayload with file method",
+			Payload:            edgeStackFromStringPayload{},
+			Method:             "file",
+			ExpectedStatusCode: 400,
+		},
+		{
+			Name: "Duplicated EdgeStack Name",
+			Payload: edgeStackFromStringPayload{
+				Name:             edgeStack.Name,
+				StackFileContent: "content",
+				EdgeGroups:       edgeStack.EdgeGroups,
+				DeploymentType:   edgeStack.DeploymentType,
+			},
+			Method:             "string",
+			ExpectedStatusCode: http.StatusConflict,
+		},
+		{
+			Name: "Empty EdgeStack Groups",
+			Payload: edgeStackFromStringPayload{
+				Name:             edgeStack.Name,
+				StackFileContent: "content",
+				EdgeGroups:       []portainer.EdgeGroupID{},
+				DeploymentType:   edgeStack.DeploymentType,
+			},
+			Method:             "string",
+			ExpectedStatusCode: 400,
+		},
+		{
+			Name: "EdgeStackDeploymentKubernetes with Docker endpoint",
+			Payload: edgeStackFromStringPayload{
+				Name:             "stack-name",
+				StackFileContent: "content",
+				EdgeGroups:       []portainer.EdgeGroupID{1},
+				DeploymentType:   portainer.EdgeStackDeploymentKubernetes,
+			},
+			Method:             "string",
+			ExpectedStatusCode: 500,
+		},
+		{
+			Name: "Empty Stack File Content",
+			Payload: edgeStackFromStringPayload{
+				Name:             "stack-name",
+				StackFileContent: "",
+				EdgeGroups:       []portainer.EdgeGroupID{1},
+				DeploymentType:   portainer.EdgeStackDeploymentCompose,
+			},
+			Method:             "string",
+			ExpectedStatusCode: 400,
+		},
+		{
+			Name: "Clone Git repository error",
+			Payload: edgeStackFromGitRepositoryPayload{
+				Name:                     "stack-name",
+				RepositoryURL:            "github.com/portainer/portainer",
+				RepositoryReferenceName:  "ref name",
+				RepositoryAuthentication: false,
+				RepositoryUsername:       "",
+				RepositoryPassword:       "",
+				FilePathInRepository:     "/file/path",
+				EdgeGroups:               []portainer.EdgeGroupID{1},
+				DeploymentType:           portainer.EdgeStackDeploymentCompose,
+			},
+			Method:             "repository",
+			ExpectedStatusCode: 500,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			jsonPayload, err := json.Marshal(tc.Payload)
+			if err != nil {
+				t.Fatal("JSON marshal error:", err)
+			}
+			r := bytes.NewBuffer(jsonPayload)
+
+			// Create EdgeStack
+			req, err := http.NewRequest(http.MethodPost, "/edge_stacks/create/"+tc.Method, r)
+			if err != nil {
+				t.Fatal("request error:", err)
+			}
+
+			req.Header.Add("x-api-key", rawAPIKey)
+			rec := httptest.NewRecorder()
+			handler.ServeHTTP(rec, req)
+
+			if rec.Code != tc.ExpectedStatusCode {
+				t.Fatalf("expected a %d response, found: %d", tc.ExpectedStatusCode, rec.Code)
+			}
+		})
+	}
+}

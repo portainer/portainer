@@ -1,0 +1,172 @@
+<ng-form name="kubernetesConfigurationDataCreationForm">
+  <div class="col-sm-12 form-section-title" style="margin-top: 10px"> Data </div>
+
+  <div class="form-group" ng-if="$ctrl.isCreation">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
+        <pr-icon icon="'list'"></pr-icon> Advanced mode
+      </button>
+      <button type="button" class="btn btn-link btn-sm !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
+        <pr-icon icon="'edit'"></pr-icon> Simple mode
+      </button>
+    </div>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+      Switch to advanced mode to copy and paste multiple key/values
+    </div>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'configmap'">
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+      Generate a ConfigMap entry per line, use YAML format
+    </div>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple && $ctrl.type === 'secret'">
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+      Generate a Secret entry per line, use YAML format
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
+    <div class="col-sm-12 vertical-center">
+      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
+        <pr-icon class="vertical-center" icon="'plus'"></pr-icon> Create entry
+      </button>
+      <button
+        ng-if="
+          !(($ctrl.isDockerConfig || $ctrl.formValues.Type === $ctrl.KubernetesSecretTypeOptions.TLS.value) && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET)
+        "
+        type="button"
+        class="btn btn-sm btn-default ml-0"
+        ngf-select="$ctrl.addEntryFromFile($file)"
+        data-cy="k8sConfigCreate-createConfigsFromFileButton"
+      >
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Create key/value from file
+      </button>
+      <button
+        ng-if="$ctrl.isDockerConfig && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET"
+        type="button"
+        class="btn btn-sm btn-default ml-0"
+        ngf-select="$ctrl.addEntryFromFile($file)"
+        ngf-accept="'.json'"
+        data-cy="k8sConfigCreate-createConfigsFromFileButton"
+      >
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Upload docker config file
+      </button>
+      <button
+        ng-if="$ctrl.formValues.Type === $ctrl.KubernetesSecretTypeOptions.TLS.value && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET"
+        type="button"
+        class="btn btn-sm btn-default ml-0"
+        ngf-select="$ctrl.addEntryFromFile($file)"
+        data-cy="k8sConfigCreate-createConfigsFromFileButton"
+      >
+        <pr-icon icon="'upload'" class="vertical-center"></pr-icon> Upload TLS key/cert file
+      </button>
+      <portainer-tooltip message="'Maximum upload file size is 1MB'"></portainer-tooltip>
+    </div>
+  </div>
+
+  <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
+    <div class="form-group">
+      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left"
+        >Key
+        <portainer-tooltip message="'The key must consist of alphanumeric characters, \'-\', \'_\' or \'.\' and be up to 253 characters in length.'"></portainer-tooltip>
+      </label>
+      <div class="col-sm-8 col-lg-9">
+        <input
+          type="text"
+          data-cy="k8sConfigCreate-keyInput"
+          class="form-control"
+          maxlength="253"
+          id="configuration_data_key_{{ index }}"
+          name="configuration_data_key_{{ index }}"
+          ng-model="$ctrl.formValues.Data[index].Key"
+          ng-disabled="entry.Used || $ctrl.isRequiredKey(entry.Key)"
+          required
+          ng-change="$ctrl.onChangeKey(entry)"
+        />
+        <div
+          class="small text-warning mt-1"
+          ng-show="
+            kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
+            (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) ||
+            $ctrl.state.invalidKeys[index]
+          "
+        >
+          <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required. </p>
+          </ng-messages>
+          <div>
+            <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon>This key is already defined.
+            </p>
+          </div>
+          <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
+            <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_'
+            or '.'
+          </p>
+        </div>
+      </div>
+      <div class="col-sm-3 col-lg-2"></div>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left">Value</label>
+      <div class="col-sm-8 col-lg-9">
+        <textarea
+          class="form-control"
+          data-cy="k8sConfigCreate-configurationDataValue"
+          rows="5"
+          id="configuration_data_value_{{ index }}"
+          name="configuration_data_value_{{ index }}"
+          ng-model="$ctrl.formValues.Data[index].Value"
+          ng-trim="false"
+          required
+        ></textarea>
+        <div class="small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
+          <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
+            <p ng-message="required" class="vertical-center"><pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+          </ng-messages>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label required text-left">Value</label>
+      <div class="col-sm-8 control-label small text-muted text-left"
+        >Binary data <portainer-tooltip message="'This key holds binary data and cannot be displayed.'"></portainer-tooltip
+      ></div>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
+      <div class="col-sm-3 col-lg-2"></div>
+      <div class="col-sm-8">
+        <button
+          ng-if="!$ctrl.isRequiredKey(entry.Key) || $ctrl.state.duplicateKeys[index] !== undefined"
+          type="button"
+          class="btn btn-sm btn-dangerlight !ml-0"
+          style="margin-left: 0"
+          ng-disabled="entry.Used || $ctrl.isEntryRequired()"
+          ng-click="$ctrl.removeEntry(index, entry)"
+          data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
+        >
+          <pr-icon class="vertical-center" icon="'trash-2'"></pr-icon> Remove entry
+        </button>
+        <span class="small text-muted" ng-if="entry.Used">
+          <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+          This key is currently used by one or more applications
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group !px-[15px]" ng-if="!$ctrl.formValues.IsSimple">
+    <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none" data-cy="k8sConfigCreate-configurationDataYaml" />
+
+    <web-editor-form
+      identifier="kubernetes-configuration-editor"
+      value="$ctrl.formValues.DataYaml"
+      on-change="($ctrl.editorUpdate)"
+      yml="true"
+      text-tip="Define or paste key-value pairs, one pair per line"
+    >
+    </web-editor-form>
+  </div>
+</ng-form>

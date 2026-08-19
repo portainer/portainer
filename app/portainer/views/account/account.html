@@ -1,0 +1,91 @@
+<page-header title="'User settings'" breadcrumbs="['User settings']" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <theme-settings></theme-settings>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="lock" title-text="Change user password"></rd-widget-header>
+      <rd-widget-body>
+        <form name="form" class="form-horizontal" style="margin-top: 15px">
+          <!-- current-password-input -->
+          <div class="form-group">
+            <label for="current_password" class="col-sm-3 col-lg-2 control-label required text-left">Current password</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password" />
+            </div>
+          </div>
+          <!-- !current-password-input -->
+          <!-- new-password-input -->
+          <div class="form-group">
+            <label for="new_password" class="col-sm-3 col-lg-2 control-label required text-left">New password</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="password" class="form-control" ng-model="formValues.newPassword" ng-minlength="requiredPasswordLength" id="new_password" name="new_password" />
+            </div>
+          </div>
+          <!-- !new-password-input -->
+
+          <!-- confirm-password-input -->
+          <div class="form-group">
+            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label required text-left">Confirm password</label>
+            <div class="col-sm-9 col-lg-10">
+              <div class="input-group">
+                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
+                <span class="input-group-addon">
+                  <pr-icon icon="'check'" class="icon-success" ng-if="formValues.newPassword === formValues.confirmPassword"></pr-icon>
+                  <pr-icon icon="'x'" class="icon-danger" ng-if="!(formValues.newPassword === formValues.confirmPassword)"></pr-icon>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-3 col-lg-2"></div>
+            <div class="col-sm-8">
+              <password-check-hint password-valid="form.new_password.$valid && formValues.newPassword" force-change-password="forceChangePassword"></password-check-hint>
+            </div>
+          </div>
+          <!-- !confirm-password-input -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="(AuthenticationMethod !== 1 && !isInitialAdmin) || !formValues.currentPassword || !formValues.newPassword || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
+                ng-click="updatePassword()"
+              >
+                Update password
+              </button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-click="skipPasswordChange()" ng-if="forceChangePassword && timesPasswordChangeSkipped < 2">
+                Remind me later
+              </button>
+              <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !isInitialAdmin">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                You cannot change your password when using LDAP authentication.
+              </span>
+              <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !isInitialAdmin">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                You cannot change your password when using OAuth authentication.
+              </span>
+            </div>
+          </div>
+          <div ng-if="userRole === 1">
+            <p class="text-muted vertical-center">
+              <pr-icon icon="'alert-circle'" class-name="'icon-primary'"></pr-icon>
+              Minimum password length is set <a ui-sref="portainer.settings.authentication">here.</a>
+            </p>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<application-settings-widget></application-settings-widget>
+
+<access-tokens-datatable ui-can-exit="uiCanExit()"></access-tokens-datatable>
+
+<helm-repository-datatable></helm-repository-datatable>

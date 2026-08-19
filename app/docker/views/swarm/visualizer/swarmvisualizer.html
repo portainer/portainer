@@ -1,0 +1,124 @@
+<page-header title="'Swarm visualizer'" breadcrumbs="[{label:'Swarm', link:'docker.swarm'}, {label:'Cluster visualizer', link:'docker.swarm.visualizer'}]" reload="true">
+</page-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="trello" title-text="Cluster information">
+        <div class="pull-right">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="changeShowInformationPanel(true)" ng-if="!state.ShowInformationPanel">Show</button>
+          <button type="button" class="btn btn-sm btn-primary" ng-click="changeShowInformationPanel(false)" ng-if="state.ShowInformationPanel">Hide</button>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body ng-if="state.ShowInformationPanel">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ nodes.length }}</td>
+            </tr>
+            <tr>
+              <td>Services</td>
+              <td>{{ services.length }}</td>
+            </tr>
+            <tr>
+              <td>Tasks</td>
+              <td>{{ tasks.length }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title"> Options </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="state.DisplayOnlyRunningTasks"
+                label="'Only display running tasks'"
+                on-change="(handleChangeDisplayOnlyRunningTasks)"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="state.DisplayNodeLabels"
+                label="'Display node labels'"
+                on-change="(handleChangeDisplayNodeLabels)"
+              ></por-switch-field>
+            </div>
+          </div>
+        </form>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title"> Refresh rate </div>
+          <div class="form-group">
+            <label for="refreshRate" class="col-sm-2 margin-sm-top control-label text-left">
+              <pr-icon id="refreshRateChange" icon="'check'" mode="'success'" size="'sm'" style="display: none"></pr-icon>
+            </label>
+            <div class="col-sm-2">
+              <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control" data-cy="swarm-refreshRate-select">
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="30">30s</option>
+                <option value="60">60s</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="visualizerData">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="trello" title-text="Cluster visualizer"></rd-widget-header>
+      <rd-widget-body>
+        <div class="visualizer_container">
+          <div class="node" ng-repeat="node in visualizerData.nodes | orderBy : ['Role', 'Hostname'] track by $index">
+            <div class="node_info">
+              <div>
+                <div>
+                  <b>{{ node.Name || node.Hostname }}</b>
+                  <span class="node_platform">
+                    <pr-icon ng-if="node.PlatformOS === 'linux'" icon="'svg-linux'"></pr-icon>
+                    <pr-icon ng-if="node.PlatformOS === 'windows'" icon="'layout-grid'"></pr-icon>
+                  </span>
+                </div>
+              </div>
+              <div>{{ node.Role }}</div>
+              <div>CPU: {{ node.CPUs / 1000000000 }}</div>
+              <div>Memory: {{ node.Memory | humansize: 2 }}</div>
+              <div
+                ><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div
+              >
+              <div class="node_labels" ng-if="node.Labels.length > 0 && state.DisplayNodeLabels">
+                <div>Labels</div>
+                <div class="node_label" ng-repeat="label in node.Labels">
+                  <span class="label_key"> {{ label.key }} </span>
+                  <span class="label_value" ng-if="label.value"> = {{ label.value }} </span>
+                </div>
+              </div>
+            </div>
+            <div class="tasks">
+              <div
+                class="task task_{{ task.Status.State | visualizerTask }}"
+                style="border: 2px solid {{ task.ServiceId | visualizerTaskBorderColor }}"
+                ng-repeat="task in node.Tasks | orderBy: 'ServiceName' | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }"
+              >
+                <div class="service_name">{{ task.ServiceName }}</div>
+                <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
+                <div>Status: {{ task.Status.State }}</div>
+                <div>Update: {{ task.Updated | getisodate }}</div>
+                <div ng-if="task.Spec.Resources.Limits.MemoryBytes">Memory limit: {{ task.Spec.Resources.Limits.MemoryBytes | humansize: 2 : 2 }}</div>
+                <div ng-if="task.Spec.Resources.Limits.NanoCPUs">CPU limit: {{ task.Spec.Resources.Limits.NanoCPUs / 1000000000 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

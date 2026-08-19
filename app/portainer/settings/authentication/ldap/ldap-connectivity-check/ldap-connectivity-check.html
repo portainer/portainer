@@ -1,0 +1,21 @@
+<div class="form-group">
+  <label class="col-sm-3 col-lg-2 control-label vertical-center text-left">
+    Connectivity check
+    <pr-icon icon="'check'" mode="'success'" ng-if="$ctrl.state.successfulConnectivityCheck"></pr-icon>
+    <pr-icon icon="'x'" mode="'danger'" ng-if="$ctrl.state.failedConnectivityCheck"></pr-icon>
+  </label>
+  <div class="col-sm-9 col-lg-10">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      ng-disabled="($ctrl.state.connectivityCheckInProgress) || (!$ctrl.settings.URLs.length) || ((!$ctrl.settings.ReaderDN || !$ctrl.settings.Password) && !$ctrl.settings.AnonymousMode)"
+      ng-click="$ctrl.connectivityCheck()"
+      button-spinner="$ctrl.state.connectivityCheckInProgress"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
+      <span ng-hide="$ctrl.state.connectivityCheckInProgress">Test connectivity</span>
+      <span ng-show="$ctrl.state.connectivityCheckInProgress">Testing connectivity...</span>
+    </button>
+  </div>
+</div>

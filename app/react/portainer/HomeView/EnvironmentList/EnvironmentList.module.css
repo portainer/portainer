@@ -1,0 +1,74 @@
+.actionBar {
+  margin-left: 15px !important;
+  margin-right: 15px !important;
+}
+
+.actionBar .description {
+  margin-bottom: 10px;
+}
+
+.refresh-environments-button {
+  margin-left: 0 !important;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0px 5px;
+}
+
+.filter-container input[type='text'] {
+  background: none !important;
+  border: 0px !important;
+}
+
+.filter-left {
+  width: 15%;
+}
+
+.filter-right {
+  width: 20%;
+  margin-left: auto;
+}
+
+.filter-button {
+  margin-left: 10px;
+  padding: 10px 0px;
+  width: 5%;
+  display: inline-block;
+}
+
+.clear-button {
+  white-space: nowrap;
+
+  border: 0px;
+
+  background: transparent;
+  margin: 0;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-button {
+  display: inline-block;
+  width: fit-content;
+}
+
+.kubeconfig-button {
+  display: inline-block;
+  width: fit-content;
+}
+
+.filterSearchbar {
+  display: inline-block;
+  width: 100%;
+}
+
+.filterSearchbar input[type='text'] {
+  background: none !important;
+  border: 0px !important;
+}

@@ -1,0 +1,125 @@
+package websocket
+
+import (
+	"net/http"
+	"net/url"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+)
+
+// @summary Execute a websocket on kubectl shell pod
+// @description The request will be upgraded to the websocket protocol. The request will proxy input from the client to the pod via long-lived websocket connection.
+// @description **Access policy**: authenticated
+// @security ApiKeyAuth
+// @security jwt
+// @tags websocket
+// @accept json
+// @produce json
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Environment not found"
+// @failure 500 "Server error"
+// @router /websocket/kubernetes-shell [get]
+func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.NotFound("Unable to find the environment in the database", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find the environment in the database", err)
+	}
+
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access environment", err)
+	}
+
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
+	}
+
+	cli, err := handler.KubernetesClientFactory.GetPrivilegedKubeClient(endpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
+	}
+
+	serviceAccount, err := cli.GetPortainerUserServiceAccount(tokenData)
+	if err != nil {
+		return httperror.InternalServerError("Unable to find serviceaccount associated with user", err)
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return httperror.InternalServerError("Unable read settings", err)
+	}
+
+	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name, settings.KubectlShellImage)
+	if err != nil {
+		return httperror.InternalServerError("Unable to create user shell", err)
+	}
+
+	// Modifying request params mid-flight before forwarding to K8s API server (websocket)
+	setPodExecTarget(r.URL, shellPod)
+
+	// Modify url path mid-flight before forewarding to k8s API server (websocket)
+	r.URL.Path = "/websocket/pod"
+
+	/*
+		Note: The following websocket proxying logic is duplicated from `api/http/handler/websocket/pod.go`
+	*/
+	params := &webSocketRequestParams{
+		endpoint: endpoint,
+	}
+
+	r.Header.Del("Origin")
+
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		err := handler.proxyAgentWebsocketRequest(w, r, params)
+		if err != nil {
+			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
+		}
+		return nil
+	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
+		if err != nil {
+			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
+		}
+		return nil
+	}
+
+	handlerErr := handler.hijackPodExecStartOperation(
+		w,
+		r,
+		cli,
+		"",
+		true,
+		endpoint,
+		shellPod.Namespace,
+		shellPod.PodName,
+		shellPod.ContainerName,
+		shellPod.ShellExecCommand,
+	)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	return nil
+}
+
+func setPodExecTarget(u *url.URL, shellPod *portainer.KubernetesShellPod) {
+	q := u.Query()
+	q.Set("namespace", shellPod.Namespace)
+	q.Set("podName", shellPod.PodName)
+	q.Set("containerName", shellPod.ContainerName)
+	q.Set("command", shellPod.ShellExecCommand)
+	u.RawQuery = q.Encode()
+}

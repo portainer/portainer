@@ -1,0 +1,25 @@
+{
+  // Separate tsconfig for type-checking auto-generated API client files only.
+  // These files use .ts import extensions and hey-api internals that conflict
+  // with the main tsconfig's strict settings and axios module augmentation.
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": false,
+    "module": "es6",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "baseUrl": "app",
+    "paths": {
+      "@/*": ["./*", "../app/*"]
+    },
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "include": ["app/react/portainer/generated-api"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,11 @@
+.sensitive-details-container {
+  display: grid;
+  grid-template-columns: 25ch 25ch auto;
+  gap: 20px;
+  align-items: start;
+}
+
+.show-hide-container {
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,0 +1,16 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <pr-icon icon="'zap'" class-name="'mr-0.5'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+      </div>
+
+      <div class="blocklist">
+        <product-item ng-repeat="product in $ctrl.products" model="product" go-to="$ctrl.goTo"></product-item>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

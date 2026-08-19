@@ -1,0 +1,52 @@
+import { Meta, StoryFn } from '@storybook/react-webpack5';
+import { useEffect, useState } from 'react';
+
+import { Slider, Props } from './Slider';
+
+export default {
+  component: Slider,
+  title: 'Components/Forms/Slider',
+} as Meta;
+
+function Template({
+  value,
+  min,
+  max,
+  step,
+  dataCy,
+  visibleTooltip,
+}: JSX.IntrinsicAttributes & Props) {
+  const [sliderValue, setSliderValue] = useState(min);
+
+  useEffect(() => {
+    setSliderValue(value);
+  }, [value]);
+
+  return (
+    <Slider
+      min={min}
+      max={max}
+      step={step}
+      value={sliderValue}
+      onChange={(value) => {
+        if (Array.isArray(value)) {
+          setSliderValue(value[0]);
+        } else {
+          setSliderValue(value);
+        }
+      }}
+      dataCy={dataCy}
+      visibleTooltip={visibleTooltip}
+    />
+  );
+}
+
+export const Primary: StoryFn<Props> = Template.bind({});
+Primary.args = {
+  min: 0,
+  max: 100,
+  step: 1,
+  value: 5,
+  visibleTooltip: true,
+  dataCy: 'someView-coolSlider',
+};

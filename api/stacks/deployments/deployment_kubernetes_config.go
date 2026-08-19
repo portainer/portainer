@@ -1,0 +1,88 @@
+package deployments
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+	k "github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/rs/zerolog/log"
+)
+
+type KubernetesStackDeploymentConfig struct {
+	stack              *portainer.Stack
+	kubernetesDeployer portainer.KubernetesDeployer
+	appLabels          k.KubeAppLabels
+	user               *portainer.User
+	endpoint           *portainer.Endpoint
+	output             string
+}
+
+func CreateKubernetesStackDeploymentConfig(stack *portainer.Stack, kubeDeployer portainer.KubernetesDeployer, appLabels k.KubeAppLabels, user *portainer.User, endpoint *portainer.Endpoint) *KubernetesStackDeploymentConfig {
+	return &KubernetesStackDeploymentConfig{
+		stack:              stack,
+		kubernetesDeployer: kubeDeployer,
+		appLabels:          appLabels,
+		user:               user,
+		endpoint:           endpoint,
+	}
+}
+
+func (config *KubernetesStackDeploymentConfig) Deploy(ctx context.Context) error {
+	fileNames := stackutils.GetStackFilePaths(config.stack, false)
+
+	manifestFilePaths := make([]string, 0, len(fileNames))
+
+	tmpDir, err := os.MkdirTemp("", "kub_deployment")
+	if err != nil {
+		return errors.Wrap(err, "failed to create temp kub deployment directory")
+	}
+
+	defer func() {
+		if err := os.RemoveAll(tmpDir); err != nil {
+			log.Warn().Err(err).Msg("failed to remove temp kub deployment directory")
+		}
+	}()
+
+	for _, fileName := range fileNames {
+		manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
+		manifestContent, err := os.ReadFile(filesystem.JoinPaths(config.stack.ProjectPath, fileName))
+		if err != nil {
+			return errors.Wrap(err, "failed to read manifest file")
+		}
+
+		manifestContent, err = k.AddAppLabels(manifestContent, config.appLabels.ToMap())
+		if err != nil {
+			return errors.Wrap(err, "failed to add application labels")
+		}
+
+		if err := filesystem.WriteToFile(manifestFilePath, manifestContent); err != nil {
+			return errors.Wrap(err, "failed to create temp manifest file")
+		}
+
+		manifestFilePaths = append(manifestFilePaths, manifestFilePath)
+	}
+
+	output, err := config.kubernetesDeployer.Deploy(ctx, config.user.ID, config.endpoint, manifestFilePaths, config.stack.Namespace)
+	if err != nil {
+		return fmt.Errorf("failed to deploy kubernete stack: %w", err)
+	}
+
+	config.output = output
+	return nil
+}
+
+func (config *KubernetesStackDeploymentConfig) Undeploy(ctx context.Context) error {
+	// Kubernetes is an orchestrator that handles partial failures internally,
+	// so there is no need to remove failed resources before redeploying.
+	// This method exists only to satisfy the deployment interface.
+	return nil
+}
+
+func (config *KubernetesStackDeploymentConfig) GetResponse() string {
+	return config.output
+}

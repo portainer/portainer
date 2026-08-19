@@ -1,0 +1,362 @@
+package stacks
+
+import (
+	"fmt"
+	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/git/update"
+	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/stackbuilders"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	valid "github.com/portainer/portainer/pkg/validate"
+
+	"github.com/pkg/errors"
+)
+
+type swarmStackFromFileContentPayload struct {
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+	// Swarm cluster identifier
+	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
+	// Content of the Stack file
+	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
+}
+
+func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
+	if len(payload.Name) == 0 {
+		return errors.New("Invalid stack name")
+	}
+	if len(payload.SwarmID) == 0 {
+		return errors.New("Invalid Swarm ID")
+	}
+	if len(payload.StackFileContent) == 0 {
+		return errors.New("Invalid stack file content")
+	}
+	return nil
+}
+
+func createStackPayloadFromSwarmFileContentPayload(name string, swarmID string, fileContent string, env []portainer.Pair, fromAppTemplate bool) stackbuilders.StackPayload {
+	return stackbuilders.StackPayload{
+		Name:             name,
+		SwarmID:          swarmID,
+		StackFileContent: []byte(fileContent),
+		Env:              env,
+		FromAppTemplate:  fromAppTemplate,
+	}
+}
+
+// @id StackCreateDockerSwarmString
+// @summary Deploy a new swarm stack from a text
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body swarmStackFromFileContentPayload true "stack config"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/string [post]
+func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	var payload swarmStackFromFileContentPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
+
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
+	if err != nil {
+		return httperror.InternalServerError("Unable to check for name collision", err)
+	}
+	if !isUnique {
+		return stackExistsError(payload.Name)
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	stackPayload := createStackPayloadFromSwarmFileContentPayload(payload.Name, payload.SwarmID, payload.StackFileContent, payload.Env, payload.FromAppTemplate)
+
+	swarmStackBuilder := stackbuilders.CreateSwarmStackFileBuilder(securityContext,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer)
+
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, swarmStackBuilder, &stackPayload, endpoint, userID)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return handler.decorateStackResponse(w, stack, userID)
+}
+
+type swarmStackFromGitRepositoryPayload struct {
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+	// Swarm cluster identifier
+	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
+
+	// SourceID references an existing Source for git credentials/URL.
+	// When set, the inline URL and authentication fields are ignored.
+	SourceID portainer.SourceID `example:"1"`
+	// Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
+	RepositoryURL string `example:"https://github.com/openfaas/faas"`
+	// Reference name of a Git repository hosting the Stack file
+	RepositoryReferenceName string `example:"refs/heads/master"`
+	// Deprecated: use SourceID instead. Use basic authentication to clone the Git repository.
+	RepositoryAuthentication bool `example:"true"`
+	// Deprecated: use SourceID instead. Username used in basic authentication.
+	RepositoryUsername string `example:"myGitUsername"`
+	// Deprecated: use SourceID instead. Password used in basic authentication.
+	RepositoryPassword string `example:"myGitPassword"`
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
+	// Path to the Stack file inside the Git repository
+	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	// Applicable when deploying with multiple stack files
+	AdditionalFiles []string `example:"[nz.compose.yml, uat.compose.yml]"`
+	// Optional GitOps update configuration
+	AutoUpdate *portainer.AutoUpdateSettings
+	// Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
+	TLSSkipVerify bool `example:"false"`
+}
+
+func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
+	if len(payload.Name) == 0 {
+		return errors.New("Invalid stack name")
+	}
+	if len(payload.SwarmID) == 0 {
+		return errors.New("Invalid Swarm ID")
+	}
+
+	if payload.SourceID == 0 {
+		if len(payload.RepositoryURL) == 0 || !valid.IsURL(payload.RepositoryURL) {
+			return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		}
+		if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
+			return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
+		}
+	}
+
+	return update.ValidateAutoUpdateSettings(payload.AutoUpdate)
+}
+
+func createStackPayloadFromSwarmGitPayload(name, swarmID, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool, sourceID portainer.SourceID) stackbuilders.StackPayload {
+	return stackbuilders.StackPayload{
+		Name:    name,
+		SwarmID: swarmID,
+		RepositoryConfigPayload: stackbuilders.RepositoryConfigPayload{
+			SourceID:       sourceID,
+			URL:            repoUrl,
+			ReferenceName:  repoReference,
+			Authentication: repoAuthentication,
+			Username:       repoUsername,
+			Password:       repoPassword,
+			TLSSkipVerify:  repoSkipSSLVerify,
+		},
+		ComposeFile:     composeFile,
+		AdditionalFiles: additionalFiles,
+		AutoUpdate:      autoUpdate,
+		Env:             env,
+		FromAppTemplate: fromAppTemplate,
+	}
+}
+
+// @id StackCreateDockerSwarmRepository
+// @summary Deploy a new swarm stack from a git repository
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @accept json
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @param body body swarmStackFromGitRepositoryPayload true "stack config"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 409 "Stack name or webhook ID already exists"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/repository [post]
+func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	var payload swarmStackFromGitRepositoryPayload
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
+
+	if isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true); err != nil {
+		return httperror.InternalServerError("Unable to check for name collision", err)
+	} else if !isUnique {
+		return stackExistsError(payload.Name)
+	}
+
+	//make sure the webhook ID is unique
+	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
+		if isUnique, err := handler.checkUniqueWebhookID(handler.DataStore, payload.AutoUpdate.Webhook); err != nil {
+			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
+		} else if !isUnique {
+			return httperror.Conflict(fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), stackutils.ErrWebhookIDAlreadyExists)
+		}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
+	}
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+	if payload.SourceID != 0 {
+		if _, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, userContext, payload.SourceID); httpErr != nil {
+			return httpErr
+		}
+	}
+
+	stackPayload := createStackPayloadFromSwarmGitPayload(payload.Name,
+		payload.SwarmID,
+		payload.RepositoryURL,
+		payload.RepositoryReferenceName,
+		payload.RepositoryUsername,
+		payload.RepositoryPassword,
+		payload.RepositoryAuthentication,
+		payload.ComposeFile,
+		payload.AdditionalFiles,
+		payload.AutoUpdate,
+		payload.Env,
+		payload.FromAppTemplate,
+		payload.TLSSkipVerify,
+		payload.SourceID,
+	)
+
+	swarmStackBuilder := stackbuilders.CreateSwarmStackGitBuilder(securityContext,
+		handler.DataStore,
+		handler.FileService,
+		handler.GitService,
+		handler.SourceScheduler,
+		handler.StackDeployer)
+
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, swarmStackBuilder, &stackPayload, endpoint, userID)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return handler.decorateStackResponse(w, stack, userID)
+}
+
+type swarmStackFromFileUploadPayload struct {
+	Name             string
+	SwarmID          string
+	StackFileContent []byte
+	Env              []portainer.Pair
+}
+
+func createStackPayloadFromSwarmFileUploadPayload(name, swarmID string, fileContentBytes []byte, env []portainer.Pair) stackbuilders.StackPayload {
+	return stackbuilders.StackPayload{
+		Name:             name,
+		SwarmID:          swarmID,
+		StackFileContent: fileContentBytes,
+		Env:              env,
+	}
+}
+
+func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error {
+	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
+	if err != nil {
+		return errors.New("Invalid stack name")
+	}
+	payload.Name = name
+
+	swarmID, err := request.RetrieveMultiPartFormValue(r, "SwarmID", false)
+	if err != nil {
+		return errors.New("Invalid Swarm ID")
+	}
+	payload.SwarmID = swarmID
+
+	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
+	if err != nil {
+		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
+	}
+	payload.StackFileContent = composeFileContent
+
+	var env []portainer.Pair
+	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
+	if err != nil {
+		return errors.New("Invalid Env parameter")
+	}
+	payload.Env = env
+	return nil
+}
+
+// @id StackCreateDockerSwarmFile
+// @summary Deploy a new swarm stack from a file
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Name formData string false "Name of the stack"
+// @param SwarmID formData string false "Swarm cluster identifier."
+// @param Env formData string false "Environment variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional"
+// @param file formData file false "Stack file"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
+// @success 200 {object} portainer.Stack
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks/create/swarm/file [post]
+func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	var payload swarmStackFromFileUploadPayload
+	err := payload.Validate(r)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
+
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
+
+	if err != nil {
+		return httperror.InternalServerError("Unable to check for name collision", err)
+	}
+	if !isUnique {
+		return stackExistsError(payload.Name)
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	stackPayload := createStackPayloadFromSwarmFileUploadPayload(payload.Name, payload.SwarmID, payload.StackFileContent, payload.Env)
+
+	swarmStackBuilder := stackbuilders.CreateSwarmStackFileBuilder(securityContext,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer)
+
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, swarmStackBuilder, &stackPayload, endpoint, userID)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return handler.decorateStackResponse(w, stack, userID)
+}

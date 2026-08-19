@@ -1,0 +1,78 @@
+.root {
+  width: 500px;
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  background: red;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.notification-container {
+  display: flex;
+  border-bottom: 1px solid var(--ui-gray-4);
+  padding: 5px 10px;
+  margin-bottom: 15px;
+}
+
+.item-last {
+  margin-left: auto;
+}
+
+.notifications {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.notification {
+  border-bottom: 1px solid var(--ui-gray-3);
+  border-radius: 0;
+}
+
+.container {
+  display: flex;
+}
+.notificationIcon {
+  flex-basis: 5rem;
+  width: 5rem;
+}
+.notificationBody {
+  flex-basis: 80rem;
+}
+.deleteButton {
+  flex-basis: 5rem;
+}
+
+.notification-details {
+  word-break: break-all;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+.container > div {
+  padding: 0px 10px;
+  margin: auto;
+}
+
+.notification-title {
+  font-weight: 700;
+}
+
+.notification-link {
+  border-top: 1px solid var(--ui-gray-4);
+  padding: 10px;
+  text-align: center;
+}

@@ -1,0 +1,69 @@
+<page-header
+  title="'Task details'"
+  breadcrumbs="[
+    { label:'Services', link:'docker.services' },
+    {
+      label: service.Name,
+      link: 'docker.services.service',
+      linkParams:{ id: service.Id }
+    }, task.Id]"
+>
+</page-header>
+
+<div class="row" ng-if="task && service">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="list" title-text="Task status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>{{ task.Id }}</td>
+            </tr>
+            <tr>
+              <td>State</td>
+              <td
+                ><span class="label label-{{ task.Status.State | taskstatusbadge }}">{{ task.Status.State }}</span></td
+              >
+            </tr>
+            <tr>
+              <td>State Message</td>
+              <td>{{ task.Status.Message }}</td>
+            </tr>
+            <tr ng-if="task.Status.Err">
+              <td>Error message</td>
+              <td
+                ><code>{{ task.Status.Err }}</code></td
+              >
+            </tr>
+            <tr>
+              <td>Image</td>
+              <td>{{ task.Spec.ContainerSpec.Image | hideshasum }}</td>
+            </tr>
+            <tr ng-if="service.Mode !== 'global'">
+              <td>Slot</td>
+              <td>{{ task.Slot }}</td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ task.Created | getisodate }}</td>
+            </tr>
+            <tr ng-if="task.Status.ContainerStatus.ContainerID">
+              <td>Container ID</td>
+              <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
+            </tr>
+            <tr ng-if="applicationState.endpoint.apiVersion >= 1.3 && task.Status.State | taskhaslogs">
+              <td colspan="2"
+                ><a class="btn btn-primary btn-sm" type="button" ui-sref="docker.tasks.task.logs({id: task.Id})">
+                  <pr-icon icon="'file-text'"></pr-icon>
+                  Task logs</a
+                ></td
+              >
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

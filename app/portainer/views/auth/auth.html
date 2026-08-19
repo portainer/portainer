@@ -1,0 +1,145 @@
+<div class="page-wrapper">
+  <!-- login box -->
+  <div class="simple-box container">
+    <div class="col-sm-4 col-sm-offset-4">
+      <!-- login box logo -->
+      <div class="row">
+        <div ng-if="!ctrl.logo">
+          <img src="~@/assets/images/logo_alt.svg" class="simple-box-logo hidden th-highcontrast:!block th-dark:!block" alt="Portainer" />
+          <img src="~@/assets/images/logo_alt_black.svg" class="simple-box-logo block th-highcontrast:hidden th-dark:hidden" alt="Portainer" />
+        </div>
+        <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
+      </div>
+      <!-- !login box logo -->
+
+      <div class="row p-5 text-center">
+        <p class="text-xl">Log in to your account</p>
+        <p class="text-md text-muted fw-bold">Welcome back! Please enter your details</p>
+      </div>
+
+      <!-- login panel -->
+      <div class="panel panel-default" ng-if="!ctrl.state.loginInProgress">
+        <div class="panel-body">
+          <!-- login form -->
+          <form class="simple-box-form form-horizontal">
+            <div class="form-group">
+              <div class="col-sm-12" style="display: flex; justify-content: center" ng-if="ctrl.state.showOAuthLogin">
+                <a ng-href="{{ ctrl.OAuthLoginURI }}">
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
+                    <pr-icon icon="'svg-microsoft'"></pr-icon>
+                    Login with Microsoft
+                  </div>
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Google'">
+                    <pr-icon icon="'svg-google'"></pr-icon>
+                    Login with Google
+                  </div>
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Github'">
+                    <pr-icon icon="'svg-github'"></pr-icon>
+                    Login with GitHub
+                  </div>
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
+                    <pr-icon icon="'log-in'"></pr-icon>
+                    Login with OAuth
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <!-- divider -->
+            <div class="form-group" ng-if="ctrl.state.showOAuthLogin">
+              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center">
+                <div class="striketext small text-muted" style="display: flex; align-items: center; justify-content: center; width: 90%">or</div>
+              </div>
+            </div>
+
+            <!-- use internal auth button -->
+            <div class="form-group" ng-if="ctrl.state.showOAuthLogin && !ctrl.state.showStandardLogin">
+              <div class="col-sm-12" style="display: flex; justify-content: center">
+                <div class="btn btn-primary btn-md btn-block" style="margin-left: 2px" ng-click="ctrl.toggleStandardLogin()"> Use internal authentication </div>
+              </div>
+            </div>
+
+            <!-- !username input -->
+            <div ng-if="ctrl.state.showStandardLogin">
+              <div class="pb-2">Username</div>
+              <input
+                id="username"
+                type="text"
+                data-cy="auth-usernameInput"
+                class="form-control"
+                name="username"
+                ng-model="ctrl.formValues.Username"
+                auto-focus
+                placeholder="Enter your username"
+              />
+            </div>
+
+            <!-- password input -->
+            <div ng-if="ctrl.state.showStandardLogin">
+              <div class="pb-2">Password</div>
+              <div class="relative">
+                <input
+                  id="password"
+                  ng-attr-type="{{ ctrl.state.passwordInputType }}"
+                  class="form-control pr-10"
+                  name="password"
+                  ng-model="ctrl.formValues.Password"
+                  autocomplete="off"
+                  data-cy="auth-passwordInput"
+                  placeholder="Enter your password"
+                  ng-trim="false"
+                />
+                <button
+                  data-cy="auth-passwordInputToggle"
+                  type="button"
+                  ng-click="ctrl.toggleShowPassword()"
+                  class="absolute right-0 top-0 flex h-[34px] w-[50px] items-center justify-center border-none bg-transparent"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="top"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="{{ ctrl.state.passwordInputType === 'password' ? 'Show password' : 'Hide password' }}"
+                >
+                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye-off' : 'eye'" size="'md'"></pr-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group overflow-auto" ng-if="ctrl.state.showStandardLogin">
+              <!-- login button -->
+              <div class="col-sm-12 d-flex py-1">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg btn-block"
+                  ng-click="ctrl.authenticateUser()"
+                  button-spinner="ctrl.state.loginInProgress"
+                  ng-disabled="ctrl.state.loginInProgress"
+                  data-cy="auth-loginButton"
+                >
+                  <span ng-hide="ctrl.state.loginInProgress">Login</span>
+                  <span ng-show="ctrl.state.loginInProgress">Login in progress...</span>
+                </button>
+              </div>
+            </div>
+          </form>
+          <!-- !login form -->
+
+          <!-- error message -->
+          <div class="pull-right" ng-if="ctrl.state.AuthenticationError">
+            <pr-icon icon="'alert-triangle'" mode="'danger'"></pr-icon>
+            <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- !login panel -->
+      <div class="panel panel-default" ng-show="ctrl.state.loginInProgress">
+        <div class="panel-body">
+          <div class="form-group text-center">
+            <span class="small text-muted">Authentication in progress... <span button-spinner="true"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- !login box -->
+</div>

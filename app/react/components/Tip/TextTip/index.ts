@@ -1,0 +1,1 @@
+export { TextTip } from './TextTip';

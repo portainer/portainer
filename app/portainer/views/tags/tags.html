@@ -1,0 +1,64 @@
+<page-header title="'Tags'" breadcrumbs="['Tag management']" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="plus" title-text="Add a new tag"> </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="tagCreationForm" ng-submit="createTag()">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="name" class="col-sm-2 control-label required text-left"> Name </label>
+            <div class="col-sm-10">
+              <input
+                type="text"
+                data-cy="tag-name-input"
+                class="form-control"
+                name="name"
+                ng-model="formValues.Name"
+                ng-change="checkNameValidity(tagCreationForm)"
+                placeholder="org/acme"
+                required
+                auto-focus
+              />
+              <div class="help-block" ng-show="tagCreationForm.name.$invalid">
+                <div class="small text-warning">
+                  <div ng-messages="tagCreationForm.name.$error">
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                      This field is required.
+                    </p>
+                    <p ng-message="validName" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                      This tag already exists.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !tagCreationForm.$valid"
+                ng-click="createTag()"
+                button-spinner="state.actionInProgress"
+              >
+                <span ng-hide="state.actionInProgress" class="vertical-center">
+                  <pr-icon icon="'plus'"></pr-icon>
+                  Create tag
+                </span>
+                <span ng-show="state.actionInProgress">Creating tag...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<tags-datatable dataset="tags" on-remove="(removeAction)"></tags-datatable>

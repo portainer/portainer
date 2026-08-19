@@ -1,0 +1,197 @@
+import angular from 'angular';
+
+import { r2a } from '@/react-tools/react2angular';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
+import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { AnnotationsBeTeaser } from '@/react/kubernetes/annotations/AnnotationsBeTeaser';
+import { withFormValidation } from '@/react-tools/withFormValidation';
+import { withControlledInput } from '@/react-tools/withControlledInput';
+
+import {
+  EnvironmentVariablesFieldset,
+  EnvironmentVariablesPanel,
+  envVarValidation,
+} from '@@/form-components/EnvironmentVariablesFieldset';
+import { Icon } from '@@/Icon';
+import { ReactQueryDevtoolsWrapper } from '@@/ReactQueryDevtoolsWrapper';
+import { PageHeader } from '@@/PageHeader';
+import { Loading } from '@@/Widget/Loading';
+import { PasswordCheckHint } from '@@/PasswordCheckHint';
+import { Tooltip } from '@@/Tip/Tooltip';
+import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
+import { TerminalTooltip } from '@@/TerminalTooltip';
+import { Terminal } from '@@/Terminal/Terminal';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
+import { BETeaserButton } from '@@/BETeaserButton';
+import { CodeEditor } from '@@/CodeEditor';
+import { TextTip } from '@@/Tip/TextTip';
+
+import { fileUploadField } from './file-upload-field';
+import { switchField } from './switch-field';
+import { customTemplatesModule } from './custom-templates';
+import { gitFormModule } from './git-form';
+import { settingsModule } from './settings';
+import { accessControlModule } from './access-control';
+import { environmentsModule } from './environments';
+import { registriesModule } from './registries';
+import { accountModule } from './account';
+import { usersModule } from './users';
+import { activityLogsModule } from './activity-logs';
+import { rbacModule } from './rbac';
+import { stacksModule } from './stacks';
+import { authModule } from './auth';
+
+export const ngModule = angular
+  .module('portainer.app.react.components', [
+    authModule,
+    accessControlModule,
+    customTemplatesModule,
+    environmentsModule,
+    gitFormModule,
+    registriesModule,
+    settingsModule,
+    accountModule,
+    usersModule,
+    activityLogsModule,
+    rbacModule,
+    stacksModule,
+  ])
+  .component(
+    'beTeaserButton',
+    r2a(BETeaserButton, [
+      'featureId',
+      'heading',
+      'message',
+      'buttonText',
+      'className',
+      'buttonClassName',
+      'data-cy',
+    ])
+  )
+  .component(
+    'portainerTooltip',
+    r2a(Tooltip, ['message', 'position', 'className', 'setHtmlMessage', 'size'])
+  )
+  .component('terminalTooltip', r2a(TerminalTooltip, []))
+  .component('fileUploadField', fileUploadField)
+  .component('porSwitchField', switchField)
+  .component(
+    'passwordCheckHint',
+    r2a(withReactQuery(PasswordCheckHint), [
+      'forceChangePassword',
+      'passwordValid',
+    ])
+  )
+  .component('rdLoading', r2a(Loading, []))
+  .component(
+    'tableColumnHeader',
+    r2a(TableColumnHeaderAngular, [
+      'colTitle',
+      'canSort',
+      'isSorted',
+      'isSortedDesc',
+    ])
+  )
+  .component(
+    'pageHeader',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(PageHeader))), [
+      'title',
+      'breadcrumbs',
+      'loading',
+      'onReload',
+      'reload',
+      'id',
+      'showTitle',
+    ])
+  )
+  .component('prIcon', r2a(Icon, ['className', 'icon', 'mode', 'size', 'spin']))
+  .component(
+    'reactQueryDevTools',
+    r2a(withReactQuery(ReactQueryDevtoolsWrapper), [])
+  )
+  .component(
+    'porSelect',
+    r2a(PortainerSelect, [
+      'name',
+      'inputId',
+      'placeholder',
+      'disabled',
+      'data-cy',
+      'bindToBody',
+      'value',
+      'onChange',
+      'options',
+      'isMulti',
+      'filterOption',
+      'isClearable',
+      'components',
+      'isLoading',
+      'noOptionsMessage',
+      'aria-label',
+      'size',
+      'loadingMessage',
+      'getOptionValue',
+      'onBlur',
+    ])
+  )
+  .component(
+    'reactCodeEditor',
+    r2a(CodeEditor, [
+      'id',
+      'textTip',
+      'type',
+      'readonly',
+      'onChange',
+      'value',
+      'height',
+      'data-cy',
+      'versions',
+      'onVersionChange',
+      'schema',
+      'fileName',
+      'placeholder',
+      'showToolbar',
+      'aria-label',
+    ])
+  )
+  .component(
+    'textTip',
+    r2a(TextTip, [
+      'className',
+      'color',
+      'icon',
+      'inline',
+      'children',
+      'childrenWrapperClassName',
+    ])
+  )
+  .component('annotationsBeTeaser', r2a(AnnotationsBeTeaser, []))
+  .component(
+    'shellTerminal',
+    r2a(Terminal, [
+      'url',
+      'connect',
+      'onStateChange',
+      'onResize',
+      'initialCommands',
+    ])
+  );
+
+export const componentsModule = ngModule.name;
+
+withFormValidation(
+  ngModule,
+  withControlledInput(EnvironmentVariablesFieldset, { values: 'onChange' }),
+  'environmentVariablesFieldset',
+  ['canUndoDelete'],
+  envVarValidation
+);
+
+withFormValidation(
+  ngModule,
+  withControlledInput(EnvironmentVariablesPanel, { values: 'onChange' }),
+  'environmentVariablesPanel',
+  ['explanation', 'showHelpMessage', 'isFoldable'],
+  envVarValidation
+);

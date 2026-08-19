@@ -1,0 +1,73 @@
+import { StoryFn } from '@storybook/react-webpack5';
+
+import {
+  Environment,
+  EnvironmentStatus,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
+
+import { EnvironmentItem } from './EnvironmentItem';
+
+export default {
+  component: EnvironmentItem,
+  title: 'Components/Home/EnvironmentList/EnvironmentItem',
+};
+
+interface Args {
+  environment: Environment;
+}
+
+function Template({ environment }: Args) {
+  return (
+    <EnvironmentItem
+      environment={environment}
+      onClickBrowse={() => {}}
+      onClickDisconnect={() => {}}
+      isActive={false}
+    />
+  );
+}
+
+export const DockerEnvironment: StoryFn<Args> = Template.bind({});
+DockerEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.Docker),
+};
+
+export const DockerAgentEnvironment: StoryFn<Args> = Template.bind({});
+DockerAgentEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.AgentOnDocker),
+};
+
+export const DockerEdgeEnvironment: StoryFn<Args> = Template.bind({});
+DockerEdgeEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.EdgeAgentOnDocker),
+};
+
+export const AzureEnvironment: StoryFn<Args> = Template.bind({});
+AzureEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.Azure),
+};
+
+export const KubernetesLocalEnvironment: StoryFn<Args> = Template.bind({});
+KubernetesLocalEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.KubernetesLocal),
+};
+
+export const KubernetesAgentEnvironment: StoryFn<Args> = Template.bind({});
+KubernetesAgentEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.AgentOnKubernetes),
+};
+
+export const KubernetesEdgeEnvironment: StoryFn<Args> = Template.bind({});
+KubernetesEdgeEnvironment.args = {
+  environment: mockEnvironment(EnvironmentType.EdgeAgentOnKubernetes),
+};
+
+function mockEnvironment(type: EnvironmentType): Environment {
+  const env = createMockEnvironment();
+  env.Type = type;
+  env.Status = EnvironmentStatus.Up;
+
+  return env;
+}

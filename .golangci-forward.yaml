@@ -1,0 +1,13 @@
+version: '2'
+run:
+  allow-parallel-runners: true
+linters:
+  default: none
+  enable:
+    - forbidigo
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: ^dataservices.DataStore.(EdgeGroup|EdgeJob|EdgeStack|EndpointRelation|Endpoint|GitCredential|Registry|ResourceControl|Role|Settings|Snapshot|SSLSettings|Stack|Tag|User)$
+          msg: Use a transaction instead
+      analyze-types: true

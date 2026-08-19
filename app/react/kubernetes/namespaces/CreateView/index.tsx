@@ -1,0 +1,1 @@
+export { CreateNamespaceView } from './CreateNamespaceView';

@@ -1,0 +1,52 @@
+root = "."
+testdata_dir = "testdata"
+tmp_dir = ".tmp"
+
+[build]
+  args_bin = []
+  bin = "./dist/portainer"
+  cmd = "SKIP_GO_GET=true make build-server"
+  delay = 1000
+  exclude_dir = []
+  exclude_file = []
+  exclude_regex = ["_test.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = "./dist/portainer --log-level=DEBUG"
+  include_dir = ["api"]
+  include_ext = ["go"]
+  include_file = []
+  kill_delay = "0s"
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  post_cmd = []
+  pre_cmd = []
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = false
+  stop_on_error = false
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  silent = false
+  time = false
+
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

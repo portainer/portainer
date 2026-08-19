@@ -1,0 +1,104 @@
+<!-- use registry -->
+<div class="row">
+  <div class="form-group" ng-if="$ctrl.model.UseRegistry">
+    <label for="image_registry" class="control-label col-sm-3 col-lg-2 text-left" ng-class="$ctrl.labelClass"> Registry </label>
+    <div ng-class="$ctrl.inputClass" class="col-sm-8">
+      <select
+        data-cy="component-registrySelect"
+        ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
+        ng-model="$ctrl.model.Registry"
+        id="image_registry"
+        class="form-control"
+        data-cy="component-registrySelect"
+      ></select>
+    </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.model.UseRegistry">
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image</label>
+    <div ng-class="$ctrl.inputClass" class="col-sm-8">
+      <div class="input-group">
+        <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
+        <input
+          type="text"
+          data-cy="component-imageInput"
+          class="form-control"
+          aria-describedby="registry-name"
+          uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
+          ng-model="$ctrl.model.Image"
+          name="image_name"
+          placeholder="e.g. my-image:my-tag"
+          ng-change="$ctrl.onImageChange()"
+          required
+        />
+        <span ng-if="$ctrl.isDockerHubRegistry()" class="input-group-btn">
+          <a
+            href="https://hub.docker.com/search?type=image&q={{ $ctrl.model.Image | trimshasum | trimversiontag }}"
+            class="btn btn-default vertical-center"
+            title="Search image on Docker Hub"
+            target="_blank"
+          >
+            <pr-icon icon="'svg-docker'" size="'md'"></pr-icon> Search
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+  <!-- ! use registry -->
+  <!-- don't use registry -->
+  <div ng-if="!$ctrl.model.UseRegistry">
+    <div class="form-group">
+      <span class="small">
+        <p class="text-muted ml-4"> When using advanced mode, image and repository <b>must be</b> publicly available. </p>
+      </span>
+      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label col-sm-3 col-lg-2 required text-left">Image </label>
+      <div ng-class="$ctrl.inputClass" class="col-sm-8">
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.model.Image"
+          name="image_name"
+          placeholder="e.g. registry:port/my-image:my-tag"
+          required
+          data-cy="component-imageInput"
+        />
+      </div>
+    </div>
+  </div>
+  <!-- ! don't use registry -->
+  <!-- info message -->
+  <div class="form-group" ng-show="$ctrl.form.image_name.$invalid">
+    <div class="small">
+      <div class="col-sm-3 col-lg-2"></div>
+      <div class="col-sm-8" ng-messages="$ctrl.form.image_name.$error">
+        <p class="text-warning vertical-center" ng-message="required">
+          <pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> Image name is required.
+          <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- ! info message -->
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
+        <pr-icon icon="'database'"> </pr-icon> Simple mode
+      </button>
+      <button type="button" class="btn btn-link btn-sm vertical-center !ml-0 p-0 hover:no-underline" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
+        <pr-icon icon="'globe'"> </pr-icon> Advanced mode
+      </button>
+    </div>
+  </div>
+
+  <div ng-transclude></div>
+
+  <por-image-registry-rate-limits
+    ng-if="$ctrl.checkRateLimits && $ctrl.isDockerHubRegistry()"
+    endpoint="$ctrl.endpoint"
+    registry="$ctrl.model.Registry"
+    set-validity="$ctrl.setValidity"
+    is-authenticated="$ctrl.model.Registry.Authentication"
+    is-admin="$ctrl.isAdmin"
+    registry-id="$ctrl.model.Registry.Id"
+  >
+  </por-image-registry-rate-limits>
+</div>

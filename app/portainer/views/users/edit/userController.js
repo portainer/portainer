@@ -1,0 +1,135 @@
+import { ModalType } from '@@/modals';
+import { buildConfirmButton } from '@@/modals/utils';
+import { confirm, confirmChangePassword, confirmDelete } from '@@/modals/confirm';
+
+angular.module('portainer.app').controller('UserController', [
+  '$q',
+  '$scope',
+  '$state',
+  '$transition$',
+  'UserService',
+  'Notifications',
+  'SettingsService',
+  'Authentication',
+  function ($q, $scope, $state, $transition$, UserService, Notifications, SettingsService, Authentication) {
+    $scope.state = {
+      updatePasswordError: '',
+    };
+
+    $scope.formValues = {
+      username: '',
+      newPassword: '',
+      confirmPassword: '',
+      Administrator: false,
+    };
+
+    $scope.handleAdministratorChange = function (checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Administrator = checked;
+      });
+    };
+
+    $scope.deleteUser = function () {
+      confirmDelete('Do you want to remove this user? This user will not be able to login into Portainer anymore.').then((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        deleteUser();
+      });
+    };
+
+    $scope.updateUser = async function () {
+      const role = $scope.formValues.Administrator ? 1 : 2;
+      const oldUsername = $scope.user.Username;
+      const username = $scope.formValues.username;
+
+      if (username != oldUsername) {
+        const confirmed = await confirm({
+          title: 'Are you sure?',
+          modalType: ModalType.Warn,
+          message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
+          confirmButton: buildConfirmButton('Update'),
+        });
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      UserService.updateUser($scope.user.Id, { role, username })
+        .then(function success() {
+          Notifications.success('Success', 'User successfully updated');
+          $state.reload();
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to update user permissions');
+        });
+    };
+
+    $scope.updatePassword = async function () {
+      const isCurrentUser = Authentication.getUserDetails().ID === $scope.user.Id;
+      const confirmed = !isCurrentUser || (await confirmChangePassword());
+      if (!confirmed) {
+        return;
+      }
+      UserService.updateUser($scope.user.Id, { newPassword: $scope.formValues.newPassword })
+        .then(function success() {
+          Notifications.success('Success', 'Password successfully updated');
+
+          if (isCurrentUser) {
+            $state.go('portainer.logout');
+          } else {
+            $state.reload();
+          }
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to update user password');
+        });
+    };
+
+    function deleteUser() {
+      UserService.deleteUser($scope.user.Id)
+        .then(function success() {
+          Notifications.success('User successfully deleted', $scope.user.Username);
+          $state.go('portainer.users');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove user');
+        });
+    }
+
+    $scope.isSubmitEnabled = isSubmitEnabled;
+    function isSubmitEnabled() {
+      const { user, formValues } = $scope;
+      return user && (user.Username !== formValues.username || (formValues.Administrator && user.Role !== 1) || (!formValues.Administrator && user.Role === 1));
+    }
+
+    $scope.isDeleteDisabled = isDeleteDisabled;
+    function isDeleteDisabled() {
+      const { user } = $scope;
+      return user && user.Id === 1;
+    }
+
+    function initView() {
+      $scope.isAdmin = Authentication.isAdmin();
+
+      $q.all({
+        user: UserService.user($transition$.params().id),
+        settings: SettingsService.publicSettings(),
+      })
+        .then(function success(data) {
+          var user = data.user;
+          $scope.user = user;
+          $scope.formValues.Administrator = user.Role === 1;
+          $scope.formValues.username = user.Username;
+          $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve user information');
+        });
+    }
+
+    initView();
+  },
+]);

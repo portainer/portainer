@@ -1,0 +1,216 @@
+<page-header ng-if="ctrl.state.viewReady" title="'Create from code'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row kubernetes-deploy">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0">
+              <uib-tab-heading> <pr-icon icon="'code'"></pr-icon> Deploy </uib-tab-heading>
+              <form class="form-horizontal mt-6" name="ctrl.deploymentForm">
+                <div class="col-sm-12 form-section-title"> Deploy from </div>
+                <box-selector
+                  slim="true"
+                  radio-name="'method'"
+                  value="ctrl.state.BuildMethod"
+                  options="ctrl.methodOptions"
+                  data-cy="k8sAppDeploy-buildSelector"
+                  on-change="(ctrl.onChangeMethod)"
+                ></box-selector>
+
+                <!-- namespace -->
+                <div class="col-sm-12 form-section-title !mt-4"> Deploy to </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                  <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
+                    Use namespace(s) specified from manifest
+                    <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
+                    </portainer-tooltip>
+                  </label>
+                  <div class="col-sm-9 col-lg-10 vertical-center pt-1">
+                    <label class="switch">
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" data-cy="use-namespce-from-menifest" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div ng-if="!ctrl.formValues.namespace_toggle">
+                  <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                    <div class="col-sm-12">
+                      <k8s-registry-access-notice namespace="ctrl.formValues.Namespace"></k8s-registry-access-notice>
+                    </div>
+                  </div>
+                  <namespace-selector
+                    values="ctrl.formValues.Namespace"
+                    on-change="(ctrl.onChangeNamespace)"
+                    validation-data="{namespaceOptionCount: ctrl.namespaces.length}"
+                  ></namespace-selector>
+                </div>
+                <div class="form-group" ng-if="ctrl.formValues.namespace_toggle">
+                  <label class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
+                  <div class="col-sm-9 col-lg-10">
+                    <span class="small text-muted pt-[7px]">Namespaces specified in the manifest will be used</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <div class="col-sm-9 col-lg-10 text-muted small pt-[7px]"> Resource names specified in the manifest will be used </div>
+                </div>
+
+                <div ng-if="!ctrl.deploymentOptions.hideStacksFunctionality">
+                  <div class="mb-4 w-fit">
+                    <stack-name-label-insight></stack-name-label-insight>
+                  </div>
+                  <kube-stack-name
+                    stack-name="ctrl.formValues.StackName"
+                    set-stack-name="(ctrl.setStackName)"
+                    stacks="ctrl.stacks"
+                    error="ctrl.state.stackNameError"
+                  ></kube-stack-name>
+                </div>
+                <!-- !namespace -->
+
+                <!-- repository -->
+                <git-form
+                  ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT"
+                  value="ctrl.formValues"
+                  on-change="(ctrl.onChangeFormValues)"
+                  environment-type="KUBERNETES"
+                  is-force-pull-visible="false"
+                  is-additional-files-field-visible="true"
+                  is-auth-explanation-visible="true"
+                  is-source-selection-visible="true"
+                  deploy-method="{{ ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest' }}"
+                  base-webhook-url="{{ ctrl.state.baseWebhookUrl }}"
+                  webhook-id="{{ ctrl.state.webhookId }}"
+                  webhooks-docs="/user/kubernetes/applications/webhooks"
+                ></git-form>
+                <!-- !repository -->
+
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <div class="col-sm-12 form-section-title !mt-4"> Custom template </div>
+
+                  <custom-template-selector
+                    new-template-path="kubernetes.templates.custom.new"
+                    stack-type="3"
+                    on-change="(ctrl.onChangeTemplateId)"
+                    value="ctrl.state.templateId"
+                    is-load-failed="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId && ctrl.state.templateLoadFailed"
+                  ></custom-template-selector>
+
+                  <custom-templates-variables-field
+                    ng-if="ctrl.isTemplateVariablesEnabled && ctrl.state.template"
+                    definitions="ctrl.state.template.Variables"
+                    value="ctrl.formValues.Variables"
+                    on-change="(ctrl.onChangeTemplateVariables)"
+                  ></custom-templates-variables-field>
+                </div>
+
+                <!-- editor -->
+                <div class="mt-4">
+                  <div class="mb-1">
+                    <k8s-registry-access-notice
+                      ng-if="
+                        ctrl.formValues.namespace_toggle &&
+                        (ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR || (ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId))
+                      "
+                      manifest-content="ctrl.formValues.EditorContent"
+                    ></k8s-registry-access-notice>
+                  </div>
+                  <web-editor-form
+                    ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR || (ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId)"
+                    identifier="kubernetes-deploy-editor"
+                    value="ctrl.formValues.EditorContent"
+                    on-change="(ctrl.onChangeFileContent)"
+                    ng-required="true"
+                    yml="true"
+                    placeholder="Define or paste the content of your manifest file here"
+                    read-only="ctrl.state.isEditorReadOnly"
+                  >
+                    <editor-description>
+                      <p class="vertical-center">
+                        <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                        This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
+                      </p>
+                      <p>
+                        You can get more information about Kubernetes file format in the
+                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/" target="_blank">official documentation</a>.
+                      </p>
+                    </editor-description>
+                  </web-editor-form>
+                </div>
+                <!-- !editor -->
+
+                <!-- url -->
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.URL">
+                  <div class="col-sm-12 form-section-title"> URL </div>
+                  <div class="form-group">
+                    <div class="col-sm-12 small vertical-center pt-[7px]">
+                      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+                      Specify the URL to the
+                      <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/" target="_blank">Kubernetes manifest.</a>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label required text-left">URL</label>
+                    <div class="col-sm-9 col-lg-10">
+                      <input
+                        type="text"
+                        data-cy="k8sAppDeploy-urlFileUrl"
+                        class="form-control"
+                        ng-model="ctrl.formValues.ManifestURL"
+                        id="manifest_url"
+                        placeholder="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/controllers/nginx-deployment.yaml"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <!-- !url -->
+
+                <!-- actions -->
+                <div class="col-sm-12 form-section-title !mt-4"> Actions </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm !ml-0"
+                      ng-disabled="!ctrl.deploymentForm.$valid || ctrl.disableDeploy()"
+                      ng-click="ctrl.deploy()"
+                      button-spinner="ctrl.state.actionInProgress"
+                      data-cy="k8sAppDeploy-deployButton"
+                      analytics-on
+                      analytics-category="kubernetes"
+                      analytics-event="kubernetes-application-advanced-deployment"
+                      analytics-properties="ctrl.buildAnalyticsProperties()"
+                    >
+                      <span ng-hide="ctrl.state.actionInProgress">Deploy</span>
+                      <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
+                    </button>
+                  </div>
+                </div>
+                <!-- !actions -->
+              </form>
+            </uib-tab>
+
+            <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
+              <uib-tab-heading> <pr-icon icon="'file-text'"></pr-icon> Logs </uib-tab-heading>
+              <form class="form-horizontal mt-3">
+                <div class="form-group" ng-if="ctrl.state.activeTab === 1">
+                  <div class="col-sm-12">
+                    <code-editor identifier="kubernetes-deploy-logs" yml="true" read-only="true" value="ctrl.errorLog"></code-editor>
+                  </div>
+                </div>
+              </form>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

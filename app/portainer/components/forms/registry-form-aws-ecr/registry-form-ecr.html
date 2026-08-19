@@ -1,0 +1,184 @@
+<form class="form-horizontal" name="$ctrl.registryFormEcr" ng-submit="$ctrl.formAction()">
+  <div class="col-sm-12 form-section-title"> Important notice </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      For information on how to generate an Access Key, follow the
+      <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_console" target="_blank">AWS guide</a>.
+    </span>
+  </div>
+
+  <div class="col-sm-12 form-section-title"> ECR connection details </div>
+
+  <!-- name-input -->
+  <div class="form-group">
+    <label for="registry_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+        type="text"
+        class="form-control"
+        id="registry_name"
+        name="registry_name"
+        ng-model="$ctrl.model.Name"
+        placeholder="my-ecr-registry"
+        required
+        auto-focus
+        data-cy="registry-name-input"
+      />
+      <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_name.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="$ctrl.registryFormEcr.registry_name.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'"></pr-icon>
+              This field is required.
+            </p>
+            <p ng-message="used" class="vertical-center">
+              <pr-icon icon="'alert-triangle'"></pr-icon>
+              A registry with the same name already exists.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- !name-input -->
+
+  <!-- url-input -->
+  <div class="form-group">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+      <span class="required">Registry URL</span>
+      <portainer-tooltip message="'URL of an Amazon Elastic Container Registry, which contains an account id and region.'"></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+        type="text"
+        data-cy="registry-url-input"
+        class="form-control"
+        id="registry_url"
+        name="registry_url"
+        ng-model="$ctrl.model.URL"
+        placeholder="aws-account-id.dkr.ecr.us-east-1.amazonaws.com/"
+        required
+      />
+      <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="$ctrl.registryFormEcr.registry_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- url-input -->
+
+  <!-- authentication-checkbox -->
+  <div class="form-group">
+    <div class="col-sm-12">
+      <por-switch-field
+        label="'Authentication'"
+        label-class="'col-sm-3 col-lg-2'"
+        tooltip="'Enable this option if you need to specify credentials to connect to a private registry.'"
+        name="'administrator'"
+        checked="$ctrl.model.Authentication"
+        on-change="($ctrl.toggleAuthentication)"
+        label-class="'col-sm-2'"
+      ></por-switch-field>
+    </div>
+  </div>
+  <!-- !authentication-checkbox -->
+
+  <div ng-if="$ctrl.model.Authentication">
+    <!-- aws-access-key -->
+    <div class="form-group">
+      <label for="registry_access_key" class="col-sm-3 col-lg-2 control-label required text-left">AWS Access Key</label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="registry_access_key" name="registry_access_key" ng-model="$ctrl.model.Username" required data-cy="registry-access-key-input" />
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_access_key.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_access_key.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'"></pr-icon>
+                This field is required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- !aws-access-key -->
+
+    <!-- aws-secret-access-key -->
+    <div class="form-group">
+      <label for="registry_secret_access_key" class="col-sm-3 col-lg-2 control-label required text-left">AWS Secret Access Key</label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="password" class="form-control" id="registry_secret_access_key" name="registry_secret_access_key" ng-model="$ctrl.model.Password" required />
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_secret_access_key.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_secret_access_key.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'"></pr-icon>
+                This field is required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- !aws-secret-access-key -->
+
+    <!-- region -->
+    <div class="form-group">
+      <label for="registry_region" class="col-sm-3 col-lg-2 control-label required text-left">Region</label>
+      <div class="col-sm-9 col-lg-10">
+        <input
+          type="text"
+          class="form-control"
+          id="registry_region"
+          name="registry_region"
+          placeholder="us-west-1"
+          ng-model="$ctrl.model.Ecr.Region"
+          required
+          data-cy="registry-region-input"
+        />
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'"></pr-icon>
+                This field is required.
+              </p>
+              <p ng-message="used" class="vertical-center">
+                <pr-icon icon="'alert-triangle'"></pr-icon>
+                A registry with the same name already exists.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- !region -->
+  </div>
+
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title"> Actions </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        ng-disabled="$ctrl.actionInProgress || !$ctrl.registryFormEcr.$valid"
+        button-spinner="$ctrl.actionInProgress"
+        analytics-on
+        analytics-category="portainer"
+        analytics-event="portainer-registry-creation"
+        analytics-properties="{ metadata: { type: 'ecr' } }"
+      >
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>

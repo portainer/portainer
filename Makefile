@@ -1,0 +1,156 @@
+# build target, can be one of "production", "testing", "development"
+ENV=development
+WEBPACK_CONFIG=webpack/webpack.$(ENV).js
+TAG=local
+
+SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.6
+GOTESTSUM_VERSION?=v1.13.0
+GOTESTSUM=go run gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
+GOLANGCI_LINT_VERSION := $(shell cat $(shell git rev-parse --show-toplevel)/.golangci-version)
+
+# Don't change anything below this line unless you know what you're doing
+.DEFAULT_GOAL := help
+
+
+##@ Building
+.PHONY: all init-dist build-storybook build build-client build-server build-image devops
+init-dist:
+	@mkdir -p dist
+
+all: tidy deps build-server build-client ## Build the client, server and download external dependancies (doesn't build an image)
+
+build-all: all ## Alias for the 'all' target (used by CI)
+
+build-client: init-dist ## Build the client
+	export NODE_ENV=$(ENV) && pnpm run build --config $(WEBPACK_CONFIG)
+
+build-server: init-dist ## Build the server binary
+	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
+
+build-image: build-all ## Build the Portainer image locally
+	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
+
+build-storybook: ## Build and serve the storybook files
+	pnpm run storybook:build
+
+##@ Build dependencies
+.PHONY: deps server-deps client-deps tidy
+deps: server-deps client-deps ## Download all client and server build dependancies
+
+## This is empty because the pipeline requires it but ce has no server deps
+server-deps: init-dist ## Download dependant server binaries
+
+client-deps: ## Install client dependencies
+	pnpm install
+
+tidy: ## Tidy up the go.mod file
+	@go mod tidy
+
+##@ Cleanup
+.PHONY: clean
+clean: ## Remove all build and download artifacts
+	@echo "Clearing the dist directory..."
+	@rm -rf dist/*
+
+##@ Testing
+.PHONY: test test-client test-server
+test: test-server test-client ## Run all tests
+
+test-client: ## Run client tests
+	pnpm run test $(ARGS) --coverage
+
+TEST_PACKAGES?=./...
+
+test-server:	## Run server tests
+	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover -covermode=atomic -coverprofile=coverage.out $(TEST_PACKAGES)
+
+##@ Dev
+.PHONY: dev dev-client dev-server
+dev: ## Run both the client and server in development mode
+	make dev-server
+	make dev-client
+
+dev-client: ## Run the client in development mode
+	pnpm install && pnpm run dev
+
+dev-server: build-server ## Run the server in development mode
+	@./dev/run_container.sh
+
+dev-server-podman: build-server ## Run the server in development mode
+	@./dev/run_container_podman.sh
+
+##@ Format
+.PHONY: format format-client format-server
+
+format: format-client format-server ## Format all code
+
+format-client: ## Format client code
+	pnpm run format
+
+format-server: ## Format server code
+	go fmt ./...
+
+##@ Lint
+.PHONY: lint lint-client lint-server check-lint-version
+lint: lint-client lint-server ## Lint all code
+
+lint-client: ## Lint client code
+	pnpm run lint
+
+check-lint-version:
+	@installed=v$$(golangci-lint --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1); \
+	if [ "$$installed" = "v" ]; then \
+		echo "ERROR: golangci-lint not found, need $(GOLANGCI_LINT_VERSION)"; \
+		echo "Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)"; \
+		exit 1; \
+	elif [ "$$installed" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		echo "ERROR: golangci-lint $$installed installed, need $(GOLANGCI_LINT_VERSION)"; \
+		echo "Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)"; \
+		exit 1; \
+	fi
+
+lint-server: tidy check-lint-version ## Lint server code
+	golangci-lint run --timeout=10m --new-from-rev=HEAD~ -c .golangci.yaml
+	golangci-lint run --timeout=10m --new-from-rev=HEAD~ -c .golangci-forward.yaml
+
+##@ Extension
+.PHONY: dev-extension
+dev-extension: build-server build-client ## Run the extension in development mode
+	make local -f build/docker-extension/Makefile
+
+##@ Docs
+.PHONY: docs-build docs-validate docs-sync-check docs-clean docs-validate-clean
+docs-build: ## Build docs
+	go mod download
+	mkdir -p api/docs
+	cd api && $(SWAG) init -o "./docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ --overridesFile .swaggo
+
+docs-validate: docs-build ## Validate docs
+	pnpm swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
+	pnpm swagger-cli validate api/docs/openapi.yaml
+
+docs-sync-check: docs-build ## Check if committed API spec is in sync with Go annotations; fail if not
+	@if ! git diff --exit-code api/docs/swagger.yaml > /dev/null 2>&1; then \
+		echo ""; \
+		echo "ERROR: API spec is out of sync with Go annotations."; \
+		echo "Run 'make generate-api' in package/server-ce and commit the result."; \
+		echo ""; \
+		git diff --stat api/docs/swagger.yaml; \
+		exit 1; \
+	fi
+
+.PHONY: docs-serve
+docs-serve: docs-build ## Serve docs locally with Swagger UI on port 8080
+	docker run -p 8080:8080 \
+		-e SWAGGER_JSON=/foo/swagger.yaml \
+		-v $(PWD)/api/docs:/foo \
+		swaggerapi/swagger-ui
+
+.PHONY: generate-api
+generate-api: docs-validate ## Generate API client and types from OpenAPI spec
+	pnpm generate-api
+
+##@ Helpers
+.PHONY: help
+help:  ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)

@@ -1,0 +1,409 @@
+<page-header
+  ng-if="!ctrl.state.isEdit && !ctrl.stack.IsComposeFormat && ctrl.state.viewReady"
+  title="'Create application'"
+  breadcrumbs="[
+    { label:'Applications', link:'kubernetes.applications' },
+     'Create an application'
+     ]"
+  reload="true"
+>
+</page-header>
+
+<page-header
+  ng-if="ctrl.state.isEdit && !ctrl.stack.IsComposeFormat && ctrl.state.viewReady"
+  title="'Edit application'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    {
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool',
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    {
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application',
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'Edit',
+     ]"
+  reload="true"
+>
+</page-header>
+
+<page-header
+  ng-if="ctrl.stack.IsComposeFormat"
+  title="'View application'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    {
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool',
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    {
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application',
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'View',
+     ]"
+  reload="true"
+>
+</page-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+<div ng-if="ctrl.state.viewReady">
+  <div class="row kubernetes-create">
+    <div class="col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal mt-4" name="kubernetesApplicationCreationForm" autocomplete="off" novalidate>
+            <div ng-if="ctrl.isExternalApplication()">
+              <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"> Namespace </div>
+              <!-- #region NAMESPACE -->
+              <namespace-selector
+                values="ctrl.formValues.ResourcePool.Namespace.Name"
+                on-change="(ctrl.onChangeNamespaceName)"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.isAdmin}"
+                is-edit="ctrl.state.isEdit"
+              ></namespace-selector>
+              <!-- kubernetes services options -->
+              <div ng-if="ctrl.formValues.ResourcePool">
+                <kube-services-form
+                  on-change="(ctrl.onServicesChange)"
+                  values="ctrl.formValues.Services"
+                  app-name="ctrl.formValues.Name"
+                  selector="ctrl.formValues.Selector"
+                  validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
+                  is-edit-mode="ctrl.state.isEdit"
+                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                ></kube-services-form>
+              </div>
+              <!-- kubernetes services options -->
+
+              <!-- kubernetes summary for external application -->
+              <!--  below workaround is needed because we wanted react to render it again 
+                by hiding/showing it, but the page was fluctuating. so we added two blocks for both the conditions -->
+              <div ng-if="!ctrl.isTemporaryRefresh">
+                <application-summary-section
+                  application-kind="ctrl.formValues.ApplicationType"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                  ng-if="kubernetesApplicationCreationForm.$valid && ctrl.isExternalApplication()"
+                ></application-summary-section>
+              </div>
+              <div ng-if="ctrl.isTemporaryRefresh">
+                <application-summary-section
+                  application-kind="ctrl.formValues.ApplicationType"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                  ng-if="kubernetesApplicationCreationForm.$valid && ctrl.isExternalApplication()"
+                ></application-summary-section>
+              </div>
+              <!-- kubernetes summary for external application -->
+              <div class="col-sm-12 form-section-title !mt-6" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
+              <!-- #region ACTIONS -->
+              <div class="form-group" ng-hide="ctrl.stack.IsComposeFormat">
+                <div class="col-sm-12">
+                  <button
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-primary btn-sm !ml-0"
+                    ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid() || ctrl.hasPortErrors() || !ctrl.formValues.ResourcePool"
+                    ng-click="ctrl.deployApplication()"
+                    button-spinner="ctrl.state.actionInProgress"
+                    data-cy="k8sAppCreate-deployButton"
+                  >
+                    <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
+                    <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
+                    <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
+                    <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
+                  </button>
+                  <button
+                    ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress && ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-sm btn-default"
+                    ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
+                    data-cy="k8sAppCreate-appCancelButton"
+                  >
+                    Cancel
+                  </button>
+                  <!-- #Web editor buttons -->
+                  <button
+                    class="btn btn-sm btn-primary"
+                    ng-click="ctrl.updateApplicationViaWebEditor()"
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
+                    ng-disabled="ctrl.isUpdateApplicationViaWebEditorButtonDisabled() || !kubernetesApplicationCreationForm.$valid"
+                    style="margin-top: 7px; margin-left: 0"
+                    button-spinner="ctrl.state.updateWebEditorInProgress"
+                  >
+                    <span ng-show="!ctrl.state.updateWebEditorInProgress">Update application</span>
+                    <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
+                  </button>
+                </div>
+              </div>
+              <!-- #endregion -->
+            </div>
+            <div ng-if="!ctrl.isExternalApplication()">
+              <!-- #region NAMESPACE -->
+              <namespace-selector
+                values="ctrl.formValues.ResourcePool.Namespace.Name"
+                on-change="(ctrl.onChangeNamespaceName)"
+                validation-data="{hasQuota: ctrl.state.resourcePoolHasQuota, isResourceQuotaCapacityExceeded: ctrl.resourceQuotaCapacityExceeded(), namespaceOptionCount: ctrl.resourcePools.length, isEnvironmentAdmin: ctrl.isAdmin}"
+                is-edit="ctrl.state.isEdit"
+              ></namespace-selector>
+              <!-- #endregion -->
+
+              <!-- #region STACK -->
+              <kube-stack-name
+                ng-if="!ctrl.deploymentOptions.hideStacksFunctionality && ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                stack-name="ctrl.formValues.StackName"
+                set-stack-name="(ctrl.onChangeStackName)"
+                text-tip="'Enter or select a \'stack\' name to group multiple deployments together, or else leave empty to ignore.'"
+                stacks="ctrl.stacks"
+                input-class-name="'col-lg-10 col-sm-9'"
+                error="ctrl.state.stackNameError"
+              ></kube-stack-name>
+              <!-- #endregion -->
+
+              <!-- #region web editor -->
+              <edit-yaml-form-section
+                ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT"
+                values="ctrl.stackFileContent"
+                on-change="(ctrl.onChangeFileContent)"
+                is-compose-format="ctrl.stack.IsComposeFormat"
+              ></edit-yaml-form-section>
+              <!-- #endregion -->
+              <div ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
+                <!-- #region NAME FIELD -->
+                <name-form-section
+                  values="ctrl.formValues.Name"
+                  on-change="(ctrl.onChangeAppName)"
+                  is-edit="ctrl.state.isEdit"
+                  validation-data="{existingNames: ctrl.applicationNames, isEdit: ctrl.state.isEdit, originalName: ctrl.application.Name}"
+                ></name-form-section>
+                <!-- #endregion -->
+
+                <!-- #region IMAGE FIELD -->
+                <div class="form-group mb-2">
+                  <div class="col-sm-12">
+                    <por-image-registry
+                      model="ctrl.formValues.ImageModel"
+                      ng-if="ctrl.formValues.ResourcePool"
+                      auto-complete="false"
+                      label-class="col-sm-3 col-lg-2"
+                      input-class="col-sm-9 col-lg-10"
+                      namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                      endpoint="ctrl.endpoint"
+                      is-admin="ctrl.isAdmin"
+                      check-rate-limits="true"
+                      set-validity="ctrl.setPullImageValidity"
+                    ></por-image-registry>
+                  </div>
+                </div>
+                <!-- #end region IMAGE FIELD -->
+
+                <div class="col-sm-12 mb-4 !p-0">
+                  <annotations-be-teaser></annotations-be-teaser>
+                </div>
+
+                <div ng-if="ctrl.formValues.ResourcePool">
+                  <!-- #region STACK -->
+                  <kube-stack-name
+                    ng-if="!ctrl.deploymentOptions.hideStacksFunctionality"
+                    stack-name="ctrl.formValues.StackName"
+                    set-stack-name="(ctrl.onChangeStackName)"
+                    text-tip="'Enter or select a \'stack\' name to group multiple deployments together, or else leave empty to ignore.'"
+                    stacks="ctrl.stacks"
+                    input-class-name="'col-lg-10 col-sm-9'"
+                    error="ctrl.state.stackNameError"
+                  ></kube-stack-name>
+                  <!-- #endregion -->
+
+                  <!-- #region ENVIRONMENT VARIABLES -->
+                  <environment-variables-form-section
+                    values="ctrl.formValues.EnvironmentVariables"
+                    on-change="(ctrl.onEnvironmentVariableChange)"
+                  ></environment-variables-form-section>
+                  <!-- #endregion -->
+
+                  <!-- #region CONFIGMAPS -->
+                  <config-maps-form-section
+                    values="ctrl.formValues.ConfigMaps"
+                    on-change="(ctrl.onConfigMapsChange)"
+                    namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                    validation-data="ctrl.formValues.ConfigMaps"
+                  ></config-maps-form-section>
+
+                  <!-- #region SECRETS -->
+                  <secrets-form-section
+                    values="ctrl.formValues.Secrets"
+                    on-change="(ctrl.onSecretsChange)"
+                    namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                    validation-data="ctrl.formValues.Secrets"
+                  ></secrets-form-section>
+                  <!-- #endregion -->
+
+                  <persisted-folders-form-section
+                    values="ctrl.formValues.PersistedFolders"
+                    initial-values="ctrl.formValues.OriginalPersistedFolders"
+                    on-change="(ctrl.onChangePersistedFolder)"
+                    is-edit="ctrl.state.isEdit"
+                    application-values="ctrl.formValues"
+                    is-add-persistent-folder-button-shown="ctrl.isAddPersistentFolderButtonShown()"
+                    available-volumes="ctrl.availableVolumes"
+                    validation-data="{ namespaceQuotas: ctrl.formValues.ResourcePool.Quota, persistedFolders: ctrl.formValues.PersistedFolders, storageAvailabilities: ctrl.state.storages.availabilities }"
+                  ></persisted-folders-form-section>
+
+                  <!-- #region DATA ACCESS POLICY -->
+                  <access-policy-form-section
+                    ng-if="ctrl.showDataAccessPolicySection()"
+                    value="ctrl.formValues.DataAccessPolicy"
+                    on-change="(ctrl.onDataAccessPolicyChange)"
+                    is-edit="ctrl.state.isEdit"
+                    persisted-folders-use-existing-volumes="ctrl.state.persistedFoldersUseExistingVolumes"
+                  ></access-policy-form-section>
+                  <!-- #endregion -->
+
+                  <resource-reservation-form-section
+                    values="{memoryLimit: ctrl.formValues.MemoryLimit, cpuLimit: ctrl.formValues.CpuLimit}"
+                    on-change="(ctrl.onChangeResourceReservation)"
+                    namespace-has-quota="ctrl.state.resourcePoolHasQuota"
+                    min-memory-limit="ctrl.state.sliders.memory.min"
+                    min-cpu-limit="ctrl.state.sliders.cpu.min"
+                    max-memory-limit="ctrl.state.sliders.memory.max"
+                    max-cpu-limit="ctrl.state.sliders.cpu.max"
+                    validation-data="{isExistingCPUReservationUnchanged: ctrl.state.isExistingCPUReservationUnchanged, isExistingMemoryReservationUnchanged: ctrl.state.isExistingMemoryReservationUnchanged, maxMemoryLimit: ctrl.state.sliders.memory.max, maxCpuLimit: ctrl.state.sliders.cpu.max, isEnvironmentAdmin: ctrl.isAdmin, nodeLimits: ctrl.nodesLimits.nodesLimits}"
+                    resource-quota-capacity-exceeded="ctrl.resourceQuotaCapacityExceeded()"
+                  ></resource-reservation-form-section>
+
+                  <!-- deployment options -->
+                  <app-deployment-type-form-section
+                    values="ctrl.formValues.DeploymentType"
+                    on-change="(ctrl.onChangeDeploymentType)"
+                    support-global-deployment="ctrl.supportGlobalDeployment()"
+                    radio-name="'deploymentType'"
+                    validation-data="{isQuotaExceeded: ctrl.resourceReservationsOverflow()}"
+                  ></app-deployment-type-form-section>
+
+                  <!-- replica count -->
+                  <div ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated">
+                    <replication-form-section
+                      values="{replicaCount: ctrl.formValues.ReplicaCount}"
+                      on-change="(ctrl.onChangeReplicaCount)"
+                      support-scalable-replica-deployment="ctrl.supportScalableReplicaDeployment()"
+                      memory-limit="ctrl.formValues.MemoryLimit"
+                      cpu-limit="ctrl.formValues.CpuLimit"
+                      resource-reservations-overflow="ctrl.resourceReservationsOverflow()"
+                      non-scalable-storage="ctrl.getNonScalableStorage()"
+                      validation-data="{resourceReservationsOverflow: ctrl.resourceReservationsOverflow(), quotaExceeded: ctrl.state.storages.quotaExceeded, nonScalableStorage: ctrl.getNonScalableStorage(), supportScalableReplicaDeployment: ctrl.supportScalableReplicaDeployment()}"
+                    ></replication-form-section>
+                  </div>
+                  <!-- #endregion -->
+
+                  <!-- #region AUTO SCALING -->
+                  <div ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.Global">
+                    <auto-scaling-form-section
+                      values="ctrl.formValues.AutoScaler"
+                      on-change="(ctrl.onAutoScaleChange)"
+                      validation-data="{autoScalerOverflow: ctrl.autoScalerOverflow()}"
+                      is-metrics-enabled="ctrl.state.useServerMetrics"
+                    ></auto-scaling-form-section>
+                  </div>
+                  <!-- #endregion -->
+                </div>
+
+                <div class="mb-8" ng-if="ctrl.formValues.ResourcePool">
+                  <placement-form-section
+                    ng-show="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.Replicated"
+                    values="{placements: ctrl.formValues.Placements, placementType: ctrl.formValues.PlacementType}"
+                    on-change="(ctrl.onChangePlacements)"
+                  ></placement-form-section>
+
+                  <!-- kubernetes services options -->
+                  <kube-services-form
+                    on-change="(ctrl.onServicesChange)"
+                    values="ctrl.formValues.Services"
+                    load-balancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                    app-name="ctrl.formValues.Name"
+                    selector="ctrl.formValues.Selector"
+                    validation-data="{nodePortServices: ctrl.state.nodePortServices, formServices: ctrl.formValues.Services, ingressPaths: ctrl.ingressPaths, originalIngressPaths: ctrl.originalIngressPaths}"
+                    is-edit-mode="ctrl.state.isEdit"
+                    namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                  ></kube-services-form>
+                </div>
+                <!-- kubernetes services options -->
+
+                <!-- application summary start -->
+                <!--  below workaround is needed because we wanted react to render it again 
+                  by hiding/showing it, but the page was fluctuating. so we added two blocks for both the conditions -->
+                <div ng-if="!ctrl.isTemporaryRefresh">
+                  <!-- summary -->
+                  <application-summary-section
+                    application-kind="ctrl.formValues.ApplicationType"
+                    ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+                    form-values="ctrl.formValues"
+                    old-form-values="ctrl.savedFormValues"
+                  ></application-summary-section>
+                </div>
+                <div ng-if="ctrl.isTemporaryRefresh">
+                  <!-- summary -->
+                  <application-summary-section
+                    application-kind="ctrl.formValues.ApplicationType"
+                    ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+                    form-values="ctrl.formValues"
+                    old-form-values="ctrl.savedFormValues"
+                  ></application-summary-section>
+                </div>
+                <!-- application summary end -->
+              </div>
+              <!-- #region ACTIONS -->
+              <div class="col-sm-12 form-section-title !mt-6" ng-hide="ctrl.stack.IsComposeFormat"> Actions </div>
+              <div class="form-group" ng-hide="ctrl.stack.IsComposeFormat">
+                <div class="col-sm-12">
+                  <button
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-primary btn-sm !ml-0"
+                    ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid() || ctrl.hasPortErrors() || !ctrl.formValues.ResourcePool"
+                    ng-click="ctrl.deployApplication()"
+                    button-spinner="ctrl.state.actionInProgress"
+                    data-cy="k8sAppCreate-deployButton"
+                  >
+                    <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
+                    <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
+                    <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
+                    <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
+                  </button>
+                  <button
+                    ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress && ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-sm btn-default"
+                    ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
+                    data-cy="k8sAppCreate-appCancelButton"
+                  >
+                    Cancel
+                  </button>
+                  <!-- #Web editor buttons -->
+                  <button
+                    class="btn btn-sm btn-primary"
+                    ng-click="ctrl.updateApplicationViaWebEditor()"
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
+                    ng-disabled="ctrl.isUpdateApplicationViaWebEditorButtonDisabled() || !kubernetesApplicationCreationForm.$valid"
+                    style="margin-top: 7px; margin-left: 0"
+                    button-spinner="ctrl.state.updateWebEditorInProgress"
+                  >
+                    <span ng-show="!ctrl.state.updateWebEditorInProgress">Update application</span>
+                    <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

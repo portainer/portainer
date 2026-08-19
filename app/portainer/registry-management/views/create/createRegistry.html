@@ -1,0 +1,80 @@
+<page-header title="'Create registry'" breadcrumbs="[{label:'Registries', link:'portainer.registries'}, 'Add registry']" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title"> Registry provider </div>
+
+          <box-selector radio-name="'availableRegistry'" value="$ctrl.state.registryValue" options="$ctrl.state.availableRegistry" on-change="($ctrl.setRegistry)"></box-selector>
+
+          <registry-form-quay
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.QUAY"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-quay>
+
+          <registry-form-azure
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.AZURE"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-azure>
+
+          <registry-form-custom
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.CUSTOM"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-custom>
+
+          <registry-form-ecr
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.ECR"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-ecr>
+
+          <registry-form-proget
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.PROGET"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-proget>
+
+          <registry-form-gitlab
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.GITLAB"
+            model="$ctrl.model"
+            retrieve-registries="$ctrl.retrieveGitlabRegistries"
+            create-registries="$ctrl.createGitlabRegistries"
+            projects="$ctrl.gitlabProjects"
+            state="$ctrl.state"
+            action-in-progress="$ctrl.state.actionInProgress"
+            reset-defaults="$ctrl.useDefaultGitlabConfiguration"
+          ></registry-form-gitlab>
+
+          <registry-form-dockerhub
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.DOCKERHUB"
+            initial-values="$ctrl.model"
+            on-submit="($ctrl.onSubmitDocker)"
+            submit-label="'Add registry'"
+            is-loading="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
+          ></registry-form-dockerhub>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

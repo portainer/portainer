@@ -1,0 +1,18 @@
+<page-header
+  title="'Node Browser'"
+  breadcrumbs="[
+    {
+      label:'swarm',
+      link:'docker.swarm'
+    },
+    {
+      label: $ctrl.node.Hostname,
+      link: 'docker.nodes.node',
+      linkParams: { id: $ctrl.nodeId }
+    },
+    'browse'
+  ]"
+>
+</page-header>
+
+<host-browser ng-if="$ctrl.node" endpoint-id="$ctrl.endpoint.Id"></host-browser>

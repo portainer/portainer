@@ -1,0 +1,49 @@
+.root {
+  --selected-item-color: var(--blue-2);
+  @apply border border-solid;
+  @apply border-gray-5 bg-gray-2 text-black;
+  @apply th-dark:border-gray-neutral-8 th-dark:bg-gray-iron-10 th-dark:text-white;
+  @apply th-highcontrast:border-gray-neutral-8 th-highcontrast:bg-gray-iron-10 th-highcontrast:text-white;
+
+  display: block;
+  width: 200px;
+
+  min-height: 300px;
+
+  border-radius: 5px;
+  padding: 25px 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow-boxselector-color);
+
+  margin: 0;
+  display: block;
+}
+
+.feature:hover {
+  border-color: var(--blue-2);
+  color: #337ab7;
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
+}
+
+.teaser {
+  @apply border-2;
+  border-color: var(--BE-only);
+  color: var(--text-muted-color);
+}
+
+.teaser:hover {
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
+}
+
+.active {
+  @apply border-blue-6 bg-blue-3;
+  @apply th-dark:border-blue-7 th-dark:bg-blue-10;
+
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
+}
+
+.icon-component {
+  font-size: 80px;
+  height: 80px;
+  width: auto;
+}

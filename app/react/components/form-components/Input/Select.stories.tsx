@@ -1,0 +1,37 @@
+import { Meta, StoryFn } from '@storybook/react-webpack5';
+import { useState } from 'react';
+
+import { Select } from './Select';
+
+export default {
+  title: 'Components/Forms/Select',
+  args: {
+    disabled: false,
+  },
+} as Meta;
+
+interface Args {
+  disabled?: boolean;
+}
+
+export function Example({ disabled }: Args) {
+  const [value, setValue] = useState(0);
+  const options = [
+    { value: 1, label: 'one' },
+    { value: 2, label: 'two' },
+  ];
+  return (
+    <Select
+      value={value}
+      data-cy="select"
+      onChange={(e) => setValue(parseInt(e.target.value, 10))}
+      disabled={disabled}
+      options={options}
+    />
+  );
+}
+
+export const DisabledSelect: StoryFn<Args> = Example.bind({});
+DisabledSelect.args = {
+  disabled: true,
+};

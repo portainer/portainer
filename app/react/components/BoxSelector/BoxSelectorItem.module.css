@@ -1,0 +1,49 @@
+.box-selector-item {
+  flex: 1;
+}
+
+.box-selector-item .header {
+  @apply text-black;
+  @apply th-dark:text-white;
+  @apply th-highcontrast:text-white;
+
+  font-size: 18px;
+  font-weight: bold;
+  user-select: none;
+}
+
+.image-container {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.icon,
+.icon img {
+  font-size: 90px;
+}
+
+.slim .icon {
+  font-size: 56px;
+}
+
+.icon > svg {
+  margin-left: -5px;
+}
+
+.header pr-icon {
+  margin-right: 5px;
+}
+
+.content {
+  padding-left: 20px;
+}
+
+/* used for BE teaser */
+.box-selector-item.limited.business label,
+.box-selector-item.limited.business input:checked + label {
+  @apply border-gray-6 bg-gray-6 bg-opacity-10;
+  @apply th-dark:border-gray-6 th-dark:bg-gray-6 th-dark:bg-opacity-10;
+  @apply th-highcontrast:border-gray-6 th-highcontrast:bg-gray-6 th-highcontrast:bg-opacity-10;
+
+  filter: none;
+}

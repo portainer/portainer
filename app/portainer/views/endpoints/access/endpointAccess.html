@@ -1,0 +1,55 @@
+<page-header
+  title="'Environment access'"
+  breadcrumbs="[
+    { label:'Environments', link:'portainer.endpoints' },
+    {
+      label:ctrl.endpoint.Name,
+      link: 'portainer.endpoints.endpoint',
+      linkParams:{id: ctrl.endpoint.Id}
+    }, 'Access management']"
+  reload="true"
+>
+</page-header>
+
+<div class="row" ng-if="ctrl.endpoint">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="hard-drive" title-text="Environment"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ ctrl.endpoint.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td>URL</td>
+              <td>
+                {{ ctrl.endpoint.URL | stripprotocol }}
+              </td>
+            </tr>
+            <tr>
+              <td>Group</td>
+              <td>
+                <a ui-sref="portainer.groups.group({ id: ctrl.group.Id })">{{ ctrl.group.Name }}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<por-access-management
+  ng-if="ctrl.endpoint && ctrl.group"
+  access-controlled-entity="ctrl.endpoint"
+  action-in-progress="ctrl.state.actionInProgress"
+  entity-type="endpoint"
+  inherit-from="ctrl.group"
+  update-access="ctrl.updateAccess"
+  limited-feature="ctrl.limitedFeature"
+>
+</por-access-management>

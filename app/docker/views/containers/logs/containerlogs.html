@@ -1,0 +1,23 @@
+<page-header
+  title="'Container logs'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    { 
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container', 
+      linkParams: { id: container.Id }
+    }, 'Logs']"
+>
+</page-header>
+
+<container-log-view ng-if="!logsEnabled"></container-log-view>
+
+<log-viewer
+  data="logs"
+  ng-if="logs && logsEnabled"
+  log-collection-change="changeLogCollection"
+  display-timestamps="state.displayTimestamps"
+  line-count="state.lineCount"
+  since-timestamp="state.sinceTimestamp"
+  resource-name="container.Name"
+></log-viewer>

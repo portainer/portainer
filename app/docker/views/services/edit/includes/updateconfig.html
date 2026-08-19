@@ -1,0 +1,132 @@
+<div id="service-update-config">
+  <rd-widget>
+    <rd-widget-header icon="list" title-text="Update configuration"> </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <table class="mb-0 table">
+        <tbody>
+          <tr>
+            <td>Update Parallelism</td>
+            <td>
+              <input
+                class="input-sm"
+                type="number"
+                data-cy="docker-service-update-parallelism-input"
+                ng-model="service.UpdateParallelism"
+                ng-change="updateServiceAttribute(service, 'UpdateParallelism')"
+                disable-authorization="DockerServiceUpdate"
+              />
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px"> Maximum number of tasks to be updated simultaneously (0 to update all at once). </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Update Delay</td>
+            <td>
+              <input
+                class="input-sm"
+                type="text"
+                data-cy="docker-service-update-delay-input"
+                ng-model="service.UpdateDelay"
+                ng-change="updateServiceAttribute(service, 'UpdateDelay')"
+                ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+                disable-authorization="DockerServiceUpdate"
+              />
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px"> Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h). Example: 1m. </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Update Failure Action</td>
+            <td>
+              <div class="form-group !mb-0">
+                <label class="radio-inline align-baseline">
+                  <input
+                    type="radio"
+                    name="failure_action"
+                    data-cy="update-failure-action-continue"
+                    ng-model="service.UpdateFailureAction"
+                    value="continue"
+                    ng-change="updateServiceAttribute(service, 'UpdateFailureAction')"
+                    disable-authorization="DockerServiceUpdate"
+                  />
+                  Continue
+                </label>
+                <label class="radio-inline align-baseline">
+                  <input
+                    type="radio"
+                    name="failure_action"
+                    data-cy="update-failure-action-pause"
+                    ng-model="service.UpdateFailureAction"
+                    value="pause"
+                    ng-change="updateServiceAttribute(service, 'UpdateFailureAction')"
+                    disable-authorization="DockerServiceUpdate"
+                  />
+                  Pause
+                </label>
+              </div>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px"> Action taken on failure to start after update. </p>
+            </td>
+          </tr>
+          <tr ng-if="applicationState.endpoint.apiVersion >= 1.29">
+            <td>Order</td>
+            <td>
+              <div class="form-group !mb-0">
+                <label class="radio-inline">
+                  <input
+                    type="radio"
+                    name="updateconfig_order"
+                    data-cy="update-order-start-first"
+                    ng-model="service.UpdateOrder"
+                    value="start-first"
+                    ng-change="updateServiceAttribute(service, 'UpdateOrder')"
+                    disable-authorization="DockerServiceUpdate"
+                  />
+                  start-first
+                </label>
+                <label class="radio-inline">
+                  <input
+                    type="radio"
+                    name="updateconfig_order"
+                    data-cy="update-order-stop-first"
+                    ng-model="service.UpdateOrder"
+                    value="stop-first"
+                    ng-change="updateServiceAttribute(service, 'UpdateOrder')"
+                    disable-authorization="DockerServiceUpdate"
+                  />
+                  stop-first
+                </label>
+              </div>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px"> Operation order on failure. </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer authorization="DockerServiceUpdate">
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-disabled="!hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])"
+            ng-click="updateService(service)"
+            >Apply changes</button
+          >
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <pr-icon icon="'chevron-down'"></pr-icon>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

@@ -1,0 +1,13 @@
+<page-header
+  title="'Volume browser'"
+  breadcrumbs="[
+    { label:'Volumes', link:'docker.volumes' },
+    { 
+      label:volumeId,
+      link: 'docker.volumes.volume', 
+      linkParams:{ id: volumeId }
+    }, 'browse']"
+>
+</page-header>
+
+<volume-browser volume-id="volumeId" node-name="nodeName" is-upload-enabled="agentApiVersion > 1" endpoint-id="endpointId"></volume-browser>

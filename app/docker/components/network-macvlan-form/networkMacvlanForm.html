@@ -1,0 +1,91 @@
+<div>
+  <div class="col-sm-12 form-section-title"> Macvlan configuration </div>
+
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small vertical-center">
+      <pr-icon icon="'alert-circle'" mode="'primary'"></pr-icon>
+      To create a MACVLAN network you need to create a configuration, then create the network from this configuration.
+    </span>
+  </div>
+
+  <box-selector slim="true" options="$ctrl.options" value="$ctrl.data.Scope" on-change="($ctrl.onChangeScope)"></box-selector>
+
+  <ng-form name="macvlanConfigurationForm">
+    <!-- configuration-inputs -->
+    <div ng-show="$ctrl.data.Scope === 'local'">
+      <!-- network-card-input -->
+      <div class="form-group">
+        <label for="network_card" class="col-sm-3 col-lg-2 control-label text-left">Parent network card</label>
+        <div class="col-sm-9 col-lg-10">
+          <input
+            type="text"
+            data-cy="macvlan-network-card-input"
+            class="form-control"
+            name="network_card"
+            ng-model="$ctrl.data.ParentNetworkCard"
+            placeholder="e.g. eth0 or ens160 ..."
+            ng-required="$ctrl.data.Scope === 'local' && !$ctrl.data.ParentNetworkCard"
+          />
+        </div>
+      </div>
+      <div class="form-group" ng-show="macvlanConfigurationForm.network_card.$invalid">
+        <div class="col-sm-12 small text-warning">
+          <div ng-messages="macvlanConfigurationForm.network_card.$error">
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Parent network card must be specified.</p>
+          </div>
+        </div>
+      </div>
+      <!-- network-card-input -->
+      <!-- nodes-selector -->
+      <div ng-if="$ctrl.applicationState.endpoint.mode.agentProxy && $ctrl.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+        <macvlan-nodes-selector
+          dataset="$ctrl.nodes"
+          is-ip-column-visible="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
+          have-access-to-node="$ctrl.isAdmin"
+          value="$ctrl.data.DatatableState.selectedItems"
+          on-change="($ctrl.onChangeSelectedNodes)"
+        ></macvlan-nodes-selector>
+
+        <div class="form-group" ng-show="macvlanConfigurationForm.node_selector.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="macvlanConfigurationForm.node_selector.$error">
+              <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> At least one node must be selected.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- !nodes-selector -->
+    </div>
+    <!-- configuration-inputs -->
+    <!-- deploy-inputs -->
+    <div ng-show="$ctrl.data.Scope === 'swarm'">
+      <!-- configuration-selector -->
+      <!-- network-input -->
+      <div class="form-group">
+        <label for="config_network" class="col-sm-3 col-lg-2 control-label text-left">Configuration</label>
+        <div class="col-sm-9 col-lg-10">
+          <select
+            class="form-control"
+            ng-options="net.Name for net in $ctrl.availableNetworks"
+            ng-model="$ctrl.data.SelectedNetworkConfig"
+            name="config_network"
+            ng-required="$ctrl.requiredConfigSelection()"
+            data-cy="macvlanConfigNetworkSelector"
+          >
+            <option selected disabled hidden value="">Select a network</option>
+          </select>
+        </div>
+      </div>
+      <!-- !network-input -->
+      <div class="form-group" ng-show="macvlanConfigurationForm.config_network.$invalid">
+        <div class="col-sm-12 small text-warning">
+          <div ng-messages="macvlanConfigurationForm.config_network.$error">
+            <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Select a configuration network.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !configuration-selector -->
+    </div>
+    <!-- deploy-inputs -->
+  </ng-form>
+</div>

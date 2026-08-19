@@ -1,0 +1,125 @@
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Create ConfigMap'"
+  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations', linkParams:{ tab: 'configmaps' } }, 'Create a ConfigMap']"
+  reload="true"
+></page-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <!-- resource-pool -->
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
+              <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
+              <div class="col-sm-8 col-lg-9">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                  data-cy="k8sConfigCreate-namespaceDropdown"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-warning vertical-center">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
+                namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-warning vertical-center">
+                <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
+              </div>
+            </div>
+            <!-- !resource-pool -->
+
+            <!-- name -->
+            <div class="form-group">
+              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label required text-left">Name</label>
+              <div class="col-sm-8 col-lg-9 mb-0">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="configuration_name"
+                  ng-model="ctrl.formValues.Name"
+                  ng-pattern="/^[a-z0-9]([a-z0-9-.]{0,61}[a-z0-9])?$/"
+                  ng-change="ctrl.onChangeName()"
+                  placeholder="my-configmap"
+                  auto-focus
+                  required
+                  data-cy="k8sConfigCreate-nameInput"
+                />
+                <div ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.alreadyExist">
+                  <div class="help-block small text-warning">
+                    <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
+                      <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> This field is required.</p>
+                      <p ng-message="pattern" class="vertical-center"
+                        ><pr-icon icon="'alert-triangle'" mode="'warning'" class="vertical-center"></pr-icon> This field must consist of lower case alphanumeric characters, '-' or
+                        '.', and contain at most 63 characters, and must start and end with an alphanumeric character.</p
+                      >
+                    </div>
+                    <p ng-if="ctrl.state.alreadyExist" class="vertical-center"
+                      ><pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> A configuration with the same name already exists inside the selected namespace.</p
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- !name -->
+
+            <div class="col-sm-12 !p-0">
+              <annotations-be-teaser></annotations-be-teaser>
+            </div>
+
+            <div ng-if="ctrl.formValues.ResourcePool">
+              <kubernetes-configuration-data
+                ng-if="ctrl.formValues"
+                form-values="ctrl.formValues"
+                is-docker-config="ctrl.state.isDockerConfig"
+                is-valid="ctrl.state.isDataValid"
+                on-change-validation="ctrl.isFormValid()"
+                is-creation="true"
+                type="'configmap'"
+                is-editor-dirty="ctrl.state.isEditorDirty"
+              ></kubernetes-configuration-data>
+            </div>
+
+            <!-- summary -->
+            <kubernetes-summary-view
+              ng-if="!(!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress)"
+              form-values="ctrl.formValues"
+            ></kubernetes-summary-view>
+
+            <!-- actions -->
+            <div class="col-sm-12 form-section-title" style="margin-top: 10px"> Actions </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm !ml-0"
+                  ng-disabled="!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress || !ctrl.formValues.ResourcePool"
+                  ng-click="ctrl.createConfiguration()"
+                  button-spinner="ctrl.state.actionInProgress"
+                  data-cy="k8sConfigCreate-CreateConfigButton"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress">Create {{ ctrl.formValues.Kind | kubernetesConfigurationKindText }}</span>
+                  <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

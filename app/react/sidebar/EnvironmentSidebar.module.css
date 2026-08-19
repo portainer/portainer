@@ -1,0 +1,11 @@
+.root {
+  background-color: var(--bg-sidebar-nav-color);
+}
+
+.closeBtn {
+  background-color: transparent;
+}
+
+.closeBtn:hover {
+  background-color: var(--graphite-500);
+}

@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-sm-12 form-section-title"> Resource reservation </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small vertical-center">
+      <pr-icon icon="'info'" mode="'primary'"></pr-icon>
+      {{ $ctrl.description }}
+    </span>
+  </div>
+  <div class="form-group" ng-if="$ctrl.memoryLimit !== 0">
+    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left"> Memory reservation </label>
+    <div class="col-sm-9" style="margin-top: 4px" data-cy="k8sNamespaceDetail-memoryUsage">
+      <uib-progressbar animate="false" value="$ctrl.memoryReservationPercent" type="{{ $ctrl.memoryReservationPercent | kubernetesUsageLevelInfo }}"></uib-progressbar>
+      <span> {{ $ctrl.memoryReservation }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryReservationPercent }}% </span>
+    </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.displayUsage && $ctrl.memoryLimit !== 0">
+    <label for="memory-usage" class="col-sm-3 col-lg-2 control-label text-left"> Memory used </label>
+    <div class="col-sm-9" style="margin-top: 4px">
+      <uib-progressbar animate="false" value="$ctrl.memoryUsagePercent" type="{{ $ctrl.memoryUsagePercent | kubernetesUsageLevelInfo }}"></uib-progressbar>
+      <span> {{ $ctrl.memoryUsage }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsagePercent }}% </span>
+    </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.cpuLimit !== 0">
+    <label for="cpu-reservation" class="col-sm-3 col-lg-2 control-label text-left"> CPU reservation </label>
+    <div class="col-sm-9" style="margin-top: 4px">
+      <uib-progressbar animate="false" value="$ctrl.cpuReservationPercent" type="{{ $ctrl.cpuReservationPercent | kubernetesUsageLevelInfo }}"></uib-progressbar>
+      <span> {{ $ctrl.cpuReservation | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuReservationPercent }}% </span>
+    </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.displayUsage && $ctrl.cpuLimit !== 0">
+    <label for="cpu-usage" class="col-sm-3 col-lg-2 control-label text-left"> CPU used </label>
+    <div class="col-sm-9" style="margin-top: 4px">
+      <uib-progressbar animate="false" value="$ctrl.cpuUsagePercent" type="{{ $ctrl.cpuUsagePercent | kubernetesUsageLevelInfo }}"></uib-progressbar>
+      <span> {{ $ctrl.cpuUsage | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsagePercent }}% </span>
+    </div>
+  </div>
+</div>

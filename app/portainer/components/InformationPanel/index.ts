@@ -1,0 +1,1 @@
+export { InformationPanelAngular } from './InformationPanelAngular';

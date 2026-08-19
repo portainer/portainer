@@ -1,0 +1,34 @@
+<!-- extension -->
+<div class="blocklist-item" ng-click="$ctrl.goTo($ctrl.model)">
+  <div class="blocklist-item-box">
+    <!-- extension-image -->
+    <span class="blocklist-item-logo">
+      <img class="blocklist-item-logo" ng-if="$ctrl.model.Id == 1 || $ctrl.model.Id == 2 || $ctrl.model.Id == 3" src="~@/assets/images/support_1.png" />
+      <img class="blocklist-item-logo" ng-if="$ctrl.model.Id == 4 || $ctrl.model.Id == 5" src="~@/assets/images/support_2.png" />
+    </span>
+    <!-- !extension-image -->
+    <!-- extension-details -->
+    <span class="col-sm-12">
+      <!-- blocklist-item-line1 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-title">
+            {{ $ctrl.model.Name }}
+          </span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line1 -->
+      <!-- blocklist-item-line2 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-desc">
+            {{ $ctrl.model.ShortDescription }}
+          </span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line2 -->
+    </span>
+    <!-- !extension-details -->
+  </div>
+  <!-- !extension -->
+</div>

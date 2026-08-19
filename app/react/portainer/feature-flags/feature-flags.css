@@ -1,0 +1,62 @@
+.form-control.limited-be {
+  border-color: var(--BE-only);
+}
+
+.form-control.limited-be.no-border {
+  border-color: var(--border-form-control-color);
+}
+
+button.limited-be,
+button[disabled].limited-be.oauth-save-settings-button {
+  background-color: var(--BE-only);
+  border-color: var(--BE-only);
+  margin-left: 0px;
+}
+
+button.limited-be.oauth-save-settings-button {
+  background-color: var(--blue-2);
+  border-color: transparent;
+  margin-left: 0px;
+}
+
+ng-form.limited-be,
+form.limited-be,
+div.limited-be {
+  border: solid 1px var(--BE-only);
+  border-radius: 8px;
+  pointer-events: none;
+  touch-action: none;
+  display: block;
+}
+
+.limited-be-content {
+  @apply border-gray-6 p-2.5 opacity-50;
+}
+
+.limited-be-link {
+  padding: 10px;
+  width: inherit;
+  z-index: 5;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  float: right;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  touch-action: auto;
+  cursor: hand;
+  pointer-events: auto;
+}
+
+.limited-be-link a {
+  @apply text-gray-6;
+}
+
+.limited-be-link a:hover {
+  @apply underline;
+  @apply border-blue-9 text-blue-9;
+}
+
+.form-control.limited-be[disabled] {
+  background-color: transparent !important;
+}

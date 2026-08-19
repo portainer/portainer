@@ -1,0 +1,19 @@
+.root [data-reach-combobox-popover] {
+  border-radius: 5px;
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-dropdown-menu-color);
+  color: var(--text-form-control-color);
+  z-index: 9999;
+}
+
+.root [data-reach-combobox-option]:hover {
+  background-color: var(--bg-dropdown-hover);
+}
+
+.root [data-suggested-value] {
+  font-weight: normal;
+}
+
+.root [data-user-value] {
+  font-weight: bold;
+}

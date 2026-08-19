@@ -1,0 +1,79 @@
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Stacks logs'"
+  breadcrumbs="[
+{ label:'Namespaces', link:'kubernetes.resourcePools' },
+{ label:ctrl.state.transition.namespace, link:'kubernetes.resourcePools.resourcePool', linkParams:{ id: ctrl.state.transition.namespace } },
+{ label:'Applications', link:'kubernetes.applications' },
+'Stacks',
+ctrl.state.transition.name,
+'Logs'
+]"
+  reload="true"
+></page-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" autocomplete="off">
+            <div class="col-sm-12 form-section-title"> Actions </div>
+            <!-- auto-refresh -->
+            <div class="form-group">
+              <label class="control-label col-sm-3 col-lg-2 vertical-center !py-2 text-left">
+                Auto-refresh
+                <portainer-tooltip message="'Automatically refresh logs every 30 seconds'"></portainer-tooltip>
+              </label>
+              <div class="col-sm-8 col-sm-9 vertical-center">
+                <label class="switch col-sm-8 col-sm-9 vertical-center !mb-0">
+                  <input type="checkbox" ng-model="ctrl.state.autoRefresh" ng-change="ctrl.updateAutoRefresh()" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <!-- !auto-refresh -->
+            <!-- search -->
+            <div class="form-group">
+              <label for="logs_search" class="col-sm-3 col-lg-2 control-label text-left"> Search </label>
+              <div class="col-sm-8 col-lg-9">
+                <input
+                  class="form-control"
+                  type="text"
+                  name="logs_search"
+                  ng-model="ctrl.state.search"
+                  ng-change="ctrl.state.selectedLines.length = 0;"
+                  placeholder="Filter..."
+                  auto-focus
+                />
+              </div>
+            </div>
+            <!-- !search -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-primary btn-sm vertical-center !ml-0" type="button" ng-click="ctrl.downloadLogs()">
+                  <pr-icon icon="'download'"></pr-icon>
+                  Download logs
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 h-[max(400px,calc(100vh-380px))]">
+      <pre class="log_viewer">
+        <div ng-repeat="log in ctrl.state.filteredLogs = (ctrl.stackLogs | filter:{ 'line': ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line"><span ng-style="{'color': log.appColor, 'font-weight': 'bold'};">{{ log.appName }}</span> <span ng-repeat="span in log.spans track by $index" ng-style="{ 'color': span.fgColor, 'background-color': span.bgColor, 'font-weight': span.fontWeight }">{{ span.text }}</span></p></div>
+        <div ng-if="ctrl.stackLogs.length && !ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ ctrl.state.search }}' filter</p></div>
+        <div ng-if="ctrl.stackLogs.length === 0" class="line"><p class="inner_line">No logs available</p></div>
+    </pre>
+    </div>
+  </div>
+</div>

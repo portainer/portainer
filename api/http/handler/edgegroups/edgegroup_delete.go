@@ -1,0 +1,90 @@
+package edgegroups
+
+import (
+	"errors"
+	"net/http"
+	"slices"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+	"github.com/portainer/portainer/pkg/libhttp/request"
+	"github.com/portainer/portainer/pkg/libhttp/response"
+)
+
+// @id EdgeGroupDelete
+// @summary Deletes an EdgeGroup
+// @description **Access policy**: administrator
+// @tags edge_groups
+// @security ApiKeyAuth
+// @security jwt
+// @param id path int true "EdgeGroup Id"
+// @success 204
+// @failure 409 "Edge group is in use by an Edge stack, Edge job or Workflow"
+// @failure 503 "Edge compute features are disabled"
+// @failure 500 "Server error"
+// @router /edge_groups/{id} [delete]
+func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest("Invalid Edge group identifier route variable", err)
+	}
+
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return deleteEdgeGroup(tx, portainer.EdgeGroupID(edgeGroupID))
+	})
+
+	return response.TxEmptyResponse(w, err)
+}
+
+func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) error {
+	ok, err := tx.EdgeGroup().Exists(ID)
+	if !ok {
+		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", dserrors.ErrObjectNotFound)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
+	}
+
+	edgeStacks, err := tx.EdgeStack().EdgeStacks()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve Edge stacks from the database", err)
+	}
+
+	for _, edgeStack := range edgeStacks {
+		if slices.Contains(edgeStack.EdgeGroups, ID) {
+			return httperror.Conflict("Edge group is used by an Edge stack", errors.New("edge group is used by an Edge stack"))
+		}
+	}
+
+	edgeJobs, err := tx.EdgeJob().ReadAll()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve Edge jobs from the database", err)
+	}
+
+	for _, edgeJob := range edgeJobs {
+		if slices.Contains(edgeJob.EdgeGroups, ID) {
+			return httperror.Conflict("Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
+		}
+	}
+
+	workflows, err := tx.Workflow().ReadAll()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve workflows from the database", err)
+	}
+
+	for _, workflow := range workflows {
+		for _, artifact := range workflow.Artifacts {
+			if slices.Contains(artifact.EdgeGroups, ID) {
+				return httperror.Conflict("Edge group is used by a workflow", errors.New("edge group is used by a workflow"))
+			}
+		}
+	}
+
+	err = tx.EdgeGroup().Delete(ID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to remove the Edge group from the database", err)
+	}
+
+	return nil
+}

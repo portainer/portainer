@@ -1,0 +1,7 @@
+<page-header title="'Settings'" breadcrumbs="[{label:'Settings', link:'portainer.settings'}, 'Edge Compute']" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-sm-12" ng-if="$ctrl.settings">
+    <settings-edge-compute on-submit="($ctrl.onSubmitEdgeCompute)" settings="($ctrl.settings)"></settings-edge-compute>
+  </div>
+</div>

@@ -1,0 +1,308 @@
+<page-header title="'Create network'" breadcrumbs="[{label:'Networks', link:'docker.networks'}, 'Add network']"> </page-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="networkCreationForm">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="network_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
+            <div class="col-sm-10 col-lg-11">
+              <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork" data-cy="network-name-input" />
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="col-sm-12 form-section-title"> Driver configuration </div>
+          <!-- driver-input -->
+          <div class="form-group">
+            <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+            <div class="col-sm-10 col-lg-11">
+              <select
+                class="form-control"
+                ng-options="driver for driver in availableNetworkDrivers"
+                ng-model="config.Driver"
+                ng-if="availableNetworkDrivers.length > 0"
+                data-cy="network-driver-select"
+                id="network_driver"
+              >
+                <option disabled hidden value="">Select a driver</option>
+              </select>
+              <input
+                type="text"
+                class="form-control"
+                ng-model="config.Driver"
+                id="network_driver"
+                placeholder="e.g. driverName"
+                ng-if="availableNetworkDrivers.length === 0"
+                data-cy="network-driver-input"
+              />
+            </div>
+          </div>
+          <!-- !driver-input -->
+          <!-- driver-options -->
+          <div class="form-group">
+            <div class="col-sm-12 mt-1">
+              <label class="control-label text-left">
+                Driver options
+                <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
+              </label>
+            </div>
+            <!-- driver-options-input-list -->
+            <div class="col-sm-12 form-inline mt-2">
+              <div ng-repeat="option in formValues.DriverOptions" class="mt-1">
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">name</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    ng-model="option.name"
+                    placeholder="e.g. com.docker.network.bridge.enable_icc"
+                    data-cy="network-driver-option-name-input"
+                  />
+                </div>
+                <div class="input-group col-sm-6 input-group-sm">
+                  <span class="input-group-addon">value</span>
+                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" data-cy="network-driver-option-value-input" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-dangerlight" type="button" ng-click="removeDriverOption($index)">
+                      <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add driver option </div>
+            </div>
+            <!-- !driver-options-input-list -->
+          </div>
+          <!-- !driver-options -->
+          <!-- macvlan-management -->
+          <network-macvlan-form ng-show="config.Driver === 'macvlan'" data="formValues.Macvlan" application-state="applicationState"></network-macvlan-form>
+          <!-- !macvlan-management -->
+          <div ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'swarm'">
+            <div class="col-sm-12 form-section-title"> IPV4 Network configuration </div>
+            <!-- subnet-gateway-inputs -->
+            <div class="form-group">
+              <label for="ipv4_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.Subnet"
+                  id="ipv4_network_subnet"
+                  placeholder="e.g. 172.20.0.0/16"
+                  data-cy="network-ipv4-subnet-input"
+                />
+              </div>
+              <label for="ipv4_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.Gateway"
+                  id="ipv4_network_gateway"
+                  placeholder="e.g. 172.20.10.11"
+                  data-cy="network-ipv4-gateway-input"
+                />
+              </div>
+            </div>
+            <!-- !subnet-gateway-inputs -->
+            <!-- iprange-auxaddr-inputs -->
+            <div class="form-group">
+              <label for="ipv4_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV4.IPRange"
+                  id="ipv4_network_iprange"
+                  placeholder="e.g. 172.20.10.128/25"
+                  data-cy="network-ipv4-iprange-input"
+                />
+              </div>
+            </div>
+            <div ng-repeat="auxAddress in formValues.IPV4.AuxiliaryAddresses track by $index" class="form-group">
+              <label for="ipv4_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  data-cy="network-ipv4-auxaddr-input"
+                  class="form-control"
+                  ng-model="formValues.IPV4.AuxiliaryAddresses[$index]"
+                  ng-change="checkIPV4AuxiliaryAddress($index)"
+                  id="ipv4_network_auxaddr_{{ $index }}"
+                  placeholder="e.g. my-router=172.20.10.129"
+                />
+              </div>
+              <button class="btn btn-dangerlight" type="button" ng-click="removeIPV4AuxAddress($index)">
+                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+              </button>
+              <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+              </div>
+            </div>
+            <!-- !iprange-auxaddr-inputs -->
+            <div class="form-group">
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV4AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
+              </div>
+            </div>
+          </div>
+          <div ng-show="config.Driver === 'bridge' || config.Driver === 'ipvlan' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
+            <div class="col-sm-12 form-section-title"> IPV6 Network configuration </div>
+            <!-- subnet-gateway-inputs -->
+            <div class="form-group">
+              <label for="ipv6_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.Subnet"
+                  id="ipv6_network_subnet"
+                  placeholder="e.g. 2001:db8::/48"
+                  data-cy="network-ipv6-subnet-input"
+                />
+              </div>
+              <label for="ipv6_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.Gateway"
+                  id="ipv6_network_gateway"
+                  placeholder="e.g. 2001:db8::1"
+                  data-cy="network-ipv6-gateway-input"
+                />
+              </div>
+            </div>
+            <!-- !subnet-gateway-inputs -->
+            <!-- iprange-auxaddr-inputs -->
+            <div class="form-group">
+              <label for="ipv6_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.IPV6.IPRange"
+                  id="ipv6_network_iprange"
+                  placeholder="e.g. 2001:db8::/64"
+                  data-cy="network-ipv6-iprange-input"
+                />
+              </div>
+            </div>
+            <div ng-repeat="auxAddress in formValues.IPV6.AuxiliaryAddresses track by $index" class="form-group">
+              <label for="ipv6_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <div class="col-sm-4 col-lg-5">
+                <input
+                  type="text"
+                  data-cy="network-ipv6-auxaddr-input"
+                  class="form-control"
+                  ng-model="formValues.IPV6.AuxiliaryAddresses[$index]"
+                  ng-change="checkIPV6AuxiliaryAddress($index)"
+                  id="ipv6_network_auxaddr_{{ $index }}"
+                  placeholder="e.g. my-router=2001:db8::1"
+                />
+              </div>
+              <button class="btn btn-dangerlight" type="button" ng-click="removeIPV6AuxAddress($index)">
+                <pr-icon icon="'trash-2'" size="'md'"></pr-icon>
+              </button>
+              <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon> Exclude ip cannot be the same as gateway.</p>
+              </div>
+            </div>
+            <!-- !iprange-auxaddr-inputs -->
+            <div class="form-group">
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV6AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'"></pr-icon> Add excluded IP
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title"> Advanced configuration </div>
+          <!-- labels -->
+          <div class="form-group">
+            <!-- labels-input-list -->
+            <div class="col-sm-12 form-inline">
+              <div ng-repeat="label in formValues.Labels" class="mt-1">
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">name</span>
+                  <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" data-cy="network-label-key-input" />
+                </div>
+                <div class="input-group col-sm-6 input-group-sm">
+                  <span class="input-group-addon">value</span>
+                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" data-cy="network-label-value-input" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)"> <pr-icon icon="'trash-2'" size="'md'"></pr-icon> </button
+                  ></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()"> <pr-icon icon="'plus'" size="'md'"></pr-icon> Add label </div>
+              </div>
+            </div>
+            <!-- !labels-input-list -->
+          </div>
+          <!-- !labels-->
+          <!-- internal -->
+          <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Internal"
+                label="'Isolated network'"
+                tooltip="'An isolated network has no inbound or outbound communications.'"
+                on-change="(onChangeInternal)"
+              ></por-switch-field>
+            </div>
+          </div>
+          <!-- !internal -->
+          <!-- attachable -->
+          <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Attachable"
+                label="'Enable manual container attachment'"
+                on-change="(onChangeAttachable)"
+              ></por-switch-field>
+            </div>
+          </div>
+          <!-- !attachable -->
+          <div
+            ng-if="
+              applicationState.endpoint.mode.agentProxy &&
+              applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' &&
+              config.Driver !== 'overlay' &&
+              config.Driver !== 'macvlan'
+            "
+          >
+            <div class="col-sm-12 form-section-title"> Deployment </div>
+            <!-- node-selection -->
+            <node-selector model="formValues.NodeName" endpoint-id="endpoint.Id"> </node-selector>
+            <!-- !node-selection -->
+          </div>
+          <!-- access-control -->
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
+          <!-- !access-control -->
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title"> Actions </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !config.Name || (config.Driver === 'macvlan' && networkCreationForm.$invalid) || !isValid()"
+                ng-click="create()"
+                button-spinner="state.actionInProgress"
+              >
+                <span ng-hide="state.actionInProgress">Create the network</span>
+                <span ng-show="state.actionInProgress">Creating network...</span>
+              </button>
+              <span class="text-danger space-left" ng-if="state.formValidationError">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

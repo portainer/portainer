@@ -1,0 +1,15 @@
+<div ng-if="$ctrl.registry">
+  <page-header title="'Registry access'" breadcrumbs="[{label:'Registries', link:$ctrl.registryTo,}, $ctrl.registry.Name, 'Access management']"> </page-header>
+
+  <registry-details registry="$ctrl.registry"></registry-details>
+
+  <por-access-management
+    ng-if="$ctrl.endpointGroup"
+    access-controlled-entity="$ctrl.registryEndpointAccesses"
+    entity-type="registry"
+    action-in-progress="$ctrl.state.actionInProgress"
+    update-access="$ctrl.updateAccess"
+    filter-users="$ctrl.filterUsers"
+  >
+  </por-access-management>
+</div>

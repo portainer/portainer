@@ -1,0 +1,1 @@
+export { WizardEndpointsList } from './WizardEndpointsList';

@@ -1,0 +1,436 @@
+/* Overide Vendor CSS */
+.form-control {
+  border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
+  color: var(--text-form-control-color);
+}
+
+.text-muted {
+  color: var(--text-muted-color);
+}
+
+.table > thead > tr > th {
+  border-bottom: 1px solid var(--border-table-color);
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: var(--bg-hover-table-color);
+}
+
+.switch i {
+  @apply bg-gray-6;
+  @apply th-dark:bg-gray-warm-8;
+  @apply th-highcontrast:bg-gray-warm-8;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  border-top: 1px solid var(--border-table-top-color);
+}
+
+/* the first cell in the table should have 20px padding instead of 5px to match all other widgets */
+.widget .table:not(td .table) > thead > tr > th:first-child,
+.widget .table:not(td .table) > tbody > tr > th:first-child,
+.widget .table:not(td .table) > tfoot > tr > th:first-child,
+.widget .table:not(td .table) > thead > tr > td:first-child,
+.widget .table:not(td .table) > tbody > tr > td:first-child,
+.widget .table:not(td .table) > tfoot > tr > td:first-child {
+  padding-left: 20px;
+}
+
+/* the last cell in the table should have 20px padding instead of 5px to match all other widgets */
+.widget .table:not(td .table) > thead > tr > th:last-child,
+.widget .table:not(td .table) > tbody > tr > th:last-child,
+.widget .table:not(td .table) > tfoot > tr > th:last-child,
+.widget .table:not(td .table) > thead > tr > td:last-child,
+.widget .table:not(td .table) > tbody > tr > td:last-child,
+.widget .table:not(td .table) > tfoot > tr > td:last-child {
+  padding-right: 20px;
+}
+
+/* tables inside widgets should extend the full width of the widget, with 20px table cell padding padding on the left and right */
+.widget-body:not(.no-padding) > .table,
+.widget-body:not(.no-padding) > .widget-content > .table,
+.widget-body:not(.no-padding) > .widget-content > form > .table {
+  margin: 0 -20px;
+  width: calc(100% + 40px);
+  max-width: calc(100% + 40px);
+}
+
+.input-group-addon {
+  color: var(--text-input-group-addon-color);
+  background-color: var(--bg-input-group-addon-color);
+  border: 1px solid var(--border-input-group-addon-color);
+}
+
+.input-group .form-control {
+  z-index: unset;
+}
+
+.input-group-sm > .input-group-addon {
+  line-height: 1;
+}
+
+.text-danger {
+  color: var(--ui-error-9);
+}
+
+.table .table {
+  background-color: initial;
+}
+
+.table-bordered {
+  border-color: var(--border-table-top-color);
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > td {
+  border-color: var(--border-table-top-color);
+}
+
+.md-checkbox input[type='checkbox']:disabled + label:before {
+  background: var(--bg-md-checkbox-color) !important;
+  border-color: var(--border-md-checkbox-color) !important;
+}
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+  background-color: var(--bg-form-control-disabled-color) !important;
+}
+
+.modal.in .modal-dialog {
+  border: var(--border-modal);
+}
+
+.modal-content {
+  background-color: var(--bg-modal-content-color);
+}
+
+code {
+  color: var(--text-code-color);
+  background-color: var(--bg-code-color);
+}
+
+.nav-tabs {
+  border-bottom: 1px solid var(--border-navtabs-color);
+}
+
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
+}
+
+.nav-tabs > li.active > a {
+  border: 1px solid transparent;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: var(--text-nav-tab-active-color);
+  background-color: var(--bg-nav-tab-active-color);
+  border: 1px solid var(--border-navtabs-color);
+}
+
+.nav-tabs > li.disabled > a {
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.nav-tabs > li > a:hover {
+  border-color: var(--border-navtabs-color);
+}
+
+.nav > li > a {
+  color: var(--text-navtabs-color);
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+  color: var(--text-navtabs-hover-color);
+  background-color: var(--bg-navtabs-hover-color);
+}
+
+.table > thead > tr > td.active,
+.table > tbody > tr > td.active,
+.table > tfoot > tr > td.active,
+.table > thead > tr > th.active,
+.table > tbody > tr > th.active,
+.table > tfoot > tr > th.active,
+.table > thead > tr.active > td,
+.table > tbody > tr.active > td,
+.table > tfoot > tr.active > td,
+.table > thead > tr.active > th,
+.table > tbody > tr.active > th,
+.table > tfoot > tr.active > th {
+  background-color: var(--bg-table-selected-color);
+}
+.table-hover > tbody > tr > td.active:hover,
+.table-hover > tbody > tr > th.active:hover,
+.table-hover > tbody > tr.active:hover > td,
+.table-hover > tbody > tr:hover > .active,
+.table-hover > tbody > tr.active:hover > th {
+  background-color: var(--bg-table-selected-color);
+}
+
+.dropdown-menu {
+  background: var(--bg-dropdown-menu-color);
+  border-radius: 8px;
+}
+
+.dropdown-menu > li > a {
+  color: var(--text-dropdown-menu-color);
+}
+
+pre {
+  border: 1px solid var(--border-pre-color);
+  border-radius: 8px;
+  background-color: var(--bg-pre-color);
+  color: var(--text-pre-color);
+}
+
+.progress {
+  background-color: var(--bg-progress-color);
+}
+
+.widget-body.motd-body {
+  border: 1px solid var(--border-motd-body-color);
+  color: var(--text-motd-body-color);
+  background: var(--bg-motd-body-color) url(../images/purple-gradient.svg) top right / 40% no-repeat;
+}
+
+.widget-body.motd-body .btn.btn-link,
+.widget-body.motd-body .btn.btn-link:hover {
+  padding: 0 5px 0 4px;
+  border-radius: 4px;
+  background-color: var(--bg-motd-btn-color);
+  color: var(--text-motd-btn-color);
+}
+
+.panel-body {
+  background-color: var(--bg-panel-body-color) !important;
+}
+
+.panel {
+  border: 1px solid var(--border-panel-color);
+  background-color: var(--bg-panel-body-color);
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+}
+
+.theme-information .col-sm-12 {
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-top: 15px;
+}
+
+.theme-panel {
+  margin-top: 15px;
+}
+
+.bold {
+  color: var(--text-summary-color);
+  font-weight: 700;
+}
+
+.input-sm {
+  background-color: var(--bg-input-sm-color);
+  border: 1px solid var(--border-input-sm-color);
+}
+
+.rzslider .rz-bubble {
+  color: var(--text-rzslider-color);
+}
+
+.rzslider .rz-bubble.rz-limit {
+  color: var(--text-rzslider-limit-color);
+}
+
+.rz-bubble.rz-limit.rz-ceil {
+  position: absolute;
+  right: 0;
+  left: auto !important;
+  top: -26px;
+}
+
+input,
+select,
+textarea {
+  background: var(--text-input-textarea);
+}
+
+[theme='highcontrast'] input,
+[theme='highcontrast'] select,
+[theme='highcontrast'] textarea {
+  border: 1px solid var(--white-color);
+}
+
+.daterangepicker {
+  background-color: var(--bg-daterangepicker-color);
+  border: 1px solid var(--border-daterangepicker-color);
+}
+
+.daterangepicker .drp-calendar.left {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.left .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .drp-calendar.right {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.right .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .calendar-table {
+  border: 1px solid var(--border-calendar-table);
+}
+
+.daterangepicker td.off,
+.daterangepicker td.off.in-range,
+.daterangepicker td.off.start-date,
+.daterangepicker td.off.end-date {
+  background-color: var(--bg-daterangepicker-end-date);
+  color: var(--text-daterangepicker-end-date);
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+  background-color: var(--bg-daterangepicker-hover);
+}
+
+.daterangepicker td.in-range {
+  background-color: var(--bg-daterangepicker-in-range);
+  color: var(--text-daterangepicker-in-range);
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: var(--bg-daterangepicker-active);
+  color: var(--text-daterangepicker-active);
+}
+
+.daterangepicker .drp-buttons {
+  border-top: 1px solid var(--border-daterangepicker);
+}
+
+.daterangepicker .calendar-table .next span,
+.daterangepicker .calendar-table .prev span {
+  border-color: var(--border-pre-next-month);
+}
+
+.daterangepicker:after {
+  border-bottom: 6px solid var(--border-daterangepicker-after);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+  box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-input-autofill-color) !important;
+}
+
+/* Overide Vendor CSS */
+.multiSelect.inlineBlock button {
+  margin: 0;
+}
+
+.label-default {
+  line-height: 11px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+}
+
+/* Tippy */
+/* For triangle arrow (Sharp) */
+/* Tippy */
+/* For triangle arrow (Sharp) */
+.tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--bg-tooltip-color);
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 8px solid var(--bg-tooltip-color);
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='top'] > .tippy-arrow:before {
+  border-top: 8px solid var(--white-color);
+  margin-bottom: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+  border-bottom: 8px solid var(--white-color);
+  margin-top: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--white-color);
+  margin-left: -1px;
+}
+
+[theme='highcontrast'] .tippy-box[data-placement^='left'] > .tippy-arrow:before {
+  border-left: 8px solid var(--white-color);
+  margin-right: -1px;
+}
+
+/* Sidebar */
+.sidebar .tippy-box {
+  font-size: 12px;
+}
+
+.sidebar.tippy-box[data-placement^='right'] > .tippy-arrow {
+  width: 12px;
+  height: 12px;
+  margin-left: -1px;
+}
+
+.sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--graphite-600);
+  border-width: 6px 8px 6px 0;
+}
+
+[theme='highcontrast'] .sidebar.tippy-box[data-placement^='right'] > .tippy-arrow:before {
+  border-right: 8px solid var(--ui-white);
+}
+
+.sidebar .tippy-content {
+  white-space: nowrap;
+}
+
+.tippy-content {
+  padding: 0;
+}

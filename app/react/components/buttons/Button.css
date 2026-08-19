@@ -1,0 +1,32 @@
+.btn-blue {
+  @apply border-blue-8 bg-blue-8 text-white;
+  @apply hover:border-blue-9 hover:bg-blue-9 hover:text-white;
+  @apply th-dark:border-blue-7 th-dark:bg-blue-7 th-dark:text-white th-dark:hover:border-blue-6 th-dark:hover:bg-blue-6 th-dark:hover:text-white;
+  @apply th-highcontrast:border th-highcontrast:border-solid th-highcontrast:border-white th-highcontrast:bg-blue-8 th-highcontrast:text-white th-highcontrast:hover:bg-blue-9 th-highcontrast:hover:text-white;
+}
+
+.btn-none {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: 0;
+}
+
+.btn-none:focus {
+  outline: none;
+  color: inherit;
+}
+
+/* used for BE teaser. Dark theme specs defined by EE-5621 */
+.btn-warninglight {
+  @apply border-warning-5 bg-warning-2 text-black;
+  @apply th-dark:border-blue-8 th-dark:bg-blue-8 th-dark:bg-opacity-10 th-dark:text-white;
+  @apply th-highcontrast:bg-warning-5 th-highcontrast:bg-opacity-10 th-highcontrast:text-white;
+}
+
+.btn-none:active {
+  outline: none;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}

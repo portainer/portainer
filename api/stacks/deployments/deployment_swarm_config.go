@@ -1,0 +1,109 @@
+package deployments
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/docker/docker/client"
+)
+
+type SwarmStackDeploymentConfig struct {
+	stack         *portainer.Stack
+	endpoint      *portainer.Endpoint
+	registries    []portainer.Registry
+	prune         bool
+	isAdmin       bool
+	user          *portainer.User
+	pullImage     bool
+	FileService   portainer.FileService
+	StackDeployer StackDeployer
+}
+
+func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityContext *security.RestrictedRequestContext, stack *portainer.Stack, endpoint *portainer.Endpoint, fileService portainer.FileService, deployer StackDeployer, prune bool, pullImage bool) (*SwarmStackDeploymentConfig, error) {
+	user, err := tx.User().Read(securityContext.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load user information from the database: %w", err)
+	}
+
+	registries, err := tx.Registry().ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("unable to retrieve registries from the database: %w", err)
+	}
+
+	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
+
+	registryutils.RefreshAndPersistECRTokens(tx, filteredRegistries)
+
+	config := &SwarmStackDeploymentConfig{
+		stack:         stack,
+		endpoint:      endpoint,
+		registries:    filteredRegistries,
+		prune:         prune,
+		isAdmin:       securityContext.IsAdmin,
+		user:          user,
+		pullImage:     pullImage,
+		FileService:   fileService,
+		StackDeployer: deployer,
+	}
+
+	return config, nil
+}
+
+func (config *SwarmStackDeploymentConfig) Deploy(ctx context.Context) error {
+	if config.FileService == nil || config.StackDeployer == nil {
+		log.Println("[deployment, swarm] file service or stack deployer is not initialised")
+		return errors.New("file service or stack deployer cannot be nil")
+	}
+
+	isAdminOrEndpointAdmin := stackutils.UserIsAdminOrEndpointAdmin(config.user)
+
+	settings := &config.endpoint.SecuritySettings
+
+	if !isAdminOrEndpointAdmin {
+		var dockerClient *client.Client
+
+		if factory := config.StackDeployer.GetDockerClientFactory(); factory != nil {
+			var err error
+
+			dockerClient, err = factory.CreateClient(config.endpoint, "", nil)
+			if err != nil {
+				return err
+			}
+			defer logs.CloseAndLogErr(dockerClient)
+		}
+
+		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService, dockerClient); err != nil {
+			return err
+		}
+	}
+
+	if err := stackutils.ValidateComposeURLs(ctx, config.stack, config.FileService); err != nil {
+		return err
+	}
+
+	if stackutils.IsRelativePathStack(config.stack) {
+		return config.StackDeployer.DeployRemoteSwarmStack(ctx, config.user.ID, config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
+	}
+
+	return config.StackDeployer.DeploySwarmStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
+}
+
+func (config *SwarmStackDeploymentConfig) Undeploy(ctx context.Context) error {
+	// Swarm is an orchestrator that handles partial failures internally,
+	// so there is no need to remove failed resources before redeploying.
+	// This method exists only to satisfy the deployment interface.
+	return nil
+}
+
+func (config *SwarmStackDeploymentConfig) GetResponse() string {
+	return ""
+}

@@ -1,0 +1,19 @@
+.code {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 20px;
+}
+
+.root {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: min(20px, 25%);
+  right: 20px;
+  padding: 0;
+  outline: none !important;
+  margin: 0;
+}

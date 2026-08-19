@@ -1,0 +1,89 @@
+<div>
+  <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title"> Access control </div>
+  <!-- access-control-switch -->
+  <div class="form-group">
+    <div class="col-sm-12">
+      <por-switch-field
+        label-class="'col-sm-2'"
+        checked="$ctrl.formData.AccessControlEnabled"
+        label="'Enable access control'"
+        tooltip="'When enabled, you can restrict the access and management of this resource.'"
+        on-change="($ctrl.onChangeEnablement)"
+        data-cy="portainer-accessMgmtToggle"
+      ></por-switch-field>
+    </div>
+  </div>
+  <!-- !access-control-switch -->
+  <!-- restricted-access -->
+
+  <access-type-selector
+    ng-if="$ctrl.formData.AccessControlEnabled"
+    value="$ctrl.formData.Ownership"
+    on-change="($ctrl.onChangeOwnership)"
+    is-admin="$ctrl.isAdmin"
+    name="Ownership"
+    teams="$ctrl.availableTeams"
+  ></access-type-selector>
+
+  <!-- restricted-access -->
+  <!-- authorized-teams -->
+  <div
+    class="form-group mt-4"
+    ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))"
+  >
+    <div class="vertical-center w-full">
+      <label for="teams-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
+        Authorized teams
+        <portainer-tooltip
+          ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0"
+          message="'You can select which teams(s) will be able to manage this resource.'"
+        ></portainer-tooltip>
+        <portainer-tooltip
+          ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 1"
+          message="'As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource.'"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted">
+          You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
+        </span>
+
+        <por-access-control-form-team-selector
+          ng-if="($ctrl.isAdmin && $ctrl.availableTeams.length > 0) || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1)"
+          options="$ctrl.availableTeams"
+          value="$ctrl.formData.AuthorizedTeams"
+          input-id="'teams-selector'"
+          on-change="($ctrl.onAuthorizedTeamsChange)"
+        ></por-access-control-form-team-selector>
+      </div>
+    </div>
+  </div>
+
+  <!-- !authorized-teams -->
+  <!-- authorized-users -->
+  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
+    <div class="vertical-center w-full">
+      <label for="users-selector" class="control-label col-sm-3 col-lg-2 !pt-0 text-left">
+        Authorized users
+        <portainer-tooltip
+          ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0"
+          message="'You can select which user(s) will be able to manage this resource.'"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted">
+          You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
+        </span>
+
+        <por-access-control-form-user-selector
+          ng-if="$ctrl.availableUsers.length > 0"
+          options="$ctrl.availableUsers"
+          value="$ctrl.formData.AuthorizedUsers"
+          input-id="'users-selector'"
+          on-change="($ctrl.onAuthorizedUsersChange)"
+        ></por-access-control-form-user-selector>
+      </div>
+    </div>
+  </div>
+  <!-- !authorized-users -->
+</div>

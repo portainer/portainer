@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" ng-app="portainer" ng-strict-di data-edition="<%= process.env.PORTAINER_EDITION %>">
+  <head>
+    <meta charset="utf-8" />
+    <title>Portainer</title>
+    <meta name="description" content="" />
+    <meta name="author" content="<%= author %>" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="robots" content="noindex" />
+    <base id="base" />
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="<%=require('./assets/ico/apple-touch-icon.png')%>" />
+    <link rel="icon" type="image/png" sizes="32x32" href="<%=require('./assets/ico/favicon-32x32.png')%>" />
+    <link rel="icon" type="image/png" sizes="16x16" href="<%=require('./assets/ico/favicon-16x16.png')%>" />
+    <link rel="mask-icon" href="<%=require('./assets/ico/safari-pinned-tab.svg')%>" color="#000000" />
+    <link rel="shortcut icon" href="<%=require('./assets/ico/favicon.ico')%>" />
+    <meta name="msapplication-config" content="<%=require('./assets/ico/browserconfig.xml')%>" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+
+  <body ng-controller="MainController">
+    <react-query-dev-tools></react-query-dev-tools>
+    <div
+      id="page-wrapper"
+      ng-class="{
+        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin', 'portainer.init.edge', 'kubernetes.kubectlshell'].indexOf($state.current.name) === -1,
+        nopadding:
+          ['portainer.auth', 'portainer.init.admin', 'portainer.init.edge', 'portainer.logout', 'kubernetes.kubectlshell'].indexOf($state.current.name) > -1 ||
+          applicationState.loading,
+      }"
+      ng-cloak
+    >
+      <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
+
+      <div id="content-wrapper">
+        <div class="page-content">
+          <div class="page-wrapper" ng-if="applicationState.loading">
+            <!-- loading box -->
+            <div class="simple-box container">
+              <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+                <!-- loading box logo -->
+                <div class="row">
+                  <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
+                  <div ng-if="!logo">
+                    <img src="<%=require('./assets/images/logo_alt.svg')%>" class="simple-box-logo hidden th-highcontrast:!block th-dark:!block" alt="Portainer" />
+                    <img src="<%=require('./assets/images/logo_alt_black.svg')%>" class="simple-box-logo block th-highcontrast:hidden th-dark:hidden" alt="Portainer" />
+                  </div>
+                </div>
+                <!-- !loading box logo -->
+                <!-- panel -->
+                <div class="ml-0 mr-0 flex items-center justify-center text-center">
+                  Loading Portainer...
+                  <!-- adding the svg inline means that the settings icon loads in time (vs pr-icon) and with the correct color (vs img) -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="!ml-1 inline animate-spin-slow"
+                  >
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                    ></path>
+                  </svg>
+                </div>
+                <!-- !panel -->
+              </div>
+            </div>
+            <!-- !loading box -->
+          </div>
+
+          <!-- Main Content -->
+          <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
+        </div>
+        <!-- End Page Content -->
+      </div>
+      <!-- End Content Wrapper -->
+    </div>
+    <!-- End Page Wrapper -->
+  </body>
+</html>

@@ -1,0 +1,125 @@
+/* react-datetime-picker */
+/* https://github.com/wojtekmaj/react-datetime-picker#custom-styling */
+
+/*
+  library css for buttons is overriden by `.widget .widget-body button`
+  so we have to force margin: 0
+*/
+.react-daterange-picker__calendar .react-calendar button {
+  margin: 0 !important;
+}
+
+/*
+  Extending Calendar.css from react-daterange-picker__calendar
+*/
+.react-calendar {
+  background: var(--bg-calendar-color);
+  color: var(--text-main-color);
+  @apply th-dark:bg-gray-iron-10;
+}
+
+/* calendar nav buttons */
+.react-calendar__navigation button:disabled {
+  background: var(--bg-calendar-color);
+  @apply opacity-60;
+  @apply brightness-95 th-dark:brightness-110;
+  @apply th-dark:bg-gray-iron-7;
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background: var(--bg-daterangepicker-color);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+/* date tile */
+.react-calendar__tile:disabled {
+  @apply opacity-60;
+  @apply brightness-95 th-dark:brightness-110;
+  @apply th-dark:bg-gray-iron-7;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+/* today's date tile */
+.react-calendar__tile--now {
+  @apply th-highcontrast:text-[color:var(--bg-calendar-color)] th-dark:text-[color:var(--bg-calendar-color)];
+  border-radius: 0.25rem !important;
+}
+.react-daterange-picker__calendar .react-calendar__tile--now:enabled:hover,
+.react-daterange-picker__calendar .react-calendar__tile--now:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+/* probably date tile in range */
+.react-calendar__tile--hasActive {
+  background: var(--bg-daterangepicker-end-date);
+  color: var(--text-daterangepicker-end-date);
+  @apply th-dark:bg-gray-iron-7;
+}
+.react-calendar__tile--hasActive:enabled:hover,
+.react-calendar__tile--hasActive:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background: var(--bg-daterangepicker-hover);
+  color: var(--text-daterangepicker-hover);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+.react-daterange-picker__calendar
+  .react-calendar__month-view__days__day:hover:not(.react-daterange-picker__calendar .react-calendar__tile--hoverEnd):not(
+    .react-daterange-picker__calendar .react-calendar__tile--hoverStart
+  ):not(.react-calendar__tile--active) {
+  border-radius: 0.25rem !important;
+}
+
+/* on range select hover */
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background: var(--bg-daterangepicker-in-range);
+  color: var(--text-daterangepicker-in-range);
+  @apply th-dark:bg-gray-iron-7;
+}
+
+/*
+  Extending DateTimePicker.css from react-daterange-picker__calendar
+*/
+.react-daterange-picker__calendar .react-daterange-picker__calendar--disabled {
+  @apply opacity-40;
+}
+
+/* selected date tile */
+.react-daterange-picker__calendar .react-calendar__tile--active {
+  background: var(--bg-daterangepicker-active) !important;
+  color: var(--text-daterangepicker-active) !important;
+}
+
+.react-daterange-picker__calendar .react-calendar__tile--rangeStart:not(.react-calendar__tile--rangeEnd),
+.react-daterange-picker__calendar .react-calendar__tile--hoverStart {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.react-daterange-picker__calendar .react-calendar__tile--rangeEnd:not(.react-calendar__tile--rangeStart),
+.react-daterange-picker__calendar .react-calendar__tile--hoverEnd {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.react-daterange-picker__calendar .react-calendar__month-view__days__day--weekend {
+  color: inherit;
+}
+
+.react-calendar__tile--active.react-calendar__month-view__days__day--weekend {
+  color: var(--text-daterangepicker-active);
+  @apply th-dark:bg-gray-iron-7;
+}

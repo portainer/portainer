@@ -1,0 +1,25 @@
+.status:not(:last-child) {
+  margin-right: 1em;
+}
+
+.status .icon {
+  padding: 0 !important;
+  margin-right: 1ch;
+  border-radius: 50%;
+  background-color: grey;
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+}
+
+.status .error {
+  background-color: #ae2323;
+}
+
+.status .acknowledged {
+  background-color: #337ab7;
+}
+
+.status .ok {
+  background-color: #23ae89;
+}

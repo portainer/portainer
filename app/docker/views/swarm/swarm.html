@@ -1,0 +1,40 @@
+<page-header title="'Cluster overview'" breadcrumbs="['Swarm']" reload="true"> </page-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="trello" title-text="Cluster status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ info.Swarm.Nodes }}</td>
+            </tr>
+            <tr>
+              <td>Docker API version</td>
+              <td>{{ docker.ApiVersion }}</td>
+            </tr>
+            <tr>
+              <td>Total CPU</td>
+              <td>{{ totalCPU }}</td>
+            </tr>
+            <tr>
+              <td>Total memory</td>
+              <td>{{ totalMemory | humansize: 2 }}</td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a ui-sref="docker.swarm.visualizer" class="vertical-center"><pr-icon icon="'trello'" class-name="'icon'"></pr-icon>Go to cluster visualizer</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<nodes-datatable dataset="nodes" is-ip-column-visible="applicationState.endpoint.apiVersion >= 1.25" have-access-to-node="isAdmin" on-refresh="(getNodes)"></nodes-datatable>

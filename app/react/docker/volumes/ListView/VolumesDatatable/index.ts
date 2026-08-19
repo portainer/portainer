@@ -1,0 +1,1 @@
+export { VolumesDatatable } from './VolumesDatatable';

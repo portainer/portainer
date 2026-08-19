@@ -1,0 +1,163 @@
+import { Formik, Form } from 'formik';
+import { Laptop, Network } from 'lucide-react';
+import { useState } from 'react';
+
+import { Settings } from '@/react/portainer/settings/types';
+import { PortainerUrlField } from '@/react/portainer/common/PortainerUrlField';
+import { PortainerTunnelAddrField } from '@/react/portainer/common/PortainerTunnelAddrField';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { ConnectivityTestModal } from '@/react/edge/components/ConnectivityTestModal/ConnectivityTestModal';
+
+import { Switch } from '@@/form-components/SwitchField/Switch';
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
+import { Button } from '@@/buttons';
+
+import { validationSchema } from './EdgeComputeSettings.validation';
+import { FormValues } from './types';
+
+interface Props {
+  settings?: Settings;
+  onSubmit(values: FormValues): void;
+}
+
+export function EdgeComputeSettings({ settings, onSubmit }: Props) {
+  const [isConnectivityModalOpen, setIsConnectivityModalOpen] = useState(false);
+
+  if (!settings) {
+    return null;
+  }
+
+  const initialValues: FormValues = {
+    EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
+    EdgePortainerUrl: settings.EdgePortainerUrl,
+    Edge: {
+      TunnelServerAddress: settings.Edge?.TunnelServerAddress,
+    },
+    EnforceEdgeID: settings.EnforceEdgeID,
+  };
+
+  return (
+    <div className="row">
+      <Widget>
+        <WidgetTitle icon={Laptop} title="Edge Compute settings" />
+
+        <WidgetBody>
+          <Formik
+            initialValues={initialValues}
+            enableReinitialize
+            validationSchema={() => validationSchema()}
+            onSubmit={onSubmit}
+            validateOnMount
+          >
+            {({
+              values,
+              errors,
+              handleSubmit,
+              setFieldValue,
+              isSubmitting,
+              isValid,
+              dirty,
+            }) => (
+              <Form
+                className="form-horizontal"
+                onSubmit={handleSubmit}
+                noValidate
+              >
+                <FormControl
+                  inputId="edge_enable"
+                  label="Enable Edge Compute features"
+                  size="small"
+                  errors={errors.EnableEdgeComputeFeatures}
+                >
+                  <Switch
+                    id="edge_enable"
+                    data-cy="edge-enable-switch"
+                    name="edge_enable"
+                    className="space-right"
+                    checked={values.EnableEdgeComputeFeatures}
+                    onChange={(e) =>
+                      setFieldValue('EnableEdgeComputeFeatures', e)
+                    }
+                  />
+                </FormControl>
+
+                <TextTip color="blue" className="mb-2">
+                  Enable this setting to use Portainer Edge Compute
+                  capabilities.
+                </TextTip>
+
+                {isBE && values.EnableEdgeComputeFeatures && (
+                  <>
+                    <PortainerUrlField
+                      fieldName="EdgePortainerUrl"
+                      tooltip="URL of this Portainer instance that will be used by Edge agents to initiate the communications."
+                    />
+
+                    <PortainerTunnelAddrField fieldName="Edge.TunnelServerAddress" />
+
+                    <div className="form-group">
+                      <div className="col-sm-12">
+                        <Button
+                          color="default"
+                          icon={Network}
+                          onClick={() => setIsConnectivityModalOpen(true)}
+                          data-cy="edge-compute-test-connectivity-button"
+                          className="!ml-0"
+                        >
+                          Test connectivity
+                        </Button>
+                      </div>
+                    </div>
+
+                    {isConnectivityModalOpen && (
+                      <ConnectivityTestModal
+                        portainerUrl={values.EdgePortainerUrl}
+                        tunnelServerAddr={values.Edge.TunnelServerAddress}
+                        onDismiss={() => setIsConnectivityModalOpen(false)}
+                      />
+                    )}
+                  </>
+                )}
+
+                <FormControl
+                  inputId="edge_enforce_id"
+                  label="Enforce use of Portainer generated Edge ID"
+                  size="small"
+                  tooltip="This setting only applies to manually created environments."
+                  errors={errors.EnforceEdgeID}
+                >
+                  <Switch
+                    id="edge_enforce_id"
+                    data-cy="edge-enforce-id-switch"
+                    name="edge_enforce_id"
+                    className="space-right"
+                    checked={values.EnforceEdgeID}
+                    onChange={(e) =>
+                      setFieldValue('EnforceEdgeID', e.valueOf())
+                    }
+                  />
+                </FormControl>
+
+                <div className="form-group mt-5">
+                  <div className="col-sm-12">
+                    <LoadingButton
+                      disabled={!isValid || !dirty}
+                      data-cy="settings-edgeComputeButton"
+                      isLoading={isSubmitting}
+                      loadingText="Saving settings..."
+                    >
+                      Save settings
+                    </LoadingButton>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </WidgetBody>
+      </Widget>
+    </div>
+  );
+}

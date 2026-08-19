@@ -1,0 +1,103 @@
+package oauthtest
+
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
+
+	"github.com/gorilla/mux"
+	"github.com/segmentio/encoding/json"
+)
+
+const AccessToken = "test-token"
+
+// OAuthRoutes is an OAuth 2.0 compliant handler
+func OAuthRoutes(code string, config *portainer.OAuthSettings) http.Handler {
+	router := mux.NewRouter()
+
+	router.HandleFunc(
+		"/authorize",
+		func(w http.ResponseWriter, req *http.Request) {
+			location := fmt.Sprintf("%s?code=%s&state=%s", config.RedirectURI, code, "anything")
+			// w.Header().Set("Location", location)
+			// w.WriteHeader(http.StatusFound)
+			http.Redirect(w, req, location, http.StatusFound)
+		},
+	).Methods(http.MethodGet)
+
+	router.HandleFunc(
+		"/access_token",
+		func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			if err := req.ParseForm(); err != nil {
+				if _, innerErr := fmt.Fprintf(w, "ParseForm() err: %v", err); innerErr != nil {
+					log.Warn().Err(innerErr).Msg("failed to write response")
+				}
+
+				return
+			}
+
+			reqCode := req.FormValue("code")
+			if reqCode != code {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode(map[string]any{
+				"token_type":   "Bearer",
+				"expires_in":   86400,
+				"access_token": AccessToken,
+				"scope":        "groups",
+			}); err != nil {
+				log.Warn().Err(err).Msg("failed to write response")
+			}
+		},
+	).Methods(http.MethodPost)
+
+	router.HandleFunc(
+		"/user",
+		func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			authHeader := req.Header.Get("Authorization")
+			splitToken := strings.Split(authHeader, "Bearer ")
+			if len(splitToken) < 2 || splitToken[1] != AccessToken {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode(map[string]any{
+				"username": "test-oauth-user",
+				"groups":   "testing",
+			}); err != nil {
+				log.Warn().Err(err).Msg("failed to write response")
+			}
+		},
+	).Methods(http.MethodGet)
+
+	return router
+}
+
+// RunOAuthServer is a barebones OAuth 2.0 compliant test server which can be used to test OAuth 2 functionality
+func RunOAuthServer(code string, config *portainer.OAuthSettings) (*httptest.Server, *portainer.OAuthSettings) {
+	srv := httptest.NewUnstartedServer(http.DefaultServeMux)
+
+	addr := srv.Listener.Addr()
+
+	config.AuthorizationURI = fmt.Sprintf("http://%s/authorize", addr)
+	config.AccessTokenURI = fmt.Sprintf("http://%s/access_token", addr)
+	config.ResourceURI = fmt.Sprintf("http://%s/user", addr)
+	config.RedirectURI = fmt.Sprintf("http://%s/", addr)
+
+	srv.Config.Handler = OAuthRoutes(code, config)
+	srv.Start()
+
+	return srv, config
+}

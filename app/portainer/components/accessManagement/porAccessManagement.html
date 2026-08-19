@@ -1,0 +1,78 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget ng-if="ctrl.availableUsersAndTeams && ctrl.accessControlledEntity">
+      <rd-widget-header icon="user-check" title-text="Create access"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
+            <span class="col-sm-12 small text-warning">
+              <p class="vertical-center">
+                <pr-icon icon="'alert-circle'" mode="'warning'"></pr-icon>
+                Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
+              </p>
+            </span>
+          </div>
+
+          <por-access-management-users-selector
+            options="ctrl.availableUsersAndTeams"
+            value="ctrl.formValues.multiselectOutput"
+            on-change="(ctrl.onChangeUsersAndTeams)"
+          ></por-access-management-users-selector>
+
+          <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
+            <label class="col-sm-3 col-lg-2 control-label text-left"> Role </label>
+            <div class="col-sm-9 col-lg-6">
+              <div class="flex items-center">
+                <div>
+                  <select
+                    class="form-control"
+                    data-cy="access-management-role-select"
+                    ng-model="ctrl.formValues.selectedRole"
+                    ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles"
+                  >
+                  </select>
+                </div>
+                <be-feature-indicator feature="ctrl.limitedFeature" class="space-left"></be-feature-indicator>
+              </div>
+            </div>
+          </div>
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm vertical-center"
+                ng-disabled="ctrl.availableUsersAndTeams.length === 0 || ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
+                ng-click="ctrl.authorizeAccess()"
+                button-spinner="ctrl.actionInProgress"
+                data-cy="access-createAccess"
+              >
+                <span ng-hide="ctrl.state.actionInProgress" class="vertical-center">
+                  <pr-icon icon="'plus'"></pr-icon>
+                  Create access
+                </span>
+                <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<access-datatable
+  ng-if="ctrl.authorizedUsersAndTeams"
+  table-key="'access_' + ctrl.entityType"
+  show-warning="ctrl.entityType !== 'registry'"
+  is-update-enabled="ctrl.entityType !== 'registry'"
+  show-roles="ctrl.entityType !== 'registry'"
+  roles="ctrl.roles"
+  inherit-from="ctrl.inheritFrom"
+  dataset="ctrl.authorizedUsersAndTeams"
+  on-update="(ctrl.updateAction)"
+  on-remove="(ctrl.unauthorizeAccess)"
+>
+</access-datatable>

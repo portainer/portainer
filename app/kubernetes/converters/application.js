@@ -1,0 +1,380 @@
+import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
+
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from '@/kubernetes/models/application/models/appConstants';
+import {
+  KubernetesApplication,
+  KubernetesApplicationConfigurationVolume,
+  KubernetesApplicationPersistedFolder,
+  KubernetesApplicationPort,
+  KubernetesPortainerApplicationNameLabel,
+  KubernetesPortainerApplicationNote,
+  KubernetesPortainerApplicationOwnerLabel,
+  KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationStackIdLabel,
+  KubernetesPortainerApplicationKindLabel,
+} from '@/kubernetes/models/application/models';
+import { KubernetesServiceTypes } from '@/kubernetes/models/service/models';
+import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
+import { KubernetesApplicationFormValues } from '@/kubernetes/models/application/formValues';
+import KubernetesApplicationHelper from '@/kubernetes/helpers/application';
+import KubernetesDeploymentConverter from '@/kubernetes/converters/deployment';
+import KubernetesDaemonSetConverter from '@/kubernetes/converters/daemonSet';
+import KubernetesStatefulSetConverter from '@/kubernetes/converters/statefulSet';
+import KubernetesPodConverter from '@/kubernetes/pod/converter';
+import KubernetesServiceConverter from '@/kubernetes/converters/service';
+import KubernetesPersistentVolumeClaimConverter from '@/kubernetes/converters/persistentVolumeClaim';
+import PortainerError from '@/portainer/error';
+import { KubernetesIngressHelper } from '@/kubernetes/ingress/helper';
+import KubernetesCommonHelper from '@/kubernetes/helpers/commonHelper';
+import { KubernetesConfigurationKinds } from '@/kubernetes/models/configuration/models';
+import { parseCPU } from '@/react/kubernetes/utils';
+
+function _apiPortsToPublishedPorts(pList, pRefs) {
+  const ports = _.map(pList, (item) => {
+    const res = new KubernetesApplicationPort();
+    res.Port = item.port;
+    res.TargetPort = item.targetPort;
+    res.NodePort = item.nodePort;
+    res.Protocol = item.protocol;
+    return res;
+  });
+  _.forEach(ports, (port) => {
+    if (isNaN(port.TargetPort)) {
+      const targetPort = _.find(pRefs, { name: port.TargetPort });
+      if (targetPort) {
+        port.TargetPort = targetPort.containerPort;
+      }
+    }
+  });
+  return ports;
+}
+
+class KubernetesApplicationConverter {
+  static applicationCommon(res, data, pods, service, ingresses) {
+    const containers = data.spec.template ? _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined) : data.spec.containers;
+    res.Id = data.metadata.uid;
+    res.Name = data.metadata.name;
+    res.Metadata = data.metadata;
+    res.ApplicationType = data.kind;
+    res.Labels = data.metadata.labels || {};
+
+    if (data.metadata.labels) {
+      const { labels } = data.metadata;
+      res.StackId = labels[KubernetesPortainerApplicationStackIdLabel] ? parseInt(labels[KubernetesPortainerApplicationStackIdLabel], 10) : null;
+      res.StackName = labels[KubernetesPortainerApplicationStackNameLabel] || '';
+      res.ApplicationKind = labels[KubernetesPortainerApplicationKindLabel] || '';
+      res.ApplicationOwner = labels[KubernetesPortainerApplicationOwnerLabel] || '';
+      res.ApplicationName = labels[KubernetesPortainerApplicationNameLabel] || res.Name;
+    }
+
+    res.Note = data.metadata.annotations ? data.metadata.annotations[KubernetesPortainerApplicationNote] || '' : '';
+    res.ResourcePool = data.metadata.namespace;
+    if (containers.length) {
+      res.Image = containers[0].image;
+    }
+    if (data.spec.template && data.spec.template.spec && data.spec.template.spec.imagePullSecrets && data.spec.template.spec.imagePullSecrets.length) {
+      res.RegistryId = parseInt(data.spec.template.spec.imagePullSecrets[0].name.replace('registry-', ''), 10);
+    }
+    res.CreationDate = data.metadata.creationTimestamp;
+    res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
+    res.Pods = data.spec.selector ? KubernetesApplicationHelper.associatePodsAndApplication(pods, data.spec.selector) : [data];
+
+    const limits = {
+      Cpu: 0,
+      Memory: 0,
+    };
+    res.Limits = _.reduce(
+      containers,
+      (acc, item) => {
+        if (item.resources.limits && item.resources.limits.cpu) {
+          acc.Cpu += parseCPU(item.resources.limits.cpu);
+        }
+        if (item.resources.limits && item.resources.limits.memory) {
+          acc.Memory += filesizeParser(item.resources.limits.memory, { base: 10 });
+        }
+        return acc;
+      },
+      limits
+    );
+
+    const requests = {
+      Cpu: 0,
+      Memory: 0,
+    };
+    res.Requests = _.reduce(
+      containers,
+      (acc, item) => {
+        if (item.resources.requests && item.resources.requests.cpu) {
+          acc.Cpu += parseCPU(item.resources.requests.cpu);
+        }
+        if (item.resources.requests && item.resources.requests.memory) {
+          acc.Memory += filesizeParser(item.resources.requests.memory, { base: 10 });
+        }
+        return acc;
+      },
+      requests
+    );
+
+    if (service) {
+      const serviceType = service.spec.type;
+      res.ServiceType = serviceType;
+      res.ServiceId = service.metadata.uid;
+      res.ServiceName = service.metadata.name;
+      res.ClusterIp = service.spec.clusterIP;
+      res.ExternalIp = service.spec.externalIP;
+
+      if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
+        if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
+          res.LoadBalancerIPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
+        }
+      }
+
+      const portsRefs = _.concat(..._.map(containers, (container) => container.ports));
+      const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
+      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service.metadata.name);
+      _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
+      res.PublishedPorts = ports;
+    }
+
+    if (data.spec.template) {
+      res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+    } else {
+      res.Volumes = data.spec.volumes;
+    }
+
+    // TODO: review
+    // this if() fixs direct use of PVC reference inside spec.template.spec.containers[0].volumeMounts
+    // instead of referencing the PVC the "good way" using spec.template.spec.volumes array
+    // Basically it creates an "in-memory" reference for the PVC, as if it was saved in
+    // spec.template.spec.volumes and retrieved from here.
+    //
+    // FIX FOR SFS ONLY ; as far as we know it's not possible to do this with DEPLOYMENTS/DAEMONSETS
+    //
+    // This may lead to destructing behaviours when we will allow external apps to be edited.
+    // E.G. if we try to generate the formValues and patch the app, SFS reference will be created under
+    // spec.template.spec.volumes and not be referenced directly inside spec.template.spec.containers[0].volumeMounts
+    // As we preserve original SFS name and try to build around it, it SHOULD be fine, but we definitely need to test this
+    // before allowing external apps modification
+    if (data.spec.volumeClaimTemplates) {
+      const vcTemplates = _.map(data.spec.volumeClaimTemplates, (vc) => {
+        return {
+          name: vc.metadata.name,
+          persistentVolumeClaim: { claimName: vc.metadata.name },
+        };
+      });
+      const inexistingPVC = _.filter(vcTemplates, (vc) => {
+        return !_.find(res.Volumes, { persistentVolumeClaim: { claimName: vc.persistentVolumeClaim.claimName } });
+      });
+      res.Volumes = _.concat(res.Volumes, inexistingPVC);
+    }
+
+    const persistedFolders = _.filter(res.Volumes, (volume) => volume.persistentVolumeClaim || volume.hostPath);
+
+    res.PersistedFolders = _.map(persistedFolders, (volume) => {
+      const volumeMounts = _.uniq(_.flatMap(_.map(containers, 'volumeMounts')), 'name');
+      const matchingVolumeMount = _.find(volumeMounts, { name: volume.name });
+
+      if (matchingVolumeMount) {
+        const persistedFolder = new KubernetesApplicationPersistedFolder();
+        persistedFolder.MountPath = matchingVolumeMount.mountPath;
+
+        if (volume.persistentVolumeClaim) {
+          persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
+        } else {
+          persistedFolder.HostPath = volume.hostPath.path;
+        }
+
+        return persistedFolder;
+      }
+    });
+
+    res.PersistedFolders = _.without(res.PersistedFolders, undefined);
+
+    res.ConfigurationVolumes = _.reduce(
+      res.Volumes,
+      (acc, volume) => {
+        if (volume.configMap || volume.secret) {
+          const matchingVolumeMount = _.find(_.flatMap(_.map(containers, 'volumeMounts')), { name: volume.name });
+
+          if (matchingVolumeMount) {
+            let items = [];
+            let configurationName = '';
+
+            if (volume.configMap) {
+              items = volume.configMap.items;
+              configurationName = volume.configMap.name;
+            } else {
+              items = volume.secret.items;
+              configurationName = volume.secret.secretName;
+            }
+
+            if (!items) {
+              const configurationVolume = new KubernetesApplicationConfigurationVolume();
+              configurationVolume.fileMountPath = matchingVolumeMount.mountPath;
+              configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
+              configurationVolume.configurationName = configurationName;
+              configurationVolume.configurationType = volume.configMap ? KubernetesConfigurationKinds.CONFIGMAP : KubernetesConfigurationKinds.SECRET;
+
+              acc.push(configurationVolume);
+            } else {
+              _.forEach(items, (item) => {
+                const configurationVolume = new KubernetesApplicationConfigurationVolume();
+                configurationVolume.fileMountPath = matchingVolumeMount.mountPath + '/' + item.path;
+                configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
+                configurationVolume.configurationKey = item.key;
+                configurationVolume.configurationName = configurationName;
+                configurationVolume.configurationType = volume.configMap ? KubernetesConfigurationKinds.CONFIGMAP : KubernetesConfigurationKinds.SECRET;
+
+                acc.push(configurationVolume);
+              });
+            }
+          }
+        }
+
+        return acc;
+      },
+      []
+    );
+  }
+
+  static apiPodToApplication(data, pods, service, ingresses) {
+    const res = new KubernetesApplication();
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
+    res.ApplicationType = KubernetesApplicationTypes.Pod;
+    return res;
+  }
+
+  static apiDeploymentToApplication(data, pods, service, ingresses) {
+    const res = new KubernetesApplication();
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
+    res.ApplicationType = KubernetesApplicationTypes.Deployment;
+    res.DeploymentType = KubernetesApplicationDeploymentTypes.Replicated;
+    res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.Shared;
+    res.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas || 0;
+    res.TotalPodsCount = data.spec.replicas;
+    return res;
+  }
+
+  static apiDaemonSetToApplication(data, pods, service, ingresses) {
+    const res = new KubernetesApplication();
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
+    res.ApplicationType = KubernetesApplicationTypes.DaemonSet;
+    res.DeploymentType = KubernetesApplicationDeploymentTypes.Global;
+    res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.Shared;
+    res.RunningPodsCount = data.status.numberAvailable || data.status.desiredNumberScheduled - data.status.numberUnavailable || 0;
+    res.TotalPodsCount = data.status.desiredNumberScheduled;
+    return res;
+  }
+
+  static apiStatefulSetToapplication(data, pods, service, ingresses) {
+    const res = new KubernetesApplication();
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
+    res.ApplicationType = KubernetesApplicationTypes.StatefulSet;
+    res.DeploymentType = KubernetesApplicationDeploymentTypes.Replicated;
+    res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.Isolated;
+    res.RunningPodsCount = data.status.readyReplicas || 0;
+    res.TotalPodsCount = data.spec.replicas;
+    res.HeadlessServiceName = data.spec.serviceName;
+    return res;
+  }
+
+  static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims, nodesLabels, ingresses) {
+    const res = new KubernetesApplicationFormValues();
+    res.ApplicationType = app.ApplicationType;
+    res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
+    res.Name = app.Name;
+    res.Labels = app.Labels;
+    res.Services = KubernetesApplicationHelper.generateServicesFormValuesFromServices(app, ingresses);
+    res.Selector = KubernetesApplicationHelper.generateSelectorFromService(app);
+    res.StackName = app.StackName;
+    res.ApplicationOwner = app.ApplicationOwner;
+    res.ImageModel.Image = app.Image;
+    res.ImageModel.Registry.Id = app.RegistryId;
+    res.ReplicaCount = app.TotalPodsCount;
+    res.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(app.Limits.Memory);
+    res.CpuLimit = app.Limits.Cpu;
+    res.DeploymentType = app.DeploymentType;
+    res.DataAccessPolicy = app.DataAccessPolicy;
+    res.EnvironmentVariables = KubernetesApplicationHelper.generateEnvVariablesFromEnv(app.Env);
+    res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
+    res.Secrets = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(
+      app.Env,
+      app.ConfigurationVolumes,
+      configurations,
+      KubernetesConfigurationKinds.SECRET
+    );
+    res.ConfigMaps = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(
+      app.Env,
+      app.ConfigurationVolumes,
+      configurations,
+      KubernetesConfigurationKinds.CONFIGMAP
+    );
+    res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
+    res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts, ingresses);
+    res.Containers = app.Containers;
+
+    res.PublishingType = app.ServiceType;
+
+    if (app.Pods && app.Pods.length) {
+      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity);
+    }
+
+    return res;
+  }
+
+  static applicationFormValuesToApplication(formValues) {
+    formValues.ApplicationOwner = KubernetesCommonHelper.ownerToLabel(formValues.ApplicationOwner);
+
+    const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
+    const rwx = KubernetesApplicationHelper.hasRWX(claims);
+
+    const deployment =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.Replicated &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.Shared))) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.Deployment;
+
+    const statefulSet =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.Replicated &&
+        claims.length > 0 &&
+        formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.Isolated) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.StatefulSet;
+
+    const daemonSet =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.Global &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.Shared && rwx))) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.DaemonSet;
+
+    const pod = formValues.ApplicationType === KubernetesApplicationTypes.Pod;
+
+    let app;
+    if (deployment) {
+      app = KubernetesDeploymentConverter.applicationFormValuesToDeployment(formValues, claims);
+    } else if (statefulSet) {
+      app = KubernetesStatefulSetConverter.applicationFormValuesToStatefulSet(formValues, claims);
+    } else if (daemonSet) {
+      app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues, claims);
+    } else if (pod) {
+      app = KubernetesPodConverter.applicationFormValuesToPod(formValues, claims);
+    } else {
+      throw new PortainerError('Unable to determine which association to use to convert form');
+    }
+    app.ApplicationType = formValues.ApplicationType;
+
+    let headlessService;
+    if (statefulSet) {
+      headlessService = KubernetesServiceConverter.applicationFormValuesToHeadlessService(formValues);
+    }
+
+    let service = KubernetesServiceConverter.applicationFormValuesToService(formValues);
+    if (!service.Ports.length) {
+      service = undefined;
+    }
+
+    let services = KubernetesServiceConverter.applicationFormValuesToServices(formValues);
+
+    return [app, headlessService, services, service, claims];
+  }
+}
+
+export default KubernetesApplicationConverter;

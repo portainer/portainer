@@ -1,0 +1,193 @@
+.btn {
+  @apply !outline-none;
+  @apply border border-solid border-transparent;
+
+  border-radius: 8px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  @apply opacity-40;
+  touch-action: none;
+}
+
+.btn:hover {
+  color: var(--text-button-hover-color);
+}
+
+.btn.active {
+  box-shadow: none;
+}
+
+.btn-icon {
+  @apply !border-none !bg-transparent p-0;
+}
+
+.btn.btn-primary {
+  @apply border-graphite-700 bg-graphite-700 text-mist-100;
+  @apply hover:border-graphite-700/90 hover:bg-graphite-700/90 hover:text-mist-100;
+  @apply focus:border-blue-5 focus:text-mist-100 focus:shadow-graphite-700/80;
+
+  @apply th-dark:border-mist-100 th-dark:bg-mist-100 th-dark:text-graphite-700;
+  @apply th-dark:hover:border-mist-100/90 th-dark:hover:bg-mist-100/90 th-dark:hover:text-graphite-700;
+  @apply th-dark:focus:border-blue-5 th-dark:focus:text-graphite-700 th-dark:focus:shadow-white/80;
+
+  @apply th-highcontrast:border-mist-100 th-highcontrast:bg-mist-100 th-highcontrast:text-graphite-700;
+  @apply th-highcontrast:hover:border-mist-100/90 th-highcontrast:hover:bg-mist-100/90 th-highcontrast:hover:text-graphite-700;
+  @apply th-highcontrast:focus:border-blue-5 th-highcontrast:focus:text-graphite-700 th-highcontrast:focus:shadow-white/80;
+}
+
+/* Sidebar background is always dark, so we need to override the primary button styles */
+.btn.btn-primary.sidebar {
+  @apply border-mist-100 bg-mist-100 text-graphite-700;
+  @apply hover:border-mist-100/90 hover:bg-mist-100/90 hover:text-graphite-700;
+  @apply focus:border-blue-5 focus:text-graphite-700 focus:shadow-white/80;
+}
+
+.btn.btn-primary:active,
+.btn.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  @apply border-graphite-700/80 bg-graphite-700 text-mist-100;
+  @apply th-dark:border-white/80 th-dark:bg-mist-100 th-dark:text-graphite-700;
+  @apply th-highcontrast:border-white/80 th-highcontrast:bg-mist-100 th-highcontrast:text-graphite-700;
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  @apply bg-graphite-700 text-mist-100;
+  @apply th-dark:bg-mist-100 th-dark:text-graphite-700;
+  @apply th-highcontrast:bg-mist-100 th-highcontrast:text-graphite-700;
+}
+
+/* Button Secondary */
+.btn.btn-secondary {
+  @apply border border-solid;
+
+  @apply border-graphite-700 bg-mist-100 text-graphite-700;
+  @apply hover:border-graphite-700 hover:bg-graphite-700/10 hover:text-graphite-700;
+  @apply focus:border-blue-5 focus:text-graphite-700 focus:shadow-graphite-700/20;
+
+  @apply th-dark:border-mist-100 th-dark:bg-graphite-700 th-dark:text-mist-100;
+  @apply th-dark:hover:border-mist-100 th-dark:hover:bg-mist-100/20 th-dark:hover:text-mist-100;
+  @apply th-dark:focus:border-blue-5 th-dark:focus:text-mist-100 th-dark:focus:shadow-white/80;
+
+  @apply th-highcontrast:border-mist-100 th-highcontrast:bg-graphite-700 th-highcontrast:text-mist-100;
+  @apply th-highcontrast:hover:border-mist-100 th-highcontrast:hover:bg-mist-100/20 th-highcontrast:hover:text-mist-100;
+  @apply th-highcontrast:focus:border-blue-5 th-highcontrast:focus:text-mist-100 th-highcontrast:focus:shadow-white/80;
+}
+
+.btn.btn-secondary:active,
+.btn.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  @apply border-graphite-700 bg-graphite-700/10 text-graphite-700;
+  @apply th-dark:border-mist-100 th-dark:bg-mist-100/20 th-dark:text-mist-100;
+  @apply th-highcontrast:border-mist-100 th-highcontrast:bg-mist-100/20 th-highcontrast:text-mist-100;
+}
+
+.btn.btn-danger {
+  @apply border-error-8 bg-error-8;
+  @apply hover:border-error-7 hover:bg-error-7 hover:text-white;
+  @apply focus:border-blue-5 focus:text-white focus:shadow-error-8/20;
+  @apply th-dark:focus:border-blue-5 th-dark:focus:text-white th-dark:focus:shadow-white/80;
+  @apply th-highcontrast:focus:border-blue-5 th-highcontrast:focus:text-white th-highcontrast:focus:shadow-white/80;
+}
+
+.btn.btn-danger:active,
+.btn.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+  @apply border-error-5 bg-error-8 text-white;
+}
+
+.btn.btn-dangerlight {
+  @apply text-error-9 th-dark:text-white;
+  @apply bg-error-3 th-dark:bg-error-9;
+  @apply hover:bg-error-2 th-dark:hover:bg-error-11;
+  @apply border-error-5 th-highcontrast:border-error-7 th-dark:border-error-7;
+  @apply border border-solid;
+
+  @apply focus:border-blue-5 focus:text-error-9 focus:shadow-error-8/20;
+  @apply th-dark:focus:border-blue-5 th-dark:focus:text-white th-dark:focus:shadow-white/80;
+  @apply th-highcontrast:focus:border-blue-5 th-highcontrast:focus:shadow-white/80;
+}
+.btn.btn-icon.btn-dangerlight {
+  @apply hover:text-error-11 th-dark:hover:text-error-7;
+}
+
+.btn.btn-success {
+  background-color: var(--ui-success-7);
+}
+
+.btn.btn-success:hover {
+  color: var(--white-color);
+}
+
+/* secondary-grey */
+.btn.btn-default,
+.btn.btn-light {
+  @apply border-gray-5 bg-white text-gray-8;
+  @apply hover:border-gray-5 hover:bg-gray-3 hover:text-gray-10;
+  @apply focus:border-blue-5 focus:text-gray-8 focus:shadow-graphite-700/20;
+
+  /* dark mode */
+  @apply th-dark:border-gray-warm-7 th-dark:bg-gray-iron-10 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:border-gray-6 th-dark:hover:bg-gray-iron-9 th-dark:hover:text-gray-warm-4;
+  @apply th-dark:focus:border-blue-5 th-dark:focus:text-gray-warm-4 th-dark:focus:shadow-white/80;
+
+  @apply th-highcontrast:border-gray-2 th-highcontrast:bg-black th-highcontrast:text-white;
+  @apply th-highcontrast:hover:border-gray-6 th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:text-gray-warm-4;
+  @apply th-highcontrast:focus:border-blue-5 th-highcontrast:focus:text-white th-highcontrast:focus:shadow-white/80;
+}
+
+.btn.btn-light:active,
+.btn.btn-light.active,
+.open > .dropdown-toggle.btn-light {
+  background-color: var(--ui-gray-3);
+}
+
+.btn.btn-link {
+  @apply text-blue-8 hover:text-blue-9 disabled:text-gray-5;
+  @apply th-dark:text-blue-7 th-dark:hover:text-blue-8;
+  @apply th-highcontrast:text-blue-5 th-highcontrast:hover:text-blue-6;
+}
+
+.btn-group {
+  display: inline-flex;
+}
+
+.input-group-btn .btn.active,
+.btn-group .btn.active {
+  @apply border-graphite-700/80 bg-graphite-700 text-mist-100;
+  @apply th-dark:border-white/80 th-dark:bg-mist-100 th-dark:text-graphite-700;
+  @apply th-highcontrast:border-white/80 th-highcontrast:bg-mist-100 th-highcontrast:text-graphite-700;
+}
+
+.btn.btn-icon:focus {
+  box-shadow: none !important;
+}
+
+.btn:focus {
+  box-shadow: 0px 0px 0px 2px var(--tw-shadow-color);
+}
+
+a.no-link,
+a[ng-click] {
+  @apply text-current th-highcontrast:text-current th-dark:text-current;
+  @apply hover:text-current hover:no-underline;
+  @apply focus:text-current focus:no-underline;
+}
+
+a,
+a.hyperlink {
+  @apply text-blue-8 hover:text-blue-9 th-highcontrast:text-blue-5 th-highcontrast:hover:text-blue-6 th-dark:text-blue-7 th-dark:hover:text-blue-8;
+  @apply cursor-pointer hover:underline;
+}
+
+a.no-decoration {
+  text-decoration: none;
+}

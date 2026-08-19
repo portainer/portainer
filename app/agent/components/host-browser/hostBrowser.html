@@ -1,0 +1,12 @@
+<agent-host-browser-react
+  ng-if="$ctrl.files"
+  dataset="$ctrl.files"
+  is-root="$ctrl.isRoot()"
+  on-go-to-parent="($ctrl.goToParent)"
+  relative-path="$ctrl.getRelativePath()"
+  on-browse="($ctrl.browse)"
+  on-rename="($ctrl.renameFile)"
+  on-download="($ctrl.downloadFile)"
+  on-delete="($ctrl.confirmDeleteFile)"
+  on-file-selected-for-upload="($ctrl.onFileSelectedForUpload)"
+></agent-host-browser-react>
