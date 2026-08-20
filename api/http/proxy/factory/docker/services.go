@@ -34,7 +34,7 @@ type partialServiceSpec struct {
 	} `json:"TaskTemplate"`
 }
 
-func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func() (*client.Client, error)) error {
+func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func(nodeName string) (*client.Client, error)) error {
 	defer logs.CloseAndLogErr(request.Body)
 
 	body, err := io.ReadAll(request.Body)
@@ -77,21 +77,13 @@ func CheckServiceBodyRestrictions(request *http.Request, securitySettings *porta
 		}
 
 		if len(referencedVolumes) > 0 {
-			cli, err := getClient()
+			isBind, err := anyClusterNodeHasBindMountVolume(request.Context(), getClient, referencedVolumes)
 			if err != nil {
 				return err
 			}
-			defer logs.CloseAndLogErr(cli)
 
-			for _, name := range referencedVolumes {
-				isBind, err := docker.InspectVolumeIsBindMount(request.Context(), cli, name)
-				if err != nil {
-					return err
-				}
-
-				if isBind {
-					return ErrBindMountsForbidden
-				}
+			if isBind {
+				return ErrBindMountsForbidden
 			}
 		}
 	}
@@ -99,6 +91,45 @@ func CheckServiceBodyRestrictions(request *http.Request, securitySettings *porta
 	request.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	return nil
+}
+
+func anyClusterNodeHasBindMountVolume(ctx context.Context, getClient func(nodeName string) (*client.Client, error), volumeNames []string) (bool, error) {
+	cli, err := getClient("")
+	if err != nil {
+		return false, err
+	}
+	defer logs.CloseAndLogErr(cli)
+
+	nodes, err := cli.NodeList(ctx, swarm.NodeListOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	nodeClients := make([]*client.Client, 0, len(nodes))
+	for _, node := range nodes {
+		nodeClient, err := getClient(node.Description.Hostname)
+		if err != nil {
+			return false, err
+		}
+
+		defer logs.CloseAndLogErr(nodeClient)
+		nodeClients = append(nodeClients, nodeClient)
+	}
+
+	for _, name := range volumeNames {
+		for _, nodeClient := range nodeClients {
+			isBind, err := docker.InspectVolumeIsBindMount(ctx, nodeClient, name)
+			if err != nil {
+				return false, err
+			}
+
+			if isBind {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 }
 
 func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, endpointID portainer.EndpointID, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -187,10 +218,8 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 		return nil, err
 	}
 
-	getClient := func() (*client.Client, error) {
-		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-		return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+	getClient := func(nodeName string) (*client.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
 	}
 
 	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
@@ -222,10 +251,8 @@ func (transport *Transport) decorateServiceUpdateOperation(request *http.Request
 		return nil, err
 	}
 
-	getClient := func() (*client.Client, error) {
-		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-		return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+	getClient := func(nodeName string) (*client.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
 	}
 
 	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
