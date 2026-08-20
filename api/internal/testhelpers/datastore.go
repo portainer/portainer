@@ -1,6 +1,7 @@
 package testhelpers
 
 import (
+	"io"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -45,6 +46,7 @@ type testDatastore struct {
 }
 
 func (d *testDatastore) Backup(path string) (string, error)                  { return "", nil }
+func (d *testDatastore) BackupTo(w io.Writer) error                          { return nil }
 func (d *testDatastore) Open() (bool, error)                                 { return false, nil }
 func (d *testDatastore) Init() error                                         { return nil }
 func (d *testDatastore) Close() error                                        { return nil }

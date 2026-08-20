@@ -1,8 +1,11 @@
 package filesystem
 
 import (
+	"errors"
 	"os"
 	"testing"
+	"testing/synctest"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -90,6 +93,45 @@ func Test_CopyPath_shouldCopyDir(t *testing.T) {
 	assert.FileExists(t, JoinPaths(destination, "copy_test", "outer"))
 	assert.FileExists(t, JoinPaths(destination, "copy_test", "dir", ".dotfile"))
 	assert.FileExists(t, JoinPaths(destination, "copy_test", "dir", "inner"))
+}
+
+func Test_RunWithTimeout_returnsUnderlyingResult(t *testing.T) {
+	t.Parallel()
+
+	require.NoError(t, RunWithTimeout("op", time.Hour, func() error { return nil }))
+
+	boom := errors.New("boom")
+	require.ErrorIs(t, RunWithTimeout("op", time.Hour, func() error { return boom }), boom)
+}
+
+func Test_RunWithTimeout_timesOutWhenFnNeverReturnsInTime(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		release := make(chan struct{})
+
+		err := RunWithTimeout("op", time.Hour, func() error {
+			<-release
+			return nil
+		})
+		require.Error(t, err)
+
+		close(release)
+	})
+}
+
+func Test_resolveBackupTimeout_returnsDefaultWhenUnset(t *testing.T) {
+	t.Setenv(backupTimeoutEnvVar, "")
+	assert.Equal(t, time.Hour, resolveBackupTimeout(time.Hour))
+}
+
+func Test_resolveBackupTimeout_usesParsedValue(t *testing.T) {
+	t.Setenv(backupTimeoutEnvVar, "30m")
+	assert.Equal(t, 30*time.Minute, resolveBackupTimeout(time.Hour))
+}
+
+func Test_resolveBackupTimeout_returnsDefaultWhenInvalid(t *testing.T) {
+	t.Setenv(backupTimeoutEnvVar, "not-a-duration")
+	assert.Equal(t, time.Hour, resolveBackupTimeout(time.Hour))
 }
 
 func TestCopyPathPanic(t *testing.T) {

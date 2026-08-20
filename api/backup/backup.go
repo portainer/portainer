@@ -87,8 +87,16 @@ func backupDatabaseAndFilesystem(gate *offlinegate.OfflineGate, datastore datase
 
 func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
 	dbFileName := datastore.Connection().GetDatabaseFileName()
-	_, err := datastore.Backup(filesystem.JoinPaths(backupDirPath, dbFileName))
-	return err
+
+	f, err := os.Create(filesystem.JoinPaths(backupDirPath, dbFileName))
+	if err != nil {
+		return fmt.Errorf("failed to create database backup file: %w", err)
+	}
+	defer logs.CloseAndLogErr(f)
+
+	return filesystem.RunWithTimeout(dbFileName, filesystem.BackupTimeout, func() error {
+		return datastore.BackupTo(f)
+	})
 }
 
 func encrypt(path string, passphrase string) (string, error) {
