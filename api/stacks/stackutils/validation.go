@@ -49,7 +49,7 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 			}
 
 			if config.DockerClient == nil {
-				continue
+				return fmt.Errorf("volume %q: unable to verify bind-mount status without a Docker client", volumeKey)
 			}
 
 			isBind, err := docker.InspectVolumeIsBindMount(context.Background(), config.DockerClient, volumeConfig.Name)
@@ -66,7 +66,7 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 	for _, service := range composeConfig.Services {
 		if !config.SecuritySettings.AllowBindMountsForRegularUsers {
 			for _, volume := range service.Volumes {
-				if strings.EqualFold(volume.Type, "bind") {
+				if docker.IsBindMount(docker.MountDescriptor{Type: volume.Type}) {
 					return errors.New("bind-mount disabled for non administrator users")
 				}
 			}
