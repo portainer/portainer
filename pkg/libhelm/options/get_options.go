@@ -7,6 +7,7 @@ type GetOptions struct {
 	ShowResources           bool
 	Revision                int
 	KubernetesClusterAccess *KubernetesClusterAccess
+	ReleaseStorage          ReleaseStorage
 
 	Env []string
 }

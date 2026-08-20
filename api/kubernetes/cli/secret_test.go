@@ -150,3 +150,44 @@ func Test_SetSecretsIsUsed_SAWithEmptyImagePullSecrets(t *testing.T) {
 	require.NoError(t, err)
 	assert.False(t, secrets[0].IsUsed)
 }
+
+// The kubectl apply annotation holds the whole object, data included, so leaving it in
+// a response would defeat the withData check that withholds secret values.
+func Test_parseSecret_StripsTheKubectlApplyAnnotation(t *testing.T) {
+	t.Parallel()
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "applied",
+			Namespace: "default",
+			Annotations: map[string]string{
+				lastAppliedConfigAnnotation: `{"apiVersion":"v1","data":{"password":"c3VwZXJzZWNyZXQ="},"kind":"Secret"}`,
+				"portainer.io/registry.id":  "3",
+			},
+		},
+		Data: map[string][]byte{"password": []byte("supersecret")},
+	}
+
+	for _, withData := range []bool{false, true} {
+		result := parseSecret(secret, withData)
+
+		assert.NotContains(t, result.Annotations, lastAppliedConfigAnnotation)
+		assert.Equal(t, "3", result.Annotations["portainer.io/registry.id"])
+	}
+
+	assert.Contains(t, secret.Annotations, lastAppliedConfigAnnotation, "the live secret must not be mutated")
+}
+
+func Test_parseSecret_KeepsAnnotationsWhenThereIsNothingToStrip(t *testing.T) {
+	t.Parallel()
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        "plain",
+			Namespace:   "default",
+			Annotations: map[string]string{"portainer.io/registry.id": "3"},
+		},
+	}
+
+	assert.Equal(t, secret.Annotations, parseSecret(secret, false).Annotations)
+}

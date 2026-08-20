@@ -30,7 +30,7 @@ func (hspm *HelmSDKPackageManager) Rollback(rollbackOpts options.RollbackOptions
 
 	// Initialize action configuration with kubernetes config
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(rollbackOpts.Namespace), rollbackOpts.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(rollbackOpts.Namespace), rollbackOpts.KubernetesClusterAccess, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize helm configuration for helm release rollback")
 	}
