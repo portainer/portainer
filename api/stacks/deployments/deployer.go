@@ -15,6 +15,7 @@ type BaseStackDeployer interface {
 	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error
 	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forcePullImage, forceRecreate bool) error
 	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error
+	GetDockerClientFactory() *dockerclient.ClientFactory
 }
 
 type StackDeployer interface {
@@ -43,6 +44,10 @@ func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStac
 		ClientFactory:       clientFactory,
 		dataStore:           dataStore,
 	}
+}
+
+func (d *stackDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return d.ClientFactory
 }
 
 func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {

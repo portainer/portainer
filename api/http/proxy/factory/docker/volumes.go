@@ -10,6 +10,7 @@ import (
 	"path"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -134,6 +135,7 @@ func CheckVolumeBodyRestrictions(request *http.Request) error {
 	}
 
 	var volumeCreateBody struct {
+		Driver     string            `json:"Driver"`
 		DriverOpts map[string]string `json:"DriverOpts"`
 	}
 
@@ -141,7 +143,7 @@ func CheckVolumeBodyRestrictions(request *http.Request) error {
 		return err
 	}
 
-	if volumeCreateBody.DriverOpts["type"] == "bind" {
+	if docker.IsBindMount(docker.MountDescriptor{Driver: volumeCreateBody.Driver, DriverOpts: volumeCreateBody.DriverOpts}) {
 		return ErrBindMountsForbidden
 	}
 
