@@ -54,6 +54,29 @@ type Release struct {
 	Values Values `json:"values,omitzero"`
 }
 
+// RedactSensitive removes everything about a release that is rendered from the chart
+// and can therefore carry Kubernetes Secret data: the manifest, the hooks, both value
+// sets and the rendered notes. A rendered chart routinely contains Secret objects with
+// real values, and values files routinely contain credentials.
+//
+// Info.Resources survives. It is reduced to each object's metadata, kind and status
+// before it reaches here, so it identifies what the release owns without disclosing
+// anything the resource APIs would not.
+func (r *Release) RedactSensitive() {
+	if r == nil {
+		return
+	}
+
+	r.Manifest = ""
+	r.Hooks = nil
+	r.Config = nil
+	r.Values = Values{}
+
+	if r.Info != nil {
+		r.Info.Notes = ""
+	}
+}
+
 type Values struct {
 	UserSuppliedValues string `json:"userSuppliedValues,omitempty"`
 	ComputedValues     string `json:"computedValues,omitempty"`

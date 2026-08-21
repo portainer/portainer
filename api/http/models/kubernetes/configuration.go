@@ -10,6 +10,8 @@ type (
 		K8sConfiguration
 	}
 
+	// K8sSecret carries base64 encoded Data values, unlike K8sConfigMap whose values
+	// are plain text: a secret holds arbitrary bytes that a JSON string cannot represent.
 	K8sSecret struct {
 		K8sConfiguration
 		SecretType string `json:"SecretType"`

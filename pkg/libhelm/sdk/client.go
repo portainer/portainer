@@ -7,6 +7,8 @@ import (
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 	"helm.sh/helm/v4/pkg/action"
 	"helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/storage"
+	"helm.sh/helm/v4/pkg/storage/driver"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
@@ -38,7 +40,11 @@ func namespaceOrDefault(namespace string) string {
 // storage cluster-wide, which is how `helm list --all-namespaces` sees
 // releases in every namespace (action.List.AllNamespaces alone does not widen
 // the storage scope).
-func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configuration, namespace string, k8sAccess *options.KubernetesClusterAccess) error {
+//
+// releaseStorage, when non-nil, backs the release storage driver instead of the
+// client derived from k8sAccess. Only the read paths offer it; see
+// options.ReleaseStorage.
+func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configuration, namespace string, k8sAccess *options.KubernetesClusterAccess, releaseStorage options.ReleaseStorage) error {
 	// Setup logging for Helm SDK using zerolog
 	logger := log.With().Str("context", "HelmClient").Logger()
 	logOptions := slogzerolog.Option{
@@ -50,7 +56,11 @@ func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configu
 		// Use default kubeconfig
 		settings := cli.New()
 		clientGetter := settings.RESTClientGetter()
-		return actionConfig.Init(clientGetter, namespace, "secret")
+		if err := actionConfig.Init(clientGetter, namespace, "secret"); err != nil {
+			return err
+		}
+
+		return useReleaseStorage(actionConfig, namespace, releaseStorage)
 	}
 
 	// Create client config
@@ -70,7 +80,27 @@ func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configu
 		return err
 	}
 
-	return actionConfig.Init(clientGetter, namespace, "secret")
+	if err := actionConfig.Init(clientGetter, namespace, "secret"); err != nil {
+		return err
+	}
+
+	return useReleaseStorage(actionConfig, namespace, releaseStorage)
+}
+
+// useReleaseStorage repoints the release storage driver at the supplied client,
+// leaving actionConfig.KubeClient on the caller's own credentials so live cluster
+// access still goes through Kubernetes RBAC. A nil client leaves the storage as
+// actionConfig.Init built it.
+func useReleaseStorage(actionConfig *action.Configuration, namespace string, releaseStorage options.ReleaseStorage) error {
+	if releaseStorage == nil {
+		return nil
+	}
+
+	secretsDriver := driver.NewSecrets(releaseStorage.Secrets(namespace))
+	secretsDriver.SetLogger(actionConfig.Logger().Handler())
+	actionConfig.Releases = storage.Init(secretsDriver)
+
+	return nil
 }
 
 // generateConfigAPI generates a new kubeconfig configuration
