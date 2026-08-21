@@ -242,7 +242,7 @@ angular
 
       var group = {
         name: 'portainer.groups.group',
-        url: '/:id',
+        url: '/:id?tab',
         views: {
           'content@': {
             component: 'environmentGroupEditView',

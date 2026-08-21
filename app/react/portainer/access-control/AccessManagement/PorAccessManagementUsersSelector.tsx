@@ -3,7 +3,7 @@ import { OptionProps, components, MultiValueGenericProps } from 'react-select';
 
 import { Select } from '@@/form-components/ReactSelect';
 
-type Option = { Type: 'user' | 'team'; Id: number; Name: string };
+export type Option = { Type: 'user' | 'team'; Id: number; Name: string };
 
 interface Props {
   value: Option[];

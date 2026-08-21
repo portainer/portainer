@@ -72,7 +72,11 @@ export function AccessDatatable({
       isRowSelectable={({ original: item }) => !inheritFrom || !item.Inherited}
       renderTableActions={(selectedItems) => (
         <>
-          <RemoveAccessButton items={selectedItems} onClick={onRemove} />
+          <RemoveAccessButton
+            items={selectedItems}
+            onClick={onRemove}
+            isLoading={isUpdatingAccess}
+          />
 
           {isBE && isUpdateEnabled && (
             <LoadingButton
