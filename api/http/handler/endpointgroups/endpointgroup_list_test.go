@@ -3,6 +3,7 @@ package endpointgroups
 import (
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -140,6 +141,43 @@ func TestHandler_endpointGroupList(t *testing.T) {
 		assert.Equal(t, 1, group2.TypeInfo.Kubernetes)
 		assert.Equal(t, 0, group2.TypeInfo.Podman)
 		assert.True(t, group2.TypeInfo.Mixed, "should be marked as mixed when multiple types exist")
+	})
+
+	t.Run("with untrusted edge endpoint in waiting room", func(t *testing.T) {
+		trustedEdgeEndpoint := &portainer.Endpoint{
+			ID:          6,
+			GroupID:     groups[0].ID,
+			Type:        portainer.EdgeAgentOnDockerEnvironment,
+			UserTrusted: true,
+		}
+		require.NoError(t, store.Endpoint().Create(trustedEdgeEndpoint))
+		t.Cleanup(func() { _ = store.Endpoint().DeleteEndpoint(trustedEdgeEndpoint.ID) })
+
+		waitingRoomEndpoint := &portainer.Endpoint{
+			ID:          7,
+			GroupID:     groups[0].ID,
+			Type:        portainer.EdgeAgentOnDockerEnvironment,
+			UserTrusted: false,
+		}
+		require.NoError(t, store.Endpoint().Create(waitingRoomEndpoint))
+		t.Cleanup(func() { _ = store.Endpoint().DeleteEndpoint(waitingRoomEndpoint.ID) })
+
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, "/endpoint_groups?size=true", nil)
+		rrc := &security.RestrictedRequestContext{
+			IsAdmin: true,
+		}
+		req = req.WithContext(security.StoreRestrictedRequestContext(req, rrc))
+
+		handler.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code)
+		res := make([]EndpointGroupResponse, 0)
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&res))
+
+		i := slices.IndexFunc(res, func(g EndpointGroupResponse) bool { return g.ID == groups[0].ID })
+		require.GreaterOrEqual(t, i, 0)
+		assert.Equal(t, 1, res[i].Total, "waiting room endpoint should not be counted")
 	})
 
 	t.Run("with podman endpoint", func(t *testing.T) {

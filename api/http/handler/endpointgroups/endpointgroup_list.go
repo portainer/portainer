@@ -26,6 +26,10 @@ func computeGroupSizeInfo(endpointGroups []portainer.EndpointGroup, endpoints []
 		if _, ok := groupSet[endpoint.GroupID]; !ok {
 			continue
 		}
+
+		if endpointutils.IsEdgeEndpoint(&endpoint) && !endpoint.UserTrusted {
+			continue
+		}
 		countMap[endpoint.GroupID]++
 
 		typeInfo := typeInfoMap[endpoint.GroupID]
