@@ -14,12 +14,17 @@ import (
 	"github.com/google/uuid"
 )
 
+type webhookInvokeResponse struct {
+	StackID portainer.StackID `json:"stackId"`
+	Message string            `json:"message"`
+}
+
 // @id WebhookInvoke
 // @summary Webhook for triggering stack updates from git
 // @description **Access policy**: public
 // @tags stacks
 // @param webhookID path string true "Stack identifier"
-// @success 200 "Success"
+// @success 202 {object} webhookInvokeResponse "Accepted"
 // @failure 400 "Invalid request"
 // @failure 409 "Autoupdate for the stack isn't available" or "Stack deployment is already in progress"
 // @failure 500 "Server error"
@@ -53,7 +58,10 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		return httperror.InternalServerError("Failed to update the stack", err)
 	}
 
-	return response.Empty(w)
+	return response.JSONWithStatus(w, webhookInvokeResponse{
+		StackID: stack.ID,
+		Message: "Deployment triggered. Poll the stack to check the deployment status.",
+	}, http.StatusAccepted)
 }
 
 func retrieveUUIDRouteVariableValue(r *http.Request, name string) (uuid.UUID, error) {

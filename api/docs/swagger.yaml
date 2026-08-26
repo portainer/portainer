@@ -6901,6 +6901,13 @@ definitions:
            image:nginx
         type: string
     type: object
+  stacks.webhookInvokeResponse:
+    properties:
+      message:
+        type: string
+      stackId:
+        type: integer
+    type: object
   stats.ContainerStats:
     properties:
       healthy:
@@ -24786,8 +24793,10 @@ paths:
         required: true
         type: string
       responses:
-        "200":
-          description: Success
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/stacks.webhookInvokeResponse'
         "400":
           description: Invalid request
         "409":

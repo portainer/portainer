@@ -1515,6 +1515,7 @@ import {
   zValidateOAuthBody,
   zValidateOAuthResponse,
   zWebhookInvokePath,
+  zWebhookInvokeResponse,
 } from './zod.gen';
 
 export type Options<
@@ -10426,6 +10427,8 @@ export const webhookInvoke = <ThrowOnError extends boolean = true>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zWebhookInvokeResponse.parseAsync(data),
     url: '/stacks/webhooks/{webhookID}',
     ...options,
   });
