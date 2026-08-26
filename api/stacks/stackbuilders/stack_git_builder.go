@@ -161,8 +161,20 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 			return fmt.Errorf("failed to persist source sync status: %w", err)
 		}
 
+		name := b.stack.Name
+		if name == "" {
+			endpointName := "<unknown>"
+			if b.endpoint != nil {
+				endpointName = b.endpoint.Name
+				if endpointName == "" {
+					endpointName = fmt.Sprintf("<ID=%d>", b.endpoint.ID)
+				}
+			}
+			name = fmt.Sprintf("'%s' from source '%s' in environment '%s'", file.Path, resolvedSrc.Name, endpointName)
+		}
+
 		wf := &portainer.Workflow{
-			Name: b.stack.Name,
+			Name: name,
 			Artifacts: []portainer.Artifact{{
 				StackID: b.stack.ID,
 				Files:   []portainer.ArtifactFile{file},
