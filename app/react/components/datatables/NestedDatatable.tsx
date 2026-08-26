@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { difference } from 'lodash';
 import {
   getCoreRowModel,
@@ -72,6 +72,7 @@ export function NestedDatatable<D extends DefaultType>({
     },
     getRowId,
     autoResetExpanded: false,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -79,6 +80,18 @@ export function NestedDatatable<D extends DefaultType>({
   });
 
   const tableState = tableInstance.getState();
+
+  // the table keeps its page across dataset changes (see autoResetPageIndex),
+  // so pull the user back in range when the rows behind the current page are
+  // gone - removed items, or a search narrowing the results
+  const { pageIndex } = tableState.pagination;
+  const lastPageIndex = Math.max(tableInstance.getPageCount() - 1, 0);
+  useEffect(() => {
+    if (enablePagination && pageIndex > lastPageIndex) {
+      tableInstance.setPageIndex(lastPageIndex);
+    }
+  }, [enablePagination, lastPageIndex, pageIndex, tableInstance]);
+
   const selectedRowModel = tableInstance.getSelectedRowModel();
   const selectedItems = selectedRowModel.rows.map((row) => row.original);
   const filteredItems = tableInstance
