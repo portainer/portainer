@@ -115,6 +115,31 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 		return nil, errors.Wrap(err, "stop container error")
 	}
 
+	// restore is armed as soon as the container stops, so any later failure rolls
+	// the original container back instead of leaving it stranded.
+	restore := true
+
+	defer func() {
+		if !restore {
+			return
+		}
+
+		log.Debug().Str("context", "ContainerRecreateRestore").Str("container_id", containerId).Str("container", container.Name).Msg("restoring the container")
+		if err := cli.ContainerRename(ctx, containerId, container.Name); err != nil {
+			log.Warn().Err(err).Str("context", "ContainerRecreateRestore").Str("container_id", containerId).Msg("failure to rename container")
+		}
+
+		for _, containerNetwork := range container.NetworkSettings.Networks {
+			if err := cli.NetworkConnect(ctx, containerNetwork.NetworkID, containerId, containerNetwork); err != nil {
+				log.Warn().Err(err).Str("context", "ContainerRecreateRestore").Str("container_id", containerId).Msg("failure to connect container to network")
+			}
+		}
+
+		if err := cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{}); err != nil {
+			log.Warn().Err(err).Str("context", "ContainerRecreateRestore").Str("container_id", containerId).Msg("failure to start container")
+		}
+	}()
+
 	// 3. rename the current container
 	log.Debug().Str("container_id", containerId).Msg("starting to rename the container")
 	if err := cli.ContainerRename(ctx, containerId, container.Name+"-old"); err != nil {
@@ -126,9 +151,9 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	}
 
 	// 4. disconnect all networks from the current container
-	for name, network := range container.NetworkSettings.Networks {
+	for name, endpointSettings := range container.NetworkSettings.Networks {
 		// This allows new container to use the same IP address if specified
-		if err := cli.NetworkDisconnect(ctx, network.NetworkID, containerId, true); err != nil {
+		if err := cli.NetworkDisconnect(ctx, endpointSettings.NetworkID, containerId, true); err != nil {
 			return nil, errors.Wrap(err, "disconnect network from old container error")
 		}
 
@@ -136,32 +161,9 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 		if len(initialNetwork.EndpointsConfig) == 0 {
 			// Retrieve the first network that is linked to the present container, which
 			// will be utilized when creating the container.
-			initialNetwork.EndpointsConfig[name] = network
+			initialNetwork.EndpointsConfig[name] = endpointSettings
 		}
 	}
-
-	restore := true
-
-	defer func() {
-		if !restore {
-			return
-		}
-
-		log.Debug().Str("container_id", containerId).Str("container", container.Name).Msg("restoring the container")
-		if err := cli.ContainerRename(ctx, containerId, container.Name); err != nil {
-			log.Warn().Err(err).Msg("failure to rename container")
-		}
-
-		for _, network := range container.NetworkSettings.Networks {
-			if err := cli.NetworkConnect(ctx, network.NetworkID, containerId, network); err != nil {
-				log.Warn().Err(err).Msg("failure to connect container to network")
-			}
-		}
-
-		if err := cli.ContainerStart(ctx, containerId, dockercontainer.StartOptions{}); err != nil {
-			log.Warn().Err(err).Msg("failure to start container")
-		}
-	}()
 
 	log.Debug().Str("container", strings.Split(container.Name, "/")[1]).Msg("starting to create a new container")
 
@@ -207,13 +209,13 @@ func (c *ContainerService) Recreate(ctx context.Context, endpoint *portainer.End
 	// see https://github.com/moby/moby/issues/17750
 	log.Debug().Str("container_id", newContainerId).Msg("connecting networks to container")
 	networks := container.NetworkSettings.Networks
-	for key, network := range networks {
+	for key, containerNetwork := range networks {
 		if _, ok := initialNetwork.EndpointsConfig[key]; ok {
 			// skip the network that is used during container creation
 			continue
 		}
 
-		if err := cli.NetworkConnect(ctx, network.NetworkID, newContainerId, network); err != nil {
+		if err := cli.NetworkConnect(ctx, containerNetwork.NetworkID, newContainerId, containerNetwork); err != nil {
 			return nil, errors.Wrap(err, "connect container network error")
 		}
 	}
