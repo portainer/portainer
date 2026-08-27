@@ -228,6 +228,56 @@ func TestGitMethodStackBuilder_WithoutSourceID_InlinePathStillWorks(t *testing.T
 	assert.Equal(t, "https://github.com/org/public-repo", allSources[0].Git.URL)
 }
 
+func TestGitMethodStackBuilder_WritesAutoUpdateIntervalToNewSource(t *testing.T) {
+	t.Parallel()
+	builder := newGitMethodBuilder(t, "feedcafe")
+	builder.stack.ID = 4
+
+	payload := &StackPayload{
+		AutoUpdate: &portainer.AutoUpdateSettings{Interval: "5m"},
+		RepositoryConfigPayload: RepositoryConfigPayload{
+			URL:           "https://github.com/org/public-repo",
+			ReferenceName: "refs/heads/main",
+		},
+	}
+
+	err := builder.prepare(context.Background(), payload, portainer.UserID(1))
+	require.NoError(t, err)
+
+	allSources, err := builder.dataStore.Source().ReadAll(adminUserContext)
+	require.NoError(t, err)
+	require.Len(t, allSources, 1)
+	assert.Equal(t, "5m", allSources[0].Interval)
+}
+
+func TestGitMethodStackBuilder_WritesAutoUpdateIntervalToExistingSource(t *testing.T) {
+	t.Parallel()
+	builder := newGitMethodBuilder(t, "abc123")
+	builder.stack.ID = 1
+
+	src := &portainer.Source{
+		Name: "my-repo",
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://github.com/org/private-repo"},
+	}
+	require.NoError(t, builder.dataStore.Source().Create(adminUserContext, src))
+
+	payload := &StackPayload{
+		AutoUpdate: &portainer.AutoUpdateSettings{Interval: "5m"},
+		RepositoryConfigPayload: RepositoryConfigPayload{
+			SourceID:      src.ID,
+			ReferenceName: "refs/heads/main",
+		},
+	}
+
+	err := builder.prepare(context.Background(), payload, portainer.UserID(1))
+	require.NoError(t, err)
+
+	updatedSrc, err := builder.dataStore.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	assert.Equal(t, "5m", updatedSrc.Interval)
+}
+
 // builderWorkflowSourceID returns the first SourceID referenced by the Workflow Artifact for this stack.
 func builderWorkflowSourceID(t *testing.T, builder *GitMethodStackBuilder) portainer.SourceID {
 	t.Helper()

@@ -12,6 +12,7 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -260,6 +261,18 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 		if err := saveStackGitConfig(tx, uc, stack.WorkflowID, stack.ID, sourceID, payload.SourceID, gitConfig); err != nil {
 			return err
+		}
+
+		if payload.AutoUpdate != nil {
+			src, _, err := workflows.GitSourceAndArtifactForStack(tx, uc, stack.WorkflowID, stack.ID)
+			if err != nil {
+				return err
+			}
+			if src != nil {
+				if err := workflows.ApplySourceInterval(tx, uc, src.ID, payload.AutoUpdate.Interval); err != nil {
+					return err
+				}
+			}
 		}
 
 		var err error
