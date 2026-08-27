@@ -15,7 +15,7 @@ import { isArrayErrorType } from '@@/form-components/formikUtils';
 
 import { useNodeQuery } from '../../queries/useNodeQuery';
 import { useKubernetesEndpointsQuery } from '../../kubernetesEndpoint.service';
-import { getAvailability } from '../../nodeUtils';
+import { getAvailability, getRole } from '../../nodeUtils';
 import { confirmUpdateNode } from '../ConfirmUpdateNode';
 import { useUpdateNodeMutation } from '../../queries/useUpdateNodeMutation';
 import { useDrainNodeMutation } from '../../queries/useDrainNodeMutation';
@@ -38,7 +38,11 @@ export function NodeDetails({ nodeName, environmentId }: Props) {
   const router = useRouter();
   const nodeQuery = useNodeQuery(environmentId, nodeName);
   const nodesAvailabilityQuery = useNodesQuery(environmentId, {
-    select: (nodes) => nodes.map(getAvailability),
+    select: (nodes) =>
+      nodes.map((node) => ({
+        availability: getAvailability(node),
+        role: getRole(node),
+      })),
   });
   const applicationsQuery = useApplications(environmentId, {
     nodeName,
@@ -72,9 +76,12 @@ export function NodeDetails({ nodeName, environmentId }: Props) {
   const containsPortainer = applications.some(
     (app) => app.Name === 'portainer'
   );
-  const hasDrainOperation = !!nodesAvailabilityQuery.data?.some(
-    (availability) => availability === 'Drain'
-  );
+  const activeWorkerCount =
+    nodesAvailabilityQuery.data?.filter(
+      (node) => node.role === 'Worker' && node.availability === 'Active'
+    ).length ?? 0;
+  const isLastWorkerNode =
+    getRole(nodeQuery.data) === 'Worker' && activeWorkerCount <= 1;
   return (
     <Formik
       initialValues={nodeFormValues}
@@ -82,8 +89,8 @@ export function NodeDetails({ nodeName, environmentId }: Props) {
       enableReinitialize
       validationSchema={createValidationSchema(
         isOnlyNode,
-        hasDrainOperation,
-        containsPortainer
+        containsPortainer,
+        isLastWorkerNode
       )}
     >
       <NodeDetailsForm

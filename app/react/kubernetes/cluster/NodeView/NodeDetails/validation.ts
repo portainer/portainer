@@ -111,8 +111,8 @@ const drainOptionsSchema = object({
 
 export function createValidationSchema(
   isOnlyNode: boolean,
-  hasDrainOperation: boolean,
-  containsPortainer: boolean
+  containsPortainer: boolean,
+  isLastWorkerNode: boolean
 ) {
   return object({
     availability: string()
@@ -128,20 +128,20 @@ export function createValidationSchema(
         }
       )
       .test(
-        'other-node-drain',
-        'Cannot drain node when another node is currently being drained',
+        'portainer-drain',
+        'Cannot drain node where the Portainer instance is running',
         (value) => {
-          if (value === 'Drain' && hasDrainOperation) {
+          if (value === 'Drain' && containsPortainer) {
             return false;
           }
           return true;
         }
       )
       .test(
-        'portainer-drain',
-        'Cannot drain node where the Portainer instance is running',
+        'last-worker-node',
+        'Cannot drain the last worker node in the cluster',
         (value) => {
-          if (value === 'Drain' && containsPortainer) {
+          if (value === 'Drain' && isLastWorkerNode) {
             return false;
           }
           return true;

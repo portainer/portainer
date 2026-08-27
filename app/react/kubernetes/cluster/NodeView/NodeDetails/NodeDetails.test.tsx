@@ -1,3 +1,4 @@
+import { Node } from 'kubernetes-types/core/v1';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -51,7 +52,7 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 // Sample test data
-const mockNode = {
+const mockNode: Node = {
   metadata: {
     name: 'test-node',
     labels: {
@@ -99,6 +100,29 @@ const mockNodes = [
   },
 ];
 
+// test-node without the control-plane label/taint, i.e. a worker node
+const mockWorkerNode: Node = {
+  ...mockNode,
+  metadata: {
+    name: 'test-node',
+    labels: {
+      'kubernetes.io/hostname': 'test-node',
+      'custom-label': 'custom-value',
+    },
+  },
+  spec: { unschedulable: false },
+};
+
+// a second, unrelated control-plane node, so the cluster has >1 node overall
+// but only one worker (mockWorkerNode)
+const mockOtherControlPlaneNode: Node = {
+  ...mockNodes[1],
+  metadata: {
+    name: 'node-2',
+    labels: { 'node-role.kubernetes.io/control-plane': '' },
+  },
+};
+
 const mockApplications = [
   {
     Name: 'test-app',
@@ -118,6 +142,7 @@ const mockEndpoints: unknown[] = [];
 function setupMocks({
   applications = mockApplications,
   nodes = mockNodes,
+  node = mockNode,
   hasWriteAccess = true,
 } = {}) {
   vi.mocked(useAuthorizations).mockReturnValue({
@@ -127,7 +152,7 @@ function setupMocks({
 
   server.use(
     http.get('/api/endpoints/1/kubernetes/api/v1/nodes/test-node', () =>
-      HttpResponse.json(mockNode)
+      HttpResponse.json(node)
     ),
     http.get('/api/kubernetes/1/nodes', () => HttpResponse.json(nodes)),
     http.get('/api/kubernetes/1/applications', () =>
@@ -254,22 +279,12 @@ describe('NodeDetails', () => {
     expect(submitButton).toBeDisabled();
   });
 
-  it('prevents drain when another node is already draining', async () => {
+  it('prevents drain when it is the last worker node', async () => {
     const user = userEvent.setup();
-    const drainingNodes = [
-      mockNode,
-      {
-        ...mockNodes[1],
-        metadata: {
-          ...mockNodes[1].metadata,
-          labels: {
-            'io.portainer/node-status-drain': '',
-          },
-        },
-        spec: { unschedulable: true },
-      },
-    ];
-    setupMocks({ nodes: drainingNodes });
+    setupMocks({
+      node: mockWorkerNode,
+      nodes: [mockWorkerNode, mockOtherControlPlaneNode],
+    });
 
     renderComponent();
 
@@ -282,9 +297,12 @@ describe('NodeDetails', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/cannot drain.*another node.*currently.*drained/i)
+        screen.getByText(/cannot drain.*last worker node.*cluster/i)
       ).toBeInTheDocument();
     });
+
+    const submitButton = screen.getByRole('button', { name: /update node/i });
+    expect(submitButton).toBeDisabled();
   });
 
   it('shows cordon warning when submitting with Pause availability', async () => {
