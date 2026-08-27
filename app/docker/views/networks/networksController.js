@@ -2,6 +2,8 @@ import _ from 'lodash-es';
 import DockerNetworkHelper from '@/docker/helpers/networkHelper';
 import { processItemsInBatches } from '@/react/common/processItemsInBatches';
 
+import { groupSwarmNetworksManagerNodesFirst } from './groupSwarmNetworks';
+
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
   '$scope',
@@ -31,23 +33,6 @@ angular.module('portainer.docker').controller('NetworksController', [
     };
 
     $scope.getNetworks = getNetworks;
-
-    function groupSwarmNetworksManagerNodesFirst(networks, agents) {
-      const getRole = (item) => _.find(agents, (agent) => agent.NodeName === item.NodeName).NodeRole;
-
-      const nonSwarmNetworks = _.remove(networks, (item) => item.Scope !== 'swarm');
-      const grouped = _.toArray(_.groupBy(networks, (item) => item.Id));
-      const sorted = _.map(grouped, (arr) => _.sortBy(arr, (item) => getRole(item)));
-      const arr = _.map(sorted, (a) => {
-        const item = a[0];
-        for (let i = 1; i < a.length; i++) {
-          item.Subs.push(a[i]);
-        }
-        return item;
-      });
-      const res = _.concat(arr, ...nonSwarmNetworks);
-      return res;
-    }
 
     function getNetworks() {
       const req = {
