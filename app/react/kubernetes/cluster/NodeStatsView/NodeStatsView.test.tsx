@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
@@ -31,12 +32,7 @@ function addBaseHandlers() {
 }
 
 beforeEach(() => {
-  vi.useFakeTimers();
   addBaseHandlers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
 });
 
 function renderComponent() {
@@ -60,6 +56,7 @@ describe('NodeStatsView', () => {
   });
 
   it('shows "Unable to retrieve node metrics" panel when metrics fetch returns 500', async () => {
+    const restoreConsole = suppressConsoleLogs();
     server.use(
       http.get('/api/kubernetes/1/metrics/nodes/my-node', () =>
         HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 })
@@ -73,6 +70,8 @@ describe('NodeStatsView', () => {
         screen.getByText('Unable to retrieve node metrics')
       ).toBeInTheDocument();
     });
+
+    restoreConsole();
   });
 
   it('shows the refresh rate select when metrics are available', async () => {

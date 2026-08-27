@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
@@ -8,12 +8,27 @@ import { NodeMetric } from '../types';
 export function useNodeMetricsQuery<T = NodeMetric>(
   nodeName: string,
   environmentId: EnvironmentId,
-  queryOptions?: UseQueryOptions<NodeMetric, unknown, T>
+  {
+    select,
+    refreshRateMS,
+    retry,
+  }: {
+    select?: (data: NodeMetric) => T;
+    refreshRateMS?: number;
+    retry?: boolean;
+  } = {}
 ) {
   return useQuery({
     queryKey: [environmentId, 'node-metrics', nodeName],
     queryFn: () => getMetricsForNode(environmentId, nodeName),
-    ...queryOptions,
+    select,
+    ...(retry !== undefined && { retry }),
+    refetchInterval: refreshRateMS
+      ? (_data, query) => (query.state.error ? false : refreshRateMS)
+      : undefined,
+    refetchOnWindowFocus: refreshRateMS ? false : undefined,
+    refetchOnReconnect: refreshRateMS ? false : undefined,
+    refetchIntervalInBackground: !!refreshRateMS,
   });
 }
 

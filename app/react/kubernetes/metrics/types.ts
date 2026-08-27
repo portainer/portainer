@@ -36,6 +36,16 @@ export type Usage = {
   memory: string;
 };
 
+export type SinglePodMetric = {
+  timestamp?: string;
+  containers?: PodContainerMetric[];
+};
+
+export type PodContainerMetric = {
+  name: string;
+  usage: ResourceUsage;
+};
+
 export type ApplicationResource = {
   CpuRequest: number;
   CpuLimit: number;

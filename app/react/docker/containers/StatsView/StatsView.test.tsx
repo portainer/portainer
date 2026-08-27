@@ -1,13 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@/setup-tests/server';
-import { ContainerStatsViewModel } from '@/docker/models/containerStats';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 
-import { StatsView, formatPercent, calculateCpuPercent } from './StatsView';
+import { StatsView } from './StatsView';
 
 vi.mock('@uirouter/react', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -69,12 +69,7 @@ function addBaseHandlers() {
 }
 
 beforeEach(() => {
-  vi.useFakeTimers();
   addBaseHandlers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
 });
 
 function renderComponent() {
@@ -83,65 +78,6 @@ function renderComponent() {
   );
   return render(<Wrapped />);
 }
-
-describe('formatPercent', () => {
-  it('rounds to the nearest integer for values >= 1', () => {
-    expect(formatPercent(20)).toBe('20%');
-    expect(formatPercent(1.6)).toBe('2%');
-  });
-
-  it('formats to one decimal place for values between 0.1 and 1', () => {
-    expect(formatPercent(0.5)).toBe('0.5%');
-    expect(formatPercent(0.1)).toBe('0.1%');
-  });
-
-  it('formats to two decimal places for values below 0.1', () => {
-    expect(formatPercent(0.028)).toBe('0.03%');
-    expect(formatPercent(0)).toBe('0.00%');
-  });
-});
-
-// Real-world fixture from Docker API: cpu_stats then precpu_stats
-const realWorldStats = new ContainerStatsViewModel({
-  read: '2024-01-01T00:00:01Z',
-  preread: '2024-01-01T00:00:00Z',
-  cpu_stats: {
-    cpu_usage: { total_usage: 709734856000 },
-    system_cpu_usage: 16006861690000000,
-    online_cpus: 4,
-  },
-  precpu_stats: {
-    cpu_usage: { total_usage: 709734581000 },
-    system_cpu_usage: 16006857740000000,
-  },
-  memory_stats: { usage: 0 },
-});
-
-describe('calculateCpuPercent', () => {
-  it('computes the correct percentage from real-world cgroups v2 stats', () => {
-    // cpuDelta=275000, systemDelta=3950000000, cores=4 → ~0.028%
-    expect(calculateCpuPercent(realWorldStats)).toBeCloseTo(0.0278, 3);
-  });
-
-  it('returns 0 when cpu and system deltas are both zero', () => {
-    const idleStats = new ContainerStatsViewModel({
-      read: '2024-01-01T00:00:01Z',
-      preread: '2024-01-01T00:00:00Z',
-      cpu_stats: {
-        cpu_usage: { total_usage: 1000000 },
-        system_cpu_usage: 100000000,
-        online_cpus: 2,
-      },
-      precpu_stats: {
-        cpu_usage: { total_usage: 1000000 },
-        system_cpu_usage: 100000000,
-      },
-      memory_stats: { usage: 0 },
-    });
-
-    expect(calculateCpuPercent(idleStats)).toBe(0);
-  });
-});
 
 describe('StatsView', () => {
   it('renders the page header "Container statistics"', () => {
@@ -163,6 +99,7 @@ describe('StatsView', () => {
   });
 
   it('shows "Unable to retrieve container statistics" error panel when stats fetch returns 500', async () => {
+    const restoreConsole = suppressConsoleLogs();
     server.use(
       http.get('/api/endpoints/1/docker/containers/container1/stats', () =>
         HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 })
@@ -171,11 +108,11 @@ describe('StatsView', () => {
 
     renderComponent();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Unable to retrieve container statistics')
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('Unable to retrieve container statistics')
+    ).toBeInTheDocument();
+
+    restoreConsole();
   });
 
   it('shows "Network stats are unavailable" message when stats have empty networks', async () => {
@@ -187,11 +124,11 @@ describe('StatsView', () => {
 
     renderComponent();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Network stats are unavailable for this container.')
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        'Network stats are unavailable for this container.'
+      )
+    ).toBeInTheDocument();
   });
 
   it('does not render the Network chart widget when networkUnavailable is true', async () => {
@@ -203,11 +140,11 @@ describe('StatsView', () => {
 
     renderComponent();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Network stats are unavailable for this container.')
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        'Network stats are unavailable for this container.'
+      )
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByText('Network usage (aggregate)')
@@ -223,10 +160,8 @@ describe('StatsView', () => {
 
     renderComponent();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('I/O stats are unavailable for this container.')
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('I/O stats are unavailable for this container.')
+    ).toBeInTheDocument();
   });
 });

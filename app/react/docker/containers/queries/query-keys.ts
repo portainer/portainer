@@ -21,4 +21,7 @@ export const queryKeys = {
 
   top: (environmentId: EnvironmentId, id: string) =>
     [...queryKeys.container(environmentId, id), 'top'] as const,
+
+  stats: (environmentId: EnvironmentId, id: string) =>
+    [...queryKeys.container(environmentId, id), 'stats'] as const,
 };

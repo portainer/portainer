@@ -37,7 +37,12 @@ export function StatsLineChart({
 }: Props) {
   return (
     <div style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minHeight={height}
+        initialDimension={{ width: 1, height }}
+      >
         <ComposedChart
           data={data}
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
