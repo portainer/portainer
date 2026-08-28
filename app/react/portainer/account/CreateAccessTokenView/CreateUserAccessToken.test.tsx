@@ -8,6 +8,15 @@ import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 
 import { CreateUserAccessToken } from './CreateUserAccessToken';
 
+test('marks the password field as the current password for autofill', () => {
+  const { getByLabelText } = renderComponent();
+
+  expect(getByLabelText(/Current password/)).toHaveAttribute(
+    'autocomplete',
+    'current-password'
+  );
+});
+
 test('the button is disabled when all fields are blank and enabled when all fields are filled', async () => {
   const { getByRole, getByLabelText } = renderComponent();
 
