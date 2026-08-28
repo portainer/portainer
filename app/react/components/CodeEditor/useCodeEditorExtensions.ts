@@ -7,7 +7,7 @@ import {
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { keymap, Extension } from '@uiw/react-codemirror';
-import { highlightSpecialChars, lineNumbers } from '@codemirror/view';
+import { Command, highlightSpecialChars, lineNumbers } from '@codemirror/view';
 import type { JSONSchema7 } from 'json-schema';
 import { lintKeymap, lintGutter } from '@codemirror/lint';
 import { defaultKeymap } from '@codemirror/commands';
@@ -75,10 +75,29 @@ function yamlLanguage(schema?: JSONSchema7) {
 
 export function useCodeEditorExtensions(
   type?: CodeEditorType,
-  schema?: JSONSchema7
+  schema?: JSONSchema7,
+  onSave?: () => void,
 ): Extension[] {
+  const baseExtensions: Extension[] = [extendedHighlightSpecialChars];
+
+  if (onSave) {
+    const handleSave: Command = () => {
+      onSave();
+      return true;
+    };
+
+    const saveKeymap = keymap.of([
+      {
+        key: 'Mod-s', // 'Mod' maps to 'Cmd' on Mac and 'Ctrl' on Windows/Linux
+        run: handleSave,
+        preventDefault: true, // Prevents the browser's default save dialog
+      },
+    ]);
+
+    baseExtensions.push(saveKeymap);
+  }
+
   return useMemo(() => {
-    const baseExtensions = [extendedHighlightSpecialChars];
     switch (type) {
       case 'dockerfile':
         return [...baseExtensions, dockerFileLanguage];
