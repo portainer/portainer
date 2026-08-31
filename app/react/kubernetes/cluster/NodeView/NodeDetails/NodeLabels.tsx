@@ -52,7 +52,7 @@ function NodeLabelItem({
 }: ItemProps<NodeLabel>) {
   const formikError = isErrorType(error) ? error : undefined;
   return (
-    <div className="flex flex-wrap items-start gap-2">
+    <div className="mr-2 flex flex-wrap items-center gap-2">
       <div className="w-64 flex-none">
         <InputGroup
           size="small"
