@@ -78,6 +78,36 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 	}
 }
 
+// A status update for an Edge stack that no longer exists (e.g. it was
+// deleted after the agent last polled) must not panic and must be reported
+// as successful, since the agent has nothing left to reconcile against.
+func TestUpdateStatusForNonExistentEdgeStack(t *testing.T) {
+	t.Parallel()
+	handler, _ := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+
+	newStatus := portainer.EdgeStackStatusRunning
+	payload := updateStatusPayload{
+		Status:     &newStatus,
+		EndpointID: endpoint.ID,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, "/edge_stacks/9999/status", r)
+	require.NoError(t, err)
+
+	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, endpoint.EdgeID)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+	require.Empty(t, rec.Body.Bytes())
+}
+
 func TestUpdateStatusForUnassignedEdgeStack(t *testing.T) {
 	t.Parallel()
 	handler, _ := setupHandler(t)

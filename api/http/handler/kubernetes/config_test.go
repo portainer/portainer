@@ -1,11 +1,38 @@
 package kubernetes
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// A Host header containing bytes that are illegal inside a URL (here a DEL
+// control character) makes url.Parse fail on the cluster server URL. buildCluster
+// must not dereference the resulting nil *url.URL and must fall back to a
+// non-self-signed cluster configuration.
+func TestBuildCluster_HandlesUnparsableServerURL(t *testing.T) {
+	t.Parallel()
+
+	handler := &Handler{
+		kubeClusterAccessService: kubernetes.NewKubeClusterAccessService("", "", ""),
+	}
+
+	endpoint := portainer.Endpoint{ID: 1, Name: "test-endpoint"}
+
+	req := httptest.NewRequest(http.MethodGet, "/kubernetes/config", nil)
+	req.Host = "mysite.com\x7f"
+
+	cluster := handler.buildCluster(req, endpoint, false)
+
+	require.False(t, cluster.Cluster.InsecureSkipTLSVerify)
+	require.Equal(t, "portainer-cluster-test-endpoint", cluster.Name)
+}
 
 func TestIsSelfSignedCertificate(t *testing.T) {
 	t.Parallel()

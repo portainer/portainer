@@ -291,6 +291,48 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	require.Zero(t, updatedSrc.LastSync)
 }
 
+func Test_redeployWhenChangedSecondStage_FailsWhenGitSourceHasNoGitConfig(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+	tmpDir := t.TempDir()
+
+	admin := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	err := store.User().Create(admin)
+	require.NoError(t, err, "error creating an admin")
+
+	endpoint := &portainer.Endpoint{ID: 1}
+	err = store.Endpoint().Create(endpoint)
+	require.NoError(t, err, "error creating environment")
+
+	// Type is SourceTypeGit but Git is nil, a shape the Source service's own
+	// Create/Update reject, so it's written directly into the bucket to
+	// reach MergeSourceAndFile's nil-gitConfig path.
+	src := &portainer.Source{ID: 1, Type: portainer.SourceTypeGit}
+	err = store.Connection().UpdateTx(func(tx portainer.Transaction) error {
+		return tx.CreateObjectWithId(source.BucketName, int(src.ID), src)
+	})
+	require.NoError(t, err, "failed to insert the malformed git source")
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 8, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	err = store.Workflow().Create(wf)
+	require.NoError(t, err, "failed to create workflow")
+
+	stack := &portainer.Stack{
+		ID:          8,
+		EndpointID:  endpoint.ID,
+		ProjectPath: tmpDir,
+		UpdatedBy:   admin.Username,
+		WorkflowID:  wf.ID,
+		Type:        portainer.DockerComposeStack,
+	}
+	err = store.Stack().Create(stack)
+	require.NoError(t, err, "failed to create a test stack")
+
+	err = redeployWhenChangedSecondStage(t.Context(), stack, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), admin, endpoint)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "has a git source with no git configuration")
+}
+
 func setupRedeployStore(t *testing.T, stackType portainer.StackType, stackID portainer.StackID) (dataservices.DataStore, portainer.StackID) {
 	t.Helper()
 

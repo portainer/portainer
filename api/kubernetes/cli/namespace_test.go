@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 
@@ -11,7 +13,10 @@ import (
 	core "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	kfake "k8s.io/client-go/kubernetes/fake"
+	ktesting "k8s.io/client-go/testing"
 )
 
 func Test_ToggleSystemState(t *testing.T) {
@@ -241,4 +246,34 @@ func Test_GetNamespace(t *testing.T) {
 		require.Error(t, err)
 		assert.True(t, k8serrors.IsForbidden(err), "expected a Forbidden error, got %v", err)
 	})
+}
+
+// TestCombineNamespacesWithResourceQuotasNilResourceQuotas exercises the case where
+// GetResourceQuotas returns a nil *[]corev1.ResourceQuota alongside a NotFound error
+// (the underlying List call is tolerated as NotFound), so
+// CombineNamespacesWithResourceQuotas must fall back to the plain namespace list
+// instead of dereferencing a nil pointer.
+func TestCombineNamespacesWithResourceQuotasNilResourceQuotas(t *testing.T) {
+	t.Parallel()
+
+	clientset := kfake.NewSimpleClientset()
+	clientset.PrependReactor("list", "resourcequotas", func(action ktesting.Action) (bool, runtime.Object, error) {
+		return true, nil, k8serrors.NewNotFound(schema.GroupResource{Resource: "resourcequotas"}, "")
+	})
+
+	kcl := &KubeClient{
+		cli:         clientset,
+		instanceID:  "instance",
+		isKubeAdmin: true,
+	}
+
+	namespaces := map[string]portainer.K8sNamespaceInfo{
+		"ns-1": {Name: "ns-1"},
+	}
+
+	rr := httptest.NewRecorder()
+	handlerErr := kcl.CombineNamespacesWithResourceQuotas(namespaces, rr)
+	require.Nil(t, handlerErr)
+	require.Equal(t, http.StatusOK, rr.Code)
+	require.Contains(t, rr.Body.String(), "ns-1")
 }

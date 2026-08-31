@@ -69,7 +69,7 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 
 	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
 	if err != nil {
-		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %q from the database", registry.Name), err)
+		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %d from the database", registryID), err)
 	}
 
 	if err := handler.DataStore.Registry().Delete(portainer.RegistryID(registryID)); err != nil {

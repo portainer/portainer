@@ -114,6 +114,10 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return nil
 	}
 
+	if stack == nil {
+		return nil
+	}
+
 	if err := fillEdgeStackStatus(handler.DataStore, stack); err != nil {
 		return handlerDBErr(err, "Unable to retrieve edge stack status from the database")
 	}

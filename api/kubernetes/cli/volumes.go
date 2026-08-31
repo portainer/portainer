@@ -285,6 +285,10 @@ func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8s
 							log.Error().Err(err).Msg("Failed to convert pod to application")
 							return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to convert pod to application. Error: %w", err)
 						}
+
+						if application == nil {
+							continue
+						}
 						// Check if the application already exists in the OwningApplications slice
 						exists := false
 						for _, existingApp := range (*volumes)[i].PersistentVolumeClaim.OwningApplications {
@@ -293,7 +297,7 @@ func (kcl *KubeClient) updateVolumesWithOwningApplications(volumes *[]models.K8s
 								break
 							}
 						}
-						if !exists && application != nil {
+						if !exists {
 							(*volumes)[i].PersistentVolumeClaim.OwningApplications = append((*volumes)[i].PersistentVolumeClaim.OwningApplications, *application)
 						}
 					}

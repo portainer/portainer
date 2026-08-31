@@ -407,7 +407,7 @@ func (kcl *KubeClient) CombineNamespacesWithResourceQuotas(namespaces map[string
 		return httperror.InternalServerError("an error occurred during the CombineNamespacesWithResourceQuotas operation, unable to retrieve resource quotas from the Kubernetes for an admin user. Error: ", err)
 	}
 
-	if len(*resourceQuotas) > 0 {
+	if resourceQuotas != nil && len(*resourceQuotas) > 0 {
 		return response.JSON(w, kcl.UpdateNamespacesWithResourceQuotas(namespaces, *resourceQuotas))
 	}
 

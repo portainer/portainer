@@ -183,7 +183,7 @@ func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoin
 		log.Warn().Err(err).Msg("Failed to parse server URL")
 	}
 
-	if strings.EqualFold(serverUrl.Scheme, "https") {
+	if err == nil && strings.EqualFold(serverUrl.Scheme, "https") {
 		var certPem []byte
 		var err error
 

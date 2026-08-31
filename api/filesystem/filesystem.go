@@ -705,6 +705,10 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 	}
 
 	block, _ := pem.Decode(fileContent)
+	if block == nil {
+		return nil, errors.New("failed to decode PEM block")
+	}
+
 	return block.Bytes, nil
 }
 

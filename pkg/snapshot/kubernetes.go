@@ -39,7 +39,12 @@ func CreateKubernetesSnapshot(cli *kubernetes.Clientset) (*portainer.KubernetesS
 }
 
 func kubernetesSnapshotVersion(snapshot *portainer.KubernetesSnapshot, cli kubernetes.Interface) error {
-	versionInfo, err := cli.Discovery().ServerVersion()
+	discoveryClient := cli.Discovery()
+	if discoveryClient == nil {
+		return errors.New("kubernetes discovery client is nil")
+	}
+
+	versionInfo, err := discoveryClient.ServerVersion()
 	if err != nil {
 		return err
 	}

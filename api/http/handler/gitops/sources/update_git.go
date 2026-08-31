@@ -152,6 +152,10 @@ func ApplyGitSourceChanges(src *portainer.Source, payload GitSourceUpdatePayload
 // ApplyBaseGitSourceChanges applies the non-authentication field changes (name,
 // URL, reference, TLS) to the source in place, ensuring src.Git is set
 func ApplyBaseGitSourceChanges(src *portainer.Source, payload GitSourceUpdatePayload) error {
+	if src == nil {
+		return ErrNotGitSource
+	}
+
 	if src.Type != portainer.SourceTypeGit {
 		return ErrNotGitSource
 	}

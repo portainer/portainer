@@ -146,6 +146,9 @@ func redeployWhenChangedSecondStage(
 	}
 
 	gitConfig := workflows.MergeSourceAndFile(gitSrc, file)
+	if gitConfig == nil {
+		return errors.Errorf("stack %v has a git source with no git configuration", stack.ID)
+	}
 
 	var gitCommitChangedOrForceUpdate bool
 

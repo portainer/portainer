@@ -40,8 +40,12 @@ func (kcl *KubeClient) fetchResourceQuotasForNonAdmin(namespace string) (*[]core
 		return nil, err
 	}
 
-	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := []corev1.ResourceQuota{}
+	if resourceQuotas == nil {
+		return &results, nil
+	}
+
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	for _, resourceQuota := range *resourceQuotas {
 		if _, exists := nonAdminNamespaceSet[resourceQuota.Namespace]; exists {
 			results = append(results, resourceQuota)

@@ -2,11 +2,14 @@ package registries
 
 import (
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/pendingactions"
@@ -56,6 +59,25 @@ func newTestHandler(t *testing.T) (*Handler, dataservices.DataStore) {
 	handler.DataStore = store
 
 	return handler, store
+}
+
+// registryDelete must report the requested registry ID (not the zero-value
+// registry.Name) when the registry cannot be read from the database.
+func TestHandler_registryDelete_NonExistentRegistry(t *testing.T) {
+	t.Parallel()
+
+	handler, _ := newTestHandler(t)
+
+	r := httptest.NewRequest(http.MethodDelete, "/registries/42", nil)
+	w := httptest.NewRecorder()
+
+	restrictedContext := &security.RestrictedRequestContext{IsAdmin: true, UserID: 1}
+	r = r.WithContext(security.StoreRestrictedRequestContext(r, restrictedContext))
+
+	handler.ServeHTTP(w, r)
+
+	require.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Contains(t, w.Body.String(), "Unable to load registry 42 from the database")
 }
 
 // --- cleanupRegistryFromNamespaces unit tests ---

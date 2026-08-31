@@ -286,20 +286,29 @@ func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podLi
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return PortainerApplicationResources{}, fmt.Errorf("unable to list replica sets across the cluster: %w", err)
 	}
-	portainerApplicationResources.ReplicaSets = replicaSets.Items
+
+	if replicaSets != nil {
+		portainerApplicationResources.ReplicaSets = replicaSets.Items
+	}
 
 	deployments, err := kcl.cli.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return PortainerApplicationResources{}, fmt.Errorf("unable to list deployments across the cluster: %w", err)
 	}
-	portainerApplicationResources.Deployments = deployments.Items
+
+	if deployments != nil {
+		portainerApplicationResources.Deployments = deployments.Items
+	}
 
 	if includeStatefulSets {
 		statefulSets, err := kcl.cli.AppsV1().StatefulSets(namespace).List(context.Background(), metav1.ListOptions{})
 		if err != nil && !k8serrors.IsNotFound(err) {
 			return PortainerApplicationResources{}, fmt.Errorf("unable to list stateful sets across the cluster: %w", err)
 		}
-		portainerApplicationResources.StatefulSets = statefulSets.Items
+
+		if statefulSets != nil {
+			portainerApplicationResources.StatefulSets = statefulSets.Items
+		}
 	}
 
 	if includeDaemonSets {
@@ -307,20 +316,29 @@ func (kcl *KubeClient) fetchResourcesWithOwnerReferences(namespace string, podLi
 		if err != nil && !k8serrors.IsNotFound(err) {
 			return PortainerApplicationResources{}, fmt.Errorf("unable to list daemon sets across the cluster: %w", err)
 		}
-		portainerApplicationResources.DaemonSets = daemonSets.Items
+
+		if daemonSets != nil {
+			portainerApplicationResources.DaemonSets = daemonSets.Items
+		}
 	}
 
 	services, err := kcl.cli.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return PortainerApplicationResources{}, fmt.Errorf("unable to list services across the cluster: %w", err)
 	}
-	portainerApplicationResources.Services = services.Items
+
+	if services != nil {
+		portainerApplicationResources.Services = services.Items
+	}
 
 	hpas, err := kcl.cli.AutoscalingV2().HorizontalPodAutoscalers(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil && !k8serrors.IsNotFound(err) {
 		return PortainerApplicationResources{}, fmt.Errorf("unable to list horizontal pod autoscalers across the cluster: %w", err)
 	}
-	portainerApplicationResources.HorizontalPodAutoscalers = hpas.Items
+
+	if hpas != nil {
+		portainerApplicationResources.HorizontalPodAutoscalers = hpas.Items
+	}
 
 	return portainerApplicationResources, nil
 }

@@ -43,6 +43,10 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 		return httpErr
 	}
 
+	if templatesResponse == nil {
+		return httperror.NotFound("Unable to find a template with the specified identifier", nil)
+	}
+
 	templateIdx := slices.IndexFunc(templatesResponse.Templates, func(template portainer.Template) bool {
 		return template.ID == portainer.TemplateID(id)
 	})

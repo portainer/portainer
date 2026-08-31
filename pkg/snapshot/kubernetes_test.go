@@ -12,9 +12,20 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
 	kfake "k8s.io/client-go/kubernetes/fake"
 	ktesting "k8s.io/client-go/testing"
 )
+
+// nilDiscoveryClientset wraps a fake clientset so Discovery() can be forced to
+// return nil, which the real *kubernetes.Clientset never does.
+type nilDiscoveryClientset struct {
+	*kfake.Clientset
+}
+
+func (n *nilDiscoveryClientset) Discovery() discovery.DiscoveryInterface {
+	return nil
+}
 
 func TestClusterTypeFromProviderID(t *testing.T) {
 	t.Parallel()
@@ -188,6 +199,18 @@ func TestCreateKubernetesSnapshotIntegration(t *testing.T) {
 
 	t.Logf("Integration test result: Version=%s, Nodes=%d, CPUs=%d, Memory=%d bytes",
 		snapshot.KubernetesVersion, snapshot.NodeCount, snapshot.TotalCPU, snapshot.TotalMemory)
+}
+
+func TestKubernetesSnapshotVersionNilDiscoveryClient(t *testing.T) {
+	t.Parallel()
+
+	cli := &nilDiscoveryClientset{Clientset: kfake.NewClientset()}
+	snapshot := &portainer.KubernetesSnapshot{}
+
+	err := kubernetesSnapshotVersion(snapshot, cli)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "kubernetes discovery client is nil")
+	require.Empty(t, snapshot.KubernetesVersion)
 }
 
 func TestKubernetesSnapshotNodesWithAPIError(t *testing.T) {

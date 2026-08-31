@@ -326,6 +326,13 @@ func TestGitSourceUpdate_ConflictWhenAuthChangesMatchAnotherSource(t *testing.T)
 	require.Equal(t, http.StatusConflict, rr.Code)
 }
 
+func TestApplyBaseGitSourceChanges_NilSource(t *testing.T) {
+	t.Parallel()
+
+	err := ApplyBaseGitSourceChanges(nil, GitSourceUpdatePayload{})
+	require.ErrorIs(t, err, ErrNotGitSource)
+}
+
 func TestGitSourceUpdate_NonNumericID(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)

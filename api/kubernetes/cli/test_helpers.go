@@ -12,7 +12,11 @@ import (
 // a specific endpoint ID. Intended for use in tests across packages that need to
 // inject a fake Kubernetes client without a real cluster connection.
 func NewTestClientFactory(endpointID portainer.EndpointID, kcl *KubeClient) *ClientFactory {
-	factory, _ := NewClientFactory(nil, nil, nil, "test", "", "")
+	factory, err := NewClientFactory(nil, nil, nil, "test", "", "")
+	if err != nil {
+		panic(err)
+	}
+
 	factory.endpointProxyClients.Set(strconv.Itoa(int(endpointID)), kcl, 0)
 	return factory
 }
