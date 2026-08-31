@@ -65,6 +65,8 @@ export class StackViewModel implements IResource {
 
   FilesystemPath: string;
 
+  WorkflowID: number | undefined;
+
   constructor(stack: Stack, orphaned = false) {
     this.Id = stack.Id;
     this.Type = stack.Type;
@@ -104,5 +106,7 @@ export class StackViewModel implements IResource {
 
     this.SupportRelativePath = stack.SupportRelativePath;
     this.FilesystemPath = stack.FilesystemPath;
+
+    this.WorkflowID = stack.WorkflowID;
   }
 }

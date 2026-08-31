@@ -6,9 +6,11 @@ import { EdgeStackBadge } from '@/react/kubernetes/applications/ListView/Applica
 import { Link } from '@@/Link';
 import { SystemBadge } from '@@/Badge/SystemBadge';
 import { ExternalBadge } from '@@/Badge/ExternalBadge';
+import { WorkflowBadge } from '@@/Badge/WorkflowBadge';
 
 import { helper } from './columns.helper';
 import { ApplicationRowData } from './types';
+import { getTableMeta } from './meta';
 
 export const name = helper.accessor('Name', {
   header: 'Name',
@@ -17,7 +19,9 @@ export const name = helper.accessor('Name', {
 
 function Cell({
   row: { original: item },
+  table,
 }: CellContext<ApplicationRowData, string>) {
+  const { isWorkflowManaged } = getTableMeta(table.options.meta);
   const isSystem = useIsSystemNamespace(item.ResourcePool);
   const isEdgeStack = !isSystem && item.StackKind === 'edge';
 
@@ -53,6 +57,7 @@ function Cell({
       {!isSystem && !item.ApplicationOwner && (
         <ExternalBadge className="ml-auto" />
       )}
+      {isWorkflowManaged(item) && <WorkflowBadge className="ml-auto" />}
     </div>
   );
 }

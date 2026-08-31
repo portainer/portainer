@@ -3,6 +3,7 @@ import { CellContext, Column } from '@tanstack/react-table';
 import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 import { getValueAsArrayOfStrings } from '@/portainer/helpers/array';
 import { StackStatus } from '@/react/common/stacks/types';
+import { isWorkflowManagedStack } from '@/react/common/stacks/isWorkflowManagedStack';
 import {
   isExternalStack,
   isOrphanedStack,
@@ -11,6 +12,7 @@ import {
 
 import { Link } from '@@/Link';
 import { MultipleSelectionFilter } from '@@/datatables/Filter';
+import { WorkflowBadge } from '@@/Badge/WorkflowBadge';
 
 import { DecoratedStack } from '../types';
 
@@ -80,6 +82,9 @@ function NameCell({
         <span className="label label-danger image-tag space-left ml-2">
           Error
         </span>
+      )}
+      {isRegularStack(item) && isWorkflowManagedStack(item) && (
+        <WorkflowBadge className="ml-2" />
       )}
     </>
   );

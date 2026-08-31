@@ -4,10 +4,12 @@ import _ from 'lodash';
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { GitCommitLink } from '@/react/portainer/gitops/GitCommitLink';
+import { isWorkflowManagedStack } from '@/react/common/stacks/isWorkflowManagedStack';
 
 import { buildNameColumnFromObject } from '@@/datatables/buildNameColumn';
 import { Link } from '@@/Link';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { WorkflowBadge } from '@@/Badge/WorkflowBadge';
 
 import { StatusType } from '../../types';
 
@@ -23,6 +25,8 @@ export const columns = _.compact([
     path: 'edge.stacks.edit',
     dataCy: 'edge-stacks-name',
     idParam: 'stackId',
+    renderSuffix: (item) =>
+      isWorkflowManagedStack(item) && <WorkflowBadge className="ml-2" />,
   }),
   columnHelper.accessor(
     (item) =>

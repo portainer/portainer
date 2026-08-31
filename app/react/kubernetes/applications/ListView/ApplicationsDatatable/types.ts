@@ -17,6 +17,7 @@ export interface Application {
   Services?: Array<Service>;
   CreationDate: string;
   ApplicationOwner?: string;
+  StackId?: string;
   StackName?: string;
   StackKind?: string;
   ResourcePool: string;

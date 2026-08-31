@@ -18,6 +18,7 @@ import { TableSettingsMenu } from '@@/datatables';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 import { AddButton } from '@@/buttons';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
+import { withMeta } from '@@/datatables/extend-options/withMeta';
 
 import { NamespaceFilter } from '../ApplicationsStacksDatatable/NamespaceFilter';
 import {
@@ -29,6 +30,7 @@ import { useApplications } from '../../queries/useApplications';
 import { ApplicationsTableSettings } from '../useKubeAppsTableStore';
 import { useDeleteApplicationsMutation } from '../../queries/useDeleteApplicationsMutation';
 import { getStacksFromApplications } from '../ApplicationsStacksDatatable/getStacksFromApplications';
+import { useIsWorkflowManagedCheck } from '../../hooks/useIsWorkflowManagedCheck';
 
 import { Application, ApplicationRowData, ConfigKind } from './types';
 import { useColumns } from './useColumns';
@@ -78,6 +80,8 @@ export function ApplicationsDatatable({
     reportStacks: false,
   });
 
+  const isWorkflowManaged = useIsWorkflowManagedCheck();
+
   const columns = useColumns(hideStacks);
 
   return (
@@ -94,6 +98,10 @@ export function ApplicationsDatatable({
         !isSystemNamespace(row.original.ResourcePool, namespaceListQuery.data)
       }
       getRowCanExpand={(row) => isExpandable(row.original)}
+      extendTableOptions={withMeta({
+        table: 'applications',
+        isWorkflowManaged,
+      })}
       renderSubRow={(row) => (
         <SubRow
           item={row.original}

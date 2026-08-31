@@ -10,6 +10,7 @@ import {
 import { Stack, StackStatus, StackType } from '@/react/common/stacks/types';
 import { ContainerDetailsViewModel } from '@/docker/models/containerDetails';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
+import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 
 export function createMockUser(overrides: Partial<User> = {}) {
   return {
@@ -243,6 +244,43 @@ export function createMockStack(overrides?: Partial<Stack>): Stack {
     PreviousDeploymentInfo: undefined,
     ...overrides,
   };
+}
+
+export function createMockWorkflowManagedStack(
+  overrides: Partial<Stack> = {}
+): Stack {
+  return createMockStack({
+    GitConfig: {
+      URL: 'https://github.com/test/repo',
+      ReferenceName: 'main',
+      ConfigFilePath: 'docker-compose.yml',
+      ConfigHash: '',
+      TLSSkipVerify: false,
+    },
+    GitSourceId: 1,
+    WorkflowID: 1,
+    ...overrides,
+  });
+}
+
+export function createMockEdgeStack(overrides?: Partial<EdgeStack>): EdgeStack {
+  return _.merge(
+    {
+      Id: 1,
+      Name: '',
+      Status: {},
+      CreationDate: 0,
+      EdgeGroups: [],
+      ProjectPath: '',
+      EntryPoint: '',
+      Version: 0,
+      NumDeployments: 0,
+      ManifestPath: '',
+      DeploymentType: DeploymentType.Compose,
+      UseManifestNamespaces: false,
+    } satisfies EdgeStack,
+    overrides
+  );
 }
 
 export function createMockContainer(

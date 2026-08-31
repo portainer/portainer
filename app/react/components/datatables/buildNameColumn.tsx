@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { ColumnDef, CellContext } from '@tanstack/react-table';
 import { UISrefProps } from '@uirouter/react';
 
@@ -33,6 +34,7 @@ export function buildNameColumnFromObject<T extends DefaultType>({
   idParam = 'id',
   idGetter = defaultGetRowId<T>,
   linkParamsBuilder = () => ({}),
+  renderSuffix,
 }: {
   nameKey: keyof T;
   path: string;
@@ -40,6 +42,7 @@ export function buildNameColumnFromObject<T extends DefaultType>({
   idParam?: string;
   idGetter?: (row: T) => string;
   linkParamsBuilder?: (row: T) => UISrefProps['params'];
+  renderSuffix?: (row: T) => ReactNode;
 }): ColumnDef<T> {
   const cell = createCell();
 
@@ -61,17 +64,20 @@ export function buildNameColumnFromObject<T extends DefaultType>({
       }
 
       return (
-        <Link
-          to={path}
-          params={{
-            ...linkParamsBuilder(row.original),
-            [idParam]: idGetter(row.original),
-          }}
-          title={name}
-          data-cy={`${dataCy}_${name}`}
-        >
-          {name}
-        </Link>
+        <>
+          <Link
+            to={path}
+            params={{
+              ...linkParamsBuilder(row.original),
+              [idParam]: idGetter(row.original),
+            }}
+            title={name}
+            data-cy={`${dataCy}_${name}`}
+          >
+            {name}
+          </Link>
+          {renderSuffix?.(row.original)}
+        </>
       );
     };
   }

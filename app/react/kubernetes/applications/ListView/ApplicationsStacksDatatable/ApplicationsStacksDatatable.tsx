@@ -12,10 +12,12 @@ import { useIngresses } from '@/react/kubernetes/ingresses/queries';
 import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
 import { TableSettingsMenu } from '@@/datatables';
 import { DeleteButton } from '@@/buttons/DeleteButton';
+import { withMeta } from '@@/datatables/extend-options/withMeta';
 
 import { useApplications } from '../../queries/useApplications';
 import { ApplicationsTableSettings } from '../useKubeAppsTableStore';
 import { useDeleteApplicationsMutation } from '../../queries/useDeleteApplicationsMutation';
+import { useIsWorkflowManagedCheck } from '../../hooks/useIsWorkflowManagedCheck';
 
 import { columns } from './columns';
 import { SubRows } from './SubRows';
@@ -55,6 +57,7 @@ export function ApplicationsStacksDatatable({
     ingresses,
     reportStacks: true,
   });
+  const isWorkflowManaged = useIsWorkflowManagedCheck();
 
   return (
     <ExpandableDatatable
@@ -66,6 +69,10 @@ export function ApplicationsStacksDatatable({
       columns={columns}
       settingsManager={tableState}
       disableSelect={!hasWriteAuth}
+      extendTableOptions={withMeta({
+        table: 'applications-stacks',
+        isWorkflowManaged,
+      })}
       renderSubRow={(row) => (
         <SubRows stack={row.original} span={row.getVisibleCells().length} />
       )}

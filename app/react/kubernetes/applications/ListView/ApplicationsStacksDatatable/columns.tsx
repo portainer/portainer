@@ -7,8 +7,10 @@ import { buildExpandColumn } from '@@/datatables/expand-column';
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
 import { SystemBadge } from '@@/Badge/SystemBadge';
+import { WorkflowBadge } from '@@/Badge/WorkflowBadge';
 
 import { Stack } from './types';
+import { getTableMeta } from './meta';
 
 export const columnHelper = createColumnHelper<Stack>();
 
@@ -38,7 +40,21 @@ function NamespaceCell({ row, getValue }: CellContext<Stack, string>) {
 const name = columnHelper.accessor('Name', {
   id: 'name',
   header: 'Stack',
+  cell: NameCell,
 });
+
+function NameCell({ row, getValue, table }: CellContext<Stack, string>) {
+  const { isWorkflowManaged } = getTableMeta(table.options.meta);
+  return (
+    <div className="flex gap-2">
+      {getValue()}
+
+      {isWorkflowManaged(row.original.Applications[0]) && (
+        <WorkflowBadge className="ml-auto" />
+      )}
+    </div>
+  );
+}
 
 const applications = columnHelper.accessor((row) => row.Applications.length, {
   id: 'applications',
