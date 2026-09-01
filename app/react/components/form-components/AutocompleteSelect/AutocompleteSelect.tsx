@@ -20,6 +20,7 @@ import styles from './AutocompleteSelect.module.css';
 export function AutocompleteSelect({
   value,
   onChange,
+  onSelect,
   placeholder,
   searchResults,
   readOnly,
@@ -34,6 +35,13 @@ export function AutocompleteSelect({
    * when the input is changed, the call is debounced
    */
   onChange(value: string): void;
+  /**
+   * onSelect is called when the value is settled: an option is picked from the
+   * suggestion list, or the field is left after typing. Never while the input
+   * is still focused and being edited — so a consumer can tell a value the user
+   * is done with apart from text still being typed.
+   */
+  onSelect?(value: string): void;
   placeholder?: string;
   searchResults?: Option<string>[];
   readOnly?: boolean;
@@ -53,13 +61,14 @@ export function AutocompleteSelect({
       className={clsx(styles.root, 'form-control', {
         'bg-[var(--bg-form-control-disabled-color)]': disabled,
       })}
-      onSelect={onSelect}
+      onSelect={handleSelect}
       data-cy="component-gitComposeInput"
     >
       <ComboboxInput
         value={searchTerm}
         className="w-full border-none bg-transparent outline-none"
         onChange={handleChange}
+        onBlur={handleBlur}
         placeholder={placeholder}
         readOnly={readOnly}
         disabled={disabled}
@@ -92,8 +101,13 @@ export function AutocompleteSelect({
     setSelected(false);
   }
 
-  function onSelect(value: string) {
+  function handleBlur() {
+    onSelect?.(searchTerm);
+  }
+
+  function handleSelect(value: string) {
     onChange(value);
+    onSelect?.(value);
     setSelected(true);
   }
 }
