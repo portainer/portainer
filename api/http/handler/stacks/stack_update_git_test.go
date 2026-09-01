@@ -105,3 +105,71 @@ func TestStackUpdateGitWebhookUniqueness(t *testing.T) {
 
 	require.Equal(t, http.StatusConflict, rr.Code)
 }
+
+func TestStackUpdateGit_WritesAutoUpdateIntervalToSource(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, false)
+
+	user, err := mockCreateUser(store)
+	require.NoError(t, err)
+
+	endpoint := &portainer.Endpoint{
+		ID:   1,
+		Name: "endpoint1",
+		Type: portainer.DockerEnvironment,
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowStackManagementForRegularUsers: true,
+		},
+	}
+	require.NoError(t, store.Endpoint().Create(endpoint))
+
+	src := &portainer.Source{
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://github.com/portainer/portainer.git"},
+	}
+	require.NoError(t, store.Source().Create(source.InsecureNewAdminContext(), src))
+
+	const stackID portainer.StackID = 10
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stackID,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID, Path: "docker-compose.yml", Ref: "refs/heads/main"}},
+	}}}
+	require.NoError(t, store.Workflow().Create(wf))
+
+	stack := portainer.Stack{
+		ID:         stackID,
+		Name:       "git-stack",
+		Type:       portainer.DockerComposeStack,
+		EndpointID: endpoint.ID,
+		WorkflowID: wf.ID,
+	}
+	require.NoError(t, store.Stack().Create(&stack))
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+
+	payload := &stackGitUpdatePayload{
+		RepositoryReferenceName: "refs/heads/main",
+		AutoUpdate: &portainer.AutoUpdateSettings{
+			Interval: "5m",
+		},
+	}
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	url := "/stacks/" + strconv.Itoa(int(stack.ID)) + "/git?endpointId=" + strconv.Itoa(int(endpoint.ID))
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(jsonPayload))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
+		IsAdmin: true,
+		UserID:  user.ID,
+		User:    user,
+	}))
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code, rr.Body.String())
+
+	updatedSrc, err := store.Source().Read(source.InsecureNewAdminContext(), src.ID)
+	require.NoError(t, err)
+	require.Equal(t, "5m", updatedSrc.Interval)
+}

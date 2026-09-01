@@ -161,6 +161,12 @@ func (b *GitMethodStackBuilder) prepare(ctx context.Context, payload *StackPaylo
 			return fmt.Errorf("failed to persist source sync status: %w", err)
 		}
 
+		if payload.AutoUpdate != nil {
+			if err := workflows.ApplySourceInterval(tx, userContext, resolvedSrc.ID, payload.AutoUpdate.Interval); err != nil {
+				return err
+			}
+		}
+
 		name := b.stack.Name
 		if name == "" {
 			endpointName := "<unknown>"

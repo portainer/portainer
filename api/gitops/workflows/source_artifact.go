@@ -234,6 +234,30 @@ func FindOrCreateGitSource(tx gitSourceStore, userContext source.UserContext, sr
 	return tx.Source().FindOrCreateGitSource(userContext, src)
 }
 
+// ApplySourceInterval writes the GitOps polling interval onto the source.
+// No-op when sourceID is 0 or the stored interval already matches.
+func ApplySourceInterval(tx gitSourceStore, userContext source.UserContext, sourceID portainer.SourceID, interval string) error {
+	if sourceID == 0 {
+		return nil
+	}
+
+	src, err := tx.Source().Read(userContext, sourceID)
+	if err != nil {
+		return fmt.Errorf("failed to read source: %w", err)
+	}
+
+	if src.Interval == interval {
+		return nil
+	}
+
+	src.Interval = interval
+	if err := tx.Source().Update(userContext, src.ID, src); err != nil {
+		return fmt.Errorf("failed to persist source polling interval: %w", err)
+	}
+
+	return nil
+}
+
 // SaveWorkflowGitConfig persists URL/auth/TLS on the Source and ref/path/hash on the Artifact
 // matched by matchArtifact. When the URL changes, an existing or new Source is located via
 // FindOrCreateGitSource and the Workflow's SourceID is updated atomically alongside the Artifact fields.

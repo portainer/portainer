@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/git/update"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
 	k "github.com/portainer/portainer/api/kubernetes"
@@ -108,6 +109,12 @@ func (handler *Handler) updateKubernetesStack(tx dataservices.DataStoreTx, r *ht
 
 		if err := saveStackGitConfig(tx, userContext, stack.WorkflowID, stack.ID, sourceID, 0, gitConfig); err != nil {
 			return nil, nil, httperror.InternalServerError("Unable to update source git config", err)
+		}
+
+		if payload.AutoUpdate != nil {
+			if err := workflows.ApplySourceInterval(tx, userContext, sourceID, payload.AutoUpdate.Interval); err != nil {
+				return nil, nil, httperror.InternalServerError("Unable to persist source polling interval", err)
+			}
 		}
 
 		return nil, nil, nil

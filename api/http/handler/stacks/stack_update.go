@@ -131,6 +131,9 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	if deploymentConfig == nil {
+		if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+			log.Warn().Err(err).Msg("source scheduler reconcile failed after stack update")
+		}
 		return response.JSON(w, stack)
 	}
 
