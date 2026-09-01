@@ -14,6 +14,9 @@ import { quickActions } from './quick-actions';
 import { stack } from './stack';
 import { state } from './state';
 import { gpus } from './gpus';
+import { cpuPercent } from './cpu';
+import { memory } from './memory';
+import { blockIO } from './blockIO';
 
 export function useColumns(
   isHostColumnVisible: boolean,
@@ -32,6 +35,9 @@ export function useColumns(
         isHostColumnVisible && host,
         isGPUsColumnVisible && gpus,
         ports,
+        cpuPercent,
+        memory,
+        blockIO,
         createOwnershipColumn<ContainerListViewModel>(),
       ]),
     [isHostColumnVisible, isGPUsColumnVisible]
