@@ -51,6 +51,8 @@ linters:
               desc: use github.com/portainer/portainer/pkg/libhttp
             - pkg: golang.org/x/crypto
               desc: golang.org/x/crypto is not allowed because of FIPS mode
+            - pkg: software.sslmate.com/src/go-pkcs12
+              desc: pkcs12 uses non-FIPS primitives (DES/SHA-1/PBKDF2); not allowed because of FIPS mode
             - pkg: github.com/ProtonMail/go-crypto/openpgp
               desc: github.com/ProtonMail/go-crypto/openpgp is not allowed because of FIPS mode
             - pkg: github.com/cosi-project/runtime
