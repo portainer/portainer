@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/logoutcontext"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
@@ -43,6 +44,37 @@ func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *htt
 	return handler.doProxyWebsocketRequest(w, r, params, agentURL, false)
 }
 
+// buildAgentProxyDirector returns the websocketproxy director that decorates the
+// outgoing handshake with the agent headers.
+func buildAgentProxyDirector(
+	signatureService portainer.DigitalSignatureService,
+	nodeName,
+	token string,
+	fipsMode bool,
+) (func(*http.Request, http.Header), error) {
+	// The agent verifies this signature unless it is running in FIPS mode, where it
+	// relies on mTLS instead. Skip sending it to match that behaviour.
+	var publicKey, signature string
+	if !fipsMode {
+		var err error
+		signature, err = signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		publicKey = signatureService.EncodedPublicKey()
+	}
+
+	return func(_ *http.Request, out http.Header) {
+		if !fipsMode {
+			out.Set(portainer.PortainerAgentPublicKeyHeader, publicKey)
+			out.Set(portainer.PortainerAgentSignatureHeader, signature)
+		}
+		out.Set(portainer.PortainerAgentTargetHeader, nodeName)
+		out.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
+	}, nil
+}
+
 func (handler *Handler) doProxyWebsocketRequest(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -74,17 +106,12 @@ func (handler *Handler) doProxyWebsocketRequest(
 		proxyDialer.TLSClientConfig = crypto.CreateTLSConfiguration(params.endpoint.TLSConfig.TLSSkipVerify)
 	}
 
-	signature, err := handler.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	director, err := buildAgentProxyDirector(handler.SignatureService, params.nodeName, params.token, fips.FIPSMode())
 	if err != nil {
 		return err
 	}
 
-	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set(portainer.PortainerAgentPublicKeyHeader, handler.SignatureService.EncodedPublicKey())
-		out.Set(portainer.PortainerAgentSignatureHeader, signature)
-		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
-		out.Set(portainer.PortainerAgentKubernetesSATokenHeader, params.token)
-	}
+	proxy.Director = director
 
 	if isEdge {
 		handler.ReverseTunnelService.UpdateLastActivity(params.endpoint.ID)

@@ -7,6 +7,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
@@ -36,6 +37,10 @@ func NewEdgeTransport(dataStore dataservices.DataStore, signatureService portain
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	return transport.roundTrip(request, fips.FIPSMode())
+}
+
+func (transport *edgeTransport) roundTrip(request *http.Request, fipsMode bool) (*http.Response, error) {
 	token, err := transport.getRoundTripToken(request, transport.tokenManager)
 	if err != nil {
 		return nil, err
@@ -50,13 +55,17 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 		}
 	}
 
-	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
-	}
+	// The agent verifies this signature unless it is running in FIPS mode, where
+	// it relies on mTLS instead. Skip sending it to match that behaviour.
+	if !fipsMode {
+		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+		if err != nil {
+			return nil, err
+		}
 
-	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
-	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
+		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+	}
 
 	response, err := transport.baseTransport.RoundTrip(request)
 
