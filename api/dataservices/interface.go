@@ -22,6 +22,7 @@ type (
 		ResourceControl() ResourceControlService
 		Role() RoleService
 		APIKeyRepository() APIKeyRepository
+		LogForge() LogForgeService
 		Settings() SettingsService
 		Snapshot() SnapshotService
 		SSLSettings() SSLSettingsService
@@ -180,6 +181,14 @@ type (
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
+		BucketName() string
+	}
+
+	// LogForgeService represents a service for managing LogForge integration settings
+	LogForgeService interface {
+		Settings() (*portainer.LogForgeSettings, error)
+		UpdateSettings(settings *portainer.LogForgeSettings) error
+		DeleteSettings() error
 		BucketName() string
 	}
 
