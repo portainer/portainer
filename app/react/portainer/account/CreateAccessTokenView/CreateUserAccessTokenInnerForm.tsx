@@ -33,7 +33,7 @@ export function CreateUserAccessTokenInnerForm({ showAuthentication }: Props) {
             id="password"
             name="password"
             value={values.password}
-            autoComplete="new-password"
+            autoComplete="current-password"
           />
         </FormControl>
       )}
