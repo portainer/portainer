@@ -69,6 +69,7 @@
                 class="form-control"
                 name="username"
                 ng-model="ctrl.formValues.Username"
+                autocomplete="username"
                 auto-focus
                 placeholder="Enter your username"
               />
@@ -84,7 +85,7 @@
                   class="form-control pr-10"
                   name="password"
                   ng-model="ctrl.formValues.Password"
-                  autocomplete="off"
+                  autocomplete="current-password"
                   data-cy="auth-passwordInput"
                   placeholder="Enter your password"
                   ng-trim="false"
