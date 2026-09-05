@@ -28,6 +28,12 @@ Portainer CE is updated regularly. We aim to do an update release every couple o
 
 View [this](https://www.portainer.io/features) table to see all of the Portainer CE functionality and compare to Portainer Business.
 
+## One-click Deployment
+
+You can deploy Portainer on Elestio using one-click-deployment.
+
+[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/portainer)
+
 ## Getting help
 
 Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
