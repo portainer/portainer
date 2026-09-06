@@ -1,1 +1,0 @@
-export { EnvironmentItem } from './EnvironmentItem';

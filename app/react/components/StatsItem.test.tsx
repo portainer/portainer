@@ -18,10 +18,10 @@ describe('StatsItem', () => {
   });
 
   describe('CPUStats', () => {
-    it('renders CPU count with cores label', () => {
+    it('renders CPU count with CORES label', () => {
       render(<CPUStats value={8} />);
       expect(screen.getByText('8')).toBeVisible();
-      expect(screen.getByText('cores')).toBeVisible();
+      expect(screen.getByText('CORES')).toBeVisible();
     });
   });
 
@@ -42,16 +42,20 @@ describe('StatsItem', () => {
   });
 
   describe('ContainerStats', () => {
-    it('renders running/total containers with a progress bar', () => {
+    it('renders running/total containers with a CONTAINERS label', () => {
       render(<ContainerStats total={5} running={3} stopped={2} />);
-      expect(screen.getByText('3')).toBeVisible();
-      expect(screen.getByText('/ 5')).toBeVisible();
-      expect(screen.getByRole('progressbar')).toBeVisible();
+      expect(screen.getByText('3 / 5')).toBeVisible();
+      expect(screen.getByText('CONTAINERS')).toBeVisible();
     });
 
-    it('renders a progress bar when total is zero', () => {
-      render(<ContainerStats total={0} running={0} stopped={0} />);
-      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    it('exposes running and total counts to assistive technology', () => {
+      render(<ContainerStats total={5} running={3} stopped={2} />);
+      expect(screen.getByText('3 of 5 containers running')).toBeInTheDocument();
+    });
+
+    it('falls back to running+stopped when total is zero', () => {
+      render(<ContainerStats total={0} running={2} stopped={1} />);
+      expect(screen.getByText('2 / 3')).toBeVisible();
     });
   });
 });
