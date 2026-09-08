@@ -825,7 +825,15 @@ func (transport *Transport) decorateGenericResourceCreationResponse(response *ht
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	return utils.RewriteResponse(response, responseObject, response.StatusCode)
+	if response.Header == nil {
+		response.Header = make(http.Header)
+	}
+	if response.Request != nil && response.Request.URL != nil {
+		basePath := strings.TrimSuffix(response.Request.URL.Path, "/create")
+		response.Header.Set("Location", basePath+"/"+resourceID)
+	}
+
+	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
 }
 
 func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
@@ -839,8 +847,9 @@ func (transport *Transport) decorateGenericResourceCreationOperation(request *ht
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusCreated {
+	if response.StatusCode == http.StatusCreated || response.StatusCode == http.StatusOK {
 		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+		response.StatusCode = http.StatusCreated
 	}
 
 	return response, err

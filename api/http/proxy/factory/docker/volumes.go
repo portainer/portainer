@@ -201,8 +201,9 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusCreated {
+	if response.StatusCode == http.StatusCreated || response.StatusCode == http.StatusOK {
 		err = transport.decorateVolumeCreationResponse(response, resourceType, tokenData.ID)
+		response.StatusCode = http.StatusCreated
 	}
 
 	return response, err
@@ -232,7 +233,7 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	return utils.RewriteResponse(response, responseObject, http.StatusOK)
+	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
 }
 
 func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {
