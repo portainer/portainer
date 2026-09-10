@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
-	nethttp "net/http"
 	"os"
 	"path"
 	"strings"
@@ -59,10 +58,6 @@ import (
 	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
 	"github.com/portainer/portainer/pkg/validate"
 
-	gogitclient "github.com/go-git/go-git/v5/plumbing/transport/client"
-	gogitraw "github.com/go-git/go-git/v5/plumbing/transport/git"
-	gogithttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-	gogitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
@@ -418,10 +413,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		log.Fatal().Msg("failed to wrap default HTTP transport with SSRF protection")
 	}
 
-	gogithttp.DefaultClient = gogithttp.NewClient(&nethttp.Client{Transport: nethttp.DefaultTransport})
-	gogitclient.InstallProtocol("git", git.NewSSRFGitTransport(gogitraw.DefaultClient))
-	gogitclient.InstallProtocol("ssh", git.NewSSRFGitTransport(gogitssh.DefaultClient))
-	gogitclient.InstallProtocol("file", nil)
+	git.InstallSSRFProtocols()
 
 	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {
