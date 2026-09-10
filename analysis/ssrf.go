@@ -4,18 +4,42 @@ package gorules
 
 import "github.com/quasilyte/go-ruleguard/dsl"
 
-// unwrappedHTTPTransport flags any bare http.Transport composite literal.
-// All transports must be created via ssrf.NewTransport or ssrf.NewInternalTransport,
+// unwrappedHTTPTransport flags any bare *http.Transport construction (a
+// composite literal or new(http.Transport)) reaching a var, a struct field, a
+// function call, or a return, at any position among other values. All
+// transports must be created via ssrf.NewTransport or ssrf.NewInternalTransport,
 // which clone http.DefaultTransport and handle SSRF protection internally.
+//
+// Matches are by resolved type (Type.Is) on the constructed value itself, not
+// by the literal "http" token or a blanket unary-expression check, so they
+// still fire when net/http is imported under a different local name, and they
+// do not fire on a dereference or address-of an already-safe transport.
+// getter.WithTransport is excluded from the call-form match; it is covered by
+// the more specific diagnostic in helmGetterTransport. Test files are exempt:
+// they build fixtures against local/mock servers, never a real production
+// destination, so an unwrapped transport in a _test.go file carries no SSRF risk.
 func unwrappedHTTPTransport(m dsl.Matcher) {
-	m.Match(`$f(&http.Transport{$*_})`).
+	m.Match(`$_ := &$typ{$*_}`, `$_ = &$typ{$*_}`, `var $_ = &$typ{$*_}`).
+		Where(m["typ"].Type.Is(`http.Transport`) && !m.File().Name.Matches(`_test\.go$`)).
+		Report(`bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
+
+	m.Match(`$_ := new($typ)`, `$_ = new($typ)`, `var $_ = new($typ)`).
+		Where(m["typ"].Type.Is(`http.Transport`) && !m.File().Name.Matches(`_test\.go$`)).
+		Report(`bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
+
+	m.Match(`$_: &$typ{$*_}`, `$_: new($typ)`).
+		Where(m["typ"].Type.Is(`http.Transport`) && !m.File().Name.Matches(`_test\.go$`)).
+		Report(`struct field initialized with a bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
+
+	m.Match(`$f($*_, &$typ{$*_}, $*_)`, `$f($*_, new($typ), $*_)`).
+		Where(m["typ"].Type.Is(`http.Transport`) &&
+			!m["f"].Text.Matches(`^getter\.WithTransport$`) &&
+			!m.File().Name.Matches(`_test\.go$`)).
 		Report(`$f receives a bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
 
-	m.Match(`$_ := &http.Transport{$*_}`).
-		Report(`bare *http.Transport variable; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
-
-	m.Match(`$_.Transport = &http.Transport{$*_}`).
-		Report(`bare *http.Transport field assignment; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
+	m.Match(`return $*_, &$typ{$*_}, $*_`, `return $*_, new($typ), $*_`).
+		Where(m["typ"].Type.Is(`http.Transport`) && !m.File().Name.Matches(`_test\.go$`)).
+		Report(`returning a bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
 }
 
 // helmGetterTransport flags getter.WithTransport calls that receive a bare *http.Transport.
@@ -30,8 +54,10 @@ func helmGetterTransport(m dsl.Matcher) {
 // The one legitimate clone is in main.go where http.DefaultTransport is globally
 // wrapped with SSRF protection at server startup.
 func cloneDefaultTransport(m dsl.Matcher) {
-	m.Match(`$_.(*http.Transport).Clone()`).
-		Where(!m.File().Name.Matches(`^main\.go$`)).
+	m.Match(`$ta.Clone()`).
+		Where(m["ta"].Node.Is(`TypeAssertExpr`) &&
+			m["ta"].Type.Is(`*http.Transport`) &&
+			!m.File().Name.Matches(`^main\.go$`)).
 		Report(`cloning *http.Transport directly is forbidden; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
 }
 
