@@ -102,6 +102,8 @@ linters:
           msg: Use git.CloneContext with NewNoSymlinkFS to prevent symlink traversal attacks
         - pattern: ^(filepath|path)\.Join$
           msg: Use filesystem.JoinPaths() from github.com/portainer/portainer/api/filesystem to prevent path traversal attacks
+        - pattern: ^action\.ChartPathOptions\.LocateChart$
+          msg: Use sdk.locateChart() instead, which uses SSRF protections for chart resolution
       analyze-types: true
   exclusions:
     generated: lax

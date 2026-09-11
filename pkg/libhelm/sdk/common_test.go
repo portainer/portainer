@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 
 	"github.com/portainer/portainer/api/filesystem"
@@ -138,6 +139,24 @@ func TestLoadAndValidateChartWithPathOptions(t *testing.T) {
 		"dependency tarball should have been downloaded into charts/ — proves ContentCache was threaded into downloader.Manager")
 }
 
+func TestLoadAndValidateChartWithPathOptions_DependencyTransportError(t *testing.T) {
+	t.Parallel()
+
+	depTgzPath := saveMinimalDepChart(t, "dep-chart", "0.1.0")
+	server := newHelmHTTPRepoServer(t, depTgzPath)
+	parentDir := writeParentChart(t, "parent-chart", "dep-chart", "0.1.0", server.URL)
+
+	hspm := newIsolatedHelmSDKPackageManager(t)
+
+	_, err := hspm.loadAndValidateChartWithPathOptions(
+		new(action.Configuration),
+		&action.ChartPathOptions{CertFile: "/nonexistent/cert.pem", KeyFile: "/nonexistent/key.pem"},
+		parentDir, "", "", true, "test",
+	)
+
+	require.ErrorContains(t, err, "failed to build the chart dependency download transport")
+}
+
 // saveMinimalDepChart produces a valid dependency chart tarball on disk and returns its path.
 func saveMinimalDepChart(t *testing.T, name, version string) string {
 	t.Helper()
@@ -154,10 +173,23 @@ func saveMinimalDepChart(t *testing.T, name, version string) string {
 
 func newHelmHTTPRepoServer(t *testing.T, tgzPath string) *httptest.Server {
 	t.Helper()
+	server, _ := newHelmHTTPRepoServerWithRequestCounter(t, tgzPath)
+	return server
+}
+
+// newHelmHTTPRepoServerWithRequestCounter is like newHelmHTTPRepoServer but also returns a counter of
+// the requests the server received, so callers can prove a request was (or wasn't) actually made.
+func newHelmHTTPRepoServerWithRequestCounter(t *testing.T, tgzPath string) (*httptest.Server, *atomic.Int64) {
+	t.Helper()
 	tgzName := filepath.Base(tgzPath)
 
+	var requests atomic.Int64
+
 	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests.Add(1)
+		mux.ServeHTTP(w, r)
+	}))
 	t.Cleanup(server.Close)
 
 	mux.HandleFunc("/"+tgzName, func(w http.ResponseWriter, r *http.Request) {
@@ -176,7 +208,7 @@ entries:
 		w.Header().Set("Content-Type", "text/yaml")
 		_, _ = w.Write([]byte(index))
 	})
-	return server
+	return server, &requests
 }
 
 // writeParentChart writes a Chart.yaml declaring a single HTTP dependency and returns the chart dir.

@@ -42,12 +42,20 @@ func unwrappedHTTPTransport(m dsl.Matcher) {
 		Report(`returning a bare *http.Transport; use ssrf.NewTransport(tlsConfig) or ssrf.NewInternalTransport(tlsConfig) instead`)
 }
 
-// helmGetterTransport flags getter.WithTransport calls that receive a bare *http.Transport.
-// Helm v4 installs its own transport and bypasses http.DefaultTransport, so the transport
-// passed here must be created via ssrf.NewTransport.
+// helmGetterTransport flags getter.WithTransport calls that receive a bare
+// *http.Transport (alias-immune, see unwrappedHTTPTransport), and flags any
+// getter.All call missing a getter.WithTransport option entirely. Helm v4
+// installs its own transport and bypasses http.DefaultTransport, so a getter
+// with no explicit transport option is unprotected.
 func helmGetterTransport(m dsl.Matcher) {
-	m.Match(`getter.WithTransport(&http.Transport{$*_})`).
+	m.Match(`getter.WithTransport($rhs)`).
+		Where(m["rhs"].Type.Is(`*http.Transport`) &&
+			(m["rhs"].Node.Is(`UnaryExpr`) || (m["rhs"].Node.Is(`CallExpr`) && m["rhs"].Text.Matches(`^new\(`)))).
 		Report(`getter.WithTransport called with a bare *http.Transport; use ssrf.NewTransport(tlsConfig) as Helm v4 bypasses http.DefaultTransport`)
+
+	m.Match(`getter.All($_, $*opts)`).
+		Where(!m["opts"].Contains(`getter.WithTransport($_)`)).
+		Report(`getter.All called without getter.WithTransport(ssrf.NewTransport(tlsConfig)); Helm v4 bypasses http.DefaultTransport`)
 }
 
 // cloneDefaultTransport flags direct clones of *http.Transport outside main.go.

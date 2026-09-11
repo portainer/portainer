@@ -38,7 +38,7 @@ const (
 // it also checks for chart dependencies and updates them if necessary.
 // it returns the chart information.
 func (hspm *HelmSDKPackageManager) loadAndValidateChartWithPathOptions(actionConfig *action.Configuration, chartPathOptions *action.ChartPathOptions, chartName, version string, repoURL string, dependencyUpdate bool, operation string) (*v2chart.Chart, error) {
-	chartPath, err := chartPathOptions.LocateChart(chartName, hspm.settings)
+	chartPath, err := locateChart(chartPathOptions, actionConfig.RegistryClient, chartName, hspm.settings)
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").
@@ -85,7 +85,12 @@ func (hspm *HelmSDKPackageManager) loadAndValidateChartWithPathOptions(actionCon
 				Str("chart", chartName).
 				Msg("Updating chart dependencies for helm " + operation)
 
-			providers := getter.All(hspm.settings)
+			transport, err := chartTransport(chartPathOptions)
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to build the chart dependency download transport")
+			}
+
+			providers := getter.All(hspm.settings, getter.WithTransport(transport))
 			manager := &downloader.Manager{
 				Out:              os.Stdout,
 				ChartPath:        chartPath,
