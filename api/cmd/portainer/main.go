@@ -53,6 +53,7 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhelm"
+	libhelmcache "github.com/portainer/portainer/pkg/libhelm/cache"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/libstack/compose"
 	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
@@ -459,6 +460,10 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 	}
 
 	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx, fileService)
+
+	if err := libhelmcache.Initialize(settings.UserSessionTimeout); err != nil {
+		log.Fatal().Err(err).Msg("failed initializing Helm registry cache")
+	}
 
 	dockerClientFactory := dockerclient.NewClientFactory(signatureService, reverseTunnelService)
 

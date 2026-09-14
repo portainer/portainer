@@ -6,6 +6,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/stretchr/testify/require"
 )
 
 // helper to build a multipart request for registry configure validation
@@ -47,6 +52,27 @@ func newConfigureRequest(t *testing.T, tls bool, skipVerify bool, includeCert bo
 	req := httptest.NewRequest(http.MethodPost, "/registries/1/configure", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	return req
+}
+
+func TestHandler_registryConfigure(t *testing.T) {
+	t.Parallel()
+
+	handler, store := newTestHandler(t)
+
+	registry := &portainer.Registry{Type: portainer.ProGetRegistry}
+	err := store.Registry().Create(registry)
+	require.NoError(t, err)
+
+	r := newConfigureRequest(t, false, false, false, false, false)
+
+	restrictedContext := &security.RestrictedRequestContext{IsAdmin: true, UserID: 1}
+
+	ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
+	r = r.WithContext(ctx)
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, r)
+	require.Equal(t, http.StatusNoContent, w.Code)
 }
 
 func Test_registryConfigurePayload_Validate_TLSBundleRules(t *testing.T) {

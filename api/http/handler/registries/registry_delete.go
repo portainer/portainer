@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/pendingactions/handlers"
+	libhelmcache "github.com/portainer/portainer/pkg/libhelm/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -69,12 +70,19 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 
 	registry, err := handler.DataStore.Registry().Read(portainer.RegistryID(registryID))
 	if err != nil {
-		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %q from the database", registry.Name), err)
+		return httperror.InternalServerError(fmt.Sprintf("Unable to load registry %d from the database", registryID), err)
 	}
 
 	if err := handler.DataStore.Registry().Delete(portainer.RegistryID(registryID)); err != nil {
 		return httperror.InternalServerError("Unable to remove the registry from the database", err)
 	}
+
+	libhelmcache.FlushRegistryByID(registry.ID)
+	log.Info().
+		Int("registry_id", int(registry.ID)).
+		Str("registry_name", registry.Name).
+		Str("context", "RegistryDeleteHandler").
+		Msg("Flushed Helm registry cache due to registry deletion")
 
 	handler.deleteKubernetesSecrets(handler.DataStore, registry)
 

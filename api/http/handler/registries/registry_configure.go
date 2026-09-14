@@ -8,9 +8,12 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	libhelmcache "github.com/portainer/portainer/pkg/libhelm/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/rs/zerolog/log"
 )
 
 type registryConfigurePayload struct {
@@ -181,6 +184,13 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist registry changes inside the database", err)
 	}
+
+	libhelmcache.FlushRegistryByID(registry.ID)
+	log.Info().
+		Int("registry_id", int(registry.ID)).
+		Str("registry_name", registry.Name).
+		Str("context", "RegistryConfigureHandler").
+		Msg("Flushed Helm registry cache due to configuration changes")
 
 	return response.Empty(w)
 }

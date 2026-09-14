@@ -9,9 +9,12 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	libhelmcache "github.com/portainer/portainer/pkg/libhelm/cache"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+
+	"github.com/rs/zerolog/log"
 )
 
 type registryUpdatePayload struct {
@@ -175,6 +178,15 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if err := handler.DataStore.Registry().Update(registry.ID, registry); err != nil {
 		return httperror.InternalServerError("Unable to persist registry changes inside the database", err)
+	}
+
+	if shouldUpdateSecrets {
+		libhelmcache.FlushRegistryByID(registry.ID)
+		log.Info().
+			Int("registry_id", int(registry.ID)).
+			Str("registry_name", registry.Name).
+			Str("context", "RegistryUpdateHandler").
+			Msg("Flushed Helm registry cache due to registry changes")
 	}
 
 	hideFields(registry, true)
