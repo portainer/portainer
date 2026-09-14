@@ -817,15 +817,20 @@ func (transport *Transport) decorateGenericResourceCreationResponse(response *ht
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
+	setDockerCreationLocation(response, resourceID)
+
+	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
+}
+
+func setDockerCreationLocation(response *http.Response, resourceID string) {
 	if response.Header == nil {
 		response.Header = make(http.Header)
 	}
-	if response.Request != nil && response.Request.URL != nil {
-		basePath := strings.TrimSuffix(response.Request.URL.Path, "/create")
-		response.Header.Set("Location", basePath+"/"+resourceID)
-	}
 
-	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
+	// Keep this reference relative so the client resolves it against the original
+	// Portainer proxy URL. The request URL has already been stripped and rewritten
+	// for the upstream Docker endpoint by the time this response is decorated.
+	response.Header.Set("Location", resourceID)
 }
 
 func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {

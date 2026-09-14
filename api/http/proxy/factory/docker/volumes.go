@@ -232,6 +232,7 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 	responseObject[volumeObjectIdentifier] = resourceID
 
 	responseObject = decorateObject(responseObject, resourceControl)
+	setDockerCreationLocation(response, responseObject["Name"].(string))
 
 	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
 }
