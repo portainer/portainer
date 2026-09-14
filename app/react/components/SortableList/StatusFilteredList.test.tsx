@@ -5,10 +5,9 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {
-  useTableStateFromUrl,
-  asEnum,
-} from '@@/datatables/useTableStateFromUrl';
+import { asEnum } from '@/react/utils/enum';
+
+import { useTableStateFromUrl } from '@@/datatables/useTableStateFromUrl';
 import { buildGroupSortExtras } from '@@/datatables/groupSortState';
 import {
   StatusSummaryBar,

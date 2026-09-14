@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { asEnum } from '@/react/utils/enum';
+
 import { PageHeader } from '@@/PageHeader';
 import { StatusSummaryBar } from '@@/StatusSummaryBar/StatusSummaryBar';
 import {
@@ -7,7 +9,6 @@ import {
   SortableGroup,
   SortOption,
 } from '@@/SortableList/SortableList';
-import { asEnum } from '@@/datatables/useTableStateFromUrl';
 
 import { useWorkflows } from '../queries/useWorkflows';
 import { useWorkflowsSummary } from '../../queries/useWorkflowsSummary';
