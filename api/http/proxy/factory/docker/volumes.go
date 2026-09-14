@@ -203,7 +203,6 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 
 	if response.StatusCode == http.StatusCreated || response.StatusCode == http.StatusOK {
 		err = transport.decorateVolumeCreationResponse(response, resourceType, tokenData.ID)
-		response.StatusCode = http.StatusCreated
 	}
 
 	return response, err
