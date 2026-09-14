@@ -2173,6 +2173,8 @@ const (
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
 	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
+	// DefaultSecretsDir is the directory a relative --secret-key-name is resolved against
+	DefaultSecretsDir = "/run/secrets"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token
