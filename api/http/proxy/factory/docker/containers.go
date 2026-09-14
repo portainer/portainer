@@ -351,7 +351,6 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 	if response.StatusCode == http.StatusCreated || response.StatusCode == http.StatusOK {
 		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
-		response.StatusCode = http.StatusCreated
 	}
 
 	return response, err
