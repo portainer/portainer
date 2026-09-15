@@ -443,6 +443,11 @@ func TestGetApplications(t *testing.T) {
 		_, err = fakeClient.CoreV1().Pods(namespace).Create(t.Context(), pod2, metav1.CreateOptions{})
 		require.NoError(t, err)
 
+		// Create a deployment scaled to 0 replicas, i.e. with no scheduled pods anywhere in the cluster
+		zeroReplicaDeploy := createTestDeployment("zero-replica-deploy", namespace, 0)
+		_, err = fakeClient.AppsV1().Deployments(namespace).Create(t.Context(), zeroReplicaDeploy, metav1.CreateOptions{})
+		require.NoError(t, err)
+
 		// Create the KubeClient
 		kubeClient := &KubeClient{
 			cli:         fakeClient,
@@ -454,7 +459,62 @@ func TestGetApplications(t *testing.T) {
 		apps, err := kubeClient.GetApplications(namespace, nodeName)
 		require.NoError(t, err)
 
-		// We expect to find only the pod on the specified node
+		// We expect to find only the pod on the specified node - the 0-replica deployment isn't
+		// scheduled on this (or any) node, so it must not be included
+		assert.Len(t, apps, 1)
+		if len(apps) > 0 {
+			assert.Equal(t, "node-deploy", apps[0].Name)
+		}
+	})
+
+	t.Run("Filter by node name - non-admin user", func(t *testing.T) {
+		// Create a fake K8s client
+		fakeClient := fake.NewSimpleClientset()
+
+		// Setup test namespace
+		namespace := "node-filter-ns-non-admin"
+		nodeName := "worker-node-1"
+
+		// Create a deployment with pods on specific node
+		deploy := createTestDeployment("node-deploy", namespace, 2)
+		_, err := fakeClient.AppsV1().Deployments(namespace).Create(t.Context(), deploy, metav1.CreateOptions{})
+		require.NoError(t, err)
+
+		// Create ReplicaSet for the deployment
+		rs := createTestReplicaSet("rs-node-deploy", namespace, "node-deploy")
+		_, err = fakeClient.AppsV1().ReplicaSets(namespace).Create(t.Context(), rs, metav1.CreateOptions{})
+		require.NoError(t, err)
+
+		// Create 2 pods, one on the specified node, one on a different node
+		pod1 := createTestPod("pod-on-node", namespace, "ReplicaSet", "rs-node-deploy", true)
+		pod1.Spec.NodeName = nodeName
+		_, err = fakeClient.CoreV1().Pods(namespace).Create(t.Context(), pod1, metav1.CreateOptions{})
+		require.NoError(t, err)
+
+		pod2 := createTestPod("pod-other-node", namespace, "ReplicaSet", "rs-node-deploy", true)
+		pod2.Spec.NodeName = "worker-node-2"
+		_, err = fakeClient.CoreV1().Pods(namespace).Create(t.Context(), pod2, metav1.CreateOptions{})
+		require.NoError(t, err)
+
+		// Create a deployment scaled to 0 replicas, i.e. with no scheduled pods anywhere in the cluster
+		zeroReplicaDeploy := createTestDeployment("zero-replica-deploy", namespace, 0)
+		_, err = fakeClient.AppsV1().Deployments(namespace).Create(t.Context(), zeroReplicaDeploy, metav1.CreateOptions{})
+		require.NoError(t, err)
+
+		// Create the KubeClient with non-admin privileges, granted access to the namespace
+		kubeClient := &KubeClient{
+			cli:                fakeClient,
+			instanceID:         "test-instance",
+			isKubeAdmin:        false,
+			nonAdminNamespaces: []string{namespace},
+		}
+
+		// Test filtering by node name
+		apps, err := kubeClient.GetApplications(namespace, nodeName)
+		require.NoError(t, err)
+
+		// We expect to find only the pod on the specified node - the 0-replica deployment isn't
+		// scheduled on this (or any) node, so it must not be included
 		assert.Len(t, apps, 1)
 		if len(apps) > 0 {
 			assert.Equal(t, "node-deploy", apps[0].Name)

@@ -8,6 +8,7 @@ import {
   ControllerRevision,
 } from 'kubernetes-types/apps/v1';
 import { Pod } from 'kubernetes-types/core/v1';
+import { LabelSelector } from 'kubernetes-types/meta/v1';
 
 import { parseCPU, safeFilesizeParser } from '@/react/kubernetes/utils';
 
@@ -123,12 +124,35 @@ export function getResourceLimits(application: Application) {
   return limits;
 }
 
-// matchLabelsToLabelSelectorValue converts a map of labels to a label selector value that can be used in the
-// labelSelector param for the kube api to filter kube resources by labels
-export function matchLabelsToLabelSelectorValue(obj?: Record<string, string>) {
-  if (!obj) return '';
-  return Object.entries(obj)
-    .map(([key, value]) => `${key}=${value}`)
+// matchLabelsToLabelSelectorValue converts a label selector (matchLabels and matchExpressions) to a label
+// selector value that can be used in the labelSelector param for the kube api to filter kube resources.
+// matchLabels and matchExpressions are ANDed together, matching kubernetes selector semantics.
+export function matchLabelsToLabelSelectorValue(selector?: LabelSelector) {
+  if (!selector) return '';
+
+  const matchLabelTerms = Object.entries(selector.matchLabels ?? {}).map(
+    ([key, value]) => `${key}=${value}`
+  );
+
+  const matchExpressionTerms = (selector.matchExpressions ?? []).map(
+    (requirement) => {
+      switch (requirement.operator) {
+        case 'In':
+          return `${requirement.key} in (${(requirement.values ?? []).join(',')})`;
+        case 'NotIn':
+          return `${requirement.key} notin (${(requirement.values ?? []).join(',')})`;
+        case 'Exists':
+          return requirement.key;
+        case 'DoesNotExist':
+          return `!${requirement.key}`;
+        default:
+          return '';
+      }
+    }
+  );
+
+  return [...matchLabelTerms, ...matchExpressionTerms]
+    .filter((term) => term !== '')
     .join(',');
 }
 

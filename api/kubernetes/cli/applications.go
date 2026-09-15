@@ -53,6 +53,12 @@ func (kcl *KubeClient) fetchApplications(namespace, nodeName string) ([]models.K
 		return nil, err
 	}
 
+	// Workloads with no scheduled pods aren't running on any node, so they can't be attributed
+	// to the requested node and must be excluded rather than appearing under every node's list.
+	if nodeName != "" {
+		return applications, nil
+	}
+
 	unhealthyApplications, err := fetchUnhealthyApplications(portainerApplicationResources)
 	if err != nil {
 		return nil, err
@@ -89,14 +95,20 @@ func (kcl *KubeClient) fetchApplicationsForNonAdmin(namespace, nodeName string) 
 		return nil, err
 	}
 
-	unhealthyApplications, err := fetchUnhealthyApplications(portainerApplicationResources)
-	if err != nil {
-		return nil, err
+	// Workloads with no scheduled pods aren't running on any node, so they can't be attributed
+	// to the requested node and must be excluded rather than appearing under every node's list.
+	if nodeName == "" {
+		unhealthyApplications, err := fetchUnhealthyApplications(portainerApplicationResources)
+		if err != nil {
+			return nil, err
+		}
+
+		applications = append(applications, unhealthyApplications...)
 	}
 
 	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
 	results := make([]models.K8sApplication, 0)
-	for _, application := range append(applications, unhealthyApplications...) {
+	for _, application := range applications {
 		if _, ok := nonAdminNamespaceSet[application.ResourcePool]; ok {
 			results = append(results, application)
 		}
