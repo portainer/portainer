@@ -49,7 +49,7 @@ export function InnerForm({
     <Form>
       <Modal
         onDismiss={onDismiss}
-        aria-label="edit-git-settings"
+        aria-label={`Edit stack settings — ${stackName}`}
         size="xl"
         className="flex h-[80vh] flex-col px-0"
       >
@@ -58,7 +58,7 @@ export function InnerForm({
             <div className="inline-flex items-center gap-1 px-5">
               <WidgetIcon icon={Settings} />
               <h2 className="m-0 ml-1 text-base">
-                Edit Git settings — {stackName}
+                Edit stack settings — {stackName}
               </h2>
             </div>
           }

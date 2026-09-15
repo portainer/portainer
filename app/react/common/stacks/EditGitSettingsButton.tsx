@@ -24,7 +24,7 @@ export function EditGitSettingsButton({ stack }: { stack: Stack }) {
         data-cy="edit-git-settings-button"
         icon={PencilIcon}
       >
-        Edit Git settings
+        Edit stack settings
       </Button>
       {isOpen && (
         <EditGitSettingsModal stack={stack} onClose={() => setIsOpen(false)} />
