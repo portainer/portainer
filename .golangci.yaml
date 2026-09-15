@@ -55,6 +55,12 @@ linters:
               desc: pkcs12 uses non-FIPS primitives (DES/SHA-1/PBKDF2); not allowed because of FIPS mode
             - pkg: github.com/ProtonMail/go-crypto/openpgp
               desc: github.com/ProtonMail/go-crypto/openpgp is not allowed because of FIPS mode
+            - pkg: helm.sh/helm/v3/pkg/provenance
+              desc: chart provenance verification uses openpgp; not allowed because of FIPS mode
+            - pkg: helm.sh/helm/v4/pkg/provenance
+              desc: chart provenance verification uses openpgp; not allowed because of FIPS mode
+            - pkg: github.com/prometheus/exporter-toolkit
+              desc: exporter-toolkit basic auth uses bcrypt; not allowed because of FIPS mode
             - pkg: github.com/cosi-project/runtime
               desc: github.com/cosi-project/runtime is not allowed because of FIPS mode
             - pkg: gopkg.in/yaml.v2
@@ -87,7 +93,7 @@ linters:
         - ruleguard
       settings:
         ruleguard:
-          rules: './analysis/ssrf.go,./analysis/git.go,./analysis/transaction.go'
+          rules: './analysis/ssrf.go,./analysis/git.go,./analysis/transaction.go,./analysis/fips.go'
     forbidigo:
       forbid:
         - pattern: ^tls\.Config$
@@ -96,6 +102,16 @@ linters:
           msg: Do not set this field directly, use crypto.CreateTLSConfiguration() instead
         - pattern: ^object\.(Commit|Tag)\.Verify$
           msg: 'Not allowed because of FIPS mode'
+        - pattern: ^action\.(ChartPathOptions|Dependency)\.Verify$
+          msg: 'Chart provenance verification uses openpgp. Not allowed because of FIPS mode'
+        - pattern: ^downloader\.(Manager|ChartDownloader)\.Verify$
+          msg: 'Chart provenance verification uses openpgp. Not allowed because of FIPS mode'
+        - pattern: ^downloader\.(VerifyChart|VerifyAlways|VerifyIfPossible|VerifyLater)$
+          msg: 'Chart provenance verification uses openpgp. Not allowed because of FIPS mode'
+        - pattern: ^ldap\.Conn\.(NTLMBind|NTLMBindWithHash|NTLMChallengeBind|NTLMUnauthenticatedBind|MD5Bind|DigestMD5Bind)$
+          msg: 'NTLM and DIGEST-MD5 binds use MD4/MD5/DES/RC4. Not allowed because of FIPS mode'
+        - pattern: ^ldap\.Conn\.(GSSAPIBind|GSSAPIBindRequest|GSSAPIBindRequestWithAPOptions)$
+          msg: 'GSSAPI/Kerberos bind is not allowed because of FIPS mode'
         - pattern: ^(types\.SystemContext\.)?(DockerDaemonInsecureSkipTLSVerify|DockerInsecureSkipTLSVerify|OCIInsecureSkipTLSVerify)$
           msg: 'Not allowed because of FIPS mode'
         - pattern: ^git\.PlainClone(Context|WithOptions)?$
