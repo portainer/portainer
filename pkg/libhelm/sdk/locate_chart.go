@@ -34,8 +34,8 @@ func locateChart(opts *action.ChartPathOptions, registryClient *registry.Client,
 				return abs, err
 			}
 
-			if opts.Verify {
-				if _, err := downloader.VerifyChart(abs, abs+".prov", opts.Keyring); err != nil {
+			if opts.Verify { //nolint:forbidigo
+				if _, err := downloader.VerifyChart(abs, abs+".prov", opts.Keyring); err != nil { //nolint:forbidigo
 					return "", err
 				}
 			}
@@ -74,8 +74,8 @@ func locateChart(opts *action.ChartPathOptions, registryClient *registry.Client,
 		dl.Options = append(dl.Options, getter.WithRegistryClient(registryClient))
 	}
 
-	if opts.Verify {
-		dl.Verify = downloader.VerifyAlways
+	if opts.Verify { //nolint:forbidigo
+		dl.Verify = downloader.VerifyAlways //nolint:forbidigo
 	}
 
 	if opts.RepoURL != "" {
