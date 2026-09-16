@@ -1,10 +1,13 @@
 import { RefreshCwIcon } from 'lucide-react';
 import { useFormikContext } from 'formik';
 
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
 import { Card } from '@@/primitives/Card';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { IntervalField } from '../../../components/IntervalField';
+import { PollingIntervalScopeTip } from '../../../components/PollingIntervalScopeTip';
 
 import { SettingsFormValues } from './types';
 
@@ -34,6 +37,7 @@ export function EditPollingWidget() {
               onChange={(value) => setFieldValue('interval', value)}
               errors={errors.interval}
             />
+            {!isBE && <PollingIntervalScopeTip />}
           </div>
         )}
       </Card.Body>
