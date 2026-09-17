@@ -7,6 +7,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 
 import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
+import { formatArrayQueryParamsForDockerAPI } from '../../proxy/queries/utils';
 
 export function useExportMutation() {
   const environmentId = useEnvironmentId();
@@ -43,6 +44,7 @@ export async function exportImage({
         params: {
           names,
         },
+        paramsSerializer: formatArrayQueryParamsForDockerAPI,
       }
     );
 
