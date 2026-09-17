@@ -732,3 +732,120 @@ services:
 	err := ValidateComposeURLs(t.Context(), stack, fileService)
 	require.NoError(t, err)
 }
+
+func TestIsValidStackFile_ConfigAndSecretFileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			WorkingDir:       workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a config reading an absolute host path is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: /etc/shadow
+`), false, forbidden)
+
+	// a config climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: ../../../../etc/shadow
+`), false, forbidden)
+
+	// the same trick through a secret is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    secrets:
+      - leak
+
+secrets:
+  leak:
+    file: /root/.ssh/id_rsa
+`), false, forbidden)
+
+	// a config file shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    file: ./nginx.conf
+`), false, "")
+
+	// so does one in a subdirectory of the stack
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    file: ./conf.d/nginx.conf
+`), false, "")
+
+	// inline content is not a host path
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    content: |
+      server { listen 80; }
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: /etc/shadow
+`), true, "")
+}

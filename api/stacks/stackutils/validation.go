@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -63,6 +64,20 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 		}
 	}
 
+	if !config.SecuritySettings.AllowBindMountsForRegularUsers {
+		for name, configObj := range composeConfig.Configs {
+			if err := checkFileObjectSource("config", name, configObj.File, config.WorkingDir); err != nil {
+				return err
+			}
+		}
+
+		for name, secret := range composeConfig.Secrets {
+			if err := checkFileObjectSource("secret", name, secret.File, config.WorkingDir); err != nil {
+				return err
+			}
+		}
+	}
+
 	for _, service := range composeConfig.Services {
 		if !config.SecuritySettings.AllowBindMountsForRegularUsers {
 			for _, volume := range service.Volumes {
@@ -95,6 +110,27 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 		if !config.SecuritySettings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
 			return errors.New("container capabilities disabled for non administrator users")
 		}
+	}
+
+	return nil
+}
+
+// checkFileObjectSource rejects a top-level config or secret that reads its
+// content from a file outside the stack's own directory. The compose loader has
+// already resolved the path against the working directory, so both an absolute
+// path and one that climbs out with ".." end up outside it.
+func checkFileObjectSource(kind, name, file, workingDir string) error {
+	if file == "" {
+		return nil
+	}
+
+	if workingDir == "" {
+		return fmt.Errorf("%s %q: reading a file from the host is disabled for non administrator users", kind, name)
+	}
+
+	rel, err := filepath.Rel(filepath.Clean(workingDir), filepath.Clean(file))
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("%s %q: reading a file from the host is disabled for non administrator users", kind, name)
 	}
 
 	return nil
