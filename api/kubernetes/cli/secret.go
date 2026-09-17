@@ -2,8 +2,10 @@ package cli
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"maps"
 	"time"
 
 	models "github.com/portainer/portainer/api/http/models/kubernetes"
@@ -150,6 +152,20 @@ func (kcl *KubeClient) DeleteSecret(namespace, name string) error {
 	return kcl.cli.CoreV1().Secrets(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 }
 
+// secretAnnotations returns the secret's annotations without the one kubectl writes on
+// apply, whose value is the whole object including its data. Leaving it in would hand
+// the data to every caller withData is meant to withhold it from.
+func secretAnnotations(secret *corev1.Secret) map[string]string {
+	if _, hasLastApplied := secret.Annotations[lastAppliedConfigAnnotation]; !hasLastApplied {
+		return secret.Annotations
+	}
+
+	annotations := maps.Clone(secret.Annotations)
+	delete(annotations, lastAppliedConfigAnnotation)
+
+	return annotations
+}
+
 // parseSecret parses a k8s Secret object into a K8sSecret struct.
 // for get operation, withData will be set to true.
 // otherwise, only metadata will be parsed.
@@ -160,7 +176,7 @@ func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 			Name:                 secret.Name,
 			Namespace:            secret.Namespace,
 			CreationDate:         secret.CreationTimestamp.Time.UTC().Format(time.RFC3339),
-			Annotations:          secret.Annotations,
+			Annotations:          secretAnnotations(secret),
 			Labels:               secret.Labels,
 			ConfigurationOwner:   secret.Labels[labelPortainerKubeConfigOwner],
 			ConfigurationOwnerId: secret.Labels[labelPortainerKubeConfigOwnerId],
@@ -169,10 +185,11 @@ func parseSecret(secret *corev1.Secret, withData bool) models.K8sSecret {
 	}
 
 	if withData {
-		secretData := secret.Data
-		secretDataMap := make(map[string]string, len(secretData))
-		for key, value := range secretData {
-			secretDataMap[key] = string(value)
+		secretDataMap := make(map[string]string, len(secret.Data))
+		for key, value := range secret.Data {
+			// a secret holds arbitrary bytes and a JSON string must be valid UTF-8, so
+			// values go over the wire base64 encoded, as the Kubernetes API does
+			secretDataMap[key] = base64.StdEncoding.EncodeToString(value)
 		}
 
 		result.Data = secretDataMap

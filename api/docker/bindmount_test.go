@@ -57,6 +57,10 @@ func TestIsBindMount(t *testing.T) {
 
 	// tmpfs without a device is not a bind mount
 	f(MountDescriptor{DriverOpts: map[string]string{"type": "tmpfs"}}, false)
+
+	// Windows named-pipe mount is bind-equivalent, case-insensitively
+	f(MountDescriptor{Type: "npipe"}, true)
+	f(MountDescriptor{Type: "NPipe"}, true)
 }
 
 func TestIsBindPath(t *testing.T) {
@@ -78,6 +82,12 @@ func TestIsBindPath(t *testing.T) {
 
 	// named volume, not a host path
 	f("myvolume:/data", false)
+
+	// Windows named-pipe UNC path
+	f(`\\.\pipe\docker_engine:\\.\pipe\docker_engine`, true)
+
+	// Windows network-share UNC path
+	f(`\\fileserver\share:/data`, true)
 }
 
 func newVolumeInspectClient(t *testing.T, handler http.HandlerFunc) *client.Client {
