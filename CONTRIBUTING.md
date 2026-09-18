@@ -9,9 +9,13 @@ Please make sure that there aren't existing pull requests attempting to address 
 - Please open a discussion in a new issue / existing issue to talk about the changes you'd like to bring
 - Develop in a topic branch, not master/develop
 
-When creating a new branch, prefix it with the _type_ of the change (see section **Commit Message Format** below), the associated opened issue number, a dash and some text describing the issue (using dash as a separator).
+When creating a new branch, prefix it with the _type_ of the change (see **Commit Message Format** below), followed by a slash and a short kebab-case description:
 
-For example, if you work on a bugfix for the issue #361, you could name the branch `fix361-template-selection`.
+```
+<type>/<short-desc>
+```
+
+For example, a bugfix for the templates view could be `fix/template-selection`. If you are working from an existing issue, include its number: `fix/361-template-selection`.
 
 ## Issues open to contribution
 
@@ -35,7 +39,7 @@ Lines should not exceed 72 characters. This allows the message to be easier to r
 
 ### Type
 
-Must be one of the following:
+Should be one of the following:
 
 - **feat**: A new feature
 - **fix**: A bug fix
@@ -65,17 +69,9 @@ The subject contains succinct description of the change:
 
 ## Contribution process
 
-Our contribution process is described below. Some of the steps can be visualized inside GitHub via specific `status/` labels, such as `status/1-functional-review` or `status/2-technical-review`.
+For security issues please refer to our [Security](SECURITY.md) policy.
 
-### Bug report
-
-![portainer_bugreport_workflow](https://user-images.githubusercontent.com/5485061/45727219-50190a00-bbf5-11e8-9fe8-3a563bb8d5d7.png)
-
-### Feature request
-
-The feature request process is similar to the bug report process but has an extra functional validation before the technical validation as well as a documentation validation before the testing phase.
-
-![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)
+Bug reports and feature requests should start with a GitHub issue. PRs are welcome, but not all feature requests are accepted, so it pays to raise the issue first. We don't guarantee a response on every issue — if you'd rather not wait, open the PR and make the case in the description.
 
 ## Build and run Portainer locally
 
@@ -151,7 +147,37 @@ When adding a new route to an existing handler use the following as a template (
 
 explanation about each line can be found [here](https://github.com/swaggo/swag#api-operation)
 
-After changing these annotations, regenerate the TypeScript API client and types — see [Generating API types](./README.md#generating-api-types).
+After changing these annotations, regenerate the TypeScript API client and types — see [Generating API types](#generating-api-types) below.
+
+## Generating API types
+
+The frontend consumes a TypeScript API client (SDK functions and request/response types) generated from the Go API's Swagger annotations. Regenerate it after any API change — a new endpoint, a changed request/response shape, or a removed endpoint:
+
+```sh
+make generate-api
+```
+
+> **Always use `make generate-api`, not the bare `pnpm generate-api`.** The pnpm script runs `openapi-ts` _only_ — it reads the existing `api/docs/openapi.yaml` and never rebuilds it from the Go backend. If that spec is stale (for example, you pulled a branch that added an endpoint but didn't rebuild the docs), the generator silently drops the missing symbols, leaving the frontend referencing SDK functions and types that no longer exist (`export 'X' was not found in '@api/sdk.gen'`). `make generate-api` rebuilds the spec from current Go code first, so it can't go stale.
+
+### Pipeline
+
+```
+Go Swagger annotations
+  → api/docs/swagger.yaml        (make docs-build, via swaggo/swag)
+  → api/docs/openapi.yaml        (swagger2openapi + validation)
+  → app/react/portainer/generated-api/portainer/   (hey-api/openapi-ts)
+```
+
+### Output
+
+Generated files live in `app/react/portainer/generated-api/portainer/`. Do **not** edit them by hand — your changes will be overwritten on the next run. Import from the generated client instead of writing direct axios calls:
+
+- `@api/sdk.gen` — SDK functions
+- `@api/types.gen` — request/response types
+
+### Configuration
+
+`openapi-ts.config.ts` controls the generator (output path, plugins, and tag filters). `deprecated` endpoints and `edge_agent`-tagged routes are excluded from generation.
 
 ## Licensing
 

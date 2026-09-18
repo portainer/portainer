@@ -2,16 +2,9 @@
 
 ## Supported Versions
 
-Portainer maintains both Short-Term Support (STS) and Long-Term Support (LTS) versions in accordance with our official [Portainer Lifecycle Policy](https://docs.portainer.io/start/lifecycle).
+Portainer CE is updated periodically, with no guarantees on cadence and is provided as-is and without support. CE still receives critical security fixes, and vulnerability reports are handled through the process below. Where a fix is applied, only the latest CE version will be patched — earlier releases do not receive backported security fixes.
 
-| Version Type             | Support Status                              |
-| ------------------------ | ------------------------------------------- |
-| LTS (Long-Term Support)  | Supported for critical security fixes       |
-| STS (Short-Term Support) | Supported until the next STS or LTS release |
-| Legacy / EOL             | Not supported                               |
-
-For a detailed breakdown of current versions and their specific End of Life (EOL) dates,
-please refer to the [Portainer Lifecycle Policy](https://docs.portainer.io/start/lifecycle).
+Portainer Business Edition and other Portainer products have different [lifecycle policies](https://docs.portainer.io/start/lifecycle) and receive more frequent patches and backports for security issues. We accept reports for all Portainer products.
 
 ## Reporting a Vulnerability
 
@@ -21,10 +14,10 @@ The Portainer team takes the security of our products seriously. If you believe 
 
 ### Disclosure Process
 
-1. **Report**: You can report in one of two ways:
-   - **GitHub**: Use the **Report a vulnerability** button on the **Security** tab of this repository.
+1. **Report**: You can report in one of two ways.
+   - **GitHub (preferred)**: Use the **Report a vulnerability** button on the **Security** tab of this repository. This opens a private advisory we can triage directly, merge with any duplicate reports of the same issue, and use for all follow-up.
 
-   - **Email**: Send your findings to security@portainer.io.
+   - **Email**: You can also send your findings to security@portainer.io. Please include your GitHub handle if you would like to be credited. We will move the report into a GitHub Security Advisory, and all correspondence will continue there.
 
 2. **Details**: To help us verify the issue, please include:
    - A description of the vulnerability and its potential impact.
@@ -33,7 +26,7 @@ The Portainer team takes the security of our products seriously. If you believe 
 
    - The version of the software and the environment in which it was found.
 
-3. **Acknowledge**: We will acknowledge receipt of your report and provide an initial assessment.
+3. **Acknowledge**: We will acknowledge receipt of your report and track this in a GitHub Security Advisory. After receipt all correspondence will be through this advisory.
 
 4. **Resolution**: We will work to resolve the issue as quickly as possible. We request that you do not disclose the vulnerability publicly until we have released a fix and notified affected users.
 
@@ -43,9 +36,7 @@ If you follow the responsible disclosure process, we will:
 
 - Respond to your report in a timely manner.
 
-- Provide an estimated timeline for remediation.
-
-- Notify you when the vulnerability has been patched.
+- Provide updates through GitHub as we work through reports.
 
 - Give credit for the discovery (if desired) once the fix is public.
 
