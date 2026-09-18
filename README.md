@@ -54,6 +54,19 @@ For information about reporting security vulnerabilities, please see our [Securi
 
 If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for good devs, either freelance or employed. Drop us a line at contribute@portainer.io with your details, or visit our [careers page](https://apply.workable.com/portainer/).
 
+## Running Portainer using Docker (for Local Setup)
+
+You can easily run Portainer locally using Docker or Docker Compose.  
+This is useful for developers who want to explore Portainer CE before deploying it in production.
+
+### Using Docker Compose
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/portainer/portainer.git
+   cd portainer
+
+
 ## Licensing
 
 Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
