@@ -70,6 +70,10 @@ func (tx *StoreTx) Role() dataservices.RoleService {
 
 func (tx *StoreTx) APIKeyRepository() dataservices.APIKeyRepository { return nil }
 
+func (tx *StoreTx) LogForge() dataservices.LogForgeService {
+	return tx.store.LogForgeService.Tx(tx.tx)
+}
+
 func (tx *StoreTx) Settings() dataservices.SettingsService {
 	return tx.store.SettingsService.Tx(tx.tx)
 }

@@ -1239,6 +1239,28 @@ type (
 		ForceSecureCookies bool `json:"ForceSecureCookies" example:"false"`
 	}
 
+	// LogForgeSettings represents the persisted Portainer-side LogForge integration settings.
+	LogForgeSettings struct {
+		Enabled bool `json:"Enabled"`
+
+		Managed             bool       `json:"Managed"`
+		ApplianceStackID    StackID    `json:"ApplianceStackId,omitempty"`
+		ApplianceEndpointID EndpointID `json:"ApplianceEndpointId,omitempty"`
+		ApplianceURL        string     `json:"ApplianceUrl,omitempty"`
+		ApplianceHostHeader string     `json:"ApplianceHostHeader,omitempty"`
+		TLSSkipVerify       bool       `json:"TLSSkipVerify"`
+		BrowserProxyPath    string     `json:"BrowserProxyPath,omitempty"`
+		ApplianceImage      string     `json:"ApplianceImage,omitempty"`
+		StackName           string     `json:"StackName,omitempty"`
+
+		PortainerInstanceID  string `json:"PortainerInstanceId,omitempty"`
+		ServiceKey           string `json:"ServiceKey,omitempty"`
+		ServiceKeyPrefix     string `json:"ServiceKeyPrefix,omitempty"`
+		ServiceKeyCreatedAt  int64  `json:"ServiceKeyCreatedAt,omitempty"`
+		ServiceKeyLastUsedAt int64  `json:"ServiceKeyLastUsedAt,omitempty"`
+		ServiceKeyRotatedAt  int64  `json:"ServiceKeyRotatedAt,omitempty"`
+	}
+
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
 	SnapshotJob struct{}
 

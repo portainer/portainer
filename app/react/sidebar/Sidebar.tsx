@@ -15,6 +15,7 @@ import { Header } from './Header';
 import { SidebarProvider, useSidebarState } from './useSidebarState';
 import { UpgradeBEBannerWrapper } from './UpgradeBEBanner';
 import { AppDeliverySidebar } from './AppDeliverySidebar';
+import { ObservabilitySidebar } from './ObservabilitySidebar';
 
 export function Sidebar() {
   return (
@@ -72,6 +73,8 @@ function InnerSidebar() {
             <EnvironmentSidebar />
 
             <AppDeliverySidebar />
+
+            <ObservabilitySidebar />
 
             {isAdmin && <EdgeComputeSidebar />}
 

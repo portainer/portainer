@@ -23,6 +23,7 @@ type testDatastore struct {
 	endpointGroup           dataservices.EndpointGroupService
 	endpointRelation        dataservices.EndpointRelationService
 	helmUserRepository      dataservices.HelmUserRepositoryService
+	logForge                dataservices.LogForgeService
 	registry                dataservices.RegistryService
 	resourceControl         dataservices.ResourceControlService
 	source                  dataservices.SourceService
@@ -72,6 +73,7 @@ func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService 
 func (d *testDatastore) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
+func (d *testDatastore) LogForge() dataservices.LogForgeService { return d.logForge }
 func (d *testDatastore) Registry() dataservices.RegistryService { return d.registry }
 func (d *testDatastore) ResourceControl() dataservices.ResourceControlService {
 	return d.resourceControl

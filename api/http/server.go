@@ -34,6 +34,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/helm"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
+	"github.com/portainer/portainer/api/http/handler/logforge"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -218,6 +219,12 @@ func (server *Server) Start(ctx context.Context) error {
 	ldapHandler.FileService = server.FileService
 	ldapHandler.LDAPService = server.LDAPService
 
+	var logForgeHandler = logforge.NewHandler(requestBouncer)
+	logForgeHandler.DataStore = server.DataStore
+	logForgeHandler.FileService = server.FileService
+	logForgeHandler.ComposeStackManager = server.ComposeStackManager
+	logForgeHandler.StackDeployer = server.StackDeployer
+
 	motdSvc := motdservice.NewService(portainer.MessageOfTheDayURL)
 	motdSvc.Start(ctx)
 
@@ -319,6 +326,7 @@ func (server *Server) Start(ctx context.Context) error {
 		GitOperationHandler:    gitOperationHandler,
 		FileHandler:            fileHandler,
 		LDAPHandler:            ldapHandler,
+		LogForgeHandler:        logForgeHandler,
 		HelmTemplatesHandler:   helmTemplatesHandler,
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
