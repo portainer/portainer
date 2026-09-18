@@ -5,6 +5,8 @@ type ImageInspectConfig = NonNullable<ImageInspect['Config']>;
 export class ImageDetailsViewModel {
   Id: ImageInspect['Id'];
 
+  RepoDigests: ImageInspect['RepoDigests'];
+
   Parent: ImageInspect['Parent'];
 
   Created: ImageInspect['Created'];
@@ -41,6 +43,7 @@ export class ImageDetailsViewModel {
 
   constructor(data: ImageInspect) {
     this.Id = data.Id;
+    this.RepoDigests = data.RepoDigests;
     // this.Tag = data.Tag; // doesn't seem to be used?
     this.Parent = data.Parent;
     this.Created = data.Created;
