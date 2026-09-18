@@ -1,7 +1,10 @@
 package system
 
 import (
+	"context"
 	"net/http"
+	"sync/atomic"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
@@ -10,11 +13,16 @@ import (
 	libclient "github.com/portainer/portainer/pkg/libhttp/client"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/schedule"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
+
+const versionCheckInterval = 6 * time.Hour
+
+var cachedLatestVersion atomic.Pointer[string]
 
 type versionResponse struct {
 	// Whether portainer has an update available
@@ -69,29 +77,48 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) *httperr
 	return response.JSON(w, &result)
 }
 
-func GetLatestVersion() string {
-	if err := libclient.ExternalRequestDisabled(portainer.VersionCheckURL); err != nil {
-		log.Debug().Err(err).Msg("External request disabled: Version check")
-		return ""
+func StartVersionCheckService(ctx context.Context, versionCheckURL string) {
+	if err := libclient.ExternalRequestDisabled(versionCheckURL); err != nil {
+		return
 	}
 
-	motd, err := client.Get(portainer.VersionCheckURL, 5)
+	refresh := func() { refreshLatestVersion(versionCheckURL) }
+
+	go refresh()
+	go schedule.RunOnInterval(ctx, versionCheckInterval, refresh, nil)
+}
+
+func refreshLatestVersion(versionCheckURL string) {
+	if err := libclient.ExternalRequestDisabled(versionCheckURL); err != nil {
+		log.Debug().Err(err).Msg("External request disabled: Version check")
+		return
+	}
+
+	body, err := client.Get(versionCheckURL, 5)
 	if err != nil {
 		log.Debug().Err(err).Msg("couldn't fetch latest Portainer release version")
-		return ""
+		return
 	}
 
 	var data struct {
 		TagName string `json:"tag_name"`
 	}
 
-	if err := json.Unmarshal(motd, &data); err != nil {
+	if err := json.Unmarshal(body, &data); err != nil {
 		log.Debug().Err(err).Msg("couldn't parse latest Portainer version")
+		return
+	}
 
+	cachedLatestVersion.Store(&data.TagName)
+}
+
+func GetLatestVersion() string {
+	tagName := cachedLatestVersion.Load()
+	if tagName == nil {
 		return ""
 	}
 
-	return data.TagName
+	return *tagName
 }
 
 func HasNewerVersion(currentVersion, latestVersion string) bool {

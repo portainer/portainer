@@ -157,4 +157,17 @@ describe('AccessDatatable', () => {
       expect(screen.getByText(/logout and login/i)).toBeVisible();
     });
   });
+
+  describe('isUpdatingAccess prop', () => {
+    it('should show "Removing..." text on remove button when isUpdatingAccess is true', () => {
+      const mockAccess = createMockAccess();
+      renderComponent({
+        isLoading: false,
+        isUpdatingAccess: true,
+        dataset: [mockAccess],
+      });
+
+      expect(screen.getByText('Removing...')).toBeVisible();
+    });
+  });
 });

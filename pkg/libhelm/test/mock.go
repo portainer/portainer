@@ -50,10 +50,25 @@ func newMockReleaseElement(installOpts options.InstallOptions) *release.ReleaseE
 	}
 }
 
+// MockReleaseSecretValue appears in every content field of a mock release, so a test can
+// assert that redaction left none of it in a response.
+const MockReleaseSecretValue = "supersecret"
+
 func newMockRelease(re *release.ReleaseElement) *release.Release {
 	return &release.Release{
 		Name:      re.Name,
 		Namespace: re.Namespace,
+		Manifest:  "apiVersion: v1\nkind: Secret\ndata:\n  password: " + MockReleaseSecretValue + "\n",
+		Config:    map[string]any{"password": MockReleaseSecretValue},
+		Hooks:     []*release.Hook{{Name: "pre-install", Manifest: "password: " + MockReleaseSecretValue}},
+		Values: release.Values{
+			UserSuppliedValues: "password: " + MockReleaseSecretValue,
+			ComputedValues:     "password: " + MockReleaseSecretValue,
+		},
+		Info: &release.Info{
+			Status: release.Status(re.Status),
+			Notes:  "Your password is " + MockReleaseSecretValue,
+		},
 	}
 }
 

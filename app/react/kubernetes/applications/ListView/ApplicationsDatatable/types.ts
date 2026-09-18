@@ -18,6 +18,7 @@ export interface Application {
   CreationDate: string;
   ApplicationOwner?: string;
   StackName?: string;
+  StackId?: string;
   StackKind?: string;
   ResourcePool: string;
   ApplicationType: AppType;

@@ -29,7 +29,7 @@ export default defineConfig({
     // any edit to it. Dependency changes move pnpm-lock.yaml, so key off that instead.
     forceRerunTriggers: ['**/pnpm-lock.yaml', '**/{vitest,vite}.config.*'],
     bail: 2,
-    include: ['./app/**/*.test.ts', './app/**/*.test.tsx'],
+    include: ['./app/**/*.test.ts', './app/**/*.test.tsx', './app/**/*.test.js'],
     env: {
       PORTAINER_EDITION: 'CE',
     },

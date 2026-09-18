@@ -2377,6 +2377,11 @@ export const zStacksUpdateSwarmStackPayload = z.object({
   StackFileContent: z.string().optional(),
 });
 
+export const zStacksWebhookInvokeResponse = z.object({
+  message: z.string().optional(),
+  stackId: z.int().optional(),
+});
+
 export const zStatsContainerStats = z.object({
   healthy: z.int().optional(),
   running: z.int().optional(),
@@ -7472,6 +7477,11 @@ export const zStackDeleteKubernetesByNameResponse = z.void();
 export const zWebhookInvokePath = z.object({
   webhookID: z.string(),
 });
+
+/**
+ * Accepted
+ */
+export const zWebhookInvokeResponse = zStacksWebhookInvokeResponse;
 
 /**
  * Success

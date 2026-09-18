@@ -10372,8 +10372,12 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: Success
+        "202":
+          description: Accepted
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/stacks.webhookInvokeResponse"
         "400":
           description: Invalid request
         "409":
@@ -19378,6 +19382,13 @@ components:
              web:
              image:nginx
           type: string
+      type: object
+    stacks.webhookInvokeResponse:
+      properties:
+        message:
+          type: string
+        stackId:
+          type: integer
       type: object
     stats.ContainerStats:
       properties:
