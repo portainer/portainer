@@ -22,6 +22,11 @@ angular.module('portainer.docker').controller('LogViewerController', [
       search: '',
       filteredLogs: [],
       selectedLines: [],
+      showSettings: true,
+    };
+
+    this.toggleSettings = function () {
+      this.state.showSettings = !this.state.showSettings;
     };
 
     this.handleLogsCollectionChange = handleLogsCollectionChange.bind(this);

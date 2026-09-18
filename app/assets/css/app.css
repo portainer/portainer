@@ -523,10 +523,12 @@ input[type='checkbox'] {
 
 .log_viewer {
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: auto;
   color: var(--text-log-viewer-color);
   font-size: 0.85em;
   background-color: var(--bg-log-viewer-color);
+  border-radius: 4px;
 }
 
 .log_viewer.wrap_lines {
