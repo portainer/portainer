@@ -61,7 +61,7 @@ func (hspm *HelmSDKPackageManager) Upgrade(upgradeOpts options.InstallOptions) (
 
 	// Initialize action configuration with kubernetes config
 	actionConfig := new(action.Configuration)
-	err = hspm.initActionConfig(actionConfig, namespaceOrDefault(upgradeOpts.Namespace), upgradeOpts.KubernetesClusterAccess)
+	err = hspm.initActionConfig(actionConfig, namespaceOrDefault(upgradeOpts.Namespace), upgradeOpts.KubernetesClusterAccess, nil)
 	if err != nil {
 		// error is already logged in initActionConfig
 		return nil, errors.Wrap(err, "failed to initialize helm configuration for helm release upgrade")

@@ -330,13 +330,14 @@ func SaveWorkflowArtifact(tx gitSourceStore, workflowID portainer.WorkflowID, ma
 
 // LoadWorkflowMap fetches workflows by their IDs and returns them keyed by ID.
 func LoadWorkflowMap(tx gitSourceStore, ids set.Set[portainer.WorkflowID]) (map[portainer.WorkflowID]portainer.Workflow, error) {
-	result := make(map[portainer.WorkflowID]portainer.Workflow, len(ids))
-	for id := range ids {
-		wf, err := tx.Workflow().Read(id)
-		if err != nil {
-			return nil, err
-		}
-		result[id] = *wf
+	wfs, err := tx.Workflow().ReadAll(func(w portainer.Workflow) bool { return ids.Contains(w.ID) })
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[portainer.WorkflowID]portainer.Workflow, len(wfs))
+	for _, wf := range wfs {
+		result[wf.ID] = wf
 	}
 
 	return result, nil

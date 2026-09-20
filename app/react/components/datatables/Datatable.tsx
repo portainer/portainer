@@ -16,7 +16,7 @@ import {
   getExpandedRowModel,
   TableOptions,
 } from '@tanstack/react-table';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 import _ from 'lodash';
 
@@ -148,6 +148,7 @@ export function Datatable<D extends DefaultType>({
       },
       enableRowSelection,
       autoResetExpanded: false,
+      autoResetPageIndex: false,
       globalFilterFn: defaultGlobalFilterFn,
       getRowId,
       getCoreRowModel: getCoreRowModel(),
@@ -173,6 +174,17 @@ export function Datatable<D extends DefaultType>({
   );
 
   const tableState = tableInstance.getState();
+
+  // the table keeps its page across dataset changes (see autoResetPageIndex),
+  // so pull the user back in range when the rows behind the current page are
+  // gone - removed items, or a search narrowing the results
+  const { pageIndex } = tableState.pagination;
+  const lastPageIndex = Math.max(tableInstance.getPageCount() - 1, 0);
+  useEffect(() => {
+    if (!isServerSidePagination && pageIndex > lastPageIndex) {
+      tableInstance.setPageIndex(lastPageIndex);
+    }
+  }, [isServerSidePagination, lastPageIndex, pageIndex, tableInstance]);
 
   useGoToHighlightedRow(
     isServerSidePagination,

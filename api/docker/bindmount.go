@@ -10,7 +10,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-var windowsAbsolutePathPrefix = regexp.MustCompile(`^[A-Za-z]:[\\/]`)
+var windowsAbsolutePathPrefix = regexp.MustCompile(`^([A-Za-z]:[\\/]|\\\\)`)
 
 type MountDescriptor struct {
 	Type       string
@@ -19,7 +19,7 @@ type MountDescriptor struct {
 }
 
 func IsBindMount(m MountDescriptor) bool {
-	if strings.EqualFold(m.Type, "bind") {
+	if strings.EqualFold(m.Type, "bind") || strings.EqualFold(m.Type, "npipe") {
 		return true
 	}
 
