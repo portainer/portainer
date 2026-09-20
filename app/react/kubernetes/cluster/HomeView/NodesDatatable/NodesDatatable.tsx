@@ -7,19 +7,35 @@ import { createStore } from '@/react/kubernetes/datatables/default-kube-datatabl
 import { IndexOptional } from '@/react/kubernetes/configs/types';
 import { useEnvironment } from '@/react/portainer/environments/queries';
 
-import { Datatable, TableSettingsMenu } from '@@/datatables';
+import { Datatable } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
-import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+import { hiddenColumnsSettings } from '@@/datatables/types';
+import { getColumnVisibilityState } from '@@/datatables/ColumnVisibilityMenu';
 
 import { useKubernetesEndpointsQuery } from '../../kubernetesEndpoint.service';
 import { useNodesQuery } from '../../queries/useNodesQuery';
-import { getNodeApiDetails, isNodePublished } from '../../nodeUtils';
+import {
+  getInstanceType,
+  getNodeApiDetails,
+  getNodeGroup,
+  isNodePublished,
+} from '../../nodeUtils';
 
 import { getColumns } from './columns';
-import { NodeRowData } from './types';
+import { NodeRowData, NodesTableSettings } from './types';
+import { TableSettings } from './TableSettings';
 
 const storageKey = 'k8sNodesDatatable';
-const settingsStore = createStore(storageKey);
+// Only the node group is shown by default. Instance type, labels and taints are
+// opted into from the show/hide columns menu: together they push the table past
+// the width of a laptop screen, and a node's pool is the one operators asked to
+// see at a glance.
+const defaultHiddenColumns = ['instanceType', 'labels', 'taints'];
+const settingsStore = createStore<NodesTableSettings>(
+  storageKey,
+  undefined,
+  (set) => hiddenColumnsSettings(set, defaultHiddenColumns)
+);
 
 export function NodesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
@@ -46,7 +62,11 @@ export function NodesDatatable() {
     <Datatable<IndexOptional<NodeRowData>>
       disableSelect
       dataset={nodeRowData ?? []}
-      columns={getColumns(isServerMetricsEnabled)}
+      columns={getColumns({
+        isServerMetricsEnabled,
+        hasNodeGroups: nodeRowData.some((node) => getNodeGroup(node)),
+        hasInstanceTypes: nodeRowData.some((node) => getInstanceType(node)),
+      })}
       settingsManager={tableState}
       isLoading={
         nodesQuery.isLoading ||
@@ -56,13 +76,9 @@ export function NodesDatatable() {
       title="Nodes"
       titleIcon={HardDrive}
       getRowId={(row) => row.metadata?.uid ?? ''}
-      renderTableSettings={() => (
-        <TableSettingsMenu>
-          <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRateMS}
-            onChange={(value) => tableState.setAutoRefreshRate(value)}
-          />
-        </TableSettingsMenu>
+      initialTableState={getColumnVisibilityState(tableState.hiddenColumns)}
+      renderTableSettings={(table) => (
+        <TableSettings settings={tableState} table={table} />
       )}
       data-cy="k8s-nodes-datatable"
     />
