@@ -12,26 +12,60 @@ import { Stack } from './types';
 
 export const columnHelper = createColumnHelper<Stack>();
 
-const namespace = columnHelper.accessor('ResourcePool', {
-  id: 'namespace',
-  header: 'Namespace',
-  cell: NamespaceCell,
-});
+// a stack has no namespace of its own, so it's taken from its applications
+function getNamespaces(stack: Stack) {
+  return [...new Set(stack.Applications.map((app) => app.ResourcePool))];
+}
 
-function NamespaceCell({ row, getValue }: CellContext<Stack, string>) {
-  const value = getValue();
-  const isSystem = useIsSystemNamespace(value);
+const namespace = columnHelper.accessor(
+  (row) => getNamespaces(row).join(', '),
+  {
+    id: 'namespace',
+    header: 'Namespace',
+    cell: NamespaceCell,
+  }
+);
+
+function NamespaceCell({ row }: CellContext<Stack, string>) {
+  const namespaces = getNamespaces(row.original);
+
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap items-center">
+      {namespaces.map((namespace, index) => (
+        <NamespaceLink
+          key={namespace}
+          namespace={namespace}
+          stackName={row.original.Name}
+          isLast={index === namespaces.length - 1}
+        />
+      ))}
+    </div>
+  );
+}
+
+function NamespaceLink({
+  namespace,
+  stackName,
+  isLast,
+}: {
+  namespace: string;
+  stackName: string;
+  isLast: boolean;
+}) {
+  const isSystem = useIsSystemNamespace(namespace);
+
+  return (
+    <span className="flex items-center">
       <Link
         to="kubernetes.resourcePools.resourcePool"
-        params={{ id: value }}
-        data-cy={`app-stack-namespace-link-${row.original.Name}`}
+        params={{ id: namespace }}
+        data-cy={`app-stack-namespace-link-${stackName}`}
       >
-        {value}
+        {namespace}
       </Link>
-      {isSystem && <SystemBadge className="ml-auto" />}
-    </div>
+      {isSystem && <SystemBadge className="ml-1" />}
+      {!isLast && <span className="mr-1">,</span>}
+    </span>
   );
 }
 
@@ -51,7 +85,7 @@ const actions = columnHelper.display({
   cell: ({ row: { original: item } }) => (
     <Link
       to="kubernetes.stacks.stack.logs"
-      params={{ namespace: item.ResourcePool, name: item.Name }}
+      params={{ namespace: getNamespaces(item)[0], name: item.Name }}
       className="flex items-center gap-1"
       data-cy={`app-stack-logs-link-${item.Name}`}
     >
