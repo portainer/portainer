@@ -47,6 +47,33 @@ services:
 			ExpectedStatus:        libstack.StatusError,
 			ExpectedStatusMessage: "task: non-zero exit (1)",
 		},
+		{
+			TestName: "replicated-job",
+			FileContent: `version: '3'
+services:
+  job:
+    image: alpine:latest
+    command: ["sh", "-c", "echo done"]
+    deploy:
+      mode: replicated-job
+      replicas: 1
+      restart_policy:
+        condition: none`,
+			ExpectedStatus: libstack.StatusCompleted,
+		},
+		{
+			TestName: "global-job",
+			FileContent: `version: '3'
+services:
+  job:
+    image: alpine:latest
+    command: ["sh", "-c", "echo done"]
+    deploy:
+      mode: global-job
+      restart_policy:
+        condition: none`,
+			ExpectedStatus: libstack.StatusCompleted,
+		},
 	}
 
 	ensureSwarmMode(t)
