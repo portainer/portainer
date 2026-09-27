@@ -114,6 +114,8 @@ linters:
           msg: 'GSSAPI/Kerberos bind is not allowed because of FIPS mode'
         - pattern: ^(types\.SystemContext\.)?(DockerDaemonInsecureSkipTLSVerify|DockerInsecureSkipTLSVerify|OCIInsecureSkipTLSVerify)$
           msg: 'Not allowed because of FIPS mode'
+        - pattern: ^(chclient\.TLSConfig\.)?SkipVerify$
+          msg: 'Not allowed because of FIPS mode'
         - pattern: ^git\.PlainClone(Context|WithOptions)?$
           msg: Use git.CloneContext with NewNoSymlinkFS to prevent symlink traversal attacks
         - pattern: ^(filepath|path)\.Join$
