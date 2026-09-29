@@ -171,3 +171,20 @@ func TestAuthorizedResourceControlUpdate_UserAndTeamAccessCombinationDenied(t *t
 
 	require.False(t, AuthorizedResourceControlUpdate(rc, ctx))
 }
+
+func TestAuthorizedResourceControlUpdate_SelfUserAndMultipleForeignTeamsDenied(t *testing.T) {
+	t.Parallel()
+
+	rc := &portainer.ResourceControl{
+		UserAccesses: []portainer.UserResourceAccess{
+			{UserID: 1, AccessLevel: portainer.ReadWriteAccessLevel},
+		},
+		TeamAccesses: []portainer.TeamResourceAccess{
+			{TeamID: 2, AccessLevel: portainer.ReadWriteAccessLevel},
+			{TeamID: 3, AccessLevel: portainer.ReadWriteAccessLevel},
+		},
+	}
+	ctx := &RestrictedRequestContext{IsAdmin: false, UserID: 1}
+
+	require.False(t, AuthorizedResourceControlUpdate(rc, ctx))
+}
