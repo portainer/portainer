@@ -15,10 +15,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	defaultServerURL = "https://kubernetes.default.svc"
-)
-
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
 type KubernetesDeployer struct {
 	dataStore                   dataservices.DataStore
@@ -91,7 +87,7 @@ func (deployer *KubernetesDeployer) command(ctx context.Context, operation strin
 		return "", errors.Wrap(err, "failed generating a user token")
 	}
 
-	serverURL := defaultServerURL
+	serverURL := libkubectl.InClusterServerURL
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		url, proxy, err := deployer.getAgentURL(endpoint)
 		if err != nil {
@@ -102,10 +98,8 @@ func (deployer *KubernetesDeployer) command(ctx context.Context, operation strin
 		serverURL = url
 	}
 
-	client, err := libkubectl.NewClient(&libkubectl.ClientAccess{
-		Token:     token,
-		ServerUrl: serverURL,
-	}, namespace, "", true)
+	clientAccess, insecure := libkubectl.NewClientAccess(serverURL, token)
+	client, err := libkubectl.NewClient(clientAccess, namespace, "", insecure)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create kubectl client")
 	}

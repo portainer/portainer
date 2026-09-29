@@ -8,12 +8,56 @@ import (
 
 func TestGenerateConfigFlags(t *testing.T) {
 	t.Parallel()
-	config, err := generateConfigFlags("test-token", "https://api.example.com", "", "", false)
+	config, err := generateConfigFlags("test-token", "https://api.example.com", "", "", "", false)
 	require.NoError(t, err)
 	require.NotNil(t, config)
+	require.Empty(t, *config.CAFile)
 
-	_, err = generateConfigFlags("test-token", "", "", "", false)
+	config, err = generateConfigFlags("test-token", "https://api.example.com", "/path/to/ca.crt", "", "", false)
+	require.NoError(t, err)
+	require.NotNil(t, config.CAFile)
+	require.Equal(t, "/path/to/ca.crt", *config.CAFile)
+
+	_, err = generateConfigFlags("test-token", "", "", "", "", false)
 	require.Error(t, err)
+}
+
+func TestNewClientAccess(t *testing.T) {
+	t.Parallel()
+
+	access, insecure := NewClientAccess(InClusterServerURL, "a-token")
+	require.Equal(t, "a-token", access.Token)
+	require.Equal(t, InClusterServerURL, access.ServerUrl)
+	require.Equal(t, InClusterCAFile, access.CAFile)
+	require.False(t, insecure)
+
+	access, insecure = NewClientAccess("http://127.0.0.1:12345/kubernetes", "a-token")
+	require.Equal(t, "a-token", access.Token)
+	require.Equal(t, "http://127.0.0.1:12345/kubernetes", access.ServerUrl)
+	require.Empty(t, access.CAFile)
+	require.True(t, insecure)
+
+	access, insecure = NewClientAccess("https://proxy.invalid", "a-token")
+	require.Equal(t, "a-token", access.Token)
+	require.Equal(t, "https://proxy.invalid", access.ServerUrl)
+	require.Equal(t, InClusterCAFile, access.CAFile)
+	require.False(t, insecure)
+}
+
+func TestClientAccessFor(t *testing.T) {
+	t.Parallel()
+
+	caFile, insecure := ClientAccessFor(InClusterServerURL)
+	require.Equal(t, InClusterCAFile, caFile)
+	require.False(t, insecure)
+
+	caFile, insecure = ClientAccessFor("http://127.0.0.1:12345/kubernetes")
+	require.Empty(t, caFile)
+	require.True(t, insecure)
+
+	caFile, insecure = ClientAccessFor("https://proxy.invalid")
+	require.Equal(t, InClusterCAFile, caFile)
+	require.False(t, insecure)
 }
 
 func TestNewClient(t *testing.T) {
