@@ -137,6 +137,26 @@ func TestGitSourceAndArtifactForStack_ReturnsMatchingSourceAndFile(t *testing.T)
 	require.Equal(t, "abc123", file.Hash)
 }
 
+// TestGitSourceAndArtifactForStack_MissingWorkflowReturnsNilNotError covers BE-13446: a stack's
+// WorkflowID surviving after the Workflow record itself was deleted (e.g. by a non-atomic
+// detach-then-delete elsewhere) must not surface as a hard error to every caller that loads the
+// stack's git config.
+func TestGitSourceAndArtifactForStack_MissingWorkflowReturnsNilNotError(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var src *portainer.Source
+	var file *portainer.ArtifactFile
+	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		src, file, txErr = GitSourceAndArtifactForStack(tx, adminUserContext, 999, 1)
+		return txErr
+	})
+	require.NoError(t, err)
+	require.Nil(t, src)
+	require.Nil(t, file)
+}
+
 func TestGitSourceAndArtifactForStack_NoMatchingArtifactReturnsNil(t *testing.T) {
 	t.Parallel()
 	_, store := datastore.MustNewTestStore(t, false, true)
@@ -235,6 +255,24 @@ func TestGitSourceAndArtifactForEdgeStack_ReturnsMatchingSourceAndFile(t *testin
 	require.Equal(t, portainer.SourceTypeGit, src.Type)
 	require.NotNil(t, file)
 	require.Equal(t, "refs/heads/edge", file.Ref)
+}
+
+// TestGitSourceAndArtifactForEdgeStack_MissingWorkflowReturnsNilNotError is the edge-stack
+// counterpart of TestGitSourceAndArtifactForStack_MissingWorkflowReturnsNilNotError.
+func TestGitSourceAndArtifactForEdgeStack_MissingWorkflowReturnsNilNotError(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var src *portainer.Source
+	var file *portainer.ArtifactFile
+	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		src, file, txErr = GitSourceAndArtifactForEdgeStack(tx, adminUserContext, 999, 1)
+		return txErr
+	})
+	require.NoError(t, err)
+	require.Nil(t, src)
+	require.Nil(t, file)
 }
 
 func TestUpdateArtifactFileForStack_NoMatchingArtifactIsNoOp(t *testing.T) {
