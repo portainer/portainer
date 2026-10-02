@@ -1865,6 +1865,7 @@ type (
 		GenerateToken(data *TokenData) (string, time.Time, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
+		ParseAndVerifySessionToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 

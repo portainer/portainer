@@ -150,6 +150,35 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	}, cl.ID, cl.ExpiresAt.Time, nil
 }
 
+// ParseAndVerifySessionToken parses and verifies a user session token. A token
+// carrying any other scope is refused before its signature is checked, so a
+// kubeconfig token is never verified against the kubeconfig secret and accepted
+// as a session.
+func (service *Service) ParseAndVerifySessionToken(token string) (*portainer.TokenData, string, time.Time, error) {
+	if !hasSessionScope(token) {
+		return nil, "", time.Time{}, errInvalidJWTToken
+	}
+
+	return service.ParseAndVerifyToken(token)
+}
+
+// hasSessionScope reports whether the token's own scope claim is the session
+// scope. It reads the claim itself rather than parseScope, which maps every
+// unrecognised scope onto the default one. A missing claim is a session token.
+func hasSessionScope(token string) bool {
+	unverifiedToken, _, err := new(jwt.Parser).ParseUnverified(token, &claims{})
+	if err != nil || unverifiedToken == nil {
+		return false
+	}
+
+	cl, ok := unverifiedToken.Claims.(*claims)
+	if !ok {
+		return false
+	}
+
+	return cl.Scope == "" || cl.Scope == defaultScope
+}
+
 // Parse a JWT token, fallback to defaultScope if no scope is present in the JWT
 func parseScope(token string) scope {
 	unverifiedToken, _, _ := new(jwt.Parser).ParseUnverified(token, &claims{})

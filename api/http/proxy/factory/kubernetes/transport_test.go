@@ -43,6 +43,10 @@ func (m *MockJWTService) ParseAndVerifyToken(token string) (*portainer.TokenData
 	return &portainer.TokenData{ID: 1, Username: "mock", Role: portainer.AdministratorRole}, "mock-id", time.Now().Add(24 * time.Hour), nil
 }
 
+func (m *MockJWTService) ParseAndVerifySessionToken(token string) (*portainer.TokenData, string, time.Time, error) {
+	return m.ParseAndVerifyToken(token)
+}
+
 func (m *MockJWTService) SetUserSessionDuration(userSessionDuration time.Duration) {
 	// Mock implementation - not used in tests
 }
