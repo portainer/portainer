@@ -36,7 +36,7 @@ var singleflightGroup = &singleflight.Group{}
 
 // RedeployWhenChanged pull and redeploy the stack when git repo changed
 // Stack will always be redeployed if force deployment is set to true
-func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
+func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService) error {
 	stack, err := datastore.Stack().Read(stackID)
 	if dataservices.IsErrObjectNotFound(err) {
 		return scheduler.NewPermanentError(errors.WithMessagef(err, "failed to get the stack %v", stackID))
@@ -50,18 +50,18 @@ func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deploye
 
 	// Webhook
 	if stack.AutoUpdate != nil && stack.AutoUpdate.Webhook != "" {
-		return redeployWhenChanged(ctx, stack, deployer, datastore, gitService, true)
+		return redeployWhenChanged(ctx, stack, deployer, datastore, gitService, fileService, true)
 	}
 
 	// Polling
 	_, err, _ = singleflightGroup.Do(strconv.Itoa(int(stackID)), func() (any, error) {
-		return nil, redeployWhenChanged(ctx, stack, deployer, datastore, gitService, false)
+		return nil, redeployWhenChanged(ctx, stack, deployer, datastore, gitService, fileService, false)
 	})
 
 	return err
 }
 
-func redeployWhenChanged(ctx context.Context, stack *portainer.Stack, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, webhook bool) error {
+func redeployWhenChanged(ctx context.Context, stack *portainer.Stack, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService, webhook bool) error {
 	log.Debug().Int("stack_id", int(stack.ID)).Msg("redeploying stack")
 
 	if stack.WorkflowID == 0 {
@@ -101,7 +101,7 @@ func redeployWhenChanged(ctx context.Context, stack *portainer.Stack, deployer S
 
 	if webhook {
 		go func() {
-			if err := redeployWhenChangedSecondStage(ctx, stack, deployer, datastore, gitService, user, endpoint); err != nil {
+			if err := redeployWhenChangedSecondStage(ctx, stack, deployer, datastore, gitService, fileService, user, endpoint); err != nil {
 				log.Error().Err(err).
 					Int("stack_id", int(stack.ID)).
 					Str("stack", stack.Name).
@@ -114,7 +114,7 @@ func redeployWhenChanged(ctx context.Context, stack *portainer.Stack, deployer S
 		return nil
 	}
 
-	return redeployWhenChangedSecondStage(ctx, stack, deployer, datastore, gitService, user, endpoint)
+	return redeployWhenChangedSecondStage(ctx, stack, deployer, datastore, gitService, fileService, user, endpoint)
 }
 
 func redeployWhenChangedSecondStage(
@@ -123,6 +123,7 @@ func redeployWhenChangedSecondStage(
 	deployer StackDeployer,
 	datastore dataservices.DataStore,
 	gitService portainer.GitService,
+	fileService portainer.FileService,
 	user *portainer.User,
 	endpoint *portainer.Endpoint,
 ) error {
@@ -210,6 +211,10 @@ func redeployWhenChangedSecondStage(
 
 	redeployStack := func(stack *portainer.Stack) error {
 		var err error
+
+		if err := ValidateStackForUser(stack, endpoint, user, deployer, fileService); err != nil {
+			return err
+		}
 		switch stack.Type {
 		case portainer.DockerComposeStack:
 			if stackutils.IsRelativePathStack(stack) {

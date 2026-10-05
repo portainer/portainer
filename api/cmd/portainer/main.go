@@ -575,7 +575,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
 	sourceScheduler := scheduling.NewSourceScheduler(sched, dataStore, scheduling.Deployers{
 		Stack: func(ctx context.Context, stackID portainer.StackID) error {
-			return deployments.RedeployWhenChanged(ctx, stackID, stackDeployer, dataStore, gitService)
+			return deployments.RedeployWhenChanged(ctx, stackID, stackDeployer, dataStore, gitService, fileService)
 		},
 		StackExists: dataStore.Stack().Exists,
 		EdgeStackExists: func(edgeStackID portainer.EdgeStackID) (bool, error) {
