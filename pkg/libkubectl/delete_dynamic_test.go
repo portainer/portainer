@@ -2,9 +2,20 @@ package libkubectl
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic/fake"
 )
 
 // TestDeleteDynamic tests require a Kubernetes cluster.
@@ -235,4 +246,128 @@ metadata:
 
 	_, err = client.DeleteDynamic(t.Context(), mixedManifests)
 	require.NoError(t, err, "DeleteDynamic() should handle non-existent resources gracefully")
+}
+
+func TestDeleteResourceNamespaceResolution(t *testing.T) {
+	t.Parallel()
+
+	gvk := schema.GroupVersionKind{Version: "v1", Kind: "ConfigMap"}
+	gvr := schema.GroupVersionResource{Version: "v1", Resource: "configmaps"}
+
+	mapper := meta.NewDefaultRESTMapper(nil)
+	mapper.Add(gvk, meta.RESTScopeNamespace)
+
+	newConfigMap := func(namespace string) *unstructured.Unstructured {
+		obj := &unstructured.Unstructured{}
+		obj.SetGroupVersionKind(gvk)
+		obj.SetName("cm")
+		obj.SetNamespace(namespace)
+
+		return obj
+	}
+
+	f := func(configuredNamespace, manifestNamespace, wantDeletedFrom string, wantErr bool) {
+		t.Helper()
+
+		client := fake.NewSimpleDynamicClientWithCustomListKinds(
+			runtime.NewScheme(),
+			map[schema.GroupVersionResource]string{gvr: "ConfigMapList"},
+			newConfigMap("default"), newConfigMap("stack-ns"),
+		)
+
+		manifest := "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: cm\n"
+		if manifestNamespace != "" {
+			manifest += "  namespace: " + manifestNamespace + "\n"
+		}
+
+		_, err := (&Client{}).deleteResource(t.Context(), client, mapper, configuredNamespace, []byte(manifest))
+		if wantErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+
+		for _, namespace := range []string{"default", "stack-ns"} {
+			_, err := client.Resource(gvr).Namespace(namespace).Get(t.Context(), "cm", metav1.GetOptions{})
+			if namespace == wantDeletedFrom {
+				require.True(t, apierrors.IsNotFound(err), "expected cm to be deleted from %s", namespace)
+				continue
+			}
+
+			require.NoError(t, err, "cm must still exist in %s", namespace)
+		}
+	}
+
+	// The manifest names no namespace, so the stack's namespace is used instead of default
+	f("stack-ns", "", "stack-ns", false)
+
+	// The manifest namespace matches the stack's namespace
+	f("stack-ns", "stack-ns", "stack-ns", false)
+
+	// The manifest namespace conflicts with the stack's namespace, nothing is deleted
+	f("stack-ns", "default", "", true)
+
+	// No configured namespace, the manifest namespace is used
+	f("", "stack-ns", "stack-ns", false)
+
+	// Neither is set, default is used
+	f("", "", "default", false)
+}
+
+func TestDeleteDynamicUsesConfiguredNamespace(t *testing.T) {
+	t.Parallel()
+
+	f := func(namespace, manifestNamespace, wantPath string, deleteStatus int, wantErr bool) {
+		t.Helper()
+
+		var deletedPath atomic.Value
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			switch {
+			case r.Method == http.MethodDelete:
+				deletedPath.Store(r.URL.Path)
+				w.WriteHeader(deleteStatus)
+				_, _ = w.Write([]byte(`{"kind":"Status","apiVersion":"v1","code":` + strconv.Itoa(deleteStatus) + `}`))
+			case r.URL.Path == "/api":
+				_, _ = w.Write([]byte(`{"kind":"APIVersions","versions":["v1"]}`))
+			case r.URL.Path == "/api/v1":
+				_, _ = w.Write([]byte(`{"kind":"APIResourceList","groupVersion":"v1","resources":[{"name":"configmaps","namespaced":true,"kind":"ConfigMap","verbs":["delete"]}]}`))
+			default:
+				_, _ = w.Write([]byte(`{"kind":"APIGroupList","groups":[]}`))
+			}
+		}))
+		defer server.Close()
+
+		client, err := NewClient(&ClientAccess{ServerUrl: server.URL}, namespace, "", true)
+		require.NoError(t, err)
+
+		manifest := "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: cm\n"
+		if manifestNamespace != "" {
+			manifest += "  namespace: " + manifestNamespace + "\n"
+		}
+
+		_, err = client.DeleteDynamic(t.Context(), []string{manifest})
+		if wantErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+
+		got, _ := deletedPath.Load().(string)
+		require.Equal(t, wantPath, got)
+	}
+
+	// The manifest names no namespace, so the stack's namespace is used
+	f("stack-ns", "", "/api/v1/namespaces/stack-ns/configmaps/cm", http.StatusOK, false)
+
+	// No namespace is configured, so the manifest namespace is used
+	f("", "other", "/api/v1/namespaces/other/configmaps/cm", http.StatusOK, false)
+
+	// A server failure other than not found is reported
+	f("stack-ns", "", "/api/v1/namespaces/stack-ns/configmaps/cm", http.StatusInternalServerError, true)
+
+	// A missing resource is ignored
+	f("stack-ns", "", "/api/v1/namespaces/stack-ns/configmaps/cm", http.StatusNotFound, false)
 }
