@@ -106,10 +106,19 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return httperror.BadRequest("Stack is already active", errors.New("Stack is already active"))
 	}
 
+	user, err := handler.DataStore.User().Read(securityContext.UserID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to load user information from the database", err)
+	}
+
+	if err := deployments.ValidateStackForUser(stack, endpoint, user, handler.StackDeployer, handler.FileService); err != nil {
+		return httperror.Forbidden("Stack files are not allowed for this user", err)
+	}
+
 	if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
 		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 
-		jobID, e := deployments.StartAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		jobID, e := deployments.StartAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService, handler.FileService)
 		if e != nil {
 			return e
 		}
@@ -117,7 +126,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		stack.AutoUpdate.JobID = jobID
 	}
 
-	err = handler.startStack(stack, endpoint, securityContext)
+	err = handler.startStack(stack, endpoint, user, securityContext)
 	if err != nil {
 		return httperror.InternalServerError("Unable to start stack", err)
 	}
@@ -139,13 +148,9 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 func (handler *Handler) startStack(
 	stack *portainer.Stack,
 	endpoint *portainer.Endpoint,
+	user *portainer.User,
 	securityContext *security.RestrictedRequestContext,
 ) error {
-	user, err := handler.DataStore.User().Read(securityContext.UserID)
-	if err != nil {
-		return fmt.Errorf("unable to load user information from the database: %w", err)
-	}
-
 	registries, err := handler.DataStore.Registry().ReadAll()
 	if err != nil {
 		return fmt.Errorf("unable to retrieve registries from the database: %w", err)

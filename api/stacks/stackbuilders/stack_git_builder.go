@@ -135,7 +135,8 @@ func (b *GitMethodStackBuilder) SetAutoUpdate(payload *StackPayload) GitMethodSt
 			b.scheduler,
 			b.stackDeployer,
 			b.dataStore,
-			b.gitService)
+			b.gitService,
+			b.fileService)
 		if err != nil {
 			b.err = err
 			return b

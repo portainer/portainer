@@ -38,7 +38,7 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		return httperror.NewError(statusCode, "Unable to find the stack by webhook ID", err)
 	}
 
-	if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
+	if err = deployments.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService, handler.FileService); err != nil {
 		var StackAuthorMissingErr *deployments.StackAuthorMissingErr
 		if errors.As(err, &StackAuthorMissingErr) {
 			return httperror.Conflict("Autoupdate for the stack isn't available", err)

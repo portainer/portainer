@@ -587,7 +587,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
-	if err := deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService); err != nil {
+	if err := deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService, fileService); err != nil {
 		log.Fatal().Err(err).Msg("failed to start stack scheduler")
 	}
 

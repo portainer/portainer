@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/datastore"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/pkg/fips"
@@ -160,7 +162,7 @@ func agentServer(t *testing.T) string {
 func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, true, true)
 
-	err := RedeployWhenChanged(1, nil, store, nil)
+	err := RedeployWhenChanged(1, nil, store, nil, nil)
 	require.Error(t, err)
 	assert.Truef(t, strings.HasPrefix(err.Error(), "failed to get the stack"), "it isn't an error we expected: %v", err.Error())
 }
@@ -175,7 +177,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 	err = store.Stack().Create(&portainer.Stack{ID: 1, CreatedBy: "admin"})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, ""))
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, ""), nil)
 	require.NoError(t, err)
 }
 
@@ -204,7 +206,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 		}})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, "oldHash"))
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(nil, "oldHash"), nil)
 	require.NoError(t, err)
 }
 
@@ -238,7 +240,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 		}})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
+	err = RedeployWhenChanged(1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"), nil)
 	require.Error(t, err)
 	require.ErrorIs(t, err, cloneErr, "should failed to clone but didn't, check test setup")
 }
@@ -275,7 +277,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		err = store.Stack().Update(stack.ID, &stack)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), nil)
 		require.NoError(t, err)
 	})
 
@@ -284,7 +286,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		err = store.Stack().Update(stack.ID, &stack)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), nil)
 		require.NoError(t, err)
 	})
 
@@ -293,7 +295,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 		err = store.Stack().Update(stack.ID, &stack)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		err = RedeployWhenChanged(1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), nil)
 		require.NoError(t, err)
 	})
 }
@@ -374,4 +376,55 @@ func Test_getUserRegistries(t *testing.T) {
 		require.NoError(t, err)
 		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam}, registries)
 	})
+}
+
+func Test_ValidateStackForUser_BindMountBlockedForNonAdmin(t *testing.T) {
+	t.Parallel()
+
+	fileService, err := filesystem.NewService(t.TempDir(), "")
+	require.NoError(t, err)
+
+	projectPath := t.TempDir()
+	err = os.WriteFile(filesystem.JoinPaths(projectPath, "docker-compose.yml"), []byte("services:\n  web:\n    image: alpine\n    volumes:\n      - /:/host\n"), 0o600)
+	require.NoError(t, err)
+
+	stack := &portainer.Stack{Name: "evil", ProjectPath: projectPath, EntryPoint: "docker-compose.yml", Type: portainer.DockerComposeStack}
+	endpoint := &portainer.Endpoint{ID: 1}
+	user := &portainer.User{ID: 2, Role: portainer.StandardUserRole}
+	admin := &portainer.User{ID: 1, Role: portainer.AdministratorRole}
+
+	// A non-admin author is refused
+	err = ValidateStackForUser(stack, endpoint, user, noopDeployer{}, fileService)
+	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+
+	// An admin author is not validated
+	err = ValidateStackForUser(stack, endpoint, admin, noopDeployer{}, fileService)
+	require.NoError(t, err)
+
+	// Without a file service a non-admin fails closed
+	err = ValidateStackForUser(stack, endpoint, user, noopDeployer{}, nil)
+	require.Error(t, err)
+}
+
+type factoryDeployer struct {
+	noopDeployer
+}
+
+func (factoryDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return dockerclient.NewClientFactory(nil, nil)
+}
+
+func Test_ValidateStackForUser_DockerClientCreationFails(t *testing.T) {
+	t.Parallel()
+
+	fileService, err := filesystem.NewService(t.TempDir(), "")
+	require.NoError(t, err)
+
+	stack := &portainer.Stack{Name: "s", ProjectPath: t.TempDir(), EntryPoint: "docker-compose.yml", Type: portainer.DockerComposeStack}
+	endpoint := &portainer.Endpoint{ID: 1, Type: portainer.AzureEnvironment}
+	user := &portainer.User{ID: 2, Role: portainer.StandardUserRole}
+
+	// A failure to create the Docker client must fail closed
+	err = ValidateStackForUser(stack, endpoint, user, factoryDeployer{}, fileService)
+	require.ErrorContains(t, err, "environment not supported")
 }
