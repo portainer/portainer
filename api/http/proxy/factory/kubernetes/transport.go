@@ -60,9 +60,7 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 
 	switch {
 	case strings.EqualFold(requestPath, "/namespaces/portainer/configmaps/portainer-config") && (request.Method == "PUT" || request.Method == "POST"):
-		transport.k8sClientFactory.ClearClientCache()
-		defer transport.tokenManager.UpdateUserServiceAccountsForEndpoint(portainer.EndpointID(endpointID))
-		return transport.executeKubernetesRequest(request)
+		return transport.proxyPortainerConfigUpdate(request, portainer.EndpointID(endpointID))
 	case strings.EqualFold(requestPath, "/namespaces"):
 		return transport.executeKubernetesRequest(request)
 	case strings.HasPrefix(requestPath, "/namespaces"):
@@ -70,6 +68,20 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 	default:
 		return transport.executeKubernetesRequest(request)
 	}
+}
+
+// proxyPortainerConfigUpdate forwards a portainer-config write and only refreshes the cached clients
+// and user service accounts once Kubernetes has accepted it.
+func (transport *baseTransport) proxyPortainerConfigUpdate(request *http.Request, endpointID portainer.EndpointID) (*http.Response, error) {
+	resp, err := transport.executeKubernetesRequest(request)
+	if !isSuccessfulResponse(resp, err) {
+		return resp, err
+	}
+
+	transport.k8sClientFactory.ClearClientCache()
+	transport.tokenManager.UpdateUserServiceAccountsForEndpoint(endpointID)
+
+	return resp, nil
 }
 
 func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fullRequestPath string) (*http.Response, error) {
@@ -128,6 +140,11 @@ func (transport *baseTransport) executeKubernetesRequest(request *http.Request) 
 	}
 
 	return resp, err
+}
+
+// isSuccessfulResponse reports whether Kubernetes accepted the forwarded request
+func isSuccessfulResponse(resp *http.Response, err error) bool {
+	return err == nil && resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 }
 
 // #endregion
