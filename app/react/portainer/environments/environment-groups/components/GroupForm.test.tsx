@@ -314,4 +314,68 @@ describe('GroupForm', () => {
       expect(descriptionInput).toHaveValue('pre-filled-description');
     });
   });
+
+  describe('Unassigned group name', () => {
+    it('should make the name read-only for the unassigned group', async () => {
+      renderGroupForm({
+        groupId: 1,
+        initialValues: { name: 'Unassigned', description: '', tagIds: [] },
+      });
+
+      expect(await screen.findByTestId('group-name-input')).toHaveAttribute(
+        'readonly'
+      );
+      expect(
+        screen.getByText(/The default group can't be renamed/i)
+      ).toBeVisible();
+      expect(
+        screen.queryByTestId('group-name-reset-button')
+      ).not.toBeInTheDocument();
+    });
+
+    it('should reset a renamed unassigned group back to "Unassigned"', async () => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      renderGroupForm({
+        groupId: 1,
+        initialValues: { name: 'K8S Prod', description: '', tagIds: [] },
+        onSubmit,
+        submitLabel: 'Update',
+      });
+
+      expect(
+        await screen.findByText(/Reset its name to save changes/i)
+      ).toBeVisible();
+      await user.click(screen.getByTestId('group-name-reset-button'));
+
+      expect(screen.getByTestId('group-name-input')).toHaveValue('Unassigned');
+      const submitButton = screen.getByRole('button', { name: /Update/i });
+      await waitFor(() => {
+        expect(submitButton).toBeEnabled();
+      });
+
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith(
+          expect.objectContaining({ name: 'Unassigned' }),
+          expect.anything()
+        );
+      });
+    });
+
+    it('should keep the name editable for other groups', async () => {
+      renderGroupForm({
+        groupId: 2,
+        initialValues: { name: 'K8S Prod', description: '', tagIds: [] },
+      });
+
+      expect(await screen.findByTestId('group-name-input')).not.toHaveAttribute(
+        'readonly'
+      );
+      expect(
+        screen.queryByText(/The default group can't be renamed/i)
+      ).not.toBeInTheDocument();
+    });
+  });
 });

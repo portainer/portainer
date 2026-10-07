@@ -1623,6 +1623,8 @@ paths:
                 $ref: "#/components/schemas/portainer.EndpointGroup"
         "400":
           description: Invalid request
+        "403":
+          description: Renaming the default 'Unassigned' group is not allowed
         "404":
           description: EndpointGroup not found
         "500":

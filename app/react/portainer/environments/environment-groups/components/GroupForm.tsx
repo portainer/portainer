@@ -18,10 +18,16 @@ import { useCanExit } from '@/react/hooks/useCanExit';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
+import { TextTip } from '@@/Tip/TextTip';
 import { TagSelector } from '@@/TagSelector';
 import { confirmGenericDiscard } from '@@/modals/confirm';
-import { LoadingButton } from '@@/buttons';
+import { Button, LoadingButton } from '@@/buttons';
 import { StickyFooter } from '@@/StickyFooter/StickyFooter';
+
+import {
+  UNASSIGNED_GROUP_ID,
+  UNASSIGNED_GROUP_NAME,
+} from '../utils/getPlatformLabel';
 
 import { FormModeEnvironmentsSelector } from './AssociatedEnvironmentsSelector/FormModeEnvironmentsSelector';
 
@@ -101,6 +107,7 @@ function InnerForm({
     isSubmitting,
   } = useFormikContext<GroupFormValues>();
   const isCreateMode = !groupId;
+  const isUnassignedGroup = groupId === UNASSIGNED_GROUP_ID;
 
   return (
     <Form className="form-horizontal">
@@ -117,7 +124,14 @@ function InnerForm({
           onChange={handleChange}
           placeholder="e.g. my-group"
           data-cy="group-name-input"
+          readOnly={isUnassignedGroup}
         />
+        {isUnassignedGroup && (
+          <UnassignedGroupNameTip
+            name={values.name}
+            onReset={() => setFieldValue('name', UNASSIGNED_GROUP_NAME)}
+          />
+        )}
       </FormControl>
 
       <FormControl label="Description" inputId="group-description">
@@ -157,5 +171,32 @@ function InnerForm({
         </LoadingButton>
       </StickyFooter>
     </Form>
+  );
+}
+
+function UnassignedGroupNameTip({
+  name,
+  onReset,
+}: {
+  name: string;
+  onReset: () => void;
+}) {
+  const isRenamed = name !== UNASSIGNED_GROUP_NAME;
+
+  return (
+    <TextTip color="blue" className="mt-2">
+      The default group can&apos;t be renamed.
+      {isRenamed && ' Reset its name to save changes.'}
+      {isRenamed && (
+        <Button
+          color="link"
+          className="!ml-1 !p-0"
+          onClick={onReset}
+          data-cy="group-name-reset-button"
+        >
+          Reset name to &quot;{UNASSIGNED_GROUP_NAME}&quot;
+        </Button>
+      )}
+    </TextTip>
   );
 }

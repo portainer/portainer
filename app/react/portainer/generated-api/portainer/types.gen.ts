@@ -15072,6 +15072,10 @@ export type EndpointGroupUpdateErrors = {
    */
   400: unknown;
   /**
+   * Renaming the default 'Unassigned' group is not allowed
+   */
+  403: unknown;
+  /**
    * EndpointGroup not found
    */
   404: unknown;
