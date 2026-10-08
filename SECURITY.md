@@ -10,9 +10,11 @@ Portainer Business Edition and other Portainer products have different [lifecycl
 
 Portainer follows a shared-responsibility model for Business Edition, published at
 [docs.portainer.io/advanced/security](https://docs.portainer.io/advanced/security). Portainer's
-responsibility is that the controls it ships work as documented: authentication, authorization,
-environment access, resource ownership and (Business Edition) governance policies. The operator
+responsibility for Business Edition is that the controls it ships work as documented: authentication, authorization,
+environment access, resource ownership and governance policies. The operator
 is responsible for network exposure, egress control, and the configuration of optional controls.
+
+Community Edition is provided as-is. That leans more towards deployer responsibility, including whether to allow access to Portainer Community Edition through a network or by inviting other users to use the application.
 
 Reports are triaged against that model. A report that shows a Portainer Business Edition control failing as
 documented is in scope. A report whose outcome depends on the operator's
