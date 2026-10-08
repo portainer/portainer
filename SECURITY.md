@@ -8,22 +8,16 @@ Portainer Business Edition and other Portainer products have different [lifecycl
 
 ## Security Model and Scope
 
-Portainer follows a shared-responsibility model, published at
+Portainer follows a shared-responsibility model for Business Edition, published at
 [docs.portainer.io/advanced/security](https://docs.portainer.io/advanced/security). Portainer's
 responsibility is that the controls it ships work as documented: authentication, authorization,
 environment access, resource ownership and (Business Edition) governance policies. The operator
 is responsible for network exposure, egress control, and the configuration of optional controls.
 
-Reports are triaged against that model. A report that shows a Portainer control failing as
-documented is in scope for either edition. A report whose outcome depends on the operator's
+Reports are triaged against that model. A report that shows a Portainer Business Edition control failing as
+documented is in scope. A report whose outcome depends on the operator's
 network posture, or on an optional control being left at its default, is deployment hardening
 and is not treated as a vulnerability.
-
-Some controls exist only in Business Edition. Community Edition ships the same code but has no
-way to enable them, so their absence in Community Edition is a documented edition boundary rather
-than a vulnerability. The server-side request forgery (SSRF) allow-list is one such control: in
-Community Edition, the destinations the server may reach are governed by the operator's network
-segmentation and egress filtering.
 
 ## Reporting a Vulnerability
 
