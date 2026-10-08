@@ -14,12 +14,18 @@ responsibility for Business Edition is that the controls it ships work as docume
 environment access, resource ownership and governance policies. The operator
 is responsible for network exposure, egress control, and the configuration of optional controls.
 
-Community Edition is provided as-is. That leans more towards deployer responsibility, including whether to allow access to Portainer Community Edition through a network or by inviting other users to use the application.
+Community Edition is provided as-is, without support, and is intended for homelabs,
+learning environments and other non-production use (see the README). It receives
+security fixes on its latest release only, and several protective controls, including
+the server-side request forgery (SSRF) allow-list, exist only in Business Edition.
+Exposing Community Edition on a network, or operating it with multiple users, is a
+deployer decision taken without those controls.
 
-Reports are triaged against that model. A report that shows a Portainer Business Edition control failing as
-documented is in scope. A report whose outcome depends on the operator's
-network posture, or on an optional control being left at its default, is deployment hardening
-and is not treated as a vulnerability.
+Reports are triaged against this model regardless of the edition they were found in,
+since both editions share a codebase. A report that shows a Portainer control failing
+as documented is in scope. An outcome that depends on the operator's network posture,
+on an optional control left at its default, or on a control that exists only in
+Business Edition is deployment hardening and is not treated as a vulnerability.
 
 ## Reporting a Vulnerability
 
