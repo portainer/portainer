@@ -6,6 +6,28 @@ Portainer CE is updated periodically, with no guarantees on cadence and is provi
 
 Portainer Business Edition and other Portainer products have different [lifecycle policies](https://docs.portainer.io/start/lifecycle) and receive more frequent patches and backports for security issues. We accept reports for all Portainer products.
 
+## Security Model and Scope
+
+Portainer follows a shared-responsibility model for Business Edition, published at
+[docs.portainer.io/advanced/security](https://docs.portainer.io/advanced/security). Portainer's
+responsibility for Business Edition is that the controls it ships work as documented: authentication, authorization,
+environment access, resource ownership and governance policies. The operator
+is responsible for network exposure, egress control, and the configuration of optional controls.
+
+Community Edition is provided as-is, without support, and is intended for homelabs,
+learning environments and other non-production use (see the README). It receives
+security fixes on its latest release only, and several protective controls, including
+the server-side request forgery (SSRF) allow-list, exist only in Business Edition.
+Exposing Community Edition on a network, or operating it with multiple users, is a
+deployer decision taken without those controls.
+
+Reports are triaged against this model regardless of the edition they were found in,
+since both editions share a codebase. A report that shows a Portainer control failing
+as documented is in scope, including when network access is a precondition or the control
+exists only in Business Edition. An outcome caused solely by the operator's network
+configuration, by an optional control left at its default, or by the absence in Community
+Edition of a Business Edition-only control is deployment hardening and is not treated as a vulnerability.
+
 ## Reporting a Vulnerability
 
 The Portainer team takes the security of our products seriously. If you believe you have found a security vulnerability in any Portainer-owned repository, please report it to us responsibly.
@@ -48,4 +70,5 @@ Thank you for helping keep Portainer and our community secure.
 
 ## Resources
 
+- [Portainer security model and hardening guidance](https://docs.portainer.io/advanced/security)
 - [Contributing to Portainer](https://docs.portainer.io/contribute/contribute#contributing-to-the-portainer-ce-codebase)
