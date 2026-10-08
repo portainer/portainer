@@ -23,9 +23,10 @@ deployer decision taken without those controls.
 
 Reports are triaged against this model regardless of the edition they were found in,
 since both editions share a codebase. A report that shows a Portainer control failing
-as documented is in scope. An outcome that depends on the operator's network posture,
-on an optional control left at its default, or on a control that exists only in
-Business Edition is deployment hardening and is not treated as a vulnerability.
+as documented is in scope, including when network access is a precondition or the control
+exists only in Business Edition. An outcome caused solely by the operator's network
+configuration, by an optional control left at its default, or by the absence in Community
+Edition of a Business Edition-only control is deployment hardening and is not treated as a vulnerability.
 
 ## Reporting a Vulnerability
 
