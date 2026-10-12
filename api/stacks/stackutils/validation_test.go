@@ -368,6 +368,36 @@ services:
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
 }
 
+func TestValidateStackFiles_VolumesFromBlockedForNonAdmin(t *testing.T) {
+	t.Parallel()
+
+	fileContent := []byte(`
+services:
+  pwn:
+    image: alpine
+    volumes_from:
+      - "container:portainer"
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	// Denied when bind mounts are disabled for regular users
+	err := ValidateStackFiles(stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}, fileService, nil)
+	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+
+	// Allowed when bind mounts are enabled
+	err = ValidateStackFiles(stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: true}, fileService, nil)
+	require.NoError(t, err)
+}
+
 func TestValidateStackFiles_ConfigFileHostEscapeBlockedForNonAdmin(t *testing.T) {
 	t.Parallel()
 	fileContent := []byte(`
