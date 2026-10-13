@@ -30,6 +30,12 @@ Portainer CE is updated periodically, with no guarantees on cadence, and is prov
 - [Documentation](https://docs.portainer.io)
 - [Contribute to the project](CONTRIBUTING.md)
 
+## One-click Deployment
+
+You can deploy Portainer on Elestio using one-click-deployment.
+
+[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/portainer)
+
 ## Getting help
 
 Portainer CE has no official support channel.
