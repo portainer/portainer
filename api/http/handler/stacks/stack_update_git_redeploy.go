@@ -285,7 +285,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 			return err
 		}
 
-		if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
+		if err := workflows.SaveStackStatus(tx, userContext, stack.WorkflowID, stack.ID, sourceID, nil); err != nil {
 			return err
 		}
 
@@ -387,7 +387,7 @@ func (handler *Handler) deployKubernetesStackInline(deploymentConfiger deploymen
 			return err
 		}
 
-		if err := workflows.SaveSourceStatus(tx, userContext, sourceID, nil); err != nil {
+		if err := workflows.SaveStackStatus(tx, userContext, stack.WorkflowID, stack.ID, sourceID, nil); err != nil {
 			return err
 		}
 
