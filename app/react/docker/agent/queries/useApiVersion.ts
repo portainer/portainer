@@ -4,7 +4,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isAxiosError } from '@/portainer/services/axios/utils/isAxiosError';
 
-import { buildDockerProxyUrl } from '../../proxy/queries/buildDockerProxyUrl';
+import { buildAgentUrl } from './build-url';
 
 export function useApiVersion(
   environmentId: EnvironmentId,
@@ -20,7 +20,7 @@ export function useApiVersion(
 async function getApiVersion(environmentId: EnvironmentId) {
   try {
     const { headers } = await axios.get(
-      buildDockerProxyUrl(environmentId, 'ping')
+      buildAgentUrl(environmentId, 1, 'ping')
     );
     return parseInt(headers['portainer-agent-api-version'], 10) || 1;
   } catch (error) {
