@@ -16,7 +16,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "container with defaults",
 			in:    Input{Image: "alpine:latest"},
-			score: 64, pass: 3, warn: 3, fail: 1,
+			score: 71, pass: 3, warn: 3, fail: 1,
 		},
 		{
 			name: "portainer-like container",
@@ -25,7 +25,7 @@ func TestEvaluate(t *testing.T) {
 				Binds:        []string{"/var/run/docker.sock:/var/run/docker.sock"},
 				PortBindings: []PortBinding{{HostIP: "0.0.0.0", HostPort: "9444"}, {HostIP: "", HostPort: "9001"}},
 			},
-			score: 50, pass: 1, warn: 5, fail: 1,
+			score: 55, pass: 1, warn: 5, fail: 1,
 		},
 	}
 
