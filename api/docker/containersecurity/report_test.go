@@ -9,14 +9,20 @@ func TestEvaluate(t *testing.T) {
 		score, pass, warn, fail int
 	}{
 		{
-			name:  "fully hardened container",
-			in:    Input{Image: "nginx:1.27", User: "1000", MemoryLimit: 256 << 20, ReadonlyRootfs: true},
-			score: 100, pass: 7, warn: 0, fail: 0,
+			name: "fully hardened container",
+			in: Input{
+				Image:          "nginx:1.27",
+				User:           "1000",
+				MemoryLimit:    256 << 20,
+				NanoCPUs:       1_000_000_000,
+				ReadonlyRootfs: true,
+			},
+			score: 100, pass: 10, warn: 0, fail: 0,
 		},
 		{
 			name:  "container with defaults",
 			in:    Input{Image: "alpine:latest"},
-			score: 71, pass: 3, warn: 3, fail: 1,
+			score: 76, pass: 5, warn: 4, fail: 1,
 		},
 		{
 			name: "portainer-like container",
@@ -25,7 +31,7 @@ func TestEvaluate(t *testing.T) {
 				Binds:        []string{"/var/run/docker.sock:/var/run/docker.sock"},
 				PortBindings: []PortBinding{{HostIP: "0.0.0.0", HostPort: "9444"}, {HostIP: "", HostPort: "9001"}},
 			},
-			score: 55, pass: 1, warn: 5, fail: 1,
+			score: 64, pass: 3, warn: 6, fail: 1,
 		},
 	}
 

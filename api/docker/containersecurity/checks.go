@@ -25,6 +25,25 @@ func checkMemory(in Input) Check {
 	return c
 }
 
+func checkCPU(in Input) Check {
+	c := Check{
+		ID:          "cpu",
+		Title:       "No CPU limit",
+		Description: "Set a CPU limit so one container can't starve the host",
+		Risk:        "A container without a CPU limit can consume all CPU and slow down other containers.",
+		Fix:         "Run it with --cpus 1.0 or --cpu-shares (choose a value that fits your app).",
+		Status:      StatusWarn,
+	}
+
+	if in.NanoCPUs > 0 {
+		c.Title = "CPU limit set"
+		c.Description = "A CPU limit protects the host from this container"
+		c.Status = StatusPass
+	}
+
+	return c
+}
+
 func checkPrivileged(in Input) Check {
 	c := Check{
 		ID:          "privileged",
@@ -154,23 +173,71 @@ func checkImageTag(in Input) Check {
 	return c
 }
 
+func checkCapabilities(in Input) Check {
+	dangerousCaps := []string{
+		"SYS_ADMIN", "NET_ADMIN", "SYS_MODULE", "SYS_PTRACE",
+		"SYS_RAWIO", "SYS_TIME", "MKNOD", "AUDIT_WRITE", "NET_RAW",
+	}
+
+	c := Check{
+		ID:          "capabilities",
+		Title:       "No dangerous capabilities",
+		Description: "No high-risk capabilities were added",
+		Risk:        "Dangerous capabilities can allow a container to escape or attack the host.",
+		Fix:         "Drop all capabilities with --cap-drop=ALL and only add the ones you really need.",
+		Status:      StatusPass,
+	}
+
+	var found []string
+	for _, cap := range in.CapAdd {
+		cap = strings.ToUpper(strings.TrimPrefix(cap, "CAP_"))
+		if slices.Contains(dangerousCaps, cap) {
+			found = append(found, cap)
+		}
+	}
+
+	if len(found) > 0 {
+		c.Title = "Dangerous capabilities added"
+		c.Description = "Added: " + strings.Join(found, ", ")
+		c.Status = StatusFail
+	}
+
+	return c
+}
+
+func checkNetworkMode(in Input) Check {
+	c := Check{
+		ID:          "network",
+		Title:       "Network mode is isolated",
+		Description: "Container is not using host network",
+		Risk:        "Host network mode removes network isolation and exposes all host interfaces to the container.",
+		Fix:         "Avoid --network=host unless absolutely required. Prefer bridge or custom networks.",
+		Status:      StatusPass,
+	}
+
+	if strings.EqualFold(in.NetworkMode, "host") {
+		c.Title = "Using host network mode"
+		c.Description = "Container shares the host's network stack"
+		c.Status = StatusFail
+	}
+
+	return c
+}
+
 func hasDockerSock(s string) bool {
 	return strings.Contains(s, "docker.sock")
 }
 
 // isAllInterfaces reports whether a host IP means "every network interface".
-// "invalid IP" is how a zero netip.Addr prints, in case the SDK uses that type.
 func isAllInterfaces(ip string) bool {
 	switch ip {
 	case "", "0.0.0.0", "::", "invalid IP":
 		return true
 	}
-
 	return false
 }
 
 // usesLatestTag reports whether an image reference has no tag or the latest tag.
-// Images pinned by digest are not considered latest.
 func usesLatestTag(image string) bool {
 	if image == "" || strings.Contains(image, "@sha256:") {
 		return false
@@ -184,6 +251,5 @@ func usesLatestTag(image string) bool {
 	}
 
 	tag := lastSegment[i+1:]
-
 	return tag == "" || tag == "latest"
 }

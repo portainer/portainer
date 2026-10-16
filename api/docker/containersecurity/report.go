@@ -43,11 +43,16 @@ type Input struct {
 	Image          string
 	User           string
 	MemoryLimit    int64
+	NanoCPUs       int64 // New: CPU limit in nano CPUs
 	Privileged     bool
 	ReadonlyRootfs bool
 	Binds          []string
 	MountSources   []string
 	PortBindings   []PortBinding
+	CapAdd         []string // New: added capabilities
+	CapDrop        []string // New: dropped capabilities
+	NetworkMode    string   // New: network mode (host, bridge, none...)
+	SecurityOpt    []string // New: AppArmor / Seccomp options
 }
 
 // pointsByStatus returns the percentage of the weight to give based on status.
@@ -68,12 +73,15 @@ func pointsByStatus(status Status) float64 {
 func Evaluate(in Input) Report {
 	checks := []Check{
 		checkMemory(in),
+		checkCPU(in),
 		checkPrivileged(in),
 		checkDockerSocket(in),
 		checkPorts(in),
 		checkRootUser(in),
 		checkReadonlyRootfs(in),
 		checkImageTag(in),
+		checkCapabilities(in),
+		checkNetworkMode(in),
 	}
 
 	report := Report{Checks: checks}
@@ -85,9 +93,9 @@ func Evaluate(in Input) Report {
 		switch checks[i].ID {
 		case "privileged", "socket":
 			checks[i].Weight = 25 // Critical
-		case "memory", "root":
+		case "memory", "root", "capabilities", "network":
 			checks[i].Weight = 15 // High
-		case "ports", "readonly":
+		case "ports", "readonly", "cpu":
 			checks[i].Weight = 10 // Medium
 		case "latest":
 			checks[i].Weight = 5 // Low

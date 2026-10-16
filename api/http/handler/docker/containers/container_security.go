@@ -58,9 +58,14 @@ func (handler *Handler) containerSecurityInspect(w http.ResponseWriter, r *http.
 
 	if container.HostConfig != nil {
 		in.MemoryLimit = container.HostConfig.Memory
+		in.NanoCPUs = container.HostConfig.NanoCPUs
 		in.Privileged = container.HostConfig.Privileged
 		in.ReadonlyRootfs = container.HostConfig.ReadonlyRootfs
 		in.Binds = container.HostConfig.Binds
+		in.CapAdd = container.HostConfig.CapAdd
+		in.CapDrop = container.HostConfig.CapDrop
+		in.NetworkMode = string(container.HostConfig.NetworkMode)
+		in.SecurityOpt = container.HostConfig.SecurityOpt
 
 		for _, bindings := range container.HostConfig.PortBindings {
 			for _, b := range bindings {
