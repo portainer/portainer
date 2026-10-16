@@ -201,7 +201,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusCreated {
+	if response.StatusCode == http.StatusCreated || response.StatusCode == http.StatusOK {
 		err = transport.decorateVolumeCreationResponse(response, resourceType, tokenData.ID)
 	}
 
@@ -231,8 +231,9 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 	responseObject[volumeObjectIdentifier] = resourceID
 
 	responseObject = decorateObject(responseObject, resourceControl)
+	setDockerCreationLocation(response, responseObject["Name"].(string))
 
-	return utils.RewriteResponse(response, responseObject, http.StatusOK)
+	return utils.RewriteResponse(response, responseObject, http.StatusCreated)
 }
 
 func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {
