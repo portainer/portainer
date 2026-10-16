@@ -12,14 +12,6 @@ const (
 	StatusFail Status = "fail"
 )
 
-// Every check is worth 100 (pass), 50 (warn) or 0 (fail) points,
-// and the score is the average over all checks.
-var pointsByStatus = map[Status]int{
-	StatusPass: 100,
-	StatusWarn: 50,
-	StatusFail: 0,
-}
-
 // Check is the result of one security check.
 type Check struct {
 	ID          string `json:"id"`
@@ -28,6 +20,7 @@ type Check struct {
 	Risk        string `json:"risk"`
 	Fix         string `json:"fix"`
 	Status      Status `json:"status"`
+	Weight      int    `json:"weight"`
 }
 
 // Report is the full security evaluation of a container.
@@ -45,8 +38,7 @@ type PortBinding struct {
 	HostPort string
 }
 
-// Input holds the container settings the checks need, so the checks do not
-// depend on the Docker SDK types.
+// Input holds the container settings the checks need.
 type Input struct {
 	Image          string
 	User           string
@@ -58,7 +50,21 @@ type Input struct {
 	PortBindings   []PortBinding
 }
 
-// Evaluate runs all the security checks and computes the score.
+// pointsByStatus returns the percentage of the weight to give based on status.
+func pointsByStatus(status Status) float64 {
+	switch status {
+	case StatusPass:
+		return 1.0
+	case StatusWarn:
+		return 0.5
+	case StatusFail:
+		return 0.0
+	default:
+		return 0.0
+	}
+}
+
+// Evaluate runs all the security checks and computes a weighted score.
 func Evaluate(in Input) Report {
 	checks := []Check{
 		checkMemory(in),
@@ -71,12 +77,28 @@ func Evaluate(in Input) Report {
 	}
 
 	report := Report{Checks: checks}
-	total := 0
+	totalWeight := 0
+	earnedPoints := 0.0
 
-	for _, c := range checks {
-		total += pointsByStatus[c.Status]
+	for i := range checks {
+		// Assign weights based on severity
+		switch checks[i].ID {
+		case "privileged", "socket":
+			checks[i].Weight = 25 // Critical
+		case "memory", "root":
+			checks[i].Weight = 15 // High
+		case "ports", "readonly":
+			checks[i].Weight = 10 // Medium
+		case "latest":
+			checks[i].Weight = 5 // Low
+		default:
+			checks[i].Weight = 10
+		}
 
-		switch c.Status {
+		totalWeight += checks[i].Weight
+		earnedPoints += float64(checks[i].Weight) * pointsByStatus(checks[i].Status)
+
+		switch checks[i].Status {
 		case StatusPass:
 			report.PassCount++
 		case StatusWarn:
@@ -86,7 +108,9 @@ func Evaluate(in Input) Report {
 		}
 	}
 
-	report.Score = int(math.Round(float64(total) / float64(len(checks))))
+	if totalWeight > 0 {
+		report.Score = int(math.Round((earnedPoints / float64(totalWeight)) * 100))
+	}
 
 	return report
 }
