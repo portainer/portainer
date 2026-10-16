@@ -15,6 +15,7 @@ export interface SecurityCheck {
   risk: string;
   fix: string;
   status: CheckStatus;
+  weight?: number;
 }
 
 export interface SecurityReport {
