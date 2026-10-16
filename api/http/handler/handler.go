@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
+	"github.com/portainer/portainer/api/http/handler/logforge"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -58,6 +59,7 @@ type Handler struct {
 	KubernetesHandler      *kubernetes.Handler
 	FileHandler            *file.Handler
 	LDAPHandler            *ldap.Handler
+	LogForgeHandler        *logforge.Handler
 	MOTDHandler            *motd.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
@@ -248,6 +250,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.GitOperationHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/ldap"):
 		http.StripPrefix("/api", h.LDAPHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/logforge"):
+		http.StripPrefix("/api", h.LogForgeHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/logforge/ui"):
+		h.LogForgeHandler.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):
 		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):

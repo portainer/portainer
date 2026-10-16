@@ -10,6 +10,7 @@ import { EdgeComputeSettingsView } from '@/react/portainer/settings/EdgeComputeV
 import { InitEdgeView } from '@/react/portainer/init/InitEdgeView/InitEdgeView';
 import { SettingsView } from '@/react/portainer/settings/SettingsView/SettingsView';
 import { CreateHelmRepositoriesView } from '@/react/portainer/account/helm-repositories/CreateHelmRepositoryView';
+import { LogForgeView } from '@/react/portainer/logforge';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -60,6 +61,10 @@ export const viewsModule = angular
   .component(
     'settingsView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(SettingsView))), [])
+  )
+  .component(
+    'logforgeView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(LogForgeView))), [])
   )
   .component(
     'createHelmRepositoryView',
