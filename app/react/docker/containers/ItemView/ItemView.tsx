@@ -20,6 +20,7 @@ import { ContainerDetailsSection } from './ContainerDetailsSection/ContainerDeta
 import { VolumesSection } from './VolumesSection/VolumesSection';
 import { ContainerNetworksDatatable } from './ContainerNetworksDatatable';
 import { HealthStatus } from './HealthStatus';
+import { SecurityScoreSection } from './SecurityScoreSection/SecurityScoreSection';
 
 export function ItemView() {
   const environmentId = useEnvironmentId();
@@ -102,6 +103,12 @@ export function ItemView() {
         />
 
         <VolumesSection volumes={container.Mounts} nodeName={nodeName} />
+
+        <SecurityScoreSection
+          environmentId={environmentId}
+          containerId={containerId}
+          nodeName={nodeName}
+        />
       </div>
 
       {container.NetworkSettings?.Networks && (
