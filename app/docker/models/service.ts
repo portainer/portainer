@@ -150,6 +150,11 @@ export class ServiceViewModel {
     if (data.Spec?.Mode?.Replicated) {
       this.Mode = 'replicated';
       this.Replicas = data.Spec.Mode.Replicated.Replicas;
+    } else if (data.Spec?.Mode?.ReplicatedJob) {
+      this.Mode = 'replicated-job';
+      this.Replicas = data.Spec.Mode.ReplicatedJob.TotalCompletions;
+    } else if (data.Spec?.Mode?.GlobalJob) {
+      this.Mode = 'global-job';
     } else {
       this.Mode = 'global';
     }
