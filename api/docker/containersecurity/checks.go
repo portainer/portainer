@@ -15,13 +15,11 @@ func checkMemory(in Input) Check {
 		Fix:         "Run it with --memory 256m (choose a value that fits your app).",
 		Status:      StatusFail,
 	}
-
 	if in.MemoryLimit > 0 {
 		c.Title = "Memory limit set"
 		c.Description = "A memory limit protects the host from this container"
 		c.Status = StatusPass
 	}
-
 	return c
 }
 
@@ -34,13 +32,11 @@ func checkCPU(in Input) Check {
 		Fix:         "Run it with --cpus 1.0 or --cpu-shares (choose a value that fits your app).",
 		Status:      StatusWarn,
 	}
-
 	if in.NanoCPUs > 0 {
 		c.Title = "CPU limit set"
 		c.Description = "A CPU limit protects the host from this container"
 		c.Status = StatusPass
 	}
-
 	return c
 }
 
@@ -53,13 +49,11 @@ func checkPrivileged(in Input) Check {
 		Fix:         "Remove --privileged and add only the specific capabilities you need with --cap-add.",
 		Status:      StatusPass,
 	}
-
 	if in.Privileged {
 		c.Title = "Privileged mode is on"
 		c.Description = "Privileged containers have almost full access to the host"
 		c.Status = StatusFail
 	}
-
 	return c
 }
 
@@ -72,13 +66,11 @@ func checkDockerSocket(in Input) Check {
 		Fix:         "Do not mount /var/run/docker.sock unless the container really needs it, or put a Docker socket proxy in front of it.",
 		Status:      StatusPass,
 	}
-
 	if slices.ContainsFunc(in.MountSources, hasDockerSock) || slices.ContainsFunc(in.Binds, hasDockerSock) {
 		c.Title = "Docker socket mounted"
 		c.Description = "Gives this container control over the whole host"
-		c.Status = StatusWarn
+		c.Status = StatusFail
 	}
-
 	return c
 }
 
@@ -91,32 +83,24 @@ func checkPorts(in Input) Check {
 		Fix:         "Bind to localhost, for example -p 127.0.0.1:8080:80, or put a firewall or reverse proxy in front.",
 		Status:      StatusPass,
 	}
-
 	var open []string
-
 	for _, b := range in.PortBindings {
 		if isAllInterfaces(b.HostIP) && b.HostPort != "" {
 			open = append(open, b.HostPort)
 		}
 	}
-
-	// The Docker API returns ports in a map, so sort them to get a stable result.
 	slices.Sort(open)
 	open = slices.Compact(open)
-
 	if len(open) > 0 {
 		c.Title = "Ports open on all interfaces"
 		c.Description = strings.Join(open, " and ") + " listen on 0.0.0.0"
 		c.Status = StatusWarn
 	}
-
 	return c
 }
 
 func checkRootUser(in Input) Check {
-	// The user can be "name", "uid" or "user:group".
 	user, _, _ := strings.Cut(in.User, ":")
-
 	c := Check{
 		ID:          "root",
 		Title:       "Runs as non-root user",
@@ -125,13 +109,11 @@ func checkRootUser(in Input) Check {
 		Fix:         "Run as a normal user with --user 1000, or set USER in the Dockerfile.",
 		Status:      StatusPass,
 	}
-
 	if user == "" || user == "root" || user == "0" {
 		c.Title = "Runs as root"
 		c.Description = "The main process runs as the root user"
 		c.Status = StatusWarn
 	}
-
 	return c
 }
 
@@ -144,13 +126,11 @@ func checkReadonlyRootfs(in Input) Check {
 		Fix:         "Add --read-only, and use --tmpfs /tmp or a volume for folders that must be writable.",
 		Status:      StatusWarn,
 	}
-
 	if in.ReadonlyRootfs {
 		c.Title = "Read-only root filesystem"
 		c.Description = "The container cannot modify its own filesystem"
 		c.Status = StatusPass
 	}
-
 	return c
 }
 
@@ -163,13 +143,11 @@ func checkImageTag(in Input) Check {
 		Fix:         "Pin a specific version such as nginx:1.27, or an image digest (@sha256:...).",
 		Status:      StatusPass,
 	}
-
 	if usesLatestTag(in.Image) {
 		c.Title = "Image tag is latest"
 		c.Description = fmt.Sprintf("Image %q has no fixed version", in.Image)
 		c.Status = StatusWarn
 	}
-
 	return c
 }
 
@@ -178,7 +156,6 @@ func checkCapabilities(in Input) Check {
 		"SYS_ADMIN", "NET_ADMIN", "SYS_MODULE", "SYS_PTRACE",
 		"SYS_RAWIO", "SYS_TIME", "MKNOD", "AUDIT_WRITE", "NET_RAW",
 	}
-
 	c := Check{
 		ID:          "capabilities",
 		Title:       "No dangerous capabilities",
@@ -187,7 +164,13 @@ func checkCapabilities(in Input) Check {
 		Fix:         "Drop all capabilities with --cap-drop=ALL and only add the ones you really need.",
 		Status:      StatusPass,
 	}
-
+	droppedAll := false
+	for _, d := range in.CapDrop {
+		if strings.EqualFold(d, "ALL") || strings.EqualFold(d, "CAP_ALL") {
+			droppedAll = true
+			break
+		}
+	}
 	var found []string
 	for _, cap := range in.CapAdd {
 		cap = strings.ToUpper(strings.TrimPrefix(cap, "CAP_"))
@@ -195,13 +178,15 @@ func checkCapabilities(in Input) Check {
 			found = append(found, cap)
 		}
 	}
-
 	if len(found) > 0 {
 		c.Title = "Dangerous capabilities added"
 		c.Description = "Added: " + strings.Join(found, ", ")
 		c.Status = StatusFail
+	} else if droppedAll {
+		c.Title = "All capabilities dropped"
+		c.Description = "Container runs with --cap-drop=ALL (best practice)"
+		c.Status = StatusPass
 	}
-
 	return c
 }
 
@@ -214,13 +199,38 @@ func checkNetworkMode(in Input) Check {
 		Fix:         "Avoid --network=host unless absolutely required. Prefer bridge or custom networks.",
 		Status:      StatusPass,
 	}
-
 	if strings.EqualFold(in.NetworkMode, "host") {
 		c.Title = "Using host network mode"
 		c.Description = "Container shares the host's network stack"
 		c.Status = StatusFail
 	}
+	return c
+}
 
+func checkSeccomp(in Input) Check {
+	c := Check{
+		ID:          "seccomp",
+		Title:       "Seccomp profile active",
+		Description: "Default or custom seccomp profile is in use",
+		Risk:        "Disabling seccomp removes an important layer of syscall filtering and makes container escapes easier.",
+		Fix:         "Do not set --security-opt seccomp=unconfined. Prefer the default profile or a tighter custom profile.",
+		Status:      StatusPass,
+	}
+	for _, opt := range in.SecurityOpt {
+		lower := strings.ToLower(opt)
+		if strings.Contains(lower, "seccomp=unconfined") || strings.Contains(lower, "seccomp:unconfined") {
+			c.Title = "Seccomp is disabled"
+			c.Description = "seccomp=unconfined removes syscall filtering"
+			c.Status = StatusFail
+			return c
+		}
+		if strings.Contains(lower, "apparmor=unconfined") || strings.Contains(lower, "apparmor:unconfined") {
+			c.Title = "AppArmor is disabled"
+			c.Description = "apparmor=unconfined removes mandatory access control"
+			c.Status = StatusWarn
+			return c
+		}
+	}
 	return c
 }
 
@@ -228,7 +238,6 @@ func hasDockerSock(s string) bool {
 	return strings.Contains(s, "docker.sock")
 }
 
-// isAllInterfaces reports whether a host IP means "every network interface".
 func isAllInterfaces(ip string) bool {
 	switch ip {
 	case "", "0.0.0.0", "::", "invalid IP":
@@ -237,19 +246,15 @@ func isAllInterfaces(ip string) bool {
 	return false
 }
 
-// usesLatestTag reports whether an image reference has no tag or the latest tag.
 func usesLatestTag(image string) bool {
 	if image == "" || strings.Contains(image, "@sha256:") {
 		return false
 	}
-
 	lastSegment := image[strings.LastIndex(image, "/")+1:]
-
 	i := strings.LastIndex(lastSegment, ":")
 	if i == -1 {
 		return true
 	}
-
 	tag := lastSegment[i+1:]
 	return tag == "" || tag == "latest"
 }

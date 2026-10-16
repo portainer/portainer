@@ -3,6 +3,7 @@ package containers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker/containersecurity"
@@ -14,13 +15,17 @@ import (
 
 // @id dockerContainerSecurityInspect
 // @summary Evaluate the security configuration of a container
-// @description
-// @description **Access policy**:
+// @description Returns a weighted security score (0-100) plus detailed checks.
+// @description Optional query parameters:
+// @description - ignore: comma-separated list of check IDs to skip (e.g. ignore=socket,privileged)
+// @description - minSeverity: only include checks of this severity or higher (critical|high|medium|low)
 // @tags docker
 // @security jwt
 // @produce json
 // @param environmentId path int true "Environment identifier"
 // @param containerId path string true "Container identifier"
+// @param ignore query string false "Comma-separated check IDs to ignore"
+// @param minSeverity query string false "Minimum severity filter"
 // @success 200 {object} containersecurity.Report "Success"
 // @failure 400 "Bad request"
 // @failure 404 "Environment or container not found"
@@ -81,5 +86,20 @@ func (handler *Handler) containerSecurityInspect(w http.ResponseWriter, r *http.
 		in.MountSources = append(in.MountSources, m.Source)
 	}
 
-	return response.JSON(w, containersecurity.Evaluate(in))
+	opts := &containersecurity.Options{}
+
+	if ignore := r.URL.Query().Get("ignore"); ignore != "" {
+		for _, id := range strings.Split(ignore, ",") {
+			id = strings.TrimSpace(id)
+			if id != "" {
+				opts.IgnoreChecks = append(opts.IgnoreChecks, id)
+			}
+		}
+	}
+
+	if minSev := r.URL.Query().Get("minSeverity"); minSev != "" {
+		opts.MinSeverity = containersecurity.Severity(strings.ToLower(minSev))
+	}
+
+	return response.JSON(w, containersecurity.Evaluate(in, opts))
 }

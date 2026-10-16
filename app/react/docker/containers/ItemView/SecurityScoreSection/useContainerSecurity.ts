@@ -16,6 +16,7 @@ export interface SecurityCheck {
   fix: string;
   status: CheckStatus;
   weight?: number;
+  severity?: 'critical' | 'high' | 'medium' | 'low';
 }
 
 export interface SecurityReport {
