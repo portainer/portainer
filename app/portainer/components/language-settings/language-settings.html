@@ -1,0 +1,25 @@
+<div class="mt-6">
+  <rd-widget>
+    <rd-widget-header icon="globe" title-text="Language Settings"></rd-widget-header>
+    <rd-widget-body>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label for="languageSelect" class="col-sm-3 col-lg-2 control-label text-left">
+            Select Language
+          </label>
+          <div class="col-sm-9 col-lg-10">
+            <select
+              id="languageSelect"
+              class="form-control"
+              ng-model="$ctrl.state.selectedLanguage"
+              ng-change="$ctrl.changeLanguage()"
+            >
+              <option value="en">English</option>
+              <option value="zh">中文 (Chinese)</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </rd-widget-body>
+  </rd-widget>
+</div>
