@@ -4,9 +4,7 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { Widget } from '@@/Widget';
 
-import { useContainerInspect } from '../../queries/useContainerInspect';
-
-import { CheckStatus, getScore, getSecurityChecks } from './securityChecks';
+import { CheckStatus, useContainerSecurity } from './useContainerSecurity';
 
 const COLORS: Record<CheckStatus, { main: string; bg: string }> = {
   pass: { main: '#3f8a2f', bg: 'rgba(63,138,47,0.15)' },
@@ -47,21 +45,21 @@ export function SecurityScoreSection({
   containerId: string;
   nodeName?: string;
 }) {
-  const inspectQuery = useContainerInspect(environmentId, containerId, {
+  const securityQuery = useContainerSecurity(environmentId, containerId, {
     nodeName,
   });
 
-  if (!inspectQuery.data) {
+  if (!securityQuery.data) {
     return null;
   }
 
-  const checks = getSecurityChecks(inspectQuery.data);
-  const score = getScore(checks);
+  const { checks, score } = securityQuery.data;
 
-  const counts: Record<CheckStatus, number> = { pass: 0, warn: 0, fail: 0 };
-  checks.forEach((c) => {
-    counts[c.status] += 1;
-  });
+  const counts: Record<CheckStatus, number> = {
+    pass: securityQuery.data.passCount,
+    warn: securityQuery.data.warnCount,
+    fail: securityQuery.data.failCount,
+  };
 
   return (
     <Widget>
