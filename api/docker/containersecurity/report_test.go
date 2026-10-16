@@ -63,3 +63,82 @@ func TestUsesLatestTag(t *testing.T) {
 		}
 	}
 }
+
+func TestPortsOnlyWarnWhenPublishedOnAllInterfaces(t *testing.T) {
+	tests := []struct {
+		name    string
+		binding PortBinding
+		want    Status
+	}{
+		{
+			name:    "all interfaces",
+			binding: PortBinding{HostIP: "0.0.0.0", HostPort: "8080"},
+			want:    StatusWarn,
+		},
+		{
+			name:    "empty host IP",
+			binding: PortBinding{HostIP: "", HostPort: "8080"},
+			want:    StatusWarn,
+		},
+		{
+			name:    "localhost only",
+			binding: PortBinding{HostIP: "127.0.0.1", HostPort: "8080"},
+			want:    StatusPass,
+		},
+		{
+			name:    "not published",
+			binding: PortBinding{HostIP: "0.0.0.0", HostPort: ""},
+			want:    StatusPass,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := checkPorts(Input{PortBindings: []PortBinding{tt.binding}})
+			if got.Status != tt.want {
+				t.Errorf("got status %q, want %q", got.Status, tt.want)
+			}
+		})
+	}
+}
+
+func TestDockerSocketDetection(t *testing.T) {
+	tests := []struct {
+		name string
+		in   Input
+		want Status
+	}{
+		{
+			name: "socket in binds",
+			in:   Input{Binds: []string{"/var/run/docker.sock:/var/run/docker.sock"}},
+			want: StatusWarn,
+		},
+		{
+			name: "socket in mount sources",
+			in:   Input{MountSources: []string{"/var/run/docker.sock"}},
+			want: StatusWarn,
+		},
+		{
+			name: "no socket",
+			in:   Input{Binds: []string{"/tmp:/tmp"}},
+			want: StatusPass,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := checkDockerSocket(tt.in)
+			if got.Status != tt.want {
+				t.Errorf("got status %q, want %q", got.Status, tt.want)
+			}
+		})
+	}
+}
+
+func TestPrivilegedContainerFails(t *testing.T) {
+	got := checkPrivileged(Input{Privileged: true})
+
+	if got.Status != StatusFail {
+		t.Errorf("got status %q, want %q", got.Status, StatusFail)
+	}
+}
