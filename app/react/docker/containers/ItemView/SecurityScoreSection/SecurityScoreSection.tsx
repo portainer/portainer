@@ -95,6 +95,10 @@ export function SecurityScoreSection({
     <Widget>
       <Widget.Title icon={Shield} title="Security score" />
       <Widget.Body>
+        <p className="mb-4 text-sm opacity-70">
+          The score is based on weighted security checks. A higher score indicates a safer configuration.
+          Pass, Warn, and Fail show the current result; severity describes the potential impact if a check fails.
+        </p>
         <div className="mb-4 flex flex-wrap items-center gap-8">
           <svg width="130" height="130" viewBox="0 0 130 130" role="img">
             <title>{`Security score ${score} out of 100`}</title>
@@ -206,7 +210,9 @@ function CheckRow({ check }: { check: SecurityCheck }) {
             className="rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wide"
             style={{ background: sevColor.bg, color: sevColor.main }}
           >
-            {severity}
+            {check.status === 'pass'
+              ? `Potential risk: ${severity}`
+              : `Severity: ${severity}`}
           </span>
           {typeof check.weight === 'number' && (
             <span className="text-[10px] opacity-50">w{check.weight}</span>
