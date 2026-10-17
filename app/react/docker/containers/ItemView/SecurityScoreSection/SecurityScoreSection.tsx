@@ -215,7 +215,7 @@ function CheckRow({ check }: { check: SecurityCheck }) {
               : `Severity: ${severity}`}
           </span>
           {typeof check.weight === 'number' && (
-            <span className="text-[10px] opacity-50">w{check.weight}</span>
+            <span className="text-[10px] opacity-60">Weight: {check.weight}</span>
           )}
         </div>
         <div className="opacity-70">{check.description}</div>
