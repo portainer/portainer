@@ -174,7 +174,7 @@ func checkCapabilities(in Input) Check {
 	}
 	var found []string
 	for _, cap := range in.CapAdd {
-		cap = strings.ToUpper(strings.TrimPrefix(cap, "CAP_"))
+		cap = strings.TrimPrefix(strings.ToUpper(strings.TrimSpace(cap)), "CAP_")
 		if cap == "ALL" || slices.Contains(dangerousCaps, cap) {
 			found = append(found, cap)
 		}

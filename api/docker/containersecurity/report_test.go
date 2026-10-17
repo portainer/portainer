@@ -209,6 +209,33 @@ func TestMinSeverityDoesNotChangeOverallScore(t *testing.T) {
 	}
 }
 
+func TestCapabilitiesNormalizeNames(t *testing.T) {
+	tests := []string{
+		"SYS_ADMIN", "NET_ADMIN", "SYS_MODULE", "SYS_PTRACE",
+		"SYS_RAWIO", "SYS_TIME", "MKNOD", "AUDIT_WRITE", "NET_RAW",
+		"CAP_NET_ADMIN", "cap_net_admin", " cap_net_admin ",
+	}
+
+	for _, cap := range tests {
+		t.Run(cap, func(t *testing.T) {
+			got := checkCapabilities(Input{CapAdd: []string{cap}})
+			if got.Status != StatusFail {
+				t.Errorf("CapAdd %q: got %s, want %s", cap, got.Status, StatusFail)
+			}
+		})
+	}
+}
+
+func TestDangerousCapabilityFailsEvenWhenAllAreDropped(t *testing.T) {
+	got := checkCapabilities(Input{
+		CapAdd:  []string{"cap_net_admin"},
+		CapDrop: []string{"ALL"},
+	})
+	if got.Status != StatusFail {
+		t.Errorf("got %s, want %s", got.Status, StatusFail)
+	}
+}
+
 func TestCheckCapabilitiesFlagsAll(t *testing.T) {
 	c := checkCapabilities(Input{CapAdd: []string{"ALL"}})
 	if c.Status != StatusFail {
