@@ -191,6 +191,27 @@ describe('GitReferenceCard', () => {
       );
     });
 
+    it('falls back to the configured reference when the deployed value is empty', async () => {
+      renderCard({
+        currentDeploymentInfo: {
+          Version: 1,
+          FileVersion: 1,
+          RepositoryURL: defaultGitConfig.URL,
+          ReferenceName: '',
+          ConfigFilePath: 'subdir/docker-compose.yml',
+        },
+      });
+
+      await waitFor(() =>
+        expect(screen.getByRole('group', { name: 'Ref' })).toHaveTextContent(
+          defaultGitConfig.ReferenceName
+        )
+      );
+      expect(
+        screen.queryByText(/could not be found on the remote repository/)
+      ).not.toBeInTheDocument();
+    });
+
     it('always shows the next config file path in the divergence alert', async () => {
       renderCard({
         currentDeploymentInfo: {
