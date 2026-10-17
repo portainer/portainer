@@ -7,9 +7,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DashboardView } from '@/react/docker/DashboardView/DashboardView';
 import { ListView } from '@/react/docker/events/ListView';
 
-// استيراد مكون الـ Security Score الجديد
 import { SecurityScoreView } from './security-score/SecurityScoreView';
-
 import { containersModule } from './containers';
 import { configsModule } from './configs';
 import { imagesModule } from './images';
