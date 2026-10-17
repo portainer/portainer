@@ -98,7 +98,13 @@ func (handler *Handler) containerSecurityInspect(w http.ResponseWriter, r *http.
 	}
 
 	if minSev := r.URL.Query().Get("minSeverity"); minSev != "" {
-		opts.MinSeverity = containersecurity.Severity(strings.ToLower(minSev))
+		value := containersecurity.Severity(strings.ToLower(strings.TrimSpace(minSev)))
+		switch value {
+		case containersecurity.SeverityCritical, containersecurity.SeverityHigh, containersecurity.SeverityMedium, containersecurity.SeverityLow:
+			opts.MinSeverity = value
+		default:
+			return httperror.BadRequest("Invalid minSeverity value", nil)
+		}
 	}
 
 	return response.JSON(w, containersecurity.Evaluate(in, opts))

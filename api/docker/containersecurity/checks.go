@@ -2,6 +2,7 @@ package containersecurity
 
 import (
 	"fmt"
+	"net"
 	"slices"
 	"strings"
 )
@@ -216,21 +217,32 @@ func checkSeccomp(in Input) Check {
 		Fix:         "Do not set --security-opt seccomp=unconfined. Prefer the default profile or a tighter custom profile.",
 		Status:      StatusPass,
 	}
+
+	appArmorDisabled := false
+
 	for _, opt := range in.SecurityOpt {
-		lower := strings.ToLower(opt)
-		if strings.Contains(lower, "seccomp=unconfined") || strings.Contains(lower, "seccomp:unconfined") {
+		lower := strings.ToLower(strings.TrimSpace(opt))
+
+		if lower == "seccomp=unconfined" ||
+			lower == "seccomp:unconfined" {
 			c.Title = "Seccomp is disabled"
 			c.Description = "seccomp=unconfined removes syscall filtering"
 			c.Status = StatusFail
 			return c
 		}
-		if strings.Contains(lower, "apparmor=unconfined") || strings.Contains(lower, "apparmor:unconfined") {
-			c.Title = "AppArmor is disabled"
-			c.Description = "apparmor=unconfined removes mandatory access control"
-			c.Status = StatusWarn
-			return c
+
+		if lower == "apparmor=unconfined" ||
+			lower == "apparmor:unconfined" {
+			appArmorDisabled = true
 		}
 	}
+
+	if appArmorDisabled {
+		c.Title = "AppArmor is disabled"
+		c.Description = "apparmor=unconfined removes mandatory access control"
+		c.Status = StatusWarn
+	}
+
 	return c
 }
 
@@ -239,11 +251,12 @@ func hasDockerSock(s string) bool {
 }
 
 func isAllInterfaces(ip string) bool {
-	switch ip {
-	case "", "0.0.0.0", "::", "invalid IP":
+	ip = strings.TrimSpace(ip)
+	if ip == "" {
 		return true
 	}
-	return false
+	parsed := net.ParseIP(ip)
+	return parsed != nil && parsed.IsUnspecified()
 }
 
 func usesLatestTag(image string) bool {

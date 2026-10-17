@@ -159,3 +159,39 @@ func TestIgnoreChecks(t *testing.T) {
 		}
 	}
 }
+
+func TestSeccompTakesPriorityOverAppArmor(t *testing.T) {
+	got := checkSeccomp(Input{
+		SecurityOpt: []string{
+			"apparmor=unconfined",
+			"seccomp=unconfined",
+		},
+	})
+
+	if got.Status != StatusFail {
+		t.Errorf("expected Fail when both protections are disabled, got %s", got.Status)
+	}
+}
+
+func TestIsAllInterfaces(t *testing.T) {
+	tests := []struct {
+		name string
+		ip   string
+		want bool
+	}{
+		{name: "empty IP", ip: "", want: true},
+		{name: "IPv4 all interfaces", ip: "0.0.0.0", want: true},
+		{name: "IPv6 all interfaces", ip: "::", want: true},
+		{name: "localhost IPv4", ip: "127.0.0.1", want: false},
+		{name: "localhost IPv6", ip: "::1", want: false},
+		{name: "invalid IP", ip: "invalid IP", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isAllInterfaces(tt.ip); got != tt.want {
+				t.Errorf("isAllInterfaces(%q) = %v, want %v", tt.ip, got, tt.want)
+			}
+		})
+	}
+}
