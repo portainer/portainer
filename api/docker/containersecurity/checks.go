@@ -30,7 +30,7 @@ func checkCPU(in Input) Check {
 		Title:       "No CPU limit",
 		Description: "Set a CPU limit so one container can't starve the host",
 		Risk:        "A container without a CPU limit can consume all CPU and slow down other containers.",
-		Fix:         "Run it with --cpus 1.0 or --cpu-shares (choose a value that fits your app).",
+		Fix:         "Run it with --cpus 1.0 (choose a value that fits your app); --cpu-shares only sets relative CPU weight.",
 		Status:      StatusWarn,
 	}
 	if in.NanoCPUs > 0 {
@@ -94,7 +94,7 @@ func checkPorts(in Input) Check {
 	open = slices.Compact(open)
 	if len(open) > 0 {
 		c.Title = "Ports open on all interfaces"
-		c.Description = strings.Join(open, " and ") + " listen on 0.0.0.0"
+		c.Description = strings.Join(open, " and ") + " listen on all host interfaces"
 		c.Status = StatusWarn
 	}
 	return c
@@ -175,7 +175,7 @@ func checkCapabilities(in Input) Check {
 	var found []string
 	for _, cap := range in.CapAdd {
 		cap = strings.ToUpper(strings.TrimPrefix(cap, "CAP_"))
-		if slices.Contains(dangerousCaps, cap) {
+		if cap == "ALL" || slices.Contains(dangerousCaps, cap) {
 			found = append(found, cap)
 		}
 	}

@@ -52,7 +52,7 @@ func TestEvaluate(t *testing.T) {
 				User:  "1000",
 			},
 			opts:  &Options{MinSeverity: SeverityHigh},
-			score: 86, pass: 5, warn: 0, fail: 1,
+			score: 83, pass: 5, warn: 0, fail: 1,
 		},
 	}
 
@@ -72,7 +72,7 @@ func TestEvaluate(t *testing.T) {
 
 func TestOpenPortsAreSorted(t *testing.T) {
 	c := checkPorts(Input{PortBindings: []PortBinding{{HostPort: "9444"}, {HostPort: "9001"}}})
-	if want := "9001 and 9444 listen on 0.0.0.0"; c.Description != want {
+	if want := "9001 and 9444 listen on all host interfaces"; c.Description != want {
 		t.Errorf("got %q, want %q", c.Description, want)
 	}
 }
@@ -193,5 +193,25 @@ func TestIsAllInterfaces(t *testing.T) {
 				t.Errorf("isAllInterfaces(%q) = %v, want %v", tt.ip, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestMinSeverityDoesNotChangeOverallScore(t *testing.T) {
+	in := Input{}
+	full := Evaluate(in, nil)
+	filtered := Evaluate(in, &Options{MinSeverity: SeverityCritical})
+
+	if filtered.Score != full.Score {
+		t.Errorf("minSeverity changed overall score: full=%d, filtered=%d", full.Score, filtered.Score)
+	}
+	if len(filtered.Checks) >= len(full.Checks) {
+		t.Errorf("expected minSeverity to filter checks: full=%d, filtered=%d", len(full.Checks), len(filtered.Checks))
+	}
+}
+
+func TestCheckCapabilitiesFlagsAll(t *testing.T) {
+	c := checkCapabilities(Input{CapAdd: []string{"ALL"}})
+	if c.Status != StatusFail {
+		t.Errorf("CapAdd ALL: got status=%s, want %s", c.Status, StatusFail)
 	}
 }

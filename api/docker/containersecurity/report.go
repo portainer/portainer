@@ -69,7 +69,7 @@ type Input struct {
 	SecurityOpt    []string
 }
 
-// Options controls which checks are evaluated.
+// Options controls which checks are ignored or included in the report.
 type Options struct {
 	IgnoreChecks []string
 	MinSeverity  Severity
@@ -149,12 +149,11 @@ func Evaluate(in Input, opts *Options) Report {
 
 		c.Weight, c.Severity = defaultWeightAndSeverity(c.ID)
 
+		totalWeight += c.Weight
+		earnedPoints += float64(c.Weight) * pointsByStatus(c.Status)
 		if opts.MinSeverity != "" && severityRank(c.Severity) < severityRank(opts.MinSeverity) {
 			continue
 		}
-
-		totalWeight += c.Weight
-		earnedPoints += float64(c.Weight) * pointsByStatus(c.Status)
 
 		switch c.Status {
 		case StatusPass:
