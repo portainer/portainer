@@ -35,6 +35,7 @@ func NewHandler(routePrefix string, bouncer security.BouncerService, dataStore d
 
 	router.Handle("/{containerId}/gpus", httperror.LoggerHandler(h.containerGpusInspect)).Methods(http.MethodGet)
 	router.Handle("/{containerId}/recreate", httperror.LoggerHandler(h.recreate)).Methods(http.MethodPost)
+	router.Handle("/{containerId}/security", httperror.LoggerHandler(h.containerSecurityInspect)).Methods(http.MethodGet)
 
 	return h
 }
