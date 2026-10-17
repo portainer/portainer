@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function SecurityScoreView() {
   return (
     <div className="row">
