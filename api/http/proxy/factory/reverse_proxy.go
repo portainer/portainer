@@ -30,6 +30,14 @@ var allowedHeaders = map[string]struct{}{
 	"X-Registry-Config":                                   {},
 	"X-Stream-Protocol-Version":                           {},
 
+	// BuildKit session headers, required by the Docker /session endpoint for image builds
+	// (e.g. stacks with a `build:` section). Without them, every session is registered with an
+	// empty ID and the build fails with "no active sessions" or "session already exists".
+	"X-Docker-Expose-Session-Uuid":        {},
+	"X-Docker-Expose-Session-Name":        {},
+	"X-Docker-Expose-Session-Sharedkey":   {},
+	"X-Docker-Expose-Session-Grpc-Method": {},
+
 	// WebSocket headers those are required for kubectl exec/attach/port-forward operations
 	"Sec-Websocket-Key":        {},
 	"Sec-Websocket-Version":    {},
