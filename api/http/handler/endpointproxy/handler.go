@@ -35,6 +35,6 @@ func NewHandler(bouncer security.BouncerService) *Handler {
 	h.PathPrefix("/{id}/agent/kubernetes").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
 	h.PathPrefix("/{id}/agent/host").Handler(
-                bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAgentHostAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAgentHostAPI)))
 	return h
 }
