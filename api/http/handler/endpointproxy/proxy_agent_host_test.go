@@ -51,6 +51,33 @@ func (denyBouncer) AuthorizedEndpointOperation(_ *http.Request, _ *portainer.End
 	return errors.New("access denied to environment")
 }
 
+// tokenBouncer mirrors the real bouncer's contract: AuthenticatedAccess puts
+// token data in the request context, and AuthorizedEndpointOperation needs it.
+type tokenBouncer struct {
+	security.BouncerService
+}
+
+func (tokenBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := security.StoreTokenData(r, &portainer.TokenData{ID: 1, Role: portainer.AdministratorRole})
+		h.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (tokenBouncer) AuthorizedEndpointOperation(r *http.Request, _ *portainer.Endpoint) error {
+	_, err := security.RetrieveTokenData(r)
+	return err
+}
+
+// Verify the stubTunnelService satisfies the interface at compile time.
+var _ portainer.ReverseTunnelService = (*stubTunnelService)(nil)
+
+// Verify the bouncer wrappers satisfy the interface at compile time.
+var (
+	_ security.BouncerService = denyBouncer{}
+	_ security.BouncerService = tokenBouncer{}
+)
+
 // setupProxyHandler builds a Handler backed by a real (empty) test datastore.
 // The real datastore is required because proxyRequestsToAgentHostAPI uses ViewTx,
 // which must execute its callback to populate the endpoint variable.
@@ -192,8 +219,26 @@ func TestProxyAgentHostAPI_ProxyCreationFails(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, rw.Code)
 }
 
-// Verify the stubTunnelService satisfies the interface at compile time.
-var _ portainer.ReverseTunnelService = (*stubTunnelService)(nil)
+func TestProxyAgentHostAPI_RouteIsAuthenticated(t *testing.T) {
+	t.Parallel()
 
-// Verify denyBouncer satisfies the interface at compile time.
-var _ security.BouncerService = denyBouncer{}
+	// Without AuthenticatedAccess on the route, the token data is never in the
+	// context and every request fails the endpoint authorization with a 403.
+	// An Edge environment without an EdgeID returns 500 once past that check.
+	h, store := setupProxyHandler(t, tokenBouncer{BouncerService: testhelpers.NewTestRequestBouncer()})
+
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+		ID:     5,
+		Name:   "edge-env-auth",
+		Type:   portainer.EdgeAgentOnDockerEnvironment,
+		EdgeID: "",
+	}))
+
+	rw := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/5/agent/host/docker-storage", nil)
+
+	h.ServeHTTP(rw, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rw.Code)
+	assert.Contains(t, rw.Body.String(), "No Edge agent registered")
+}
