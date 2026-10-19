@@ -2,15 +2,19 @@ package scheduling
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/git/update"
 	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/scheduler"
+	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/rs/zerolog/log"
 )
@@ -33,8 +37,9 @@ type SourceScheduler struct {
 	dataStore dataStore
 	deployers Deployers
 
-	mu   sync.Mutex
-	jobs map[portainer.SourceID]jobEntry
+	mu      sync.Mutex
+	jobs    map[portainer.SourceID]jobEntry
+	running map[portainer.SourceID]*atomic.Bool
 }
 
 type jobEntry struct {
@@ -48,6 +53,7 @@ func NewSourceScheduler(s *scheduler.Scheduler, ds dataStore, deployers Deployer
 		dataStore: ds,
 		deployers: deployers,
 		jobs:      make(map[portainer.SourceID]jobEntry),
+		running:   make(map[portainer.SourceID]*atomic.Bool),
 	}
 }
 
@@ -125,7 +131,20 @@ func (s *SourceScheduler) reconcileSource(src *portainer.Source) error {
 	}
 
 	sourceID := src.ID
+	running, ok := s.running[sourceID]
+	if !ok {
+		running = &atomic.Bool{}
+		s.running[sourceID] = running
+	}
+
 	jobID := s.scheduler.StartJobEvery(d, func() error {
+		if !running.CompareAndSwap(false, true) {
+			log.Warn().Int("source_id", int(sourceID)).Msg("source poll: previous poll is still running, skipping this tick")
+
+			return nil
+		}
+		defer running.Store(false)
+
 		return s.tick(context.Background(), sourceID)
 	})
 	s.jobs[src.ID] = jobEntry{jobID: jobID, interval: src.Interval}
@@ -138,6 +157,7 @@ func (s *SourceScheduler) stop(sourceID portainer.SourceID) {
 	defer s.mu.Unlock()
 
 	s.stopLocked(sourceID)
+	delete(s.running, sourceID)
 }
 
 func (s *SourceScheduler) stopLocked(sourceID portainer.SourceID) {
@@ -157,13 +177,21 @@ func (s *SourceScheduler) stopLocked(sourceID portainer.SourceID) {
 // Individual deploy failures are logged and do not abort the remaining work; each deployer
 // persists the resulting source and artifact status itself. Artifacts whose backing stack or
 // edge stack no longer exists (e.g. deleted through a path that didn't clean up the workflow) are
-// skipped rather than deployed against a nonexistent target.
+// skipped rather than deployed against a nonexistent target. When several artifacts reference the
+// source they share the results of their git ref lookups and clones.
 func (s *SourceScheduler) tick(ctx context.Context, sourceID portainer.SourceID) error {
 	matchingWorkflows, err := s.dataStore.Workflow().ReadAll(func(wf portainer.Workflow) bool {
 		return workflowReferencesSource(wf, sourceID)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to read workflows for source %d: %w", sourceID, err)
+	}
+
+	// Share a copy only when multiple artifacts need it
+	if countSourceArtifacts(matchingWorkflows, sourceID) > 1 {
+		var tmpClones *update.TmpClones
+		ctx, tmpClones = update.WithTmpClones(ctx)
+		defer tmpClones.Close()
 	}
 
 	for _, wf := range matchingWorkflows {
@@ -193,15 +221,23 @@ func (s *SourceScheduler) tick(ctx context.Context, sourceID portainer.SourceID)
 func (s *SourceScheduler) deployArtifact(ctx context.Context, a portainer.Artifact) {
 	if a.StackID != 0 && s.deployers.Stack != nil {
 		if err := s.deployers.Stack(ctx, a.StackID); err != nil {
-			log.Warn().Err(err).Int("stack_id", int(a.StackID)).Msg("source poll: stack redeploy failed")
+			log.Warn().Err(err).AnErr("cause", handlerErrorCause(err)).Int("stack_id", int(a.StackID)).Msg("source poll: stack redeploy failed")
 		}
 	}
 
 	if a.EdgeStackID != 0 && s.deployers.EdgeStack != nil {
 		if err := s.deployers.EdgeStack(ctx, a.EdgeStackID); err != nil {
-			log.Warn().Err(err).Int("edge_stack_id", int(a.EdgeStackID)).Msg("source poll: edge stack redeploy failed")
+			log.Warn().Err(err).AnErr("cause", handlerErrorCause(err)).Int("edge_stack_id", int(a.EdgeStackID)).Msg("source poll: edge stack redeploy failed")
 		}
 	}
+}
+
+func handlerErrorCause(err error) error {
+	if handlerErr, ok := errors.AsType[*httperror.HandlerError](err); ok {
+		return handlerErr.Err
+	}
+
+	return nil
 }
 
 // sourceReferenced reports whether any workflow artifact referencing sourceID still has a live
@@ -249,6 +285,19 @@ func (s *SourceScheduler) artifactBackingExists(a portainer.Artifact) (bool, err
 	}
 
 	return workflows.ArtifactBackingExists(a, stackExists, edgeStackExists)
+}
+
+func countSourceArtifacts(workflows []portainer.Workflow, sourceID portainer.SourceID) int {
+	count := 0
+	for _, wf := range workflows {
+		for _, a := range wf.Artifacts {
+			if artifactReferencesSource(a, sourceID) {
+				count++
+			}
+		}
+	}
+
+	return count
 }
 
 func workflowReferencesSource(wf portainer.Workflow, sourceID portainer.SourceID) bool {

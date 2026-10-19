@@ -151,3 +151,18 @@ func TestCopyPathPanic(t *testing.T) {
 	err = os.Chmod(dir, 0755)
 	require.NoError(t, err)
 }
+
+func Test_copyFile_shouldKeepFileMode(t *testing.T) {
+	t.Parallel()
+	tmpdir := t.TempDir()
+
+	err := os.WriteFile(JoinPaths(tmpdir, "script"), []byte("#!/bin/sh"), 0o755)
+	require.NoError(t, err)
+
+	err = copyFile(JoinPaths(tmpdir, "script"), JoinPaths(tmpdir, "copy"))
+	require.NoError(t, err)
+
+	info, err := os.Stat(JoinPaths(tmpdir, "copy"))
+	require.NoError(t, err)
+	assert.Equal(t, os.FileMode(0o755), info.Mode().Perm())
+}

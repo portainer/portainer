@@ -114,7 +114,12 @@ func copyFile(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		return err
 	}
-	to, err := os.Create(dst)
+	info, err := from.Stat()
+	if err != nil {
+		return err
+	}
+
+	to, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode().Perm())
 	if err != nil {
 		return err
 	}
