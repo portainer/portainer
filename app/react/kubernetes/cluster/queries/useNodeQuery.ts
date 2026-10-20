@@ -21,6 +21,9 @@ async function getNode(
         headers: {
           Accept: isYaml ? 'application/yaml' : undefined,
         },
+        // axios-cache-interceptor keys responses by URL, not by Accept header,
+        // so a unique param stops the YAML request reusing the cached JSON node
+        params: isYaml ? { _: Date.now() } : undefined,
       }
     );
     return node;
