@@ -198,12 +198,11 @@ function getUpdatedIngressesWithRemovedPaths(
 
 async function deleteStack(stack: Stack, environmentId: EnvironmentId) {
   try {
-    await axios.delete(`/stacks/name/${stack.Name}`, {
+    // delete by id: deleting by name also matches on a namespace the stack may not have
+    await axios.delete(`/stacks/${stack.Id}`, {
       params: {
         external: false,
-        name: stack.Name,
         endpointId: environmentId,
-        namespace: stack.ResourcePool,
       },
     });
   } catch (error) {
@@ -292,11 +291,7 @@ function removeApplicationFromStack(
   application: ApplicationRowData,
   stacks: Stack[]
 ) {
-  const stack = stacks.find(
-    (stack) =>
-      stack.Name === application.StackName &&
-      stack.ResourcePool === application.ResourcePool
-  );
+  const stack = stacks.find((stack) => stack.Id === application.StackId);
   if (stack) {
     stack.Applications = stack.Applications.filter(
       (app) => app.Name !== application.Name

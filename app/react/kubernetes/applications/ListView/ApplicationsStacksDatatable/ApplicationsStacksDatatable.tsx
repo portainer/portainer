@@ -102,7 +102,7 @@ export function ApplicationsStacksDatatable({
           <DefaultDatatableSettings settings={tableState} />
         </TableSettingsMenu>
       )}
-      getRowId={(row) => `${row.Name}-${row.ResourcePool}`}
+      getRowId={(row) => row.Id}
       data-cy="applications-stacks-datatable"
     />
   );
