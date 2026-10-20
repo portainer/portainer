@@ -114,7 +114,7 @@ func (transport *baseTransport) addTokenForExec(request *http.Request) error {
 		return err
 	}
 
-	token, err := transport.jwtService.GenerateTokenForKubeconfig(tokenData)
+	token, err := transport.jwtService.GenerateTokenForKubeconfig(tokenData, transport.endpoint.ID)
 	if err != nil {
 		return err
 	}

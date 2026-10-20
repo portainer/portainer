@@ -18,27 +18,22 @@ const (
 	year = time.Hour * 24 * 365
 
 	keyLen = 32
-
-	defaultScope    = scope("default")
-	kubeConfigScope = scope("kubeconfig")
 )
-
-// scope represents JWT scopes that are supported in JWT claims.
-type scope string
 
 // Service represents a service for managing JWT tokens.
 type Service struct {
-	secrets            map[scope][]byte
+	secrets            map[portainer.TokenScope][]byte
 	userSessionTimeout time.Duration
 	dataStore          dataservices.DataStore
 }
 
 type claims struct {
-	UserID              int    `json:"id"`
-	Username            string `json:"username"`
-	Role                int    `json:"role"`
-	Scope               scope  `json:"scope"`
-	ForceChangePassword bool   `json:"forceChangePassword"`
+	UserID              int                  `json:"id"`
+	Username            string               `json:"username"`
+	Role                int                  `json:"role"`
+	Scope               portainer.TokenScope `json:"scope"`
+	EndpointID          portainer.EndpointID `json:"endpoint,omitempty"`
+	ForceChangePassword bool                 `json:"forceChangePassword"`
 	jwt.RegisteredClaims
 }
 
@@ -65,9 +60,9 @@ func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*
 	}
 
 	return &Service{
-		map[scope][]byte{
-			defaultScope:    secret,
-			kubeConfigScope: kubeSecret,
+		map[portainer.TokenScope][]byte{
+			portainer.DefaultTokenScope:    secret,
+			portainer.KubeconfigTokenScope: kubeSecret,
 		},
 		userSessionTimeout,
 		dataStore,
@@ -106,15 +101,16 @@ func (service *Service) defaultExpireAt() time.Time {
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, time.Time, error) {
 	expiryTime := service.defaultExpireAt()
-	token, err := service.generateSignedToken(data, expiryTime, defaultScope)
+	token, err := service.generateSignedToken(data, expiryTime, portainer.DefaultTokenScope, portainer.UnscopedToken)
 
 	return token, expiryTime, err
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, string, time.Time, error) {
-	scope := parseScope(token)
-	secret := service.secrets[scope]
+func (service *Service) ParseAndVerifyToken(token string) (*portainer.ScopedTokenData, string, time.Time, error) {
+	// The scope only selects the signing secret here. The claim itself is
+	// trustworthy once the signature below verifies against that secret.
+	secret := service.secrets[parseScope(token)]
 
 	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -141,56 +137,58 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		cl.ExpiresAt = &jwt.NumericDate{}
 	}
 
-	return &portainer.TokenData{
-		ID:                  portainer.UserID(cl.UserID),
-		Username:            cl.Username,
-		Role:                portainer.UserRole(cl.Role),
-		Token:               token,
-		ForceChangePassword: cl.ForceChangePassword,
+	return &portainer.ScopedTokenData{
+		TokenData: &portainer.TokenData{
+			ID:                  portainer.UserID(cl.UserID),
+			Username:            cl.Username,
+			Role:                portainer.UserRole(cl.Role),
+			Token:               token,
+			ForceChangePassword: cl.ForceChangePassword,
+		},
+		Scope:      verifiedScope(cl.Scope),
+		EndpointID: cl.EndpointID,
 	}, cl.ID, cl.ExpiresAt.Time, nil
 }
 
 // ParseAndVerifySessionToken parses and verifies a user session token. A token
-// carrying any other scope is refused before its signature is checked, so a
-// kubeconfig token is never verified against the kubeconfig secret and accepted
+// carrying any other scope is refused, so a kubeconfig token is never accepted
 // as a session.
 func (service *Service) ParseAndVerifySessionToken(token string) (*portainer.TokenData, string, time.Time, error) {
-	if !hasSessionScope(token) {
+	tokenData, jti, expiresAt, err := service.ParseAndVerifyToken(token)
+	if err != nil {
+		return nil, "", time.Time{}, err
+	}
+
+	if tokenData.Scope != portainer.DefaultTokenScope {
 		return nil, "", time.Time{}, errInvalidJWTToken
 	}
 
-	return service.ParseAndVerifyToken(token)
+	return tokenData.TokenData, jti, expiresAt, nil
 }
 
-// hasSessionScope reports whether the token's own scope claim is the session
-// scope. It reads the claim itself rather than parseScope, which maps every
-// unrecognised scope onto the default one. A missing claim is a session token.
-func hasSessionScope(token string) bool {
-	unverifiedToken, _, err := new(jwt.Parser).ParseUnverified(token, &claims{})
-	if err != nil || unverifiedToken == nil {
-		return false
+// verifiedScope is the token's own scope claim, carried through once the
+// signature has been checked. Tokens predating scopes have no claim and are
+// session tokens.
+func verifiedScope(claimed portainer.TokenScope) portainer.TokenScope {
+	if claimed == "" {
+		return portainer.DefaultTokenScope
 	}
 
-	cl, ok := unverifiedToken.Claims.(*claims)
-	if !ok {
-		return false
-	}
-
-	return cl.Scope == "" || cl.Scope == defaultScope
+	return claimed
 }
 
-// Parse a JWT token, fallback to defaultScope if no scope is present in the JWT
-func parseScope(token string) scope {
+// Parse a JWT token, fallback to the default scope if no scope is present in the JWT
+func parseScope(token string) portainer.TokenScope {
 	unverifiedToken, _, _ := new(jwt.Parser).ParseUnverified(token, &claims{})
 	if unverifiedToken == nil {
-		return defaultScope
+		return portainer.DefaultTokenScope
 	}
 
-	if cl, ok := unverifiedToken.Claims.(*claims); ok && cl.Scope == kubeConfigScope {
-		return kubeConfigScope
+	if cl, ok := unverifiedToken.Claims.(*claims); ok && cl.Scope == portainer.KubeconfigTokenScope {
+		return portainer.KubeconfigTokenScope
 	}
 
-	return defaultScope
+	return portainer.DefaultTokenScope
 }
 
 // SetUserSessionDuration sets the user session duration
@@ -198,10 +196,10 @@ func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration
 	service.userSessionTimeout = userSessionDuration
 }
 
-func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt time.Time, scope scope) (string, error) {
-	secret, found := service.secrets[scope]
+func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt time.Time, tokenScope portainer.TokenScope, endpointID portainer.EndpointID) (string, error) {
+	secret, found := service.secrets[tokenScope]
 	if !found {
-		return "", fmt.Errorf("invalid scope: %v", scope)
+		return "", fmt.Errorf("invalid scope: %v", tokenScope)
 	}
 
 	settings, err := service.dataStore.Settings().Settings()
@@ -223,7 +221,8 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		UserID:              int(data.ID),
 		Username:            data.Username,
 		Role:                int(data.Role),
-		Scope:               scope,
+		Scope:               tokenScope,
+		EndpointID:          endpointID,
 		ForceChangePassword: data.ForceChangePassword,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        uuid.String(),

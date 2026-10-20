@@ -36,7 +36,7 @@ func TestParseAndVerifySessionToken(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, portainer.UserID(1), tokenData.ID)
 
-	kubeconfigToken, err := service.GenerateTokenForKubeconfig(data)
+	kubeconfigToken, err := service.GenerateTokenForKubeconfig(data, 1)
 	require.NoError(t, err)
 
 	_, _, _, err = service.ParseAndVerifySessionToken(kubeconfigToken)
@@ -54,7 +54,7 @@ func TestParseAndVerifySessionToken(t *testing.T) {
 
 // signedTokenWithScope signs a token carrying an arbitrary scope with the
 // session secret, which generateSignedToken refuses to do.
-func signedTokenWithScope(service *Service, s scope) (string, error) {
+func signedTokenWithScope(service *Service, s portainer.TokenScope) (string, error) {
 	cl := claims{
 		UserID:   1,
 		Username: "User",
@@ -67,5 +67,5 @@ func signedTokenWithScope(service *Service, s scope) (string, error) {
 		},
 	}
 
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, cl).SignedString(service.secrets[defaultScope])
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, cl).SignedString(service.secrets[portainer.DefaultTokenScope])
 }

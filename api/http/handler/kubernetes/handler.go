@@ -281,15 +281,9 @@ func (handler *Handler) kubeClientMiddleware(next http.Handler) http.Handler {
 			isKubeAdmin = false
 		}
 
-		bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
+		config, err := handler.buildConfig(r, tokenData, []portainer.Endpoint{*endpoint}, true)
 		if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to generate token for kubeconfig. Error: ", err)
-			return
-		}
-
-		config := handler.buildConfig(r, tokenData, bearerToken, []portainer.Endpoint{*endpoint}, true)
-		if len(config.Clusters) == 0 {
-			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to build kubeconfig. Error: ", nil)
+			httperror.WriteError(w, http.StatusInternalServerError, "an error occurred during the KubeClientMiddleware operation, unable to build kubeconfig. Error: ", err)
 			return
 		}
 

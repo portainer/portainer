@@ -28,6 +28,9 @@ func (denyingBouncer) RestrictedAccess(h http.Handler) http.Handler     { return
 func (denyingBouncer) TeamLeaderAccess(h http.Handler) http.Handler     { return h }
 func (denyingBouncer) AuthenticatedAccess(h http.Handler) http.Handler  { return h }
 func (denyingBouncer) EdgeComputeOperation(h http.Handler) http.Handler { return h }
+func (denyingBouncer) AuthenticatedAccessAllowingKubeconfig(h http.Handler) http.Handler {
+	return h
+}
 func (denyingBouncer) AuthorizedEndpointOperation(_ *http.Request, _ *portainer.Endpoint) error {
 	return security.ErrAuthorizationRequired
 }

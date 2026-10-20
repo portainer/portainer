@@ -1,11 +1,67 @@
 package kubernetes
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/jwt"
+	"github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// Every context carries its own credential, so the bearer token sent on any one
+// request stays a constant size however many environments the kubeconfig covers.
+func TestBuildConfig_IssuesACredentialPerEnvironment(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, true, false)
+	require.NoError(t, store.User().Create(&portainer.User{ID: 1}))
+
+	settings, err := store.Settings().Settings()
+	require.NoError(t, err)
+	settings.KubeconfigExpiry = "0"
+	require.NoError(t, store.Settings().UpdateSettings(settings))
+
+	jwtService, err := jwt.NewService("1h", store)
+	require.NoError(t, err)
+
+	clientFactory, err := cli.NewClientFactory(nil, nil, store, "instance", "", "")
+	require.NoError(t, err)
+
+	handler := &Handler{
+		JwtService:               jwtService,
+		kubeClusterAccessService: kubernetes.NewKubeClusterAccessService("", "", ""),
+		KubernetesClientFactory:  clientFactory,
+	}
+
+	endpoints := []portainer.Endpoint{
+		{ID: 1, Name: "first"},
+		{ID: 2, Name: "second"},
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/kubernetes/config", nil)
+
+	config, err := handler.buildConfig(req, &portainer.TokenData{ID: 1}, endpoints, false)
+	require.NoError(t, err)
+	require.Len(t, config.AuthInfos, len(endpoints))
+	require.Len(t, config.Contexts, len(endpoints))
+
+	for idx, endpoint := range endpoints {
+		authInfo := config.AuthInfos[idx]
+
+		require.Equal(t, authInfo.Name, config.Contexts[idx].Context.AuthInfo, "context points at another environment's credential")
+
+		parsed, _, _, err := jwtService.ParseAndVerifyToken(authInfo.AuthInfo.Token)
+		require.NoError(t, err)
+		require.Equal(t, endpoint.ID, parsed.EndpointID, "token reaches beyond its own environment")
+	}
+}
 
 func TestIsSelfSignedCertificate(t *testing.T) {
 	t.Parallel()

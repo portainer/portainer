@@ -45,12 +45,6 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
-	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesConfig").Msg("Unable to generate JWT token")
-		return httperror.InternalServerError("Unable to generate JWT token", err)
-	}
-
 	endpoints, handlerErr := handler.filterUserKubeEndpoints(r)
 	if handlerErr != nil {
 		log.Error().Err(handlerErr).Str("context", "getKubernetesConfig").Msg("Unable to filter user kube endpoints")
@@ -62,7 +56,11 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return httperror.BadRequest("empty endpoints list", errors.New("empty endpoints list"))
 	}
 
-	config := handler.buildConfig(r, tokenData, bearerToken, endpoints, false)
+	config, err := handler.buildConfig(r, tokenData, endpoints, false)
+	if err != nil {
+		log.Error().Err(err).Str("context", "getKubernetesConfig").Msg("Unable to build Kubeconfig")
+		return httperror.InternalServerError("Unable to build Kubeconfig", err)
+	}
 
 	return writeFileContent(w, r, endpoints, tokenData, config)
 }
@@ -133,24 +131,31 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	return filteredEndpoints, nil
 }
 
-func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenData, bearerToken string, endpoints []portainer.Endpoint, isInternal bool) *clientV1.Config {
-	var configAuthInfos []clientV1.NamedAuthInfo
+func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenData, endpoints []portainer.Endpoint, isInternal bool) (*clientV1.Config, error) {
+	serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), handler.KubernetesClientFactory.GetInstanceID())
+
+	endpointIDs := make([]portainer.EndpointID, len(endpoints))
+	for idx, endpoint := range endpoints {
+		endpointIDs[idx] = endpoint.ID
+	}
+
+	// A credential per environment keeps every bearer token a constant size,
+	// however many environments the kubeconfig covers.
+	bearerTokens, err := handler.JwtService.GenerateTokensForKubeconfig(tokenData, endpointIDs)
+	if err != nil {
+		return nil, fmt.Errorf("unable to generate kubeconfig tokens: %w", err)
+	}
 
 	configClusters := make([]clientV1.NamedCluster, len(endpoints))
 	configContexts := make([]clientV1.NamedContext, len(endpoints))
-	authInfosSet := make(map[string]bool)
+	configAuthInfos := make([]clientV1.NamedAuthInfo, len(endpoints))
 
 	for idx, endpoint := range endpoints {
-		instanceID := handler.KubernetesClientFactory.GetInstanceID()
-		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
+		authInfoName := buildAuthInfoName(serviceAccountName, endpoint)
 
 		configClusters[idx] = handler.buildCluster(r, endpoint, isInternal)
-		configContexts[idx] = buildContext(serviceAccountName, endpoint)
-
-		if !authInfosSet[serviceAccountName] {
-			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
-			authInfosSet[serviceAccountName] = true
-		}
+		configContexts[idx] = buildContext(authInfoName, endpoint)
+		configAuthInfos[idx] = buildAuthInfo(authInfoName, bearerTokens[endpoint.ID])
 	}
 
 	return &clientV1.Config{
@@ -160,7 +165,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 		Contexts:       configContexts,
 		CurrentContext: configContexts[0].Name,
 		AuthInfos:      configAuthInfos,
-	}
+	}, nil
 }
 
 // buildCluster builds a Kubernetes cluster configuration based on the endpoint and if it's used internally or externally.
@@ -217,19 +222,25 @@ func buildClusterName(endpointName string) string {
 	return "portainer-cluster-" + endpointName
 }
 
-func buildContext(serviceAccountName string, endpoint portainer.Endpoint) clientV1.NamedContext {
+func buildContext(authInfoName string, endpoint portainer.Endpoint) clientV1.NamedContext {
 	return clientV1.NamedContext{
 		Name: "portainer-ctx-" + endpoint.Name,
 		Context: clientV1.Context{
-			AuthInfo: serviceAccountName,
+			AuthInfo: authInfoName,
 			Cluster:  buildClusterName(endpoint.Name),
 		},
 	}
 }
 
-func buildAuthInfo(serviceAccountName string, bearerToken string) clientV1.NamedAuthInfo {
+// buildAuthInfoName keys the credential on the environment ID rather than its name,
+// which environments are not required to hold uniquely.
+func buildAuthInfoName(serviceAccountName string, endpoint portainer.Endpoint) string {
+	return fmt.Sprintf("%s-%d", serviceAccountName, endpoint.ID)
+}
+
+func buildAuthInfo(authInfoName string, bearerToken string) clientV1.NamedAuthInfo {
 	return clientV1.NamedAuthInfo{
-		Name: serviceAccountName,
+		Name: authInfoName,
 		AuthInfo: clientV1.AuthInfo{
 			Token: bearerToken,
 		},

@@ -27,11 +27,11 @@ func TestGenerateSignedToken(t *testing.T) {
 	}
 	expiresAt := time.Now().Add(1 * time.Hour)
 
-	generatedToken, err := svc.generateSignedToken(token, expiresAt, defaultScope)
+	generatedToken, err := svc.generateSignedToken(token, expiresAt, portainer.DefaultTokenScope, portainer.UnscopedToken)
 	require.NoError(t, err, "failed to generate a signed token")
 
 	parsedToken, err := jwt.ParseWithClaims(generatedToken, &claims{}, func(token *jwt.Token) (any, error) {
-		return svc.secrets[defaultScope], nil
+		return svc.secrets[portainer.DefaultTokenScope], nil
 	})
 	require.NoError(t, err, "failed to parse generated token")
 
@@ -57,7 +57,7 @@ func TestGenerateSignedToken_InvalidScope(t *testing.T) {
 	}
 	expiresAt := time.Now().Add(1 * time.Hour)
 
-	_, err = svc.generateSignedToken(token, expiresAt, "testing")
+	_, err = svc.generateSignedToken(token, expiresAt, "testing", portainer.UnscopedToken)
 	require.Error(t, err)
 	assert.Equal(t, "invalid scope: testing", err.Error())
 }
@@ -85,7 +85,8 @@ func TestGenerationAndParsing(t *testing.T) {
 
 	token, _, _, err := service.ParseAndVerifyToken(tokenString)
 	require.NoError(t, err)
-	require.Equal(t, expectedToken, token)
+	require.Equal(t, expectedToken, token.TokenData)
+	require.Equal(t, portainer.DefaultTokenScope, token.Scope)
 }
 
 func TestExpiration(t *testing.T) {

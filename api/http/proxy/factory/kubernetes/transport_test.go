@@ -33,7 +33,7 @@ func (m *MockJWTService) GenerateToken(data *portainer.TokenData) (string, time.
 	return "mock-token", time.Now().Add(24 * time.Hour), nil
 }
 
-func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData) (string, error) {
+func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData, endpointID portainer.EndpointID) (string, error) {
 	if m.generateTokenFunc != nil {
 		return m.generateTokenFunc(data)
 	}
@@ -41,12 +41,34 @@ func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData) (
 	return "mock-kubeconfig-token", nil
 }
 
-func (m *MockJWTService) ParseAndVerifyToken(token string) (*portainer.TokenData, string, time.Time, error) {
-	return &portainer.TokenData{ID: 1, Username: "mock", Role: portainer.AdministratorRole}, "mock-id", time.Now().Add(24 * time.Hour), nil
+func (m *MockJWTService) GenerateTokensForKubeconfig(data *portainer.TokenData, endpointIDs []portainer.EndpointID) (map[portainer.EndpointID]string, error) {
+	tokens := make(map[portainer.EndpointID]string, len(endpointIDs))
+	for _, endpointID := range endpointIDs {
+		token, err := m.GenerateTokenForKubeconfig(data, endpointID)
+		if err != nil {
+			return nil, err
+		}
+
+		tokens[endpointID] = token
+	}
+
+	return tokens, nil
+}
+
+func (m *MockJWTService) ParseAndVerifyToken(token string) (*portainer.ScopedTokenData, string, time.Time, error) {
+	return &portainer.ScopedTokenData{
+		TokenData: &portainer.TokenData{ID: 1, Username: "mock", Role: portainer.AdministratorRole},
+		Scope:     portainer.DefaultTokenScope,
+	}, "mock-id", time.Now().Add(24 * time.Hour), nil
 }
 
 func (m *MockJWTService) ParseAndVerifySessionToken(token string) (*portainer.TokenData, string, time.Time, error) {
-	return m.ParseAndVerifyToken(token)
+	tokenData, jti, expiresAt, err := m.ParseAndVerifyToken(token)
+	if err != nil {
+		return nil, "", time.Time{}, err
+	}
+
+	return tokenData.TokenData, jti, expiresAt, nil
 }
 
 func (m *MockJWTService) SetUserSessionDuration(userSessionDuration time.Duration) {
@@ -82,6 +104,7 @@ func TestBaseTransport_AddTokenForExec(t *testing.T) {
 	// Create base transport
 	transport := &baseTransport{
 		jwtService: jwtService,
+		endpoint:   &portainer.Endpoint{ID: 1},
 	}
 
 	tests := []struct {
@@ -249,6 +272,7 @@ func TestBaseTransport_AddTokenForExec(t *testing.T) {
 			if tt.name == "JWT service failure" {
 				testTransport = &baseTransport{
 					jwtService: nil,
+					endpoint:   &portainer.Endpoint{ID: 1},
 				}
 			} else {
 				testTransport = transport
@@ -304,6 +328,7 @@ func TestBaseTransport_AddTokenForExec_Integration(t *testing.T) {
 	transport := &baseTransport{
 		httpTransport: &http.Transport{},
 		jwtService:    mockJWTService,
+		endpoint:      &portainer.Endpoint{ID: 1},
 	}
 
 	tests := []struct {

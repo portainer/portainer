@@ -1578,6 +1578,20 @@ type (
 		Token               string
 	}
 
+	// TokenScope is the API surface a token is allowed to reach.
+	TokenScope string
+
+	// ScopedTokenData is the identity a token carries, together with the
+	// restrictions the token itself places on where that identity may be used.
+	ScopedTokenData struct {
+		*TokenData
+
+		Scope TokenScope
+		// EndpointID is the single environment a kubeconfig-scoped token may reach.
+		// UnscopedToken means unrestricted.
+		EndpointID EndpointID
+	}
+
 	// TunnelDetails represents information associated to a tunnel
 	TunnelDetails struct {
 		Status       string
@@ -1863,8 +1877,9 @@ type (
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, time.Time, error)
-		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
+		GenerateTokenForKubeconfig(data *TokenData, endpointID EndpointID) (string, error)
+		GenerateTokensForKubeconfig(data *TokenData, endpointIDs []EndpointID) (map[EndpointID]string, error)
+		ParseAndVerifyToken(token string) (*ScopedTokenData, string, time.Time, error)
 		ParseAndVerifySessionToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
@@ -2121,6 +2136,14 @@ type (
 		CheckRunningStatus(ctx context.Context, stack *Stack, endpoint *Endpoint) (bool, error)
 	}
 )
+
+const (
+	DefaultTokenScope    TokenScope = "default"
+	KubeconfigTokenScope TokenScope = "kubeconfig"
+)
+
+// UnscopedToken marks a token that is not confined to a single environment.
+const UnscopedToken = 0
 
 const (
 	// APIVersion is the version number of the Portainer API
