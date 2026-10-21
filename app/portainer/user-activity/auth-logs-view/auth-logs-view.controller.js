@@ -68,11 +68,9 @@ export default class AuthLogsViewController {
   }
 
   onChangeKeyword(keyword) {
-    return this.$scope.$evalAsync(() => {
-      this.state.page = 1;
-      this.state.keyword = keyword;
-      this.loadLogs();
-    });
+    this.state.page = 1;
+    this.state.keyword = keyword;
+    this.loadLogs();
   }
 
   onChangeDate({ startDate, endDate }) {
