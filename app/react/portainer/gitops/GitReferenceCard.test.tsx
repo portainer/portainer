@@ -4,12 +4,15 @@ import { HttpResponse } from 'msw';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server, http } from '@/setup-tests/server';
 import { withTestRouter } from '@/react/test-utils/withRouter';
+import { truncateLeftRight } from '@/portainer/filters/filters';
 
-import { RepoConfigResponse } from './types';
+import { AutoUpdateResponse, RepoConfigResponse } from './types';
 import { GitReferenceCard } from './GitReferenceCard';
 
 vi.mock('@/portainer/helpers/webhookHelper', () => ({
   baseStackWebhookUrl: () => 'https://portainer.example/api/stacks/webhooks',
+  baseEdgeStackWebhookUrl: () =>
+    'https://portainer.example/api/edge_stacks/webhooks',
 }));
 
 const defaultGitConfig: RepoConfigResponse = {
@@ -18,6 +21,13 @@ const defaultGitConfig: RepoConfigResponse = {
   ConfigFilePath: 'docker-compose.yml',
   ConfigHash: 'abc123def456',
   TLSSkipVerify: false,
+};
+
+const defaultAutoUpdate: AutoUpdateResponse = {
+  Interval: '',
+  Webhook: '',
+  ForceUpdate: false,
+  ForcePullImage: false,
 };
 
 function renderCard(
@@ -223,6 +233,50 @@ describe('GitReferenceCard', () => {
       expect(
         screen.queryByText('Settings changed since last deploy')
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Webhook', () => {
+    it('uses the regular stack webhook route for non-edge stacks', async () => {
+      renderCard({ autoUpdate: { ...defaultAutoUpdate, Webhook: 'id' } });
+
+      await waitFor(() =>
+        expect(screen.getByTestId('git-webhook-url')).toHaveTextContent(
+          truncateLeftRight(
+            'https://portainer.example/api/stacks/webhooks/id',
+            0,
+            10,
+            25
+          )
+        )
+      );
+    });
+
+    it('uses the edge stack webhook route for edge stacks', async () => {
+      renderCard({
+        stackType: 'edge',
+        autoUpdate: { ...defaultAutoUpdate, Webhook: 'id' },
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId('git-webhook-url')).toHaveTextContent(
+          truncateLeftRight(
+            'https://portainer.example/api/edge_stacks/webhooks/id',
+            0,
+            10,
+            25
+          )
+        )
+      );
+    });
+
+    it('hides the webhook row when no webhook is configured', async () => {
+      renderCard({ autoUpdate: { ...defaultAutoUpdate, Interval: '5m' } });
+
+      await waitFor(() =>
+        expect(screen.getByRole('group', { name: 'Repo' })).toBeInTheDocument()
+      );
+      expect(screen.queryByTestId('git-webhook-url')).not.toBeInTheDocument();
     });
   });
 });

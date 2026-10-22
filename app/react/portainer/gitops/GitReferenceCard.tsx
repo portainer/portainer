@@ -2,7 +2,10 @@ import { ReactNode } from 'react';
 import { CheckCircle, GitMerge, Loader2, XCircle } from 'lucide-react';
 
 import { truncateLeftRight } from '@/portainer/filters/filters';
-import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
+import {
+  baseEdgeStackWebhookUrl,
+  baseStackWebhookUrl,
+} from '@/portainer/helpers/webhookHelper';
 import { GitCommitLink } from '@/react/portainer/gitops/GitCommitLink';
 import { useGitRefs } from '@/react/portainer/gitops/queries/useGitRefs';
 import { useSearch } from '@/react/portainer/gitops/queries/useSearch';
@@ -92,8 +95,7 @@ export function GitReferenceCard({
       fileCheckQuery.isError ||
       (fileCheckQuery.isFetched && !foundFile));
 
-  const { Webhook: webhook } = autoUpdate || {};
-  const webhookUrl = webhook ? `${baseStackWebhookUrl()}/${webhook}` : '';
+  const webhookUrl = getWebhookUrl(stackType, autoUpdate);
 
   const isRefLoading = refCheckQuery.isFetching;
   const isFileLoading = enableFileCheck && fileCheckQuery.isFetching;
@@ -192,7 +194,7 @@ export function GitReferenceCard({
           {!!sourceIdToShow && (
             <AutoUpdateIntervalLineItem sourceId={sourceIdToShow} />
           )}
-          {!!webhook && (
+          {!!webhookUrl && (
             <LineItem
               label="Webhook"
               value={
@@ -223,6 +225,21 @@ export function GitReferenceCard({
       </Card.Body>
     </Card.Container>
   );
+}
+
+function getWebhookUrl(
+  stackType: 'docker' | 'helm' | 'edge' | 'edge-helm' | 'kubernetes',
+  autoUpdate: AutoUpdateResponse | null | undefined
+) {
+  const { Webhook: webhook } = autoUpdate || {};
+  if (!webhook) {
+    return undefined;
+  }
+
+  const isEdge = stackType === 'edge' || stackType === 'edge-helm';
+  const base = isEdge ? baseEdgeStackWebhookUrl() : baseStackWebhookUrl();
+
+  return `${base}/${webhook}`;
 }
 
 function SourceLineItem({ sourceId }: { sourceId: number }) {
