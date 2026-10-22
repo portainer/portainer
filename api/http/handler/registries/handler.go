@@ -22,13 +22,17 @@ import (
 
 func hideFields(registry *portainer.Registry, hideAccesses bool) {
 	registry.Password = ""
+	registry.AccessToken = ""
+
 	if registry.ManagementConfiguration != nil {
 		// TLS and SkipTLSVerify should be retained since it's not sensitive information
 		minimalManagementConfig := &portainer.RegistryManagementConfiguration{}
 		minimalManagementConfig.TLSConfig = registry.ManagementConfiguration.TLSConfig
 		registry.ManagementConfiguration = minimalManagementConfig
 	}
+
 	if hideAccesses {
+		registry.AccessTokenExpiry = 0
 		if registry.ManagementConfiguration != nil {
 			registry.ManagementConfiguration.TLSConfig.TLSCACertPath = ""
 			registry.ManagementConfiguration.TLSConfig.TLSCertPath = ""
