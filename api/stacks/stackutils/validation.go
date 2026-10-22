@@ -108,6 +108,10 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 
 	for _, service := range composeConfig.Services {
 		if !config.SecuritySettings.AllowBindMountsForRegularUsers {
+			if len(service.VolumesFrom) > 0 {
+				return errors.New("bind-mount disabled for non administrator users")
+			}
+
 			for _, volume := range service.Volumes {
 				if docker.IsBindMount(docker.MountDescriptor{Type: volume.Type}) {
 					return errors.New("bind-mount disabled for non administrator users")
