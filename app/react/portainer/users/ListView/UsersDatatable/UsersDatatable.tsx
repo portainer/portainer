@@ -2,9 +2,9 @@ import { User as UserIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useUsers } from '@/portainer/users/queries';
+import { useUserMembership, useUsers } from '@/portainer/users/queries';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
-import { useSettings } from '@/react/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   mutationOptions,
@@ -31,18 +31,31 @@ const store = createPersistedStore('users');
 
 export function UsersDatatable() {
   const removeMutation = useRemoveMutation();
-  const { isPureAdmin } = useCurrentUser();
+  const { user: currentUser, isPureAdmin } = useCurrentUser();
   const usersQuery = useUsers(isPureAdmin);
-  const membershipsQuery = useTeamMemberships();
-  const settingsQuery = useSettings();
+  const leadsTeamQuery = useUserMembership(currentUser.Id, {
+    enabled: !isPureAdmin,
+    select: (memberships) =>
+      memberships.some((membership) => membership.Role === TeamRole.Leader),
+  });
+  const canListMemberships = isPureAdmin || !!leadsTeamQuery.data;
+  const membershipsQuery = useTeamMemberships(undefined, {
+    enabled: canListMemberships,
+  });
+  const settingsQuery = usePublicSettings();
   const tableState = useTableState(store, 'users');
 
   const dataset: Array<DecoratedUser> | null = useMemo(() => {
-    if (!usersQuery.data || !membershipsQuery.data || !settingsQuery.data) {
+    const memberships = canListMemberships ? membershipsQuery.data : [];
+
+    if (
+      !usersQuery.data ||
+      !memberships ||
+      !settingsQuery.data ||
+      leadsTeamQuery.isInitialLoading
+    ) {
       return null;
     }
-
-    const memberships = membershipsQuery.data;
 
     return usersQuery.data.map((user) => {
       const teamMembership = memberships.find(
@@ -60,7 +73,13 @@ export function UsersDatatable() {
           ],
       };
     });
-  }, [membershipsQuery.data, settingsQuery.data, usersQuery.data]);
+  }, [
+    canListMemberships,
+    leadsTeamQuery.isInitialLoading,
+    membershipsQuery.data,
+    settingsQuery.data,
+    usersQuery.data,
+  ]);
 
   return (
     <Datatable
