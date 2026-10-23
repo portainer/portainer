@@ -19,7 +19,8 @@
                 label-class="'col-sm-3 col-lg-2 control-label text-left'"
                 checked="formValues.Administrator"
                 label="'Administrator'"
-                tooltip="'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
+                tooltip="isLastAdmin ? 'This is the only administrator. Make another user an administrator before removing this role.' : 'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
+                disabled="isLastAdmin"
                 on-change="(handleAdministratorChange)"
               ></por-switch-field>
             </div>

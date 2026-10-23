@@ -25595,6 +25595,8 @@ paths:
           description: Permission denied
         "404":
           description: User not found
+        "409":
+          description: User is the last administrator
         "500":
           description: Server error
       security:
@@ -25670,7 +25672,7 @@ paths:
         "404":
           description: User not found
         "409":
-          description: Username already exist
+          description: Username already exist or the user is the last administrator
         "500":
           description: Server error
       security:

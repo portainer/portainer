@@ -27,6 +27,7 @@ import (
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "User not found"
+// @failure 409 "User is the last administrator"
 // @failure 500 "Server error"
 // @router /users/{id} [delete]
 func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -87,9 +88,18 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 }
 
 func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	handler.cleanupUserK8sServiceAccounts(user.ID)
-
 	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		current, err := tx.User().Read(user.ID)
+		if err != nil && !dataservices.IsErrObjectNotFound(err) {
+			return err
+		}
+
+		if err == nil && current.Role == portainer.AdministratorRole {
+			if err := ensureAnotherAdminExists(tx, user.ID); err != nil {
+				return err
+			}
+		}
+
 		if err := handler.AuthorizationService.RemoveUserAccessPolicies(tx, user.ID); err != nil {
 			return err
 		}
@@ -103,9 +113,13 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		}
 
 		return nil
-	}); err != nil {
+	}); errors.Is(err, errLastAdmin) {
+		return httperror.Conflict("Cannot remove the last administrator account", err)
+	} else if err != nil {
 		return httperror.InternalServerError("Unable to remove user from the database", err)
 	}
+
+	handler.cleanupUserK8sServiceAccounts(user.ID)
 
 	// Remove all of the users persisted API keys
 	apiKeys, err := handler.apiKeyService.GetAPIKeys(user.ID)

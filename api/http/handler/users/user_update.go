@@ -8,6 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -59,7 +60,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "User not found"
-// @failure 409 "Username already exist"
+// @failure 409 "Username already exist or the user is the last administrator"
 // @failure 500 "Server error"
 // @router /users/{id} [put]
 func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -103,8 +104,6 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		} else if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
 			return httperror.Conflict("Another user with the same username already exists", errUserAlreadyExists)
 		}
-
-		user.Username = payload.Username
 	}
 
 	if payload.Password != "" && payload.NewPassword == "" {
@@ -115,6 +114,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return httperror.BadRequest("Existing password field specified without new password field.", errors.New("To change the password, you must include both 'password' and 'newPassword' in your request"))
 	}
 
+	var hashedPassword string
 	if payload.NewPassword != "" {
 		// Non-admins need to supply the previous password
 		if tokenData.Role != portainer.AdministratorRole {
@@ -127,10 +127,53 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 			return httperror.BadRequest("Password does not meet the minimum strength requirements", nil)
 		}
 
-		user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
+		hashedPassword, err = handler.CryptoService.Hash(payload.NewPassword)
 		if err != nil {
 			return httperror.InternalServerError("Unable to hash user password", errCryptoHashFailure)
 		}
+	}
+
+	var updatedUser *portainer.User
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		current, err := tx.User().Read(user.ID)
+		if err != nil {
+			return err
+		}
+
+		wasAdmin := current.Role == portainer.AdministratorRole
+		applyUserUpdate(current, payload, hashedPassword)
+
+		if wasAdmin && current.Role != portainer.AdministratorRole {
+			if err := ensureAnotherAdminExists(tx, current.ID); err != nil {
+				return err
+			}
+		}
+
+		updatedUser = current
+
+		return tx.User().Update(current.ID, current)
+	}); errors.Is(err, errLastAdmin) {
+		return httperror.Conflict("Cannot remove the administrator role from the last administrator", err)
+	} else if err != nil {
+		return httperror.InternalServerError("Unable to persist user changes inside the database", err)
+	}
+
+	// remove all of the users persisted API keys
+	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
+
+	// hide the password field in the response payload
+	updatedUser.Password = ""
+
+	return response.JSON(w, updatedUser)
+}
+
+func applyUserUpdate(user *portainer.User, payload userUpdatePayload, hashedPassword string) {
+	if payload.Username != "" {
+		user.Username = payload.Username
+	}
+
+	if payload.NewPassword != "" {
+		user.Password = hashedPassword
 		user.TokenIssueAt = time.Now().Unix()
 	}
 
@@ -144,16 +187,4 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Role = portainer.UserRole(payload.Role)
 		user.TokenIssueAt = time.Now().Unix()
 	}
-
-	if err := handler.DataStore.User().Update(user.ID, user); err != nil {
-		return httperror.InternalServerError("Unable to persist user changes inside the database", err)
-	}
-
-	// remove all of the users persisted API keys
-	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
-
-	// hide the password field in the response payload
-	user.Password = ""
-
-	return response.JSON(w, user)
 }

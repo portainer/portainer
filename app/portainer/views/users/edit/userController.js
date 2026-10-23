@@ -116,11 +116,13 @@ angular.module('portainer.app').controller('UserController', [
       $q.all({
         user: UserService.user($transition$.params().id),
         settings: SettingsService.publicSettings(),
+        users: $scope.isAdmin ? UserService.users(true) : [],
       })
         .then(function success(data) {
           var user = data.user;
           $scope.user = user;
           $scope.formValues.Administrator = user.Role === 1;
+          $scope.isLastAdmin = user.Role === 1 && data.users.filter((u) => u.Role === 1).length === 1;
           $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
           $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;

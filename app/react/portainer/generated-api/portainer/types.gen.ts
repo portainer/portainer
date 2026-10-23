@@ -24573,6 +24573,10 @@ export type UserDeleteErrors = {
    */
   404: unknown;
   /**
+   * User is the last administrator
+   */
+  409: unknown;
+  /**
    * Server error
    */
   500: unknown;
@@ -24657,7 +24661,7 @@ export type UserUpdateErrors = {
    */
   404: unknown;
   /**
-   * Username already exist
+   * Username already exist or the user is the last administrator
    */
   409: unknown;
   /**
