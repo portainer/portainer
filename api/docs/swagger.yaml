@@ -18068,6 +18068,7 @@ paths:
       - application/json
       description: |-
         Tests connectivity for a GitOps source, applying optional overrides to the stored configuration.
+        The test ignores the name and interval fields. To send any other field, the user must be the owner of the source or an administrator. Other users can only test the stored settings.
         **Access policy**: authenticated
       operationId: GitOpsSourcesTestById
       parameters:
@@ -18076,8 +18077,9 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Optional connection overrides; omitted fields fall back to stored
-          values
+      - description: Optional changes to the stored settings, used only for this test.
+          A field that is not sent keeps its stored value. Fields other than name
+          and interval need write access to the source
         in: body
         name: body
         schema:
@@ -18092,7 +18094,8 @@ paths:
         "400":
           description: Invalid request payload
         "403":
-          description: Access denied
+          description: Access denied, or the request changes settings and the user
+            has no write access to the source
         "404":
           description: Source not found
         "500":

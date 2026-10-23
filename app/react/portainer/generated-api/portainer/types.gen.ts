@@ -16652,7 +16652,7 @@ export type GitOpsSourcesUpdateAccessResponse =
 
 export type GitOpsSourcesTestByIdData = {
   /**
-   * Optional connection overrides; omitted fields fall back to stored values
+   * Optional changes to the stored settings, used only for this test. A field that is not sent keeps its stored value. Fields other than name and interval need write access to the source
    */
   body?: SourcesGitSourceUpdatePayload;
   path: {
@@ -16671,7 +16671,7 @@ export type GitOpsSourcesTestByIdErrors = {
    */
   400: unknown;
   /**
-   * Access denied
+   * Access denied, or the request changes settings and the user has no write access to the source
    */
   403: unknown;
   /**

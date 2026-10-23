@@ -4403,6 +4403,7 @@ export const gitOpsSourcesUpdateAccess = <ThrowOnError extends boolean = true>(
  * Test the connection of a stored source
  *
  * Tests connectivity for a GitOps source, applying optional overrides to the stored configuration.
+ * The test ignores the name and interval fields. To send any other field, the user must be the owner of the source or an administrator. Other users can only test the stored settings.
  * **Access policy**: authenticated
  */
 export const gitOpsSourcesTestById = <ThrowOnError extends boolean = true>(

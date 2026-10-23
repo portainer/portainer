@@ -36,14 +36,16 @@ func enforceUserPermissions(ctx UserContext, source *portainer.Source, action ac
 		return nil
 	}
 
-	if action == actionWrite && userCanWriteSource(source, ctx) {
+	if action == actionWrite && UserCanWriteSource(source, ctx) {
 		return nil
 	}
 
 	return ErrNotEnoughPermission
 }
 
-func userCanWriteSource(source *portainer.Source, context UserContext) bool {
+// UserCanWriteSource returns true when the user can change the source. The user must be
+// an administrator or the owner of the source
+func UserCanWriteSource(source *portainer.Source, context UserContext) bool {
 	if source == nil || context == nil {
 		return false
 	}

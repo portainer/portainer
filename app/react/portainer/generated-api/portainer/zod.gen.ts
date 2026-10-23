@@ -5508,7 +5508,7 @@ export const zGitOpsSourcesUpdateAccessPath = z.object({
 export const zGitOpsSourcesUpdateAccessResponse = zPortainerSource;
 
 /**
- * Optional connection overrides; omitted fields fall back to stored values
+ * Optional changes to the stored settings, used only for this test. A field that is not sent keeps its stored value. Fields other than name and interval need write access to the source
  */
 export const zGitOpsSourcesTestByIdBody = zSourcesGitSourceUpdatePayload;
 
