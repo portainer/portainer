@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
 	nethttp "net/http"
 	"os"
 	"path"
@@ -684,6 +685,13 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 }
 
 func main() {
+	// Intercept healthcheck flag before initializing the application
+	for _, arg := range os.Args {
+		if arg == "--healthcheck" {
+			runHealthcheck()
+			return
+		}
+	}
 	logs.ConfigureLogger()
 	logs.SetLoggingMode("PRETTY")
 
@@ -746,4 +754,31 @@ func recoverStaleDeployingStacks(tx dataservices.DataStoreTx) error {
 	}
 
 	return nil
+}
+
+func runHealthcheck() {
+	// Skip TLS verification because of default self-signed certs
+	client := &nethttp.Client{
+		Timeout: 3 * time.Second,
+		Transport: &nethttp.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	endpoints := []string{
+		"https://127.0.0.1:9443/api/system/status",
+		"http://127.0.0.1:9000/api/system/status",
+	}
+
+	for _, endpoint := range endpoints {
+		resp, err := client.Get(endpoint)
+		if err == nil {
+			defer resp.Body.Close()
+			if resp.StatusCode == nethttp.StatusOK {
+				os.Exit(0) // Healthy
+			}
+		}
+	}
+
+	os.Exit(1) // Unhealthy
 }
