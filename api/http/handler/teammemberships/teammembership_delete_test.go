@@ -183,3 +183,46 @@ func TestDeleteTeamMembership_removesUserSABindings(t *testing.T) {
 		assert.True(t, saInCRB, "SA must remain in CRB when user still has direct endpoint access")
 	})
 }
+
+func TestDeleteTeamMembership_leaderCannotRemoveOwnMembership(t *testing.T) {
+	t.Parallel()
+
+	const teamID = portainer.TeamID(1)
+
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	leader := &portainer.User{Username: "leader", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(leader))
+	member := &portainer.User{Username: "member", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(member))
+
+	leaderMembership := &portainer.TeamMembership{UserID: leader.ID, TeamID: teamID, Role: portainer.TeamLeader}
+	require.NoError(t, store.TeamMembershipService.Create(leaderMembership))
+	memberMembership := &portainer.TeamMembership{UserID: member.ID, TeamID: teamID, Role: portainer.TeamMember}
+	require.NoError(t, store.TeamMembershipService.Create(memberMembership))
+
+	h := NewHandler(testhelpers.NewTestRequestBouncer())
+	h.DataStore = store
+
+	leaderContext := &security.RestrictedRequestContext{
+		IsTeamLeader:    true,
+		UserID:          leader.ID,
+		UserMemberships: []portainer.TeamMembership{*leaderMembership},
+	}
+
+	deleteAsLeader := func(membershipID portainer.TeamMembershipID) int {
+		rr := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/team_memberships/%d", membershipID), nil)
+		r = r.WithContext(security.StoreTokenData(r, &portainer.TokenData{ID: leader.ID, Role: portainer.StandardUserRole}))
+		r = r.WithContext(security.StoreRestrictedRequestContext(r, leaderContext))
+		h.ServeHTTP(rr, r)
+
+		return rr.Code
+	}
+
+	require.Equal(t, http.StatusForbidden, deleteAsLeader(leaderMembership.ID))
+	_, err := store.TeamMembership().Read(leaderMembership.ID)
+	require.NoError(t, err, "the leader's own membership must survive")
+
+	require.Equal(t, http.StatusNoContent, deleteAsLeader(memberMembership.ID))
+}
