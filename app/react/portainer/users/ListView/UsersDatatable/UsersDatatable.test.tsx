@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { HttpResponse, http } from 'msw';
 
@@ -6,10 +7,11 @@ import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { UserViewModel } from '@/portainer/models/user';
-import { Role } from '@/portainer/users/types';
+import { Role, User } from '@/portainer/users/types';
 import { server } from '@/setup-tests/server';
 import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { AuthenticationMethod } from '@/react/portainer/settings/types';
+import { notifySuccess } from '@/portainer/services/notifications';
 
 import { TeamRole } from '../../teams/types';
 
@@ -21,6 +23,16 @@ vi.mock('@@/Link', () => ({
   ),
 }));
 
+vi.mock('@@/modals/confirm', () => ({
+  confirmDelete: vi.fn(() => Promise.resolve(true)),
+}));
+
+vi.mock('@/portainer/services/notifications', () => ({
+  notifyError: vi.fn(),
+  notifySuccess: vi.fn(),
+}));
+
+const admin = { Id: 1, Username: 'admin', Role: Role.Admin };
 const leader = { Id: 5, Username: 'leader', Role: Role.Standard };
 const member = { Id: 6, Username: 'member', Role: Role.Standard };
 const loner = { Id: 7, Username: 'loner', Role: Role.Standard };
@@ -40,6 +52,13 @@ const memberMembership = {
 
 beforeEach(() => {
   server.use(
+    http.get('/api/users', () => HttpResponse.json([admin, leader, member])),
+    http.get('/api/users/:id/memberships', () =>
+      HttpResponse.json([leaderMembership])
+    ),
+    http.get('/api/team_memberships', () =>
+      HttpResponse.json([leaderMembership, memberMembership])
+    ),
     http.get('/api/settings/public', () =>
       HttpResponse.json({ AuthenticationMethod: AuthenticationMethod.LDAP })
     ),
@@ -47,6 +66,43 @@ beforeEach(() => {
       HttpResponse.json({ message: 'Access denied' }, { status: 403 })
     )
   );
+});
+
+it('offers an administrator the remove action and row selection', async () => {
+  renderTable(new UserViewModel(admin));
+
+  expect(await screen.findByText('member')).toBeVisible();
+  expect(screen.getByTestId('remove-users-button')).toBeVisible();
+  expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0);
+});
+
+it('removes the selected users once an administrator confirms', async () => {
+  const removedUserIds: Array<string> = [];
+  server.use(
+    http.delete<{ id: string }>('/api/users/:id', ({ params }) => {
+      removedUserIds.push(params.id);
+      return new HttpResponse(null, { status: 204 });
+    })
+  );
+  const user = userEvent.setup();
+  renderTable(new UserViewModel(admin));
+
+  await screen.findByText('member');
+  await user.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  await user.click(screen.getByTestId('remove-users-button'));
+
+  await waitFor(() =>
+    expect(notifySuccess).toHaveBeenCalledWith('Users successfully removed', '')
+  );
+  expect(removedUserIds.sort()).toEqual([`${leader.Id}`, `${member.Id}`]);
+});
+
+it('offers a team leader neither, since only administrators can delete users', async () => {
+  renderTable(new UserViewModel(leader));
+
+  expect(await screen.findByText('member')).toBeVisible();
+  expect(screen.queryByTestId('remove-users-button')).not.toBeInTheDocument();
+  expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
 });
 
 it('lists the users a team leader can see, without the admin-only settings', async () => {
@@ -90,10 +146,7 @@ it('does not ask for every membership when the user leads no team', async () => 
   restoreConsole();
 });
 
-function renderTable(
-  user: UserViewModel,
-  onQueryError?: (error: unknown) => void
-) {
+function renderTable(user: User, onQueryError?: (error: unknown) => void) {
   const Wrapped = withTestQueryProvider(
     withUserProvider(
       withTestRouter(() => <UsersDatatable />),

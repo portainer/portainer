@@ -89,25 +89,28 @@ export function UsersDatatable() {
       title="Users"
       titleIcon={UserIcon}
       settingsManager={tableState}
+      disableSelect={!isPureAdmin}
       isRowSelectable={(row) => row.original.Id !== 1}
-      renderTableActions={(selectedUsers) => (
-        <DeleteButton
-          disabled={selectedUsers.length === 0}
-          confirmMessage="Do you want to remove the selected users? They will not be able to login into Portainer anymore."
-          onConfirmed={() =>
-            removeMutation.mutate(
-              selectedUsers.map((i) => i.Id),
-              {
-                onSuccess: () => {
-                  notifySuccess('Users successfully removed', '');
-                },
-              }
-            )
-          }
-          data-cy="remove-users-button"
-          isLoading={removeMutation.isLoading}
-        />
-      )}
+      renderTableActions={(selectedUsers) =>
+        isPureAdmin && (
+          <DeleteButton
+            disabled={selectedUsers.length === 0}
+            confirmMessage="Do you want to remove the selected users? They will not be able to login into Portainer anymore."
+            onConfirmed={() =>
+              removeMutation.mutate(
+                selectedUsers.map((i) => i.Id),
+                {
+                  onSuccess: () => {
+                    notifySuccess('Users successfully removed', '');
+                  },
+                }
+              )
+            }
+            data-cy="remove-users-button"
+            isLoading={removeMutation.isLoading}
+          />
+        )
+      }
       data-cy="users-datatable"
     />
   );
