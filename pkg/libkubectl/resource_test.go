@@ -4,7 +4,64 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestSplitManifestDocuments(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name              string
+		manifest          string
+		expectedDocuments []string
+	}{
+		{
+			name:              "empty manifest",
+			manifest:          "",
+			expectedDocuments: []string{},
+		},
+		{
+			name:              "single document",
+			manifest:          "kind: ConfigMap\n",
+			expectedDocuments: []string{"kind: ConfigMap"},
+		},
+		{
+			name:              "documents separated by a plain separator",
+			manifest:          "kind: ConfigMap\n---\nkind: Deployment\n",
+			expectedDocuments: []string{"kind: ConfigMap", "kind: Deployment"},
+		},
+		{
+			name:              "separator carrying trailing whitespace",
+			manifest:          "kind: ConfigMap\n--- \nkind: Deployment\n",
+			expectedDocuments: []string{"kind: ConfigMap", "kind: Deployment"},
+		},
+		{
+			name:              "windows line endings",
+			manifest:          "kind: ConfigMap\r\n---\r\nkind: Deployment\r\n",
+			expectedDocuments: []string{"kind: ConfigMap", "kind: Deployment"},
+		},
+		{
+			name:              "blank documents are dropped",
+			manifest:          "kind: ConfigMap\n---\n\n---\nkind: Deployment\n---\n\n",
+			expectedDocuments: []string{"kind: ConfigMap", "kind: Deployment"},
+		},
+		{
+			name:              "a separator inside a block scalar is content",
+			manifest:          "kind: ConfigMap\ndata:\n  script: |\n    ---\n    still the same document\n",
+			expectedDocuments: []string{"kind: ConfigMap\ndata:\n  script: |\n    ---\n    still the same document"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			documents, err := splitManifestDocuments(tt.manifest)
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.expectedDocuments, documents)
+		})
+	}
+}
 
 func TestResourcesToArgsHelper(t *testing.T) {
 	t.Parallel()

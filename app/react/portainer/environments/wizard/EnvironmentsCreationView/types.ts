@@ -10,7 +10,8 @@ export interface AnalyticsState {
   kubernetesAgent: number;
   kubernetesEdgeAgentStandard: number;
   kubernetesEdgeAgentAsync: number;
-  kaasAgent: number;
+  kubesoloEdgeAgentStandard: number;
+  kubesoloEdgeAgentAsync: number;
   aciApi: number;
   localEndpoint: number; // docker socket
 }

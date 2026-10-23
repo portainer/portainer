@@ -15,7 +15,7 @@ import { CreateFromManifestButton } from '@/react/kubernetes/components/CreateFr
 
 import { confirmDelete } from '@@/modals/confirm';
 import { TableSettingsMenu } from '@@/datatables';
-import { ExpandableDatatable } from '@@/datatables/ExpandableDatatable';
+import { CardExpandableList } from '@@/datatables/CardExpandableList';
 import { LoadingButton } from '@@/buttons';
 import {
   type FilteredColumnsTableSettings,
@@ -52,7 +52,7 @@ export function CronJobsDatatable() {
   );
 
   const cronJobsQuery = useCronJobs(environmentId, {
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
   });
   const cronJobsRowData = cronJobsQuery.data;
 
@@ -72,7 +72,7 @@ export function CronJobsDatatable() {
   );
 
   return (
-    <ExpandableDatatable
+    <CardExpandableList
       dataset={filteredCronJobs || []}
       columns={columns}
       settingsManager={tableState}
@@ -105,13 +105,7 @@ export function CronJobsDatatable() {
 }
 
 function SubRow({ item }: CronJobsExecutionsProps) {
-  return (
-    <tr>
-      <td colSpan={8}>
-        <CronJobsExecutionsInnerDatatable item={item} />
-      </td>
-    </tr>
-  );
+  return <CronJobsExecutionsInnerDatatable item={item} />;
 }
 
 interface SelectedCronJob {

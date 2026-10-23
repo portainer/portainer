@@ -23,6 +23,7 @@ interface Props {
   'aria-labelledby'?: string;
   size?: 'md' | 'lg' | 'xl';
   className?: string;
+  dialogClassName?: string;
 }
 
 export function Modal({
@@ -32,6 +33,7 @@ export function Modal({
   'aria-labelledby': ariaLabelledBy,
   size = 'md',
   className,
+  dialogClassName,
 }: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
@@ -53,7 +55,8 @@ export function Modal({
               'w-[450px]': size === 'md',
               'w-[700px]': size === 'lg',
               'w-[1000px]': size === 'xl',
-            }
+            },
+            dialogClassName
           )}
         >
           <div

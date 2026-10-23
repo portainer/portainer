@@ -3,7 +3,10 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { useCustomTemplateFile } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplateFile';
 import { useCustomTemplate } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplate';
-import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
+import {
+  CustomTemplate,
+  getTemplateSourceId,
+} from '@/react/portainer/templates/custom-templates/types';
 import { StackType } from '@/react/common/stacks/types';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 
@@ -79,7 +82,7 @@ function getValuesFromTemplate(
       template.Type === StackType.Kubernetes
         ? DeploymentType.Kubernetes
         : DeploymentType.Compose,
-    git: toGitFormModel(template.GitConfig),
+    git: toGitFormModel(getTemplateSourceId(template), template.GitConfig),
     ...(template.EdgeSettings
       ? {
           prePullImage: template.EdgeSettings.PrePullImage || false,

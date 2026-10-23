@@ -49,7 +49,7 @@ export function useApplicationEventsTableData() {
   const { data: events, ...eventsQuery } = useEvents(environmentId, {
     namespace,
     queryOptions: {
-      autoRefreshRate: appEventsTableState.autoRefreshRate * 1000,
+      autoRefreshRate: appEventsTableState.autoRefreshRateMS,
     },
   });
 

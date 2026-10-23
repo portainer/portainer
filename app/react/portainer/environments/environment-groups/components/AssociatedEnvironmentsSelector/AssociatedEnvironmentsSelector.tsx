@@ -17,10 +17,24 @@ interface Props {
   groupId: EnvironmentGroupId;
   /* For unassigned group, don't show the add/remove buttons and hide the checkbox */
   readOnly: boolean;
+  externalDrawerOpen?: boolean;
+  onExternalDrawerClose?: () => void;
 }
 
-export function AssociatedEnvironmentsSelector({ groupId, readOnly }: Props) {
+export function AssociatedEnvironmentsSelector({
+  groupId,
+  readOnly,
+  externalDrawerOpen,
+  onExternalDrawerClose,
+}: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isDrawerOpen = drawerOpen || (externalDrawerOpen ?? false);
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+    onExternalDrawerClose?.();
+  }
 
   const groupQuery = useGroup(groupId);
   const environmentsQuery = useEnvironmentList({
@@ -46,8 +60,8 @@ export function AssociatedEnvironmentsSelector({ groupId, readOnly }: Props) {
       />
 
       <AddEnvironmentsDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={isDrawerOpen}
+        onClose={closeDrawer}
         excludeGroupIds={[groupId]}
         onAdd={handleAdd}
         isLoading={updateMutation.isLoading}

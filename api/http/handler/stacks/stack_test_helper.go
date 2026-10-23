@@ -47,6 +47,7 @@ func mockCreateStackRequestWithSecurityContext(method, target string, body io.Re
 	ctx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
 		IsAdmin: true,
 		UserID:  portainer.UserID(1),
+		User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
 	})
 
 	return req.WithContext(ctx)

@@ -4,4 +4,4 @@ services:
     image: nginx:latest
   failing-service:
     image: busybox
-    command: ["false"]
+    command: ['false']

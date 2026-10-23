@@ -89,7 +89,7 @@ func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
 		trustedRoot = "."
 	}
 
-	p := filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...)) //nolint:forbidigo
+	p := filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
 
 	// avoid setting a volume name from the untrusted paths
 	vnp := filepath.VolumeName(p)

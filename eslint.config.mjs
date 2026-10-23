@@ -14,7 +14,7 @@ import globals from 'globals';
 import prettier from 'eslint-config-prettier';
 
 export default defineConfig([
-  globalIgnores(['**/node_modules/', '**/dist/', '**/test/', '.storybook/public/', 'coverage']),
+  globalIgnores(['**/node_modules/', '**/dist/', '**/test/', '.storybook/public/', 'coverage', 'app/react/portainer/generated-api/']),
 
   js.configs.recommended,
 
@@ -43,6 +43,8 @@ export default defineConfig([
       'no-empty': 'warn',
       'no-empty-function': 'warn',
       'no-useless-escape': 'off',
+      // TODO: this is off for Angular code, on for React
+      'no-useless-assignment': 'off',
       // Preserve ESLint 8 default: catch-block error variables are not checked
       'no-unused-vars': ['error', { caughtErrors: 'none' }],
     },
@@ -101,6 +103,7 @@ export default defineConfig([
       'no-plusplus': 'off',
       'no-underscore-dangle': 'off',
       'no-await-in-loop': 'off',
+      'no-useless-assignment': 'error',
       'consistent-return': 'off',
       'default-case': 'off', // covered by @typescript-eslint/switch-exhaustiveness-check
       'func-style': ['error', 'declaration'],
@@ -188,6 +191,7 @@ export default defineConfig([
         'error',
         {
           pathGroups: [
+            { pattern: '@api/**', group: 'internal', position: 'before' },
             { pattern: '@@/**', group: 'internal', position: 'after' },
             { pattern: '@/**', group: 'internal' },
           ],

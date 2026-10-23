@@ -65,6 +65,8 @@ interface CustomTemplateUpdatePayload {
    * Required
    */
   Type: StackType;
+  /** References an existing Source for git credentials/URL. When set, inline URL and auth are ignored. */
+  SourceId?: number;
   /** URL of a Git repository hosting the Stack file */
   RepositoryURL?: string;
   /** Reference name of a Git repository hosting the Stack file */
@@ -75,11 +77,6 @@ interface CustomTemplateUpdatePayload {
   RepositoryUsername?: string;
   /** Password used in basic authentication. Required when RepositoryAuthentication is true */
   RepositoryPassword?: string;
-  /**
-   * GitCredentialID used to identify the bound git credential.
-   * Required when RepositoryAuthentication is true and RepositoryUsername/RepositoryPassword are not provided
-   */
-  RepositoryGitCredentialID?: number;
   /** Path to the Stack file inside the Git repository */
   ComposeFilePathInRepository?: string;
   /** Content of stack file */

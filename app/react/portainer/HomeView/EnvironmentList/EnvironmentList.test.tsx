@@ -1,21 +1,14 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  createContext,
-  ReactNode,
-} from 'react';
+import { useState, useEffect } from 'react';
 import { http, HttpResponse } from 'msw';
 import type { HttpHandler } from 'msw';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {
-  Environment,
   EnvironmentStatus,
   EnvironmentType,
   PlatformType,
+  Environment,
 } from '@/react/portainer/environments/types';
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
@@ -26,7 +19,11 @@ import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { EnvironmentList } from './EnvironmentList';
 
-// vi.hoisted ensures these are initialised before the vi.mock factory runs.
+function getArrayParam(params: URLSearchParams, key: string): number[] {
+  return params.get(key)?.split(',').filter(Boolean).map(Number) ?? [];
+}
+
+// vi.hoisted ensures these are initialized before the vi.mock factory runs.
 // The store is reactive: stateService.go updates it and notifies React subscribers.
 const { mockUrlParamsStore, mockStateServiceGo } = vi.hoisted(() => {
   let snapshot: Record<string, unknown> = {};
@@ -84,12 +81,6 @@ vi.mock('@uirouter/react', async (importOriginal) => {
   };
 });
 
-type MenuCtxType = {
-  isOpen: boolean;
-  setOpen: (v: boolean) => void;
-  menuRef: React.RefObject<HTMLDivElement>;
-};
-
 beforeEach(() => {
   sessionStorage.clear();
   localStorage.clear();
@@ -97,102 +88,7 @@ beforeEach(() => {
   mockStateServiceGo.mockClear();
 });
 
-vi.mock('@reach/menu-button', () => {
-  const MenuCtx = createContext<MenuCtxType | null>(null);
-
-  function Menu({ children }: { children?: ReactNode }) {
-    const [isOpen, setOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      function handleDocDown(e: MouseEvent) {
-        const target = e.target as Node | null;
-        if (
-          isOpen &&
-          menuRef.current &&
-          target &&
-          !menuRef.current.contains(target)
-        ) {
-          setOpen(false);
-        }
-      }
-
-      document.addEventListener('mousedown', handleDocDown);
-      return () => document.removeEventListener('mousedown', handleDocDown);
-    }, [isOpen]);
-
-    return (
-      <MenuCtx.Provider value={{ isOpen, setOpen, menuRef }}>
-        <div ref={menuRef}>{children}</div>
-      </MenuCtx.Provider>
-    );
-  }
-
-  function MenuButton({
-    children,
-    onClick: externalOnClick,
-    ...props
-  }: {
-    children?: ReactNode;
-    onClick?: () => void;
-    [key: string]: unknown;
-  }) {
-    const ctx = useContext(MenuCtx);
-
-    function handleClick() {
-      externalOnClick?.();
-      ctx?.setOpen(!ctx.isOpen);
-    }
-
-    return (
-      <button type="button" onClick={handleClick} {...props}>
-        {children}
-      </button>
-    );
-  }
-
-  function MenuList({
-    children,
-    className,
-  }: {
-    children?: ReactNode;
-    className?: string;
-  }) {
-    const ctx = useContext(MenuCtx);
-    if (!ctx?.isOpen) return null;
-    return (
-      <div role="menu" className={className}>
-        {children}
-      </div>
-    );
-  }
-
-  function MenuItem({
-    children,
-    onSelect,
-    className,
-  }: {
-    children?: ReactNode;
-    onSelect?: () => void;
-    className?: string;
-  }) {
-    const ctx = useContext(MenuCtx);
-
-    function handleClick() {
-      onSelect?.();
-      ctx?.setOpen(false);
-    }
-
-    return (
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
-      <div role="menuitem" onClick={handleClick} className={className}>
-        {children}
-      </div>
-    );
-  }
-
-  return { Menu, MenuButton, MenuList, MenuItem };
-});
+vi.mock('@reach/menu-button');
 
 test('when no environments for query should show empty list message', async () => {
   const { findByText } = await renderComponent(false, []);
@@ -285,12 +181,11 @@ test('Platform filter groups Docker, AgentOnDocker, and EdgeAgentOnDocker togeth
       })
     ),
     http.get('/api/endpoints', ({ request }) => {
-      const platformTypes = new URL(request.url).searchParams
-        .getAll('platformTypes[]')
-        .map(Number);
-      const envTypesByPlatform: Partial<
-        Record<PlatformType, EnvironmentType[]>
-      > = {
+      const platformTypes = getArrayParam(
+        new URL(request.url).searchParams,
+        'platformTypes'
+      );
+      const envTypesByPlatform: Partial<Record<PlatformType, number[]>> = {
         [PlatformType.Docker]: [
           EnvironmentType.Docker,
           EnvironmentType.AgentOnDocker,
@@ -363,9 +258,10 @@ test('Health filter shows only environments matching the selected status', async
       })
     ),
     http.get('/api/endpoints', ({ request }) => {
-      const statuses = new URL(request.url).searchParams
-        .getAll('status[]')
-        .map(Number);
+      const statuses = getArrayParam(
+        new URL(request.url).searchParams,
+        'status'
+      );
       const filtered = statuses.length
         ? allEnvironments.filter((e) => statuses.includes(e.Status))
         : allEnvironments;
@@ -421,8 +317,8 @@ test('Heartbeat filter shows only edge envs with an active heartbeat', async () 
     ),
     http.get('/api/endpoints', ({ request }) => {
       const params = new URL(request.url).searchParams;
-      const types = params.getAll('types[]').map(Number);
-      const statuses = params.getAll('status[]').map(Number);
+      const types = getArrayParam(params, 'types');
+      const statuses = getArrayParam(params, 'status');
 
       let filtered = allEnvironments;
       if (types.length > 0) {
@@ -496,7 +392,7 @@ test('URL param groupBy=health&groupFilter=up activates Up status filter in API 
 
   await waitFor(() => {
     // EnvironmentStatus.Up = 1
-    expect(capturedParams?.getAll('status[]')).toContain('1');
+    expect(capturedParams?.get('status')).toBe('1');
   });
 });
 
@@ -520,7 +416,7 @@ test('URL param groupBy=platform&groupFilter=docker activates Docker platform fi
 
   await waitFor(() => {
     // PlatformType.Docker = 0
-    expect(capturedParams?.getAll('platformTypes[]')).toContain('0');
+    expect(capturedParams?.get('platformTypes')).toBe('0');
   });
 });
 
@@ -547,7 +443,7 @@ test('URL param groupFilter without groupBy is ignored (default Id sort used)', 
   await waitFor(() => {
     expect(capturedParams).not.toBeNull();
   });
-  expect(capturedParams!.getAll('status[]')).toHaveLength(0);
+  expect(capturedParams!.get('status')).toBeNull();
   expect(capturedParams!.get('sort')).toBe('Id');
 });
 
@@ -581,7 +477,7 @@ test('selecting a sort/filter updates URL via stateService.go', async () => {
     expect(mockStateServiceGo).toHaveBeenCalledWith(
       '.',
       expect.objectContaining({ groupBy: 'Health', groupFilter: 'Up' }),
-      { reload: false }
+      { reload: false, location: 'replace' }
     );
   });
 });

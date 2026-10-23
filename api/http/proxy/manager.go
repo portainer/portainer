@@ -2,8 +2,9 @@ package proxy
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
+	"strconv"
+	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -11,8 +12,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
-
-	cmap "github.com/orcaman/concurrent-map"
 )
 
 var ErrProxyFactoryNotInitialized = errors.New("proxy factory not initialized")
@@ -20,14 +19,13 @@ var ErrProxyFactoryNotInitialized = errors.New("proxy factory not initialized")
 // Manager represents a service used to manage proxies to environments (endpoints) and extensions.
 type Manager struct {
 	proxyFactory     *factory.ProxyFactory
-	endpointProxies  cmap.ConcurrentMap
+	endpointProxies  sync.Map
 	k8sClientFactory *cli.ClientFactory
 }
 
 // NewManager initializes a new proxy Service
 func NewManager(kubernetesClientFactory *cli.ClientFactory) *Manager {
 	return &Manager{
-		endpointProxies:  cmap.New(),
 		k8sClientFactory: kubernetesClientFactory,
 	}
 }
@@ -48,7 +46,7 @@ func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpo
 		return nil, err
 	}
 
-	manager.endpointProxies.Set(fmt.Sprint(endpoint.ID), proxy)
+	manager.endpointProxies.Store(strconv.Itoa(int(endpoint.ID)), proxy)
 
 	return proxy, nil
 }
@@ -65,7 +63,7 @@ func (manager *Manager) CreateAgentProxyServer(endpoint *portainer.Endpoint) (*f
 
 // GetEndpointProxy returns the proxy associated to a key
 func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Handler {
-	proxy, ok := manager.endpointProxies.Get(fmt.Sprint(endpoint.ID))
+	proxy, ok := manager.endpointProxies.Load(strconv.Itoa(int(endpoint.ID)))
 	if !ok {
 		return nil
 	}
@@ -77,7 +75,7 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 // and cleans the k8s environment(endpoint) client cache. DeleteEndpointProxy
 // is currently only called for edge connection clean up and when endpoint is updated
 func (manager *Manager) DeleteEndpointProxy(endpointID portainer.EndpointID) {
-	manager.endpointProxies.Remove(fmt.Sprint(endpointID))
+	manager.endpointProxies.Delete(strconv.Itoa(int(endpointID)))
 
 	if manager.k8sClientFactory != nil {
 		manager.k8sClientFactory.RemoveKubeClient(endpointID)

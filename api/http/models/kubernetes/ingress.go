@@ -18,6 +18,14 @@ type (
 
 	K8sIngressControllers []K8sIngressController
 
+	// K8sIngressClass is the read model for a cluster ingress class.
+	K8sIngressClass struct {
+		Name        string            `json:"Name"`
+		Controller  string            `json:"Controller"`
+		IsDefault   bool              `json:"IsDefault"`
+		Annotations map[string]string `json:"Annotations,omitempty"`
+	}
+
 	K8sIngressInfo struct {
 		Name         string            `json:"Name"`
 		UID          string            `json:"UID"`
@@ -42,6 +50,7 @@ type (
 		Host        string `json:"Host"`
 		ServiceName string `json:"ServiceName"`
 		Port        int    `json:"Port"`
+		PortName    string `json:"PortName,omitempty"`
 		Path        string `json:"Path"`
 		PathType    string `json:"PathType"`
 		HasService  bool   `json:"HasService"`

@@ -5,6 +5,7 @@ import {
   SortOption,
 } from '@@/SortableList/SortableList';
 import { StatusSummaryBar } from '@@/StatusSummaryBar/StatusSummaryBar';
+import { AddButton } from '@@/buttons';
 
 import { useSources } from '../queries/useSources';
 import { useSourcesSummary } from '../queries/useSourcesSummary';
@@ -72,7 +73,11 @@ export function ListView() {
 
   return (
     <>
-      <PageHeader title="GitOps Sources" breadcrumbs="GitOps Sources" reload />
+      <PageHeader title="GitOps Sources" breadcrumbs="GitOps Sources" reload>
+        <div className="ml-auto">
+          <AddButton data-cy="add-source-button">Add new</AddButton>
+        </div>
+      </PageHeader>
       <div className="mx-4 mb-4 space-y-4">
         <StatusSummaryBar
           total={summaryTotal}

@@ -1,15 +1,10 @@
-import { FormikErrors } from 'formik';
-
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { type AutoUpdateModel } from '@/react/portainer/gitops/types';
 
-import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
-import { FormControl } from '@@/form-components/FormControl';
 import { SwitchField } from '@@/form-components/SwitchField';
 import { TextTip } from '@@/Tip/TextTip';
 
 import { ForceDeploymentSwitch } from './ForceDeploymentSwitch';
-import { IntervalField } from './IntervalField';
 import { WebhookSettings } from './WebhookSettings';
 
 export function AutoUpdateSettings({
@@ -17,7 +12,6 @@ export function AutoUpdateSettings({
   onChange,
   environmentType,
   showForcePullImage,
-  errors,
   baseWebhookUrl,
   webhookId,
   webhookDocs,
@@ -26,46 +20,23 @@ export function AutoUpdateSettings({
   onChange: (value: Partial<AutoUpdateModel>) => void;
   environmentType?: 'DOCKER' | 'KUBERNETES';
   showForcePullImage: boolean;
-  errors?: FormikErrors<AutoUpdateModel>;
   baseWebhookUrl: string;
   webhookId: string;
   webhookDocs?: string;
 }) {
   return (
     <>
+      <WebhookSettings
+        baseUrl={baseWebhookUrl}
+        value={webhookId}
+        docsLink={webhookDocs}
+      />
+
       <TextTip color="orange" className="mb-2">
         Any changes to this stack or application that have been made locally via
         Portainer or directly in the cluster will be overwritten by the git
         repository content, which may cause service interruption.
       </TextTip>
-
-      <FormControl label="Mechanism">
-        <ButtonSelector
-          size="small"
-          options={[
-            { value: 'Interval', label: 'Polling' },
-            { value: 'Webhook', label: 'Webhook' },
-          ]}
-          value={value.RepositoryMechanism || 'Interval'}
-          onChange={(value) => onChange({ RepositoryMechanism: value })}
-        />
-      </FormControl>
-
-      {value.RepositoryMechanism === 'Webhook' && (
-        <WebhookSettings
-          baseUrl={baseWebhookUrl}
-          value={webhookId}
-          docsLink={webhookDocs}
-        />
-      )}
-
-      {value.RepositoryMechanism === 'Interval' && (
-        <IntervalField
-          value={value.RepositoryFetchInterval || ''}
-          onChange={(value) => onChange({ RepositoryFetchInterval: value })}
-          errors={errors?.RepositoryFetchInterval}
-        />
-      )}
 
       {showForcePullImage && (
         <div className="form-group">

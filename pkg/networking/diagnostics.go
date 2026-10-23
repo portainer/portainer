@@ -10,6 +10,7 @@ import (
 
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/encoding/json"
@@ -73,10 +74,8 @@ func ProbeTelnetConnection(url string) string {
 // ignores errors for the http request since we want to know if the host is reachable
 func DetectProxy(url string) string {
 	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: crypto.CreateTLSConfiguration(true),
-		},
-		Timeout: 10 * time.Second,
+		Transport: ssrf.NewTransport(crypto.CreateTLSConfiguration(true)),
+		Timeout:   10 * time.Second,
 	}
 
 	result := map[string]string{

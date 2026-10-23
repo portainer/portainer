@@ -36,6 +36,7 @@ export function SortableListPagerInfo({
         className={clsx(
           'rounded border border-solid border-gray-4 bg-transparent px-2 py-1',
           'text-xs text-gray-7 th-highcontrast:text-gray-4 th-dark:border-gray-7 th-dark:text-gray-4',
+          'th-highcontrast:bg-black th-dark:bg-gray-iron-10',
           'cursor-pointer focus:outline-none'
         )}
         value={pageSize}
@@ -45,7 +46,11 @@ export function SortableListPagerInfo({
         }}
       >
         {PAGE_SIZE_OPTIONS.map((size) => (
-          <option key={size} value={size}>
+          <option
+            key={size}
+            value={size}
+            className="th-highcontrast:bg-black th-dark:bg-gray-iron-10"
+          >
             {size}
           </option>
         ))}

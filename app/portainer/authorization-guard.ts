@@ -1,5 +1,7 @@
 import { Transition, TransitionService } from '@uirouter/angularjs';
 
+import { storeReturnUrl } from '@/react/portainer/helpers/returnUrl';
+
 import { IAuthenticationService } from './services/types';
 
 export enum AccessHeaders {
@@ -40,6 +42,9 @@ export async function checkAuthorizations(transition: Transition) {
       'User is not authenticated, redirecting to login, access:',
       access
     );
+    const currentUrl =
+      window.location.pathname + window.location.search + window.location.hash;
+    storeReturnUrl(currentUrl);
     return $state.target('portainer.logout');
   }
 

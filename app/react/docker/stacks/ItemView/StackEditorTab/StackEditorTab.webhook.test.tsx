@@ -10,7 +10,11 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
-import { createMockStack, createMockUsers } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockStack,
+  createMockUsers,
+} from '@/react-tools/test-mocks';
 import { Role } from '@/portainer/users/types';
 import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
@@ -39,14 +43,13 @@ describe('StackEditorTab - Webhook ID Handling', () => {
 
     server.use(
       http.get('/api/endpoints/1', () =>
-        HttpResponse.json({
-          Id: 1,
-          Type: EnvironmentType.Docker,
-          ComposeSyntaxMaxVersion: '3',
-          ChangeWindow: {
-            Enabled: false,
-          },
-        })
+        HttpResponse.json(
+          createMockEnvironment({
+            Id: 1,
+            Type: EnvironmentType.Docker,
+            ComposeSyntaxMaxVersion: '3',
+          })
+        )
       )
     );
   });

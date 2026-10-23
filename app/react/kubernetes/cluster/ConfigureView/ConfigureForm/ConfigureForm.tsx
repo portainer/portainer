@@ -48,7 +48,8 @@ export function ConfigureForm() {
     ingressClasses
   );
 
-  if (!initialValues || !environment) {
+  // Wait for ingress classes before rendering; enableReinitialize would otherwise re-seed the form once the late query lands and discard in-flight edits (QE-4214)
+  if (!initialValues || !environment || ingressClassesQuery.isLoading) {
     return null;
   }
 

@@ -5,20 +5,22 @@ import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { queryKeys } from './query-keys';
-import { useIsSwarm } from './useInfo';
+import { useIsSwarmManager } from './useInfo';
 import { buildDockerProxyUrl } from './buildDockerProxyUrl';
 
 export function useSwarm<T = Swarm>(
   environmentId: EnvironmentId,
   { select }: { select?(value: Swarm): T } = {}
 ) {
-  const isSwarm = useIsSwarm(environmentId);
+  // Swarm info is only available from a manager node; querying it on a worker
+  // returns 503, so gate the query on manager rather than swarm membership.
+  const isSwarmManager = useIsSwarmManager(environmentId);
 
   return useQuery({
     queryKey: [...queryKeys.base(environmentId), 'swarm'] as const,
     queryFn: () => getSwarm(environmentId),
     select,
-    enabled: isSwarm,
+    enabled: isSwarmManager,
   });
 }
 

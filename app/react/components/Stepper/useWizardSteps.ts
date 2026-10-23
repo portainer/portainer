@@ -5,13 +5,13 @@ export interface StepConfig {
   label: string;
 }
 
-interface UseWizardStepsOptions {
-  steps: Array<StepConfig>;
+interface UseWizardStepsOptions<T extends StepConfig = StepConfig> {
+  steps: Array<T>;
   initialStepId?: string;
 }
 
-interface WizardStepState {
-  currentStep: StepConfig;
+export interface WizardStepState<T extends StepConfig = StepConfig> {
+  currentStep: T;
   currentStepIndex: number;
   isFirstStep: boolean;
   isLastStep: boolean;
@@ -23,10 +23,10 @@ interface WizardStepState {
   goToStepByIndex: (index: number) => void;
 }
 
-export function useWizardSteps({
+export function useWizardSteps<T extends StepConfig = StepConfig>({
   steps,
   initialStepId,
-}: UseWizardStepsOptions): WizardStepState {
+}: UseWizardStepsOptions<T>): WizardStepState<T> {
   const initialIndex = useMemo(() => {
     if (!initialStepId) return 0;
     const index = steps.findIndex((s) => s.id === initialStepId);

@@ -2,6 +2,8 @@ import angular from 'angular';
 import uuidv4 from 'uuid/v4';
 import { getEnvironments } from '@/react/portainer/environments/environment.service';
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
+import { isValidReturnUrl } from '@/portainer/helpers/url-utils';
+import { storeReturnUrl, getReturnUrl, cleanReturnUrl } from '@/react/portainer/helpers/returnUrl';
 
 class AuthenticationController {
   /* @ngInject */
@@ -123,9 +125,16 @@ class AuthenticationController {
 
       if (endpoints.value.length === 0 && isAdmin) {
         return this.$state.go('portainer.wizard');
-      } else {
-        return this.$state.go('portainer.home');
       }
+
+      const returnUrl = getReturnUrl();
+      cleanReturnUrl();
+      if (returnUrl && isValidReturnUrl(returnUrl)) {
+        this.$window.location.href = returnUrl;
+        return;
+      }
+
+      return this.$state.go('portainer.home');
     } catch (err) {
       this.error(err, 'Unable to retrieve environments');
     }
@@ -219,6 +228,11 @@ class AuthenticationController {
       this.state.showStandardLogin = !this.state.showOAuthLogin;
       this.state.OAuthLoginURI = settings.OAuthLoginURI;
       this.state.OAuthProvider = this.determineOauthProvider(settings.OAuthLoginURI);
+
+      const returnUrl = new URLSearchParams(this.$window.location.search).get('returnUrl');
+      if (returnUrl && isValidReturnUrl(returnUrl)) {
+        storeReturnUrl(returnUrl);
+      }
 
       const code = this.URLHelper.getParameter('code');
       const state = this.URLHelper.getParameter('state');

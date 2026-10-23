@@ -4,6 +4,7 @@ dist
 portainer-checksum.txt
 api/cmd/portainer/portainer*
 storybook-static
+debug-storybook.log
 .tmp
 **/.vscode/settings.json
 **/.vscode/tasks.json
@@ -13,7 +14,6 @@ storybook-static
 .eslintcache
 __debug_bin*
 
-api/docs
 .idea
 .env
 go.work.sum

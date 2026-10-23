@@ -6,6 +6,7 @@ TAG=local
 SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.6
 GOTESTSUM_VERSION?=v1.13.0
 GOTESTSUM=go run gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
+GOLANGCI_LINT_VERSION := $(shell cat $(shell git rev-parse --show-toplevel)/.golangci-version)
 
 # Don't change anything below this line unless you know what you're doing
 .DEFAULT_GOAL := help
@@ -36,8 +37,8 @@ build-storybook: ## Build and serve the storybook files
 .PHONY: deps server-deps client-deps tidy
 deps: server-deps client-deps ## Download all client and server build dependancies
 
+## This is empty because the pipeline requires it but ce has no server deps
 server-deps: init-dist ## Download dependant server binaries
-	@./build/download_binaries.sh $(PLATFORM) $(ARCH)
 
 client-deps: ## Install client dependencies
 	pnpm install
@@ -90,14 +91,26 @@ format-server: ## Format server code
 	go fmt ./...
 
 ##@ Lint
-.PHONY: lint lint-client lint-server
+.PHONY: lint lint-client lint-server check-lint-version
 lint: lint-client lint-server ## Lint all code
 
 lint-client: ## Lint client code
 	pnpm run lint
 
-lint-server: tidy ## Lint server code
-	golangci-lint run --timeout=10m -c .golangci.yaml
+check-lint-version:
+	@installed=v$$(golangci-lint --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1); \
+	if [ "$$installed" = "v" ]; then \
+		echo "ERROR: golangci-lint not found, need $(GOLANGCI_LINT_VERSION)"; \
+		echo "Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)"; \
+		exit 1; \
+	elif [ "$$installed" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		echo "ERROR: golangci-lint $$installed installed, need $(GOLANGCI_LINT_VERSION)"; \
+		echo "Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)"; \
+		exit 1; \
+	fi
+
+lint-server: tidy check-lint-version ## Lint server code
+	golangci-lint run --timeout=10m --new-from-rev=HEAD~ -c .golangci.yaml
 	golangci-lint run --timeout=10m --new-from-rev=HEAD~ -c .golangci-forward.yaml
 
 ##@ Extension
@@ -106,21 +119,36 @@ dev-extension: build-server build-client ## Run the extension in development mod
 	make local -f build/docker-extension/Makefile
 
 ##@ Docs
-.PHONY: docs-build docs-validate docs-clean docs-validate-clean
-docs-build: init-dist ## Build docs
+.PHONY: docs-build docs-validate docs-sync-check docs-clean docs-validate-clean
+docs-build: ## Build docs
 	go mod download
-	cd api && $(SWAG) init -o "../dist/docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./
+	mkdir -p api/docs
+	cd api && $(SWAG) init -o "./docs" -ot "yaml" -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 -p pascalcase --markdownFiles ./ --overridesFile .swaggo
 
 docs-validate: docs-build ## Validate docs
-	pnpm swagger2openapi --warnOnly dist/docs/swagger.yaml -o dist/docs/openapi.yaml
-	pnpm swagger-cli validate dist/docs/openapi.yaml
+	pnpm swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
+	pnpm swagger-cli validate api/docs/openapi.yaml
+
+docs-sync-check: docs-build ## Check if committed API spec is in sync with Go annotations; fail if not
+	@if ! git diff --exit-code api/docs/swagger.yaml > /dev/null 2>&1; then \
+		echo ""; \
+		echo "ERROR: API spec is out of sync with Go annotations."; \
+		echo "Run 'make generate-api' in package/server-ce and commit the result."; \
+		echo ""; \
+		git diff --stat api/docs/swagger.yaml; \
+		exit 1; \
+	fi
 
 .PHONY: docs-serve
 docs-serve: docs-build ## Serve docs locally with Swagger UI on port 8080
 	docker run -p 8080:8080 \
 		-e SWAGGER_JSON=/foo/swagger.yaml \
-		-v $(PWD)/dist/docs:/foo \
+		-v $(PWD)/api/docs:/foo \
 		swaggerapi/swagger-ui
+
+.PHONY: generate-api
+generate-api: docs-validate ## Generate API client and types from OpenAPI spec
+	pnpm generate-api
 
 ##@ Helpers
 .PHONY: help

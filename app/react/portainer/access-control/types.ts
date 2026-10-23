@@ -44,7 +44,7 @@ export enum ResourceControlType {
   ContainerGroup,
 }
 
-enum ResourceAccessLevel {
+export enum ResourceAccessLevel {
   ReadWriteAccessLevel = 1,
 }
 

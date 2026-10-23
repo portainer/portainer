@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
@@ -18,7 +19,8 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Environment(Endpoint) group identifier"
-// @success 200 {object} portainer.EndpointGroup "Success"
+// @param size query boolean false "If true, include the number of environments and breakdown by type"
+// @success 200 {object} EndpointGroupResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "EndpointGroup not found"
 // @failure 500 "Server error"
@@ -29,12 +31,42 @@ func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Invalid environment group identifier route variable", err)
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().Read(portainer.EndpointGroupID(endpointGroupID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
-	} else if err != nil {
-		return httperror.InternalServerError("Unable to find an environment group with the specified identifier inside the database", err)
+	includeSize, err := request.RetrieveBooleanQueryParameter(r, "size", true)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: size", err)
 	}
 
-	return response.JSON(w, endpointGroup)
+	groupID := portainer.EndpointGroupID(endpointGroupID)
+
+	var endpointGroup *portainer.EndpointGroup
+	var endpoints []portainer.Endpoint
+
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		endpointGroup, err = tx.EndpointGroup().Read(groupID)
+		if err != nil {
+			return err
+		}
+		if includeSize {
+			endpoints, err = tx.Endpoint().Endpoints()
+		}
+		return err
+	}); err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.NotFound("Unable to find an environment group with the specified identifier inside the database", err)
+		}
+		return httperror.InternalServerError("Unable to retrieve environment group details", err)
+	}
+
+	resp := EndpointGroupResponse{
+		EndpointGroup: *endpointGroup,
+	}
+
+	if includeSize {
+		countMap, typeInfoMap := computeGroupSizeInfo([]portainer.EndpointGroup{*endpointGroup}, endpoints)
+		resp.Total = countMap[groupID]
+		resp.TypeInfo = typeInfoMap[groupID]
+	}
+
+	return response.JSON(w, resp)
 }

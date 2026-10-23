@@ -25,7 +25,7 @@ export function TableSettingsMenus({
       />
       <TableSettingsMenu>
         <TableSettingsMenuAutoRefresh
-          value={tableState.autoRefreshRate}
+          value={tableState.autoRefreshRateMS}
           onChange={(value) => tableState.setAutoRefreshRate(value)}
         />
       </TableSettingsMenu>

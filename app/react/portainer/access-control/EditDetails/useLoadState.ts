@@ -3,7 +3,7 @@ import { useUsers } from '@/portainer/users/queries';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { useIsEdgeAdmin } from '@/react/hooks/useUser';
 
-export function useLoadState(environmentId: EnvironmentId) {
+export function useLoadState(environmentId?: EnvironmentId) {
   const isAdminQuery = useIsEdgeAdmin();
   const teams = useTeams(false, environmentId);
 

@@ -1,4 +1,3 @@
-import { NodeList } from 'kubernetes-types/core/v1';
 import { http, HttpResponse } from 'msw';
 
 export const kubernetesHandlers = [
@@ -41,7 +40,5 @@ export const kubernetesHandlers = [
     HttpResponse.json([])
   ),
 
-  http.get('/api/endpoints/:endpointId/kubernetes/api/v1/nodes', () =>
-    HttpResponse.json({ items: [] } satisfies NodeList)
-  ),
+  http.get('/api/kubernetes/:endpointId/nodes', () => HttpResponse.json([])),
 ];

@@ -3,21 +3,28 @@ import { Database, HardDrive } from 'lucide-react';
 import { PageHeader } from '@@/PageHeader';
 import { WidgetTabs, Tab, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
 
-import { VolumesDatatable } from './VolumesDatatable';
-import { StorageDatatable } from './StorageDatatable';
+import { PersistentVolumesDatatable } from './PersistentVolumesDatatable';
+import { StorageClassesDatatable } from './StorageClassesDatatable';
+import { PersistentVolumeClaimsDatatable } from './PersistentVolumeClaimsDatatable';
 
 export function VolumesView() {
   const tabs: Tab[] = [
     {
-      name: 'Volumes',
+      name: 'Persistent volume claims',
       icon: Database,
-      widget: <VolumesDatatable />,
+      widget: <PersistentVolumeClaimsDatatable />,
+      selectedTabParam: 'volume-claims',
+    },
+    {
+      name: 'Persistent volumes',
+      icon: Database,
+      widget: <PersistentVolumesDatatable />,
       selectedTabParam: 'volumes',
     },
     {
-      name: 'Storage',
+      name: 'Storage classes',
       icon: HardDrive,
-      widget: <StorageDatatable />,
+      widget: <StorageClassesDatatable />,
       selectedTabParam: 'storage',
     },
   ];

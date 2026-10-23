@@ -4,10 +4,13 @@ import { UIRouterContext, UIRouterReact } from '@uirouter/react';
 
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
-import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 import { Stack } from '@/react/common/stacks/types';
-import { createMockStack } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockEnvironmentGroup,
+  createMockStack,
+} from '@/react-tools/test-mocks';
 
 import { StackDuplicationForm } from './StackDuplicationForm';
 
@@ -57,13 +60,13 @@ function renderComponent({
   yamlError?: string;
   originalFileContent?: string;
 } = {}) {
-  const mockEnvironments: Environment[] = [
-    { Id: 1, Name: 'Current Environment', GroupId: 1 } as Environment,
-    { Id: 2, Name: 'Target Environment', GroupId: 1 } as Environment,
+  const mockEnvironments = [
+    createMockEnvironment({ Id: 1, Name: 'Current Environment', GroupId: 1 }),
+    createMockEnvironment({ Id: 2, Name: 'Target Environment', GroupId: 1 }),
   ];
 
   const mockGroups: EnvironmentGroup[] = [
-    { Id: 1, Name: 'Unassigned' } as EnvironmentGroup,
+    createMockEnvironmentGroup({ Id: 1, Name: 'Unassigned' }),
   ];
 
   server.use(

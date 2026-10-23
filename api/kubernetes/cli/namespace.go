@@ -111,6 +111,20 @@ func parseNamespace(namespace *corev1.Namespace) portainer.K8sNamespaceInfo {
 
 // GetNamespace gets the namespace in the current k8s environment(endpoint).
 func (kcl *KubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, error) {
+	if !kcl.GetIsKubeAdmin() {
+		if _, allowed := kcl.buildNonAdminNamespacesMap()[name]; !allowed {
+			log.Warn().
+				Str("context", "GetNamespace").
+				Str("namespace", name).
+				Msg("Non-admin user denied access to namespace not in allowed list")
+			return portainer.K8sNamespaceInfo{}, k8serrors.NewForbidden(
+				corev1.Resource("namespaces"),
+				name,
+				errors.New("user does not have access to this namespace"),
+			)
+		}
+	}
+
 	namespace, err := kcl.cli.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		log.Error().

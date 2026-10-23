@@ -87,7 +87,7 @@ export function AzureEnvironmentForm({ environment, onSuccess }: Props) {
         payload: {
           Name: values.name,
           GroupID: values.meta.groupId,
-          TagIds: values.meta.tagIds,
+          TagIDs: values.meta.tagIds,
           AzureApplicationID: values.azure.applicationId || undefined,
           AzureTenantID: values.azure.tenantId || undefined,
           AzureAuthenticationKey: values.azure.authenticationKey || undefined,

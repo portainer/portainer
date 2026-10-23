@@ -105,8 +105,7 @@ class CreateConfigController {
 
   validateForm(accessControlData, isAdmin) {
     this.state.formValidationError = '';
-    let error = '';
-    error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
+    let error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
 
     if (error) {
       this.state.formValidationError = error;

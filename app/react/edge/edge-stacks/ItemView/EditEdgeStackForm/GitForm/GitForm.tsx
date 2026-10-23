@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Form, Formik, useFormikContext } from 'formik';
 import { useRouter } from '@uirouter/react';
+import { array, number, object } from 'yup';
 
-import { AuthFieldset } from '@/react/portainer/gitops/AuthFieldset';
 import { AutoUpdateFieldset } from '@/react/portainer/gitops/AutoUpdateFieldset';
-import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { GitSourceSelector } from '@/react/portainer/gitops/sources/GitSourceSelector';
 import {
   parseAutoUpdateResponse,
   transformAutoUpdateViewModel,
@@ -11,17 +12,12 @@ import {
 import { RefField } from '@/react/portainer/gitops/RefField';
 import {
   AutoUpdateModel,
-  GitAuthModel,
   RelativePathModel,
 } from '@/react/portainer/gitops/types';
 import {
   baseEdgeStackWebhookUrl,
   createWebhookId,
 } from '@/portainer/helpers/webhookHelper';
-import {
-  parseAuthResponse,
-  transformGitAuthenticationViewModel,
-} from '@/react/portainer/gitops/AuthFieldset/utils';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 import { DeploymentType, EdgeStack } from '@/react/edge/edge-stacks/types';
 import { EdgeGroupsSelector } from '@/react/edge/edge-stacks/components/EdgeGroupsSelector';
@@ -32,7 +28,7 @@ import { Registry } from '@/react/portainer/registries/types/registry';
 import { useRegistries } from '@/react/portainer/registries/queries/useRegistries';
 import { RelativePathFieldset } from '@/react/portainer/gitops/RelativePathFieldset/RelativePathFieldset';
 import { parseRelativePathResponse } from '@/react/portainer/gitops/RelativePathFieldset/utils';
-import { useSaveCredentialsIfRequired } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 import { GitReferenceCard } from '@/react/portainer/gitops/GitReferenceCard';
 
 import { LoadingButton } from '@@/buttons';
@@ -41,6 +37,7 @@ import { TextTip } from '@@/Tip/TextTip';
 import { FormError } from '@@/form-components/FormError';
 import { EnvironmentVariablesPanel } from '@@/form-components/EnvironmentVariablesFieldset';
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
+import { Link } from '@@/Link';
 
 import { useEdgeGroupHasType } from '../useEdgeGroupHasType';
 import { PrivateRegistryFieldset } from '../../../components/PrivateRegistryFieldset';
@@ -55,7 +52,6 @@ interface FormValues {
   deploymentType: DeploymentType;
   autoUpdate: AutoUpdateModel;
   refName: string;
-  authentication: GitAuthModel;
   envVars: EnvVar[];
   privateRegistryId?: Registry['Id'];
   relativePath: RelativePathModel;
@@ -64,38 +60,36 @@ interface FormValues {
 export function GitForm({ stack }: { stack: EdgeStack }) {
   const router = useRouter();
   const updateStackMutation = useUpdateEdgeStackGitMutation();
-  const { saveCredentials, isLoading: isSaveCredentialsLoading } =
-    useSaveCredentialsIfRequired();
+
+  const [webhookId] = useState(
+    () => stack.AutoUpdate?.Webhook || createWebhookId()
+  );
 
   if (!stack.GitConfig) {
     return null;
   }
-
-  const gitConfig = stack.GitConfig;
 
   const initialValues: FormValues = {
     groupIds: stack.EdgeGroups,
     deploymentType: stack.DeploymentType,
     autoUpdate: parseAutoUpdateResponse(stack.AutoUpdate),
     refName: stack.GitConfig.ReferenceName,
-    authentication: parseAuthResponse(stack.GitConfig.Authentication),
     relativePath: parseRelativePathResponse(stack),
     envVars: stack.EnvVars || [],
   };
 
-  const webhookId = stack.AutoUpdate?.Webhook || createWebhookId();
-
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={formValidation()}
+    >
       {({ values, isValid }) => {
         return (
           <InnerForm
             webhookId={webhookId}
             onUpdateSettingsClick={handleUpdateSettings}
-            gitUrl={gitConfig.URL}
-            isLoading={
-              updateStackMutation.isLoading || isSaveCredentialsLoading
-            }
+            isLoading={updateStackMutation.isLoading}
             isUpdateVersion={!!updateStackMutation.variables?.updateVersion}
             stack={stack}
           />
@@ -106,9 +100,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
             return;
           }
 
-          const credentialId = await saveCredentials(values.authentication);
-
-          updateStackMutation.mutate(getPayload(values, credentialId, false), {
+          updateStackMutation.mutate(getPayload(values, false), {
             onSuccess() {
               notifySuccess('Success', 'Stack updated successfully');
               router.stateService.reload();
@@ -120,9 +112,7 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
   );
 
   async function handleSubmit(values: FormValues) {
-    const credentialId = await saveCredentials(values.authentication);
-
-    updateStackMutation.mutate(getPayload(values, credentialId, true), {
+    updateStackMutation.mutate(getPayload(values, true), {
       onSuccess() {
         notifySuccess('Success', 'Stack updated successfully');
         router.stateService.reload();
@@ -131,17 +121,12 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
   }
 
   function getPayload(
-    { authentication, autoUpdate, privateRegistryId, ...values }: FormValues,
-    credentialId: number | undefined,
+    { autoUpdate, privateRegistryId, ...values }: FormValues,
     updateVersion: boolean
   ): UpdateEdgeStackGitPayload {
     return {
       updateVersion,
       id: stack.Id,
-      authentication: transformGitAuthenticationViewModel({
-        ...authentication,
-        RepositoryGitCredentialID: credentialId,
-      }),
       autoUpdate: transformAutoUpdateViewModel(autoUpdate, webhookId),
       registries:
         typeof privateRegistryId !== 'undefined'
@@ -153,14 +138,12 @@ export function GitForm({ stack }: { stack: EdgeStack }) {
 }
 
 function InnerForm({
-  gitUrl,
   isLoading,
   isUpdateVersion,
   onUpdateSettingsClick,
   webhookId,
   stack,
 }: {
-  gitUrl: string;
   isLoading: boolean;
   isUpdateVersion: boolean;
   onUpdateSettingsClick(): void;
@@ -175,6 +158,10 @@ function InnerForm({
 
   const hasKubeEndpoint = hasType(EnvironmentType.EdgeAgentOnKubernetes);
   const hasDockerEndpoint = hasType(EnvironmentType.EdgeAgentOnDocker);
+
+  if (!stack.GitConfig || !stack.GitSourceId) {
+    return null;
+  }
 
   return (
     <Form className="form-horizontal" onSubmit={handleSubmit}>
@@ -209,14 +196,12 @@ function InnerForm({
         }}
       />
 
-      {!!stack.GitConfig && (
-        <GitReferenceCard
-          stackId={stack.Id}
-          stackType="edge"
-          autoUpdate={stack.AutoUpdate}
-          gitConfig={stack.GitConfig}
-        />
-      )}
+      <GitReferenceCard
+        stackType="edge"
+        autoUpdate={stack.AutoUpdate}
+        gitConfig={stack.GitConfig}
+        sourceId={stack.GitSourceId}
+      />
 
       <FormSection title="Update from git repository">
         <AutoUpdateFieldset
@@ -229,7 +214,6 @@ function InnerForm({
             })
           }
           baseWebhookUrl={baseEdgeStackWebhookUrl()}
-          errors={errors.autoUpdate}
         />
       </FormSection>
 
@@ -237,21 +221,21 @@ function InnerForm({
         <RefField
           value={values.refName}
           onChange={(value) => setFieldValue('refName', value)}
-          model={{ ...values.authentication, RepositoryURL: gitUrl }}
+          sourceId={stack.GitSourceId}
           error={errors.refName}
-          isUrlValid
         />
 
-        <AuthFieldset
-          value={values.authentication}
-          isAuthExplanationVisible
-          onChange={(value) =>
-            Object.entries(value).forEach(([key, value]) => {
-              setFieldValue(`authentication.${key}`, value);
-            })
-          }
-          errors={errors.authentication}
-        />
+        <GitSourceSelector value={stack.GitSourceId} readOnly />
+        <TextTip>
+          Credentials are managed by the source.{' '}
+          <Link
+            to="portainer.gitops.sources.item"
+            params={{ sourceId: stack.GitSourceId }}
+            data-cy="source-item-link"
+          >
+            Edit source
+          </Link>
+        </TextTip>
 
         {isBE && (
           <RelativePathFieldset
@@ -278,26 +262,37 @@ function InnerForm({
       />
 
       <FormSection title="Actions">
-        <LoadingButton
-          disabled={dirty || !isValid || isLoading}
-          data-cy="pull-and-update-stack-button"
-          isLoading={isUpdateVersion && isLoading}
-          loadingText="updating stack..."
-        >
-          Pull and update stack
-        </LoadingButton>
+        <div className="flex items-center gap-2">
+          <LoadingButton
+            disabled={dirty || !isValid || isLoading}
+            data-cy="pull-and-update-stack-button"
+            isLoading={isUpdateVersion && isLoading}
+            loadingText="updating stack..."
+          >
+            Pull and update stack
+          </LoadingButton>
 
-        <LoadingButton
-          type="button"
-          disabled={!dirty || !isValid || isLoading}
-          isLoading={!isUpdateVersion && isLoading}
-          loadingText="updating settings..."
-          onClick={onUpdateSettingsClick}
-          data-cy="edge-stack-update-settings-button"
-        >
-          Update settings
-        </LoadingButton>
+          <LoadingButton
+            type="button"
+            disabled={!dirty || !isValid || isLoading}
+            isLoading={!isUpdateVersion && isLoading}
+            loadingText="updating settings..."
+            onClick={onUpdateSettingsClick}
+            data-cy="edge-stack-update-settings-button"
+          >
+            Update settings
+          </LoadingButton>
+        </div>
       </FormSection>
     </Form>
   );
+}
+
+function formValidation() {
+  return object({
+    groupIds: array()
+      .of(number().required())
+      .required()
+      .min(1, 'At least one edge group is required'),
+  });
 }

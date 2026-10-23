@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/fips"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -40,7 +41,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		// Execute updateStackInTx within a successful transaction
 		err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+			_, _, _, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 			if handlerErr != nil {
 				return handlerErr
 			}
@@ -70,7 +71,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		// Execute updateStackInTx within a transaction that we force to fail
 		err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			updatedStack, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+			updatedStack, _, _, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 			if handlerErr != nil {
 				return handlerErr
 			}
@@ -109,7 +110,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, 9999, setup.endpoint.ID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, 9999, setup.endpoint.ID)
 			return handlerErr
 		})
 
@@ -132,7 +133,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
 			return nil
 		})
 
@@ -162,7 +163,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
 			return nil
 		})
 
@@ -187,7 +188,7 @@ func Test_updateStackInTx(t *testing.T) {
 
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, stack.EndpointID)
 			return nil
 		})
 
@@ -246,7 +247,7 @@ func TestStackUpdate(t *testing.T) {
 	require.NoError(t, err, "error storing stack file")
 
 	// Create handler
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.DataStore = store
 	handler.FileService = fileService
 	handler.StackDeployer = testhelpers.NewTestStackDeployer()
@@ -366,7 +367,7 @@ func setupUpdateStackInTxTest[T testUpdateStackPayload](t *testing.T, stack *por
 	require.NoError(t, err, "error storing stack file")
 
 	// Create handler
-	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
 	handler.DataStore = store
 	handler.FileService = fileService
 	handler.StackDeployer = testhelpers.NewTestStackDeployer()
@@ -393,6 +394,71 @@ func setupUpdateStackInTxTest[T testUpdateStackPayload](t *testing.T, stack *por
 		jsonPayload:     jsonPayload,
 		req:             req,
 	}
+}
+
+// Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack covers a double-submit race: a
+// concurrent request (e.g. a second click before the update button disables) already deleted the
+// stack's shared Workflow record before this request's transaction runs. The stack update must
+// still succeed rather than failing to detach the stack from its now-gone Workflow.
+func Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack(t *testing.T) {
+	t.Parallel()
+	fips.InitFIPS(false)
+
+	payload := &updateComposeStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	}
+	stack := &portainer.Stack{
+		ID:         1,
+		Name:       "test-stack-workflow-gone",
+		EntryPoint: "docker-compose.yml",
+		Type:       portainer.DockerComposeStack,
+		WorkflowID: 999,
+	}
+	setup := setupUpdateStackInTxTest(t, stack, payload)
+
+	var handlerErr *httperror.HandlerError
+	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		return nil
+	})
+	require.NoError(t, err)
+	require.Nil(t, handlerErr, "stack update should succeed even though its Workflow was already gone")
+
+	stored, err := setup.store.Stack().Read(setup.stack.ID)
+	require.NoError(t, err)
+	assert.Zero(t, stored.WorkflowID, "stack should be detached from the now-gone Workflow")
+}
+
+// Test_updateSwarmStack_WorkflowAlreadyDeleted_StillUpdatesStack mirrors
+// Test_updateComposeStack_WorkflowAlreadyDeleted_StillUpdatesStack for Swarm stacks.
+func Test_updateSwarmStack_WorkflowAlreadyDeleted_StillUpdatesStack(t *testing.T) {
+	t.Parallel()
+	fips.InitFIPS(false)
+
+	payload := &updateSwarmStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	}
+	stack := &portainer.Stack{
+		ID:         1,
+		Name:       "test-stack-workflow-gone",
+		EntryPoint: "docker-compose.yml",
+		Type:       portainer.DockerSwarmStack,
+		WorkflowID: 999,
+	}
+	setup := setupUpdateStackInTxTest(t, stack, payload)
+	setup.handler.SwarmStackManager = swarmStackManager{}
+
+	var handlerErr *httperror.HandlerError
+	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		return nil
+	})
+	require.NoError(t, err)
+	require.Nil(t, handlerErr, "stack update should succeed even though its Workflow was already gone")
+
+	stored, err := setup.store.Stack().Read(setup.stack.ID)
+	require.NoError(t, err)
+	assert.Zero(t, stored.WorkflowID, "stack should be detached from the now-gone Workflow")
 }
 
 type swarmStackManager struct {
@@ -422,8 +488,11 @@ func Test_updateSwarmStack_Prune(t *testing.T) {
 	deployer := testhelpers.NewTestStackDeployer()
 	setup.handler.StackDeployer = deployer
 
+	var deploymentConfig deployments.StackDeploymentConfiger
+	var postDeploy postDeployFunc
 	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		var handlerErr *httperror.HandlerError
+		_, deploymentConfig, postDeploy, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 		if handlerErr != nil {
 			return handlerErr
 		}
@@ -436,7 +505,8 @@ func Test_updateSwarmStack_Prune(t *testing.T) {
 	require.NotNil(t, stored.Option, "stack.Option should not be nil")
 	assert.True(t, stored.Option.Prune, "stack.Option.Prune should be persisted as true")
 
-	// Deploy runs asynchronously; wait for the goroutine to call the deployer
+	go stackDeploy(setup.store, setup.stack.ID, deploymentConfig, postDeploy)
+
 	require.Eventually(t, func() bool {
 		return deployer.DeploySwarmCallCount == 1
 	}, 5*time.Second, 10*time.Millisecond, "DeploySwarmStack should be called exactly once")
@@ -461,8 +531,11 @@ func Test_updateComposeStack_Prune(t *testing.T) {
 	deployer := testhelpers.NewTestStackDeployer()
 	setup.handler.StackDeployer = deployer
 
+	var deploymentConfig deployments.StackDeploymentConfiger
+	var postDeploy postDeployFunc
 	err := setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		_, handlerErr := setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
+		var handlerErr *httperror.HandlerError
+		_, deploymentConfig, postDeploy, handlerErr = setup.handler.updateStackInTx(tx, setup.req, setup.stack.ID, setup.endpoint.ID)
 		if handlerErr != nil {
 			return handlerErr
 		}
@@ -475,7 +548,8 @@ func Test_updateComposeStack_Prune(t *testing.T) {
 	require.NotNil(t, stored.Option, "stack.Option should not be nil")
 	assert.True(t, stored.Option.Prune, "stack.Option.Prune should be persisted as true")
 
-	// Deploy runs asynchronously; wait for the goroutine to call the deployer
+	go stackDeploy(setup.store, setup.stack.ID, deploymentConfig, postDeploy)
+
 	require.Eventually(t, func() bool {
 		return deployer.DeployComposeCallCount == 1
 	}, 5*time.Second, 10*time.Millisecond, "DeployComposeStack should be called exactly once")

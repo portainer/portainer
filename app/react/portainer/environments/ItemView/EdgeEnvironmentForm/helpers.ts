@@ -1,7 +1,5 @@
 import { Environment } from '@/react/portainer/environments/types';
 
-import { getDefaultEdgeIntervalsValues } from '../../common/EdgeIntervalsFieldset/types';
-
 import { EdgeEnvironmentFormValues } from './types';
 
 /**
@@ -14,7 +12,12 @@ export function buildInitialValues(
     name: environment.Name,
     publicUrl: environment.PublicURL || '',
 
-    edge: getDefaultEdgeIntervalsValues(),
+    edge: {
+      checkinInterval: environment.EdgeCheckinInterval,
+      pingInterval: environment.Edge.PingInterval,
+      snapshotInterval: environment.Edge.SnapshotInterval,
+      commandInterval: environment.Edge.CommandInterval,
+    },
 
     meta: {
       groupId: environment.GroupId,

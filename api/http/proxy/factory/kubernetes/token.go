@@ -3,19 +3,96 @@ package kubernetes
 import (
 	"fmt"
 	"os"
+	"strings"
+	"sync"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/rs/zerolog/log"
 )
 
-const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+const (
+	defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+	adminTokenRefreshInterval      = 30 * time.Second
+)
+
+// adminTokenSource re-reads the projected service account token from disk so that
+// the rotation performed by the kubelet is picked up without restarting the process.
+type adminTokenSource struct {
+	path            string
+	refreshInterval time.Duration
+
+	mu          sync.RWMutex
+	token       string
+	lastAttempt time.Time
+}
+
+func newAdminTokenSource(path string, refreshInterval time.Duration) (*adminTokenSource, error) {
+	source := &adminTokenSource{
+		path:            path,
+		refreshInterval: refreshInterval,
+	}
+
+	if _, err := source.refresh(); err != nil {
+		return nil, fmt.Errorf("failed reading the service account token from %s. Error: %w", path, err)
+	}
+
+	return source, nil
+}
+
+func (source *adminTokenSource) refresh() (string, error) {
+	source.mu.Lock()
+	defer source.mu.Unlock()
+
+	// another caller refreshed while this one waited for the lock
+	if time.Since(source.lastAttempt) < source.refreshInterval {
+		return source.token, nil
+	}
+
+	source.lastAttempt = time.Now()
+
+	content, err := os.ReadFile(source.path)
+	if err != nil {
+		return "", err
+	}
+
+	token := strings.TrimSpace(string(content))
+	if token == "" {
+		return "", fmt.Errorf("the service account token file %s is empty", source.path)
+	}
+
+	source.token = token
+
+	return token, nil
+}
+
+func (source *adminTokenSource) Token() string {
+	source.mu.RLock()
+	token, lastAttempt := source.token, source.lastAttempt
+	source.mu.RUnlock()
+
+	if time.Since(lastAttempt) < source.refreshInterval {
+		return token
+	}
+
+	refreshed, err := source.refresh()
+	if err != nil {
+		log.Warn().Err(err).
+			Str("path", source.path).
+			Msg("unable to re-read the service account token, falling back to the last known value")
+
+		return token
+	}
+
+	return refreshed
+}
 
 type tokenManager struct {
 	tokenCache *tokenCache
 	kubecli    portainer.KubeClient
 	dataStore  dataservices.DataStore
-	adminToken string
+	adminToken *adminTokenSource
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
@@ -26,23 +103,26 @@ func NewTokenManager(kubecli portainer.KubeClient, dataStore dataservices.DataSt
 		tokenCache: cache,
 		kubecli:    kubecli,
 		dataStore:  dataStore,
-		adminToken: "",
 	}
 
 	if setLocalAdminToken {
-		token, err := os.ReadFile(defaultServiceAccountTokenFile)
+		source, err := newAdminTokenSource(defaultServiceAccountTokenFile, adminTokenRefreshInterval)
 		if err != nil {
 			return nil, err
 		}
 
-		tokenManager.adminToken = string(token)
+		tokenManager.adminToken = source
 	}
 
 	return tokenManager, nil
 }
 
 func (manager *tokenManager) GetAdminServiceAccountToken() string {
-	return manager.adminToken
+	if manager.adminToken == nil {
+		return ""
+	}
+
+	return manager.adminToken.Token()
 }
 
 func (manager *tokenManager) setupUserServiceAccounts(userID portainer.UserID, endpoint *portainer.Endpoint) error {

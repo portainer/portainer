@@ -1,6 +1,7 @@
 import { PageHeader } from '@@/PageHeader';
+import { AddButton } from '@@/buttons';
 
-import { EnvironmentGroupsDatatable } from './EnvironmentGroupsDatatable';
+import { EnvironmentGroupsTable } from './EnvironmentGroupsTable/EnvironmentGroupsTable';
 
 export function ListView() {
   return (
@@ -9,9 +10,15 @@ export function ListView() {
         title="Environment Groups"
         breadcrumbs="Environment group management"
         reload
-      />
+      >
+        <AddButton to=".new" data-cy="add-environment-group-button">
+          Add group
+        </AddButton>
+      </PageHeader>
 
-      <EnvironmentGroupsDatatable />
+      <div className="mx-5 mb-5">
+        <EnvironmentGroupsTable />
+      </div>
     </>
   );
 }

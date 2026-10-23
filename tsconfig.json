@@ -23,39 +23,15 @@
     "noUnusedLocals": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      "@@/*": [
-        "./app/react/components/*"
-      ],
-      "@/*": [
-        "./app/*"
-      ],
-      "yaml-schema": [
-        "./node_modules/codemirror-json-schema/dist/yaml"
-      ]
+      "@@/*": ["./app/react/components/*"],
+      "@/*": ["./app/*"],
+      "@api/*": ["./app/react/portainer/generated-api/portainer/*"],
+      "yaml-schema": ["./node_modules/codemirror-json-schema/dist/yaml"]
     },
-    "types": [
-      "vitest/globals",
-      "@testing-library/jest-dom",
-      "node"
-    ]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
   },
-  "exclude": [
-    "api",
-    "build",
-    "dist",
-    "distribution",
-    "node_modules",
-    "test",
-    "webpack"
-  ],
-  "include": [
-    "app",
-    ".storybook"
-  ]
+  "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack", "app/react/portainer/generated-api"],
+  "include": ["app", ".storybook"]
 }

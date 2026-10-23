@@ -128,19 +128,21 @@ func parseVolume(persistentVolumeClaim *corev1.PersistentVolumeClaim, persistent
 func parsePersistentVolumeClaim(volume *corev1.PersistentVolumeClaim) models.K8sPersistentVolumeClaim {
 	storage := volume.Spec.Resources.Requests[corev1.ResourceStorage]
 	return models.K8sPersistentVolumeClaim{
-		ID:                 string(volume.UID),
-		Name:               volume.Name,
-		Namespace:          volume.Namespace,
-		CreationDate:       volume.CreationTimestamp.Time,
-		Storage:            storage.Value(),
-		AccessModes:        volume.Spec.AccessModes,
-		VolumeName:         volume.Spec.VolumeName,
-		ResourcesRequests:  &volume.Spec.Resources.Requests,
-		StorageClass:       volume.Spec.StorageClassName,
-		VolumeMode:         volume.Spec.VolumeMode,
-		OwningApplications: nil,
-		Phase:              volume.Status.Phase,
-		Labels:             volume.Labels,
+		ID:                       string(volume.UID),
+		Name:                     volume.Name,
+		Namespace:                volume.Namespace,
+		CreationDate:             volume.CreationTimestamp.Time,
+		Storage:                  storage.Value(),
+		StorageRequest:           storage.String(),
+		AccessModes:              humanReadableAccessModes(volume.Spec.AccessModes),
+		HumanReadableAccessModes: volume.Spec.AccessModes,
+		VolumeName:               volume.Spec.VolumeName,
+		ResourcesRequests:        &volume.Spec.Resources.Requests,
+		StorageClass:             volume.Spec.StorageClassName,
+		VolumeMode:               volume.Spec.VolumeMode,
+		OwningApplications:       nil,
+		Phase:                    volume.Status.Phase,
+		Labels:                   volume.Labels,
 	}
 }
 
@@ -149,13 +151,17 @@ func parsePersistentVolume(volume *corev1.PersistentVolume) models.K8sPersistent
 	return models.K8sPersistentVolume{
 		Name:                          volume.Name,
 		Annotations:                   volume.Annotations,
-		AccessModes:                   volume.Spec.AccessModes,
+		Labels:                        volume.Labels,
+		AccessModes:                   humanReadableAccessModes(volume.Spec.AccessModes),
+		HumanReadableAccessModes:      volume.Spec.AccessModes,
 		Capacity:                      volume.Spec.Capacity,
 		ClaimRef:                      volume.Spec.ClaimRef,
 		StorageClassName:              volume.Spec.StorageClassName,
 		PersistentVolumeReclaimPolicy: volume.Spec.PersistentVolumeReclaimPolicy,
 		VolumeMode:                    volume.Spec.VolumeMode,
 		CSI:                           volume.Spec.CSI,
+		Status:                        volume.Status.Phase,
+		CreationDate:                  volume.CreationTimestamp.Time,
 	}
 }
 

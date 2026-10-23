@@ -5,18 +5,22 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"regexp"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/rs/zerolog/log"
@@ -29,9 +33,9 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	customTemplate, err := handler.createCustomTemplate(method, r)
@@ -39,32 +43,43 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
-	customTemplate.CreatedByUserID = tokenData.ID
+	customTemplate.CreatedByUserID = securityContext.UserID
 
-	customTemplates, err := handler.DataStore.CustomTemplate().ReadAll()
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return createCustomTemplateTx(tx, customTemplate, securityContext)
+	})
+
+	return response.TxResponse(w, customTemplate, err)
+}
+
+func createCustomTemplateTx(tx dataservices.DataStoreTx, customTemplate *portainer.CustomTemplate, sc *security.RestrictedRequestContext) error {
+	existingTemplates, err := tx.CustomTemplate().ReadAll()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}
 
-	for _, existingTemplate := range customTemplates {
-		if existingTemplate.Title == customTemplate.Title {
+	for _, existing := range existingTemplates {
+		if existing.Title == customTemplate.Title {
 			return httperror.InternalServerError("Template name must be unique", errors.New("Template name must be unique"))
 		}
 	}
 
-	if err := handler.DataStore.CustomTemplate().Create(customTemplate); err != nil {
+	if err := tx.CustomTemplate().Create(customTemplate); err != nil {
 		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
-	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, tokenData.ID)
+	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, sc.UserID)
 
-	if err := handler.DataStore.ResourceControl().Create(resourceControl); err != nil {
+	if err := tx.ResourceControl().Create(resourceControl); err != nil {
 		return httperror.InternalServerError("Unable to persist resource control inside the database", err)
 	}
 
 	customTemplate.ResourceControl = resourceControl
 
-	return response.JSON(w, customTemplate)
+	userContext := source.NewUserContext(sc.User, sc.UserMemberships)
+	populateGitConfig(tx, userContext, customTemplate)
+
+	return nil
 }
 
 func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*portainer.CustomTemplate, error) {
@@ -122,19 +137,11 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
-	if !isValidNote(payload.Note) {
+	if !IsValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	return validateVariablesDefinitions(payload.Variables)
-}
-
-func isValidNote(note string) bool {
-	if len(note) == 0 {
-		return true
-	}
-	match, _ := regexp.MatchString("<img", note)
-	return !match
+	return ValidateVariablesDefinitions(payload.Variables)
 }
 
 // @id CustomTemplateCreateString
@@ -200,21 +207,24 @@ type customTemplateFromGitRepositoryPayload struct {
 	// * 3 - kubernetes
 	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
 
-	// URL of a Git repository hosting the Stack file
-	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// SourceID references an existing Source for git credentials/URL.
+	// When set, the inline URL and authentication fields are ignored.
+	SourceID portainer.SourceID `example:"1" validate:"required"`
+	// Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
+	RepositoryURL string `example:"https://github.com/openfaas/faas"`
 	// Reference name of a Git repository hosting the Stack file
 	RepositoryReferenceName string `example:"refs/heads/master"`
-	// Use basic authentication to clone the Git repository
+	// Deprecated: use SourceID instead. Use basic authentication to clone the Git repository.
 	RepositoryAuthentication bool `example:"true"`
-	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Username used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryUsername string `example:"myGitUsername"`
-	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
 	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Definitions of variables in the stack file
 	Variables []portainer.CustomTemplateVariableDefinition
-	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	// Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
 	TLSSkipVerify bool `example:"false"`
 	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 	IsComposeFormat bool `example:"false"`
@@ -229,11 +239,13 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if len(payload.Description) == 0 {
 		return errors.New("Invalid custom template description")
 	}
-	if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
-	}
-	if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if payload.SourceID == 0 {
+		if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
+			return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		}
+		if payload.RepositoryAuthentication && (len(payload.RepositoryUsername) == 0 || len(payload.RepositoryPassword) == 0) {
+			return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		}
 	}
 	if len(payload.ComposeFilePathInRepository) == 0 {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -246,11 +258,11 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack && payload.Type != portainer.KubernetesStack {
 		return errors.New("Invalid custom template type")
 	}
-	if !isValidNote(payload.Note) {
+	if !IsValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	return validateVariablesDefinitions(payload.Variables)
+	return ValidateVariablesDefinitions(payload.Variables)
 }
 
 // @id CustomTemplateCreateRepository
@@ -273,6 +285,11 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		return nil, err
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
 		ID:              portainer.CustomTemplateID(customTemplateID),
@@ -293,28 +310,56 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
 
-	gitConfig := &gittypes.RepoConfig{
-		URL:            payload.RepositoryURL,
-		ReferenceName:  payload.RepositoryReferenceName,
-		ConfigFilePath: payload.ComposeFilePathInRepository,
-		TLSSkipVerify:  payload.TLSSkipVerify,
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
+	gitConfig, httpErr := sources.ResolveRepoConfig(handler.DataStore, userContext, sources.RepoConfigInput{
+		SourceID:                 payload.SourceID,
+		ReferenceName:            payload.RepositoryReferenceName,
+		ConfigFilePath:           payload.ComposeFilePathInRepository,
+		RepositoryURL:            payload.RepositoryURL,
+		TLSSkipVerify:            payload.TLSSkipVerify,
+		RepositoryAuthentication: payload.RepositoryAuthentication,
+		Username:                 payload.RepositoryUsername,
+		Password:                 payload.RepositoryPassword,
+	})
+	if httpErr != nil {
+		return nil, httpErr
 	}
 
-	if payload.RepositoryAuthentication {
-		gitConfig.Authentication = &gittypes.GitAuthentication{
-			Username: payload.RepositoryUsername,
-			Password: payload.RepositoryPassword,
-		}
+	if err := ssrf.CheckURL(r.Context(), gitConfig.URL); err != nil {
+		return nil, err
 	}
 
-	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), *gitConfig, handler.GitService, getProjectPath)
+	commitHash, err := stackutils.DownloadGitRepository(context.TODO(), gitConfig, handler.GitService, getProjectPath)
 	if err != nil {
 		return nil, err
 	}
 
-	gitConfig.ConfigHash = commitHash
-	customTemplate.GitConfig = gitConfig
+	sourceID := payload.SourceID
+	if sourceID == 0 {
+		src, err := workflows.FindOrCreateGitSource(handler.DataStore, userContext, &portainer.Source{
+			Name: gittypes.RepoName(gitConfig.URL),
+			Type: portainer.SourceTypeGit,
+			Git: &gittypes.GitSource{
+				URL:            gitConfig.URL,
+				Authentication: gitConfig.Authentication,
+				TLSSkipVerify:  gitConfig.TLSSkipVerify,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		sourceID = src.ID
+	}
 
+	customTemplate.Artifact = &portainer.Artifact{
+		Files: []portainer.ArtifactFile{{
+			SourceID: sourceID,
+			Path:     gitConfig.ConfigFilePath,
+			Ref:      gitConfig.ReferenceName,
+			Hash:     commitHash,
+		}},
+	}
 	isValidProject := true
 	defer func() {
 		if !isValidProject {
@@ -390,7 +435,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	payload.Logo = logo
 
 	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)
-	if !isValidNote(note) {
+	if !IsValidNote(note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 	payload.Note = note
@@ -422,7 +467,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 		if err := json.Unmarshal([]byte(varsString), &payload.Variables); err != nil {
 			return errors.New("Invalid variables. Ensure that the variables are valid JSON")
 		}
-		if err := validateVariablesDefinitions(payload.Variables); err != nil {
+		if err := ValidateVariablesDefinitions(payload.Variables); err != nil {
 			return err
 		}
 	}

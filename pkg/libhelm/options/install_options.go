@@ -17,6 +17,9 @@ type InstallOptions struct {
 	// Values contains inline Helm values merged with the chart defaults.
 	// If both are provided, entries in Values override those from ValuesFile.
 	Values map[string]any
+	// ResetValues resets to chart defaults before applying Values on upgrade
+	// (Helm's --reset-values), so omitted keys revert rather than persist.
+	ResetValues bool
 	// ValuesFile is a path to a YAML file with Helm values to apply.
 	// File values are applied first; Values take precedence on conflicts.
 	ValuesFile              string
@@ -27,6 +30,10 @@ type InstallOptions struct {
 	KubernetesClusterAccess *KubernetesClusterAccess
 	TakeOwnership           bool
 	CreateNamespace         bool
+	// MaxHistory caps the number of old revisions Helm keeps for this release
+	// on upgrade (0, the zero value, means unlimited history, matching Helm's
+	// own default).
+	MaxHistory int
 
 	// GitOps related options
 	AutoUpdate *portainer.AutoUpdateSettings

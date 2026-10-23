@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -32,37 +32,43 @@ export function GroupDnBuilder({
     parseDN(parsePath(value, suffix), suffix)
   );
 
+  // The DN string can't represent an empty (in-progress) group name or path
+  // row, so re-parsing our own emitted value would drop it — making the field
+  // vanish as you clear its text. Track what we emitted so we re-sync only when
+  // `value` changes from an external source (initial load, reset).
+  const emittedRef = useRef(buildGroupDN(groupName, entries, suffix));
+
   useEffect(() => {
-    const groupName = parseGroupName(value, suffix);
-    const entries = parseDN(parsePath(value, suffix), suffix);
-    setGroupName(groupName);
-    setEntries(entries);
+    if (value !== emittedRef.current) {
+      const parsedGroupName = parseGroupName(value, suffix);
+      const parsedEntries = parseDN(parsePath(value, suffix), suffix);
+      emittedRef.current = buildGroupDN(parsedGroupName, parsedEntries, suffix);
+      setGroupName(parsedGroupName);
+      setEntries(parsedEntries);
+    }
+  }, [value, suffix]);
+
+  // Keep the emitted DN in sync with the group name, path entries and suffix.
+  useEffect(() => {
     const dn = buildGroupDN(groupName, entries, suffix);
-    if (dn !== value) {
+    if (dn !== emittedRef.current) {
+      emittedRef.current = dn;
       onChange(index, dn);
     }
-  }, [index, onChange, suffix, value]);
+  }, [groupName, entries, suffix, index, onChange]);
 
   return (
     <>
       <GroupNameField
         id={`group-name-input-${index}`}
         value={groupName}
-        onChange={(newGroupName) => {
-          setGroupName(newGroupName);
-          onChange(index, buildGroupDN(newGroupName, entries, suffix));
-        }}
+        onChange={setGroupName}
         disabled={isLimited}
         onRemoveClick={onRemoveClick ? () => onRemoveClick(index) : undefined}
       />
       <DnEntriesField
         value={entries}
-        onChange={(entries: DnEntry[]) => {
-          setEntries(entries);
-          if (groupName) {
-            onChange(index, buildGroupDN(groupName, entries, suffix));
-          }
-        }}
+        onChange={setEntries}
         label="Path to group"
         limitedFeatureId={limitedFeatureId}
       />

@@ -1,15 +1,17 @@
-import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
+import { endpointCreate } from '@api/sdk.gen';
+import { EndpointCreateData } from '@api/types.gen';
+
+import { arrayToJson } from '@/portainer/helpers/json';
+import { parseAxiosError } from '@/portainer/services/axios/axios';
 import {
   type EnvironmentGroupId,
-  type Environment,
   ContainerEngine,
   EnvironmentCreationTypes,
 } from '@/react/portainer/environments/types';
 import { type TagId } from '@/portainer/tags/types';
 import { EdgeAsyncIntervalsValues } from '@/react/edge/components/EdgeAsyncIntervalsForm';
-import { arrayToJson, json2formData } from '@/portainer/helpers/json';
 
-import { buildUrl } from './utils';
+import { toEnvironment } from './utils';
 
 export interface EnvironmentMetadata {
   groupId?: EnvironmentGroupId;
@@ -195,10 +197,6 @@ export function createEdgeAgentEnvironment({
     EnvironmentCreationTypes.EdgeAgentEnvironment,
     {
       url: portainerUrl,
-      tls: {
-        skipVerify: true,
-        skipClientVerify: true,
-      },
       pollFrequency,
       edge,
       meta,
@@ -212,7 +210,11 @@ async function createEnvironment(
   creationType: EnvironmentCreationTypes,
   options?: EnvironmentOptions
 ) {
-  let payload: Record<string, unknown> = {
+  if (creationType === EnvironmentCreationTypes.KubeConfigEnvironment) {
+    throw new Error('Kube config creation is not supported on CE');
+  }
+
+  let payload: EndpointCreateData['body'] = {
     Name: name,
     EndpointCreationType: creationType,
   };
@@ -251,23 +253,12 @@ async function createEnvironment(
         AzureAuthenticationKey: azure.authenticationKey,
       };
     }
-
-    if (options.edge?.asyncMode) {
-      payload = {
-        ...payload,
-        EdgeAsyncMode: true,
-        EdgePingInterval: options.edge?.PingInterval,
-        EdgeSnapshotInterval: options.edge?.SnapshotInterval,
-        EdgeCommandInterval: options.edge?.CommandInterval,
-      };
-    }
   }
 
-  const formPayload = json2formData(payload);
   try {
-    const { data } = await axios.post<Environment>(buildUrl(), formPayload);
+    const { data } = await endpointCreate({ body: payload });
 
-    return data;
+    return toEnvironment(data);
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

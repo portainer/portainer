@@ -5,8 +5,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 )
 
@@ -20,14 +20,14 @@ func CreateComposeStackGitBuilder(securityContext *security.RestrictedRequestCon
 	dataStore dataservices.DataStore,
 	fileService portainer.FileService,
 	gitService portainer.GitService,
-	scheduler *scheduler.Scheduler,
+	sourceScheduler *scheduling.SourceScheduler,
 	stackDeployer deployments.StackDeployer) *ComposeStackGitBuilder {
 
 	return &ComposeStackGitBuilder{
 		GitMethodStackBuilder: GitMethodStackBuilder{
-			StackBuilder: CreateStackBuilder(dataStore, fileService, stackDeployer),
-			gitService:   gitService,
-			scheduler:    scheduler,
+			StackBuilder:    CreateStackBuilder(dataStore, fileService, stackDeployer),
+			gitService:      gitService,
+			sourceScheduler: sourceScheduler,
 		},
 		SecurityContext: securityContext,
 	}

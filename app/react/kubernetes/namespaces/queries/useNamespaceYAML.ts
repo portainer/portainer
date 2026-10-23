@@ -5,12 +5,12 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isFulfilled } from '@/portainer/helpers/promise-utils';
 
 import { parseKubernetesAxiosError } from '../../axiosError';
-import { generateResourceQuotaName } from '../resourceQuotaUtils';
+import { getResourceQuotas } from '../../queries/useResourceQuotasQuery';
 
 import { queryKeys } from './queryKeys';
 
 /**
- * Gets the YAML for a namespace and its resource quota directly from the K8s proxy API.
+ * Gets the YAML for a namespace and every resource quota it contains directly from the K8s proxy API.
  */
 export function useNamespaceYAML(
   environmentId: EnvironmentId,
@@ -27,11 +27,11 @@ async function composeNamespaceYAML(
   namespace: string
 ) {
   const settledPromises = await Promise.allSettled([
-    getNamespaceYAML(environmentId, namespace),
-    getResourceQuotaYAML(environmentId, namespace),
+    getNamespaceYAML(environmentId, namespace).then((yaml) => [yaml]),
+    getResourceQuotasYAML(environmentId, namespace),
   ]);
   const resolvedPromises = settledPromises.filter(isFulfilled);
-  return resolvedPromises.map((p) => p.value).join('\n---\n');
+  return resolvedPromises.flatMap((p) => p.value).join('\n---\n');
 }
 
 async function getNamespaceYAML(
@@ -53,19 +53,37 @@ async function getNamespaceYAML(
   }
 }
 
-async function getResourceQuotaYAML(
+/**
+ * Gets the YAML for every resource quota in the namespace, not just the Portainer managed one.
+ * The list call only returns JSON, so each quota is fetched separately to get it as its own YAML document.
+ */
+async function getResourceQuotasYAML(
   environmentId: EnvironmentId,
   namespace: string
 ) {
-  const resourceQuotaName = generateResourceQuotaName(namespace);
+  const resourceQuotas = await getResourceQuotas(environmentId, namespace);
+  const names = resourceQuotas.flatMap((quota) => quota.metadata?.name ?? []);
+  const settledPromises = await Promise.allSettled(
+    names.map((name) => getResourceQuotaYAML(environmentId, namespace, name))
+  );
+  return settledPromises.filter(isFulfilled).map((p) => p.value);
+}
+
+async function getResourceQuotaYAML(
+  environmentId: EnvironmentId,
+  namespace: string,
+  name: string
+) {
   try {
     const { data: yaml } = await axios.get<string>(
-      `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/resourcequotas/${resourceQuotaName}`,
+      `/endpoints/${environmentId}/kubernetes/api/v1/namespaces/${namespace}/resourcequotas/${name}`,
       { headers: { Accept: 'application/yaml' } }
     );
     return yaml;
   } catch (e) {
-    // silently ignore if resource quota does not exist
-    return null;
+    throw parseKubernetesAxiosError(
+      e,
+      `Unable to retrieve resource quota ${name} YAML`
+    );
   }
 }

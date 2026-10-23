@@ -201,6 +201,41 @@ func TestDecorateVolumeResourceCreationOperation_BindDriverOptAllowedWhenSetting
 	require.NoError(t, err)
 }
 
+func TestDecorateVolumeResourceCreationOperation_BindMountRestrictions(t *testing.T) {
+	t.Parallel()
+
+	f := func(driverOpts map[string]string) {
+		t.Helper()
+
+		fx := newVolumeCreationFixtures(t)
+		fx.setSecuritySettings(t, portainer.EndpointSecuritySettings{
+			AllowBindMountsForRegularUsers: false,
+		})
+
+		body := volume.CreateOptions{
+			Name:       "evil-volume",
+			Driver:     "local",
+			DriverOpts: driverOpts,
+		}
+
+		resp, err := fx.newTransport().decorateVolumeResourceCreationOperation(fx.newRequest(t, body, fx.stdUser), portainer.VolumeResourceControl)
+		require.ErrorIs(t, err, ErrBindMountsForbidden)
+		require.NotNil(t, resp)
+		require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// local driver's "type=none,o=bind" trick is forbidden
+	f(map[string]string{"type": "none", "device": "/etc", "o": "bind"})
+
+	// a real filesystem type mounted via a device is forbidden
+	f(map[string]string{"type": "ext4", "device": "/dev/sda1"})
+
+	// "type" match is case-insensitive
+	f(map[string]string{"type": "BIND", "device": "/etc"})
+}
+
 func TestDecorateVolumeResourceCreationOperation_NonBindDriverOptNotForbidden(t *testing.T) {
 	t.Parallel()
 

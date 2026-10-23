@@ -30,6 +30,10 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		edgeStack, err = handler.createSwarmStack(tx, method, dryrun, tokenData, r)
 		return err
 	}); err != nil {
+		if securityContext, secErr := security.RetrieveRestrictedRequestContext(r); secErr == nil {
+			handler.persistGitSyncFailure(securityContext, err)
+		}
+
 		switch {
 		case httperrors.IsInvalidPayloadError(err):
 			return httperror.BadRequest("Invalid payload", err)

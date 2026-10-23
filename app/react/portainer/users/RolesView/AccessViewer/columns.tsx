@@ -87,8 +87,8 @@ function manageAccess(item: AccessViewerPolicyModel, isPureAdmin: boolean) {
   if (item.groupName) {
     return (
       <Link
-        to="portainer.groups.group.access"
-        params={{ id: item.groupId }}
+        to="portainer.groups.group"
+        params={{ id: item.groupId, tab: 'access' }}
         data-cy={`manage-access-button-${item.roleName}`}
       >
         {manageAccessLabel}

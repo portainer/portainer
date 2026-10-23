@@ -17,27 +17,10 @@ describe('GitSection', () => {
     expect(screen.getByText('Git repository')).toBeInTheDocument();
   });
 
-  it('should render authentication toggle', () => {
+  it('should render the source selector', () => {
     renderComponent();
 
-    expect(screen.getByText('Authentication')).toBeInTheDocument();
-  });
-
-  it('should render TLS skip verification toggle', () => {
-    renderComponent();
-
-    expect(screen.getByText('Skip TLS Verification')).toBeInTheDocument();
-  });
-
-  it('should render with git authentication enabled', () => {
-    renderComponent({
-      initialValues: {
-        RepositoryAuthentication: true,
-        RepositoryUsername: 'testuser',
-      },
-    });
-
-    expect(screen.getByText('Authentication')).toBeInTheDocument();
+    expect(screen.getByText('Source')).toBeInTheDocument();
   });
 
   it('should render with auto update enabled', () => {
@@ -46,8 +29,6 @@ describe('GitSection', () => {
       initialValues: {
         AutoUpdate: {
           RepositoryAutomaticUpdates: true,
-          RepositoryMechanism: 'Interval' as const,
-          RepositoryFetchInterval: '5m',
           ForcePullImage: false,
           RepositoryAutomaticUpdatesForce: false,
         },
@@ -76,21 +57,13 @@ function renderComponent({
   const values = mockFormValues({
     method: 'repository',
     git: {
-      RepositoryURL: '',
+      SourceId: 0,
       RepositoryReferenceName: 'refs/heads/main',
       ComposeFilePathInRepository: 'docker-compose.yml',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
-      RepositoryGitCredentialID: 0,
-      TLSSkipVerify: false,
       AdditionalFiles: [],
       AutoUpdate: undefined,
-      RepositoryAuthorizationType: undefined,
       SupportRelativePath: false,
       FilesystemPath: '',
-      SaveCredential: false,
-      NewCredentialName: '',
       ...initialValues,
     },
   });

@@ -2,6 +2,7 @@ package security
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 )
 
@@ -12,19 +13,14 @@ func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) 
 		return teams
 	}
 
-	n := 0
+	memberOf := map[portainer.TeamID]bool{}
 	for _, membership := range context.UserMemberships {
-		for _, team := range teams {
-			if team.ID == membership.TeamID {
-				teams[n] = team
-				n++
-
-				break
-			}
-		}
+		memberOf[membership.TeamID] = true
 	}
 
-	return teams[:n]
+	return slicesx.FilterInPlace(teams, func(team portainer.Team) bool {
+		return memberOf[team.ID]
+	})
 }
 
 // FilterLeaderTeams filters teams based on user role.
@@ -44,6 +40,21 @@ func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext
 	return slicesx.FilterInPlace(teams, func(team portainer.Team) bool {
 		return leaderSet[team.ID]
 	})
+}
+
+// LeaderTeamMembershipFilter returns a predicate matching team memberships that
+// belong to teams the caller leads, for use with TeamMembershipService.ReadAll.
+func LeaderTeamMembershipFilter(context *RestrictedRequestContext) func(portainer.TeamMembership) bool {
+	leaderSet := set.Set[portainer.TeamID]{}
+	for _, membership := range context.UserMemberships {
+		if membership.Role == portainer.TeamLeader && membership.UserID == context.UserID {
+			leaderSet.Add(membership.TeamID)
+		}
+	}
+
+	return func(membership portainer.TeamMembership) bool {
+		return leaderSet.Contains(membership.TeamID)
+	}
 }
 
 // FilterUsers filters users based on user role.

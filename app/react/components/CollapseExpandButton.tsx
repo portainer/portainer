@@ -7,8 +7,12 @@ import { Icon } from './Icon';
 export function CollapseExpandButton({
   onClick,
   isExpanded,
+  quarterRotation = false,
   ...props
-}: { isExpanded: boolean } & ComponentProps<'button'>) {
+}: {
+  isExpanded: boolean;
+  quarterRotation?: boolean;
+} & ComponentProps<'button'>) {
   return (
     <button
       onClick={(e) => {
@@ -31,8 +35,11 @@ export function CollapseExpandButton({
           icon={ChevronDown}
           size="md"
           className={clsx('transition ease-in-out', {
-            'rotate-180': isExpanded,
-            'rotate-0': !isExpanded,
+            'rotate-180': isExpanded && !quarterRotation,
+            '-rotate-90': !isExpanded && quarterRotation,
+            'rotate-0':
+              (!isExpanded && !quarterRotation) ||
+              (isExpanded && quarterRotation),
           })}
         />
       </div>

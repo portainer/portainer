@@ -4,11 +4,14 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
@@ -48,5 +51,27 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 }
 
 func userCanEditTemplate(customTemplate *portainer.CustomTemplate, securityContext *security.RestrictedRequestContext) bool {
-	return securityContext.IsAdmin || customTemplate.CreatedByUserID == securityContext.UserID
+	resourceControl := customTemplate.ResourceControl
+
+	if securityContext.IsAdmin {
+		return true
+	}
+
+	if resourceControl == nil || resourceControl.AdministratorsOnly {
+		return false
+	}
+
+	if resourceControl.Public {
+		return true
+	}
+
+	if customTemplate.CreatedByUserID != securityContext.UserID {
+		return false
+	}
+
+	teamIDs := slicesx.Map(securityContext.UserMemberships, func(m portainer.TeamMembership) portainer.TeamID {
+		return m.TeamID
+	})
+
+	return authorization.UserCanAccessResource(securityContext.UserID, teamIDs, resourceControl)
 }

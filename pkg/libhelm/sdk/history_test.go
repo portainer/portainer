@@ -33,4 +33,45 @@ func Test_ConvertHistory(t *testing.T) {
 		require.NoError(t, err)
 		is.Equal(release.Name, result.Name)
 	})
+
+	t.Run("populates ChartReference when portainer/chart-path annotation is present", func(t *testing.T) {
+		is := assert.New(t)
+
+		sdkRel := sdkrelease.Release{
+			Name:    "releaseName",
+			Version: 1,
+			Info:    &sdkrelease.Info{Status: "deployed"},
+			Chart: &chart.Chart{
+				Metadata: &chart.Metadata{
+					Name: "chartName",
+					Annotations: map[string]string{
+						ChartPathAnnotation: "/some/chart/path",
+					},
+				},
+			},
+		}
+
+		result, err := convertHistory(&sdkRel)
+		require.NoError(t, err)
+		is.Equal("/some/chart/path", result.ChartReference.ChartPath)
+	})
+
+	t.Run("ChartReference.ChartPath is empty when annotation is absent", func(t *testing.T) {
+		is := assert.New(t)
+
+		sdkRel := sdkrelease.Release{
+			Name:    "releaseName",
+			Version: 1,
+			Info:    &sdkrelease.Info{Status: "deployed"},
+			Chart: &chart.Chart{
+				Metadata: &chart.Metadata{
+					Name: "chartName",
+				},
+			},
+		}
+
+		result, err := convertHistory(&sdkRel)
+		require.NoError(t, err)
+		is.Empty(result.ChartReference.ChartPath)
+	})
 }

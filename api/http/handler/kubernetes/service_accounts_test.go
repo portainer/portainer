@@ -20,6 +20,9 @@ import (
 	kubeclient "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kfake "k8s.io/client-go/kubernetes/fake"
 )
 
 func newServiceAccountTestHandler(t *testing.T) (*Handler, *portainer.User, string) {
@@ -217,4 +220,60 @@ func TestUpdateKubernetesServiceAccountImagePullSecrets_WrongMethodReturns404(t 
 
 	// Gorilla mux returns 404 (not 405) for method mismatches when no MethodNotAllowedHandler is set
 	assert.Equal(t, http.StatusNotFound, rr.Code, "unregistered method on this route returns 404")
+}
+
+const serviceAccountPath = "/kubernetes/1/namespaces/team-a/service_accounts/build-bot"
+
+func newServiceAccountClientset(namespace, name string) *kfake.Clientset {
+	return kfake.NewSimpleClientset(&corev1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+	})
+}
+
+func TestGetKubernetesServiceAccount_ReturnsAccountInNamespace(t *testing.T) {
+	t.Parallel()
+	handler, factory, admin, tk := newPodTestHandler(t)
+
+	kcl := kubeclient.NewTestKubeClient(newServiceAccountClientset("team-a", "build-bot"))
+	seedProxyKubeClient(factory, admin.ID, kcl)
+
+	req := newPodRequest(t, http.MethodGet, serviceAccountPath, admin, tk)
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestGetKubernetesServiceAccount_ForbiddenNamespaceDenied(t *testing.T) {
+	t.Parallel()
+	handler, factory, _, _ := newPodTestHandler(t)
+
+	nonAdmin, tk := newNonAdminUser(t, handler, "tenant-b")
+
+	clientset := newServiceAccountClientset("team-a", "build-bot")
+	clientset.PrependReactor("get", "serviceaccounts", forbiddenReactor("serviceaccounts"))
+	kcl := kubeclient.NewTestKubeClient(clientset)
+	kcl.SetIsKubeAdmin(false)
+	kcl.SetClientNonAdminNamespaces([]string{"team-a"})
+	seedProxyKubeClient(factory, nonAdmin.ID, kcl)
+
+	req := newPodRequest(t, http.MethodGet, serviceAccountPath, nonAdmin, tk)
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusForbidden, rr.Code)
+}
+
+func TestGetKubernetesServiceAccount_NotFound(t *testing.T) {
+	t.Parallel()
+	handler, factory, admin, tk := newPodTestHandler(t)
+
+	kcl := kubeclient.NewTestKubeClient(kfake.NewSimpleClientset())
+	seedProxyKubeClient(factory, admin.ID, kcl)
+
+	req := newPodRequest(t, http.MethodGet, serviceAccountPath, admin, tk)
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusNotFound, rr.Code)
 }

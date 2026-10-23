@@ -11,6 +11,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/docker/docker/api/types/image"
@@ -88,7 +90,7 @@ func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*cli
 		client.WithHTTPClient(httpCli),
 	}
 
-	if nnTransport, ok := httpCli.Transport.(*NodeNameTransport); ok && nnTransport.TLSClientConfig != nil {
+	if endpoint.TLSConfig.TLS {
 		opts = append(opts, client.WithScheme("https"))
 	}
 
@@ -122,7 +124,7 @@ func createAgentClient(endpoint *portainer.Endpoint, endpointURL string, signatu
 		client.WithHTTPHeaders(headers),
 	}
 
-	if nnTransport, ok := httpCli.Transport.(*NodeNameTransport); ok && nnTransport.TLSClientConfig != nil {
+	if endpoint.TLSConfig.TLS {
 		opts = append(opts, client.WithScheme("https"))
 	}
 
@@ -184,17 +186,18 @@ func (t *NodeNameTransport) RoundTrip(req *http.Request) (*http.Response, error)
 }
 
 func httpClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*http.Client, error) {
-	transport := &NodeNameTransport{
-		Transport: &http.Transport{},
-	}
-
+	var transport *NodeNameTransport
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		transport.TLSClientConfig = tlsConfig
+		t := ssrf.NewTransport(tlsConfig)
+		t.Protocols = ssrf.HTTP1Only()
+		transport = &NodeNameTransport{Transport: t}
+	} else {
+		transport = &NodeNameTransport{Transport: ssrf.NewTransport(nil)}
 	}
 
 	clientTimeout := defaultDockerRequestTimeout

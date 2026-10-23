@@ -2,7 +2,6 @@ package boltdb
 
 import (
 	"bytes"
-	"crypto/aes"
 	"crypto/cipher"
 
 	"github.com/pkg/errors"
@@ -28,18 +27,18 @@ func (connection *DbConnection) MarshalObject(object any) ([]byte, error) {
 		}
 	}
 
-	if connection.getEncryptionKey() == nil {
+	if connection.gcm == nil {
 		return buf.Bytes(), nil
 	}
 
-	return encrypt(buf.Bytes(), connection.getEncryptionKey())
+	return encrypt(buf.Bytes(), connection.gcm), nil
 }
 
 // UnmarshalObject decodes an object from binary data
 func (connection *DbConnection) UnmarshalObject(data []byte, object any) error {
 	var err error
-	if connection.getEncryptionKey() != nil {
-		data, err = decrypt(data, connection.getEncryptionKey())
+	if connection.gcm != nil {
+		data, err = decrypt(data, connection.gcm)
 		if err != nil {
 			return errors.Wrap(err, "Failed decrypting object")
 		}
@@ -59,48 +58,23 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object any) error {
 	return err
 }
 
-// mmm, don't have a KMS .... aes GCM seems the most likely from
-// https://gist.github.com/atoponce/07d8d4c833873be2f68c34f9afc5a78a#symmetric-encryption
-
-func encrypt(plaintext []byte, passphrase []byte) (encrypted []byte, err error) {
-	block, err := aes.NewCipher(passphrase)
-	if err != nil {
-		return encrypted, err
-	}
-
-	// NewGCMWithRandomNonce in go 1.24 handles setting up the nonce and adding it to the encrypted output
-	gcm, err := cipher.NewGCMWithRandomNonce(block)
-	if err != nil {
-		return encrypted, err
-	}
-
-	return gcm.Seal(nil, nil, plaintext, nil), nil
+func encrypt(plaintext []byte, gcm cipher.AEAD) []byte {
+	return gcm.Seal(nil, nil, plaintext, nil)
 }
 
-func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err error) {
+func decrypt(encrypted []byte, gcm cipher.AEAD) ([]byte, error) {
 	if string(encrypted) == "false" {
 		return []byte("false"), nil
 	}
 
-	block, err := aes.NewCipher(passphrase)
-	if err != nil {
-		return encrypted, errors.Wrap(err, "Error creating cypher block")
-	}
-
-	// NewGCMWithRandomNonce in go 1.24 handles reading the nonce from the encrypted input for us
-	gcm, err := cipher.NewGCMWithRandomNonce(block)
-	if err != nil {
-		return encrypted, errors.Wrap(err, "Error creating GCM")
-	}
-
-	if len(encrypted) < gcm.NonceSize() {
+	if len(encrypted) < gcm.Overhead() {
 		return encrypted, errEncryptedStringTooShort
 	}
 
-	plaintextByte, err = gcm.Open(nil, nil, encrypted, nil)
+	plaintextByte, err := gcm.Open(nil, nil, encrypted, nil)
 	if err != nil {
 		return encrypted, errors.Wrap(err, "Error decrypting text")
 	}
 
-	return plaintextByte, err
+	return plaintextByte, nil
 }

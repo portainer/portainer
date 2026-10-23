@@ -7,7 +7,7 @@ const dockerTexts = {
       <p>
         You can get more information about Compose file format in the{' '}
         <a
-          href="https://docs.docker.com/compose/compose-file/"
+          href="https://docs.docker.com/reference/compose-file/"
           target="_blank"
           rel="noreferrer"
         >
@@ -35,7 +35,7 @@ export const textByType = {
           <p>
             You can get more information about Kubernetes file format in the{' '}
             <a
-              href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/"
+              href="https://kubernetes.io/docs/concepts/overview/working-with-objects/"
               target="_blank"
               rel="noreferrer"
             >

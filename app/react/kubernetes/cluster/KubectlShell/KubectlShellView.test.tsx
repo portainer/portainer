@@ -44,7 +44,11 @@ function triggerStateChange(state: ShellState) {
 beforeEach(() => {
   vi.clearAllMocks();
   Object.defineProperty(window, 'location', {
-    value: { protocol: 'https:', host: 'localhost:3000' },
+    value: {
+      protocol: 'https:',
+      host: 'localhost:3000',
+      href: 'https://localhost:3000/',
+    },
     writable: true,
   });
 });
@@ -60,7 +64,11 @@ describe('KubectlShellView', () => {
 
     it('builds ws:// URL when location is http', () => {
       Object.defineProperty(window, 'location', {
-        value: { protocol: 'http:', host: 'localhost:3000' },
+        value: {
+          protocol: 'http:',
+          host: 'localhost:3000',
+          href: 'http://localhost:3000/',
+        },
         writable: true,
       });
       renderComponent();

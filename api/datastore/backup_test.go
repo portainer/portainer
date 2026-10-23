@@ -130,7 +130,8 @@ func TestBackupDBFileUsesCorrectPath(t *testing.T) {
 	_, store := MustNewTestStore(t, true, false)
 
 	t.Run("backs up unencrypted db when encrypted flag is false", func(t *testing.T) {
-		store.connection.SetEncrypted(false)
+		err := store.connection.SetEncrypted(false)
+		require.NoError(t, err)
 
 		backupFilename, err := store.backupDBFile("")
 		require.NoError(t, err)

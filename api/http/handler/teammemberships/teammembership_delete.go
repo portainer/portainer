@@ -13,8 +13,8 @@ import (
 
 // @id TeamMembershipDelete
 // @summary Remove a team membership
-// @description Remove a team membership. Access is only available to administrators leaders of the associated team.
-// @description **Access policy**: administrator
+// @description Remove a team membership. Access is only available to administrators or leaders of the associated team.
+// @description **Access policy**: administrator or leaders of the associated team
 // @tags team_memberships
 // @security ApiKeyAuth
 // @security jwt

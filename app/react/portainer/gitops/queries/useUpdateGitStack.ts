@@ -6,19 +6,12 @@ import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
 
 import { EnvVarValues } from '@@/form-components/EnvironmentVariablesFieldset';
 
-import { AuthTypeOption } from '../../account/git-credentials/types';
-
 interface DeployGitPayload {
   RepositoryReferenceName?: string;
-  RepositoryAuthentication?: boolean;
-  RepositoryUsername?: string;
-  RepositoryPassword?: string;
-  RepositoryAuthorizationType?: AuthTypeOption;
   Env?: EnvVarValues;
   Prune?: boolean;
   // RepullImageAndRedeploy indicates whether to force repulling images and redeploying the stack
   RepullImageAndRedeploy?: boolean;
-  RepositoryGitCredentialID?: number;
 
   StackName?: string;
 }

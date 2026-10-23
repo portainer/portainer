@@ -2,7 +2,9 @@ package update
 
 import (
 	"context"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -27,15 +29,21 @@ func UpdateGitObject(ctx context.Context, gitService portainer.GitService, objId
 
 	username, password := git.GetCredentials(gitConfig.Authentication)
 
+	fetchCtx, cancel := context.WithTimeout(ctx, time.Minute)
 	newHash, err := gitService.LatestCommitID(
-		ctx,
+		fetchCtx,
 		gitConfig.URL,
 		gitConfig.ReferenceName,
 		username,
 		password,
 		gitConfig.TLSSkipVerify,
 	)
+	cancel()
 	if err != nil {
+		if fetchCtx.Err() == context.DeadlineExceeded {
+			log.Error().Str("object", objId).Msg("git fetch timed out after 1 minute")
+		}
+
 		return false, "", errors.WithMessagef(err, "failed to fetch latest commit id of %v", objId)
 	}
 
@@ -71,6 +79,11 @@ func UpdateGitObject(ctx context.Context, gitService portainer.GitService, objId
 	}
 
 	if err := cloneGitRepository(ctx, gitService, cloneParams); err != nil {
+		if enableVersionFolder {
+			if removeErr := os.RemoveAll(toDir); removeErr != nil {
+				log.Warn().Err(removeErr).Str("dir", toDir).Msg("failed to remove partial clone directory")
+			}
+		}
 		return false, "", errors.WithMessagef(err, "failed to do a fresh clone of %v", objId)
 	}
 

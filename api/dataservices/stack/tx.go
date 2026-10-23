@@ -7,6 +7,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
+
+	"github.com/rs/zerolog/log"
 )
 
 type ServiceTx struct {
@@ -56,7 +58,19 @@ func (service ServiceTx) GetNextIdentifier() int {
 
 // CreateStack creates a new stack.
 func (service ServiceTx) Create(stack *portainer.Stack) error {
+	if stack.GitConfig != nil {
+		log.Warn().Int("stackID", int(stack.ID)).Str("url", stack.GitConfig.URL).Msg("stack persisted with non-nil GitConfig; GitConfig is deprecated, use WorkflowID/Source instead")
+	}
+
 	return service.Tx.CreateObjectWithId(BucketName, int(stack.ID), stack)
+}
+
+func (service ServiceTx) Update(ID portainer.StackID, stack *portainer.Stack) error {
+	if stack.GitConfig != nil {
+		log.Warn().Int("stackID", int(ID)).Str("url", stack.GitConfig.URL).Msg("stack persisted with non-nil GitConfig; GitConfig is deprecated, use WorkflowID/Source instead")
+	}
+
+	return service.BaseDataServiceTx.Update(ID, stack)
 }
 
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
@@ -82,17 +96,4 @@ func (service ServiceTx) StackByWebhookID(id string) (*portainer.Stack, error) {
 
 	return nil, err
 
-}
-
-// RefreshableStacks returns stacks that are configured for a periodic update
-func (service ServiceTx) RefreshableStacks() ([]portainer.Stack, error) {
-	stacks := make([]portainer.Stack, 0)
-
-	return stacks, service.Tx.GetAll(
-		BucketName,
-		&portainer.Stack{},
-		dataservices.FilterFn(&stacks, func(e portainer.Stack) bool {
-			return e.AutoUpdate != nil && e.AutoUpdate.Interval != ""
-		}),
-	)
 }

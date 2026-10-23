@@ -119,7 +119,7 @@ function SortOptionItem<TSortKey extends string>({
       <DropdownMenu
         label={option.label}
         options={groupOptions?.[option.key]}
-        selected={isActive ? value.groupValue ?? null : null}
+        selected={isActive ? (value.groupValue ?? null) : null}
         onSelect={(selected) => {
           onChange({ group: option.key, groupValue: selected });
         }}

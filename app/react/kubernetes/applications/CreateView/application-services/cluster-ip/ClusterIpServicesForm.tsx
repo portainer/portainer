@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react';
 import { FormikErrors } from 'formik';
 
-import { Card } from '@@/Card';
+import { Card } from '@@/primitives/Card';
 import { TextTip } from '@@/Tip/TextTip';
 import { Button } from '@@/buttons';
 
@@ -37,63 +37,65 @@ export function ClusterIpServicesForm({
     (service) => service.Type === 'ClusterIP'
   ).length;
   return (
-    <Card className="pb-5">
-      <div className="flex flex-col gap-6">
-        <TextTip color="blue">
-          Publish <b>internally</b> in the cluster via a{' '}
-          <b>ClusterIP service</b>, optionally exposing <b>externally</b> to the
-          outside world via an <b>ingress</b>.
-        </TextTip>
-        {clusterIPServiceCount > 0 && (
-          <div className="flex w-full flex-col gap-4">
-            {services.map((service, index) =>
-              service.Type === 'ClusterIP' ? (
-                <ClusterIpServiceForm
-                  key={index}
-                  serviceName={service.Name}
-                  servicePorts={service.Ports}
-                  errors={errors?.[index]?.Ports}
-                  onChangePort={(servicePorts: ServicePort[]) => {
-                    const newServices = [...services];
-                    newServices[index].Ports = servicePorts;
-                    onChangeService(newServices);
-                  }}
-                  services={services}
-                  serviceIndex={index}
-                  onChangeService={onChangeService}
-                  namespace={namespace}
-                  isEditMode={isEditMode}
-                />
-              ) : null
-            )}
+    <Card.Container variant="filled">
+      <Card.Body className="pb-5">
+        <div className="flex flex-col gap-6">
+          <TextTip color="blue">
+            Publish <b>internally</b> in the cluster via a{' '}
+            <b>ClusterIP service</b>, optionally exposing <b>externally</b> to
+            the outside world via an <b>ingress</b>.
+          </TextTip>
+          {clusterIPServiceCount > 0 && (
+            <div className="flex w-full flex-col gap-4">
+              {services.map((service, index) =>
+                service.Type === 'ClusterIP' ? (
+                  <ClusterIpServiceForm
+                    key={index}
+                    serviceName={service.Name}
+                    servicePorts={service.Ports}
+                    errors={errors?.[index]?.Ports}
+                    onChangePort={(servicePorts: ServicePort[]) => {
+                      const newServices = [...services];
+                      newServices[index].Ports = servicePorts;
+                      onChangeService(newServices);
+                    }}
+                    services={services}
+                    serviceIndex={index}
+                    onChangeService={onChangeService}
+                    namespace={namespace}
+                    isEditMode={isEditMode}
+                  />
+                ) : null
+              )}
+            </div>
+          )}
+          <div className="flex">
+            <Button
+              color="secondary"
+              className="!ml-0"
+              icon={Plus}
+              size="small"
+              onClick={() => {
+                // create a new service form value and add it to the list of services
+                const newService = structuredClone(serviceFormDefaultValues);
+                newService.Name = generateUniqueName(
+                  appName,
+                  services.length + 1,
+                  services
+                );
+                newService.Type = 'ClusterIP';
+                const newServicePort = newPort(newService.Name);
+                newService.Ports = [newServicePort];
+                newService.Selector = selector;
+                onChangeService([...services, newService]);
+              }}
+              data-cy="k8sAppCreate-createServiceButton"
+            >
+              Create service
+            </Button>
           </div>
-        )}
-        <div className="flex">
-          <Button
-            color="secondary"
-            className="!ml-0"
-            icon={Plus}
-            size="small"
-            onClick={() => {
-              // create a new service form value and add it to the list of services
-              const newService = structuredClone(serviceFormDefaultValues);
-              newService.Name = generateUniqueName(
-                appName,
-                services.length + 1,
-                services
-              );
-              newService.Type = 'ClusterIP';
-              const newServicePort = newPort(newService.Name);
-              newService.Ports = [newServicePort];
-              newService.Selector = selector;
-              onChangeService([...services, newService]);
-            }}
-            data-cy="k8sAppCreate-createServiceButton"
-          >
-            Create service
-          </Button>
         </div>
-      </div>
-    </Card>
+      </Card.Body>
+    </Card.Container>
   );
 }

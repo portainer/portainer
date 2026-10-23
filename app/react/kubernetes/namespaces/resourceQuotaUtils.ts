@@ -1,11 +1,5 @@
 import { safeFilesizeParser } from '../utils';
 
-export const KubernetesPortainerResourceQuotaPrefix = 'portainer-rq-';
-
-export function generateResourceQuotaName(name: string) {
-  return `${KubernetesPortainerResourceQuotaPrefix}${name}`;
-}
-
 export function terabytesValue(value: string | number) {
   return gigabytesValue(value) / 1000;
 }

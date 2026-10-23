@@ -76,7 +76,7 @@ var endpointTestCases = []endpointTestCase{
 	},
 }
 
-func mustSetupHandler(t *testing.T) *Handler {
+func mustSetupHandler(t testing.TB) *Handler {
 	tmpDir := t.TempDir()
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {

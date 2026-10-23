@@ -98,11 +98,13 @@ export const columns = _.compact([
 
         return (
           <div className="flex items-center gap-2">
-            <DeploymentCounter
-              count={count}
-              type={StatusType.Error}
-              total={row.original.NumDeployments}
-            />
+            <div className="min-w-0 flex-1">
+              <DeploymentCounter
+                count={count}
+                type={StatusType.Error}
+                total={row.original.NumDeployments}
+              />
+            </div>
             {count > 0 && (
               <Link
                 className="hover:no-underline"

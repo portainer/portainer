@@ -16,6 +16,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
 )
 
 // Status constants
@@ -26,6 +27,11 @@ const (
 	Skipped    = Status("skipped")
 	Preparing  = Status("preparing")
 	Error      = Status("error")
+)
+
+const (
+	errorStatusCacheTTL       = 5 * time.Minute
+	maxConcurrentStatusChecks = 8
 )
 
 var (
@@ -46,13 +52,17 @@ func (c *DigestClient) ContainersImageStatus(ctx context.Context, containers []t
 	}
 
 	statuses := make([]Status, len(containers))
-	for i, ct := range containers {
+
+	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(maxConcurrentStatusChecks)
+
+	containerStatus := func(ct types.Container) Status {
 		var nodeName string
 		if swarmNodeId := ct.Labels[consts.SwarmNodeIDLabel]; swarmNodeId != "" {
 			if swarmNodeName, ok := swarmID2NameCache.Get(swarmNodeId); ok {
 				nodeName, _ = swarmNodeName.(string)
 			} else {
-				node, _, err := cli.NodeInspectWithRaw(ctx, ct.Labels[consts.SwarmNodeIDLabel])
+				node, _, err := cli.NodeInspectWithRaw(ctx, swarmNodeId)
 				if err != nil {
 					return Error
 				}
@@ -64,23 +74,26 @@ func (c *DigestClient) ContainersImageStatus(ctx context.Context, containers []t
 
 		s, err := c.ContainerImageStatus(ctx, ct.ID, endpoint, nodeName)
 		if err != nil {
-			statuses[i] = Error
 			log.Warn().Str("containerId", ct.ID).Err(err).Msg("error when fetching image status for container")
-
-			continue
+			return Error
 		}
 
-		statuses[i] = s
-
-		if s == Outdated || s == Processing {
-			break
-		}
+		return s
 	}
 
-	return FigureOut(statuses)
+	for i, ct := range containers {
+		g.Go(func() error {
+			statuses[i] = containerStatus(ct)
+			return nil
+		})
+	}
+
+	_ = g.Wait()
+
+	return AggregateImageStatus(statuses)
 }
 
-func FigureOut(statuses []Status) Status {
+func AggregateImageStatus(statuses []Status) Status {
 	if allMatch(statuses, Skipped) {
 		return Skipped
 	}
@@ -141,7 +154,7 @@ func (c *DigestClient) ContainerImageStatus(ctx context.Context, containerID str
 		images = append(images, ParseRepoTags(imageInspect.RepoTags)...)
 	}
 
-	s, err := c.checkStatus(images, digs)
+	s, err := c.checkStatus(ctx, images, digs)
 	if err != nil {
 		log.Debug().Str("image", container.Image).Err(err).Msg("fetching a certain image status")
 		return Error, err
@@ -191,7 +204,7 @@ func (c *DigestClient) ServiceImageStatus(ctx context.Context, serviceID string,
 	return c.ContainersImageStatus(ctx, nonExistedOrStoppedContainers, endpoint), nil
 }
 
-func (c *DigestClient) checkStatus(images []*Image, digests []digest.Digest) (Status, error) {
+func (c *DigestClient) checkStatus(ctx context.Context, images []*Image, digests []digest.Digest) (Status, error) {
 	if digests == nil {
 		digests = make([]digest.Digest, 0)
 	}
@@ -216,7 +229,7 @@ func (c *DigestClient) checkStatus(images []*Image, digests []digest.Digest) (St
 			remoteDigest, _ = rd.(digest.Digest)
 		}
 		if remoteDigest == "" {
-			remoteDigest, err = c.RemoteDigest(*img)
+			remoteDigest, err = c.RemoteDigest(ctx, *img)
 			if err != nil {
 				log.Error().Str("image", img.String()).Msg("error when fetch remote digest for image")
 				return Error, err
@@ -261,6 +274,10 @@ func CachedResourceImageStatus(resourceID string) (Status, error) {
 
 func CacheResourceImageStatus(resourceID string, status Status) {
 	statusCache.Set(resourceID, status, 0)
+}
+
+func CacheErrorImageStatus(resourceID string) {
+	statusCache.Set(resourceID, Error, errorStatusCacheTTL)
 }
 
 func CachedImageDigest(resourceID string) (Status, error) {

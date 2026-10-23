@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/pkg/libhelm/sdk"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"helm.sh/helm/v4/pkg/cli"
 	"helm.sh/helm/v4/pkg/getter"
 	repo "helm.sh/helm/v4/pkg/repo/v1"
@@ -40,12 +41,14 @@ func ValidateHelmRepositoryURL(repoUrl string, _ *http.Client) error {
 		return fmt.Errorf("failed to derive repo name: %w", err)
 	}
 
+	ssrfTransport := ssrf.NewTransport(nil)
+
 	r, err := repo.NewChartRepository(
 		&repo.Entry{
 			Name: repoName,
 			URL:  repoUrl,
 		},
-		getter.All(settings),
+		getter.All(settings, getter.WithTransport(ssrfTransport)),
 	)
 	if err != nil {
 		return fmt.Errorf("%s is not a valid chart repository or cannot be reached: %w", repoUrl, err)
@@ -53,7 +56,7 @@ func ValidateHelmRepositoryURL(repoUrl string, _ *http.Client) error {
 
 	indexPath, err := r.DownloadIndexFile()
 	if err != nil {
-		return fmt.Errorf("%s is not a valid chart repository or cannot be reached: %w", repoUrl, err)
+		return fmt.Errorf("%s is not a valid chart repository or cannot be reached", repoUrl)
 	}
 
 	// Best-effort: load and seed in-memory cache for future SearchRepo calls

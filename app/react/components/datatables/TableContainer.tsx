@@ -24,14 +24,10 @@ export function TableContainer({
   }
 
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <div className="datatable">
-          <Widget aria-label={ariaLabel} id={id}>
-            <WidgetBody className="no-padding">{children}</WidgetBody>
-          </Widget>
-        </div>
-      </div>
+    <div className="datatable mx-4">
+      <Widget aria-label={ariaLabel} id={id}>
+        <WidgetBody className="no-padding">{children}</WidgetBody>
+      </Widget>
     </div>
   );
 }

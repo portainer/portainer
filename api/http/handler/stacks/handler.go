@@ -11,14 +11,15 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
 	"github.com/portainer/portainer/api/docker/consts"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/logs"
-	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/api/stacks/teardown"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/docker/docker/api/types"
@@ -41,8 +42,9 @@ type Handler struct {
 	ComposeStackManager     portainer.ComposeStackManager
 	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
-	Scheduler               *scheduler.Scheduler
+	SourceScheduler         *scheduling.SourceScheduler
 	StackDeployer           deployments.StackDeployer
+	teardownService         teardown.Service
 }
 
 func stackExistsError(name string) *httperror.HandlerError {
@@ -52,12 +54,13 @@ func stackExistsError(name string) *httperror.HandlerError {
 }
 
 // NewHandler creates a handler to manage stack operations.
-func NewHandler(bouncer security.BouncerService) *Handler {
+func NewHandler(bouncer security.BouncerService, teardownService teardown.Service) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
+		teardownService:    teardownService,
 	}
 
 	h.Handle("/stacks/create/{type}/{method}",

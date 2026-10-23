@@ -21,12 +21,12 @@ import (
 
 var edgeStackSingleFlightGroup = singleflight.Group{}
 
-// @summary Inspect an Edge Stack for an Environment(Endpoint)
-// @description **Access policy**: public
-// @tags edge, endpoints, edge_stacks
+// @summary Inspect an Edge Stack for an Environment
+// @description **Access policy**: Edge agent only — requires X-PortainerAgent-EdgeID header
+// @tags edge_agent, edge_stacks
 // @accept json
 // @produce json
-// @param id path int true "environment(endpoint) Id"
+// @param id path int true "environment Id"
 // @param stackId path int true "EdgeStack Id"
 // @success 200 {object} edge.StackPayload
 // @failure 500
@@ -67,6 +67,15 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 
 	// WARNING: this variable must not be mutated
 	edgeStack := s.(*portainer.EdgeStack)
+
+	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.InternalServerError("Unable to retrieve relation object from the database", fmt.Errorf("%w. Environment ID: %d", err, endpoint.ID))
+	}
+
+	if relation == nil || !relation.EdgeStacks[edgeStack.ID] {
+		return httperror.Forbidden("Permission denied to access this Edge stack", fmt.Errorf("Edge stack %d is not assigned to environment %d", edgeStack.ID, endpoint.ID))
+	}
 
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {

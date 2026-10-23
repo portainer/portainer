@@ -39,27 +39,22 @@
                   </div>
                 </div>
 
-                <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <label for="target_namespace" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
-                  <div class="col-sm-9 col-lg-10">
-                    <div class="mb-1">
-                      <k8s-registry-access-notice ng-if="!ctrl.formValues.namespace_toggle" namespace="ctrl.formValues.Namespace"></k8s-registry-access-notice>
+                <div ng-if="!ctrl.formValues.namespace_toggle">
+                  <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                    <div class="col-sm-12">
+                      <k8s-registry-access-notice namespace="ctrl.formValues.Namespace"></k8s-registry-access-notice>
                     </div>
-                    <namespace-portainer-select
-                      ng-if="!ctrl.formValues.namespace_toggle"
-                      is-disabled="ctrl.formValues.namespace_toggle || ctrl.state.isNamespaceInputDisabled"
-                      value="ctrl.formValues.Namespace"
-                      on-change="(ctrl.onChangeNamespace)"
-                      options="ctrl.namespaceOptions"
-                    ></namespace-portainer-select>
-                    <span ng-if="ctrl.formValues.namespace_toggle" class="small text-muted pt-[7px]">Namespaces specified in the manifest will be used</span>
                   </div>
+                  <namespace-selector
+                    values="ctrl.formValues.Namespace"
+                    on-change="(ctrl.onChangeNamespace)"
+                    validation-data="{namespaceOptionCount: ctrl.namespaces.length}"
+                  ></namespace-selector>
                 </div>
-
-                <div class="form-group" ng-if="!ctrl.formValues.Namespace">
-                  <div class="col-sm-12 small text-warning">
-                    <pr-icon icon="'alert-triangle'" mode="'warning'"></pr-icon>
-                    You do not have access to any namespace. Contact your administrator to get access to a namespace.
+                <div class="form-group" ng-if="ctrl.formValues.namespace_toggle">
+                  <label class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
+                  <div class="col-sm-9 col-lg-10">
+                    <span class="small text-muted pt-[7px]">Namespaces specified in the manifest will be used</span>
                   </div>
                 </div>
 
@@ -90,6 +85,7 @@
                   is-force-pull-visible="false"
                   is-additional-files-field-visible="true"
                   is-auth-explanation-visible="true"
+                  is-source-selection-visible="true"
                   deploy-method="{{ ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest' }}"
                   base-webhook-url="{{ ctrl.state.baseWebhookUrl }}"
                   webhook-id="{{ ctrl.state.webhookId }}"
@@ -144,7 +140,7 @@
                       </p>
                       <p>
                         You can get more information about Kubernetes file format in the
-                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/" target="_blank">official documentation</a>.
                       </p>
                     </editor-description>
                   </web-editor-form>
@@ -158,7 +154,7 @@
                     <div class="col-sm-12 small vertical-center pt-[7px]">
                       <pr-icon icon="'info'" mode="'primary'"></pr-icon>
                       Specify the URL to the
-                      <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">Kubernetes manifest.</a>
+                      <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/" target="_blank">Kubernetes manifest.</a>
                     </div>
                   </div>
                   <div class="form-group">

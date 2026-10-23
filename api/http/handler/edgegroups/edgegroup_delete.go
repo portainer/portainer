@@ -21,7 +21,7 @@ import (
 // @security jwt
 // @param id path int true "EdgeGroup Id"
 // @success 204
-// @failure 409 "Edge group is in use by an Edge stack or Edge job"
+// @failure 409 "Edge group is in use by an Edge stack, Edge job or Workflow"
 // @failure 503 "Edge compute features are disabled"
 // @failure 500 "Server error"
 // @router /edge_groups/{id} [delete]
@@ -65,6 +65,19 @@ func deleteEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) erro
 	for _, edgeJob := range edgeJobs {
 		if slices.Contains(edgeJob.EdgeGroups, ID) {
 			return httperror.Conflict("Edge group is used by an Edge job", errors.New("edge group is used by an Edge job"))
+		}
+	}
+
+	workflows, err := tx.Workflow().ReadAll()
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve workflows from the database", err)
+	}
+
+	for _, workflow := range workflows {
+		for _, artifact := range workflow.Artifacts {
+			if slices.Contains(artifact.EdgeGroups, ID) {
+				return httperror.Conflict("Edge group is used by a workflow", errors.New("edge group is used by a workflow"))
+			}
 		}
 	}
 

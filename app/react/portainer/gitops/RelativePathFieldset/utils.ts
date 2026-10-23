@@ -14,15 +14,8 @@ export function parseRelativePathResponse(stack: EdgeStack): RelativePathModel {
 }
 
 export const dummyGitForm: GitFormModel = {
-  RepositoryURL: '',
-  RepositoryURLValid: false,
-  RepositoryAuthentication: false,
-  RepositoryUsername: '',
-  RepositoryPassword: '',
+  SourceId: 0,
   AdditionalFiles: [],
   RepositoryReferenceName: '',
   ComposeFilePathInRepository: '',
-  NewCredentialName: '',
-  SaveCredential: false,
-  TLSSkipVerify: false,
 };

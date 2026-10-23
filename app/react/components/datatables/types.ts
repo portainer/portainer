@@ -87,18 +87,18 @@ export function hiddenColumnsSettings<T extends SettableColumnsTableSettings>(
 
 // auto refresh settings
 export interface RefreshableTableSettings {
-  autoRefreshRate: number;
-  setAutoRefreshRate: (autoRefreshRate: number) => void;
+  autoRefreshRateMS: number;
+  setAutoRefreshRate: (autoRefreshRateMS: number) => void;
 }
 
 export function refreshableSettings<T extends RefreshableTableSettings>(
   set: ZustandSetFunc<T>,
-  autoRefreshRate: number = 0
+  autoRefreshRateMS: number = 0
 ): RefreshableTableSettings {
   return {
-    autoRefreshRate,
-    setAutoRefreshRate: (autoRefreshRate: number) =>
-      set((s) => ({ ...s, autoRefreshRate })),
+    autoRefreshRateMS,
+    setAutoRefreshRate: (autoRefreshRateMS: number) =>
+      set((s) => ({ ...s, autoRefreshRateMS })),
   };
 }
 

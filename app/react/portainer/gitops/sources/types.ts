@@ -1,21 +1,17 @@
 import { type LucideIcon, Box, GitBranch, Package } from 'lucide-react';
 
-export type SourceStatus =
-  | 'healthy'
-  | 'error'
-  | 'syncing'
-  | 'paused'
-  | 'unknown';
-export type SourceType = 'git' | 'helm' | 'oci';
+import { WorkflowsStatus, SourcesSourceType } from '@api/types.gen';
+
+export type SourceStatus = WorkflowsStatus;
+export type SourceType = SourcesSourceType;
 
 export interface Source {
-  id: string;
+  id: number;
   name: string;
   type: SourceType;
   url: string;
   status: SourceStatus;
   error?: string;
-  provider?: string;
   usedBy: number;
   environments: number;
   lastSync: number;

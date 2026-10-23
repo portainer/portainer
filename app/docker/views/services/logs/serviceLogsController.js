@@ -30,7 +30,6 @@ angular.module('portainer.docker').controller('ServiceLogsController', [
       var repeater = $scope.repeater;
       if (angular.isDefined(repeater)) {
         $interval.cancel(repeater);
-        repeater = null;
       }
     }
 

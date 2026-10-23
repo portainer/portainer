@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -93,7 +96,22 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
-	if gitStackPendingRedeploy(stack) {
+	var gitConfig *gittypes.RepoConfig
+	if stack.WorkflowID != 0 {
+		if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var err error
+			userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+			gitConfig, _, err = loadGitConfigForStack(tx, userContext, stack.WorkflowID, stack.ID)
+			if err != nil {
+				return httperror.InternalServerError("Unable to load git config for stack", err)
+			}
+			return nil
+		}); err != nil {
+			return response.TxErrorResponse(err)
+		}
+	}
+
+	if gitStackPendingRedeploy(stack, gitConfig) {
 		return httperror.Conflict("Stack git settings have changed. Redeploy the stack to apply the new configuration.", errors.New("git settings updated without redeploy"))
 	}
 
@@ -108,10 +126,11 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 // gitStackPendingRedeploy returns true when the stack's git settings (URL or config file path)
 // have been updated via "save settings" but the stack has not yet been redeployed to apply them.
 // In that state the local clone is stale and the stack file cannot be read from disk.
-func gitStackPendingRedeploy(stack *portainer.Stack) bool {
-	if stack.GitConfig == nil || stack.CurrentDeploymentInfo == nil {
+func gitStackPendingRedeploy(stack *portainer.Stack, gitConfig *gittypes.RepoConfig) bool {
+	if gitConfig == nil || stack.CurrentDeploymentInfo == nil {
 		return false
 	}
-	return stack.GitConfig.URL != stack.CurrentDeploymentInfo.RepositoryURL ||
-		stack.GitConfig.ConfigFilePath != stack.CurrentDeploymentInfo.ConfigFilePath
+
+	return gitConfig.URL != stack.CurrentDeploymentInfo.RepositoryURL ||
+		gitConfig.ConfigFilePath != stack.CurrentDeploymentInfo.ConfigFilePath
 }

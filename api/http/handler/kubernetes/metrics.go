@@ -1,6 +1,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/middlewares"
@@ -9,6 +10,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -103,31 +105,34 @@ func (handler *Handler) getKubernetesMetricsForNode(w http.ResponseWriter, r *ht
 // @success 200 {object} v1beta1.PodMetricsList "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
+// @failure 403 "Permission denied - the user is authenticated but is not authorized to access pod metrics in the specified namespace. Check your user roles and permissions."
 // @failure 500 "Server error occurred while attempting to retrieve the list of pods with their live metrics."
-// @router /kubernetes/{id}/metrics/pods/{namespace} [get]
+// @router /kubernetes/{id}/metrics/pods/namespace/{namespace} [get]
 func (handler *Handler) getKubernetesMetricsForAllPods(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Msg("Failed to fetch endpoint")
-		return httperror.InternalServerError(err.Error(), err)
-	}
-
-	cli, err := handler.KubernetesClientFactory.CreateRemoteMetricsClient(endpoint)
-	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Msg("Failed to create metrics KubeClient")
-		return httperror.InternalServerError("failed to create metrics KubeClient", nil)
-	}
-
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
 		log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Msg("Invalid namespace identifier route variable")
 		return httperror.BadRequest("Invalid namespace identifier route variable", err)
 	}
 
-	metrics, err := cli.MetricsV1beta1().PodMetricses(namespace).List(r.Context(), v1.ListOptions{})
+	cli, httpErr := handler.getProxyKubeClient(r)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	metrics, err := cli.GetMetricsClient().MetricsV1beta1().PodMetricses(namespace).List(r.Context(), v1.ListOptions{})
 	if err != nil {
-		log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Msg("Failed to fetch metrics")
-		return httperror.InternalServerError("Failed to fetch metrics", err)
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Str("namespace", namespace).Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("unauthorized access to pod metrics. Error: ", err)
+		}
+
+		upstreamStatus := int32(0)
+		if apiStatus, ok := err.(k8serrors.APIStatus); ok {
+			upstreamStatus = apiStatus.Status().Code
+		}
+		log.Error().Err(err).Str("context", "getKubernetesMetricsForAllPods").Str("namespace", namespace).Int32("upstreamStatus", upstreamStatus).Str("reason", string(k8serrors.ReasonForError(err))).Msg("Failed to fetch metrics")
+		return httperror.InternalServerError(fmt.Sprintf("Failed to fetch metrics (upstream status %d)", upstreamStatus), err)
 	}
 
 	return response.JSON(w, metrics)

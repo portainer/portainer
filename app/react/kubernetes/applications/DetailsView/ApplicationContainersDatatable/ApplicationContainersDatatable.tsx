@@ -7,20 +7,23 @@ import { IndexOptional } from '@/react/kubernetes/configs/types';
 import { createStore } from '@/react/kubernetes/datatables/default-kube-datatable-store';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useEnvironment } from '@/react/portainer/environments/queries';
+import { useKubernetesVersion } from '@/react/kubernetes/queries/useKubernetesVersion';
+import { notifyError, notifySuccess } from '@/portainer/services/notifications';
 
-import {
-  Datatable,
-  TableSettingsMenu,
-  TableSettingsMenuAutoRefresh,
-} from '@@/datatables';
+import { TableSettingsMenu, TableSettingsMenuAutoRefresh } from '@@/datatables';
 import { useTableState } from '@@/datatables/useTableState';
+import { CardExpandableList } from '@@/datatables/CardExpandableList';
+import { NestedDatatable } from '@@/datatables/NestedDatatable';
 
 import { useApplication } from '../../queries/useApplication';
 import { useApplicationPods } from '../../queries/useApplicationPods';
+import { useDeletePodMutation } from '../../queries/useDeletePodMutation';
 
-import { ContainerRowData } from './types';
-import { getColumns } from './columns';
+import { ContainerRowData, PodRowData } from './types';
+import { getPodColumns } from './columns/pod';
+import { getContainerColumns } from './columns/container';
 import { computeContainerStatus } from './computeContainerStatus';
+import { computePodStatus } from './computePodStatus';
 
 const storageKey = 'k8sContainersDatatable';
 const settingsStore = createStore(storageKey);
@@ -36,14 +39,13 @@ export function ApplicationContainersDatatable() {
     params: { name, namespace, 'resource-type': resourceType },
   } = useCurrentStateAndParams();
 
-  // get the containers from the aapplication pods
   const applicationQuery = useApplication(
     environmentId,
     namespace,
     name,
     resourceType,
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     }
   );
   const podsQuery = useApplicationPods(
@@ -52,69 +54,133 @@ export function ApplicationContainersDatatable() {
     name,
     applicationQuery.data,
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     }
   );
-  const appContainers = useContainersRowData(podsQuery.data);
+  const versionQuery = useKubernetesVersion(environmentId);
+  const deletePodMutation = useDeletePodMutation(
+    environmentId,
+    namespace,
+    name
+  );
+  const podRows = useContainersRowData(podsQuery.data);
+  const containerColumns = useMemo(
+    () => getContainerColumns(!!useServerMetricsQuery.data),
+    [useServerMetricsQuery.data]
+  );
+  const podColumns = useMemo(
+    () =>
+      getPodColumns({
+        supportsRestartStrategy: !!versionQuery.data?.supportsPodRestart,
+        isDeleting: deletePodMutation.isLoading,
+        isLoading: versionQuery.isLoading,
+        onDelete: (podName) => {
+          deletePodMutation.mutate(
+            { podName },
+            {
+              onSuccess: () =>
+                notifySuccess('Success', `Pod '${podName}' deleted`),
+              onError: (error) =>
+                notifyError(
+                  'Failure',
+                  error as Error,
+                  `Unable to delete pod '${podName}'`
+                ),
+            }
+          );
+        },
+      }),
+    [versionQuery, deletePodMutation]
+  );
 
   return (
-    <Datatable<IndexOptional<ContainerRowData>>
-      dataset={appContainers}
-      columns={getColumns(!!useServerMetricsQuery.data)}
-      settingsManager={tableState}
-      isLoading={
-        applicationQuery.isLoading ||
-        podsQuery.isLoading ||
-        useServerMetricsQuery.isLoading
-      }
-      title="Application containers"
-      titleIcon={Server}
-      getRowId={(row) => row.podName} // use pod name because it's unique (name is not unique)
-      disableSelect
-      data-cy="k8s-application-containers-datatable"
-      renderTableSettings={() => (
-        <TableSettingsMenu>
-          <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
-            onChange={(value) => tableState.setAutoRefreshRate(value)}
-          />
-        </TableSettingsMenu>
-      )}
-    />
+    <div className="row">
+      <div className="col-sm-12">
+        <CardExpandableList<IndexOptional<PodRowData>>
+          dataset={podRows}
+          columns={podColumns}
+          settingsManager={tableState}
+          isLoading={
+            applicationQuery.isLoading ||
+            podsQuery.isLoading ||
+            useServerMetricsQuery.isLoading
+          }
+          title="Application pods"
+          titleIcon={Server}
+          getRowId={(row) => row.podName}
+          disableSelect
+          data-cy="k8s-application-containers-datatable"
+          getRowCanExpand={(row) => row.original.containers.length > 0}
+          renderSubRow={(row) => (
+            <div className="-m-2 overflow-hidden rounded-sm bg-[color:var(--bg-card-color)] pl-6">
+              <NestedDatatable<ContainerRowData>
+                dataset={row.original.containers}
+                columns={containerColumns}
+                getRowId={(c) => `${row.original.podName}/${c.name}`}
+                data-cy={`k8s-application-containers-${row.original.podName}-inner`}
+                enablePagination={false}
+              />
+            </div>
+          )}
+          renderTableSettings={() => (
+            <TableSettingsMenu>
+              <TableSettingsMenuAutoRefresh
+                value={tableState.autoRefreshRateMS}
+                onChange={(value) => tableState.setAutoRefreshRate(value)}
+              />
+            </TableSettingsMenu>
+          )}
+          initialTableState={{
+            pagination: { pageIndex: 0, pageSize: 5 },
+            expanded: true,
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
-// useContainersRowData row data gets the pod.spec?.containers and pod.spec?.initContainers from an array of pods
-// it then appends the podName, nodeName, podId, creationDate, and status to each container
-function useContainersRowData(pods?: Pod[]): ContainerRowData[] {
-  return (
-    useMemo(
-      () =>
-        pods?.flatMap((pod) => {
-          const containers = [
-            ...(pod.spec?.containers?.map((c) => ({ ...c, isInit: false })) ||
-              []),
-            ...(pod.spec?.initContainers?.map((c) => ({
-              ...c,
-              isInit: true,
-              // https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/#sidecar-containers-and-pod-lifecycle
-              isSidecar: c.restartPolicy === 'Always',
-            })) || []),
-          ];
-          return containers.map((container) => ({
-            ...container,
-            podName: pod.metadata?.name ?? '',
-            nodeName: pod.spec?.nodeName ?? '',
-            podIp: pod.status?.podIP ?? '',
-            creationDate: pod.status?.startTime ?? '',
-            status: computeContainerStatus(
-              container.name,
-              pod.status?.containerStatuses,
-              pod.status?.initContainerStatuses
-            ),
-          }));
-        }) || [],
-      [pods]
-    ) || []
-  );
+// useContainersRowData groups containers (including init containers) under their
+// owning pod, returning one row per pod for the top-level datatable.
+function useContainersRowData(pods?: Pod[]): PodRowData[] {
+  return useMemo(() => {
+    if (!pods) {
+      return [];
+    }
+    return pods.map((pod) => {
+      const containers: ContainerRowData[] = [
+        ...(pod.spec?.containers?.map((c) => ({
+          ...c,
+          isInit: false,
+        })) ?? []),
+        ...(pod.spec?.initContainers?.map((c) => ({
+          ...c,
+          isInit: true,
+          // https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/#sidecar-containers-and-pod-lifecycle
+          isSidecar: c.restartPolicy === 'Always',
+        })) ?? []),
+      ].map((container) => ({
+        ...container,
+        podName: pod.metadata?.name ?? '',
+        status: computeContainerStatus(
+          container.name,
+          pod.status?.containerStatuses,
+          pod.status?.initContainerStatuses
+        ),
+      }));
+
+      const statuses = pod.status?.containerStatuses ?? [];
+      return {
+        podName: pod.metadata?.name ?? '',
+        nodeName: pod.spec?.nodeName ?? '',
+        podIp: pod.status?.podIP ?? '',
+        creationDate: pod.status?.startTime ?? '',
+        status: computePodStatus(pod),
+        containers,
+        readyContainers: statuses.filter((s) => s.ready).length,
+        totalContainers:
+          statuses.length || containers.filter((c) => !c.isInit).length,
+      };
+    });
+  }, [pods]);
 }

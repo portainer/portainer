@@ -1,6 +1,6 @@
 import { CalendarCheck2 } from 'lucide-react';
 
-import { NestedDatatable } from '@@/datatables/NestedDatatable';
+import { BasicTable } from '@@/datatables/BasicTable';
 
 import { columns } from '../JobsDatatable/columns';
 import { Job } from '../JobsDatatable/types';
@@ -13,12 +13,11 @@ export function CronJobsExecutionsInnerDatatable({
   item,
 }: CronJobsExecutionsProps) {
   return (
-    <NestedDatatable
+    <BasicTable
       dataset={item}
       columns={columns}
       getRowId={(row) => row.Id}
       data-cy="k8s-cronJobs-executions-datatable"
-      enablePagination={false}
       title="Executions"
       titleIcon={CalendarCheck2}
     />

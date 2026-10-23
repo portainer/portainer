@@ -32,6 +32,8 @@ type Connection interface {
 	Close() error
 
 	UpdateTx(fn func(Transaction) error) error
+	UpdateTxBatch(fn func(Transaction) error) error
+	BatchingEnabled() bool
 	ViewTx(fn func(Transaction) error) error
 
 	// write the db contents to filename as json (the schema needs defining)
@@ -46,7 +48,7 @@ type Connection interface {
 
 	IsEncryptedStore() bool
 	NeedsEncryptionMigration() (bool, error)
-	SetEncrypted(encrypted bool)
+	SetEncrypted(encrypted bool) error
 
 	BackupMetadata() (map[string]any, error)
 	RestoreMetadata(s map[string]any) error

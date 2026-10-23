@@ -94,15 +94,16 @@ function buildPageNumbers(
 
 const btnBase = clsx(
   'flex h-7 w-7 items-center justify-center rounded',
-  'border border-solid border-gray-4 th-dark:border-gray-7',
-  'text-sm text-gray-7 th-dark:text-gray-4',
-  'transition-colors hover:bg-gray-3 th-dark:hover:bg-gray-iron-9',
+  'border border-solid border-gray-4 th-highcontrast:border-white th-dark:border-gray-7',
+  'text-sm text-gray-7 th-highcontrast:text-white th-highcontrast:hover:text-black th-dark:text-gray-4',
+  'transition-colors hover:bg-gray-3 th-highcontrast:bg-black th-highcontrast:hover:bg-white th-dark:hover:bg-gray-iron-9',
   'disabled:cursor-not-allowed disabled:opacity-40'
 );
 
 const btnActivePage = clsx(
-  'border-blue-7 bg-blue-7 text-white hover:bg-blue-6',
-  'th-dark:border-blue-7 th-dark:bg-blue-7 th-dark:text-white'
+  'border-blue-7 bg-blue-7 text-white hover:!bg-blue-6',
+  'th-dark:border-blue-7 th-dark:bg-blue-7 th-dark:text-white',
+  'th-highcontrast:bg-white th-highcontrast:!text-black hover:th-highcontrast:!bg-white'
 );
 
 interface PagerButtonProps {
@@ -123,7 +124,11 @@ function PagerButton({
   return (
     <button
       type="button"
-      className={clsx(btnBase, active && btnActivePage)}
+      className={clsx(
+        btnBase,
+        active && btnActivePage,
+        disabled && 'cursor-not-allowed'
+      )}
       disabled={disabled}
       onClick={onClick}
       title={title}

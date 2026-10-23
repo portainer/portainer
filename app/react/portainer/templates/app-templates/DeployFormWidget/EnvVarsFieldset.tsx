@@ -55,6 +55,7 @@ function Item({
   return (
     <FormControl
       label={option.label || option.name}
+      tooltip={option.description}
       required={false}
       errors={errors}
       inputId={inputId}

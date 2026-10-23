@@ -58,8 +58,8 @@ export function KubectlShellView() {
         initialCommands={[
           ...LINUX_SHELL_INIT_COMMANDS,
 
-          '# Run kubectl commands inside here',
-          '# e.g. kubectl get all',
+          '# Run kubectl commands inside here\n',
+          '# e.g. kubectl get all\n',
           '',
         ]}
         onResize={supportsResizeOverSocket ? 'socket' : null}

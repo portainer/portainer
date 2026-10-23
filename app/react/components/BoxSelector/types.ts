@@ -11,7 +11,7 @@ export interface BoxSelectorOption<T extends Value> extends IconProps {
   readonly label: string;
   readonly description?: ReactNode;
   readonly value: T;
-  readonly disabled?: () => boolean;
+  readonly disabled?: boolean | (() => boolean);
   readonly tooltip?: () => string;
   readonly feature?: FeatureId;
   readonly disabledWhenLimited?: boolean;

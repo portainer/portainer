@@ -6,11 +6,22 @@ import { cpu } from './cpu';
 import { memory } from './memory';
 import { version } from './version';
 import { ip } from './ip';
+import { cachedImages } from './cachedImages';
 import { getActions } from './actions';
 
 export function getColumns(isServerMetricsEnabled: boolean) {
   if (!isServerMetricsEnabled) {
-    return [name, role, status, conditions, cpu, memory, version, ip];
+    return [
+      name,
+      role,
+      status,
+      conditions,
+      cpu,
+      memory,
+      version,
+      ip,
+      cachedImages,
+    ];
   }
 
   return [
@@ -22,6 +33,7 @@ export function getColumns(isServerMetricsEnabled: boolean) {
     memory,
     version,
     ip,
+    cachedImages,
     getActions(isServerMetricsEnabled),
   ];
 }

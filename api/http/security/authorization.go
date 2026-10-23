@@ -2,6 +2,7 @@ package security
 
 import (
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -80,12 +81,14 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 
 	if teamAccessesCount > 0 {
 		for _, access := range resourceControl.TeamAccesses {
-			for _, membership := range context.UserMemberships {
-				if membership.TeamID == access.TeamID {
-					return true
-				}
+			if !slices.ContainsFunc(context.UserMemberships, func(m portainer.TeamMembership) bool {
+				return m.TeamID == access.TeamID
+			}) {
+				return false
 			}
 		}
+
+		return true
 	}
 
 	return false

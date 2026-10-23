@@ -2,8 +2,10 @@ import { ReactNode, createContext, useContext } from 'react';
 import clsx from 'clsx';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { StatusDot, type StatusDotColor } from '@@/primitives/StatusDot';
+
 const containerVariants = cva(
-  'flex min-w-[6rem] flex-col gap-0.5 rounded-md border border-solid px-3 py-2',
+  'flex min-w-[6rem] flex-col gap-1 rounded-md border border-solid px-3 py-2',
   {
     variants: {
       status: {
@@ -16,7 +18,7 @@ const containerVariants = cva(
         pending:
           'border-blue-4 bg-blue-2 th-dark:border-blue-8 th-dark:bg-blue-10 th-highcontrast:border-white th-highcontrast:bg-blue-10',
         muted:
-          'border-gray-4 bg-gray-2 th-dark:border-gray-7 th-dark:bg-gray-iron-10 th-highcontrast:border-gray-11 th-highcontrast:bg-transparent',
+          'border-gray-4 bg-gray-2 th-dark:border-gray-8 th-dark:bg-gray-iron-10 th-highcontrast:border-gray-11 th-highcontrast:bg-transparent',
       },
     },
     defaultVariants: { status: 'muted' },
@@ -42,18 +44,13 @@ const valueVariants = cva('font-semibold leading-tight', {
   defaultVariants: { status: 'muted', size: 'xs' },
 });
 
-const dotVariants = cva('h-2 w-2 shrink-0 rounded-full', {
-  variants: {
-    status: {
-      success: 'bg-green-7',
-      danger: 'bg-error-7',
-      warning: 'bg-warning-7',
-      pending: 'bg-blue-7',
-      muted: 'bg-gray-7',
-    },
-  },
-  defaultVariants: { status: 'muted' },
-});
+const statusToColor: Record<ResourceStatBlockStatus, StatusDotColor> = {
+  success: 'success',
+  danger: 'danger',
+  warning: 'warn',
+  pending: 'info',
+  muted: 'muted',
+};
 
 export type ResourceStatBlockStatus = NonNullable<
   VariantProps<typeof containerVariants>['status']
@@ -88,7 +85,7 @@ interface LabelProps {
 
 function StatBlockLabel({ icon, children }: LabelProps) {
   return (
-    <div className="flex items-center gap-1.5 text-xs font-normal uppercase tracking-wide text-gray-7 th-highcontrast:text-white th-dark:text-gray-5">
+    <div className="flex items-center gap-1.5 text-xs font-normal uppercase tracking-wide text-gray-6 th-highcontrast:text-white th-dark:text-gray-6">
       {icon && <span aria-hidden="true">{icon}</span>}
       <span>{children}</span>
     </div>
@@ -123,11 +120,9 @@ function StatBlockValue({
       className={clsx('flex items-baseline gap-2', valueAlignClasses[align])}
     >
       {dot && (
-        <span
-          className={dotVariants({ status })}
-          aria-hidden="true"
-          data-cy="stat-block-dot"
-        />
+        <span data-cy="stat-block-dot">
+          <StatusDot color={statusToColor[status]} size="sm" />
+        </span>
       )}
       <span className={valueVariants({ status, size })}>{children}</span>
       {suffix && (

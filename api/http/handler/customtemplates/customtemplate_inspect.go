@@ -6,6 +6,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -54,25 +55,26 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 			return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 		}
 
+		customTemplate.ResourceControl = resourceControl
 		canEdit := userCanEditTemplate(customTemplate, securityContext)
 		hasAccess := false
 
 		if resourceControl != nil {
-			customTemplate.ResourceControl = resourceControl
-
 			teamIDs := slicesx.Map(securityContext.UserMemberships, func(m portainer.TeamMembership) portainer.TeamID {
 				return m.TeamID
 			})
 
 			hasAccess = authorization.UserCanAccessResource(securityContext.UserID, teamIDs, resourceControl)
-
 		}
 
-		if canEdit || hasAccess {
-			return nil
+		if !canEdit && !hasAccess {
+			return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 		}
 
-		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+		populateGitConfig(tx, userContext, customTemplate)
+
+		return nil
 	})
 
 	return response.TxResponse(w, customTemplate, err)

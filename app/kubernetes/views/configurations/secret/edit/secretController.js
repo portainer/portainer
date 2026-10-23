@@ -150,7 +150,7 @@ class KubernetesSecretController {
       } catch (err) {
         if (err.status === 403) {
           this.$state.go('kubernetes.configurations', { tab: 'secrets' });
-          throw new Error('Not authorized to edit secret');
+          throw new Error('Not authorized to edit secret', { cause: err });
         }
       }
       this.formValues.ResourcePool = this.configuration.Namespace;

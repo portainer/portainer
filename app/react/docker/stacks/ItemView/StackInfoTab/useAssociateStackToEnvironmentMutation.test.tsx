@@ -6,6 +6,7 @@ import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { Stack } from '@/react/common/stacks/types';
 import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { useAssociateStackToEnvironmentMutation } from './useAssociateStackToEnvironmentMutation';
 
@@ -192,15 +193,14 @@ describe('useAssociateStackToEnvironmentMutation', () => {
   });
 
   describe('error handling', () => {
-    let consoleError: ReturnType<typeof vi.spyOn>;
+    let restoreConsole: () => void;
 
     beforeEach(() => {
-      // Suppress console.error for error tests to reduce noise
-      consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      restoreConsole = suppressConsoleLogs();
     });
 
     afterEach(() => {
-      consoleError.mockRestore();
+      restoreConsole();
     });
 
     it('should handle API error when association fails', async () => {

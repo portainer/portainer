@@ -6,6 +6,7 @@ import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server } from '@/setup-tests/server';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { NetworkContainer } from '../types';
 
@@ -31,7 +32,11 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
 }));
 
 test('Network container values should be visible and the link should be valid', async () => {
-  server.use(http.get('/api/endpoints/1', () => HttpResponse.json({})));
+  server.use(
+    http.get('/api/endpoints/1', () =>
+      HttpResponse.json(createMockEnvironment())
+    )
+  );
 
   const user = new UserViewModel({ Username: 'test', Role: 1 });
 

@@ -12,8 +12,6 @@ import { useMemo } from 'react';
 import Lazy from 'yup/lib/Lazy';
 
 import { buildGitValidationSchema } from '@/react/portainer/gitops/GitForm';
-import { useGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
-import { useCurrentUser } from '@/react/hooks/useUser';
 import { relativePathValidation } from '@/react/portainer/gitops/RelativePathFieldset/validation';
 import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
 import { TemplateViewModel } from '@/react/portainer/templates/app-templates/view-model';
@@ -43,8 +41,6 @@ export function useValidation({
   appTemplate: TemplateViewModel | undefined;
   customTemplate: CustomTemplate | undefined;
 }): Lazy<SchemaOf<FormValues>> {
-  const { user } = useCurrentUser();
-  const gitCredentialsQuery = useGitCredentials(user.Id);
   const nameValidation = useNameValidation();
   const edgeGroupsQuery = useEdgeGroups();
   const edgeGroups = edgeGroupsQuery.data;
@@ -130,11 +126,7 @@ export function useValidation({
                 values.deploymentType === DeploymentType.Compose
                   ? 'compose'
                   : 'manifest';
-              return buildGitValidationSchema(
-                gitCredentialsQuery.data || [],
-                !!customTemplate,
-                deploymentMethod
-              );
+              return buildGitValidationSchema(deploymentMethod);
             },
           }) as SchemaOf<GitFormModel>,
           relativePath: mixed().when('method', {
@@ -144,12 +136,6 @@ export function useValidation({
           useManifestNamespaces: boolean().default(false),
         })
       ),
-    [
-      appTemplate?.Env,
-      customTemplate,
-      edgeGroups,
-      gitCredentialsQuery.data,
-      nameValidation,
-    ]
+    [appTemplate?.Env, customTemplate, edgeGroups, nameValidation]
   );
 }

@@ -3,12 +3,20 @@ package exec
 import (
 	"context"
 	"fmt"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/pkg/libstack"
 	"github.com/portainer/portainer/pkg/libstack/swarm"
 )
+
+// postDeployFailureCheckTimeout bounds how long Deploy waits for tasks to start or fail after being accepted by Swarm.
+const postDeployFailureCheckTimeout = 30 * time.Second
+
+// runningStatusProbeTimeout bounds how long IsCurrentlyRunning waits for a single status probe before giving up.
+const runningStatusProbeTimeout = 10 * time.Second
 
 // SwarmStackManager represents a service for managing stacks.
 type SwarmStackManager struct {
@@ -52,17 +60,61 @@ func (manager *SwarmStackManager) Deploy(
 		env = append(env, ev.Name+"="+ev.Value)
 	}
 
-	return manager.deployer.Deploy(context.TODO(), filePaths, swarm.DeployOptions{
-		Options: swarm.Options{
-			ProjectName: stack.Name,
-			Host:        url,
-			Env:         env,
-			WorkingDir:  stack.ProjectPath,
-			Registries:  portainerRegistriesToAuthConfigs(registries),
-		},
+	options := swarm.Options{
+		ProjectName: stack.Name,
+		Host:        url,
+		Env:         env,
+		WorkingDir:  stack.ProjectPath,
+		Registries:  portainerRegistriesToAuthConfigs(registries),
+	}
+
+	if err := manager.deployer.Deploy(context.TODO(), filePaths, swarm.DeployOptions{
+		Options:       options,
 		RemoveOrphans: prune,
 		PullImage:     pullImage,
-	})
+	}); err != nil {
+		return err
+	}
+
+	// Swarm schedules and pulls images asynchronously, so check for early failures before reporting success.
+	waitCtx, cancel := context.WithTimeout(ctx, postDeployFailureCheckTimeout)
+	defer cancel()
+
+	result := manager.deployer.WaitForStatus(waitCtx, stack.Name, options, libstack.StatusRunning)
+	if result.Status == libstack.StatusError {
+		return fmt.Errorf("deployment failed: %s", result.ErrorMsg)
+	}
+
+	return nil
+}
+
+// CheckRunningStatus probes live Swarm state for up to runningStatusProbeTimeout and reports whether
+// the stack is confirmed running. It returns false, not an error, if that can't be confirmed in time.
+func (manager *SwarmStackManager) CheckRunningStatus(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) (bool, error) {
+	url, proxy, err := fetchEndpointProxy(manager.proxyManager, endpoint)
+	if err != nil {
+		return false, fmt.Errorf("failed to fetch environment proxy: %w", err)
+	}
+
+	if proxy != nil {
+		defer proxy.Close()
+	}
+
+	options := swarm.Options{
+		ProjectName: stack.Name,
+		Host:        url,
+	}
+
+	waitCtx, cancel := context.WithTimeout(ctx, runningStatusProbeTimeout)
+	defer cancel()
+
+	result := manager.deployer.WaitForStatus(waitCtx, stack.Name, options, libstack.StatusRunning)
+	if result.Status == libstack.StatusError {
+		return false, nil
+	}
+
+	// ErrorMsg is only empty when Running was actually observed, not just assumed on timeout.
+	return result.ErrorMsg == "", nil
 }
 
 // Remove deletes all resources belonging to a Swarm stack.

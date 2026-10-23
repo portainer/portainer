@@ -1,11 +1,8 @@
 package edgestack
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type ServiceTx struct {
@@ -24,17 +21,8 @@ func (service ServiceTx) EdgeStacks() ([]portainer.EdgeStack, error) {
 	err := service.tx.GetAll(
 		BucketName,
 		&portainer.EdgeStack{},
-		func(obj any) (any, error) {
-			stack, ok := obj.(*portainer.EdgeStack)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
-				return nil, fmt.Errorf("failed to convert to EdgeStack object: %s", obj)
-			}
-
-			stacks = append(stacks, *stack)
-
-			return &portainer.EdgeStack{}, nil
-		})
+		dataservices.AppendFn(&stacks),
+	)
 
 	return stacks, err
 }

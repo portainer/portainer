@@ -15,7 +15,7 @@ export function GpuInfo({
 
   const gpuUseAll = snapshot.GpuUseAll;
   const gpuUseList = snapshot.GpuUseList;
-  let gpuFreeStr = '';
+  let gpuFreeStr;
   if (gpuUseAll) {
     gpuFreeStr = 'none';
   } else {

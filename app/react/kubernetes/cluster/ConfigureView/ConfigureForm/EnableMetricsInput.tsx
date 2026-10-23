@@ -29,7 +29,7 @@ export function EnableMetricsInput({ value, error, environmentId }: Props) {
           autoscaling and to see container and node resource usage. This
           requires{' '}
           <a
-            href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server"
+            href="https://kubernetes.io/docs/tasks/debug/debug-cluster/resource-metrics-pipeline/#metrics-server"
             target="_blank"
             rel="noreferrer"
           >

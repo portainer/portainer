@@ -2,8 +2,8 @@ import { FeatureId } from '@/react/portainer/feature-flags/enums';
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Podman from '@/assets/ico/vendor/podman.svg?c';
 import Kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
+import Kubesolo from '@/assets/ico/vendor/kubesolo.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
-import KaaS from '@/assets/ico/vendor/kaas-icon.svg?c';
 import InstallK8s from '@/assets/ico/vendor/install-kubernetes.svg?c';
 
 import { BoxSelectorOption } from '@@/BoxSelector';
@@ -14,7 +14,7 @@ export type EnvironmentOptionValue =
   | 'podman'
   | 'kubernetes'
   | 'aci'
-  | 'kaas'
+  | 'kubesolo'
   | 'k8sInstall';
 
 export interface EnvironmentOption extends BoxSelectorOption<EnvironmentOptionValue> {
@@ -66,14 +66,14 @@ export const existingEnvironmentTypes: EnvironmentOption[] = [
 
 export const newEnvironmentTypes: EnvironmentOption[] = [
   {
-    id: 'kaas',
-    value: 'kaas',
-    label: 'Provision KaaS Cluster (Deprecated)',
+    id: 'kubesolo',
+    value: 'kubesolo',
+    label: 'KubeSolo (Edge)',
     description:
-      "Provision a Kubernetes cluster via a cloud provider's Kubernetes as a Service",
-    icon: KaaS,
+      'Deploy a single-node Kubernetes edge environment with KubeSolo',
+    icon: Kubesolo,
     iconType: 'logo',
-    feature: FeatureId.KAAS_PROVISIONING,
+    feature: FeatureId.KUBESOLO,
     disabledWhenLimited: true,
   },
   {
@@ -99,6 +99,6 @@ export const formTitles: Record<EnvironmentOptionValue, string> = {
   podman: 'Connect to your Podman environment',
   kubernetes: 'Connect to your Kubernetes environment',
   aci: 'Connect to your ACI environment',
-  kaas: 'Provision a KaaS environment',
+  kubesolo: 'Deploy a KubeSolo edge environment',
   k8sInstall: 'Create a Kubernetes cluster',
 };

@@ -1,6 +1,8 @@
 package endpoints
 
 import (
+	"net/http"
+	"net/url"
 	"strconv"
 	"testing"
 
@@ -25,15 +27,11 @@ type filterTest struct {
 func Test_Filter_AgentVersion(t *testing.T) {
 	t.Parallel()
 	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1,
-		Type: portainer.AgentOnDockerEnvironment,
-		Agent: struct {
-			Version string `example:"1.0.0"`
-		}{Version: "1.0.0"}}
+		Type:  portainer.AgentOnDockerEnvironment,
+		Agent: portainer.EnvironmentAgentData{Version: "1.0.0"}}
 	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1,
-		Type: portainer.AgentOnDockerEnvironment,
-		Agent: struct {
-			Version string `example:"1.0.0"`
-		}{Version: "2.0.0"}}
+		Type:  portainer.AgentOnDockerEnvironment,
+		Agent: portainer.EnvironmentAgentData{Version: "2.0.0"}}
 	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1,
 		Type: portainer.AgentOnDockerEnvironment,
 	}
@@ -725,4 +723,32 @@ func Test_FilterQuery_Outdated(t *testing.T) {
 	}
 
 	runTests(tests, t, handler, endpoints)
+}
+
+func Test_parseQuery_emptyArrayParams(t *testing.T) {
+	t.Parallel()
+
+	makeRequest := func(rawQuery string) *http.Request {
+		r := &http.Request{URL: &url.URL{RawQuery: rawQuery}}
+		require.NoError(t, r.ParseForm())
+		return r
+	}
+
+	tests := []struct {
+		name  string
+		query string
+	}{
+		{name: "empty status", query: "status="},
+		{name: "empty endpointIds", query: "endpointIds="},
+		{name: "empty groupIds", query: "groupIds="},
+		{name: "empty tagIds", query: "tagIds="},
+		{name: "multiple empty params", query: "status=&groupIds=&tagIds="},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := parseQuery(makeRequest(tt.query))
+			require.NoError(t, err)
+		})
+	}
 }

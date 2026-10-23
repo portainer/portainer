@@ -75,57 +75,6 @@ func createComposeFile(t *testing.T, dir, name, content string) string {
 	return path
 }
 
-func TestSwarmValidate(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	deployer := NewSwarmDeployer()
-	dir := t.TempDir()
-
-	testCases := []struct {
-		name          string
-		composeFile   string
-		expectedError string
-	}{
-		{
-			name: "valid compose file",
-			composeFile: `version: '3'
-services:
-  web:
-    image: nginx:latest`,
-			expectedError: "",
-		},
-		{
-			name:          "invalid YAML returns error",
-			composeFile:   "not valid yaml content",
-			expectedError: "failed to load compose file: top-level object must be a mapping",
-		},
-		{
-			name: "missing image returns error",
-			composeFile: `version: '3'
-services:
-  web:
-    command: echo hello`,
-			expectedError: "invalid image reference for service web: no image specified",
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			path := createComposeFile(t, dir, "docker-compose.yml", testCase.composeFile)
-			err := deployer.Validate(t.Context(), []string{path}, Options{})
-			var gotError string
-			if err != nil {
-				gotError = err.Error()
-			}
-
-			if gotError != "" && testCase.expectedError == "" {
-				t.Fatalf("expected no error but got: %v", err)
-			}
-			require.Contains(t, gotError, testCase.expectedError)
-		})
-	}
-}
-
 func TestSwarmDeployWithRemoveOrphans(t *testing.T) {
 	ensureIntegrationTest(t)
 

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
@@ -66,9 +65,9 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return httperror.NotFound("Unable to find the environment associated to the stack inside the database", err)
+		return httperror.NotFound("Unable to find the environment in the database", err)
 	} else if err != nil {
-		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
+		return httperror.InternalServerError("Unable to find the environment in the database", err)
 	}
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
@@ -123,7 +122,7 @@ func (handler *Handler) hijackPodExecStartOperation(
 	endpoint *portainer.Endpoint,
 	namespace, podName, containerName, command string,
 ) *httperror.HandlerError {
-	commandArray := strings.Split(command, " ")
+	commandArray := ws.SplitExecCommand(command)
 
 	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)
 	if err != nil {

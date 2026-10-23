@@ -8,6 +8,7 @@ import { UserViewModel } from '@/portainer/models/user';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { mockCodeMirror } from '@/setup-tests/mock-codemirror';
 import { mockLocalizeDate } from '@/setup-tests/mock-localizeDate';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { HelmApplicationView } from './HelmApplicationView';
 
@@ -266,8 +267,7 @@ describe('HelmApplicationView', () => {
       )
     );
 
-    // Mock console.error to prevent test output pollution
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const restoreConsole = suppressConsoleLogs();
 
     renderComponent();
 
@@ -280,8 +280,7 @@ describe('HelmApplicationView', () => {
       )
     ).toBeInTheDocument();
 
-    // Restore console.error
-    vi.spyOn(console, 'error').mockRestore();
+    restoreConsole();
   });
 
   it('should display additional details when available in helm release', async () => {

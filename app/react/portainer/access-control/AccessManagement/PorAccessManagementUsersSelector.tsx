@@ -26,7 +26,7 @@ export function PorAccessManagementUsersSelector({
       >
         Select user(s) and/or team(s)
       </label>
-      <div className="col-sm-9 col-lg-4">
+      <div className="col-sm-9 col-lg-10">
         <Select
           isMulti
           getOptionLabel={(option) => option.Name}

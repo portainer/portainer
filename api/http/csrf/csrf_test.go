@@ -37,13 +37,87 @@ func TestWithProtect_safeMethodsAlwaysAllowed(t *testing.T) {
 	}
 }
 
-func TestWithProtect_allowsPostWithNoOriginHeaders(t *testing.T) {
+func TestWithProtect_allowsPostWithNoOriginHeadersAndNoAuthCookie(t *testing.T) {
 	t.Parallel()
 
 	handler, err := WithProtect(okHandler, nil)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestWithProtect_blocksUnsafeCookieRequestWithNoOriginHeaders(t *testing.T) {
+	t.Parallel()
+
+	handler, err := WithProtect(okHandler, nil)
+	require.NoError(t, err)
+
+	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete} {
+		req := httptest.NewRequest(method, "/", nil)
+		req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: "some-token"})
+
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+		require.Equal(t, http.StatusForbidden, rr.Code, "method %s with auth cookie and no origin headers should be blocked", method)
+	}
+}
+
+func TestWithProtect_allowsPostWithNonAuthCookieAndNoOriginHeaders(t *testing.T) {
+	t.Parallel()
+
+	handler, err := WithProtect(okHandler, nil)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.AddCookie(&http.Cookie{Name: "some-other-cookie", Value: "some-value"})
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestWithProtect_allowsAPIKeyRequestWithCookieAndNoOriginHeaders(t *testing.T) {
+	t.Parallel()
+
+	handler, err := WithProtect(okHandler, nil)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: "some-token"})
+	req.Header.Set(portainer.APIKeyHeader, "some-api-key")
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestWithProtect_allowsBearerRequestWithCookieAndNoOriginHeaders(t *testing.T) {
+	t.Parallel()
+
+	handler, err := WithProtect(okHandler, nil)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: "some-token"})
+	req.Header.Set("Authorization", "Bearer some-token")
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestWithProtect_allowNoOriginEnvVarRestoresFailOpen(t *testing.T) {
+	t.Setenv(portainer.CSRFAllowNoOriginEnvVar, "1")
+
+	handler, err := WithProtect(okHandler, nil)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.AddCookie(&http.Cookie{Name: portainer.AuthCookieKey, Value: "some-token"})
 
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)

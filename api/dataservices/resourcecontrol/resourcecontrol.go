@@ -2,13 +2,10 @@ package resourcecontrol
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-
-	"github.com/rs/zerolog/log"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -48,35 +45,26 @@ func (service *Service) Tx(tx portainer.Transaction) ServiceTx {
 // to the main ResourceID or in SubResourceIDs. It also performs a check on the resource type. Return nil
 // if no ResourceControl was found.
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
-	var resourceControl *portainer.ResourceControl
-	stop := errors.New("ok")
+	var found portainer.ResourceControl
+
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},
-		func(obj any) (any, error) {
-			rc, ok := obj.(*portainer.ResourceControl)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to ResourceControl object")
-				return nil, fmt.Errorf("failed to convert to ResourceControl object: %s", obj)
-			}
+		dataservices.FirstFn(&found, func(rc portainer.ResourceControl) bool {
+			return (rc.ResourceID == resourceID && rc.Type == resourceType) ||
+				slices.Contains(rc.SubResourceIDs, resourceID)
+		}),
+	)
 
-			if rc.ResourceID == resourceID && rc.Type == resourceType {
-				resourceControl = rc
-				return nil, stop
-			}
-
-			if slices.Contains(rc.SubResourceIDs, resourceID) {
-				resourceControl = rc
-				return nil, stop
-			}
-
-			return &portainer.ResourceControl{}, nil
-		})
-	if errors.Is(err, stop) {
-		return resourceControl, nil
+	if errors.Is(err, dataservices.ErrStop) {
+		return &found, nil
 	}
 
-	return nil, err
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 // CreateResourceControl creates a new ResourceControl object

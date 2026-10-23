@@ -40,10 +40,10 @@ func (tx *DbTransaction) GetRawBytes(bucketName string, key []byte) ([]byte, err
 		return nil, fmt.Errorf("%w (bucket=%s, key=%s)", dserrors.ErrObjectNotFound, bucketName, keyToString(key))
 	}
 
-	if tx.conn.getEncryptionKey() != nil {
+	if tx.conn.gcm != nil {
 		var err error
 
-		if value, err = decrypt(value, tx.conn.getEncryptionKey()); err != nil {
+		if value, err = decrypt(value, tx.conn.gcm); err != nil {
 			return value, errors.Wrap(err, "Failed decrypting object")
 		}
 	}

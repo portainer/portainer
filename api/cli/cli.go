@@ -8,6 +8,8 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/internal/edge"
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/rs/zerolog/log"
@@ -33,7 +35,7 @@ func CLIFlags() *portainer.CLIFlags {
 		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		EndpointURL:               kingpin.Flag("host", "Environment URL").Short('H').String(),
 		FeatureFlags:              kingpin.Flag("feat", "List of feature flags").Envar(portainer.FeatureFlagEnvVar).Strings(),
-		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
+		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Envar(portainer.EdgeComputeEnvVar).Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
 		TLSSkipVerify:             kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
 		HTTPDisabled:              kingpin.Flag("http-disabled", "Serve portainer only on https").Default(defaultHTTPDisabled).Bool(),
@@ -47,8 +49,8 @@ func CLIFlags() *portainer.CLIFlags {
 		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
 		BaseURL:                   kingpin.Flag("base-url", "Base URL parameter such as portainer if running portainer as http://yourdomain.com/portainer/.").Short('b').Default(defaultBaseURL).String(),
 		InitialMmapSize:           kingpin.Flag("initial-mmap-size", "Initial mmap size of the database in bytes").Int(),
-		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Int(),
-		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Duration(),
+		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Default(defaultMaxBatchSize).Int(),
+		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Default(defaultMaxBatchDelay).Duration(),
 		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption and will be used as /run/secrets/<secret-key-name>.").Default(defaultSecretKeyName).String(),
 		LogLevel:                  kingpin.Flag("log-level", "Set the minimum logging level to show").Default("INFO").Enum("DEBUG", "INFO", "WARN", "ERROR"),
 		LogMode:                   kingpin.Flag("log-mode", "Set the logging output mode").Default("PRETTY").Enum("NOCOLOR", "PRETTY", "JSON"),
@@ -56,6 +58,10 @@ func CLIFlags() *portainer.CLIFlags {
 		TrustedOrigins:            kingpin.Flag("trusted-origins", "List of trusted origins for CSRF protection. Separate multiple origins with a comma.").Envar(portainer.TrustedOriginsEnvVar).String(),
 		CSP:                       kingpin.Flag("csp", "Content Security Policy (CSP) header").Envar(portainer.CSPEnvVar).Default("true").Bool(),
 		CompactDB:                 kingpin.Flag("compact-db", "Enable database compaction on startup").Envar(portainer.CompactDBEnvVar).Default("false").Bool(),
+		NoSetupToken:              kingpin.Flag("no-setup-token", "Disable the setup token requirement for admin initialization and restore on an uninitialized instance").Envar(portainer.NoSetupTokenEnvVar).Bool(),
+		SetupToken:                kingpin.Flag("setup-token", "Set a custom setup token for admin initialization and restore on an uninitialized instance (overrides auto-generation)").Envar(portainer.SetupTokenEnvVar).String(),
+		EdgePortainerURL:          kingpin.Flag("edge-portainer-url", "HTTPS URL that edge agents connect back to, e.g. https://edge.example.com:9443. Use a hostname distinct from the web UI when edge mTLS is enabled.").Envar(portainer.EdgePortainerURLEnvVar).String(),
+		EdgeTrustOnFirstConnect:   kingpin.Flag("edge-trust-on-first-connect", "Auto-trust edge agents on first connect (disables the waiting room).").Envar(portainer.EdgeTrustOnFirstConnectEnvVar).Bool(),
 	}
 }
 
@@ -114,7 +120,7 @@ func (Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 			panic(err)
 		}
 
-		*flags.Assets = filepath.Join(filepath.Dir(ex), *flags.Assets)
+		*flags.Assets = filesystem.JoinPaths(filepath.Dir(ex), *flags.Assets)
 	}
 
 	// If the user didn't provide a tls flag remove the defaults to match previous behaviour
@@ -171,7 +177,20 @@ func (Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return ErrAdminPassExcludeAdminPassFile
 	}
 
+	if err := ValidateEdgePortainerURL(*flags.EdgePortainerURL); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func ValidateEdgePortainerURL(edgeURL string) error {
+	if edgeURL == "" {
+		return nil
+	}
+
+	_, err := edge.ParseHostForEdge(edgeURL)
+	return err
 }
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {

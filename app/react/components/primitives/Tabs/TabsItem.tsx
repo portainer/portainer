@@ -61,7 +61,7 @@ const tabItem = cva(
         className: [
           'bg-transparent text-gray-7 th-highcontrast:text-white th-dark:text-gray-6',
           'hover:bg-graphite-50 hover:text-graphite-900',
-          'th-dark:hover:bg-graphite-600 th-dark:hover:text-gray-6',
+          'th-dark:hover:bg-graphite-600 th-dark:hover:text-gray-4',
           'th-highcontrast:hover:bg-white th-highcontrast:hover:text-black',
         ],
       },
@@ -69,9 +69,9 @@ const tabItem = cva(
         variant: 'contained',
         isActive: true,
         className: [
-          'bg-graphite-50 text-graphite-900',
-          'th-dark:bg-graphite-600 th-dark:text-white',
-          'th-highcontrast:bg-white th-highcontrast:text-black',
+          'bg-graphite-50 text-graphite-900 hover:text-inherit focus:text-inherit',
+          'th-dark:bg-graphite-600 th-dark:text-white th-dark:hover:text-inherit th-dark:focus:text-inherit',
+          'th-highcontrast:bg-white th-highcontrast:text-black th-highcontrast:hover:text-black th-highcontrast:focus:text-black',
         ],
       },
     ],

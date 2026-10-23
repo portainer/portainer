@@ -20,7 +20,7 @@ func (hspm *HelmSDKPackageManager) GetHistory(historyOptions options.HistoryOpti
 		Msg("Get Helm history")
 
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, historyOptions.Namespace, historyOptions.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(historyOptions.Namespace), historyOptions.KubernetesClusterAccess)
 
 	if err != nil {
 		log.Error().
@@ -79,5 +79,6 @@ func convertHistory(r sdkrelease.Releaser) (*release.Release, error) {
 				AppVersion: v1Release.Chart.Metadata.AppVersion,
 			},
 		},
+		ChartReference: extractChartReferenceAnnotations(v1Release.Chart.Metadata.Annotations),
 	}, nil
 }

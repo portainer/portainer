@@ -72,6 +72,7 @@ func (handler *Handler) initRouter(bouncer accessGuard) {
 	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryUpdate)).Methods(http.MethodPut)
 	adminRouter.Handle("/registries/{id}/configure", httperror.LoggerHandler(handler.registryConfigure)).Methods(http.MethodPost)
 	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryDelete)).Methods(http.MethodDelete)
+	adminRouter.PathPrefix("/registries/proxies/gitlab").Handler(httperror.LoggerHandler(handler.proxyRequestsToGitlabAPIWithoutRegistry))
 
 	// Use registry-specific access bouncer for inspect and repositories endpoints
 	registryAccessRouter := handler.NewRoute().Subrouter()
@@ -82,7 +83,6 @@ func (handler *Handler) initRouter(bouncer accessGuard) {
 	authenticatedRouter := handler.NewRoute().Subrouter()
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 	authenticatedRouter.Handle("/registries/ping", httperror.LoggerHandler(handler.pingRegistry)).Methods(http.MethodPost)
-	authenticatedRouter.PathPrefix("/registries/proxies/gitlab").Handler(httperror.LoggerHandler(handler.proxyRequestsToGitlabAPIWithoutRegistry))
 }
 
 type accessGuard interface {

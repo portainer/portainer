@@ -29,6 +29,7 @@ export type Props<T extends Value> = Union<T> & {
   useGridLayout?: boolean;
   className?: string;
   label?: string;
+  'aria-label'?: string;
 };
 
 export function BoxSelector<T extends Value>({
@@ -40,6 +41,7 @@ export function BoxSelector<T extends Value>({
   useGridLayout,
   className,
   label,
+  'aria-label': ariaLabel,
   ...props
 }: Props<T>) {
   const rootClassName = clsx(
@@ -57,17 +59,19 @@ export function BoxSelector<T extends Value>({
           <div
             className={rootClassName}
             role={props.isMulti ? 'group' : 'radiogroup'}
-            aria-label={label}
+            aria-label={ariaLabel ?? label}
           >
             {options
               .filter((option) => !option.hide)
-              .map((option) => (
+              .map(({ disabled, ...option }) => (
                 <BoxSelectorItem
                   key={option.id}
                   radioName={radioName}
                   option={option}
                   onSelect={handleSelect}
-                  disabled={option.disabled && option.disabled()}
+                  disabled={
+                    typeof disabled === 'function' ? disabled() : disabled
+                  }
                   tooltip={option.tooltip && option.tooltip()}
                   type={props.isMulti ? 'checkbox' : 'radio'}
                   isSelected={isSelected}

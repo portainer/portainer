@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -23,7 +24,7 @@ import (
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
-// @success 200 {object} portainer.Stack "Success"
+// @success 200 {object} stackResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "Stack not found"
@@ -91,10 +92,11 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		}
 	}
 
-	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
-		// sanitize password in the http response to minimise possible security leaks
-		stack.GitConfig.Authentication.Password = ""
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+	resp, err := newStackResponse(handler.DataStore, userContext, stack)
+	if err != nil {
+		return httperror.InternalServerError("Unable to load git config for stack", err)
 	}
 
-	return response.JSON(w, stack)
+	return response.JSON(w, resp)
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -35,7 +35,9 @@ func (store *Store) Open() (newStore bool, err error) {
 		// NeedsEncryptionMigration() sets encrypted=true as a side effect when a key exists.
 		// We need to set it back to false so GetDatabaseFilePath() returns the path to the
 		// actual unencrypted file (portainer.db) that we want to back up.
-		store.connection.SetEncrypted(false)
+		if err := store.connection.SetEncrypted(false); err != nil {
+			return false, err
+		}
 
 		// Use backupDBFile directly since connection isn't open yet
 		// and we don't want to trigger the close/open cycle of Backup()
@@ -124,7 +126,10 @@ func (store *Store) Rollback(force bool) error {
 }
 
 func (store *Store) encryptDB() error {
-	store.connection.SetEncrypted(false)
+	if err := store.connection.SetEncrypted(false); err != nil {
+		return err
+	}
+
 	if err := store.connection.Open(); err != nil {
 		return err
 	}
@@ -138,7 +143,7 @@ func (store *Store) encryptDB() error {
 	log.Info().Msg("encrypting database")
 
 	// export file path for backup
-	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+	exportFilename := filepath.Clean(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
 	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
 

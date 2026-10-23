@@ -28,10 +28,10 @@ func TestWorkflowsList_RBAC_NonAdminNoAccess(t *testing.T) {
 	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "test-env"}))
 
 	// Stack on endpoint 1 WITHOUT resource control — non-admin cannot see it
-	require.NoError(t, store.StackService.Create(&portainer.Stack{
+	createGitStack(t, store, &portainer.Stack{
 		ID: 1, Name: "no-rc-stack", EndpointID: 1,
 		GitConfig: gitConfig("https://github.com/x/no-rc"),
-	}))
+	})
 
 	h := NewHandler(store, nil, nil)
 	rr := httptest.NewRecorder()
@@ -56,10 +56,10 @@ func TestWorkflowsList_RBAC_NonAdminWithAccess(t *testing.T) {
 	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "test-env"}))
 
 	const stackName = "rc-stack"
-	require.NoError(t, store.StackService.Create(&portainer.Stack{
+	createGitStack(t, store, &portainer.Stack{
 		ID: 1, Name: stackName, EndpointID: 1,
 		GitConfig: gitConfig("https://github.com/x/rc"),
-	}))
+	})
 
 	require.NoError(t, store.ResourceControl().Create(&portainer.ResourceControl{
 		ID:         1,

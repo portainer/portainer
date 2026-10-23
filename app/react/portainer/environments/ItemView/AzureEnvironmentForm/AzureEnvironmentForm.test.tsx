@@ -8,6 +8,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import {
   createMockUsers,
   createMockEnvironment,
+  createMockEnvironmentGroup,
 } from '@/react-tools/test-mocks';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 
@@ -84,7 +85,7 @@ test('submits form with updated values', async () => {
     expect(requestBody).toMatchObject({
       Name: 'updated-azure-env',
       GroupID: 1,
-      TagIds: [],
+      TagIDs: [],
       AzureApplicationID: 'app-123',
       AzureTenantID: 'tenant-456',
     });
@@ -106,7 +107,9 @@ function renderComponent({
       HttpResponse.json({ value: [], totalCount: 0 })
     ),
     http.get('/api/endpoint_groups', () =>
-      HttpResponse.json([{ Id: 1, Name: 'Default' }])
+      HttpResponse.json([
+        createMockEnvironmentGroup({ Id: 1, Name: 'Default' }),
+      ])
     ),
     http.get('/api/tags', () => HttpResponse.json([]))
   );

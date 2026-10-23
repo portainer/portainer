@@ -32,7 +32,7 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 		}
 	}
 
-	restorePath := filepath.Join(filestorePath, "restore", time.Now().Format("20060102150405"))
+	restorePath := filesystem.JoinPaths(filestorePath, "restore", time.Now().Format("20060102150405"))
 	defer func() {
 		if err := os.RemoveAll(filepath.Dir(restorePath)); err != nil {
 			log.Warn().Err(err).Msg("failed to clean up restore files")
@@ -94,7 +94,7 @@ func getRestoreSourcePath(dir string) (string, error) {
 
 func restoreFiles(srcDir string, destinationDir string) error {
 	for _, filename := range filesToRestore {
-		if err := filesystem.CopyPath(filepath.Join(srcDir, filename), destinationDir); err != nil {
+		if err := filesystem.CopyPath(filesystem.JoinPaths(srcDir, filename), destinationDir); err != nil {
 			return err
 		}
 	}
@@ -102,20 +102,20 @@ func restoreFiles(srcDir string, destinationDir string) error {
 	// TODO:  This is very boltdb module specific once again due to the filename.  Move to bolt module? Refactor for another day
 
 	// Prevent the possibility of having both databases.  Remove any default new instance
-	if err := os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName)); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(filesystem.JoinPaths(destinationDir, boltdb.DatabaseFileName)); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	if err := os.Remove(filepath.Join(destinationDir, boltdb.EncryptedDatabaseFileName)); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(filesystem.JoinPaths(destinationDir, boltdb.EncryptedDatabaseFileName)); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
 	// Now copy the database.  It'll be either portainer.db or portainer.edb
 
 	// Note: CopyPath does not return an error if the source file doesn't exist
-	if err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir); err != nil {
+	if err := filesystem.CopyPath(filesystem.JoinPaths(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir); err != nil {
 		return err
 	}
 
-	return filesystem.CopyPath(filepath.Join(srcDir, boltdb.DatabaseFileName), destinationDir)
+	return filesystem.CopyPath(filesystem.JoinPaths(srcDir, boltdb.DatabaseFileName), destinationDir)
 }

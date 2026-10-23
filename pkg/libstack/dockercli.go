@@ -3,6 +3,7 @@ package libstack
 import (
 	"context"
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/portainer/portainer/api/logs"
@@ -18,6 +19,8 @@ import (
 type DockerCliOptions struct {
 	Host       string
 	Registries []configtypes.AuthConfig
+	// Headers are injected as custom HTTP headers on every request the client makes.
+	Headers map[string]string
 }
 
 // mu serialises calls to cli.Initialize across all deployer types (compose and
@@ -49,6 +52,17 @@ func WithCli(
 		return fmt.Errorf("unable to initialize the Docker client: %w", err)
 	}
 	mu.Unlock()
+
+	// Inject custom headers before the first Client() call, which is where the
+	// Docker client is lazily created and reads ConfigFile().HTTPHeaders.
+	if len(options.Headers) > 0 {
+		cfg := cli.ConfigFile()
+		if cfg.HTTPHeaders == nil {
+			cfg.HTTPHeaders = make(map[string]string)
+		}
+		maps.Copy(cfg.HTTPHeaders, options.Headers)
+	}
+
 	defer logs.CloseAndLogErr(cli.Client())
 
 	for _, r := range options.Registries {

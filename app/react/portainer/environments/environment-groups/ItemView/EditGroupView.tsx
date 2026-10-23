@@ -1,96 +1,91 @@
+import { useMemo, useState } from 'react';
+import { Box } from 'lucide-react';
 import { useRouter } from '@uirouter/react';
-import { useMemo } from 'react';
-import { FormikHelpers } from 'formik';
 
+import { notifySuccess } from '@/portainer/services/notifications';
 import { useIdParam } from '@/react/hooks/useIdParam';
 
-import { Widget } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
-import { Alert } from '@@/Alert';
+import { Tab, WidgetTabs, useCurrentTabIndex } from '@@/Widget/WidgetTabs';
+import { confirm } from '@@/modals/confirm';
+import { ModalType } from '@@/modals/Modal';
+import { buildConfirmButton } from '@@/modals/utils';
 
 import { useGroup } from '../queries/useGroup';
-import { useUpdateGroupMutation } from '../queries/useUpdateGroupMutation';
-import { GroupForm, GroupFormValues } from '../components/GroupForm';
-import { AssociatedEnvironmentsSelector } from '../components/AssociatedEnvironmentsSelector/AssociatedEnvironmentsSelector';
+import { useDeleteEnvironmentGroupMutation } from '../queries/useDeleteEnvironmentGroupMutation';
+
+import { EnvironmentsTab } from './tabs/EnvironmentsTab';
+import { GroupHeader } from './GroupHeader';
 
 export function EditGroupView() {
-  const groupId = useIdParam();
   const router = useRouter();
-  const groupQuery = useGroup(groupId);
-  const isUnassignedGroup = groupId === 1;
-  const updateMutation = useUpdateGroupMutation();
-
-  const initialValues: GroupFormValues = useMemo(
-    () => ({
-      name: groupQuery.data?.Name ?? '',
-      description: groupQuery.data?.Description ?? '',
-      tagIds: groupQuery.data?.TagIds ?? [],
-    }),
-    [groupQuery.data]
+  const groupId = useIdParam();
+  const deleteMutation = useDeleteEnvironmentGroupMutation();
+  const [addEnvsDrawerOpen, setAddEnvsDrawerOpen] = useState(false);
+  const groupQuery = useGroup(
+    deleteMutation.isLoading || deleteMutation.isSuccess ? undefined : groupId,
+    { size: true }
   );
+  const group = groupQuery.data;
+  const groupName = group?.Name ?? 'Environment group';
+
+  async function handleDeleteGroup() {
+    const confirmed = await confirm({
+      title: 'Delete Environment Group',
+      modalType: ModalType.Destructive,
+      message: `Are you sure you want to delete the environment group "${groupName}"? This action cannot be undone.`,
+      confirmButton: buildConfirmButton('Delete', 'danger'),
+    });
+
+    if (confirmed) {
+      deleteMutation.mutate(groupId, {
+        onSuccess() {
+          notifySuccess('Success', 'Environment group deleted');
+          router.stateService.go('portainer.groups');
+        },
+      });
+    }
+  }
+
+  const tabs: Array<Tab> = useMemo(
+    () => [
+      {
+        name: 'Environments',
+        icon: Box,
+        widget: (
+          <EnvironmentsTab
+            externalDrawerOpen={addEnvsDrawerOpen}
+            onExternalDrawerClose={() => setAddEnvsDrawerOpen(false)}
+          />
+        ),
+        selectedTabParam: 'environments',
+      },
+    ],
+    [addEnvsDrawerOpen]
+  );
+
+  const currentTabIndex = useCurrentTabIndex(tabs);
 
   return (
     <>
       <PageHeader
-        title="Environment group details"
-        breadcrumbs={[
-          { label: 'Groups', link: 'portainer.groups' },
-          { label: groupQuery.data?.Name ?? 'Edit group' },
-        ]}
+        breadcrumbs={[{ label: 'Groups', link: 'portainer.groups' }, groupName]}
       />
-
-      <div className="row">
-        <div className="col-sm-12">
-          <Widget>
-            <Widget.Body loading={groupQuery.isLoading}>
-              {groupQuery.isError && (
-                <Alert color="error" title="Error">
-                  Failed to load group details
-                </Alert>
-              )}
-              {!groupQuery.isError && groupQuery.data && (
-                <GroupForm
-                  initialValues={initialValues}
-                  onSubmit={handleSubmit}
-                  submitLabel="Update"
-                  submitLoadingLabel="Updating..."
-                  groupId={groupId}
-                />
-              )}
-            </Widget.Body>
-          </Widget>
-        </div>
+      <div className="mx-4 space-y-4">
+        <GroupHeader
+          group={group}
+          isLoading={groupQuery.isLoading}
+          onRefresh={() => groupQuery.refetch()}
+          onAddEnvironments={() => setAddEnvsDrawerOpen(true)}
+          onDelete={handleDeleteGroup}
+        />
+        <WidgetTabs
+          tabs={tabs}
+          currentTabIndex={currentTabIndex}
+          useContainer={false}
+        />
       </div>
-
-      <div className="row pb-20">
-        <div className="col-sm-12">
-          <AssociatedEnvironmentsSelector
-            groupId={groupId}
-            readOnly={isUnassignedGroup}
-          />
-        </div>
-      </div>
+      {tabs[currentTabIndex].widget}
     </>
   );
-
-  async function handleSubmit(
-    values: GroupFormValues,
-    { resetForm }: FormikHelpers<GroupFormValues>
-  ) {
-    await updateMutation.mutateAsync(
-      {
-        id: groupId,
-        name: values.name,
-        description: values.description,
-        tagIds: values.tagIds,
-        // associatedEnvironments omitted — backend preserves existing when field is absent (nil)
-      },
-      {
-        onSuccess() {
-          resetForm();
-          router.stateService.go('portainer.groups');
-        },
-      }
-    );
-  }
 }

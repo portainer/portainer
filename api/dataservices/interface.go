@@ -8,6 +8,7 @@ import (
 type (
 	DataStoreTx interface {
 		IsErrObjectNotFound(err error) bool
+		AllowList() AllowListService
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
@@ -24,6 +25,7 @@ type (
 		Settings() SettingsService
 		Snapshot() SnapshotService
 		SSLSettings() SSLSettingsService
+		Source() SourceService
 		Stack() StackService
 		Tag() TagService
 		TeamMembership() TeamMembershipService
@@ -32,6 +34,7 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+		Workflow() WorkflowService
 		PendingActions() PendingActionsService
 	}
 
@@ -49,6 +52,15 @@ type (
 		Export(filename string) (err error)
 
 		DataStoreTx
+	}
+
+	// AllowListService represents a service for managing the URL allow list
+	AllowListService interface {
+		Read(id portainer.AllowListKey) (*portainer.AllowList, error)
+		ReadAll() ([]portainer.AllowList, error)
+		ReadParsed(id portainer.AllowListKey) (*portainer.ParsedAllowList, error)
+		Update(id portainer.AllowListKey, allowList *portainer.AllowList) error
+		BucketName() string
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
@@ -183,6 +195,24 @@ type (
 		BucketName() string
 	}
 
+	SourceServiceUserContext interface {
+		ID() portainer.UserID
+		TeamMemberships() []portainer.TeamMembership
+		IsAdmin() bool
+	}
+
+	// SourceService represents a service for managing GitOps source data
+	SourceService interface {
+		Create(context SourceServiceUserContext, source *portainer.Source) error
+		Read(context SourceServiceUserContext, ID portainer.SourceID) (*portainer.Source, error)
+		Exists(context SourceServiceUserContext, ID portainer.SourceID) (bool, error)
+		ReadAll(context SourceServiceUserContext, predicates ...func(portainer.Source) bool) ([]portainer.Source, error)
+		Update(context SourceServiceUserContext, ID portainer.SourceID, source *portainer.Source) error
+		UpdateSyncStatus(context SourceServiceUserContext, ID portainer.SourceID, status portainer.SourceStatus, statusError string) error
+		Delete(context SourceServiceUserContext, ID portainer.SourceID) error
+		FindOrCreateGitSource(context SourceServiceUserContext, source *portainer.Source) (*portainer.Source, error)
+	}
+
 	// StackService represents a service for managing stack data
 	StackService interface {
 		BaseCRUD[portainer.Stack, portainer.StackID]
@@ -190,7 +220,6 @@ type (
 		StacksByName(name string) ([]portainer.Stack, error)
 		GetNextIdentifier() int
 		StackByWebhookID(ID string) (*portainer.Stack, error)
-		RefreshableStacks() ([]portainer.Stack, error)
 	}
 
 	// TagService represents a service for managing tag data
@@ -244,5 +273,10 @@ type (
 		BaseCRUD[portainer.Webhook, portainer.WebhookID]
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
+	}
+
+	// WorkflowService represents a service for managing GitOps workflow data
+	WorkflowService interface {
+		BaseCRUD[portainer.Workflow, portainer.WorkflowID]
 	}
 )

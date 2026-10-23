@@ -23,6 +23,7 @@ export function AutocompleteSelect({
   placeholder,
   searchResults,
   readOnly,
+  disabled,
   inputId,
   'data-cy': dataCy,
 }: {
@@ -36,6 +37,12 @@ export function AutocompleteSelect({
   placeholder?: string;
   searchResults?: Option<string>[];
   readOnly?: boolean;
+  /**
+   * Blocks editing and greys the control, matching a disabled Input. Prefer it
+   * over readOnly alone, which suppresses typing with no visual change and so
+   * reads as an editable field that has stopped working.
+   */
+  disabled?: boolean;
   inputId: string;
 } & AutomationTestingProps) {
   const [searchTerm, setSearchTerm] = useDebounce(value, onChange);
@@ -43,7 +50,9 @@ export function AutocompleteSelect({
 
   return (
     <Combobox
-      className={clsx(styles.root, 'form-control')}
+      className={clsx(styles.root, 'form-control', {
+        'bg-[var(--bg-form-control-disabled-color)]': disabled,
+      })}
       onSelect={onSelect}
       data-cy="component-gitComposeInput"
     >
@@ -53,6 +62,7 @@ export function AutocompleteSelect({
         onChange={handleChange}
         placeholder={placeholder}
         readOnly={readOnly}
+        disabled={disabled}
         id={inputId}
         autoComplete="off"
         data-cy={dataCy}

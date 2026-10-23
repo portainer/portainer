@@ -6,8 +6,6 @@ import { validation as commonFieldsValidation } from '@/react/portainer/custom-t
 import { Platform } from '@/react/portainer/templates/types';
 import { variablesValidation } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { buildGitValidationSchema } from '@/react/portainer/gitops/GitForm';
-import { useGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
-import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
 import { DeployMethod } from '@/react/portainer/gitops/types';
@@ -26,8 +24,6 @@ export function useValidation({
   viewType: TemplateViewType;
   deployMethod: DeployMethod;
 }) {
-  const { user } = useCurrentUser();
-  const gitCredentialsQuery = useGitCredentials(user.Id);
   const customTemplatesQuery = useCustomTemplates({
     params: {
       edge: undefined,
@@ -49,13 +45,7 @@ export function useValidation({
           .default(StackType.DockerCompose),
         FileContent: string().required('Template is required.'),
 
-        Git: isGit
-          ? buildGitValidationSchema(
-              gitCredentialsQuery.data || [],
-              false,
-              deployMethod
-            )
-          : mixed(),
+        Git: isGit ? buildGitValidationSchema(deployMethod) : mixed(),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
       }).concat(
@@ -64,13 +54,6 @@ export function useValidation({
           currentTemplateId: templateId,
         })
       ),
-    [
-      customTemplatesQuery.data,
-      gitCredentialsQuery.data,
-      isGit,
-      templateId,
-      viewType,
-      deployMethod,
-    ]
+    [customTemplatesQuery.data, isGit, templateId, viewType, deployMethod]
   );
 }

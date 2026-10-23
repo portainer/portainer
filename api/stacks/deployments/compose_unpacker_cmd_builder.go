@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/registryutils"
 )
 
@@ -34,6 +35,7 @@ type unpackerCmdBuilderOptions struct {
 	forceRecreate      bool
 	composeDestination string
 	registries         []portainer.Registry
+	gitConfig          *gittypes.RepoConfig
 }
 
 type buildCmdFunc func(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string
@@ -65,8 +67,8 @@ func (d *stackDeployer) buildUnpackerCmdForStack(stack *portainer.Stack, operati
 // deploy [-u username -p password] [--skip-tls-verify] [--force-recreate] [-r] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdDeploy}
-	cmd = appendGitAuthIfNeeded(cmd, stack)
-	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
+	cmd = appendGitAuthIfNeeded(cmd, opts.gitConfig)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, opts.gitConfig)
 	cmd = appendForceRecreateIfNeeded(cmd, opts.forceRecreate)
 
 	if opts.prune {
@@ -76,8 +78,8 @@ func buildDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, regi
 	cmd = append(cmd, env...)
 	cmd = append(cmd, registries...)
 	cmd = append(cmd,
-		stack.GitConfig.URL,
-		stack.GitConfig.ReferenceName,
+		opts.gitConfig.URL,
+		opts.gitConfig.ReferenceName,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -89,8 +91,8 @@ func buildDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, regi
 // undeploy [-u username -p password] [-k] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildUndeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdUndeploy}
-	cmd = appendGitAuthIfNeeded(cmd, stack)
-	cmd = append(cmd, stack.GitConfig.URL,
+	cmd = appendGitAuthIfNeeded(cmd, opts.gitConfig)
+	cmd = append(cmd, opts.gitConfig.URL,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -102,13 +104,13 @@ func buildUndeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, re
 // deploy [-u username -p password] [--skip-tls-verify] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildComposeStartCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdDeploy}
-	cmd = appendGitAuthIfNeeded(cmd, stack)
-	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
+	cmd = appendGitAuthIfNeeded(cmd, opts.gitConfig)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, opts.gitConfig)
 	cmd = append(cmd, "-k")
 	cmd = append(cmd, env...)
 	cmd = append(cmd, registries...)
-	cmd = append(cmd, stack.GitConfig.URL,
-		stack.GitConfig.ReferenceName,
+	cmd = append(cmd, opts.gitConfig.URL,
+		opts.gitConfig.ReferenceName,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -120,10 +122,10 @@ func buildComposeStartCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions
 // undeploy [-u username -p password] [-k] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildComposeStopCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdUndeploy}
-	cmd = appendGitAuthIfNeeded(cmd, stack)
+	cmd = appendGitAuthIfNeeded(cmd, opts.gitConfig)
 	cmd = append(cmd,
 		"-k",
-		stack.GitConfig.URL,
+		opts.gitConfig.URL,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -135,8 +137,8 @@ func buildComposeStopCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions,
 // swarm-deploy [-u username -p password] [--skip-tls-verify] [--force-recreate] [-f] [-r] [-k] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <git-ref> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildSwarmDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdSwarmDeploy}
-	cmd = appendGitAuthIfNeeded(cmd, stack)
-	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
+	cmd = appendGitAuthIfNeeded(cmd, opts.gitConfig)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, opts.gitConfig)
 	cmd = appendForceRecreateIfNeeded(cmd, opts.forceRecreate)
 	if opts.pullImage {
 		cmd = append(cmd, "-f")
@@ -148,8 +150,8 @@ func buildSwarmDeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions,
 
 	cmd = append(cmd, env...)
 	cmd = append(cmd, registries...)
-	cmd = append(cmd, stack.GitConfig.URL,
-		stack.GitConfig.ReferenceName,
+	cmd = append(cmd, opts.gitConfig.URL,
+		opts.gitConfig.ReferenceName,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -166,11 +168,11 @@ func buildSwarmUndeployCmd(stack *portainer.Stack, opts unpackerCmdBuilderOption
 // swarm-deploy [-u username -p password] [-f] [-r] [-k] [--skip-tls-verify] [--env KEY1=VALUE1 --env KEY2=VALUE2] <git-repo-url> <project-name> <destination> <compose-file-path> [<more-file-paths>...]
 func buildSwarmStartCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, registries []string, env []string) []string {
 	cmd := []string{UnpackerCmdSwarmDeploy, "-f", "-r", "-k"}
-	cmd = appendSkipTLSVerifyIfNeeded(cmd, stack)
+	cmd = appendSkipTLSVerifyIfNeeded(cmd, opts.gitConfig)
 	cmd = append(cmd, getEnv(stack.Env)...)
 	cmd = append(cmd, registries...)
-	cmd = append(cmd, stack.GitConfig.URL,
-		stack.GitConfig.ReferenceName,
+	cmd = append(cmd, opts.gitConfig.URL,
+		opts.gitConfig.ReferenceName,
 		stack.Name,
 		opts.composeDestination,
 		stack.EntryPoint,
@@ -184,16 +186,16 @@ func buildSwarmStopCmd(stack *portainer.Stack, opts unpackerCmdBuilderOptions, r
 	return []string{UnpackerCmdSwarmUndeploy, "-k", stack.Name, opts.composeDestination}
 }
 
-func appendGitAuthIfNeeded(cmd []string, stack *portainer.Stack) []string {
-	if stack.GitConfig.Authentication == nil || stack.GitConfig.Authentication.Password == "" {
+func appendGitAuthIfNeeded(cmd []string, gc *gittypes.RepoConfig) []string {
+	if gc == nil || gc.Authentication == nil || gc.Authentication.Password == "" {
 		return cmd
 	}
 
-	return append(cmd, "-u", stack.GitConfig.Authentication.Username, "-p", stack.GitConfig.Authentication.Password)
+	return append(cmd, "-u", gc.Authentication.Username, "-p", gc.Authentication.Password)
 }
 
-func appendSkipTLSVerifyIfNeeded(cmd []string, stack *portainer.Stack) []string {
-	if !stack.GitConfig.TLSSkipVerify {
+func appendSkipTLSVerifyIfNeeded(cmd []string, gc *gittypes.RepoConfig) []string {
+	if gc == nil || !gc.TLSSkipVerify {
 		return cmd
 	}
 
@@ -204,6 +206,7 @@ func appendForceRecreateIfNeeded(cmd []string, forceRecreate bool) []string {
 	if forceRecreate {
 		cmd = append(cmd, "--force-recreate")
 	}
+
 	return cmd
 }
 

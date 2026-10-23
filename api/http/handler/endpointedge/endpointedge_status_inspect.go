@@ -60,17 +60,17 @@ type endpointEdgeStatusInspectResponse struct {
 }
 
 // @id EndpointEdgeStatusInspect
-// @summary Get environment(endpoint) status
-// @description environment(endpoint) for edge agent to check status of environment(endpoint)
-// @description **Access policy**: restricted only to Edge environments(endpoints)
-// @tags endpoints
+// @summary Get environment status
+// @description Endpoint for edge agent to check status of environment
+// @description **Access policy**: Edge agent only — requires X-PortainerAgent-EdgeID header
+// @tags edge_agent
 // @security ApiKeyAuth
 // @security jwt
-// @param id path int true "Environment(Endpoint) identifier"
+// @param id path int true "Environment identifier"
 // @success 200 {object} endpointEdgeStatusInspectResponse "Success"
 // @failure 400 "Invalid request"
-// @failure 403 "Permission denied to access environment(endpoint)"
-// @failure 404 "Environment(Endpoint) not found"
+// @failure 403 "Permission denied to access environment"
+// @failure 404 "Environment not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/edge/status [get]
 func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -134,6 +134,10 @@ func (handler *Handler) parseHeaders(r *http.Request, endpoint *portainer.Endpoi
 
 	version := r.Header.Get(portainer.PortainerAgentHeader)
 	endpoint.Agent.Version = version
+
+	if gpuOperatorHeader := r.Header.Get(portainer.HTTPResponseAgentGPUOperator); gpuOperatorHeader != "" {
+		endpoint.Kubernetes.Flags.GPUOperator = gpuOperatorHeader == "true"
+	}
 
 	return nil
 }
@@ -319,9 +323,7 @@ func cacheResponse(w http.ResponseWriter, endpointID portainer.EndpointID, statu
 
 func (handler *Handler) respondFromCache(w http.ResponseWriter, r *http.Request, endpointID portainer.EndpointID) bool {
 	inmHeader := r.Header.Get("If-None-Match")
-	etags := strings.Split(inmHeader, ",")
-
-	if len(inmHeader) == 0 || etags[0] == "" {
+	if inmHeader == "" {
 		return false
 	}
 
@@ -330,7 +332,7 @@ func (handler *Handler) respondFromCache(w http.ResponseWriter, r *http.Request,
 		return false
 	}
 
-	for _, etag := range etags {
+	for etag := range strings.SplitSeq(inmHeader, ",") {
 		if !bytes.Equal([]byte(etag), cachedETag) {
 			continue
 		}

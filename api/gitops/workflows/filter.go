@@ -3,11 +3,9 @@ package workflows
 import (
 	"fmt"
 	"slices"
-	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/http/models/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -16,8 +14,38 @@ import (
 	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 	"github.com/portainer/portainer/api/stacks/stackutils"
+
+	"github.com/rs/zerolog/log"
 )
 
+// HasAccessibleSource reports whether any of the artifact's files has a source visible in
+// sourceMap.
+func HasAccessibleSource(files []portainer.ArtifactFile, sourceMap map[portainer.SourceID]portainer.Source) bool {
+	return slicesx.Some(files, func(f portainer.ArtifactFile) bool {
+		_, ok := sourceMap[f.SourceID]
+		return ok
+	})
+}
+
+// ArtifactBackingExists reports whether the artifact's target stack or edge stack still exists,
+// using the caller-supplied existence checks. An artifact with neither StackID nor EdgeStackID set
+// has no backing target.
+//
+// The check is expressed as caller-supplied closures rather than a shared store interface because
+// CE and EE each define their own Stack/EdgeStack service and domain types (portainer.Stack vs
+// portaineree.Stack), so a single interface type cannot be satisfied by both editions' DataStoreTx.
+func ArtifactBackingExists(a portainer.Artifact, stackExists func(portainer.StackID) (bool, error), edgeStackExists func(portainer.EdgeStackID) (bool, error)) (bool, error) {
+	switch {
+	case a.StackID != 0:
+		return stackExists(a.StackID)
+	case a.EdgeStackID != 0:
+		return edgeStackExists(a.EdgeStackID)
+	default:
+		return false, nil
+	}
+}
+
+// EndpointMatchesStackType reports whether ep is a valid target for stackType.
 func EndpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackType) bool {
 	switch stackType {
 	case portainer.DockerSwarmStack:
@@ -31,7 +59,9 @@ func EndpointMatchesStackType(ep portainer.Endpoint, stackType portainer.StackTy
 	}
 }
 
-func buildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (map[portainer.EndpointID]portainer.Endpoint, error) {
+// BuildEndpointMap reads and returns the endpoints backing stacks, keyed by endpoint ID, with
+// snapshot data filled in.
+func BuildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (map[portainer.EndpointID]portainer.Endpoint, error) {
 	ids := set.ToSet(slicesx.Map(stacks, func(s portainer.Stack) portainer.EndpointID { return s.EndpointID }))
 
 	endpoints, err := tx.Endpoint().ReadAll(func(ep portainer.Endpoint) bool { return ids[ep.ID] })
@@ -50,8 +80,8 @@ func buildEndpointMap(tx dataservices.DataStoreTx, stacks []portainer.Stack) (ma
 	return m, nil
 }
 
-// filterDockerStacksByAccess filters stacks to only those the current user can access.
-func filterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
+// FilterDockerStacksByAccess filters stacks to only those the current user can access.
+func FilterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.Stack, sc *security.RestrictedRequestContext) ([]portainer.Stack, error) {
 	if sc.IsAdmin {
 		return stacks, nil
 	}
@@ -77,9 +107,10 @@ func filterDockerStacksByAccess(tx dataservices.DataStoreTx, stacks []portainer.
 	return filtered, nil
 }
 
-func resolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, ep *portainer.Endpoint) (endpointAccess, error) {
+// ResolveKubeAccess determines sc's Kubernetes admin/namespace access on ep.
+func ResolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, ep *portainer.Endpoint) (endpointAccess, error) {
 	if sc.IsAdmin {
-		return endpointAccess{isKubeAdmin: true}, nil
+		return endpointAccess{IsKubeAdmin: true}, nil
 	}
 
 	pcli, err := k8sFactory.GetPrivilegedKubeClient(ep)
@@ -97,14 +128,16 @@ func resolveKubeAccess(k8sFactory *cli.ClientFactory, sc *security.RestrictedReq
 		return endpointAccess{}, fmt.Errorf("unable to retrieve non-admin namespaces for endpoint %d: %w", ep.ID, err)
 	}
 
-	return endpointAccess{isKubeAdmin: false, nonAdminNamespaces: nonAdminNamespaces}, nil
+	return endpointAccess{IsKubeAdmin: false, NonAdminNamespaces: nonAdminNamespaces}, nil
 }
 
 type endpointAccess struct {
-	isKubeAdmin        bool
-	nonAdminNamespaces []string
+	IsKubeAdmin        bool
+	NonAdminNamespaces []string
 }
 
+// buildEndpointAccessMap resolves sc's Kubernetes access for every Kubernetes endpoint in
+// endpointMap, skipping (and logging) any endpoint whose access cannot be resolved.
 func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.RestrictedRequestContext, endpointMap map[portainer.EndpointID]portainer.Endpoint) (map[portainer.EndpointID]endpointAccess, error) {
 	result := make(map[portainer.EndpointID]endpointAccess, len(endpointMap))
 
@@ -113,9 +146,10 @@ func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.Restrict
 			continue
 		}
 
-		access, err := resolveKubeAccess(k8sFactory, sc, &ep)
+		access, err := ResolveKubeAccess(k8sFactory, sc, &ep)
 		if err != nil {
-			return nil, err
+			log.Warn().Err(err).Str("context", "buildEndpointAccessMap").Int("endpoint_id", int(epID)).Msg("Failed to resolve kube access for endpoint, skipping")
+			continue
 		}
 
 		result[epID] = access
@@ -124,55 +158,22 @@ func buildEndpointAccessMap(k8sFactory *cli.ClientFactory, sc *security.Restrict
 	return result, nil
 }
 
-// lookup only if env is kube and either not edge or (edge + not async)
-func ShouldPerformEnvLookup(endpoint *portainer.Endpoint) bool {
-	return endpointutils.IsKubernetesEndpoint(endpoint) &&
-		(!endpointutils.IsEdgeEndpoint(endpoint) ||
-			(endpointutils.IsEdgeEndpoint(endpoint) && !endpoint.Edge.AsyncMode))
+// isK8SNamespaceAccessible reports whether a Kubernetes stack's stored namespace is visible to the
+// user given the resolved endpoint access. Non-Kubernetes stacks always pass.
+func isK8SNamespaceAccessible(stack portainer.Stack, accessMap map[portainer.EndpointID]endpointAccess) bool {
+	if stack.Type != portainer.KubernetesStack {
+		return true
+	}
+
+	access := accessMap[stack.EndpointID]
+	return access.IsKubeAdmin || slices.Contains(access.NonAdminNamespaces, stack.Namespace)
 }
 
-func filterK8SStacks(items []portainer.Stack, endpointMap map[portainer.EndpointID]portainer.Endpoint, k8sFactory *cli.ClientFactory, accessMap map[portainer.EndpointID]endpointAccess) ([]portainer.Stack, error) {
-	k8sStacks, result := slicesx.Partition(items, func(s portainer.Stack) bool {
-		return s.Type == portainer.KubernetesStack
+// filterK8SStacks drops Kubernetes stacks whose namespace is not accessible to the user. It relies
+// on the stored stack namespace rather than querying the cluster, matching the workflow list's
+// access filtering. Docker stacks pass through unchanged.
+func filterK8SStacks(items []portainer.Stack, accessMap map[portainer.EndpointID]endpointAccess) []portainer.Stack {
+	return slicesx.Filter(items, func(s portainer.Stack) bool {
+		return isK8SNamespaceAccessible(s, accessMap)
 	})
-
-	groupedByEnvId := slicesx.GroupBy(k8sStacks, func(s portainer.Stack) portainer.EndpointID {
-		return s.EndpointID
-	})
-
-	for envID, stacks := range groupedByEnvId {
-		ep, ok := endpointMap[envID]
-		if !ok || !ShouldPerformEnvLookup(&ep) {
-			continue
-		}
-
-		kcl, err := k8sFactory.GetPrivilegedKubeClient(&ep)
-		if err != nil {
-			return nil, err
-		}
-
-		access := accessMap[envID]
-		kcl.SetIsKubeAdmin(access.isKubeAdmin)
-		kcl.SetClientNonAdminNamespaces(access.nonAdminNamespaces)
-
-		apps, err := kcl.GetApplications("", "")
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range stacks {
-			idx := slices.IndexFunc(apps, func(app kubernetes.K8sApplication) bool {
-				return app.StackKind != "edge" && app.StackID == strconv.Itoa(int(s.ID))
-			})
-			if idx == -1 {
-				continue
-			}
-
-			app := apps[idx]
-			s.Name = app.Name
-			s.Namespace = app.ResourcePool
-			result = append(result, s)
-		}
-	}
-	return result, nil
 }

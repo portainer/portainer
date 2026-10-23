@@ -35,7 +35,7 @@ export function usePlacementTableState() {
 
 export function usePlacementTableData() {
   const placementsTableState = usePlacementTableState();
-  const autoRefreshRate = placementsTableState.autoRefreshRate * 1000; // ms to seconds
+  const { autoRefreshRateMS } = placementsTableState;
 
   const stateAndParams = useCurrentStateAndParams();
   const {
@@ -51,17 +51,17 @@ export function usePlacementTableData() {
     namespace,
     name,
     resourceType,
-    { autoRefreshRate }
+    { autoRefreshRate: autoRefreshRateMS }
   );
   const { data: pods, ...podsQuery } = useApplicationPods(
     environmentId,
     namespace,
     name,
     application,
-    { autoRefreshRate }
+    { autoRefreshRate: autoRefreshRateMS }
   );
   const { data: nodes, ...nodesQuery } = useNodesQuery(environmentId, {
-    autoRefreshRate,
+    autoRefreshRate: autoRefreshRateMS,
   });
 
   const placementsData = useMemo(

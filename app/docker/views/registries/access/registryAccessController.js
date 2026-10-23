@@ -29,11 +29,11 @@ class DockerRegistryAccessController {
   }
 
   filterUsers(users) {
-    const endpointUsers = this.endpoint.UserAccessPolicies;
-    const endpointTeams = this.endpoint.TeamAccessPolicies;
+    const endpointUsers = this.endpoint.UserAccessPolicies || {};
+    const endpointTeams = this.endpoint.TeamAccessPolicies || {};
 
-    const endpointGroupUsers = this.endpointGroup.UserAccessPolicies;
-    const endpointGroupTeams = this.endpointGroup.TeamAccessPolicies;
+    const endpointGroupUsers = this.endpointGroup.UserAccessPolicies || {};
+    const endpointGroupTeams = this.endpointGroup.TeamAccessPolicies || {};
 
     return users.filter((userOrTeam) => {
       const userAccess = userOrTeam instanceof UserAccessViewModel && (endpointUsers[userOrTeam.Id] || endpointGroupUsers[userOrTeam.Id]);

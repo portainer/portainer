@@ -53,7 +53,7 @@ To do so, use the `/endpoints/{id}/docker` endpoint. Note that this endpoint is 
 # Private Registry
 
 When using a private registry, include a Base64-encoded JSON string in the request header. The header parameter name is `X-Registry-Auth` and the value should encode the following structure: ‘{"registryId":\<registryId\>}’ where `<registryId>` is the ID of the registry where the repository was created.
- 
+
 Example encoded value:
 
 ```

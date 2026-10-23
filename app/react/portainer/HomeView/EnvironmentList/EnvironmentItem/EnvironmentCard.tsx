@@ -60,7 +60,7 @@ export function EnvironmentCard({
         params={dashboardRoute.params}
         data-cy={`environment-card-${environment.Name}`}
       >
-        <div className="flex grow gap-3">
+        <div className="flex min-w-0 flex-1 gap-3">
           <div className="flex items-center justify-center self-center rounded-lg bg-blue-9/10 p-2 pt-2">
             <EnvironmentIcon
               type={environment.Type}
@@ -68,10 +68,12 @@ export function EnvironmentCard({
             />
           </div>
 
-          <div className="flex flex-1 grow flex-col gap-1">
+          <div className="flex min-w-0 flex-1 grow flex-col gap-1">
             {/* First row - title */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold">{environment.Name}</span>
+              <span className="break-words text-sm font-bold">
+                {environment.Name}
+              </span>
               <EnvironmentStatusBadge environment={environment} />
               {showSnapshotButton && <SnapshotBadge />}
             </div>

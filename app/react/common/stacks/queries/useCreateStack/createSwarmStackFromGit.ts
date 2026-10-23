@@ -18,18 +18,11 @@ export type SwarmGitRepositoryPayload = {
   /** Swarm cluster identifier */
   swarmID: string;
 
-  /** URL of a Git repository hosting the Stack file */
-  repositoryUrl: string;
+  /** URL of a Git repository hosting the Stack file (used for app templates) */
+  repositoryUrl?: string;
   /** Reference name of a Git repository hosting the Stack file */
   repositoryReferenceName?: string;
-  /** Use basic authentication to clone the Git repository */
-  repositoryAuthentication?: boolean;
-  /** Username used in basic authentication. Required when RepositoryAuthentication is true. */
-  repositoryUsername?: string;
-  /** Password used in basic authentication. Required when RepositoryAuthentication is true. */
-  repositoryPassword?: string;
-  /** GitCredentialID used to identify the binded git credential */
-  repositoryGitCredentialId?: number;
+
   /** Path to the Stack file inside the Git repository */
   composeFile?: string;
 
@@ -42,8 +35,9 @@ export type SwarmGitRepositoryPayload = {
   supportRelativePath?: boolean;
   /** Local filesystem path */
   filesystemPath?: string;
-  /** TLSSkipVerify skips SSL verification when cloning the Git repository */
-  tlsSkipVerify?: boolean;
+
+  /** ID of an existing Source. When set, repositoryUrl and authentication fields are ignored. */
+  sourceId?: number;
   environmentId: EnvironmentId;
   registries?: Array<RegistryId>;
 };

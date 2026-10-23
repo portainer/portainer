@@ -5,8 +5,11 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
-import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
+import {
+  createMockEnvironment,
+  createMockEnvironmentGroup,
+} from '@/react-tools/test-mocks';
 
 import { StackDuplicationFormInner } from './StackDuplicationFormInner';
 import { FormSubmitValues } from './StackDuplicationForm.types';
@@ -491,13 +494,13 @@ function renderFormInner({
   initialValues?: FormSubmitValues;
   isLoading?: boolean;
 } = {}) {
-  const mockEnvironments: Environment[] = [
-    { Id: 1, Name: 'Current Environment', GroupId: 1 } as Environment,
-    { Id: 2, Name: 'Target Environment', GroupId: 1 } as Environment,
+  const mockEnvironments = [
+    createMockEnvironment({ Id: 1, Name: 'Current Environment', GroupId: 1 }),
+    createMockEnvironment({ Id: 2, Name: 'Target Environment', GroupId: 1 }),
   ];
 
   const mockGroups: EnvironmentGroup[] = [
-    { Id: 1, Name: 'Unassigned' } as EnvironmentGroup,
+    createMockEnvironmentGroup({ Id: 1, Name: 'Unassigned' }),
   ];
 
   server.use(

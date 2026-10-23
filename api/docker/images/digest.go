@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
-	dockerclient "github.com/portainer/portainer/api/docker/client"
+	portainer "github.com/portainer/portainer/api"
 
 	"github.com/docker/docker/api/types/image"
+	dockerclient "github.com/docker/docker/client"
 	"github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -15,28 +16,33 @@ import (
 	imagetypes "go.podman.io/image/v5/types"
 )
 
-// Options holds docker registry object options
-type Options struct {
-	Auth    imagetypes.DockerAuthConfig
-	Timeout time.Duration
+const digestFetchTimeout = 5 * time.Second
+
+// ClientFactory creates Docker clients for a given environment.
+type ClientFactory interface {
+	CreateClient(endpoint *portainer.Endpoint, nodeName string, timeout *time.Duration) (*dockerclient.Client, error)
+}
+
+// RegistryAuthProvider looks up registry credentials for an image.
+type RegistryAuthProvider interface {
+	RegistryAuth(image Image) (string, string, error)
 }
 
 type DigestClient struct {
-	clientFactory  *dockerclient.ClientFactory
-	opts           Options
+	clientFactory  ClientFactory
 	sysCtx         *imagetypes.SystemContext
-	registryClient *RegistryClient
+	registryClient RegistryAuthProvider
 }
 
-func NewClientWithRegistry(registryClient *RegistryClient, clientFactory *dockerclient.ClientFactory) *DigestClient {
+func NewClientWithRegistry(registryClient RegistryAuthProvider, clientFactory ClientFactory) *DigestClient {
 	return &DigestClient{
 		clientFactory:  clientFactory,
 		registryClient: registryClient,
 	}
 }
 
-func (c *DigestClient) RemoteDigest(image Image) (digest.Digest, error) {
-	ctx, cancel := c.timeoutContext()
+func (c *DigestClient) RemoteDigest(ctx context.Context, image Image) (digest.Digest, error) {
+	ctx, cancel := context.WithTimeout(ctx, digestFetchTimeout)
 	defer cancel()
 
 	// Docker references with both a tag and digest are currently not supported
@@ -169,15 +175,4 @@ func ParseRepoTag(repoTag string) *Image {
 	}
 
 	return &image
-}
-
-func (c *DigestClient) timeoutContext() (context.Context, context.CancelFunc) {
-	ctx := context.Background()
-	var cancel context.CancelFunc = func() {}
-
-	if c.opts.Timeout > 0 {
-		ctx, cancel = context.WithTimeout(ctx, c.opts.Timeout)
-	}
-
-	return ctx, cancel
 }

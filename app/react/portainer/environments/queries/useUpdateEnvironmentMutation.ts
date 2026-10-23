@@ -1,19 +1,19 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
+import {
+  EndpointsEndpointUpdatePayload,
+  PortainerEndpoint,
+} from '@api/types.gen';
+
 import { withError, withInvalidate } from '@/react-tools/react-query';
 import {
   EnvironmentId,
   EnvironmentStatusMessage,
-  Environment,
   KubernetesSettings,
-  DeploymentOptions,
-  EndpointChangeWindow,
-  EnvironmentGroupId,
 } from '@/react/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios/axios';
-import { TagId } from '@/portainer/tags/types';
 
-import { buildUrl } from '../environment.service/utils';
+import { buildUrl, toEnvironment } from '../environment.service/utils';
 
 import { environmentQueryKeys } from './query-keys';
 
@@ -26,31 +26,17 @@ export function useUpdateEnvironmentMutation() {
   });
 }
 
-export interface UpdateEnvironmentPayload extends Partial<Environment> {
-  TLSCACert?: File;
-  TLSCert?: File;
-  TLSKey?: File;
-
-  Name: string;
-  PublicURL: string;
-  GroupID: EnvironmentGroupId;
-  TagIds: TagId[];
-
-  EdgeCheckinInterval: number;
-
-  TLS: boolean;
-  TLSSkipVerify: boolean;
-  TLSSkipClientVerify: boolean;
-  AzureApplicationID?: string;
-  AzureTenantID?: string;
-  AzureAuthenticationKey?: string;
-
-  IsSetStatusMessage: boolean;
-  StatusMessage: EnvironmentStatusMessage;
+export type UpdateEnvironmentPayload = Omit<
+  EndpointsEndpointUpdatePayload,
+  'Kubernetes'
+> & {
   Kubernetes?: KubernetesSettings;
-  DeploymentOptions?: DeploymentOptions | null;
-  ChangeWindow?: EndpointChangeWindow;
-}
+  TLSCACert: File | undefined;
+  TLSCert: File | undefined;
+  TLSKey: File | undefined;
+  IsSetStatusMessage?: boolean;
+  StatusMessage?: EnvironmentStatusMessage;
+};
 
 export async function updateEnvironment({
   id,
@@ -67,12 +53,9 @@ export async function updateEnvironment({
       payload.TLSKey
     );
 
-    const { data: endpoint } = await axios.put<Environment>(
-      buildUrl(id),
-      payload
-    );
+    const { data } = await axios.put<PortainerEndpoint>(buildUrl(id), payload);
 
-    return endpoint;
+    return toEnvironment(data);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update environment');
   }

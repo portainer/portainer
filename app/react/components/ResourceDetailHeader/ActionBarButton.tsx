@@ -1,17 +1,21 @@
-import { ComponentProps } from 'react';
+import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-import { Button } from '@@/buttons';
+import { Button, ButtonProps } from '@@/buttons';
 
-type Props = Omit<ComponentProps<typeof Button>, 'color' | 'size'>;
+type Props<TasProps> = Omit<ButtonProps<TasProps>, 'size'>;
 
-export function ActionBarButton({ className, ...props }: Props) {
+export function ActionBarButton<TasProps = unknown>({
+  className,
+  color = 'none',
+  ...props
+}: PropsWithChildren<Props<TasProps>>) {
   return (
-    <Button
-      color="none"
+    <Button<TasProps>
+      color={color}
       size="small"
       className={clsx(
-        'rounded-md !px-3 !py-1.5 transition-colors',
+        '!ml-0 rounded-md !px-3 !py-1.5 transition-colors',
         'hover:bg-[var(--bg-blocklist-hover-color)] hover:text-[var(--text-blocklist-hover-color)]',
         className
       )}

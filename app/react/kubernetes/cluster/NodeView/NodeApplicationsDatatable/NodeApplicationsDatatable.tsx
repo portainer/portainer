@@ -32,7 +32,7 @@ export function NodeApplicationsDatatable() {
   } = useCurrentStateAndParams();
   const applicationsQuery = useApplications(envId, {
     nodeName,
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
   });
   const applications = applicationsQuery.data ?? [];
 
@@ -50,7 +50,7 @@ export function NodeApplicationsDatatable() {
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={tableState.setAutoRefreshRate}
           />
         </TableSettingsMenu>

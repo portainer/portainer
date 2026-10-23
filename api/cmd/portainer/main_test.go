@@ -12,6 +12,44 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func Test_resolveSetupToken(t *testing.T) {
+	t.Parallel()
+
+	t.Run("admin already exists — returns empty token", func(t *testing.T) {
+		admin := portainer.User{Role: portainer.AdministratorRole}
+		store := testhelpers.NewDatastore(testhelpers.WithUsers([]portainer.User{admin}))
+		token, err := resolveSetupToken(store, "")
+		require.NoError(t, err)
+		assert.Empty(t, token)
+	})
+
+	t.Run("no admin — generates a 64-char hex token", func(t *testing.T) {
+		store := testhelpers.NewDatastore(testhelpers.WithUsers([]portainer.User{}))
+		token, err := resolveSetupToken(store, "")
+		require.NoError(t, err)
+		assert.Len(t, token, 64)
+
+		token2, err := resolveSetupToken(store, "")
+		require.NoError(t, err)
+		assert.NotEqual(t, token, token2)
+	})
+
+	t.Run("no admin — uses provided token", func(t *testing.T) {
+		store := testhelpers.NewDatastore(testhelpers.WithUsers([]portainer.User{}))
+		token, err := resolveSetupToken(store, "mysecrettoken")
+		require.NoError(t, err)
+		assert.Equal(t, "mysecrettoken", token)
+	})
+
+	t.Run("admin already exists — ignores provided token", func(t *testing.T) {
+		admin := portainer.User{Role: portainer.AdministratorRole}
+		store := testhelpers.NewDatastore(testhelpers.WithUsers([]portainer.User{admin}))
+		token, err := resolveSetupToken(store, "mysecrettoken")
+		require.NoError(t, err)
+		assert.Empty(t, token)
+	})
+}
+
 const secretFileName = "secret.txt"
 
 func createPasswordFile(t *testing.T, secretPath, password string) string {
@@ -83,6 +121,8 @@ func TestUpdateSettingsFromFlags_KubectlShellImage(t *testing.T) {
 				SnapshotInterval:          &emptyString,
 				Logo:                      &emptyString,
 				EnableEdgeComputeFeatures: &falseBool,
+				EdgePortainerURL:          &emptyString,
+				EdgeTrustOnFirstConnect:   &falseBool,
 				Templates:                 &emptyString,
 				Labels:                    &emptyLabels,
 				HTTPDisabled:              &falseBool,
@@ -101,6 +141,42 @@ func TestUpdateSettingsFromFlags_KubectlShellImage(t *testing.T) {
 	}
 }
 
+func TestUpdateSettingsFromFlags_EdgeCompute(t *testing.T) {
+	emptyString := ""
+	falseBool := false
+	trueBool := true
+	var emptyLabels []portainer.Pair
+
+	edgeURL := "https://edge.example.com:9443"
+
+	store := testhelpers.NewDatastore(
+		testhelpers.WithSettingsService(&portainer.Settings{}),
+		testhelpers.WithSSLSettingsService(&portainer.SSLSettings{}),
+	)
+
+	flags := &portainer.CLIFlags{
+		SnapshotInterval:          &emptyString,
+		Logo:                      &emptyString,
+		EnableEdgeComputeFeatures: &trueBool,
+		EdgePortainerURL:          &edgeURL,
+		EdgeTrustOnFirstConnect:   &trueBool,
+		Templates:                 &emptyString,
+		Labels:                    &emptyLabels,
+		HTTPDisabled:              &falseBool,
+		HTTPEnabled:               &falseBool,
+		KubectlShellImage:         &emptyString,
+	}
+
+	err := updateSettingsFromFlags(store, flags)
+	require.NoError(t, err)
+
+	settings, err := store.Settings().Settings()
+	require.NoError(t, err)
+	require.True(t, settings.EnableEdgeComputeFeatures)
+	require.Equal(t, edgeURL, settings.EdgePortainerURL)
+	require.True(t, settings.TrustOnFirstConnect)
+}
+
 func TestDBSecretPath(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -111,7 +187,7 @@ func TestDBSecretPath(t *testing.T) {
 		{keyFilenameFlag: "/tmp/secret.txt", expected: "/tmp/secret.txt"},
 		{keyFilenameFlag: "/run/secrets/secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "./secret.txt", expected: "/run/secrets/secret.txt"},
-		{keyFilenameFlag: "../secret.txt", expected: "/run/secret.txt"},
+		{keyFilenameFlag: "../secret.txt", expected: "/run/secrets/secret.txt"},
 		{keyFilenameFlag: "foo/bar/secret.txt", expected: "/run/secrets/foo/bar/secret.txt"},
 	}
 

@@ -33,7 +33,6 @@ export function GitSection({ webhookId, isDockerStandalone = false }: Props) {
         deployMethod="compose"
         isDockerStandalone={isDockerStandalone}
         isAdditionalFilesFieldVisible
-        isAuthExplanationVisible
         isForcePullVisible
         errors={errors.git}
         baseWebhookUrl={baseStackWebhookUrl()}

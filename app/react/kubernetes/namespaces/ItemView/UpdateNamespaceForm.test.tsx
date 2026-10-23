@@ -8,6 +8,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { UserViewModel } from '@/portainer/models/user';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { UpdateNamespaceForm } from './UpdateNamespaceForm';
 
@@ -17,6 +18,11 @@ vi.mock('@uirouter/react', async (importOriginal: () => Promise<object>) => ({
   ...(await importOriginal()),
   useCurrentStateAndParams: vi.fn(() => ({
     params: { id: NAMESPACE_NAME },
+  })),
+  useRouter: vi.fn(() => ({
+    stateService: {
+      reload: vi.fn(),
+    },
   })),
 }));
 
@@ -197,6 +203,14 @@ describe('UpdateNamespaceForm', () => {
   });
 
   describe('error states', () => {
+    let restoreConsole: () => void;
+    beforeEach(() => {
+      restoreConsole = suppressConsoleLogs();
+    });
+    afterEach(() => {
+      restoreConsole();
+    });
+
     it('should show error alert when namespace query fails', async () => {
       setupDefaultHandlers({ namespaceError: true });
       renderComponent();

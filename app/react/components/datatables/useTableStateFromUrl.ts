@@ -1,5 +1,4 @@
-import { useLocalStorage } from '@/react/hooks/useLocalStorage';
-import { useParamsState } from '@/react/hooks/useParamState';
+import { usePersistedParamsState } from '@/react/hooks/useParamState';
 
 import { BasicTableSettings } from './types';
 
@@ -10,7 +9,7 @@ type CoreUrlState = {
   groupBy: string | null;
   groupFilter: string | null;
   page: number;
-  pageSize: number | null;
+  pageSize: number;
 };
 
 type Extra = {
@@ -31,35 +30,64 @@ export function useTableStateFromUrl<
   localStorageKey,
   defaultSort = 'name',
   defaultGroupBy,
+  persistedExtraKeys,
   parseExtra,
   buildExtra,
 }: {
   localStorageKey: string;
   defaultSort?: string;
   defaultGroupBy?: string;
-  parseExtra?: (params: Record<string, string | undefined>) => TParsed;
+  persistedExtraKeys?: string[];
+  parseExtra?: (params: Record<string, unknown>) => TParsed;
   buildExtra?: (
     urlState: CoreUrlState & TParsed,
     setUrlState: (s: Partial<CoreUrlState & TParsed>) => void
   ) => TExtra;
 }): BasicTableSettings & TExtra & Extra {
-  const [storedPageSize, setStoredPageSize] = useLocalStorage(
-    `datatable_settings_${localStorageKey}_pageSize`,
-    10
+  const persistedKeys = [
+    'sort',
+    'order',
+    'groupBy',
+    'groupFilter',
+    'pageSize',
+    ...(persistedExtraKeys ?? []),
+  ];
+
+  const [urlState, setUrlState] = usePersistedParamsState<
+    CoreUrlState & TParsed
+  >(
+    (params) => ({
+      search: typeof params.search === 'string' ? params.search : '',
+      sort: typeof params.sort === 'string' ? params.sort : defaultSort,
+      order:
+        parseOrder(
+          typeof params.order === 'string' ? params.order : undefined
+        ) ?? 'asc',
+      groupBy:
+        params.groupBy !== undefined
+          ? (params.groupBy as string | null)
+          : (defaultGroupBy ?? null),
+      groupFilter:
+        params.groupFilter !== undefined
+          ? (params.groupFilter as string | null)
+          : null,
+      page: Math.max(
+        0,
+        typeof params.page === 'number'
+          ? params.page
+          : parseIntOrDefault(
+              typeof params.page === 'string' ? params.page : undefined,
+              0
+            )
+      ),
+      pageSize: parsePositiveIntOrNull(params.pageSize) ?? 10,
+      ...(parseExtra ? parseExtra(params) : ({} as TParsed)),
+    }),
+    {
+      storageKey: `datatable_${localStorageKey}_state`,
+      persistedKeys,
+    }
   );
-
-  const [urlState, setUrlState] = useParamsState((params) => ({
-    search: params.search ?? '',
-    sort: params.sort ?? defaultSort,
-    order: (params.order === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc',
-    groupBy: params.groupBy ?? defaultGroupBy ?? null,
-    groupFilter: params.groupFilter ?? null,
-    page: Math.max(0, parseIntOrDefault(params.page, 0)),
-    pageSize: parsePositiveIntOrNull(params.pageSize),
-    ...(parseExtra ? parseExtra(params) : ({} as TParsed)),
-  }));
-
-  const pageSize = urlState.pageSize ?? storedPageSize;
 
   const extra = buildExtra ? buildExtra(urlState, setUrlState) : ({} as TExtra);
 
@@ -106,9 +134,8 @@ export function useTableStateFromUrl<
     page: urlState.page,
     setPage: (page) => setCoreState({ page }),
 
-    pageSize,
+    pageSize: urlState.pageSize,
     setPageSize: (size) => {
-      setStoredPageSize(size);
       setCoreState({ pageSize: size, page: 0 });
     },
 
@@ -116,7 +143,7 @@ export function useTableStateFromUrl<
   } satisfies BasicTableSettings & TExtra & Extra;
 
   function setCoreState(partial: Partial<CoreUrlState>) {
-    return setUrlState(partial as Partial<CoreUrlState & TParsed>);
+    setUrlState(partial as Partial<CoreUrlState & TParsed>);
   }
 }
 
@@ -129,14 +156,16 @@ export function parseIntOrDefault<T>(
   return Number.isFinite(n) ? n : fallback;
 }
 
-export function parsePositiveIntOrNull(raw: string | undefined): number | null {
-  const n = parseIntOrDefault(raw, null);
+export function parsePositiveIntOrNull(raw: unknown): number | null {
+  if (typeof raw === 'number') return raw > 0 ? Math.floor(raw) : null;
+  const n = parseIntOrDefault(typeof raw === 'string' ? raw : undefined, null);
   return n !== null && n > 0 ? n : null;
 }
 
-export function asEnum<T>(
-  value: string | undefined,
-  allowed: Set<T>
-): T | null {
+export function asEnum<T>(value: unknown, allowed: Set<T>): T | null {
   return allowed.has(value as T) ? (value as T) : null;
+}
+
+function parseOrder(raw: string | undefined): 'asc' | 'desc' | null {
+  return raw === 'asc' || raw === 'desc' ? raw : null;
 }

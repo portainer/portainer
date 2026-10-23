@@ -7,6 +7,24 @@ interface Props {
   className?: string;
 }
 
+/**
+ * Fixed action bar pinned to the bottom of the viewport.
+ *
+ * Wrap the page content in `StickyFooter.Container` so the footer never
+ * obscures the last element:
+ *
+ * ```tsx
+ * <StickyFooter.Container>
+ *   <form>
+ *     ...
+ *     <StickyFooter>
+ *       <Button>Cancel</Button>
+ *       <Button>Save</Button>
+ *     </StickyFooter>
+ *   </form>
+ * </StickyFooter.Container>
+ * ```
+ */
 export function StickyFooter({
   className,
   children,
@@ -26,3 +44,14 @@ export function StickyFooter({
     </div>
   );
 }
+
+/**
+ * Wraps page content to prevent `StickyFooter` from overlapping the bottom
+ * of the page. Always use this as the outermost wrapper when rendering a
+ * `StickyFooter` inside a page or form.
+ */
+function Container({ children }: PropsWithChildren<unknown>) {
+  return <div className="pb-20">{children}</div>;
+}
+
+StickyFooter.Container = Container;

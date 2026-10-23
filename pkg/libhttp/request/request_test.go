@@ -1,8 +1,13 @@
 package request
 
 import (
+	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRetrieveQueryParameter(t *testing.T) {
@@ -221,66 +226,77 @@ func TestRetrieveArrayQueryParameter(t *testing.T) {
 	}
 }
 
-func TestRetrieveNumberArrayQueryParameter(t *testing.T) {
+func Test_getArrayQueryParameter(t *testing.T) {
 	t.Parallel()
+
+	makeRequest := func(rawQuery string) *http.Request {
+		r := &http.Request{URL: &url.URL{RawQuery: rawQuery}}
+		require.NoError(t, r.ParseForm())
+
+		return r
+	}
+
 	tests := []struct {
-		name    string
-		url     string
-		param   string
-		want    []int
-		wantErr bool
+		name     string
+		query    string
+		param    string
+		expected []string
 	}{
 		{
-			name:    "valid integer array",
-			url:     "http://example.com?ids[]=1&ids[]=2&ids[]=3",
-			param:   "ids",
-			want:    []int{1, 2, 3},
-			wantErr: false,
+			name:     "bracket notation",
+			query:    "ids[]=1&ids[]=2",
+			param:    "ids",
+			expected: []string{"1", "2"},
 		},
 		{
-			name:    "single value",
-			url:     "http://example.com?ids[]=42",
-			param:   "ids",
-			want:    []int{42},
-			wantErr: false,
+			name:     "comma-separated",
+			query:    "ids=1,2",
+			param:    "ids",
+			expected: []string{"1", "2"},
 		},
 		{
-			name:    "no values returns nil",
-			url:     "http://example.com",
-			param:   "ids",
-			want:    nil,
-			wantErr: false,
+			name:     "plain repeated",
+			query:    "ids=1&ids=2",
+			param:    "ids",
+			expected: []string{"1", "2"},
 		},
 		{
-			name:    "invalid number in array",
-			url:     "http://example.com?ids[]=1&ids[]=abc&ids[]=3",
-			param:   "ids",
-			want:    nil,
-			wantErr: true,
+			name:     "single value",
+			query:    "ids=1",
+			param:    "ids",
+			expected: []string{"1"},
+		},
+		{
+			name:     "missing param returns nil",
+			query:    "",
+			param:    "ids",
+			expected: nil,
+		},
+		{
+			name:     "bracket notation takes priority over plain",
+			query:    "ids[]=1&ids=2",
+			param:    "ids",
+			expected: []string{"1"},
+		},
+		{
+			name:     "empty plain param returns nil",
+			query:    "ids=",
+			param:    "ids",
+			expected: nil,
+		},
+		{
+			name:     "trailing comma is ignored",
+			query:    "ids=1,2,",
+			param:    "ids",
+			expected: []string{"1", "2"},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.url, nil)
-			got, err := RetrieveNumberArrayQueryParameter[int](req, tt.param)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RetrieveNumberArrayQueryParameter() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			if !tt.wantErr {
-				if len(got) != len(tt.want) {
-					t.Errorf("RetrieveNumberArrayQueryParameter() length = %v, want %v", len(got), len(tt.want))
-					return
-				}
-				for i := range got {
-					if got[i] != tt.want[i] {
-						t.Errorf("RetrieveNumberArrayQueryParameter()[%d] = %v, want %v", i, got[i], tt.want[i])
-					}
-				}
-			}
+			r := makeRequest(tt.query)
+			result := RetrieveArrayQueryParameter(r, tt.param)
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

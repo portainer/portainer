@@ -1,44 +1,42 @@
 package middlewares
 
 import (
+	"net"
 	"net/http"
 	"strings"
+
+	"github.com/portainer/portainer/pkg/libhttp"
 )
 
-// parseForwardedHeaderProto parses the Forwarded header and extracts the protocol.
-// The Forwarded header format supports:
-// - Single proxy: Forwarded: by=<identifier>;for=<identifier>;host=<host>;proto=<http|https>
-// - Multiple proxies: Forwarded: for=192.0.2.43, for=198.51.100.17
-// We take the first (leftmost) entry as it represents the original client
+// parseForwardedHeaderProto extracts the proto= parameter of the rightmost
+// element of a Forwarded header value (RFC 7239).
 func parseForwardedHeaderProto(forwarded string) string {
 	if forwarded == "" {
 		return ""
 	}
 
-	// Parse the first part (leftmost proxy, closest to original client)
-	firstPart, _, _ := strings.Cut(forwarded, ",")
-	firstPart = strings.TrimSpace(firstPart)
+	proto, _ := libhttp.ForwardedElementParam(libhttp.LastCommaSeparated(forwarded), "proto")
 
-	// Split by semicolon to get key-value pairs within this proxy entry
-	// Format: key=value;key=value;key=value
-	for pair := range strings.SplitSeq(firstPart, ";") {
-		// Split by equals sign to separate key and value
-		key, value, found := strings.Cut(pair, "=")
-		if !found {
-			continue
-		}
+	return proto
+}
 
-		if strings.EqualFold(strings.TrimSpace(key), "proto") {
-			return strings.Trim(strings.TrimSpace(value), `"'`)
+// IsHTTPSRequest checks if the original request was made over HTTPS by
+// examining the rightmost entry of the X-Forwarded-Proto header, falling
+// back to the rightmost proto= parameter of the Forwarded header. If
+// trustedProxies is empty, both headers are honoured unconditionally,
+// preserving existing behaviour for deployments that have not configured a
+// trusted proxy list; once it is set, the headers are only honoured when
+// the immediate peer (r.RemoteAddr) matches one of them.
+func IsHTTPSRequest(r *http.Request, trustedProxies []*net.IPNet) bool {
+	if len(trustedProxies) > 0 {
+		peer := libhttp.ParseRequestIP(r.RemoteAddr)
+		if peer == nil || !libhttp.IsTrustedProxy(peer, trustedProxies) {
+			return false
 		}
 	}
 
-	return ""
-}
+	xForwardedProto := libhttp.LastCommaSeparated(r.Header.Get("X-Forwarded-Proto"))
 
-// IsHTTPSRequest checks if the original request was made over HTTPS
-// by examining both X-Forwarded-Proto and Forwarded headers
-func IsHTTPSRequest(r *http.Request) bool {
-	return strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https") ||
+	return strings.EqualFold(xForwardedProto, "https") ||
 		strings.EqualFold(parseForwardedHeaderProto(r.Header.Get("Forwarded")), "https")
 }

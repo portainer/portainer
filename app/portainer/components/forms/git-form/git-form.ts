@@ -5,7 +5,7 @@ import controller from './git-form.controller';
 export const gitForm: IComponentOptions = {
   template: `
 <ng-form name="$ctrl.gitForm">
-  <react-git-form 
+  <react-git-form
     value="$ctrl.value"
     on-change="$ctrl.handleChange"
     environment-type="$ctrl.environmentType"

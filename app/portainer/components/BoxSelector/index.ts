@@ -19,6 +19,7 @@ const BoxSelectorReact = react2angular(BoxSelector, [
   'useGridLayout',
   'className',
   'label',
+  'aria-label',
 ]);
 
 export const boxSelectorModule = angular

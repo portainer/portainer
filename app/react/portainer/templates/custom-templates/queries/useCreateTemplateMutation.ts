@@ -16,9 +16,6 @@ import { GitFormModel } from '@/react/portainer/gitops/types';
 import { DefinitionFieldValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { AccessControlFormData } from '@/react/portainer/access-control/types';
 import { applyResourceControl } from '@/react/portainer/access-control/access-control.service';
-import { useCurrentUser } from '@/react/hooks/useUser';
-import { UserId } from '@/portainer/users/types';
-import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
 import { json2formData } from '@/portainer/helpers/json';
 
 import { Platform } from '../../types';
@@ -43,14 +40,13 @@ interface CreateTemplatePayload {
 }
 
 export function useCreateTemplateMutation() {
-  const { user } = useCurrentUser();
   const queryClient = useQueryClient();
 
   return useMutation(
     async (
       payload: CreateTemplatePayload & { AccessControl?: AccessControlFormData }
     ) => {
-      const template = await createTemplate(user.Id, payload);
+      const template = await createTemplate(payload);
       const resourceControl = template.ResourceControl;
 
       if (resourceControl && payload.AccessControl) {
@@ -66,29 +62,26 @@ export function useCreateTemplateMutation() {
   );
 }
 
-function createTemplate(userId: UserId, payload: CreateTemplatePayload) {
+function createTemplate(payload: CreateTemplatePayload) {
   switch (payload.Method) {
     case 'editor':
       return createTemplateFromText(payload);
     case 'upload':
       return createTemplateFromFile(payload);
     case 'repository':
-      return createTemplateAndGitCredential(userId, payload);
+      return createTemplateFromGitPayload(payload);
     default:
       throw new Error('Unknown method');
   }
 }
 
-async function createTemplateAndGitCredential(
-  userId: UserId,
-  { Git: gitModel, ...values }: CreateTemplatePayload
-) {
-  const resolvedAuth = await saveGitCredentialsIfNeeded(userId, gitModel);
-
+function createTemplateFromGitPayload({
+  Git: gitModel,
+  ...values
+}: CreateTemplatePayload) {
   return createTemplateFromGit({
     ...values,
     ...gitModel,
-    ...resolvedAuth,
     ...(values.EdgeSettings
       ? {
           EdgeSettings: {
@@ -208,26 +201,14 @@ interface CustomTemplateFromGitRepositoryPayload {
   Platform: Platform;
   /** Type of created stack. Required. */
   Type: StackType;
-  /** URL of a Git repository hosting the Stack file. Required. */
-  RepositoryURL: string;
+  /** References an existing Source for git credentials/URL. */
+  SourceId?: number;
   /** Reference name of a Git repository hosting the Stack file. */
   RepositoryReferenceName?: string;
-  /** Use basic authentication to clone the Git repository. */
-  RepositoryAuthentication?: boolean;
-  /** Username used in basic authentication when RepositoryAuthentication is true. */
-  RepositoryUsername?: string;
-  /** Password used in basic authentication when RepositoryAuthentication is true. */
-  RepositoryPassword?: string;
-  /** GitCredentialID used to identify the bound git credential. Required when RepositoryAuthentication
-   * is true and RepositoryUsername/RepositoryPassword are not provided
-   */
-  RepositoryGitCredentialID?: number;
   /** Path to the Stack file inside the Git repository. */
-  ComposeFilePathInRepository: string;
+  ComposeFilePathInRepository?: string;
   /** Definitions of variables in the stack file. */
   Variables: VariableDefinition[];
-  /** Indicates whether to skip SSL verification when cloning the Git repository. */
-  TLSSkipVerify?: boolean;
   /** Indicates if the Kubernetes template is created from a Docker Compose file. */
   IsComposeFormat?: boolean;
   /** Indicates if this template is for Edge Stack. */

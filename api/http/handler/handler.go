@@ -79,9 +79,9 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.41.1
-// @description.markdown api-description.md
-// @x-tagGroups [{"name":"Access Control","tags":["auth","roles","team_memberships","teams","users"]},{"name":"Administration","tags":["backup","ldap","motd","settings","status","system","ssl","upload"]},{"name":"Docker","tags":["templates","custom_templates","docker","registries","resource_controls","stacks","webhooks","websocket"]},{"name":"Edge Compute","tags":["edge_groups","edge_jobs","edge","edge_stacks"]},{"name":"Environment Management","tags":["endpoint_groups","endpoints","tags"]},{"name":"GitOps","tags":["gitops"]},{"name":"Kubernetes","tags":["helm","kubernetes"]}]
+// @version 2.45.0
+// @description.markdown
+// @x-tagGroups [{"name":"Access Control","tags":["auth","roles","team_memberships","teams","users"]},{"name":"Administration","tags":["backup","ldap","motd","settings","status","system","ssl","upload"]},{"name":"Docker","tags":["templates","custom_templates","docker","registries","resource_controls","stacks","webhooks","websocket"]},{"name":"Edge Compute","tags":["edge_agent","edge_groups","edge_jobs","edge","edge_stacks"]},{"name":"Environment Management","tags":["endpoint_groups","endpoints","tags"]},{"name":"GitOps","tags":["gitops"]},{"name":"Kubernetes","tags":["helm","kubernetes"]}]
 // @termsOfService
 
 // @contact.email info@portainer.io
@@ -116,6 +116,9 @@ type Handler struct {
 // @tag.name edge
 // @tag.description Manage Edge related settings
 // @tag.x-displayName Edge settings
+// @tag.name edge_agent
+// @tag.description Manage an Edge agent
+// @tag.x-displayName Edge agent
 // @tag.name edge_groups
 // @tag.description Manage Edge Groups
 // @tag.x-displayName Edge groups

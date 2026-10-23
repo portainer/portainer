@@ -85,7 +85,7 @@ func (handler *Handler) getAllKubernetesServices(r *http.Request) ([]models.K8sS
 	}
 
 	if withApplications && len(services) > 0 {
-		servicesWithApplications, err := cli.CombineServicesWithApplications(services)
+		servicesWithApplications, err := cli.CombineServicesWithApplications("", services)
 		if err != nil {
 			log.Error().Err(err).Str("context", "GetAllKubernetesServices").Msg("Unable to combine services with applications")
 			return nil, httperror.InternalServerError("unable to combine services with applications. Error: ", err)

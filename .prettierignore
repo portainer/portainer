@@ -1,3 +1,5 @@
 dist
 api/datastore/test_data
 coverage
+
+pnpm-lock.yaml

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 /* eslint-disable no-console */
 import { intersection } from 'lodash';
 import { useEffect, useRef } from 'react';
@@ -49,4 +50,5 @@ export function useDebugPropChanges(
   }
   lastProps.current = newProps;
 }
+/* eslint-enable react-hooks/refs */
 /* eslint-enable no-console */

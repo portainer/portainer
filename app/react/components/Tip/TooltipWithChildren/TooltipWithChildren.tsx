@@ -78,7 +78,7 @@ export function TooltipWithChildren({
       interactive
       disabled={!message}
     >
-      {children}
+      <span>{children}</span>
     </Tippy>
   );
 }

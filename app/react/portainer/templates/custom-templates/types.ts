@@ -96,7 +96,18 @@ export type CustomTemplate = {
   EdgeTemplate: boolean;
 
   EdgeSettings?: EdgeTemplateSettings;
+
+  /** Artifact stores the git source reference for git-backed templates. */
+  artifact?: {
+    files?: Array<{ sourceId?: number }>;
+  };
 };
+
+export function getTemplateSourceId(
+  template?: Pick<CustomTemplate, 'artifact'>
+) {
+  return template?.artifact?.files?.[0]?.sourceId;
+}
 
 /**
  * EdgeTemplateSettings represents the configuration of a custom template for Edge

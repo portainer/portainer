@@ -50,10 +50,10 @@ export function DeleteButton({
       <Button
         size={size}
         color="dangerlight"
-        disabled={disabled || isLoading}
+        disabled={disabled}
         onClick={() => handleClick()}
         icon={Trash2}
-        className={clsx('!m-0', icon ? 'btn-icon' : '')}
+        className={clsx(icon ? 'btn-icon' : '')}
         data-cy={dataCy}
         type={type}
       >
@@ -69,7 +69,6 @@ export function DeleteButton({
       disabled={disabled}
       onClick={() => handleClick()}
       icon={Trash2}
-      className="!m-0"
       data-cy={dataCy}
       isLoading={isLoading}
       loadingText={loadingText}

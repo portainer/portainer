@@ -3,11 +3,13 @@
 package factory
 
 import (
+	"context"
 	"net"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -31,9 +33,11 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 }
 
 func newSocketTransport(socketPath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return net.Dial("unix", socketPath)
-		},
+	d := &net.Dialer{}
+	t := ssrf.NewInternalTransport(nil)
+	t.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
+		return d.DialContext(ctx, "unix", socketPath)
 	}
+
+	return t
 }

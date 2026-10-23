@@ -129,9 +129,7 @@ function setupMocks({
     http.get('/api/endpoints/1/kubernetes/api/v1/nodes/test-node', () =>
       HttpResponse.json(mockNode)
     ),
-    http.get('/api/endpoints/1/kubernetes/api/v1/nodes', () =>
-      HttpResponse.json({ items: nodes })
-    ),
+    http.get('/api/kubernetes/1/nodes', () => HttpResponse.json(nodes)),
     http.get('/api/kubernetes/1/applications', () =>
       HttpResponse.json(applications)
     ),

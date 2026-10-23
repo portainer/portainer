@@ -47,6 +47,7 @@ export function useUpdateGroupMutation() {
     mutationFn: updateGroup,
     onSuccess: () => {
       queryClient.invalidateQueries(queryKeys.base());
+      queryClient.invalidateQueries(queryKeys.list(true));
       queryClient.invalidateQueries(environmentQueryKeys.base());
       notifySuccess('Success', 'Group successfully updated');
     },

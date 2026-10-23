@@ -193,6 +193,7 @@ func parseIngress(ingress netv1.Ingress) models.K8sIngressInfo {
 			if p.Backend.Service != nil {
 				path.ServiceName = p.Backend.Service.Name
 				path.Port = int(p.Backend.Service.Port.Number)
+				path.PortName = p.Backend.Service.Port.Name
 			}
 			result.Paths = append(result.Paths, path)
 		}
@@ -338,8 +339,9 @@ func (kcl *KubeClient) CombineIngressWithService(ingress models.K8sIngressInfo) 
 
 	serviceMap := kcl.buildServicesMap(services)
 	for pathIndex, path := range ingress.Paths {
-		if _, ok := serviceMap[path.ServiceName]; ok {
+		if service, ok := serviceMap[serviceMapKey(ingress.Namespace, path.ServiceName)]; ok {
 			ingress.Paths[pathIndex].HasService = true
+			resolvePortByName(&ingress.Paths[pathIndex], service)
 		}
 	}
 
@@ -361,11 +363,26 @@ func (kcl *KubeClient) CombineIngressesWithServices(ingresses []models.K8sIngres
 	serviceMap := kcl.buildServicesMap(services)
 	for ingressIndex, ingress := range ingresses {
 		for pathIndex, path := range ingress.Paths {
-			if _, ok := serviceMap[path.ServiceName]; ok {
+			if service, ok := serviceMap[serviceMapKey(ingress.Namespace, path.ServiceName)]; ok {
 				(ingresses)[ingressIndex].Paths[pathIndex].HasService = true
+				resolvePortByName(&(ingresses)[ingressIndex].Paths[pathIndex], service)
 			}
 		}
 	}
 
 	return ingresses, nil
+}
+
+// resolvePortByName fills in path.Port from service.Ports by matching path.PortName.
+func resolvePortByName(path *models.K8sIngressPath, service models.K8sServiceInfo) {
+	if path.Port != 0 || path.PortName == "" {
+		return
+	}
+
+	for _, port := range service.Ports {
+		if port.Name == path.PortName {
+			path.Port = port.Port
+			return
+		}
+	}
 }

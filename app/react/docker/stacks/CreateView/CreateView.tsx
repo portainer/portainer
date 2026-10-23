@@ -1,5 +1,5 @@
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { useIsSwarm } from '@/react/docker/proxy/queries/useInfo';
+import { useIsSwarmManager } from '@/react/docker/proxy/queries/useInfo';
 import { useSwarmId } from '@/react/docker/proxy/queries/useSwarm';
 
 import { PageHeader } from '@@/PageHeader';
@@ -10,7 +10,8 @@ import { CreateStackForm } from './CreateStackForm/CreateStackForm';
 export function CreateView() {
   const environmentId = useEnvironmentId();
 
-  const isSwarm = useIsSwarm(environmentId);
+  // Only swarm managers deploy swarm stacks; workers deploy compose stacks.
+  const isSwarm = useIsSwarmManager(environmentId);
   const swarmIdQuery = useSwarmId(environmentId);
 
   if (isSwarm && swarmIdQuery.isLoading) {

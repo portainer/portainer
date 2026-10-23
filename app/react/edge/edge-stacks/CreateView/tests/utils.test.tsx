@@ -85,7 +85,6 @@ const customTemplatesResponseBody = [
       Authentication: {
         Username: '',
         Password: '',
-        GitCredentialID: 0,
       },
       ConfigHash: '1db40a888e07da7d9455897aadd349d0bc83bd83',
       TLSSkipVerify: false,
@@ -142,16 +141,6 @@ const edgeGroups = [
     HasEdgeJob: false,
     EndpointTypes: [7],
     TrustedEndpoints: [11],
-  },
-];
-
-const gitCredentials = [
-  {
-    id: 1,
-    userId: 1,
-    name: 'test',
-    username: 'portainer-test',
-    creationDate: 1732761658,
   },
 ];
 
@@ -238,11 +227,6 @@ export function renderCreateForm() {
   server.use(http.get('/api/edge_stacks', () => HttpResponse.json([])));
   server.use(http.get('/api/edge_groups', () => HttpResponse.json(edgeGroups)));
   server.use(http.get('/api/registries', () => HttpResponse.json(registries)));
-  server.use(
-    http.get('/api/users/1/gitcredentials', () =>
-      HttpResponse.json(gitCredentials)
-    )
-  );
   const Wrapped = withTestQueryProvider(
     withUserProvider(withTestRouter(CreateForm), user)
   );

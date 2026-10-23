@@ -8,8 +8,10 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
+	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -40,9 +42,7 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
-	if err := registryutils.ValidateRegistriesECRTokens(tx, filteredRegistries); err != nil {
-		return nil, err
-	}
+	registryutils.RefreshAndPersistECRTokens(tx, filteredRegistries)
 
 	config := &ComposeStackDeploymentConfig{
 		stack:          stack,
@@ -68,13 +68,29 @@ func (config *ComposeStackDeploymentConfig) Deploy(ctx context.Context) error {
 
 	isAdminOrEndpointAdmin := stackutils.UserIsAdminOrEndpointAdmin(config.user)
 	if !isAdminOrEndpointAdmin && config.endpoint != nil {
-		if err := stackutils.ValidateStackFiles(config.stack, &config.endpoint.SecuritySettings, config.FileService); err != nil {
+		var dockerClient *client.Client
+
+		if factory := config.StackDeployer.GetDockerClientFactory(); factory != nil {
+			var err error
+
+			dockerClient, err = factory.CreateClient(config.endpoint, "", nil)
+			if err != nil {
+				return err
+			}
+			defer logs.CloseAndLogErr(dockerClient)
+		}
+
+		if err := stackutils.ValidateStackFiles(config.stack, &config.endpoint.SecuritySettings, config.FileService, dockerClient); err != nil {
 			return err
 		}
 	}
 
+	if err := stackutils.ValidateComposeURLs(ctx, config.stack, config.FileService); err != nil {
+		return err
+	}
+
 	if stackutils.IsRelativePathStack(config.stack) {
-		return config.StackDeployer.DeployRemoteComposeStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
+		return config.StackDeployer.DeployRemoteComposeStack(ctx, config.user.ID, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
 	}
 
 	return config.StackDeployer.DeployComposeStack(ctx, config.stack, config.endpoint, config.registries, config.prune, config.forcePullImage, config.ForceCreate)
@@ -87,7 +103,7 @@ func (config *ComposeStackDeploymentConfig) Undeploy(ctx context.Context) error 
 	}
 
 	if stackutils.IsRelativePathStack(config.stack) {
-		return config.StackDeployer.UndeployRemoteComposeStack(ctx, config.stack, config.endpoint)
+		return config.StackDeployer.UndeployRemoteComposeStack(ctx, config.user.ID, config.stack, config.endpoint)
 	}
 	return config.StackDeployer.UndeployComposeStack(ctx, config.stack, config.endpoint)
 }

@@ -35,7 +35,7 @@ func CreateStackBuilder(dataStore dataservices.DataStore, fileService portainer.
 	}
 }
 
-func (b *StackBuilder) setGeneralInfo(_ *StackPayload, endpoint *portainer.Endpoint) {
+func (b *StackBuilder) setGeneralInfo(endpoint *portainer.Endpoint) {
 	b.endpoint = endpoint
 	stackID := b.dataStore.Stack().GetNextIdentifier()
 	b.stack.ID = portainer.StackID(stackID)
@@ -52,8 +52,6 @@ func (b *StackBuilder) deploy(ctx context.Context, _ *portainer.Endpoint) error 
 func (b *StackBuilder) postDeploy(_ context.Context, _ *portainer.Stack) error { return nil }
 
 func (b *StackBuilder) saveStack() (*portainer.Stack, error) {
-	defer func() { _ = b.cleanUp() }()
-
 	if err := b.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 		if err := tx.Stack().Create(b.stack); err != nil {
 			return fmt.Errorf("Unable to persist the stack inside the database: %w", err)
@@ -72,6 +70,19 @@ func (b *StackBuilder) saveStack() (*portainer.Stack, error) {
 func (b *StackBuilder) cleanUp() error {
 	if !b.doCleanUp {
 		return nil
+	}
+
+	if b.stack.WorkflowID != 0 {
+		if err := b.dataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			err := tx.Workflow().Delete(b.stack.WorkflowID)
+			if tx.IsErrObjectNotFound(err) {
+				return nil
+			}
+
+			return err
+		}); err != nil {
+			log.Error().Err(err).Msg("unable to cleanup orphan workflow records after failed stack creation")
+		}
 	}
 
 	if err := b.fileService.RemoveDirectory(b.stack.ProjectPath); err != nil {

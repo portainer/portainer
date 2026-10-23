@@ -14,6 +14,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/validate"
 
 	"github.com/pkg/errors"
@@ -72,6 +73,12 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 
 	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" && !validate.IsURL(*payload.HelmRepositoryURL) {
 		return errors.New("Invalid Helm repository URL. Must correspond to a valid URL format")
+	}
+
+	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" {
+		if err := ssrf.CheckURL(r.Context(), *payload.HelmRepositoryURL); err != nil {
+			return errors.New("Invalid Helm repository URL. Must correspond to a valid URL format")
+		}
 	}
 
 	if payload.UserSessionTimeout != nil {

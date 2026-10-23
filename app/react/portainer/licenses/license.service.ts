@@ -51,7 +51,8 @@ export async function attachLicense(licenseKeys: string[]) {
     const axiosError = e as AxiosError;
     if (axiosError.response?.status === 401) {
       throw new Error(
-        'Your session has expired, please refresh the browser and log in again.'
+        'Your session has expired, please refresh the browser and log in again.',
+        { cause: e }
       );
     }
     throw parseAxiosError(e);

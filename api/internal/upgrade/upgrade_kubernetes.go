@@ -18,7 +18,7 @@ import (
 func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licenseKey, version string) error {
 	ctx := context.TODO()
 
-	kubeCLI, err := service.kubernetesClientFactory.CreateClient(environment)
+	kubeCLI, _, err := service.kubernetesClientFactory.CreateClient(environment)
 	if err != nil {
 		return errors.WithMessage(err, "failed to get kubernetes client")
 	}

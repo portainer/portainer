@@ -99,7 +99,8 @@ describe('ResourceStatBlock', () => {
     it('should render a dot inheriting the container status when dot is true', () => {
       renderComponent({ valueDot: true, status: 'success' });
 
-      expect(screen.getByTestId('stat-block-dot')).toHaveClass('bg-green-7');
+      const wrapper = screen.getByTestId('stat-block-dot');
+      expect(wrapper.firstElementChild).toHaveClass('bg-success-7');
     });
   });
 

@@ -8,6 +8,7 @@ import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { createMockUser } from '@/react-tools/test-mocks';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 import { User } from '@/portainer/users/types';
 
 import { NameRow } from './NameRow';
@@ -262,10 +263,8 @@ describe('NameRow', () => {
     });
 
     it('handles rename API error gracefully', async () => {
-      // Mock console.error to suppress expected error logs
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      // Suppress expected error logs
+      const restoreConsole = suppressConsoleLogs();
 
       server.use(
         http.post(
@@ -304,7 +303,7 @@ describe('NameRow', () => {
       expect(screen.getByTestId('containerNameInput')).toBeVisible();
       expect(nameInput).toHaveValue('new-name');
 
-      consoleErrorSpy.mockRestore();
+      restoreConsole();
     });
 
     it('validates that container name is required', async () => {

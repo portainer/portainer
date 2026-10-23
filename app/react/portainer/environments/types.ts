@@ -1,7 +1,10 @@
+import {
+  PortainerEndpoint,
+  PortainerEndpointSecuritySettings,
+} from '@api/types.gen';
+
 import { TagId } from '@/portainer/tags/types';
 import { DockerSnapshot } from '@/react/docker/snapshots/types';
-
-import { TLSConfiguration } from '../settings/types';
 
 export type EnvironmentGroupId = number;
 
@@ -55,13 +58,15 @@ export interface KubernetesSnapshot {
   TotalMemory: number;
   Time: number;
   NodeCount: number;
+  GPUNodeCount?: number;
+  TotalGPU?: Record<string, number>;
 }
 
 export type IngressClass = {
   Name: string;
   Type: string;
   Blocked?: boolean;
-  BlockedNamespaces?: string[] | null;
+  BlockedNamespaces?: string[];
 };
 
 export interface StorageClass {
@@ -86,7 +91,7 @@ export interface KubernetesConfiguration {
 }
 
 export interface KubernetesSettings {
-  Snapshots?: KubernetesSnapshot[] | null;
+  Snapshots?: KubernetesSnapshot[];
   Configuration: KubernetesConfiguration;
   Flags: {
     IsServerMetricsDetected: boolean;
@@ -102,28 +107,7 @@ export type EnvironmentEdge = {
   CommandInterval: number;
 };
 
-export interface EnvironmentSecuritySettings {
-  // Whether non-administrator should be able to use bind mounts when creating containers
-  allowBindMountsForRegularUsers: boolean;
-  // Whether non-administrator should be able to use privileged mode when creating containers
-  allowPrivilegedModeForRegularUsers: boolean;
-  // Whether non-administrator should be able to browse volumes
-  allowVolumeBrowserForRegularUsers: boolean;
-  // Whether non-administrator should be able to use the host pid
-  allowHostNamespaceForRegularUsers: boolean;
-  // Whether non-administrator should be able to use device mapping
-  allowDeviceMappingForRegularUsers: boolean;
-  // Whether non-administrator should be able to manage stacks
-  allowStackManagementForRegularUsers: boolean;
-  // Whether non-administrator should be able to use container capabilities
-  allowContainerCapabilitiesForRegularUsers: boolean;
-  // Whether non-administrator should be able to use sysctl settings
-  allowSysctlSettingForRegularUsers: boolean;
-  // Whether non-administrator should be able to use security-opt settings
-  allowSecurityOptForRegularUsers: boolean;
-  // Whether host management features are enabled
-  enableHostManagementFeatures: boolean;
-}
+export type EnvironmentSecuritySettings = PortainerEndpointSecuritySettings;
 
 export type DeploymentOptions = {
   overrideGlobalOptions: boolean;
@@ -145,49 +129,27 @@ export interface EnvironmentStatusMessage {
   detail: string;
 }
 
-export type Environment = {
-  Agent: { Version: string; IsOutdated?: boolean };
-  Id: EnvironmentId;
-  Type: EnvironmentType;
-  ContainerEngine?: ContainerEngine;
-  TagIds: TagId[];
-  GroupId: EnvironmentGroupId;
-  DeploymentOptions: DeploymentOptions | null;
-  EnableGPUManagement: boolean;
-  EdgeID?: string;
-  EdgeKey: string;
-  EdgeCheckinInterval?: number;
-  Heartbeat?: boolean;
-  LastCheckInDate?: number;
-  Name: string;
-  Status: EnvironmentStatus;
-  URL: string;
-  Snapshots: DockerSnapshot[];
-  Kubernetes: KubernetesSettings;
-  PublicURL?: string;
-  UserTrusted?: boolean;
-  Edge: EnvironmentEdge;
-  SecuritySettings: EnvironmentSecuritySettings;
-  Gpus?: { name: string; value: string }[];
-  TLSConfig?: TLSConfiguration;
-  AzureCredentials?: {
-    ApplicationID: string;
-    TenantID: string;
-    AuthenticationKey: string;
-  };
-  ComposeSyntaxMaxVersion: string;
-  EnableImageNotification: boolean;
-  LocalTimeZone?: string;
+type EnvironmentBase = Omit<PortainerEndpoint, 'Status'>;
 
-  /** GitOps update change window restriction for stacks and apps */
+export interface Environment extends EnvironmentBase {
+  Status: EnvironmentStatus;
+  Type: EnvironmentType;
+  ContainerEngine: ContainerEngine;
+
+  TagIds: TagId[];
+  Snapshots: DockerSnapshot[];
+  Agent: { Version: string; IsOutdated?: boolean };
+  Edge: EnvironmentEdge;
+  EnableGPUManagement: boolean;
+  Kubernetes: KubernetesSettings;
+
+  // Fields not in CE PortainerEndpoint (EE-only in server)
+  LocalTimeZone?: string;
+  EnableImageNotification: boolean;
   ChangeWindow: EndpointChangeWindow;
-  /**
-   *  A message that describes the status. Should be included for Status Provisioning or Error.
-   */
+  DeploymentOptions: DeploymentOptions | null;
   StatusMessage?: EnvironmentStatusMessage;
-  UserAccessPolicies?: UserAccessPolicies;
-  TeamAccessPolicies?: TeamAccessPolicies;
-};
+}
 
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota

@@ -92,7 +92,13 @@ describe('buildInitialValues', () => {
       environment: {
         URL: 'tcp://10.0.0.1:2375',
         Type: EnvironmentType.Docker,
-        TLSConfig: { TLS: true, TLSSkipVerify: false },
+        TLSConfig: {
+          TLS: true,
+          TLSSkipVerify: false,
+          TLSCACert: '',
+          TLSCert: '',
+          TLSKey: '',
+        },
       },
       expectedUrl: '10.0.0.1:2375',
       expectedTls: {
@@ -205,6 +211,6 @@ describe('buildUpdatePayload', () => {
     expect(payload.Name).toBe(values.name);
     expect(payload.PublicURL).toBe(values.publicUrl);
     expect(payload.GroupID).toBe(values.meta.groupId);
-    expect(payload.TagIds).toEqual(values.meta.tagIds);
+    expect(payload.TagIDs).toEqual(values.meta.tagIds);
   });
 });

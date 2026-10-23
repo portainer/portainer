@@ -59,12 +59,11 @@ func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Reques
 			return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 		}
 
+		customTemplate.ResourceControl = resourceControl
 		canEdit := userCanEditTemplate(customTemplate, securityContext)
 		hasAccess := false
 
 		if resourceControl != nil {
-			customTemplate.ResourceControl = resourceControl
-
 			teamIDs := slicesx.Map(securityContext.UserMemberships, func(m portainer.TeamMembership) portainer.TeamID {
 				return m.TeamID
 			})
@@ -82,8 +81,8 @@ func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Reques
 	}
 
 	entryPath := customTemplate.EntryPoint
-	if customTemplate.GitConfig != nil {
-		entryPath = customTemplate.GitConfig.ConfigFilePath
+	if customTemplate.Artifact != nil && len(customTemplate.Artifact.Files) > 0 {
+		entryPath = customTemplate.Artifact.Files[0].Path
 	}
 	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, entryPath)
 	if err != nil {

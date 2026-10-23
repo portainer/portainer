@@ -66,11 +66,11 @@ export function ReleaseTabs({ release, selectedRevision }: Props) {
       selectedCompareRevisionNumber
     );
 
-  const { autoRefreshRate } = useHelmEventsTableState();
+  const { autoRefreshRateMS } = useHelmEventsTableState();
   const { data: eventWarningCount } = useEvents(environmentId, {
     namespace: release.namespace ?? '',
     queryOptions: {
-      autoRefreshRate: autoRefreshRate * 1000,
+      autoRefreshRate: autoRefreshRateMS,
       select: (data) => {
         const relatedEvents = filterRelatedEvents(
           data,

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
-import { Cpu, Hexagon, LaptopMinimal, MemoryStick } from 'lucide-react';
+import { Cpu, Gpu, Hexagon, LaptopMinimal, MemoryStick } from 'lucide-react';
 
 import { Icon, IconProps } from '@/react/components/Icon';
 
@@ -49,7 +49,9 @@ export function NodeStats({ value }: StatsProps) {
 export function CPUStats({ value }: StatsProps) {
   return (
     <StatsItem icon={Cpu} title="CPUS">
-      <span className="text-left font-bold leading-none">{value}</span>
+      <span className="min-w-[2ch] text-right font-bold tabular-nums leading-none">
+        {value}
+      </span>
       <span className="align-baseline text-xs leading-none">cores</span>
     </StatsItem>
   );
@@ -58,6 +60,14 @@ export function CPUStats({ value }: StatsProps) {
 export function MemoryStats({ value }: StatsProps) {
   return (
     <StatsItem icon={MemoryStick} title="MEMORY">
+      <span className="text-left font-bold leading-none">{value}</span>
+    </StatsItem>
+  );
+}
+
+export function GpuStats({ value }: StatsProps) {
+  return (
+    <StatsItem icon={Gpu} title="GPUS">
       <span className="text-left font-bold leading-none">{value}</span>
     </StatsItem>
   );
@@ -74,22 +84,24 @@ export function ContainerStats({
   running,
   stopped,
 }: ContainerStatsProps) {
-  const actualTotal = total || running + stopped;
+  const safeRunning = running || 0;
+  const safeStopped = stopped || 0;
+  const actualTotal = total || safeRunning + safeStopped;
   return (
     <StatsItem title="CONTAINERS" icon={Hexagon}>
       <div className="flex w-full flex-col">
         <div>
-          <span className="text-base font-bold leading-none">{running}</span>
+          <span className="text-base font-bold leading-none">
+            {safeRunning}
+          </span>
           <span> / {actualTotal}</span>
         </div>
-        {actualTotal > 0 && (
-          <progress
-            className="h-[4px] w-auto rounded bg-gray-4 th-dark:bg-white/10"
-            value={running}
-            max={actualTotal}
-            aria-label={`${running} of ${actualTotal} containers running`}
-          />
-        )}
+        <progress
+          className="h-[4px] w-auto rounded bg-gray-4 th-dark:bg-white/10"
+          value={safeRunning}
+          max={Math.max(actualTotal, 1)}
+          aria-label={`${safeRunning} of ${actualTotal} containers running`}
+        />
       </div>
     </StatsItem>
   );

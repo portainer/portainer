@@ -83,24 +83,3 @@ func (b *stackBuilder) createNewStack(webhookID string) portainer.Stack {
 
 	return stack
 }
-
-func Test_RefreshableStacks(t *testing.T) {
-	t.Parallel()
-	if testing.Short() {
-		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
-	}
-	_, store := datastore.MustNewTestStore(t, false, true)
-
-	staticStack := portainer.Stack{ID: 1}
-	stackWithWebhook := portainer.Stack{ID: 2, AutoUpdate: &portainer.AutoUpdateSettings{Webhook: "webhook"}}
-	refreshableStack := portainer.Stack{ID: 3, AutoUpdate: &portainer.AutoUpdateSettings{Interval: "1m"}}
-
-	for _, stack := range []*portainer.Stack{&staticStack, &stackWithWebhook, &refreshableStack} {
-		err := store.Stack().Create(stack)
-		require.NoError(t, err)
-	}
-
-	stacks, err := store.Stack().RefreshableStacks()
-	require.NoError(t, err)
-	assert.ElementsMatch(t, []portainer.Stack{refreshableStack}, stacks)
-}

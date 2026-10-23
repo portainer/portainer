@@ -9,7 +9,6 @@ function renderComponent(
   props: Partial<ComponentProps<typeof ResourceDetailHeader>> = {}
 ) {
   const defaultProps: ComponentProps<typeof ResourceDetailHeader> = {
-    isLoading: false,
     title: 'Test Group',
     icon: <span data-cy="test-icon">icon</span>,
     ...props,
@@ -90,19 +89,5 @@ describe('ResourceDetailHeader', () => {
     renderComponent();
 
     expect(screen.queryByText('Add Environment')).not.toBeInTheDocument();
-  });
-
-  it('should show loading state', () => {
-    renderComponent({ isLoading: true });
-
-    expect(screen.getByText('Loading details...')).toBeVisible();
-    expect(screen.queryByText('Test Group')).not.toBeInTheDocument();
-  });
-
-  it('should show error state', () => {
-    renderComponent({ errorMessage: 'Something went wrong' });
-
-    expect(screen.getByText('Something went wrong')).toBeVisible();
-    expect(screen.queryByText('Test Group')).not.toBeInTheDocument();
   });
 });

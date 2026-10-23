@@ -21,6 +21,7 @@ export const accessControlModule = angular
       'resourceId',
       'resourceType',
       'environmentId',
+      'resourceName',
     ])
   )
   .component(
@@ -32,6 +33,7 @@ export const accessControlModule = angular
       'onChange',
       'value',
       'teams',
+      'resourceName',
     ])
   )
   .component(

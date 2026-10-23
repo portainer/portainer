@@ -4,6 +4,7 @@ import { updateAxiosAdapter } from '@/react/portainer/services/axios/axios';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { cache } from '@/react/portainer/services/axios/axios';
 import { CACHE_REFRESH_EVENT, CACHE_DURATION } from '../portainer/services/http-request.helper';
+import { AccessHeaders } from '../portainer/authorization-guard';
 
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
@@ -577,6 +578,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       data: {
         docs: '/user/kubernetes/volumes',
       },
+      params: {
+        tab: null,
+      },
     };
 
     const volume = {
@@ -585,6 +589,54 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       views: {
         'content@': {
           component: 'kubernetesVolumeView',
+        },
+      },
+    };
+
+    const persistentVolume = {
+      name: 'kubernetes.volumes.persistentVolume',
+      url: '/persistent-volumes/:name?tab',
+      views: {
+        'content@': {
+          component: 'kubernetesResourceDetailsYAMLView',
+        },
+      },
+      data: {
+        resourceConfig: {
+          title: 'Persistent Volume details',
+          breadcrumbLabel: 'Volumes',
+          breadcrumbLink: 'kubernetes.volumes',
+          breadcrumbTab: 'volumes',
+          resourceType: 'persistentvolume',
+          apiVersion: 'v1',
+          resourcePlural: 'persistentvolumes',
+          namespaced: false,
+          yamlIdentifier: 'persistent-volume-yaml',
+          dataCy: 'persistent-volume-yaml',
+        },
+      },
+    };
+
+    const storageClass = {
+      name: 'kubernetes.volumes.storageClass',
+      url: '/storage-classes/:name?tab',
+      views: {
+        'content@': {
+          component: 'kubernetesResourceDetailsYAMLView',
+        },
+      },
+      data: {
+        resourceConfig: {
+          title: 'Storage Class details',
+          breadcrumbLabel: 'Volumes',
+          breadcrumbLink: 'kubernetes.volumes',
+          breadcrumbTab: 'storage',
+          resourceType: 'storageclass',
+          apiVersion: 'storage.k8s.io/v1',
+          resourcePlural: 'storageclasses',
+          namespaced: false,
+          yamlIdentifier: 'storage-class-yaml',
+          dataCy: 'storage-class-yaml',
         },
       },
     };
@@ -609,6 +661,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
         'content@': {
           component: 'kubernetesRegistryAccessView',
         },
+      },
+      data: {
+        access: AccessHeaders.Admin,
       },
     };
 
@@ -880,6 +935,8 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(namespaceAccess);
     $stateRegistryProvider.register(volumes);
     $stateRegistryProvider.register(volume);
+    $stateRegistryProvider.register(persistentVolume);
+    $stateRegistryProvider.register(storageClass);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registriesAccess);
     $stateRegistryProvider.register(endpointKubernetesConfiguration);

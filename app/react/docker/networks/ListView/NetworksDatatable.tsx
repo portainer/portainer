@@ -13,7 +13,6 @@ import {
 import { AddButton } from '@@/buttons';
 import { TableSettingsMenu } from '@@/datatables';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useRepeater } from '@@/datatables/useRepeater';
 import { useTableState } from '@@/datatables/useTableState';
 import { DeleteButton } from '@@/buttons/DeleteButton';
 
@@ -22,6 +21,7 @@ import { useIsSwarm } from '../../proxy/queries/useInfo';
 import { useColumns } from './columns';
 import { DecoratedNetwork } from './types';
 import { NestedNetworksDatatable } from './NestedNetworksTable';
+import { useNetworksData } from './useNetworksData';
 
 const storageKey = 'docker.networks';
 
@@ -35,30 +35,31 @@ const settingsStore = createPersistedStore<TableSettings>(
   })
 );
 
-type DatasetType = Array<DecoratedNetwork>;
 interface Props {
-  dataset: DatasetType;
-  onRemove(selectedItems: DatasetType): void;
-  onRefresh(): Promise<void>;
+  onRemove(
+    selectedItems: Array<{ nodeName?: string; id: string; name: string }>
+  ): void;
 }
 
-export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
+export function NetworksDatatable({ onRemove }: Props) {
   const settings = useTableState(settingsStore, storageKey);
 
   const environmentId = useEnvironmentId();
   const isSwarm = useIsSwarm(environmentId);
 
+  const datasetQuery = useNetworksData(settings.autoRefreshRateMS);
   const columns = useColumns(isSwarm);
 
-  useRepeater(settings.autoRefreshRate, onRefresh);
+  const dataset = datasetQuery.data;
 
   return (
     <ExpandableDatatable<DecoratedNetwork>
       settingsManager={settings}
       title="Networks"
       titleIcon={Network}
-      dataset={dataset}
+      dataset={dataset || []}
       columns={columns}
+      isLoading={datasetQuery.isLoading}
       getRowCanExpand={({ original: item }) =>
         !!(item.Subs && item.Subs?.length > 0)
       }
@@ -83,7 +84,15 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
               disabled={selectedRows.length === 0}
               data-cy="network-removeNetworkButton"
               confirmMessage="Do you want to remove the selected network(s)?"
-              onConfirmed={() => onRemove(selectedRows)}
+              onConfirmed={() =>
+                onRemove(
+                  selectedRows.map((n) => ({
+                    id: n.Id,
+                    name: n.Name,
+                    nodeName: n.NodeName,
+                  }))
+                )
+              }
             />
           </Authorized>
           <Authorized authorizations="DockerNetworkCreate">
@@ -97,7 +106,7 @@ export function NetworksDatatable({ dataset, onRemove, onRefresh }: Props) {
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
             onChange={settings.setAutoRefreshRate}
-            value={settings.autoRefreshRate}
+            value={settings.autoRefreshRateMS}
           />
         </TableSettingsMenu>
       )}

@@ -1,4 +1,4 @@
-import { array, string, boolean, object } from 'yup';
+import { array, string, boolean, number, object } from 'yup';
 
 import { buildUniquenessTest } from '@@/form-components/validate-unique';
 
@@ -96,6 +96,19 @@ const taintSchema = object({
   isChanged: boolean().default(false),
 });
 
+const drainOptionsSchema = object({
+  ignoreDaemonSets: boolean().default(true),
+  timeoutSeconds: number()
+    .min(0, 'Timeout must be zero or a positive number of seconds')
+    .required('Timeout is required'),
+  gracePeriodSeconds: number()
+    .min(-1, 'Grace period must be -1 or a positive number of seconds')
+    .required('Grace period is required'),
+  force: boolean().default(false),
+  deleteEmptyDirData: boolean().default(true),
+  disableEviction: boolean().default(false),
+});
+
 export function createValidationSchema(
   isOnlyNode: boolean,
   hasDrainOperation: boolean,
@@ -145,5 +158,6 @@ export function createValidationSchema(
       'Duplicate taint keys are not allowed',
       buildUniquenessTest(() => 'This taint key is already defined', 'key')
     ),
+    drainOptions: drainOptionsSchema,
   });
 }

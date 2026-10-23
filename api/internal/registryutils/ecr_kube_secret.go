@@ -11,8 +11,8 @@ func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID porta
 	return slices.Contains(registry.RegistryAccesses[endpointID].Namespaces, namespace)
 }
 
-func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, dataStore dataservices.DataStore, namespace string) error {
-	registries, err := dataStore.Registry().ReadAll()
+func RefreshEcrSecret(tx dataservices.DataStoreTx, cli portainer.KubeClient, endpoint *portainer.Endpoint, namespace string) error {
+	registries, err := tx.Registry().ReadAll()
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func RefreshEcrSecret(cli portainer.KubeClient, endpoint *portainer.Endpoint, da
 			continue
 		}
 
-		if err := EnsureRegTokenValid(dataStore, &registry); err != nil {
+		if err := EnsureRegTokenValid(tx, &registry); err != nil {
 			return err
 		}
 

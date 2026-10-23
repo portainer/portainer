@@ -14,6 +14,7 @@ module.exports = {
       current: 'currentColor',
       inherit: 'inherit',
       ...colors,
+      'group-accent': colors.violet,
 
       'legacy-grey-3': 'var(--grey-3)',
       'legacy-blue-2': 'var(--blue-2)',

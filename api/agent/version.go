@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/url"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/rs/zerolog/log"
 )
@@ -19,10 +21,14 @@ import (
 //
 // it sends a ping to the agent and parses the version and platform from the headers
 func GetAgentVersionAndPlatform(endpointUrl string, tlsConfig *tls.Config) (portainer.AgentPlatform, string, error) { //nolint:forbidigo
+	if err := ssrf.CheckURL(context.Background(), endpointUrl); err != nil {
+		return 0, "", err
+	}
+
 	httpCli := &http.Client{Timeout: 3 * time.Second}
 
 	if tlsConfig != nil {
-		httpCli.Transport = &http.Transport{TLSClientConfig: tlsConfig}
+		httpCli.Transport = ssrf.NewTransport(tlsConfig)
 	}
 
 	parsedURL, err := url.ParseURL(endpointUrl + "/ping")

@@ -7,6 +7,12 @@ export const queryKeys = {
     'kubernetes',
     'volumes',
   ],
+  claims: (environmentId: EnvironmentId) => [
+    'environments',
+    environmentId,
+    'kubernetes',
+    'claims',
+  ],
   storages: (environmentId: EnvironmentId) => [
     'environments',
     environmentId,

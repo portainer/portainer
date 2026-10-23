@@ -20,7 +20,7 @@ func (hspm *HelmSDKPackageManager) Get(getOptions options.GetOptions) (*release.
 		Msg("Get Helm release")
 
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, getOptions.Namespace, getOptions.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(getOptions.Namespace), getOptions.KubernetesClusterAccess)
 
 	if err != nil {
 		log.Error().

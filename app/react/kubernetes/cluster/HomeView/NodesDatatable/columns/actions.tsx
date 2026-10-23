@@ -3,6 +3,7 @@ import { BarChart } from 'lucide-react';
 
 import { Link } from '@@/Link';
 import { Icon } from '@@/Icon';
+import { TooltipWithChildren } from '@@/Tip/TooltipWithChildren';
 
 import { NodeRowData } from '../types';
 
@@ -34,13 +35,14 @@ function ActionsCell({
     <div className="flex gap-1.5">
       {metricsEnabled && (
         <Link
-          title="Stats"
           to="kubernetes.cluster.node.stats"
           params={{ nodeName }}
           className="flex items-center p-1"
           data-cy="nodeStatsButton"
         >
-          <Icon icon={BarChart} />
+          <TooltipWithChildren message="Stats" position="top">
+            <Icon icon={BarChart} />
+          </TooltipWithChildren>
         </Link>
       )}
     </div>

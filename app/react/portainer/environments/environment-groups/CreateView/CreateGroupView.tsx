@@ -30,41 +30,42 @@ export function CreateGroupView() {
         ]}
       />
 
-      <div className="row pb-20">
-        <div className="col-sm-12">
-          <Widget>
-            <Widget.Body>
-              <GroupForm
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-                submitLabel="Create"
-                submitLoadingLabel="Creating..."
-              />
-            </Widget.Body>
-          </Widget>
-        </div>
+      <div className="mx-4 pb-20">
+        <Widget>
+          <Widget.Body>
+            <GroupForm
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+              submitLabel="Create"
+              submitLoadingLabel="Creating..."
+            />
+          </Widget.Body>
+        </Widget>
       </div>
     </>
   );
 
-  async function handleSubmit(
+  function handleSubmit(
     values: GroupFormValues,
     { resetForm }: FormikHelpers<GroupFormValues>
-  ) {
-    await createMutation.mutateAsync(
-      {
-        name: values.name,
-        description: values.description,
-        tagIds: values.tagIds,
-        associatedEnvironments: values.associatedEnvironments,
-      },
-      {
-        onSuccess: () => {
-          resetForm();
-          notifySuccess('Success', 'Group successfully created');
-          router.stateService.go('portainer.groups');
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      createMutation.mutate(
+        {
+          name: values.name,
+          description: values.description,
+          tagIds: values.tagIds,
+          associatedEnvironments: values.associatedEnvironments,
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            resetForm();
+            notifySuccess('Success', 'Group successfully created');
+            router.stateService.go('portainer.groups');
+          },
+          onSettled: () => resolve(),
+        }
+      );
+    });
   }
 }

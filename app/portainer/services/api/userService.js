@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { UserViewModel } from '@/portainer/models/user';
 import { getUsers } from '@/portainer/users/user.service';
 import { getUser } from '@/portainer/users/queries/useUser';
+import { userAdminInit } from '@api/sdk.gen';
 
 import { TeamMembershipModel } from '../../models/teamMembership';
 
@@ -84,8 +85,11 @@ export function UserService($q, Users, TeamService) {
     return deferred.promise;
   };
 
-  service.initAdministrator = function (username, password) {
-    return Users.initAdminUser({ Username: username, Password: password }).$promise;
+  service.initAdministrator = function (username, password, setupToken) {
+    return userAdminInit({
+      body: { Username: username, Password: password },
+      ...(setupToken && { headers: { 'X-Setup-Token': setupToken } }),
+    });
   };
 
   service.administratorExists = function () {

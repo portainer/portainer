@@ -1,5 +1,6 @@
 import angular from 'angular';
 import { dispatchCacheRefreshEvent } from '@/portainer/services/http-request.helper';
+import { cleanReturnUrl } from '@/react/portainer/helpers/returnUrl';
 
 class LogoutController {
   /* @ngInject */
@@ -34,6 +35,7 @@ class LogoutController {
       // always clear the kubernetes cache
       dispatchCacheRefreshEvent();
 
+      cleanReturnUrl();
       this.LocalStorage.storeLogoutReason(error);
       if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
         this.$window.location.href = settings.OAuthLogoutURI;

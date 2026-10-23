@@ -23,10 +23,14 @@ async function getSources(params: SourcesParams) {
   return withPaginationHeaders(response);
 }
 
-export function useSources(params: SourcesParams) {
+export function useSources(
+  params: SourcesParams,
+  { enabled = true }: { enabled?: boolean } = {}
+) {
   return useQuery({
     queryKey: sourceQueryKeys.list(params),
     queryFn: () => getSources(params),
+    enabled,
     ...withError('Failed loading sources'),
   });
 }

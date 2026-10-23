@@ -31,7 +31,7 @@ export default class ThemeSettingsController {
   async updateThemeSettings(theme) {
     try {
       await this.UserService.updateUserTheme(this.state.userId, theme);
-      await queryClient.invalidateQueries(userQueryKeys.user(this.state.userId));
+      await queryClient.invalidateQueries(userQueryKeys.base());
 
       notifySuccess('Success', 'User theme settings successfully updated');
     } catch (err) {

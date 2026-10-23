@@ -1,6 +1,10 @@
-export type AutoUpdateMechanism = 'Webhook' | 'Interval';
 export interface AutoUpdateResponse {
-  /* Auto update interval */
+  /**
+   * Auto update interval
+   *
+   * @deprecated polling interval now lives on the associated Source (Source.Interval).
+   * Kept for API backwards-compatibility only; the UI never reads or writes this field.
+   */
   Interval: string;
 
   /* A UUID generated from client */
@@ -15,8 +19,6 @@ export interface AutoUpdateResponse {
 
 export type AutoUpdateModel = {
   RepositoryAutomaticUpdates: boolean;
-  RepositoryMechanism: AutoUpdateMechanism;
-  RepositoryFetchInterval: string;
   ForcePullImage: boolean;
   RepositoryAutomaticUpdatesForce: boolean;
 };
@@ -25,8 +27,6 @@ export function getDefaultAutoUpdateValues(): AutoUpdateModel {
   return {
     RepositoryAutomaticUpdates: false,
     RepositoryAutomaticUpdatesForce: false,
-    RepositoryMechanism: 'Interval',
-    RepositoryFetchInterval: '5m',
     ForcePullImage: false,
   };
 }
@@ -40,8 +40,6 @@ export function parseAutoUpdateResponse(
 
   return {
     RepositoryAutomaticUpdates: true,
-    RepositoryMechanism: response.Interval ? 'Interval' : 'Webhook',
-    RepositoryFetchInterval: response.Interval || '',
     RepositoryAutomaticUpdatesForce: response.ForceUpdate,
     ForcePullImage: response.ForcePullImage,
   };
@@ -55,17 +53,13 @@ export function transformAutoUpdateViewModel(
     return null;
   }
 
-  if (viewModel.RepositoryMechanism === 'Webhook' && !webhookId) {
+  if (!webhookId) {
     throw new Error('Webhook ID is required');
   }
 
   return {
-    Interval:
-      viewModel.RepositoryMechanism === 'Interval'
-        ? viewModel.RepositoryFetchInterval
-        : '',
-    Webhook:
-      viewModel.RepositoryMechanism === 'Webhook' && webhookId ? webhookId : '',
+    Interval: '',
+    Webhook: webhookId,
     ForceUpdate: viewModel.RepositoryAutomaticUpdatesForce,
     ForcePullImage: viewModel.ForcePullImage,
   };

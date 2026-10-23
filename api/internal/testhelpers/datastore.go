@@ -13,6 +13,7 @@ import (
 var _ dataservices.DataStore = &testDatastore{}
 
 type testDatastore struct {
+	allowList               dataservices.AllowListService
 	customTemplate          dataservices.CustomTemplateService
 	edgeGroup               dataservices.EdgeGroupService
 	edgeJob                 dataservices.EdgeJobService
@@ -24,6 +25,7 @@ type testDatastore struct {
 	helmUserRepository      dataservices.HelmUserRepositoryService
 	registry                dataservices.RegistryService
 	resourceControl         dataservices.ResourceControlService
+	source                  dataservices.SourceService
 	apiKeyRepositoryService dataservices.APIKeyRepository
 	role                    dataservices.RoleService
 	sslSettings             dataservices.SSLSettingsService
@@ -38,6 +40,7 @@ type testDatastore struct {
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
 	pendingActionsService   dataservices.PendingActionsService
+	workflow                dataservices.WorkflowService
 	connection              portainer.Connection
 }
 
@@ -51,6 +54,7 @@ func (d *testDatastore) ViewTx(func(dataservices.DataStoreTx) error) error   { r
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
 func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
+func (d *testDatastore) AllowList() dataservices.AllowListService           { return d.allowList }
 func (d *testDatastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
 func (d *testDatastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }
 func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { return d.edgeJob }
@@ -72,7 +76,8 @@ func (d *testDatastore) Registry() dataservices.RegistryService { return d.regis
 func (d *testDatastore) ResourceControl() dataservices.ResourceControlService {
 	return d.resourceControl
 }
-func (d *testDatastore) Role() dataservices.RoleService { return d.role }
+func (d *testDatastore) Source() dataservices.SourceService { return d.source }
+func (d *testDatastore) Role() dataservices.RoleService     { return d.role }
 func (d *testDatastore) APIKeyRepository() dataservices.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
@@ -87,6 +92,7 @@ func (d *testDatastore) TunnelServer() dataservices.TunnelServerService     { re
 func (d *testDatastore) User() dataservices.UserService                     { return d.user }
 func (d *testDatastore) Version() dataservices.VersionService               { return d.version }
 func (d *testDatastore) Webhook() dataservices.WebhookService               { return d.webhook }
+func (d *testDatastore) Workflow() dataservices.WorkflowService             { return d.workflow }
 
 func (d *testDatastore) PendingActions() dataservices.PendingActionsService {
 	return d.pendingActionsService
@@ -418,18 +424,6 @@ func (s *stubStacksService) StacksByEndpointID(endpointID portainer.EndpointID) 
 
 	for _, stack := range s.stacks {
 		if stack.EndpointID == endpointID {
-			result = append(result, stack)
-		}
-	}
-
-	return result, nil
-}
-
-func (s *stubStacksService) RefreshableStacks() ([]portainer.Stack, error) {
-	result := make([]portainer.Stack, 0)
-
-	for _, stack := range s.stacks {
-		if stack.AutoUpdate != nil {
 			result = append(result, stack)
 		}
 	}

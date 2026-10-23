@@ -8,6 +8,7 @@ interface Props {
   title: ReactNode;
   icon?: ReactNode;
   className?: string;
+  subtitle?: string;
 }
 
 export function WidgetTitle({
@@ -15,6 +16,7 @@ export function WidgetTitle({
   icon,
   className,
   children,
+  subtitle,
 }: PropsWithChildren<Props>) {
   const { titleId } = useWidgetContext();
 
@@ -29,6 +31,7 @@ export function WidgetTitle({
         </span>
         <span className={clsx('flex items-center', className)}>{children}</span>
       </div>
+      {subtitle && <span className="text-muted small">{subtitle}</span>}
     </div>
   );
 }

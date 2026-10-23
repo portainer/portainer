@@ -11,6 +11,7 @@ import { TableState } from '../useTableState';
 import { actionsColumn } from './actionsColumn';
 
 interface BasicRow {
+  id: number;
   Name: string;
   Created: string;
 }
@@ -70,10 +71,10 @@ const editableColumns = [
 Default.args = {
   isLoading: false,
   data: [
-    { Name: 'Juan', Created: '2021-01-21' },
-    { Name: 'Ji Hee', Created: '2023-03-01' },
-    { Name: 'Saki', Created: '2023-08-16' },
-    { Name: 'Eve', Created: '2017-11-06' },
+    { id: 1, Name: 'Juan', Created: '2021-01-21' },
+    { id: 2, Name: 'Ji Hee', Created: '2023-03-01' },
+    { id: 3, Name: 'Saki', Created: '2023-08-16' },
+    { id: 4, Name: 'Eve', Created: '2017-11-06' },
   ],
   columns: editableColumns,
   settings: {

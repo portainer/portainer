@@ -1,4 +1,5 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
+import clsx from 'clsx';
 
 interface Props {
   // props for the image to load
@@ -9,23 +10,26 @@ interface Props {
 }
 
 export function FallbackImage({ src, fallbackIcon, alt, className }: Props) {
-  const [error, setError] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'failed'>(
+    'loading'
+  );
 
-  useEffect(() => {
-    setError(false);
-  }, [src]);
-
-  if (!error && src) {
-    return (
-      <img
-        className={className}
-        src={src}
-        alt={alt}
-        onError={() => setError(true)}
-      />
-    );
-  }
-
-  // fallback icon if there is an error loading the image
-  return <div className={className}>{fallbackIcon}</div>;
+  // while loading, the fallback renders alongside the hidden img rather than
+  // replacing it — the img must stay mounted for onLoad/onError to fire
+  return (
+    <>
+      {(!src || status !== 'loaded') && (
+        <div className={className}>{fallbackIcon}</div>
+      )}
+      {!!src && status !== 'failed' && (
+        <img
+          className={clsx(className, status !== 'loaded' && 'hidden')}
+          src={src}
+          alt={alt}
+          onLoad={() => setStatus('loaded')}
+          onError={() => setStatus('failed')}
+        />
+      )}
+    </>
+  );
 }

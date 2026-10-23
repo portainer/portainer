@@ -182,6 +182,16 @@ func (handler *Handler) updateEndpointStacks(tx dataservices.DataStoreTx, endpoi
 		edgeStackSet[edgeStackID] = true
 	}
 
+	for edgeStackID := range edgeStackSet {
+		if relation.EdgeStacks[edgeStackID] {
+			continue
+		}
+
+		if err := tx.EdgeStackStatus().Clear(edgeStackID, []portainer.EndpointID{endpoint.ID}); err != nil {
+			return err
+		}
+	}
+
 	relation.EdgeStacks = edgeStackSet
 
 	return tx.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)

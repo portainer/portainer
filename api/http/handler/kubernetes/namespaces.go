@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
+	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -21,8 +22,8 @@ import (
 // @security ApiKeyAuth || jwt
 // @produce json
 // @param id path int true "Environment identifier"
-// @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. Default is false"
-// @param withUnhealthyEvents query boolean true "When set to true, include the unhealthy events information as part of the Namespace information. Default is false"
+// @param withResourceQuota query boolean false "When set to true, include the resource quota information as part of the Namespace information. Default is false"
+// @param withUnhealthyEvents query boolean false "When set to true, include the unhealthy events information as part of the Namespace information. Default is false"
 // @success 200 {array} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
@@ -110,7 +111,7 @@ func (handler *Handler) getKubernetesNamespacesCount(w http.ResponseWriter, r *h
 // @produce json
 // @param id path int true "Environment identifier"
 // @param namespace path string true "The namespace name to get details for"
-// @param withResourceQuota query boolean true "When set to true, include the resource quota information as part of the Namespace information. Default is false"
+// @param withResourceQuota query boolean false "When set to true, include the resource quota information as part of the Namespace information. Default is false"
 // @success 200 {object} portainer.K8sNamespaceInfo "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
@@ -170,7 +171,7 @@ func (handler *Handler) getKubernetesNamespace(w http.ResponseWriter, r *http.Re
 // @produce json
 // @param id path int true "Environment identifier"
 // @param body body models.K8sNamespaceDetails true "Namespace configuration details"
-// @success 200 {object} portainer.K8sNamespaceInfo "Success"
+// @success 200 {object} KubernetesCreateNamespaceResponse "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 401 "Unauthorized access - the user is not authenticated or does not have the necessary permissions. Ensure that you have provided a valid API key or JWT token, and that you have the required permissions."
 // @failure 403 "Permission denied - the user is authenticated but does not have the necessary permissions to access the requested resource or perform the specified operation. Check your user roles and permissions."
@@ -194,25 +195,21 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 
 	namespace, err := cli.CreateNamespace(payload)
 	if err != nil {
-		if k8serrors.IsAlreadyExists(err) {
-			log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("The namespace already exists")
-			return httperror.Conflict(fmt.Sprintf("an error occurred during the CreateKubernetesNamespace operation, the namespace %s already exists. Error: ", namespaceName), err)
-		}
-
-		log.Error().Err(err).Str("context", "CreateKubernetesNamespace").Str("namespace", namespaceName).Msg("Unable to create the namespace")
-		return httperror.InternalServerError("an error occurred during the CreateKubernetesNamespace operation, unable to create the namespace: "+namespaceName, err)
+		return writeErrorResponse(err, "CreateKubernetesNamespace", "", namespaceName, "create the namespace")
 	}
 
 	return response.JSON(w, namespace)
 }
 
 // @id DeleteKubernetesNamespace
-// @summary Delete a kubernetes namespace
-// @description Delete a kubernetes namespace within the given environment.
+// @summary Delete kubernetes namespaces
+// @description Delete one or more kubernetes namespaces within the given environment.
 // @description **Access policy**: Authenticated user.
 // @tags kubernetes
 // @security ApiKeyAuth || jwt
+// @accept json
 // @param id path int true "Environment identifier"
+// @param body body deleteKubernetesNamespacePayload true "List of namespace names to delete"
 // @success 200 {string} string "Success"
 // @failure 400 "Invalid request payload, such as missing required fields or fields not meeting validation criteria."
 // @failure 403 "Unauthorized access or operation not allowed."
@@ -221,8 +218,8 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 func (handler *Handler) deleteKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	namespaceNames, err := request.GetPayload[deleteKubernetesNamespacePayload](r)
 	if err != nil {
-		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Invalid namespace identifier route variable")
-		return httperror.BadRequest("an error occurred during the DeleteKubernetesNamespace operation, invalid namespace identifier route variable. Error: ", err)
+		log.Error().Err(err).Str("context", "DeleteKubernetesNamespace").Msg("Invalid request payload")
+		return httperror.BadRequest("an error occurred during the DeleteKubernetesNamespace operation, invalid request payload. Error: ", err)
 	}
 
 	cli, httpErr := handler.getProxyKubeClient(r)
@@ -256,6 +253,9 @@ func (payload deleteKubernetesNamespacePayload) Validate(r *http.Request) error 
 	return nil
 }
 
+// KubernetesCreateNamespaceResponse is the documented response model for namespace create endpoints.
+type KubernetesCreateNamespaceResponse corev1.Namespace
+
 // @id UpdateKubernetesNamespace
 // @summary Update a namespace
 // @description Update a namespace within the given environment.
@@ -288,7 +288,7 @@ func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http
 
 	namespace, err := cli.UpdateNamespace(payload)
 	if err != nil {
-		return httperror.InternalServerError(fmt.Sprintf("an error occurred during the UpdateKubernetesNamespace operation for the namespace %s, unable to update the Kubernetes namespace. Error: ", namespaceName), err)
+		return writeErrorResponse(err, "UpdateKubernetesNamespace", "", namespaceName, "update the namespace")
 	}
 
 	return response.JSON(w, namespace)

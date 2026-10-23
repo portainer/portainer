@@ -3,6 +3,7 @@ import { HttpResponse } from 'msw';
 
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server, http } from '@/setup-tests/server';
+import { withTestRouter } from '@/react/test-utils/withRouter';
 
 import { RepoConfigResponse } from './types';
 import { GitReferenceCard } from './GitReferenceCard';
@@ -22,15 +23,33 @@ const defaultGitConfig: RepoConfigResponse = {
 function renderCard(
   overrides: Partial<Parameters<typeof GitReferenceCard>[0]> = {}
 ) {
-  const Component = withTestQueryProvider(() => (
-    <GitReferenceCard
-      stackId={1}
-      gitConfig={defaultGitConfig}
-      stackType="docker"
-      {...overrides}
-    />
-  ));
+  const Component = withTestQueryProvider(
+    withTestRouter(() => (
+      <GitReferenceCard
+        gitConfig={defaultGitConfig}
+        stackType="docker"
+        sourceId={1}
+        {...overrides}
+      />
+    ))
+  );
   return render(<Component />);
+}
+
+function mockSource(overrides: Partial<{ interval: string }> = {}) {
+  server.use(
+    http.get('/api/gitops/sources/:id', () =>
+      HttpResponse.json({
+        id: 1,
+        name: 'my-source',
+        type: 'git',
+        url: 'https://github.com/portainer/portainer-compose',
+        status: 'healthy',
+        connection: {},
+        ...overrides,
+      })
+    )
+  );
 }
 
 describe('GitReferenceCard', () => {
@@ -43,6 +62,7 @@ describe('GitReferenceCard', () => {
         HttpResponse.json(['docker-compose.yml'])
       )
     );
+    mockSource();
   });
 
   describe('Normal state (no divergence)', () => {
@@ -83,29 +103,29 @@ describe('GitReferenceCard', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('shows auto-update as Off when not set', () => {
+    it('shows a Polling row sourced from the linked Source when it has an interval', async () => {
+      mockSource({ interval: '5m' });
       renderCard();
-      expect(
-        screen.getByRole('group', { name: 'Auto-update' })
-      ).toHaveTextContent('Off');
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole('group', { name: 'Polling' })
+        ).toHaveTextContent('5m')
+      );
     });
 
-    it('shows auto-update as On when autoUpdate is provided', async () => {
-      renderCard({
-        autoUpdate: {
-          Interval: '5m',
-          Webhook: '',
-          ForcePullImage: false,
-          ForceUpdate: false,
-        },
-      });
+    it('hides the Polling row when the Source has no interval', async () => {
+      mockSource();
+      renderCard();
 
-      expect(
-        screen.getByRole('group', { name: 'Auto-update' })
-      ).toHaveTextContent('On');
-      expect(screen.getByRole('group', { name: 'Interval' })).toHaveTextContent(
-        '5m'
+      await waitFor(() =>
+        expect(screen.getByRole('group', { name: 'Repo' })).toHaveTextContent(
+          defaultGitConfig.URL
+        )
       );
+      expect(
+        screen.queryByRole('group', { name: 'Polling' })
+      ).not.toBeInTheDocument();
     });
   });
 

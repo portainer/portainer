@@ -10,6 +10,7 @@ import { LogView } from '@/react/docker/containers/LogView';
 import { CreateView } from '@/react/docker/containers/CreateView';
 import { InspectView } from '@/react/docker/containers/InspectView/InspectView';
 import { ItemView } from '@/react/docker/containers/ItemView/ItemView';
+import { StatsView } from '@/react/docker/containers/StatsView/StatsView';
 
 export const containersModule = angular
   .module('portainer.docker.react.views.containers', [])
@@ -35,6 +36,10 @@ export const containersModule = angular
   .component(
     'dockerContainerInspectView',
     r2a(withUIRouter(withReactQuery(withCurrentUser(InspectView))), [])
+  )
+  .component(
+    'containerStatsView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(StatsView))), [])
   )
   .config(config).name;
 
@@ -124,8 +129,7 @@ function config($stateRegistryProvider: StateRegistry) {
     url: '/stats',
     views: {
       'content@': {
-        templateUrl: '~@/docker/views/containers/stats/containerstats.html',
-        controller: 'ContainerStatsController',
+        component: 'containerStatsView',
       },
     },
   });

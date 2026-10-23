@@ -24,8 +24,14 @@ export function EditGitSettingsModal({ stack, onClose }: Props) {
     () => stack.AutoUpdate?.Webhook || createWebhookId()
   );
 
+  const mutation = useUpdateGitStack(stack);
+
   const gitModel = toGitFormModel(
-    stack.GitConfig,
+    stack.GitSourceId,
+    {
+      ReferenceName: stack.GitConfig?.ReferenceName ?? '',
+      ConfigFilePath: stack.GitConfig?.ConfigFilePath ?? '',
+    },
     parseAutoUpdateResponse(stack.AutoUpdate)
   );
 
@@ -34,13 +40,12 @@ export function EditGitSettingsModal({ stack, onClose }: Props) {
     git: {
       ...gitModel,
       AdditionalFiles: stack.AdditionalFiles || [],
+      SourceId: stack.GitSourceId,
     },
     env: stack.Env || [],
     prune: stack.Option?.Prune || false,
     redeployNow: false,
   };
-
-  const mutation = useUpdateGitStack(stack);
 
   return (
     <Formik

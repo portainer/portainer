@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/pkg/libstack"
 
 	"github.com/containerd/errdefs"
@@ -30,6 +32,21 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// ManagerOperationHeader forces the Portainer agent to route requests to a swarm
+// manager node. Swarm-scoped operations (e.g. network create/remove) fail on worker
+// nodes without it. This constant is originally defined in the agent, see package/agent/README.md.
+const ManagerOperationHeader = "X-PortainerAgent-ManagerOperation"
+
+// cliOptions builds the Docker CLI options for swarm operations, always setting the
+// manager-operation header so requests proxied through an agent target a manager node.
+func cliOptions(host string, registries []configtypes.AuthConfig) libstack.DockerCliOptions {
+	return libstack.DockerCliOptions{
+		Host:       host,
+		Registries: registries,
+		Headers:    map[string]string{ManagerOperationHeader: "1"},
+	}
+}
+
 // Options holds connection and credential settings for swarm operations.
 type Options struct {
 	ProjectName string
@@ -47,6 +64,9 @@ type DeployOptions struct {
 	//   true  - query the registry (ResolveImageAlways)
 	//   false - never contact the registry; reuse the existing digest (ResolveImageNever)
 	PullImage bool
+	// ForceRecreate increments ForceUpdate on every existing service so that
+	// Docker re-schedules all tasks even when nothing in the spec has changed.
+	ForceRecreate bool
 }
 
 // RemoveOptions extends Options with removal settings.
@@ -70,11 +90,15 @@ func NewSwarmDeployer() *SwarmDeployer { return &SwarmDeployer{} }
 
 // Deploy creates or updates a Docker Swarm stack from the given compose files.
 func (d *SwarmDeployer) Deploy(ctx context.Context, filePaths []string, options DeployOptions) error {
+	// WithCli replaces the context with Background internally, so we capture the
+	// caller's context here to preserve cancellation.
+	callerCtx := ctx
+
 	return libstack.WithCli(
 		ctx,
-		libstack.DockerCliOptions{Host: options.Host, Registries: options.Registries},
-		func(ctx context.Context, dockerCLI *command.DockerCli) error {
-			return deployStack(ctx, dockerCLI, filePaths, options)
+		cliOptions(options.Host, options.Registries),
+		func(_ context.Context, dockerCLI *command.DockerCli) error {
+			return deployStack(callerCtx, dockerCLI, filePaths, options)
 		})
 }
 
@@ -86,28 +110,32 @@ func (d *SwarmDeployer) Validate(_ context.Context, filePaths []string, options 
 
 // Remove deletes all resources belonging to a Swarm stack and waits for tasks to terminate.
 func (d *SwarmDeployer) Remove(ctx context.Context, projectName string, options RemoveOptions) error {
+	// WithCli replaces the context with Background internally, so we capture the
+	// caller's context here to preserve cancellation.
+	callerCtx := ctx
+
 	return libstack.WithCli(
 		ctx,
-		libstack.DockerCliOptions{Host: options.Host, Registries: options.Registries},
-		func(ctx context.Context, dockerCLI *command.DockerCli) error {
+		cliOptions(options.Host, options.Registries),
+		func(_ context.Context, dockerCLI *command.DockerCli) error {
 			apiClient := dockerCLI.Client()
 
-			services, err := getStackServices(ctx, apiClient, projectName)
+			services, err := getStackServices(callerCtx, apiClient, projectName)
 			if err != nil {
 				return err
 			}
 
-			secrets, err := getStackSecrets(ctx, apiClient, projectName)
+			secrets, err := getStackSecrets(callerCtx, apiClient, projectName)
 			if err != nil {
 				return err
 			}
 
-			configs, err := getStackConfigs(ctx, apiClient, projectName)
+			configs, err := getStackConfigs(callerCtx, apiClient, projectName)
 			if err != nil {
 				return err
 			}
 
-			networks, err := getStackNetworks(ctx, apiClient, projectName)
+			networks, err := getStackNetworks(callerCtx, apiClient, projectName)
 			if err != nil {
 				return err
 			}
@@ -119,19 +147,19 @@ func (d *SwarmDeployer) Remove(ctx context.Context, projectName string, options 
 
 			var errs []error
 
-			if err := removeServices(ctx, apiClient, services); err != nil {
+			if err := removeServices(callerCtx, apiClient, services); err != nil {
 				errs = append(errs, err)
 			}
 
-			if err := removeSecrets(ctx, apiClient, secrets); err != nil {
+			if err := removeSecrets(callerCtx, apiClient, secrets); err != nil {
 				errs = append(errs, err)
 			}
 
-			if err := removeConfigs(ctx, apiClient, configs); err != nil {
+			if err := removeConfigs(callerCtx, apiClient, configs); err != nil {
 				errs = append(errs, err)
 			}
 
-			if err := removeNetworks(ctx, apiClient, networks); err != nil {
+			if err := removeNetworks(callerCtx, apiClient, networks); err != nil {
 				errs = append(errs, err)
 			}
 
@@ -141,7 +169,7 @@ func (d *SwarmDeployer) Remove(ctx context.Context, projectName string, options 
 
 			// Wait for all tasks to reach a terminal state before returning, mirroring
 			// the behaviour of `docker stack rm --detach=false`.
-			return waitOnTasks(ctx, apiClient, projectName)
+			return waitOnTasks(callerCtx, apiClient, projectName)
 		})
 }
 
@@ -211,13 +239,16 @@ func deployStack(ctx context.Context, dockerCLI *command.DockerCli, filePaths []
 		return err
 	}
 
+	registries := normalizeRegistryServerAddresses(options.Registries)
+
 	return deployServices(
 		ctx,
 		dockerCLI.Client(),
-		options.Registries,
+		registries,
 		services,
 		namespace,
 		options.PullImage,
+		options.ForceRecreate,
 	)
 }
 
@@ -367,6 +398,23 @@ func createConfigs(ctx context.Context, apiClient client.APIClient, configs []sw
 	return nil
 }
 
+// normalizeRegistryServerAddresses returns a copy of registries with each ServerAddress
+// rewritten so it matches the domain encodeRegistryAuth resolves for docker.io images
+// (dockerregistry.IndexServer).
+func normalizeRegistryServerAddresses(registries []configtypes.AuthConfig) []configtypes.AuthConfig {
+	normalized := make([]configtypes.AuthConfig, len(registries))
+
+	for i, r := range registries {
+		if r.ServerAddress == "" || r.ServerAddress == dockerregistry.DefaultNamespace {
+			r.ServerAddress = dockerregistry.IndexServer
+		}
+
+		normalized[i] = r
+	}
+
+	return normalized
+}
+
 // encodeRegistryAuth finds the registry credentials for the given image and returns
 // the base64-encoded auth string expected by the Docker service API.
 // Returns an empty string (no error) when no matching credentials are found.
@@ -408,6 +456,7 @@ func deployServices(
 	services map[string]swarm.ServiceSpec,
 	namespace convert.Namespace,
 	pullImage bool,
+	forceRecreate bool,
 ) error {
 	existingServices, err := getStackServices(ctx, apiClient, namespace.Name())
 	if err != nil {
@@ -444,8 +493,12 @@ func deployServices(
 				}
 			}
 
-			// Preserve ForceUpdate so that tasks are not re-deployed if nothing changed.
-			serviceSpec.TaskTemplate.ForceUpdate = existing.Spec.TaskTemplate.ForceUpdate
+			if forceRecreate {
+				serviceSpec.TaskTemplate.ForceUpdate = existing.Spec.TaskTemplate.ForceUpdate + 1
+			} else {
+				// Preserve ForceUpdate so that tasks are not re-deployed if nothing changed.
+				serviceSpec.TaskTemplate.ForceUpdate = existing.Spec.TaskTemplate.ForceUpdate
+			}
 
 			response, err := apiClient.ServiceUpdate(ctx, existing.ID, existing.Version, serviceSpec, updateOpts)
 			if err != nil {
@@ -632,7 +685,7 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 		return details, errors.New("at least one compose file must be specified")
 	}
 
-	details.WorkingDir = workingDir
+	details.WorkingDir = filepath.Dir(filePaths[0])
 
 	details.ConfigFiles = make([]composetypes.ConfigFile, 0, len(filePaths))
 	for _, fp := range filePaths {
@@ -645,6 +698,24 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 		if err != nil {
 			return details, err
 		}
+
+		// env_file paths are authored relative to the compose file's directory, but are resolved
+		// under the git repo / project root (workingDir) so they can reference sibling directories
+		// within the root (e.g. an edge-config directory) while staying clamped to it. composeDirRel
+		// is the compose file's directory relative to that root. When no root is provided, fall back
+		// to resolving against the compose file's own directory.
+		composeDir := filepath.Dir(fp)
+		root := workingDir
+		var composeDirRel string
+		if root == "" {
+			root = composeDir
+		} else if rel, err := filepath.Rel(root, composeDir); err == nil {
+			composeDirRel = rel
+		} else {
+			root = composeDir
+		}
+
+		resolveRelativePaths(config, root, composeDirRel)
 
 		details.ConfigFiles = append(details.ConfigFiles, composetypes.ConfigFile{
 			Filename: fp,
@@ -675,6 +746,73 @@ func getConfigDetails(filePaths []string, workingDir string, env []string) (comp
 	return details, nil
 }
 
+// resolveRelativePaths rewrites the on-disk paths a compose file references (service env_file
+// entries and secret/config file entries) to absolute paths clamped under root, so that a relative
+// "../" can reach a sibling directory within the project root but can never escape above it.
+func resolveRelativePaths(rawConfig map[string]any, root, composeDirRel string) {
+	resolveEnvFilePaths(rawConfig, root, composeDirRel)
+	resolveFileObjectPaths(rawConfig, "secrets", root, composeDirRel)
+	resolveFileObjectPaths(rawConfig, "configs", root, composeDirRel)
+}
+
+// resolveEnvFilePaths rewrites each service's relative env_file to an absolute path. Paths are
+// authored relative to the compose file's directory (composeDirRel, relative to root) and are
+// resolved under root via filesystem.JoinPaths. Because JoinPaths keeps the result clamped to root,
+// a "../" can traverse into a sibling directory within the root (e.g. an edge-config directory) but
+// can never escape above it.
+func resolveEnvFilePaths(rawConfig map[string]any, root, composeDirRel string) {
+	services, ok := rawConfig["services"].(map[string]any)
+	if !ok {
+		return
+	}
+	for _, svcAny := range services {
+		svc, ok := svcAny.(map[string]any)
+		if !ok {
+			continue
+		}
+		envFileAny, ok := svc["env_file"]
+		if !ok {
+			continue
+		}
+		switch ef := envFileAny.(type) {
+		case string:
+			if !filepath.IsAbs(ef) {
+				svc["env_file"] = filesystem.JoinPaths(root, composeDirRel, ef)
+			}
+		case []any:
+			for i, v := range ef {
+				if s, ok := v.(string); ok && !filepath.IsAbs(s) {
+					ef[i] = filesystem.JoinPaths(root, composeDirRel, s)
+				}
+			}
+		}
+	}
+}
+
+// resolveFileObjectPaths rewrites relative file entries under a top-level section (secrets or
+// configs) to absolute paths clamped under root via filesystem.JoinPaths, using the same semantics
+// as resolveEnvFilePaths. External and driver-based secrets/configs carry no file key and are
+// skipped. Unlike env_file, the file field is always a single string.
+func resolveFileObjectPaths(rawConfig map[string]any, section, root, composeDirRel string) {
+	objs, ok := rawConfig[section].(map[string]any)
+	if !ok {
+		return
+	}
+	for _, objAny := range objs {
+		obj, ok := objAny.(map[string]any)
+		if !ok {
+			continue
+		}
+		fileAny, ok := obj["file"]
+		if !ok {
+			continue
+		}
+		if s, ok := fileAny.(string); ok && !filepath.IsAbs(s) {
+			obj["file"] = filesystem.JoinPaths(root, composeDirRel, s)
+		}
+	}
+}
+
 // WaitForStatus blocks until all services in the stack reach the requested status,
 // or the context is cancelled. It polls the Docker API every second.
 func (d *SwarmDeployer) WaitForStatus(
@@ -691,7 +829,7 @@ func (d *SwarmDeployer) WaitForStatus(
 
 	err := libstack.WithCli(
 		ctx,
-		libstack.DockerCliOptions{Host: options.Host, Registries: options.Registries},
+		cliOptions(options.Host, options.Registries),
 		func(_ context.Context, dockerCLI *command.DockerCli) error {
 			apiClient := dockerCLI.Client()
 
@@ -727,6 +865,8 @@ func (d *SwarmDeployer) WaitForStatus(
 					}
 
 					if errorMessage != "" {
+						// An error message means a service failed, so the result must reflect that.
+						waitResult.Status = libstack.StatusError
 						waitResult.ErrorMsg = errorMessage
 						return nil
 					}
@@ -818,7 +958,8 @@ func getServiceStatus(
 			return libstack.StatusStarting, "", nil
 		case swarm.TaskStateRemove:
 			return libstack.StatusRemoving, "", nil
-		case swarm.TaskStateFailed:
+		case swarm.TaskStateFailed, swarm.TaskStateRejected:
+			// Rejected means the task could never start (e.g. missing image, no disk space).
 			return libstack.StatusError, task.Status.Err, nil
 		default:
 			return libstack.StatusUnknown, "", nil

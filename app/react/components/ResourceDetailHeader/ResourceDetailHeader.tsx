@@ -1,14 +1,10 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
 
-import { InlineLoader } from '@@/InlineLoader';
-import { Alert } from '@@/Alert';
 import { Widget } from '@@/Widget';
+import { Alert } from '@@/Alert';
 
 interface Props {
-  isLoading: boolean;
-  errorMessage?: string;
-
   icon: ReactNode;
   iconBackgroundClassName?: string;
 
@@ -21,65 +17,50 @@ interface Props {
   rightInfo?: ReactNode;
   actionBar?: ReactNode;
 
-  containerClassName?: string;
-  widgetClassName?: string;
+  isLoading?: boolean;
+  errorMessage?: string;
 }
 
 export function ResourceDetailHeader({
-  isLoading,
-  errorMessage,
   icon,
-  iconBackgroundClassName = 'bg-group-accent-3 th-dark:bg-group-accent-10',
+  iconBackgroundClassName = 'bg-group-accent-3 th-dark:bg-group-accent-10 th-highcontrast:bg-transparent',
   subtitleLabel,
-  subtitleClassName = 'text-group-accent-10 th-dark:text-group-accent-8',
+  subtitleClassName = 'text-group-accent-10 th-dark:text-group-accent-8 th-highcontrast:text-white',
   title,
   badge,
   description,
   rightInfo,
   actionBar,
-  containerClassName = 'flex items-center gap-4 p-6',
-  widgetClassName = 'widget-body',
+  isLoading,
+  errorMessage,
 }: Props) {
-  if (isLoading) {
-    return (
-      <Widget className={widgetClassName}>
-        <div className={containerClassName}>
-          <InlineLoader>Loading details...</InlineLoader>
-        </div>
-      </Widget>
-    );
-  }
-
-  if (errorMessage) {
-    return (
-      <Widget className={widgetClassName}>
-        <div className={containerClassName}>
+  return (
+    <Widget>
+      <Widget.Body loading={isLoading}>
+        {errorMessage && (
           <Alert color="error" title="Error">
             {errorMessage}
           </Alert>
-        </div>
-      </Widget>
-    );
-  }
+        )}
+        {!errorMessage && (
+          <div className="flex items-center gap-4">
+            <HeaderIcon
+              icon={icon}
+              iconBackgroundClassName={iconBackgroundClassName}
+            />
+            <HeaderInfo
+              subtitleLabel={subtitleLabel}
+              subtitleClassName={subtitleClassName}
+              title={title}
+              badge={badge}
+              description={description}
+            />
+            {rightInfo}
+          </div>
+        )}
+      </Widget.Body>
 
-  return (
-    <Widget className={widgetClassName}>
-      <div className={containerClassName}>
-        <HeaderIcon
-          icon={icon}
-          iconBackgroundClassName={iconBackgroundClassName}
-        />
-        <HeaderInfo
-          subtitleLabel={subtitleLabel}
-          subtitleClassName={subtitleClassName}
-          title={title}
-          badge={badge}
-          description={description}
-        />
-        {rightInfo}
-      </div>
-
-      {actionBar}
+      {!isLoading && !errorMessage && actionBar}
     </Widget>
   );
 }

@@ -97,7 +97,6 @@ export function InnerForm({
                 baseWebhookUrl={baseStackWebhookUrl()}
                 webhookId={webhookId}
                 webhooksDocs="/user/docker/stacks/webhooks"
-                isAuthExplanationVisible
                 isAdditionalFilesFieldVisible
                 isAutoUpdateVisible
                 errors={errors.git}

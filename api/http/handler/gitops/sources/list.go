@@ -3,26 +3,31 @@ package sources
 import (
 	"context"
 	"net/http"
-	"slices"
-	"strconv"
 	"strings"
 
-	gocache "github.com/patrickmn/go-cache"
 	portainer "github.com/portainer/portainer/api"
-	ceWorkflows "github.com/portainer/portainer/api/gitops/workflows"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/http/utils/filters"
-	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 )
 
+// Source is the list item response for a GitOps source
+type Source struct {
+	SourceBase
+	UsedBy       int `json:"usedBy"`
+	Environments int `json:"environments"`
+}
+
 // @id GitOpsSourcesList
 // @summary List all GitOps sources
 // @description Returns a deduplicated list of git repositories used across all GitOps workflows.
-// @description **Access policy**: admin
+// @description **Access policy**: authenticated
 // @tags gitops
 // @security ApiKeyAuth
 // @security jwt
@@ -47,19 +52,13 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	if !securityContext.IsAdmin {
-		return httperror.Forbidden("Access denied", nil)
-	}
-
-	key := cacheKey(securityContext)
-
-	sources, err := h.getSources(r.Context(), key, securityContext)
+	sources, err := h.fetchSources(r.Context(), securityContext)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve sources", err)
 	}
 
 	if status, _ := request.RetrieveQueryParameter(r, "status", true); status != "" {
-		s, err := ceWorkflows.ParseStatus(status)
+		s, err := workflows.ParseStatus(status)
 		if err != nil {
 			return httperror.BadRequest("Invalid status parameter", err)
 		}
@@ -81,7 +80,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 		SortBindings: []filters.SortBinding[Source]{
 			{Key: "name", Fn: func(a, b Source) int { return strings.Compare(a.Name, b.Name) }},
 			{Key: "status", Fn: func(a, b Source) int { return strings.Compare(string(a.Status), string(b.Status)) }},
-			{Key: "type", Fn: func(a, b Source) int { return strings.Compare(a.Type, b.Type) }},
+			{Key: "type", Fn: func(a, b Source) int { return strings.Compare(string(a.Type), string(b.Type)) }},
 		},
 	})
 
@@ -89,75 +88,35 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.Handle
 	return response.JSON(w, results.Items)
 }
 
-func (h *Handler) getSources(ctx context.Context, key string, sc *security.RestrictedRequestContext) ([]Source, error) {
-	if cached, ok := h.cache.Get(key); ok {
-		return slices.Clone(cached.([]Source)), nil
-	}
-
-	result, err := h.fetchSources(ctx, sc)
-	if err != nil {
-		return nil, err
-	}
-	h.cache.Set(key, result, gocache.DefaultExpiration)
-	return slices.Clone(result), nil
-}
-
-func cacheKey(sc *security.RestrictedRequestContext) string {
-	teamIDs := make([]string, len(sc.UserMemberships))
-	for i, membership := range sc.UserMemberships {
-		teamIDs[i] = strconv.Itoa(int(membership.TeamID))
-	}
-	slices.Sort(teamIDs)
-
-	return strconv.Itoa(int(sc.UserID)) + ":" + strconv.FormatBool(sc.IsAdmin) + ":" + strings.Join(teamIDs, ",")
-}
-
 func (h *Handler) fetchSources(ctx context.Context, sc *security.RestrictedRequestContext) ([]Source, error) {
-	workflows, err := ceWorkflows.FetchWorkflows(ctx, h.dataStore, h.gitService, h.k8sFactory, sc, nil)
-	if err != nil {
+	var allSrcs []portainer.Source
+	var stats map[portainer.SourceID]workflows.SourceStats
+
+	if err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		userContext := source.NewUserContext(sc.User, sc.UserMemberships)
+
+		sources, err := tx.Source().ReadAll(userContext)
+		if err != nil {
+			return err
+		}
+
+		allSrcs = sources
+
+		stats, err = workflows.FetchSourceStats(tx, h.k8sFactory, sc)
+		return err
+	}); err != nil {
 		return nil, err
 	}
 
-	byURL := make(map[string][]ceWorkflows.Workflow)
-	for _, wf := range workflows {
-		if wf.GitConfig != nil {
-			byURL[wf.GitConfig.URL] = append(byURL[wf.GitConfig.URL], wf)
-		}
-	}
-
-	sources := make([]Source, 0, len(byURL))
-	for url, wfs := range byURL {
-		statuses := make([]ceWorkflows.Status, 0, len(wfs))
-		var sourceError string
-		var lastSync int64
-		endpointIDs := make(set.Set[portainer.EndpointID])
-		for _, wf := range wfs {
-			statuses = append(statuses, wf.Status.Source.Status)
-			if sourceError == "" && wf.Status.Source.Status == ceWorkflows.StatusError {
-				sourceError = wf.Status.Source.Error
-			}
-			if wf.LastSyncDate > lastSync {
-				lastSync = wf.LastSyncDate
-			}
-			if wf.Target.EndpointID != 0 {
-				endpointIDs.Add(wf.Target.EndpointID)
-			}
-			for _, id := range wf.Target.ResolvedEndpointIDs {
-				endpointIDs.Add(id)
-			}
+	result := make([]Source, 0, len(allSrcs))
+	for _, src := range allSrcs {
+		stat, ok := stats[src.ID]
+		if !ok {
+			stat = workflows.SourceStats{}
 		}
 
-		sources = append(sources, Source{
-			ID:           sourceID(url),
-			Name:         repoName(url),
-			Type:         "git",
-			URL:          url,
-			Status:       worstCaseStatus(statuses),
-			Error:        sourceError,
-			UsedBy:       len(wfs),
-			Environments: len(endpointIDs),
-			LastSync:     lastSync,
-		})
+		result = append(result, h.buildSource(&src, stat))
 	}
-	return sources, nil
+
+	return result, nil
 }

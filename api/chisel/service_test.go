@@ -187,6 +187,24 @@ func TestCheckTunnelsKeepsHasSnapshotFalseOnSnapshotFailure(t *testing.T) {
 	require.False(t, s.activeTunnels[endpoint.ID].HasSnapshot, "HasSnapshot must stay false after failure")
 }
 
+func TestCheckTunnelsClosesStaleEntryForDeletedEndpoint(t *testing.T) {
+	t.Parallel()
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	// Endpoint is not created in the store, simulates deletion while tunnel stays open.
+	s := NewService(store, nil, nil)
+	s.activeTunnels[1] = &portainer.TunnelDetails{
+		Status:       portainer.EdgeAgentManagementRequired,
+		Port:         50010,
+		LastActivity: time.Now(),
+	}
+
+	s.checkTunnels()
+
+	require.Nil(t, s.activeTunnels[1], "stale tunnel for deleted endpoint must be removed immediately")
+}
+
 func TestCheckTunnelsClosesIdleTunnelAndSnapshots(t *testing.T) {
 	t.Parallel()
 

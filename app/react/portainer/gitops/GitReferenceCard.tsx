@@ -13,26 +13,28 @@ import {
   RepoConfigResponse,
 } from '@/react/portainer/gitops/types';
 import { StackDeploymentInfo } from '@/react/common/stacks/types';
+import { useSource } from '@/react/portainer/gitops/sources/queries/useSource';
 
 import { CopyButton } from '@@/buttons';
-import { Card } from '@@/Card';
+import { Card } from '@@/primitives/Card';
 import { Icon } from '@@/Icon';
 import { Alert } from '@@/Alert';
+import { Link } from '@@/Link';
 
 import { getGitValidityError } from './hooks/useGitRepoValidity';
 
 export function GitReferenceCard({
-  stackId,
   stackType,
   gitConfig,
   autoUpdate,
   currentDeploymentInfo,
+  sourceId,
 }: {
-  stackId: number;
   stackType: 'docker' | 'helm' | 'edge' | 'edge-helm' | 'kubernetes';
   gitConfig: RepoConfigResponse;
   autoUpdate?: AutoUpdateResponse | null;
   currentDeploymentInfo?: StackDeploymentInfo | null;
+  sourceId: number;
 }) {
   const hasDivergence = isGitConfigDiverged(gitConfig, currentDeploymentInfo);
 
@@ -41,16 +43,13 @@ export function GitReferenceCard({
   const configFilePath = deployed?.ConfigFilePath ?? gitConfig.ConfigFilePath;
   const reference = deployed?.ReferenceName ?? gitConfig.ReferenceName;
   const commitId = deployed?.ConfigHash ?? gitConfig.ConfigHash;
-
-  const fromEdgeStack = stackType === 'edge' || stackType === 'edge-helm';
+  const sourceIdToShow = deployed?.SourceID ?? sourceId;
 
   const refCheckQuery = useGitRefs(
     {
-      repository: url || '',
-      stackId,
-      fromEdgeStack,
+      sourceId: sourceIdToShow,
     },
-    { enabled: !!url, suppressError: true }
+    { enabled: !!sourceIdToShow, suppressError: true }
   );
 
   const repoError = getGitValidityError(
@@ -70,14 +69,12 @@ export function GitReferenceCard({
   const enableFileCheck = stackType !== 'helm' && stackType !== 'edge-helm';
   const fileCheckQuery = useSearch(
     {
-      repository: url || '',
       keyword: configFilePath || '',
-      stackId,
-      fromEdgeStack,
       reference,
+      sourceId: sourceIdToShow,
     },
     enableFileCheck &&
-      !!url &&
+      !!sourceIdToShow &&
       !!reference &&
       !!configFilePath &&
       !hasRepoError &&
@@ -95,7 +92,7 @@ export function GitReferenceCard({
       fileCheckQuery.isError ||
       (fileCheckQuery.isFetched && !foundFile));
 
-  const { Interval: autoUpdateInterval, Webhook: webhook } = autoUpdate || {};
+  const { Webhook: webhook } = autoUpdate || {};
   const webhookUrl = webhook ? `${baseStackWebhookUrl()}/${webhook}` : '';
 
   const isRefLoading = refCheckQuery.isFetching;
@@ -109,127 +106,171 @@ export function GitReferenceCard({
   const infoMessage = explainedError || repoError;
 
   return (
-    <Card>
-      <div className="form-section-title !mt-0 flex items-center gap-2">
-        <Icon icon={GitMerge} /> Managed by Git
-      </div>
-      {hasError && (
-        <>
-          <Alert color="error" className="mb-5">
-            <div className="flex flex-col">
-              {hasRepoError && (
-                <div>
-                  The git repository <span>{url || ''}</span> could not be
-                  reached.
-                </div>
-              )}
-              {hasRefError && (
-                <div>
-                  The git reference <span>{reference || ''}</span> could not be
-                  found on the remote repository.
-                </div>
-              )}
-              {hasFileError && (
-                <div>
-                  The referenced file{' '}
-                  <span className="muted">{configFilePath || ''}</span> could
-                  not be found on the remote repository.
-                </div>
-              )}
-            </div>
-          </Alert>
-          {!!infoMessage && (
-            <Alert color="info" className="mb-5">
-              {infoMessage}
+    <Card.Container variant="filled">
+      <Card.Body>
+        <div className="form-section-title !mt-0 flex items-center gap-2">
+          <Icon icon={GitMerge} /> Managed by Git
+        </div>
+        {hasError && (
+          <>
+            <Alert color="error" className="mb-5">
+              <div className="flex flex-col">
+                {hasRepoError && (
+                  <div>
+                    The git repository <span>{url || ''}</span> could not be
+                    reached.
+                  </div>
+                )}
+                {hasRefError && (
+                  <div>
+                    The git reference <span>{reference || ''}</span> could not
+                    be found on the remote repository.
+                  </div>
+                )}
+                {hasFileError && (
+                  <div>
+                    The referenced file{' '}
+                    <span className="muted">{configFilePath || ''}</span> could
+                    not be found on the remote repository.
+                  </div>
+                )}
+              </div>
             </Alert>
-          )}
-        </>
-      )}
+            {!!infoMessage && (
+              <Alert color="info" className="mb-5">
+                {infoMessage}
+              </Alert>
+            )}
+          </>
+        )}
 
-      <div
-        className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm lg:grid-cols-2 xl:grid-cols-3"
-        data-cy="git-reference-card-info"
-      >
-        <LineItem
-          label="Repo"
-          value={url || 'missing'}
-          title={url || 'missing'}
-          isLoading={isRefLoading}
-          isValid={!!url && !hasRepoError}
-          isError={!url || hasRepoError}
-          data-cy="git-url"
-        />
-        <LineItem
-          label="Ref"
-          value={reference || 'missing'}
-          title={reference || 'missing'}
-          isLoading={isRefLoading}
-          isValid={foundRef}
-          isError={!reference || hasRefError}
-          data-cy="git-ref"
-        />
-        {enableFileCheck && (
+        <div
+          className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm lg:grid-cols-2 xl:grid-cols-3"
+          data-cy="git-reference-card-info"
+        >
           <LineItem
-            label="File"
-            value={configFilePath || 'missing'}
-            title={configFilePath || 'missing'}
-            isLoading={isFileLoading}
-            isValid={foundFile}
-            isError={!configFilePath || hasFileError}
-            data-cy="git-file-path"
+            label="Repo"
+            value={url || 'missing'}
+            title={url || 'missing'}
+            isLoading={isRefLoading}
+            isValid={!!url && !hasRepoError}
+            isError={!url || hasRepoError}
+            data-cy="git-url"
+          />
+          <LineItem
+            label="Ref"
+            value={reference || 'missing'}
+            title={reference || 'missing'}
+            isLoading={isRefLoading}
+            isValid={foundRef}
+            isError={!reference || hasRefError}
+            data-cy="git-ref"
+          />
+          {enableFileCheck && (
+            <LineItem
+              label="File"
+              value={configFilePath || 'missing'}
+              title={configFilePath || 'missing'}
+              isLoading={isFileLoading}
+              isValid={foundFile}
+              isError={!configFilePath || hasFileError}
+              data-cy="git-file-path"
+            />
+          )}
+
+          {!!sourceIdToShow && <SourceLineItem sourceId={sourceIdToShow} />}
+          {!!commitId && (
+            <LineItem
+              label="Commit"
+              value={
+                <GitCommitLink baseURL={url || ''} commitHash={commitId} />
+              }
+              title={commitId}
+              data-cy="git-commit"
+            />
+          )}
+          {!!sourceIdToShow && (
+            <AutoUpdateIntervalLineItem sourceId={sourceIdToShow} />
+          )}
+          {!!webhook && (
+            <LineItem
+              label="Webhook"
+              value={
+                <>
+                  <span data-cy="git-webhook-url">
+                    {truncateLeftRight(webhookUrl, 0, 10, 25)}
+                  </span>
+                  <CopyButton
+                    copyText={webhookUrl}
+                    color="light"
+                    data-cy="git-webhook-copy-button"
+                  >
+                    Copy link
+                  </CopyButton>
+                </>
+              }
+              title="webhook"
+              data-cy="git-webhook"
+            />
+          )}
+        </div>
+        {currentDeploymentInfo && hasDivergence && (
+          <DivergenceAlert
+            gitConfig={gitConfig}
+            currentDeploymentInfo={currentDeploymentInfo}
           />
         )}
-        {!!commitId && (
-          <LineItem
-            label="Commit"
-            value={<GitCommitLink baseURL={url || ''} commitHash={commitId} />}
-            title={commitId}
-            data-cy="git-commit"
-          />
-        )}
-        <LineItem
-          label="Auto-update"
-          value={autoUpdate ? 'On' : 'Off'}
-          title="auto-update"
-          data-cy="git-auto-update"
-        />
-        {!!autoUpdateInterval && (
-          <LineItem
-            label="Interval"
-            value={autoUpdateInterval}
-            title="auto-update-interval"
-            data-cy="git-interval"
-          />
-        )}
-        {!!webhook && (
-          <LineItem
-            label="Webhook"
-            value={
-              <>
-                <span data-cy="git-webhook-url">
-                  {truncateLeftRight(webhookUrl, 0, 10, 25)}
-                </span>
-                <CopyButton
-                  copyText={webhookUrl}
-                  color="light"
-                  data-cy="git-webhook-copy-button"
-                >
-                  Copy link
-                </CopyButton>
-              </>
-            }
-            title="webhook"
-            data-cy="git-webhook"
-          />
-        )}
-      </div>
-      {currentDeploymentInfo && hasDivergence && (
-        <DivergenceAlert
-          gitConfig={gitConfig}
-          currentDeploymentInfo={currentDeploymentInfo}
-        />
-      )}
-    </Card>
+      </Card.Body>
+    </Card.Container>
+  );
+}
+
+function SourceLineItem({ sourceId }: { sourceId: number }) {
+  const sourceQuery = useSource(sourceId);
+  const sourceName = sourceQuery.data?.name;
+
+  return (
+    <LineItem
+      label="Source"
+      value={
+        sourceName ? (
+          <Link
+            to="portainer.gitops.sources.item"
+            params={{ sourceId }}
+            data-cy="git-source-link"
+          >
+            {sourceName}
+          </Link>
+        ) : sourceQuery.isLoading ? (
+          ''
+        ) : (
+          'not found'
+        )
+      }
+      title={sourceName ?? ''}
+      isLoading={sourceQuery.isLoading}
+      isError={sourceQuery.isError || (!sourceQuery.isLoading && !sourceName)}
+      isValid={!!sourceName}
+      data-cy="git-source"
+    />
+  );
+}
+
+function AutoUpdateIntervalLineItem({ sourceId }: { sourceId: number }) {
+  const sourceQuery = useSource(sourceId);
+  const pollingInterval = sourceQuery.data?.interval;
+
+  if (!pollingInterval) {
+    return null;
+  }
+
+  return (
+    <LineItem
+      label="Polling"
+      value={pollingInterval}
+      title="polling-interval"
+      data-cy="git-polling-interval"
+    />
   );
 }
 

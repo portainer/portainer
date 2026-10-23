@@ -1,18 +1,13 @@
 import _ from 'lodash-es';
+
+import { strToHash } from '@/react/utils/hash';
+
 import { hideShaSum, joinCommand, nodeStatusBadge, taskStatusBadge, trimContainerName, trimSHA, trimVersionTag } from './utils';
 
 function includeString(text, values) {
   return values.some(function (val) {
     return text.indexOf(val) !== -1;
   });
-}
-
-function strToHash(str) {
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return hash;
 }
 
 function hashToHexColor(hash) {

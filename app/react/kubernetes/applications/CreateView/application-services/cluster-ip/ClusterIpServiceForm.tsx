@@ -5,7 +5,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { FormError } from '@@/form-components/FormError';
 import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 import { Button } from '@@/buttons';
-import { Card } from '@@/Card';
+import { Card } from '@@/primitives/Card';
 import { Widget } from '@@/Widget';
 import { isErrorType } from '@@/form-components/formikUtils';
 
@@ -79,97 +79,101 @@ export function ClusterIpServiceForm({
               : undefined;
 
             return (
-              <Card key={portIndex} className="flex flex-col gap-y-3">
-                <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-1">
-                  <div className="inline-flex min-w-min flex-grow basis-3/4 flex-wrap gap-x-4 gap-y-1">
-                    <div className="flex min-w-min basis-1/3 flex-col">
-                      <ContainerPortInput
-                        serviceIndex={serviceIndex}
-                        portIndex={portIndex}
-                        value={servicePort.targetPort}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              <Card.Container key={portIndex} variant="filled">
+                <Card.Body className="flex flex-col gap-y-3">
+                  <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-1">
+                    <div className="inline-flex min-w-min flex-grow basis-3/4 flex-wrap gap-x-4 gap-y-1">
+                      <div className="flex min-w-min basis-1/3 flex-col">
+                        <ContainerPortInput
+                          serviceIndex={serviceIndex}
+                          portIndex={portIndex}
+                          value={servicePort.targetPort}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            const newServicePorts = [...servicePorts];
+                            const newValue = e.target.valueAsNumber;
+                            newServicePorts[portIndex] = {
+                              ...newServicePorts[portIndex],
+                              targetPort: newValue,
+                              port: newValue,
+                            };
+                            onChangePort(newServicePorts);
+                          }}
+                        />
+                        {servicePortErrors?.targetPort && (
+                          <FormError>{servicePortErrors.targetPort}</FormError>
+                        )}
+                      </div>
+                      <div className="flex min-w-min basis-1/3 flex-col">
+                        <ServicePortInput
+                          serviceIndex={serviceIndex}
+                          portIndex={portIndex}
+                          value={servicePort.port}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            const newServicePorts = [...servicePorts];
+                            newServicePorts[portIndex] = {
+                              ...newServicePorts[portIndex],
+                              port: e.target.valueAsNumber,
+                            };
+                            onChangePort(newServicePorts);
+                          }}
+                        />
+                        {servicePortErrors?.port && (
+                          <FormError>{servicePortErrors.port}</FormError>
+                        )}
+                      </div>
+                      <ButtonSelector
+                        className="h-[30px]"
+                        onChange={(value) => {
                           const newServicePorts = [...servicePorts];
-                          const newValue = e.target.valueAsNumber;
                           newServicePorts[portIndex] = {
                             ...newServicePorts[portIndex],
-                            targetPort: newValue,
-                            port: newValue,
+                            protocol: value,
                           };
                           onChangePort(newServicePorts);
                         }}
+                        value={servicePort.protocol || 'TCP'}
+                        options={[{ value: 'TCP' }, { value: 'UDP' }]}
                       />
-                      {servicePortErrors?.targetPort && (
-                        <FormError>{servicePortErrors.targetPort}</FormError>
-                      )}
                     </div>
-                    <div className="flex min-w-min basis-1/3 flex-col">
-                      <ServicePortInput
-                        serviceIndex={serviceIndex}
-                        portIndex={portIndex}
-                        value={servicePort.port}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          const newServicePorts = [...servicePorts];
-                          newServicePorts[portIndex] = {
-                            ...newServicePorts[portIndex],
-                            port: e.target.valueAsNumber,
-                          };
-                          onChangePort(newServicePorts);
-                        }}
-                      />
-                      {servicePortErrors?.port && (
-                        <FormError>{servicePortErrors.port}</FormError>
-                      )}
-                    </div>
-                    <ButtonSelector
-                      className="h-[30px]"
-                      onChange={(value) => {
-                        const newServicePorts = [...servicePorts];
-                        newServicePorts[portIndex] = {
-                          ...newServicePorts[portIndex],
-                          protocol: value,
-                        };
+                    <Button
+                      disabled={servicePorts.length === 1}
+                      size="small"
+                      className="!ml-0 h-[30px]"
+                      color="dangerlight"
+                      type="button"
+                      onClick={() => {
+                        // remove the port at the index in an immutable way
+                        const newServicePorts = [
+                          ...servicePorts.slice(0, portIndex),
+                          ...servicePorts.slice(portIndex + 1),
+                        ];
                         onChangePort(newServicePorts);
                       }}
-                      value={servicePort.protocol || 'TCP'}
-                      options={[{ value: 'TCP' }, { value: 'UDP' }]}
-                    />
+                      data-cy={`k8sAppCreate-rmPortButton-${serviceIndex}-${portIndex}`}
+                      icon={Trash2}
+                    >
+                      Remove port
+                    </Button>
                   </div>
-                  <Button
-                    disabled={servicePorts.length === 1}
-                    size="small"
-                    className="!ml-0 h-[30px]"
-                    color="dangerlight"
-                    type="button"
-                    onClick={() => {
-                      // remove the port at the index in an immutable way
-                      const newServicePorts = [
-                        ...servicePorts.slice(0, portIndex),
-                        ...servicePorts.slice(portIndex + 1),
-                      ];
+                  <AppIngressPathsForm
+                    servicePortIngressPaths={
+                      servicePorts[portIndex].ingressPaths
+                    }
+                    onChangeIngressPaths={(
+                      ingressPaths?: ServicePortIngressPath[]
+                    ) => {
+                      const newServicePorts = [...servicePorts];
+                      newServicePorts[portIndex].ingressPaths = ingressPaths;
                       onChangePort(newServicePorts);
                     }}
-                    data-cy={`k8sAppCreate-rmPortButton-${serviceIndex}-${portIndex}`}
-                    icon={Trash2}
-                  >
-                    Remove port
-                  </Button>
-                </div>
-                <AppIngressPathsForm
-                  servicePortIngressPaths={servicePorts[portIndex].ingressPaths}
-                  onChangeIngressPaths={(
-                    ingressPaths?: ServicePortIngressPath[]
-                  ) => {
-                    const newServicePorts = [...servicePorts];
-                    newServicePorts[portIndex].ingressPaths = ingressPaths;
-                    onChangePort(newServicePorts);
-                  }}
-                  namespace={namespace}
-                  ingressPathsErrors={ingressPathsErrors}
-                  serviceIndex={serviceIndex}
-                  portIndex={portIndex}
-                  isEditMode={isEditMode}
-                />
-              </Card>
+                    namespace={namespace}
+                    ingressPathsErrors={ingressPathsErrors}
+                    serviceIndex={serviceIndex}
+                    portIndex={portIndex}
+                    isEditMode={isEditMode}
+                  />
+                </Card.Body>
+              </Card.Container>
             );
           })}
           <div className="flex">

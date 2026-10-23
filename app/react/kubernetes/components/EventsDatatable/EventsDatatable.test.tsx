@@ -17,7 +17,7 @@ const mockTableState: TableState<TableSettings> = {
   sortBy: { id: 'Date', desc: true },
   pageSize: 10,
   search: '',
-  autoRefreshRate: 0,
+  autoRefreshRateMS: 0,
   showSystemResources: false,
   setSortBy: vi.fn(),
   setPageSize: vi.fn(),

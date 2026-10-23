@@ -131,7 +131,7 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 			}
 
 			if tc.key {
-				connection.EncryptionKey = []byte("secret")
+				connection.EncryptionKey = secretToEncryptionKey("secret")
 			}
 
 			result, err := connection.NeedsEncryptionMigration()
@@ -140,6 +140,57 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 			is.Equal(result, tc.expectResult, "Failed test: %s", tc.name)
 		})
 	}
+}
+
+func TestSetEncrypted_InvalidKeyReturnsError(t *testing.T) {
+	t.Parallel()
+
+	conn := DbConnection{EncryptionKey: []byte("bad")}
+	err := conn.SetEncrypted(true)
+	require.Error(t, err)
+	require.Nil(t, conn.gcm)
+}
+
+func TestSetEncrypted_NilKeyDoesNotSetGCM(t *testing.T) {
+	t.Parallel()
+
+	conn := DbConnection{}
+	err := conn.SetEncrypted(true)
+	require.NoError(t, err)
+	require.Nil(t, conn.gcm)
+}
+
+func TestSetEncrypted_EnableThenDisableStopsEncryption(t *testing.T) {
+	t.Parallel()
+
+	key := secretToEncryptionKey(passphrase)
+	conn := DbConnection{EncryptionKey: key}
+
+	err := conn.SetEncrypted(true)
+	require.NoError(t, err)
+	require.NotNil(t, conn.gcm)
+
+	err = conn.SetEncrypted(false)
+	require.NoError(t, err)
+	require.Nil(t, conn.gcm)
+
+	// MarshalObject must return plaintext after encryption is disabled
+	data, err := conn.MarshalObject("hello")
+	require.NoError(t, err)
+	require.Equal(t, "hello", string(data))
+}
+
+func TestNeedsEncryptionMigration_InvalidKeyError(t *testing.T) {
+	t.Parallel()
+
+	conn := DbConnection{
+		Path:          t.TempDir(),
+		EncryptionKey: []byte("bad"),
+	}
+
+	result, err := conn.NeedsEncryptionMigration()
+	require.Error(t, err)
+	require.False(t, result)
 }
 
 func TestDBCompaction(t *testing.T) {

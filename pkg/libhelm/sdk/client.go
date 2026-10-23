@@ -22,13 +22,23 @@ type clientConfigGetter struct {
 	namespace    string
 }
 
-// initActionConfig initializes the action configuration with kubernetes config
-func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configuration, namespace string, k8sAccess *options.KubernetesClusterAccess) error {
-	// If namespace is not provided, use the default namespace
+// namespaceOrDefault returns "default" for an empty namespace. Actions that
+// operate on a single release pass their namespace through this before calling
+// initActionConfig, so an omitted namespace resolves to "default" rather than
+// initializing the release storage cluster-wide.
+func namespaceOrDefault(namespace string) string {
 	if namespace == "" {
-		namespace = "default"
+		return "default"
 	}
+	return namespace
+}
 
+// initActionConfig initializes the action configuration scoped to the given
+// namespace, which may be empty: an empty namespace initializes the release
+// storage cluster-wide, which is how `helm list --all-namespaces` sees
+// releases in every namespace (action.List.AllNamespaces alone does not widen
+// the storage scope).
+func (hspm *HelmSDKPackageManager) initActionConfig(actionConfig *action.Configuration, namespace string, k8sAccess *options.KubernetesClusterAccess) error {
 	// Setup logging for Helm SDK using zerolog
 	logger := log.With().Str("context", "HelmClient").Logger()
 	logOptions := slogzerolog.Option{

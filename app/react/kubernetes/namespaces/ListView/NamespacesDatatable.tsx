@@ -39,7 +39,7 @@ export function NamespacesDatatable() {
     })
   );
   const namespacesQuery = useNamespacesQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
     withResourceQuota: true,
     withUnhealthyEvents: true,
   });

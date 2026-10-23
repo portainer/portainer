@@ -11,8 +11,8 @@ angular.module('portainer.app').factory('BackupService', [
       return Backup.download({}, payload).$promise;
     };
 
-    service.uploadBackup = function (file, password) {
-      return FileUploadService.uploadBackup(file, password);
+    service.uploadBackup = function (file, password, setupToken) {
+      return FileUploadService.uploadBackup(file, password, setupToken);
     };
 
     service.getS3Settings = function () {

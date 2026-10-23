@@ -6,8 +6,6 @@ import { validation as commonFieldsValidation } from '@/react/portainer/custom-t
 import { Platform } from '@/react/portainer/templates/types';
 import { variablesValidation } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField';
 import { buildGitValidationSchema } from '@/react/portainer/gitops/GitForm';
-import { useGitCredentials } from '@/react/portainer/account/git-credentials/git-credentials.service';
-import { useCurrentUser } from '@/react/hooks/useUser';
 import { useCustomTemplates } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplates';
 import { edgeFieldsetValidation } from '@/react/portainer/templates/custom-templates/CreateView/EdgeSettingsFieldset.validation';
 import { DeployMethod } from '@/react/portainer/gitops/types';
@@ -28,8 +26,6 @@ export function useValidation({
   viewType: 'kube' | 'docker' | 'edge';
   deployMethod: DeployMethod;
 }) {
-  const { user } = useCurrentUser();
-  const gitCredentialsQuery = useGitCredentials(user.Id);
   const customTemplatesQuery = useCustomTemplates({
     params: {
       edge: undefined,
@@ -60,12 +56,7 @@ export function useValidation({
         }),
         Git: mixed().when('Method', {
           is: git.value,
-          then: () =>
-            buildGitValidationSchema(
-              gitCredentialsQuery.data || [],
-              false,
-              deployMethod
-            ),
+          then: () => buildGitValidationSchema(deployMethod),
         }),
         Variables: variablesValidation(),
         EdgeSettings: viewType === 'edge' ? edgeFieldsetValidation() : mixed(),
@@ -74,11 +65,6 @@ export function useValidation({
           templates: customTemplatesQuery.data,
         })
       ),
-    [
-      customTemplatesQuery.data,
-      gitCredentialsQuery.data,
-      viewType,
-      deployMethod,
-    ]
+    [customTemplatesQuery.data, viewType, deployMethod]
   );
 }

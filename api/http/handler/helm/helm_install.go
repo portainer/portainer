@@ -16,6 +16,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/rs/zerolog/log"
 
 	"github.com/pkg/errors"
@@ -63,6 +64,10 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 	var payload installChartPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return httperror.BadRequest("Invalid Helm install payload", err)
+	}
+
+	if err := ssrf.CheckURL(r.Context(), payload.Repo); err != nil {
+		return httperror.BadRequest("Repository URL blocked by SSRF policy", err)
 	}
 
 	release, err := handler.installChart(r, payload, dryRun)

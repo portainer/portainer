@@ -49,11 +49,12 @@ func skipIfNoKubeconfig(tb testing.TB) string {
 func TestApplyDynamic(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name      string
-		manifests []string
-		wantErr   bool
-		errMsg    string
-		desc      string
+		name         string
+		manifests    []string
+		wantErr      bool
+		errMsg       string
+		desc         string
+		wantNoOutput bool
 	}{
 		{
 			name: "apply simple deployment",
@@ -482,6 +483,8 @@ data:
 ---`,
 			},
 			wantErr: false,
+			// The documents hold no resource, so there is nothing to report.
+			wantNoOutput: true,
 		},
 		{
 			name: "invalid yaml",
@@ -565,7 +568,7 @@ data:
 				if err != nil {
 					t.Errorf("ApplyDynamic() unexpected error = %v", err)
 				}
-				if output == "" && len(tt.manifests) > 0 && tt.manifests[0] != "" {
+				if !tt.wantNoOutput && output == "" && len(tt.manifests) > 0 && tt.manifests[0] != "" {
 					t.Errorf("ApplyDynamic() expected output but got empty string")
 				}
 			}
@@ -684,7 +687,8 @@ metadata:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := client.applyResource(t.Context(), dynamicClient, mapper, []byte(tt.yaml), tt.configuredNS)
+			setup := &applySetup{dynamicClient: dynamicClient, mapper: mapper, configuredNamespace: tt.configuredNS}
+			result, err := client.applyResource(t.Context(), setup, []byte(tt.yaml), false)
 
 			if tt.wantErr {
 				if err == nil {
@@ -698,8 +702,8 @@ metadata:
 				t.Errorf("unexpected error: %v", err)
 				return
 			}
-			if result == "" {
-				t.Error("expected non-empty result")
+			if result.Name == "" {
+				t.Error("expected the applied resource to be named")
 			}
 		})
 	}

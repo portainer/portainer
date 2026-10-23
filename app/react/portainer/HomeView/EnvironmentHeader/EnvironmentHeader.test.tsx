@@ -94,7 +94,7 @@ describe('EnvironmentHeader', () => {
         page: 0,
         search: '',
       }),
-      { reload: false }
+      { reload: false, location: 'replace' }
     );
   });
 
@@ -119,7 +119,7 @@ describe('EnvironmentHeader', () => {
         page: 0,
         search: '',
       }),
-      { reload: false }
+      { reload: false, location: 'replace' }
     );
   });
 });

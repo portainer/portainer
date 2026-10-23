@@ -9,6 +9,7 @@ import {
   Clipboard,
   Edit,
   Network,
+  Database,
 } from 'lucide-react';
 
 import {
@@ -21,7 +22,6 @@ import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
 
 import { SidebarItem } from './SidebarItem';
 import { DashboardLink } from './items/DashboardLink';
-import { VolumesLink } from './items/VolumesLink';
 import { SidebarParent } from './SidebarItem/SidebarParent';
 
 interface Props {
@@ -143,9 +143,11 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         data-cy="dockerSidebar-networks"
       />
 
-      <VolumesLink
-        environmentId={environmentId}
-        platformPath="docker"
+      <SidebarItem
+        to="docker.volumes"
+        params={{ endpointId: environmentId }}
+        icon={Database}
+        label="Volumes"
         data-cy="dockerSidebar-volumes"
       />
 

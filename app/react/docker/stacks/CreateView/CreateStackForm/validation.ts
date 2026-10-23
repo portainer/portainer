@@ -1,7 +1,6 @@
 import { object, array, number, mixed, SchemaOf, bool } from 'yup';
 
 import { accessControlFormValidation } from '@/react/portainer/access-control/AccessControlForm';
-import { GitCredential } from '@/react/portainer/account/git-credentials/types';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { nameValidation } from '@/react/docker/stacks/common/NameField';
 import { Stack } from '@/react/common/stacks/types';
@@ -19,17 +18,15 @@ export function getValidationSchema({
   environmentId,
   stacks,
   containerNames = [],
-  gitCredentials = [],
 }: {
   isAdmin: boolean;
   environmentId: EnvironmentId;
   stacks?: Array<Stack>;
   containerNames?: Array<string>;
-  gitCredentials?: Array<GitCredential>;
 }): SchemaOf<FormValues> {
   return getBaseValidationSchema({ isAdmin, environmentId, stacks }).concat(
     object({
-      git: getGitValidationSchema({ gitCredentials }).when('method', {
+      git: getGitValidationSchema().when('method', {
         is: 'repository',
         then: (schema) => schema.required(),
         otherwise: () => mixed(),

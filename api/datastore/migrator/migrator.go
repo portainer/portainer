@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
+	"github.com/portainer/portainer/api/dataservices/customtemplate"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/edgegroup"
 	"github.com/portainer/portainer/api/dataservices/edgejob"
@@ -21,12 +22,14 @@ import (
 	"github.com/portainer/portainer/api/dataservices/schedule"
 	"github.com/portainer/portainer/api/dataservices/settings"
 	"github.com/portainer/portainer/api/dataservices/snapshot"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/dataservices/stack"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
 	"github.com/portainer/portainer/api/dataservices/tunnelserver"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
+	"github.com/portainer/portainer/api/dataservices/workflow"
 	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/Masterminds/semver/v3"
@@ -64,6 +67,9 @@ type (
 		edgeGroupService        *edgegroup.Service
 		TunnelServerService     *tunnelserver.Service
 		pendingActionsService   *pendingactions.Service
+		customTemplateService   *customtemplate.Service
+		sourceService           *source.Service
+		workflowService         *workflow.Service
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
@@ -94,6 +100,9 @@ type (
 		EdgeGroupService        *edgegroup.Service
 		TunnelServerService     *tunnelserver.Service
 		PendingActionsService   *pendingactions.Service
+		CustomTemplateService   *customtemplate.Service
+		SourceService           *source.Service
+		WorkflowService         *workflow.Service
 	}
 )
 
@@ -126,6 +135,9 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		edgeGroupService:        parameters.EdgeGroupService,
 		TunnelServerService:     parameters.TunnelServerService,
 		pendingActionsService:   parameters.PendingActionsService,
+		customTemplateService:   parameters.CustomTemplateService,
+		sourceService:           parameters.SourceService,
+		workflowService:         parameters.WorkflowService,
 	}
 
 	migrator.initMigrations()
@@ -259,6 +271,18 @@ func (m *Migrator) initMigrations() {
 	m.addMigrations("2.33.1", m.migrateEdgeGroupEndpointsToRoars_2_33_0)
 
 	m.addMigrations("2.40.0", m.migrateRegistryAccessSASecrets_2_40_0)
+
+	m.addMigrations("2.43.0",
+		m.migrateGitConfigToSources_2_43_0,
+		m.migrateCustomTemplateGitConfigToSources_2_43_0,
+	)
+
+	m.addMigrations("2.44.0", m.backfillSourceInterval_2_44_0)
+
+	m.addMigrations("2.45.0",
+		m.cleanOrphanedWorkflowReferences_2_45_0,
+		m.pruneOrphanedStackArtifacts_2_45_0,
+	)
 
 	// WARNING: do not change migrations that have already been released!
 

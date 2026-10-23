@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { useEnvironment } from '@/react/portainer/environments/queries';
-import { useGroup } from '@/react/portainer/environments/environment-groups/queries';
+import { useGroup } from '@/react/portainer/environments/environment-groups/queries/useGroup';
 import { useUsers } from '@/portainer/users/queries';
 import { useTeams } from '@/react/portainer/users/teams/queries/useTeams';
 import { User } from '@/portainer/users/types';

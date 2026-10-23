@@ -5,20 +5,20 @@ import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { buildAgentUrl } from './build-url';
 
-interface Node {
+export interface AgentNode {
   IPAddress: string;
   NodeName: string;
   NodeRole: string;
 }
 
-export function useAgentNodes<T = Array<Node>>(
+export function useAgentNodes<T = Array<AgentNode>>(
   environmentId: EnvironmentId,
   apiVersion: number,
   {
     select,
     enabled,
   }: {
-    select?: (data: Array<Node>) => T;
+    select?: (data: Array<AgentNode>) => T;
     enabled?: boolean;
   } = {}
 ) {
@@ -34,7 +34,7 @@ export function useAgentNodes<T = Array<Node>>(
 
 async function getNodes(environmentId: EnvironmentId, apiVersion: number) {
   try {
-    const response = await axios.get<Array<Node>>(
+    const response = await axios.get<Array<AgentNode>>(
       buildAgentUrl(environmentId, apiVersion, 'agents')
     );
     return response.data;

@@ -2,7 +2,7 @@ import { Badge } from '@/react/components/Badge';
 import { localizeDate } from '@/react/common/date-utils';
 
 import { Alert } from '@@/Alert';
-import { Card } from '@@/Card';
+import { Card } from '@@/primitives/Card';
 
 import { HelmRelease } from '../types';
 import {
@@ -33,62 +33,64 @@ export function HelmSummary({ release }: Props) {
             {release.info?.description}
           </Alert>
         )}
-        <Card>
-          <div className="form-section-title">Details</div>
-          <div
-            className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm lg:grid-cols-2 xl:grid-cols-3"
-            data-cy="helm-release-info"
-          >
-            {!!release.namespace && (
-              <div className="min-w-0">
-                <span className="text-muted">Namespace: </span>
-                <span data-cy="helm-info-namespace">{release.namespace}</span>
-              </div>
-            )}
-            {!!release.version && (
-              <div className="min-w-0">
-                <span className="text-muted">Revision: </span>
-                <span data-cy="helm-info-revision">#{release.version}</span>
-              </div>
-            )}
-            {!!release.chart?.metadata?.name && (
-              <div className="min-w-0">
-                <span className="text-muted">Chart: </span>
-                <span data-cy="helm-info-chart">
-                  {release.chart.metadata.name}
-                </span>
-              </div>
-            )}
-            <ChartReferenceBadge chartReference={release.chartReference} />
-            {!!release.chart?.metadata?.appVersion && (
-              <div className="min-w-0">
-                <span className="text-muted">App version: </span>
-                <span data-cy="helm-info-app-version">
-                  {release.chart.metadata.appVersion}
-                </span>
-              </div>
-            )}
-            {!!release.chart?.metadata?.version && (
-              <div className="min-w-0">
-                <span className="text-muted">Chart version: </span>
-                <span className="inline-flex flex-wrap items-center gap-1">
-                  <span data-cy="helm-info-chart-version">
-                    {release.chart.metadata.name}-
-                    {release.chart.metadata.version}
+        <Card.Container variant="filled">
+          <Card.Body>
+            <div className="form-section-title">Details</div>
+            <div
+              className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm lg:grid-cols-2 xl:grid-cols-3"
+              data-cy="helm-release-info"
+            >
+              {!!release.namespace && (
+                <div className="min-w-0">
+                  <span className="text-muted">Namespace: </span>
+                  <span data-cy="helm-info-namespace">{release.namespace}</span>
+                </div>
+              )}
+              {!!release.version && (
+                <div className="min-w-0">
+                  <span className="text-muted">Revision: </span>
+                  <span data-cy="helm-info-revision">#{release.version}</span>
+                </div>
+              )}
+              {!!release.chart?.metadata?.name && (
+                <div className="min-w-0">
+                  <span className="text-muted">Chart: </span>
+                  <span data-cy="helm-info-chart">
+                    {release.chart.metadata.name}
                   </span>
-                </span>
-              </div>
-            )}
-            {!!release.info?.last_deployed && (
-              <div className="min-w-0">
-                <span className="text-muted">Last deployed: </span>
-                <span data-cy="helm-info-last-deployed">
-                  {localizeDate(new Date(release.info.last_deployed))}
-                </span>
-              </div>
-            )}
-          </div>
-        </Card>
+                </div>
+              )}
+              <ChartReferenceBadge chartReference={release.chartReference} />
+              {!!release.chart?.metadata?.appVersion && (
+                <div className="min-w-0">
+                  <span className="text-muted">App version: </span>
+                  <span data-cy="helm-info-app-version">
+                    {release.chart.metadata.appVersion}
+                  </span>
+                </div>
+              )}
+              {!!release.chart?.metadata?.version && (
+                <div className="min-w-0">
+                  <span className="text-muted">Chart version: </span>
+                  <span className="inline-flex flex-wrap items-center gap-1">
+                    <span data-cy="helm-info-chart-version">
+                      {release.chart.metadata.name}-
+                      {release.chart.metadata.version}
+                    </span>
+                  </span>
+                </div>
+              )}
+              {!!release.info?.last_deployed && (
+                <div className="min-w-0">
+                  <span className="text-muted">Last deployed: </span>
+                  <span data-cy="helm-info-last-deployed">
+                    {localizeDate(new Date(release.info.last_deployed))}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Card.Body>
+        </Card.Container>
       </div>
     </div>
   );

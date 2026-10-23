@@ -80,7 +80,10 @@ export function ConnectivityTestModal({
       <Modal.Body>
         <p className="mb-4">
           Run the command in the environment where the Edge Agent will be
-          deployed to verify it can reach the Portainer server.
+          deployed to verify it can reach the Portainer server. Each target is
+          announced before it is probed and its result printed as it completes.
+          Allow up to 30 seconds to finish, as an unreachable host has to time
+          out rather than fail outright.
         </p>
         <div className="mb-4">
           <SwitchField

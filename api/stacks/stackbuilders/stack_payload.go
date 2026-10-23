@@ -36,17 +36,18 @@ type StackPayload struct {
 }
 
 type RepositoryConfigPayload struct {
+	// SourceID references an existing Source.
+	// When non-zero, only ReferenceName is still applied.
+	SourceID portainer.SourceID
 	// URL of a Git repository hosting the Stack file
-	URL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	URL string `example:"https://github.com/openfaas/faas"`
 	// Reference name of a Git repository hosting the Stack file
 	ReferenceName string `example:"refs/heads/master"`
 	// Use basic authentication to clone the Git repository
 	Authentication bool `example:"true"`
 	// Username used in basic authentication. Required when RepositoryAuthentication is true
-	// and RepositoryGitCredentialID is 0
 	Username string `example:"myGitUsername"`
 	// Password used in basic authentication. Required when RepositoryAuthentication is true
-	// and RepositoryGitCredentialID is 0
 	Password string `example:"myGitPassword"`
 	// TLSSkipVerify skips SSL verification when cloning the Git repository
 	TLSSkipVerify bool `example:"false"`

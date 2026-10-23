@@ -45,6 +45,8 @@ func CreateDockerSnapshot(cli *client.Client) (*portainer.DockerSnapshot, error)
 		if err := dockerSnapshotNodes(dockerSnapshot, cli); err != nil {
 			log.Warn().Err(err).Msg("unable to snapshot Swarm nodes")
 		}
+	} else {
+		dockerSnapshot.NodeCount = 1
 	}
 
 	if err := dockerSnapshotContainers(dockerSnapshot, cli); err != nil {
@@ -102,10 +104,7 @@ func dockerSnapshotNodes(snapshot *portainer.DockerSnapshot, cli *client.Client)
 
 	snapshot.TotalCPU = int(nanoCpus / 1e9)
 	snapshot.TotalMemory = totalMem
-	snapshot.NodeCount = 1
-	if snapshot.Swarm {
-		snapshot.NodeCount = len(nodes)
-	}
+	snapshot.NodeCount = len(nodes)
 
 	return nil
 }

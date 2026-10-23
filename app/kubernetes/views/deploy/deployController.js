@@ -68,6 +68,7 @@ class KubernetesDeployController {
 
     this.formValues = {
       StackName: '',
+      SourceId: undefined,
       RepositoryURL: '',
       RepositoryReferenceName: '',
       RepositoryAuthentication: false,
@@ -160,8 +161,6 @@ class KubernetesDeployController {
 
     function automaticUpdatesLabel(repositoryAutomaticUpdates, repositoryMechanism) {
       switch (repositoryAutomaticUpdates && repositoryMechanism) {
-        case RepositoryMechanismTypes.INTERVAL:
-          return 'polling';
         case RepositoryMechanismTypes.WEBHOOK:
           return 'webhook';
         default:
@@ -308,13 +307,17 @@ class KubernetesDeployController {
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
-        payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
-        payload.RepositoryURL = this.formValues.RepositoryURL;
         payload.RepositoryReferenceName = this.formValues.RepositoryReferenceName;
-        payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
-        if (payload.RepositoryAuthentication) {
-          payload.RepositoryUsername = this.formValues.RepositoryUsername;
-          payload.RepositoryPassword = this.formValues.RepositoryPassword;
+        if (this.formValues.SourceId) {
+          payload.SourceId = this.formValues.SourceId;
+        } else {
+          payload.TLSSkipVerify = this.formValues.TLSSkipVerify;
+          payload.RepositoryURL = this.formValues.RepositoryURL;
+          payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
+          if (payload.RepositoryAuthentication) {
+            payload.RepositoryUsername = this.formValues.RepositoryUsername;
+            payload.RepositoryPassword = this.formValues.RepositoryPassword;
+          }
         }
         payload.ManifestFile = this.formValues.ComposeFilePathInRepository;
         payload.AdditionalFiles = this.formValues.AdditionalFiles;
@@ -371,10 +374,6 @@ class KubernetesDeployController {
       if (this.namespaces.length > 0) {
         this.formValues.Namespace = this.namespaces[0].Name;
       }
-      this.namespaceOptions = _.map(namespaces, (namespace) => ({
-        label: namespace.Name,
-        value: namespace.Name,
-      }));
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load namespaces data');
     }

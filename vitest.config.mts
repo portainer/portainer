@@ -18,12 +18,16 @@ export default defineConfig({
       './app/setup-tests/stub-modules.ts',
       './app/setup-tests/setup.ts',
       './app/setup-tests/setup-codemirror.ts',
+      './app/setup-tests/setup-fail-on-console.ts',
     ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules/', 'app/setup-tests/global-setup.js'],
     },
+    // The default includes package.json, which made `--changed` run the whole suite for
+    // any edit to it. Dependency changes move pnpm-lock.yaml, so key off that instead.
+    forceRerunTriggers: ['**/pnpm-lock.yaml', '**/{vitest,vite}.config.*'],
     bail: 2,
     include: ['./app/**/*.test.ts', './app/**/*.test.tsx'],
     env: {
@@ -38,5 +42,5 @@ export default defineConfig({
       return !/Can't perform a React state update on an unmounted component/.test(log);
     },
   },
-  plugins: [svgr({ include: /\?c$/ }), tsconfigPaths()],
+  plugins: [svgr({ include: /\?c$/ }), tsconfigPaths(), tsconfigPaths({ projects: ['./tsconfig.generated.json'] })],
 });

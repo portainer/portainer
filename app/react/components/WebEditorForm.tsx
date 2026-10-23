@@ -1,17 +1,11 @@
-import {
-  ReactNode,
-  ComponentProps,
-  PropsWithChildren,
-  useMemo,
-  useEffect,
-} from 'react';
-import { useTransitionHook } from '@uirouter/react';
+import { ReactNode, ComponentProps, PropsWithChildren, useMemo } from 'react';
 import { JSONSchema7 } from 'json-schema';
 
 import { CodeEditor } from '@@/CodeEditor';
 
 import { FormSectionTitle } from './form-components/FormSectionTitle';
 import { FormError } from './form-components/FormError';
+import { usePreventFormExit } from './form-components/usePreventFormExit';
 import { confirmWebEditorDiscard } from './modals/confirm';
 import { ShortcutsTooltip } from './CodeEditor/ShortcutsTooltip';
 
@@ -84,36 +78,7 @@ export function usePreventExit(
     [initialValue, value]
   );
 
-  const preventExit = check && isChanged;
-
-  // when navigating away from the page with unsaved changes, show a portainer prompt to confirm
-  useTransitionHook('onBefore', {}, async () => {
-    if (!preventExit) {
-      return true;
-    }
-    const confirmed = await confirmWebEditorDiscard();
-    return confirmed;
-  });
-
-  // when reloading or exiting the page with unsaved changes, show a browser prompt to confirm
-  useEffect(() => {
-    function handler(event: BeforeUnloadEvent) {
-      if (!preventExit) {
-        return undefined;
-      }
-
-      event.preventDefault();
-      // eslint-disable-next-line no-param-reassign
-      event.returnValue = '';
-      return '';
-    }
-
-    // if the form is changed, then set the onbeforeunload
-    window.addEventListener('beforeunload', handler);
-    return () => {
-      window.removeEventListener('beforeunload', handler);
-    };
-  }, [preventExit]);
+  usePreventFormExit(() => isChanged, check, confirmWebEditorDiscard);
 }
 
 function cleanText(value: string) {

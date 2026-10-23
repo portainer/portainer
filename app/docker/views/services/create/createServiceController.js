@@ -358,7 +358,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       input.ExtraNetworks.forEach(function (network) {
         networks.push({ Target: network.Name });
       });
-      config.Networks = _.uniqWith(networks, _.isEqual);
+      config.TaskTemplate.Networks = _.uniqWith(networks, _.isEqual);
     }
 
     function prepareHostsEntries(config, input) {
@@ -544,8 +544,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
-      var error = '';
-      error = FormValidator.validateAccessControl(accessControlData, isAdmin) || $scope.formValues.Secrets.$error || $scope.formValues.Configs.$error;
+      var error = FormValidator.validateAccessControl(accessControlData, isAdmin) || $scope.formValues.Secrets.$error || $scope.formValues.Configs.$error;
 
       if (error) {
         $scope.state.formValidationError = error;

@@ -22,26 +22,26 @@ func TestWorkflowsList_StackStatusDerivation(t *testing.T) {
 		expectedStatus ce.Status
 	}{
 		{
-			name:           "no deployment status → healthy",
+			name:           "no deployment status gives healthy",
 			expectedStatus: ce.StatusHealthy,
 		},
 		{
-			name:           "active → healthy",
+			name:           "active gives healthy",
 			deployStatus:   []portainer.StackDeploymentStatus{{Status: portainer.StackStatusActive}},
 			expectedStatus: ce.StatusHealthy,
 		},
 		{
-			name:           "error → error",
+			name:           "error gives error",
 			deployStatus:   []portainer.StackDeploymentStatus{{Status: portainer.StackStatusError}},
 			expectedStatus: ce.StatusError,
 		},
 		{
-			name:           "deploying → syncing",
+			name:           "deploying gives syncing",
 			deployStatus:   []portainer.StackDeploymentStatus{{Status: portainer.StackStatusDeploying}},
 			expectedStatus: ce.StatusSyncing,
 		},
 		{
-			name:           "inactive → paused",
+			name:           "inactive gives paused",
 			deployStatus:   []portainer.StackDeploymentStatus{{Status: portainer.StackStatusInactive}},
 			expectedStatus: ce.StatusPaused,
 		},
@@ -61,12 +61,12 @@ func TestWorkflowsList_StackStatusDerivation(t *testing.T) {
 			_, store := datastore.MustNewTestStore(t, false, true)
 
 			require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-				require.NoError(t, tx.Stack().Create(&portainer.Stack{
+				createGitStack(t, tx, &portainer.Stack{
 					ID:               1,
 					Name:             "status-stack",
 					DeploymentStatus: tc.deployStatus,
 					GitConfig:        gitConfig("https://github.com/x/y"),
-				}))
+				})
 
 				require.NoError(t, tx.User().Create(&portainer.User{ID: 1, Role: portainer.AdministratorRole}))
 				return nil

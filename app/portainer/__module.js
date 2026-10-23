@@ -252,6 +252,9 @@ angular
           id: {
             type: 'int',
           },
+          tab: {
+            dynamic: true,
+          },
         },
       };
 
@@ -265,23 +268,14 @@ angular
         },
       };
 
-      var groupAccess = {
-        name: 'portainer.groups.group.access',
-        url: '/access',
-        views: {
-          'content@': {
-            templateUrl: './views/groups/access/groupAccess.html',
-            controller: 'GroupAccessController',
-          },
-        },
-      };
-
       var home = {
         name: 'portainer.home',
         url: '/home?redirect&environmentId&environmentName&route&groupBy&groupFilter&search&order',
         params: {
-          ...paginationParams('Id'),
-          groupBy: filterParam('Id'),
+          ...paginationParams(),
+          sort: filterParam(),
+          order: filterParam(),
+          groupBy: filterParam(),
           groupFilter: filterParam(),
         },
         views: {
@@ -303,8 +297,11 @@ angular
       var workflows = {
         name: 'portainer.gitops.workflows',
         url: '/workflows?search&sort&order&page&pageSize&status&type&platform&groupBy&groupFilter',
+        data: { docs: '/user/app-delivery/workflows' },
         params: {
-          ...paginationParams('name'),
+          ...paginationParams(),
+          sort: filterParam(),
+          order: filterParam(),
           status: filterParam(),
           type: filterParam(),
           platform: filterParam(),
@@ -318,17 +315,53 @@ angular
         },
       };
 
+      var gitopsWorkflowDetail = {
+        name: 'portainer.gitops.workflows.item',
+        url: '/:workflowId',
+        views: {
+          'content@': {
+            component: 'workflowItemView',
+          },
+        },
+      };
+
       var gitopsSources = {
         name: 'portainer.gitops.sources',
         url: '/sources?search&sort&order&page&pageSize&status&type',
+        data: { docs: '/user/app-delivery/sources' },
         params: {
-          ...paginationParams('name'),
+          ...paginationParams(),
+          sort: filterParam(),
+          order: filterParam(),
           status: filterParam(),
           type: filterParam(),
         },
         views: {
           'content@': {
             component: 'sourcesListView',
+          },
+        },
+      };
+
+      var gitopsSourceDetail = {
+        name: 'portainer.gitops.sources.item',
+        url: '/:sourceId?tab',
+        params: {
+          tab: filterParam('settings'),
+        },
+        views: {
+          'content@': {
+            component: 'sourceItemView',
+          },
+        },
+      };
+
+      const gitopsSourceCreate = {
+        name: 'portainer.gitops.sources.new',
+        url: '/new',
+        views: {
+          'content@': {
+            component: 'sourceCreateView',
           },
         },
       };
@@ -352,6 +385,16 @@ angular
           'content@': {
             templateUrl: './views/init/admin/initAdmin.html',
             controller: 'InitAdminController',
+          },
+        },
+      };
+
+      const initEdge = {
+        name: 'portainer.init.edge',
+        url: '/edge',
+        views: {
+          'content@': {
+            component: 'initEdgeView',
           },
         },
       };
@@ -450,14 +493,17 @@ angular
       $stateRegistryProvider.register(edgeAutoCreateScript);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
-      $stateRegistryProvider.register(groupAccess);
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(gitopsBase);
       $stateRegistryProvider.register(workflows);
+      $stateRegistryProvider.register(gitopsWorkflowDetail);
       $stateRegistryProvider.register(gitopsSources);
+      $stateRegistryProvider.register(gitopsSourceDetail);
+      $stateRegistryProvider.register(gitopsSourceCreate);
       $stateRegistryProvider.register(init);
       $stateRegistryProvider.register(initAdmin);
+      $stateRegistryProvider.register(initEdge);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
       $stateRegistryProvider.register(settingsEdgeCompute);

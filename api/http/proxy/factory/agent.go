@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/url"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -40,21 +41,31 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 	}
 
 	endpointURL.Scheme = "http"
-	httpTransport := &http.Transport{}
 
+	var innerTransport *http.Transport
 	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-		config, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
 		if err != nil {
 			return nil, errors.WithMessage(err, "failed generating tls configuration")
 		}
 
-		httpTransport.TLSClientConfig = config
 		endpointURL.Scheme = "https"
+
+		if endpointutils.IsEdgeEndpoint(endpoint) {
+			innerTransport = ssrf.NewInternalTransport(tlsConfig)
+		} else {
+			innerTransport = ssrf.NewTransport(tlsConfig)
+			innerTransport.Protocols = ssrf.HTTP1Only()
+		}
+	} else if endpointutils.IsEdgeEndpoint(endpoint) {
+		innerTransport = ssrf.NewInternalTransport(nil)
+	} else {
+		innerTransport = ssrf.NewTransport(nil)
 	}
 
 	proxy := NewSingleHostReverseProxyWithHostHeader(endpointURL)
 
-	proxy.Transport = agent.NewTransport(factory.signatureService, httpTransport)
+	proxy.Transport = agent.NewTransport(factory.signatureService, innerTransport)
 
 	proxyServer := &ProxyServer{
 		server: &http.Server{

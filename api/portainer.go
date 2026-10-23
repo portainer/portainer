@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"time"
 
@@ -20,16 +21,18 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/segmentio/encoding/json"
 	"golang.org/x/oauth2"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/client-go/tools/remotecommand"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 type (
 	// AccessPolicy represent a policy that can be associated to a user or team
 	AccessPolicy struct {
 		// Role identifier. Reference the role that will be associated to this access policy
-		RoleID RoleID `json:"RoleId" example:"1"`
+		RoleID RoleID `json:"RoleId" example:"1" validate:"required"`
 		// Namespaces is a list of namespaces that this access policy applies to. Only used for namespaced level roles
 		Namespaces []string `json:"Namespaces,omitempty"`
 	}
@@ -49,6 +52,8 @@ type (
 	// AutoUpdateSettings represents the git auto sync config for stack deployment
 	AutoUpdateSettings struct {
 		// Auto update interval
+		// Deprecated: polling interval now lives on the associated Source (Source.Interval).
+		// Kept for DB backwards-compatibility only; new code must not read or write this field.
 		Interval string `example:"1m30s"`
 		// A UUID generated from client
 		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
@@ -64,11 +69,11 @@ type (
 	// environment(endpoint).
 	AzureCredentials struct {
 		// Azure application ID
-		ApplicationID string `json:"ApplicationID" example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"`
+		ApplicationID string `json:"ApplicationID" example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4" validate:"required"`
 		// Azure tenant ID
-		TenantID string `json:"TenantID" example:"34ddc78d-4fel-2358-8cc1-df84c8o839f5"`
+		TenantID string `json:"TenantID" example:"34ddc78d-4fel-2358-8cc1-df84c8o839f5" validate:"required"`
 		// Azure authentication key
-		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
+		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=" validate:"required"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -111,6 +116,10 @@ type (
 		KubectlShellImageSet      bool
 		PullLimitCheckDisabled    *bool
 		TrustedOrigins            *string
+		NoSetupToken              *bool
+		SetupToken                *string
+		EdgePortainerURL          *string
+		EdgeTrustOnFirstConnect   *bool
 	}
 
 	// CustomTemplateVariableDefinition
@@ -150,6 +159,7 @@ type (
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Variables       []CustomTemplateVariableDefinition
 		GitConfig       *gittypes.RepoConfig `json:"GitConfig"`
+		Artifact        *Artifact            `json:"artifact,omitempty"`
 		// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
 		// EdgeTemplate indicates if this template purpose for Edge Stack
@@ -185,27 +195,27 @@ type (
 
 	// DockerSnapshot represents a snapshot of a specific Docker environment(endpoint) at a specific time
 	DockerSnapshot struct {
-		Time                    int64               `json:"Time"`
-		DockerVersion           string              `json:"DockerVersion"`
-		Swarm                   bool                `json:"Swarm"`
-		TotalCPU                int                 `json:"TotalCPU"`
-		TotalMemory             int64               `json:"TotalMemory"`
-		ContainerCount          int                 `json:"ContainerCount"`
-		RunningContainerCount   int                 `json:"RunningContainerCount"`
-		StoppedContainerCount   int                 `json:"StoppedContainerCount"`
-		HealthyContainerCount   int                 `json:"HealthyContainerCount"`
-		UnhealthyContainerCount int                 `json:"UnhealthyContainerCount"`
-		VolumeCount             int                 `json:"VolumeCount"`
-		ImageCount              int                 `json:"ImageCount"`
-		ServiceCount            int                 `json:"ServiceCount"`
-		StackCount              int                 `json:"StackCount"`
+		Time                    int64               `json:"Time" validate:"required"`
+		DockerVersion           string              `json:"DockerVersion" validate:"required"`
+		Swarm                   bool                `json:"Swarm" validate:"required"`
+		TotalCPU                int                 `json:"TotalCPU" validate:"required"`
+		TotalMemory             int64               `json:"TotalMemory" validate:"required"`
+		ContainerCount          int                 `json:"ContainerCount" validate:"required"`
+		RunningContainerCount   int                 `json:"RunningContainerCount" validate:"required"`
+		StoppedContainerCount   int                 `json:"StoppedContainerCount" validate:"required"`
+		HealthyContainerCount   int                 `json:"HealthyContainerCount" validate:"required"`
+		UnhealthyContainerCount int                 `json:"UnhealthyContainerCount" validate:"required"`
+		VolumeCount             int                 `json:"VolumeCount" validate:"required"`
+		ImageCount              int                 `json:"ImageCount" validate:"required"`
+		ServiceCount            int                 `json:"ServiceCount" validate:"required"`
+		StackCount              int                 `json:"StackCount" validate:"required"`
 		SnapshotRaw             DockerSnapshotRaw   `json:"DockerSnapshotRaw"`
-		NodeCount               int                 `json:"NodeCount"`
-		GpuUseAll               bool                `json:"GpuUseAll"`
-		GpuUseList              []string            `json:"GpuUseList"`
-		IsPodman                bool                `json:"IsPodman"`
-		DiagnosticsData         *DiagnosticsData    `json:"DiagnosticsData"`
-		PerformanceMetrics      *PerformanceMetrics `json:"PerformanceMetrics"`
+		NodeCount               int                 `json:"NodeCount" validate:"required"`
+		GpuUseAll               bool                `json:"GpuUseAll" validate:"required"`
+		GpuUseList              []string            `json:"GpuUseList,omitempty"`
+		IsPodman                bool                `json:"IsPodman" validate:"required"`
+		DiagnosticsData         *DiagnosticsData    `json:"DiagnosticsData,omitempty"`
+		PerformanceMetrics      *PerformanceMetrics `json:"PerformanceMetrics,omitempty"`
 	}
 
 	// PerformanceMetrics represents the performance metrics of a Docker, Swarm, Podman, and Kubernetes environments
@@ -225,10 +235,10 @@ type (
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	DockerSnapshotRaw struct {
-		Containers []DockerContainerSnapshot `json:"Containers" swaggerignore:"true"`
+		Containers []DockerContainerSnapshot `json:"Containers,omitempty" swaggerignore:"true"`
 		Volumes    volume.ListResponse       `json:"Volumes" swaggerignore:"true"`
-		Networks   []network.Summary         `json:"Networks" swaggerignore:"true"`
-		Images     []image.Summary           `json:"Images" swaggerignore:"true"`
+		Networks   []network.Summary         `json:"Networks,omitempty" swaggerignore:"true"`
+		Images     []image.Summary           `json:"Images,omitempty" swaggerignore:"true"`
 		Info       system.Info               `json:"Info" swaggerignore:"true"`
 		Version    types.Version             `json:"Version" swaggerignore:"true"`
 	}
@@ -240,7 +250,7 @@ type (
 		Name         string                `json:"Name"`
 		Dynamic      bool                  `json:"Dynamic"`
 		TagIDs       []TagID               `json:"TagIds"`
-		EndpointIDs  roar.Roar[EndpointID] `json:"EndpointIds"`
+		EndpointIDs  roar.Roar[EndpointID] `json:"EndpointIds" validate:"optional"`
 		PartialMatch bool                  `json:"PartialMatch"`
 
 		// Deprecated: only used for API responses
@@ -316,6 +326,8 @@ type (
 		ReferenceName string `json:"ReferenceName,omitempty"`
 		// AdditionalFiles are the additional files used for deploying the stack
 		AdditionalFiles []string `json:"AdditionalFiles,omitempty"`
+		// SourceID is the Source used for deploying the stack
+		SourceID SourceID `json:"SourceID,omitempty"`
 	}
 
 	// EdgeStack represents an edge stack
@@ -439,46 +451,46 @@ type (
 	// to connect to it
 	Endpoint struct {
 		// Environment(Endpoint) Identifier
-		ID EndpointID `json:"Id" example:"1"`
+		ID EndpointID `json:"Id" example:"1" validate:"required"`
 		// Environment(Endpoint) name
-		Name string `json:"Name" example:"my-environment"`
+		Name string `json:"Name" example:"my-environment" validate:"required"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
-		Type EndpointType `json:"Type" example:"1"`
-		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environmentes, otherwise '' for kubernetes environments.
-		ContainerEngine string `json:"ContainerEngine" example:"docker"`
+		Type EndpointType `json:"Type" example:"1" validate:"required"`
+		// ContainerEngine represents the container engine type. This can be 'docker' or 'podman' when interacting directly with these environments, otherwise '' for kubernetes environments.
+		ContainerEngine string `json:"ContainerEngine" example:"docker" validate:"required"`
 		// URL or IP address of the Docker host associated to this environment(endpoint)
-		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
+		URL string `json:"URL" example:"docker.mydomain.tld:2375" validate:"required"`
 		// Environment(Endpoint) group identifier
-		GroupID EndpointGroupID `json:"GroupId" example:"1"`
+		GroupID EndpointGroupID `json:"GroupId" example:"1" validate:"required"`
 		// URL or IP address where exposed containers will be reachable
-		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		Gpus             []Pair           `json:"Gpus"`
-		TLSConfig        TLSConfiguration `json:"TLSConfig"`
+		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375" validate:"required"`
+		Gpus             []Pair           `json:"Gpus,omitempty"`
+		TLSConfig        TLSConfiguration `json:"TLSConfig" validate:"required"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitzero"`
 		// List of tag identifiers to which this environment(endpoint) is associated
-		TagIDs []TagID `json:"TagIds"`
-		// The status of the environment(endpoint) (1 - up, 2 - down)
-		Status EndpointStatus `json:"Status" example:"1"`
+		TagIDs []TagID `json:"TagIds,omitempty"`
+		// The status of the environment(endpoint) (1 - up, 2 - down, 3 - provisioning, 4 - error)
+		Status EndpointStatus `json:"Status,omitempty" example:"1" enums:"1,2,3,4"`
 		// List of snapshots
-		Snapshots []DockerSnapshot `json:"Snapshots"`
+		Snapshots []DockerSnapshot `json:"Snapshots,omitempty"`
 		// List of user identifiers authorized to connect to this environment(endpoint)
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies,omitempty"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies,omitempty"`
 		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty"`
 		// The key which is used to map the agent to Portainer
-		EdgeKey string `json:"EdgeKey"`
+		EdgeKey string `json:"EdgeKey" validate:"required"`
 		// The check in interval for edge agent (in seconds)
-		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
+		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5" validate:"required"`
 		// Associated Kubernetes data
-		Kubernetes KubernetesData `json:"Kubernetes"`
+		Kubernetes KubernetesData `json:"Kubernetes" validate:"required"`
 		// Maximum version of docker-compose
-		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
+		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8" validate:"required"`
 		// Environment(Endpoint) specific security settings
-		SecuritySettings EndpointSecuritySettings
+		SecuritySettings EndpointSecuritySettings `validate:"required"`
 		// LastCheckInDate mark last check-in date on checkin
-		LastCheckInDate int64
+		LastCheckInDate int64 `validate:"required"`
 		// Heartbeat indicates the heartbeat status of an edge environment
 		Heartbeat bool `json:"Heartbeat" example:"true"`
 
@@ -486,43 +498,46 @@ type (
 		UserTrusted bool `json:"UserTrusted,omitempty"`
 
 		// Whether we need to run any "post init migrations".
-		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
+		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations" swaggerignore:"true"`
 
-		Edge EnvironmentEdgeSettings
+		Edge EnvironmentEdgeSettings `validate:"required"`
 
-		Agent struct {
-			Version string `example:"1.0.0"`
-		}
+		Agent EnvironmentAgentData `validate:"required"`
 
 		EnableGPUManagement bool `json:"EnableGPUManagement,omitempty"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
-		TLS           bool   `json:"TLS,omitempty"`
-		TLSCACertPath string `json:"TLSCACert,omitempty"`
-		TLSCertPath   string `json:"TLSCert,omitempty"`
-		TLSKeyPath    string `json:"TLSKey,omitempty"`
+		TLS           bool   `json:"TLS,omitempty" swaggerignore:"true"`
+		TLSCACertPath string `json:"TLSCACert,omitempty" swaggerignore:"true"`
+		TLSCertPath   string `json:"TLSCert,omitempty" swaggerignore:"true"`
+		TLSKeyPath    string `json:"TLSKey,omitempty" swaggerignore:"true"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers,omitempty" swaggerignore:"true"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams,omitempty" swaggerignore:"true"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags"`
+		Tags []string `json:"Tags,omitempty" swaggerignore:"true"`
 
 		// Deprecated v2.18
-		IsEdgeDevice bool `json:"IsEdgeDevice,omitempty"`
+		IsEdgeDevice bool `json:"IsEdgeDevice,omitempty" swaggerignore:"true"`
+	}
+
+	// EnvironmentAgentData represents the data associated to an agent deployed
+	EnvironmentAgentData struct {
+		Version string `json:"Version,omitempty" example:"1.0.0"`
 	}
 
 	EnvironmentEdgeSettings struct {
 		// Whether the device has been started in edge async mode
-		AsyncMode bool
+		AsyncMode bool `validate:"required"`
 		// The ping interval for edge agent - used in edge async mode [seconds]
-		PingInterval int `json:"PingInterval" example:"60"`
+		PingInterval int `json:"PingInterval" example:"60" validate:"required"`
 		// The snapshot interval for edge agent - used in edge async mode [seconds]
-		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		SnapshotInterval int `json:"SnapshotInterval" example:"60" validate:"required"`
 		// The command list interval for edge agent - used in edge async mode [seconds]
-		CommandInterval int `json:"CommandInterval" example:"60"`
+		CommandInterval int `json:"CommandInterval" example:"60" validate:"required"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -533,30 +548,31 @@ type (
 	// An environment(endpoint) may belong to only 1 environment(endpoint) group.
 	EndpointGroup struct {
 		// Environment(Endpoint) group Identifier
-		ID EndpointGroupID `json:"Id" example:"1"`
+		ID EndpointGroupID `json:"Id" example:"1" validate:"required"`
 		// Environment(Endpoint) group name
-		Name string `json:"Name" example:"my-environment-group"`
+		Name string `json:"Name" example:"my-environment-group" validate:"required"`
 		// Description associated to the environment(endpoint) group
-		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		Description        string             `json:"Description" example:"Environment(Endpoint) group description" validate:"required"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies,omitempty"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies,omitempty"`
 		// List of tags associated to this environment(endpoint) group
-		TagIDs []TagID `json:"TagIds"`
+		TagIDs []TagID `json:"TagIds,omitempty"`
 
 		// Deprecated fields
-		Labels []Pair `json:"Labels"`
+		Labels []Pair `json:"Labels,omitempty" swaggerignore:"true"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers,omitempty" swaggerignore:"true"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams,omitempty" swaggerignore:"true"`
 
 		// Deprecated in DBVersion == 22
-		Tags []string `json:"Tags,omitempty"`
+		Tags []string `json:"Tags,omitempty" swaggerignore:"true"`
 	}
 
 	PolicyChartSummary struct {
-		ChartName   string `json:"ChartName"`
-		Fingerprint string `json:"Fingerprint"`
+		ChartName   string   `json:"ChartName"`
+		Fingerprint string   `json:"Fingerprint"`
+		PolicyID    PolicyID `json:"PolicyID,omitempty"` // 0 when server hasn't populated the field
 	}
 
 	PolicyChartStatus struct {
@@ -578,13 +594,20 @@ type (
 	}
 
 	PolicyChartBundle struct {
-		PolicyChartSummary  `mapstructure:",squash"`
-		EncodedTgz          string             `json:"EncodedTgz"`
-		Namespace           string             `json:"Namespace"`
+		PolicyChartSummary `mapstructure:",squash"`
+		EncodedTgz         string `json:"EncodedTgz"`
+		Namespace          string `json:"Namespace"`
+		ReleaseName        string `json:"ReleaseName,omitempty"`
+		// Base64 YAML kubectl-applied by the agent before Helm install when set (e.g. Gatekeeper gatekeeper-system namespace + PSA labels).
 		PreReleaseManifest  string             `json:"PreReleaseManifest,omitempty"`
 		EncodedValues       string             `json:"EncodedValues"`
 		PreInstallDeletions []ResourceDeletion `json:"PreInstallDeletions,omitempty"`
 		PreInstallAdoptions []ResourceAdoption `json:"PreInstallAdoptions,omitempty"`
+		// WaitForCRDs lists CRD names that must be registered in API discovery after
+		// this chart installs before the agent proceeds to the next chart.
+		WaitForCRDs []string `json:"WaitForCRDs,omitempty"`
+		// NoWait disables waiting for pods to be ready after install.
+		NoWait bool `json:"NoWait,omitempty"`
 	}
 
 	// ResourceDeletion identifies an existing Kubernetes resource to delete before policy install
@@ -613,6 +636,65 @@ type (
 
 	PolicyID int
 
+	// PolicyDesiredState is the per-policy desired state sent from server to agent
+	// in PollStatusResponse.PolicyStates (per-policy payload format).
+	PolicyDesiredState struct {
+		PolicyID    PolicyID `json:"policyID"`
+		Type        string   `json:"type"`        // e.g. "helm-k8s"
+		Fingerprint string   `json:"fingerprint"` // install-affecting only; restore manifest excluded
+		Config      []byte   `json:"config"`      // handler-specific config blob (e.g. HelmPolicyConfig JSON)
+	}
+
+	// PolicyStatesAsyncPayload is the value of an async "policyStates" command.
+	// States carries per-policy desired state; ChartBundles carries helm chart tarballs
+	// for policies that need installing (emitted only on mutation, never idle polls).
+	PolicyStatesAsyncPayload struct {
+		States        []PolicyDesiredState  `json:"states"`
+		ChartBundles  []PolicyChartBundle   `json:"chartBundles,omitempty"`
+		RestoreBundle RestoreSettingsBundle `json:"restoreBundle,omitempty"`
+	}
+
+	// PolicyActualState is the per-policy actual state reported by the agent
+	// via PUT /endpoints/{id}/edge/policies/statuses.
+	PolicyActualState struct {
+		PolicyID    PolicyID `json:"policyID"`
+		Type        string   `json:"type"`
+		Fingerprint string   `json:"fingerprint"`
+		Status      string   `json:"status"` // applying|applied|failed|removing
+		Message     string   `json:"message,omitempty"`
+	}
+
+	// HelmPolicyConfig is the Config payload for "helm-k8s" PolicyDesiredState entries.
+	// Bundles are not included in the poll response Config — they travel separately
+	// (sync: on-demand GetCharts; async: PolicyStatesCommandPayload.ChartBundles).
+	// RestoreSettings is helm-internal metadata and is intentionally NOT part of the
+	// fingerprint — see Fingerprint contract in reconcile-refactor-plan.md.
+	HelmPolicyConfig struct {
+		Charts          []PolicyChartSummary `json:"charts"`
+		Bundles         []PolicyChartBundle  `json:"bundles,omitempty"`
+		RestoreSettings *RestoreSettings     `json:"restoreSettings,omitempty"`
+	}
+
+	// ResourcePatchConfig is the Config payload for resource-patch-k8s PolicyDesiredState entries:
+	// a policy-agnostic set of field patches the agent applies authoritatively and reverses on detach.
+	ResourcePatchConfig struct {
+		Patches []ResourcePatchOperation `json:"patches"`
+	}
+
+	// ResourcePatchOperation is the patcher operation details for the agent to apply.
+	ResourcePatchOperation struct {
+		APIVersion       string                     `json:"apiVersion"`
+		Kind             string                     `json:"kind"`
+		Resource         string                     `json:"resource"`
+		Name             string                     `json:"name"`
+		Namespace        string                     `json:"namespace,omitempty"`
+		FieldPath        []string                   `json:"fieldPath"`
+		Values           map[string]json.RawMessage `json:"values"`
+		OwnedKeyPrefixes []string                   `json:"ownedKeyPrefixes"`
+		Exclusive        bool                       `json:"exclusive,omitempty"`
+		CreateIfMissing  bool                       `json:"createIfMissing,omitempty"`
+	}
+
 	// PolicyType represents the type of policy
 	PolicyType string
 )
@@ -634,25 +716,25 @@ type (
 	// EndpointSecuritySettings represents settings for an environment(endpoint)
 	EndpointSecuritySettings struct {
 		// Whether non-administrator should be able to use bind mounts when creating containers
-		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
+		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false" validate:"required"`
 		// Whether non-administrator should be able to use privileged mode when creating containers
-		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
+		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false" validate:"required"`
 		// Whether non-administrator should be able to browse volumes
-		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
+		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to use the host pid
-		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
+		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to use device mapping
-		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
+		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to manage stacks
-		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
+		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to use container capabilities
-		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to use sysctl settings
-		AllowSysctlSettingForRegularUsers bool `json:"allowSysctlSettingForRegularUsers" example:"true"`
+		AllowSysctlSettingForRegularUsers bool `json:"allowSysctlSettingForRegularUsers" example:"true" validate:"required"`
 		// Whether non-administrator should be able to use security-opt settings
-		AllowSecurityOptForRegularUsers bool `json:"allowSecurityOptForRegularUsers" example:"true"`
+		AllowSecurityOptForRegularUsers bool `json:"allowSecurityOptForRegularUsers" example:"true" validate:"required"`
 		// Whether host management features are enabled
-		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
+		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true" validate:"required"`
 	}
 
 	// EndpointType represents the type of an environment(endpoint)
@@ -763,28 +845,32 @@ type (
 
 	// KubernetesData contains all the Kubernetes related environment(endpoint) information
 	KubernetesData struct {
-		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
-		Configuration KubernetesConfiguration `json:"Configuration"`
-		Flags         KubernetesFlags         `json:"Flags"`
+		Snapshots     []KubernetesSnapshot    `json:"Snapshots,omitempty"`
+		Configuration KubernetesConfiguration `json:"Configuration" validate:"required"`
+		Flags         KubernetesFlags         `json:"Flags" validate:"required"`
 	}
 
 	// KubernetesFlags are used to detect if we need to run initial cluster
 	// detection again.
 	KubernetesFlags struct {
-		IsServerMetricsDetected      bool `json:"IsServerMetricsDetected"`
-		IsServerIngressClassDetected bool `json:"IsServerIngressClassDetected"`
-		IsServerStorageDetected      bool `json:"IsServerStorageDetected"`
+		IsServerMetricsDetected      bool `json:"IsServerMetricsDetected" validate:"required"`
+		IsServerIngressClassDetected bool `json:"IsServerIngressClassDetected" validate:"required"`
+		IsServerStorageDetected      bool `json:"IsServerStorageDetected" validate:"required"`
+		GPUOperator                  bool `json:"GPUOperator,omitempty"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
 	KubernetesSnapshot struct {
-		Time               int64               `json:"Time"`
-		KubernetesVersion  string              `json:"KubernetesVersion"`
-		NodeCount          int                 `json:"NodeCount"`
-		TotalCPU           int64               `json:"TotalCPU"`
-		TotalMemory        int64               `json:"TotalMemory"`
-		DiagnosticsData    *DiagnosticsData    `json:"DiagnosticsData"`
-		PerformanceMetrics *PerformanceMetrics `json:"PerformanceMetrics"`
+		Time               int64               `json:"Time" validate:"required"`
+		KubernetesVersion  string              `json:"KubernetesVersion" validate:"required"`
+		NodeCount          int                 `json:"NodeCount" validate:"required"`
+		TotalCPU           int64               `json:"TotalCPU" validate:"required"`
+		TotalMemory        int64               `json:"TotalMemory" validate:"required"`
+		ClusterType        string              `json:"ClusterType,omitempty"`
+		GPUNodeCount       int                 `json:"GPUNodeCount,omitempty"`
+		TotalGPU           map[string]int64    `json:"TotalGPU,omitempty"`
+		DiagnosticsData    *DiagnosticsData    `json:"DiagnosticsData,omitempty"`
+		PerformanceMetrics *PerformanceMetrics `json:"PerformanceMetrics,omitempty"`
 	}
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
@@ -793,27 +879,27 @@ type (
 		UseServerMetrics                bool                           `json:"UseServerMetrics"`
 		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit"`
 		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage"`
-		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
+		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses,omitempty"`
+		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses,omitempty"`
 		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
-		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
-		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass"`
+		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace" validate:"required"`
+		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass" validate:"required"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
 	KubernetesStorageClassConfig struct {
-		Name                 string   `json:"Name"`
-		AccessModes          []string `json:"AccessModes"`
-		Provisioner          string   `json:"Provisioner"`
-		AllowVolumeExpansion bool     `json:"AllowVolumeExpansion"`
+		Name                 string   `json:"Name" validate:"required"`
+		AccessModes          []string `json:"AccessModes,omitempty"`
+		Provisioner          string   `json:"Provisioner" validate:"required"`
+		AllowVolumeExpansion bool     `json:"AllowVolumeExpansion" validate:"required"`
 	}
 
 	// KubernetesIngressClassConfig represents a Kubernetes Ingress Class configuration
 	KubernetesIngressClassConfig struct {
-		Name              string   `json:"Name"`
-		Type              string   `json:"Type"`
+		Name              string   `json:"Name" validate:"required"`
+		Type              string   `json:"Type" validate:"required"`
 		GloballyBlocked   bool     `json:"Blocked"`
-		BlockedNamespaces []string `json:"BlockedNamespaces"`
+		BlockedNamespaces []string `json:"BlockedNamespaces,omitempty"`
 	}
 
 	// KubernetesShellPod represents a Kubectl Shell details to facilitate pod exec functionality
@@ -905,8 +991,8 @@ type (
 
 	// Pair defines a key/value string pair
 	Pair struct {
-		Name  string `json:"name" example:"name"`
-		Value string `json:"value" example:"value"`
+		Name  string `json:"name" example:"name" validate:"required"`
+		Value string `json:"value" example:"value" validate:"required"`
 	}
 
 	// Registry represents a Docker registry with all the info required
@@ -1159,6 +1245,21 @@ type (
 	// SoftwareEdition represents an edition of Portainer
 	SoftwareEdition int
 
+	// AllowList holds the list of permitted outbound proxy destinations.
+	AllowList struct {
+		ID      AllowListKey `json:"Id"`
+		Mode    SSRFMode     `json:"Mode"`
+		Entries []string     `json:"Entries"`
+	}
+
+	// ParsedAllowList holds the three parsed forms of allow list entries.
+	ParsedAllowList struct {
+		Mode  SSRFMode
+		Nets  []*net.IPNet
+		Hosts map[string]bool
+		Wilds []string // stored as ".foo.com" ("*." prefix stripped)
+	}
+
 	// SSLSettings represents a pair of SSL certificate and key
 	SSLSettings struct {
 		CertPath    string `json:"certPath"`
@@ -1210,8 +1311,12 @@ type (
 		AutoUpdate *AutoUpdateSettings `json:"AutoUpdate"`
 		// The stack deployment option
 		Option *StackOption `json:"Option"`
-		// The git config of this stack
-		GitConfig *gittypes.RepoConfig
+		// GitConfig is the git repository configuration for git-backed stacks.
+		// Deprecated: loaded from Source via WorkflowID; kept for DB backwards-compatibility only.
+		// Non-migration code must not read or write this field; use Source records instead.
+		GitConfig *gittypes.RepoConfig `json:"GitConfig"`
+		// WorkflowID is the ID of the Workflow that owns the Source for this stack.
+		WorkflowID WorkflowID `json:"WorkflowID,omitempty"`
 		// CurrentDeploymentInfo records the git repository state at the time of the last actual deployment.
 		CurrentDeploymentInfo *StackDeploymentInfo `json:"CurrentDeploymentInfo,omitempty"`
 		// Whether the stack is from a app template
@@ -1239,6 +1344,34 @@ type (
 
 	// StackType represents the type of the stack (compose v2, stack deploy v3)
 	StackType int
+
+	// Source represents a GitOps source that can be referenced by stacks or deployments.
+	Source struct {
+		ID       SourceID            `json:"id" example:"1"`
+		Name     string              `json:"name" example:"my-source"`
+		LastSync int64               `json:"lastSync,omitempty" example:"1587399600"`
+		Type     SourceType          `json:"type" example:"1"`
+		Git      *gittypes.GitSource `json:"git,omitempty"`
+		Registry *Registry           `json:"registry,omitempty"`
+		Helm     *HelmConfig         `json:"helm,omitempty"`
+
+		Public             bool         `json:"public"`
+		AdministratorsOnly bool         `json:"administratorsOnly"`
+		UserAccesses       []UserID     `json:"userAccesses"`
+		TeamAccesses       []TeamID     `json:"teamAccesses"`
+		OwnerID            UserID       `json:"ownerID,omitempty"`
+		Status             SourceStatus `json:"status,omitempty"`
+		StatusError        string       `json:"statusError,omitempty"`
+		Interval           string       `json:"interval,omitempty" example:"5m"`
+	}
+
+	SourceStatus int
+
+	// SourceID represents a source identifier
+	SourceID int
+
+	// SourceType represents the type of a source
+	SourceType int
 
 	// Status represents the application status
 	Status struct {
@@ -1269,6 +1402,8 @@ type (
 		ID TeamID `json:"Id" example:"1"`
 		// Team name
 		Name string `json:"Name" example:"developers"`
+		// Whether members of this team are denied access to Portainer itself (EE only)
+		DenyPortainerAccess bool `json:"DenyPortainerAccess" example:"false"`
 	}
 
 	// TeamAccessPolicies represent the association of an access policy and a team
@@ -1419,9 +1554,9 @@ type (
 	// TLSConfiguration represents a TLS configuration
 	TLSConfiguration struct {
 		// Use TLS
-		TLS bool `json:"TLS" example:"true"`
+		TLS bool `json:"TLS" example:"true" validate:"required"`
 		// Skip the verification of the server TLS certificate
-		TLSSkipVerify bool `json:"TLSSkipVerify" example:"false"`
+		TLSSkipVerify bool `json:"TLSSkipVerify" example:"false" validate:"required"`
 		// Path to the TLS CA certificate file
 		TLSCACertPath string `json:"TLSCACert,omitempty" example:"/data/tls/ca.pem"`
 		// Path to the TLS client certificate file
@@ -1460,11 +1595,11 @@ type (
 	// User represents a user account
 	User struct {
 		// User Identifier
-		ID       UserID `json:"Id" example:"1"`
-		Username string `json:"Username" example:"bob"`
+		ID       UserID `json:"Id" example:"1" validate:"required"`
+		Username string `json:"Username" example:"bob" validate:"required"`
 		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role          UserRole          `json:"Role" example:"1"`
+		Role          UserRole          `json:"Role" example:"1" validate:"required"`
 		TokenIssueAt  int64             `json:"TokenIssueAt" example:"1"`
 		ThemeSettings UserThemeSettings `json:"ThemeSettings"`
 		UseCache      bool              `json:"UseCache" example:"true"`
@@ -1472,11 +1607,11 @@ type (
 		// Deprecated fields
 
 		// Deprecated
-		UserTheme string `json:"UserTheme,omitempty" example:"dark"`
+		UserTheme string `json:"UserTheme,omitempty" example:"dark" swaggerignore:"true"`
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations
+		PortainerAuthorizations Authorizations `swaggerignore:"true"`
 		// Deprecated in DBVersion == 25
-		EndpointAuthorizations EndpointAuthorizations
+		EndpointAuthorizations EndpointAuthorizations `swaggerignore:"true"`
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
@@ -1498,7 +1633,7 @@ type (
 	// UserThemeSettings represents the theme settings for a user
 	UserThemeSettings struct {
 		// Color represents the color theme of the UI
-		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto"`
+		Color string `json:"color" example:"dark" enums:"dark,light,highcontrast,auto,"`
 	}
 
 	// Webhook represents a url webhook that can be used to update a service
@@ -1518,6 +1653,37 @@ type (
 
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
+
+	// Artifact is one entry in a Workflow's artifact list, pairing target IDs with source files
+	Artifact struct {
+		StackID     StackID           `json:"stackId,omitempty"`
+		EdgeStackID EdgeStackID       `json:"edgeStackId,omitempty"`
+		Files       []ArtifactFile    `json:"files,omitempty"`
+		EnvIDs      []EndpointID      `json:"envIds,omitempty"`
+		EnvGroups   []EndpointGroupID `json:"envGroups,omitempty"`
+		EdgeGroups  []EdgeGroupID     `json:"edgeGroups,omitempty"`
+	}
+
+	// ArtifactFile represents one file within an artifact, tied to a specific source and location within it
+	ArtifactFile struct {
+		SourceID   SourceID     `json:"sourceId"`
+		Path       string       `json:"path,omitempty" example:"portainer.yaml"`
+		Ref        string       `json:"ref,omitempty" example:"refs/heads/main"`
+		Hash       string       `json:"hash,omitempty" example:"abc123"`
+		RefStatus  SourceStatus `json:"refStatus,omitempty"`
+		RefError   string       `json:"refError,omitempty"`
+		PathStatus SourceStatus `json:"pathStatus,omitempty"`
+		PathError  string       `json:"pathError,omitempty"`
+	}
+
+	// Workflow represents a GitOps workflow
+	Workflow struct {
+		ID        WorkflowID `json:"id" example:"1"`
+		Name      string     `json:"name,omitempty" example:"my-workflow"`
+		Artifacts []Artifact `json:"artifacts,omitempty"`
+	}
+
+	WorkflowID int
 
 	Snapshot struct {
 		EndpointID EndpointID          `json:"EndpointId"`
@@ -1723,6 +1889,7 @@ type (
 		SetIsKubeAdmin(isKubeAdmin bool)
 		GetClientNonAdminNamespaces() []string
 		SetClientNonAdminNamespaces([]string)
+		GetMetricsClient() metricsv.Interface
 		NamespaceAccessPoliciesDeleteNamespace(ns string) error
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -1731,6 +1898,7 @@ type (
 		// Applications
 		GetApplications(namespace, nodeName string) ([]models.K8sApplication, error)
 		GetApplicationsResource(namespace, node string) (models.K8sApplicationResource, error)
+		GetClusterNodes() ([]corev1.Node, error)
 
 		// ClusterRole
 		GetClusterRoles() ([]models.K8sClusterRole, error)
@@ -1738,6 +1906,9 @@ type (
 
 		// ConfigMap
 		GetConfigMap(namespace, configMapName string) (models.K8sConfigMap, error)
+		CreateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error)
+		UpdateConfigMap(namespace string, request models.K8sConfigMapWriteRequest) (models.K8sConfigMap, error)
+		DeleteConfigMap(namespace, name string) error
 		CombineConfigMapWithApplications(configMap models.K8sConfigMap) (models.K8sConfigMap, error)
 
 		// CronJob
@@ -1761,6 +1932,7 @@ type (
 		HasStackName(namespace string, stackName string) (bool, error)
 
 		// Ingress
+		GetIngressClasses() ([]models.K8sIngressClass, error)
 		GetIngressControllers() (models.K8sIngressControllers, error)
 		GetIngress(namespace, ingressName string) (models.K8sIngressInfo, error)
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
@@ -1793,7 +1965,28 @@ type (
 		GetMaxResourceLimits(skipNamespace string, overCommitEnabled bool, resourceOverCommitPercent int) (K8sNodeLimits, error)
 
 		// Pod
+		GetPods(namespace string, opts models.K8sResourceListOptions) ([]corev1.Pod, error)
+		GetPodLogsStream(ctx context.Context, namespace, podName string, opts corev1.PodLogOptions) (io.ReadCloser, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
+		DeletePod(namespace, name string) error
+		RestartPod(namespace, name string) error
+		SupportsPodRestart(ctx context.Context) (bool, error)
+
+		// ReplicaSet
+		GetReplicaSets(namespace, ownerDeployment string, opts models.K8sResourceListOptions) ([]appsv1.ReplicaSet, error)
+
+		// Deployment
+		GetDeployment(namespace, name string) (*appsv1.Deployment, error)
+		GetDeployments(namespace string, opts models.K8sResourceListOptions) ([]appsv1.Deployment, error)
+		CreateDeployment(namespace string, request models.K8sDeploymentWriteRequest) (*appsv1.Deployment, error)
+		UpdateDeployment(namespace string, request models.K8sDeploymentWriteRequest) (*appsv1.Deployment, error)
+		ScaleDeployment(namespace, name string, replicas int32) (*appsv1.Deployment, error)
+		PatchDeployment(namespace, name string, request models.K8sDeploymentPatchRequest) (*appsv1.Deployment, error)
+		RolloutUndo(namespace, name string, revision int64) (*appsv1.Deployment, error)
+		DeleteDeployment(namespace, name string) error
+
+		// ResourceQuota
+		GetResourceQuotas(namespace string) (*[]corev1.ResourceQuota, error)
 
 		// RBAC
 		IsRBACEnabled() (bool, error)
@@ -1813,6 +2006,9 @@ type (
 		// Secret
 		GetSecrets(namespace string) ([]models.K8sSecret, error)
 		GetSecret(namespace string, secretName string) (models.K8sSecret, error)
+		CreateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error)
+		UpdateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error)
+		DeleteSecret(namespace, name string) error
 		CombineSecretWithApplications(secret models.K8sSecret) (models.K8sSecret, error)
 
 		// ServiceAccount
@@ -1823,12 +2019,14 @@ type (
 		RemoveImagePullSecretFromServiceAccount(namespace, serviceAccountName, secretName string) error
 		UpdateServiceAccountImagePullSecrets(namespace, name string, secretNames []string) error
 		SetupUserServiceAccount(int, []int, bool) error
+		RemoveUserServiceAccountBindings(userID int) error
+		RemoveUserServiceAccount(userID int) error
 		GetPortainerUserServiceAccount(tokendata *TokenData) (*corev1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 
 		// Service
 		GetServices(namespace string) ([]models.K8sServiceInfo, error)
-		CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error)
+		CombineServicesWithApplications(namespace string, services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error)
 		CreateService(namespace string, info models.K8sServiceInfo) error
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		UpdateService(namespace string, info models.K8sServiceInfo) error
@@ -1843,6 +2041,25 @@ type (
 		GetVolumes(namespace string) ([]models.K8sVolumeInfo, error)
 		GetVolume(namespace, volumeName string) (*models.K8sVolumeInfo, error)
 		CombineVolumesWithApplications(volumes *[]models.K8sVolumeInfo) (*[]models.K8sVolumeInfo, error)
+
+		// StorageClass
+		GetStorageClasses() ([]models.K8sStorageClass, error)
+		GetStorageClass(name string) (*models.K8sStorageClass, error)
+		DeleteStorageClasses(names []string) error
+		SetDefaultStorageClass(name string) error
+
+		// PersistentVolume
+		GetPersistentVolumes() ([]models.K8sPersistentVolume, error)
+		GetPersistentVolume(name string) (*models.K8sPersistentVolume, error)
+		DeletePersistentVolumes(names []string) error
+		UpdatePersistentVolumeReclaimPolicy(name string, policy corev1.PersistentVolumeReclaimPolicy) error
+
+		// PersistentVolumeClaim
+		GetPersistentVolumeClaims(namespace string) ([]models.K8sPersistentVolumeClaim, error)
+		GetPersistentVolumeClaim(namespace, name string) (*models.K8sPersistentVolumeClaim, error)
+		CreatePersistentVolumeClaim(namespace string, request models.K8sPersistentVolumeClaimCreateRequest) (*models.K8sPersistentVolumeClaim, error)
+		DeletePersistentVolumeClaims(reqs models.K8sVolumeDeleteRequests) error
+		ResizePersistentVolumeClaim(namespace, name, newSize string) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
@@ -1900,14 +2117,15 @@ type (
 		Deploy(ctx context.Context, stack *Stack, prune bool, pullImage bool, endpoint *Endpoint, registries []Registry) error
 		Remove(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
+		CheckRunningStatus(ctx context.Context, stack *Stack, endpoint *Endpoint) (bool, error)
 	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.41.1"
+	APIVersion = "2.45.0"
 	// Support annotation for the API version ("STS" for Short-Term Support or "LTS" for Long-Term Support)
-	APIVersionSupport = "STS"
+	APIVersionSupport = "LTS"
 	// Edition is what this edition of Portainer is called
 	Edition = PortainerCE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1936,6 +2154,8 @@ const (
 	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// HTTPAlertStateHeaderName is the name of the header used to transmit edge alert evaluation state
 	HTTPAlertStateHeaderName = "X-PortainerAgent-AlertState"
+	// HTTPResponseAgentGPUOperator represents the name of the header indicating whether the GPU operator is enabled on the agent
+	HTTPResponseAgentGPUOperator = "Portainer-Agent-GPU-Operator"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
@@ -1959,6 +2179,8 @@ const (
 	AuthCookieKey = "portainer_api_key"
 	// PortainerCacheHeader is used to enabled FE caching for Kubernetes resources
 	PortainerCacheHeader = "X-Portainer-Cache"
+	// APIKeyHeader is the name of the header used for API key authentication
+	APIKeyHeader = "X-API-KEY"
 	// KubectlShellImageEnvVar is the environment variable used to override the default kubectl shell image
 	KubectlShellImageEnvVar = "KUBECTL_SHELL_IMAGE"
 	// PullLimitCheckDisabledEnvVar is the environment variable used to disable the pull limit check
@@ -1976,6 +2198,18 @@ const (
 	CSPEnvVar = "CSP"
 	// CompactDBEnvVar is the environment variable used to enable/disable the startup compaction of the database
 	CompactDBEnvVar = "COMPACT_DB"
+	// NoSetupTokenEnvVar is the environment variable used to disable the setup token requirement on an uninitialized instance
+	NoSetupTokenEnvVar = "PORTAINER_NO_SETUP_TOKEN"
+	// SetupTokenEnvVar is the environment variable used to provide a custom setup token for admin initialization and restore on an uninitialized instance
+	SetupTokenEnvVar = "PORTAINER_SETUP_TOKEN"
+	// CSRFAllowNoOriginEnvVar is the environment variable used to allow unsafe cookie-authenticated requests that carry no Origin or Sec-Fetch-Site header, reverting the CSRF protection to fail open for such requests
+	CSRFAllowNoOriginEnvVar = "CSRF_ALLOW_NO_ORIGIN"
+	// EdgeComputeEnvVar is the environment variable used to enable Edge Compute features
+	EdgeComputeEnvVar = "EDGE_COMPUTE"
+	// EdgePortainerURLEnvVar is the environment variable used to set the URL that edge agents connect back to
+	EdgePortainerURLEnvVar = "EDGE_PORTAINER_URL"
+	// EdgeTrustOnFirstConnectEnvVar is the environment variable used to auto-trust edge agents on first connect
+	EdgeTrustOnFirstConnectEnvVar = "EDGE_TRUST_ON_FIRST_CONNECT"
 )
 
 // List of supported features
@@ -2135,6 +2369,22 @@ const (
 	PortainerBE
 	// PortainerEE represents the business edition of Portainer
 	PortainerEE
+)
+
+const (
+	_ SourceType = iota
+	SourceTypeGit
+	SourceTypeRegistry
+	SourceTypeHelm
+)
+
+const (
+	// SourceStatusUnknown means the check has not been performed yet
+	SourceStatusUnknown SourceStatus = iota
+	// SourceStatusHealthy means the last check succeeded
+	SourceStatusHealthy
+	// SourceStatusError means the last check failed
+	SourceStatusError
 )
 
 const (
@@ -2495,16 +2745,22 @@ const (
 
 const (
 	// PolicyType constants
-	RbacK8s            PolicyType = "rbac-k8s"
-	SecurityK8s        PolicyType = "security-k8s"
-	SetupK8s           PolicyType = "setup-k8s"
-	RegistryK8s        PolicyType = "registry-k8s"
-	RbacDocker         PolicyType = "rbac-docker"
-	SecurityDocker     PolicyType = "security-docker"
-	SetupDocker        PolicyType = "setup-docker"
-	RegistryDocker     PolicyType = "registry-docker"
-	ChangeConfirmation PolicyType = "change-confirmation"
+	RbacK8s                 PolicyType = "rbac-k8s"
+	SecurityK8s             PolicyType = "security-k8s"
+	SetupK8s                PolicyType = "setup-k8s"
+	RegistryK8s             PolicyType = "registry-k8s"
+	RbacDocker              PolicyType = "rbac-docker"
+	SecurityDocker          PolicyType = "security-docker"
+	SetupDocker             PolicyType = "setup-docker"
+	RegistryDocker          PolicyType = "registry-docker"
+	ChangeConfirmation      PolicyType = "change-confirmation"
+	CleanupDocker           PolicyType = "cleanup-docker"
+	ObservabilityK8s        PolicyType = "observability-k8s"
+	PodSecurityStandardsK8s PolicyType = "pod-security-standards-k8s"
+	NetworkSecurityK8s      PolicyType = "network-security-k8s"
 )
+
+const ResourcePatchAgentType = "resource-patch-k8s"
 
 type HelmInstallStatus string
 
@@ -2513,6 +2769,7 @@ const (
 	HelmInstallStatusInstalled    HelmInstallStatus = "installed"
 	HelmInstallStatusFailed       HelmInstallStatus = "failed"
 	HelmInstallStatusUninstalling HelmInstallStatus = "uninstalling"
+	HelmInstallStatusConflict     HelmInstallStatus = "conflict"
 )
 
 func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
@@ -2530,3 +2787,17 @@ func DefaultEndpointSecuritySettings() EndpointSecuritySettings {
 		AllowStackManagementForRegularUsers: true,
 	}
 }
+
+type AllowListKey int
+
+const (
+	AllowListSSRF AllowListKey = iota
+)
+
+type SSRFMode int
+
+const (
+	SSRFModeOff SSRFMode = iota
+	SSRFModeAudit
+	SSRFModeEnforce
+)

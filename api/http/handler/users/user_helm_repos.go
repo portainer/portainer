@@ -11,6 +11,7 @@ import (
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/pkg/errors"
 )
@@ -24,7 +25,11 @@ type addHelmRepoUrlPayload struct {
 	URL string `json:"url"`
 }
 
-func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
+func (p *addHelmRepoUrlPayload) Validate(r *http.Request) error {
+	if err := ssrf.CheckURL(r.Context(), p.URL); err != nil {
+		return err
+	}
+
 	return libhelm.ValidateHelmRepositoryURL(p.URL, nil)
 }
 

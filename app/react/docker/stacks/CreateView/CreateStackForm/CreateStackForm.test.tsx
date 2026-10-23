@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 
+import { SourcesSource } from '@api/types.gen';
+
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { server } from '@/setup-tests/server';
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
 
 import { CreateStackForm } from './CreateStackForm';
 
@@ -90,7 +93,7 @@ describe('CreateStackForm', () => {
     expect(element).toBeChecked();
 
     expect(
-      await screen.findByRole('textbox', { name: /repository url/i })
+      await screen.findByRole('combobox', { name: /source/i })
     ).toBeVisible();
   });
 
@@ -242,6 +245,25 @@ describe('CreateStackForm', () => {
   it('should submit git form successfully', async () => {
     let requestBody: unknown;
     server.use(
+      http.get('/api/gitops/sources', () =>
+        HttpResponse.json<SourcesSource[]>(
+          [
+            {
+              id: 1,
+              name: 'my-source',
+              type: 'git',
+              url: 'https://github.com/test/repo',
+              status: 'healthy',
+            },
+          ],
+          {
+            headers: {
+              'x-total-count': '1',
+              'x-total-available': '1',
+            },
+          }
+        )
+      ),
       http.post(
         '/api/stacks/create/standalone/repository',
         async ({ request }) => {
@@ -268,17 +290,17 @@ describe('CreateStackForm', () => {
     // Switch to git
     await user.click(await screen.findByRole('radio', { name: /repository/i }));
 
-    // Fill in form
     // using paste to reduce test validation time and test time
     const nameInput = screen.getByRole('textbox', { name: /name/i });
     await user.clear(nameInput);
     await user.paste('test-stack');
 
-    const urlField = await screen.findByRole('textbox', {
-      name: /repository url/i,
+    // Select a source (sets URL and SourceId)
+    const sourceInput = await screen.findByRole('combobox', {
+      name: /source/i,
     });
-    await user.clear(urlField);
-    await user.paste('https://github.com/test/repo');
+    await user.click(sourceInput);
+    await user.click(await screen.findByRole('option', { name: 'my-source' }));
 
     const refsField = screen.getByLabelText(/reference/i);
     await user.clear(refsField);
@@ -304,7 +326,7 @@ describe('CreateStackForm', () => {
       expect(requestBody).toMatchObject(
         expect.objectContaining({
           name: 'test-stack',
-          repositoryUrl: 'https://github.com/test/repo',
+          sourceId: 1,
           repositoryReferenceName: 'refs/heads/main',
           composeFile: 'docker-compose.yml',
         })
@@ -313,10 +335,7 @@ describe('CreateStackForm', () => {
   });
 
   it('should handle API error gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const restoreConsole = suppressConsoleLogs();
 
     const mutationError = vi.fn();
     const errorMessage = 'test - failed to create stack';
@@ -359,7 +378,6 @@ describe('CreateStackForm', () => {
       );
     });
 
-    consoleErrorSpy.mockRestore();
-    consoleLogSpy.mockRestore();
+    restoreConsole();
   });
 });

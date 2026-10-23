@@ -63,6 +63,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
   const fileQuery = useEdgeStackFile(edgeStack.Id, { skipErrors: true });
   const allowKubeToSelectCompose = useAllowKubeToSelectCompose(edgeStack);
   const router = useRouter();
+  const [webhookId] = useState(() => edgeStack.Webhook || createWebhookId());
 
   if (!fileQuery.isSuccess) {
     return null;
@@ -141,9 +142,7 @@ export function NonGitStackForm({ edgeStack }: { edgeStack: EdgeStack }) {
         rePullImage,
         retryDeploy: values.retryDeploy,
         updateVersion,
-        webhook: values.webhookEnabled
-          ? edgeStack.Webhook || createWebhookId()
-          : '',
+        webhook: values.webhookEnabled ? webhookId : '',
         envVars: values.envVars,
         rollbackTo: values.rollbackTo,
         staggerConfig: values.staggerConfig,

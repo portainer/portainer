@@ -42,7 +42,7 @@ export function NodesDatatable({
 }) {
   const columns = useColumns(isIpColumnVisible);
   const tableState = useTableState(store, tableKey);
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  useRepeater(tableState.autoRefreshRateMS, onRefresh);
 
   return (
     <Datatable<NodeViewModel>
@@ -62,7 +62,7 @@ export function NodesDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

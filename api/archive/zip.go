@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/logs"
 
 	"github.com/pkg/errors"
@@ -23,7 +24,7 @@ func UnzipFile(src string, dest string) error {
 	defer logs.CloseAndLogErr(r)
 
 	for _, f := range r.File {
-		p := filepath.Join(dest, f.Name)
+		p := filesystem.JoinPaths(dest, f.Name)
 
 		// Check for ZipSlip. More Info: http://bit.ly/2MsjAWE
 		if !strings.HasPrefix(p, filepath.Clean(dest)+string(os.PathSeparator)) {

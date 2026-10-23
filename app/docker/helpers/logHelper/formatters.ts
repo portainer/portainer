@@ -47,7 +47,7 @@ export function formatTime(
 ) {
   let nl = line;
   if (time) {
-    let date = '';
+    let date;
     if (typeof time === 'number') {
       // time is a number, so it is the number of seconds OR milliseconds since Unix Epoch (1970-01-01T00:00:00.000Z)
       // we need to know if time's unit is second or millisecond

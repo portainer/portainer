@@ -68,14 +68,14 @@ export function ApplicationDetailsWidget() {
           <WidgetBody>
             {!isSystemNamespace && (
               <>
-                {!!stack?.GitConfig && (
+                {!!stack?.GitConfig && !!stack.GitSourceId && (
                   <div className="mb-4">
                     <GitReferenceCard
-                      stackId={stack.Id}
                       autoUpdate={stack.AutoUpdate}
                       gitConfig={stack.GitConfig}
                       currentDeploymentInfo={stack.CurrentDeploymentInfo}
                       stackType="kubernetes"
+                      sourceId={stack.GitSourceId}
                     />
                   </div>
                 )}

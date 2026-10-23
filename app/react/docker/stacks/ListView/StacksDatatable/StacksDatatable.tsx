@@ -31,7 +31,7 @@ export function StacksDatatable({
   dataset: Array<DecoratedStack>;
 }) {
   const tableState = useStore();
-  useRepeater(tableState.autoRefreshRate, onReload);
+  useRepeater(tableState.autoRefreshRateMS, onReload);
   const isAdminQuery = useIsEdgeAdmin();
   const { authorized: canManageStacks } = useAuthorizations([
     'PortainerStackCreate',

@@ -12,13 +12,21 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ height: '200vh', paddingTop: '50px' }}>
-        <p className="px-6">
-          Scroll down to see the sticky action bar at the bottom of the
-          viewport.
-        </p>
-        <Story />
-      </div>
+      <StickyFooter.Container>
+        <div
+          className="h-[200vh] pt-12"
+          // adding eslint and ts ignore errors because style type doesn't support css variables
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          style={{ '--sidebar-closed-width': 0 }}
+        >
+          <p className="px-6">
+            Scroll down to see the sticky action bar at the bottom of the
+            viewport.
+          </p>
+          <Story />
+        </div>
+      </StickyFooter.Container>
     ),
   ],
 } as Meta<typeof StickyFooter>;

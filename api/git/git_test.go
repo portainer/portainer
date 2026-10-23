@@ -99,6 +99,19 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	assert.NoDirExists(t, filesystem.JoinPaths(dir, ".git"))
 }
 
+func Test_ClonePublicRepository_NonExistentDst(t *testing.T) {
+	t.Parallel()
+	service := Service{git: NewGitClient(false)}
+	repositoryURL := setup(t)
+	referenceName := "refs/heads/main"
+
+	dir := filesystem.JoinPaths(t.TempDir(), "sub", "dir")
+	err := service.CloneRepository(t.Context(), dir, repositoryURL, referenceName, "", "", false)
+	require.NoError(t, err)
+	assert.DirExists(t, dir)
+	assert.NoDirExists(t, filesystem.JoinPaths(dir, ".git"))
+}
+
 func Test_latestCommitID(t *testing.T) {
 	t.Parallel()
 	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
@@ -262,6 +275,7 @@ func createBareRepoWithSymlink(t *testing.T) string {
 }
 
 func Test_Download_RejectsSymlink(t *testing.T) {
+	t.Parallel()
 	client := NewGitClient(false)
 	repoURL := createBareRepoWithSymlink(t)
 

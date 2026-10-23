@@ -86,6 +86,70 @@ func (kcl *KubeClient) GetSecret(namespace string, secretName string) (models.K8
 	return parseSecret(secret, true), nil
 }
 
+// CreateSecret creates a secret in the given namespace. The returned secret carries
+// metadata only: the caller already holds the data it just wrote, so it is not echoed
+// back.
+func (kcl *KubeClient) CreateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error) {
+	secretType := corev1.SecretType(request.SecretType)
+	if secretType == "" {
+		secretType = corev1.SecretTypeOpaque
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        request.Name,
+			Namespace:   namespace,
+			Labels:      request.Labels,
+			Annotations: request.Annotations,
+		},
+		Type: secretType,
+		// StringData is encoded by the API server, so plain values can be passed through.
+		StringData: request.Data,
+	}
+
+	created, err := kcl.cli.CoreV1().Secrets(namespace).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		return models.K8sSecret{}, err
+	}
+
+	return parseSecret(created, false), nil
+}
+
+// UpdateSecret updates an existing secret in the given namespace. The live secret is
+// read first so that fields the payload does not model, such as the immutable secret
+// type, survive the update.
+func (kcl *KubeClient) UpdateSecret(namespace string, request models.K8sSecretWriteRequest) (models.K8sSecret, error) {
+	secret, err := kcl.cli.CoreV1().Secrets(namespace).Get(context.Background(), request.Name, metav1.GetOptions{})
+	if err != nil {
+		return models.K8sSecret{}, err
+	}
+
+	if request.Data != nil {
+		// StringData is merged into Data by the API server, so the existing data has to
+		// be dropped for the payload to replace it rather than add to it.
+		secret.Data = nil
+		secret.StringData = request.Data
+	}
+	if request.Labels != nil {
+		secret.Labels = request.Labels
+	}
+	if request.Annotations != nil {
+		secret.Annotations = request.Annotations
+	}
+
+	updated, err := kcl.cli.CoreV1().Secrets(namespace).Update(context.Background(), secret, metav1.UpdateOptions{})
+	if err != nil {
+		return models.K8sSecret{}, err
+	}
+
+	return parseSecret(updated, false), nil
+}
+
+// DeleteSecret deletes the named secret in the given namespace.
+func (kcl *KubeClient) DeleteSecret(namespace, name string) error {
+	return kcl.cli.CoreV1().Secrets(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+}
+
 // parseSecret parses a k8s Secret object into a K8sSecret struct.
 // for get operation, withData will be set to true.
 // otherwise, only metadata will be parsed.

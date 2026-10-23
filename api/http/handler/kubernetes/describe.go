@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/portainer/portainer/pkg/libkubectl"
 	"github.com/rs/zerolog/log"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 type describeResourceResponse struct {
@@ -65,6 +66,11 @@ func (handler *Handler) describeResource(w http.ResponseWriter, r *http.Request)
 
 	out, err := client.Describe(namespace, name, kind)
 	if err != nil {
+		if k8serrors.IsUnauthorized(err) || k8serrors.IsForbidden(err) {
+			log.Error().Err(err).Str("context", "describeResource").Msg("Unauthorized access to the Kubernetes API")
+			return httperror.Forbidden("an error occurred during the describeResource operation, unauthorized access to the Kubernetes API. Error: ", err)
+		}
+
 		log.Error().Err(err).Str("context", "describeResource").Msg("Failed to describe kubernetes resource")
 		return httperror.InternalServerError("an error occurred during the describeResource operation, failed to describe kubernetes resource. Error: ", err)
 	}

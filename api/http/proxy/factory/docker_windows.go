@@ -3,12 +3,14 @@
 package factory
 
 import (
+	"context"
 	"net"
 	"net/http"
 
 	"github.com/Microsoft/go-winio"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 )
 
 func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -32,9 +34,10 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 }
 
 func newNamedPipeTransport(namedPipePath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return winio.DialPipe(namedPipePath, nil)
-		},
+	t := ssrf.NewInternalTransport(nil)
+	t.DialContext = func(_ context.Context, _, _ string) (net.Conn, error) {
+		return winio.DialPipe(namedPipePath, nil)
 	}
+
+	return t
 }

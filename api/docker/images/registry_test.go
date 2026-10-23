@@ -57,6 +57,21 @@ func TestFindBestMatchNeedAuthRegistry(t *testing.T) {
 	})
 }
 
+func TestFindBestMatchRegistryCachesResult(t *testing.T) {
+	t.Parallel()
+
+	repository := "caching-test/nginx:latest"
+	registries := []portainer.Registry{createNewRegistry("docker.io", "", true)}
+
+	r, err := findBestMatchRegistry(repository, registries)
+	require.NoError(t, err)
+
+	cached, err := cachedRegistry(repository)
+	require.NoError(t, err)
+	require.Equal(t, r.URL, cached.URL)
+	require.Equal(t, r.Authentication, cached.Authentication)
+}
+
 func createNewRegistry(domain, username string, auth bool) portainer.Registry {
 	registry := portainer.Registry{
 		URL:            domain,

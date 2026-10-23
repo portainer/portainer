@@ -39,6 +39,7 @@ export enum FeatureId {
   K8S_ADM_ONLY_SECRETS = 'k8s-admin-only-secrets',
   K8S_ROLLING_RESTART = 'k8s-rolling-restart',
   K8SINSTALL = 'k8s-install',
+  KUBESOLO = 'kubesolo',
   K8S_ANNOTATIONS = 'k8s-annotations',
   CA_FILE = 'ca-file',
   K8S_REQUIRE_NOTE_ON_APPLICATIONS = 'k8s-note-on-applications',

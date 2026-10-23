@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import type { AriaAttributes } from 'react';
 import {
+  FilterOptionOption,
   GroupBase,
   OptionsOrGroups,
   SelectComponentsConfig,
 } from 'react-select';
 import _ from 'lodash';
-import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -27,7 +27,7 @@ export interface GroupOption<TValue> {
   options: Option<TValue>[];
 }
 
-type Options<TValue> = OptionsOrGroups<
+export type Options<TValue> = OptionsOrGroups<
   Option<TValue>,
   GroupBase<Option<TValue>>
 >;
@@ -252,7 +252,7 @@ export function MultiSelect<TValue = string>({
       noOptionsMessage={noOptionsMessage}
       loadingMessage={loadingMessage}
       formatCreateLabel={formatCreateLabel}
-      onCreateOption={onCreateOption}
+      onCreateOption={handleCreateOption}
       inputValue={inputValue}
       onInputChange={(textInput) => setInputValue(textInput)}
       onBlur={handleBlur}
@@ -262,6 +262,15 @@ export function MultiSelect<TValue = string>({
     />
   );
 
+  // Selecting the "create" menu option calls onCreateOption directly,
+  // bypassing the onChange handler above, so inputValue is cleared here
+  // instead — otherwise the stale text would trigger a second, duplicate
+  // creation from handleBlur below once the select loses focus.
+  function handleCreateOption(input: string) {
+    setInputValue('');
+    onCreateOption?.(input);
+  }
+
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
     onBlur?.(e);
     const trimmed = inputValue.trim();
@@ -270,11 +279,10 @@ export function MultiSelect<TValue = string>({
       return;
     }
     if (onCreateOption && isCreatable) {
-      onCreateOption(trimmed);
+      handleCreateOption(trimmed);
     } else {
       onChange([...value, trimmed as TValue]);
     }
-    setInputValue('');
   }
 }
 

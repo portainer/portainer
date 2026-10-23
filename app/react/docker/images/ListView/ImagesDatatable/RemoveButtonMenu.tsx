@@ -4,10 +4,10 @@ import { positionRight } from '@reach/popover';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Authorized } from '@/react/hooks/useUser';
-import { withInvalidate } from '@/react-tools/react-query';
 import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
-import { notifySuccess } from '@/portainer/services/notifications';
-import { processItemsInBatches } from '@/react/common/processItemsInBatches';
+import { notifyError, notifySuccess } from '@/portainer/services/notifications';
+import { getAllSettledItems } from '@/portainer/helpers/promise-utils';
+import { pluralize } from '@/portainer/helpers/strings';
 
 import { Button, ButtonGroup } from '@@/buttons';
 import { ButtonWithRef } from '@@/buttons/Button';
@@ -95,11 +95,16 @@ export function RemoveButtonMenu({
     }
 
     deleteImageListMutation.mutate({
-      imageIds: selectedItems.map((image) => image.id),
+      images: selectedItems.map((image) => ({
+        id: image.id,
+        nodeName: image.nodeName,
+      })),
       force,
     });
   }
 }
+
+type ImageToDelete = { id: string; nodeName?: string };
 
 function useDeleteImageListMutation() {
   const environmentId = useEnvironmentId();
@@ -107,16 +112,35 @@ function useDeleteImageListMutation() {
 
   return useMutation({
     mutationFn: ({
-      imageIds,
-      ...args
+      images,
+      force,
     }: {
-      imageIds: Array<string>;
-    } & Omit<Parameters<typeof deleteImage>[0], 'imageId' | 'environmentId'>) =>
-      processItemsInBatches(imageIds, (imageId) =>
-        deleteImage({ ...args, environmentId, imageId }).then(() =>
-          notifySuccess('Image successfully removed', imageId)
-        )
+      images: Array<ImageToDelete>;
+      force?: boolean;
+    }) =>
+      getAllSettledItems(images, (image) =>
+        deleteImage({
+          environmentId,
+          imageId: image.id,
+          nodeName: image.nodeName,
+          force,
+        })
       ),
-    ...withInvalidate(queryClient, [queryKeys.base(environmentId)]),
+    onSuccess: ({ fulfilledItems, rejectedItems }) => {
+      // one error notification per rejected item
+      rejectedItems.forEach(({ item, reason }) => {
+        notifyError(`Failed to remove image '${item.id}'`, new Error(reason));
+      });
+
+      // one success notification for all fulfilled items
+      if (fulfilledItems.length) {
+        notifySuccess(
+          `${pluralize(fulfilledItems.length, 'Image')} successfully removed`,
+          fulfilledItems.map((item) => item.id).join(', ')
+        );
+      }
+
+      return queryClient.invalidateQueries(queryKeys.base(environmentId));
+    },
   });
 }

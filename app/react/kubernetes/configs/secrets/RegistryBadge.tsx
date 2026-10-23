@@ -38,7 +38,7 @@ export function RegistryBadge({ registryId, children, dataCy }: Props) {
           to="portainer.registries.registry"
           params={{ id: registryId }}
           className="!text-inherit"
-          data-cy={dataCy ? `${dataCy}-link` : undefined}
+          data-cy={dataCy ? `${dataCy}-link` : 'registry-badge-link'}
         >
           {Name}
         </Link>

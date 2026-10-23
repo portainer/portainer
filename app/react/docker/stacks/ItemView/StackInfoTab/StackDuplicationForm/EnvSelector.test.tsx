@@ -3,31 +3,35 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
-import { Environment } from '@/react/portainer/environments/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
+import {
+  createMockEnvironment,
+  createMockEnvironmentGroup,
+} from '@/react-tools/test-mocks';
+import { Environment } from '@/react/portainer/environments/types';
 
 import { EnvSelector, getEnvironmentOptions } from './EnvSelector';
 
 describe('EnvSelector', () => {
   it('should render when environment options are available', async () => {
-    const mockEnvironments: Environment[] = [
-      {
+    const mockEnvironments = [
+      createMockEnvironment({
         Id: 1,
         Name: 'Environment 1',
         GroupId: 1,
-      } as Environment,
-      {
+      }),
+      createMockEnvironment({
         Id: 2,
         Name: 'Environment 2',
         GroupId: 1,
-      } as Environment,
+      }),
     ];
 
-    const mockGroups: EnvironmentGroup[] = [
-      {
+    const mockGroups = [
+      createMockEnvironmentGroup({
         Id: 1,
         Name: 'Unassigned',
-      } as EnvironmentGroup,
+      }),
     ];
 
     renderComponent({
@@ -61,19 +65,19 @@ describe('EnvSelector', () => {
   });
 
   it('should display FormError when error prop is provided', async () => {
-    const mockEnvironments: Environment[] = [
-      {
+    const mockEnvironments = [
+      createMockEnvironment({
         Id: 1,
         Name: 'Environment 1',
         GroupId: 1,
-      } as Environment,
+      }),
     ];
 
     const mockGroups: EnvironmentGroup[] = [
-      {
+      createMockEnvironmentGroup({
         Id: 1,
         Name: 'Group 1',
-      } as EnvironmentGroup,
+      }),
     ];
 
     const error = 'Environment is required';
@@ -120,10 +124,10 @@ describe('getEnvironmentOptions', () => {
     expect(
       getEnvironmentOptions(
         [
-          {
+          createMockEnvironmentGroup({
             Id: 1,
             Name: 'Group 1',
-          } as EnvironmentGroup,
+          }),
         ],
         []
       )
@@ -132,11 +136,14 @@ describe('getEnvironmentOptions', () => {
 
   it('should exclude current environment when currentEnvironmentId is provided', () => {
     const groups: EnvironmentGroup[] = [
-      { Id: 1, Name: 'Group 1' } as EnvironmentGroup,
+      createMockEnvironmentGroup({
+        Id: 1,
+        Name: 'Group 1',
+      }),
     ];
-    const environments: Environment[] = [
-      { Id: 1, Name: 'Env 1', GroupId: 1 } as Environment,
-      { Id: 2, Name: 'Env 2', GroupId: 1 } as Environment,
+    const environments = [
+      createMockEnvironment({ Id: 1, Name: 'Env 1', GroupId: 1 }),
+      createMockEnvironment({ Id: 2, Name: 'Env 2', GroupId: 1 }),
     ];
 
     const result = getEnvironmentOptions(groups, environments, 1);
@@ -148,13 +155,19 @@ describe('getEnvironmentOptions', () => {
 
   it('should group environments by GroupId with correct structure', () => {
     const groups: EnvironmentGroup[] = [
-      { Id: 1, Name: 'Group 1' } as EnvironmentGroup,
-      { Id: 2, Name: 'Group 2' } as EnvironmentGroup,
+      createMockEnvironmentGroup({
+        Id: 1,
+        Name: 'Group 1',
+      }),
+      createMockEnvironmentGroup({
+        Id: 2,
+        Name: 'Group 2',
+      }),
     ];
-    const environments: Environment[] = [
-      { Id: 1, Name: 'Env 1', GroupId: 1 } as Environment,
-      { Id: 2, Name: 'Env 2', GroupId: 1 } as Environment,
-      { Id: 3, Name: 'Env 3', GroupId: 2 } as Environment,
+    const environments = [
+      createMockEnvironment({ Id: 1, Name: 'Env 1', GroupId: 1 }),
+      createMockEnvironment({ Id: 2, Name: 'Env 2', GroupId: 1 }),
+      createMockEnvironment({ Id: 3, Name: 'Env 3', GroupId: 2 }),
     ];
 
     const result = getEnvironmentOptions(groups, environments);
@@ -174,9 +187,9 @@ describe('getEnvironmentOptions', () => {
   });
 
   it('should auto create an Others group if group is missing', () => {
-    const environments: Environment[] = [
-      { Id: 1, Name: 'Env 1', GroupId: 1 } as Environment,
-      { Id: 2, Name: 'Env 2', GroupId: 2 } as Environment,
+    const environments = [
+      createMockEnvironment({ Id: 1, Name: 'Env 1', GroupId: 1 }),
+      createMockEnvironment({ Id: 2, Name: 'Env 2', GroupId: 2 }),
     ];
     const groups: EnvironmentGroup[] = [];
 

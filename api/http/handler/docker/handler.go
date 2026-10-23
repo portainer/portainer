@@ -44,7 +44,9 @@ func NewHandler(bouncer security.BouncerService, authorizationService *authoriza
 	endpointRouter.Use(bouncer.AuthenticatedAccess)
 	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"), dockerOnlyMiddleware)
 
-	endpointRouter.Handle("/dashboard", httperror.LoggerHandler(h.dashboard)).Methods(http.MethodGet)
+	// /dashboard is the only route on this router without its own endpoint authorization;
+	// the containers/images sub-routers already apply CheckEndpointAuthorization.
+	endpointRouter.Handle("/dashboard", middlewares.CheckEndpointAuthorization(bouncer)(httperror.LoggerHandler(h.dashboard))).Methods(http.MethodGet)
 
 	containersHandler := containers.NewHandler("/docker/{id}/containers", bouncer, dataStore, dockerClientFactory, containerService)
 	endpointRouter.PathPrefix("/containers").Handler(containersHandler)

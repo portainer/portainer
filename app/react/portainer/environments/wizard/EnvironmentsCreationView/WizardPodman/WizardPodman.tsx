@@ -86,6 +86,9 @@ export function WizardPodman({ onCreate }: Props) {
   const edgeAgentDocsUrl = useDocsUrl(
     '/faqs/getting-started/why-do-we-recommend-using-the-edge-agent-instead-of-the-traditional-agent'
   );
+  const podmanSupportDocsUrl = useDocsUrl(
+    '/faqs/installing/does-portainer-support-podman'
+  );
   const [creationType, setCreationType] = useState<CreationType>(
     primaryOptions[0].value
   );
@@ -129,9 +132,17 @@ export function WizardPodman({ onCreate }: Props) {
       </FormSection>
 
       <TextTip color="orange" className="mb-2" inline={false}>
-        Currently, Portainer only supports <b>Podman 5</b> running in rootful
-        (privileged) mode on <b>CentOS 9</b> Linux environments. Rootless mode
-        and other Linux distros may work, but aren&apos;t officially supported.
+        Portainer connects to Podman through Podman&apos;s{' '}
+        <b>Docker-compatible API</b> and only supports <b>Podman 5</b> running
+        in rootful (privileged) mode on <b>CentOS 9</b> Linux environments.
+        Rootless mode and other Linux distros may work, but aren&apos;t
+        officially supported.{' '}
+        <ExternalLink
+          to={podmanSupportDocsUrl}
+          data-cy="wizard-podman-support-docs-link"
+        >
+          Supported Podman configurations
+        </ExternalLink>
       </TextTip>
       {tab}
     </div>

@@ -99,7 +99,7 @@ export function toViewModel(portBindings: PortMap): Values {
     return ports
       .reduce((acc, port) => {
         let hostIp = '';
-        let hostPort = 0;
+        let hostPort;
         if (port.hostPort.includes(':')) {
           const [ipStr, portStr] = port.hostPort.split(':');
           hostIp = ipStr;

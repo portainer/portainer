@@ -36,8 +36,8 @@ export function ResourceEventsDatatable({
     namespace,
     params,
     queryOptions: {
-      autoRefreshRate: tableState.autoRefreshRate
-        ? tableState.autoRefreshRate * 1000
+      autoRefreshRate: tableState.autoRefreshRateMS
+        ? tableState.autoRefreshRateMS
         : undefined,
     },
   });

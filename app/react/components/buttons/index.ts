@@ -1,4 +1,4 @@
-export { Button } from './Button';
+export { Button, type Props as ButtonProps } from './Button';
 export { AddButton } from './AddButton';
 export { ButtonGroup } from './ButtonGroup';
 export { LoadingButton } from './LoadingButton';

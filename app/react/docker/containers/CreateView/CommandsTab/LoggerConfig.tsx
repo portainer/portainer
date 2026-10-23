@@ -63,7 +63,7 @@ export function LoggerConfig({
         Select Default logging driver if you don&apos;t want to override it.
         Supported logging drivers can be found{' '}
         <a
-          href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers"
+          href="https://docs.docker.com/engine/logging/configure/#supported-logging-drivers"
           target="_blank"
           rel="noreferrer"
         >

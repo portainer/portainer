@@ -43,20 +43,50 @@ func (handler *Handler) updateUserServiceAccounts(membership *portainer.TeamMemb
 		log.Error().Err(err).Msgf("failed fetching environments for team %d", membership.TeamID)
 		return
 	}
+
+	// Query remaining team memberships after the deletion has already been committed.
+	remainingMemberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(membership.UserID)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed fetching team memberships for user %d", membership.UserID)
+		return
+	}
+	remainingTeamIDs := make([]int, 0, len(remainingMemberships))
+	for _, m := range remainingMemberships {
+		remainingTeamIDs = append(remainingTeamIDs, int(m.TeamID))
+	}
+
 	for _, endpoint := range endpoints {
-		restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
-		// update kubernenets service accounts if the team is associated with a kubernetes environment
-		if endpointutils.IsKubernetesEndpoint(&endpoint) {
-			kubecli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(&endpoint)
-			if err != nil {
-				log.Error().Err(err).Msgf("failed getting kube client for environment %d", endpoint.ID)
-				continue
+		if !endpointutils.IsKubernetesEndpoint(&endpoint) {
+			continue
+		}
+
+		kubecli, err := handler.K8sClientFactory.GetPrivilegedKubeClient(&endpoint)
+		if err != nil {
+			log.Error().Err(err).Int("environment_id", int(endpoint.ID)).Msg("failed getting kube client for environment")
+			continue
+		}
+
+		if !userHasEndpointAccess(int(membership.UserID), remainingTeamIDs, &endpoint) {
+			if err := kubecli.RemoveUserServiceAccountBindings(int(membership.UserID)); err != nil {
+				log.Error().Err(err).Int("environment_id", int(endpoint.ID)).Int("user_id", int(membership.UserID)).Msg("failed removing SA bindings for user")
 			}
-			teamIDs := []int{int(membership.TeamID)}
-			err = kubecli.SetupUserServiceAccount(int(membership.UserID), teamIDs, restrictDefaultNamespace)
-			if err != nil {
-				log.Error().Err(err).Msgf("failed setting-up service account for user %d", membership.UserID)
-			}
+			continue
+		}
+
+		if err := kubecli.SetupUserServiceAccount(int(membership.UserID), remainingTeamIDs, endpoint.Kubernetes.Configuration.RestrictDefaultNamespace); err != nil {
+			log.Error().Err(err).Int("environment_id", int(endpoint.ID)).Int("user_id", int(membership.UserID)).Msg("failed setting-up service account for user")
 		}
 	}
+}
+
+func userHasEndpointAccess(userID int, teamIDs []int, endpoint *portainer.Endpoint) bool {
+	if _, ok := endpoint.UserAccessPolicies[portainer.UserID(userID)]; ok {
+		return true
+	}
+	for _, teamID := range teamIDs {
+		if _, ok := endpoint.TeamAccessPolicies[portainer.TeamID(teamID)]; ok {
+			return true
+		}
+	}
+	return false
 }

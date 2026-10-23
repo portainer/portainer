@@ -33,7 +33,7 @@ export function ClusterRolesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
 
   const clusterRolesQuery = useClusterRoles(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const clusterRoleBindingsQuery = useClusterRoleBindings(environmentId);
   const roleBindingsQuery = useRoleBindings(environmentId);

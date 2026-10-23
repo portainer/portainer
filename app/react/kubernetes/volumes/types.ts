@@ -50,6 +50,8 @@ interface K8sStorageClass {
 export interface K8sVolOwningApplication {
   Uid?: string;
   Name: string;
+  ResourcePool: string;
+  ApplicationType?: string;
   Namespace?: string;
   Kind?: string;
   Labels?: { [key: string]: string };

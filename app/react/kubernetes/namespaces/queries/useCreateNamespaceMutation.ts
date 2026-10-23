@@ -23,12 +23,8 @@ export function useCreateNamespaceMutation(environmentId: EnvironmentId) {
       updateRegistriesPayload: UpdateRegistryPayload[];
       namespaceIngressControllerPayload: IngressControllerClassMap[];
     }) => {
-      try {
-        // create the namespace first, so that it exists before referencing it in the registry access request
-        await createNamespace(environmentId, createNamespacePayload);
-      } catch (e) {
-        throw new Error(e as string);
-      }
+      // create the namespace first, so that it exists before referencing it in the registry access request
+      await createNamespace(environmentId, createNamespacePayload);
 
       // collect promises
       const updateRegistriesPromises = updateRegistriesPayload.map(

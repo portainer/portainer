@@ -12,7 +12,10 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/pkg/fips"
@@ -76,7 +79,13 @@ L9x22ol5c5rToZa1qKSnSdSDCud298MyRujMUy2UcUKHeNs3MK9AT41sDv266I7b
 vJUUCFYm8+9p6gTVOcoMit+eGSwa81PCPEs1TnU1PV/PaDFeUhn/mg==
 -----END RSA PRIVATE KEY-----`
 
+var adminUserContext = source.InsecureNewAdminContext()
+
 type noopDeployer struct{}
+
+func (s noopDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return nil
+}
 
 // without unpacker
 func (s noopDeployer) DeploySwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
@@ -96,28 +105,28 @@ func (s noopDeployer) DeployKubernetesStack(_ context.Context, stack *portainer.
 }
 
 // with unpacker
-func (s noopDeployer) DeployRemoteComposeStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, forcePullImage, forceRecreate bool) error {
+func (s noopDeployer) DeployRemoteComposeStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, forcePullImage, forceRecreate bool) error {
 	return nil
 }
-func (s noopDeployer) UndeployRemoteComposeStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (s noopDeployer) UndeployRemoteComposeStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	return nil
 }
-func (s noopDeployer) StartRemoteComposeStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error {
+func (s noopDeployer) StartRemoteComposeStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error {
 	return nil
 }
-func (s noopDeployer) StopRemoteComposeStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (s noopDeployer) StopRemoteComposeStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	return nil
 }
-func (s noopDeployer) DeployRemoteSwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
+func (s noopDeployer) DeployRemoteSwarmStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	return nil
 }
-func (s noopDeployer) UndeployRemoteSwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (s noopDeployer) UndeployRemoteSwarmStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	return nil
 }
-func (s noopDeployer) StartRemoteSwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error {
+func (s noopDeployer) StartRemoteSwarmStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error {
 	return nil
 }
-func (s noopDeployer) StopRemoteSwarmStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (s noopDeployer) StopRemoteSwarmStack(_ context.Context, userId portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	return nil
 }
 
@@ -190,28 +199,42 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	admin := &portainer.User{ID: 1, Username: "admin"}
+	admin := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
 	err := store.User().Create(admin)
 	require.NoError(t, err, "error creating an admin")
 
-	err = store.Endpoint().Create(&portainer.Endpoint{
-		ID: 0,
-	})
+	err = store.Endpoint().Create(&portainer.Endpoint{ID: 0})
 	require.NoError(t, err, "error creating environment")
 
+	src := &portainer.Source{
+		Type: portainer.SourceTypeGit,
+		Git: &gittypes.GitSource{
+			URL: "url",
+		},
+	}
+	err = store.Source().Create(adminUserContext, src)
+	require.NoError(t, err, "failed to create source")
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: 2, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	err = store.Workflow().Create(wf)
+	require.NoError(t, err, "failed to create workflow")
+
 	err = store.Stack().Create(&portainer.Stack{
-		ID:          1,
+		ID:          2,
 		CreatedBy:   "admin",
 		ProjectPath: tmpDir,
-		GitConfig: &gittypes.RepoConfig{
-			URL:           "url",
-			ReferenceName: "ref",
-			ConfigHash:    "oldHash",
-		}})
+		WorkflowID:  wf.ID,
+	})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(nil, "oldHash"))
+	err = RedeployWhenChanged(t.Context(), 2, nil, store, testhelpers.NewGitService(nil, "oldHash"))
 	require.NoError(t, err)
+
+	updatedSrc, err := store.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
+	require.Empty(t, updatedSrc.StatusError)
+	require.NotZero(t, updatedSrc.LastSync)
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
@@ -220,7 +243,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	cloneErr := errors.New("failed to clone")
 	_, store := datastore.MustNewTestStore(t, false, true)
 
-	admin := &portainer.User{ID: 1, Username: "admin"}
+	admin := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
 	err := store.User().Create(admin)
 	require.NoError(t, err, "error creating an admin")
 
@@ -234,25 +257,44 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	})
 	require.NoError(t, err, "error creating environment")
 
+	src := &portainer.Source{
+		Type: portainer.SourceTypeGit,
+		Git: &gittypes.GitSource{
+			URL: "url",
+		},
+	}
+	err = store.Source().Create(adminUserContext, src)
+	require.NoError(t, err, "failed to create source")
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: 3,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID}},
+	}}}
+	err = store.Workflow().Create(wf)
+	require.NoError(t, err, "failed to create workflow")
+
 	err = store.Stack().Create(&portainer.Stack{
-		ID:        1,
-		CreatedBy: "admin",
-		GitConfig: &gittypes.RepoConfig{
-			URL:           "url",
-			ReferenceName: "ref",
-			ConfigHash:    "oldHash",
-		}})
+		ID:         3,
+		CreatedBy:  "admin",
+		WorkflowID: wf.ID,
+	})
 	require.NoError(t, err, "failed to create a test stack")
 
-	err = RedeployWhenChanged(t.Context(), 1, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
+	err = RedeployWhenChanged(t.Context(), 3, nil, store, testhelpers.NewGitService(cloneErr, "newHash"))
 	require.Error(t, err)
 	require.ErrorIs(t, err, cloneErr, "should failed to clone but didn't, check test setup")
+
+	updatedSrc, err := store.Source().Read(adminUserContext, src.ID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.SourceStatusError, updatedSrc.Status)
+	require.Contains(t, updatedSrc.StatusError, cloneErr.Error())
+	require.Zero(t, updatedSrc.LastSync)
 }
 
-func Test_redeployWhenChanged(t *testing.T) {
-	t.Parallel()
-	_, store := datastore.MustNewTestStore(t, false, true)
+func setupRedeployStore(t *testing.T, stackType portainer.StackType, stackID portainer.StackID) (dataservices.DataStore, portainer.StackID) {
+	t.Helper()
 
+	_, store := datastore.MustNewTestStore(t, false, true)
 	tmpDir := t.TempDir()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
@@ -262,46 +304,206 @@ func Test_redeployWhenChanged(t *testing.T) {
 	err = store.User().Create(&portainer.User{Username: username, Role: portainer.AdministratorRole})
 	require.NoError(t, err, "error creating a user")
 
-	stack := portainer.Stack{
-		ID:          1,
+	src := &portainer.Source{
+		Type: portainer.SourceTypeGit,
+		Git: &gittypes.GitSource{
+			URL: "url",
+		},
+	}
+	err = store.Source().Create(adminUserContext, src)
+	require.NoError(t, err, "failed to create source")
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{StackID: stackID, Files: []portainer.ArtifactFile{{SourceID: src.ID}}}}}
+	err = store.Workflow().Create(wf)
+	require.NoError(t, err, "failed to create workflow")
+
+	err = store.Stack().Create(&portainer.Stack{
+		ID:          stackID,
 		EndpointID:  1,
 		ProjectPath: tmpDir,
 		UpdatedBy:   username,
-		GitConfig: &gittypes.RepoConfig{
-			URL:           "url",
-			ReferenceName: "ref",
-			ConfigHash:    "oldHash",
-		},
-	}
-
-	err = store.Stack().Create(&stack)
+		WorkflowID:  wf.ID,
+		Type:        stackType,
+	})
 	require.NoError(t, err, "failed to create a test stack")
 
-	t.Run("can deploy docker compose stack", func(t *testing.T) {
-		stack.Type = portainer.DockerComposeStack
-		err = store.Stack().Update(stack.ID, &stack)
+	return store, stackID
+}
+
+func Test_redeployWhenChanged_DockerComposeStack(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.DockerComposeStack, 4)
+
+	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+	require.NoError(t, err)
+}
+
+func Test_redeployWhenChanged_DockerSwarmStack(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.DockerSwarmStack, 5)
+
+	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+	require.NoError(t, err)
+}
+
+func Test_redeployWhenChanged_KubernetesStack(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.KubernetesStack, 6)
+
+	err := RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+	require.NoError(t, err)
+}
+
+type failingDeployer struct {
+	noopDeployer
+	deployErr error
+}
+
+func (f failingDeployer) DeployKubernetesStack(_ context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
+	return f.deployErr
+}
+
+func Test_redeployWhenChanged_KubernetesStack_DeployFailure_DoesNotAdvanceArtifactHash(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.KubernetesStack, 7)
+	deployErr := errors.New("failed to apply resources")
+
+	err := RedeployWhenChanged(t.Context(), stackID, failingDeployer{deployErr: deployErr}, store, testhelpers.NewGitService(nil, "newHash"))
+	require.NoError(t, err, "a failed deploy is recorded on the stack, not returned as a scheduler error")
+
+	var updated *portainer.Stack
+	err = store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var rerr error
+		updated, rerr = tx.Stack().Read(stackID)
+		return rerr
+	})
+	require.NoError(t, err)
+	assert.Equal(t, portainer.StackStatusError, updated.Status)
+	assert.Nil(t, updated.CurrentDeploymentInfo, "CurrentDeploymentInfo should stay at its pre-attempt value (nil here) since nothing was actually deployed")
+
+	workflows, err := store.Workflow().ReadAll()
+	require.NoError(t, err)
+	require.Len(t, workflows, 1)
+	require.Len(t, workflows[0].Artifacts, 1)
+	require.Len(t, workflows[0].Artifacts[0].Files, 1)
+	assert.Empty(t, workflows[0].Artifacts[0].Files[0].Hash, "artifact hash should stay at its old value (empty, in this fixture) since the deploy failed - the UI's git banner reads this field")
+}
+
+type stubSwarmStackManager struct {
+	portainer.SwarmStackManager
+
+	running map[portainer.StackID]bool
+	errs    map[portainer.StackID]error
+}
+
+func (f *stubSwarmStackManager) CheckRunningStatus(_ context.Context, stack *portainer.Stack, _ *portainer.Endpoint) (bool, error) {
+	if err, ok := f.errs[stack.ID]; ok {
+		return false, err
+	}
+
+	return f.running[stack.ID], nil
+}
+
+func Test_ReconcileSwarmStackStatus(t *testing.T) {
+	t.Parallel()
+
+	newEndpoint := func(t *testing.T, store dataservices.DataStore, id portainer.EndpointID) {
+		t.Helper()
+		err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.Endpoint().Create(&portainer.Endpoint{ID: id})
+		})
+		require.NoError(t, err, "error creating environment")
+	}
+
+	newSwarmStack := func(t *testing.T, store dataservices.DataStore, id portainer.StackID, endpointID portainer.EndpointID, stackType portainer.StackType, status portainer.StackStatus) *portainer.Stack {
+		t.Helper()
+		stack := &portainer.Stack{
+			ID:         id,
+			EndpointID: endpointID,
+			Type:       stackType,
+			Status:     status,
+		}
+		err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.Stack().Create(stack)
+		})
+		require.NoError(t, err, "error creating stack")
+
+		return stack
+	}
+
+	t.Run("flips a recovered errored swarm stack back to active", func(t *testing.T) {
+		t.Parallel()
+		_, store := datastore.MustNewTestStore(t, false, true)
+		newEndpoint(t, store, 1)
+		stack := newSwarmStack(t, store, 1, 1, portainer.DockerSwarmStack, portainer.StackStatusError)
+
+		manager := &stubSwarmStackManager{running: map[portainer.StackID]bool{1: true}}
+
+		err := ReconcileSwarmStackStatus(t.Context(), store, manager)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(t.Context(), 1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		result, err := store.Stack().Read(stack.ID)
 		require.NoError(t, err)
+		assert.Equal(t, portainer.StackStatusActive, result.Status)
+		require.NotEmpty(t, result.DeploymentStatus)
+		assert.Equal(t, portainer.StackStatusActive, result.DeploymentStatus[len(result.DeploymentStatus)-1].Status)
 	})
 
-	t.Run("can deploy docker swarm stack", func(t *testing.T) {
-		stack.Type = portainer.DockerSwarmStack
-		err = store.Stack().Update(stack.ID, &stack)
+	t.Run("leaves a still-failing swarm stack in the error state", func(t *testing.T) {
+		t.Parallel()
+		_, store := datastore.MustNewTestStore(t, false, true)
+		newEndpoint(t, store, 1)
+		stack := newSwarmStack(t, store, 1, 1, portainer.DockerSwarmStack, portainer.StackStatusError)
+
+		manager := &stubSwarmStackManager{running: map[portainer.StackID]bool{1: false}}
+
+		err := ReconcileSwarmStackStatus(t.Context(), store, manager)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(t.Context(), 1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		result, err := store.Stack().Read(stack.ID)
 		require.NoError(t, err)
+		assert.Equal(t, portainer.StackStatusError, result.Status)
 	})
 
-	t.Run("can deploy kube app", func(t *testing.T) {
-		stack.Type = portainer.KubernetesStack
-		err = store.Stack().Update(stack.ID, &stack)
+	t.Run("continues past a stack whose live check errors", func(t *testing.T) {
+		t.Parallel()
+		_, store := datastore.MustNewTestStore(t, false, true)
+		newEndpoint(t, store, 1)
+		stack := newSwarmStack(t, store, 1, 1, portainer.DockerSwarmStack, portainer.StackStatusError)
+
+		manager := &stubSwarmStackManager{errs: map[portainer.StackID]error{1: errors.New("agent unreachable")}}
+
+		err := ReconcileSwarmStackStatus(t.Context(), store, manager)
+		require.NoError(t, err, "a single stack's check failing should not fail the whole reconcile pass")
+
+		result, err := store.Stack().Read(stack.ID)
+		require.NoError(t, err)
+		assert.Equal(t, portainer.StackStatusError, result.Status, "status should be left untouched when the check itself failed")
+	})
+
+	t.Run("ignores stacks that aren't swarm stacks or aren't in the error state", func(t *testing.T) {
+		t.Parallel()
+		_, store := datastore.MustNewTestStore(t, false, true)
+		newEndpoint(t, store, 1)
+		composeStack := newSwarmStack(t, store, 1, 1, portainer.DockerComposeStack, portainer.StackStatusError)
+		activeSwarmStack := newSwarmStack(t, store, 2, 1, portainer.DockerSwarmStack, portainer.StackStatusActive)
+
+		manager := &stubSwarmStackManager{running: map[portainer.StackID]bool{1: true, 2: true}}
+
+		err := ReconcileSwarmStackStatus(t.Context(), store, manager)
 		require.NoError(t, err)
 
-		err = RedeployWhenChanged(t.Context(), 1, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"))
+		result, err := store.Stack().Read(composeStack.ID)
 		require.NoError(t, err)
+		assert.Equal(t, portainer.StackStatusError, result.Status, "non-swarm stacks must not be touched")
+
+		result, err = store.Stack().Read(activeSwarmStack.ID)
+		require.NoError(t, err)
+		assert.Equal(t, portainer.StackStatusActive, result.Status, "stacks that aren't in error must not be touched")
 	})
 }
 
@@ -319,7 +521,7 @@ func Test_getUserRegistries(t *testing.T) {
 	err = store.User().Create(user)
 	require.NoError(t, err, "error creating a user")
 
-	team := portainer.Team{ID: 1, Name: "team"}
+	team := portainer.Team{ID: 1}
 
 	err = store.TeamMembership().Create(&portainer.TeamMembership{
 		ID:     1,

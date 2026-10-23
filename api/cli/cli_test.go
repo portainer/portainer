@@ -27,6 +27,87 @@ func TestOptionParser(t *testing.T) {
 	require.True(t, *opts.EnableEdgeComputeFeatures)
 }
 
+func TestParseEdgeFlags(t *testing.T) {
+	const edgeURL = "https://edge.example.com:9443"
+
+	testCases := []struct {
+		name          string
+		args          []string
+		envVars       map[string]string
+		expectedURL   string
+		expectedTrust bool
+	}{
+		{
+			name:          "no edge flags or env vars",
+			expectedURL:   "",
+			expectedTrust: false,
+		},
+		{
+			name:          "flags set",
+			args:          []string{"portainer", "--edge-portainer-url", edgeURL, "--edge-trust-on-first-connect"},
+			expectedURL:   edgeURL,
+			expectedTrust: true,
+		},
+		{
+			name: "env vars set",
+			envVars: map[string]string{
+				portainer.EdgePortainerURLEnvVar:        edgeURL,
+				portainer.EdgeTrustOnFirstConnectEnvVar: "1",
+			},
+			expectedURL:   edgeURL,
+			expectedTrust: true,
+		},
+		{
+			name:        "flag overrides env var",
+			args:        []string{"portainer", "--edge-portainer-url", edgeURL},
+			envVars:     map[string]string{portainer.EdgePortainerURLEnvVar: "https://other.example.com:9443"},
+			expectedURL: edgeURL,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.args == nil {
+				tc.args = []string{"portainer"}
+			}
+			setOsArgs(t, tc.args)
+
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+
+			flags, err := Service{}.ParseFlags("test-version")
+			require.NoError(t, err)
+
+			require.Equal(t, tc.expectedURL, *flags.EdgePortainerURL)
+			require.Equal(t, tc.expectedTrust, *flags.EdgeTrustOnFirstConnect)
+		})
+	}
+}
+
+func TestValidateEdgePortainerURL(t *testing.T) {
+	testCases := []struct {
+		name      string
+		edgeURL   string
+		expectErr bool
+	}{
+		{name: "empty url is valid (flags are optional)", edgeURL: ""},
+		{name: "valid https url with port", edgeURL: "https://edge.example.com:9443"},
+		{name: "localhost is rejected", edgeURL: "https://localhost:9443", expectErr: true},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := ValidateEdgePortainerURL(tc.edgeURL)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestParseKubectlShellImageFlag(t *testing.T) {
 	tests := []struct {
 		name                         string

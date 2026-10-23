@@ -88,6 +88,7 @@ export type EdgeStack = Partial<RelativePathModel> & {
   ManifestPath: string;
   DeploymentType: DeploymentType;
   UseManifestNamespaces: boolean;
+  GitSourceId?: number;
 } & Partial<{
     // EE
     Registries: RegistryId[];

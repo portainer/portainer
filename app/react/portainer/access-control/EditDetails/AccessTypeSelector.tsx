@@ -12,6 +12,7 @@ export function AccessTypeSelector({
   teams,
   value,
   onChange,
+  resourceName = 'resource',
 }: {
   name: string;
   isAdmin: boolean;
@@ -19,8 +20,9 @@ export function AccessTypeSelector({
   isPublicVisible: boolean;
   value: ResourceControlOwnership;
   onChange(value: ResourceControlOwnership): void;
+  resourceName?: string;
 }) {
-  const options = useOptions(isAdmin, teams, isPublicVisible);
+  const options = useOptions(isAdmin, teams, isPublicVisible, resourceName);
 
   return (
     <BoxSelector

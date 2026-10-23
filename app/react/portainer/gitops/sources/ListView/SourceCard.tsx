@@ -2,9 +2,10 @@ import { AlertTriangle, GitCommit, Server, WatchIcon } from 'lucide-react';
 import moment from 'moment';
 
 import { Icon } from '@@/Icon';
+import { Link } from '@@/Link';
 import { SortableListItem } from '@@/SortableList/SortableListItem';
 
-import { StatusBadge } from '../../WorkflowsView/WorkflowBadges';
+import { StatusBadge } from '../../components/StatusBadge';
 import { Source, SOURCE_TYPES } from '../types';
 
 import { StatBlock } from './StatBlock';
@@ -24,9 +25,14 @@ export function SourceCard({ item }: { item: Source }) {
         <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className="truncate font-semibold tracking-wide text-gray-9 th-highcontrast:text-white th-dark:text-white">
+              <Link
+                to="portainer.gitops.sources.item"
+                params={{ sourceId: item.id }}
+                className="truncate font-semibold tracking-wide text-gray-9 th-highcontrast:text-white th-dark:text-white"
+                data-cy={`source-link-${item.id}`}
+              >
                 {item.name}
-              </span>
+              </Link>
               <StatusBadge status={item.status} />
             </div>
             <span className="truncate text-sm text-gray-7 th-highcontrast:text-gray-3 th-dark:text-gray-3">

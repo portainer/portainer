@@ -133,6 +133,10 @@ func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 // SnapshotEndpoint will create a snapshot of the environment(endpoint) based on the environment(endpoint) type.
 // If the snapshot is a success, it will be associated to the environment(endpoint).
 func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
+	return service.SnapshotEndpointTx(service.dataStore, endpoint)
+}
+
+func (service *Service) SnapshotEndpointTx(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
 	if endpoint.Type == portainer.AgentOnDockerEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig)
 		if err != nil {
@@ -151,10 +155,10 @@ func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 	case portainer.AzureEnvironment:
 		return nil
 	case portainer.KubernetesLocalEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnKubernetesEnvironment:
-		return service.snapshotKubernetesEndpoint(endpoint)
+		return service.snapshotKubernetesEndpoint(tx, endpoint)
 	}
 
-	return service.snapshotDockerEndpoint(endpoint)
+	return service.snapshotDockerEndpoint(tx, endpoint)
 }
 
 func (service *Service) Create(snapshot portainer.Snapshot) error {
@@ -165,7 +169,7 @@ func (service *Service) FillSnapshotData(endpoint *portainer.Endpoint, includeRa
 	return FillSnapshotData(service.dataStore, endpoint, includeRaw)
 }
 
-func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
+func (service *Service) snapshotKubernetesEndpoint(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
 	kubernetesSnapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
 	if err != nil {
 		return err
@@ -174,13 +178,13 @@ func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint)
 	if kubernetesSnapshot != nil {
 		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Kubernetes: kubernetesSnapshot}
 
-		return service.dataStore.Snapshot().Create(snapshot)
+		return tx.Snapshot().Create(snapshot)
 	}
 
 	return nil
 }
 
-func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) error {
+func (service *Service) snapshotDockerEndpoint(tx dataservices.DataStoreTx, endpoint *portainer.Endpoint) error {
 	dockerSnapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
 	if err != nil {
 		return err
@@ -193,7 +197,7 @@ func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) err
 	if dockerSnapshot != nil {
 		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Docker: dockerSnapshot}
 
-		return service.dataStore.Snapshot().Create(snapshot)
+		return tx.Snapshot().Create(snapshot)
 	}
 
 	return nil
@@ -279,7 +283,7 @@ func updateEndpointStatus(tx dataservices.DataStoreTx, endpoint *portainer.Endpo
 	if snapshotError != nil {
 		log.Debug().
 			Str("endpoint", endpoint.Name).
-			Str("URL", endpoint.URL).Err(err).
+			Str("URL", endpoint.URL).Err(snapshotError).
 			Msg("background schedule error (environment snapshot), unable to create snapshot")
 
 		latestEndpointReference.Status = portainer.EndpointStatusDown

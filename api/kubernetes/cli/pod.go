@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -17,13 +18,90 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (kcl *KubeClient) GetPods(namespace string) ([]corev1.Pod, error) {
-	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
+// GetPods gets the pods in the given namespace (or all namespaces when empty),
+// optionally narrowed by labelSelector and fieldSelector (raw Kubernetes selector
+// strings, empty to skip).
+// if the user is an admin, all matching pods are fetched.
+// otherwise, namespaces the non-admin user has access to will be used to filter the pods.
+func (kcl *KubeClient) GetPods(namespace string, opts models.K8sResourceListOptions) ([]corev1.Pod, error) {
+	if kcl.GetIsKubeAdmin() {
+		return kcl.getPods(namespace, opts)
+	}
+
+	return kcl.getPodsForNonAdmin(namespace, opts)
+}
+
+// getPodsForNonAdmin fetches the pods in the namespaces the user has access to.
+// This function is called when the user is not an admin.
+func (kcl *KubeClient) getPodsForNonAdmin(namespace string, opts models.K8sResourceListOptions) ([]corev1.Pod, error) {
+	nonAdminNamespaces := kcl.GetClientNonAdminNamespaces()
+
+	log.Debug().
+		Strs("non_admin_namespaces", nonAdminNamespaces).
+		Msg("fetching pods for non-admin user")
+
+	if len(nonAdminNamespaces) == 0 {
+		return nil, nil
+	}
+
+	pods, err := kcl.getPods(namespace, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	nonAdminNamespaceSet := kcl.buildNonAdminNamespacesMap()
+	results := []corev1.Pod{}
+	for _, pod := range pods {
+		if _, ok := nonAdminNamespaceSet[pod.Namespace]; ok {
+			results = append(results, pod)
+		}
+	}
+
+	return results, nil
+}
+
+func (kcl *KubeClient) getPods(namespace string, opts models.K8sResourceListOptions) ([]corev1.Pod, error) {
+	pods, err := kcl.cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: opts.LabelSelector,
+		FieldSelector: opts.FieldSelector,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	return pods.Items, nil
+}
+
+// GetPodLogsStream returns the logs for a pod in the given namespace as a stream.
+// The caller is responsible for closing the returned reader. When opts.Follow is
+// set the stream stays open and emits new log lines until the context is cancelled;
+// otherwise it ends at EOF once the current logs have been read. When the pod has
+// more than one container, opts.Container must be set; otherwise the Kubernetes API
+// returns an error listing the available containers.
+func (kcl *KubeClient) GetPodLogsStream(ctx context.Context, namespace, podName string, opts corev1.PodLogOptions) (io.ReadCloser, error) {
+	return kcl.cli.CoreV1().Pods(namespace).GetLogs(podName, &opts).Stream(ctx)
+}
+
+// DeletePod deletes a single pod. The owning controller (Deployment,
+// StatefulSet, DaemonSet, ...) is responsible for recreating it. For naked
+// pods the pod is removed permanently.
+func (kcl *KubeClient) DeletePod(namespace, name string) error {
+	return kcl.cli.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+}
+
+// RestartPod restarts all containers inside a pod in place using the
+// Kubernetes 1.35 alpha pod-restart subresource. The pod itself is preserved.
+// Requires the cluster to expose the corresponding subresource (and feature
+// gate). On clusters that don't, the API server typically returns 404 or 405
+// which is surfaced to the caller.
+func (kcl *KubeClient) RestartPod(namespace, name string) error {
+	return kcl.cli.CoreV1().RESTClient().Post().
+		Namespace(namespace).
+		Resource("pods").
+		Name(name).
+		SubResource("restart").
+		Do(context.TODO()).
+		Error()
 }
 
 // isReplicaSetOwner checks if the pod's owner reference is a ReplicaSet

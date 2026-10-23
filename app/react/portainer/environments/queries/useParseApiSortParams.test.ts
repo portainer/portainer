@@ -7,12 +7,13 @@ import {
   PlatformType,
 } from '@/react/portainer/environments/types';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
+import { createMockEnvironmentGroup } from '@/react-tools/test-mocks';
 
 import { useParseSortGroupApiParams } from './useParseApiSortParams';
 
 const groups: EnvironmentGroup[] = [
-  { Id: 1, Name: 'Unassigned' } as EnvironmentGroup,
-  { Id: 2, Name: 'Production' } as EnvironmentGroup,
+  createMockEnvironmentGroup({ Id: 1, Name: 'Unassigned' }),
+  createMockEnvironmentGroup({ Id: 2, Name: 'Production' }),
 ];
 
 describe('useParseSortGroupApiParams', () => {

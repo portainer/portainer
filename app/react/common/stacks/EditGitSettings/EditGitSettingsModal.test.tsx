@@ -29,6 +29,7 @@ vi.mock('@/portainer/services/notifications', () => ({
 const mockStack = createMockStack({
   Id: 1,
   EndpointId: 1,
+  GitSourceId: 1,
   GitConfig: {
     URL: 'https://github.com/test/repo',
     ReferenceName: 'main',
@@ -146,6 +147,20 @@ describe('EditGitSettingsModal', () => {
 
 function renderComponent(onClose = vi.fn()) {
   server.use(
+    http.get('/api/gitops/sources', () =>
+      HttpResponse.json([
+        {
+          id: 1,
+          name: 'test-source',
+          type: 'git',
+          url: 'https://github.com/test/repo',
+          status: 'valid',
+          usedBy: 0,
+          environments: 0,
+          lastSync: 0,
+        },
+      ])
+    ),
     http.post('/api/gitops/repo/refs', () => HttpResponse.json([])),
     http.post('/api/gitops/repo/files/search', () => HttpResponse.json([]))
   );

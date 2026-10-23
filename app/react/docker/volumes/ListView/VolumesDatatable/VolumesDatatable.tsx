@@ -49,7 +49,7 @@ export function VolumesDatatable({
   isBrowseVisible: boolean;
 }) {
   const tableState = useTableState(store, storageKey);
-  useRepeater(tableState.autoRefreshRate, onRefresh);
+  useRepeater(tableState.autoRefreshRateMS, onRefresh);
   const columns = useColumns();
 
   return (
@@ -66,7 +66,7 @@ export function VolumesDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

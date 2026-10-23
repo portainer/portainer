@@ -372,4 +372,23 @@ vi.mock('@/react/hooks/useParamState', () => ({
     }
     return [parseParams(params), setState] as const;
   },
+  usePersistedParamsState: <T extends Record<string, unknown>>(
+    parseParams: (params: Record<string, unknown>) => T
+  ) => {
+    const [params, setParams] = useState<Record<string, unknown>>({});
+    function setState(newState: Partial<T>) {
+      setParams((prev) => {
+        const next = { ...prev };
+        for (const [k, v] of Object.entries(newState)) {
+          if (v === null || v === undefined) {
+            delete next[k];
+          } else {
+            next[k] = v;
+          }
+        }
+        return next;
+      });
+    }
+    return [parseParams(params), setState] as const;
+  },
 }));

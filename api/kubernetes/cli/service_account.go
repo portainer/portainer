@@ -261,6 +261,57 @@ func (kcl *KubeClient) removeNamespaceAccessForServiceAccount(serviceAccountName
 	return err
 }
 
+func (kcl *KubeClient) RemoveUserServiceAccountBindings(userID int) error {
+	serviceAccountName := UserServiceAccountName(userID, kcl.instanceID)
+
+	namespaces, err := kcl.cli.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, ns := range namespaces.Items {
+		if err := kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, ns.Name); err != nil {
+			return err
+		}
+	}
+
+	return kcl.removeServiceAccountFromUserClusterRoleBinding(serviceAccountName)
+}
+
+func (kcl *KubeClient) RemoveUserServiceAccount(userID int) error {
+	if err := kcl.RemoveUserServiceAccountBindings(userID); err != nil {
+		return err
+	}
+
+	serviceAccountName := UserServiceAccountName(userID, kcl.instanceID)
+	if err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.TODO(), serviceAccountName, metav1.DeleteOptions{}); err != nil && !k8serrors.IsNotFound(err) {
+		return err
+	}
+
+	return nil
+}
+
+func (kcl *KubeClient) removeServiceAccountFromUserClusterRoleBinding(serviceAccountName string) error {
+	crb, err := kcl.cli.RbacV1().ClusterRoleBindings().Get(context.TODO(), portainerUserCRBName, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	updated := crb.Subjects[:0]
+	for _, s := range crb.Subjects {
+		if s.Name != serviceAccountName {
+			updated = append(updated, s)
+		}
+	}
+	crb.Subjects = updated
+
+	_, err = kcl.cli.RbacV1().ClusterRoleBindings().Update(context.TODO(), crb, metav1.UpdateOptions{})
+	return err
+}
+
 func (kcl *KubeClient) AddImagePullSecretToServiceAccount(namespace, serviceAccountName, secretName string) error {
 	sa, err := kcl.cli.CoreV1().ServiceAccounts(namespace).Get(context.TODO(), serviceAccountName, metav1.GetOptions{})
 	if err != nil {

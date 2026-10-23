@@ -113,7 +113,7 @@ describe('GeneralEnvironmentForm', () => {
           setTimeout(resolve, 100);
         });
         requestPayload = await request.json();
-        return HttpResponse.json({});
+        return HttpResponse.json(createMockEnvironment());
       })
     );
 
@@ -354,7 +354,7 @@ describe('GeneralEnvironmentForm', () => {
               setTimeout(resolve, 100);
             });
             requestPayload = await request.json();
-            return HttpResponse.json({});
+            return HttpResponse.json(createMockEnvironment());
           })
         );
 

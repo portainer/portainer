@@ -145,7 +145,7 @@ class KubernetesConfigMapController {
       } catch (err) {
         if (err.status === 403) {
           this.$state.go('kubernetes.configurations', { tab: 'configmaps' });
-          throw new Error('Not authorized to edit ConfigMap');
+          throw new Error('Not authorized to edit ConfigMap', { cause: err });
         }
       }
 

@@ -25,11 +25,11 @@ export function NodesDatatable() {
   const tableState = useTableState(settingsStore, storageKey);
   const environmentId = useEnvironmentId();
   const { data: nodes, ...nodesQuery } = useNodesQuery(environmentId, {
-    autoRefreshRate: tableState.autoRefreshRate * 1000,
+    autoRefreshRate: tableState.autoRefreshRateMS,
   });
   const { data: kubernetesEndpoints, ...kubernetesEndpointsQuery } =
     useKubernetesEndpointsQuery(environmentId, {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     });
   const { data: environment, ...environmentQuery } =
     useEnvironment(environmentId);
@@ -59,7 +59,7 @@ export function NodesDatatable() {
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

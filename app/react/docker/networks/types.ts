@@ -12,7 +12,7 @@ export type NetworkId = string;
 
 export type NetworkOptions = Record<string, string>;
 
-type IpamOptions = Record<string, string> | null;
+type IpamOptions = Record<string, string> | undefined;
 
 export type NetworkResponseContainer = {
   EndpointID: string;

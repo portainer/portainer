@@ -14,7 +14,6 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
-import { Alert } from '@@/Alert';
 import { StickyFooter } from '@@/StickyFooter/StickyFooter';
 
 import {
@@ -94,15 +93,6 @@ export function EnvironmentCreationView() {
           <WidgetTitle icon={Wand2} title="Environment Wizard" />
           <WidgetBody>
             <FormSection title={formTitles[currentStep.id]}>
-              {currentStep.id === 'kaas' && (
-                <Alert color="warn" title="Deprecated Feature" className="mb-2">
-                  Provisioning a KaaS environment from Portainer is deprecated
-                  and will be removed in a future release. You will still be
-                  able to use any Kubernetes clusters provisioned using this
-                  method but will no longer have access to any of the
-                  KaaS-specific management functionality.
-                </Alert>
-              )}
               <Component
                 onCreate={handleCreateEnvironment}
                 isDockerStandalone={isDockerStandalone}
@@ -222,7 +212,8 @@ function useAnalyticsState() {
     kubernetesAgent: 0,
     kubernetesEdgeAgentAsync: 0,
     kubernetesEdgeAgentStandard: 0,
-    kaasAgent: 0,
+    kubesoloEdgeAgentStandard: 0,
+    kubesoloEdgeAgentAsync: 0,
     aciApi: 0,
     localEndpoint: 0,
   });

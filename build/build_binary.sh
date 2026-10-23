@@ -2,12 +2,6 @@
 set -euo pipefail
 
 BUILD_SOURCESDIRECTORY=${BUILD_SOURCESDIRECTORY:-$(pwd)}
-BINARY_VERSION_FILE="$BUILD_SOURCESDIRECTORY/binary-version.json"
-
-if [[ ! -f $BINARY_VERSION_FILE ]] ; then
-    echo 'File $BINARY_VERSION_FILE not found, aborting build.'
-    exit 1
-fi
 
 mkdir -p dist
 
@@ -22,7 +16,7 @@ GO_VERSION=${GO_VERSION:-$(go version | awk '{print $3}')}
 GIT_COMMIT_HASH=${GIT_COMMIT_HASH:-$(git rev-parse --short HEAD)}
 
 # populate dependencies versions
-DOCKER_VERSION=$(jq -r '.docker' < "${BINARY_VERSION_FILE}")
+DOCKER_VERSION=$(go list -m -f '{{.Version}}' github.com/docker/docker)
 COMPOSE_VERSION=$(go list -m -f '{{.Version}}' github.com/docker/compose/v2)
 # Kubernetes SDK uses v0.x.y versioning, but official kubectl releases use v1.x.y
 # We need to transform the version (e.g., v0.33.2 -> v1.33.2)

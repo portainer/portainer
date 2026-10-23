@@ -14,6 +14,10 @@ func (tx *StoreTx) IsErrObjectNotFound(err error) bool {
 	return tx.store.IsErrObjectNotFound(err)
 }
 
+func (tx *StoreTx) AllowList() dataservices.AllowListService {
+	return tx.store.AllowListService.Tx(tx.tx)
+}
+
 func (tx *StoreTx) CustomTemplate() dataservices.CustomTemplateService {
 	return tx.store.CustomTemplateService.Tx(tx.tx)
 }
@@ -74,6 +78,10 @@ func (tx *StoreTx) Snapshot() dataservices.SnapshotService {
 	return tx.store.SnapshotService.Tx(tx.tx)
 }
 
+func (tx *StoreTx) Source() dataservices.SourceService {
+	return tx.store.SourceService.Tx(tx.tx)
+}
+
 func (tx *StoreTx) SSLSettings() dataservices.SSLSettingsService {
 	return tx.store.SSLSettingsService.Tx(tx.tx)
 }
@@ -102,3 +110,7 @@ func (tx *StoreTx) User() dataservices.UserService {
 
 func (tx *StoreTx) Version() dataservices.VersionService { return nil }
 func (tx *StoreTx) Webhook() dataservices.WebhookService { return nil }
+
+func (tx *StoreTx) Workflow() dataservices.WorkflowService {
+	return tx.store.WorkflowService.Tx(tx.tx)
+}

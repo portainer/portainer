@@ -1,11 +1,11 @@
 import { Meta, StoryObj } from '@storybook/react-webpack5';
 import {
-  Layers,
-  AlertCircle,
+  LayoutGrid,
+  Shield,
   Database,
+  AlertCircle,
   Plus,
   RefreshCw,
-  Shield,
   Trash2,
 } from 'lucide-react';
 
@@ -13,6 +13,7 @@ import KubernetesLogo from '@/assets/ico/vendor/kubernetes.svg';
 import DockerLogo from '@/assets/ico/vendor/docker.svg';
 import PodmanLogo from '@/assets/ico/vendor/podman.svg';
 
+import { ResourceDetailHeaderSkeleton } from './ResourceDetailHeaderSkeleton';
 import { ResourceDetailHeader } from './ResourceDetailHeader';
 import { ActionBarButton } from './ActionBarButton';
 import { ActionBarShell } from './ActionBarShell';
@@ -65,10 +66,10 @@ type Story = StoryObj<typeof ResourceDetailHeader>;
  */
 export const ActionBar: Story = {
   args: {
-    isLoading: false,
     title: 'Production Cluster',
-    icon: <Layers className="text-blue-9 th-dark:text-blue-3" />,
-    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    icon: (
+      <LayoutGrid className="!text-group-accent-8 th-dark:!text-group-accent-2" />
+    ),
     subtitleLabel: 'Environment Group',
     description: 'Resource detail header with the action bar slot in use',
   },
@@ -115,10 +116,10 @@ export const ActionBar: Story = {
  */
 export const StatBlocks: Story = {
   args: {
-    isLoading: false,
     title: 'orders-api',
-    icon: <Layers className="text-blue-9 th-dark:text-blue-3" />,
-    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    icon: (
+      <LayoutGrid className="!text-group-accent-8 th-dark:!text-group-accent-2" />
+    ),
     subtitleLabel: 'GitOps Source',
     description: 'Synced from origin/main · 14 services',
     rightInfo: (
@@ -149,10 +150,10 @@ export const StatBlocks: Story = {
  */
 export const WithStatBlocksAndActionBar: Story = {
   args: {
-    isLoading: false,
     title: 'Production Cluster',
-    icon: <Layers className="text-blue-9 th-dark:text-blue-3" />,
-    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    icon: (
+      <LayoutGrid className="!text-group-accent-8 th-dark:!text-group-accent-2" />
+    ),
     subtitleLabel: 'Environment Group',
     description: 'Main production environment group',
   },
@@ -212,10 +213,8 @@ export const WithStatBlocksAndActionBar: Story = {
 
 export const Default: Story = {
   args: {
-    isLoading: false,
     title: 'Production Cluster',
-    icon: <Layers className="text-blue-9 th-dark:text-blue-3" />,
-    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    icon: <LayoutGrid className="text-blue-9 th-dark:text-blue-3" />,
     subtitleLabel: 'Environment Group',
     description: 'Main production environment group',
   },
@@ -234,27 +233,21 @@ export const WithBadge: Story = {
 
 export const MinimalUsage: Story = {
   args: {
-    isLoading: false,
     title: 'Simple Group',
-    icon: <Layers className="text-blue-8" />,
+    icon: <LayoutGrid className="text-blue-8" />,
   },
 };
 
 export const LoadingState: Story = {
-  args: {
-    isLoading: true,
-    title: 'Loading...',
-    icon: <Layers />,
-  },
+  render: () => (
+    <ResourceDetailHeaderSkeleton statBlockCount={2} hasActionBar />
+  ),
 };
 
-export const ErrorState: Story = {
-  args: {
-    isLoading: false,
-    errorMessage: 'Failed to load group details',
-    title: '',
-    icon: <AlertCircle />,
-  },
+export const LoadingStateNoActionBar: Story = {
+  render: () => (
+    <ResourceDetailHeaderSkeleton statBlockCount={1} hasActionBar={false} />
+  ),
 };
 
 export const CustomIconBackground: Story = {
@@ -262,6 +255,20 @@ export const CustomIconBackground: Story = {
     ...Default.args,
     icon: <Database className="text-warning-8 th-dark:text-warning-2" />,
     iconBackgroundClassName: 'bg-warning-3 th-dark:bg-warning-10',
+  },
+};
+
+export const WithoutDescription: Story = {
+  args: {
+    ...Default.args,
+    description: undefined,
+  },
+};
+
+export const WithoutStats: Story = {
+  args: {
+    ...Default.args,
+    rightInfo: undefined,
   },
 };
 
@@ -275,12 +282,74 @@ export const LongTitle: Story = {
   },
 };
 
+export const DevelopmentGroup: Story = {
+  args: {
+    title: 'Development Environments',
+    icon: <LayoutGrid className="text-success-8 th-dark:text-success-2" />,
+    iconBackgroundClassName: 'bg-success-3 th-dark:bg-success-10',
+    subtitleLabel: 'Environment Group',
+    description: 'Development and testing environments for team collaboration',
+    badge: (
+      <span className="inline-block rounded-full bg-success-1 px-2 py-1 text-xs font-medium text-success-9 th-dark:bg-success-11 th-dark:text-success-2">
+        Dev
+      </span>
+    ),
+  },
+};
+
+export const StagingGroup: Story = {
+  args: {
+    title: 'Staging Environment',
+    icon: <LayoutGrid className="text-orange-8 th-dark:text-orange-2" />,
+    iconBackgroundClassName: 'bg-orange-3 th-dark:bg-orange-10',
+    subtitleLabel: 'Environment Group',
+    description: 'Staging and pre-production validation environment',
+    badge: (
+      <span className="inline-block rounded-full bg-orange-1 px-2 py-1 text-xs font-medium text-orange-9 th-dark:bg-orange-11 th-dark:text-orange-2">
+        Staging
+      </span>
+    ),
+  },
+};
+
+export const PolicyExample: Story = {
+  args: {
+    title: 'Security Policy',
+    icon: <Shield className="h-6 w-6 text-blue-9 th-dark:text-blue-3" />,
+    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    subtitleLabel: 'Policy',
+    subtitleClassName: 'text-blue-10 th-dark:text-blue-8',
+    badge: (
+      <span className="inline-block rounded bg-blue-2 px-2 py-1 text-xs font-medium text-blue-9 th-dark:bg-blue-11 th-dark:text-blue-2">
+        Docker
+      </span>
+    ),
+    rightInfo: (
+      <div className="text-muted text-sm">
+        <b>12</b> environments targeted
+      </div>
+    ),
+  },
+};
+
+export const CustomSubtitleColor: Story = {
+  args: {
+    title: 'Custom Entity',
+    icon: <AlertCircle className="text-purple-8" />,
+    iconBackgroundClassName: 'bg-purple-3 th-dark:bg-purple-9',
+    subtitleLabel: 'Custom Type',
+    subtitleClassName: 'text-purple-10 th-dark:text-purple-8',
+    description:
+      'Demonstrates custom subtitle color for different entity types',
+  },
+};
+
 export const EnvironmentGroup: Story = {
   args: {
-    isLoading: false,
     title: 'Production Cluster',
-    icon: <Layers className="text-blue-9 th-dark:text-blue-3" />,
-    iconBackgroundClassName: 'bg-blue-3 th-dark:bg-blue-9',
+    icon: (
+      <LayoutGrid className="!text-group-accent-8 th-dark:!text-group-accent-2" />
+    ),
     subtitleLabel: 'Environment Group',
     description: 'Main production environment group',
   },

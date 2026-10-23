@@ -24,14 +24,16 @@ import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
 
 interface Props {
   resourceControl?: ResourceControlViewModel;
-  resourceType: ResourceControlType;
+  resourceType?: ResourceControlType;
   isAuthorisedToFetchUsers?: boolean;
+  resourceName?: string;
 }
 
 export function AccessControlPanelDetails({
   resourceControl,
   resourceType,
   isAuthorisedToFetchUsers = false,
+  resourceName = 'resource',
 }: Props) {
   const inheritanceMessage = getInheritanceMessage(
     resourceType,
@@ -81,7 +83,7 @@ export function AccessControlPanelDetails({
               aria-label="ownership-icon"
             />
             <span aria-label="ownership">{ownership}</span>
-            <Tooltip message={getOwnershipTooltip(ownership)} />
+            <Tooltip message={getOwnershipTooltip(ownership, resourceName)} />
           </td>
         </tr>
         {inheritanceMessage}
@@ -102,22 +104,25 @@ export function AccessControlPanelDetails({
   );
 }
 
-function getOwnershipTooltip(ownership: ResourceControlOwnership) {
+function getOwnershipTooltip(
+  ownership: ResourceControlOwnership,
+  resourceName: string
+) {
   switch (ownership) {
     case ResourceControlOwnership.PRIVATE:
-      return 'Management of this resource is restricted to a single user.';
+      return `Management of this ${resourceName} is restricted to a single user.`;
     case ResourceControlOwnership.RESTRICTED:
-      return 'This resource can be managed by a restricted set of users and/or teams.';
+      return `This ${resourceName} can be managed by a restricted set of users and/or teams.`;
     case ResourceControlOwnership.PUBLIC:
-      return 'This resource can be managed by any user with access to this environment.';
+      return `This ${resourceName} can be managed by any user with access to this environment.`;
     case ResourceControlOwnership.ADMINISTRATORS:
     default:
-      return 'This resource can only be managed by administrators.';
+      return `This ${resourceName} can only be managed by administrators.`;
   }
 }
 
 function getInheritanceMessage(
-  resourceType: ResourceControlType,
+  resourceType: ResourceControlType | undefined,
   resourceControl?: ResourceControlViewModel
 ) {
   if (!resourceControl || resourceControl.Type === resourceType) {

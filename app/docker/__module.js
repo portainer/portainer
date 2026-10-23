@@ -3,6 +3,7 @@ import angular from 'angular';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 
 import { EnvironmentStatus } from '@/react/portainer/environments/types';
+import { AccessHeaders } from '@/portainer/authorization-guard';
 
 import { reactModule } from './react';
 
@@ -251,8 +252,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       url: '/networks',
       views: {
         'content@': {
-          templateUrl: './views/networks/networks.html',
-          controller: 'NetworksController',
+          component: 'networksListView',
         },
       },
       data: {
@@ -625,6 +625,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           component: 'dockerRegistryAccessView',
         },
       },
+      data: {
+        access: AccessHeaders.Admin,
+      },
     };
 
     const swarmRegistryAccess = {
@@ -634,6 +637,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         'content@': {
           component: 'dockerRegistryAccessView',
         },
+      },
+      data: {
+        access: AccessHeaders.Admin,
       },
     };
 

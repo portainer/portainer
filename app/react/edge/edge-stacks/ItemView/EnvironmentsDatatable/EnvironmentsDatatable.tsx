@@ -1,4 +1,3 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
 import { HardDrive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -7,6 +6,7 @@ import { useEnvironmentList } from '@/react/portainer/environments/queries';
 import { useParamState } from '@/react/hooks/useParamState';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+import { useIdParam } from '@/react/hooks/useIdParam';
 
 import { Datatable } from '@@/datatables';
 import { PortainerSelect } from '@@/form-components/PortainerSelect';
@@ -23,9 +23,8 @@ const tableKey = 'edge-stacks-environment';
 const settingsStore = createPersistedStore(tableKey);
 
 export function EnvironmentsDatatable() {
-  const {
-    params: { stackId },
-  } = useCurrentStateAndParams();
+  const stackId = useIdParam('stackId');
+
   const edgeStackQuery = useEdgeStack(stackId, {
     refetchInterval(data) {
       if (!data) {

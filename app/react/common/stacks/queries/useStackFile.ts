@@ -10,7 +10,7 @@ import { queryKeys } from './query-keys';
 export function useStackFile(
   stackId?: StackId,
   { version, commitHash }: { version?: number; commitHash?: string } = {},
-  { enabled = true }: { enabled?: boolean } = {}
+  { enabled }: { enabled?: boolean } = {}
 ) {
   return useQuery({
     queryKey: queryKeys.stackFile(stackId, { version, commitHash }),

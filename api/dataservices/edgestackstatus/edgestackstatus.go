@@ -1,6 +1,8 @@
 package edgestackstatus
 
 import (
+	"encoding/binary"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
@@ -85,5 +87,9 @@ func (s *Service) Clear(edgeStackID portainer.EdgeStackID, relatedEnvironmentsID
 }
 
 func (s *Service) key(edgeStackID portainer.EdgeStackID, endpointID portainer.EndpointID) []byte {
-	return append(s.conn.ConvertToKey(int(edgeStackID)), s.conn.ConvertToKey(int(endpointID))...)
+	k := make([]byte, 16)
+	binary.BigEndian.PutUint64(k[:8], uint64(edgeStackID))
+	binary.BigEndian.PutUint64(k[8:], uint64(endpointID))
+
+	return k
 }

@@ -8,8 +8,7 @@ import {
   GitFormModel,
   RelativePathModel,
 } from '@/react/portainer/gitops/types';
-import { saveGitCredentialsIfNeeded } from '@/react/portainer/account/git-credentials/queries/useCreateGitCredentialsMutation';
-import { UserId } from '@/portainer/users/types';
+import { withError } from '@/react-tools/react-query';
 
 import { DeploymentType, StaggerConfig } from '../../types';
 
@@ -18,11 +17,13 @@ import { createStackFromFileContent } from './createStackFromFileContent';
 import { createStackFromGit } from './createStackFromGit';
 
 export function useCreateEdgeStack() {
-  return useMutation(createEdgeStack);
+  return useMutation({
+    mutationFn: createEdgeStack,
+    ...withError('unable to create edge stack'),
+  });
 }
 
 export type BasePayload = {
-  userId: UserId;
   /** Name of the stack */
   name: string;
   /** Content of the Stack file */
@@ -92,7 +93,7 @@ function createEdgeStack({ method, payload }: CreateEdgeStackPayload) {
         Webhook: payload.webhook,
       });
     case 'git':
-      return createStackAndGitCredential(payload.userId, payload);
+      return createEdgeStackFromGit(payload);
     case 'string':
       return createStackFromFileContent({
         deploymentType: payload.deploymentType,
@@ -112,16 +113,13 @@ function createEdgeStack({ method, payload }: CreateEdgeStackPayload) {
   }
 }
 
-async function createStackAndGitCredential(
-  userId: UserId,
+function createEdgeStackFromGit(
   payload: BasePayload & {
     git: GitFormModel;
     relativePathSettings?: RelativePathModel;
     autoUpdate: AutoUpdateResponse | null;
   }
 ) {
-  const resolvedAuth = await saveGitCredentialsIfNeeded(userId, payload.git);
-
   return createStackFromGit({
     deploymentType: payload.deploymentType,
     edgeGroups: payload.edgeGroups,
@@ -132,13 +130,9 @@ async function createStackAndGitCredential(
     retryDeploy: payload.retryDeploy,
     staggerConfig: payload.staggerConfig,
     useManifestNamespaces: payload.useManifestNamespaces,
-    repositoryUrl: payload.git.RepositoryURL,
+    sourceId: payload.git.SourceId,
     repositoryReferenceName: payload.git.RepositoryReferenceName,
     filePathInRepository: payload.git.ComposeFilePathInRepository,
-    repositoryAuthentication: resolvedAuth.RepositoryAuthentication,
-    repositoryUsername: resolvedAuth.RepositoryUsername,
-    repositoryPassword: resolvedAuth.RepositoryPassword,
-    repositoryGitCredentialId: resolvedAuth.RepositoryGitCredentialID,
     filesystemPath: payload.relativePathSettings?.FilesystemPath,
     supportRelativePath: payload.relativePathSettings?.SupportRelativePath,
     perDeviceConfigsGroupMatchType:
@@ -146,7 +140,6 @@ async function createStackAndGitCredential(
     perDeviceConfigsMatchType:
       payload.relativePathSettings?.PerDeviceConfigsMatchType,
     perDeviceConfigsPath: payload.relativePathSettings?.PerDeviceConfigsPath,
-    tlsSkipVerify: payload.git.TLSSkipVerify,
     autoUpdate: payload.autoUpdate,
   });
 }

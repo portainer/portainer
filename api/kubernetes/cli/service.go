@@ -176,10 +176,10 @@ func (kcl *KubeClient) UpdateService(namespace string, info models.K8sServiceInf
 // if replicasets are found, it updates the owner reference to deployment
 // it then combines the service with the application
 // finally, it returns a list of K8sServiceInfo objects
-func (kcl *KubeClient) CombineServicesWithApplications(services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
+func (kcl *KubeClient) CombineServicesWithApplications(namespace string, services []models.K8sServiceInfo) ([]models.K8sServiceInfo, error) {
 	if containsServiceWithSelector(services) {
 		updatedServices := make([]models.K8sServiceInfo, len(services))
-		portainerApplicationResources, err := kcl.fetchAllApplicationsListResources("", metav1.ListOptions{})
+		portainerApplicationResources, err := kcl.fetchAllApplicationsListResources(namespace, metav1.ListOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("an error occurred during the CombineServicesWithApplications operation, unable to fetch pods and replica sets. Error: %w", err)
 		}
@@ -216,12 +216,17 @@ func containsServiceWithSelector(services []models.K8sServiceInfo) bool {
 	return false
 }
 
-// buildServicesMap builds a map of service names from a list of K8sServiceInfo objects
-// it returns a map of service names for lookups
-func (kcl *KubeClient) buildServicesMap(services []models.K8sServiceInfo) map[string]struct{} {
-	serviceMap := make(map[string]struct{})
+// buildServicesMap builds a map keyed by namespace/name from a list of K8sServiceInfo objects
+// it returns a map for lookups scoped by namespace, since service names are only unique within a namespace
+func (kcl *KubeClient) buildServicesMap(services []models.K8sServiceInfo) map[string]models.K8sServiceInfo {
+	serviceMap := make(map[string]models.K8sServiceInfo, len(services))
 	for _, service := range services {
-		serviceMap[service.Name] = struct{}{}
+		serviceMap[serviceMapKey(service.Namespace, service.Name)] = service
 	}
 	return serviceMap
+}
+
+// serviceMapKey namespaces a service name for use as a buildServicesMap key.
+func serviceMapKey(namespace, name string) string {
+	return namespace + "/" + name
 }

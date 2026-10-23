@@ -115,6 +115,11 @@ func (handler *Handler) createEdgeStackFromFileUpload(r *http.Request, tx datase
 	if dryrun {
 		return stack, nil
 	}
+
+	if err := stackutils.ValidateEdgeStackComposeContent(r.Context(), payload.DeploymentType, payload.StackFileContent); err != nil {
+		return nil, httperrors.NewInvalidPayloadError(err.Error())
+	}
+
 	stack.CreatedByUserId = fmt.Sprintf("%d", tokenData.ID)
 	stack.CreatedBy = stackutils.SanitizeLabel(tokenData.Username)
 

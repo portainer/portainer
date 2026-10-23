@@ -1,7 +1,6 @@
 import { PropsWithChildren, ReactNode } from 'react';
 import { SchemaOf, string } from 'yup';
 
-import { StackId } from '@/react/common/stacks/types';
 import { useStateWrapper } from '@/react/hooks/useStateWrapper';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -11,27 +10,15 @@ import { TextTip } from '@@/Tip/TextTip';
 import { isBE } from '../../feature-flags/feature-flags.service';
 
 import { RefSelector } from './RefSelector';
-import { RefFieldModel } from './types';
 
 interface Props {
   value: string;
   onChange(value: string): void;
-  model: RefFieldModel;
+  sourceId?: number;
   error?: string;
-  isUrlValid?: boolean;
-  stackId?: StackId;
-  createdFromCustomTemplateId?: number;
 }
 
-export function RefField({
-  value,
-  onChange,
-  model,
-  error,
-  isUrlValid,
-  stackId,
-  createdFromCustomTemplateId,
-}: Props) {
+export function RefField({ value, onChange, sourceId, error }: Props) {
   const [inputValue, updateInputValue] = useStateWrapper(value, onChange);
   const inputId = 'repository-reference-field';
   return isBE ? (
@@ -50,10 +37,7 @@ export function RefField({
         inputId={inputId}
         value={value}
         onChange={onChange}
-        model={model}
-        isUrlValid={isUrlValid}
-        stackId={stackId}
-        createdFromCustomTemplateId={createdFromCustomTemplateId}
+        sourceId={sourceId}
       />
     </Wrapper>
   ) : (

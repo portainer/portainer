@@ -3,8 +3,6 @@ package backup
 import (
 	"fmt"
 	"os"
-	"path"
-	"path/filepath"
 	"time"
 
 	"github.com/portainer/portainer/api/archive"
@@ -60,13 +58,13 @@ func backupDatabaseAndFilesystem(gate *offlinegate.OfflineGate, datastore datase
 	unlock := gate.Lock()
 	defer unlock()
 
-	backupDirPath := filepath.Join(filestorePath, "backup", time.Now().Format("2006-01-02_15-04-05"))
+	backupDirPath := filesystem.JoinPaths(filestorePath, "backup", time.Now().Format("2006-01-02_15-04-05"))
 	if err := os.MkdirAll(backupDirPath, rwxr__r__); err != nil {
 		return "", errors.Wrap(err, "Failed to create backup dir")
 	}
 
 	// new export
-	exportFilename := path.Join(backupDirPath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+	exportFilename := filesystem.JoinPaths(backupDirPath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 	if err := datastore.Export(exportFilename); err != nil {
 		log.Error().Err(err).Str("filename", exportFilename).Msg("failed to export")
@@ -79,7 +77,7 @@ func backupDatabaseAndFilesystem(gate *offlinegate.OfflineGate, datastore datase
 	}
 
 	for _, filename := range filesToBackup {
-		if err := filesystem.CopyPath(filepath.Join(filestorePath, filename), backupDirPath); err != nil {
+		if err := filesystem.CopyPath(filesystem.JoinPaths(filestorePath, filename), backupDirPath); err != nil {
 			return "", errors.Wrap(err, "Failed to create backup file")
 		}
 	}
@@ -89,7 +87,7 @@ func backupDatabaseAndFilesystem(gate *offlinegate.OfflineGate, datastore datase
 
 func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
 	dbFileName := datastore.Connection().GetDatabaseFileName()
-	_, err := datastore.Backup(filepath.Join(backupDirPath, dbFileName))
+	_, err := datastore.Backup(filesystem.JoinPaths(backupDirPath, dbFileName))
 	return err
 }
 

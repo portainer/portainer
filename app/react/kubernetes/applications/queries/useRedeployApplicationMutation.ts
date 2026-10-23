@@ -31,7 +31,9 @@ export function useRedeployApplicationMutation(
           })
         );
       } catch (error) {
-        throw new Error(`Unable to redeploy application: ${error}`);
+        throw new Error(`Unable to redeploy application: ${error}`, {
+          cause: error,
+        });
       }
     },
     {

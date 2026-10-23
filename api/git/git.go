@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/portainer/portainer/api/filesystem"
@@ -47,11 +48,19 @@ func NewGitClient(preserveGitDir bool) *gitClient {
 }
 
 func (c *gitClient) Download(ctx context.Context, dst string, opt *git.CloneOptions) error {
+	resolved, err := filepath.EvalSymlinks(dst)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return errors.Wrap(err, "failed to resolve destination path")
+	}
+	if err == nil {
+		dst = resolved
+	}
+
 	wt := NewNoSymlinkFS(osfs.New(dst))
 	dot := osfs.New(filesystem.JoinPaths(dst, ".git"))
 	storer := gogitfs.NewStorage(dot, cache.NewObjectLRU(0))
 
-	_, err := git.CloneContext(ctx, storer, wt, opt)
+	_, err = git.CloneContext(ctx, storer, wt, opt)
 	if err != nil {
 		if err.Error() == "authentication required" {
 			return gittypes.ErrAuthenticationFailure
@@ -77,7 +86,7 @@ func (c *gitClient) LatestCommitID(ctx context.Context, repositoryUrl, reference
 		URLs: []string{repositoryUrl},
 	})
 
-	refs, err := remote.List(opt)
+	refs, err := remote.ListContext(ctx, opt)
 	if err != nil {
 		if err.Error() == "authentication required" {
 			return "", gittypes.ErrAuthenticationFailure
@@ -109,7 +118,7 @@ func (c *gitClient) ListRefs(ctx context.Context, repositoryUrl string, opt *git
 		URLs: []string{repositoryUrl},
 	})
 
-	refs, err := rem.List(opt)
+	refs, err := rem.ListContext(ctx, opt)
 	if err != nil {
 		return nil, checkGitError(err)
 	}

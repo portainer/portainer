@@ -1,7 +1,12 @@
 package middlewares
 
 import (
+	"net/http/httptest"
 	"testing"
+
+	"github.com/portainer/portainer/pkg/libhttp"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tests = []struct {
@@ -40,14 +45,14 @@ var tests = []struct {
 		expected:  "https",
 	},
 	{
-		name:      "multiple proxies - takes first",
+		name:      "multiple proxies - takes last",
 		forwarded: "proto=https, proto=http",
-		expected:  "https",
+		expected:  "http",
 	},
 	{
 		name:      "multiple proxies with complex format",
 		forwarded: "for=192.0.2.43;proto=https, for=198.51.100.17;proto=http",
-		expected:  "https",
+		expected:  "http",
 	},
 	{
 		name:      "multiple proxies with for directive only",
@@ -57,12 +62,12 @@ var tests = []struct {
 	{
 		name:      "multiple proxies with proto only in second",
 		forwarded: "for=192.0.2.43, proto=https",
-		expected:  "",
+		expected:  "https",
 	},
 	{
 		name:      "multiple proxies with proto only in first",
 		forwarded: "proto=https, for=198.51.100.17",
-		expected:  "https",
+		expected:  "",
 	},
 	{
 		name:      "quoted protocol value",
@@ -102,7 +107,7 @@ var tests = []struct {
 	{
 		name:      "whitespace around commas",
 		forwarded: "proto=https , proto=http",
-		expected:  "https",
+		expected:  "http",
 	},
 	{
 		name:      "IPv6 address in for directive",
@@ -112,7 +117,7 @@ var tests = []struct {
 	{
 		name:      "complex multiple proxies with IPv6",
 		forwarded: "for=192.0.2.43;proto=https, for=\"[2001:db8:cafe::17]\";proto=http",
-		expected:  "https",
+		expected:  "http",
 	},
 	{
 		name:      "obfuscated identifiers",
@@ -171,4 +176,40 @@ func FuzzParseForwardedHeaderProto(f *testing.F) {
 	f.Fuzz(func(t *testing.T, forwarded string) {
 		parseForwardedHeaderProto(forwarded)
 	})
+}
+
+func TestIsHTTPSRequest(t *testing.T) {
+	t.Parallel()
+
+	f := func(trustedProxyEntries []string, remoteAddr, xForwardedProto, forwarded string, want bool) {
+		t.Helper()
+
+		trustedProxies, err := libhttp.ParseTrustedProxies(trustedProxyEntries)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest("GET", "/", nil)
+		req.RemoteAddr = remoteAddr
+
+		if xForwardedProto != "" {
+			req.Header.Set("X-Forwarded-Proto", xForwardedProto)
+		}
+
+		if forwarded != "" {
+			req.Header.Set("Forwarded", forwarded)
+		}
+
+		require.Equal(t, want, IsHTTPSRequest(req, trustedProxies))
+	}
+
+	// no trusted proxies configured, header is honoured unconditionally
+	f(nil, "203.0.113.99:12345", "https", "", true)
+
+	// trusted proxy, rightmost X-Forwarded-Proto entry is used
+	f([]string{"127.0.0.1/32"}, "127.0.0.1:54321", "http, https", "", true)
+
+	// trusted proxy, falls back to the Forwarded header
+	f([]string{"127.0.0.1/32"}, "127.0.0.1:54321", "", "proto=http, proto=https", true)
+
+	// untrusted peer, spoofed header is ignored
+	f([]string{"10.0.0.1/32"}, "203.0.113.99:12345", "https", "", false)
 }

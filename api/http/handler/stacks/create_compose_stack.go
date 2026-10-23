@@ -6,10 +6,12 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git/update"
+	"github.com/portainer/portainer/api/gitops/sources"
+	"github.com/portainer/portainer/api/gitops/workflows"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackbuilders"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -51,25 +53,29 @@ func createStackPayloadFromComposeFileContentPayload(name string, fileContent st
 	}
 }
 
-func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID, stack *portainer.Stack) error {
+func (handler *Handler) checkAndCleanStackDupFromSwarm(_ http.ResponseWriter, _ *http.Request, _ *portainer.Endpoint, _ portainer.UserID, stack *portainer.Stack) error {
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
 		return err
 	}
 
-	// stop scheduler updates of the stack before removal
-	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
+	var reconcileSourceID portainer.SourceID
+	if stack.WorkflowID != 0 {
+		if _, sid, err := loadGitConfigForStack(handler.DataStore, source.InsecureNewAdminContext(), stack.WorkflowID, stack.ID); err == nil {
+			reconcileSourceID = sid
+		}
+
+		if err := workflows.DetachStackArtifact(handler.DataStore, stack.WorkflowID, stack.ID); err != nil {
+			return err
+		}
 	}
 
-	err = handler.DataStore.Stack().Delete(stack.ID)
-	if err != nil {
+	if err := handler.DataStore.Stack().Delete(stack.ID); err != nil {
 		return err
 	}
 
 	if resourceControl != nil {
-		err = handler.DataStore.ResourceControl().Delete(resourceControl.ID)
-		if err != nil {
+		if err := handler.DataStore.ResourceControl().Delete(resourceControl.ID); err != nil {
 			log.Error().
 				Str("stack", fmt.Sprintf("%+v", stack)).
 				Msg("unable to remove the associated resource control from the database for stack")
@@ -77,12 +83,15 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 	}
 
 	if exists, _ := handler.FileService.FileExists(stack.ProjectPath); exists {
-		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
-		if err != nil {
+		if err := handler.FileService.RemoveDirectory(stack.ProjectPath); err != nil {
 			log.Warn().
 				Str("stack", fmt.Sprintf("%+v", stack)).
 				Msg("unable to remove stack files from disk for stack")
 		}
+	}
+
+	if err := handler.SourceScheduler.Reconcile(reconcileSourceID); err != nil {
+		log.Warn().Err(err).Msg("source scheduler reconcile failed after stack duplicate cleanup")
 	}
 
 	return nil
@@ -160,7 +169,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		handler.FileService,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -171,15 +180,18 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 type composeStackFromGitRepositoryPayload struct {
 	// Name of the stack
 	Name string `example:"myStack" validate:"required"`
-	// URL of a Git repository hosting the Stack file
-	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// SourceID references an existing Source for git credentials/URL.
+	// When set, the inline URL and authentication fields are ignored.
+	SourceID portainer.SourceID `example:"1"`
+	// Deprecated: use SourceID instead. URL of a Git repository hosting the Stack file.
+	RepositoryURL string `example:"https://github.com/openfaas/faas"`
 	// Reference name of a Git repository hosting the Stack file
 	RepositoryReferenceName string `example:"refs/heads/master"`
-	// Use basic authentication to clone the Git repository
+	// Deprecated: use SourceID instead. Use basic authentication to clone the Git repository.
 	RepositoryAuthentication bool `example:"true"`
-	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Username used in basic authentication.
 	RepositoryUsername string `example:"myGitUsername"`
-	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	// Deprecated: use SourceID instead. Password used in basic authentication.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
@@ -191,14 +203,15 @@ type composeStackFromGitRepositoryPayload struct {
 	Env []portainer.Pair
 	// Whether the stack is from a app template
 	FromAppTemplate bool `example:"false"`
-	// TLSSkipVerify skips SSL verification when cloning the Git repository
+	// Deprecated: use SourceID instead. TLSSkipVerify skips SSL verification when cloning the Git repository.
 	TLSSkipVerify bool `example:"false"`
 }
 
-func createStackPayloadFromComposeGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool) stackbuilders.StackPayload {
+func createStackPayloadFromComposeGitPayload(name, repoUrl, repoReference, repoUsername, repoPassword string, repoAuthentication bool, composeFile string, additionalFiles []string, autoUpdate *portainer.AutoUpdateSettings, env []portainer.Pair, fromAppTemplate bool, repoSkipSSLVerify bool, sourceID portainer.SourceID) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		Name: name,
 		RepositoryConfigPayload: stackbuilders.RepositoryConfigPayload{
+			SourceID:       sourceID,
 			URL:            repoUrl,
 			ReferenceName:  repoReference,
 			Authentication: repoAuthentication,
@@ -218,11 +231,14 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if len(payload.Name) == 0 {
 		return errors.New("Invalid stack name")
 	}
-	if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
-		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
-	}
-	if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
-		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
+
+	if payload.SourceID == 0 {
+		if len(payload.RepositoryURL) == 0 || !validate.IsURL(payload.RepositoryURL) {
+			return errors.New("Invalid repository URL. Must correspond to a valid URL format")
+		}
+		if payload.RepositoryAuthentication && len(payload.RepositoryPassword) == 0 {
+			return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
+		}
 	}
 
 	return update.ValidateAutoUpdateSettings(payload.AutoUpdate)
@@ -273,7 +289,14 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
+	}
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
+	if payload.SourceID != 0 {
+		if _, httpErr := sources.ValidateGitSourceAccess(handler.DataStore, userContext, payload.SourceID); httpErr != nil {
+			return httpErr
+		}
 	}
 
 	stackPayload := createStackPayloadFromComposeGitPayload(payload.Name,
@@ -288,16 +311,17 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		payload.Env,
 		payload.FromAppTemplate,
 		payload.TLSSkipVerify,
+		payload.SourceID,
 	)
 
 	composeStackBuilder := stackbuilders.CreateComposeStackGitBuilder(securityContext,
 		handler.DataStore,
 		handler.FileService,
 		handler.GitService,
-		handler.Scheduler,
+		handler.SourceScheduler,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -383,7 +407,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		handler.FileService,
 		handler.StackDeployer)
 
-	stack, httpErr := stackbuilders.Build(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
+	stack, httpErr := stackbuilders.BuildAndAsyncDeploy(r.Context(), handler.DataStore, composeStackBuilder, &stackPayload, endpoint, userID)
 	if httpErr != nil {
 		return httpErr
 	}

@@ -20,6 +20,9 @@ interface Props extends AutomationTestingProps {
   label: string;
   isSubMenu?: boolean;
   ignorePaths?: string[];
+  /** When a create or detail path id differs from the list path, includePaths can be used to specify which paths should also mark the item as active.
+   *
+   * E.g. including the portainer.wizard.endpoints (create environment) path to activate the portainer.endpoints sidebar item. */
   includePaths?: string[];
   count?: number;
 }

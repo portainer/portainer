@@ -10,7 +10,10 @@ import { EnvironmentType } from '@/react/portainer/environments/types';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
-import { createMockUsers } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockUsers,
+} from '@/react-tools/test-mocks';
 import { Role } from '@/portainer/users/types';
 
 import { mockFormValues } from './test-utils';
@@ -34,14 +37,13 @@ describe('CreateStackForm - Webhook ID Integration', () => {
 
     server.use(
       http.get('/api/endpoints/1', () =>
-        HttpResponse.json({
-          Id: 1,
-          Type: EnvironmentType.Docker,
-          ComposeSyntaxMaxVersion: '3',
-          ChangeWindow: {
-            Enabled: false,
-          },
-        })
+        HttpResponse.json(
+          createMockEnvironment({
+            Id: 1,
+            Type: EnvironmentType.Docker,
+            ComposeSyntaxMaxVersion: '3',
+          })
+        )
       )
     );
   });
@@ -94,27 +96,16 @@ describe('CreateStackForm - Webhook ID Integration', () => {
         method: 'repository',
         name: 'test-stack',
         git: {
-          RepositoryURL: 'https://github.com/test/repo',
           RepositoryReferenceName: 'main',
           ComposeFilePathInRepository: 'docker-compose.yml',
-          RepositoryAuthentication: false,
-          RepositoryUsername: '',
-          RepositoryPassword: '',
-          RepositoryGitCredentialID: 0,
-          TLSSkipVerify: false,
           AdditionalFiles: [],
           AutoUpdate: {
             RepositoryAutomaticUpdates: true,
-            RepositoryMechanism: 'Webhook',
-            RepositoryFetchInterval: '',
             ForcePullImage: false,
             RepositoryAutomaticUpdatesForce: false,
           },
-          RepositoryAuthorizationType: undefined,
           SupportRelativePath: false,
           FilesystemPath: '',
-          SaveCredential: false,
-          NewCredentialName: '',
         },
       }),
     });

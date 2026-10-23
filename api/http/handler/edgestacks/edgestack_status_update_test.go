@@ -78,6 +78,72 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 	}
 }
 
+func TestUpdateStatusForUnassignedEdgeStack(t *testing.T) {
+	t.Parallel()
+	handler, _ := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	unrelatedEndpoint := createEndpointWithId(t, handler.DataStore, 6)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	newStatus := portainer.EdgeStackStatusRunning
+	payload := updateStatusPayload{
+		Status:     &newStatus,
+		EndpointID: unrelatedEndpoint.ID,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/edge_stacks/%d/status", edgeStack.ID), r)
+	require.NoError(t, err)
+
+	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, unrelatedEndpoint.EdgeID)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code)
+
+	_, err = handler.DataStore.EdgeStackStatus().Read(edgeStack.ID, unrelatedEndpoint.ID)
+	require.True(t, handler.DataStore.IsErrObjectNotFound(err))
+}
+
+func TestUpdateStatusRemovedAllowedAfterUnassignment(t *testing.T) {
+	t.Parallel()
+	handler, _ := setupHandler(t)
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	// Simulate the endpoint being unassigned from the stack (e.g. edge group changed)
+	// before the agent has torn down and reported its final status back.
+	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
+	require.NoError(t, err)
+
+	delete(relation.EdgeStacks, edgeStack.ID)
+	require.NoError(t, handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation))
+
+	newStatus := portainer.EdgeStackStatusRemoved
+	payload := updateStatusPayload{
+		Status:     &newStatus,
+		EndpointID: endpoint.ID,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	require.NoError(t, err)
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/edge_stacks/%d/status", edgeStack.ID), r)
+	require.NoError(t, err)
+
+	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, endpoint.EdgeID)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+}
+
 func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 	t.Parallel()
 	handler, _ := setupHandler(t)

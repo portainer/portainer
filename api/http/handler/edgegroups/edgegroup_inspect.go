@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/roar"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -55,7 +56,7 @@ func getEdgeGroup(tx dataservices.DataStoreTx, ID portainer.EdgeGroupID) (*porta
 	}
 
 	if edgeGroup.Dynamic {
-		endpoints, err := GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
+		endpoints, err := endpointutils.GetEndpointsByTags(tx, edgeGroup.TagIDs, edgeGroup.PartialMatch)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 		}

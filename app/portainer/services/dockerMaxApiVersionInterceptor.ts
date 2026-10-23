@@ -8,7 +8,6 @@ import { MAX_DOCKER_API_VERSION } from './dockerMaxApiVersion';
 
 const envVersionAxios = Axios.create({
   baseURL: 'api',
-  maxDockerAPIVersion: MAX_DOCKER_API_VERSION,
 });
 
 // setup a cache for the intermediary request sent by the interceptor
@@ -43,17 +42,16 @@ export async function dockerMaxAPIVersionInterceptor(
       );
 
       const apiVersion = parseFloat(data.ApiVersion ?? '0');
-      const { maxDockerAPIVersion } = config;
 
-      if (apiVersion > maxDockerAPIVersion) {
+      if (apiVersion > MAX_DOCKER_API_VERSION) {
         config.url = config.url?.replace(
           /docker/,
-          `docker/v${maxDockerAPIVersion}`
+          `docker/v${MAX_DOCKER_API_VERSION}`
         );
       }
     }
     return config;
-  } catch (err) {
+  } catch {
     // if the interceptor errors, return the original config
     return rawConfig;
   }

@@ -134,7 +134,7 @@ function KubeDeployDescription() {
       <div>
         You can get more information about Kubernetes file format in the
         <a
-          href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/"
+          href="https://kubernetes.io/docs/concepts/overview/working-with-objects/"
           target="_blank"
           rel="noreferrer"
         >

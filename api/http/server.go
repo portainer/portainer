@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http/csrf"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -65,8 +66,8 @@ import (
 	motdservice "github.com/portainer/portainer/api/motd"
 	"github.com/portainer/portainer/api/pendingactions"
 	"github.com/portainer/portainer/api/platform"
-	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/teardown"
 	libhelmtypes "github.com/portainer/portainer/pkg/libhelm/types"
 
 	"github.com/rs/zerolog/log"
@@ -104,7 +105,7 @@ type Server struct {
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
 	HelmPackageManager          libhelmtypes.HelmPackageManager
-	Scheduler                   *scheduler.Scheduler
+	SourceScheduler             *scheduling.SourceScheduler
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               deployments.StackDeployer
 	UpgradeService              upgrade.Service
@@ -113,6 +114,7 @@ type Server struct {
 	PlatformService             platform.Service
 	PullLimitCheckDisabled      bool
 	TrustedOrigins              []string
+	SetupToken                  string
 }
 
 // Start starts the HTTP server
@@ -124,7 +126,7 @@ func (server *Server) Start(ctx context.Context) error {
 		requestBouncer.DisableCSP()
 	}
 
-	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour, nil)
 	offlineGate := offlinegate.NewOfflineGate()
 
 	passwordStrengthChecker := security.NewPasswordStrengthChecker(server.DataStore.Settings())
@@ -149,6 +151,7 @@ func (server *Server) Start(ctx context.Context) error {
 		server.ShutdownTrigger,
 		adminMonitor,
 	)
+	backupHandler.SetupToken = server.SetupToken
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -202,11 +205,11 @@ func (server *Server) Start(ctx context.Context) error {
 
 	var dockerHandler = dockerhandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.DockerClientFactory, containerService)
 
-	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), server.CSP, adminMonitor.WasInstanceDisabled)
+	var fileHandler = file.NewHandler(filesystem.JoinPaths(server.AssetsPath, "public"), server.CSP, adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
-	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService, server.KubernetesClientFactory)
+	var gitOperationHandler = gitops.NewHandler(requestBouncer, server.DataStore, server.GitService, server.FileService, server.KubernetesClientFactory, server.SourceScheduler)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -235,18 +238,20 @@ func (server *Server) Start(ctx context.Context) error {
 	settingsHandler.JWTService = server.JWTService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.SnapshotService = server.SnapshotService
+	settingsHandler.SetupTokenRequired = server.SetupToken != ""
 
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	var stackHandler = stacks.NewHandler(requestBouncer)
+	teardownService := teardown.NewService(server.FileService, server.SwarmStackManager, server.ComposeStackManager, server.StackDeployer, server.KubernetesDeployer)
+	var stackHandler = stacks.NewHandler(requestBouncer, teardownService)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.FileService = server.FileService
 	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
-	stackHandler.Scheduler = server.Scheduler
+	stackHandler.SourceScheduler = server.SourceScheduler
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.StackDeployer = server.StackDeployer
@@ -258,6 +263,7 @@ func (server *Server) Start(ctx context.Context) error {
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.DataStore = server.DataStore
+	teamHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
@@ -282,6 +288,9 @@ func (server *Server) Start(ctx context.Context) error {
 	userHandler.CryptoService = server.CryptoService
 	userHandler.AdminCreationDone = server.AdminCreationDone
 	userHandler.FileService = server.FileService
+	userHandler.SetupToken = server.SetupToken
+	userHandler.AuthorizationService = server.AuthorizationService
+	userHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore

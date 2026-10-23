@@ -49,7 +49,7 @@ export function StackContainersDatatable({ stackName }: Props) {
   const containersQuery = useComposeStackContainers(
     { environmentId: environmentQuery.data?.Id, stackName },
     {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
     }
   );
 

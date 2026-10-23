@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { withTestRouter } from '@/react/test-utils/withRouter';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { server, http } from '@/setup-tests/server';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
 
 import { WizardKubernetes } from './WizardKubernetes';
 
@@ -70,7 +71,7 @@ describe('WizardKubernetes', () => {
           key,
           typeof value === 'string' ? value : 'binary',
         ]);
-        return HttpResponse.json({});
+        return HttpResponse.json(createMockEnvironment());
       })
     );
 

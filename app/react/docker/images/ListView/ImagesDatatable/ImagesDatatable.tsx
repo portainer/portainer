@@ -56,7 +56,7 @@ export function ImagesDatatable({
     [isHostColumnVisible]
   );
   const imagesQuery = useImages(environmentId, true, {
-    refetchInterval: tableState.autoRefreshRate * 1000,
+    refetchInterval: tableState.autoRefreshRateMS,
   });
 
   return (
@@ -92,7 +92,7 @@ export function ImagesDatatable({
       renderTableSettings={() => (
         <TableSettingsMenu>
           <TableSettingsMenuAutoRefresh
-            value={tableState.autoRefreshRate}
+            value={tableState.autoRefreshRateMS}
             onChange={(value) => tableState.setAutoRefreshRate(value)}
           />
         </TableSettingsMenu>

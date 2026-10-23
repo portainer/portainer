@@ -16,7 +16,6 @@ import (
 	"github.com/portainer/portainer/pkg/libcrypto"
 	"github.com/portainer/portainer/pkg/librand"
 
-	"github.com/dchest/uniuri"
 	"github.com/rs/zerolog/log"
 )
 
@@ -82,17 +81,24 @@ func (s *Service) Open(endpoint *portainer.Endpoint) error {
 	return nil
 }
 
-// close removes the tunnel from the map so the agent will close it
+// close removes the tunnel from the map so the agent will close it.
+// The lock is released before cleaning up the chisel user and proxy to avoid
+// blocking Config/Open callers while DeleteUser interacts with chisel internals.
 func (s *Service) close(endpointID portainer.EndpointID) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	tun, ok := s.activeTunnels[endpointID]
 	if !ok {
+		s.mu.Unlock()
 		return
 	}
 
-	if len(tun.Credentials) > 0 && s.chiselServer != nil {
+	delete(s.activeTunnels, endpointID)
+	cache.Del(endpointID)
+
+	s.mu.Unlock()
+
+	if s.chiselServer != nil {
 		user, _, _ := strings.Cut(tun.Credentials, ":")
 		s.chiselServer.DeleteUser(user)
 	}
@@ -100,10 +106,6 @@ func (s *Service) close(endpointID portainer.EndpointID) {
 	if s.ProxyManager != nil {
 		s.ProxyManager.DeleteEndpointProxy(endpointID)
 	}
-
-	delete(s.activeTunnels, endpointID)
-
-	cache.Del(endpointID)
 }
 
 // Config returns the tunnel details needed for the agent to connect
@@ -130,8 +132,6 @@ func (s *Service) TunnelAddr(endpoint *portainer.Endpoint) (string, error) {
 
 	for t0 := time.Now(); ; {
 		if time.Since(t0) > 2*checkinInterval {
-			s.close(endpoint.ID)
-
 			return "", errors.New("unable to open the tunnel")
 		}
 
@@ -222,8 +222,8 @@ func randomInt(min, max int) int {
 }
 
 func generateRandomCredentials() (string, string) {
-	username := uniuri.NewLen(8)
-	password := uniuri.NewLen(8)
+	username := librand.String(8)
+	password := librand.String(8)
 
 	return username, password
 }
@@ -240,10 +240,16 @@ func encryptCredentials(username, password, key string) (string, error) {
 }
 
 func endpointHasSnapshot(dataStore dataservices.DataStore, endpointID portainer.EndpointID) bool {
-	s, err := dataStore.Snapshot().Read(endpointID)
-	if err != nil {
-		return false
-	}
+	var hasSnapshot bool
+	_ = dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		s, err := tx.Snapshot().Read(endpointID)
+		if err != nil {
+			return err
+		}
 
-	return s.Docker != nil || s.Kubernetes != nil
+		hasSnapshot = s.Docker != nil || s.Kubernetes != nil
+		return nil
+	})
+
+	return hasSnapshot
 }

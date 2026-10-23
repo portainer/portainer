@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
+import { slugify } from 'markdown-to-jsx';
 
 interface Props {
   children: ReactNode;
@@ -18,11 +19,14 @@ export function DetailsRow({
   columns,
   ariaLabel,
 }: Props) {
-  const labelString = typeof label === 'string' ? label : undefined;
+  const labelString = typeof label === 'string' ? label : ariaLabel;
   return (
-    <tr className={className} aria-label={ariaLabel ?? labelString}>
+    <tr className={className} aria-label={labelString}>
       <td className={clsx(colClassName, '!break-normal')}>{label}</td>
-      <td className={colClassName} data-cy={`detailsTable-${label}Value`}>
+      <td
+        className={colClassName}
+        data-cy={`detailsTable-${slugify(labelString || 'unlabelled')}Value`}
+      >
         {children}
       </td>
       {columns?.map((column, index) => (

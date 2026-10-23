@@ -9,8 +9,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/librand"
 
-	"github.com/dchest/uniuri"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,12 +72,16 @@ func newEndpoint(endpointType portainer.EndpointType, id portainer.EndpointID, n
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		TagIDs:             []portainer.TagID{},
-		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.DockerSnapshot{},
-		Kubernetes:         portainer.KubernetesDefault(),
+		TagIDs:    nil,
+		Status:    portainer.EndpointStatusUp,
+		Snapshots: nil,
+		Kubernetes: portainer.KubernetesData{
+			Configuration: portainer.KubernetesConfiguration{
+				UseLoadBalancer:          false,
+				UseServerMetrics:         false,
+				EnableResourceOverCommit: true,
+			},
+		},
 	}
 
 	if TLS {
@@ -172,7 +176,7 @@ func (store *Store) testSSLSettings(t *testing.T) {
 
 func (store *Store) testTunnelServer(t *testing.T) {
 	is := assert.New(t)
-	expectPrivateKeySeed := uniuri.NewLen(16)
+	expectPrivateKeySeed := librand.String(16)
 
 	err := store.TunnelServer().UpdateInfo(&portainer.TunnelServerInfo{PrivateKeySeed: expectPrivateKeySeed})
 	require.NoError(t, err, "UpdateInfo should have succeeded")

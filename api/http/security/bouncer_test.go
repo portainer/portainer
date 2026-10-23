@@ -257,59 +257,6 @@ func Test_extractAPIKeyHeader(t *testing.T) {
 	}
 }
 
-func Test_extractAPIKeyQueryParam(t *testing.T) {
-	t.Parallel()
-	is := assert.New(t)
-
-	tt := []struct {
-		name            string
-		queryParam      string
-		queryParamValue string
-		wantApiKey      string
-		succeeds        bool
-	}{
-		{
-			name:            "missing request header",
-			queryParam:      "",
-			queryParamValue: "",
-			wantApiKey:      "",
-			succeeds:        false,
-		},
-		{
-			name:            "invalid api-key request header",
-			queryParam:      "api-key",
-			queryParamValue: "abc",
-			wantApiKey:      "",
-			succeeds:        false,
-		},
-		{
-			name:            "valid api-key request header",
-			queryParam:      apiKeyHeader,
-			queryParamValue: "abc",
-			wantApiKey:      "abc",
-			succeeds:        true,
-		},
-		{
-			name:            "valid api-key request header case-insensitive canonical check",
-			queryParam:      "x-api-key",
-			queryParamValue: "def",
-			wantApiKey:      "def",
-			succeeds:        true,
-		},
-	}
-
-	for _, test := range tt {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		q := req.URL.Query()
-		q.Add(test.queryParam, test.queryParamValue)
-		req.URL.RawQuery = q.Encode()
-
-		apiKey, ok := extractAPIKey(req)
-		is.Equal(test.wantApiKey, apiKey)
-		is.Equal(test.succeeds, ok)
-	}
-}
-
 func Test_apiKeyLookup(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)

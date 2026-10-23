@@ -28,7 +28,7 @@ func (hspm *HelmSDKPackageManager) Uninstall(uninstallOpts options.UninstallOpti
 
 	// Initialize action configuration with kubernetes config
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, uninstallOpts.Namespace, uninstallOpts.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(uninstallOpts.Namespace), uninstallOpts.KubernetesClusterAccess)
 	if err != nil {
 		// error is already logged in initActionConfig
 		return errors.Wrap(err, "failed to initialize helm configuration")
@@ -103,7 +103,7 @@ func (hspm *HelmSDKPackageManager) ForceRemoveRelease(uninstallOpts options.Unin
 		Msg("Force-removing release history (skipping resource deletion)")
 
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, uninstallOpts.Namespace, uninstallOpts.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(uninstallOpts.Namespace), uninstallOpts.KubernetesClusterAccess)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize helm configuration for force-remove")
 	}

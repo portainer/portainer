@@ -2,13 +2,10 @@ package apikeyrepository
 
 import (
 	"errors"
-	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/rs/zerolog/log"
 )
 
 // BucketName represents the name of the bucket where this service stores data.
@@ -40,19 +37,10 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.APIKey{},
-		func(obj any) (any, error) {
-			record, ok := obj.(*portainer.APIKey)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
-				return nil, fmt.Errorf("failed to convert to APIKey object: %s", obj)
-			}
-
-			if record.UserID == userID {
-				result = append(result, *record)
-			}
-
-			return &portainer.APIKey{}, nil
-		})
+		dataservices.FilterFn(&result, func(record portainer.APIKey) bool {
+			return record.UserID == userID
+		}),
+	)
 
 	return result, err
 }
@@ -60,27 +48,18 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 // GetAPIKeyByDigest returns the API key for the associated digest.
 // Note: there is a 1-to-1 mapping of api-key and digest
 func (service *Service) GetAPIKeyByDigest(digest string) (*portainer.APIKey, error) {
-	var k *portainer.APIKey
-	stop := errors.New("ok")
+	var found portainer.APIKey
+
 	err := service.Connection.GetAll(
 		BucketName,
 		&portainer.APIKey{},
-		func(obj any) (any, error) {
-			key, ok := obj.(*portainer.APIKey)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
-				return nil, fmt.Errorf("failed to convert to APIKey object: %s", obj)
-			}
-			if key.Digest == digest {
-				k = key
-				return nil, stop
-			}
+		dataservices.FirstFn(&found, func(key portainer.APIKey) bool {
+			return key.Digest == digest
+		}),
+	)
 
-			return &portainer.APIKey{}, nil
-		})
-
-	if errors.Is(err, stop) {
-		return k, nil
+	if errors.Is(err, dataservices.ErrStop) {
+		return &found, nil
 	}
 
 	if err == nil {

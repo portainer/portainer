@@ -136,7 +136,7 @@ export function InputList<T = DefaultType>({
               typeof errors === 'object' ? errors[index] : undefined;
 
             return (
-              <div key={key} className="flex">
+              <div key={key} className="flex gap-1">
                 {Item ? (
                   <Item
                     item={item}

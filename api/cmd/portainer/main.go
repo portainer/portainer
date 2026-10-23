@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
+	nethttp "net/http"
 	"os"
 	"path"
 	"strings"
@@ -26,9 +27,11 @@ import (
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/gitops/scheduling"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security/setuptoken"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -51,13 +54,20 @@ import (
 	"github.com/portainer/portainer/pkg/featureflags"
 	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhelm"
+	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 	"github.com/portainer/portainer/pkg/libstack/compose"
 	libswarm "github.com/portainer/portainer/pkg/libstack/swarm"
 	"github.com/portainer/portainer/pkg/validate"
 
+	gogitclient "github.com/go-git/go-git/v5/plumbing/transport/client"
+	gogitraw "github.com/go-git/go-git/v5/plumbing/transport/git"
+	gogithttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	gogitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
+
+const swarmStackStatusCheckInterval = time.Minute
 
 func initCLI() *portainer.CLIFlags {
 	cliService := cli.Service{}
@@ -225,6 +235,30 @@ func initSnapshotService(
 	return snapshotService, nil
 }
 
+func resolveSetupToken(tx dataservices.DataStoreTx, providedToken string) (string, error) {
+	admins, err := tx.User().UsersByRole(portainer.AdministratorRole)
+	if err != nil {
+		return "", err
+	}
+	if len(admins) > 0 {
+		return "", nil
+	}
+
+	if providedToken != "" {
+		log.Info().Msg("using custom setup token; admin initialization and backup restore require this token in the X-Setup-Token header")
+		return providedToken, nil
+	}
+
+	token, err := setuptoken.Generate()
+	if err != nil {
+		return "", err
+	}
+
+	setuptoken.LogToken(token)
+
+	return token, nil
+}
+
 func initStatus(instanceID string) *portainer.Status {
 	return &portainer.Status{
 		Version:    portainer.APIVersion,
@@ -241,6 +275,8 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	settings.SnapshotInterval = cmp.Or(*flags.SnapshotInterval, settings.SnapshotInterval)
 	settings.LogoURL = cmp.Or(*flags.Logo, settings.LogoURL)
 	settings.EnableEdgeComputeFeatures = cmp.Or(*flags.EnableEdgeComputeFeatures, settings.EnableEdgeComputeFeatures)
+	settings.EdgePortainerURL = cmp.Or(*flags.EdgePortainerURL, settings.EdgePortainerURL)
+	settings.TrustOnFirstConnect = cmp.Or(*flags.EdgeTrustOnFirstConnect, settings.TrustOnFirstConnect)
 	settings.TemplatesURL = cmp.Or(*flags.Templates, settings.TemplatesURL)
 
 	if flags.KubectlShellImageSet {
@@ -315,7 +351,7 @@ func dbSecretPath(keyFilenameFlag string) string {
 	if path.IsAbs(keyFilenameFlag) {
 		return keyFilenameFlag
 	}
-	return path.Join("/run/secrets", keyFilenameFlag)
+	return filesystem.JoinPaths("/run/secrets", keyFilenameFlag)
 }
 
 func loadEncryptionSecretKey(keyfilename string) []byte {
@@ -374,6 +410,19 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		log.Fatal().Msg("The database schema version does not align with the server version. Please consider reverting to the previous server version or addressing the database migration issue.")
 	}
 
+	if err := ssrf.Configure(dataStore.AllowList()); err != nil {
+		log.Fatal().Err(err).Msg("failed initializing ssrf service")
+	}
+
+	if !ssrf.WrapDefaultTransport() {
+		log.Fatal().Msg("failed to wrap default HTTP transport with SSRF protection")
+	}
+
+	gogithttp.DefaultClient = gogithttp.NewClient(&nethttp.Client{Transport: nethttp.DefaultTransport})
+	gogitclient.InstallProtocol("git", git.NewSSRFGitTransport(gogitraw.DefaultClient))
+	gogitclient.InstallProtocol("ssh", git.NewSSRFGitTransport(gogitssh.DefaultClient))
+	gogitclient.InstallProtocol("file", nil)
+
 	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed getting instance id")
@@ -401,7 +450,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 
 	signatureService := initDigitalSignatureService()
 
-	edgeStacksService := edgestacks.NewService(dataStore)
+	edgeStacksService := edgestacks.NewService(dataStore, fileService)
 
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.TLSCert, *flags.TLSKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
@@ -510,15 +559,44 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		}
 	}
 
+	setupToken := ""
+	if adminPasswordHash == "" && !*flags.NoSetupToken {
+		if err := dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var txErr error
+			setupToken, txErr = resolveSetupToken(tx, *flags.SetupToken)
+			return txErr
+		}); err != nil {
+			log.Fatal().Err(err).Msg("failed initializing setup token")
+		}
+	}
+
 	if err := reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService); err != nil {
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
 
-	scheduler := scheduler.NewScheduler(shutdownCtx)
+	sched := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer, dockerClientFactory, dataStore)
-	if err := deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService); err != nil {
-		log.Fatal().Err(err).Msg("failed to start stack scheduler")
+	sourceScheduler := scheduling.NewSourceScheduler(sched, dataStore, scheduling.Deployers{
+		Stack: func(ctx context.Context, stackID portainer.StackID) error {
+			return deployments.RedeployWhenChanged(ctx, stackID, stackDeployer, dataStore, gitService)
+		},
+		StackExists: dataStore.Stack().Exists,
+		EdgeStackExists: func(edgeStackID portainer.EdgeStackID) (bool, error) {
+			_, err := dataStore.EdgeStack().EdgeStack(edgeStackID)
+			if dataservices.IsErrObjectNotFound(err) {
+				return false, nil
+			}
+
+			return err == nil, err
+		},
+	})
+	if err := sourceScheduler.ReconcileAll(); err != nil {
+		log.Fatal().Err(err).Msg("failed to start source scheduler")
 	}
+
+	sched.StartJobEvery(swarmStackStatusCheckInterval, func() error {
+		return deployments.ReconcileSwarmStackStatus(shutdownCtx, dataStore, swarmStackManager)
+	})
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
@@ -592,7 +670,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		SSLService:                  sslService,
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
-		Scheduler:                   scheduler,
+		SourceScheduler:             sourceScheduler,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
 		UpgradeService:              upgradeService,
@@ -601,6 +679,7 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 		PlatformService:             platformService,
 		PullLimitCheckDisabled:      *flags.PullLimitCheckDisabled,
 		TrustedOrigins:              trustedOrigins,
+		SetupToken:                  setupToken,
 	}
 }
 

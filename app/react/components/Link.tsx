@@ -1,11 +1,8 @@
 import { PropsWithChildren, AnchorHTMLAttributes } from 'react';
 import { UISrefProps, useSref } from '@uirouter/react';
 
-interface Props {
-  title?: string;
-  target?: AnchorHTMLAttributes<HTMLAnchorElement>['target'];
-  rel?: AnchorHTMLAttributes<HTMLAnchorElement>['rel'];
-  'data-cy': AnchorHTMLAttributes<HTMLAnchorElement>['data-cy'];
+interface Props extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  'data-cy': string;
 }
 
 export function Link({

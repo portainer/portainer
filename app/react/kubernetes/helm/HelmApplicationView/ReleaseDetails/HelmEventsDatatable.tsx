@@ -31,7 +31,7 @@ export function HelmEventsDatatable({
   const eventsQuery = useEvents(environmentId, {
     namespace,
     queryOptions: {
-      autoRefreshRate: tableState.autoRefreshRate * 1000,
+      autoRefreshRate: tableState.autoRefreshRateMS,
       select: (data) => filterRelatedEvents(data, releaseResources),
     },
   });

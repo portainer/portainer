@@ -25,6 +25,7 @@ type Color =
   | 'warninglight'
   | 'warning'
   | 'success'
+  | 'blue'
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
@@ -44,12 +45,13 @@ export interface Props<TasProps = unknown>
   props?: Omit<TasProps, keyof Props>;
 }
 
-export const ButtonWithRef = forwardRef<HTMLButtonElement, Omit<Props, 'mRef'>>(
-  (props, ref) => (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <Button {...props} mRef={ref} />
-  )
-);
+export const ButtonWithRef = forwardRef<
+  HTMLButtonElement,
+  PropsWithChildren<Omit<Props, 'mRef'>>
+>((props, ref) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} mRef={ref} />
+));
 
 ButtonWithRef.displayName = 'ButtonWithRef';
 
@@ -110,12 +112,14 @@ function getIconSize(size: Size) {
 
 function sizeClass(size?: Size) {
   switch (size) {
-    case 'large':
-      return 'btn-lg';
-    case 'medium':
-      return 'btn-md';
     case 'xsmall':
       return 'btn-xs';
+    case 'medium':
+      return 'btn-md';
+    case 'large':
+      return 'btn-lg';
+    case 'small':
+    case undefined:
     default:
       return 'btn-sm';
   }

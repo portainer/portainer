@@ -38,13 +38,11 @@ function FileUploadFactory($q, Upload) {
     });
   };
 
-  service.uploadBackup = function (file, password) {
+  service.uploadBackup = function (file, password, setupToken) {
     return Upload.upload({
       url: 'api/restore',
-      data: {
-        file,
-        password,
-      },
+      data: { file, password },
+      headers: setupToken ? { 'X-Setup-Token': setupToken } : {},
     });
   };
 

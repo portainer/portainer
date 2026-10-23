@@ -25,11 +25,11 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 
 // endpointEdgeJobsLogs
 // @summary Update the logs collected from an Edge Job
-// @description Authorized only if the request is done by an Edge Environment(Endpoint)
-// @tags edge, endpoints
+// @description **Access policy**: Edge agent only — requires X-PortainerAgent-EdgeID header
+// @tags edge_agent
 // @accept json
 // @produce json
-// @param id path int true "environment(endpoint) Id"
+// @param id path int true "environment Id"
 // @param jobID path int true "Job Id"
 // @success 200
 // @failure 500

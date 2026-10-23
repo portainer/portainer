@@ -7,7 +7,10 @@ import { server, http } from '@/setup-tests/server';
 import { withTestQueryProvider } from '@/react/test-utils/withTestQuery';
 import { withUserProvider } from '@/react/test-utils/withUserProvider';
 import { withTestRouter } from '@/react/test-utils/withRouter';
-import { createMockEnvironment } from '@/react-tools/test-mocks';
+import {
+  createMockEnvironment,
+  createMockEnvironmentGroup,
+} from '@/react-tools/test-mocks';
 import { EnvironmentType } from '@/react/portainer/environments/types';
 
 import { EdgeEnvironmentForm } from './EdgeEnvironmentForm';
@@ -45,8 +48,8 @@ function setupDefaultMocks() {
     // Groups endpoint
     http.get('/api/endpoint_groups', () =>
       HttpResponse.json([
-        { Id: 1, Name: 'Default' },
-        { Id: 2, Name: 'Production' },
+        createMockEnvironmentGroup({ Id: 1, Name: 'Default' }),
+        createMockEnvironmentGroup({ Id: 2, Name: 'Production' }),
       ])
     ),
     // Tags endpoint
@@ -106,6 +109,33 @@ describe('EdgeEnvironmentForm', () => {
       expect(screen.queryByText('Ping interval')).not.toBeInTheDocument();
       expect(screen.queryByText('Snapshot interval')).not.toBeInTheDocument();
       expect(screen.queryByText('Command interval')).not.toBeInTheDocument();
+    });
+
+    it('should render poll frequency field with the environment initial value', async () => {
+      const environment = createMockEnvironment({
+        Id: 1,
+        Name: 'Test Edge Environment',
+        Type: EnvironmentType.EdgeAgentOnDocker,
+        EdgeID: 'edge-123',
+        EdgeCheckinInterval: 10,
+        Edge: {
+          AsyncMode: false,
+          PingInterval: 0,
+          SnapshotInterval: 0,
+          CommandInterval: 0,
+        },
+      });
+
+      const onSuccess = vi.fn();
+      const WrappedForm = createWrappedForm();
+
+      render(<WrappedForm environment={environment} onSuccess={onSuccess} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('combobox', { name: /poll frequency/i })
+        ).toHaveValue('10');
+      });
     });
   });
 

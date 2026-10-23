@@ -9,9 +9,9 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -125,18 +125,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
-	if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
-
-		jobID, e := deployments.StartAutoupdate(context.TODO(), stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
-		if e != nil {
-			return e
-		}
-
-		stack.AutoUpdate.JobID = jobID
-	}
-
-	if err := handler.startStack(context.TODO(), stack, endpoint, securityContext); err != nil {
+	if err := handler.startStack(context.TODO(), securityContext.UserID, stack, endpoint, securityContext); err != nil {
 		stack.Status = portainer.StackStatusError
 		stack.DeploymentStatus = append(stack.DeploymentStatus, portainer.StackDeploymentStatus{
 			Status:  portainer.StackStatusError,
@@ -156,22 +145,25 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	stack.DeploymentStatus = []portainer.StackDeploymentStatus{
 		{Status: portainer.StackStatusActive, Time: time.Now().Unix()},
 	}
-	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		return tx.Stack().Update(stack.ID, stack)
-	}); err != nil {
-		return httperror.InternalServerError("Unable to update stack status", err)
-	}
+	err = handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := tx.Stack().Update(stack.ID, stack); err != nil {
+			return httperror.InternalServerError("Unable to update stack status", err)
+		}
 
-	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
-		// sanitize password in the http response to minimise possible security leaks
-		stack.GitConfig.Authentication.Password = ""
-	}
+		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 
-	return response.JSON(w, stack)
+		if err := fillStackGitConfig(tx, userContext, stack); err != nil {
+			return httperror.InternalServerError("Unable to load git config for stack", err)
+		}
+		return nil
+	})
+
+	return response.TxResponse(w, stack, err)
 }
 
 func (handler *Handler) startStack(
 	ctx context.Context,
+	userID portainer.UserID,
 	stack *portainer.Stack,
 	endpoint *portainer.Endpoint,
 	securityContext *security.RestrictedRequestContext,
@@ -193,7 +185,7 @@ func (handler *Handler) startStack(
 		stack.Name = handler.ComposeStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.StartRemoteComposeStack(ctx, stack, endpoint, filteredRegistries)
+			return handler.StackDeployer.StartRemoteComposeStack(ctx, userID, stack, endpoint, filteredRegistries)
 		}
 
 		return handler.StackDeployer.DeployComposeStack(ctx, stack, endpoint, filteredRegistries, false, false, false)
@@ -201,7 +193,7 @@ func (handler *Handler) startStack(
 		stack.Name = handler.SwarmStackManager.NormalizeStackName(stack.Name)
 
 		if stackutils.IsRelativePathStack(stack) {
-			return handler.StackDeployer.StartRemoteSwarmStack(ctx, stack, endpoint, filteredRegistries)
+			return handler.StackDeployer.StartRemoteSwarmStack(ctx, userID, stack, endpoint, filteredRegistries)
 		}
 
 		return handler.StackDeployer.DeploySwarmStack(ctx, stack, endpoint, filteredRegistries, true, true)

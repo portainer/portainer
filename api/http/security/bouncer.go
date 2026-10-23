@@ -20,7 +20,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const apiKeyHeader = "X-API-KEY"
+const apiKeyHeader = portainer.APIKeyHeader
 const jwtTokenHeader = "Authorization"
 
 type (
@@ -58,6 +58,7 @@ type (
 		IsTeamLeader    bool
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
+		User            *portainer.User
 	}
 
 	// tokenLookup looks up a token in the request
@@ -274,7 +275,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
+		requestContext, err := newRestrictedContextRequest(bouncer.dataStore, tokenData.ID, tokenData.Role)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
@@ -499,21 +500,11 @@ func extractKeyFromCookie(r *http.Request) (string, error) {
 	return cookie.Value, nil
 }
 
-// extractAPIKey extracts the api key from the api key request header or query params.
+// extractAPIKey extracts the api key from the X-API-KEY request header.
 func extractAPIKey(r *http.Request) (string, bool) {
-	// extract the API key from the request header
 	apiKey := r.Header.Get(apiKeyHeader)
 	if apiKey != "" {
 		return apiKey, true
-	}
-
-	// extract the API key from query params.
-	// Case-insensitive check for the "X-API-KEY" query param.
-	query := r.URL.Query()
-	for k, v := range query {
-		if strings.EqualFold(k, apiKeyHeader) {
-			return v[0], true
-		}
 	}
 
 	return "", false
@@ -535,15 +526,21 @@ func MWSecureHeaders(next http.Handler, hsts, csp bool) http.Handler {
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+func newRestrictedContextRequest(tx dataservices.DataStoreTx, userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+	user, err := tx.User().Read(userID)
+	if err != nil {
+		return nil, err
+	}
+
 	if userRole == portainer.AdministratorRole {
 		return &RestrictedRequestContext{
 			IsAdmin: true,
 			UserID:  userID,
+			User:    user,
 		}, nil
 	}
 
-	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	memberships, err := tx.TeamMembership().TeamMembershipsByUserID(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -557,6 +554,7 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		UserID:          userID,
 		IsTeamLeader:    isTeamLeader,
 		UserMemberships: memberships,
+		User:            user,
 	}, nil
 }
 

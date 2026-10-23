@@ -14,7 +14,7 @@ import (
 func (hspm *HelmSDKPackageManager) doesReleaseExist(releaseName, namespace string, clusterAccess *options.KubernetesClusterAccess) (bool, error) {
 	// Initialize action configuration
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, namespace, clusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(namespace), clusterAccess)
 	if err != nil {
 		// error is already logged in initActionConfig
 		return false, fmt.Errorf("failed to initialize helm configuration: %w", err)

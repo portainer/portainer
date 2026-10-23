@@ -72,11 +72,11 @@ export function HomeView() {
       {process.env.PORTAINER_EDITION !== 'CE' && <BackupFailedPanel />}
 
       {connectingToEdgeEndpoint ? (
-        <div className="flex flex-1 flex-col items-center justify-center">
+        <div className="mb-5 flex flex-1 flex-col items-center justify-center">
           <EdgeLoadingSpinner />
         </div>
       ) : (
-        <div className="mx-5 flex flex-col gap-6">
+        <div className="mx-5 mb-5 flex flex-col gap-6">
           <EnvironmentHeader />
           <EnvironmentList onClickBrowse={handleBrowseClick} />
         </div>

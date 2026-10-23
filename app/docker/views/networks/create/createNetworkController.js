@@ -219,8 +219,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
 
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
-      var error = '';
-      error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+      var error = FormValidator.validateAccessControl(accessControlData, isAdmin);
 
       if (error) {
         $scope.state.formValidationError = error;

@@ -58,29 +58,3 @@ export function NamespaceSelector({
     </FormControl>
   );
 }
-
-/** NamespacePortainerSelect is exported for use by angular views, so that the data-cy attribute is set correctly */
-export function NamespacePortainerSelect({
-  value,
-  onChange,
-  isDisabled,
-  options,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  isDisabled: boolean;
-  options: { label: string; value: string }[];
-}) {
-  return (
-    <PortainerSelect
-      value={value}
-      options={options}
-      onChange={onChange}
-      disabled={isDisabled}
-      noOptionsMessage={() => 'No namespaces found'}
-      placeholder="No namespaces found" // will only show when there are no options
-      inputId="namespace-selector"
-      data-cy="namespace-select"
-    />
-  );
-}

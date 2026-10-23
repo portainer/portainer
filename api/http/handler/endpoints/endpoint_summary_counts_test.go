@@ -243,6 +243,123 @@ func TestSummaryCounts(t *testing.T) {
 	}
 }
 
+func TestSummaryCountsHealthBreakdown(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	currentVersion := portainer.APIVersion
+
+	type ep struct {
+		id          portainer.EndpointID
+		name        string
+		epType      portainer.EndpointType
+		status      portainer.EndpointStatus
+		lastCheckIn int64
+		trusted     bool
+		agentVer    string
+	}
+
+	for _, e := range []ep{
+		{1, "outdated-up", portainer.EdgeAgentOnDockerEnvironment, 0, time.Now().Unix(), true, "2.0.0"},
+		{2, "outdated-down", portainer.EdgeAgentOnDockerEnvironment, 0, time.Now().Add(-1 * time.Hour).Unix(), true, "2.0.0"},
+		{3, "up-current", portainer.DockerEnvironment, portainer.EndpointStatusUp, 0, false, currentVersion},
+		{4, "down-current", portainer.DockerEnvironment, portainer.EndpointStatusDown, 0, false, currentVersion},
+	} {
+		endpoint := &portainer.Endpoint{
+			ID:              e.id,
+			Name:            e.name,
+			Type:            e.epType,
+			Status:          e.status,
+			LastCheckInDate: e.lastCheckIn,
+			GroupID:         2,
+			UserTrusted:     e.trusted,
+		}
+		endpoint.Agent.Version = e.agentVer
+		require.NoError(t, store.Endpoint().Create(endpoint))
+	}
+
+	err := store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	require.NoError(t, err)
+
+	bouncer := testhelpers.NewTestRequestBouncer()
+	handler := NewHandler(bouncer)
+	handler.DataStore = store
+
+	req := httptest.NewRequest(http.MethodGet, "/endpoints/summary", nil)
+	ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
+	req = req.WithContext(ctx)
+	restrictedCtx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
+	req = req.WithContext(restrictedCtx)
+	testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	body, err := io.ReadAll(rr.Body)
+	require.NoError(t, err)
+
+	var counts EnvironmentSummaryCountsResponse
+	require.NoError(t, json.Unmarshal(body, &counts))
+
+	assert.Equal(t, 4, counts.Total)
+	assert.Equal(t, 2, counts.Up, "outdated-up counts in both Up and Outdated")
+	assert.Equal(t, 2, counts.Down, "outdated-down counts in both Down and Outdated")
+	assert.Equal(t, 2, counts.Outdated)
+
+	assert.Equal(t, healthCounts{
+		Down:      2,
+		Outdated:  2,
+		Up:        2,
+		Heartbeat: 1,
+	}, counts.ByHealth)
+}
+
+func TestSummaryCountsHeartbeatRefreshedFromInMemoryMap(t *testing.T) {
+	_, store := datastore.MustNewTestStore(t, true, true)
+
+	endpoint := &portainer.Endpoint{
+		ID:              1,
+		Name:            "stale-edge",
+		Type:            portainer.EdgeAgentOnDockerEnvironment,
+		GroupID:         2,
+		UserTrusted:     true,
+		LastCheckInDate: time.Now().Add(-1 * time.Hour).Unix(),
+	}
+	endpoint.Agent.Version = portainer.APIVersion
+	require.NoError(t, store.Endpoint().Create(endpoint))
+
+	store.Endpoint().UpdateHeartbeat(1)
+
+	err := store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	require.NoError(t, err)
+
+	bouncer := testhelpers.NewTestRequestBouncer()
+	handler := NewHandler(bouncer)
+	handler.DataStore = store
+
+	req := httptest.NewRequest(http.MethodGet, "/endpoints/summary", nil)
+	ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
+	req = req.WithContext(ctx)
+	restrictedCtx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
+	req = req.WithContext(restrictedCtx)
+	testhelpers.AddTestSecurityCookie(req, "Bearer dummytoken")
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	body, err := io.ReadAll(rr.Body)
+	require.NoError(t, err)
+
+	var counts EnvironmentSummaryCountsResponse
+	require.NoError(t, json.Unmarshal(body, &counts))
+
+	assert.Equal(t, 1, counts.Total)
+	assert.Equal(t, 1, counts.Up, "in-memory heartbeat should override stale DB LastCheckInDate")
+	assert.Equal(t, 0, counts.Down)
+	assert.Equal(t, healthCounts{Up: 1, Heartbeat: 1}, counts.ByHealth)
+}
+
 func TestResolveEndpointStatus(t *testing.T) {
 	settings := &portainer.Settings{EdgeAgentCheckinInterval: 60}
 

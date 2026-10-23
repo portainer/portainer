@@ -38,7 +38,7 @@ func fetchEndpointProxy(proxyManager *proxy.Manager, endpoint *portainer.Endpoin
 
 // portainerRegistriesToAuthConfigs converts registries to Docker auth configs.
 // Callers must ensure ECR tokens are valid before calling this function (e.g. via
-// registryutils.ValidateRegistriesECRTokens with a real DataStoreTx). This function
+// registryutils.RefreshAndPersistECRTokens with a real DataStoreTx). This function
 // intentionally performs no DB writes to avoid write-lock contention when called inside
 // an active BoltDB write transaction.
 func portainerRegistriesToAuthConfigs(registries []portainer.Registry) []types.AuthConfig {

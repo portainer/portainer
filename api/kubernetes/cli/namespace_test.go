@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	core "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kfake "k8s.io/client-go/kubernetes/fake"
 )
@@ -182,5 +183,62 @@ func Test_ToggleSystemState(t *testing.T) {
 		actualPolicies, err := kcl.GetNamespaceAccessPolicies()
 		require.NoError(t, err, "failed to fetch policies")
 		assert.Equal(t, expectedPolicies, actualPolicies)
+	})
+}
+
+func Test_GetNamespace(t *testing.T) {
+	t.Parallel()
+
+	newClient := func() *KubeClient {
+		return &KubeClient{
+			cli: kfake.NewSimpleClientset(
+				&core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns-1"}},
+				&core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "ns-2"}},
+				&core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "kube-system"}},
+			),
+			instanceID: "instance",
+		}
+	}
+
+	t.Run("admin can fetch any namespace", func(t *testing.T) {
+		kcl := newClient()
+		kcl.SetIsKubeAdmin(true)
+		kcl.SetClientNonAdminNamespaces(nil)
+
+		for _, name := range []string{"ns-1", "ns-2", "kube-system"} {
+			ns, err := kcl.GetNamespace(name)
+			require.NoError(t, err)
+			assert.Equal(t, name, ns.Name)
+		}
+	})
+
+	t.Run("non-admin can fetch a namespace in their namespace access", func(t *testing.T) {
+		kcl := newClient()
+		kcl.SetIsKubeAdmin(false)
+		kcl.SetClientNonAdminNamespaces([]string{"ns-1"})
+
+		ns, err := kcl.GetNamespace("ns-1")
+		require.NoError(t, err)
+		assert.Equal(t, "ns-1", ns.Name)
+	})
+
+	t.Run("non-admin is forbidden from a namespace outside their namespace access", func(t *testing.T) {
+		kcl := newClient()
+		kcl.SetIsKubeAdmin(false)
+		kcl.SetClientNonAdminNamespaces([]string{"ns-1"})
+
+		_, err := kcl.GetNamespace("ns-2")
+		require.Error(t, err)
+		assert.True(t, k8serrors.IsForbidden(err), "expected a Forbidden error, got %v", err)
+	})
+
+	t.Run("non-admin with no namespace access is forbidden from any namespace", func(t *testing.T) {
+		kcl := newClient()
+		kcl.SetIsKubeAdmin(false)
+		kcl.SetClientNonAdminNamespaces(nil)
+
+		_, err := kcl.GetNamespace("ns-1")
+		require.Error(t, err)
+		assert.True(t, k8serrors.IsForbidden(err), "expected a Forbidden error, got %v", err)
 	})
 }

@@ -338,7 +338,7 @@
       <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
         Scopes
         <portainer-tooltip
-          message="'Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this'"
+          message="'Space-separated list of scopes the OAuth provider requires to return information about the authenticated user (for example, openid profile email). The required scopes depend on your provider; refer to your OAuth provider documentation.'"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
@@ -348,7 +348,7 @@
           class="form-control"
           id="oauth_scopes"
           ng-model="$ctrl.settings.Scopes"
-          placeholder="id,email,name"
+          placeholder="id email name"
           ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
           ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
         />

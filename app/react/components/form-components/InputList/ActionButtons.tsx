@@ -49,7 +49,7 @@ export function InputListActionButtons<T = DefaultType>({
             size="medium"
             disabled={disabled || index === 0}
             onClick={onMoveUp}
-            className="vertical-center btn-only-icon"
+            className="vertical-center btn-only-icon h-[34px]"
             icon={ArrowUpIcon}
             data-cy={`${dataCy}-move-up_${index}`}
           />
@@ -58,7 +58,7 @@ export function InputListActionButtons<T = DefaultType>({
             type="button"
             disabled={disabled || index === count - 1}
             onClick={onMoveDown}
-            className="vertical-center btn-only-icon"
+            className="vertical-center btn-only-icon h-[34px]"
             icon={ArrowDownIcon}
             data-cy={`${dataCy}-move-down_${index}`}
           />
@@ -85,7 +85,7 @@ export function InputListActionButtons<T = DefaultType>({
               color="dangerlight"
               size="medium"
               onClick={onDelete}
-              className="vertical-center btn-only-icon"
+              className="vertical-center btn-only-icon h-[34px]"
               data-cy={`${dataCy}RemoveButton_${index}`}
               icon={Trash2Icon}
               disabled={disabled}
@@ -136,7 +136,7 @@ function CanUndoDeleteButton<T>({
           color="dangerlight"
           size="medium"
           onClick={handleDeleteClick}
-          className="vertical-center btn-only-icon"
+          className="vertical-center btn-only-icon h-[34px]"
           icon={Trash2Icon}
           data-cy={`${dataCy}_delete`}
           disabled={disabled}
@@ -147,7 +147,7 @@ function CanUndoDeleteButton<T>({
           color="default"
           size="medium"
           onClick={handleDeleteClick}
-          className="vertical-center btn-only-icon"
+          className="vertical-center btn-only-icon h-[34px]"
           icon={RotateCwIcon}
           data-cy={`${dataCy}_undo_delete`}
           disabled={disabled}

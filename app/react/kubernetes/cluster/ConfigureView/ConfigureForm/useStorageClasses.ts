@@ -102,7 +102,7 @@ function transformStorageClassesToFormValues(
           (sc) => sc.Name === storageClass.metadata?.name
         );
       let selected = false;
-      let AccessModes: AccessMode[] = [];
+      let AccessModes: AccessMode[];
       if (enabledStorage) {
         selected = true;
         AccessModes =

@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/portainer/portainer/api/logs"
@@ -168,14 +169,31 @@ func RetrieveJSONQueryParameter(request *http.Request, name string, target any, 
 // Example:
 //
 //	GET /api/resource?filter=foo&filter=bar
+//	GET /api/resource?filter[]=foo&filter[]=bar
+//	GET /api/resource?filter=foo,bar
 //	RetrieveArrayQueryParameter(request, "filter") => []string{"foo", "bar"}
 func RetrieveArrayQueryParameter(r *http.Request, parameter string) []string {
-	list, exists := r.Form[parameter+"[]"]
-	if !exists {
-		return nil
+	// bracket notation: param[]=1&param[]=2
+	if list, exists := r.Form[parameter+"[]"]; exists {
+		return list
 	}
 
-	return list
+	// plain repeated or comma-separated: param=1&param=2 or param=1,2
+	if list, exists := r.Form[parameter]; exists {
+		var result []string
+		for _, v := range list {
+			for item := range strings.SplitSeq(v, ",") {
+				if item != "" {
+					result = append(result, item)
+				}
+			}
+		}
+		if len(result) > 0 {
+			return result
+		}
+	}
+
+	return nil
 }
 
 func RetrieveNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]T, error) {

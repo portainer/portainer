@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { FormSection } from '@@/form-components/FormSection';
+import { Widget, WidgetBody } from '@@/Widget';
 
 import { EnvironmentTableData } from './types';
 import { AssociatedEnvironmentsTable } from './AssociatedEnvironmentsTable';
@@ -27,16 +28,21 @@ export function FormModeEnvironmentsSelector({ selectedIds, onChange }: Props) {
   return (
     <FormSection title="Associate environments">
       <p className="small text-muted">
-        Assocate environments to this group by clicking the add button below.
+        Associate environments to this group by clicking the add button below.
       </p>
-      <AssociatedEnvironmentsTable
-        title="Associated environments"
-        environments={selectedEnvironments}
-        onRemove={handleRemove}
-        onOpenAddDrawer={() => setDrawerOpen(true)}
-        confirmRemove={false}
-        data-cy="group-associatedEndpoints"
-      />
+      <Widget>
+        <WidgetBody className="no-padding">
+          <AssociatedEnvironmentsTable
+            noWidget
+            title="Associated environments"
+            environments={selectedEnvironments}
+            onRemove={handleRemove}
+            onOpenAddDrawer={() => setDrawerOpen(true)}
+            confirmRemove={false}
+            data-cy="group-associatedEndpoints"
+          />
+        </WidgetBody>
+      </Widget>
 
       <AddEnvironmentsDrawer
         open={drawerOpen}

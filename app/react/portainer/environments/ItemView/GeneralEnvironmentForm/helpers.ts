@@ -49,7 +49,7 @@ export function buildUpdatePayload({
     Name: values.name,
     PublicURL: values.publicUrl,
     GroupID: values.meta.groupId,
-    TagIds: values.meta.tagIds,
+    TagIDs: values.meta.tagIds,
 
     URL: formatURL({
       url: values.environmentUrl,

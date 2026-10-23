@@ -90,6 +90,17 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 			return httperror.InternalServerError("Unable to retrieve Edge stack from the database", err)
 		}
 
+		relation, err := tx.EndpointRelation().EndpointRelation(payload.EndpointID)
+		if err != nil && !dataservices.IsErrObjectNotFound(err) {
+			return httperror.InternalServerError("Unable to retrieve relation object from the database", fmt.Errorf("%w. Environment ID: %d", err, payload.EndpointID))
+		}
+
+		// Removal reports must still go through after the relation was cleared.
+		isRemovalReport := *payload.Status == portainer.EdgeStackStatusRemoved || *payload.Status == portainer.EdgeStackStatusRemoving
+		if (relation == nil || !relation.EdgeStacks[stack.ID]) && !isRemovalReport {
+			return httperror.Forbidden("Permission denied to update status for this Edge stack", fmt.Errorf("Edge stack %d is not assigned to environment %d", stack.ID, payload.EndpointID))
+		}
+
 		if err := handler.updateEdgeStackStatus(tx, stack, stack.ID, payload); err != nil {
 			return httperror.InternalServerError("Unable to update Edge stack status", err)
 		}

@@ -117,7 +117,7 @@ func shouldIncludeFile(dirEntry DirEntry, deviceName, configPath string) bool {
 	}
 
 	// example: A/B/C/<deviceName>
-	filterEqual := filepath.Join(configPath, deviceName)
+	filterEqual := JoinPaths(configPath, deviceName)
 
 	// example: A/B/C/<deviceName>/
 	filterPrefix := filterEqual + "."
@@ -128,7 +128,7 @@ func shouldIncludeFile(dirEntry DirEntry, deviceName, configPath string) bool {
 
 func shouldIncludeDir(dirEntry DirEntry, deviceName, configPath string) bool {
 	// example: A/B/C/'/<deviceName>
-	filterEqual := filepath.Join(configPath, deviceName)
+	filterEqual := JoinPaths(configPath, deviceName)
 
 	// example: A/B/C/<deviceName>/
 	filterPrefix := appendTailSeparator(filterEqual)

@@ -94,15 +94,17 @@ export function StackInfoTab({
             />
           ) : (
             <div className="space-y-4">
-              {stack.GitConfig && !stack.FromAppTemplate && (
-                <GitReferenceCard
-                  stackId={stack.Id}
-                  gitConfig={stack.GitConfig}
-                  autoUpdate={stack.AutoUpdate}
-                  currentDeploymentInfo={stack.CurrentDeploymentInfo}
-                  stackType="docker"
-                />
-              )}
+              {!!stack.GitConfig &&
+                !stack.FromAppTemplate &&
+                !!stack.GitSourceId && (
+                  <GitReferenceCard
+                    gitConfig={stack.GitConfig}
+                    autoUpdate={stack.AutoUpdate}
+                    currentDeploymentInfo={stack.CurrentDeploymentInfo}
+                    stackType="docker"
+                    sourceId={stack.GitSourceId}
+                  />
+                )}
 
               {isRegular && !!stackFileContent && (
                 <StackDuplicationForm

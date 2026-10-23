@@ -4,7 +4,10 @@ import { useState, useMemo } from 'react';
 import { toGitFormModel } from '@/react/portainer/gitops/types';
 import { getDefaultRelativePathModel } from '@/react/portainer/gitops/RelativePathFieldset/types';
 import { createWebhookId } from '@/portainer/helpers/webhookHelper';
-import { CustomTemplate } from '@/react/portainer/templates/custom-templates/types';
+import {
+  CustomTemplate,
+  getTemplateSourceId,
+} from '@/react/portainer/templates/custom-templates/types';
 import { useCustomTemplate } from '@/react/portainer/templates/custom-templates/queries/useCustomTemplate';
 import { getVariablesFieldDefaultValues } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesField';
 import { useAppTemplate } from '@/react/portainer/templates/app-templates/queries/useAppTemplates';
@@ -145,6 +148,7 @@ function useInitialValues(
         getDefaultStaggerConfig(),
       method: templateParams.templateId ? 'template' : 'editor',
       git: toGitFormModel(
+        getTemplateSourceId(templateQuery.customTemplate),
         templateQuery.customTemplate?.GitConfig,
         parseAutoUpdateResponse()
       ),

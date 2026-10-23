@@ -1,10 +1,15 @@
 import toastr from 'toastr';
 
+import { suppressConsoleLogs } from '@/setup-tests/suppress-console';
+
 import { notifyError, notifySuccess, notifyWarning } from './notifications';
 
-vi.spyOn(console, 'error').mockImplementation(() => vi.fn());
-
+let restoreConsole: () => void;
+beforeEach(() => {
+  restoreConsole = suppressConsoleLogs();
+});
 afterEach(() => {
+  restoreConsole();
   vi.resetAllMocks();
 });
 
@@ -18,9 +23,6 @@ it('calling success should show success message', () => {
 });
 
 it('calling error with Error should show error message', () => {
-  const consoleErrorFn = vi
-    .spyOn(console, 'error')
-    .mockImplementation(() => vi.fn());
   const title = 'title';
   const errorMessage = 'message';
   const fallback = 'fallback';
@@ -32,14 +34,9 @@ it('calling error with Error should show error message', () => {
     title,
     expect.anything()
   );
-
-  consoleErrorFn.mockRestore();
 });
 
 it('calling error without Error should show fallback message', () => {
-  const consoleErrorFn = vi
-    .spyOn(console, 'error')
-    .mockImplementation(() => vi.fn());
   const title = 'title';
 
   const fallback = 'fallback';
@@ -47,7 +44,6 @@ it('calling error without Error should show fallback message', () => {
   notifyError(title, undefined, fallback);
 
   expect(toastr.error).toHaveBeenCalledWith(fallback, title, expect.anything());
-  consoleErrorFn.mockRestore();
 });
 
 it('calling warning should show warning message', () => {

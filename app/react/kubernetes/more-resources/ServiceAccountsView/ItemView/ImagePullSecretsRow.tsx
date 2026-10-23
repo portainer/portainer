@@ -89,6 +89,7 @@ export function ImagePullSecretsRow({
 
   return (
     <DetailsRow
+      ariaLabel="Image pull secrets"
       label={
         <span className="flex items-center">
           Image pull secrets

@@ -169,7 +169,7 @@ func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, r *http.Requ
 }
 
 func (handler *Handler) isSecureCookie(r *http.Request, forceSecureCookies bool) bool {
-	return r.TLS != nil || middlewares.IsHTTPSRequest(r) || forceSecureCookies
+	return r.TLS != nil || middlewares.IsHTTPSRequest(r, nil) || forceSecureCookies
 }
 
 func (handler *Handler) syncUserTeamsWithLDAPGroups(user *portainer.User, settings *portainer.LDAPSettings) error {
