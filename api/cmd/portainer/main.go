@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"flag"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -757,17 +758,44 @@ func recoverStaleDeployingStacks(tx dataservices.DataStoreTx) error {
 }
 
 func runHealthcheck() {
-	// Skip TLS verification because of default self-signed certs
+	// Parse optional flags so custom --bind or --bind-https ports are respected
+	var bindHTTP, bindHTTPS string
+	flag.StringVar(&bindHTTP, "bind", "127.0.0.1:9000", "HTTP bind address")
+	flag.StringVar(&bindHTTPS, "bind-https", "127.0.0.1:9443", "HTTPS bind address")
+	// Also support legacy/alternative port flags if passed
+	var httpPort, httpsPort string
+	flag.StringVar(&httpPort, "p", "", "HTTP port override")
+	flag.StringVar(&httpsPort, "s", "", "HTTPS port override")
+	flag.Parse()
+
+	// Build endpoint list dynamically based on parsed flags
+	httpAddr := "127.0.0.1:9000"
+	httpsAddr := "127.0.0.1:9443"
+
+	if bindHTTP != "" {
+		httpAddr = bindHTTP
+	}
+	if bindHTTPS != "" {
+		httpsAddr = bindHTTPS
+	}
+	if httpPort != "" {
+		httpAddr = "127.0.0.1:" + httpPort
+	}
+	if httpsPort != "" {
+		httpsAddr = "127.0.0.1:" + httpsPort
+	}
+
+	// Shorter timeout (1.5s each) to stay well under Docker's 5s healthcheck limit
 	client := &nethttp.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 1500 * time.Millisecond,
 		Transport: &nethttp.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:forbidigo
 		},
 	}
 
 	endpoints := []string{
-		"https://127.0.0.1:9443/api/system/status",
-		"http://127.0.0.1:9000/api/system/status",
+		"https://" + httpsAddr + "/api/system/status",
+		"http://" + httpAddr + "/api/system/status",
 	}
 
 	for _, endpoint := range endpoints {
