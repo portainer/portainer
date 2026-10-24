@@ -41,7 +41,7 @@ export function GitReferenceCard({
   const deployed = hasDivergence ? currentDeploymentInfo : undefined;
   const url = deployed?.RepositoryURL ?? gitConfig.URL;
   const configFilePath = deployed?.ConfigFilePath ?? gitConfig.ConfigFilePath;
-  const reference = deployed?.ReferenceName ?? gitConfig.ReferenceName;
+  const reference = deployed?.ReferenceName || gitConfig.ReferenceName;
   const commitId = deployed?.ConfigHash ?? gitConfig.ConfigHash;
   const sourceIdToShow = deployed?.SourceID ?? sourceId;
 
