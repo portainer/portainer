@@ -1,0 +1,34 @@
+{
+  "name": "Portainer CE",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.26.6"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22.22.1"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "containerEnv": {
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+  },
+  "postCreateCommand": "corepack enable && pnpm install --frozen-lockfile",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8000,
+    8999,
+    9000,
+    9443,
+    6006
+  ]
+}

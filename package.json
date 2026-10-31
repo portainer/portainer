@@ -88,7 +88,6 @@
     "buffer": "^6.0.3",
     "c8": "^9.1.0",
     "chardet": "^1.4.0",
-    "recharts": "^3.8.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^1.1.1",
     "codemirror": "^6.0.1",
@@ -130,6 +129,7 @@
     "react-json-view-lite": "^1.5.0",
     "react-select": "^5.10.2",
     "react-select-async-paginate": "^0.7.11",
+    "recharts": "^3.8.1",
     "sanitize-html": "^2.17.0",
     "spinkit": "^2.0.1",
     "strip-ansi": "^6.0.0",
@@ -270,7 +270,15 @@
     },
     "configDependencies": {
       "@pnpm/plugin-types-fixer": "0.1.0+sha512-bLww63gRHi7siYTqFJb5qNdcXadU0jv20Et6z5AryMZ7FlLolbEJOrXLpg8+amQZNHHNW1dfFUBGVw/9ezQbFg=="
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "@uirouter/core",
+      "core-js",
+      "esbuild",
+      "msw",
+      "unrs-resolver"
+    ]
   },
   "browserslist": "last 2 versions",
   "msw": {
