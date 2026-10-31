@@ -1,6 +1,7 @@
 # build target, can be one of "production", "testing", "development"
 ENV=development
 WEBPACK_CONFIG=webpack/webpack.$(ENV).js
+IMAGE_REPOSITORY=portainerci
 TAG=local
 
 SWAG=go run github.com/swaggo/swag/cmd/swag@v1.16.6
@@ -28,7 +29,7 @@ build-server: init-dist ## Build the server binary
 	./build/build_binary.sh "$(PLATFORM)" "$(ARCH)"
 
 build-image: build-all ## Build the Portainer image locally
-	docker buildx build --load -t portainerci/portainer-ce:$(TAG) -f build/linux/Dockerfile .
+	docker buildx build --load -t $(IMAGE_REPOSITORY)/portainer-ce:$(TAG) -f build/linux/Dockerfile .
 
 build-storybook: ## Build and serve the storybook files
 	pnpm run storybook:build
