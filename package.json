@@ -35,7 +35,7 @@
   "engines": {
     "node": "^22.22.1"
   },
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.27.0",
   "dependencies": {
     "@aws-crypto/sha256-js": "^2.0.0",
     "@codemirror/autocomplete": "^6.20.2",

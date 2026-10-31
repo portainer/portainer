@@ -5,10 +5,10 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.26.6"
+      "version": "1.26.10"
     },
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "22.22.1"
+      "version": "22.23.3"
     },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
