@@ -24,7 +24,7 @@ export function useDeleteNetwork(environmentId: EnvironmentId) {
     ...withError('Unable to remove network'),
     onSuccess(_, { networkId }) {
       queryClient.cancelQueries(queryKeys.item(environmentId, networkId));
-      return queryClient.invalidateQueries(queryKeys.base(environmentId));
+      return queryClient.invalidateQueries(queryKeys.lists(environmentId));
     },
   });
 }
