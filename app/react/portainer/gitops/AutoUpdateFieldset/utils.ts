@@ -34,7 +34,7 @@ export function getDefaultAutoUpdateValues(): AutoUpdateModel {
 export function parseAutoUpdateResponse(
   response?: AutoUpdateResponse | null
 ): AutoUpdateModel {
-  if (!response || (!response?.Interval && !response?.Webhook)) {
+  if (!response?.Webhook) {
     return getDefaultAutoUpdateValues();
   }
 
