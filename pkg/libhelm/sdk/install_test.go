@@ -3,11 +3,13 @@ package sdk
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/test"
 
 	"github.com/stretchr/testify/require"
+	"helm.sh/helm/v4/pkg/action"
 )
 
 func Test_Install(t *testing.T) {
@@ -193,4 +195,66 @@ func Test_Install(t *testing.T) {
 		_, err = hspm.Upgrade(installOpts)
 		require.Error(t, err, "should return error when repo doesn't exist")
 	})
+}
+
+func Test_releaseTimeout(t *testing.T) {
+	t.Parallel()
+
+	requestedTimeout := 2 * time.Minute
+
+	tests := []struct {
+		name              string
+		requested         time.Duration
+		rollbackOnFailure bool
+		want              time.Duration
+	}{
+		{name: "defaults when no timeout is requested", want: defaultReleaseTimeout},
+		{name: "defaults longer for rollback on failure", rollbackOnFailure: true, want: defaultAtomicReleaseTimeout},
+		{name: "uses the requested timeout", requested: requestedTimeout, want: requestedTimeout},
+		{name: "uses the requested timeout for rollback on failure", requested: requestedTimeout, rollbackOnFailure: true, want: requestedTimeout},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			require.Equal(t, tt.want, releaseTimeout(tt.requested, tt.rollbackOnFailure))
+		})
+	}
+}
+
+func Test_initInstallClient(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name                  string
+		opts                  options.InstallOptions
+		wantRollbackOnFailure bool
+		wantTimeout           time.Duration
+	}{
+		{
+			name:                  "keeps a failed release when atomic is off",
+			opts:                  options.InstallOptions{Name: "app"},
+			wantRollbackOnFailure: false,
+			wantTimeout:           defaultReleaseTimeout,
+		},
+		{
+			name:                  "rolls back a failed release when atomic is on",
+			opts:                  options.InstallOptions{Name: "app", Atomic: true},
+			wantRollbackOnFailure: true,
+			wantTimeout:           defaultAtomicReleaseTimeout,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			installClient, err := initInstallClient(new(action.Configuration), tt.opts)
+
+			require.NoError(t, err)
+			require.Equal(t, tt.wantRollbackOnFailure, installClient.RollbackOnFailure)
+			require.Equal(t, tt.wantTimeout, installClient.Timeout)
+		})
+	}
 }

@@ -154,6 +154,27 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 	}, nil
 }
 
+const (
+	// defaultReleaseTimeout is generous so large charts have time to become ready
+	defaultReleaseTimeout = 15 * time.Minute
+	// defaultAtomicReleaseTimeout is longer because rolling back a failed release
+	// adds to the operation time
+	defaultAtomicReleaseTimeout = 30 * time.Minute
+)
+
+// releaseTimeout returns the requested timeout, or the default when none was requested
+func releaseTimeout(requested time.Duration, rollbackOnFailure bool) time.Duration {
+	if requested != 0 {
+		return requested
+	}
+
+	if rollbackOnFailure {
+		return defaultAtomicReleaseTimeout
+	}
+
+	return defaultReleaseTimeout
+}
+
 // initInstallClient initializes the install client with the given options
 // and return the install client.
 func initInstallClient(actionConfig *action.Configuration, installOpts options.InstallOptions) (*action.Install, error) {
@@ -165,7 +186,8 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	} else {
 		installClient.WaitStrategy = kube.HookOnlyStrategy
 	}
-	installClient.Timeout = installOpts.Timeout
+	installClient.RollbackOnFailure = installOpts.Atomic
+	installClient.Timeout = releaseTimeout(installOpts.Timeout, installOpts.Atomic)
 	installClient.Version = installOpts.Version
 	if installOpts.DryRun {
 		installClient.DryRunStrategy = action.DryRunClient
@@ -178,11 +200,6 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	}
 
 	// Set default values if not specified
-	if installOpts.Timeout == 0 {
-		installClient.Timeout = 15 * time.Minute // set a bigger timeout for large charts
-	} else {
-		installClient.Timeout = installOpts.Timeout
-	}
 	if installOpts.Namespace == "" {
 		installClient.Namespace = "default"
 	} else {
