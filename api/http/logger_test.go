@@ -10,10 +10,11 @@ import (
 )
 
 func TestLogger(t *testing.T) {
-	t.Parallel()
 	msg := "Testing HTTP logger"
 	buf := &bytes.Buffer{}
 
+	original := log.Logger
+	t.Cleanup(func() { log.Logger = original })
 	log.Logger = zerolog.New(buf)
 
 	NewHTTPLogger().Print(msg)
