@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"maps"
 	"net/http"
 	"slices"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/docker/docker/client"
 	"github.com/segmentio/encoding/json"
@@ -31,6 +33,7 @@ var (
 	ErrSecurityOptSettingsForbidden   = errors.New("forbidden to use security-opt settings")
 	ErrContainerCapabilitiesForbidden = errors.New("forbidden to use container capabilities")
 	ErrBindMountsForbidden            = errors.New("forbidden to use bind mounts")
+	ErrNetworkAccessForbidden         = stackutils.ErrNetworkAccessForbidden
 )
 
 type PartialMount struct {
@@ -267,7 +270,11 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Binds       []string       `json:"Binds"`
 			VolumesFrom []string       `json:"VolumesFrom"`
 			Mounts      []PartialMount `json:"Mounts"`
+			NetworkMode string         `json:"NetworkMode"`
 		} `json:"HostConfig"`
+		NetworkingConfig struct {
+			EndpointsConfig map[string]json.RawMessage `json:"EndpointsConfig"`
+		} `json:"NetworkingConfig"`
 	}
 
 	forbiddenResponse := &http.Response{
@@ -325,13 +332,13 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, ErrContainerCapabilitiesForbidden
 		}
 
+		getClient := func() (*client.Client, error) {
+			agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
+
+			return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+		}
+
 		if !securitySettings.AllowBindMountsForRegularUsers {
-			getClient := func() (*client.Client, error) {
-				agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-				return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
-			}
-
 			if err := CheckContainerBindMountRestrictions(request.Context(), partialContainer.HostConfig.Binds, partialContainer.HostConfig.VolumesFrom, partialContainer.HostConfig.Mounts, getClient); err != nil {
 				if errors.Is(err, ErrBindMountsForbidden) {
 					return forbiddenResponse, err
@@ -339,6 +346,15 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 				return nil, err
 			}
+		}
+
+		networkNames := stackutils.ReferencedNetworkNames(slices.AppendSeq([]string{partialContainer.HostConfig.NetworkMode}, maps.Keys(partialContainer.NetworkingConfig.EndpointsConfig)))
+		if err := transport.authorizeReferencedNetworks(tokenData.ID, networkNames, getClient); err != nil {
+			if errors.Is(err, ErrNetworkAccessForbidden) {
+				return forbiddenResponse, err
+			}
+
+			return nil, err
 		}
 
 		request.Body = io.NopCloser(bytes.NewBuffer(body))

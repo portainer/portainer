@@ -11,8 +11,10 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
@@ -30,6 +32,7 @@ type serviceCreationFixtures struct {
 	adminUser  portainer.User
 	endpointID portainer.EndpointID
 	volumes    map[string]volume.Volume
+	networks   map[string]network.Inspect
 }
 
 func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
@@ -38,7 +41,8 @@ func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
 	const serviceID = "some-service-id"
 
 	f := &serviceCreationFixtures{
-		volumes: map[string]volume.Volume{},
+		volumes:  map[string]volume.Volume{},
+		networks: map[string]network.Inspect{},
 	}
 
 	dockerSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +63,19 @@ func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
 
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write(data)
+
+			return
+		}
+
+		if r.Method == http.MethodGet && path.Base(path.Dir(r.URL.Path)) == "networks" {
+			if net, ok := f.networks[path.Base(r.URL.Path)]; ok {
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(net)
+
+				return
+			}
+
+			http.NotFound(w, r)
 
 			return
 		}
@@ -143,6 +160,11 @@ func (f *serviceCreationFixtures) newTransport() *Transport {
 
 func (f *serviceCreationFixtures) setVolume(name string, vol volume.Volume) {
 	f.volumes[name] = vol
+}
+
+func (f *serviceCreationFixtures) setNetwork(net network.Inspect) {
+	f.networks[net.Name] = net
+	f.networks[net.ID] = net
 }
 
 func (f *serviceCreationFixtures) newRequest(t *testing.T, spec swarm.ServiceSpec, user portainer.User) *http.Request {
@@ -822,6 +844,119 @@ func TestCheckServiceBodyRestrictions_BindVolumeOnOtherClusterNode(t *testing.T)
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, "http://unused/services/create", bytes.NewReader(data))
 	require.NoError(t, err)
 
-	err = CheckServiceBodyRestrictions(req, &restrictiveSettings, getClient)
+	err = CheckServiceBodyRestrictions(req, &restrictiveSettings, getClient, func([]string) error { return nil })
 	require.ErrorIs(t, err, ErrBindMountsForbidden)
+}
+
+func TestDecorateServiceOperation_NetworkResourceControl(t *testing.T) {
+	t.Parallel()
+
+	withNetworks := func(targets ...string) swarm.ServiceSpec {
+		spec := swarm.ServiceSpec{TaskTemplate: swarm.TaskSpec{ContainerSpec: &swarm.ContainerSpec{}}}
+		for _, target := range targets {
+			spec.TaskTemplate.Networks = append(spec.TaskTemplate.Networks, swarm.NetworkAttachmentConfig{Target: target})
+		}
+
+		return spec
+	}
+
+	ownedByAdmin := func(fx *serviceCreationFixtures) portainer.UserID { return fx.adminUser.ID }
+	ownedByCaller := func(fx *serviceCreationFixtures) portainer.UserID { return fx.stdUser.ID }
+
+	f := func(spec swarm.ServiceSpec, networkOwner func(fx *serviceCreationFixtures) portainer.UserID, update bool, wantForbidden bool) {
+		t.Helper()
+
+		fx := newServiceCreationFixtures(t)
+		fx.setSecuritySettings(t, permissiveSettings)
+		fx.setNetwork(network.Inspect{ID: "ownernetid", Name: "ownernet"})
+		fx.setNetwork(network.Inspect{ID: "ingressid", Name: "ingress"})
+
+		if networkOwner != nil {
+			err := fx.ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+				return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("ownernetid", portainer.NetworkResourceControl, networkOwner(fx)))
+			})
+			require.NoError(t, err)
+		}
+
+		transport := fx.newTransport()
+		req := fx.newRequest(t, spec, fx.stdUser)
+
+		var resp *http.Response
+		var err error
+		if update {
+			resp, err = transport.decorateServiceUpdateOperation(req, "some-service-id")
+		} else {
+			resp, err = transport.decorateServiceCreationOperation(req)
+		}
+		require.NotNil(t, resp)
+
+		if wantForbidden {
+			require.ErrorIs(t, err, ErrNetworkAccessForbidden)
+			require.Equal(t, http.StatusForbidden, resp.StatusCode)
+		} else {
+			require.NoError(t, err)
+			require.Equal(t, http.StatusCreated, resp.StatusCode)
+		}
+
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// a service without networks needs no authorization
+	f(withNetworks(), nil, false, false)
+
+	// attaching to the swarm ingress network needs no authorization
+	f(withNetworks("ingress"), nil, false, false)
+
+	// attaching to the swarm ingress network by ID needs no authorization
+	f(withNetworks("ingressid"), nil, false, false)
+
+	// attaching to a network with no resource control at all is forbidden
+	f(withNetworks("ownernet"), nil, false, true)
+
+	// attaching to a network privately owned by another user is forbidden
+	f(withNetworks("ownernet"), ownedByAdmin, false, true)
+
+	// referencing that network by ID is forbidden too
+	f(withNetworks("ownernetid"), ownedByAdmin, false, true)
+
+	// one forbidden network among allowed ones is enough to forbid the request
+	f(withNetworks("ingress", "ownernet"), ownedByAdmin, false, true)
+
+	// attaching to a network privately owned by the caller is allowed
+	f(withNetworks("ownernet"), ownedByCaller, false, false)
+
+	// updating a service to attach it to a network owned by another user is forbidden
+	f(withNetworks("ownernet"), ownedByAdmin, true, true)
+}
+
+func TestCheckServiceBodyRestrictions_NetworkTargets(t *testing.T) {
+	t.Parallel()
+
+	f := func(body string, wantNetworks []string) {
+		t.Helper()
+
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, "http://unused/services/create", bytes.NewBufferString(body))
+		require.NoError(t, err)
+
+		var gotNetworks []string
+		err = CheckServiceBodyRestrictions(req, &permissiveSettings, nil, func(networkNames []string) error {
+			gotNetworks = networkNames
+
+			return nil
+		})
+		require.NoError(t, err)
+		require.ElementsMatch(t, wantNetworks, gotNetworks)
+	}
+
+	// TaskTemplate.Networks targets are authorized
+	f(`{"TaskTemplate":{"Networks":[{"Target":"net1"},{"Target":"net2"}]}}`, []string{"net1", "net2"})
+
+	// the deprecated top-level Networks, still honored on API versions below 1.44, are authorized too
+	f(`{"Networks":[{"Target":"net1"}]}`, []string{"net1"})
+
+	// a network referenced in both places is authorized once
+	f(`{"Networks":[{"Target":"net1"}],"TaskTemplate":{"Networks":[{"Target":"net1"}]}}`, []string{"net1"})
+
+	// the swarm ingress network needs no authorization
+	f(`{"TaskTemplate":{"Networks":[{"Target":"ingress"}]}}`, nil)
 }

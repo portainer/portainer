@@ -127,10 +127,23 @@ func redeployWhenChangedSecondStage(
 	user *portainer.User,
 	endpoint *portainer.Endpoint,
 ) error {
-	var teamMemberships []portainer.TeamMembership
+	var (
+		teamMemberships []portainer.TeamMembership
+		networkAccess   *stackutils.NetworkAccess
+	)
 	if err := datastore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		teamMemberships, err = tx.TeamMembership().TeamMembershipsByUserID(user.ID)
+		if err != nil {
+			return err
+		}
+
+		if stack.Type == portainer.KubernetesStack {
+			return nil
+		}
+
+		networkAccess, err = LoadNetworkAccessTx(tx, endpoint.ID, user)
+
 		return err
 	}); err != nil {
 		return err
@@ -212,7 +225,7 @@ func redeployWhenChangedSecondStage(
 	redeployStack := func(stack *portainer.Stack) error {
 		var err error
 
-		if err := ValidateStackForUser(stack, endpoint, user, deployer, fileService); err != nil {
+		if err := ValidateStackForUser(ctx, stack, endpoint, user, networkAccess, deployer, fileService); err != nil {
 			return err
 		}
 		switch stack.Type {

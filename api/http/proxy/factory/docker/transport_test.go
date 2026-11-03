@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/docker/docker/api/types/container"
@@ -327,6 +328,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		}))
 
 		require.NoError(t, tx.ResourceControl().Create(authorization.NewPrivateResourceControl("16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", portainer.NetworkResourceControl, std1.ID)))
+		require.NoError(t, tx.ResourceControl().Create(authorization.NewPrivateResourceControl("mycontainerid", portainer.ContainerResourceControl, std1.ID)))
 
 		return nil
 	}))
@@ -343,6 +345,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		{http.MethodDelete, "/networks/16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4"}:          struct{}{},
 		{http.MethodPost, "/networks/create"}:                                                                      network.CreateResponse{ID: "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4"},
 		{http.MethodPost, "/networks/prune"}:                                                                       struct{}{},
+		{http.MethodGet, "/containers/mycontainer/json"}:                                                           container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: "mycontainerid", Name: "mycontainer"}},
 	})
 	defer srv.Close()
 
@@ -353,7 +356,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 	}
 
 	test := func(method string, url string, token portainer.TokenData) (*http.Response, error) {
-		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, nil)
+		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, strings.NewReader(`{"Container":"mycontainer"}`))
 		req = req.WithContext(security.StoreTokenData(req, &token))
 		require.NotNil(t, req)
 
@@ -1085,4 +1088,184 @@ func TestTransport_ProxyDockerRequest_rejectsEncodedSeparator(t *testing.T) {
 	require.NotNil(t, r)
 	require.Equal(t, http.StatusOK, r.StatusCode)
 	require.NoError(t, r.Body.Close())
+}
+
+func TestTransport_proxyBuildRequest_NetworkMode(t *testing.T) {
+	t.Parallel()
+
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	std := portainer.User{ID: 2, Username: "std", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	err := ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := tx.User().Create(&admin); err != nil {
+			return err
+		}
+
+		if err := tx.User().Create(&std); err != nil {
+			return err
+		}
+
+		if err := tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env"}); err != nil {
+			return err
+		}
+
+		return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("ownernetid", portainer.NetworkResourceControl, admin.ID))
+	})
+	require.NoError(t, err)
+
+	srv, version := mockDockerAPIServer(t, RoutesDefinition{
+		{http.MethodPost, "/build"}:              map[string]any{},
+		{http.MethodGet, "/networks/ownernet"}:   network.Inspect{ID: "ownernetid", Name: "ownernet"},
+		{http.MethodGet, "/networks/ownernetid"}: network.Inspect{ID: "ownernetid", Name: "ownernet"},
+		{http.MethodGet, "/networks/hostid"}:     network.Inspect{ID: "hostid", Name: "host"},
+	})
+	t.Cleanup(srv.Close)
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{ID: 1, URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	f := func(user portainer.User, query string, contentType string, body string, wantStatus int) {
+		t.Helper()
+
+		req := httptest.NewRequest(http.MethodPost, srv.URL+"/v"+version+"/build"+query, strings.NewReader(body))
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
+		}
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role}))
+
+		resp, err := transport.proxyBuildRequest(req, "/build")
+		require.NoError(t, err)
+		require.Equal(t, wantStatus, resp.StatusCode)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// a build without networkmode needs no authorization
+	f(std, "", "", "FROM scratch", http.StatusOK)
+
+	// building on Docker's built-in host network needs no authorization
+	f(std, "?networkmode=host", "", "FROM scratch", http.StatusOK)
+
+	// referencing Docker's built-in host network by ID needs no authorization either
+	f(std, "?networkmode=hostid", "", "FROM scratch", http.StatusOK)
+
+	// building on a network privately owned by another user is forbidden
+	f(std, "?networkmode=ownernet", "", "FROM scratch", http.StatusForbidden)
+
+	// referencing that network by ID is forbidden too
+	f(std, "?networkmode=ownernetid", "", "FROM scratch", http.StatusForbidden)
+
+	// smuggling networkmode through a form encoded body, which the daemon also reads, is forbidden
+	f(std, "", "application/x-www-form-urlencoded", "networkmode=ownernet", http.StatusForbidden)
+
+	// a repeated networkmode cannot hide a forbidden value behind an allowed one
+	f(std, "?networkmode=host&networkmode=ownernet", "", "FROM scratch", http.StatusForbidden)
+
+	// administrators may build on any network
+	f(admin, "?networkmode=ownernet", "", "FROM scratch", http.StatusOK)
+}
+
+func TestTransport_proxyNetworkRequest_ConnectionContainer(t *testing.T) {
+	t.Parallel()
+
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	attacker := portainer.User{ID: 2, Username: "attacker", Role: portainer.StandardUserRole}
+	victim := portainer.User{ID: 3, Username: "victim", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	err := ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		for _, user := range []*portainer.User{&admin, &attacker, &victim} {
+			if err := tx.User().Create(user); err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env"}); err != nil {
+			return err
+		}
+
+		for _, rc := range []*portainer.ResourceControl{
+			authorization.NewPrivateResourceControl("attackernetid", portainer.NetworkResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimnetid", portainer.NetworkResourceControl, victim.ID),
+			authorization.NewPrivateResourceControl("attackerctrid", portainer.ContainerResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimctrid", portainer.ContainerResourceControl, victim.ID),
+		} {
+			if err := tx.ResourceControl().Create(rc); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	routes := RoutesDefinition{}
+	for _, name := range []string{"attackernet", "victimnet"} {
+		routes[[2]string{http.MethodGet, "/networks/" + name}] = network.Inspect{ID: name + "id", Name: name}
+		routes[[2]string{http.MethodPost, "/networks/" + name + "/connect"}] = struct{}{}
+		routes[[2]string{http.MethodPost, "/networks/" + name + "/disconnect"}] = struct{}{}
+	}
+
+	for _, name := range []string{"attackerctr", "victimctr", "orphanctr"} {
+		inspect := container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: name + "id", Name: name}, Config: &container.Config{}}
+		routes[[2]string{http.MethodGet, "/containers/" + name + "/json"}] = inspect
+		routes[[2]string{http.MethodGet, "/containers/" + name + "id/json"}] = inspect
+	}
+
+	srv, version := mockDockerAPIServer(t, routes)
+	t.Cleanup(srv.Close)
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{ID: 1, URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	f := func(user portainer.User, action string, networkName string, body string, wantStatus int) {
+		t.Helper()
+
+		url := "/networks/" + networkName + "/" + action
+		req := httptest.NewRequest(http.MethodPost, srv.URL+"/v"+version+url, strings.NewReader(body))
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role}))
+
+		resp, err := transport.proxyNetworkRequest(req, url)
+		require.NoError(t, err)
+		require.Equal(t, wantStatus, resp.StatusCode)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// connecting an owned container to an owned network is allowed
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr"}`, http.StatusOK)
+
+	// disconnecting an owned container from an owned network is allowed
+	f(attacker, "disconnect", "attackernet", `{"Container":"attackerctr"}`, http.StatusOK)
+
+	// connecting an owned container to another user's network is forbidden
+	f(attacker, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusForbidden)
+
+	// pulling another user's container into an owned network is forbidden
+	f(attacker, "connect", "attackernet", `{"Container":"victimctr"}`, http.StatusForbidden)
+
+	// referencing that container by ID is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"victimctrid"}`, http.StatusForbidden)
+
+	// a lowercase key, which the daemon also accepts, is forbidden too
+	f(attacker, "connect", "attackernet", `{"container":"victimctr"}`, http.StatusForbidden)
+
+	// a duplicated key, where the daemon uses the last value, is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","Container":"victimctr"}`, http.StatusForbidden)
+
+	// connecting a container with no resource control at all is forbidden
+	f(attacker, "connect", "attackernet", `{"Container":"orphanctr"}`, http.StatusForbidden)
+
+	// disconnecting another user's container from an owned network is forbidden
+	f(attacker, "disconnect", "attackernet", `{"Container":"victimctr","Force":true}`, http.StatusForbidden)
+
+	// administrators may connect any container to any network
+	f(admin, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusOK)
 }

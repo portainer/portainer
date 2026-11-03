@@ -126,7 +126,17 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
-	if err := deployments.ValidateStackForUser(stack, endpoint, securityContext.User, handler.StackDeployer, handler.FileService); err != nil {
+	var networkAccess *stackutils.NetworkAccess
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		networkAccess, err = deployments.LoadNetworkAccessTx(tx, endpoint.ID, securityContext.User)
+
+		return err
+	}); err != nil {
+		return httperror.InternalServerError("Unable to load network access information", err)
+	}
+
+	if err := deployments.ValidateStackForUser(r.Context(), stack, endpoint, securityContext.User, networkAccess, handler.StackDeployer, handler.FileService); err != nil {
 		return httperror.Forbidden("Stack files are not allowed for this user", err)
 	}
 

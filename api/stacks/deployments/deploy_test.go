@@ -605,15 +605,15 @@ func Test_ValidateStackForUser_BindMountBlockedForNonAdmin(t *testing.T) {
 	admin := &portainer.User{ID: 1, Role: portainer.AdministratorRole}
 
 	// A non-admin author is refused
-	err = ValidateStackForUser(stack, endpoint, user, noopDeployer{}, fileService)
+	err = ValidateStackForUser(t.Context(), stack, endpoint, user, nil, noopDeployer{}, fileService)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
 
 	// An admin author is not validated
-	err = ValidateStackForUser(stack, endpoint, admin, noopDeployer{}, fileService)
+	err = ValidateStackForUser(t.Context(), stack, endpoint, admin, nil, noopDeployer{}, fileService)
 	require.NoError(t, err)
 
 	// Without a file service a non-admin fails closed
-	err = ValidateStackForUser(stack, endpoint, user, noopDeployer{}, nil)
+	err = ValidateStackForUser(t.Context(), stack, endpoint, user, nil, noopDeployer{}, nil)
 	require.Error(t, err)
 }
 
@@ -700,6 +700,6 @@ func Test_ValidateStackForUser_DockerClientCreationFails(t *testing.T) {
 	user := &portainer.User{ID: 2, Role: portainer.StandardUserRole}
 
 	// A failure to create the Docker client must fail closed
-	err = ValidateStackForUser(stack, endpoint, user, factoryDeployer{}, fileService)
+	err = ValidateStackForUser(t.Context(), stack, endpoint, user, nil, factoryDeployer{}, fileService)
 	require.ErrorContains(t, err, "environment not supported")
 }

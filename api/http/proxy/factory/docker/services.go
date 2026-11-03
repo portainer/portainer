@@ -5,12 +5,15 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
@@ -31,10 +34,16 @@ type partialServiceSpec struct {
 			} `json:"Privileges"`
 			Mounts []PartialMount `json:"Mounts"`
 		} `json:"ContainerSpec"`
+		Networks []partialNetworkAttachment `json:"Networks"`
 	} `json:"TaskTemplate"`
+	Networks []partialNetworkAttachment `json:"Networks"`
 }
 
-func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func(nodeName string) (*client.Client, error)) error {
+type partialNetworkAttachment struct {
+	Target string `json:"Target"`
+}
+
+func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func(nodeName string) (*client.Client, error), authorizeNetworks func(networkNames []string) error) error {
 	defer logs.CloseAndLogErr(request.Body)
 
 	body, err := io.ReadAll(request.Body)
@@ -92,6 +101,15 @@ func CheckServiceBodyRestrictions(request *http.Request, securitySettings *porta
 				return ErrBindMountsForbidden
 			}
 		}
+	}
+
+	var networkTargets []string
+	for _, attachment := range slices.Concat(spec.TaskTemplate.Networks, spec.Networks) {
+		networkTargets = append(networkTargets, attachment.Target)
+	}
+
+	if err := authorizeNetworks(stackutils.ReferencedNetworkNames(networkTargets)); err != nil {
+		return err
 	}
 
 	request.Body = io.NopCloser(bytes.NewBuffer(body))
@@ -209,6 +227,14 @@ func selectorServiceLabels(responseObject map[string]any) map[string]any {
 	return nil
 }
 
+func (transport *Transport) serviceNetworksAuthorizer(userID portainer.UserID, getClient func(nodeName string) (*client.Client, error)) func(networkNames []string) error {
+	return func(networkNames []string) error {
+		return transport.authorizeReferencedNetworks(userID, networkNames, func() (*client.Client, error) {
+			return getClient("")
+		})
+	}
+}
+
 func (transport *Transport) decorateServiceCreationOperation(request *http.Request) (*http.Response, error) {
 	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
 	if err != nil {
@@ -224,11 +250,16 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 		return nil, err
 	}
 
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
 	getClient := func(nodeName string) (*client.Client, error) {
 		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
 	}
 
-	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
+	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient, transport.serviceNetworksAuthorizer(tokenData.ID, getClient)); err != nil {
 		return &http.Response{
 			StatusCode: http.StatusForbidden,
 			Body:       io.NopCloser(bytes.NewBufferString("Access denied: insufficient permissions to create service with specified configuration")),
@@ -257,11 +288,16 @@ func (transport *Transport) decorateServiceUpdateOperation(request *http.Request
 		return nil, err
 	}
 
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
 	getClient := func(nodeName string) (*client.Client, error) {
 		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
 	}
 
-	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
+	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient, transport.serviceNetworksAuthorizer(tokenData.ID, getClient)); err != nil {
 		return &http.Response{
 			StatusCode: http.StatusForbidden,
 			Body:       io.NopCloser(bytes.NewBufferString("Access denied: insufficient permissions to update service with specified configuration")),

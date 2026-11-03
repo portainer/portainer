@@ -20,6 +20,7 @@ type ComposeStackDeploymentConfig struct {
 	registries     []portainer.Registry
 	isAdmin        bool
 	user           *portainer.User
+	networkAccess  *stackutils.NetworkAccess
 	forcePullImage bool
 	ForceCreate    bool
 	FileService    portainer.FileService
@@ -31,6 +32,11 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 	user, err := tx.User().Read(securityContext.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load user information from the database: %w", err)
+	}
+
+	networkAccess, err := LoadNetworkAccessTx(tx, endpoint.ID, user)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load network access information from the database: %w", err)
 	}
 
 	registries, err := tx.Registry().ReadAll()
@@ -49,6 +55,7 @@ func CreateComposeStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityC
 		prune:          prune,
 		isAdmin:        securityContext.IsAdmin,
 		user:           user,
+		networkAccess:  networkAccess,
 		forcePullImage: forcePullImage,
 		ForceCreate:    forceCreate,
 		FileService:    fileService,
@@ -65,7 +72,7 @@ func (config *ComposeStackDeploymentConfig) Deploy(ctx context.Context) error {
 	}
 
 	if config.endpoint != nil {
-		if err := ValidateStackForUser(config.stack, config.endpoint, config.user, config.StackDeployer, config.FileService); err != nil {
+		if err := ValidateStackForUser(ctx, config.stack, config.endpoint, config.user, config.networkAccess, config.StackDeployer, config.FileService); err != nil {
 			return err
 		}
 	}
