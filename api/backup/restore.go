@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/rs/zerolog/log"
 )
@@ -24,6 +25,12 @@ var filesToRestore = append(filesToBackup, "portainer.db")
 
 // Restores system state from backup archive, will trigger system shutdown, when finished.
 func RestoreArchive(archive io.Reader, password string, filestorePath string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, shutdownTrigger context.CancelFunc) error {
+	// Fips mode only accepts a backup that was encrypted by a fips server, so a
+	// missing password is rejected before anything is extracted or shut down.
+	if err := RequireEncryptionInFIPSMode(password, fips.FIPSMode()); err != nil {
+		return err
+	}
+
 	var err error
 	if password != "" {
 		archive, err = decrypt(archive, password)
@@ -74,7 +81,7 @@ func extractArchive(r io.Reader, destinationDirPath string) error {
 
 func getRestoreSourcePath(dir string) (string, error) {
 	// find portainer.db or portainer.edb file. Return the parent directory
-	var portainerdbRegex = regexp.MustCompile(`^portainer.e?db$`)
+	portainerdbRegex := regexp.MustCompile(`^portainer.e?db$`)
 
 	backupDirPath := dir
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {

@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -34,6 +35,12 @@ var filesToBackup = []string{
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
 func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, filestorePath string) (string, error) {
+	// Checked before anything is copied so the offline gate is not taken for a
+	// backup that cannot be produced.
+	if err := RequireEncryptionInFIPSMode(password, fips.FIPSMode()); err != nil {
+		return "", err
+	}
+
 	backupDirPath, err := backupDatabaseAndFilesystem(gate, datastore, filestorePath)
 	if err != nil {
 		return "", err

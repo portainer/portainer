@@ -54,11 +54,8 @@ export function BackupFileForm() {
 
   async function onSubmit(values: BackupFileSettings) {
     const payload: DownloadBackupPayload = {
-      password: '',
+      password: values.passwordProtect ? values.password : '',
     };
-    if (values.passwordProtect) {
-      payload.password = values.password;
-    }
 
     downloadMutate.mutate(payload, {
       onSuccess() {
