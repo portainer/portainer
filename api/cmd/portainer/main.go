@@ -4,10 +4,12 @@ import (
 	"cmp"
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
 	nethttp "net/http"
 	"os"
 	"path"
 	"strings"
+	"flag"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -684,6 +686,13 @@ func buildServer(flags *portainer.CLIFlags, shutdownCtx context.Context, shutdow
 }
 
 func main() {
+	// Intercept healthcheck flag before initializing the application
+	for _, arg := range os.Args {
+		if arg == "--healthcheck" {
+			runHealthcheck()
+			return
+		}
+	}
 	logs.ConfigureLogger()
 	logs.SetLoggingMode("PRETTY")
 
@@ -746,4 +755,58 @@ func recoverStaleDeployingStacks(tx dataservices.DataStoreTx) error {
 	}
 
 	return nil
+}
+
+func runHealthcheck() {
+	// Parse optional flags so custom --bind or --bind-https ports are respected
+	var bindHTTP, bindHTTPS string
+	flag.StringVar(&bindHTTP, "bind", "127.0.0.1:9000", "HTTP bind address")
+	flag.StringVar(&bindHTTPS, "bind-https", "127.0.0.1:9443", "HTTPS bind address")
+	// Also support legacy/alternative port flags if passed
+	var httpPort, httpsPort string
+	flag.StringVar(&httpPort, "p", "", "HTTP port override")
+	flag.StringVar(&httpsPort, "s", "", "HTTPS port override")
+	flag.Parse()
+
+	// Build endpoint list dynamically based on parsed flags
+	httpAddr := "127.0.0.1:9000"
+	httpsAddr := "127.0.0.1:9443"
+
+	if bindHTTP != "" {
+		httpAddr = bindHTTP
+	}
+	if bindHTTPS != "" {
+		httpsAddr = bindHTTPS
+	}
+	if httpPort != "" {
+		httpAddr = "127.0.0.1:" + httpPort
+	}
+	if httpsPort != "" {
+		httpsAddr = "127.0.0.1:" + httpsPort
+	}
+
+	// Shorter timeout (1.5s each) to stay well under Docker's 5s healthcheck limit
+	client := &nethttp.Client{
+		Timeout: 1500 * time.Millisecond,
+		Transport: &nethttp.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:forbidigo
+		},
+	}
+
+	endpoints := []string{
+		"https://" + httpsAddr + "/api/system/status",
+		"http://" + httpAddr + "/api/system/status",
+	}
+
+	for _, endpoint := range endpoints {
+		resp, err := client.Get(endpoint)
+		if err == nil {
+			defer resp.Body.Close()
+			if resp.StatusCode == nethttp.StatusOK {
+				os.Exit(0) // Healthy
+			}
+		}
+	}
+
+	os.Exit(1) // Unhealthy
 }
