@@ -56,6 +56,12 @@ func (c *gitClient) Download(ctx context.Context, dst string, opt *git.CloneOpti
 		dst = resolved
 	}
 
+	// Download is always a fresh clone: drop a .git left behind by an
+	// interrupted clone, which would otherwise fail with "repository already exists"
+	if err := os.RemoveAll(filesystem.JoinPaths(dst, ".git")); err != nil {
+		return errors.Wrap(err, "failed to remove stale .git directory")
+	}
+
 	wt := NewNoSymlinkFS(osfs.New(dst))
 	dot := osfs.New(filesystem.JoinPaths(dst, ".git"))
 	storer := gogitfs.NewStorage(dot, cache.NewObjectLRU(0))

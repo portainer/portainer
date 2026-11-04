@@ -504,3 +504,20 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 		})
 	}
 }
+
+func Test_Download_LeftoverGitDirectory(t *testing.T) {
+	t.Parallel()
+	repoURL := setup(t)
+	dst := t.TempDir()
+
+	// simulate a previously interrupted clone that left a .git folder behind
+	opts := &git.CloneOptions{URL: repoURL, ReferenceName: plumbing.NewBranchReferenceName("main")}
+	require.NoError(t, NewGitClient(true).Download(t.Context(), dst, opts))
+	require.DirExists(t, filesystem.JoinPaths(dst, ".git"))
+
+	err := NewGitClient(false).Download(t.Context(), dst, opts)
+	require.NoError(t, err)
+	entries, err := os.ReadDir(dst)
+	require.NoError(t, err)
+	assert.NotEmpty(t, entries)
+}
