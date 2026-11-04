@@ -20,3 +20,4 @@ go.work.sum
 
 .vitest
 
+/.claude/settings.local.json

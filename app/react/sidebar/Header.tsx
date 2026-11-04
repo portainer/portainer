@@ -8,6 +8,7 @@ import fullLogoBE from './portainer_logo-BE.svg';
 import fullLogoCE from './portainer_logo-CE.svg';
 import portainerIcon from './portainer-p-icon-white.svg';
 import { useSidebarState } from './useSidebarState';
+import { ResourceCharts } from './ResourceCharts';
 import styles from './Header.module.css';
 
 interface Props {
@@ -30,6 +31,7 @@ export function Header({ logo: customLogo }: Props) {
       >
         <Logo customLogo={customLogo} isOpen={isOpen} />
       </Link>
+      <ResourceCharts isOpen={isOpen} />
       {isOpen && customLogo && (
         <div
           className={clsx(
