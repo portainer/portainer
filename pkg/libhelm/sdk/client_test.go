@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/portainer/portainer/pkg/libhelm/options"
@@ -8,6 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helm.sh/helm/v4/pkg/action"
+	sdkrelease "helm.sh/helm/v4/pkg/release"
+	releasecommon "helm.sh/helm/v4/pkg/release/common"
+	releasev1 "helm.sh/helm/v4/pkg/release/v1"
+	"helm.sh/helm/v4/pkg/storage/driver"
+	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
@@ -18,7 +24,7 @@ func Test_InitActionConfig(t *testing.T) {
 
 	t.Run("with nil k8sAccess should use default kubeconfig", func(t *testing.T) {
 		actionConfig := new(action.Configuration)
-		err := hspm.initActionConfig(actionConfig, "default", nil)
+		err := hspm.initActionConfig(actionConfig, "default", nil, nil)
 
 		// The function should not fail by design, even when not running in a k8s environment
 		require.NoError(t, err, "should not return error when not in k8s environment")
@@ -32,7 +38,7 @@ func Test_InitActionConfig(t *testing.T) {
 		}
 
 		// The function should not fail by design
-		err := hspm.initActionConfig(actionConfig, "default", k8sAccess)
+		err := hspm.initActionConfig(actionConfig, "default", k8sAccess, nil)
 		require.NoError(t, err, "should not return error when using in-memory config")
 	})
 
@@ -45,9 +51,63 @@ func Test_InitActionConfig(t *testing.T) {
 		}
 
 		// The function should not fail by design
-		err := hspm.initActionConfig(actionConfig, "default", k8sAccess)
+		err := hspm.initActionConfig(actionConfig, "default", k8sAccess, nil)
 		require.NoError(t, err, "should not return error when using in-memory config with CA")
 	})
+
+	t.Run("with release storage the driver reads through the supplied client", func(t *testing.T) {
+		storageClient := fake.NewClientset()
+		seedRelease(t, storageClient, "portainer", "demo")
+
+		actionConfig := new(action.Configuration)
+		k8sAccess := &options.KubernetesClusterAccess{
+			ClusterServerURL: "https://kubernetes.default.svc",
+			AuthToken:        "test-token",
+		}
+		require.NoError(t, hspm.initActionConfig(actionConfig, "portainer", k8sAccess, storageClient.CoreV1()))
+
+		releases, err := actionConfig.Releases.List(func(sdkrelease.Releaser) bool { return true })
+		require.NoError(t, err, "the storage driver should read through the supplied client")
+		require.Len(t, releases, 1)
+
+		found, err := releaserToV1Release(releases[0])
+		require.NoError(t, err)
+		assert.Equal(t, "demo", found.Name)
+	})
+
+	t.Run("without release storage the driver cannot see the supplied client's releases", func(t *testing.T) {
+		storageClient := fake.NewClientset()
+		seedRelease(t, storageClient, "portainer", "demo")
+
+		actionConfig := new(action.Configuration)
+		k8sAccess := &options.KubernetesClusterAccess{
+			ClusterServerURL: "https://kubernetes.default.svc",
+			AuthToken:        "test-token",
+		}
+		require.NoError(t, hspm.initActionConfig(actionConfig, "portainer", k8sAccess, nil))
+
+		// The caller's credentials point at an unreachable cluster, so this either errors
+		// or comes back empty. What matters is that the seeded release is not visible.
+		releases, err := actionConfig.Releases.List(func(sdkrelease.Releaser) bool { return true })
+		if err == nil {
+			assert.Empty(t, releases)
+		}
+	})
+}
+
+// seedRelease writes a Helm release record through the secret driver itself, so the
+// stored encoding is whatever the driver expects to read back.
+func seedRelease(t *testing.T, client *fake.Clientset, namespace, name string) {
+	t.Helper()
+
+	seeded := driver.NewSecrets(client.CoreV1().Secrets(namespace))
+	err := seeded.Create(fmt.Sprintf("sh.helm.release.v1.%s.v1", name), &releasev1.Release{
+		Name:      name,
+		Namespace: namespace,
+		Version:   1,
+		Info:      &releasev1.Info{Status: releasecommon.StatusDeployed},
+	})
+	require.NoError(t, err)
 }
 
 func Test_ClientConfigGetter(t *testing.T) {

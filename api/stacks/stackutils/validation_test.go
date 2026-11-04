@@ -443,6 +443,19 @@ services:
         target: /container/path
 `), "", nil, forbidden)
 
+	// service-level volume "type: npipe" (Windows named pipe) is bind-equivalent
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: \\.\pipe\docker_engine
+`), "", nil, forbidden)
+
 	// an external volume that is actually bind-backed is rejected
 	f([]byte(`
 version: "3"
@@ -480,7 +493,7 @@ volumes:
 		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
 	}), forbidden)
 
-	// with no Docker client, the existing-volume check is skipped and the stack is valid
+	// with no Docker client, the existing-volume check fails closed rather than being skipped
 	f([]byte(`
 version: "3"
 
@@ -492,7 +505,7 @@ services:
 
 volumes:
   data: {}
-`), "mystack", nil, "")
+`), "mystack", nil, "unable to verify bind-mount status without a Docker client")
 
 	// an explicit "name:" override resolves to the overridden Docker-side name
 	f([]byte(`

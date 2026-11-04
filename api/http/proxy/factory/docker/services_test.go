@@ -15,7 +15,9 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/client"
 	"github.com/segmentio/encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,6 +45,20 @@ func newServiceCreationFixtures(t *testing.T) *serviceCreationFixtures {
 		if r.Method == http.MethodHead && r.URL.Path == "/_ping" {
 			w.Header().Add("Api-Version", serviceCreationAPIVersion)
 			_, _ = w.Write([]byte{})
+
+			return
+		}
+
+		if r.Method == http.MethodGet && path.Base(r.URL.Path) == "nodes" {
+			data, err := json.Marshal([]swarm.Node{{ID: "single-node", Description: swarm.NodeDescription{Hostname: "single-node"}}})
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(data)
 
 			return
 		}
@@ -726,4 +742,86 @@ func TestDecorateServiceCreationOperation_BindMountRestrictions(t *testing.T) {
 	f([]mount.Mount{{Type: mount.TypeVolume, Source: "normalvol"}}, map[string]volume.Volume{
 		"normalvol": {Name: "normalvol", Driver: "local"},
 	}, false)
+}
+
+// TestCheckServiceBodyRestrictions_BindVolumeOnOtherClusterNode ensures a bind-backed volume is
+// caught even when it only exists on a cluster node other than the one the default client reaches.
+// A local-driver volume is scoped to the node it was created on: checking a single node cannot
+// rule out a same-named bind-backed volume on a different node that the Swarm scheduler could
+// still place the task on.
+func TestCheckServiceBodyRestrictions_BindVolumeOnOtherClusterNode(t *testing.T) {
+	t.Parallel()
+
+	newNodeServer := func(t *testing.T, handler http.HandlerFunc) *httptest.Server {
+		t.Helper()
+
+		srv := httptest.NewServer(handler)
+		t.Cleanup(srv.Close)
+
+		return srv
+	}
+
+	nodeAServer := newNodeServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if path.Base(r.URL.Path) == "nodes" {
+			data, err := json.Marshal([]swarm.Node{
+				{ID: "node-a", Description: swarm.NodeDescription{Hostname: "node-a"}},
+				{ID: "node-b", Description: swarm.NodeDescription{Hostname: "node-b"}},
+			})
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(data)
+
+			return
+		}
+
+		http.NotFound(w, r)
+	})
+
+	nodeBServer := newNodeServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if path.Base(r.URL.Path) == "evilvol" {
+			vol := volume.Volume{Name: "evilvol", Driver: "local", Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"}}
+
+			w.Header().Set("Content-Type", "application/json")
+			assert.NoError(t, json.NewEncoder(w).Encode(vol))
+
+			return
+		}
+
+		http.NotFound(w, r)
+	})
+
+	newClientFor := func(url string) *client.Client {
+		cli, err := client.NewClientWithOpts(client.WithHost(url), client.WithHTTPClient(http.DefaultClient))
+		require.NoError(t, err)
+
+		return cli
+	}
+
+	getClient := func(nodeName string) (*client.Client, error) {
+		if nodeName == "node-b" {
+			return newClientFor(nodeBServer.URL), nil
+		}
+
+		return newClientFor(nodeAServer.URL), nil
+	}
+
+	spec := swarm.ServiceSpec{
+		TaskTemplate: swarm.TaskSpec{
+			ContainerSpec: &swarm.ContainerSpec{
+				Mounts: []mount.Mount{{Type: mount.TypeVolume, Source: "evilvol"}},
+			},
+		},
+	}
+
+	data, err := json.Marshal(spec)
+	require.NoError(t, err)
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, "http://unused/services/create", bytes.NewReader(data))
+	require.NoError(t, err)
+
+	err = CheckServiceBodyRestrictions(req, &restrictiveSettings, getClient)
+	require.ErrorIs(t, err, ErrBindMountsForbidden)
 }

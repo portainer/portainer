@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import {
@@ -233,6 +233,76 @@ describe('Datatable', () => {
       screen.getByLabelText('Select all rows');
     expect(selectAllCheckbox.indeterminate).toBe(true);
     expect(selectAllCheckbox.checked).toBe(false);
+  });
+});
+
+describe('Datatable pagination', () => {
+  const paginatedSettings = { ...mockSettingsManager, pageSize: 2 };
+
+  it('stays on the current page when the dataset is refetched', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Datatable
+        dataset={mockData}
+        columns={mockColumns}
+        settingsManager={paginatedSettings}
+        data-cy="test-table"
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+    expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+
+    // a refetch (auto refresh, or react-query refetching on window focus)
+    // hands the table a new array holding the same rows
+    rerender(
+      <Datatable
+        dataset={[...mockData]}
+        columns={mockColumns}
+        settingsManager={paginatedSettings}
+        data-cy="test-table"
+      />
+    );
+
+    // table-core queues its auto reset on a microtask, so give it a chance to
+    // run before asserting that the page survived
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+  });
+
+  it('falls back to the last available page when the dataset shrinks', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Datatable
+        dataset={mockData}
+        columns={mockColumns}
+        settingsManager={paginatedSettings}
+        data-cy="test-table"
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+    expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+
+    // the rows backing page 2 are gone, leaving a single page
+    rerender(
+      <Datatable
+        dataset={mockData.slice(0, 2)}
+        columns={mockColumns}
+        settingsManager={paginatedSettings}
+        data-cy="test-table"
+      />
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
   });
 });
 
