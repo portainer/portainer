@@ -107,6 +107,40 @@ func Test_createRewriteFn(t *testing.T) {
 			),
 		},
 		{
+			name:   "BuildKit session headers",
+			target: createURL(t, "https://portainer.io/api/docker?a=5&b=6"),
+			req: createRequest(
+				t,
+				"POST",
+				"https://agent-portainer.io/session",
+				map[string]string{
+					"Connection":                          "Upgrade",
+					"Upgrade":                             "h2c",
+					"User-Agent":                          "test-user-agent",
+					"X-Docker-Expose-Session-Uuid":        "test-session-id",
+					"X-Docker-Expose-Session-Name":        "test-session-name",
+					"X-Docker-Expose-Session-Sharedkey":   "test-shared-key",
+					"X-Docker-Expose-Session-Grpc-Method": "/moby.filesync.v1.FileSync/DiffCopy",
+				},
+				true,
+			),
+			expectedReq: createRequest(
+				t,
+				"POST",
+				"https://portainer.io/api/docker/session?a=5&b=6",
+				map[string]string{
+					"Connection":                          "Upgrade",
+					"Upgrade":                             "h2c",
+					"User-Agent":                          "test-user-agent",
+					"X-Docker-Expose-Session-Uuid":        "test-session-id",
+					"X-Docker-Expose-Session-Name":        "test-session-name",
+					"X-Docker-Expose-Session-Sharedkey":   "test-shared-key",
+					"X-Docker-Expose-Session-Grpc-Method": "/moby.filesync.v1.FileSync/DiffCopy",
+				},
+				true,
+			),
+		},
+		{
 			name:   "Non canonical Headers",
 			target: createURL(t, "https://portainer.io/api/docker?a=5&b=6"),
 			req: createRequest(
