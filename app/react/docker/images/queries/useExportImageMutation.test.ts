@@ -185,8 +185,8 @@ describe('exportImage', () => {
     });
 
     const url = new URL(requestUrl);
-    // Axios serializes array params with brackets: names[]=value1&names[]=value2
-    const names = url.searchParams.getAll('names[]');
+    // Docker API expects repeated params: names=value1&names=value2
+    const names = url.searchParams.getAll('names');
     expect(names).toEqual(['nginx:latest', 'redis:alpine']);
     expect(saveAs).toHaveBeenCalled();
   });
@@ -217,7 +217,7 @@ describe('exportImage', () => {
     });
 
     const url = new URL(requestUrl);
-    const names = url.searchParams.getAll('names[]');
+    const names = url.searchParams.getAll('names');
     expect(names).toEqual([
       'nginx:latest',
       'sha256:def456',
