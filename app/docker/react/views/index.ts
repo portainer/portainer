@@ -7,6 +7,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { DashboardView } from '@/react/docker/DashboardView/DashboardView';
 import { ListView } from '@/react/docker/events/ListView';
 
+import { SecurityScoreView } from './security-score/SecurityScoreView';
 import { containersModule } from './containers';
 import { configsModule } from './configs';
 import { imagesModule } from './images';
@@ -29,4 +30,9 @@ export const viewsModule = angular
   .component(
     'networkDetailsView',
     r2a(withUIRouter(withCurrentUser(NetworksItemView)), [])
+  )
+  // تسجيل مكون الـ Security Score هنا
+  .component(
+    'securityScoreView',
+    r2a(withUIRouter(withCurrentUser(SecurityScoreView)), [])
   ).name;

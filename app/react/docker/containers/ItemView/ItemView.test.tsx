@@ -37,7 +37,7 @@ describe('ItemView', () => {
   it('displays container name in breadcrumbs with leading slash trimmed', async () => {
     renderComponent();
 
-    expect(await screen.findByText('test-container')).toBeVisible();
+    expect(await screen.findByText('test-container', { selector: 'span' })).toBeVisible();
     expect(screen.queryByText('/test-container')).not.toBeInTheDocument();
   });
 
@@ -75,6 +75,17 @@ function renderComponent({
   server.use(
     http.get('/api/endpoints/:endpointId/docker/containers/:id/json', () =>
       HttpResponse.json(createMockContainer(container))
+    ),
+    http.get(
+      '/api/docker/:environmentId/containers/:containerId/security',
+      () =>
+        HttpResponse.json({
+          score: 85,
+          passCount: 1,
+          warnCount: 0,
+          failCount: 0,
+          checks: [],
+        })
     )
   );
 
