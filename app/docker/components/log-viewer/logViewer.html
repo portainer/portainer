@@ -1,8 +1,13 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="file" title-text="Log viewer settings"></rd-widget-header>
-      <rd-widget-body>
+      <rd-widget-header icon="file" title-text="Log viewer settings">
+        <button type="button" class="btn btn-sm btn-link text-white !no-underline float-right" ng-click="$ctrl.toggleSettings()">
+          <pr-icon icon="$ctrl.state.showSettings ? 'chevron-up' : 'chevron-down'" class-name="'space-right'"></pr-icon>
+          {{ $ctrl.state.showSettings ? 'Hide settings' : 'Show settings' }}
+        </button>
+      </rd-widget-header>
+      <rd-widget-body ng-show="$ctrl.state.showSettings">
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
@@ -83,8 +88,28 @@
   </div>
 </div>
 
-<div class="row" style="height: 54%">
-  <div class="col-sm-12" style="height: 100%">
+<div class="row mb-2" ng-if="!$ctrl.state.showSettings">
+  <div class="col-sm-12 flex items-center justify-between gap-3">
+    <div class="flex-1">
+      <input class="form-control" type="text" name="logs_search_quick" ng-model="$ctrl.state.search" ng-change="$ctrl.state.selectedLines.length = 0;" placeholder="Filter logs..." />
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="btn btn-primary btn-sm" type="button" ng-click="$ctrl.downloadLogs()" data-cy="download-logs-button">
+        <pr-icon icon="'download'"></pr-icon> Download logs
+      </button>
+      <button
+        class="btn btn-primary btn-sm"
+        ng-click="$ctrl.copy()"
+        ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length"
+      >
+        <pr-icon icon="'copy'" class-name="'space-right'"></pr-icon>Copy
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12" ng-class="$ctrl.state.showSettings ? 'h-[max(350px,calc(100vh-450px))]' : 'h-[max(550px,calc(100vh-230px))]'">
     <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
       <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans track by $index" ng-style="{ 'color': span.fgColor, 'background-color': span.bgColor, 'font-weight': span.fontWeight }">{{ span.text }}</span></p></div>
       <div ng-if="!$ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
