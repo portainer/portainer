@@ -11,7 +11,7 @@ export const TRUNCATE_LENGTH = 32;
 
 export function createStore(storageKey: string) {
   return createPersistedStore<TableSettings>(storageKey, 'name', (set) => ({
-    ...hiddenColumnsSettings(set),
+    ...hiddenColumnsSettings(set, ['cpu', 'memory', 'blockIO']),
     ...refreshableSettings(set),
     ...filteredColumnsSettings(set),
     truncateContainerName: TRUNCATE_LENGTH,
