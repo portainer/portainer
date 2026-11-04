@@ -498,7 +498,8 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		r, err := test(http.MethodPost, "/networks/create", adminToken)
 		require.NoError(t, err)
 		require.NotNil(t, r)
-		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.Equal(t, http.StatusCreated, r.StatusCode)
+		require.Equal(t, "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", r.Header.Get("Location"))
 		require.NoError(t, r.Body.Close())
 	}
 
@@ -506,7 +507,8 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		r, err := test(http.MethodPost, "/networks/create", std1Token)
 		require.NoError(t, err)
 		require.NotNil(t, r)
-		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.Equal(t, http.StatusCreated, r.StatusCode)
+		require.Equal(t, "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", r.Header.Get("Location"))
 		require.NoError(t, r.Body.Close())
 	}
 
@@ -514,7 +516,8 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		r, err := test(http.MethodPost, "/networks/create", std2Token)
 		require.NoError(t, err)
 		require.NotNil(t, r)
-		require.Equal(t, http.StatusOK, r.StatusCode)
+		require.Equal(t, http.StatusCreated, r.StatusCode)
+		require.Equal(t, "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", r.Header.Get("Location"))
 		require.NoError(t, r.Body.Close())
 	}
 

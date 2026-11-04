@@ -157,6 +157,8 @@ func TestDecorateContainerCreationOperation_BindMounts(t *testing.T) {
 	resp, err := transport.decorateContainerCreationOperation(req, containerObjectIdentifier, portainer.ContainerResourceControl)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	require.Equal(t, "abc123", resp.Header.Get("Location"))
 
 	err = resp.Body.Close()
 	require.NoError(t, err)
@@ -198,6 +200,8 @@ func TestDecorateContainerCreationOperation_BindMounts(t *testing.T) {
 	resp, err = transport.decorateContainerCreationOperation(req, containerObjectIdentifier, portainer.ContainerResourceControl)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	require.Equal(t, "abc123", resp.Header.Get("Location"))
 
 	err = resp.Body.Close()
 	require.NoError(t, err)
