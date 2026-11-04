@@ -5,10 +5,7 @@ import { Stack } from './types';
 export function getStacksFromApplications(applications: Application[]) {
   const res = applications.reduce<Stack[]>((stacks, app) => {
     const updatedStacks = stacks.map((stack) => {
-      if (
-        stack.Name === app.StackName &&
-        stack.ResourcePool === app.ResourcePool
-      ) {
+      if (stack.Id === app.StackId) {
         return {
           ...stack,
           Applications: [...stack.Applications, app],
@@ -17,15 +14,13 @@ export function getStacksFromApplications(applications: Application[]) {
       return stack;
     });
 
-    const stackExists = updatedStacks.some(
-      (stack) =>
-        stack.Name === app.StackName && stack.ResourcePool === app.ResourcePool
-    );
+    const stackExists = updatedStacks.some((stack) => stack.Id === app.StackId);
 
-    if (!stackExists && app.StackName) {
+    // applications outside a stack have no stack id, or the placeholder id '0'
+    if (!stackExists && app.StackId && app.StackId !== '0') {
       updatedStacks.push({
-        Name: app.StackName,
-        ResourcePool: app.ResourcePool,
+        Id: app.StackId,
+        Name: app.StackName ?? '',
         Applications: [app],
         Highlighted: false,
       });
