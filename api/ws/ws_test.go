@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 	"unicode/utf8"
 
 	"github.com/portainer/portainer/api/logs"
@@ -433,4 +434,79 @@ func TestHijackRequest_Success(t *testing.T) {
 	// HijackRequest treats EOF (not a CloseError) as a clean session end and returns nil.
 	err = HijackRequest(serverConn, backendClient, req)
 	require.NoError(t, err)
+}
+
+// closeTrackingConn wraps a net.Conn and signals on closed when Close is called.
+type closeTrackingConn struct {
+	net.Conn
+
+	closed chan struct{}
+	once   sync.Once
+}
+
+func (c *closeTrackingConn) Close() error {
+	c.once.Do(func() { close(c.closed) })
+
+	return c.Conn.Close()
+}
+
+func TestHijackRequest_ClosesBackendConnOnSessionEnd(t *testing.T) {
+	t.Parallel()
+
+	serverConn, clientConn := newTestWSPair(t)
+
+	backendServer, backendClient := net.Pipe()
+	tracked := &closeTrackingConn{Conn: backendClient, closed: make(chan struct{})}
+
+	// Simulate dockerd holding the attach connection open: answer the
+	// attach request with 101, then keep reading (stdin) until the other
+	// end closes the connection.
+	go func() {
+		defer logs.CloseAndLogErr(backendServer)
+
+		buf := make([]byte, 4096)
+		if _, err := backendServer.Read(buf); err != nil {
+			return
+		}
+
+		resp := "HTTP/1.1 101 Switching Protocols\r\nUpgrade: tcp\r\nConnection: Upgrade\r\n\r\n"
+		if _, err := backendServer.Write([]byte(resp)); err != nil {
+			return
+		}
+
+		for {
+			if _, err := backendServer.Read(buf); err != nil {
+				return
+			}
+		}
+	}()
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://backend/", nil)
+	require.NoError(t, err)
+
+	done := make(chan error, 1)
+	go func() {
+		done <- HijackRequest(serverConn, tracked, req)
+	}()
+
+	// End the session the way a user leaving the Attach console does: close
+	// the browser websocket.
+	err = clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	require.NoError(t, err)
+
+	select {
+	case <-done:
+		// HijackRequest returned; the session is over.
+	case <-time.After(5 * time.Second):
+		t.Fatal("HijackRequest did not return after the websocket closed")
+	}
+
+	// The backend connection must be closed when the session ends, otherwise
+	// the reader goroutine stays blocked on Read forever and dockerd keeps
+	// writing container stdout into a connection nobody reads from.
+	select {
+	case <-tracked.closed:
+	case <-time.After(5 * time.Second):
+		t.Fatal("HijackRequest returned without closing the backend connection")
+	}
 }

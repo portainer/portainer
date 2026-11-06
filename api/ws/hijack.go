@@ -24,6 +24,16 @@ const (
 )
 
 func HijackRequest(websocketConn *websocket.Conn, conn net.Conn, request *http.Request) error {
+	// HijackRequest takes ownership of conn: close it when the session ends.
+	// The only other close in this path is resp.Body.Close() below, which is
+	// a no-op for the 101 Switching Protocols response (its body is
+	// http.NoBody), so without this the connection to the server is left open
+	// with nobody reading from it. The server keeps writing into the socket
+	// buffers until they fill up, and the reader goroutine stays blocked on
+	// Read forever. The close error is intentionally ignored: the server may
+	// already have closed the connection (e.g. the container exited).
+	defer conn.Close()
+
 	resp, err := sendHTTPRequest(conn, request)
 	if err != nil {
 		return err
