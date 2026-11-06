@@ -181,6 +181,6 @@ Generated files live in `app/react/portainer/generated-api/portainer/`. Do **not
 
 ## Licensing
 
-See the [LICENSE](https://github.com/portainer/portainer/blob/develop/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+See the [LICENSE](https://github.com/portainer/portainer/blob/HEAD/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
 
 We may ask you to sign a [Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger changes.

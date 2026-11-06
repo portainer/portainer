@@ -87,7 +87,7 @@ type Handler struct {
 // @contact.email info@portainer.io
 
 // @license.name zlib
-// @license.url https://github.com/portainer/portainer/blob/develop/LICENSE
+// @license.url https://github.com/portainer/portainer/blob/HEAD/LICENSE
 
 // @host
 // @BasePath /api

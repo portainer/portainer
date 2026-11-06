@@ -14945,7 +14945,7 @@ info:
     ```
   license:
     name: zlib
-    url: https://github.com/portainer/portainer/blob/develop/LICENSE
+    url: https://github.com/portainer/portainer/blob/HEAD/LICENSE
   title: PortainerCE API
   version: 2.45.3
 paths:
