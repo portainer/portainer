@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"time"
 
 	"github.com/pkg/errors"
@@ -10,6 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v4/pkg/action"
 	"helm.sh/helm/v4/pkg/kube"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 // Install implements the HelmPackageManager interface by using the Helm SDK to install a chart.
@@ -56,6 +60,10 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 			Err(err).
 			Msg("Failed to initialize helm install client for helm release installation")
 		return nil, errors.Wrap(err, "failed to initialize helm install client for helm release installation")
+	}
+
+	if installClient.CreateNamespace {
+		installClient.CreateNamespace = shouldCreateNamespace(actionConfig, installClient.Namespace)
 	}
 
 	var values map[string]any
@@ -211,4 +219,51 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	}
 
 	return installClient, nil
+}
+
+// shouldCreateNamespace reports whether Helm still has to create the release
+// namespace. Helm v4 server-side applies the namespace when CreateNamespace is set,
+// which patches one that already exists and fails for users who may only read
+// namespaces. A caller forbidden from reading namespaces cannot create one either,
+// so creation is skipped; any other failed check leaves creation to Helm.
+func shouldCreateNamespace(actionConfig *action.Configuration, namespace string) bool {
+	exists, err := releaseNamespaceExists(actionConfig, namespace)
+	if k8serrors.IsForbidden(err) {
+		return false
+	}
+
+	if err != nil {
+		log.Warn().
+			Str("context", "HelmClient").
+			Str("namespace", namespace).
+			Err(err).
+			Msg("unable to check whether the release namespace exists")
+
+		return true
+	}
+
+	return !exists
+}
+
+func releaseNamespaceExists(actionConfig *action.Configuration, namespace string) (bool, error) {
+	restConfig, err := actionConfig.RESTClientGetter.ToRESTConfig()
+	if err != nil {
+		return false, errors.Wrap(err, "failed to build the Kubernetes REST config")
+	}
+
+	clientset, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return false, errors.Wrap(err, "failed to build the Kubernetes client")
+	}
+
+	return namespaceExists(clientset, namespace)
+}
+
+func namespaceExists(clientset kubernetes.Interface, namespace string) (bool, error) {
+	_, err := clientset.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return false, nil
+	}
+
+	return err == nil, err
 }

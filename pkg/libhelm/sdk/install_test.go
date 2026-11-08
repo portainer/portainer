@@ -8,8 +8,20 @@ import (
 	"github.com/portainer/portainer/pkg/libhelm/options"
 	"github.com/portainer/portainer/pkg/libhelm/test"
 
+	"encoding/json"
+	"errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helm.sh/helm/v4/pkg/action"
+	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/kubernetes/fake"
+	k8stesting "k8s.io/client-go/testing"
+	"net/http"
+	"net/http/httptest"
 )
 
 func Test_Install(t *testing.T) {
@@ -257,4 +269,106 @@ func Test_initInstallClient(t *testing.T) {
 			require.Equal(t, tt.wantTimeout, installClient.Timeout)
 		})
 	}
+}
+
+func Test_namespaceExists(t *testing.T) {
+	t.Parallel()
+
+	t.Run("returns true when the namespace exists", func(t *testing.T) {
+		t.Parallel()
+		clientset := fake.NewClientset(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "team-a"}})
+
+		exists, err := namespaceExists(clientset, "team-a")
+
+		require.NoError(t, err)
+		require.True(t, exists)
+	})
+
+	t.Run("returns false when the namespace is missing", func(t *testing.T) {
+		t.Parallel()
+		clientset := fake.NewClientset()
+
+		exists, err := namespaceExists(clientset, "team-a")
+
+		require.NoError(t, err)
+		require.False(t, exists)
+	})
+
+	t.Run("returns the error when the namespace cannot be read", func(t *testing.T) {
+		t.Parallel()
+		clientset := fake.NewClientset()
+		forbidden := k8serrors.NewForbidden(schema.GroupResource{Resource: "namespaces"}, "team-a", errors.New("not allowed"))
+		clientset.PrependReactor("get", "namespaces", func(k8stesting.Action) (bool, runtime.Object, error) {
+			return true, nil, forbidden
+		})
+
+		exists, err := namespaceExists(clientset, "team-a")
+
+		require.ErrorIs(t, err, forbidden)
+		require.False(t, exists)
+	})
+}
+
+func Test_shouldCreateNamespace(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		statusCode int
+		want       bool
+	}{
+		{name: "skips creation when the namespace exists", statusCode: http.StatusOK, want: false},
+		{name: "creates the namespace when it is missing", statusCode: http.StatusNotFound, want: true},
+		{name: "skips creation when the caller cannot read namespaces", statusCode: http.StatusForbidden, want: false},
+		{name: "leaves creation to Helm when the check fails", statusCode: http.StatusInternalServerError, want: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			actionConfig := newActionConfigForServer(t, namespaceAPIServer(t, tt.statusCode))
+
+			require.Equal(t, tt.want, shouldCreateNamespace(actionConfig, "team-a"))
+		})
+	}
+}
+
+// namespaceAPIServer answers every namespace read with statusCode, returning
+// team-a on success and a Kubernetes Status otherwise.
+func namespaceAPIServer(t *testing.T, statusCode int) *httptest.Server {
+	t.Helper()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(statusCode)
+
+		var body any = &corev1.Namespace{TypeMeta: metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"}, ObjectMeta: metav1.ObjectMeta{Name: "team-a"}}
+		if statusCode != http.StatusOK {
+			body = &metav1.Status{
+				TypeMeta: metav1.TypeMeta{Kind: "Status", APIVersion: "v1"},
+				Status:   metav1.StatusFailure,
+				Code:     int32(statusCode),
+			}
+		}
+
+		assert.NoError(t, json.NewEncoder(w).Encode(body))
+	}))
+	t.Cleanup(server.Close)
+
+	return server
+}
+
+func newActionConfigForServer(t *testing.T, server *httptest.Server) *action.Configuration {
+	t.Helper()
+
+	actionConfig := new(action.Configuration)
+	err := NewHelmSDKPackageManager().initActionConfig(actionConfig, "team-a", &options.KubernetesClusterAccess{
+		ClusterName:      "test-cluster",
+		ContextName:      "test-context",
+		UserName:         "test-user",
+		ClusterServerURL: server.URL,
+	}, nil)
+	require.NoError(t, err)
+
+	return actionConfig
 }
