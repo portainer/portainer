@@ -90,6 +90,12 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 				stack.ResourceControl = resourceControl
 			}
 		}
+
+		if stack.Type == portainer.KubernetesStack {
+			if httpErr := handler.authorizeKubernetesStackRead(securityContext, endpoint, stack); httpErr != nil {
+				return httpErr
+			}
+		}
 	}
 
 	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
