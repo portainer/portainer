@@ -111,9 +111,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		hideFields(&paginatedEndpoints[idx])
 
 		paginatedEndpoints[idx].ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
-		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
-			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
-		}
+		endpointutils.UpdateEdgeEndpointCheckinInterval(&paginatedEndpoints[idx], settings)
 
 		endpointutils.UpdateEdgeEndpointHeartbeat(&paginatedEndpoints[idx], settings)
 
