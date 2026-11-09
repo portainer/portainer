@@ -228,7 +228,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 
 	t.Run("should return error for invalid credentials", func(t *testing.T) {
 		registry := &portainer.Registry{
-			URL:            "my-registry.io",
+			URL:            "my-registry.invalid",
 			Authentication: true,
 			Username:       " ",
 		}
@@ -244,7 +244,7 @@ func TestLoginToOCIRegistry(t *testing.T) {
 	t.Run("should attempt login for valid credentials", func(t *testing.T) {
 		registry := &portainer.Registry{
 			ID:             123,
-			URL:            "my-registry.io",
+			URL:            "my-registry.invalid",
 			Authentication: true,
 			Username:       "user",
 			Password:       "pass",
