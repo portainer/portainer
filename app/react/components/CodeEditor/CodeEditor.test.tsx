@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Extension } from '@codemirror/state';
+import { keymap as codeMirrorKeymap } from '@uiw/react-codemirror';
 
 import { mockClipboard } from '@/react/test-utils/clipboard';
 
@@ -132,4 +133,27 @@ test('should render with file name header when provided', async () => {
 
   expect(await findByText(fileName)).toBeInTheDocument();
   expect(await findByText(testValue)).toBeInTheDocument();
+});
+
+test('should register save keymap and call onSave command handler', () => {
+  const onSave = vi.fn();
+  const keymapOfSpy = vi.spyOn(codeMirrorKeymap, 'of');
+  render(<CodeEditor {...defaultProps} value="some content" onSave={onSave} />);
+
+  type KeyBindingLike = {
+    key?: string;
+    run?: (...args: unknown[]) => boolean;
+  };
+
+  const saveBinding = keymapOfSpy.mock.calls
+    .flatMap(([bindings]) =>
+      Array.isArray(bindings) ? (bindings as KeyBindingLike[]) : []
+    )
+    .find((binding: KeyBindingLike) => binding.key === 'Mod-s');
+
+  expect(saveBinding).toBeDefined();
+  expect(saveBinding?.run?.()).toBe(true);
+  expect(onSave).toHaveBeenCalledTimes(1);
+
+  keymapOfSpy.mockRestore();
 });
