@@ -65,6 +65,11 @@ func WithCli(
 
 	defer logs.CloseAndLogErr(cli.Client())
 
+	// Inline auths loaded from Docker config may outlive registries deleted from
+	// Portainer. Rebuild them from the current Portainer registry list for each
+	// operation so stale credentials are not used by stack deploys.
+	cli.ConfigFile().AuthConfigs = make(map[string]configtypes.AuthConfig, len(options.Registries))
+
 	for _, r := range options.Registries {
 		if r.ServerAddress == "" || r.ServerAddress == registry.DefaultNamespace {
 			r.ServerAddress = registry.IndexServer
