@@ -20,6 +20,7 @@ type SwarmStackDeploymentConfig struct {
 	prune         bool
 	isAdmin       bool
 	user          *portainer.User
+	networkAccess *stackutils.NetworkAccess
 	pullImage     bool
 	FileService   portainer.FileService
 	StackDeployer StackDeployer
@@ -38,6 +39,11 @@ func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityCon
 		return nil, fmt.Errorf("unable to load user information from the database: %w", err)
 	}
 
+	networkAccess, err := LoadNetworkAccessTx(tx, endpoint.ID, user)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load network access information from the database: %w", err)
+	}
+
 	registries, err := tx.Registry().ReadAll()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve registries from the database: %w", err)
@@ -54,6 +60,7 @@ func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityCon
 		prune:         prune,
 		isAdmin:       securityContext.IsAdmin,
 		user:          user,
+		networkAccess: networkAccess,
 		pullImage:     pullImage,
 		FileService:   fileService,
 		StackDeployer: deployer,
@@ -75,7 +82,7 @@ func (config *SwarmStackDeploymentConfig) Deploy() error {
 		return errors.New("file service or stack deployer cannot be nil")
 	}
 
-	if err := ValidateStackForUser(config.stack, config.endpoint, config.user, config.StackDeployer, config.FileService); err != nil {
+	if err := ValidateStackForUser(context.Background(), config.stack, config.endpoint, config.user, config.networkAccess, config.StackDeployer, config.FileService); err != nil {
 		return err
 	}
 

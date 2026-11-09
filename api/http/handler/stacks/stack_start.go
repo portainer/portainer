@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/deployments"
@@ -106,12 +107,28 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return httperror.BadRequest("Stack is already active", errors.New("Stack is already active"))
 	}
 
-	user, err := handler.DataStore.User().Read(securityContext.UserID)
-	if err != nil {
-		return httperror.InternalServerError("Unable to load user information from the database", err)
+	var (
+		user          *portainer.User
+		networkAccess *stackutils.NetworkAccess
+	)
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		user, err = tx.User().Read(securityContext.UserID)
+		if err != nil {
+			return fmt.Errorf("unable to load user information from the database: %w", err)
+		}
+
+		networkAccess, err = deployments.LoadNetworkAccessTx(tx, endpoint.ID, user)
+		if err != nil {
+			return fmt.Errorf("unable to load network access information: %w", err)
+		}
+
+		return nil
+	}); err != nil {
+		return httperror.InternalServerError("Unable to load user information", err)
 	}
 
-	if err := deployments.ValidateStackForUser(stack, endpoint, user, handler.StackDeployer, handler.FileService); err != nil {
+	if err := deployments.ValidateStackForUser(r.Context(), stack, endpoint, user, networkAccess, handler.StackDeployer, handler.FileService); err != nil {
 		return httperror.Forbidden("Stack files are not allowed for this user", err)
 	}
 

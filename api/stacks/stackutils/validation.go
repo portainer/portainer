@@ -26,9 +26,10 @@ type StackFileValidationConfig struct {
 	ProjectPath      string
 	StackName        string
 	DockerClient     *dockerclient.Client
+	NetworkAccess    *NetworkAccess
 }
 
-func IsValidStackFile(config StackFileValidationConfig) error {
+func IsValidStackFile(ctx context.Context, config StackFileValidationConfig) error {
 	composeConfigDetails := composetypes.ConfigDetails{
 		ConfigFiles: []composetypes.ConfigFile{{Content: config.Content}},
 		Environment: config.Env,
@@ -58,7 +59,7 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 	loadOptions := []func(*composeloader.Options){composeloader.WithSkipValidation, setProjectName, restrictResourceLoading}
 
 	if !config.SecuritySettings.AllowBindMountsForRegularUsers {
-		dict, err := composeloader.LoadModelWithContext(context.Background(), composeConfigDetails, loadOptions...)
+		dict, err := composeloader.LoadModelWithContext(ctx, composeConfigDetails, loadOptions...)
 		if err != nil {
 			return err
 		}
@@ -68,7 +69,7 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 		}
 	}
 
-	composeConfig, err := composeloader.LoadWithContext(context.Background(), composeConfigDetails, loadOptions...)
+	composeConfig, err := composeloader.LoadWithContext(ctx, composeConfigDetails, loadOptions...)
 	if err != nil {
 		return err
 	}
@@ -83,7 +84,7 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 				return fmt.Errorf("volume %q: unable to verify bind-mount status without a Docker client", volumeKey)
 			}
 
-			isBind, err := docker.InspectVolumeIsBindMount(context.Background(), config.DockerClient, volumeConfig.Name)
+			isBind, err := docker.InspectVolumeIsBindMount(ctx, config.DockerClient, volumeConfig.Name)
 			if err != nil {
 				return err
 			}
@@ -170,7 +171,54 @@ func IsValidStackFile(config StackFileValidationConfig) error {
 		}
 	}
 
-	return nil
+	return authorizeStackNetworks(ctx, composeConfig, config)
+}
+
+func authorizeStackNetworks(ctx context.Context, project *composetypes.Project, config StackFileValidationConfig) error {
+	if config.NetworkAccess != nil && config.NetworkAccess.Unrestricted {
+		return nil
+	}
+
+	var existingNetworks, stackNetworks []string
+
+	for _, net := range project.Networks {
+		if net.External {
+			existingNetworks = append(existingNetworks, net.Name)
+
+			continue
+		}
+
+		stackNetworks = append(stackNetworks, net.Name)
+	}
+
+	for _, service := range project.Services {
+		existingNetworks = append(existingNetworks, service.NetworkMode)
+
+		if service.Build != nil {
+			existingNetworks = append(existingNetworks, service.Build.Network)
+		}
+	}
+
+	existingNetworks = ReferencedNetworkNames(existingNetworks)
+	stackNetworks = ReferencedNetworkNames(stackNetworks)
+
+	if len(existingNetworks) == 0 && len(stackNetworks) == 0 {
+		return nil
+	}
+
+	if config.NetworkAccess == nil {
+		return errors.New("unable to verify network access without network access information")
+	}
+
+	if config.DockerClient == nil {
+		return errors.New("unable to verify network access without a Docker client")
+	}
+
+	if err := config.NetworkAccess.AuthorizeNetworks(ctx, config.DockerClient, existingNetworks, false); err != nil {
+		return err
+	}
+
+	return config.NetworkAccess.AuthorizeNetworks(ctx, config.DockerClient, stackNetworks, true)
 }
 
 func checkBuildContextSource(name, buildContext, projectPath string) error {
@@ -389,7 +437,7 @@ func extractImageRegistry(imageRef string) string {
 	return ""
 }
 
-func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService, dockerClient *dockerclient.Client) error {
+func ValidateStackFiles(ctx context.Context, stack *portainer.Stack, securitySettings *portainer.EndpointSecuritySettings, fileService portainer.FileService, dockerClient *dockerclient.Client, networkAccess *NetworkAccess) error {
 	env := BuildEnvMap(stack)
 	workingDir := filesystem.JoinPaths(stack.ProjectPath, path.Dir(stack.EntryPoint))
 
@@ -399,7 +447,7 @@ func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.Endp
 			return errors.Wrap(err, "failed to get stack file content")
 		}
 
-		if err := IsValidStackFile(StackFileValidationConfig{
+		if err := IsValidStackFile(ctx, StackFileValidationConfig{
 			Content:          stackContent,
 			SecuritySettings: securitySettings,
 			Env:              env,
@@ -407,6 +455,7 @@ func ValidateStackFiles(stack *portainer.Stack, securitySettings *portainer.Endp
 			ProjectPath:      stack.ProjectPath,
 			StackName:        stack.Name,
 			DockerClient:     dockerClient,
+			NetworkAccess:    networkAccess,
 		}); err != nil {
 			return errors.Wrap(err, "stack config file is invalid")
 		}

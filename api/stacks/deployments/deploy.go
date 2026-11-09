@@ -2,6 +2,7 @@ package deployments
 
 import (
 	"cmp"
+	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -149,7 +150,19 @@ func redeployWhenChangedSecondStage(
 		return err
 	}
 
-	if err := ValidateStackForUser(stack, endpoint, user, deployer, fileService); err != nil {
+	var networkAccess *stackutils.NetworkAccess
+	if stack.Type != portainer.KubernetesStack {
+		if err := datastore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var err error
+			networkAccess, err = LoadNetworkAccessTx(tx, endpoint.ID, user)
+
+			return err
+		}); err != nil {
+			return err
+		}
+	}
+
+	if err := ValidateStackForUser(context.Background(), stack, endpoint, user, networkAccess, deployer, fileService); err != nil {
 		return err
 	}
 

@@ -101,9 +101,10 @@ networks:
 `)
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := IsValidStackFile(StackFileValidationConfig{
+	err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 		Content:          yamlContent,
 		SecuritySettings: securitySettings,
+		NetworkAccess:    unrestrictedNetworks,
 	})
 	require.NoError(t, err)
 }
@@ -115,7 +116,7 @@ func TestIsValidStackFile_MissingEnvVarBehavior(t *testing.T) {
 	securitySettings := &portainer.EndpointSecuritySettings{}
 
 	t.Run("var on left side only passes (docker allows :9090)", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -125,12 +126,13 @@ services:
       - "${API_PORT}:9090"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.NoError(t, err)
 	})
 
 	t.Run("var on right side fails", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -140,12 +142,13 @@ services:
       - "9090:${API_PORT}"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.Error(t, err)
 	})
 
 	t.Run("var on both sides fails", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -155,6 +158,7 @@ services:
       - "${API_PORT}:${API_PORT}"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.Error(t, err)
 	})
@@ -162,7 +166,7 @@ services:
 
 func TestIsValidStackFile_EnvVarInBothPortFields(t *testing.T) {
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := IsValidStackFile(StackFileValidationConfig{
+	err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 		Content: []byte(`
 version: "3"
 
@@ -174,6 +178,7 @@ services:
 `),
 		SecuritySettings: securitySettings,
 		Env:              map[string]string{"API_PORT": "3000"},
+		NetworkAccess:    unrestrictedNetworks,
 	})
 	require.NoError(t, err)
 }
@@ -216,7 +221,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -243,7 +248,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -273,7 +278,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -303,7 +308,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -331,7 +336,7 @@ services:
 	securitySettings := &portainer.EndpointSecuritySettings{
 		AllowBindMountsForRegularUsers: false,
 	}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
 }
 
@@ -357,11 +362,11 @@ services:
 	}
 
 	// Denied when bind mounts are disabled for regular users
-	err := ValidateStackFiles(stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}, fileService, nil, unrestrictedNetworks)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
 
 	// Allowed when bind mounts are enabled
-	err = ValidateStackFiles(stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: true}, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: true}, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -394,7 +399,7 @@ configs:
 	securitySettings := &portainer.EndpointSecuritySettings{
 		AllowBindMountsForRegularUsers: false,
 	}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.ErrorContains(t, err, "reading a file from the host is disabled for non administrator users")
 }
 
@@ -432,7 +437,7 @@ configs:
 	securitySettings := &portainer.EndpointSecuritySettings{
 		AllowBindMountsForRegularUsers: false,
 	}
-	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -445,11 +450,12 @@ func TestIsValidStackFile_VolumeBindMountRestrictions(t *testing.T) {
 		t.Helper()
 
 		securitySettings := &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: securitySettings,
 			StackName:        stackName,
 			DockerClient:     dockerClient,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -604,11 +610,12 @@ func TestIsValidStackFile_ConfigAndSecretFileRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       workingDir,
 			ProjectPath:      workingDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -725,11 +732,12 @@ func TestIsValidStackFile_EnvFileRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       projectDir,
 			ProjectPath:      projectDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -814,11 +822,12 @@ func TestIsValidStackFile_LabelFileRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       projectDir,
 			ProjectPath:      projectDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -887,11 +896,12 @@ func TestIsValidStackFile_BuildContextRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       workingDir,
 			ProjectPath:      workingDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -972,11 +982,12 @@ func TestIsValidStackFile_DockerfileRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       workingDir,
 			ProjectPath:      workingDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1045,11 +1056,12 @@ func TestIsValidStackFile_BuildSSHRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       workingDir,
 			ProjectPath:      workingDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1121,11 +1133,12 @@ func TestIsValidStackFile_DevelopWatchRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       workingDir,
 			ProjectPath:      workingDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1205,11 +1218,12 @@ func TestIsValidStackFile_IncludeDisabledForNonAdmin(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       projectDir,
 			ProjectPath:      projectDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1284,11 +1298,12 @@ func TestIsValidStackFile_ExtendsFileRestrictions(t *testing.T) {
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
 		t.Helper()
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
 			WorkingDir:       projectDir,
 			ProjectPath:      projectDir,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1312,7 +1327,7 @@ services:
 	// extends climbing out of the stack directory is contained inside the
 	// project directory instead of escaping it, so it fails as a missing file
 	// rather than as an explicit rejection
-	err = IsValidStackFile(StackFileValidationConfig{
+	err = IsValidStackFile(t.Context(), StackFileValidationConfig{
 		Content: []byte(`
 services:
   api:
@@ -1323,6 +1338,7 @@ services:
 		SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false},
 		WorkingDir:       projectDir,
 		ProjectPath:      projectDir,
+		NetworkAccess:    unrestrictedNetworks,
 	})
 	require.Error(t, err)
 
@@ -1377,11 +1393,12 @@ configs:
     file: ` + fileRef + `
 `)
 
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          content,
 			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false},
 			WorkingDir:       workingDir,
 			ProjectPath:      projectPath,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 
 		if wantErrSubstring == "" {
@@ -1621,4 +1638,232 @@ func TestExtractImageRegistry(t *testing.T) {
 	for imageRef, expected := range cases {
 		require.Equal(t, expected, extractImageRegistry(imageRef), "imageRef=%s", imageRef)
 	}
+}
+
+func TestIsValidStackFile_NetworkRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const (
+		forbidden = "forbidden to join this network"
+		noClient  = "unable to verify network access"
+	)
+
+	dockerClient, access := newNetworkTestFixtures(t)
+
+	f := func(yamlContent string, dockerClient *client.Client, access *NetworkAccess, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          []byte(yamlContent),
+			SecuritySettings: &portainer.EndpointSecuritySettings{},
+			StackName:        "mystack",
+			DockerClient:     dockerClient,
+			NetworkAccess:    access,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// joining another user's network as an external network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: othernet
+`, dockerClient, access, forbidden)
+
+	// an external network keyed by the network's own name is checked too
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [othernet]
+networks:
+  othernet:
+    external: true
+`, dockerClient, access, forbidden)
+
+	// joining an external network the user owns is allowed
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: ownnet
+`, dockerClient, access, "")
+
+	// an external network that does not exist cannot be verified
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: missingnet
+`, dockerClient, access, "missingnet")
+
+	// a network_mode naming another user's network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: othernet
+`, dockerClient, access, forbidden)
+
+	// network modes that are not networks need no authorization
+	f(`
+services:
+  db:
+    image: alpine
+    network_mode: none
+  web:
+    image: alpine
+    network_mode: service:db
+  sidecar:
+    image: alpine
+    network_mode: container:abc123
+  local:
+    image: alpine
+    network_mode: bridge
+`, nil, nil, "")
+
+	// building on another user's network is forbidden
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: othernet
+`, dockerClient, access, forbidden)
+
+	// building on a network the user owns is allowed
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: ownnet
+`, dockerClient, access, "")
+
+	// building on a built-in network needs no authorization
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: host
+`, dockerClient, access, "")
+
+	// renaming a stack network to another user's existing network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    name: othernet
+`, dockerClient, access, forbidden)
+
+	// renaming a stack network to another user's stack network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [backend]
+networks:
+  backend:
+    name: otherstack_backend
+`, dockerClient, access, forbidden)
+
+	// renaming a stack network to a name that does not exist yet is allowed, the stack creates it
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    name: brandnew
+`, dockerClient, access, "")
+
+	// a stack network keeping its default name cannot adopt another user's network with that name
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [taken]
+networks:
+  taken: {}
+`, dockerClient, access, forbidden)
+
+	// a stack network created by a previous deploy of the same stack is allowed
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [own]
+networks:
+  own: {}
+`, dockerClient, access, "")
+
+	// a stack network keeping its default name that does not exist yet is allowed, the stack creates it
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [backend]
+networks:
+  backend: {}
+`, dockerClient, access, "")
+
+	// the implicit default network cannot be verified without a Docker client
+	f(`
+services:
+  web:
+    image: alpine
+`, nil, access, noClient)
+
+	// external networks cannot be verified without a Docker client
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: ownnet
+`, nil, access, noClient)
+
+	// external networks cannot be verified without network access information
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: ownnet
+`, dockerClient, nil, noClient)
+
+	// unrestricted access skips the check, so no Docker client is needed
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: othernet
+`, nil, &NetworkAccess{Unrestricted: true}, "")
 }

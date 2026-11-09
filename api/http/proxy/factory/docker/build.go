@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"net/url"
 
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/logs"
@@ -21,6 +22,38 @@ type postDockerfileRequest struct {
 }
 
 var ErrUploadedFilesNotFound = errors.New("uploaded files not found to build image")
+
+func BuildNetworkModes(request *http.Request) ([]string, error) {
+	networkModes := request.URL.Query()["networkmode"]
+
+	contentTypeHeader := request.Header.Get("Content-Type")
+	if contentTypeHeader == "" {
+		return networkModes, nil
+	}
+
+	mediaType, _, err := mime.ParseMediaType(contentTypeHeader)
+	if err != nil {
+		return nil, err
+	}
+
+	if mediaType != "application/x-www-form-urlencoded" {
+		return networkModes, nil
+	}
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Body = io.NopCloser(bytes.NewReader(body))
+
+	form, err := url.ParseQuery(string(body))
+	if err != nil {
+		return nil, err
+	}
+
+	return append(networkModes, form["networkmode"]...), nil
+}
 
 // buildOperation inspects the "Content-Type" header to determine if it needs to alter the request.
 //

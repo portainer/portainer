@@ -23,6 +23,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/slicesx"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	httprequest "github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
@@ -394,7 +395,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request, unversion
 		request.Method == http.MethodPost && match(requestPath, "/networks/*/disconnect"):
 
 		networkID := path.Base(path.Dir(requestPath))
-		return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+		return transport.networkConnectionOperation(request, networkID)
 
 	case request.Method == http.MethodGet && match(requestPath, "/networks/*"):
 		return transport.rewriteOperation(request, transport.networkInspectOperation)
@@ -470,11 +471,46 @@ func (transport *Transport) proxyTaskRequest(request *http.Request, unversionedP
 }
 
 func (transport *Transport) proxyBuildRequest(request *http.Request, _ string) (*http.Response, error) {
+	if err := transport.authorizeBuildNetworks(request); err != nil {
+		if errors.Is(err, ErrNetworkAccessForbidden) {
+			return utils.WriteAccessDeniedResponse()
+		}
+
+		return nil, err
+	}
+
 	if err := transport.updateDefaultGitBranch(request); err != nil {
 		return nil, err
 	}
 
 	return transport.interceptAndRewriteRequest(request, buildOperation)
+}
+
+func (transport *Transport) authorizeBuildNetworks(request *http.Request) error {
+	networkModes, err := BuildNetworkModes(request)
+	if err != nil {
+		return err
+	}
+
+	networkNames := stackutils.ReferencedNetworkNames(networkModes)
+	if len(networkNames) == 0 {
+		return nil
+	}
+
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return nil
+	}
+
+	getClient := func() (*dockerclient.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	}
+
+	return transport.authorizeReferencedNetworks(tokenData.ID, networkNames, getClient)
 }
 
 func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
@@ -620,17 +656,65 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 		return nil, err
 	}
 
-	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-	if resourceControl != nil {
-		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return utils.WriteAccessDeniedResponse()
-		}
-		return transport.executeDockerRequest(request)
+	getClient := func() (*dockerclient.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
 	}
 
-	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	canAccess, err := transport.userCanAccessResource(tokenData.ID, userTeamIDs, resourceControls, getClient, resourceID, dockerResourceID, resourceType)
 	if err != nil {
 		return nil, err
+	}
+
+	if !canAccess {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func (transport *Transport) userCanAccessResources(userID portainer.UserID, resourceIDs []string, resourceType portainer.ResourceControlType, getClient func() (*dockerclient.Client, error)) (bool, error) {
+	if len(resourceIDs) == 0 {
+		return true, nil
+	}
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	if err != nil {
+		return false, err
+	}
+
+	userTeamIDs := make([]portainer.TeamID, 0, len(teamMemberships))
+	for _, membership := range teamMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	if err != nil {
+		return false, err
+	}
+
+	for _, resourceID := range resourceIDs {
+		canAccess, err := transport.userCanAccessResource(userID, userTeamIDs, resourceControls, getClient, resourceID, "", resourceType)
+		if err != nil {
+			return false, err
+		}
+
+		if !canAccess {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+func (transport *Transport) userCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControls []portainer.ResourceControl, getClient func() (*dockerclient.Client, error), resourceID string, dockerResourceID string, resourceType portainer.ResourceControlType) (bool, error) {
+	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl != nil {
+		return authorization.UserCanAccessResource(userID, userTeamIDs, resourceControl), nil
+	}
+
+	client, err := getClient()
+	if err != nil {
+		return false, err
 	}
 	defer logs.CloseAndLogErr(client)
 
@@ -638,15 +722,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	// so get the real resource ID and retry with it
 	resourceID, err = getDockerResourceUUID(client, resourceType, resourceID)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	resourceControl = authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 	if resourceControl != nil {
-		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return utils.WriteAccessDeniedResponse()
-		}
-		return transport.executeDockerRequest(request)
+		return authorization.UserCanAccessResource(userID, userTeamIDs, resourceControl), nil
 	}
 
 	// If we still can't find the RC by provided ID or "real" (docker-extracted) ID
@@ -657,14 +738,10 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	}
 	inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(client, dockerResourceID, resourceType, resourceControls)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
-		return utils.WriteAccessDeniedResponse()
-	}
-
-	return transport.executeDockerRequest(request)
+	return inheritedResourceControl != nil && authorization.UserCanAccessResource(userID, userTeamIDs, inheritedResourceControl), nil
 }
 
 func getDockerResourceUUID(client *dockerclient.Client, resourceType portainer.ResourceControlType, resourceId string) (string, error) {

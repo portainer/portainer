@@ -1,17 +1,32 @@
 package deployments
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/docker/docker/client"
 )
 
-func ValidateStackForUser(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User, deployer BaseStackDeployer, fileService portainer.FileService) error {
+func LoadNetworkAccessTx(tx dataservices.DataStoreTx, endpointID portainer.EndpointID, user *portainer.User) (*stackutils.NetworkAccess, error) {
+	isAdmin, err := stackutils.UserIsAdminOrEndpointAdmin(user, endpointID)
+	if err != nil {
+		return nil, err
+	}
+
+	if isAdmin {
+		return &stackutils.NetworkAccess{Unrestricted: true}, nil
+	}
+
+	return stackutils.LoadNetworkAccess(tx.TeamMembership(), tx.ResourceControl(), endpointID, user.ID)
+}
+
+func ValidateStackForUser(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User, networkAccess *stackutils.NetworkAccess, deployer BaseStackDeployer, fileService portainer.FileService) error {
 	if stack.Type != portainer.DockerComposeStack && stack.Type != portainer.DockerSwarmStack {
 		return nil
 	}
@@ -41,5 +56,5 @@ func ValidateStackForUser(stack *portainer.Stack, endpoint *portainer.Endpoint, 
 		defer logs.CloseAndLogErr(dockerClient)
 	}
 
-	return stackutils.ValidateStackFiles(stack, &endpoint.SecuritySettings, fileService, dockerClient)
+	return stackutils.ValidateStackFiles(ctx, stack, &endpoint.SecuritySettings, fileService, dockerClient, networkAccess)
 }
