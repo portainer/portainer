@@ -87,7 +87,7 @@ export function useContainer<T>(
     nodeName?: string;
   },
   {
-    enabled,
+    enabled = true,
     select,
   }: { enabled?: boolean; select?(container: ContainerDetailsResponse): T } = {}
 ) {
