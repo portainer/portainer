@@ -109,7 +109,7 @@ func IsValidStackFile(ctx context.Context, config StackFileValidationConfig) err
 
 	for _, service := range composeConfig.Services {
 		if !config.SecuritySettings.AllowBindMountsForRegularUsers {
-			if len(service.VolumesFrom) > 0 {
+			if len(service.VolumesFrom) > 0 || service.UseAPISocket {
 				return errors.New("bind-mount disabled for non administrator users")
 			}
 
