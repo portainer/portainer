@@ -18,6 +18,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const allProfilesWildcard = "*"
+
 type StackFileValidationConfig struct {
 	Content          []byte
 	SecuritySettings *portainer.EndpointSecuritySettings
@@ -47,7 +49,9 @@ func IsValidStackFile(ctx context.Context, config StackFileValidationConfig) err
 
 		// `include` has its own env_file resolution that reads files directly
 		// from disk, bypassing ResourceLoaders entirely, so it can't be safely
-		// contained by restrictedResourceLoader below. Disable it outright.
+		// contained by restrictedResourceLoader below. Skipping it here keeps
+		// the loader from reading included files. checkIncludeDisabled called
+		// below rejects the file.
 		o.SkipInclude = true
 
 		o.ResourceLoaders = append(o.ResourceLoaders, restrictedResourceLoader{
@@ -56,11 +60,24 @@ func IsValidStackFile(ctx context.Context, config StackFileValidationConfig) err
 		})
 	}
 
-	loadOptions := []func(*composeloader.Options){composeloader.WithSkipValidation, setProjectName, restrictResourceLoading}
+	// The deployer activates profiles from COMPOSE_PROFILES in the stack env,
+	// so every service has to be validated regardless of its profile.
+	allProfiles := composeloader.WithProfiles([]string{allProfilesWildcard})
+
+	loadOptions := []func(*composeloader.Options){
+		composeloader.WithSkipValidation,
+		allProfiles,
+		setProjectName,
+		restrictResourceLoading,
+	}
 
 	if !config.SecuritySettings.AllowBindMountsForRegularUsers {
 		dict, err := composeloader.LoadModelWithContext(ctx, composeConfigDetails, loadOptions...)
 		if err != nil {
+			return err
+		}
+
+		if err := checkIncludeDisabled(dict); err != nil {
 			return err
 		}
 
@@ -252,6 +269,14 @@ func checkDockerfileSource(name, buildContext, dockerfile, projectPath string) e
 	return checkFileObjectSource("build dockerfile", name, dockerfile, projectPath)
 }
 
+func checkIncludeDisabled(dict map[string]any) error {
+	if _, ok := dict["include"]; ok {
+		return errors.New("include is disabled for non administrator users")
+	}
+
+	return nil
+}
+
 func checkEnvAndLabelFileSources(dict map[string]any, projectPath string) error {
 	services, _ := dict["services"].(map[string]any)
 
@@ -290,7 +315,7 @@ func toAnySlice(v any) []any {
 }
 
 // restrictedResourceLoader intercepts compose-go's resolution of `extends.file`
-// references (`include` is disabled outright, see SkipInclude above). The
+// references (`include` is rejected outright, see checkIncludeDisabled). The
 // extended file is read and merged into the compose model while the file is
 // being parsed, before any of the checks above ever run, so it is blocked
 // here instead: at the point compose-go resolves the path to a local file,
@@ -401,7 +426,12 @@ func checkComposeFileURLs(ctx context.Context, content []byte, env map[string]st
 		WorkingDir:  workingDir,
 	}
 
-	composeConfig, err := composeloader.LoadWithContext(ctx, composeConfigDetails, composeloader.WithSkipValidation)
+	composeConfig, err := composeloader.LoadWithContext(
+		ctx,
+		composeConfigDetails,
+		composeloader.WithSkipValidation,
+		composeloader.WithProfiles([]string{allProfilesWildcard}),
+	)
 	if err != nil {
 		return err
 	}
