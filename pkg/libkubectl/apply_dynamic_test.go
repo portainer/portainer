@@ -755,35 +755,3 @@ func TestIsManifestFile(t *testing.T) {
 		})
 	}
 }
-
-func TestBoolPtr(t *testing.T) {
-	tests := []struct {
-		name string
-		val  bool
-		want bool
-	}{
-		{
-			name: "true",
-			val:  true,
-			want: true,
-		},
-		{
-			name: "false",
-			val:  false,
-			want: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ptr := boolPtr(tt.val)
-			if ptr == nil {
-				t.Errorf("boolPtr() returned nil")
-				return
-			}
-			if *ptr != tt.want {
-				t.Errorf("boolPtr() = %v, want %v", *ptr, tt.want)
-			}
-		})
-	}
-}

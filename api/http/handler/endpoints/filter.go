@@ -103,7 +103,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 	var edgeAsync *bool
 	edgeAsyncParam, _ := request.RetrieveQueryParameter(r, "edgeAsync", true)
 	if edgeAsyncParam != "" {
-		edgeAsync = BoolAddr(edgeAsyncParam == "true")
+		edgeAsync = new(edgeAsyncParam == "true")
 	}
 
 	edgeDeviceUntrusted, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceUntrusted", true)

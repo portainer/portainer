@@ -106,14 +106,14 @@ func Test_Filter_edgeFilter(t *testing.T) {
 			"should show only trusted edge devices and other regular endpoints",
 			[]portainer.EndpointID{trustedEdgeAsync.ID, regularEndpoint.ID},
 			EnvironmentsQuery{
-				edgeAsync: BoolAddr(true),
+				edgeAsync: new(true),
 			},
 		},
 		{
 			"should show only untrusted edge devices and other regular endpoints",
 			[]portainer.EndpointID{untrustedEdgeAsync.ID, regularEndpoint.ID},
 			EnvironmentsQuery{
-				edgeAsync:           BoolAddr(true),
+				edgeAsync:           new(true),
 				edgeDeviceUntrusted: true,
 			},
 		},
@@ -121,7 +121,7 @@ func Test_Filter_edgeFilter(t *testing.T) {
 			"should show no edge devices",
 			[]portainer.EndpointID{regularEndpoint.ID, regularTrustedEdgeStandard.ID},
 			EnvironmentsQuery{
-				edgeAsync: BoolAddr(false),
+				edgeAsync: new(false),
 			},
 		},
 	}

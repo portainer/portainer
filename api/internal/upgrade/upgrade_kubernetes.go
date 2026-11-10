@@ -15,8 +15,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func ptr[T any](i T) *T { return &i }
-
 func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licenseKey, version string) error {
 	ctx := context.TODO()
 
@@ -53,8 +51,8 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 		},
 
 		Spec: batchv1.JobSpec{
-			TTLSecondsAfterFinished: ptr[int32](5 * 60), // cleanup after 5 minutes
-			BackoffLimit:            ptr[int32](0),
+			TTLSecondsAfterFinished: new(int32(5 * 60)), // cleanup after 5 minutes
+			BackoffLimit:            new(int32(0)),
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
 
@@ -85,7 +83,7 @@ func (service *service) upgradeKubernetes(environment *portainer.Endpoint, licen
 
 	watcher, err := jobsCli.Watch(ctx, metav1.ListOptions{
 		FieldSelector:  "metadata.name=" + taskName,
-		TimeoutSeconds: ptr[int64](60),
+		TimeoutSeconds: new(int64(60)),
 	})
 	if err != nil {
 		return errors.WithMessage(err, "failed to watch upgrade job")

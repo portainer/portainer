@@ -16,8 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func ptr[T any](i T) *T { return &i }
-
 func TestHandler_registryUpdate(t *testing.T) {
 	_, store := datastore.MustNewTestStore(t, false, false)
 
@@ -27,12 +25,12 @@ func TestHandler_registryUpdate(t *testing.T) {
 	require.NoError(t, err)
 
 	payload := registryUpdatePayload{
-		Name:           ptr("Updated test registry"),
-		URL:            ptr("http://example.org/feed"),
-		BaseURL:        ptr("http://example.org"),
-		Authentication: ptr(true),
-		Username:       ptr("username"),
-		Password:       ptr("password"),
+		Name:           new("Updated test registry"),
+		URL:            new("http://example.org/feed"),
+		BaseURL:        new("http://example.org"),
+		Authentication: new(true),
+		Username:       new("username"),
+		Password:       new("password"),
 	}
 
 	payloadBytes, err := json.Marshal(payload)
