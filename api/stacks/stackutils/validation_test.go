@@ -370,6 +370,47 @@ services:
 	require.NoError(t, err)
 }
 
+func TestValidateStackFiles_UseAPISocketBlockedForNonAdmin(t *testing.T) {
+	t.Parallel()
+
+	fileContent := []byte(`
+services:
+  pwn:
+    image: alpine
+    use_api_socket: true
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	err := ValidateStackFiles(
+		t.Context(),
+		stack,
+		&portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false},
+		fileService,
+		nil,
+		unrestrictedNetworks,
+	)
+	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+
+	err = ValidateStackFiles(
+		t.Context(),
+		stack,
+		&portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: true},
+		fileService,
+		nil,
+		unrestrictedNetworks,
+	)
+	require.NoError(t, err)
+}
+
 func TestValidateStackFiles_ConfigFileHostEscapeBlockedForNonAdmin(t *testing.T) {
 	t.Parallel()
 	fileContent := []byte(`
@@ -716,17 +757,17 @@ func TestIsValidStackFile_EnvFileRestrictions(t *testing.T) {
 	projectDir := filesystem.JoinPaths(root, "project")
 	outsideDir := filesystem.JoinPaths(root, "outside")
 
-	err := os.MkdirAll(projectDir, 0700)
+	err := os.MkdirAll(projectDir, 0o700)
 	require.NoError(t, err)
 
-	err = os.MkdirAll(outsideDir, 0700)
+	err = os.MkdirAll(outsideDir, 0o700)
 	require.NoError(t, err)
 
-	err = os.WriteFile(filesystem.JoinPaths(projectDir, "web.env"), []byte("HOST_PORT=3000\n"), 0600)
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "web.env"), []byte("HOST_PORT=3000\n"), 0o600)
 	require.NoError(t, err)
 
 	outsideFile := filesystem.JoinPaths(outsideDir, "secret.env")
-	err = os.WriteFile(outsideFile, []byte("HOST_PORT=3000\n"), 0600)
+	err = os.WriteFile(outsideFile, []byte("HOST_PORT=3000\n"), 0o600)
 	require.NoError(t, err)
 
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
@@ -806,17 +847,17 @@ func TestIsValidStackFile_LabelFileRestrictions(t *testing.T) {
 	projectDir := filesystem.JoinPaths(root, "project")
 	outsideDir := filesystem.JoinPaths(root, "outside")
 
-	err := os.MkdirAll(projectDir, 0700)
+	err := os.MkdirAll(projectDir, 0o700)
 	require.NoError(t, err)
 
-	err = os.MkdirAll(outsideDir, 0700)
+	err = os.MkdirAll(outsideDir, 0o700)
 	require.NoError(t, err)
 
-	err = os.WriteFile(filesystem.JoinPaths(projectDir, "labels.env"), []byte("owner=team-a\n"), 0600)
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "labels.env"), []byte("owner=team-a\n"), 0o600)
 	require.NoError(t, err)
 
 	outsideFile := filesystem.JoinPaths(outsideDir, "secret.env")
-	err = os.WriteFile(outsideFile, []byte("owner=team-a\n"), 0600)
+	err = os.WriteFile(outsideFile, []byte("owner=team-a\n"), 0o600)
 	require.NoError(t, err)
 
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
@@ -1212,7 +1253,7 @@ func TestIsValidStackFile_IncludeDisabledForNonAdmin(t *testing.T) {
 	root := t.TempDir()
 	projectDir := filesystem.JoinPaths(root, "project")
 
-	err := os.MkdirAll(projectDir, 0700)
+	err := os.MkdirAll(projectDir, 0o700)
 	require.NoError(t, err)
 
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
@@ -1280,19 +1321,19 @@ func TestIsValidStackFile_ExtendsFileRestrictions(t *testing.T) {
 	projectDir := filesystem.JoinPaths(root, "project")
 	outsideDir := filesystem.JoinPaths(root, "outside")
 
-	err := os.MkdirAll(projectDir, 0700)
+	err := os.MkdirAll(projectDir, 0o700)
 	require.NoError(t, err)
 
-	err = os.MkdirAll(outsideDir, 0700)
+	err = os.MkdirAll(outsideDir, 0o700)
 	require.NoError(t, err)
 
 	baseContent := []byte("services:\n  base:\n    image: nginx\n")
 
-	err = os.WriteFile(filesystem.JoinPaths(projectDir, "base.yml"), baseContent, 0600)
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "base.yml"), baseContent, 0o600)
 	require.NoError(t, err)
 
 	outsideFile := filesystem.JoinPaths(outsideDir, "base.yml")
-	err = os.WriteFile(outsideFile, baseContent, 0600)
+	err = os.WriteFile(outsideFile, baseContent, 0o600)
 	require.NoError(t, err)
 
 	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
