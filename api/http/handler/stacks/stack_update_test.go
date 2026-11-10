@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -131,9 +132,13 @@ func Test_updateStackInTx(t *testing.T) {
 		}
 		setup := setupUpdateStackInTxTest(t, stack, payload)
 
+		const missingEndpointID = portainer.EndpointID(2999)
+		stack.EndpointID = missingEndpointID
+		require.NoError(t, setup.store.Stack().Update(stack.ID, stack))
+
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
+			_, _, _, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, missingEndpointID)
 			return nil
 		})
 
@@ -554,4 +559,112 @@ func Test_updateComposeStack_Prune(t *testing.T) {
 		return deployer.DeployComposeCallCount == 1
 	}, 5*time.Second, 10*time.Millisecond, "DeployComposeStack should be called exactly once")
 	assert.True(t, deployer.LastPrune, "deployer should be invoked with prune=true")
+}
+
+func TestStackUpdate_RejectsRebindingToAnotherEnvironment(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	standardUser := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(standardUser))
+
+	allowedEndpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+
+	victimEndpoint := &portainer.Endpoint{ID: 2, Name: "victim", SecuritySettings: allowedEndpoint.SecuritySettings}
+	require.NoError(t, store.Endpoint().Create(victimEndpoint))
+
+	// Deploying status proves the endpoint guard runs before the deployment-state conflict check.
+	victimStack := &portainer.Stack{
+		ID:         1,
+		Name:       "shared-name",
+		EntryPoint: "docker-compose.yml",
+		EndpointID: victimEndpoint.ID,
+		Type:       portainer.DockerComposeStack,
+		Status:     portainer.StackStatusDeploying,
+	}
+	require.NoError(t, store.Stack().Create(victimStack))
+	require.NoError(t, store.ResourceControl().Create(&portainer.ResourceControl{
+		ID:                 1,
+		ResourceID:         stackutils.ResourceControlID(victimEndpoint.ID, victimStack.Name),
+		Type:               portainer.StackResourceControl,
+		AdministratorsOnly: true,
+	}))
+
+	shadowStack := &portainer.Stack{
+		ID:         2,
+		Name:       victimStack.Name,
+		EntryPoint: "docker-compose.yml",
+		EndpointID: allowedEndpoint.ID,
+		Type:       portainer.DockerComposeStack,
+	}
+	require.NoError(t, store.Stack().Create(shadowStack))
+	require.NoError(t, store.ResourceControl().Create(&portainer.ResourceControl{
+		ID:           2,
+		ResourceID:   stackutils.ResourceControlID(allowedEndpoint.ID, shadowStack.Name),
+		Type:         portainer.StackResourceControl,
+		UserAccesses: []portainer.UserResourceAccess{{UserID: standardUser.ID, AccessLevel: portainer.ReadWriteAccessLevel}},
+	}))
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+	handler.StackDeployer = testhelpers.NewTestStackDeployer()
+	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	jsonPayload, err := json.Marshal(&updateComposeStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	})
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(
+		http.MethodPut,
+		fmt.Sprintf("/stacks/%d?endpointId=%d", victimStack.ID, allowedEndpoint.ID),
+		bytes.NewBuffer(jsonPayload),
+	)
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
+		UserID: standardUser.ID,
+		User:   standardUser,
+	}))
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, rec.Body.String())
+
+	stored, err := store.Stack().Read(victimStack.ID)
+	require.NoError(t, err)
+	require.Equal(t, victimEndpoint.ID, stored.EndpointID, "stack must stay on its own environment")
+	require.Zero(t, stored.UpdateDate)
+}
+
+func TestStackUpdate_RejectsStackAlreadyDeploying(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	endpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+
+	stack := &portainer.Stack{
+		ID:         1,
+		Name:       "deploying",
+		EntryPoint: "docker-compose.yml",
+		EndpointID: endpoint.ID,
+		Type:       portainer.DockerComposeStack,
+		Status:     portainer.StackStatusDeploying,
+	}
+	require.NoError(t, store.Stack().Create(stack))
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+
+	jsonPayload, err := json.Marshal(&updateComposeStackPayload{StackFileContent: "version: '3'"})
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/stacks/%d?endpointId=%d", stack.ID, endpoint.ID), bytes.NewBuffer(jsonPayload))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true}))
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusConflict, rec.Code, rec.Body.String())
 }

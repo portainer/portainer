@@ -1,9 +1,12 @@
 package stacks
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"sync"
 	"testing"
@@ -15,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/stretchr/testify/require"
@@ -314,4 +318,100 @@ func TestDeployKubernetesStackInlineMarksRefStatusHealthy(t *testing.T) {
 	file := wf.Artifacts[0].Files[0]
 	require.Equal(t, portainer.SourceStatusHealthy, file.RefStatus)
 	require.Equal(t, portainer.SourceStatusHealthy, file.PathStatus)
+}
+
+func TestStackGitRedeploy_RejectsRebindingToAnotherEnvironment(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, false)
+
+	standardUser := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(standardUser))
+
+	allowedEndpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+
+	victimEndpoint := &portainer.Endpoint{ID: 2, Name: "victim", SecuritySettings: allowedEndpoint.SecuritySettings}
+	require.NoError(t, store.Endpoint().Create(victimEndpoint))
+
+	src := &portainer.Source{
+		Type: portainer.SourceTypeGit,
+		Git:  &gittypes.GitSource{URL: "https://github.com/portainer/portainer.git"},
+	}
+	require.NoError(t, store.Source().Create(source.InsecureNewAdminContext(), src))
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: 1,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID, Ref: "ref", Hash: "123"}},
+	}}}
+	require.NoError(t, store.Workflow().Create(wf))
+
+	victimStack := &portainer.Stack{
+		ID:         1,
+		Name:       "victim",
+		EndpointID: victimEndpoint.ID,
+		Type:       portainer.KubernetesStack,
+		WorkflowID: wf.ID,
+		Status:     portainer.StackStatusActive,
+	}
+	require.NoError(t, store.Stack().Create(victimStack))
+
+	deployer := &stubKubernetesDeployer{}
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+	handler.KubernetesDeployer = deployer
+
+	req := httptest.NewRequest(
+		http.MethodPut,
+		fmt.Sprintf("/stacks/%d/git/redeploy?endpointId=%d", victimStack.ID, allowedEndpoint.ID),
+		bytes.NewBufferString("{}"),
+	)
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
+		UserID:          standardUser.ID,
+		User:            standardUser,
+		UserMemberships: []portainer.TeamMembership{},
+	}))
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusForbidden, rr.Code, rr.Body.String())
+
+	stored, err := store.Stack().Read(victimStack.ID)
+	require.NoError(t, err)
+	require.Equal(t, victimEndpoint.ID, stored.EndpointID, "stack must stay on its own environment")
+}
+
+func TestStackGitRedeploy_RejectsMalformedEndpointID(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, false)
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+
+	req := httptest.NewRequest(http.MethodPut, "/stacks/1/git/redeploy?endpointId=not-a-number", bytes.NewBufferString("{}"))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true}))
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusBadRequest, rr.Code, rr.Body.String())
+}
+
+func TestStackGitRedeploy_RejectsStackWithoutGitConfig(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, false)
+
+	stack := &portainer.Stack{ID: 1, Name: "stack", EndpointID: 1, Type: portainer.DockerComposeStack}
+	require.NoError(t, store.Stack().Create(stack))
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+
+	req := httptest.NewRequest(http.MethodPut, "/stacks/1/git/redeploy?endpointId=1", bytes.NewBufferString("{}"))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true}))
+
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusBadRequest, rr.Code, rr.Body.String())
 }

@@ -9721,7 +9721,7 @@ export const stackUpdate = <ThrowOnError extends boolean = true>(
         .object({
           body: zStackUpdateBody,
           path: zStackUpdatePath,
-          query: zStackUpdateQuery,
+          query: zStackUpdateQuery.optional(),
         })
         .parseAsync(data),
     responseType: 'json',

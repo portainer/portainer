@@ -22869,11 +22869,11 @@ export type StackUpdateData = {
      */
     id: number;
   };
-  query: {
+  query?: {
     /**
-     * Environment identifier
+     * Environment(endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded.
      */
-    endpointId: number;
+    endpointId?: number;
   };
   url: '/stacks/{id}';
 };
@@ -23023,7 +23023,7 @@ export type StackUpdateGitData = {
   };
   query?: {
     /**
-     * Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack.
+     * Environment(Endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded.
      */
     endpointId?: number;
   };
@@ -23072,7 +23072,7 @@ export type StackGitRedeployData = {
   };
   query?: {
     /**
-     * Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack.
+     * Environment(Endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded.
      */
     endpointId?: number;
   };

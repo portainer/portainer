@@ -7204,7 +7204,7 @@ export const zStackUpdatePath = z.object({
 });
 
 export const zStackUpdateQuery = z.object({
-  endpointId: z.int(),
+  endpointId: z.int().optional(),
 });
 
 /**

@@ -59,7 +59,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param endpointId query int false "Environment(Endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded."
 // @param body body stackGitUpdatePayload true "Git configs for pull and redeploy a stack"
 // @success 200 {object} stackResponse "Success"
 // @failure 400 "Invalid request"
@@ -83,14 +83,30 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
-	} else if stack.WorkflowID == 0 {
-		msg := "No Git config in the found stack"
-		return httperror.InternalServerError(msg, errors.New(msg))
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	// This is a work-around for stacks created before Portainer version 1.18.0
+	// The EndpointID property is not set on these stacks. The optional EndpointID query parameter
+	// can be used to associate a valid environment(endpoint) identifier to the stack.
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	if err != nil {
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	resolvedEndpointID, httpErr := resolveStackEndpointID(securityContext, stack, portainer.EndpointID(endpointID))
+	if httpErr != nil {
+		return httpErr
+	}
+	stack.EndpointID = resolvedEndpointID
+
+	if stack.WorkflowID == 0 {
+		msg := "No Git config in the found stack"
+		return httperror.InternalServerError(msg, errors.New(msg))
 	}
 
 	var gitConfig *gittypes.RepoConfig
@@ -118,17 +134,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		if isUnique, err := handler.checkUniqueWebhookID(handler.DataStore, payload.AutoUpdate.Webhook); !isUnique || err != nil {
 			return httperror.Conflict("Webhook ID already exists", errors.New("webhook ID already exists"))
 		}
-	}
-
-	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment(endpoint)
-	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
-	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: endpointId", err)
-	}
-	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
